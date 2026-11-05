@@ -552,8 +552,7 @@ class MeshDataHandlerImpl(
         val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted
         val sender = nodeManager.getNodeById(dataPacket.from.orEmpty())
         // Muted for this one channel/conversation only (long-press a message); messages are still stored.
-        val senderMuted =
-            sender != null && senderMutePrefs.mutes.value.isSenderMuted(contactKey, sender.num, nowMillis)
+        val senderMuted = sender != null && senderMutePrefs.mutes.value.isSenderMuted(contactKey, sender.num, nowMillis)
         val nodeMuted = senderMuted || sender?.isMuted == true
         // A mention of our own id is a targeted ping, so it breaks through a muted channel/conversation
         // (per meshtastic/design#21). Node mute is a stronger, per-sender signal and stays authoritative:

@@ -165,9 +165,13 @@ class MainActivity : AppCompatActivity() {
             val dark =
                 when (theme) {
                     AppCompatDelegate.MODE_NIGHT_YES,
-                    MODE_MONO_DARK -> true
+                    MODE_MONO_DARK,
+                    -> true
+
                     AppCompatDelegate.MODE_NIGHT_NO,
-                    MODE_MONO_LIGHT -> false
+                    MODE_MONO_LIGHT,
+                    -> false
+
                     else -> isSystemInDarkTheme()
                 }
 
@@ -455,7 +459,8 @@ class MainActivity : AppCompatActivity() {
                             showToast(Res.string.map_layer_too_large, MAX_SHARED_MAP_FILE_MB)
 
                         SharedMapFileRejection.NOT_CONTENT_URI,
-                        SharedMapFileRejection.UNREADABLE -> showToast(Res.string.map_layer_open_failed)
+                        SharedMapFileRejection.UNREADABLE,
+                        -> showToast(Res.string.map_layer_open_failed)
                     }
                 }
 
@@ -465,7 +470,7 @@ class MainActivity : AppCompatActivity() {
                             displayName = load.file.displayName,
                             extensionOrMime = load.file.extensionOrMime,
                             read = { load.bytes },
-                        )
+                        ),
                     )
                     handleMeshtasticUri("$DEEP_LINK_BASE_URI/map".toUri())
                 }

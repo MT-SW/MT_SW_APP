@@ -168,11 +168,7 @@ class FakeCommandSender :
         return awaitedAdminResult
     }
 
-    override suspend fun sendAdminAndAwaitDelivery(
-        destNum: Int,
-        requestId: Int,
-        initFn: () -> AdminMessage,
-    ): Boolean {
+    override suspend fun sendAdminAndAwaitDelivery(destNum: Int, requestId: Int, initFn: () -> AdminMessage): Boolean {
         failCommandIfConfigured()
         mutableAdminRequests += AdminRequest(destNum, requestId, wantResponse = false, message = initFn())
         return true

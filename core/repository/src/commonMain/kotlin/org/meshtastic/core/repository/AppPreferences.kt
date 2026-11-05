@@ -155,26 +155,33 @@ interface UiPrefs {
 
     fun setAutoLoadChatImages(value: Boolean)
 
-    /** Whether the optional offline translator is switched on. Off by default: it needs a large model and lots of RAM. */
+    /**
+     * Whether the optional offline translator is switched on. Off by default: it needs a large model and lots of RAM.
+     */
     val translatorEnabled: StateFlow<Boolean>
 
     fun setTranslatorEnabled(value: Boolean)
 
-    /** Whether the optional offline assistant is switched on. Off by default: it needs a large model and lots of RAM. */
+    /**
+     * Whether the optional offline assistant is switched on. Off by default: it needs a large model and lots of RAM.
+     */
     val assistantEnabled: StateFlow<Boolean>
 
     fun setAssistantEnabled(value: Boolean)
 
     /**
      * Whether the assistant may use the internet (web search, reading a page, and keeping its knowledge about the app
-     * up to date). Off by default: with it off the assistant is fully offline and only model downloads started by
-     * the user touch the network.
+     * up to date). Off by default: with it off the assistant is fully offline and only model downloads started by the
+     * user touch the network.
      */
     val assistantInternetEnabled: StateFlow<Boolean>
 
     fun setAssistantInternetEnabled(value: Boolean)
 
-    /** Whether dictation records from a connected headset's microphone (Bluetooth, wired, USB) instead of the built-in one. */
+    /**
+     * Whether dictation records from a connected headset's microphone (Bluetooth, wired, USB) instead of the built-in
+     * one.
+     */
     val dictationExternalMic: StateFlow<Boolean>
         get() = kotlinx.coroutines.flow.MutableStateFlow(false)
 
@@ -192,12 +199,18 @@ interface UiPrefs {
 
     fun setAiSkipNpu(value: Boolean) {}
 
-    /** Whether the assistant keeps short notes and remembers some information between conversations (off by default until the user switches it on). */
+    /**
+     * Whether the assistant keeps short notes and remembers some information between conversations (off by default
+     * until the user switches it on).
+     */
     val assistantMemoryEnabled: StateFlow<Boolean>
 
     fun setAssistantMemoryEnabled(value: Boolean)
 
-    /** Whether the assistant's chat scrolls by itself to new messages (on by default); off lets the user keep reading where they are. */
+    /**
+     * Whether the assistant's chat scrolls by itself to new messages (on by default); off lets the user keep reading
+     * where they are.
+     */
     val assistantAutoScroll: StateFlow<Boolean>
         get() = kotlinx.coroutines.flow.MutableStateFlow(true)
 
@@ -205,14 +218,18 @@ interface UiPrefs {
 
     /**
      * Whether the header of the assistant's chat (the notice and the copy/save buttons) folds away when the chat is
-     * scrolled with a finger and comes back on the opposite swipe (on by default); useful on a strongly enlarged screen.
+     * scrolled with a finger and comes back on the opposite swipe (on by default); useful on a strongly enlarged
+     * screen.
      */
     val assistantHeaderCollapse: StateFlow<Boolean>
         get() = kotlinx.coroutines.flow.MutableStateFlow(true)
 
     fun setAssistantHeaderCollapse(value: Boolean) {}
 
-    /** True once the person has answered the offer of the configuration test of the assistant (shown once, then only on request). */
+    /**
+     * True once the person has answered the offer of the configuration test of the assistant (shown once, then only on
+     * request).
+     */
     val aiCompatAsked: StateFlow<Boolean>
         get() = kotlinx.coroutines.flow.MutableStateFlow(true)
 
@@ -324,8 +341,8 @@ interface UiPrefs {
     fun setCurrentInverted(nodeNum: Int, inverted: Boolean)
 
     /**
-     * Nodes whose "powered / battery percent" indication is swapped, for power monitors wired backwards. Display
-     * only; the current sign has its own switch ([currentInverted]).
+     * Nodes whose "powered / battery percent" indication is swapped, for power monitors wired backwards. Display only;
+     * the current sign has its own switch ([currentInverted]).
      */
     val batteryInverted: StateFlow<Set<Int>>
 

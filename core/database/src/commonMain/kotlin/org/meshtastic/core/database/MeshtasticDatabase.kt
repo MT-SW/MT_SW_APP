@@ -157,7 +157,8 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
         AutoMigration(from = 64, to = 65),
         AutoMigration(from = 65, to = 66),
-        // 66 -> 67 and 67 -> 68 are the manual MIGRATION_66_67 and MIGRATION_67_68 (the fork's own, guarded), applied via configureCommon().
+        // 66 -> 67 and 67 -> 68 are the manual MIGRATION_66_67 and MIGRATION_67_68 (the fork's own, guarded),
+        // applied via configureCommon().
     ],
     version = 68,
     exportSchema = true,
@@ -272,8 +273,8 @@ abstract class MeshtasticDatabase : RoomDatabase() {
          * name column) differs from the original's version 66 (custom node name column, no indices), so a database may
          * lack either part. Everything here is guarded, so it is safe for both. Adds, in place (no table is copied):
          * the `display_name` column of `nodes`, the MQTT root cache table, and three composite indices on `log` that
-         * serve the health screens' queries (`port_num, received_date`; `from_num, received_date`; and
-         * `port_num, from_num, received_date`, answered from the index alone).
+         * serve the health screens' queries (`port_num, received_date`; `from_num, received_date`; and `port_num,
+         * from_num, received_date`, answered from the index alone).
          */
         internal val MIGRATION_66_67: Migration =
             object : Migration(66, 67) {

@@ -160,18 +160,17 @@ class CommandSenderImpl(
         val fallback = getChannelIndex(toNum)
         val known = channelSet.value.settings.size.coerceAtLeast(1)
         val since = nowMillis - RECENT_CHANNEL_WINDOW_MS
-        val heard =
-            runCatching {
-                meshLogRepository
-                    .getLogsFromNodeSince(toNum, since)
-                    .firstOrNull()
-                    .orEmpty()
-                    .filter { log -> log.meshPacket?.let { it.decoded != null && it.channel in 0 until known } == true }
-                    .maxByOrNull { it.received_date }
-                    ?.meshPacket
-                    ?.channel
-            }
-                .getOrNull()
+        val heard = runCatching {
+            meshLogRepository
+                .getLogsFromNodeSince(toNum, since)
+                .firstOrNull()
+                .orEmpty()
+                .filter { log -> log.meshPacket?.let { it.decoded != null && it.channel in 0 until known } == true }
+                .maxByOrNull { it.received_date }
+                ?.meshPacket
+                ?.channel
+        }
+            .getOrNull()
         return heard ?: fallback
     }
 

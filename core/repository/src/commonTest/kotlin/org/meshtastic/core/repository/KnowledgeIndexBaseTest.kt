@@ -37,7 +37,8 @@ class KnowledgeIndexBaseTest {
         """
             .trimIndent()
 
-    private val manual = "# Podręcznik\n\n### Ustawienia\nAntena w aplikacji: kalkulator anten pokazuje straty toru kabla i złączy."
+    private val manual =
+        "# Podręcznik\n\n### Ustawienia\nAntena w aplikacji: kalkulator anten pokazuje straty toru kabla i złączy."
 
     private val index =
         KnowledgeIndex(
@@ -50,7 +51,11 @@ class KnowledgeIndexBaseTest {
     @Test
     fun baseIsFoundOnlyWhenAsked() {
         assertTrue(!index.lookup("czy bez anteny uszkodzę urządzenie spalenie", 2000).contains("Źródło"))
-        assertTrue(index.lookup("czy bez anteny uszkodzę urządzenie", 2000, includeBase = true).contains("Źródło: https://example.org/a"))
+        assertTrue(
+            index
+                .lookup("czy bez anteny uszkodzę urządzenie", 2000, includeBase = true)
+                .contains("Źródło: https://example.org/a"),
+        )
     }
 
     @Test

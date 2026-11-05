@@ -33,7 +33,14 @@ class KnowledgeIndex(documents: List<Document>) {
      */
     class Document(val title: String, val markdown: String, val news: Boolean = false, val base: Boolean = false)
 
-    private class Chunk(val title: String, val text: String, val stems: Set<String>, val news: Boolean, val base: Boolean, val keywords: String = "")
+    private class Chunk(
+        val title: String,
+        val text: String,
+        val stems: Set<String>,
+        val news: Boolean,
+        val base: Boolean,
+        val keywords: String = "",
+    )
 
     private val chunks: List<Chunk> = documents.flatMap { split(it.title, it.markdown, it.news, it.base) }
 
@@ -60,7 +67,8 @@ class KnowledgeIndex(documents: List<Document>) {
                     val titleStems = stems(chunk.title)
                     val inTitle = terms.count { it in titleStems }
                     score += inTitle * TITLE_BONUS
-                    // A title that holds every word of the question fits even when the word is in every page ("What is Meshtastic?").
+                    // A title that holds every word of the question fits even when the word is in every page ("What is
+                    // Meshtastic?").
                     if (inTitle == terms.size) score = maxOf(score, MIN_SCORE)
                     chunk to score
                 }
@@ -69,7 +77,9 @@ class KnowledgeIndex(documents: List<Document>) {
         val out = StringBuilder()
         for ((chunk, _) in ranked) {
             // The keywords of an entry of the base are given with it (the quoting counts them as part of the title).
-            val block = "[${chunk.title}]\n${chunk.text}" + if (chunk.base && chunk.keywords.isNotBlank()) "\nSłowa: ${chunk.keywords}" else ""
+            val block =
+                "[${chunk.title}]\n${chunk.text}" +
+                    if (chunk.base && chunk.keywords.isNotBlank()) "\nSłowa: ${chunk.keywords}" else ""
             if (out.length + block.length + 2 > maxChars) {
                 if (out.isEmpty()) out.append(block.take(maxChars))
                 break
@@ -91,7 +101,8 @@ class KnowledgeIndex(documents: List<Document>) {
         val result = ArrayList<Chunk>()
         var heading = pageTitle
         val body = StringBuilder()
-        // Words from a "Słowa:" / "Keywords:" line of an entry: searched, never shown (synonyms, English and Polish names).
+        // Words from a "Słowa:" / "Keywords:" line of an entry: searched, never shown (synonyms, English and Polish
+        // names).
         val hidden = StringBuilder()
         // An entry of the knowledge base stays whole (its keywords and source line with it).
         val limit = if (base) BASE_CHUNK else MAX_CHUNK
@@ -152,16 +163,22 @@ class KnowledgeIndex(documents: List<Document>) {
     private fun plain(line: String): String =
         line.replace(LINK, "$1").replace("**", "").replace("`", "").replace(BULLET, "• ")
 
-    private fun stems(text: String): Set<String> =
-        text
-            .lowercase()
-            .replace("wi-fi", "wifi")
-            .replace('ą', 'a').replace('ć', 'c').replace('ę', 'e').replace('ł', 'l').replace('ń', 'n')
-            .replace('ó', 'o').replace('ś', 's').replace('ź', 'z').replace('ż', 'z')
-            .split(SPLIT)
-            .filter { it.length >= MIN_WORD && it !in STOP_WORDS }
-            .map { if (it.length > STEM_LENGTH) it.take(STEM_LENGTH) else it }
-            .toSet()
+    private fun stems(text: String): Set<String> = text
+        .lowercase()
+        .replace("wi-fi", "wifi")
+        .replace('ą', 'a')
+        .replace('ć', 'c')
+        .replace('ę', 'e')
+        .replace('ł', 'l')
+        .replace('ń', 'n')
+        .replace('ó', 'o')
+        .replace('ś', 's')
+        .replace('ź', 'z')
+        .replace('ż', 'z')
+        .split(SPLIT)
+        .filter { it.length >= MIN_WORD && it !in STOP_WORDS }
+        .map { if (it.length > STEM_LENGTH) it.take(STEM_LENGTH) else it }
+        .toSet()
 
     private companion object {
         const val MIN_ROOM = 200
@@ -176,13 +193,57 @@ class KnowledgeIndex(documents: List<Document>) {
         val LINK = Regex("\\[([^\\]]*)]\\([^)]*\\)")
         val KEYWORDS = Regex("^(?:Słowa|Keywords):\\s*(.*)$", RegexOption.IGNORE_CASE)
         val BULLET = Regex("^\\s*[-*]\\s+")
-        val NEWS_WORDS = listOf("nowo", "zmian", "aktualiz", "wersj", "changelog", "what's new", "new in", "changed", "release")
+        val NEWS_WORDS =
+            listOf("nowo", "zmian", "aktualiz", "wersj", "changelog", "what's new", "new in", "changed", "release")
         val STOP_WORDS =
             setOf(
-                "jak", "jakie", "jaki", "czy", "gdzie", "mam", "mogę", "moge", "jest", "się", "sie", "jestem", "oraz",
-                "dla", "nie", "tak", "ale", "lub", "albo", "który", "która", "które", "tym", "tego", "tej", "ten",
-                "the", "and", "how", "what", "where", "when", "can", "does", "for", "with", "this", "that", "are",
-                "you", "your", "from", "have", "has", "was", "will", "not",
+                "jak",
+                "jakie",
+                "jaki",
+                "czy",
+                "gdzie",
+                "mam",
+                "mogę",
+                "moge",
+                "jest",
+                "się",
+                "sie",
+                "jestem",
+                "oraz",
+                "dla",
+                "nie",
+                "tak",
+                "ale",
+                "lub",
+                "albo",
+                "który",
+                "która",
+                "które",
+                "tym",
+                "tego",
+                "tej",
+                "ten",
+                "the",
+                "and",
+                "how",
+                "what",
+                "where",
+                "when",
+                "can",
+                "does",
+                "for",
+                "with",
+                "this",
+                "that",
+                "are",
+                "you",
+                "your",
+                "from",
+                "have",
+                "has",
+                "was",
+                "will",
+                "not",
             )
     }
 }

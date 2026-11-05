@@ -123,11 +123,10 @@ open class MeshLogRepositoryImpl(
             .map { list -> list.map { it.asExternalModel() } }
             .flowOn(dispatchers.io)
 
-    override fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> =
-        dbManager.currentDb
-            .flatMapLatest { it.meshLogDao().getLogsFromNodeSinceSlim(nodeNum, sinceTimestamp) }
-            .map { list -> list.map { it.asExternalModel() } }
-            .flowOn(dispatchers.io)
+    override fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getLogsFromNodeSinceSlim(nodeNum, sinceTimestamp) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
 
     /** The newest [MeshLog] of [portNum] from every sender. */
     override fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>> = dbManager.currentDb
@@ -202,29 +201,26 @@ open class MeshLogRepositoryImpl(
     override fun getRequestLogs(targetNodeNum: Int, portNum: PortNum): Flow<List<MeshLog>> =
         getRequestLogsLimited(targetNodeNum, portNum, DEFAULT_MAX_LOGS)
 
-    override fun getRequestLogsLimited(
-        targetNodeNum: Int,
-        portNum: PortNum,
-        maxItem: Int,
-    ): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb("MeshLogRepository.getRequestLogsLimited") {
-            it.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem)
-        }
-        .map { list ->
-            list
-                .map { it.asExternalModel() }
-                .filter { log ->
-                    val packet = log.fromRadio.packet ?: return@filter false
-                    log.fromNum == MeshLog.NODE_NUM_LOCAL &&
-                        packet.to == targetNodeNum &&
-                        packet.decoded?.want_response == true
-                }
-                // Sniffer mode's firmware hook can deliver a second echo of our own just-sent request packet
-                // (same packet.id, different MeshLog row) — collapse to one entry per request.
-                .distinctBy { it.fromRadio.packet?.id }
-        }
-        .distinctUntilChanged()
-        .conflate()
+    override fun getRequestLogsLimited(targetNodeNum: Int, portNum: PortNum, maxItem: Int): Flow<List<MeshLog>> =
+        dbManager
+            .observeCurrentDb("MeshLogRepository.getRequestLogsLimited") {
+                it.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem)
+            }
+            .map { list ->
+                list
+                    .map { it.asExternalModel() }
+                    .filter { log ->
+                        val packet = log.fromRadio.packet ?: return@filter false
+                        log.fromNum == MeshLog.NODE_NUM_LOCAL &&
+                            packet.to == targetNodeNum &&
+                            packet.decoded?.want_response == true
+                    }
+                    // Sniffer mode's firmware hook can deliver a second echo of our own just-sent request packet
+                    // (same packet.id, different MeshLog row) — collapse to one entry per request.
+                    .distinctBy { it.fromRadio.packet?.id }
+            }
+            .distinctUntilChanged()
+            .conflate()
 
     override fun getInboundRequestLogs(portNum: PortNum): Flow<List<MeshLog>> = dbManager
         .observeCurrentDb("MeshLogRepository.getInboundRequestLogs") {
@@ -263,7 +259,8 @@ open class MeshLogRepositoryImpl(
         .observeCurrentDb("MeshLogRepository.getMyNodeInfo") { db ->
             db.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS)
         }
-        // Newest first, and decoding stops at the first hit instead of reading every one of up to thousands of rows.
+        // Newest first, and decoding stops at the first hit instead of reading every one of up to thousands of
+        // rows.
         .mapLatest { list ->
             list.asSequence().map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo
         }

@@ -73,8 +73,7 @@ open class SnifferControlUseCase(
     private fun decodeLatestSnifferState(logs: List<MeshLog>, sinceMillis: Long): Boolean? = logs
         .filter { it.received_date >= sinceMillis }
         .mapNotNull { log ->
-            log.fromRadio
-                .packet
+            log.fromRadio.packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
@@ -106,8 +105,7 @@ open class SnifferControlUseCase(
 
     private fun decodeLatestFwPlusVersion(logs: List<MeshLog>): Int? = logs
         .mapNotNull { log ->
-            log.fromRadio
-                .packet
+            log.fromRadio.packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
@@ -127,8 +125,8 @@ open class SnifferControlUseCase(
 
     /**
      * Sets both local stats broadcast options (basic and extended, with intervals) on [destNum] at once. The radio
-     * answers with the state it ended up with, after it corrected the intervals -- see [localStatsConfigFlow]. To change
-     * one option only, the caller sends the other one's current value unchanged.
+     * answers with the state it ended up with, after it corrected the intervals -- see [localStatsConfigFlow]. To
+     * change one option only, the caller sends the other one's current value unchanged.
      */
     open suspend fun setLocalStatsConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
         radioController.setLocalStatsBroadcastConfig(destNum, config)
@@ -145,8 +143,7 @@ open class SnifferControlUseCase(
     private fun decodeLatestLocalStats(logs: List<MeshLog>, sinceMillis: Long): LocalStatsBroadcastConfig? = logs
         .filter { it.received_date >= sinceMillis }
         .mapNotNull { log ->
-            log.fromRadio
-                .packet
+            log.fromRadio.packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }

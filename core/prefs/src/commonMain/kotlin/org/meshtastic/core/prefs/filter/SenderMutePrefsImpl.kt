@@ -33,8 +33,7 @@ import org.meshtastic.core.repository.SenderMutePrefs
 
 /** Stores sender mutes as "key=until" strings next to the other message-filter settings. */
 @Single
-class SenderMutePrefsImpl(private val dataStore: FilterDataStore, dispatchers: CoroutineDispatchers) :
-    SenderMutePrefs {
+class SenderMutePrefsImpl(private val dataStore: FilterDataStore, dispatchers: CoroutineDispatchers) : SenderMutePrefs {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
     override val mutes: StateFlow<Map<String, Long>> =
@@ -59,7 +58,8 @@ class SenderMutePrefsImpl(private val dataStore: FilterDataStore, dispatchers: C
         val split = entry.lastIndexOf('=')
         val until = if (split > 0) entry.substring(split + 1).toLongOrNull() else null
         until?.let { entry.substring(0, split) to it }
-    }.toMap()
+    }
+        .toMap()
 
     companion object {
         val KEY_SENDER_MUTES = stringSetPreferencesKey("sender_mutes")

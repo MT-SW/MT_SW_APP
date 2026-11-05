@@ -423,8 +423,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         }
     }
 
-    private fun decodeLnaGains(raw: String?): Map<Int, Int> = raw
-        .orEmpty()
+    private fun decodeLnaGains(raw: String?): Map<Int, Int> = raw.orEmpty()
         .split(';')
         .mapNotNull { entry ->
             val parts = entry.split(':')

@@ -203,7 +203,9 @@ data class ReactionEntity(
     @ColumnInfo(name = "via_mqtt", defaultValue = "0") val viaMqtt: Boolean = false,
     @ColumnInfo(name = "transport_mechanism") val transportMechanism: Int? = null,
 ) {
-    /** A member (not an extension): Kotlin/Native cannot lower a suspend extension on an entity with nested annotations. */
+    /**
+     * A member (not an extension): Kotlin/Native cannot lower a suspend extension on an entity with nested annotations.
+     */
     suspend fun toReaction(getNode: suspend (userId: String?) -> Node?): Reaction {
         val user = getNode(userId)?.user ?: org.meshtastic.proto.User.Builder().also { wb -> wb.id = userId }.build()
         return Reaction(

@@ -25,7 +25,10 @@ enum class AiEngine {
     /** NLLB-200 through ONNX Runtime (translation only). */
     NLLB_ONNX,
 
-    /** GGUF language models through llama.cpp (a separate program the app starts; graphics card and processor share the work). */
+    /**
+     * GGUF language models through llama.cpp (a separate program the app starts; graphics card and processor share the
+     * work).
+     */
     LLAMA_CPP,
 
     /** Whisper speech recognition models through whisper.cpp (dictation only). */
@@ -48,8 +51,6 @@ enum class AiPlatform {
 
 /** The licence a model is distributed under; the model list shows its name and a link to the model's page. */
 enum class AiLicense(val label: String) {
-    /** NLLB-200 (Meta): Creative Commons BY-NC 4.0, non-commercial use only. */
-
     /** Apache License 2.0 (Gemma 4, Qwen 3.5, Bielik). */
     APACHE_2_0("Apache 2.0"),
 
@@ -61,6 +62,7 @@ enum class AiLicense(val label: String) {
 
     /** Not checked by the app: the licence is on the model's page. */
     SEE_MODEL_PAGE("see the model page"),
+
 }
 
 /** What a file of a model is for. */
@@ -72,7 +74,10 @@ enum class AiFileKind {
     HEARING,
 }
 
-/** One file of a model that is downloaded as a whole. [sizeMb] is the real size (used to see that a download is complete). */
+/**
+ * One file of a model that is downloaded as a whole. [sizeMb] is the real size (used to see that a download is
+ * complete).
+ */
 data class AiModelFile(
     val url: String,
     val fileName: String,
@@ -99,8 +104,9 @@ data class AiModelInfo(
     val license: AiLicense,
     val files: List<AiModelFile>,
     /**
-     * Other files for phones, when the version used on computers does not suit a phone's graphics card or NPU (the K-quant
-     * files write nonsense or crash on Adreno phones; Q4_0 is handled by those engines). Null: the same files everywhere.
+     * Other files for phones, when the version used on computers does not suit a phone's graphics card or NPU (the
+     * K-quant files write nonsense or crash on Adreno phones; Q4_0 is handled by those engines). Null: the same files
+     * everywhere.
      */
     val phoneFiles: List<AiModelFile>? = null,
     val platforms: Set<AiPlatform>,
@@ -111,14 +117,15 @@ data class AiModelInfo(
      */
     val quietThinking: Boolean = true,
     /**
-     * False for a model that must never try the Intel NPU (OpenVINO). No model has it now: every model tries the NPU first,
-     * and one that fails there is not tried again for a week (a new NPU driver gives it a new try at once).
+     * False for a model that must never try the Intel NPU (OpenVINO). No model has it now: every model tries the NPU
+     * first, and one that fails there is not tried again for a week (a new NPU driver gives it a new try at once).
      */
     val intelNpu: Boolean = true,
     /**
      * True for a model that gave nonsense on the NPU and the graphics card of a phone with the normal settings (seen:
      * DeepSeek R1 Distill Qwen 1.5B on a Snapdragon). On a phone the NPU and the graphics card are then tried with
-     * full-precision attention and cache (no flash attention, 32-bit cache) first; if that fails too, the processor runs it.
+     * full-precision attention and cache (no flash attention, 32-bit cache) first; if that fails too, the processor
+     * runs it.
      */
     val phoneSafeCache: Boolean = false,
     val recommendedFor: Set<AiRole> = emptySet(),
@@ -127,17 +134,22 @@ data class AiModelInfo(
     val pageUrl: String = "",
 ) {
     /** True when the engine of this model exists on the platform the app runs on. */
-    val engineReady: Boolean get() = AiModels.platform in platforms && engine !in AiModels.unavailableEngines
+    val engineReady: Boolean
+        get() = AiModels.platform in platforms && engine !in AiModels.unavailableEngines
 
     /** The files this system downloads and uses: the phone's own list on a phone when there is one. */
-    val activeFiles: List<AiModelFile> get() = if (AiModels.platform != AiPlatform.DESKTOP) phoneFiles ?: files else files
+    val activeFiles: List<AiModelFile>
+        get() = if (AiModels.platform != AiPlatform.DESKTOP) phoneFiles ?: files else files
 
     fun canDo(role: AiRole): Boolean = role in roles
 }
 
 /** The list of models offered by the app (light to strong, grouped in families). */
 object AiModels {
-    /** Removed: the model is licensed CC BY-NC (non-commercial), which does not fit a GPL-3.0 project. Kept only to clean up. */
+    /**
+     * Removed: the model is licensed CC BY-NC (non-commercial), which does not fit a GPL-3.0 project. Kept only to
+     * clean up.
+     */
     const val NLLB_600M_ID = "nllb-600m"
 
     // The ids differ from those of the old engine (gemma4-e2b, ...) so old and new can never be mixed up.
@@ -176,8 +188,8 @@ object AiModels {
     const val WHISPER_TURBO_Q8 = "whisper-large-v3-turbo-q8"
 
     /**
-     * The family of the models that belong to no main family (PLLuM, curiosities for people who want to try them). Not a
-     * name to show: the settings translate it, and put a note about curiosities above the list.
+     * The family of the models that belong to no main family (PLLuM, curiosities for people who want to try them). Not
+     * a name to show: the settings translate it, and put a note about curiosities above the list.
      */
     const val OTHER_FAMILY = "Other"
 
@@ -187,10 +199,14 @@ object AiModels {
     /** True when the assistant screen exists. */
     const val ASSISTANT_SCREEN_READY = true
 
-    /** Which kind of app is running; set once at start by the platform's own module. Decides which models are offered. */
+    /**
+     * Which kind of app is running; set once at start by the platform's own module. Decides which models are offered.
+     */
     @Volatile var platform: AiPlatform = AiPlatform.ANDROID
 
-    /** Engines that cannot run on this particular system (for example the speech program on a Mac); set once at start. */
+    /**
+     * Engines that cannot run on this particular system (for example the speech program on a Mac); set once at start.
+     */
     @Volatile var unavailableEngines: Set<AiEngine> = emptySet()
 
     private const val HF = "https://huggingface.co/"
@@ -218,14 +234,16 @@ object AiModels {
             minDeviceRamGb = 6,
             license = AiLicense.APACHE_2_0,
             files =
-            listOf(
-                hf("google/gemma-4-E2B-it-qat-q4_0-gguf", "gemma-4-E2B_q4_0-it.gguf", 3350),
-                hf(G4_E_MMPROJ_REPO, "mmproj-gemma-4-E2B-it-Q8_0.gguf", 557, AiFileKind.HEARING),
-            ),
+                listOf(
+                    hf("google/gemma-4-E2B-it-qat-q4_0-gguf", "gemma-4-E2B_q4_0-it.gguf", 3350),
+                    hf(G4_E_MMPROJ_REPO, "mmproj-gemma-4-E2B-it-Q8_0.gguf", 557, AiFileKind.HEARING),
+                ),
             platforms = BOTH,
             hearing = true,
-            descriptionPl = "Mały model Google (wersja QAT od Google): tłumaczy, odpowiada i rozumie mowę. Szybki, nawet na samym procesorze.",
-            descriptionEn = "Small Google model (Google's own QAT version): translates, answers and understands speech. Fast, even on the processor alone.",
+            descriptionPl =
+                "Mały model Google (wersja QAT od Google): tłumaczy, odpowiada i rozumie mowę. Szybki, nawet na samym procesorze.",
+            descriptionEn =
+                "Small Google model (Google's own QAT version): translates, answers and understands speech. Fast, even on the processor alone.",
             pageUrl = "${HF}google/gemma-4-E2B-it-qat-q4_0-gguf",
         )
 
@@ -241,15 +259,16 @@ object AiModels {
             minDeviceRamGb = 8,
             license = AiLicense.APACHE_2_0,
             files =
-            listOf(
-                hf("google/gemma-4-E4B-it-qat-q4_0-gguf", "gemma-4-E4B_q4_0-it.gguf", 5155),
-                hf("ggml-org/gemma-4-E4B-it-GGUF", "mmproj-gemma-4-E4B-it-Q8_0.gguf", 560, AiFileKind.HEARING),
-            ),
+                listOf(
+                    hf("google/gemma-4-E4B-it-qat-q4_0-gguf", "gemma-4-E4B_q4_0-it.gguf", 5155),
+                    hf("ggml-org/gemma-4-E4B-it-GGUF", "mmproj-gemma-4-E4B-it-Q8_0.gguf", 560, AiFileKind.HEARING),
+                ),
             platforms = BOTH,
             hearing = true,
             recommendedFor = setOf(AiRole.ASSISTANT, AiRole.TRANSLATOR),
             descriptionPl = "Dobry początek: lepsze odpowiedzi niż E2B, rozumie mowę. Na komputery od 8 GB RAM.",
-            descriptionEn = "A good start: better answers than E2B, understands speech. For computers from 8 GB of RAM.",
+            descriptionEn =
+                "A good start: better answers than E2B, understands speech. For computers from 8 GB of RAM.",
             pageUrl = "${HF}google/gemma-4-E4B-it-qat-q4_0-gguf",
         )
 
@@ -267,8 +286,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("google/gemma-4-12B-it-qat-q4_0-gguf", "gemma-4-12b-it-qat-q4_0.gguf", 6976)),
             platforms = BOTH,
-            descriptionPl = "Mocniejszy model Google. Zmieści się częściowo na karcie graficznej, resztę weźmie procesor.",
-            descriptionEn = "A stronger Google model. Part of it fits on the graphics card, the processor takes the rest.",
+            descriptionPl =
+                "Mocniejszy model Google. Zmieści się częściowo na karcie graficznej, resztę weźmie procesor.",
+            descriptionEn =
+                "A stronger Google model. Part of it fits on the graphics card, the processor takes the rest.",
             pageUrl = "${HF}google/gemma-4-12B-it-qat-q4_0-gguf",
         )
 
@@ -286,8 +307,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("google/gemma-4-26B-A4B-it-qat-q4_0-gguf", "gemma-4-26B_q4_0-it.gguf", 14439)),
             platforms = BOTH,
-            descriptionPl = "Bardzo duży model, ale w trakcie pracy używa tylko części (4 mld parametrów), więc jest szybszy niż wielkość sugeruje. Wymaga dużo RAM.",
-            descriptionEn = "A very large model that uses only part of itself while working (4 billion parameters), so it is faster than its size suggests. Needs a lot of RAM.",
+            descriptionPl =
+                "Bardzo duży model, ale w trakcie pracy używa tylko części (4 mld parametrów), więc jest szybszy niż wielkość sugeruje. Wymaga dużo RAM.",
+            descriptionEn =
+                "A very large model that uses only part of itself while working (4 billion parameters), so it is faster than its size suggests. Needs a lot of RAM.",
             pageUrl = "${HF}google/gemma-4-26B-A4B-it-qat-q4_0-gguf",
         )
 
@@ -305,8 +328,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.5-0.8B-GGUF", "Qwen3.5-0.8B-Q4_0.gguf", 507)),
             platforms = BOTH,
-            descriptionPl = "Najmniejszy i najszybszy model: do bardzo prostych pytań i najsłabszych telefonów. Odpowiada krótko, polski prosty.",
-            descriptionEn = "The smallest and fastest model: for very simple questions and the weakest phones. Answers briefly, simple Polish.",
+            descriptionPl =
+                "Najmniejszy i najszybszy model: do bardzo prostych pytań i najsłabszych telefonów. Odpowiada krótko, polski prosty.",
+            descriptionEn =
+                "The smallest and fastest model: for very simple questions and the weakest phones. Answers briefly, simple Polish.",
             pageUrl = "${HF}unsloth/Qwen3.5-0.8B-GGUF",
         )
 
@@ -343,8 +368,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.5-4B-GGUF", "Qwen3.5-4B-Q4_0.gguf", 2464)),
             platforms = BOTH,
-            descriptionPl = "Mały model dobrze radzący sobie z narzędziami i rozumowaniem; polski słabszy niż w modelach Google i Bielik.",
-            descriptionEn = "A small model that handles tools and reasoning well; its Polish is weaker than the Google and Bielik models.",
+            descriptionPl =
+                "Mały model dobrze radzący sobie z narzędziami i rozumowaniem; polski słabszy niż w modelach Google i Bielik.",
+            descriptionEn =
+                "A small model that handles tools and reasoning well; its Polish is weaker than the Google and Bielik models.",
             pageUrl = "${HF}unsloth/Qwen3.5-4B-GGUF",
         )
 
@@ -381,8 +408,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.6-35B-A3B-GGUF", "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf", 22630)),
             platforms = BOTH,
-            descriptionPl = "Bardzo duży model, który w trakcie pracy używa tylko części (3 mld parametrów). Tylko dla komputerów z dużą ilością RAM.",
-            descriptionEn = "A very large model that uses only part of itself while working (3 billion parameters). Only for computers with a lot of RAM.",
+            descriptionPl =
+                "Bardzo duży model, który w trakcie pracy używa tylko części (3 mld parametrów). Tylko dla komputerów z dużą ilością RAM.",
+            descriptionEn =
+                "A very large model that uses only part of itself while working (3 billion parameters). Only for computers with a lot of RAM.",
             pageUrl = "${HF}unsloth/Qwen3.6-35B-A3B-GGUF",
         )
 
@@ -416,10 +445,13 @@ object AiModels {
             ramMb = 2600,
             minDeviceRamGb = 4,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("speakleash/Bielik-1.5B-v3.0-Instruct-GGUF", "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf", 1700)),
+            files =
+                listOf(hf("speakleash/Bielik-1.5B-v3.0-Instruct-GGUF", "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf", 1700)),
             platforms = BOTH,
-            descriptionPl = "Najmniejszy polski model od SpeakLeash: lekki, dobrze radzi sobie z polskim w prostych rozmowach.",
-            descriptionEn = "The smallest Polish model from SpeakLeash: light, handles Polish well in simple conversations.",
+            descriptionPl =
+                "Najmniejszy polski model od SpeakLeash: lekki, dobrze radzi sobie z polskim w prostych rozmowach.",
+            descriptionEn =
+                "The smallest Polish model from SpeakLeash: light, handles Polish well in simple conversations.",
             pageUrl = "${HF}speakleash/Bielik-1.5B-v3.0-Instruct-GGUF",
         )
 
@@ -434,7 +466,8 @@ object AiModels {
             ramMb = 6500,
             minDeviceRamGb = 8,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("speakleash/Bielik-4.5B-v3.0-Instruct-GGUF", "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf", 5061)),
+            files =
+                listOf(hf("speakleash/Bielik-4.5B-v3.0-Instruct-GGUF", "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf", 5061)),
             platforms = BOTH,
             descriptionPl = "Polski model od SpeakLeash, mały; bardzo dobra polszczyzna.",
             descriptionEn = "A Polish model from SpeakLeash, small; very good Polish.",
@@ -453,13 +486,13 @@ object AiModels {
             minDeviceRamGb = 8,
             license = AiLicense.APACHE_2_0,
             files =
-            listOf(
-                hf(
-                    "speakleash/Bielik-Minitron-7B-v3.0-Instruct-GGUF",
-                    "minitron-Bielik-7B-v3.0-Instruct-GGUF.Q4_K_M.gguf",
-                    4502,
+                listOf(
+                    hf(
+                        "speakleash/Bielik-Minitron-7B-v3.0-Instruct-GGUF",
+                        "minitron-Bielik-7B-v3.0-Instruct-GGUF.Q4_K_M.gguf",
+                        4502,
+                    )
                 ),
-            ),
             platforms = BOTH,
             descriptionPl = "Polski model od SpeakLeash, odchudzona wersja 11B: dobra polszczyzna, mniejsze wymagania.",
             descriptionEn = "A Polish model from SpeakLeash, a slimmed-down 11B: good Polish, lower requirements.",
@@ -477,7 +510,8 @@ object AiModels {
             ramMb = 8500,
             minDeviceRamGb = 12,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("speakleash/Bielik-11B-v3.0-Instruct-GGUF", "Bielik-11B-v3.0-Instruct.Q4_K_M.gguf", 6724)),
+            files =
+                listOf(hf("speakleash/Bielik-11B-v3.0-Instruct-GGUF", "Bielik-11B-v3.0-Instruct.Q4_K_M.gguf", 6724)),
             platforms = BOTH,
             descriptionPl = "Polski model od SpeakLeash, najlepsza polszczyzna w tej liście.",
             descriptionEn = "A Polish model from SpeakLeash, the best Polish in this list.",
@@ -495,10 +529,13 @@ object AiModels {
             ramMb = 9500,
             minDeviceRamGb = 12,
             license = AiLicense.SEE_MODEL_PAGE,
-            files = listOf(hf("mradermacher/PLLuM-12B-instruct-2512-GGUF", "PLLuM-12B-instruct-2512.Q4_K_M.gguf", 7477)),
+            files =
+                listOf(hf("mradermacher/PLLuM-12B-instruct-2512-GGUF", "PLLuM-12B-instruct-2512.Q4_K_M.gguf", 7477)),
             platforms = BOTH,
-            descriptionPl = "Polski model (polskie ministerstwo cyfryzacji i uczelnie): dobry język urzędowy i ogólny. Plik pochodzi od osoby trzeciej (mradermacher).",
-            descriptionEn = "A Polish model (made for the Polish government and universities): good official and general language. The file comes from a third party (mradermacher).",
+            descriptionPl =
+                "Polski model (polskie ministerstwo cyfryzacji i uczelnie): dobry język urzędowy i ogólny. Plik pochodzi od osoby trzeciej (mradermacher).",
+            descriptionEn =
+                "A Polish model (made for the Polish government and universities): good official and general language. The file comes from a third party (mradermacher).",
             pageUrl = "${HF}mradermacher/PLLuM-12B-instruct-2512-GGUF",
         )
 
@@ -515,8 +552,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("ggml-org/gpt-oss-20b-GGUF", "gpt-oss-20b-MXFP4.gguf", 12390)),
             platforms = BOTH,
-            descriptionPl = "Otwarty model od OpenAI. Ciekawostka do własnych testów: zajmuje dużo pamięci i długo myśli przed odpowiedzią.",
-            descriptionEn = "An open model from OpenAI. A curiosity for your own tests: it takes a lot of memory and thinks for a long time before it answers.",
+            descriptionPl =
+                "Otwarty model od OpenAI. Ciekawostka do własnych testów: zajmuje dużo pamięci i długo myśli przed odpowiedzią.",
+            descriptionEn =
+                "An open model from OpenAI. A curiosity for your own tests: it takes a lot of memory and thinks for a long time before it answers.",
             pageUrl = "${HF}ggml-org/gpt-oss-20b-GGUF",
         )
 
@@ -549,14 +588,20 @@ object AiModels {
             ramMb = 3300,
             minDeviceRamGb = 6,
             license = AiLicense.MIT,
-            files = listOf(hf("bartowski/microsoft_Phi-4-mini-instruct-GGUF", "microsoft_Phi-4-mini-instruct-Q4_0.gguf", 2386)),
+            files =
+                listOf(
+                    hf("bartowski/microsoft_Phi-4-mini-instruct-GGUF", "microsoft_Phi-4-mini-instruct-Q4_0.gguf", 2386)
+                ),
             platforms = BOTH,
             descriptionPl = "Mały model od Microsoftu. Ciekawostka do własnych testów: szybki, ale słaby po polsku.",
             descriptionEn = "A small model from Microsoft. A curiosity for your own tests: fast, but weak in Polish.",
             pageUrl = "${HF}bartowski/microsoft_Phi-4-mini-instruct-GGUF",
         )
 
-    /** One of the "thinking" DeepSeek R1 models (the whole family is offered on every platform; the list shows what each needs). */
+    /**
+     * One of the "thinking" DeepSeek R1 models (the whole family is offered on every platform; the list shows what each
+     * needs).
+     */
     private fun deepSeek(
         id: String,
         name: String,
@@ -569,28 +614,35 @@ object AiModels {
         pl: String,
         en: String,
         phoneSafeCache: Boolean = false,
-    ) = AiModelInfo(
-        id = id,
-        phoneSafeCache = phoneSafeCache,
-        name = name,
-        family = DEEPSEEK_FAMILY,
-        engine = AiEngine.LLAMA_CPP,
-        roles = TEXT,
-        sizeMb = mb,
-        ramMb = ramMb,
-        minDeviceRamGb = minGb,
-        license = license,
-        files = listOf(hf(repo, file, mb)),
-        platforms = BOTH,
-        descriptionPl = pl,
-        descriptionEn = en,
-        pageUrl = "$HF$repo",
-    )
+    ) =
+        AiModelInfo(
+            id = id,
+            phoneSafeCache = phoneSafeCache,
+            name = name,
+            family = DEEPSEEK_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = mb,
+            ramMb = ramMb,
+            minDeviceRamGb = minGb,
+            license = license,
+            files = listOf(hf(repo, file, mb)),
+            platforms = BOTH,
+            descriptionPl = pl,
+            descriptionEn = en,
+            pageUrl = "$HF$repo",
+        )
 
     val DeepSeek15b =
         deepSeek(
-            DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf", 1807, 2900, 6, AiLicense.MIT,
+            DEEPSEEK_15B,
+            "DeepSeek R1 Distill Qwen 1.5B",
+            "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf",
+            1807,
+            2900,
+            6,
+            AiLicense.MIT,
             "Najmniejszy model „myślący” DeepSeek: zalecane minimum to 6 GB RAM, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
             "The smallest \"thinking\" DeepSeek model: recommended minimum is 6 GB of RAM, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
             phoneSafeCache = true,
@@ -598,32 +650,56 @@ object AiModels {
 
     val DeepSeek7b =
         deepSeek(
-            DEEPSEEK_7B, "DeepSeek R1 Distill Qwen 7B", "bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-7B-Q4_0.gguf", 4238, 6600, 12, AiLicense.MIT,
+            DEEPSEEK_7B,
+            "DeepSeek R1 Distill Qwen 7B",
+            "bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-7B-Q4_0.gguf",
+            4238,
+            6600,
+            12,
+            AiLicense.MIT,
             "Średni model „myślący” DeepSeek: dobry w rachunkach i logice, przed odpowiedzią długo rozumuje. Po polsku słabszy niż Gemma i Bielik.",
             "A mid-size \"thinking\" DeepSeek model: good at arithmetic and logic, and it reasons for a long time before it answers. Its Polish is weaker than Gemma and Bielik.",
         )
 
     val DeepSeek8b =
         deepSeek(
-            DEEPSEEK_8B, "DeepSeek R1 0528 Qwen3 8B", "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
-            "DeepSeek-R1-0528-Qwen3-8B-Q4_0.gguf", 4905, 6800, 12, AiLicense.MIT,
+            DEEPSEEK_8B,
+            "DeepSeek R1 0528 Qwen3 8B",
+            "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
+            "DeepSeek-R1-0528-Qwen3-8B-Q4_0.gguf",
+            4905,
+            6800,
+            12,
+            AiLicense.MIT,
             "Najnowszy z małych modeli „myślących” DeepSeek (na bazie Qwen3): najlepiej rozumuje spośród modeli do 8B. Przed odpowiedzią długo myśli, po polsku słabszy niż Gemma.",
             "The newest of the small \"thinking\" DeepSeek models (built on Qwen3): the best reasoner among the models up to 8B. It thinks for a long time before it answers; its Polish is weaker than Gemma.",
         )
 
     val DeepSeek14b =
         deepSeek(
-            DEEPSEEK_14B, "DeepSeek R1 Distill Qwen 14B", "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-14B-Q4_0.gguf", 8149, 11500, 16, AiLicense.MIT,
+            DEEPSEEK_14B,
+            "DeepSeek R1 Distill Qwen 14B",
+            "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-14B-Q4_0.gguf",
+            8149,
+            11500,
+            16,
+            AiLicense.MIT,
             "Większy model „myślący” DeepSeek: wyraźnie lepszy w rozumowaniu, rachunkach i kodzie. Na mocniejszy telefon albo komputer; po polsku nadal słabszy niż Gemma.",
             "A larger \"thinking\" DeepSeek model: clearly better at reasoning, arithmetic and code. For a stronger phone or a computer; its Polish is still weaker than Gemma.",
         )
 
     val DeepSeek32b =
         deepSeek(
-            DEEPSEEK_32B, "DeepSeek R1 Distill Qwen 32B", "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf", 18932, 23000, 32, AiLicense.MIT,
+            DEEPSEEK_32B,
+            "DeepSeek R1 Distill Qwen 32B",
+            "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf",
+            18932,
+            23000,
+            32,
+            AiLicense.MIT,
             "Duży model „myślący” DeepSeek: najlepszy z rodziny, który da się uruchomić w domu. Na komputer z dużą pamięcią; odpowiada wolno.",
             "A large \"thinking\" DeepSeek model: the best of the family that can be run at home. For a computer with a lot of memory; it answers slowly.",
         )
@@ -639,7 +715,14 @@ object AiModels {
             ramMb = 16500,
             minDeviceRamGb = 24,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF", "Mistral-Small-3.2-24B-Instruct-2506-Q4_0.gguf", 13824)),
+            files =
+                listOf(
+                    hf(
+                        "unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF",
+                        "Mistral-Small-3.2-24B-Instruct-2506-Q4_0.gguf",
+                        13824,
+                    )
+                ),
             platforms = BOTH,
             descriptionPl = "Duży model od Mistral AI. Ciekawostka do własnych testów: wymaga dużo pamięci.",
             descriptionEn = "A large model from Mistral AI. A curiosity for your own tests: needs a lot of memory.",
@@ -659,8 +742,10 @@ object AiModels {
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("allenai/OLMoE-1B-7B-0125-Instruct-GGUF", "OLMoE-1B-7B-0125-Instruct-Q4_0.gguf", 4024)),
             platforms = BOTH,
-            descriptionPl = "Model od Allen AI, który w trakcie pracy używa tylko części siebie (1 mld z 7 mld parametrów). Ciekawostka do własnych testów: sprawdzony na NPU Snapdragona, słaby po polsku.",
-            descriptionEn = "A model from Allen AI that uses only part of itself while working (1 of 7 billion parameters). A curiosity for your own tests: checked on the Snapdragon NPU, weak in Polish.",
+            descriptionPl =
+                "Model od Allen AI, który w trakcie pracy używa tylko części siebie (1 mld z 7 mld parametrów). Ciekawostka do własnych testów: sprawdzony na NPU Snapdragona, słaby po polsku.",
+            descriptionEn =
+                "A model from Allen AI that uses only part of itself while working (1 of 7 billion parameters). A curiosity for your own tests: checked on the Snapdragon NPU, weak in Polish.",
             pageUrl = "${HF}allenai/OLMoE-1B-7B-0125-Instruct-GGUF",
         )
 
@@ -683,24 +768,38 @@ object AiModels {
             pageUrl = "${HF}ggerganov/whisper.cpp",
         )
 
-    // Only the Q8_0 files are offered, one list for every platform: best quality, and about 7 times faster on the processor
-    // than the full FP16 files (log 2026-10-30: 2.3 s against 16 s for 3 s of speech). The graphics card and NPU programs of
+    // Only the Q8_0 files are offered, one list for every platform: best quality, and about 7 times faster on the
+    // processor
+    // than the full FP16 files (log 2026-10-30: 2.3 s against 16 s for 3 s of speech). The graphics card and NPU
+    // programs of
     // whisper.cpp still fail on the Adreno 750 with every format (Q5, Q8 and FP16).
     val WhisperSmallQ8 =
         whisper(
-            WHISPER_SMALL_Q8, "Whisper small", "ggml-small-q8_0.bin", 264, 1000,
+            WHISPER_SMALL_Q8,
+            "Whisper small",
+            "ggml-small-q8_0.bin",
+            264,
+            1000,
             "Mały model do dyktowania: dobry kompromis szybkości i dokładności.",
             "A small dictation model: a good balance of speed and accuracy.",
         )
     val WhisperMediumQ8 =
         whisper(
-            WHISPER_MEDIUM_Q8, "Whisper medium", "ggml-medium-q8_0.bin", 823, 2200,
+            WHISPER_MEDIUM_Q8,
+            "Whisper medium",
+            "ggml-medium-q8_0.bin",
+            823,
+            2200,
             "Dokładniejszy model do dyktowania, także dla polskiego.",
             "A more accurate dictation model, also for Polish.",
         )
     val WhisperTurboQ8 =
         whisper(
-            WHISPER_TURBO_Q8, "Whisper large v3 turbo", "ggml-large-v3-turbo-q8_0.bin", 874, 2500,
+            WHISPER_TURBO_Q8,
+            "Whisper large v3 turbo",
+            "ggml-large-v3-turbo-q8_0.bin",
+            874,
+            2500,
             "Najdokładniejszy model do dyktowania, a mimo to dość szybki.",
             "The most accurate dictation model, and still fairly fast.",
         )
@@ -708,35 +807,71 @@ object AiModels {
     /** Every model the app knows, for every platform. */
     val all: List<AiModelInfo> =
         listOf(
-            G4E2b, G4E4b, G4_12b, G4_26b,
-            Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
-            Bielik15b, Bielik45b, Bielik7b, Bielik11b,
-            DeepSeek15b, DeepSeek7b, DeepSeek8b, DeepSeek14b, DeepSeek32b,
-            Pllum12b, GptOss20b, Granite8b, PhiMini, Mistral24b, Olmoe7b,
-            WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
+            G4E2b,
+            G4E4b,
+            G4_12b,
+            G4_26b,
+            Qwen08b,
+            Qwen2b,
+            Qwen4b,
+            Qwen9b,
+            QwenMoe,
+            Qwen27b,
+            Bielik15b,
+            Bielik45b,
+            Bielik7b,
+            Bielik11b,
+            DeepSeek15b,
+            DeepSeek7b,
+            DeepSeek8b,
+            DeepSeek14b,
+            DeepSeek32b,
+            Pllum12b,
+            GptOss20b,
+            Granite8b,
+            PhiMini,
+            Mistral24b,
+            Olmoe7b,
+            WhisperSmallQ8,
+            WhisperMediumQ8,
+            WhisperTurboQ8,
         )
 
     /** The models that exist on the platform the app runs on. */
-    val available: List<AiModelInfo> get() = all.filter { it.engineReady }
+    val available: List<AiModelInfo>
+        get() = all.filter { it.engineReady }
 
-    /** The models of the platform that can do [role], in the order of the list (for dictation: the recommended ones first). */
+    /**
+     * The models of the platform that can do [role], in the order of the list (for dictation: the recommended ones
+     * first).
+     */
     fun forRole(role: AiRole): List<AiModelInfo> {
         val list = available.filter { it.canDo(role) }
-        // Dictation: the models recommended for it (the Whisper family: small, accurate, light on memory) are shown first.
+        // Dictation: the models recommended for it (the Whisper family: small, accurate, light on memory) are shown
+        // first.
         return if (role == AiRole.DICTATION) list.sortedBy { if (role in it.recommendedFor) 0 else 1 } else list
     }
 
     fun byId(id: String?): AiModelInfo? = all.firstOrNull { it.id == id }
 
-    /** Ids of the models of the old engine (Google LiteRT-LM); their files are removed once, when the app first starts with the new engine. */
     /**
-     * Ids of models that a newer one has replaced (same place in the list). Their files are removed at every start of the
-     * app, so nobody keeps tens of gigabytes of a model the list no longer offers.
+     * Ids of the models of the old engine (Google LiteRT-LM); their files are removed once, when the app first starts
+     * with the new engine.
      */
-    val retiredModelIds: List<String> = listOf(
+    /**
+     * Ids of models that a newer one has replaced (same place in the list). Their files are removed at every start of
+     * the app, so nobody keeps tens of gigabytes of a model the list no longer offers.
+     */
+    val retiredModelIds: List<String> =
+        listOf(
             "qwen35-35b-a3b-q4",
-            // Removed for licence reasons (Llama and Gemma licences are not GPL-compatible to offer): files are deleted.
-            DEEPSEEK_LLAMA_8B, DEEPSEEK_LLAMA_70B, LLAMA_1B, TG_4B, TG_12B,
+            // Removed for licence reasons (Llama and Gemma licences are not GPL-compatible to offer): files are
+            // deleted.
+            DEEPSEEK_LLAMA_8B,
+            DEEPSEEK_LLAMA_70B,
+            LLAMA_1B,
+            TG_4B,
+            TG_12B,
         )
 
     val legacyModelIds: List<String> = listOf("gemma4-e2b", "gemma4-e4b", "gemma4-12b")
@@ -777,17 +912,24 @@ sealed interface AiStorageMove {
 interface AiModelStore {
     val states: StateFlow<Map<String, TranslatorModelState>>
 
-    /** True on a computer with an NPU that our engine can use (Intel Core Ultra); the "Skip NPU" setting is shown by default only then (never on phones). */
-    val npuAvailable: Boolean get() = false
+    /**
+     * True on a computer with an NPU that our engine can use (Intel Core Ultra); the "Skip NPU" setting is shown by
+     * default only then (never on phones).
+     */
+    val npuAvailable: Boolean
+        get() = false
 
     /** Where the models (and on computers the engine programs) are kept, and what can be chosen; null = not known. */
-    val storage: StateFlow<AiStorageInfo?> get() = MutableStateFlow(null)
+    val storage: StateFlow<AiStorageInfo?>
+        get() = MutableStateFlow(null)
 
     /** Progress of moving the files to another folder (see [moveStorage]). */
-    val storageMove: StateFlow<AiStorageMove> get() = MutableStateFlow(AiStorageMove.Idle)
+    val storageMove: StateFlow<AiStorageMove>
+        get() = MutableStateFlow(AiStorageMove.Idle)
 
     /** True until the person has seen (and closed) the first-start question about the folder. */
-    val askStorageFolder: StateFlow<Boolean> get() = MutableStateFlow(false)
+    val askStorageFolder: StateFlow<Boolean>
+        get() = MutableStateFlow(false)
 
     /** Marks the first-start question as answered. */
     fun storageFolderAsked() {}
@@ -804,8 +946,12 @@ interface AiModelStore {
     /** Megabytes that would be left free on the disk after downloading [id]; null when it cannot be told. */
     fun freeSpaceAfterMb(id: String): Long? = null
 
-    /** Megabytes freed when the files of the old engine were removed at this start (0 = nothing removed); only the first start after the change. */
-    val legacyFreedMb: StateFlow<Int> get() = MutableStateFlow(0)
+    /**
+     * Megabytes freed when the files of the old engine were removed at this start (0 = nothing removed); only the first
+     * start after the change.
+     */
+    val legacyFreedMb: StateFlow<Int>
+        get() = MutableStateFlow(0)
 
     suspend fun download(id: String)
 
@@ -814,7 +960,8 @@ interface AiModelStore {
     suspend fun delete(id: String)
 
     /** Ids of the models that are in memory right now (empty when none is running). */
-    val loadedModels: StateFlow<Set<String>> get() = MutableStateFlow(emptySet())
+    val loadedModels: StateFlow<Set<String>>
+        get() = MutableStateFlow(emptySet())
 
     /** Stops every running model and frees its memory; the next question starts the model again. */
     suspend fun unloadModels() {}

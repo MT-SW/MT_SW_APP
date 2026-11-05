@@ -737,23 +737,27 @@ class MeshtasticDatabaseMigrationTest {
             )
         }
 
-        helper.runMigrationsAndValidate(SCHEMA_66_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_66_67)).use {
-            connection ->
-            val logs = "FROM log ORDER BY received_date"
-            assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))
-            assertEquals(listOf("log-a", "log-b"), queryColumn(connection, "SELECT uuid $logs"))
-            val indices = queryColumn(connection, "SELECT name FROM pragma_index_list('log')")
-            assertTrue("index_log_port_num_received_date" in indices, indices.toString())
-            assertTrue("index_log_from_num_received_date" in indices, indices.toString())
-            assertTrue("index_log_port_num_from_num_received_date" in indices, indices.toString())
-            assertEquals(
-                listOf("port_num", "from_num", "received_date"),
-                queryColumn(
-                    connection,
-                    "SELECT name FROM pragma_index_info('index_log_port_num_from_num_received_date')",
-                ),
+        helper
+            .runMigrationsAndValidate(
+                SCHEMA_66_TO_VERSION,
+                listOf(MeshtasticDatabase.MIGRATION_66_67),
             )
-        }
+            .use { connection ->
+                val logs = "FROM log ORDER BY received_date"
+                assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))
+                assertEquals(listOf("log-a", "log-b"), queryColumn(connection, "SELECT uuid $logs"))
+                val indices = queryColumn(connection, "SELECT name FROM pragma_index_list('log')")
+                assertTrue("index_log_port_num_received_date" in indices, indices.toString())
+                assertTrue("index_log_from_num_received_date" in indices, indices.toString())
+                assertTrue("index_log_port_num_from_num_received_date" in indices, indices.toString())
+                assertEquals(
+                    listOf("port_num", "from_num", "received_date"),
+                    queryColumn(
+                        connection,
+                        "SELECT name FROM pragma_index_info('index_log_port_num_from_num_received_date')",
+                    ),
+                )
+            }
     }
 
     /** The `detail` column of `EXPLAIN QUERY PLAN` for [sql], one entry per plan step. */

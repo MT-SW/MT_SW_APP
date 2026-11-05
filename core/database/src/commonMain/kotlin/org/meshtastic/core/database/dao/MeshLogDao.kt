@@ -70,8 +70,8 @@ interface MeshLogDao {
 
     /**
      * The newest log of [portNum] from every sender — exactly what summaries that only look at each node's latest
-     * report (e.g. Neighbor Info) need, without reading the whole history of that port. Without the bulky text copy
-     * of the packet (`message`), which these screens never use.
+     * report (e.g. Neighbor Info) need, without reading the whole history of that port. Without the bulky text copy of
+     * the packet (`message`), which these screens never use.
      */
     @Query(
         """

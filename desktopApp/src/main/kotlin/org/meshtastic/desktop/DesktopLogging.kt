@@ -19,7 +19,6 @@ package org.meshtastic.desktop
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
@@ -33,6 +32,7 @@ import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.core.common.log.ReportFile
 import org.meshtastic.core.common.log.ReportTarget
 import org.meshtastic.feature.map.maplibre.installMapLibreLogging
+import java.io.File
 
 /**
  * Sends Kermit output to the console, to [InMemoryLogBuffer] (which the Debug screen views and exports) and to the log
@@ -50,7 +50,7 @@ internal fun installDesktopLogging(isDebug: Boolean) {
             MinSeverityLogWriter(platformLogWriter(), Severity.Info),
             MinSeverityLogWriter(InMemoryLogBuffer, Severity.Info),
             MtSwLogging.writer,
-        )
+        ),
     )
     MtSwLogging.init(logDir, headerText = ::desktopHeader) { level ->
         Logger.setMinSeverity(MtSwLogging.minSeverityFor(Severity.Info, level))
@@ -94,47 +94,46 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
         note: String,
         withLogs: Boolean,
         extras: List<Pair<String, ByteArray>>,
-    ): ReportFile? =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val now = System.currentTimeMillis()
-                val folder = File(dir.parentFile, "reports").also { it.mkdirs() }
-                val name =
-                    "mt_sw_zgloszenie_" +
-                        java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date(now)) +
-                        ".zip"
-                val file = File(folder, name)
-                val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
-                val engineLogs =
-                    File(dir.parentFile, "engine-logs")
-                        .listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }
-                        .orEmpty()
-                file.outputStream().use { out ->
-                    MtSwLogging.writeReportZip(
-                        out,
-                        since,
-                        extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
-                        extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
-                    )
-                }
-                // A copy where the person looks first (Downloads, else Desktop, else the home folder), not six folders
-                // deep.
-                val home = File(System.getProperty("user.home").orEmpty())
-                val shown =
-                    listOf(
-                            File(home, "Downloads"),
-                            File(home, "Pobrane"),
-                            File(home, "Desktop"),
-                            File(home, "Pulpit"),
-                            home,
-                        )
-                        .firstOrNull { it.isDirectory && it.canWrite() }
-                        ?.let { runCatching { file.copyTo(File(it, name), overwrite = true) }.getOrNull() } ?: file
-                ReportFile(shown.absolutePath, shown.absolutePath, shown.length() / 1024)
+    ): ReportFile? = withContext(Dispatchers.IO) {
+        runCatching {
+            val now = System.currentTimeMillis()
+            val folder = File(dir.parentFile, "reports").also { it.mkdirs() }
+            val name =
+                "mt_sw_zgloszenie_" +
+                    java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date(now)) +
+                    ".zip"
+            val file = File(folder, name)
+            val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
+            val engineLogs =
+                File(dir.parentFile, "engine-logs")
+                    .listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }
+                    .orEmpty()
+            file.outputStream().use { out ->
+                MtSwLogging.writeReportZip(
+                    out,
+                    since,
+                    extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
+                    extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
+                )
             }
-                .onFailure { Logger.w(it) { "Report could not be built" } }
-                .getOrNull()
+            // A copy where the person looks first (Downloads, else Desktop, else the home folder), not six folders
+            // deep.
+            val home = File(System.getProperty("user.home").orEmpty())
+            val shown =
+                listOf(
+                    File(home, "Downloads"),
+                    File(home, "Pobrane"),
+                    File(home, "Desktop"),
+                    File(home, "Pulpit"),
+                    home,
+                )
+                    .firstOrNull { it.isDirectory && it.canWrite() }
+                    ?.let { runCatching { file.copyTo(File(it, name), overwrite = true) }.getOrNull() } ?: file
+            ReportFile(shown.absolutePath, shown.absolutePath, shown.length() / 1024)
         }
+            .onFailure { Logger.w(it) { "Report could not be built" } }
+            .getOrNull()
+    }
 
     /** On a computer the folder with the file opens, so the person can attach it in the group that opens next. */
     override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean = runCatching {
