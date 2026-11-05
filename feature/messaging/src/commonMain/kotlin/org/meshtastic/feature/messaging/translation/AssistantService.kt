@@ -39,6 +39,16 @@ interface AssistantService {
      */
     suspend fun dictationCheck(onStep: (String) -> Unit): String = ""
 
+    /** Forgets the remembered failed model starts, so a compatibility test shows what the device really can do. */
+    suspend fun clearFailedAttempts() {}
+
+    /** Releases the models from memory, so the next answer starts one again with the current settings. */
+    suspend fun unloadModels() {}
+
+    /** Where the model runs now (for example "NPU (...)", "GPU (...)" or "CPU"); empty where not known. */
+    val backendNow: String
+        get() = ""
+
     /** The short question the compatibility test asks (in the language of the app). */
     val compatQuestion: String
         get() = "Co to jest zasięg LoRa?"

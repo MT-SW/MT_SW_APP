@@ -771,6 +771,7 @@
     <string name="compat_run_again">Run the compatibility test</string>
     <string name="compat_running_title">Test in progress…</string>
     <string name="compat_step_dictation">Checking dictation…</string>
+    <string name="compat_step_graphics">The same question on the graphics card (NPU skipped)…</string>
     <string name="compat_step_hardware">Checking the hardware…</string>
     <string name="compat_step_question">A short question to the assistant…</string>
     <string name="compromised_keys">Compromised keys detected, select OK to regenerate.</string>

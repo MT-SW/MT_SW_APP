@@ -35,6 +35,7 @@ import org.meshtastic.core.resources.compat_offer_yes
 import org.meshtastic.core.resources.compat_report_note
 import org.meshtastic.core.resources.compat_running_title
 import org.meshtastic.core.resources.compat_step_dictation
+import org.meshtastic.core.resources.compat_step_graphics
 import org.meshtastic.core.resources.compat_step_hardware
 import org.meshtastic.core.resources.compat_step_question
 import org.meshtastic.core.ui.component.ReportIssuesDialog
@@ -76,6 +77,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                                 when (compat.step) {
                                     CompatStep.QUESTION -> Res.string.compat_step_question
                                     CompatStep.HARDWARE -> Res.string.compat_step_hardware
+                                    CompatStep.GRAPHICS -> Res.string.compat_step_graphics
                                     CompatStep.DICTATION -> Res.string.compat_step_dictation
                                 },
                             ),

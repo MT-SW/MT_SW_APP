@@ -408,6 +408,17 @@ class LlamaAssistantService(
         }
     }
 
+    override suspend fun clearFailedAttempts() {
+        store.clearFailedAttempts()
+    }
+
+    override suspend fun unloadModels() {
+        store.unloadModels()
+    }
+
+    override val backendNow: String
+        get() = engine.activeBackend
+
     override val compatQuestion: String
         get() = if (data.polish) "Co to jest zasięg LoRa?" else "What is LoRa range?"
 

@@ -3534,6 +3534,7 @@
     <string name="compat_offer_no">Nie</string>
     <string name="compat_running_title">Trwa test…</string>
     <string name="compat_step_question">Krótkie pytanie do asystenta…</string>
+    <string name="compat_step_graphics">To samo pytanie na karcie graficznej (bez NPU)…</string>
     <string name="compat_step_hardware">Sprawdzam sprzęt…</string>
     <string name="compat_step_dictation">Sprawdzam dyktowanie…</string>
     <string name="compat_report_note">Test asystenta: wynik w załączonej paczce.</string>

@@ -63,6 +63,7 @@ data class AssistantUiState(
 enum class CompatStep {
     QUESTION,
     HARDWARE,
+    GRAPHICS,
     DICTATION,
 }
 
@@ -129,21 +130,31 @@ class AssistantViewModel(
         _compat.value = CompatUi.Running(CompatStep.QUESTION)
         viewModelScope.launch {
             val files = mutableListOf<Pair<String, ByteArray>>()
+            val skipNpuBefore = uiPrefs.aiSkipNpu.value
             try {
-                setInput(service.compatQuestion)
-                send()
-                _state.first { !it.busy }
-                _compat.value = CompatUi.Running(CompatStep.HARDWARE)
-                setInput("/sprzet")
-                send()
-                _state.first { !it.busy }
-                val chat =
-                    _state.value.lines.joinToString("\n\n") {
-                        (if (it.fromUser) "> " else "") +
-                            it.text +
-                            (if (!it.fromUser && it.info.isNotBlank()) "\n[${it.info}]" else "")
-                    }
-                files += "asystent-rozmowa.txt" to chat.encodeToByteArray()
+                // Every test starts clean: remembered failed starts would make the model skip the NPU or the graphics
+                // card, and the result would not show what the device can really do.
+                try {
+                    service.clearFailedAttempts()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    // Only a convenience; the test runs without it.
+                }
+                val npu = askQuestionAndHardware()
+                files += "asystent-rozmowa.txt" to npu.chat.encodeToByteArray()
+                // The model ran on the NPU and everything went well: the same two steps once more on the graphics card
+                // (NPU skipped), so both are measured. After an error there is nothing to compare.
+                if (npu.backend.startsWith("NPU") && !npu.failed) {
+                    _compat.value = CompatUi.Running(CompatStep.GRAPHICS)
+                    uiPrefs.setAiSkipNpu(true)
+                    service.unloadModels()
+                    kotlinx.coroutines.delay(SKIP_NPU_SETTLE_MS)
+                    startNew()
+                    val gpu = askQuestionAndHardware()
+                    files += "asystent-rozmowa-karta-graficzna.txt" to gpu.chat.encodeToByteArray()
+                    files += "porownanie-npu-karta-graficzna.txt" to comparison(npu, gpu).encodeToByteArray()
+                }
                 _compat.value = CompatUi.Running(CompatStep.DICTATION)
                 val speech = service.dictationCheck { step ->
                     _compat.value = CompatUi.Running(CompatStep.DICTATION, step)
@@ -154,10 +165,66 @@ class AssistantViewModel(
             } catch (e: Throwable) {
                 Logger.w(tag = "AssistantViewModel", throwable = e) { "Compatibility test failed: ${e.message}" }
                 files += "blad-testu.txt" to (e.message ?: e.toString()).encodeToByteArray()
+            } finally {
+                // The setting goes back to what it was, also when the test is cancelled.
+                uiPrefs.setAiSkipNpu(skipNpuBefore)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                    try {
+                        service.unloadModels()
+                    } catch (_: Exception) {
+                        // The models are released at the next start anyway.
+                    }
+                }
             }
             _compat.value = CompatUi.Done(files)
         }
     }
+
+    /** What one run of the question and the hardware report found. */
+    private class CompatRun(val chat: String, val backend: String, val failed: Boolean, val seconds: Double)
+
+    /** The short question, then the hardware report; the conversation text is collected for the package. */
+    private suspend fun askQuestionAndHardware(): CompatRun {
+        val started = nowMillis
+        setInput(service.compatQuestion)
+        send()
+        _state.first { !it.busy }
+        val seconds = (nowMillis - started) / MILLIS_PER_SECOND_DOUBLE
+        val failed = _state.value.failed
+        val backend = service.backendNow
+        if (_compat.value is CompatUi.Running && (_compat.value as CompatUi.Running).step == CompatStep.QUESTION) {
+            _compat.value = CompatUi.Running(CompatStep.HARDWARE)
+        }
+        setInput("/sprzet")
+        send()
+        _state.first { !it.busy }
+        val chat =
+            _state.value.lines.joinToString("\n\n") {
+                (if (it.fromUser) "> " else "") +
+                    it.text +
+                    (if (!it.fromUser && it.info.isNotBlank()) "\n[${it.info}]" else "")
+            }
+        return CompatRun(chat, backend, failed, seconds)
+    }
+
+    /** Both runs side by side. The time of the question includes starting the model. */
+    private fun comparison(npu: CompatRun, gpu: CompatRun): String = buildString {
+        append("NPU: ").append(npu.backend.ifBlank { "?" }).append('\n')
+        append("Question time (with the model start): ").append(roundTenth(npu.seconds)).append(" s\n\n")
+        append("Graphics card (NPU skipped): ").append(gpu.backend.ifBlank { "?" }).append('\n')
+        append("Question time (with the model start): ").append(roundTenth(gpu.seconds)).append(" s\n")
+        append("Errors: ").append(if (gpu.failed) "yes" else "none").append("\n\n")
+        append(
+            when {
+                gpu.failed -> "The graphics card run had errors; the NPU result is the reliable one."
+                gpu.seconds < npu.seconds -> "The graphics card was faster."
+                gpu.seconds > npu.seconds -> "The NPU was faster."
+                else -> "Both were equally fast."
+            },
+        )
+    }
+
+    private fun roundTenth(value: Double): String = (kotlin.math.round(value * 10) / 10).toString()
 
     init {
         refreshSaved()
@@ -393,3 +460,8 @@ class AssistantViewModel(
         val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/szybki", "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")
     }
 }
+
+/** A short pause after the NPU setting changes, so the engine has taken it before the model starts again. */
+private const val SKIP_NPU_SETTLE_MS = 500L
+
+private const val MILLIS_PER_SECOND_DOUBLE = 1000.0
