@@ -69,6 +69,20 @@ interface AppLogControl {
     val canMakeReport: Boolean
         get() = false
 
+    /** True where the user can pick a folder that gets a fresh report zip automatically. */
+    val canChooseFolder: Boolean
+        get() = false
+
+    /** Name of the chosen folder, or null when none is chosen. */
+    val chosenFolderName: StateFlow<String?>
+        get() = MutableStateFlow(null)
+
+    /** Opens the folder picker. */
+    fun chooseFolder() {}
+
+    /** Forgets the chosen folder. */
+    fun clearChosenFolder() {}
+
     /**
      * True where [shareReport] hands the file itself to the chosen app (a phone); on a computer the person attaches it.
      */
