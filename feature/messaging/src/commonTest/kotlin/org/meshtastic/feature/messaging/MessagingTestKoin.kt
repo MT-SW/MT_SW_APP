@@ -17,6 +17,8 @@
 package org.meshtastic.feature.messaging
 
 import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.testing.FakeUiPrefs
 import org.meshtastic.core.ui.util.SnackbarManager
@@ -52,7 +55,11 @@ internal fun startMessagingTestKoin() {
                 single<DictationService> { UnavailableDictationService() }
                 single { SnackbarManager() }
                 single<SenderMutePrefs> { mock(MockMode.autofill) }
-                single<TranslatorModelManager> { mock(MockMode.autofill) }
+                single<TranslatorModelManager> {
+                    mock<TranslatorModelManager>(MockMode.autofill).also {
+                        every { it.state } returns MutableStateFlow(TranslatorModelState.NotDownloaded)
+                    }
+                }
                 single<MessageTranslationService> { mock(MockMode.autofill) }
             },
         )
