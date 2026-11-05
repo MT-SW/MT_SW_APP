@@ -41,6 +41,7 @@ import org.meshtastic.core.navigation.ConnectionsRoute
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.MultiBackstack
+import org.meshtastic.core.navigation.NetworkHealthRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.rememberMultiBackstack
@@ -205,6 +206,8 @@ class MeshtasticNavDisplayTabStateTest {
         entry<ContactsRoute.Contacts> { Text("messages tab") }
         entry<SettingsRoute.Settings> { Text("settings tab") }
         entry<ConnectionsRoute.Connections> { Text("connections tab") }
+        entry<NetworkHealthRoute.NetworkHealth> { Text("network health tab") }
+        entry<ContactsRoute.Translator> { Text("translator tab") }
     }
 
     @Composable
