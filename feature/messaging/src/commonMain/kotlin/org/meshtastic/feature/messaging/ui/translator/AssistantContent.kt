@@ -104,6 +104,7 @@ import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
+import org.meshtastic.core.resources.assistant_ai_label
 import org.meshtastic.core.resources.assistant_copy_all
 import org.meshtastic.core.resources.assistant_copy_assistant
 import org.meshtastic.core.resources.assistant_copy_you
@@ -352,6 +353,14 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     } else {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (shown.isNotBlank()) Text(text = shown, style = MaterialTheme.typography.bodyLarge)
+                            if (!line.fromUser && shown.isNotBlank()) {
+                                // Google Play and EU rules: AI-made text must be marked as such.
+                                Text(
+                                    text = stringResource(Res.string.assistant_ai_label),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                             if (web != null) {
                                 // A small red note, like a warning: this answer used the internet.
                                 val details =

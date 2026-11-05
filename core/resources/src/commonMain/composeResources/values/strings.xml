@@ -546,6 +546,7 @@
     <string name="are_you_sure">Are you sure?</string>
     <string name="are_you_sure_change_default">Are you sure you want to change to the default channel?</string>
     <!-- ASSISTANT -->
+    <string name="assistant_ai_label">AI answer, it may contain mistakes</string>
     <string name="assistant_autoscroll">Scroll automatically to the newest messages</string>
     <string name="assistant_autoscroll_hint">On: the chat scrolls by itself to the newest messages. Off: new messages appear lower down and the chat stays where you are reading.</string>
     <string name="assistant_close">Close</string>
@@ -1995,7 +1996,7 @@
     <string name="message_status_sfpp_confirmed">Confirmed on SF++ chain</string>
     <string name="message_status_sfpp_routing">Routing via SF++ chain…</string>
     <string name="message_status_unknown">Unknown</string>
-    <string name="message_translated_label">Translated</string>
+    <string name="message_translated_label">Translated (AI)</string>
     <!-- MESSAGES -->
     <string name="messages">Messages</string>
     <string name="messages_read_all">Read all messages aloud</string>
@@ -3218,7 +3219,7 @@
     <string name="translator_outgoing_send">Send translation</string>
     <string name="translator_outgoing_title">Translate before sending</string>
     <string name="translator_ready">The model is downloaded. The translator works without internet.</string>
-    <string name="translator_result">Translation</string>
+    <string name="translator_result">Translation (AI)</string>
     <string name="translator_save">Save translations…</string>
     <string name="translator_sessions_empty">No saved sessions. Translations and command results are saved only on this device.</string>
     <string name="translator_sessions_new">New session</string>

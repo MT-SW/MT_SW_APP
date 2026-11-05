@@ -525,6 +525,7 @@ archived_channel_read_only
 are_you_sure
 are_you_sure_change_default
 ### ASSISTANT ###
+assistant_ai_label
 assistant_autoscroll
 assistant_autoscroll_hint
 assistant_close

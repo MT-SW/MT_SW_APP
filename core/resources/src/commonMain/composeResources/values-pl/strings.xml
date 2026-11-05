@@ -1560,7 +1560,7 @@
     <string name="message_status_sfpp_confirmed">Potwierdzone w łańcuchu SF++</string>
     <string name="message_status_sfpp_routing">Trasowanie przez łańcuch SF++…</string>
     <string name="message_status_unknown">Nieznany</string>
-    <string name="message_translated_label">Przetłumaczono</string>
+    <string name="message_translated_label">Przetłumaczono (AI)</string>
     <string name="messages">Wiadomości</string>
     <string name="metric_channel_label">%1$s %2$d</string>
     <string name="micrograms_per_cubic_meter">µg/m³</string>
@@ -2854,7 +2854,7 @@
     <string name="translator_input_hint">Tekst do przetłumaczenia</string>
     <string name="translator_action">Przetłumacz</string>
     <string name="translator_busy">Tłumaczę…</string>
-    <string name="translator_result">Tłumaczenie</string>
+    <string name="translator_result">Tłumaczenie (AI)</string>
     <string name="translator_source_label">Tekst</string>
     <string name="translator_export_title">MT_SW – rozmowa w tłumaczu</string>
     <string name="translator_info_title">O tłumaczu</string>
@@ -3071,6 +3071,7 @@
     <string name="ai_privacy">Wszystko jest przetwarzane lokalnie na tym urządzeniu. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.</string>
     <string name="translator_loading_hint">Pierwsze tłumaczenie trwa dłużej, bo model jest wczytywany do pamięci (nawet minutę). Kolejne są szybsze.</string>
     <string name="assistant_input_hint">Zadaj pytanie…</string>
+    <string name="assistant_ai_label">Odpowiedź AI, może zawierać błędy</string>
     <string name="assistant_send">Wyślij</string>
     <string name="assistant_stop">Zatrzymaj</string>
     <string name="assistant_disclaimer">Funkcja eksperymentalna: nie gwarantujemy poprawności odpowiedzi. Asystent działa w całości na tym urządzeniu, bez internetu; ważne informacje sprawdzaj.</string>
