@@ -177,6 +177,9 @@ class LlamaAssistantService(
     override suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {
         testRunning = true
         try {
+            // Every test starts clean: remembered failed starts (NPU, graphics card) from earlier runs would otherwise
+            // make the model skip them and the result would not show what the device can really do.
+            runCatching { store.clearFailedAttempts() }
             selfTestRun(command, onResult)
         } finally {
             testRunning = false
