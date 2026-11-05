@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +44,18 @@ object SimplePdf {
         var y = TOP
 
         fun text(x: Double, baseline: Double, s: String, bold: Boolean, size: Double, color: Int) {
-            sb.append(rgb(color)).append(" rg BT /F").append(if (bold) 2 else 1).append(' ').append(f(size))
-                .append(" Tf ").append(f(x)).append(' ').append(f(baseline)).append(" Td ")
-                .append(PdfText.literal(s)).append(" Tj ET\n")
+            sb.append(rgb(color))
+                .append(" rg BT /F")
+                .append(if (bold) 2 else 1)
+                .append(' ')
+                .append(f(size))
+                .append(" Tf ")
+                .append(f(x))
+                .append(' ')
+                .append(f(baseline))
+                .append(" Td ")
+                .append(PdfText.literal(s))
+                .append(" Tj ET\n")
         }
 
         fun need(height: Double) {
@@ -68,7 +77,8 @@ object SimplePdf {
             for (line in lines) {
                 val bullet = line.startsWith("• ")
                 val indent = if (bullet) 10.0 else 0.0
-                val wrapped = PdfText.wrap(if (bullet) line.removePrefix("• ") else line, false, 10.0, PW - 2 * MARGIN - indent)
+                val wrapped =
+                    PdfText.wrap(if (bullet) line.removePrefix("• ") else line, false, 10.0, PW - 2 * MARGIN - indent)
                 wrapped.forEachIndexed { i, part ->
                     need(14.0)
                     if (bullet && i == 0) text(MARGIN, y - 10, "•", false, 10.0, 0x222222)

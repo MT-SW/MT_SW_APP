@@ -43,10 +43,28 @@ import kotlin.math.sqrt
  */
 
 /** The kinds of antenna the calculator draws and sizes. */
-enum class AntennaType { GROUND_PLANE, DIPOLE, FOLDED_DIPOLE, FIVE_EIGHTHS, J_POLE, SLIM_JIM, COLLINEAR, YAGI, MOXON, BIQUAD, HELIX, PATCH, COAX_STUB }
+enum class AntennaType {
+    GROUND_PLANE,
+    DIPOLE,
+    FOLDED_DIPOLE,
+    FIVE_EIGHTHS,
+    J_POLE,
+    SLIM_JIM,
+    COLLINEAR,
+    YAGI,
+    MOXON,
+    BIQUAD,
+    HELIX,
+    PATCH,
+    COAX_STUB,
+}
 
 /** Insulation on a wire element: it slows the wave a little, so the element gets a bit shorter (typical values). */
-enum class Insulation(val factor: Double) { NONE(1.0), THIN(0.97), THICK(0.95) }
+enum class Insulation(val factor: Double) {
+    NONE(1.0),
+    THIN(0.97),
+    THICK(0.95),
+}
 
 /** Coaxial cables with their velocity factor and attenuation (dB per 100 m) at two frequencies (MHz). */
 enum class Cable(val label: String, val vf: Double, val f1: Double, val a1: Double, val f2: Double, val a2: Double) {
@@ -90,16 +108,62 @@ enum class Connector(val label: String, val lossDb: Double) {
 
 /** What a dimension of a drawing stands for. */
 enum class DimKind {
-    TOTAL, RADIATOR, RADIAL, ARM, GAP, SPACING, STUB, FEED, SECTION, WHIP, REFLECTOR, DRIVEN, DIRECTOR, BOOM, POSITION,
-    WIDTH, DEPTH, TAIL_DRIVER, TAIL_REFLECTOR, SIDE, REFLECTOR_PLATE, DIAMETER, PITCH, TURN_WIRE, LENGTH, GROUND,
-    PATCH_W, PATCH_L, INSET, FEED_WIDTH, QUARTER, HALF, WAVELENGTH,
+    TOTAL,
+    RADIATOR,
+    RADIAL,
+    ARM,
+    GAP,
+    SPACING,
+    STUB,
+    FEED,
+    SECTION,
+    WHIP,
+    REFLECTOR,
+    DRIVEN,
+    DIRECTOR,
+    BOOM,
+    POSITION,
+    WIDTH,
+    DEPTH,
+    TAIL_DRIVER,
+    TAIL_REFLECTOR,
+    SIDE,
+    REFLECTOR_PLATE,
+    DIAMETER,
+    PITCH,
+    TURN_WIRE,
+    LENGTH,
+    GROUND,
+    PATCH_W,
+    PATCH_L,
+    INSET,
+    FEED_WIDTH,
+    QUARTER,
+    HALF,
+    WAVELENGTH,
 }
 
 /** One dimension: its letter on the drawing, what it is, its length in metres and the element number (Yagi). */
 data class Dim(val letter: String, val kind: DimKind, val meters: Double, val index: Int = 0)
 
 /** Notes the calculator shows under a design. */
-enum class Note { TUNE_SWR, RADIALS_ANGLE, BALUN_4_1, COIL_MATCH, CHOKE, FEED_TAP, YAGI_DRIVEN, MOXON_RANGE, HELIX_MATCH, HELIX_GAIN, PATCH_FR4, GAIN_APPROX, YAGI_BOOM, COAX_VF, HALF_WAVE_BALUN }
+enum class Note {
+    TUNE_SWR,
+    RADIALS_ANGLE,
+    BALUN_4_1,
+    COIL_MATCH,
+    CHOKE,
+    FEED_TAP,
+    YAGI_DRIVEN,
+    MOXON_RANGE,
+    HELIX_MATCH,
+    HELIX_GAIN,
+    PATCH_FR4,
+    GAIN_APPROX,
+    YAGI_BOOM,
+    COAX_VF,
+    HALF_WAVE_BALUN,
+}
 
 data class AntennaDesign(
     val dims: List<Dim>,
@@ -111,7 +175,12 @@ data class AntennaDesign(
     val shortening: Double,
 )
 
-enum class Polarization { VERTICAL, HORIZONTAL_OR_VERTICAL, CIRCULAR, LINEAR }
+enum class Polarization {
+    VERTICAL,
+    HORIZONTAL_OR_VERTICAL,
+    CIRCULAR,
+    LINEAR,
+}
 
 /** Everything the calculator needs; the defaults are a 1.5 mm copper wire on our network's frequency. */
 @Serializable
@@ -142,8 +211,8 @@ object AntennaMath {
     fun wavelength(mhz: Double) = C / (mhz * 1e6)
 
     /**
-     * Shortening of a half-wave element made of a conductor [diameterM] thick (Stutzman & Thiele):
-     * p = 0.2257 / ln(L / 2a) with L ≈ λ/2 and a the radius; thin wire ≈ 0.97–0.98, thick tube ≈ 0.92–0.94.
+     * Shortening of a half-wave element made of a conductor [diameterM] thick (Stutzman & Thiele): p = 0.2257 / ln(L /
+     * 2a) with L ≈ λ/2 and a the radius; thin wire ≈ 0.97–0.98, thick tube ≈ 0.92–0.94.
      */
     fun thicknessFactor(lambda: Double, diameterM: Double): Double {
         if (diameterM <= 0) return 0.98
@@ -180,7 +249,11 @@ object AntennaMath {
         val z = 36 + 14 * min(angle, 45.0) / 45 + max(0.0, angle - 45) * 0.4
         return AntennaDesign(
             listOf(Dim("A", DimKind.RADIATOR, l / 4 * k), Dim("B", DimKind.RADIAL, l / 4 * k)),
-            z, DIPOLE_GAIN, Polarization.VERTICAL, listOf(Note.RADIALS_ANGLE, Note.TUNE_SWR), k,
+            z,
+            DIPOLE_GAIN,
+            Polarization.VERTICAL,
+            listOf(Note.RADIALS_ANGLE, Note.TUNE_SWR),
+            k,
         )
     }
 
@@ -188,8 +261,16 @@ object AntennaMath {
         val total = l / 2 * k
         val gap = l / 100
         return AntennaDesign(
-            listOf(Dim("A", DimKind.TOTAL, total), Dim("B", DimKind.ARM, (total - gap) / 2), Dim("C", DimKind.GAP, gap)),
-            73.0, DIPOLE_GAIN, Polarization.HORIZONTAL_OR_VERTICAL, listOf(Note.TUNE_SWR), k,
+            listOf(
+                Dim("A", DimKind.TOTAL, total),
+                Dim("B", DimKind.ARM, (total - gap) / 2),
+                Dim("C", DimKind.GAP, gap),
+            ),
+            73.0,
+            DIPOLE_GAIN,
+            Polarization.HORIZONTAL_OR_VERTICAL,
+            listOf(Note.TUNE_SWR),
+            k,
         )
     }
 
@@ -202,13 +283,21 @@ object AntennaMath {
                 Dim("C", DimKind.GAP, l / 100),
                 Dim("D", DimKind.HALF, l / 2 * i.cable.vf),
             ),
-            292.0, DIPOLE_GAIN, Polarization.HORIZONTAL_OR_VERTICAL, listOf(Note.BALUN_4_1, Note.HALF_WAVE_BALUN, Note.TUNE_SWR), k,
+            292.0,
+            DIPOLE_GAIN,
+            Polarization.HORIZONTAL_OR_VERTICAL,
+            listOf(Note.BALUN_4_1, Note.HALF_WAVE_BALUN, Note.TUNE_SWR),
+            k,
         )
     }
 
     private fun fiveEighths(l: Double, k: Double, i: AntennaInput): AntennaDesign = AntennaDesign(
         listOf(Dim("A", DimKind.RADIATOR, l * 0.625 * k), Dim("B", DimKind.RADIAL, l / 4 * k)),
-        50.0, 4.0, Polarization.VERTICAL, listOf(Note.COIL_MATCH, Note.RADIALS_ANGLE, Note.GAIN_APPROX, Note.TUNE_SWR), k,
+        50.0,
+        4.0,
+        Polarization.VERTICAL,
+        listOf(Note.COIL_MATCH, Note.RADIALS_ANGLE, Note.GAIN_APPROX, Note.TUNE_SWR),
+        k,
     )
 
     private fun jPole(l: Double, k: Double, slim: Boolean): AntennaDesign {
@@ -219,8 +308,17 @@ object AntennaMath {
                 Dim("B", DimKind.RADIATOR, l / 2 * k),
                 Dim("C", DimKind.STUB, l / 4 * k),
                 Dim("D", DimKind.FEED, l / 40 * k),
-            ) + (if (slim) listOf(Dim("E", DimKind.GAP, gap)) else emptyList()) + Dim(if (slim) "F" else "E", DimKind.SPACING, l / 50)
-        return AntennaDesign(dims, 50.0, DIPOLE_GAIN, Polarization.VERTICAL, listOf(Note.FEED_TAP, Note.CHOKE, Note.TUNE_SWR), k)
+            ) +
+                (if (slim) listOf(Dim("E", DimKind.GAP, gap)) else emptyList()) +
+                Dim(if (slim) "F" else "E", DimKind.SPACING, l / 50)
+        return AntennaDesign(
+            dims,
+            50.0,
+            DIPOLE_GAIN,
+            Polarization.VERTICAL,
+            listOf(Note.FEED_TAP, Note.CHOKE, Note.TUNE_SWR),
+            k,
+        )
     }
 
     /** Typical gain of a coaxial collinear with [n] sections (cable losses included). */
@@ -235,16 +333,43 @@ object AntennaMath {
         val section = l / 2 * i.cable.vf
         val whip = l / 4 * k
         return AntennaDesign(
-            listOf(Dim("A", DimKind.SECTION, section), Dim("B", DimKind.WHIP, whip), Dim("C", DimKind.TOTAL, n * section + whip)),
-            50.0, collinearGain(n), Polarization.VERTICAL, listOf(Note.COAX_VF, Note.CHOKE, Note.GAIN_APPROX, Note.TUNE_SWR), k,
+            listOf(
+                Dim("A", DimKind.SECTION, section),
+                Dim("B", DimKind.WHIP, whip),
+                Dim("C", DimKind.TOTAL, n * section + whip),
+            ),
+            50.0,
+            collinearGain(n),
+            Polarization.VERTICAL,
+            listOf(Note.COAX_VF, Note.CHOKE, Note.GAIN_APPROX, Note.TUNE_SWR),
+            k,
         )
     }
 
     // Rothammel / DL6WU spacings (λ): reflector–driven, driven–D1, D1–D2, …
-    private val YAGI_SPACING = doubleArrayOf(
-        0.240, 0.075, 0.180, 0.215, 0.250, 0.280, 0.300, 0.315, 0.330, 0.345, 0.360, 0.375, 0.385, 0.390, 0.395,
-        0.400, 0.400, 0.400, 0.400, 0.400,
-    )
+    private val YAGI_SPACING =
+        doubleArrayOf(
+            0.240,
+            0.075,
+            0.180,
+            0.215,
+            0.250,
+            0.280,
+            0.300,
+            0.315,
+            0.330,
+            0.345,
+            0.360,
+            0.375,
+            0.385,
+            0.390,
+            0.395,
+            0.400,
+            0.400,
+            0.400,
+            0.400,
+            0.400,
+        )
 
     private fun yagi(l: Double, k: Double, i: AntennaInput): AntennaDesign {
         val n = i.elements.coerceIn(3, 20)
@@ -268,7 +393,14 @@ object AntennaMath {
         }
         dims.add(Dim("L", DimKind.BOOM, length * l))
         val gainDbd = 3.39 * ln(length) + 9.15
-        return AntennaDesign(dims, 50.0, gainDbd + DIPOLE_GAIN, Polarization.HORIZONTAL_OR_VERTICAL, listOf(Note.YAGI_DRIVEN, Note.YAGI_BOOM, Note.GAIN_APPROX, Note.TUNE_SWR), k)
+        return AntennaDesign(
+            dims,
+            50.0,
+            gainDbd + DIPOLE_GAIN,
+            Polarization.HORIZONTAL_OR_VERTICAL,
+            listOf(Note.YAGI_DRIVEN, Note.YAGI_BOOM, Note.GAIN_APPROX, Note.TUNE_SWR),
+            k,
+        )
     }
 
     private fun moxon(l: Double, d: Double, k: Double): AntennaDesign {
@@ -286,13 +418,25 @@ object AntennaMath {
                 Dim("D", DimKind.TAIL_REFLECTOR, dd * l),
                 Dim("E", DimKind.DEPTH, (b + c + dd) * l),
             ),
-            50.0, 5.9, Polarization.HORIZONTAL_OR_VERTICAL, listOf(Note.MOXON_RANGE, Note.GAIN_APPROX, Note.TUNE_SWR), k,
+            50.0,
+            5.9,
+            Polarization.HORIZONTAL_OR_VERTICAL,
+            listOf(Note.MOXON_RANGE, Note.GAIN_APPROX, Note.TUNE_SWR),
+            k,
         )
     }
 
     private fun biquad(l: Double, k: Double): AntennaDesign = AntennaDesign(
-        listOf(Dim("A", DimKind.SIDE, l / 4), Dim("B", DimKind.SPACING, l * 0.12), Dim("C", DimKind.REFLECTOR_PLATE, l)),
-        50.0, 10.5, Polarization.LINEAR, listOf(Note.GAIN_APPROX, Note.TUNE_SWR), k,
+        listOf(
+            Dim("A", DimKind.SIDE, l / 4),
+            Dim("B", DimKind.SPACING, l * 0.12),
+            Dim("C", DimKind.REFLECTOR_PLATE, l),
+        ),
+        50.0,
+        10.5,
+        Polarization.LINEAR,
+        listOf(Note.GAIN_APPROX, Note.TUNE_SWR),
+        k,
     )
 
     private fun helix(l: Double, i: AntennaInput): AntennaDesign {
@@ -308,7 +452,11 @@ object AntennaMath {
                 Dim("D", DimKind.GROUND, l * 0.75),
                 Dim("E", DimKind.TURN_WIRE, sqrt(circ * circ + s * s)),
             ),
-            140.0, gain, Polarization.CIRCULAR, listOf(Note.HELIX_MATCH, Note.HELIX_GAIN, Note.TUNE_SWR), 1.0,
+            140.0,
+            gain,
+            Polarization.CIRCULAR,
+            listOf(Note.HELIX_MATCH, Note.HELIX_GAIN, Note.TUNE_SWR),
+            1.0,
         )
     }
 
@@ -334,7 +482,11 @@ object AntennaMath {
                 Dim("E", DimKind.GROUND, w + 6 * h),
                 Dim("F", DimKind.GROUND, len + 6 * h),
             ),
-            50.0, if (er > 3) 5.0 else 7.0, Polarization.LINEAR, listOf(Note.PATCH_FR4, Note.GAIN_APPROX, Note.TUNE_SWR), 1.0,
+            50.0,
+            if (er > 3) 5.0 else 7.0,
+            Polarization.LINEAR,
+            listOf(Note.PATCH_FR4, Note.GAIN_APPROX, Note.TUNE_SWR),
+            1.0,
         )
     }
 
@@ -348,8 +500,16 @@ object AntennaMath {
     }
 
     private fun stub(l: Double, i: AntennaInput): AntennaDesign = AntennaDesign(
-        listOf(Dim("A", DimKind.QUARTER, l / 4 * i.cable.vf), Dim("B", DimKind.HALF, l / 2 * i.cable.vf), Dim("λ", DimKind.WAVELENGTH, l)),
-        null, 0.0, Polarization.LINEAR, listOf(Note.COAX_VF), 1.0,
+        listOf(
+            Dim("A", DimKind.QUARTER, l / 4 * i.cable.vf),
+            Dim("B", DimKind.HALF, l / 2 * i.cable.vf),
+            Dim("λ", DimKind.WAVELENGTH, l),
+        ),
+        null,
+        0.0,
+        Polarization.LINEAR,
+        listOf(Note.COAX_VF),
+        1.0,
     )
 
     // ------------------------------------------------------------ feed line and power
@@ -361,19 +521,27 @@ object AntennaMath {
         return -10 * log10(1 - g * g)
     }
 
-    data class Band(val from: Double, val to: Double, val erpDbm: Double?, val eirpDbm: Double?, val dutyPercent: Double?, val name: String)
+    data class Band(
+        val from: Double,
+        val to: Double,
+        val erpDbm: Double?,
+        val eirpDbm: Double?,
+        val dutyPercent: Double?,
+        val name: String,
+    )
 
     /** Power limits of the usual licence-free bands (EU short-range devices, US ISM, 2.4 GHz). */
-    val BANDS = listOf(
-        Band(433.05, 434.79, 10.0, null, 10.0, "433 MHz (EU)"),
-        Band(863.0, 868.0, 14.0, null, 1.0, "863–868 MHz (EU)"),
-        Band(868.0, 868.6, 14.0, null, 1.0, "868,0–868,6 MHz (EU)"),
-        Band(868.7, 869.2, 14.0, null, 0.1, "868,7–869,2 MHz (EU)"),
-        Band(869.4, 869.65, 27.0, null, 10.0, "869,4–869,65 MHz (EU)"),
-        Band(869.7, 870.0, 14.0, null, 1.0, "869,7–870 MHz (EU)"),
-        Band(902.0, 928.0, null, 36.0, null, "902–928 MHz (US)"),
-        Band(2400.0, 2483.5, null, 20.0, null, "2,4 GHz (EU)"),
-    )
+    val BANDS =
+        listOf(
+            Band(433.05, 434.79, 10.0, null, 10.0, "433 MHz (EU)"),
+            Band(863.0, 868.0, 14.0, null, 1.0, "863–868 MHz (EU)"),
+            Band(868.0, 868.6, 14.0, null, 1.0, "868,0–868,6 MHz (EU)"),
+            Band(868.7, 869.2, 14.0, null, 0.1, "868,7–869,2 MHz (EU)"),
+            Band(869.4, 869.65, 27.0, null, 10.0, "869,4–869,65 MHz (EU)"),
+            Band(869.7, 870.0, 14.0, null, 1.0, "869,7–870 MHz (EU)"),
+            Band(902.0, 928.0, null, 36.0, null, "902–928 MHz (US)"),
+            Band(2400.0, 2483.5, null, 20.0, null, "2,4 GHz (EU)"),
+        )
 
     fun bandFor(mhz: Double): Band? = BANDS.firstOrNull { mhz >= it.from && mhz <= it.to }
 
@@ -391,7 +559,16 @@ object AntennaMath {
         val overLimit: Boolean?,
     )
 
-    fun feed(mhz: Double, txDbm: Double, cable: Cable?, cableM: Double, connectors: Map<Connector, Int>, swr: Double, gainDbi: Double, customLossPer100m: Double? = null): FeedResult {
+    fun feed(
+        mhz: Double,
+        txDbm: Double,
+        cable: Cable?,
+        cableM: Double,
+        connectors: Map<Connector, Int>,
+        swr: Double,
+        gainDbi: Double,
+        customLossPer100m: Double? = null,
+    ): FeedResult {
         val per100 = customLossPer100m ?: cable?.lossPer100m(mhz) ?: 0.0
         val cableDb = per100 * cableM / 100
         val connDb = connectors.entries.sumOf { it.key.lossDb * it.value }
@@ -411,7 +588,14 @@ object AntennaMath {
      * The same power calculation for a feed line whose loss is already known ([feederDb] in total, of which
      * [connectorsDb] is connectors), for example from [FeederBuilder.compute] with any number of cables and connectors.
      */
-    fun feedLoss(mhz: Double, txDbm: Double, feederDb: Double, connectorsDb: Double, swr: Double, gainDbi: Double): FeedResult {
+    fun feedLoss(
+        mhz: Double,
+        txDbm: Double,
+        feederDb: Double,
+        connectorsDb: Double,
+        swr: Double,
+        gainDbi: Double,
+    ): FeedResult {
         val mm = mismatchLossDb(swr)
         val total = feederDb + mm
         val at = txDbm - total

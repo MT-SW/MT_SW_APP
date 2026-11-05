@@ -21,7 +21,10 @@ import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** Tests for signal-quality rating: preset-relative bands (narrow: -3/-7/-12, lite: -5/-10/-15 dB); RSSI over noise floor can only lower the tier. */
+/**
+ * Tests for signal-quality rating: preset-relative bands (narrow: -3/-7/-12, lite: -5/-10/-15 dB); RSSI over noise
+ * floor can only lower the tier.
+ */
 class LoraSignalIndicatorTest {
 
     // Firmware spreading factors (MeshRadio.h) paired with literal Semtech demodulation floors.
@@ -141,7 +144,10 @@ class LoraSignalIndicatorTest {
     fun `RSSI over noise floor lowers the rating when worse than SNR`() {
         val preset = ModemPreset.NARROW_FAST
         assertEquals(Quality.BAD, determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -90, noiseFloor = -80))
-        assertEquals(Quality.FAIR, determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -84, noiseFloor = -80))
+        assertEquals(
+            Quality.FAIR,
+            determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -84, noiseFloor = -80),
+        )
     }
 
     @Test

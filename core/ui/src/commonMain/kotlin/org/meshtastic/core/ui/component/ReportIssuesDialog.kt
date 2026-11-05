@@ -74,25 +74,23 @@ private const val WHATSAPP_URL = "https://chat.whatsapp.com/HNrO14NTKTx0xiQGKDVX
 private const val SIGNAL_URL =
     "https://signal.group/#CjQKIJrjVtcmsLIgJre9nmpUlTwLMpZnvvIXZUH3LSC9yGDtEhCOjGRHVeloUHeC9rTvL--l"
 
-private fun ReportTarget.url(): String =
-    when (this) {
-        ReportTarget.DISCORD -> DISCORD_URL
-        ReportTarget.WHATSAPP -> WHATSAPP_URL
-        ReportTarget.SIGNAL -> SIGNAL_URL
-    }
+private fun ReportTarget.url(): String = when (this) {
+    ReportTarget.DISCORD -> DISCORD_URL
+    ReportTarget.WHATSAPP -> WHATSAPP_URL
+    ReportTarget.SIGNAL -> SIGNAL_URL
+}
 
-private fun ReportTarget.label(): String =
-    when (this) {
-        ReportTarget.DISCORD -> "Discord"
-        ReportTarget.WHATSAPP -> "WhatsApp"
-        ReportTarget.SIGNAL -> "Signal"
-    }
+private fun ReportTarget.label(): String = when (this) {
+    ReportTarget.DISCORD -> "Discord"
+    ReportTarget.WHATSAPP -> "WhatsApp"
+    ReportTarget.SIGNAL -> "Signal"
+}
 
 /**
  * The report window. The person picks one of the three places (Discord, WhatsApp, Signal), may add a note and keeps the
- * switch for the logs of the last 24 hours; "Send" builds the package and hands it to the app of that place (on a phone,
- * with the group's link in the text) or opens the folder with it and the group (on a computer). [extras] are added to the
- * package (for example the results of a test) and [startNote] fills the note.
+ * switch for the logs of the last 24 hours; "Send" builds the package and hands it to the app of that place (on a
+ * phone, with the group's link in the text) or opens the folder with it and the group (on a computer). [extras] are
+ * added to the package (for example the results of a test) and [startNote] fills the note.
  */
 @Composable
 fun ReportIssuesDialog(
@@ -136,7 +134,11 @@ fun ReportIssuesDialog(
                             if (control.sharesFileToApp && handed) {
                                 getString(Res.string.report_done_phone, report.sizeKb.toString(), report.shownPath)
                             } else {
-                                getString(Res.string.report_done_computer, report.sizeKb.toString(), report.shownPath)
+                                getString(
+                                    Res.string.report_done_computer,
+                                    report.sizeKb.toString(),
+                                    report.shownPath,
+                                )
                             }
                     }
                     busy = false
@@ -195,7 +197,10 @@ fun ReportIssuesDialog(
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(Res.string.report_with_logs), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.report_with_logs),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
                             Text(
                                 text = stringResource(Res.string.report_with_logs_hint),
                                 style = MaterialTheme.typography.bodySmall,
@@ -210,7 +215,9 @@ fun ReportIssuesDialog(
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     Text(stringResource(Res.string.report_sending), style = MaterialTheme.typography.bodySmall)
                 }
-                result?.let { Text(it, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 8.dp)) }
+                result?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 8.dp))
+                }
                 if (failed) {
                     Text(
                         text = stringResource(Res.string.report_failed),

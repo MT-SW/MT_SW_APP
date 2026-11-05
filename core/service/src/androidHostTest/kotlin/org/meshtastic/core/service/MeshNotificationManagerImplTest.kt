@@ -62,8 +62,8 @@ import org.meshtastic.core.resources.live_update_stop_action
 import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.testing.FakeLiveUpdatePrefs
-import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeMeshPrefs
 import org.meshtastic.core.testing.runUntilSettled
 import org.meshtastic.core.testing.runWithRenderScope

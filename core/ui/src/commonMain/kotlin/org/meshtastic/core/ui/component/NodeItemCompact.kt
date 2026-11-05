@@ -296,20 +296,23 @@ private fun CompactNameRow(
                 )
             },
             badge =
-                if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
-                    {
-                        val onNeighborsClick = LocalNeighborsClick.current
-                        NeighborCountBadge(
-                            count = neighborCount,
-                            iconSize = 18.dp,
-                            onClick = onNeighborsClick?.let { click -> { click(nodeNum) } },
-                        )
-                    }
-                } else {
-                    null
-                },
+            if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
+                {
+                    val onNeighborsClick = LocalNeighborsClick.current
+                    NeighborCountBadge(
+                        count = neighborCount,
+                        iconSize = 18.dp,
+                        onClick = onNeighborsClick?.let { click -> { click(nodeNum) } },
+                    )
+                }
+            } else {
+                null
+            },
             trailing = {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     if (thatNode.isUnknownUser) {
                         Icon(
                             imageVector = MeshtasticIcons.PersonQuestion,

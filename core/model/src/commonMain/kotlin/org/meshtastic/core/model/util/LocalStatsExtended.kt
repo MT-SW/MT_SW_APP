@@ -60,8 +60,8 @@ private const val WIRE_TYPE_FIXED32 = 5
 
 /**
  * Scans these [ByteString] unknown fields (from [org.meshtastic.proto.Telemetry.unknownFields]) for the
- * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s plus the 3 WiFi ones) by hand. Returns null if the field is
- * absent (e.g. stock firmware) or malformed.
+ * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s plus the 3 WiFi ones) by
+ * hand. Returns null if the field is absent (e.g. stock firmware) or malformed.
  */
 fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
     val submessage = findLengthDelimitedField(toByteArray(), LOCAL_STATS_EXTENDED_TAG) ?: return null

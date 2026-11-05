@@ -83,15 +83,25 @@ class IosSecurityKeyBackupStore : SecurityKeyBackupStore {
 
     override fun get(nodeNum: Int): StoredSecurityKeys? = readText(file(nodeNum))?.let(::parse)
 
-    override fun all(): Map<Int, StoredSecurityKeys> =
-        FileSystem.SYSTEM.list(dir).mapNotNull { path ->
+    override fun all(): Map<Int, StoredSecurityKeys> = FileSystem.SYSTEM.list(dir)
+        .mapNotNull { path ->
             val num = path.name.removeSuffix(".txt").toIntOrNull() ?: return@mapNotNull null
             val keys = readText(path)?.let(::parse) ?: return@mapNotNull null
             num to keys
-        }.toMap()
+        }
+        .toMap()
 
-    override fun save(nodeNum: Int, publicKeyBase64: String, privateKeyBase64: String, timestamp: Long, longName: String?) {
-        writeText(file(nodeNum), "$publicKeyBase64\n$privateKeyBase64\n$timestamp\n${longName?.replace("\n", " ").orEmpty()}")
+    override fun save(
+        nodeNum: Int,
+        publicKeyBase64: String,
+        privateKeyBase64: String,
+        timestamp: Long,
+        longName: String?,
+    ) {
+        writeText(
+            file(nodeNum),
+            "$publicKeyBase64\n$privateKeyBase64\n$timestamp\n${longName?.replace("\n", " ").orEmpty()}",
+        )
     }
 
     override fun delete(nodeNum: Int) {

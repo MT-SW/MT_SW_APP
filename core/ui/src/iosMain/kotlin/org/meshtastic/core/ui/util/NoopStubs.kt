@@ -17,12 +17,11 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLinkStyles
-import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.common.util.CommonUri
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -43,7 +42,6 @@ actual fun KeepScreenOn(enabled: Boolean) {
     // No-op iOS stub.
 }
 
-
 actual val bleScanRequiresLocationServices: Boolean = false
 
 @Composable actual fun isGpsDisabled(): Boolean = false
@@ -58,7 +56,6 @@ actual val bleScanRequiresLocationServices: Boolean = false
 actual fun SetScreenBrightness(brightness: Float) {
     // No-op iOS stub.
 }
-
 
 @Composable actual fun rememberLocationPermissionState(): PermissionUiState = grantedPermissionUiState()
 

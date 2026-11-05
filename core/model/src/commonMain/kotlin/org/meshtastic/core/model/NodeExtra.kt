@@ -26,10 +26,12 @@ enum class NodeExtraMode {
 
     /** Everything at once. */
     ALL,
+
     ;
 
     companion object {
-        // The line is no longer switched on by this mode (that is done by the separate options); OFF now means "all at once".
+        // The line is no longer switched on by this mode (that is done by the separate options); OFF now means "all at
+        // once".
         fun fromName(name: String): NodeExtraMode = if (name == PAGED.name) PAGED else ALL
     }
 }
@@ -57,7 +59,12 @@ data class NodeExtraStats(
         get() = packetsTx != null || packetsRx != null || packetsRxBad != null || rxDupe != null || txRelay != null
 
     val hasResources: Boolean
-        get() = cpuPercent != null || heapUsedPercent != null || flashUsedPercent != null || psramUsedPercent != null || wifiRssi != null
+        get() =
+            cpuPercent != null ||
+                heapUsedPercent != null ||
+                flashUsedPercent != null ||
+                psramUsedPercent != null ||
+                wifiRssi != null
 
     /** Every reading a node can send is present, so older packets cannot add anything. */
     val isComplete: Boolean

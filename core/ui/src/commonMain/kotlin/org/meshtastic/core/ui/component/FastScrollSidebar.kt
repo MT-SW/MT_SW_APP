@@ -49,8 +49,8 @@ private const val TRACK_ALPHA = 0.18f
  * A small draggable thumb along the trailing edge of [listState]'s list for fast-scrolling through a long list -- built
  * from scratch rather than a platform scrollbar API since it needs to look and behave identically on Android, Desktop
  * and iOS. It behaves like a classic desktop scrollbar: dragging the thumb scrolls the list continuously, and clicking
- * anywhere else on the faint track jumps straight there (the thumb is centred on the click, so clicking the very
- * bottom of the track scrolls to the end and the very top to the start) -- most useful on Desktop, where there's no
+ * anywhere else on the faint track jumps straight there (the thumb is centred on the click, so clicking the very bottom
+ * of the track scrolls to the end and the very top to the start) -- most useful on Desktop, where there's no
  * platform-native touch scrollbar and long lists (nodes, messages, channels, sniffer logs, ...) are otherwise
  * mouse-wheel-only.
  *
@@ -85,9 +85,10 @@ fun FastScrollSidebar(
     val sizeCache = remember(listState) { LazyItemSizeCache() }
     // Everything that changes while scrolling is read inside the draw / pointer lambdas below (never in composition),
     // so scrolling only redraws the 4dp thumb instead of recomposing this function (and its caller) on every frame.
-    val hasItems by remember(listState, itemCount) {
-        derivedStateOf { (itemCount ?: listState.layoutInfo.totalItemsCount) > 1 }
-    }
+    val hasItems by
+        remember(listState, itemCount) {
+            derivedStateOf { (itemCount ?: listState.layoutInfo.totalItemsCount) > 1 }
+        }
     if (!hasItems) return
 
     Box(
@@ -111,12 +112,12 @@ fun FastScrollSidebar(
                     val onThumb = down.position.y in thumbTop..(thumbTop + thumbPx)
 
                     if (!onThumb) {
-                        // Click on the bare track: jump so the thumb is centred under the pointer (ends hit the ends).
+                        // Click on the bare track: jump so the thumb is centred under the pointer (ends hit the
+                        // ends).
                         val along = ((down.position.y - thumbPx / 2f) / movable).coerceIn(0f, 1f)
                         val raw = if (reverseLayout) 1f - along else along
                         val targetPx = raw * metrics.maxScrollPx
-                        val (index, offset) =
-                            if (raw >= 1f) (total - 1) to 0 else sizeCache.itemAt(targetPx, total)
+                        val (index, offset) = if (raw >= 1f) (total - 1) to 0 else sizeCache.itemAt(targetPx, total)
                         coroutineScope.launch { listState.scrollToItem(index, offset) }
                     }
 
@@ -144,9 +145,9 @@ private const val MIN_THUMB_DP = 24
 
 /**
  * Remembers the pixel height of every row of a lazy list that has been on screen. A lazy list only measures what it
- * shows, so counting visible rows (as this used to) made the thumb grow and shrink with the height of the rows
- * in view. With the sizes remembered, the content height is estimated as known rows plus the average for unseen ones,
- * which settles quickly and is exact once the whole list has been seen -- so the thumb keeps one size and only moves.
+ * shows, so counting visible rows (as this used to) made the thumb grow and shrink with the height of the rows in view.
+ * With the sizes remembered, the content height is estimated as known rows plus the average for unseen ones, which
+ * settles quickly and is exact once the whole list has been seen -- so the thumb keeps one size and only moves.
  */
 private class LazyItemSizeCache {
     private val sizes = HashMap<Int, Int>()
@@ -235,8 +236,10 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
                     down.consume()
 
                     val thumbFraction =
-                        (scrollState.viewportSize.toFloat() / (max + scrollState.viewportSize))
-                            .coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
+                        (scrollState.viewportSize.toFloat() / (max + scrollState.viewportSize)).coerceIn(
+                            MIN_THUMB_HEIGHT_FRACTION,
+                            1f,
+                        )
                     val minThumbPx = MIN_THUMB_DP.dp.toPx().coerceAtMost(trackPx)
                     val thumbPx = (trackPx * thumbFraction).coerceIn(minThumbPx, trackPx)
                     val thumbTop = (trackPx - thumbPx) * (scrollState.value.toFloat() / max).coerceIn(0f, 1f)
@@ -263,8 +266,10 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
                 val totalContentPx = max + scrollState.viewportSize
                 val scrollFraction = (scrollState.value.toFloat() / max.toFloat()).coerceIn(0f, 1f)
                 val thumbFraction =
-                    (scrollState.viewportSize.toFloat() / totalContentPx.toFloat())
-                        .coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
+                    (scrollState.viewportSize.toFloat() / totalContentPx.toFloat()).coerceIn(
+                        MIN_THUMB_HEIGHT_FRACTION,
+                        1f,
+                    )
                 drawTrack(thumbColor)
                 drawThumb(thumbColor, scrollFraction, thumbFraction)
             },

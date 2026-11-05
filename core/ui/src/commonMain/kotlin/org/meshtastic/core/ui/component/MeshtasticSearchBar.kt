@@ -211,11 +211,9 @@ private fun InlineSearchField(
             errorIndicatorColor = Color.Transparent,
         ),
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .testTag(testTag)
-            .semantics { contentDescription = placeholder },
+        modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag(testTag).semantics {
+            contentDescription = placeholder
+        },
     )
 }
 

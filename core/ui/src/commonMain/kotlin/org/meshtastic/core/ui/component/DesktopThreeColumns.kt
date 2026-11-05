@@ -42,8 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
@@ -54,8 +54,8 @@ import androidx.navigation3.scene.SceneStrategyScope
 
 /**
  * Which column a screen takes in the list / detail / extra layout. The library's own layout draws its width slider only
- * between two columns, so on a wide desktop window (three columns) [DesktopThreeColumnSceneStrategy] lays the columns out
- * itself and needs to know the role of each screen. The library's own metadata is added too, so everywhere else the
+ * between two columns, so on a wide desktop window (three columns) [DesktopThreeColumnSceneStrategy] lays the columns
+ * out itself and needs to know the role of each screen. The library's own metadata is added too, so everywhere else the
  * screens behave exactly as before.
  */
 object MeshtasticPanes {
@@ -115,7 +115,11 @@ internal class ThreeColumnWidths {
 }
 
 /** Which of the desktop layouts a scene uses. */
-private enum class ColumnsLayout { LIST_DETAIL, DETAIL_EXTRA, THREE }
+private enum class ColumnsLayout {
+    LIST_DETAIL,
+    DETAIL_EXTRA,
+    THREE,
+}
 
 /** How many columns the desktop layout draws when a screen is open over the node's details. */
 internal enum class ColumnMode {
@@ -201,11 +205,10 @@ private class ColumnsScene(
     override val entries: List<NavEntry<NavKey>> = columns
     override val content: @Composable () -> Unit = { Columns(columns, layout, widths, movables) }
 
-    override fun equals(other: Any?): Boolean =
-        other is ColumnsScene &&
-            other.layout == layout &&
-            other.entries == entries &&
-            other.previousEntries == previousEntries
+    override fun equals(other: Any?): Boolean = other is ColumnsScene &&
+        other.layout == layout &&
+        other.entries == entries &&
+        other.previousEntries == previousEntries
 
     override fun hashCode(): Int = 31 * (31 * entries.hashCode() + previousEntries.hashCode()) + layout.hashCode()
 }
@@ -287,11 +290,10 @@ private fun Columns(
                 }
             }
         // Measurables alternate: column, divider, column, ...
-        val placeables =
-            measurables.mapIndexed { index, measurable ->
-                val w = if (index % 2 == 1) dividerPx else columnWidths[index / 2]
-                measurable.measure(Constraints(minWidth = w, maxWidth = w, minHeight = height, maxHeight = height))
-            }
+        val placeables = measurables.mapIndexed { index, measurable ->
+            val w = if (index % 2 == 1) dividerPx else columnWidths[index / 2]
+            measurable.measure(Constraints(minWidth = w, maxWidth = w, minHeight = height, maxHeight = height))
+        }
         layout(width, height) {
             var x = 0
             placeables.forEach {

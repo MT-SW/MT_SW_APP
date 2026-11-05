@@ -18,10 +18,10 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import java.io.File
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 private const val COMMAND_TIMEOUT_SECONDS = 20L
 private const val BAND_24_MAX_MHZ = 2500
@@ -46,14 +46,14 @@ private class DesktopPhoneWifiScanner : PhoneWifiScanner {
         runCatching {
             when {
                 "win" in os ->
-                    run("netsh", "wlan", "show", "interfaces")
-                        ?.lines()
-                        ?.firstNotNullOfOrNull { Regex("^\\s*SSID\\s*:\\s*(.+)$").find(it)?.groupValues?.get(1)?.trim() }
+                    run("netsh", "wlan", "show", "interfaces")?.lines()?.firstNotNullOfOrNull {
+                        Regex("^\\s*SSID\\s*:\\s*(.+)$").find(it)?.groupValues?.get(1)?.trim()
+                    }
 
                 "mac" in os && File(MAC_AIRPORT).exists() ->
-                    run(MAC_AIRPORT, "-I")
-                        ?.lines()
-                        ?.firstNotNullOfOrNull { Regex("^\\s*SSID:\\s*(.+)$").find(it)?.groupValues?.get(1)?.trim() }
+                    run(MAC_AIRPORT, "-I")?.lines()?.firstNotNullOfOrNull {
+                        Regex("^\\s*SSID:\\s*(.+)$").find(it)?.groupValues?.get(1)?.trim()
+                    }
 
                 "mac" in os ->
                     run("networksetup", "-getairportnetwork", "en0")
@@ -77,9 +77,13 @@ private class DesktopPhoneWifiScanner : PhoneWifiScanner {
         runCatching {
             when {
                 "win" in os -> parseWindows(run("netsh", "wlan", "show", "networks", "mode=bssid").orEmpty())
+
                 "mac" in os && File(MAC_AIRPORT).exists() -> parseMac(run(MAC_AIRPORT, "-s").orEmpty())
+
                 "mac" in os -> emptyList()
-                else -> parseLinux(run("nmcli", "-t", "-f", "SSID,SIGNAL,FREQ", "dev", "wifi", "list").orEmpty())
+
+                else ->
+                    parseLinux(run("nmcli", "-t", "-f", "SSID,SIGNAL,FREQ", "dev", "wifi", "list").orEmpty())
             }
         }
             .getOrDefault(emptyList())

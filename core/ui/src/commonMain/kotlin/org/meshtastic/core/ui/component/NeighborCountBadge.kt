@@ -26,11 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.unit.Constraints
-import kotlin.math.max
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -38,6 +37,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.ui.icon.Group
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import kotlin.math.max
 
 /**
  * Grey "neighbours" icon (people) with the count from the node's last saved neighbour list. With [onClick] it is a
@@ -64,14 +64,16 @@ fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp =
     }
 }
 
-/** Opens the window with a node's last neighbour list when its icon is tapped; null (the default) makes the icon inert. */
+/**
+ * Opens the window with a node's last neighbour list when its icon is tapped; null (the default) makes the icon inert.
+ */
 val LocalNeighborsClick = compositionLocalOf<((nodeNum: Int) -> Unit)?> { null }
 
 /**
  * Puts [badge] in the same column on every card: a fixed distance from the right edge of the header line, left of the
  * icons on the right (more icons push it further left). The name gets the width up to the badge (it is shortened only
- * when there is no room), [trailing] stays at the right edge of this row, and without a badge the name simply takes
- * the space as before. [extraRight] is the width of the icons that sit to the right of this row on the same line.
+ * when there is no room), [trailing] stays at the right edge of this row, and without a badge the name simply takes the
+ * space as before. [extraRight] is the width of the icons that sit to the right of this row on the same line.
  */
 @Composable
 fun NameRowWithCenteredBadge(
@@ -131,5 +133,7 @@ fun NameRowWithCenteredBadge(
 
 private val MIN_BADGE_GAP = 4.dp
 
-/** Distance from the right edge of the header line to the right edge of the neighbour badge (room for about four icons). */
+/**
+ * Distance from the right edge of the header line to the right edge of the neighbour badge (room for about four icons).
+ */
 private val BADGE_ZONE = 104.dp

@@ -19,10 +19,6 @@ package org.meshtastic.core.service
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.suspendCancellableCoroutine
-import platform.CoreLocation.CLGeocoder
-import platform.CoreLocation.CLLocation
-import platform.CoreLocation.CLPlacemark
-import kotlin.coroutines.resume
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.GeocodedPlace
@@ -30,6 +26,10 @@ import org.meshtastic.core.repository.Location
 import org.meshtastic.core.repository.LocationService
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.ReverseGeocoder
+import platform.CoreLocation.CLGeocoder
+import platform.CoreLocation.CLLocation
+import platform.CoreLocation.CLPlacemark
+import kotlin.coroutines.resume
 
 /** iPhone: the system asks about the local network by itself, so the app treats it as allowed. */
 @Single
@@ -49,11 +49,12 @@ class IosReverseGeocoder : ReverseGeocoder {
     override suspend fun place(latitude: Double, longitude: Double): GeocodedPlace? =
         withTimeoutOrNull(GEOCODE_TIMEOUT_MS) {
             suspendCancellableCoroutine { cont ->
-                CLGeocoder().reverseGeocodeLocation(CLLocation(latitude = latitude, longitude = longitude)) { marks, _ ->
+                CLGeocoder().reverseGeocodeLocation(CLLocation(latitude = latitude, longitude = longitude)) {
+                        marks,
+                        _,
+                    ->
                     val mark = marks?.firstOrNull() as? CLPlacemark
-                    cont.resume(
-                        mark?.let { GeocodedPlace(it.ISOcountryCode, it.administrativeArea, it.locality) },
-                    )
+                    cont.resume(mark?.let { GeocodedPlace(it.ISOcountryCode, it.administrativeArea, it.locality) })
                 }
             }
         }

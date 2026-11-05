@@ -25,23 +25,23 @@ import org.jetbrains.compose.resources.getString
 import org.meshtastic.core.common.util.CommonUri
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
-import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSString
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSURL
 import platform.Foundation.NSURL.Companion.fileURLWithPath
+import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.writeToFile
-import platform.Foundation.NSUTF8StringEncoding
 import platform.UIKit.NSTextAlignmentCenter
-import platform.UIKit.UIColor
-import platform.UIKit.UIFont
-import platform.UIKit.UILabel
-import platform.UIKit.UIView
-import platform.Foundation.NSURL
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
+import platform.UIKit.UIColor
 import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
+import platform.UIKit.UIFont
+import platform.UIKit.UILabel
+import platform.UIKit.UIView
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
@@ -77,11 +77,12 @@ private fun percentEncode(text: String): String = buildString {
 
 @Composable
 actual fun rememberShareText(): (text: String, subject: String) -> Unit = { text, _ ->
-    topViewController()?.presentViewController(
-        UIActivityViewController(activityItems = listOf(text), applicationActivities = null),
-        animated = true,
-        completion = null,
-    )
+    topViewController()
+        ?.presentViewController(
+            UIActivityViewController(activityItems = listOf(text), applicationActivities = null),
+            animated = true,
+            completion = null,
+        )
 }
 
 @Composable
@@ -97,7 +98,9 @@ actual fun rememberOpenMap(): (latitude: Double, longitude: Double, label: Strin
 
 @Composable actual fun rememberOpenWifiSettings(): () -> Unit = { openAppSettings() }
 
-private class PickerDelegate(var onUri: (CommonUri?) -> Unit) : NSObject(), UIDocumentPickerDelegateProtocol {
+private class PickerDelegate(var onUri: (CommonUri?) -> Unit) :
+    NSObject(),
+    UIDocumentPickerDelegateProtocol {
     override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentsAtURLs: List<*>) {
         val url = didPickDocumentsAtURLs.firstOrNull() as? NSURL
         onUri(url?.absoluteString?.let { CommonUri.parse(it) })
@@ -124,8 +127,9 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
 @OptIn(ExperimentalForeignApi::class)
 private fun showToastNow(text: String) {
     val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
-    val window = (scene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } ?: scene?.windows?.firstOrNull()) as? UIWindow
-        ?: return
+    val window =
+        (scene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } ?: scene?.windows?.firstOrNull())
+            as? UIWindow ?: return
     val (width, height) = window.bounds.useContents { size.width to size.height }
     val label = UILabel()
     label.text = text

@@ -20,6 +20,7 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -32,7 +33,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,8 +49,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.MeasurementSystem
@@ -58,7 +58,6 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
-import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.AirQuality
 import org.meshtastic.core.ui.icon.AirUtilization
 import org.meshtastic.core.ui.icon.ChannelUtilization
@@ -69,21 +68,22 @@ import org.meshtastic.core.ui.icon.ElectricPower
 import org.meshtastic.core.ui.icon.Humidity
 import org.meshtastic.core.ui.icon.LightMode
 import org.meshtastic.core.ui.icon.Memory
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PeopleCount
 import org.meshtastic.core.ui.icon.Pressure
+import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.SoilMoisture
 import org.meshtastic.core.ui.icon.SoilTemperature
-import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Speed
 import org.meshtastic.core.ui.icon.Storage
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
+import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.Wifi
+import org.meshtastic.core.ui.icon.WindDirection
 import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
-import org.meshtastic.core.ui.icon.Weight
-import org.meshtastic.core.ui.icon.WindDirection
 
 /**
  * How the extra line of data under each node is shown; provided by the node list. [packets] and [hardware] switch the
@@ -129,36 +129,36 @@ private fun legend(icon: (@Composable () -> ImageVector)?, text: String) = icon 
 
 /** Icon -> meaning, for the (i) legend in the settings. */
 val nodeExtraLegend: List<Pair<(@Composable () -> ImageVector)?, String>> =
-        listOf(
-            legend({ MeshtasticIcons.Temperature }, "Temperatura"),
-            legend({ MeshtasticIcons.Humidity }, "Wilgotność"),
-            legend({ MeshtasticIcons.Pressure }, "Ciśnienie"),
-            legend({ MeshtasticIcons.WindDirection }, "Wiatr (prędkość, kierunek)"),
-            legend({ MeshtasticIcons.Speed }, "Poryw wiatru"),
-            legend({ MeshtasticIcons.Tsunami }, "Deszcz (1 godz. / 24 godz.)"),
-            legend({ MeshtasticIcons.LightMode }, "Światło / promieniowanie UV"),
-            legend({ MeshtasticIcons.DetectionSensor }, "Promieniowanie"),
-            legend({ MeshtasticIcons.Distance }, "Odległość / poziom"),
-            legend({ MeshtasticIcons.Weight }, "Waga"),
-            legend({ MeshtasticIcons.SoilTemperature }, "Gleba (temperatura)"),
-            legend({ MeshtasticIcons.SoilMoisture }, "Gleba (wilgotność)"),
-            legend({ MeshtasticIcons.AirQuality }, "Jakość powietrza"),
-            legend({ MeshtasticIcons.PeopleCount }, "Licznik osób (BLE / Wi-Fi)"),
-            legend({ MeshtasticIcons.Voltage }, "Napięcie"),
-            legend({ MeshtasticIcons.ElectricPower }, "Prąd / kanały zasilania"),
-            legend({ MeshtasticIcons.ChannelUtilization }, "Zajętość kanału"),
-            legend({ MeshtasticIcons.AirUtilization }, "Czas nadawania"),
-            legend({ MeshtasticIcons.Snr }, "Szum tła (poziom szumu na kanale)"),
-            legend(null, "TX: pakiety wysłane"),
-            legend(null, "RX: pakiety odebrane"),
-            legend(null, "B: pakiety błędne (uszkodzone)"),
-            legend(null, "D: duplikaty"),
-            legend(null, "Przek.: pakiety przekazane dalej"),
-            legend({ MeshtasticIcons.Wifi }, "Siła sygnału Wi-Fi węzła (z jego pakietu)"),
-            legend({ MeshtasticIcons.Memory }, "Procesor (CPU)"),
-            legend({ MeshtasticIcons.DataUsage }, "Wolna pamięć"),
-            legend({ MeshtasticIcons.Storage }, "Zajęta pamięć flash / PSRAM"),
-        )
+    listOf(
+        legend({ MeshtasticIcons.Temperature }, "Temperatura"),
+        legend({ MeshtasticIcons.Humidity }, "Wilgotność"),
+        legend({ MeshtasticIcons.Pressure }, "Ciśnienie"),
+        legend({ MeshtasticIcons.WindDirection }, "Wiatr (prędkość, kierunek)"),
+        legend({ MeshtasticIcons.Speed }, "Poryw wiatru"),
+        legend({ MeshtasticIcons.Tsunami }, "Deszcz (1 godz. / 24 godz.)"),
+        legend({ MeshtasticIcons.LightMode }, "Światło / promieniowanie UV"),
+        legend({ MeshtasticIcons.DetectionSensor }, "Promieniowanie"),
+        legend({ MeshtasticIcons.Distance }, "Odległość / poziom"),
+        legend({ MeshtasticIcons.Weight }, "Waga"),
+        legend({ MeshtasticIcons.SoilTemperature }, "Gleba (temperatura)"),
+        legend({ MeshtasticIcons.SoilMoisture }, "Gleba (wilgotność)"),
+        legend({ MeshtasticIcons.AirQuality }, "Jakość powietrza"),
+        legend({ MeshtasticIcons.PeopleCount }, "Licznik osób (BLE / Wi-Fi)"),
+        legend({ MeshtasticIcons.Voltage }, "Napięcie"),
+        legend({ MeshtasticIcons.ElectricPower }, "Prąd / kanały zasilania"),
+        legend({ MeshtasticIcons.ChannelUtilization }, "Zajętość kanału"),
+        legend({ MeshtasticIcons.AirUtilization }, "Czas nadawania"),
+        legend({ MeshtasticIcons.Snr }, "Szum tła (poziom szumu na kanale)"),
+        legend(null, "TX: pakiety wysłane"),
+        legend(null, "RX: pakiety odebrane"),
+        legend(null, "B: pakiety błędne (uszkodzone)"),
+        legend(null, "D: duplikaty"),
+        legend(null, "Przek.: pakiety przekazane dalej"),
+        legend({ MeshtasticIcons.Wifi }, "Siła sygnału Wi-Fi węzła (z jego pakietu)"),
+        legend({ MeshtasticIcons.Memory }, "Procesor (CPU)"),
+        legend({ MeshtasticIcons.DataUsage }, "Wolna pamięć"),
+        legend({ MeshtasticIcons.Storage }, "Zajęta pamięć flash / PSRAM"),
+    )
 
 private fun Float?.ok(): Float? = this?.takeIf { !it.isNaN() && !it.isInfinite() }
 
@@ -175,16 +175,22 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
     (env.relative_humidity.ok()?.takeIf { it != 0f } ?: aq.co2_humidity.ok()?.takeIf { it != 0f })?.let {
         add(ExtraChip({ MeshtasticIcons.Humidity }, "Wilg.", MetricFormatter.humidity(it)))
     }
-    env.barometric_pressure.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip({ MeshtasticIcons.Pressure }, "Baro", MetricFormatter.pressure(it)))
-    }
+    env.barometric_pressure
+        .ok()
+        ?.takeIf { it != 0f }
+        ?.let {
+            add(ExtraChip({ MeshtasticIcons.Pressure }, "Baro", MetricFormatter.pressure(it)))
+        }
     env.wind_speed.ok()?.let { speed ->
-        val dir = env.wind_direction?.let { " ${it}°" } ?: ""
+        val dir = env.wind_direction?.let { " $it°" } ?: ""
         add(ExtraChip({ MeshtasticIcons.WindDirection }, "Wiatr", MetricFormatter.windSpeed(speed, imperial) + dir))
     }
-    env.wind_gust.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip({ MeshtasticIcons.Speed }, "Poryw", MetricFormatter.windSpeed(it, imperial)))
-    }
+    env.wind_gust
+        .ok()
+        ?.takeIf { it != 0f }
+        ?.let {
+            add(ExtraChip({ MeshtasticIcons.Speed }, "Poryw", MetricFormatter.windSpeed(it, imperial)))
+        }
     val rain1 = env.rainfall_1h.ok()
     val rain24 = env.rainfall_24h.ok()
     if (rain1 != null || rain24 != null) {
@@ -204,9 +210,11 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
     env.soil_temperature.ok()?.let {
         add(ExtraChip({ MeshtasticIcons.SoilTemperature }, "Gleba", MetricFormatter.temperature(it, tempF)))
     }
-    env.soil_moisture?.takeIf { it in 0..100 }?.let {
-        add(ExtraChip({ MeshtasticIcons.SoilMoisture }, "Wilg. gl.", MetricFormatter.percent(it)))
-    }
+    env.soil_moisture
+        ?.takeIf { it in 0..100 }
+        ?.let {
+            add(ExtraChip({ MeshtasticIcons.SoilMoisture }, "Wilg. gl.", MetricFormatter.percent(it)))
+        }
     env.iaq?.takeIf { it != 0 }?.let { add(ExtraChip({ MeshtasticIcons.AirQuality }, "IAQ", "$it")) }
     if (pax.ble != 0 || pax.wifi != 0) {
         add(ExtraChip({ MeshtasticIcons.PeopleCount }, "Osoby", "B:${pax.ble} W:${pax.wifi}"))
@@ -220,11 +228,16 @@ private fun powerChips(node: Node, lna: LnaCorrection): List<ExtraChip> = buildL
     val power = node.powerMetrics
     // Only the voltage of an external sensor (environment or power telemetry) is shown here. The basic device
     // voltage belongs to the battery percentage and is not repeated.
-    env.voltage.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
-    }
+    env.voltage
+        .ok()
+        ?.takeIf { it != 0f }
+        ?.let {
+            add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
+        }
     // The current is shown with the sign switch of its node (sensor wired backwards), like everywhere else in the app.
-    env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(lna.current(node.num, it)))) }
+    env.current.ok()?.let {
+        add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(lna.current(node.num, it))))
+    }
     listOf(
         Triple(1, power.ch1_voltage.ok(), power.ch1_current.ok()),
         Triple(2, power.ch2_voltage.ok(), power.ch2_current.ok()),
@@ -233,7 +246,10 @@ private fun powerChips(node: Node, lna: LnaCorrection): List<ExtraChip> = buildL
         .forEach { (ch, v, c) ->
             if (v != null || c != null) {
                 val text =
-                    listOfNotNull(v?.let { MetricFormatter.voltage(it) }, c?.let { MetricFormatter.current(lna.current(node.num, it)) })
+                    listOfNotNull(
+                        v?.let { MetricFormatter.voltage(it) },
+                        c?.let { MetricFormatter.current(lna.current(node.num, it)) },
+                    )
                         .joinToString(" ")
                 add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Kan. $ch", text))
             }
@@ -292,7 +308,9 @@ private fun buildGroups(
     isThisNode: Boolean,
     lna: LnaCorrection,
 ): List<ExtraGroup> = buildList {
-    if (showEnvironment) add(ExtraGroup(powerChips(node, lna) + weatherChips(node, tempF, imperial), rightAligned = false))
+    if (showEnvironment) {
+        add(ExtraGroup(powerChips(node, lna) + weatherChips(node, tempF, imperial), rightAligned = false))
+    }
     if (config.packets) add(ExtraGroup(trafficChips(stats), rightAligned = true))
     if (config.hardware) add(ExtraGroup(resourceChips(stats), rightAligned = true))
 }
@@ -375,7 +393,9 @@ private fun PagedRow(pages: List<ExtraPage>, iconsOnly: Boolean) {
     }
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }
-            .collect { scrolling -> if (scrolling && !autoScrolling) pausedUntil = tickState.value + MANUAL_PAUSE_TICKS }
+            .collect { scrolling ->
+                if (scrolling && !autoScrolling) pausedUntil = tickState.value + MANUAL_PAUSE_TICKS
+            }
     }
 
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -384,7 +404,11 @@ private fun PagedRow(pages: List<ExtraPage>, iconsOnly: Boolean) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement =
-                if (page?.rightAligned == true) Arrangement.spacedBy(12.dp, Alignment.End) else Arrangement.spacedBy(12.dp),
+                if (page?.rightAligned == true) {
+                    Arrangement.spacedBy(12.dp, Alignment.End)
+                } else {
+                    Arrangement.spacedBy(12.dp)
+                },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 page?.chips?.forEach { ExtraChipView(it, iconsOnly) }
@@ -446,9 +470,9 @@ private fun chipItem(chip: ExtraChip, iconsOnly: Boolean): @Composable () -> Uni
 
 /**
  * Ether readings (channel utilization, air time, noise floor) for a node card. They carry a short label, unless the
- * "same icons" option is on or [forceIconsOnly] is set (when they share the hops line). Empty when the "Ether" option is
- * off. On the full card our own node already shows channel utilization and air time in its signal row, so it gets only
- * the noise floor there ([compactCard] has no such row and gets all three).
+ * "same icons" option is on or [forceIconsOnly] is set (when they share the hops line). Empty when the "Ether" option
+ * is off. On the full card our own node already shows channel utilization and air time in its signal row, so it gets
+ * only the noise floor there ([compactCard] has no such row and gets all three).
  */
 @Composable
 fun etherInlineItems(

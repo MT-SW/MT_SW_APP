@@ -38,8 +38,8 @@ import org.meshtastic.core.resources.ic_folder_open
 import org.meshtastic.core.resources.ic_keep
 import org.meshtastic.core.resources.ic_list
 import org.meshtastic.core.resources.ic_mark_chat_read
-import org.meshtastic.core.resources.ic_mic
 import org.meshtastic.core.resources.ic_mark_chat_unread
+import org.meshtastic.core.resources.ic_mic
 import org.meshtastic.core.resources.ic_more_vert
 import org.meshtastic.core.resources.ic_offline_share
 import org.meshtastic.core.resources.ic_output

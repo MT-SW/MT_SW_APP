@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@ package org.meshtastic.core.ui.util
 /** Writing text into JSON files by hand (the exports are small and need no library). */
 object JsonText {
     /** [s] as a quoted JSON string: quotes, backslashes and control characters escaped. */
-    fun quote(s: String): String =
-        buildString {
-            append('"')
-            for (c in s) when {
+    fun quote(s: String): String = buildString {
+        append('"')
+        for (c in s) {
+            when {
                 c == '"' -> append("\\\"")
                 c == '\\' -> append("\\\\")
                 c == '\n' -> append("\\n")
@@ -31,6 +31,7 @@ object JsonText {
                 c.code < 0x20 -> append("\\u").append(c.code.toString(16).padStart(4, '0'))
                 else -> append(c)
             }
-            append('"')
         }
+        append('"')
+    }
 }

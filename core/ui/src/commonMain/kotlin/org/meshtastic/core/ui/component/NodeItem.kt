@@ -656,7 +656,11 @@ private fun NodeItemHeader(
                     modifier = Modifier.size(16.dp),
                 )
             }
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 StatusAwareLastHeard(
                     lastHeard = thatNode.lastHeard,
                     online = thatNode.isOnline,

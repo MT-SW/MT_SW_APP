@@ -79,20 +79,19 @@ fun Waypoint.toGeofence(): Geofence? {
         } else {
             null
         }
-    val box =
-        bounding_box?.let {
-            val southDeg = it.latitude_south_i * DEG_D
-            val northDeg = it.latitude_north_i * DEG_D
-            val westDeg = it.longitude_west_i * DEG_D
-            val eastDeg = it.longitude_east_i * DEG_D
-            // Normalize transposed corners so an inverted box (south>north / west>east) from another client still
-            // describes the intended rectangle. (Antimeridian-crossing boxes remain a documented non-goal.)
-            GeofenceBox(
-                south = minOf(southDeg, northDeg),
-                west = minOf(westDeg, eastDeg),
-                north = maxOf(southDeg, northDeg),
-                east = maxOf(westDeg, eastDeg),
-            )
-        }
+    val box = bounding_box?.let {
+        val southDeg = it.latitude_south_i * DEG_D
+        val northDeg = it.latitude_north_i * DEG_D
+        val westDeg = it.longitude_west_i * DEG_D
+        val eastDeg = it.longitude_east_i * DEG_D
+        // Normalize transposed corners so an inverted box (south>north / west>east) from another client still
+        // describes the intended rectangle. (Antimeridian-crossing boxes remain a documented non-goal.)
+        GeofenceBox(
+            south = minOf(southDeg, northDeg),
+            west = minOf(westDeg, eastDeg),
+            north = maxOf(southDeg, northDeg),
+            east = maxOf(westDeg, eastDeg),
+        )
+    }
     return if (circle == null && box == null) null else Geofence(circle, box)
 }

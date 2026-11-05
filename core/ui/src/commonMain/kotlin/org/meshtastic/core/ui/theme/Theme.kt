@@ -25,15 +25,15 @@ import androidx.compose.material3.MotionScheme.Companion.expressive
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
@@ -44,8 +44,8 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import co.touchlab.kermit.Logger
-import kotlin.concurrent.Volatile
 import kotlinx.coroutines.CancellationException
+import kotlin.concurrent.Volatile
 
 private val lightScheme =
     lightColorScheme(
@@ -124,7 +124,6 @@ private val darkScheme =
         surfaceContainerHigh = surfaceContainerHighDark,
         surfaceContainerHighest = surfaceContainerHighestDark,
     )
-
 
 // ─── Monochrome (black and white) themes ───
 // Pure greys only. Nothing in these two schemes carries a hue, and AppTheme additionally drains the colour out of
@@ -233,8 +232,8 @@ fun PauseGrayscaleLayer() {
 }
 
 /**
- * Whether the black-and-white theme is active, readable outside composition (map layers build their colours as text
- * in plain functions). Set by [AppTheme].
+ * Whether the black-and-white theme is active, readable outside composition (map layers build their colours as text in
+ * plain functions). Set by [AppTheme].
  */
 object MonochromeState {
     @Volatile var on: Boolean = false
@@ -248,13 +247,15 @@ fun Color.monoSafe(): Color {
 }
 
 /**
- * Drains the colour out of this element (and what it contains) in the black-and-white themes. Used for the bars while
- * a map is on screen, because the global grayscale layer is paused then. Never put a native view (map, camera) inside.
+ * Drains the colour out of this element (and what it contains) in the black-and-white themes. Used for the bars while a
+ * map is on screen, because the global grayscale layer is paused then. Never put a native view (map, camera) inside.
  */
 @Composable
 fun Modifier.monochromeLayer(): Modifier {
     if (!LocalMonochrome.current) return this
-    val paint = remember { Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) } }
+    val paint = remember {
+        Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
+    }
     return this.drawWithContent {
         drawIntoCanvas { canvas ->
             canvas.saveLayer(Rect(0f, 0f, size.width, size.height), paint)
@@ -268,10 +269,9 @@ fun Modifier.monochromeLayer(): Modifier {
 @Composable
 private fun GrayscaleLayer(content: @Composable () -> Unit) {
     val gate = remember { GrayscaleGate() }
-    val paint =
-        remember {
-            Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
-        }
+    val paint = remember {
+        Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
+    }
     val paused = gate.nativeViews > 0
     Box(
         modifier =

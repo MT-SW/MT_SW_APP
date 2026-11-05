@@ -105,21 +105,20 @@ fun MeshtasticDialog(
     val confirmButtonText = confirmText ?: confirmTextRes?.let { stringResource(it) }
     val dismissButtonText = dismissText ?: dismissTextRes?.let { stringResource(it) }
 
-    val htmlAnnotated =
-        html?.let {
-            annotatedStringFromHtml(
-                it,
-                linkStyles =
-                TextLinkStyles(
-                    style =
-                    SpanStyle(
-                        textDecoration = TextDecoration.Underline,
-                        fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colorScheme.link,
-                    ),
+    val htmlAnnotated = html?.let {
+        annotatedStringFromHtml(
+            it,
+            linkStyles =
+            TextLinkStyles(
+                style =
+                SpanStyle(
+                    textDecoration = TextDecoration.Underline,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.link,
                 ),
-            )
-        }
+            ),
+        )
+    }
 
     // A dialog opens in its own window whose composition resets LocalDensity to the system value, which would
     // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
@@ -150,10 +149,7 @@ fun MeshtasticDialog(
                         style = MaterialTheme.typography.headlineSmallEmphasized,
                     )
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        Column(
-                            modifier =
-                            Modifier.weight(1f, fill = false).then(bodyScroll),
-                        ) {
+                        Column(modifier = Modifier.weight(1f, fill = false).then(bodyScroll)) {
                             if (text != null) {
                                 text()
                             } else if (htmlAnnotated != null) {
@@ -189,7 +185,9 @@ fun MeshtasticDialog(
                                     onClick = onDismiss,
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                     colors =
-                                    ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                                    ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.onSurface,
+                                    ),
                                 ) {
                                     Text(text = dismissButtonText ?: stringResource(Res.string.cancel))
                                 }
@@ -199,7 +197,9 @@ fun MeshtasticDialog(
                                     onClick = onConfirm,
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                     colors =
-                                    ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                                    ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.onSurface,
+                                    ),
                                 ) {
                                     Text(text = confirmButtonText ?: stringResource(Res.string.okay))
                                 }

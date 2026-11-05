@@ -45,8 +45,8 @@ import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.proto.Config
 
 /**
- * The preset to rate signal quality against. With a manual (non-preset) configuration `modem_preset` is only a
- * leftover default, so the bandwidth decides: up to 62.5 kHz is rated as Narrow, up to 125 kHz as Lite.
+ * The preset to rate signal quality against. With a manual (non-preset) configuration `modem_preset` is only a leftover
+ * default, so the bandwidth decides: up to 62.5 kHz is rated as Narrow, up to 125 kHz as Lite.
  */
 private fun Config.LoRaConfig.effectiveModemPreset(): Config.LoRaConfig.ModemPreset = when {
     use_preset -> modem_preset
@@ -108,9 +108,10 @@ fun MeshtasticAppShell(
     val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
     val currentInverted by uiPrefs.currentInverted.collectAsStateWithLifecycle()
     val batteryInverted by uiPrefs.batteryInverted.collectAsStateWithLifecycle()
-    val lnaCorrection = remember(myNodeNum, lnaGains, currentInverted, batteryInverted) {
-        LnaCorrection(myNodeNum, lnaGains, currentInverted, batteryInverted)
-    }
+    val lnaCorrection =
+        remember(myNodeNum, lnaGains, currentInverted, batteryInverted) {
+            LnaCorrection(myNodeNum, lnaGains, currentInverted, batteryInverted)
+        }
 
     MeshtasticSnackbarProvider(snackbarManager = uiViewModel.snackbarManager, hostModifier = hostModifier) {
         // Provide the activity FLOW (stable ref) — not a collected value — so it costs no recomposition; only the

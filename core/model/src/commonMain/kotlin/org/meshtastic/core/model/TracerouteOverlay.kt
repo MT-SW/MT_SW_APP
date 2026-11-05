@@ -27,7 +27,9 @@ data class TracerouteOverlay(
     val requestId: Int,
     val forwardRoute: List<Int> = emptyList(),
     val returnRoute: List<Int> = emptyList(),
-    /** SNR of each forward hop in quarter dB, as the radio reports it (-128 = unknown); hop i is route[i] to route[i+1]. */
+    /**
+     * SNR of each forward hop in quarter dB, as the radio reports it (-128 = unknown); hop i is route[i] to route[i+1].
+     */
     val forwardSnr: List<Int> = emptyList(),
     /** Same as [forwardSnr] for the return route. */
     val returnSnr: List<Int> = emptyList(),

@@ -544,8 +544,8 @@ enum class ChannelOption(
     /**
      * The coding rates `coding_rate` can set on this preset while `use_preset` is on, besides the preset's own. Stock
      * firmware applies it only when it is higher than [codingRate] ([Capabilities.supportsCodingRateOverride]), so
-     * normally only higher rates are offered and a preset already at 4/8 has none. The Narrow/Tiny presets that
-     * default to 4/6 also offer 4/5 (less redundancy, shorter packets) for MT_SW firmware.
+     * normally only higher rates are offered and a preset already at 4/8 has none. The Narrow/Tiny presets that default
+     * to 4/6 also offer 4/5 (less redundancy, shorter packets) for MT_SW firmware.
      */
     val codingRateOverrides: List<Int>
         get() {

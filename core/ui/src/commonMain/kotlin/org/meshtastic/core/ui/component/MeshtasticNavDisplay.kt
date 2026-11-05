@@ -34,7 +34,6 @@ import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneSt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import org.meshtastic.core.ui.util.isDesktopPlatform
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -55,6 +54,7 @@ import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.replaceAll
 import org.meshtastic.core.navigation.rumViewName
 import org.meshtastic.core.repository.PlatformAnalytics
+import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /**
  * Shared [NavDisplay] wrapper that configures the standard Meshtastic entry decorators, scene strategies, and
@@ -141,13 +141,12 @@ private fun rememberTolerantSaveableStateDecorator(): NavEntryDecorator<NavKey> 
         NavEntryDecorator<NavKey>(
             onPop = { contentKey -> holder.removeState(contentKey) },
             decorate = { entry ->
-                val slotKey =
-                    remember {
-                        var candidate: Any = entry.contentKey
-                        var n = 1
-                        while (!claimed.add(candidate)) candidate = "${entry.contentKey}#${n++}"
-                        candidate
-                    }
+                val slotKey = remember {
+                    var candidate: Any = entry.contentKey
+                    var n = 1
+                    while (!claimed.add(candidate)) candidate = "${entry.contentKey}#${n++}"
+                    candidate
+                }
                 DisposableEffect(slotKey) { onDispose { claimed.remove(slotKey) } }
                 holder.SaveableStateProvider(slotKey) { entry.Content() }
             },

@@ -83,7 +83,6 @@ import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.repository.Notification as MeshNotification
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
@@ -91,6 +90,9 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.app_update_message
+import org.meshtastic.core.resources.app_update_test_message
+import org.meshtastic.core.resources.app_update_title
 import org.meshtastic.core.resources.channel
 import org.meshtastic.core.resources.connected
 import org.meshtastic.core.resources.connecting
@@ -99,27 +101,24 @@ import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.resources.discovery_scan_in_progress
 import org.meshtastic.core.resources.firmware_update_available
 import org.meshtastic.core.resources.firmware_update_in_progress
-import org.meshtastic.core.resources.app_update_message
-import org.meshtastic.core.resources.app_update_test_message
-import org.meshtastic.core.resources.app_update_title
 import org.meshtastic.core.resources.firmware_update_notification_android
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.live_update_cpu
 import org.meshtastic.core.resources.live_update_direct
 import org.meshtastic.core.resources.live_update_distance
+import org.meshtastic.core.resources.live_update_flash
 import org.meshtastic.core.resources.live_update_heard
 import org.meshtastic.core.resources.live_update_heard_now
 import org.meshtastic.core.resources.live_update_hops
-import org.meshtastic.core.resources.live_update_cpu
-import org.meshtastic.core.resources.live_update_flash
 import org.meshtastic.core.resources.live_update_nodes_online
 import org.meshtastic.core.resources.live_update_psram
 import org.meshtastic.core.resources.live_update_ram
 import org.meshtastic.core.resources.live_update_role
-import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.live_update_signal
 import org.meshtastic.core.resources.live_update_stop_action
 import org.meshtastic.core.resources.live_update_unread
+import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_battery
 import org.meshtastic.core.resources.local_stats_diagnostics_prefix
@@ -154,6 +153,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import org.meshtastic.core.repository.Notification as MeshNotification
 
 /**
  * Manages the creation and display of all app notifications.
@@ -1090,9 +1090,13 @@ class MeshNotificationManagerImpl(
             }
             reading.localStats?.let { stats ->
                 addAll(
-                    stats.formatToStringSuspend(null, includeNodes = false, includeBasics = false).lines().filter {
-                        it.isNotBlank()
-                    }.map { it.removePrefix(BULLET) },
+                    stats
+                        .formatToStringSuspend(null, includeNodes = false, includeBasics = false)
+                        .lines()
+                        .filter {
+                            it.isNotBlank()
+                        }
+                        .map { it.removePrefix(BULLET) },
                 )
             }
             addAll(
@@ -1163,11 +1167,21 @@ class MeshNotificationManagerImpl(
         if (ext == null) return emptyList()
         return buildList {
             if (ext.cpuUsagePercent > 0) {
-                add(getStringSuspend(Res.string.live_update_cpu, MetricFormatter.percent(ext.cpuUsagePercent.toFloat(), 0)))
+                add(
+                    getStringSuspend(
+                        Res.string.live_update_cpu,
+                        MetricFormatter.percent(ext.cpuUsagePercent.toFloat(), 0),
+                    ),
+                )
             }
             if (!ramAlreadyShown && ext.memoryTotal > 0) {
                 val used = (ext.memoryTotal - ext.memoryFreeCheap).toLong()
-                add(getStringSuspend(Res.string.live_update_ram, MetricFormatter.usedPercent(used, ext.memoryTotal.toLong())))
+                add(
+                    getStringSuspend(
+                        Res.string.live_update_ram,
+                        MetricFormatter.usedPercent(used, ext.memoryTotal.toLong()),
+                    ),
+                )
             }
             if (ext.flashTotalBytes > 0) {
                 add(
@@ -1179,7 +1193,12 @@ class MeshNotificationManagerImpl(
             }
             if (ext.memoryPsramTotal > 0) {
                 val used = (ext.memoryPsramTotal - ext.memoryPsramFree).toLong()
-                add(getStringSuspend(Res.string.live_update_psram, MetricFormatter.usedPercent(used, ext.memoryPsramTotal.toLong())))
+                add(
+                    getStringSuspend(
+                        Res.string.live_update_psram,
+                        MetricFormatter.usedPercent(used, ext.memoryPsramTotal.toLong()),
+                    ),
+                )
             }
             if (ext.wifiRssi != 0) add(getStringSuspend(Res.string.live_update_wifi, ext.wifiRssi))
         }
@@ -1636,7 +1655,10 @@ class MeshNotificationManagerImpl(
                         NumberFormatter.format(heap_total_bytes / BYTES_PER_KB, 2),
                     ) +
                     " (" +
-                    MetricFormatter.usedPercent((heap_total_bytes - heap_free_bytes).toLong(), heap_total_bytes.toLong()) +
+                    MetricFormatter.usedPercent(
+                        (heap_total_bytes - heap_free_bytes).toLong(),
+                        heap_total_bytes.toLong(),
+                    ) +
                     ")",
             )
         }

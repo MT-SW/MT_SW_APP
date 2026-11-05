@@ -129,8 +129,8 @@ enum class SecurityState(
     ),
 
     /**
-     * State for an insecure channel with precise location enabled, but MQTT not causing the highest warning. (purple open
-     * lock)
+     * State for an insecure channel with precise location enabled, but MQTT not causing the highest warning. (purple
+     * open lock)
      */
     INSECURE_PRECISE_ONLY(
         icon = Res.drawable.ic_lock_open,
@@ -140,8 +140,8 @@ enum class SecurityState(
     ),
 
     /**
-     * State indicating an insecure channel with precise location and MQTT enabled (purple open lock with a white warning
-     * badge).
+     * State indicating an insecure channel with precise location and MQTT enabled (purple open lock with a white
+     * warning badge).
      */
     INSECURE_PRECISE_MQTT_WARNING(
         icon = Res.drawable.ic_lock_open,

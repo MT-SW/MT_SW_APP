@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,25 @@ package org.meshtastic.core.ui.util
 object PdfText {
     /** Polish letters absent from WinAnsi; they live on codes 1..16 via /Differences. */
     internal const val POLISH = "ąćęłńśźżĄĆĘŁŃŚŹŻ"
-    internal val GLYPHS = listOf(
-        "aogonek", "cacute", "eogonek", "lslash", "nacute", "sacute", "zacute", "zdotaccent",
-        "Aogonek", "Cacute", "Eogonek", "Lslash", "Nacute", "Sacute", "Zacute", "Zdotaccent",
-    )
+    internal val GLYPHS =
+        listOf(
+            "aogonek",
+            "cacute",
+            "eogonek",
+            "lslash",
+            "nacute",
+            "sacute",
+            "zacute",
+            "zdotaccent",
+            "Aogonek",
+            "Cacute",
+            "Eogonek",
+            "Lslash",
+            "Nacute",
+            "Sacute",
+            "Zacute",
+            "Zdotaccent",
+        )
 
     /** Code (1..16) used in the content stream for a Polish letter, or -1. */
     fun polishCode(c: Char): Int = POLISH.indexOf(c).let { if (it < 0) -1 else it + 1 }
@@ -63,7 +78,8 @@ object PdfText {
         val sb = StringBuilder(s.length + 8)
         for (c in s) when (c) {
             '\u03BB' -> sb.append("lambda")
-            '\u03A9', '\u2126' -> sb.append("ohm")
+            '\u03A9',
+            '\u2126' -> sb.append("ohm")
             '\u221A' -> sb.append("sqrt ")
             '\u2212' -> sb.append('-')
             '\u03BC' -> sb.append('\u00B5')
@@ -82,7 +98,10 @@ object PdfText {
         val sb = StringBuilder(s.length)
         for (c in expand(s)) {
             val p = polishCode(c)
-            if (p > 0) { sb.append(p.toChar()); continue }
+            if (p > 0) {
+                sb.append(p.toChar())
+                continue
+            }
             val w = winAnsi(c)
             sb.append(if (w < 0) '?' else w.toChar())
         }
@@ -95,7 +114,10 @@ object PdfText {
         for (c in encoded) {
             val v = c.code
             when {
-                c == '(' || c == ')' || c == '\\' -> { sb.append('\\'); sb.append(c) }
+                c == '(' || c == ')' || c == '\\' -> {
+                    sb.append('\\')
+                    sb.append(c)
+                }
                 v < 32 || v > 126 -> {
                     sb.append('\\')
                     sb.append(('0' + ((v shr 6) and 7))).append(('0' + ((v shr 3) and 7))).append(('0' + (v and 7)))
@@ -109,12 +131,20 @@ object PdfText {
     /** `(...)` literal for a Unicode string. */
     fun literal(s: String): String = "(" + escape(encode(s)) + ")"
 
-    private const val REG = "278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556," +
-        "1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333," +
-        "556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584"
-    private const val BLD = "278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611," +
-        "975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333," +
-        "556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584"
+    private const val REG =
+        "278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556," +
+        "278,278,584,584,584,556," +
+            "1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944," +
+            "667,667,611,278,278,278,469,556,333," +
+            "556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500," +
+            "500,334,260,334,584"
+    private const val BLD =
+        "278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556," +
+        "333,333,584,584,584,611," +
+            "975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667," +
+            "667,611,333,278,333,584,556,333," +
+            "556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556," +
+            "500,389,280,389,584"
     private val W_REG = REG.split(',').map { it.toInt() }.toIntArray()
     private val W_BLD = BLD.split(',').map { it.toInt() }.toIntArray()
     private const val LAT_U = "AAAAAAACEEEEIIIIDNOOOOO*OUUUUYPs"
@@ -125,7 +155,11 @@ object PdfText {
         val sb = StringBuilder("/FirstChar 1 /LastChar 255 /Widths [")
         for (code in 1..255) {
             if (code > 1) sb.append(' ')
-            val defined = code in 1..16 || code in 32..126 || code in 0xA0..0xFF || code in intArrayOf(0x80, 0x82, 0x84, 0x85, 0x86, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x99)
+            val defined =
+                code in 1..16 ||
+                    code in 32..126 ||
+                    code in 0xA0..0xFF ||
+                    code in intArrayOf(0x80, 0x82, 0x84, 0x85, 0x86, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x99)
             sb.append(if (defined) codeWidth(code, bold) else 0)
         }
         return sb.append(']').toString()
@@ -176,14 +210,20 @@ object PdfText {
                 var word = word0
                 if (word.isEmpty() && line.isNotEmpty()) continue
                 while (width(word, bold, size) > maxW && word.length > 1) {
-                    if (line.isNotEmpty()) { out.add(line); line = "" }
+                    if (line.isNotEmpty()) {
+                        out.add(line)
+                        line = ""
+                    }
                     var k = 1
                     while (k < word.length && width(word.substring(0, k + 1), bold, size) <= maxW) k++
                     out.add(word.substring(0, k))
                     word = word.substring(k)
                 }
                 val cand = if (line.isEmpty()) word else "$line $word"
-                if (line.isNotEmpty() && width(cand, bold, size) > maxW) { out.add(line); line = word } else line = cand
+                if (line.isNotEmpty() && width(cand, bold, size) > maxW) {
+                    out.add(line)
+                    line = word
+                } else line = cand
             }
             out.add(line)
         }
@@ -201,19 +241,26 @@ object PdfFile {
         val kids = (0 until np).joinToString(" ") { "${7 + 2 * it} 0 R" }
         objs.add("<< /Type /Pages /Kids [$kids] /Count $np >>")
         objs.add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica ${PdfText.widthsEntry(false)} /Encoding 5 0 R >>")
-        objs.add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold ${PdfText.widthsEntry(true)} /Encoding 5 0 R >>")
+        objs.add(
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold ${PdfText.widthsEntry(true)} /Encoding 5 0 R >>"
+        )
         objs.add("<< /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [${PdfText.differences()}] >>")
         objs.add("<< /Title ${utf16Hex(title)} /Creator ${utf16Hex(creator)} >>")
         for (i in 0 until np) {
             objs.add(
                 "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents ${8 + 2 * i} 0 R " +
-                    "/Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> >>",
+                    "/Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> >>"
             )
             val c = contents[i]
             objs.add("<< /Length ${c.length} >>\nstream\n$c\nendstream")
         }
         val out = StringBuilder()
-        out.append("%PDF-1.4\n%").append(0xE2.toChar()).append(0xE3.toChar()).append(0xCF.toChar()).append(0xD3.toChar()).append('\n')
+        out.append("%PDF-1.4\n%")
+            .append(0xE2.toChar())
+            .append(0xE3.toChar())
+            .append(0xCF.toChar())
+            .append(0xD3.toChar())
+            .append('\n')
         val offs = IntArray(objs.size)
         for ((i, o) in objs.withIndex()) {
             offs[i] = out.length
@@ -223,7 +270,11 @@ object PdfFile {
         out.append("xref\n0 ").append(objs.size + 1).append('\n')
         out.append("0000000000 65535 f \n")
         for (o in offs) out.append(o.toString().padStart(10, '0')).append(" 00000 n \n")
-        out.append("trailer\n<< /Size ").append(objs.size + 1).append(" /Root 1 0 R /Info 6 0 R >>\nstartxref\n").append(xref).append("\n%%EOF\n")
+        out.append("trailer\n<< /Size ")
+            .append(objs.size + 1)
+            .append(" /Root 1 0 R /Info 6 0 R >>\nstartxref\n")
+            .append(xref)
+            .append("\n%%EOF\n")
         val bytes = ByteArray(out.length)
         for (i in 0 until out.length) bytes[i] = out[i].code.toByte()
         return bytes
@@ -232,7 +283,10 @@ object PdfFile {
     private fun utf16Hex(s: String): String {
         val h = "0123456789ABCDEF"
         val sb = StringBuilder("<FEFF")
-        for (c in s) { val v = c.code; sb.append(h[(v shr 12) and 15]).append(h[(v shr 8) and 15]).append(h[(v shr 4) and 15]).append(h[v and 15]) }
+        for (c in s) {
+            val v = c.code
+            sb.append(h[(v shr 12) and 15]).append(h[(v shr 8) and 15]).append(h[(v shr 4) and 15]).append(h[v and 15])
+        }
         return sb.append('>').toString()
     }
 }

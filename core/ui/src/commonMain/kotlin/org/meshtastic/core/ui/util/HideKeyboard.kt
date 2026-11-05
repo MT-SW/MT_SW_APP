@@ -28,37 +28,37 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 /**
- * Hides the keyboard when the finger drags across the screen (scrolling a chat or a list) or taps an empty place.
- * Taps on fields and buttons are not touched, because they consume the touch themselves. Nothing is consumed here.
+ * Hides the keyboard when the finger drags across the screen (scrolling a chat or a list) or taps an empty place. Taps
+ * on fields and buttons are not touched, because they consume the touch themselves. Nothing is consumed here.
  */
 fun Modifier.hideKeyboardOnTapOrScroll(): Modifier = composed {
-  val focusManager = LocalFocusManager.current
-  val keyboard = LocalSoftwareKeyboardController.current
-  pointerInput(Unit) {
-    awaitEachGesture {
-      val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-      val slop = viewConfiguration.touchSlop
-      var moved = false
-      var total = Offset.Zero
-      var consumedByChild = false
-      while (true) {
-        val event = awaitPointerEvent(PointerEventPass.Final)
-        val change = event.changes.firstOrNull { it.id == down.id } ?: break
-        total += change.positionChange()
-        if (!moved && total.getDistance() > slop) {
-          moved = true
-          focusManager.clearFocus()
-          keyboard?.hide()
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            val slop = viewConfiguration.touchSlop
+            var moved = false
+            var total = Offset.Zero
+            var consumedByChild = false
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Final)
+                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                total += change.positionChange()
+                if (!moved && total.getDistance() > slop) {
+                    moved = true
+                    focusManager.clearFocus()
+                    keyboard?.hide()
+                }
+                if (change.isConsumed && !moved) consumedByChild = true
+                if (!change.pressed) {
+                    if (!moved && !consumedByChild) {
+                        focusManager.clearFocus()
+                        keyboard?.hide()
+                    }
+                    break
+                }
+            }
         }
-        if (change.isConsumed && !moved) consumedByChild = true
-        if (!change.pressed) {
-          if (!moved && !consumedByChild) {
-            focusManager.clearFocus()
-            keyboard?.hide()
-          }
-          break
-        }
-      }
     }
-  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,20 +20,18 @@ import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
 
 /** A cable run between two connectors. [cableId] is a [CableDb] id or [FeederBuilder.CUSTOM_ID]. */
-@Serializable
-data class FeederSection(val cableId: String, val lengthM: Double, val customDbPerM: Double? = null)
+@Serializable data class FeederSection(val cableId: String, val lengthM: Double, val customDbPerM: Double? = null)
 
 /** Feeder description: N connectors joined by N-1 cable sections (see [FeederBuilder.resize]). */
-@Serializable
-data class FeederConfig(val connectorIds: List<String>, val sections: List<FeederSection>)
+@Serializable data class FeederConfig(val connectorIds: List<String>, val sections: List<FeederSection>)
 
 /** One line of the loss breakdown; [label] is a neutral identifier (e.g. "SMA", "RG316 · 0.5 m"). */
 data class FeederBreakdownLine(val label: String, val lossDb: Double)
 
 /**
- * Result of [FeederBuilder.compute]. [warnings] are stable machine codes (not prose), e.g.
- * `SECTION_COUNT_MISMATCH`, `CONNECTOR_COUNT_EXCEEDS_MAX`, `UNKNOWN_CONNECTOR:<id>`, `UNKNOWN_CABLE:<id>`,
- * `CUSTOM_LOSS_MISSING`, `INVALID_LENGTH`, `FREQUENCY_CLAMPED`; the UI localizes them.
+ * Result of [FeederBuilder.compute]. [warnings] are stable machine codes (not prose), e.g. `SECTION_COUNT_MISMATCH`,
+ * `CONNECTOR_COUNT_EXCEEDS_MAX`, `UNKNOWN_CONNECTOR:<id>`, `UNKNOWN_CABLE:<id>`, `CUSTOM_LOSS_MISSING`,
+ * `INVALID_LENGTH`, `FREQUENCY_CLAMPED`; the UI localizes them.
  */
 data class FeederResult(
     val totalDb: Double,
@@ -96,8 +94,8 @@ object FeederBuilder {
         )
 
     /**
-     * Loss of the feeder at [fMHz]. Order: connector 0, section 0, connector 1, section 1, ... Mismatched sizes
-     * are tolerated: sections beyond N-1 are ignored, missing sections count as 0 dB; both add a warning.
+     * Loss of the feeder at [fMHz]. Order: connector 0, section 0, connector 1, section 1, ... Mismatched sizes are
+     * tolerated: sections beyond N-1 are ignored, missing sections count as 0 dB; both add a warning.
      */
     fun compute(config: FeederConfig, fMHz: Double): FeederResult {
         val warnings = mutableListOf<String>()
@@ -169,14 +167,15 @@ object FeederBuilder {
     }
 
     /**
-     * Resizes to [connectorCount] (0..8) connectors and max(N-1,0) sections, keeping existing entries; new
-     * connectors are SMA, new sections RG316 0.2 m.
+     * Resizes to [connectorCount] (0..8) connectors and max(N-1,0) sections, keeping existing entries; new connectors
+     * are SMA, new sections RG316 0.2 m.
      */
     fun resize(config: FeederConfig, connectorCount: Int): FeederConfig {
         val n = connectorCount.coerceIn(0, MAX_CONNECTORS)
         val sectionCount = if (n > 0) n - 1 else 0
         val connectors = List(n) { config.connectorIds.getOrNull(it) ?: DEFAULT_CONNECTOR }
-        val sections = List(sectionCount) { config.sections.getOrNull(it) ?: FeederSection(DEFAULT_CABLE, DEFAULT_LENGTH_M) }
+        val sections =
+            List(sectionCount) { config.sections.getOrNull(it) ?: FeederSection(DEFAULT_CABLE, DEFAULT_LENGTH_M) }
         return FeederConfig(connectors, sections)
     }
 

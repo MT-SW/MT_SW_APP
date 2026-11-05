@@ -213,4 +213,3 @@ fun determineSignalQuality(snr: Float, modemPreset: ModemPreset?, rssi: Int? = n
         else -> Quality.NONE
     }
 }
-

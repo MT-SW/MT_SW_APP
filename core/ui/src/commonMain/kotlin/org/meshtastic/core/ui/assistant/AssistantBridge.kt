@@ -29,8 +29,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -43,8 +43,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Lets the offline assistant open a screen of the app. The assistant only ever puts a link here when the user taps
- * the button under its answer; the app shell turns it into a normal deep link.
+ * Lets the offline assistant open a screen of the app. The assistant only ever puts a link here when the user taps the
+ * button under its answer; the app shell turns it into a normal deep link.
  */
 object AssistantLinks {
     private val _links = MutableSharedFlow<String>(extraBufferCapacity = 8)

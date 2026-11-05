@@ -52,8 +52,8 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.testing.FakeLiveUpdatePrefs
-import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeMeshPrefs
 import org.meshtastic.core.testing.runUntilSettled
 import org.meshtastic.core.testing.runWithRenderScope

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 MT_SW contributors
+ * Copyright (c) 2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /**
- * One antenna with its feed line, saved by the user under a [name] ("My antenna"): the calculator takes everything
- * from it, the link planner takes the gain, the feed line and the power.
+ * One antenna with its feed line, saved by the user under a [name] ("My antenna"): the calculator takes everything from
+ * it, the link planner takes the gain, the feed line and the power.
  */
 @Serializable
 data class AntennaSetup(
@@ -36,10 +36,14 @@ data class AntennaSetup(
     val feeder: FeederConfig,
 ) {
     /** The gain used for the link: typed by the user or calculated for this antenna. */
-    val gainDbi: Double get() = gainOverrideDbi ?: AntennaMath.design(input).gainDbi
+    val gainDbi: Double
+        get() = gainOverrideDbi ?: AntennaMath.design(input).gainDbi
 
-    /** Loss of the feed line at the antenna's own frequency, in dB (connectors and cables, without the SWR mismatch). */
-    val feederLossDb: Double get() = FeederBuilder.compute(feeder, input.mhz).totalDb
+    /**
+     * Loss of the feed line at the antenna's own frequency, in dB (connectors and cables, without the SWR mismatch).
+     */
+    val feederLossDb: Double
+        get() = FeederBuilder.compute(feeder, input.mhz).totalDb
 }
 
 /** Reading and writing the list of saved antennas as text. */
@@ -50,8 +54,11 @@ object AntennaSetups {
     }
 
     /** The saved antennas in [text]; anything unreadable gives an empty list. */
-    fun decode(text: String): List<AntennaSetup> =
-        if (text.isBlank()) emptyList() else runCatching { json.decodeFromString<List<AntennaSetup>>(text) }.getOrDefault(emptyList())
+    fun decode(text: String): List<AntennaSetup> = if (text.isBlank()) {
+        emptyList()
+    } else {
+        runCatching { json.decodeFromString<List<AntennaSetup>>(text) }.getOrDefault(emptyList())
+    }
 
     fun encode(list: List<AntennaSetup>): String = json.encodeToString(list)
 
@@ -71,7 +78,8 @@ object PlannerHandoff {
     private var sideIsB: Boolean = false
 
     /** True while an antenna waits for the planner. */
-    val pending: Boolean get() = setup != null
+    val pending: Boolean
+        get() = setup != null
 
     fun offer(value: AntennaSetup, toB: Boolean) {
         setup = value

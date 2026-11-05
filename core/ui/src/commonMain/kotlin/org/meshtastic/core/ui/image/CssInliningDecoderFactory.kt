@@ -33,8 +33,7 @@ import okio.FileSystem
 class CssInliningDecoderFactory(private val delegate: Decoder.Factory) : Decoder.Factory {
     override fun create(result: SourceFetchResult, options: Options, imageLoader: ImageLoader): Decoder? {
         val looksLikeSvg =
-            result.mimeType?.contains("svg", ignoreCase = true) == true ||
-                (result.mimeType == null && sniffSvg(result))
+            result.mimeType?.contains("svg", ignoreCase = true) == true || (result.mimeType == null && sniffSvg(result))
         if (!looksLikeSvg) return delegate.create(result, options, imageLoader)
         val bytes = result.source.source().readByteArray()
         val fixed = inlineSvgCss(bytes.decodeToString()).encodeToByteArray()
@@ -51,7 +50,8 @@ class CssInliningDecoderFactory(private val delegate: Decoder.Factory) : Decoder
 
 private const val SNIFF_BYTES = 512L
 
-private val STYLE_BLOCK = Regex("<style[^>]*>(.*?)</style>", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
+private val STYLE_BLOCK =
+    Regex("<style[^>]*>(.*?)</style>", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
 private val CSS_RULE = Regex("([^{}]+)\\{([^{}]*)\\}")
 private val SHAPE_TAG = Regex("<(path|rect|circle|ellipse|line|polyline|polygon|g|text|use)\\b([^>]*)>")
 private val CLASS_ATTR = Regex("\\sclass\\s*=\\s*\"([^\"]*)\"")
@@ -97,11 +97,13 @@ internal fun inlineSvgCss(svg: String): String {
     }
 }
 
-/** For a picture that came with no type: is the start of the file an SVG tag? Short files are fine, they just fail to read. */
-private fun sniffSvg(result: SourceFetchResult): Boolean =
-    runCatching {
-        val head = result.source.source().peek()
-        head.request(SNIFF_BYTES)
-        head.buffer.snapshot().utf8().contains("<svg")
-    }
-        .getOrDefault(false)
+/**
+ * For a picture that came with no type: is the start of the file an SVG tag? Short files are fine, they just fail to
+ * read.
+ */
+private fun sniffSvg(result: SourceFetchResult): Boolean = runCatching {
+    val head = result.source.source().peek()
+    head.request(SNIFF_BYTES)
+    head.buffer.snapshot().utf8().contains("<svg")
+}
+    .getOrDefault(false)

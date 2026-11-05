@@ -58,8 +58,8 @@ import org.meshtastic.core.model.MeshActivity
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.TracerouteMapAvailability
-import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.model.asDeviceVersion
+import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.model.evaluateTracerouteMapAvailability
 import org.meshtastic.core.model.geofence.GeofencePolygon
 import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
@@ -445,9 +445,9 @@ class UIViewModel(
      * run after install, when nothing is stored yet) the next one is set a random
      * [NARROW_BAND_WARNING_MIN_GAP_MILLIS]..[NARROW_BAND_WARNING_MAX_GAP_MILLIS] ahead, so it comes up at an
      * unpredictable hour. The next time is stored only when the dialog is closed, so if the due time passes while the
-     * app is closed (or the dialog is still open when it is killed), it appears on the next launch.
-     * Foreground-only by design — no background/WorkManager check. Unrelated to the separate notice shown when remote
-     * admin is opened from Node Details.
+     * app is closed (or the dialog is still open when it is killed), it appears on the next launch. Foreground-only by
+     * design — no background/WorkManager check. Unrelated to the separate notice shown when remote admin is opened from
+     * Node Details.
      */
     fun checkNarrowBandWarningThrottled() {
         viewModelScope.launch { performNarrowBandCheck() }
@@ -508,10 +508,10 @@ class UIViewModel(
     /**
      * Checks (on a foreground app-open/resume) whether the phone is physically within the Świętokrzyskie region while
      * the locally-connected radio's LoRa channel is wide (>200 kHz). Fires immediately, unthrottled, the moment a
-     * border crossing is detected (was outside, now inside); otherwise repeats at a random hour,
-     * offset by [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own schedule so the two
-     * don't show back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already
-     * on screen when the dialog appears.
+     * border crossing is detected (was outside, now inside); otherwise repeats at a random hour, offset by
+     * [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own schedule so the two don't show
+     * back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already on screen
+     * when the dialog appears.
      */
     fun checkRegionWarningThrottled() {
         viewModelScope.launch { performRegionCheck() }
@@ -568,13 +568,12 @@ class UIViewModel(
      */
     fun startPeriodicRegionCheck() {
         if (periodicRegionCheckJob?.isActive == true) return
-        periodicRegionCheckJob =
-            viewModelScope.launch {
-                while (isActive) {
-                    performRegionCheck()
-                    delay(REGION_CHECK_INTERVAL_MILLIS)
-                }
+        periodicRegionCheckJob = viewModelScope.launch {
+            while (isActive) {
+                performRegionCheck()
+                delay(REGION_CHECK_INTERVAL_MILLIS)
             }
+        }
     }
 
     /** Stops the periodic foreground re-check; call when the app leaves the foreground. */

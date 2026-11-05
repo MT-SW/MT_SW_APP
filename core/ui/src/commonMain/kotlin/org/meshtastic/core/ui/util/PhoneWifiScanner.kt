@@ -45,7 +45,9 @@ interface PhoneWifiScanner {
 @Composable expect fun rememberPhoneWifiScanner(): PhoneWifiScanner?
 
 /** Keeps one entry per name (the strongest), drops empty names, strongest first. */
-fun List<PhoneWifiNetwork>.tidy(): List<PhoneWifiNetwork> = filter { it.ssid.isNotBlank() }
+fun List<PhoneWifiNetwork>.tidy(): List<PhoneWifiNetwork> = filter {
+    it.ssid.isNotBlank()
+}
     .groupBy { it.ssid }
     .map { (_, group) -> group.maxByOrNull { it.rssi ?: Int.MIN_VALUE }!! }
     .sortedByDescending { it.rssi ?: Int.MIN_VALUE }

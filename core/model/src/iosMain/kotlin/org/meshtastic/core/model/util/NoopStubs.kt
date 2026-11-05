@@ -58,10 +58,11 @@ actual fun x25519PublicKey(privateKey: ByteArray): ByteArray {
     return scalarMult(privateKey, base)
 }
 
-private val C121665 = LongArray(16).also {
-    it[0] = 0xDB41
-    it[1] = 1
-}
+private val C121665 =
+    LongArray(16).also {
+        it[0] = 0xDB41
+        it[1] = 1
+    }
 
 private fun car25519(o: LongArray) {
     for (i in 0 until 16) {

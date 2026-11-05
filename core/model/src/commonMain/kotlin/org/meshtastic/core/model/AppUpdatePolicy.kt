@@ -31,8 +31,7 @@ data class ReleaseVersion(val release: Int, val test: Int) : Comparable<ReleaseV
     private val order: Int
         get() = if (test == 0) Int.MAX_VALUE else test
 
-    override fun compareTo(other: ReleaseVersion): Int =
-        compareValuesBy(this, other, { it.release }, { it.order })
+    override fun compareTo(other: ReleaseVersion): Int = compareValuesBy(this, other, { it.release }, { it.order })
 }
 
 /** Decides whether a newer MT_SW_APP release than the running one is published, and when to remind about it. */

@@ -51,7 +51,9 @@ import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.enums.enumEntries
 import kotlin.jvm.JvmName
 
-/** A list of all values of an enum. The values are read where the enum type is known, so this works on every platform. */
+/**
+ * A list of all values of an enum. The values are read where the enum type is known, so this works on every platform.
+ */
 @Composable
 inline fun <reified T : Enum<T>> DropDownPreference(
     title: String,
@@ -105,13 +107,12 @@ internal fun <T : Enum<T>> EnumDropDownPreference(
             }
         }
 
-    val items =
-        enumConstants.map {
-            val label = itemLabel?.invoke(it) ?: it.schemaLabel()
-            val icon = itemIcon?.invoke(it)
-            val color = itemColor?.invoke(it)
-            DropDownItem(it, label, icon, color)
-        }
+    val items = enumConstants.map {
+        val label = itemLabel?.invoke(it) ?: it.schemaLabel()
+        val icon = itemIcon?.invoke(it)
+        val color = itemColor?.invoke(it)
+        DropDownItem(it, label, icon, color)
+    }
 
     DropDownPreference(
         title = title,
