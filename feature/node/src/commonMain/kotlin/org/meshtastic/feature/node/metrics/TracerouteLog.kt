@@ -75,7 +75,8 @@ import org.meshtastic.core.resources.traceroute_forward_hops
 import org.meshtastic.core.resources.traceroute_hops
 import org.meshtastic.core.resources.traceroute_log
 import org.meshtastic.core.resources.traceroute_no_response
-import org.meshtastic.core.resources.traceroute_observed
+import org.meshtastic.core.resources.traceroute_received_automatically
+import org.meshtastic.core.resources.traceroute_requested_manually
 import org.meshtastic.core.resources.traceroute_probably_hop
 import org.meshtastic.core.resources.traceroute_return_hops
 import org.meshtastic.core.resources.traceroute_round_trip
@@ -259,9 +260,10 @@ private fun TracerouteCard(
         if (point.kind == TracerouteKind.TRACED_BY) point.route.getInboundText() else point.route.getTextAndIcon()
     val (label, icon) =
         when (point.kind) {
-            TracerouteKind.REQUESTED -> null to routeIcon
+            TracerouteKind.REQUESTED -> stringResource(Res.string.traceroute_requested_manually) to routeIcon
 
-            TracerouteKind.OBSERVED -> stringResource(Res.string.traceroute_observed) to MeshtasticIcons.Visibility
+            TracerouteKind.OBSERVED ->
+                stringResource(Res.string.traceroute_received_automatically) to MeshtasticIcons.Visibility
 
             TracerouteKind.TRACED_BY -> {
                 val tracer = point.result?.fromRadio?.packet?.from ?: 0

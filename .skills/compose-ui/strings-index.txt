@@ -3076,7 +3076,9 @@ traceroute_no_response
 traceroute_observed
 traceroute_outgoing_route
 traceroute_probably_hop
+traceroute_received_automatically
 traceroute_relays_missing
+traceroute_requested_manually
 traceroute_return_hops
 traceroute_return_route
 traceroute_round_trip
@@ -3128,7 +3130,6 @@ translator_error_unknown
 translator_export_title
 translator_failed
 translator_from
-translator_hardware_title
 translator_history_clear
 translator_history_empty
 translator_history_title
