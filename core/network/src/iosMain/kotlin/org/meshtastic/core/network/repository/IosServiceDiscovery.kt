@@ -31,8 +31,8 @@ import platform.Foundation.NSNetService
 import platform.Foundation.NSNetServiceBrowser
 import platform.Foundation.NSNetServiceBrowserDelegateProtocol
 import platform.Foundation.NSNetServiceDelegateProtocol
-import platform.posix.memcpy
 import platform.darwin.NSObject
+import platform.posix.memcpy
 
 private const val SERVICE_TYPE = "_meshtastic._tcp."
 private const val RESOLVE_TIMEOUT_SECONDS = 10.0
@@ -64,7 +64,9 @@ class IosServiceDiscovery : ServiceDiscovery {
                         sender.TXTRecordData()?.let { data ->
                             NSNetService.dictionaryFromTXTRecordData(data)
                                 .entries
-                                .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? NSData)?.let { key to it.toBytes() } } }
+                                .mapNotNull { (k, v) ->
+                                    (k as? String)?.let { key -> (v as? NSData)?.let { key to it.toBytes() } }
+                                }
                                 .toMap()
                         } ?: emptyMap()
                     resolved[sender.name] = DiscoveredService(sender.name, host, sender.port.toInt(), txt)
@@ -109,5 +111,6 @@ class IosServiceDiscovery : ServiceDiscovery {
             browser.stop()
             found.values.forEach { it.stop() }
         }
-    }.flowOn(Dispatchers.Main)
+    }
+        .flowOn(Dispatchers.Main)
 }

@@ -19,6 +19,9 @@
 package org.meshtastic.core.network.radio
 
 import co.touchlab.kermit.Logger
+import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
@@ -64,9 +67,6 @@ import org.meshtastic.core.network.transport.HeartbeatSender
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportCallback
-import kotlin.concurrent.Volatile
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 private val CONNECTION_TIMEOUT = 15.seconds
 
@@ -282,63 +282,62 @@ class BleRadioTransport(
     // --- Connection & Discovery Logic ---
 
     private fun connect() {
-        connectionJob =
-            connectionScope.launch {
-                reconnectPolicy.execute(
-                    attempt = {
-                        val outcome =
-                            try {
-                                attemptConnection()
-                            } catch (e: CancellationException) {
-                                throw e
-                            } catch (e: Exception) {
-                                val failureTime = (nowMillis - connectionStartTime).milliseconds
-                                Logger.w(e) { "[${address.anonymize()}] Failed to connect after $failureTime" }
-                                if (e.suggestsStaleGattHandle() && bluetoothRepository.isBonded(address)) {
-                                    Logger.i {
-                                        "[${address.anonymize()}] GATT 133 against a bonded device — flagging an immediate " +
-                                            "cache refresh for the next attempt"
-                                    }
-                                    gattErrorSignatureFlagged.value = true
+        connectionJob = connectionScope.launch {
+            reconnectPolicy.execute(
+                attempt = {
+                    val outcome =
+                        try {
+                            attemptConnection()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            val failureTime = (nowMillis - connectionStartTime).milliseconds
+                            Logger.w(e) { "[${address.anonymize()}] Failed to connect after $failureTime" }
+                            if (e.suggestsStaleGattHandle() && bluetoothRepository.isBonded(address)) {
+                                Logger.i {
+                                    "[${address.anonymize()}] GATT 133 against a bonded device — " +
+                                        "flagging an immediate cache refresh for the next attempt"
                                 }
-                                BleReconnectPolicy.Outcome.Failed(e)
+                                gattErrorSignatureFlagged.value = true
                             }
-                        // Mirror this outcome into the cross-transport-instance failure tracker so a manual
-                        // Stop Connecting -> reconnect cycle doesn't erase progress towards the
-                        // stale-cache-refresh threshold.
-                        if (
-                            outcome is BleReconnectPolicy.Outcome.Disconnected &&
+                            BleReconnectPolicy.Outcome.Failed(e)
+                        }
+                    // Mirror this outcome into the cross-transport-instance failure tracker so a manual
+                    // Stop Connecting -> reconnect cycle doesn't erase progress towards the
+                    // stale-cache-refresh threshold.
+                    if (
+                        outcome is BleReconnectPolicy.Outcome.Disconnected &&
                             (outcome.wasStable || outcome.wasIntentional)
-                        ) {
-                            PersistentReconnectFailures.recordSuccess(address)
-                        } else {
-                            PersistentReconnectFailures.recordFailure(address)
-                        }
-                        outcome
-                    },
-                    onTransientDisconnect = { error ->
-                        // Guard: if handleFailure already emitted the disconnect callback for this
-                        // session (sessionFailed CAS won), don't emit a duplicate from the policy.
-                        // Silent recovery: no errorMessage — the reconnect loop is still retrying, so
-                        // a modal dialog would just confuse the user. The warning log is the
-                        // observability surface for this transient event.
-                        if (!sessionFailed.value) {
-                            error?.let {
-                                Logger.w(it) {
-                                    "[${address.anonymize()}] BLE reconnect attempt failed; continuing automatic retry"
-                                }
+                    ) {
+                        PersistentReconnectFailures.recordSuccess(address)
+                    } else {
+                        PersistentReconnectFailures.recordFailure(address)
+                    }
+                    outcome
+                },
+                onTransientDisconnect = { error ->
+                    // Guard: if handleFailure already emitted the disconnect callback for this
+                    // session (sessionFailed CAS won), don't emit a duplicate from the policy.
+                    // Silent recovery: no errorMessage — the reconnect loop is still retrying, so
+                    // a modal dialog would just confuse the user. The warning log is the
+                    // observability surface for this transient event.
+                    if (!sessionFailed.value) {
+                        error?.let {
+                            Logger.w(it) {
+                                "[${address.anonymize()}] BLE reconnect attempt failed; continuing automatic retry"
                             }
-                            callback.onDisconnect(isPermanent = false)
                         }
-                    },
-                    onPermanentDisconnect = { error ->
-                        if (!sessionFailed.value) {
-                            val msg = error?.toDisconnectReason()?.second ?: "Device unreachable"
-                            callback.onDisconnect(isPermanent = true, errorMessage = msg)
-                        }
-                    },
-                )
-            }
+                        callback.onDisconnect(isPermanent = false)
+                    }
+                },
+                onPermanentDisconnect = { error ->
+                    if (!sessionFailed.value) {
+                        val msg = error?.toDisconnectReason()?.second ?: "Device unreachable"
+                        callback.onDisconnect(isPermanent = true, errorMessage = msg)
+                    }
+                },
+            )
+        }
     }
 
     /**
@@ -407,7 +406,11 @@ class BleRadioTransport(
         bleConnection.invalidateServiceCache()
         try {
             val negotiatedMtu =
-                retryBleOperation(count = MTU_NEGOTIATION_ATTEMPTS, delayMs = MTU_RETRY_DELAY_MS, tag = address.anonymize()) {
+                retryBleOperation(
+                    count = MTU_NEGOTIATION_ATTEMPTS,
+                    delayMs = MTU_RETRY_DELAY_MS,
+                    tag = address.anonymize(),
+                ) {
                     bleConnection.negotiateMtu(MTU_SIZE)
                 }
             Logger.i { "[${address.anonymize()}] Negotiated MTU: $negotiatedMtu" }
@@ -584,7 +587,7 @@ class BleRadioTransport(
         val reconnectState = bleConnection.connectAndAwait(device, CONNECTION_TIMEOUT)
         if (reconnectState !is BleConnectionState.Connected) {
             throw RadioNotConnectedException(
-                "Failed to reconnect after GATT cache refresh ($reason, state=$reconnectState)",
+                "Failed to reconnect after GATT cache refresh ($reason, state=$reconnectState)"
             )
         }
         Logger.i { "[${address.anonymize()}] Reconnected after GATT cache refresh ($reason)" }
@@ -834,11 +837,11 @@ class BleRadioTransport(
                 transportLease.release()
                 if (!writePermit && session != null && sessionLease != null) {
                     sendRejectionLogger(
-                        "[${address.anonymize()}] BLE write backlog is full, cannot admit ${p.size} bytes",
+                        "[${address.anonymize()}] BLE write backlog is full, cannot admit ${p.size} bytes"
                     )
                 } else if (logUnavailable) {
                     sendRejectionLogger(
-                        "[${address.anonymize()}] toRadio characteristic unavailable, cannot send ${p.size} bytes",
+                        "[${address.anonymize()}] toRadio characteristic unavailable, cannot send ${p.size} bytes"
                     )
                 }
                 false
@@ -858,13 +861,12 @@ class BleRadioTransport(
         // Admission bounds the number of queued writes. Start the per-write timeout only after this operation reaches
         // the front of that bounded queue, so normal backlog does not masquerade as a dead BLE link. Four admitted
         // writes at the worst-case 10s write bound fit inside the 45s lifecycle drain budget.
-        val completed =
-            writeMutex.withLock {
-                withTimeoutOrNull(BLE_WRITE_OPERATION_TIMEOUT) {
-                    writePacket(session, packet)
-                    true
-                } == true
-            }
+        val completed = writeMutex.withLock {
+            withTimeoutOrNull(BLE_WRITE_OPERATION_TIMEOUT) {
+                writePacket(session, packet)
+                true
+            } == true
+        }
         if (!completed && activeSession.value === session) {
             handleFailure(RadioNotConnectedException("BLE write timed out after $BLE_WRITE_OPERATION_TIMEOUT"), session)
         }
@@ -907,22 +909,21 @@ class BleRadioTransport(
     override suspend fun close() {
         var completed = false
         try {
-            completed =
-                lifecycle.close {
-                    // Closing the outer gate rejects new sends while allowing writes admitted before close to finish.
-                    // Once those leases drain, cancel reconnect/heartbeat work before retiring the profile and GATT.
-                    connectionScope.cancel()
-                    Logger.i { "[${address.anonymize()}] Disconnecting. ${formatSessionStats()}" }
-                    val session = retireActiveSession()
-                    val sessionClosed = session?.lifecycle?.close() ?: true
-                    awaitPendingSessionCleanup()
-                    disconnectGatt("close")
-                    if (!sessionClosed) {
-                        Logger.w {
-                            "[${address.anonymize()}] BLE profile teardown did not complete within its lifecycle bounds"
-                        }
+            completed = lifecycle.close {
+                // Closing the outer gate rejects new sends while allowing writes admitted before close to finish.
+                // Once those leases drain, cancel reconnect/heartbeat work before retiring the profile and GATT.
+                connectionScope.cancel()
+                Logger.i { "[${address.anonymize()}] Disconnecting. ${formatSessionStats()}" }
+                val session = retireActiveSession()
+                val sessionClosed = session?.lifecycle?.close() ?: true
+                awaitPendingSessionCleanup()
+                disconnectGatt("close")
+                if (!sessionClosed) {
+                    Logger.w {
+                        "[${address.anonymize()}] BLE profile teardown did not complete within its lifecycle bounds"
                     }
                 }
+            }
             if (!completed) {
                 Logger.w { "[${address.anonymize()}] BLE teardown did not complete within its lifecycle bounds" }
             }
@@ -1043,8 +1044,7 @@ class BleRadioTransport(
                 is RadioNotConnectedException -> this.message ?: "Device not found"
 
                 is NoSuchElementException,
-                is IllegalArgumentException,
-                -> "Required characteristic missing"
+                is IllegalArgumentException -> "Required characteristic missing"
 
                 else -> this.message ?: this::class.simpleName ?: "Unknown"
             }
