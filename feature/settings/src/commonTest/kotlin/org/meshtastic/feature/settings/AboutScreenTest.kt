@@ -72,12 +72,12 @@ class AboutScreenTest {
         // What is MT_SW section
         onNodeWithText("What is MT_SW?").assertIsDisplayed()
         onNodeWithText(
-                "MT_SW is an app and a community around an open LoRa mesh network that works without the internet or " +
-                    "base stations: radios pass messages on from node to node. The app extends the original with a link " +
-                    "planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node " +
-                    "list and many more settings. We build it together with the local community of the Świętokrzyskie " +
-                    "region, and anyone can join."
-            )
+            "MT_SW is an app and a community around an open LoRa mesh network that works without the " +
+                "internet or base stations: radios pass messages on from node to node. The app extends the " +
+                "original with a link planner, a terrain panorama, an offline AI assistant and translator, " +
+                "extra statistics, a richer node list and many more settings. We build it together with the " +
+                "local community of the Świętokrzyskie region, and anyone can join.",
+        )
             .performScrollTo()
             .assertIsDisplayed()
 
@@ -85,9 +85,9 @@ class AboutScreenTest {
         onNodeWithText("Apps").assertIsDisplayed()
         onNodeWithText("Need Hardware?").performScrollTo().assertIsDisplayed()
         onNodeWithText(
-                "MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation " +
-                    "and the project website explain how to choose the hardware and set it up."
-            )
+            "MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). " +
+                "The documentation and the project website explain how to choose the hardware and set it up.",
+        )
             .performScrollTo()
             .assertIsDisplayed()
         onNodeWithText("GitHub Repository").performScrollTo().assertIsDisplayed()
