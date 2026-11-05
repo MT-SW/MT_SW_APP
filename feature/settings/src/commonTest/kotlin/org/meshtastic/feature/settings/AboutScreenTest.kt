@@ -69,30 +69,36 @@ class AboutScreenTest {
         // Top app bar
         onNodeWithText("About").assertIsDisplayed()
 
-        // What is Meshtastic section
-        onNodeWithText("What is Meshtastic?").assertIsDisplayed()
+        // What is MT_SW section
+        onNodeWithText("What is MT_SW?").assertIsDisplayed()
         onNodeWithText(
-            "An open source, off-grid, decentralized, mesh network that runs on affordable, low-power radios.",
+            "MT_SW is an app and a community around an open LoRa mesh network that works without the internet or " +
+                "base stations: radios pass messages on from node to node. The app extends the original with a link " +
+                "planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node " +
+                "list and many more settings. We build it together with the local community of the Świętokrzyskie " +
+                "region, and anyone can join.",
         )
+            .performScrollTo()
             .assertIsDisplayed()
 
         // Apps section
         onNodeWithText("Apps").assertIsDisplayed()
-        onNodeWithText("Need Hardware?").assertIsDisplayed()
+        onNodeWithText("Need Hardware?").performScrollTo().assertIsDisplayed()
         onNodeWithText(
-            "Meshtastic requires a compatible device. Our backers and partners offer ready-to-use hardware. " +
-                "Here are some of the most popular options.",
+            "MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation " +
+                "and the project website explain how to choose the hardware and set it up.",
         )
+            .performScrollTo()
             .assertIsDisplayed()
-        onNodeWithText("GitHub Repository").assertIsDisplayed()
-        onNodeWithText("Version").assertIsDisplayed()
-        onNodeWithText("2.5.0").assertIsDisplayed()
-        onNodeWithText("Acknowledgements").assertIsDisplayed()
+        onNodeWithText("GitHub Repository").performScrollTo().assertIsDisplayed()
+        onNodeWithText("Version").performScrollTo().assertIsDisplayed()
+        onNodeWithText("2.5.0").performScrollTo().assertIsDisplayed()
+        onNodeWithText("Acknowledgements").performScrollTo().assertIsDisplayed()
 
         // Project information section
-        onNodeWithText("Project information").assertIsDisplayed()
-        onNodeWithText("Website").assertIsDisplayed()
-        onNodeWithText("Documentation").assertIsDisplayed()
+        onNodeWithText("Project information").performScrollTo().assertIsDisplayed()
+        onNodeWithText("Website").performScrollTo().assertIsDisplayed()
+        onNodeWithText("Documentation").performScrollTo().assertIsDisplayed()
         onNodeWithText("License").performScrollTo().assertIsDisplayed()
 
         // Copyright footer
