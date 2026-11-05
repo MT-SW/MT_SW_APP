@@ -53,7 +53,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
     // missing wiring at a call site. Callers must wire the app-shell handler explicitly.
     onHandleDeepLink: (CommonUri, onInvalid: () -> Unit) -> Unit,
 ) {
-    entry<ContactsRoute.Contacts>(metadata = { MeshtasticPanes.list() }) {
+    entry<ContactsRoute.Contacts>(metadata = { MeshtasticPanes.list(narrow = true) }) {
         ContactsEntryContent(
             backStack = backStack,
             scrollToTopEvents = scrollToTopEvents,

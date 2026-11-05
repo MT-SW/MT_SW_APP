@@ -64,8 +64,16 @@ object MeshtasticPanes {
     private const val LIST = "list"
     private const val DETAIL = "detail"
     private const val EXTRA = "extra"
+    private const val NARROW_LIST_KEY = "org.meshtastic.pane.narrowList"
 
-    fun list(): Map<String, Any> = ListDetailSceneStrategy.listPane() + (ROLE_KEY to LIST)
+    /**
+     * A list column. With [narrow] the list takes a smaller share of the window than usual: the conversations list
+     * needs little room, so the messages beside it get more (desktop and tablet).
+     */
+    fun list(narrow: Boolean = false): Map<String, Any> =
+        ListDetailSceneStrategy.listPane() + (ROLE_KEY to LIST) + (NARROW_LIST_KEY to narrow)
+
+    internal fun isNarrowList(entry: NavEntry<*>) = entry.metadata[NARROW_LIST_KEY] == true
 
     fun detail(): Map<String, Any> = ListDetailSceneStrategy.detailPane() + (ROLE_KEY to DETAIL)
 
@@ -88,6 +96,9 @@ internal class ThreeColumnWidths {
     /** Share of the list in the two-column list / detail layout. */
     var listDetailShare by mutableFloatStateOf(DEFAULT_LIST_DETAIL_SHARE)
 
+    /** Share of the conversations list in the two-column list / messages layout (the messages get the rest). */
+    var chatListDetailShare by mutableFloatStateOf(CHAT_LIST_SHARE)
+
     /** Share of the extra screen in the two-column detail / extra layout. */
     var detailExtraShare by mutableFloatStateOf(DEFAULT_DETAIL_EXTRA_SHARE)
 
@@ -109,6 +120,9 @@ internal class ThreeColumnWidths {
         const val DEFAULT_LIST_SHARE = 0.24f
         const val DEFAULT_EXTRA_SHARE = 0.30f
         const val DEFAULT_LIST_DETAIL_SHARE = 0.5f
+
+        /** The conversations list is narrow so the messages beside it are wide; also used by the tablet layout. */
+        const val CHAT_LIST_SHARE = 0.32f
         const val DEFAULT_DETAIL_EXTRA_SHARE = 0.5f
         const val MIN_PANE_DP = 220f
         const val MIN_DETAIL_DP = 320f
@@ -226,6 +240,7 @@ private fun Columns(
     val dividerPx = with(density) { DIVIDER_WIDTH.roundToPx() }
     val minPanePx = with(density) { ThreeColumnWidths.MIN_PANE_DP.dp.roundToPx() }
     val dividerCount = columns.size - 1
+    val narrowList = layout == ColumnsLayout.LIST_DETAIL && MeshtasticPanes.isNarrowList(columns.first())
     // The usable width (without the dividers) in dp, for the dividers' drag maths.
     val usableDp = ((totalPx - dividerPx * dividerCount).coerceAtLeast(0)) / density.density
     val minShare = if (usableDp > 0f) ThreeColumnWidths.MIN_PANE_DP / usableDp else 0f
@@ -249,8 +264,13 @@ private fun Columns(
 
                             ColumnsLayout.LIST_DETAIL ->
                                 if (usableDp > 0f) {
-                                    widths.listDetailShare =
-                                        (widths.listDetailShare + deltaDp / usableDp).coerceIn(minShare, 1f - minShare)
+                                    val current = if (narrowList) widths.chatListDetailShare else widths.listDetailShare
+                                    val moved = (current + deltaDp / usableDp).coerceIn(minShare, 1f - minShare)
+                                    if (narrowList) {
+                                        widths.chatListDetailShare = moved
+                                    } else {
+                                        widths.listDetailShare = moved
+                                    }
                                 }
 
                             ColumnsLayout.DETAIL_EXTRA ->
@@ -281,7 +301,8 @@ private fun Columns(
                 }
 
                 ColumnsLayout.LIST_DETAIL -> {
-                    val listW = (usable * widths.listDetailShare).toInt().coerceIn(0, usable)
+                    val share = if (narrowList) widths.chatListDetailShare else widths.listDetailShare
+                    val listW = (usable * share).toInt().coerceIn(0, usable)
                     listOf(listW, usable - listW)
                 }
 

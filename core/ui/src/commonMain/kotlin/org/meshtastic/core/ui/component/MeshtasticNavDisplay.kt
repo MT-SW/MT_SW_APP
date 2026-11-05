@@ -194,8 +194,15 @@ private fun MeshtasticNavDisplayHost(
     // In the desktop app the list and the detail start at half of the width each (the divider can still be dragged);
     // other devices keep the original proportions.
     val paneExpansionState = rememberPaneExpansionState()
-    if (isDesktopPlatform) {
-        LaunchedEffect(paneExpansionState) { paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION) }
+    // The conversations list is narrow on desktop and tablet alike, so the messages beside it are wide. Other lists
+    // (nodes, documentation) keep their usual proportions; leaving the conversations returns to those.
+    val narrowList = entries.lastOrNull { MeshtasticPanes.isList(it) }?.let(MeshtasticPanes::isNarrowList) == true
+    LaunchedEffect(paneExpansionState, narrowList) {
+        when {
+            narrowList -> paneExpansionState.setFirstPaneProportion(ThreeColumnWidths.CHAT_LIST_SHARE)
+            isDesktopPlatform -> paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION)
+            else -> paneExpansionState.clear()
+        }
     }
     val listDetailSceneStrategy =
         rememberListDetailSceneStrategy<NavKey>(
