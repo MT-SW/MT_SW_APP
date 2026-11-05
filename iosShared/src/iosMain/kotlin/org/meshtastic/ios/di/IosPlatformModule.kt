@@ -47,7 +47,7 @@ class IosPlatformModule {
         override val isDebug: Boolean = false
         override val applicationId: String = "pl.mtsw.mtswapp"
         override val versionCode: Int = 1
-        override val versionName: String = "2.8.4"
+        override val versionName: String = "2.8.5"
         override val absoluteMinFwVersion: String = "2.3.15"
         override val minFwVersion: String = "2.5.14"
     }
