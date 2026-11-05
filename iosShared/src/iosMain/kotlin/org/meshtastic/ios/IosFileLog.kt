@@ -19,112 +19,223 @@ package org.meshtastic.ios
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.buffer
+import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.database.iosDataDir
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
 import platform.Foundation.NSLock
 import platform.Foundation.timeIntervalSince1970
+import platform.UIKit.UIDevice
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.setUnhandledExceptionHook
 
 /**
- * The app's log in the `logs` folder of the app's folder, built like the log of the other platforms: every line starts
- * with the date and time (to the millisecond), and the log is a series of parts of about [PART_BYTES] each
- * (`mt_sw_log_<session>_<nnn>.txt`), so a problem can be found and read piece by piece. The crash that ends the app is
- * written as well. Parts older than a day, and the oldest ones above [MAX_TOTAL_BYTES], are deleted.
+ * The fork's log files on iPhone and iPad, built exactly like [org.meshtastic.core.common.log.AppLogControl]'s other
+ * platforms (Android and desktop):
+ * - Off by default; the choice and the switch of the automatic log of the last 24 hours are remembered in a small
+ *   file (`logging.conf`) next to the logs.
+ * - A log is a series of parts of about [PART_BYTES] each (`mt_sw_log_<session>_<nnn>.txt`) in the `logs` folder; every
+ *   part opens with its own header and every line starts with the date and time to the millisecond.
+ * - While only the automatic log of the last day runs (on by default), parts older than a day go and the parts stay
+ *   under [RECENT_MAX_BYTES]. The oldest parts always go once all of them pass [MAX_TOTAL_BYTES].
+ * - The cause of a crash is written to its own small file in `crash/` always: the stack trace and nothing else.
  */
 internal object IosFileLog : LogWriter() {
-    private const val PART_BYTES = 400L * 1024
-    private const val MAX_TOTAL_BYTES = 60L * 1024 * 1024
-    private const val KEEP_MILLIS = 24L * 60 * 60 * 1000
+    const val PART_BYTES = 400L * 1024
+    const val RECENT_WINDOW_MS = 24L * 60 * 60 * 1000
+    private const val MAX_TOTAL_BYTES = 300L * 1024 * 1024
+    private const val RECENT_MAX_BYTES = 40L * 1024 * 1024
+    private const val MAX_CRASH_FILES = 20
     private const val PART_NUMBER_WIDTH = 3
     private const val MILLIS = 1000.0
+    private const val CONF_NAME = "logging.conf"
+    private const val RECENT_OFF = "recent=off"
 
     private val dir: Path by lazy { (iosDataDir() + "/logs").toPath() }
+    private val crashDir: Path by lazy { dir / "crash" }
     private val lock = NSLock()
     private var part = 0
     private var partBytes = 0L
+    private var open = false
+    private var currentName = ""
     private var session = ""
 
-    private fun format(pattern: String, date: NSDate = NSDate()): String =
+    private val levelFlow = MutableStateFlow(AppLogLevel.OFF)
+    val level: StateFlow<AppLogLevel>
+        get() = levelFlow
+
+    private val recentFlow = MutableStateFlow(true)
+    val recent: StateFlow<Boolean>
+        get() = recentFlow
+
+    /** What is really written: the chosen level, or the basic level while only the log of the last day is on. */
+    private fun effectiveLevel(): AppLogLevel =
+        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
+
+    fun nowMillis(): Long = (NSDate().timeIntervalSince1970 * MILLIS).toLong()
+
+    private fun format(pattern: String): String =
         NSDateFormatter()
             .apply {
                 locale = NSLocale(localeIdentifier = "en_US_POSIX")
                 dateFormat = pattern
             }
-            .stringFromDate(date)
+            .stringFromDate(NSDate())
+
+    fun stamp(): String = format("MM-dd HH:mm:ss.SSS")
+
+    /** Repeated at the top of every part and of the report. */
+    fun header(): String =
+        "MT_SW (iOS), ${UIDevice.currentDevice.systemName} ${UIDevice.currentDevice.systemVersion}, " +
+            UIDevice.currentDevice.model
 
     fun install() {
         runCatching {
-            FileSystem.SYSTEM.createDirectories(dir)
+            FileSystem.SYSTEM.createDirectories(crashDir)
             // The single-file logs of the earlier versions are replaced by the parts.
             for (name in listOf("ios-app.log", "ios-app.old.log")) {
                 val legacy = (iosDataDir() + "/" + name).toPath()
                 if (FileSystem.SYSTEM.exists(legacy)) FileSystem.SYSTEM.delete(legacy)
             }
             session = format("yyyyMMdd-HHmmss")
-            prune()
+            val conf = runCatching { FileSystem.SYSTEM.read(dir / CONF_NAME) { readUtf8() }.lines() }.getOrNull()
+            levelFlow.value = AppLogLevel.fromKey(conf?.firstOrNull())
+            recentFlow.value = conf?.getOrNull(1)?.trim() != RECENT_OFF
+            pruneRecent()
         }
         Logger.addLogWriter(this)
         @OptIn(ExperimentalNativeApi::class)
-        setUnhandledExceptionHook { error -> append("CRASH", error.stackTraceToString()) }
+        setUnhandledExceptionHook { error -> writeCrash(error.stackTraceToString()) }
+    }
+
+    fun setLevel(level: AppLogLevel) {
+        val before = levelFlow.value
+        levelFlow.value = level
+        saveConf()
+        if (effectiveLevel() == AppLogLevel.OFF) closeCurrent()
+        if (before != level) Logger.i(tag = "Log") { "Log level: ${before.key} -> ${level.key}" }
+    }
+
+    fun setRecent(on: Boolean) {
+        if (recentFlow.value == on) return
+        recentFlow.value = on
+        saveConf()
+        if (effectiveLevel() == AppLogLevel.OFF) closeCurrent()
+        Logger.i(tag = "Log") { "Automatic log of the last day: ${if (on) "on" else "off"}" }
+    }
+
+    private fun saveConf() {
+        runCatching {
+            FileSystem.SYSTEM.write(dir / CONF_NAME) {
+                writeUtf8(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF))
+            }
+        }
+    }
+
+    override fun isLoggable(tag: String, severity: Severity): Boolean {
+        val min = effectiveLevel().severity ?: return false
+        return severity >= min
     }
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
-        append("${severity.name.first()}/$tag", message + (throwable?.let { "\n" + it.stackTraceToString() } ?: ""))
-    }
-
-    private fun partFile(number: Int): Path =
-        dir / "mt_sw_log_${session}_${number.toString().padStart(PART_NUMBER_WIDTH, '0')}.txt"
-
-    private fun append(tag: String, text: String) {
+        val line = buildString {
+            append(stamp()).append(' ').append(severity.name.first()).append('/').append(tag).append(' ')
+            append(message).append('\n')
+            throwable?.let { append(it.stackTraceToString()).append('\n') }
+        }
         lock.lock()
         try {
             runCatching {
-                val line = "${format("MM-dd HH:mm:ss.SSS")} $tag: $text\n"
-                val header =
-                    if (part == 0 || partBytes >= PART_BYTES) {
+                val head =
+                    if (!open) {
                         part++
                         partBytes = 0L
-                        val opened = format("yyyy-MM-dd HH:mm:ss.SSS")
-                        "=== MT_SW log (iOS), part $part, session $session, opened $opened ===\n"
+                        open = true
+                        currentName = partName(part)
+                        "=== MT_SW log, part $part, session $session, opened ${stamp()} ===\n" +
+                            header() +
+                            "\n=== line: MM-dd HH:mm:ss.SSS L/tag message ===\n"
                     } else {
                         ""
                     }
-                val sink = FileSystem.SYSTEM.appendingSink(partFile(part)).buffer()
+                val sink = FileSystem.SYSTEM.appendingSink(dir / currentName).buffer()
                 try {
-                    sink.writeUtf8(header + line)
+                    sink.writeUtf8(head + line)
                 } finally {
                     sink.close()
                 }
-                partBytes += (header.length + line.length).toLong()
-                if (header.isNotEmpty() && part > 1) prune()
+                partBytes += head.length + line.length
+                if (head.isNotEmpty()) pruneOld()
+                if (partBytes >= PART_BYTES) open = false
             }
         } finally {
             lock.unlock()
         }
     }
 
-    private fun prune() {
-        val cutoff = (NSDate().timeIntervalSince1970 * MILLIS).toLong() - KEEP_MILLIS
-        val files =
-            FileSystem.SYSTEM.list(dir)
-                .filter { it.name.startsWith("mt_sw_log_") }
-                .map { it to FileSystem.SYSTEM.metadata(it) }
-                .sortedBy { it.first.name }
-        var total = files.sumOf { it.second.size ?: 0L }
-        for ((file, meta) in files) {
-            if (file == partFile(part)) continue
-            val modified = meta.lastModifiedAtMillis ?: Long.MAX_VALUE
-            if (modified < cutoff || total > MAX_TOTAL_BYTES) {
-                total -= meta.size ?: 0L
-                FileSystem.SYSTEM.delete(file)
+    private fun closeCurrent() {
+        lock.lock()
+        open = false
+        lock.unlock()
+    }
+
+    private fun partName(number: Int) =
+        "mt_sw_log_${session}_${number.toString().padStart(PART_NUMBER_WIDTH, '0')}.txt"
+
+    /** All log parts, oldest first. */
+    fun parts(): List<Path> =
+        runCatching {
+            FileSystem.SYSTEM.list(dir).filter { it.name.startsWith("mt_sw_log_") }.sortedBy { it.name }
+        }
+            .getOrDefault(emptyList())
+
+    fun crashFiles(): List<Path> =
+        runCatching { FileSystem.SYSTEM.list(crashDir).filter { it.name.startsWith("crash_") }.sortedBy { it.name } }
+            .getOrDefault(emptyList())
+
+    fun size(path: Path): Long = FileSystem.SYSTEM.metadataOrNull(path)?.size ?: 0L
+
+    fun modified(path: Path): Long = FileSystem.SYSTEM.metadataOrNull(path)?.lastModifiedAtMillis ?: 0L
+
+    private fun pruneRecent() {
+        if (levelFlow.value != AppLogLevel.OFF) return
+        val cutoff = nowMillis() - RECENT_WINDOW_MS
+        val all = parts()
+        var total = all.sumOf { size(it) }
+        for (f in all) {
+            if (f.name == currentName) continue
+            if (modified(f) < cutoff || total > RECENT_MAX_BYTES) {
+                total -= size(f)
+                runCatching { FileSystem.SYSTEM.delete(f) }
             }
+        }
+    }
+
+    private fun pruneOld() {
+        val all = parts()
+        var total = all.sumOf { size(it) }
+        for (f in all) {
+            if (total <= MAX_TOTAL_BYTES) break
+            if (f.name.contains(session)) continue
+            total -= size(f)
+            runCatching { FileSystem.SYSTEM.delete(f) }
+        }
+    }
+
+    /** The cause of a crash: the stack trace and nothing else (no messages, no positions, no keys). */
+    private fun writeCrash(trace: String) {
+        runCatching {
+            FileSystem.SYSTEM.createDirectories(crashDir)
+            val name = "crash_" + format("yyyyMMdd-HHmmss") + ".txt"
+            FileSystem.SYSTEM.write(crashDir / name) { writeUtf8("${stamp()} ${header()}\n$trace\n") }
+            crashFiles().dropLast(MAX_CRASH_FILES).forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
         }
     }
 }

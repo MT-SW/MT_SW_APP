@@ -37,6 +37,7 @@ import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
+import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
@@ -60,6 +61,7 @@ import kotlin.time.Duration.Companion.minutes
 /** Starts the dependency graph once for the whole life of the app process. */
 private val koin: Koin by lazy {
     IosFileLog.install()
+    AppLogControls.current = IosLogControl
     startKoin<IosKoinApp> {}.koin
 }
 
