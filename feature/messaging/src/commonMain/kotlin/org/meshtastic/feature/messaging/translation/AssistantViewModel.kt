@@ -166,7 +166,7 @@ class AssistantViewModel(
                     // Only a convenience; the test runs without it.
                 }
                 val npu = askQuestionAndHardware()
-                files += "asystent-rozmowa.txt" to npu.chat.encodeToByteArray()
+                var last = npu
                 // The model ran on the NPU and everything went well: the same two steps once more on the graphics card
                 // (NPU skipped), so both are measured. After an error there is nothing to compare.
                 if (npu.backend.startsWith("NPU") && !npu.failed) {
@@ -174,11 +174,12 @@ class AssistantViewModel(
                     uiPrefs.setAiSkipNpu(true)
                     service.unloadModels()
                     kotlinx.coroutines.delay(SKIP_NPU_SETTLE_MS)
-                    startNew()
+                    // Same conversation: both runs are read together in one place.
                     val gpu = askQuestionAndHardware()
-                    files += "asystent-rozmowa-karta-graficzna.txt" to gpu.chat.encodeToByteArray()
+                    last = gpu
                     files += "porownanie-npu-karta-graficzna.txt" to comparison(npu, gpu).encodeToByteArray()
                 }
+                files += "asystent-rozmowa.txt" to last.chat.encodeToByteArray()
                 if (withDictation) {
                     _compat.value = CompatUi.Running(CompatStep.DICTATION)
                     val speech = service.dictationCheck { step ->

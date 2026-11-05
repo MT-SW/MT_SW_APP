@@ -439,7 +439,7 @@ class LlamaAssistantService(
             }
 
     override suspend fun dictationCheck(onStep: (String) -> Unit): String = withContext(Dispatchers.IO) {
-        val pl = data.polish
+        val pl = appLanguage() == "pl"
         fun t(polish: String, english: String) = if (pl) polish else english
         val candidates = AiModels.forRole(AiRole.DICTATION)
         val model =

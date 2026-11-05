@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Test zgodności asystenta: sprawdzanie dyktowania jest w języku aplikacji, ekran nie gaśnie w trakcie testu, a porównanie NPU i karty graficznej odbywa się w jednej rozmowie (jeden plik z całą rozmową). Przepisane ciekawostki.
 * Test zgodności asystenta: opis przed testem wyjaśnia, po co on jest (poprawa działania asystenta na różnych urządzeniach).
 * Test zgodności asystenta: w oknie „Test w toku” zmieniają się krótkie podpowiedzi o funkcjach aplikacji (wspólne dla wszystkich platform).
 * Test zgodności asystenta: przed startem duże okno dokładnie opisuje wszystkie kroki i wymaga potwierdzenia, a drugie pyta osobno o zgodę na pobranie i test modelu dyktowania (można też zrobić test bez dyktowania). Asystent dostaje dłuższe pytanie ogólne bez gotowej odpowiedzi, więc model musi sam pomyśleć. W trakcie testu okno jest cały czas widoczne i można w nim tylko przerwać test. Na starcie test sam czyści zapamiętane nieudane próby uruchomienia modelu. Gdy model działa na NPU i nie było błędów, pytanie i raport sprzętu powtarzają się na karcie graficznej (NPU pominięte), a do paczki dochodzi porównanie; ustawienie wraca potem do poprzedniego.
@@ -556,6 +557,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Assistant compatibility test: the dictation check uses the app language, the screen stays on during the test, and the NPU and graphics card runs share one conversation (one file with the whole chat). Tips reworded.
 * Assistant compatibility test: the intro text now explains why the test matters (improving the assistant on many different devices).
 * Assistant compatibility test: the running-test window shows rotating short tips about app features (shared on all platforms).
 * Assistant compatibility test: before the start a large window describes every step exactly and needs a confirmation, and a second one asks separately for consent to download and try the dictation model (the test can also run without dictation). The assistant gets a longer general question with no ready-made answer, so the model has to think. While the test runs the window stays on screen and the only thing you can do is stop the test. The test clears the remembered failed model starts by itself at the start. When the model runs on the NPU and there were no errors, the question and the hardware report are repeated on the graphics card (NPU skipped) and a comparison is added to the package; the setting then returns to what it was.

@@ -68,6 +68,7 @@ import org.meshtastic.core.resources.compat_tip_8
 import org.meshtastic.core.resources.compat_tip_9
 import org.meshtastic.core.resources.compat_tips_title
 import org.meshtastic.core.ui.component.ReportIssuesDialog
+import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.CompatStep
 import org.meshtastic.feature.messaging.translation.CompatUi
@@ -180,6 +181,8 @@ private fun CompatTips() {
 
 @Composable
 private fun CompatRunningDialog(compat: CompatUi.Running, onCancel: () -> Unit) {
+    // The screen must not go to sleep while the test runs (it takes minutes).
+    KeepScreenOn(true)
     AlertDialog(
         onDismissRequest = {},
         title = { Text(stringResource(Res.string.compat_running_title)) },
