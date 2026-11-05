@@ -20,17 +20,11 @@ package org.meshtastic.feature.messaging
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import org.meshtastic.core.resources.assistant_dictate_working
-import org.meshtastic.core.resources.assistant_dictate_stop
-import org.meshtastic.core.resources.assistant_dictate
-import org.meshtastic.core.ui.icon.Mic
-import androidx.compose.ui.draw.clip
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +35,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.OutputTransformation
@@ -49,9 +45,12 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -72,11 +71,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -87,6 +83,8 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.SpanStyle
@@ -104,7 +102,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import co.touchlab.kermit.Logger
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
@@ -119,22 +116,23 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.QuickChatAction
-import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.resources.Res
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import org.meshtastic.core.resources.archived_channel_read_only
+import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate_working
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.image_send_message
 import org.meshtastic.core.resources.image_send_title
-import org.meshtastic.core.resources.image_upload_sending
-import org.meshtastic.core.resources.image_upload_retry
-import org.meshtastic.core.resources.image_upload_failed
-import org.meshtastic.core.resources.image_upload_close
 import org.meshtastic.core.resources.image_upload_cancel
-import org.meshtastic.core.resources.archived_channel_read_only
+import org.meshtastic.core.resources.image_upload_close
+import org.meshtastic.core.resources.image_upload_failed
+import org.meshtastic.core.resources.image_upload_retry
+import org.meshtastic.core.resources.image_upload_sending
 import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
@@ -144,17 +142,18 @@ import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.smartScrollToIndex
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isFromSoftKeyboard
 import org.meshtastic.feature.messaging.component.ActionModeTopBar
+import org.meshtastic.feature.messaging.component.BulkActions
 import org.meshtastic.feature.messaging.component.DeleteMessageDialog
 import org.meshtastic.feature.messaging.component.FormattingToolbar
 import org.meshtastic.feature.messaging.component.MESSAGE_COMPOSER_MAX_BYTES
 import org.meshtastic.feature.messaging.component.MessageMenuAction
 import org.meshtastic.feature.messaging.component.MessageSearchBar
-import org.meshtastic.feature.messaging.component.BulkActions
 import org.meshtastic.feature.messaging.component.MessageTopBar
 import org.meshtastic.feature.messaging.component.OutgoingTranslateAction
 import org.meshtastic.feature.messaging.component.QuickChatRow
@@ -336,7 +335,8 @@ fun MessageScreen(
     }
     val readAloud: (List<Message>) -> Unit = { list ->
         val text =
-            list.filter { it.text.isNotBlank() }
+            list
+                .filter { it.text.isNotBlank() }
                 .joinToString("\n") { m ->
                     val shown = if (m.showTranslated) m.translatedText ?: m.text else m.text
                     val who = m.node.user.long_name.ifBlank { m.node.user.short_name }
@@ -1001,15 +1001,14 @@ internal fun MessageInput(
         }
     }
     // Dictation: the recognized text is added at the cursor (or replaces the selection), then a space follows.
-    val dictation =
-        rememberDictation { spoken ->
-            val current = textFieldState.text
-            val start = textFieldState.selection.min
-            val before = if (start > 0 && !current[start - 1].isWhitespace()) " " else ""
-            textFieldState.edit {
-                replace(selection.min, selection.max, before + spoken.trim() + " ")
-            }
+    val dictation = rememberDictation { spoken ->
+        val current = textFieldState.text
+        val start = textFieldState.selection.min
+        val before = if (start > 0 && !current[start - 1].isWhitespace()) " " else ""
+        textFieldState.edit {
+            replace(selection.min, selection.max, before + spoken.trim() + " ")
         }
+    }
     val onSendAction: () -> Unit = {
         if (mentionActive) {
             insertMention(suggestions.first())
@@ -1068,7 +1067,11 @@ internal fun MessageInput(
         }
         // One row above the field: the translate chip on the left, the formatting buttons on the right edge.
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            OutgoingTranslateAction(textFieldState = textFieldState, isEnabled = isEnabled, onSendMessage = onSendMessage)
+            OutgoingTranslateAction(
+                textFieldState = textFieldState,
+                isEnabled = isEnabled,
+                onSendMessage = onSendMessage,
+            )
             Spacer(modifier = Modifier.weight(1f))
             // Markdown formatting toolbar — shown once the field is focused and holds enough text to format.
             if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
@@ -1189,7 +1192,11 @@ private fun DictationButton(dictation: Dictation, enabled: Boolean) {
             .size(32.dp)
             .clip(CircleShape)
             .background(
-                if (listening) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                if (listening) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+                },
             )
             .clickable(enabled = enabled && !working, onClick = dictation.toggle),
         contentAlignment = Alignment.Center,
@@ -1201,8 +1208,7 @@ private fun DictationButton(dictation: Dictation, enabled: Boolean) {
                 imageVector = MeshtasticIcons.Mic,
                 contentDescription = label,
                 modifier = Modifier.size(18.dp),
-                tint =
-                if (listening) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                tint = if (listening) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -1323,6 +1329,7 @@ fun MessageInputPreview() {
 private fun ImageUploadBar(state: ImageUploadState) {
     when (state) {
         ImageUploadState.Idle -> Unit
+
         is ImageUploadState.Uploading ->
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1332,10 +1339,13 @@ private fun ImageUploadBar(state: ImageUploadState) {
                             if (state.attempt > 1) " (${state.attempt}/3)" else "",
                         modifier = Modifier.weight(1f),
                     )
-                    TextButton(onClick = ChatImageUploader::cancel) { Text(stringResource(Res.string.image_upload_cancel)) }
+                    TextButton(onClick = ChatImageUploader::cancel) {
+                        Text(stringResource(Res.string.image_upload_cancel))
+                    }
                 }
                 LinearProgressIndicator(progress = { state.percent / 100f }, modifier = Modifier.fillMaxWidth())
             }
+
         is ImageUploadState.Failed ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),

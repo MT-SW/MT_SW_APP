@@ -33,12 +33,14 @@ class IosAssistantHistoryStore(baseDir: String) : AssistantHistoryStore {
     private val fs = FileSystem.SYSTEM
     private val dir: Path = (baseDir + "/assistant-chats").toPath().also { fs.createDirectories(it) }
 
-    private fun fileOf(id: String): Path = dir / (id.filter { it.isLetterOrDigit() || it == '-' || it == '_' } + ".json")
+    private fun fileOf(id: String): Path =
+        dir / (id.filter { it.isLetterOrDigit() || it == '-' || it == '_' } + ".json")
 
-    override suspend fun list(): List<StoredChat> =
-        fs.list(dir)
-            .mapNotNull { p -> runCatching { json.decodeFromString<StoredChat>(fs.read(p) { readUtf8() }) }.getOrNull() }
-            .sortedByDescending { it.updatedAt }
+    override suspend fun list(): List<StoredChat> = fs.list(dir)
+        .mapNotNull { p ->
+            runCatching { json.decodeFromString<StoredChat>(fs.read(p) { readUtf8() }) }.getOrNull()
+        }
+        .sortedByDescending { it.updatedAt }
 
     override suspend fun save(chat: StoredChat) {
         fs.write(fileOf(chat.id)) { writeUtf8(json.encodeToString(StoredChat.serializer(), chat)) }
@@ -58,15 +60,14 @@ class IosAssistantMemory(baseDir: String) : AssistantMemory {
 
     private fun safe(name: String) = name.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
 
-    private fun load(): List<MemoryNote> =
-        fs.list(dir)
-            .filter { it.name.endsWith(".md") }
-            .sortedBy { it.name }
-            .mapNotNull { p ->
-                val text = runCatching { fs.read(p) { readUtf8() } }.getOrNull()?.trim().orEmpty()
-                val name = p.name.removeSuffix(".md")
-                if (text.isEmpty()) null else MemoryNote(name, text, name == AssistantMemory.USER_NOTE)
-            }
+    private fun load(): List<MemoryNote> = fs.list(dir)
+        .filter { it.name.endsWith(".md") }
+        .sortedBy { it.name }
+        .mapNotNull { p ->
+            val text = runCatching { fs.read(p) { readUtf8() } }.getOrNull()?.trim().orEmpty()
+            val name = p.name.removeSuffix(".md")
+            if (text.isEmpty()) null else MemoryNote(name, text, name == AssistantMemory.USER_NOTE)
+        }
 
     override fun save(name: String, text: String) {
         val n = safe(name)
@@ -94,7 +95,11 @@ class IosAssistantMemory(baseDir: String) : AssistantMemory {
         val out = StringBuilder()
         for (note in state.value.sortedByDescending { it.byUser }) {
             val line =
-                if (note.byUser) "User's own instructions (always follow them): ${note.text}" else "${note.name}: ${note.text}"
+                if (note.byUser) {
+                    "User's own instructions (always follow them): ${note.text}"
+                } else {
+                    "${note.name}: ${note.text}"
+                }
             if (out.length + line.length + 1 > maxChars) break
             out.append(line).append('\n')
         }

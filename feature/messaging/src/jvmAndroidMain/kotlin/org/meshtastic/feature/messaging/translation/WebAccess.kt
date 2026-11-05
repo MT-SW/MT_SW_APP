@@ -35,15 +35,53 @@ internal object WebAccess {
     private const val CONNECT_MS = 8_000
     private const val READ_MS = 12_000
     private const val USER_AGENT = "MT_SW_APP assistant (offline-first; text only)"
-    private val QUESTION_WORDS = setOf("jaka", "jaki", "jakie", "jest", "co", "to", "kto", "czy", "jak", "ile", "dlaczego", "gdzie", "kiedy", "what", "is", "the", "who", "how", "are", "do", "does", "of", "a", "an", "why", "where", "when", "powiedz", "opowiedz", "wyjaśnij", "podaj")
+    private val QUESTION_WORDS =
+        setOf(
+            "jaka",
+            "jaki",
+            "jakie",
+            "jest",
+            "co",
+            "to",
+            "kto",
+            "czy",
+            "jak",
+            "ile",
+            "dlaczego",
+            "gdzie",
+            "kiedy",
+            "what",
+            "is",
+            "the",
+            "who",
+            "how",
+            "are",
+            "do",
+            "does",
+            "of",
+            "a",
+            "an",
+            "why",
+            "where",
+            "when",
+            "powiedz",
+            "opowiedz",
+            "wyjaśnij",
+            "podaj",
+        )
     private const val BROWSER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 
     /** Downloads [url] as text. Throws when the address is not allowed or the server does not answer properly. */
-    fun fetch(url: String, accept: String = "text/html,application/json,text/plain", agent: String = USER_AGENT): String {
+    fun fetch(
+        url: String,
+        accept: String = "text/html,application/json,text/plain",
+        agent: String = USER_AGENT,
+    ): String {
         var current = url
         repeat(MAX_REDIRECTS + 1) {
             checkAllowed(current)
-            @Suppress("DEPRECATION") val connection = URL(current).openConnection() as HttpURLConnection
+            @Suppress("DEPRECATION")
+            val connection = URL(current).openConnection() as HttpURLConnection
             try {
                 connection.instanceFollowRedirects = false
                 connection.connectTimeout = CONNECT_MS
@@ -77,7 +115,8 @@ internal object WebAccess {
     /** Raw bytes of [url] for checks that need the exact content (same rules as [fetch]). */
     fun fetchBytes(url: String): ByteArray {
         checkAllowed(url)
-        @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION")
+        val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.instanceFollowRedirects = false
             connection.connectTimeout = CONNECT_MS
@@ -121,28 +160,32 @@ internal object WebAccess {
     }
 
     /** Plain readable text of an HTML page, without scripts, styles and tags. */
-    fun htmlToText(html: String): String =
-        html
-            .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
-            .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
-            .replace(Regex("<[^>]+>"), " ")
-            .replace("&nbsp;", " ")
-            .replace("&amp;", "&")
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&quot;", "\"")
-            .replace("&#39;", "'")
-            .lines()
-            .map { it.replace(Regex("\\s+"), " ").trim() }
-            .filter { it.isNotEmpty() }
-            .joinToString("\n")
+    fun htmlToText(html: String): String = html
+        .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
+        .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
+        .replace(Regex("<[^>]+>"), " ")
+        .replace("&nbsp;", " ")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'")
+        .lines()
+        .map { it.replace(Regex("\\s+"), " ").trim() }
+        .filter { it.isNotEmpty() }
+        .joinToString("\n")
 
     /** Search results of DuckDuckGo's plain HTML page as `title - address` and a short snippet. */
     fun search(query: String, limit: Int): List<String> {
         val fromWeb = runCatching { searchDuckDuckGo(query, limit) }.getOrDefault(emptyList())
         if (fromWeb.isNotEmpty()) return fromWeb
         // DuckDuckGo often answers programs with a "are you a robot" page: then Wikipedia (an open interface) is asked.
-        val words = query.split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() && it.lowercase() !in QUESTION_WORDS }.joinToString(" ").ifBlank { query }
+        val words =
+            query
+                .split(Regex("[^\\p{L}\\p{N}]+"))
+                .filter { it.isNotEmpty() && it.lowercase() !in QUESTION_WORDS }
+                .joinToString(" ")
+                .ifBlank { query }
         for (language in listOf("pl", "en")) {
             val found = runCatching { searchWikipedia(words, limit, language) }.getOrDefault(emptyList())
             if (found.isNotEmpty()) return found
@@ -159,12 +202,33 @@ internal object WebAccess {
         val title = Regex(""""title":"((?:[^"\\]|\\.)*)"""")
         val extract = Regex(""""extract":"((?:[^"\\]|\\.)*)"""")
         // The pages come in one object each: title and extract are read in the order they are written.
-        val pages = Regex("""\{"pageid":.*?"extract":"(?:[^"\\]|\\.)*"\}""", RegexOption.DOT_MATCHES_ALL).findAll(json).map { it.value }.toList()
-        return pages.mapNotNull { page ->
-            val name = title.find(page)?.groupValues?.get(1)?.let { unescapeJson(it) } ?: return@mapNotNull null
-            val text = extract.find(page)?.groupValues?.get(1)?.let { unescapeJson(it) }.orEmpty().replace('\n', ' ').trim()
-            if (text.length < 40) null else "$name - https://$language.wikipedia.org/wiki/" + URLEncoder.encode(name.replace(' ', '_'), Charsets.UTF_8.name()) + "\n" + text
-        }.take(limit)
+        val pages =
+            Regex("""\{"pageid":.*?"extract":"(?:[^"\\]|\\.)*"\}""", RegexOption.DOT_MATCHES_ALL)
+                .findAll(json)
+                .map { it.value }
+                .toList()
+        return pages
+            .mapNotNull { page ->
+                val name = title.find(page)?.groupValues?.get(1)?.let { unescapeJson(it) } ?: return@mapNotNull null
+                val text =
+                    extract
+                        .find(page)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.let { unescapeJson(it) }
+                        .orEmpty()
+                        .replace('\n', ' ')
+                        .trim()
+                if (text.length < 40) {
+                    null
+                } else {
+                    "$name - https://$language.wikipedia.org/wiki/" +
+                        URLEncoder.encode(name.replace(' ', '_'), Charsets.UTF_8.name()) +
+                        "\n" +
+                        text
+                }
+            }
+            .take(limit)
     }
 
     private fun unescapeJson(text: String): String {
@@ -174,9 +238,26 @@ internal object WebAccess {
             val c = text[i]
             if (c == '\\' && i + 1 < text.length) {
                 when (val n = text[i + 1]) {
-                    'n', 't', 'r' -> { out.append(' '); i += 2 }
-                    'u' -> if (i + 5 < text.length) { out.append(text.substring(i + 2, i + 6).toInt(16).toChar()); i += 6 } else { i += 2 }
-                    else -> { out.append(n); i += 2 }
+                    'n',
+                    't',
+                    'r',
+                    -> {
+                        out.append(' ')
+                        i += 2
+                    }
+
+                    'u' ->
+                        if (i + 5 < text.length) {
+                            out.append(text.substring(i + 2, i + 6).toInt(16).toChar())
+                            i += 6
+                        } else {
+                            i += 2
+                        }
+
+                    else -> {
+                        out.append(n)
+                        i += 2
+                    }
                 }
             } else {
                 out.append(c)
@@ -187,9 +268,19 @@ internal object WebAccess {
     }
 
     private fun searchDuckDuckGo(query: String, limit: Int): List<String> {
-        val page = fetch("https://html.duckduckgo.com/html/?kl=pl-pl&q=" + URLEncoder.encode(query, Charsets.UTF_8.name()), agent = BROWSER_AGENT)
-        val links = Regex("""<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL).findAll(page).toList()
-        val snippets = Regex("""<a[^>]*class="result__snippet"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL).findAll(page).toList()
+        val page =
+            fetch(
+                "https://html.duckduckgo.com/html/?kl=pl-pl&q=" + URLEncoder.encode(query, Charsets.UTF_8.name()),
+                agent = BROWSER_AGENT,
+            )
+        val links =
+            Regex("""<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL)
+                .findAll(page)
+                .toList()
+        val snippets =
+            Regex("""<a[^>]*class="result__snippet"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL)
+                .findAll(page)
+                .toList()
         return links.take(limit).mapIndexed { index, match ->
             val target = realAddress(match.groupValues[1])
             val title = htmlToText(match.groupValues[2])

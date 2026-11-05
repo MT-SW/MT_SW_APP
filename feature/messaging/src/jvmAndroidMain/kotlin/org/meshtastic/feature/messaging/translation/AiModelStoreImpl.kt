@@ -57,7 +57,8 @@ interface AiEngineInstaller {
     fun handles(engine: AiEngine): Boolean
 
     /** True when this device has an NPU that the engine programs can use. */
-    val npuSupported: Boolean get() = false
+    val npuSupported: Boolean
+        get() = false
 
     /** Size of the download in megabytes while [engine] is not installed yet, 0 when it is ready. */
     fun missingMb(engine: AiEngine): Int
@@ -83,16 +84,24 @@ class AiModelStoreImpl(
     private val storageMoveState = MutableStateFlow<AiStorageMove>(AiStorageMove.Idle)
     private val askFolderState = MutableStateFlow(location?.needsFirstQuestion() == true)
 
-    override val npuAvailable: Boolean get() = installer?.npuSupported == true
+    override val npuAvailable: Boolean
+        get() = installer?.npuSupported == true
 
     override val storage: StateFlow<AiStorageInfo?> = storageState
     override val storageMove: StateFlow<AiStorageMove> = storageMoveState
     override val askStorageFolder: StateFlow<Boolean> = askFolderState
 
-    private fun storageInfoNow(): AiStorageInfo? =
-        location?.let { l ->
-            AiStorageInfo(l.base.path, l.freeMb(), l.choices.map { it.path }, l.nextBase?.path, l.canChange, l.movableMb(), l.previousError())
-        }
+    private fun storageInfoNow(): AiStorageInfo? = location?.let { l ->
+        AiStorageInfo(
+            l.base.path,
+            l.freeMb(),
+            l.choices.map { it.path },
+            l.nextBase?.path,
+            l.canChange,
+            l.movableMb(),
+            l.previousError(),
+        )
+    }
 
     override fun storageFolderAsked() {
         location?.markAsked()
@@ -104,7 +113,9 @@ class AiModelStoreImpl(
     override suspend fun moveStorage(folder: String) {
         val l = location ?: return
         if (storageMoveState.value is AiStorageMove.Moving) return
-        val busy = gguf.value.values.any { it is TranslatorModelState.Downloading } || nllb.state.value is TranslatorModelState.Downloading
+        val busy =
+            gguf.value.values.any { it is TranslatorModelState.Downloading } ||
+                nllb.state.value is TranslatorModelState.Downloading
         if (busy) {
             storageMoveState.value = AiStorageMove.Failed("a model is being downloaded, wait until it finishes")
             return
@@ -155,20 +166,27 @@ class AiModelStoreImpl(
     private fun cleanReplacedFiles() {
         runCatching {
             var bytes = 0L
-            AiModels.all.filter { it.engine != AiEngine.NLLB_ONNX }.forEach { model ->
-                val dir = modelDir(model)
-                if (!dir.isDirectory) return@forEach
-                val keep = model.activeFiles.map { it.fileName }.toSet()
-                dir.listFiles()?.filter { f ->
-                    f.isFile && (f.name.endsWith(".gguf") || f.name.endsWith(".gguf.part")) && f.name.removeSuffix(".part") !in keep
-                }?.forEach { f ->
-                    bytes += f.length()
-                    f.delete()
+            AiModels.all
+                .filter { it.engine != AiEngine.NLLB_ONNX }
+                .forEach { model ->
+                    val dir = modelDir(model)
+                    if (!dir.isDirectory) return@forEach
+                    val keep = model.activeFiles.map { it.fileName }.toSet()
+                    dir.listFiles()
+                        ?.filter { f ->
+                            f.isFile &&
+                                (f.name.endsWith(".gguf") || f.name.endsWith(".gguf.part")) &&
+                                f.name.removeSuffix(".part") !in keep
+                        }
+                        ?.forEach { f ->
+                            bytes += f.length()
+                            f.delete()
+                        }
                 }
-            }
             val mb = (bytes / MB).toInt()
             if (mb > 0) Logger.i(tag = TAG) { "Removed replaced model files: $mb MB" }
-        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced model files failed: ${it.message}" } }
+        }
+            .onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced model files failed: ${it.message}" } }
     }
 
     /*
@@ -176,15 +194,23 @@ class AiModelStoreImpl(
      * engine. Only files the app itself downloaded into its own model folder are touched, and never again afterwards,
      * so a model the user downloads later is never removed by this.
      */
-    /** Removes the files of models that a newer one replaced (see [AiModels.retiredModelIds]); nothing happens when there are none. */
+
+    /**
+     * Removes the files of models that a newer one replaced (see [AiModels.retiredModelIds]); nothing happens when
+     * there are none.
+     */
     private fun cleanRetiredModels() {
         runCatching {
-            AiModels.retiredModelIds.map { File(ggufDir, it) }.filter { it.exists() }.forEach { dir ->
-                val mb = (dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / MB).toInt()
-                dir.deleteRecursively()
-                Logger.i(tag = TAG) { "Removed a model that a newer one replaced: ${dir.name} ($mb MB)" }
-            }
-        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced models failed: ${it.message}" } }
+            AiModels.retiredModelIds
+                .map { File(ggufDir, it) }
+                .filter { it.exists() }
+                .forEach { dir ->
+                    val mb = (dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / MB).toInt()
+                    dir.deleteRecursively()
+                    Logger.i(tag = TAG) { "Removed a model that a newer one replaced: ${dir.name} ($mb MB)" }
+                }
+        }
+            .onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced models failed: ${it.message}" } }
     }
 
     private fun cleanLegacyOnce() {
@@ -201,7 +227,8 @@ class AiModelStoreImpl(
             ggufDir.listFiles()?.filter { it.name == "cache" || it.name.startsWith("cache-") }?.forEach { remove(it) }
             ggufDir.walkTopDown().filter { it.isFile && it.name.endsWith(".litertlm") }.forEach { remove(it) }
             marker.writeText("old engine files removed")
-        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing the old engine files failed: ${it.message}" } }
+        }
+            .onFailure { Logger.w(tag = TAG, throwable = it) { "Removing the old engine files failed: ${it.message}" } }
         val mb = (bytes / MB).toInt()
         if (mb > 0) Logger.i(tag = TAG) { "Removed the files of the old engine: $mb MB" }
         legacyFreed.value = mb
@@ -280,7 +307,10 @@ class AiModelStoreImpl(
                     val size = fileSizeMb(model, file).toFloat()
                     val before = done
                     downloadFile(file, File(dir, file.fileName)) { fraction ->
-                        setGguf(id, TranslatorModelState.Downloading(((before + fraction * size) / total).coerceIn(0f, 0.99f)))
+                        setGguf(
+                            id,
+                            TranslatorModelState.Downloading(((before + fraction * size) / total).coerceIn(0f, 0.99f)),
+                        )
                     }
                     done += size
                 }
@@ -320,7 +350,10 @@ class AiModelStoreImpl(
     /** Absolute path of a downloaded model file (the model itself), or null while the model is not complete. */
     fun fileOf(id: String): File? = fileOf(id, AiFileKind.MODEL)
 
-    /** Absolute path of the file of the given [kind] (for example the hearing part), or null when there is none or it is not complete. */
+    /**
+     * Absolute path of the file of the given [kind] (for example the hearing part), or null when there is none or it is
+     * not complete.
+     */
     fun fileOf(id: String, kind: AiFileKind): File? {
         val model = AiModels.byId(id) ?: return null
         val file = model.activeFiles.firstOrNull { it.kind == kind } ?: return null
@@ -343,7 +376,9 @@ class AiModelStoreImpl(
 
     private fun initialGgufStates(): Map<String, TranslatorModelState> = AiModels.all
         .filter { it.engine != AiEngine.NLLB_ONNX && it.engineReady }
-        .associate { it.id to (if (isComplete(it)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded) }
+        .associate {
+            it.id to (if (isComplete(it)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded)
+        }
 
     private fun setGguf(id: String, state: TranslatorModelState) {
         gguf.update { it + (id to state) }
@@ -356,7 +391,9 @@ class AiModelStoreImpl(
         while (true) {
             currentCoroutineContext().ensureActive()
             val have = if (part.isFile) part.length() else 0L
-            @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
+
+            @Suppress("DEPRECATION")
+            val connection = URL(url).openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = CONNECT_TIMEOUT_MS
                 connection.readTimeout = READ_TIMEOUT_MS

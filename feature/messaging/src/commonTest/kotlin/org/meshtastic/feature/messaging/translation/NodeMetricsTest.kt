@@ -56,7 +56,14 @@ class NodeMetricsTest {
 
     @Test
     fun `two metrics are answered together`() {
-        val text = assertNotNull(NodeMetrics.answer("który węzeł ma największe obciążenie procesora i najniższą baterię?", rows, polish = true))
+        val text =
+            assertNotNull(
+                NodeMetrics.answer(
+                    "który węzeł ma największe obciążenie procesora i najniższą baterię?",
+                    rows,
+                    polish = true,
+                ),
+            )
         assertTrue(text.contains("obciążenie procesora"))
         assertTrue(text.contains("poziom baterii"))
     }

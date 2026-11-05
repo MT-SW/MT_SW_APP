@@ -16,14 +16,15 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-import kotlin.concurrent.Volatile
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.getStringSuspend
+import kotlin.concurrent.Volatile
 
 /**
  * The language the assistant answers in. A whole answer is in the language of the question: when someone asks in
  * English while the app is in Polish (or the other way round), the texts the app writes itself (counts, lists, where a
- * setting is, the button captions) come from [texts] instead of the app's own language. Null texts = the app's language.
+ * setting is, the button captions) come from [texts] instead of the app's own language. Null texts = the app's
+ * language.
  */
 object AnswerLanguage {
     @Volatile var texts: Map<String, String>? = null
@@ -35,7 +36,8 @@ suspend fun aiString(res: StringResource, vararg args: Any): String {
     val values = args.map { if (it is StringResource) aiString(it) else it }
     return PLACEHOLDER.replace(template) { m ->
         values.getOrNull(m.groupValues[1].toInt() - 1)?.toString() ?: m.value
-    }.replace("%%", "%")
+    }
+        .replace("%%", "%")
 }
 
 private val PLACEHOLDER = Regex("%(\\d+)\\$[sd]")

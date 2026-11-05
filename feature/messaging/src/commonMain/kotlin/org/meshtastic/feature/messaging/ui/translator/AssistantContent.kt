@@ -16,21 +16,15 @@
  */
 package org.meshtastic.feature.messaging.ui.translator
 
-import org.meshtastic.core.resources.assistant_save_failed
-import org.meshtastic.core.resources.assistant_save_done
-import org.meshtastic.core.resources.assistant_save
-import org.meshtastic.core.resources.assistant_export_title
-import org.meshtastic.core.ui.util.rememberSaveFileLauncher
-import org.meshtastic.core.repository.FileService
-import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.common.util.DateFormatter
-import kotlinx.coroutines.CancellationException
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,32 +35,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalClipboard
-import kotlinx.coroutines.launch
-import org.meshtastic.core.resources.copy
-import org.meshtastic.core.resources.resend
-import org.meshtastic.core.ui.util.createClipEntry
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -75,58 +51,82 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import org.meshtastic.core.ui.util.isDesktopPlatform
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.Key
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.koinInject
-import org.meshtastic.core.repository.UiPrefs
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.assistant_dictate
-import org.meshtastic.core.resources.assistant_dictate_stop
-import org.meshtastic.core.resources.assistant_dictate_working
-import org.meshtastic.core.resources.assistant_disclaimer
-import org.meshtastic.core.resources.assistant_memory_notice
-import org.meshtastic.core.resources.assistant_disclaimer_web
-import org.meshtastic.core.resources.read_aloud
-import org.meshtastic.core.resources.stop_reading
-import org.meshtastic.feature.messaging.DictationPhase
-import org.meshtastic.feature.messaging.rememberDictation
-import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.core.resources.assistant_ai_label
 import org.meshtastic.core.resources.assistant_copy_all
 import org.meshtastic.core.resources.assistant_copy_assistant
 import org.meshtastic.core.resources.assistant_copy_you
+import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate_working
+import org.meshtastic.core.resources.assistant_disclaimer
+import org.meshtastic.core.resources.assistant_disclaimer_web
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
+import org.meshtastic.core.resources.assistant_export_title
 import org.meshtastic.core.resources.assistant_go_to
-import org.meshtastic.core.resources.assistant_web_searched
-import org.meshtastic.core.resources.assistant_web_sources
-import org.meshtastic.core.resources.assistant_web_used
 import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
+import org.meshtastic.core.resources.assistant_memory_notice
 import org.meshtastic.core.resources.assistant_model_missing
 import org.meshtastic.core.resources.assistant_new
 import org.meshtastic.core.resources.assistant_off
+import org.meshtastic.core.resources.assistant_save
+import org.meshtastic.core.resources.assistant_save_done
+import org.meshtastic.core.resources.assistant_save_failed
 import org.meshtastic.core.resources.assistant_send
 import org.meshtastic.core.resources.assistant_stop
 import org.meshtastic.core.resources.assistant_suggest_1
 import org.meshtastic.core.resources.assistant_suggest_2
 import org.meshtastic.core.resources.assistant_suggest_3
 import org.meshtastic.core.resources.assistant_suggest_4
+import org.meshtastic.core.resources.assistant_web_searched
+import org.meshtastic.core.resources.assistant_web_sources
+import org.meshtastic.core.resources.assistant_web_used
+import org.meshtastic.core.resources.copy
+import org.meshtastic.core.resources.read_aloud
+import org.meshtastic.core.resources.resend
+import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
+import org.meshtastic.core.ui.util.createClipEntry
+import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.messaging.DictationPhase
+import org.meshtastic.feature.messaging.rememberDictation
+import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.translation.AssistantActions
 import org.meshtastic.feature.messaging.translation.AssistantClock
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
@@ -135,7 +135,8 @@ import org.meshtastic.feature.messaging.translation.AssistantViewModel
 private const val HEADER_SWIPE_PX = 6f
 
 private val BubbleShape = RoundedCornerShape(20.dp)
-private val UserBubbleShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp)
+private val UserBubbleShape =
+    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp)
 private val AssistantBubbleShape =
     RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 4.dp, bottomEnd = 20.dp)
 
@@ -169,38 +170,46 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         // the answer comes in below and the user keeps reading where they are.
         val autoScroll by koinInject<UiPrefs>().assistantAutoScroll.collectAsStateWithLifecycle()
         LaunchedEffect(state.lines.size, lastLength, autoScroll) {
-            if (state.lines.isNotEmpty() && (autoScroll || state.lines.last().fromUser)) listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
+            if (state.lines.isNotEmpty() && (autoScroll || state.lines.last().fromUser)) {
+                listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
+            }
         }
 
-        // The header (the notice and the copy/save buttons) folds away when the chat is scrolled with a finger and comes back
-        // on the opposite swipe, so that on a strongly enlarged screen it does not take the whole chat. The switch is in the
+        // The header (the notice and the copy/save buttons) folds away when the chat is scrolled with a finger and
+        // comes back
+        // on the opposite swipe, so that on a strongly enlarged screen it does not take the whole chat. The switch is
+        // in the
         // info window; only a swipe of the user counts, not the chat following a new answer by itself.
         val collapsible by koinInject<UiPrefs>().assistantHeaderCollapse.collectAsStateWithLifecycle()
         var headerFolded by rememberSaveable { mutableStateOf(false) }
         val collapsibleNow by rememberUpdatedState(collapsible)
         val headerShown = !(collapsible && headerFolded)
-        val swipeToFold =
-            remember {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                        if (collapsibleNow && source == NestedScrollSource.UserInput) {
-                            if (available.y < -HEADER_SWIPE_PX) headerFolded = true else if (available.y > HEADER_SWIPE_PX) headerFolded = false
+        val swipeToFold = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (collapsibleNow && source == NestedScrollSource.UserInput) {
+                        if (available.y < -HEADER_SWIPE_PX) {
+                            headerFolded = true
+                        } else if (available.y > HEADER_SWIPE_PX) {
+                            headerFolded = false
                         }
-                        return Offset.Zero
                     }
+                    return Offset.Zero
                 }
             }
+        }
 
         AnimatedVisibility(visible = headerShown) {
             Column {
                 Text(
                     text =
-                        stringResource(
-                            if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
-                        ),
+                    stringResource(
+                        if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     // With the internet switched on the line warns about it, so it is red like a warning.
-                    color = if (internetOn) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color =
+                    if (internetOn) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp),
                 )
                 val memoryOn by koinInject<UiPrefs>().assistantMemoryEnabled.collectAsStateWithLifecycle()
@@ -216,20 +225,19 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         }
 
         AnimatedVisibility(visible = headerShown && state.lines.isNotEmpty()) {
-          Column {
-            val clipboard = LocalClipboard.current
-            val exportScope = rememberCoroutineScope()
-            val fileService = koinInject<FileService>()
-            val you = stringResource(Res.string.assistant_copy_you)
-            val assistant = stringResource(Res.string.assistant_copy_assistant)
-            val title = stringResource(Res.string.assistant_export_title)
-            val savedText = stringResource(Res.string.assistant_save_done)
-            val failedText = stringResource(Res.string.assistant_save_failed)
-            var saveMenu by remember { mutableStateOf(false) }
-            var saveResult by remember { mutableStateOf<String?>(null) }
-            var pendingBytes by remember { mutableStateOf<ByteArray?>(null) }
-            val saveLauncher =
-                rememberSaveFileLauncher { uri ->
+            Column {
+                val clipboard = LocalClipboard.current
+                val exportScope = rememberCoroutineScope()
+                val fileService = koinInject<FileService>()
+                val you = stringResource(Res.string.assistant_copy_you)
+                val assistant = stringResource(Res.string.assistant_copy_assistant)
+                val title = stringResource(Res.string.assistant_export_title)
+                val savedText = stringResource(Res.string.assistant_save_done)
+                val failedText = stringResource(Res.string.assistant_save_failed)
+                var saveMenu by remember { mutableStateOf(false) }
+                var saveResult by remember { mutableStateOf<String?>(null) }
+                var pendingBytes by remember { mutableStateOf<ByteArray?>(null) }
+                val saveLauncher = rememberSaveFileLauncher { uri ->
                     val bytes = pendingBytes
                     if (bytes != null) {
                         exportScope.launch {
@@ -246,48 +254,58 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                         }
                     }
                 }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(
-                    onClick = {
-                        val whole = AssistantExport.text(AssistantExport.entries(state.lines), you, assistant)
-                        exportScope.launch { clipboard.setClipEntry(createClipEntry(whole, "")) }
-                    },
-                ) {
-                    Text(stringResource(Res.string.assistant_copy_all))
-                }
-                Box {
-                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.assistant_save)) }
-                    DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
-                        ExportFormat.entries.forEach { format ->
-                            DropdownMenuItem(
-                                text = { Text(format.label) },
-                                onClick = {
-                                    saveMenu = false
-                                    val entries = AssistantExport.entries(state.lines)
-                                    val stamp = DateFormatter.formatDateTime(nowMillis)
-                                    val bytes =
-                                        when (format) {
-                                            ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, you, assistant)
-                                            ExportFormat.MARKDOWN ->
-                                                AssistantExport.markdown(entries, title, stamp, you, assistant).encodeToByteArray()
-                                            ExportFormat.TEXT ->
-                                                AssistantExport.text(entries, you, assistant).encodeToByteArray()
-                                            ExportFormat.HTML ->
-                                                AssistantExport.html(entries, title, stamp, you, assistant).encodeToByteArray()
-                                            ExportFormat.JSON ->
-                                                AssistantExport.json(entries, title, stamp).encodeToByteArray()
-                                        }
-                                    pendingBytes = bytes
-                                    saveResult = null
-                                    saveLauncher("mt_sw_assistant_" + nowMillis / 1000 + format.extension, format.mime)
-                                },
-                            )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(
+                        onClick = {
+                            val whole = AssistantExport.text(AssistantExport.entries(state.lines), you, assistant)
+                            exportScope.launch { clipboard.setClipEntry(createClipEntry(whole, "")) }
+                        },
+                    ) {
+                        Text(stringResource(Res.string.assistant_copy_all))
+                    }
+                    Box {
+                        TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.assistant_save)) }
+                        DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
+                            ExportFormat.entries.forEach { format ->
+                                DropdownMenuItem(
+                                    text = { Text(format.label) },
+                                    onClick = {
+                                        saveMenu = false
+                                        val entries = AssistantExport.entries(state.lines)
+                                        val stamp = DateFormatter.formatDateTime(nowMillis)
+                                        val bytes =
+                                            when (format) {
+                                                ExportFormat.PDF ->
+                                                    AssistantExport.pdf(entries, title, stamp, you, assistant)
+
+                                                ExportFormat.MARKDOWN ->
+                                                    AssistantExport.markdown(entries, title, stamp, you, assistant)
+                                                        .encodeToByteArray()
+
+                                                ExportFormat.TEXT ->
+                                                    AssistantExport.text(entries, you, assistant).encodeToByteArray()
+
+                                                ExportFormat.HTML ->
+                                                    AssistantExport.html(entries, title, stamp, you, assistant)
+                                                        .encodeToByteArray()
+
+                                                ExportFormat.JSON ->
+                                                    AssistantExport.json(entries, title, stamp).encodeToByteArray()
+                                            }
+                                        pendingBytes = bytes
+                                        saveResult = null
+                                        saveLauncher(
+                                            "mt_sw_assistant_" + nowMillis / 1000 + format.extension,
+                                            format.mime,
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }
+                saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
             }
-            saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
-          }
         }
 
         LazyColumn(
@@ -365,11 +383,19 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                 // A small red note, like a warning: this answer used the internet.
                                 val details =
                                     listOfNotNull(
-                                        web.queries.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_searched, it) },
-                                        web.sources.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_sources, it) },
+                                        web.queries
+                                            .takeIf { it.isNotBlank() }
+                                            ?.let { stringResource(Res.string.assistant_web_searched, it) },
+                                        web.sources
+                                            .takeIf { it.isNotBlank() }
+                                            ?.let { stringResource(Res.string.assistant_web_sources, it) },
                                     )
                                 Text(
-                                    text = web.note.ifBlank { (listOf(stringResource(Res.string.assistant_web_used)) + details).joinToString(" · ") },
+                                    text =
+                                    web.note.ifBlank {
+                                        (listOf(stringResource(Res.string.assistant_web_used)) + details)
+                                            .joinToString(" · ")
+                                    },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error,
                                 )
@@ -386,7 +412,11 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                                 AssistantLinks.open(action.uri)
                                             },
                                         ) {
-                                            Text(action.caption.ifBlank { stringResource(Res.string.assistant_go_to, action.label) })
+                                            Text(
+                                                action.caption.ifBlank {
+                                                    stringResource(Res.string.assistant_go_to, action.label)
+                                                },
+                                            )
                                         }
                                     }
                                 }
@@ -424,7 +454,9 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
                 // Computers: Enter sends, Shift+Enter makes a new line. The phone keeps its normal behaviour.
                 if (isDesktopPlatform && event.key == Key.Enter && !event.isShiftPressed) {
-                    if (event.type == KeyEventType.KeyUp && !state.busy && state.input.isNotBlank()) viewModel.send()
+                    if (event.type == KeyEventType.KeyUp && !state.busy && state.input.isNotBlank()) {
+                        viewModel.send()
+                    }
                     true
                 } else {
                     false
@@ -482,15 +514,23 @@ private fun Bubble(
     var menuOpen by remember { mutableStateOf(false) }
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start,
+    ) {
         // Wide bubbles: a long answer takes less height; yours and the assistant's may overlap in width.
         Box(modifier = Modifier.widthIn(max = 900.dp).fillMaxWidth(if (fromUser) 0.9f else 0.97f)) {
             Surface(
                 shape = if (fromUser) UserBubbleShape else AssistantBubbleShape,
                 color =
-                if (fromUser) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                if (fromUser) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                },
                 modifier =
-                Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { if (text.isNotEmpty()) menuOpen = true }),
+                Modifier.fillMaxWidth()
+                    .combinedClickable(onClick = {}, onLongClick = { if (text.isNotEmpty()) menuOpen = true }),
             ) {
                 Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) { content() }
             }

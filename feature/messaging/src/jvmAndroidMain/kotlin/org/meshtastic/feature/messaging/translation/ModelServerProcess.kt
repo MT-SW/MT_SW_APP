@@ -28,16 +28,18 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.coroutineContext
 
 /**
- * A model program (llama.cpp or whisper.cpp server) that the app started on this computer. It listens only on the
- * local address (127.0.0.1) on a free port, writes its messages to a log file, and is stopped when the model is
- * unloaded or the app ends.
+ * A model program (llama.cpp or whisper.cpp server) that the app started on this computer. It listens only on the local
+ * address (127.0.0.1) on a free port, writes its messages to a log file, and is stopped when the model is unloaded or
+ * the app ends.
  */
-internal class ModelServerProcess private constructor(
+internal class ModelServerProcess
+private constructor(
     private val process: Process,
     val port: Int,
     private val tail: ArrayDeque<String>,
 ) {
-    val isAlive: Boolean get() = process.isAlive
+    val isAlive: Boolean
+        get() = process.isAlive
 
     /** Memory (MB) this program takes in the main memory right now; null when the system does not tell. */
     fun memoryMb(): Int? = runCatching {
@@ -47,16 +49,37 @@ internal class ModelServerProcess private constructor(
             if (status.isFile) {
                 status.readLines().firstOrNull { it.startsWith("VmRSS:") }?.filter { it.isDigit() }?.toLongOrNull()
             } else if (System.getProperty("os.name").orEmpty().lowercase().contains("windows")) {
-                val out = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", "(Get-Process -Id $pid).WorkingSet64 / 1024").redirectErrorStream(true).start()
-                    .inputStream.bufferedReader().readText().trim()
+                val out =
+                    ProcessBuilder(
+                        "powershell",
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-Command",
+                        "(Get-Process -Id $pid).WorkingSet64 / 1024",
+                    )
+                        .redirectErrorStream(true)
+                        .start()
+                        .inputStream
+                        .bufferedReader()
+                        .readText()
+                        .trim()
                 out.substringBefore('.').substringBefore(',').toLongOrNull()
             } else {
-                ProcessBuilder("ps", "-o", "rss=", "-p", pid.toString()).redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim().toLongOrNull()
+                ProcessBuilder("ps", "-o", "rss=", "-p", pid.toString())
+                    .redirectErrorStream(true)
+                    .start()
+                    .inputStream
+                    .bufferedReader()
+                    .readText()
+                    .trim()
+                    .toLongOrNull()
             }
         kb?.div(1024)?.toInt()
-    }.getOrNull()
+    }
+        .getOrNull()
 
-    val baseUrl: String get() = "http://127.0.0.1:$port"
+    val baseUrl: String
+        get() = "http://127.0.0.1:$port"
 
     /** The last lines the program wrote (for the log when it fails). */
     fun logTail(): String = synchronized(tail) { tail.joinToString("\n") }
@@ -65,21 +88,30 @@ internal class ModelServerProcess private constructor(
      * Waits until `GET [path]` answers 200 (with [anyAnswer]: until the program answers at all); fails when the program
      * ends or [timeoutMs] runs out.
      */
-    suspend fun awaitReady(path: String, timeoutMs: Long, anyAnswer: Boolean = false, abortIf: (() -> String?)? = null) {
+    suspend fun awaitReady(
+        path: String,
+        timeoutMs: Long,
+        anyAnswer: Boolean = false,
+        abortIf: (() -> String?)? = null,
+    ) {
         val deadline = System.currentTimeMillis() + timeoutMs
         while (true) {
             coroutineContext.ensureActive()
             if (!process.isAlive) error("The model program stopped (exit code ${process.exitValue()})")
-            // A way to give up at once when the log already says that this start cannot work (instead of loading the whole model).
+            // A way to give up at once when the log already says that this start cannot work (instead of loading the
+            // whole model).
             abortIf?.invoke()?.let { error(it) }
-            if (System.currentTimeMillis() > deadline) error("The model program did not become ready in ${timeoutMs / 1000} s")
+            if (System.currentTimeMillis() > deadline) {
+                error("The model program did not become ready in ${timeoutMs / 1000} s")
+            }
             if (ping(path, anyAnswer)) return
             delay(POLL_MS)
         }
     }
 
     private fun ping(path: String, anyAnswer: Boolean): Boolean = try {
-        @Suppress("DEPRECATION") val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION")
+        val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = PING_TIMEOUT_MS
             connection.readTimeout = PING_TIMEOUT_MS
@@ -95,7 +127,9 @@ internal class ModelServerProcess private constructor(
     fun stop() {
         runCatching {
             process.destroy()
-            if (!process.waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)) process.destroyForcibly().waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)
+            if (!process.waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)) {
+                process.destroyForcibly().waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)
+            }
         }
         live.remove(process)
     }
@@ -109,11 +143,13 @@ internal class ModelServerProcess private constructor(
         /** The process number, read in a way that works on every Java and Android version; null when unknown. */
         private fun pidOf(process: Process): Long? = runCatching {
             (Process::class.java.getMethod("pid").invoke(process) as Long)
-        }.recoverCatching {
-            val field = process.javaClass.getDeclaredField("pid")
-            field.isAccessible = true
-            (field.get(process) as Number).toLong()
-        }.getOrNull()
+        }
+            .recoverCatching {
+                val field = process.javaClass.getDeclaredField("pid")
+                field.isAccessible = true
+                (field.get(process) as Number).toLong()
+            }
+            .getOrNull()
 
         /** Names of the model programs the app starts; only these are ever stopped as leftovers. */
         private val PROGRAMS = listOf("llama-server", "whisper-server")
@@ -150,19 +186,25 @@ internal class ModelServerProcess private constructor(
             return runCatching {
                 handleOf(pid)?.let { handle ->
                     val info = Class.forName("java.lang.ProcessHandle").getMethod("info").invoke(handle)
-                    val command = Class.forName("java.lang.ProcessHandle\$Info").getMethod("command").invoke(info) as java.util.Optional<*>
+                    val command =
+                        Class.forName("java.lang.ProcessHandle\$Info").getMethod("command").invoke(info)
+                            as java.util.Optional<*>
                     command.orElse(null)?.toString()
                 }
-            }.getOrNull()
+            }
+                .getOrNull()
         }
 
-        /** Stops process [pid] through the Java process API (computers); false where that API does not exist (Android). */
+        /**
+         * Stops process [pid] through the Java process API (computers); false where that API does not exist (Android).
+         */
         private fun destroyByHandle(pid: Long): Boolean {
             val handle = runCatching { handleOf(pid) }.getOrNull() ?: return false
             return runCatching {
                 Class.forName("java.lang.ProcessHandle").getMethod("destroyForcibly").invoke(handle)
                 true
-            }.getOrDefault(false)
+            }
+                .getOrDefault(false)
         }
 
         /** The Java process API's handle of [pid] (computers only; Android has no such API, then this throws). */
@@ -176,8 +218,8 @@ internal class ModelServerProcess private constructor(
         fun freePort(): Int = ServerSocket(0).use { it.localPort }
 
         /**
-         * Starts [command] in [directory]. Every line the program writes goes to [logFile] (replaced at each start)
-         * and to [onLine]. The libraries next to the program are found through the library path variables.
+         * Starts [command] in [directory]. Every line the program writes goes to [logFile] (replaced at each start) and
+         * to [onLine]. The libraries next to the program are found through the library path variables.
          */
         fun start(
             command: List<String>,
@@ -217,7 +259,12 @@ internal class ModelServerProcess private constructor(
                             runCatching { onLine(line) }
                         }
                     }
-                }.onFailure { if (it !is CancellationException) Logger.d(tag = "ModelServer") { "Log reader ended: ${it.message}" } }
+                }
+                    .onFailure {
+                        if (it !is CancellationException) {
+                            Logger.d(tag = "ModelServer") { "Log reader ended: ${it.message}" }
+                        }
+                    }
             }
             reader.name = "model-server-log"
             reader.isDaemon = true

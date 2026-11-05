@@ -19,7 +19,6 @@ package org.meshtastic.feature.messaging.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
@@ -143,7 +142,10 @@ internal fun OutgoingTranslateAction(
             title = { Text(stringResource(Res.string.translator_outgoing_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
                         Text(stringResource(Res.string.translator_to), style = MaterialTheme.typography.labelMedium)
                         Column {
                             OutlinedButton(onClick = { menuOpen = true }) {
@@ -169,7 +171,11 @@ internal fun OutgoingTranslateAction(
                     )
                     Text(original, style = MaterialTheme.typography.bodyMedium)
                     when {
-                        busy -> Text(stringResource(Res.string.translator_busy), style = MaterialTheme.typography.bodyMedium)
+                        busy ->
+                            Text(
+                                stringResource(Res.string.translator_busy),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
 
                         result != null -> {
                             Text(
@@ -225,7 +231,9 @@ internal fun OutgoingTranslateAction(
                     }
                 }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text(stringResource(Res.string.translator_cancel)) } },
+            dismissButton = {
+                TextButton(onClick = { open = false }) { Text(stringResource(Res.string.translator_cancel)) }
+            },
         )
     }
 }

@@ -16,13 +16,13 @@
  */
 package org.meshtastic.feature.messaging.ui.translator
 
-import kotlin.math.roundToLong
 import org.meshtastic.core.ui.util.JsonText
 import org.meshtastic.core.ui.util.PdfFile
 import org.meshtastic.core.ui.util.PdfText
 import org.meshtastic.feature.messaging.translation.AssistantActions
 import org.meshtastic.feature.messaging.translation.AssistantClock
 import org.meshtastic.feature.messaging.translation.AssistantLine
+import kotlin.math.roundToLong
 
 /** One bubble of the conversation, prepared for saving. */
 data class ExportEntry(
@@ -46,19 +46,21 @@ enum class ExportFormat(val label: String, val extension: String, val mime: Stri
 
 /** Turns the conversation into plain text, Markdown, HTML or a PDF that looks like the chat. */
 object AssistantExport {
-    fun entries(lines: List<AssistantLine>): List<ExportEntry> = lines.filter { it.text.isNotBlank() }.map { line ->
-        val (shown, actions) = AssistantActions.parse(line.text)
-        val web = AssistantActions.web(line.text)
-        ExportEntry(
-            fromUser = line.fromUser,
-            text = shown,
-            note = web?.let { it.note.ifBlank { it.queries } }?.takeIf { it.isNotBlank() },
-            buttons = actions.map { it.caption.ifBlank { it.label } },
-            at = line.at,
-            tookMs = line.tookMs,
-            info = line.info,
-        )
-    }
+    fun entries(lines: List<AssistantLine>): List<ExportEntry> = lines
+        .filter { it.text.isNotBlank() }
+        .map { line ->
+            val (shown, actions) = AssistantActions.parse(line.text)
+            val web = AssistantActions.web(line.text)
+            ExportEntry(
+                fromUser = line.fromUser,
+                text = shown,
+                note = web?.let { it.note.ifBlank { it.queries } }?.takeIf { it.isNotBlank() },
+                buttons = actions.map { it.caption.ifBlank { it.label } },
+                at = line.at,
+                tookMs = line.tookMs,
+                info = line.info,
+            )
+        }
 
     fun text(entries: List<ExportEntry>, you: String, assistant: String): String = entries.joinToString("\n\n") { e ->
         buildString {
@@ -72,23 +74,32 @@ object AssistantExport {
      * The conversation as structured data, the easiest form for a program (or a reviewer) to read: who said what, in
      * order, with the web note and the buttons of each answer, and the whole text exactly as written.
      */
-    fun json(entries: List<ExportEntry>, title: String, stamp: String): String =
-        buildString {
-            append("{\n  \"title\": ").append(q(title)).append(",\n  \"saved\": ").append(q(stamp))
-            append(",\n  \"messages\": [")
-            entries.forEachIndexed { i, e ->
-                append(if (i == 0) "\n" else ",\n")
-                append("    {\"n\": ").append(i + 1).append(", \"role\": ").append(q(if (e.fromUser) "user" else "assistant"))
-                if (e.at > 0L) append(", \"").append(if (e.fromUser) "sent" else "received").append("\": ").append(q(AssistantClock.full(e.at)))
-                if (!e.fromUser && e.tookMs > 0L) append(", \"answer_seconds\": ").append(AssistantClock.seconds(e.tookMs))
-                if (!e.fromUser) diagnosis(e)
-                append(", \"text\": ").append(q(e.text))
-                e.note?.let { append(", \"web\": ").append(q(it)) }
-                if (e.buttons.isNotEmpty()) append(", \"buttons\": [").append(e.buttons.joinToString(", ") { q(it) }).append("]")
-                append("}")
+    fun json(entries: List<ExportEntry>, title: String, stamp: String): String = buildString {
+        append("{\n  \"title\": ").append(q(title)).append(",\n  \"saved\": ").append(q(stamp))
+        append(",\n  \"messages\": [")
+        entries.forEachIndexed { i, e ->
+            append(if (i == 0) "\n" else ",\n")
+            append("    {\"n\": ")
+                .append(i + 1)
+                .append(", \"role\": ")
+                .append(q(if (e.fromUser) "user" else "assistant"))
+            if (e.at > 0L) {
+                append(", \"")
+                    .append(if (e.fromUser) "sent" else "received")
+                    .append("\": ")
+                    .append(q(AssistantClock.full(e.at)))
             }
-            append(if (entries.isEmpty()) "]\n}\n" else "\n  ]\n}\n")
+            if (!e.fromUser && e.tookMs > 0L) append(", \"answer_seconds\": ").append(AssistantClock.seconds(e.tookMs))
+            if (!e.fromUser) diagnosis(e)
+            append(", \"text\": ").append(q(e.text))
+            e.note?.let { append(", \"web\": ").append(q(it)) }
+            if (e.buttons.isNotEmpty()) {
+                append(", \"buttons\": [").append(e.buttons.joinToString(", ") { q(it) }).append("]")
+            }
+            append("}")
         }
+        append(if (entries.isEmpty()) "]\n}\n" else "\n  ]\n}\n")
+    }
 
     private fun q(s: String): String = JsonText.quote(s)
 
@@ -102,16 +113,26 @@ object AssistantExport {
         if (model.isNotBlank()) append(", \"model\": ").append(q(model))
         if (route.isNotBlank()) append(", \"route\": ").append(q(route))
         append(", \"words\": ").append(words).append(", \"chars\": ").append(e.text.length)
-        if (e.tookMs > 0L) append(", \"words_per_second\": ").append(kotlin.math.round(words * 10_000.0 / e.tookMs) / 10)
+        if (e.tookMs > 0L) {
+            append(", \"words_per_second\": ").append(kotlin.math.round(words * 10_000.0 / e.tookMs) / 10)
+        }
         append(", \"internet\": ").append(e.note != null)
         append(", \"only_points_to_setting\": ").append(POINTER.containsMatchIn(e.text.trim()))
         val end = e.text.trim().lastOrNull()
         append(", \"maybe_cut_off\": ").append(words >= 40 && end != null && end !in ".!?)…\"»")
     }
 
-    /** " (12:03:17)" for a sent question, " (12:03:29, 12.1 s)" for a received answer; empty when the time is not known. */
-    private fun stamp(e: ExportEntry): String =
-        if (e.at <= 0L) "" else " (" + AssistantClock.full(e.at) + (if (!e.fromUser && e.tookMs > 0L) ", " + AssistantClock.seconds(e.tookMs) + " s" else "") + ")"
+    /**
+     * " (12:03:17)" for a sent question, " (12:03:29, 12.1 s)" for a received answer; empty when the time is not known.
+     */
+    private fun stamp(e: ExportEntry): String = if (e.at <= 0L) {
+        ""
+    } else {
+        " (" +
+            AssistantClock.full(e.at) +
+            (if (!e.fromUser && e.tookMs > 0L) ", " + AssistantClock.seconds(e.tookMs) + " s" else "") +
+            ")"
+    }
 
     fun markdown(entries: List<ExportEntry>, title: String, stamp: String, you: String, assistant: String): String =
         buildString {
@@ -127,7 +148,9 @@ object AssistantExport {
 
     fun html(entries: List<ExportEntry>, title: String, stamp: String, you: String, assistant: String): String =
         buildString {
-            append("<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
+            append(
+                "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
+            )
             append("<title>").append(esc(title)).append("</title><style>")
             append("body{font-family:sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}")
             append(".b{border-radius:14px;padding:10px 14px;margin:10px 0;white-space:pre-wrap}")
@@ -158,7 +181,8 @@ object AssistantExport {
     private const val GAP = 8.0
 
     private class Piece(val text: String, val size: Double, val bold: Boolean, val color: Int) {
-        val height get() = size * 1.35
+        val height
+            get() = size * 1.35
     }
 
     private fun f(v: Double) = ((v * 100).roundToLong() / 100.0).toString()
@@ -177,9 +201,18 @@ object AssistantExport {
         }
 
         fun text(x: Double, baseline: Double, p: Piece) {
-            sb.append(rgb(p.color)).append(" rg BT /F").append(if (p.bold) 2 else 1).append(' ').append(f(p.size))
-                .append(" Tf ").append(f(x)).append(' ').append(f(baseline)).append(" Td ")
-                .append(PdfText.literal(p.text)).append(" Tj ET\n")
+            sb.append(rgb(p.color))
+                .append(" rg BT /F")
+                .append(if (p.bold) 2 else 1)
+                .append(' ')
+                .append(f(p.size))
+                .append(" Tf ")
+                .append(f(x))
+                .append(' ')
+                .append(f(baseline))
+                .append(" Td ")
+                .append(PdfText.literal(p.text))
+                .append(" Tj ET\n")
         }
 
         text(MARGIN, y - 14, Piece(title, 14.0, true, 0x222222))
@@ -193,7 +226,9 @@ object AssistantExport {
             val pieces = ArrayList<Piece>()
             pieces.add(Piece(if (e.fromUser) you else assistant, 8.0, true, 0x666666))
             PdfText.wrap(e.text, false, 10.0, inner).forEach { pieces.add(Piece(it, 10.0, false, 0x222222)) }
-            e.note?.let { n -> PdfText.wrap(n, false, 8.0, inner).forEach { pieces.add(Piece(it, 8.0, false, 0x666666)) } }
+            e.note?.let { n ->
+                PdfText.wrap(n, false, 8.0, inner).forEach { pieces.add(Piece(it, 8.0, false, 0x666666)) }
+            }
             e.buttons.forEach { b ->
                 PdfText.wrap("[ $b ]", false, 9.0, inner).forEach { pieces.add(Piece(it, 9.0, false, 0x1A5FB4)) }
             }
@@ -212,8 +247,16 @@ object AssistantExport {
                     i++
                 }
                 val boxH = h + 2 * PAD
-                sb.append(rgb(if (e.fromUser) 0xE3E8EE else 0xF1F1F1)).append(" rg ").append(f(x)).append(' ')
-                    .append(f(y - boxH)).append(' ').append(f(width)).append(' ').append(f(boxH)).append(" re f\n")
+                sb.append(rgb(if (e.fromUser) 0xE3E8EE else 0xF1F1F1))
+                    .append(" rg ")
+                    .append(f(x))
+                    .append(' ')
+                    .append(f(y - boxH))
+                    .append(' ')
+                    .append(f(width))
+                    .append(' ')
+                    .append(f(boxH))
+                    .append(" re f\n")
                 var base = y - PAD
                 for (k in start until i) {
                     base -= pieces[k].size * 1.05

@@ -68,16 +68,18 @@ class AiToolSpec(
 }
 
 /** All [AiTool] functions of this set as ready-to-offer tools. */
-fun AiToolSet.toSpecs(): List<AiToolSpec> = javaClass.methods.mapNotNull { method ->
-    val tool = method.getAnnotation(AiTool::class.java) ?: return@mapNotNull null
-    val params = method.parameterAnnotations.map { a -> a.filterIsInstance<AiToolParam>().firstOrNull() }
-    if (params.any { it == null }) return@mapNotNull null
-    AiToolSpec(
-        name = method.name,
-        description = tool.description,
-        params = params.map { AiToolSpec.Param(it!!.name, it.description) },
-    ) { arguments ->
-        val values = params.map { arguments[it!!.name].orEmpty() }.toTypedArray()
-        method.invoke(this, *values) as? String ?: ""
+fun AiToolSet.toSpecs(): List<AiToolSpec> = javaClass.methods
+    .mapNotNull { method ->
+        val tool = method.getAnnotation(AiTool::class.java) ?: return@mapNotNull null
+        val params = method.parameterAnnotations.map { a -> a.filterIsInstance<AiToolParam>().firstOrNull() }
+        if (params.any { it == null }) return@mapNotNull null
+        AiToolSpec(
+            name = method.name,
+            description = tool.description,
+            params = params.map { AiToolSpec.Param(it!!.name, it.description) },
+        ) { arguments ->
+            val values = params.map { arguments[it!!.name].orEmpty() }.toTypedArray()
+            method.invoke(this, *values) as? String ?: ""
+        }
     }
-}.sortedBy { it.name }
+    .sortedBy { it.name }

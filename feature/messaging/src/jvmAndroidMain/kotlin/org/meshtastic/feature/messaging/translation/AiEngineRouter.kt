@@ -21,9 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.AiEngine
@@ -45,6 +45,7 @@ class AiEngineRouter(
 
     // The model is freed from memory (RAM) after the time chosen in the settings without any use.
     private val busy = java.util.concurrent.atomic.AtomicInteger(0)
+
     @Volatile private var lastUsed = 0L
 
     init {
@@ -53,7 +54,12 @@ class AiEngineRouter(
                 while (true) {
                     delay(IDLE_CHECK_MS)
                     val minutes = uiPrefs.aiIdleUnloadMinutes.value
-                    if (minutes > 0 && lastUsed > 0 && busy.get() == 0 && nowMillis - lastUsed >= minutes * MILLIS_PER_MINUTE) {
+                    if (
+                        minutes > 0 &&
+                        lastUsed > 0 &&
+                        busy.get() == 0 &&
+                        nowMillis - lastUsed >= minutes * MILLIS_PER_MINUTE
+                    ) {
                         Logger.i(tag = TAG) { "The model was not used for $minutes min: freed from memory" }
                         lastUsed = 0
                         unloadNow()
@@ -68,7 +74,8 @@ class AiEngineRouter(
             llama.clearFailedAttempts()
             unloadNow()
         }
-        // A model stays in memory while it is used. When another model is chosen, the old one is stopped at once and the
+        // A model stays in memory while it is used. When another model is chosen, the old one is stopped at once and
+        // the
         // new one is loaded straight away (so the first question does not wait); a function switched off frees its
         // model. A newer change cancels a loading that is still going on.
         if (uiPrefs != null) {
@@ -90,7 +97,17 @@ class AiEngineRouter(
                     uiPrefs.dictationModelId,
                     uiPrefs.dictationEnabled,
                     uiPrefs.aiSkipNpu,
-                ) { v -> Choice(v[0] as Boolean, v[1] as Boolean, v[2] as String, v[3] as String, v[4] as String, v[5] as Boolean, v[6] as Boolean) }
+                ) { v ->
+                    Choice(
+                        v[0] as Boolean,
+                        v[1] as Boolean,
+                        v[2] as String,
+                        v[3] as String,
+                        v[4] as String,
+                        v[5] as Boolean,
+                        v[6] as Boolean,
+                    )
+                }
                     .distinctUntilChanged()
                     .collectLatest { now ->
                         val before = previous
@@ -100,12 +117,26 @@ class AiEngineRouter(
                         unloadNow()
                         val load =
                             when {
-                                now.assistantOn && (now.assistant != before.assistant || !before.assistantOn) -> now.assistant to false
-                                now.translatorOn && (now.translator != before.translator || !before.translatorOn) -> now.translator to false
-                                // The model of the dictation is also the assistant's or the translator's: it starts without hearing so that the
-                                // Intel NPU can be used (the NPU does not listen); listening restarts it when it is first needed.
+                                now.assistantOn && (now.assistant != before.assistant || !before.assistantOn) ->
+                                    now.assistant to false
+
+                                now.translatorOn && (now.translator != before.translator || !before.translatorOn) ->
+                                    now.translator to false
+
+                                // The model of the dictation is also the assistant's or the translator's: it starts
+                                // without hearing so that the
+                                // Intel NPU can be used (the NPU does not listen); listening restarts it when it is
+                                // first needed.
                                 now.dictationOn && now.dictation != before.dictation ->
-                                    now.dictation to !(((now.assistantOn && now.assistant == now.dictation) || (now.translatorOn && now.translator == now.dictation)) && llama.npuFirst(now.dictation))
+                                    now.dictation to
+                                        !(
+                                            (
+                                                (now.assistantOn && now.assistant == now.dictation) ||
+                                                    (now.translatorOn && now.translator == now.dictation)
+                                                ) &&
+                                                llama.npuFirst(now.dictation)
+                                            )
+
                                 else -> null
                             }
                         load?.let { (id, hearing) -> preload(id, hearing) }
@@ -114,17 +145,23 @@ class AiEngineRouter(
         }
     }
 
-    override val activeBackend: String get() = llama.activeBackend
+    override val activeBackend: String
+        get() = llama.activeBackend
 
-    override val startReport: String get() = llama.startReport
+    override val startReport: String
+        get() = llama.startReport
 
-    override val deviceSummary: String get() = llama.deviceSummary
+    override val deviceSummary: String
+        get() = llama.deviceSummary
 
-    override val memoryUsedMb: Int? get() = llama.memoryUsedMb
+    override val memoryUsedMb: Int?
+        get() = llama.memoryUsedMb
 
-    override val speechBackend: String get() = whisper?.backend.orEmpty()
+    override val speechBackend: String
+        get() = whisper?.backend.orEmpty()
 
-    override val activeResources: String get() = llama.activeResources
+    override val activeResources: String
+        get() = llama.activeResources
 
     override fun lastStart(modelId: String): LastStart? = llama.lastStart(modelId)
 
@@ -192,12 +229,22 @@ class AiEngineRouter(
         if (free >= needed) return
         val freed =
             when (model.engine) {
-                AiEngine.LLAMA_CPP -> if (whisper != null && whisper.hasLoaded && !llama.isLoaded(modelId)) whisper.also { it.unloadNow() } else null
-                AiEngine.WHISPER_CPP -> if (whisper?.isLoaded(modelId) != true && llama.hasLoaded) llama.also { it.unloadNow() } else null
+                AiEngine.LLAMA_CPP ->
+                    if (whisper != null && whisper.hasLoaded && !llama.isLoaded(modelId)) {
+                        whisper.also { it.unloadNow() }
+                    } else {
+                        null
+                    }
+
+                AiEngine.WHISPER_CPP ->
+                    if (whisper?.isLoaded(modelId) != true && llama.hasLoaded) llama.also { it.unloadNow() } else null
+
                 else -> null
             }
         if (freed != null) {
-            Logger.i(tag = TAG) { "Only $free MB free for ${model.name} (about ${model.ramMb} MB): the other model was freed first" }
+            Logger.i(tag = TAG) {
+                "Only $free MB free for ${model.name} (about ${model.ramMb} MB): the other model was freed first"
+            }
             MemoryProbe.settle()
         }
     }

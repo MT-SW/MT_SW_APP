@@ -40,11 +40,18 @@ class ModelDictationService(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    /** The chosen model when it is installed; otherwise the first installed dictation model (the choice is not rewritten). */
+    /**
+     * The chosen model when it is installed; otherwise the first installed dictation model (the choice is not
+     * rewritten).
+     */
     private fun pick(states: Map<String, TranslatorModelState>, id: String): String? {
         fun usable(model: org.meshtastic.core.repository.AiModelInfo) =
             model.canDo(AiRole.DICTATION) && model.engineReady && states[model.id] == TranslatorModelState.Ready
-        AiModels.byId(id)?.takeIf { usable(it) }?.let { return it.id }
+        AiModels.byId(id)
+            ?.takeIf { usable(it) }
+            ?.let {
+                return it.id
+            }
         return AiModels.all.firstOrNull { usable(it) }?.id
     }
 
@@ -54,7 +61,9 @@ class ModelDictationService(
     override val translatorAvailable: StateFlow<Boolean> = flow()
 
     private fun flow(): StateFlow<Boolean> =
-        combine(store.states, uiPrefs.dictationModelId, uiPrefs.dictationEnabled) { states, id, on -> on && pick(states, id) != null }
+        combine(store.states, uiPrefs.dictationModelId, uiPrefs.dictationEnabled) { states, id, on ->
+            on && pick(states, id) != null
+        }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
     override suspend fun transcribe(wav: ByteArray, translator: Boolean): String {

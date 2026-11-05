@@ -18,12 +18,7 @@ package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -47,7 +42,33 @@ object DictationLanguage {
     @Volatile var hint: String = "auto"
 
     private val SUPPORTED =
-        setOf("pl", "en", "de", "fr", "es", "it", "cs", "sk", "uk", "ru", "nl", "pt", "sv", "no", "da", "fi", "hu", "ro", "bg", "hr", "sl", "lt", "lv", "et", "tr")
+        setOf(
+            "pl",
+            "en",
+            "de",
+            "fr",
+            "es",
+            "it",
+            "cs",
+            "sk",
+            "uk",
+            "ru",
+            "nl",
+            "pt",
+            "sv",
+            "no",
+            "da",
+            "fi",
+            "hu",
+            "ro",
+            "bg",
+            "hr",
+            "sl",
+            "lt",
+            "lv",
+            "et",
+            "tr",
+        )
 
     /** The language of the app's interface when Whisper knows it, otherwise "auto". */
     fun ofApp(): String = java.util.Locale.getDefault().language.lowercase().takeIf { it in SUPPORTED } ?: "auto"
@@ -77,7 +98,8 @@ class WhisperCppEngine(
             withContext(Dispatchers.IO) {
                 val audioMs = (wav.size - WAV_HEADER_BYTES).coerceAtLeast(0) * MS_PER_SECOND / BYTES_PER_SECOND
                 var result = ""
-                // A chip that writes nonsense is switched off and the next way (in the end the processor) does the work.
+                // A chip that writes nonsense is switched off and the next way (in the end the processor) does the
+                // work.
                 repeat(MAX_SWITCHES + 1) {
                     val running = ensureLoaded(modelId)
                     val started = nowMillis
@@ -85,15 +107,23 @@ class WhisperCppEngine(
                     val window = audioContextFor(audioMs)
                     var text = send(running, wav, window)
                     if (window != 0 && (text.isBlank() || looksLikeNonsense(text, audioMs))) {
-                        Logger.w(tag = TAG) { "The short audio window ($window) gave no usable text, trying the full window" }
+                        Logger.w(tag = TAG) {
+                            "The short audio window ($window) gave no usable text, trying the full window"
+                        }
                         text = send(running, wav, 0)
                     }
                     val took = nowMillis - started
-                    Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint}, audio window ${if (window == 0) "full" else window})" }
+                    Logger.i(tag = TAG) {
+                        "Dictation with $modelId: ${text.length} chars from $audioMs ms of speech in $took ms (language ${DictationLanguage.hint}, audio window ${if (window == 0) "full" else window})"
+                    }
                     result = text
                     val chipMark = activeChipMark
                     if (chipMark == null || !looksLikeNonsense(text, audioMs)) return@withContext text
-                    Logger.w(tag = TAG) { "$backend wrote nonsense (${text.length} chars from ${audioMs} ms): ${text.take(80)} - switching it off" }
+                    Logger.w(tag = TAG) {
+                        "$backend wrote nonsense (${text.length} chars from $audioMs ms): ${text.take(
+                            80,
+                        )} - switching it off"
+                    }
                     installer.markBroken(chipMark.first, modelId + chipMark.second)
                     unload()
                 }
@@ -122,7 +152,8 @@ class WhisperCppEngine(
     fun isLoaded(modelId: String): Boolean = server?.isAlive == true && loadedId == modelId
 
     /** True when any speech program runs now. */
-    val hasLoaded: Boolean get() = server?.isAlive == true
+    val hasLoaded: Boolean
+        get() = server?.isAlive == true
 
     suspend fun unloadNow() {
         mutex.withLock { unload() }
@@ -150,12 +181,15 @@ class WhisperCppEngine(
         val dsp: Boolean = false,
         val extra: List<String> = emptyList(),
         val env: Map<String, String> = emptyMap(),
-        /** Added to the model id for the mark that remembers a failure of this way (own mark = other ways stay open). */
+        /**
+         * Added to the model id for the mark that remembers a failure of this way (own mark = other ways stay open).
+         */
         val markSuffix: String = "",
     )
 
     /** Which way the speech program runs now (for the log and the hardware report). */
-    @Volatile var backend: String = ""
+    @Volatile
+    var backend: String = ""
         private set
 
     private val chipLines = StringBuilder()
@@ -184,23 +218,41 @@ class WhisperCppEngine(
                         Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
                         continue
                     }
-                    add(Attempt("NPU (Hexagon)", asset, chip = true, dsp = true, extra = listOf("-fa"), env = mapOf("GGML_HEXAGON_DEVICES" to "1")))
+                    add(
+                        Attempt(
+                            "NPU (Hexagon)",
+                            asset,
+                            chip = true,
+                            dsp = true,
+                            extra = listOf("-fa"),
+                            env = mapOf("GGML_HEXAGON_DEVICES" to "1"),
+                        ),
+                    )
                 } else {
-                    // Flash attention crashed the OpenCL program and failed in the Adreno Vulkan driver (log 2026-10-30).
+                    // Flash attention crashed the OpenCL program and failed in the Adreno Vulkan driver (log
+                    // 2026-10-30).
                     if (installer.isBroken(asset, modelId)) {
                         Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
                     } else {
                         add(Attempt("graphics card ($kind)", asset, chip = true, extra = listOf("-nfa")))
                     }
-                    // Vulkan drivers of some phones (Adreno) fail to build the fast shaders: the same card once more with
+                    // Vulkan drivers of some phones (Adreno) fail to build the fast shaders: the same card once more
+                    // with
                     // the newer driver features switched off (own mark), as the language model program does.
                     if (kind == "vulkan" && !installer.isBroken(asset, modelId + SAFE_SUFFIX)) {
                         add(
                             Attempt(
-                                "graphics card (vulkan, safe mode)", asset, chip = true, extra = listOf("-nfa"), markSuffix = SAFE_SUFFIX,
-                                env = mapOf(
-                                    "GGML_VK_DISABLE_F16" to "1", "GGML_VK_DISABLE_COOPMAT" to "1",
-                                    "GGML_VK_DISABLE_INTEGER_DOT_PRODUCT" to "1", "GGML_VK_DISABLE_FUSION" to "1",
+                                "graphics card (vulkan, safe mode)",
+                                asset,
+                                chip = true,
+                                extra = listOf("-nfa"),
+                                markSuffix = SAFE_SUFFIX,
+                                env =
+                                mapOf(
+                                    "GGML_VK_DISABLE_F16" to "1",
+                                    "GGML_VK_DISABLE_COOPMAT" to "1",
+                                    "GGML_VK_DISABLE_INTEGER_DOT_PRODUCT" to "1",
+                                    "GGML_VK_DISABLE_FUSION" to "1",
                                 ),
                             ),
                         )
@@ -216,40 +268,68 @@ class WhisperCppEngine(
         val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
         var failure: Throwable? = null
         for (attempt in attempts) {
-            val program =
-                if (attempt.chip) installer.installGpu(attempt.asset) else installer.install(attempt.asset)
+            val program = if (attempt.chip) installer.installGpu(attempt.asset) else installer.install(attempt.asset)
             if (program == null) {
-                Logger.w(tag = TAG) { "${attempt.name}: the program could not be downloaded (${installer.lastInstallError})" }
+                Logger.w(tag = TAG) {
+                    "${attempt.name}: the program could not be downloaded (${installer.lastInstallError})"
+                }
                 continue
             }
             val port = ModelServerProcess.freePort()
             val command =
                 installer.launchPrefix(program) +
-                    listOf("-m", model.absolutePath, "--host", "127.0.0.1", "--port", port.toString(), "-l", "auto", "-t", threads.toString(), "-nt") +
+                    listOf(
+                        "-m",
+                        model.absolutePath,
+                        "--host",
+                        "127.0.0.1",
+                        "--port",
+                        port.toString(),
+                        "-l",
+                        "auto",
+                        "-t",
+                        threads.toString(),
+                        "-nt",
+                    ) +
                     attempt.extra
             val programDir = program.absoluteFile.parentFile ?: program
             val libDirs = buildList {
                 File(programDir.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
                 if (attempt.chip) addAll(VENDOR_LIB_DIRS.filter { File(it).isDirectory })
             }
-            val env = buildMap<String, String> {
-                putAll(attempt.env)
-                if (attempt.dsp) {
-                    // The NPU programs (libggml-htp-v*.so) are in the "lib" folder of the package, next to "bin".
-                    val skeletons = File(programDir.parentFile, "lib").absolutePath
-                    put("ADSP_LIBRARY_PATH", (listOf(skeletons, programDir.absolutePath) + DSP_DIRS).joinToString(";"))
+            val env =
+                buildMap<String, String> {
+                    putAll(attempt.env)
+                    if (attempt.dsp) {
+                        // The NPU programs (libggml-htp-v*.so) are in the "lib" folder of the package, next to "bin".
+                        val skeletons = File(programDir.parentFile, "lib").absolutePath
+                        put(
+                            "ADSP_LIBRARY_PATH",
+                            (listOf(skeletons, programDir.absolutePath) + DSP_DIRS).joinToString(";"),
+                        )
+                    }
                 }
-            }
             Logger.i(tag = TAG) { "Starting the speech program for $modelId: ${attempt.name}" }
             synchronized(chipLines) { chipLines.clear() }
             val started =
-                ModelServerProcess.start(command, programDir, port, File(logDir, "whisper-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
-                    if (CHIP_LINE.containsMatchIn(line)) synchronized(chipLines) { if (chipLines.length < MAX_TAIL) chipLines.appendLine(line.trim()) }
+                ModelServerProcess.start(
+                    command,
+                    programDir,
+                    port,
+                    File(logDir, "whisper-server.log"),
+                    File(logDir, PID_FILE),
+                    env,
+                    libDirs,
+                ) { line ->
+                    if (CHIP_LINE.containsMatchIn(line)) {
+                        synchronized(chipLines) { if (chipLines.length < MAX_TAIL) chipLines.appendLine(line.trim()) }
+                    }
                 }
             try {
                 started.awaitReady("/", LOAD_TIMEOUT_MS, anyAnswer = true)
                 if (attempt.chip) {
-                    // The program's log lines reach us a little after the program answers: wait for the chip's own lines.
+                    // The program's log lines reach us a little after the program answers: wait for the chip's own
+                    // lines.
                     var seen = synchronized(chipLines) { chipLines.toString() }
                     var waited = 0
                     while (!CHIP_USED.containsMatchIn(seen) && waited < CHIP_LOG_WAIT_MS) {
@@ -260,15 +340,18 @@ class WhisperCppEngine(
                     check(CHIP_USED.containsMatchIn(seen)) { "the chip took no part: ${seen.takeLast(300)}" }
                     // A software "graphics card" (llvmpipe) is slower than the processor build.
                     check(!seen.contains("llvmpipe", ignoreCase = true)) { "only a software graphics card was found" }
-                    // A chip can load the model and still fail or write nonsense: one second of silence must go through,
+                    // A chip can load the model and still fail or write nonsense: one second of silence must go
+                    // through,
                     // give (almost) no text, and the second run must be faster than the processor (about 2 seconds).
                     withContext(Dispatchers.IO) {
                         val first = send(started, silence())
-                        check(first.length <= MAX_SILENCE_CHARS) { "it wrote ${first.length} characters for silence: ${first.take(60)}" }
+                        check(first.length <= MAX_SILENCE_CHARS) {
+                            "it wrote ${first.length} characters for silence: ${first.take(60)}"
+                        }
                         val t0 = nowMillis
                         send(started, silence())
                         val took = nowMillis - t0
-                        check(took <= MAX_SILENCE_MS) { "it is slower than the processor (${took} ms for a test run)" }
+                        check(took <= MAX_SILENCE_MS) { "it is slower than the processor ($took ms for a test run)" }
                     }
                 }
             } catch (e: Throwable) {
@@ -276,7 +359,9 @@ class WhisperCppEngine(
                     started.stop()
                     throw e
                 }
-                Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not work: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
+                Logger.w(tag = TAG, throwable = e) {
+                    "${attempt.name} did not work: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}"
+                }
                 started.stop()
                 if (attempt.chip) installer.markBroken(attempt.asset, modelId + attempt.markSuffix)
                 failure = e
@@ -305,7 +390,9 @@ class WhisperCppEngine(
 
     private fun send(running: ModelServerProcess, wav: ByteArray, audioCtx: Int = 0): String {
         val boundary = "----mtsw" + UUID.randomUUID().toString().replace("-", "")
-        @Suppress("DEPRECATION") val connection = URL(running.baseUrl + "/inference").openConnection() as HttpURLConnection
+
+        @Suppress("DEPRECATION")
+        val connection = URL(running.baseUrl + "/inference").openConnection() as HttpURLConnection
         try {
             connection.requestMethod = "POST"
             connection.doOutput = true
@@ -314,13 +401,19 @@ class WhisperCppEngine(
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
             connection.outputStream.use { out ->
                 fun field(name: String, value: String) {
-                    out.write("--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n".toByteArray())
+                    out.write(
+                        "--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n".toByteArray(),
+                    )
                 }
-                out.write("--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"speech.wav\"\r\nContent-Type: audio/wav\r\n\r\n".toByteArray())
+                out.write(
+                    "--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"speech.wav\"\r\nContent-Type: audio/wav\r\n\r\n"
+                        .toByteArray(),
+                )
                 out.write(wav)
                 out.write("\r\n".toByteArray())
                 field("temperature", "0.0")
-                // No repeated attempts at higher temperatures and no beam search: the fastest decoding that stays accurate.
+                // No repeated attempts at higher temperatures and no beam search: the fastest decoding that stays
+                // accurate.
                 field("temperature_inc", "0.0")
                 field("beam_size", "1")
                 field("best_of", "1")
@@ -330,9 +423,19 @@ class WhisperCppEngine(
                 out.write("--$boundary--\r\n".toByteArray())
             }
             val code = connection.responseCode
-            val body = (if (code == HttpURLConnection.HTTP_OK) connection.inputStream else connection.errorStream ?: connection.inputStream)
-                .bufferedReader(Charsets.UTF_8).readText()
-            if (code != HttpURLConnection.HTTP_OK) error("The speech program answered HTTP $code: ${body.take(MAX_ERROR)}")
+            val body =
+                (
+                    if (code == HttpURLConnection.HTTP_OK) {
+                        connection.inputStream
+                    } else {
+                        connection.errorStream ?: connection.inputStream
+                    }
+                    )
+                    .bufferedReader(Charsets.UTF_8)
+                    .readText()
+            if (code != HttpURLConnection.HTTP_OK) {
+                error("The speech program answered HTTP $code: ${body.take(MAX_ERROR)}")
+            }
             val json = Json.parseToJsonElement(body).jsonObject
             json["error"]?.let { error("The speech program reported: ${it.jsonPrimitive.contentOrNull}") }
             return clean(json["text"]?.jsonPrimitive?.contentOrNull.orEmpty())
@@ -344,7 +447,6 @@ class WhisperCppEngine(
     /** Whisper marks silence and noise in brackets, for example [BLANK_AUDIO] or (music); those are not words. */
     private fun clean(text: String): String =
         text.replace(Regex("\\[[^\\]]*\\]|\\([^)]*\\)"), " ").replace(Regex("\\s+"), " ").trim()
-
 
     private fun unload() {
         server?.stop()
@@ -374,12 +476,20 @@ class WhisperCppEngine(
         const val MAX_SILENCE_CHARS = 30
         const val MAX_SILENCE_MS = 4_500L
         const val WAV_HEADER_BYTES = 44
-        // The system's own libraries come first: Android 17's liblog needs a symbol (std::__1::__hash_memory) that only the system's
-        // libc++ has, and an older libc++ in a vendor folder (seen on Samsung) found first made the program fail to start.
+
+        // The system's own libraries come first: Android 17's liblog needs a symbol (std::__1::__hash_memory) that only
+        // the system's
+        // libc++ has, and an older libc++ in a vendor folder (seen on Samsung) found first made the program fail to
+        // start.
         val VENDOR_LIB_DIRS = listOf("/system/lib64", "/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
-        val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
+        val DSP_DIRS =
+            listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Metal|Adreno|device", RegexOption.IGNORE_CASE)
-        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|using Metal|using MTL\\d|MTL\\d|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
+        val CHIP_USED =
+            Regex(
+                "using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|using Metal|using MTL\\d|MTL\\d|ggml-hex|Adreno|Found \\d+ Vulkan",
+                RegexOption.IGNORE_CASE,
+            )
         const val BYTES_PER_SECOND = 32_000L
         const val MS_PER_SECOND = 1_000L
         const val LOAD_TIMEOUT_MS = 120_000L

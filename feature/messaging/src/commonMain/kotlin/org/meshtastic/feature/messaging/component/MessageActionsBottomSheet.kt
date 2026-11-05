@@ -296,9 +296,9 @@ private fun AckProofListItem(ackProofStatus: Int) {
 internal const val MAX_EMOJI_ROW_SIZE = 6
 
 /**
- * The overflow button (when [onMoreActions] is supplied — the inline bar uses it to reach the actions sheet) comes first,
- * then the full picker, then the six one-tap reactions, so the two controls are always in the same, visible place and the
- * most used emoji sit right next to the picker.
+ * The overflow button (when [onMoreActions] is supplied — the inline bar uses it to reach the actions sheet) comes
+ * first, then the full picker, then the six one-tap reactions, so the two controls are always in the same, visible
+ * place and the most used emoji sit right next to the picker.
  */
 @Composable
 internal fun QuickEmojiRow(

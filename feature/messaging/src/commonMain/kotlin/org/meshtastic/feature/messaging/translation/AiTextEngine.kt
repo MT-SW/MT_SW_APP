@@ -16,7 +16,10 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-/** The last successful start of a model: [backend] it ran on, [resources] it took on each chip and the [report] of the attempts. */
+/**
+ * The last successful start of a model: [backend] it ran on, [resources] it took on each chip and the [report] of the
+ * attempts.
+ */
 data class LastStart(val backend: String, val resources: String, val report: String)
 
 /**
@@ -27,35 +30,42 @@ interface AiTextEngine {
     /** Name of the chip the loaded model runs on (for example GPU or CPU); empty while nothing is loaded. */
     val activeBackend: String
 
-    /** What happened at the last start of the model, attempt by attempt (empty before the first start); for `/sprzet`. */
-    val startReport: String get() = ""
+    /**
+     * What happened at the last start of the model, attempt by attempt (empty before the first start); for `/sprzet`.
+     */
+    val startReport: String
+        get() = ""
 
     /** Where the speech (dictation) program ran last, for the compatibility test; empty where not known. */
-    val speechBackend: String get() = ""
+    val speechBackend: String
+        get() = ""
 
     /** Memory (MB) the model program takes right now; null while nothing is loaded or when it cannot be read. */
-    val memoryUsedMb: Int? get() = null
+    val memoryUsedMb: Int?
+        get() = null
 
     /**
-     * What the loaded model takes on each chip: its memory per chip (NPU, graphics card, processor), layers on the chip, the
-     * chat memory and the chips the engine saw; empty while nothing is loaded.
+     * What the loaded model takes on each chip: its memory per chip (NPU, graphics card, processor), layers on the
+     * chip, the chat memory and the chips the engine saw; empty while nothing is loaded.
      */
-    val activeResources: String get() = ""
+    val activeResources: String
+        get() = ""
 
     /** Where the model [modelId] ran at its last start, even after it was released from memory; null = unknown. */
     fun lastStart(modelId: String): LastStart? = null
 
     /** Chip, graphics driver and memory of this device, for `/sprzet`; empty when unknown. */
-    val deviceSummary: String get() = ""
+    val deviceSummary: String
+        get() = ""
 
     /** How many tokens (question, data and answer together) the model keeps in its window. */
     fun contextTokens(modelId: String): Int
 
     /**
-     * Sends [messages] (role to text pairs, roles `system`, `user`, `assistant`; the last one must be a `user`
-     * message) to model [modelId] and returns the reply. [onPiece] receives the text as it is produced. Cancelling the
-     * coroutine stops the generation. [maxTokens] is a rough limit on the length of the answer, 0 means no limit.
-     * [jsonSchema] forces the answer into that JSON shape. [thinking] lets the model think quietly before it answers.
+     * Sends [messages] (role to text pairs, roles `system`, `user`, `assistant`; the last one must be a `user` message)
+     * to model [modelId] and returns the reply. [onPiece] receives the text as it is produced. Cancelling the coroutine
+     * stops the generation. [maxTokens] is a rough limit on the length of the answer, 0 means no limit. [jsonSchema]
+     * forces the answer into that JSON shape. [thinking] lets the model think quietly before it answers.
      */
     suspend fun chat(
         modelId: String,

@@ -16,14 +16,65 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-import co.touchlab.kermit.Logger
+import cnames.structs.llama_context
+import cnames.structs.llama_model
+import cnames.structs.llama_vocab
 import cnames.structs.mtmd_bitmap
 import cnames.structs.mtmd_context
-import llama.llama_sampler
-import cnames.structs.llama_vocab
+import cnames.structs.whisper_context
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.CPointerVar
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.IntVar
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.copy
+import kotlinx.cinterop.cstr
+import kotlinx.cinterop.get
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.plus
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.set
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import llama.llama_backend_init
+import llama.llama_batch_get_one
+import llama.llama_chat_apply_template
+import llama.llama_chat_message
+import llama.llama_context_default_params
+import llama.llama_decode
+import llama.llama_free
+import llama.llama_get_memory
+import llama.llama_init_from_model
+import llama.llama_memory_clear
+import llama.llama_model_chat_template
+import llama.llama_model_default_params
+import llama.llama_model_free
+import llama.llama_model_get_vocab
+import llama.llama_model_load_from_file
+import llama.llama_sampler
+import llama.llama_sampler_chain_add
+import llama.llama_sampler_chain_default_params
+import llama.llama_sampler_chain_init
+import llama.llama_sampler_free
+import llama.llama_sampler_init_dist
+import llama.llama_sampler_init_greedy
+import llama.llama_sampler_init_temp
+import llama.llama_sampler_sample
+import llama.llama_token_to_piece
+import llama.llama_tokenize
+import llama.llama_vocab_is_eog
 import llama.mtmd_bitmap_free
 import llama.mtmd_bitmap_init_from_audio
 import llama.mtmd_context_params_default
@@ -36,61 +87,6 @@ import llama.mtmd_input_chunks_init
 import llama.mtmd_input_text
 import llama.mtmd_support_audio
 import llama.mtmd_tokenize
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.IntVar
-import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.copy
-import kotlinx.cinterop.cstr
-import kotlinx.cinterop.readBytes
-import kotlinx.cinterop.get
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.plus
-import kotlinx.cinterop.set
-import kotlinx.cinterop.toKString
-import kotlinx.cinterop.value
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import llama.llama_backend_init
-import llama.llama_batch_get_one
-import llama.llama_chat_apply_template
-import llama.llama_chat_message
-import cnames.structs.llama_context
-import llama.llama_context_default_params
-import llama.llama_decode
-import llama.llama_free
-import llama.llama_get_memory
-import llama.llama_init_from_model
-import llama.llama_memory_clear
-import cnames.structs.llama_model
-import llama.llama_model_chat_template
-import llama.llama_model_default_params
-import llama.llama_model_free
-import llama.llama_model_get_vocab
-import llama.llama_model_load_from_file
-import llama.llama_sampler_chain_add
-import llama.llama_sampler_chain_default_params
-import llama.llama_sampler_chain_init
-import llama.llama_sampler_free
-import llama.llama_sampler_init_dist
-import llama.llama_sampler_init_greedy
-import llama.llama_sampler_init_temp
-import llama.llama_sampler_sample
-import llama.llama_token_to_piece
-import llama.llama_tokenize
-import llama.llama_vocab_is_eog
-import org.meshtastic.core.repository.AiEngine
-import org.meshtastic.core.repository.AiModels
-import platform.Foundation.NSProcessInfo
-import llama.whisper_sampling_strategy
 import llama.whisper_context_default_params
 import llama.whisper_free
 import llama.whisper_full
@@ -98,7 +94,10 @@ import llama.whisper_full_default_params
 import llama.whisper_full_get_segment_text
 import llama.whisper_full_n_segments
 import llama.whisper_init_from_file_with_params
-import cnames.structs.whisper_context
+import llama.whisper_sampling_strategy
+import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiModels
+import platform.Foundation.NSProcessInfo
 
 /** The language of the dictation: an ISO code (for example "pl") or "auto". Set by the dictation service. */
 object IosDictationLanguage {
@@ -131,7 +130,8 @@ class IosLlamaEngine(
     private var ctx: CPointer<llama_context>? = null
     private var backend = ""
 
-    override val activeBackend: String get() = backend
+    override val activeBackend: String
+        get() = backend
 
     override fun contextTokens(modelId: String): Int = CONTEXT_TOKENS
 
@@ -162,8 +162,9 @@ class IosLlamaEngine(
         val path = modelPath(modelId) ?: error("Model $modelId is not downloaded")
         llama_backend_init()
         val gpu = if (isSimulator()) 0 else GPU_LAYERS
-        val loaded = llama_model_load_from_file(path, llama_model_default_params().copy { n_gpu_layers = gpu })
-            ?: error("Could not load the model file")
+        val loaded =
+            llama_model_load_from_file(path, llama_model_default_params().copy { n_gpu_layers = gpu })
+                ?: error("Could not load the model file")
         val context =
             llama_init_from_model(
                 loaded,
@@ -286,7 +287,9 @@ class IosLlamaEngine(
                     while (done < count) {
                         currentCoroutineContext().ensureActive()
                         val part = minOf(BATCH_TOKENS, count - done)
-                        if (llama_decode(c, llama_batch_get_one(tokens + done, part)) != 0) error("The model failed to read the question")
+                        if (llama_decode(c, llama_batch_get_one(tokens + done, part)) != 0) {
+                            error("The model failed to read the question")
+                        }
                         done += part
                     }
                     generate(c, vocab, sampler, count, limit, onPiece)
@@ -300,64 +303,76 @@ class IosLlamaEngine(
     /** Dictation with a Whisper model (whisper.cpp, in the same framework as llama.cpp). */
     private fun transcribeWithWhisper(modelId: String, wav: ByteArray): String {
         val pcm = wavSamples(wav)
-        val samples = FloatArray(pcm.size / 2) { i ->
-            ((pcm[2 * i].toInt() and 0xFF) or (pcm[2 * i + 1].toInt() shl 8)).toShort() / 32768f
-        }
+        val samples =
+            FloatArray(pcm.size / 2) { i ->
+                ((pcm[2 * i].toInt() and 0xFF) or (pcm[2 * i + 1].toInt() shl 8)).toShort() / 32768f
+            }
         if (samples.isEmpty()) return ""
         if (whisperFor != modelId) {
             releaseWhisper()
             val path = modelPath(modelId) ?: error("Model $modelId is not downloaded")
             val params = whisper_context_default_params().copy { use_gpu = !isSimulator() }
-            whisperContext = whisper_init_from_file_with_params(path, params) ?: error("Could not load the speech model")
+            whisperContext =
+                whisper_init_from_file_with_params(path, params) ?: error("Could not load the speech model")
             whisperFor = modelId
         }
         val w = whisperContext!!
         return memScoped {
             val language = IosDictationLanguage.hint
             val languageCode = language.cstr.ptr
-            val params = whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY).copy {
-                n_threads = 4
-                translate = false
-                no_context = true
-                print_special = false
-                print_progress = false
-                print_realtime = false
-                print_timestamps = false
-                this.language = languageCode
-                detect_language = language == "auto"
-            }
+            val params =
+                whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY).copy {
+                    n_threads = 4
+                    translate = false
+                    no_context = true
+                    print_special = false
+                    print_progress = false
+                    print_realtime = false
+                    print_timestamps = false
+                    this.language = languageCode
+                    detect_language = language == "auto"
+                }
             val result = samples.usePinned { whisper_full(w, params, it.addressOf(0), samples.size) }
             if (result != 0) error("The speech model failed")
             buildString {
-                for (i in 0 until whisper_full_n_segments(w)) append(whisper_full_get_segment_text(w, i)?.toKString().orEmpty())
-            }.trim()
+                for (i in 0 until whisper_full_n_segments(w)) {
+                    append(whisper_full_get_segment_text(w, i)?.toKString().orEmpty())
+                }
+            }
+                .trim()
         }
     }
 
     override suspend fun transcribe(modelId: String, wav: ByteArray): String = lock.withLock {
         withContext(Dispatchers.Default) {
-            if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) return@withContext transcribeWithWhisper(modelId, wav)
+            if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) {
+                return@withContext transcribeWithWhisper(modelId, wav)
+            }
             ensureLoaded(modelId)
             val m = model!!
             val c = ctx!!
             val vocab = llama_model_get_vocab(m)
             val hearing = hearingPath(modelId) ?: error("This model has no hearing file")
-            val mtmd = mtmdContext?.takeIf { mtmdFor == modelId } ?: run {
-                mtmdContext?.let { mtmd_free(it) }
-                val params = mtmd_context_params_default().copy {
-                    use_gpu = !isSimulator()
-                    n_threads = 4
-                }
-                (mtmd_init_from_file(hearing, m, params) ?: error("Could not load the hearing file")).also {
-                    mtmdContext = it
-                    mtmdFor = modelId
-                }
-            }
+            val mtmd =
+                mtmdContext?.takeIf { mtmdFor == modelId }
+                    ?: run {
+                        mtmdContext?.let { mtmd_free(it) }
+                        val params =
+                            mtmd_context_params_default().copy {
+                                use_gpu = !isSimulator()
+                                n_threads = 4
+                            }
+                        (mtmd_init_from_file(hearing, m, params) ?: error("Could not load the hearing file")).also {
+                            mtmdContext = it
+                            mtmdFor = modelId
+                        }
+                    }
             if (!mtmd_support_audio(mtmd)) error("This model cannot hear")
             val pcm = wavSamples(wav)
-            val samples = FloatArray(pcm.size / 2) { i ->
-                ((pcm[2 * i].toInt() and 0xFF) or (pcm[2 * i + 1].toInt() shl 8)).toShort() / 32768f
-            }
+            val samples =
+                FloatArray(pcm.size / 2) { i ->
+                    ((pcm[2 * i].toInt() and 0xFF) or (pcm[2 * i + 1].toInt() shl 8)).toShort() / 32768f
+                }
             if (samples.isEmpty()) return@withContext ""
             val marker = mtmd_default_marker()!!.toKString()
             val text = prompt(m, listOf("system" to TRANSCRIBE_RULE, "user" to "$marker\n$TRANSCRIBE_ASK"))
@@ -367,8 +382,9 @@ class IosLlamaEngine(
             var bitmap: CPointer<mtmd_bitmap>? = null
             try {
                 memScoped {
-                    val bitmapPointer =
-                        samples.usePinned { mtmd_bitmap_init_from_audio(samples.size.convert(), it.addressOf(0)) }
+                    val bitmapPointer = samples.usePinned {
+                        mtmd_bitmap_init_from_audio(samples.size.convert(), it.addressOf(0))
+                    }
                     bitmap = bitmapPointer
                     val input = alloc<mtmd_input_text>()
                     input.text = text.cstr.ptr
@@ -377,12 +393,17 @@ class IosLlamaEngine(
                     input.parse_special = true
                     val bitmaps = allocArray<CPointerVar<mtmd_bitmap>>(1)
                     bitmaps[0] = bitmapPointer
-                    if (mtmd_tokenize(mtmd, chunks, input.ptr, bitmaps, 1.convert()) != 0) error("Could not prepare the recording")
+                    if (mtmd_tokenize(mtmd, chunks, input.ptr, bitmaps, 1.convert()) != 0) {
+                        error("Could not prepare the recording")
+                    }
                     val newPast = alloc<IntVar>()
                     if (mtmd_helper_eval_chunks(mtmd, c, chunks, 0, 0, BATCH_TOKENS, true, newPast.ptr) != 0) {
                         error("The model failed to listen to the recording")
                     }
-                    generate(c, vocab, sampler, newPast.value, MAX_TRANSCRIPT_TOKENS, {}).trim().trim('"', '„', '”').trim()
+                    generate(c, vocab, sampler, newPast.value, MAX_TRANSCRIPT_TOKENS, {})
+                        .trim()
+                        .trim('"', '„', '”')
+                        .trim()
                 }
             } finally {
                 bitmap?.let { mtmd_bitmap_free(it) }

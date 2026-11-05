@@ -16,11 +16,11 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.repository.AssistantMemory
 import org.meshtastic.core.repository.MemoryNote
+import java.io.File
 
 /** The notes of the assistant as small text files in one folder; nothing leaves the device. */
 class FileAssistantMemory(private val dir: File) : AssistantMemory {
@@ -61,21 +61,29 @@ class FileAssistantMemory(private val dir: File) : AssistantMemory {
         val list = state.value.sortedByDescending { it.byUser }
         val out = StringBuilder()
         for (note in list) {
-            val line = if (note.byUser) "User's own instructions (always follow them): ${note.text}" else "${note.name}: ${note.text}"
+            val line =
+                if (note.byUser) {
+                    "User's own instructions (always follow them): ${note.text}"
+                } else {
+                    "${note.name}: ${note.text}"
+                }
             if (out.length + line.length + 1 > maxChars) break
             out.append(line).append('\n')
         }
         return out.toString().trim()
     }
 
-    private fun load(): List<MemoryNote> =
-        dir.listFiles { f -> f.extension == "md" }
-            ?.sortedBy { it.name }
-            ?.mapNotNull { f ->
-                val text = runCatching { f.readText() }.getOrNull()?.trim().orEmpty()
-                if (text.isEmpty()) null else MemoryNote(f.nameWithoutExtension, text, f.nameWithoutExtension == AssistantMemory.USER_NOTE)
+    private fun load(): List<MemoryNote> = dir.listFiles { f -> f.extension == "md" }
+        ?.sortedBy { it.name }
+        ?.mapNotNull { f ->
+            val text = runCatching { f.readText() }.getOrNull()?.trim().orEmpty()
+            if (text.isEmpty()) {
+                null
+            } else {
+                MemoryNote(f.nameWithoutExtension, text, f.nameWithoutExtension == AssistantMemory.USER_NOTE)
             }
-            .orEmpty()
+        }
+        .orEmpty()
 
     companion object {
         const val USER_MAX = 1500

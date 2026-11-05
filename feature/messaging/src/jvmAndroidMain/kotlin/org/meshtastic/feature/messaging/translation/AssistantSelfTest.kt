@@ -34,7 +34,10 @@ internal object AssistantSelfTest {
     const val HARDWARE = "/sprzet"
     const val TRANSLATE = "/tlumacz"
 
-    /** A short version of /test (about a tenth of everything, evenly picked from each group): a first ranking in minutes. */
+    /**
+     * A short version of /test (about a tenth of everything, evenly picked from each group): a first ranking in
+     * minutes.
+     */
     const val QUICK = "/szybki"
 
     val commands: List<String> = listOf(COMMAND, QUICK, TOOLS, CHAT, KNOWLEDGE, TRANSLATE, HARDWARE)
@@ -43,8 +46,11 @@ internal object AssistantSelfTest {
     private const val QUICK_TRANSLATION_STEP = 4
 
     /** The translation cases of a command: all of them, or every few of them for /szybki. */
-    fun translationsFor(command: String): List<Translation> =
-        if (command.equals(QUICK, ignoreCase = true)) translations.filterIndexed { i, _ -> i % QUICK_TRANSLATION_STEP == 0 } else translations
+    fun translationsFor(command: String): List<Translation> = if (command.equals(QUICK, ignoreCase = true)) {
+        translations.filterIndexed { i, _ -> i % QUICK_TRANSLATION_STEP == 0 }
+    } else {
+        translations
+    }
 
     /** One translation test: [keep] are the things (names, numbers, links) that must stay exactly as they are. */
     class Translation(val text: String, val from: String, val to: String, val keep: List<String> = emptyList())
@@ -66,8 +72,18 @@ internal object AssistantSelfTest {
             Translation("Zasięg do Łysicy wynosi 54 km przy antenie 5 dBi.", PL, EN, listOf("54", "5 dBi")),
             Translation("Zmień region na EU_868 i ustaw limit skoków na 3.", PL, EN, listOf("EU_868", "3")),
             Translation("Sprawdź kanał LongFast, bo SNR spadł do -12 dB.", PL, EN, listOf("LongFast", "-12")),
-            Translation("Mapa jest tutaj: https://meshtastic-swietokrzyskie.pl/mapa", PL, EN, listOf("https://meshtastic-swietokrzyskie.pl/mapa")),
-            Translation("Czy ktoś słyszy węzeł SP7UNR_atk-20 w okolicy Kielc?", PL, EN, listOf("SP7UNR_atk-20", "Kielc")),
+            Translation(
+                "Mapa jest tutaj: https://meshtastic-swietokrzyskie.pl/mapa",
+                PL,
+                EN,
+                listOf("https://meshtastic-swietokrzyskie.pl/mapa"),
+            ),
+            Translation(
+                "Czy ktoś słyszy węzeł SP7UNR_atk-20 w okolicy Kielc?",
+                PL,
+                EN,
+                listOf("SP7UNR_atk-20", "Kielc"),
+            ),
             Translation("Antena ćwierćfalowa na 868 MHz ma około 8,6 cm.", PL, EN, listOf("868", "8,6")),
             Translation("Proszę o pomoc, mam słaby zasięg i rozładowaną baterię.", PL, EN),
             Translation("Spotkanie sieci w sobotę o 10:30 przy radiostacji.", PL, EN, listOf("10:30")),
@@ -88,7 +104,12 @@ internal object AssistantSelfTest {
             Translation("¿Alguien oye mi nodo? Estoy en la montaña.", ES, PL),
             Translation("Guten Tag, ich höre den Knoten SM_Base mit 12 dB.", DE, PL, listOf("SM_Base", "12")),
             Translation("Test zasięgu: 3 km, 5 km, 10 km, bez przeszkód.", PL, EN, listOf("3 km", "5 km", "10 km")),
-            Translation("Uwaga: jutro aktualizacja firmware MT_SW_FIRMWARE v3.", PL, EN, listOf("MT_SW_FIRMWARE", "v3")),
+            Translation(
+                "Uwaga: jutro aktualizacja firmware MT_SW_FIRMWARE v3.",
+                PL,
+                EN,
+                listOf("MT_SW_FIRMWARE", "v3"),
+            ),
             Translation("Dziękuję za pomoc, do usłyszenia!", PL, EN),
         )
 
@@ -102,70 +123,74 @@ internal object AssistantSelfTest {
         val every = all(node, channel)
         return when {
             command.equals(COMMAND, ignoreCase = true) -> every
+
             command.equals(QUICK, ignoreCase = true) ->
                 // Evenly spaced picks inside each group, so every kind of question is there.
-                every.groupBy { it.group }.values.flatMap { group -> group.filterIndexed { i, q -> i % QUICK_STEP == 0 && !q.followUp } }
+                every
+                    .groupBy { it.group }
+                    .values
+                    .flatMap { group -> group.filterIndexed { i, q -> i % QUICK_STEP == 0 && !q.followUp } }
+
             else -> every.filter { it.group.equals(command, ignoreCase = true) }
         }
     }
 
-    private fun all(node: String, channel: String): List<Question> =
-        listOf(
-            Question("Ile mam teraz węzłów w sieci?"),
-            Question("Który węzeł jest najdalej ode mnie?"),
-            Question("Jaki jest poziom baterii mojego węzła?"),
-            Question("Które węzły słyszałem w ciągu ostatniej godziny?"),
-            Question("Jaka jest średnia jakość sygnału (SNR) węzła $node?"),
-            Question("Pokaż statystyki mojego radia (pakiety, pamięć)."),
-            Question("Podsumuj mi całą sieć w 3 zdaniach."),
-            Question("Kto pisał do mnie ostatnio?"),
-            Question("Jak zmienić region LoRa?", group = KNOWLEDGE),
-            Question("Gdzie ustawić limit skoków (hop limit)?", group = KNOWLEDGE),
-            Question("Jak zmienić język aplikacji?", group = KNOWLEDGE),
-            Question("Jak włączyć tłumacza offline?", group = KNOWLEDGE),
-            Question("Jak zmienić motyw na ciemny?", group = KNOWLEDGE),
-            Question("Jak powiększyć interfejs?", group = KNOWLEDGE),
-            Question("Jak wyłączyć automatyczne ładowanie obrazków w czacie?", group = KNOWLEDGE),
-            Question("Gdzie jest panel debugowania?", group = KNOWLEDGE),
-            Question("Co to jest „Funkcje MT_SW”?", group = KNOWLEDGE),
-            Question("Co nowego w ostatniej wersji?", group = KNOWLEDGE),
-            Question("Jak zaktualizować firmware?", group = KNOWLEDGE),
-            Question("Jak połączyć się z urządzeniem przez Bluetooth?", group = KNOWLEDGE),
-            Question("Pokaż mi ustawienie regionu.", group = KNOWLEDGE),
-            Question("Pokaż węzeł $node na mapie."),
-            Question("Pokaż najbliższy router."),
-            Question("Czy mam zasięg do $node?"),
-            Question("Napisz na kanale $channel, że jestem na miejscu."),
-            Question("Otwórz ustawienia wyświetlania.", group = KNOWLEDGE),
-            Question("Ile wiadomości było dzisiaj na kanale $channel?"),
-            Question("A wczoraj?", followUp = true),
-            Question("Kto pisał najwięcej w ostatnim tygodniu?"),
-            Question("Czy ktoś pisał o pogodzie?"),
-            Question("Ile węzłów było aktywnych przez ostatnie 3 godziny?"),
-            Question("Które węzły mają słabą baterię?"),
-            Question("Cześć, jak się masz?", group = CHAT),
-            Question("Jak zrobić prostą antenę dipol na 868 MHz?", group = CHAT),
-            Question("Opowiedz krótko, czym różni się LoRa od Wi-Fi.", group = CHAT),
-            Question("Mam słaby zasięg — co sprawdzić i pokaż mi odpowiednie ustawienie.", group = KNOWLEDGE),
-            Question("Ile węzłów jest w sieci i jak zmienić w ustawieniach rolę mojego urządzenia?", group = KNOWLEDGE),
-            Question("How do I change the LoRa region?", group = KNOWLEDGE),
-            Question("Jaka jest stolica Francji?", group = CHAT),
-            Question("Jaka jest teraz temperatura?", group = CHAT),
-            Question("Jaki preset wybrać w naszym województwie?", group = KNOWLEDGE),
-            Question("Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?"),
-            Question("Kto może nadawać na 868 MHz w Polsce?", group = KNOWLEDGE),
-            Question("Ile to 20 dBm w miliwatach?"),
-            Question("Jaki teoretyczny zasięg mam przy antenach 5 dBi?"),
-            Question("Ile trwa wysłanie wiadomości 100 znaków?"),
-            Question("Jaka jest strefa Fresnela na 15 km?"),
-            Question("Jak daleko sięga radio z masztu 40 m?"),
-            Question("Jakie EIRP przy 22 dBm i antenie 6 dBi?"),
-            Question("Policz 12*7+3"),
-            Question("What length should a 433 MHz dipole be?", group = CHAT),
-            Question("Ktoś mnie słabo słyszy, jak poprawić zasięg?", group = CHAT),
-            Question("Jaki będzie zasięg między moim węzłem a węzłem $node?"),
-            Question("Policz zasięg mojego węzła przy antenie 5 dBi na wysokości 10 m."),
-            Question("Oblicz długość anteny ćwierćfalowej na 433 MHz."),
-            Question("Przygotuj wiadomość do kanału $channel, że wracam za godzinę (nie wysyłaj)."),
-        ) + AssistantSelfTestBank.questions(node, channel)
+    private fun all(node: String, channel: String): List<Question> = listOf(
+        Question("Ile mam teraz węzłów w sieci?"),
+        Question("Który węzeł jest najdalej ode mnie?"),
+        Question("Jaki jest poziom baterii mojego węzła?"),
+        Question("Które węzły słyszałem w ciągu ostatniej godziny?"),
+        Question("Jaka jest średnia jakość sygnału (SNR) węzła $node?"),
+        Question("Pokaż statystyki mojego radia (pakiety, pamięć)."),
+        Question("Podsumuj mi całą sieć w 3 zdaniach."),
+        Question("Kto pisał do mnie ostatnio?"),
+        Question("Jak zmienić region LoRa?", group = KNOWLEDGE),
+        Question("Gdzie ustawić limit skoków (hop limit)?", group = KNOWLEDGE),
+        Question("Jak zmienić język aplikacji?", group = KNOWLEDGE),
+        Question("Jak włączyć tłumacza offline?", group = KNOWLEDGE),
+        Question("Jak zmienić motyw na ciemny?", group = KNOWLEDGE),
+        Question("Jak powiększyć interfejs?", group = KNOWLEDGE),
+        Question("Jak wyłączyć automatyczne ładowanie obrazków w czacie?", group = KNOWLEDGE),
+        Question("Gdzie jest panel debugowania?", group = KNOWLEDGE),
+        Question("Co to jest „Funkcje MT_SW”?", group = KNOWLEDGE),
+        Question("Co nowego w ostatniej wersji?", group = KNOWLEDGE),
+        Question("Jak zaktualizować firmware?", group = KNOWLEDGE),
+        Question("Jak połączyć się z urządzeniem przez Bluetooth?", group = KNOWLEDGE),
+        Question("Pokaż mi ustawienie regionu.", group = KNOWLEDGE),
+        Question("Pokaż węzeł $node na mapie."),
+        Question("Pokaż najbliższy router."),
+        Question("Czy mam zasięg do $node?"),
+        Question("Napisz na kanale $channel, że jestem na miejscu."),
+        Question("Otwórz ustawienia wyświetlania.", group = KNOWLEDGE),
+        Question("Ile wiadomości było dzisiaj na kanale $channel?"),
+        Question("A wczoraj?", followUp = true),
+        Question("Kto pisał najwięcej w ostatnim tygodniu?"),
+        Question("Czy ktoś pisał o pogodzie?"),
+        Question("Ile węzłów było aktywnych przez ostatnie 3 godziny?"),
+        Question("Które węzły mają słabą baterię?"),
+        Question("Cześć, jak się masz?", group = CHAT),
+        Question("Jak zrobić prostą antenę dipol na 868 MHz?", group = CHAT),
+        Question("Opowiedz krótko, czym różni się LoRa od Wi-Fi.", group = CHAT),
+        Question("Mam słaby zasięg — co sprawdzić i pokaż mi odpowiednie ustawienie.", group = KNOWLEDGE),
+        Question("Ile węzłów jest w sieci i jak zmienić w ustawieniach rolę mojego urządzenia?", group = KNOWLEDGE),
+        Question("How do I change the LoRa region?", group = KNOWLEDGE),
+        Question("Jaka jest stolica Francji?", group = CHAT),
+        Question("Jaka jest teraz temperatura?", group = CHAT),
+        Question("Jaki preset wybrać w naszym województwie?", group = KNOWLEDGE),
+        Question("Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?"),
+        Question("Kto może nadawać na 868 MHz w Polsce?", group = KNOWLEDGE),
+        Question("Ile to 20 dBm w miliwatach?"),
+        Question("Jaki teoretyczny zasięg mam przy antenach 5 dBi?"),
+        Question("Ile trwa wysłanie wiadomości 100 znaków?"),
+        Question("Jaka jest strefa Fresnela na 15 km?"),
+        Question("Jak daleko sięga radio z masztu 40 m?"),
+        Question("Jakie EIRP przy 22 dBm i antenie 6 dBi?"),
+        Question("Policz 12*7+3"),
+        Question("What length should a 433 MHz dipole be?", group = CHAT),
+        Question("Ktoś mnie słabo słyszy, jak poprawić zasięg?", group = CHAT),
+        Question("Jaki będzie zasięg między moim węzłem a węzłem $node?"),
+        Question("Policz zasięg mojego węzła przy antenie 5 dBi na wysokości 10 m."),
+        Question("Oblicz długość anteny ćwierćfalowej na 433 MHz."),
+        Question("Przygotuj wiadomość do kanału $channel, że wracam za godzinę (nie wysyłaj)."),
+    ) + AssistantSelfTestBank.questions(node, channel)
 }

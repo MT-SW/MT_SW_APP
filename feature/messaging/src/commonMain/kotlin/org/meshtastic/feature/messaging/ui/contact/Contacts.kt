@@ -267,7 +267,11 @@ fun ContactsScreen(
     }
 
     // MT_SW option: the import / share menu in the top bar instead of the floating button.
-    val importInTopBar by org.koin.compose.koinInject<org.meshtastic.core.repository.UiPrefs>().importMenuInTopBar.collectAsStateWithLifecycle()
+    val importInTopBar by
+        org.koin.compose
+            .koinInject<org.meshtastic.core.repository.UiPrefs>()
+            .importMenuInTopBar
+            .collectAsStateWithLifecycle()
     val importMenu: @Composable (Boolean) -> Unit = { inBar ->
         MeshtasticImportFAB(
             asTopBarMenu = inBar,

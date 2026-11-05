@@ -18,7 +18,8 @@ package org.meshtastic.feature.messaging
 
 /**
  * A public image host that takes anonymous uploads. They are tried one after another (see [ChatImageUploader]), so a
- * host that pauses uploads (catbox.moe answers "412 uploads paused" when its storage is full) does not stop the sending.
+ * host that pauses uploads (catbox.moe answers "412 uploads paused" when its storage is full) does not stop the
+ * sending.
  */
 enum class ImageHost(val label: String, val url: String, val fileField: String, val extraFields: Map<String, String>) {
     /** The main host: files stay for good. */
@@ -41,8 +42,9 @@ fun isOwnImageHost(url: String): Boolean =
     url.contains("catbox.moe", ignoreCase = true) || url.contains("uguu.se", ignoreCase = true)
 
 /**
- * Uploads [bytes] to the image [host] and returns the link. [onProgress] gets the share sent so far (0..1). Throws when the
- * server cannot be reached, is too slow, or does not answer with a link (its error text is never returned as a link).
+ * Uploads [bytes] to the image [host] and returns the link. [onProgress] gets the share sent so far (0..1). Throws when
+ * the server cannot be reached, is too slow, or does not answer with a link (its error text is never returned as a
+ * link).
  */
 expect suspend fun uploadToCatbox(
     bytes: ByteArray,

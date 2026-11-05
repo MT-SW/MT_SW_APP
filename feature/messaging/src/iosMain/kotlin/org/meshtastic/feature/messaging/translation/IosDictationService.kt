@@ -40,11 +40,17 @@ class IosDictationService(
 ) : DictationService {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    private fun usable(model: AiModelInfo, states: Map<String, TranslatorModelState>) =
-        model.canDo(AiRole.DICTATION) && (model.hearing || model.engine == AiEngine.WHISPER_CPP) && model.engineReady && states[model.id] == TranslatorModelState.Ready
+    private fun usable(model: AiModelInfo, states: Map<String, TranslatorModelState>) = model.canDo(AiRole.DICTATION) &&
+        (model.hearing || model.engine == AiEngine.WHISPER_CPP) &&
+        model.engineReady &&
+        states[model.id] == TranslatorModelState.Ready
 
     private fun pick(states: Map<String, TranslatorModelState>, id: String): String? {
-        AiModels.byId(id)?.takeIf { usable(it, states) }?.let { return it.id }
+        AiModels.byId(id)
+            ?.takeIf { usable(it, states) }
+            ?.let {
+                return it.id
+            }
         return AiModels.all.firstOrNull { usable(it, states) }?.id
     }
 
@@ -72,6 +78,33 @@ class IosDictationService(
     }
 
     private companion object {
-        val SUPPORTED = setOf("pl", "en", "de", "fr", "es", "it", "cs", "sk", "uk", "ru", "nl", "pt", "sv", "no", "da", "fi", "hu", "ro", "bg", "hr", "sl", "lt", "lv", "et", "tr")
+        val SUPPORTED =
+            setOf(
+                "pl",
+                "en",
+                "de",
+                "fr",
+                "es",
+                "it",
+                "cs",
+                "sk",
+                "uk",
+                "ru",
+                "nl",
+                "pt",
+                "sv",
+                "no",
+                "da",
+                "fi",
+                "hu",
+                "ro",
+                "bg",
+                "hr",
+                "sl",
+                "lt",
+                "lv",
+                "et",
+                "tr",
+            )
     }
 }

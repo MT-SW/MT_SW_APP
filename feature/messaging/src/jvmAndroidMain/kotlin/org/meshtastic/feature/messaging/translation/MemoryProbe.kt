@@ -16,10 +16,12 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-import java.io.File
 import kotlinx.coroutines.delay
+import java.io.File
 
-/** Reads the free memory of the device (Android and Linux) and waits until memory of a stopped program is given back. */
+/**
+ * Reads the free memory of the device (Android and Linux) and waits until memory of a stopped program is given back.
+ */
 internal object MemoryProbe {
     private const val SAMPLE_MS = 300L
     private const val SETTLED_MB = 30
@@ -29,11 +31,16 @@ internal object MemoryProbe {
     private const val BYTES_PER_KB_TO_MB = 1024
 
     /** Memory the system can give right now (MB), or null where it cannot be read. */
-    fun availableMb(): Int? =
-        runCatching {
-            File("/proc/meminfo").readLines().firstOrNull { it.startsWith("MemAvailable:") }
-                ?.split(Regex("\\s+"))?.getOrNull(1)?.toLongOrNull()?.let { (it / BYTES_PER_KB_TO_MB).toInt() }
-        }.getOrNull()
+    fun availableMb(): Int? = runCatching {
+        File("/proc/meminfo")
+            .readLines()
+            .firstOrNull { it.startsWith("MemAvailable:") }
+            ?.split(Regex("\\s+"))
+            ?.getOrNull(1)
+            ?.toLongOrNull()
+            ?.let { (it / BYTES_PER_KB_TO_MB).toInt() }
+    }
+        .getOrNull()
 
     /**
      * Right after a program ends (or fails to start) the system still takes back its memory, so the number is too small

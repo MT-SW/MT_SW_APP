@@ -26,13 +26,13 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -472,20 +472,26 @@ class MessageViewModel(
      */
     fun translateMessages(messages: List<Message>) = safeLaunch(tag = "translateMessages") {
         val todo = messages.filter { it.text.isNotBlank() && !it.fromLocal }
-        snackbarManager.showSnackbar(MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translating)))
+        snackbarManager.showSnackbar(
+            MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translating)),
+        )
         for (message in todo) {
             if (message.translatedText != null) {
                 if (!message.showTranslated) packetRepository.setShowTranslated(message.uuid, true)
                 continue
             }
             when (val result = messageTranslationService.translate(message.text, currentLocaleCode())) {
-                is TranslationResult.Success -> packetRepository.setMessageTranslation(message.uuid, result.translatedText)
+                is TranslationResult.Success ->
+                    packetRepository.setMessageTranslation(message.uuid, result.translatedText)
+
                 is TranslationResult.NotRequired -> Unit
+
                 is TranslationResult.ModelDownloadRequired -> {
                     _translationDialogState.value =
                         TranslationDialogState.DownloadPrompt(message, result.languageTags, result.estimatedSizeMb)
                     return@safeLaunch
                 }
+
                 is TranslationResult.Unavailable -> {
                     snackbarManager.showSnackbar(
                         MessagingUiTextResolver.resolve(UiText.Resource(Res.string.translation_failed)),
@@ -494,7 +500,9 @@ class MessageViewModel(
                 }
             }
         }
-        snackbarManager.showSnackbar(MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translated_done)))
+        snackbarManager.showSnackbar(
+            MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translated_done)),
+        )
     }
 
     fun toggleShowTranslated(message: Message) = safeLaunch(tag = "toggleShowTranslated") {

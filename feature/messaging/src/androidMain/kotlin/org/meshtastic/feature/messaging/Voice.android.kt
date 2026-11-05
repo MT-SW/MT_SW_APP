@@ -22,19 +22,21 @@ import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import androidx.core.content.ContextCompat
-import kotlinx.coroutines.CompletableDeferred
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CompletableDeferred
 import java.util.Locale
 
-/** Reads with the Android text-to-speech engine; the engine is only created when something is read for the first time. */
+/**
+ * Reads with the Android text-to-speech engine; the engine is only created when something is read for the first time.
+ */
 private class AndroidSpeaker(private val context: Context) : Speaker {
     private var tts: TextToSpeech? = null
     private var ready = false
@@ -71,7 +73,12 @@ private class AndroidSpeaker(private val context: Context) : Speaker {
         val limit = (TextToSpeech.getMaxSpeechInputLength() - 100).coerceAtLeast(500)
         var first = true
         text.chunked(limit).forEach { piece ->
-            engine.speak(piece, if (first) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "mtsw-$piece".take(32))
+            engine.speak(
+                piece,
+                if (first) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
+                null,
+                "mtsw-$piece".take(32),
+            )
             first = false
         }
     }
@@ -115,7 +122,11 @@ private class HeadsetMic(context: Context) {
     /** The headset microphone, ready to record from, or null when no headset is connected. */
     fun begin(): android.media.AudioDeviceInfo? {
         val inputs = audio.getDevices(android.media.AudioManager.GET_DEVICES_INPUTS)
-        inputs.firstOrNull { it.type in WIRED }?.let { return it }
+        inputs
+            .firstOrNull { it.type in WIRED }
+            ?.let {
+                return it
+            }
         val bluetooth = inputs.firstOrNull { isBluetooth(it.type) } ?: return null
         previousMode = audio.mode
         audio.mode = android.media.AudioManager.MODE_IN_COMMUNICATION
@@ -157,9 +168,11 @@ private class HeadsetMic(context: Context) {
         routed = false
     }
 
-    private fun isBluetooth(type: Int) =
-        type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
-            (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && type == android.media.AudioDeviceInfo.TYPE_BLE_HEADSET)
+    private fun isBluetooth(type: Int) = type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
+        (
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S &&
+                type == android.media.AudioDeviceInfo.TYPE_BLE_HEADSET
+            )
 
     private companion object {
         val WIRED =
@@ -188,7 +201,10 @@ private class AndroidMic(
     @Volatile private var running = false
 
     suspend fun permission(): Boolean {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+        if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
             return true
         }
         return ask()
@@ -199,11 +215,14 @@ private class AndroidMic(
         val minimum = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         // With the setting on and a headset connected, its microphone is used (a Bluetooth one through the call route).
         val device = if (useHeadset()) runCatching { headset.begin() }.getOrNull() else null
-        val bluetooth = device != null && device.type !in setOf(
-            android.media.AudioDeviceInfo.TYPE_WIRED_HEADSET,
-            android.media.AudioDeviceInfo.TYPE_USB_HEADSET,
-            android.media.AudioDeviceInfo.TYPE_USB_DEVICE,
-        )
+        val bluetooth =
+            device != null &&
+                device.type !in
+                setOf(
+                    android.media.AudioDeviceInfo.TYPE_WIRED_HEADSET,
+                    android.media.AudioDeviceInfo.TYPE_USB_HEADSET,
+                    android.media.AudioDeviceInfo.TYPE_USB_DEVICE,
+                )
         val recorder =
             AudioRecord(
                 if (bluetooth) MediaRecorder.AudioSource.VOICE_COMMUNICATION else MediaRecorder.AudioSource.MIC,
@@ -223,12 +242,12 @@ private class AndroidMic(
         recorder.startRecording()
         thread =
             Thread {
-                    val chunk = ByteArray(4096)
-                    while (running && buffer.size() < RATE * 2 * 30) {
-                        val read = recorder.read(chunk, 0, chunk.size)
-                        if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
-                    }
+                val chunk = ByteArray(4096)
+                while (running && buffer.size() < RATE * 2 * 30) {
+                    val read = recorder.read(chunk, 0, chunk.size)
+                    if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
                 }
+            }
                 .apply {
                     isDaemon = true
                     start()

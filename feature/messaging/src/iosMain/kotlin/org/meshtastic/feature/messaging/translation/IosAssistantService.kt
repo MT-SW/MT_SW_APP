@@ -45,9 +45,8 @@ class IosAssistantService(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private fun pick(states: Map<String, TranslatorModelState>, chosen: String): String? {
-        fun usable(id: String) =
-            AiModels.byId(id)?.let { it.canDo(AiRole.ASSISTANT) && it.engineReady } == true &&
-                states[id] == TranslatorModelState.Ready
+        fun usable(id: String) = AiModels.byId(id)?.let { it.canDo(AiRole.ASSISTANT) && it.engineReady } == true &&
+            states[id] == TranslatorModelState.Ready
         if (usable(chosen)) return chosen
         return AiModels.all.firstOrNull { usable(it.id) }?.id
     }
@@ -70,12 +69,13 @@ class IosAssistantService(
                 "You are the assistant of the MT_SW app (LoRa mesh network). Answer simply and briefly. " +
                     "Use the knowledge below; if it is missing, say you do not know.\n\n$facts"
             }
-        val messages =
-            buildList {
-                add("system" to system)
-                history.dropLast(1).takeLast(HISTORY_TURNS).forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
-                add("user" to question)
+        val messages = buildList {
+            add("system" to system)
+            history.dropLast(1).takeLast(HISTORY_TURNS).forEach {
+                add((if (it.fromUser) "user" else "assistant") to it.text)
             }
+            add("user" to question)
+        }
         return engine.chat(model, messages, ANSWER_TOKENS, 0.3f, onPiece).trim()
     }
 }

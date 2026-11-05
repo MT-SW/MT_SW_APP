@@ -81,7 +81,10 @@ fun AssistantHistoryDialog(
                                 modifier = Modifier.weight(1f),
                             )
                             IconButton(onClick = { onDelete(chat) }) {
-                                Icon(MeshtasticIcons.Delete, contentDescription = stringResource(Res.string.assistant_delete))
+                                Icon(
+                                    MeshtasticIcons.Delete,
+                                    contentDescription = stringResource(Res.string.assistant_delete),
+                                )
                             }
                         }
                     }

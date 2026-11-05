@@ -33,10 +33,15 @@ object AssistantClock {
         val offset = systemTimeZone.offsetAt(kotlin.time.Instant.fromEpochMilliseconds(ms)).totalSeconds
         val day = ((ms / MS_PER_SECOND + offset) % SECONDS_PER_DAY + SECONDS_PER_DAY) % SECONDS_PER_DAY
         fun two(v: Long) = v.toString().padStart(2, '0')
-        return "${two(day / SECONDS_PER_HOUR)}:${two(day % SECONDS_PER_HOUR / SECONDS_PER_MINUTE)}:${two(day % SECONDS_PER_MINUTE)}"
+        return "${two(
+            day / SECONDS_PER_HOUR,
+        )}:${two(day % SECONDS_PER_HOUR / SECONDS_PER_MINUTE)}:${two(day % SECONDS_PER_MINUTE)}"
     }
 
-    /** The local date and time (DD.MM.YYYY HH:mm:ss) of an instant, for saved files and test reports; empty when not known. */
+    /**
+     * The local date and time (DD.MM.YYYY HH:mm:ss) of an instant, for saved files and test reports; empty when not
+     * known.
+     */
     fun full(ms: Long): String {
         if (ms <= 0L) return ""
         val local = kotlin.time.Instant.fromEpochMilliseconds(ms).toLocalDateTime(systemTimeZone)
@@ -44,21 +49,33 @@ object AssistantClock {
         return "${two(local.day)}.${two(local.month.ordinal + 1)}.${local.year} ${clock(ms)}"
     }
 
-    /** One sentence for the model: today's date, weekday, local time and time zone, so it can answer "what time is it". */
+    /**
+     * One sentence for the model: today's date, weekday, local time and time zone, so it can answer "what time is it".
+     */
     fun nowText(ms: Long, polish: Boolean): String {
         val local = kotlin.time.Instant.fromEpochMilliseconds(ms).toLocalDateTime(systemTimeZone)
         val days =
-            if (polish) listOf("poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela")
-            else listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+            if (polish) {
+                listOf("poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela")
+            } else {
+                listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+            }
         val day = days[local.dayOfWeek.ordinal]
         val zone = systemTimeZone.id
-        return if (polish) "Teraz jest $day, ${full(ms)} (strefa $zone)." else "It is now $day, ${full(ms)} (time zone $zone)."
+        return if (polish) {
+            "Teraz jest $day, ${full(ms)} (strefa $zone)."
+        } else {
+            "It is now $day, ${full(ms)} (time zone $zone)."
+        }
     }
 
     /** A duration in seconds with one decimal place ("12.3"). */
     fun seconds(ms: Long): String = (kotlin.math.round(ms / 100.0) / 10).toString()
 
-    /** "30.10.2026 12:03:17" for a question, "30.10.2026 12:03:17 · 12.3 s" for an answer that took [tookMs]; empty when the time is not known. */
+    /**
+     * "30.10.2026 12:03:17" for a question, "30.10.2026 12:03:17 · 12.3 s" for an answer that took [tookMs]; empty when
+     * the time is not known.
+     */
     fun stamp(at: Long, tookMs: Long = 0L): String {
         val time = full(at)
         if (time.isEmpty()) return ""

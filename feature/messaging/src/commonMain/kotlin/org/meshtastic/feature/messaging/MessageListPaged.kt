@@ -65,10 +65,10 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.model.hasDisplayName
 import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.util.isDesktopPlatform
-import org.meshtastic.core.model.hasDisplayName
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
@@ -333,6 +333,7 @@ private fun MessageListPagedContent(
                     } else {
                         rawMessage
                     }
+
                 // The neighbours are the rows that really show a bubble: the other chunks of a split message draw
                 // nothing, and taking one of them as the neighbour made the merged bubble look like a continuation of
                 // the previous sender's block (no name, joined corners, wrong colour).

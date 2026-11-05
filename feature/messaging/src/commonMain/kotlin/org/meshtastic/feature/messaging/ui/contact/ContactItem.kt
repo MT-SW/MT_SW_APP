@@ -128,7 +128,8 @@ private fun ContactHeader(
             AssistChipDefaults.assistChipColors(labelColor = Color(it.first), containerColor = Color(it.second))
         } ?: AssistChipDefaults.assistChipColors()
 
-    // The name text carries the colour: main channel in the theme colour, other channels red, direct messages the node's colour.
+    // The name text carries the colour: main channel in the theme colour, other channels red, direct messages the
+    // node's colour.
     val isChannel = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
     val channelIndex = if (isChannel) ContactKey(contact.contactKey).channelOrNull else null
     val nodeBackground = contact.nodeColors?.second

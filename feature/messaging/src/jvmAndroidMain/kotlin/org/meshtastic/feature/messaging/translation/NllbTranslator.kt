@@ -182,7 +182,9 @@ class NllbTranslator(private val modelDir: File, private val uiPrefs: UiPrefs) :
         while (true) {
             currentCoroutineContext().ensureActive()
             val have = if (part.isFile) part.length() else 0L
-            @Suppress("DEPRECATION") val connection = (URL(BASE_URL + f.remotePath).openConnection() as HttpURLConnection)
+
+            @Suppress("DEPRECATION")
+            val connection = (URL(BASE_URL + f.remotePath).openConnection() as HttpURLConnection)
             try {
                 connection.connectTimeout = CONNECT_TIMEOUT_MS
                 connection.readTimeout = READ_TIMEOUT_MS
@@ -278,11 +280,10 @@ class NllbTranslator(private val modelDir: File, private val uiPrefs: UiPrefs) :
 
     private fun scheduleUnload() {
         unloadJob?.cancel()
-        unloadJob =
-            scope.launch {
-                delay(IDLE_UNLOAD_MS)
-                runMutex.withLock { unload() }
-            }
+        unloadJob = scope.launch {
+            delay(IDLE_UNLOAD_MS)
+            runMutex.withLock { unload() }
+        }
     }
 
     private fun unload() {
@@ -323,8 +324,7 @@ class NllbTranslator(private val modelDir: File, private val uiPrefs: UiPrefs) :
                         val inputs = HashMap<String, OnnxTensor>()
                         inputs["encoder_attention_mask"] = maskTensor
                         inputs["encoder_hidden_states"] = hidden
-                        inputs["input_ids"] =
-                            OnnxTensor.createTensor(env, arrayOf(current)).also { stepOwned.add(it) }
+                        inputs["input_ids"] = OnnxTensor.createTensor(env, arrayOf(current)).also { stepOwned.add(it) }
                         inputs["use_cache_branch"] =
                             OnnxTensor.createTensor(env, booleanArrayOf(step > 0)).also { stepOwned.add(it) }
                         if (step == 0) {
@@ -423,12 +423,7 @@ class NllbTranslator(private val modelDir: File, private val uiPrefs: UiPrefs) :
 
     // endregion
 
-    private data class ModelFile(
-        val name: String,
-        val remotePath: String,
-        val minBytes: Long,
-        val weightBytes: Long,
-    )
+    private data class ModelFile(val name: String, val remotePath: String, val minBytes: Long, val weightBytes: Long)
 
     private companion object {
         const val TAG = "NllbTranslator"

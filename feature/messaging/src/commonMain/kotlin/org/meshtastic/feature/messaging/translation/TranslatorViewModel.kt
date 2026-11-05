@@ -22,12 +22,12 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.currentLocaleCode
 import org.meshtastic.core.common.util.nowMillis
@@ -83,7 +83,9 @@ class TranslatorViewModel(
 
     private var testJob: Job? = null
 
-    /** The id of the session that is saved as the translations are made; null until the first translation or command. */
+    /**
+     * The id of the session that is saved as the translations are made; null until the first translation or command.
+     */
     private var sessionId: String? = null
 
     private val _saved = MutableStateFlow<List<StoredChat>>(emptyList())
@@ -97,7 +99,8 @@ class TranslatorViewModel(
 
     fun refreshSaved() {
         viewModelScope.launch {
-            _saved.value = runCatching { savedStore.list() }.getOrDefault(emptyList()).filter { it.id.startsWith(SESSION_PREFIX) }
+            _saved.value =
+                runCatching { savedStore.list() }.getOrDefault(emptyList()).filter { it.id.startsWith(SESSION_PREFIX) }
         }
     }
 
@@ -124,13 +127,15 @@ class TranslatorViewModel(
     fun translate() {
         val current = _state.value
         if (current.input.isBlank() || current.busy) return
-        // The same commands as in the assistant (also without Polish letters): /tłumacz runs the translation test and /sprzęt
+        // The same commands as in the assistant (also without Polish letters): /tłumacz runs the translation test and
+        // /sprzęt
         // reports where the translator's model runs. /test and the other assistant tests stay in the assistant.
         when (commandOf(current.input)) {
             TEST_COMMAND -> {
                 runTest()
                 return
             }
+
             HARDWARE_COMMAND -> {
                 runHardware()
                 return
@@ -140,18 +145,25 @@ class TranslatorViewModel(
             _state.update { it.copy(busy = true, error = null, output = "") }
             val started = nowMillis
             val result = service.translateBetween(current.input, current.sourceNllb, current.targetNllb)
-            Logger.i(tag = "TranslatorViewModel") { "Translation finished in ${nowMillis - started} ms: ${result::class.simpleName}" }
+            Logger.i(tag = "TranslatorViewModel") {
+                "Translation finished in ${nowMillis - started} ms: ${result::class.simpleName}"
+            }
             _state.update {
                 when (result) {
                     is TranslationResult.Success ->
                         it.copy(
                             busy = false,
                             output = result.translatedText,
-                            history = it.history + TranslatorHistoryEntry(current.input.trim(), result.translatedText, nowMillis),
+                            history =
+                            it.history +
+                                TranslatorHistoryEntry(current.input.trim(), result.translatedText, nowMillis),
                         )
+
                     is TranslationResult.NotRequired -> it.copy(busy = false, error = TranslatorError.SameLanguage)
+
                     is TranslationResult.ModelDownloadRequired ->
                         it.copy(busy = false, error = TranslatorError.ModelMissing)
+
                     is TranslationResult.Unavailable ->
                         it.copy(
                             busy = false,
@@ -168,38 +180,46 @@ class TranslatorViewModel(
         }
     }
 
-    /** The command typed in [text] without Polish letters (/tłumacz = /tlumacz), or null when it is none of the translator's commands. */
+    /**
+     * The command typed in [text] without Polish letters (/tłumacz = /tlumacz), or null when it is none of the
+     * translator's commands.
+     */
     private fun commandOf(text: String): String? {
         val plain = text.trim().lowercase().map { POLISH_TO_PLAIN[it] ?: it }.joinToString("")
         return plain.takeIf { it == TEST_COMMAND || it == HARDWARE_COMMAND }
     }
 
-    /** /sprzęt: where the translator's model runs and what it takes; the report joins the session like a translation does. */
+    /**
+     * /sprzęt: where the translator's model runs and what it takes; the report joins the session like a translation
+     * does.
+     */
     private fun runHardware() {
-        _state.update { it.copy(busy = true, input = "", output = "", error = null, hardwareReport = true, testLines = emptyList()) }
-        testJob =
-            viewModelScope.launch {
-                val started = nowMillis
-                try {
-                    assistant.selfTest(TRANSLATOR_HARDWARE_COMMAND) { _, report ->
-                        val now = nowMillis
-                        _state.update {
-                            it.copy(
-                                testLines = listOf(TranslatorTestLine("/sprzęt", report, (now - started).coerceAtLeast(1L))),
-                                history = it.history + TranslatorHistoryEntry("/sprzęt", report, now),
-                            )
-                        }
+        _state.update {
+            it.copy(busy = true, input = "", output = "", error = null, hardwareReport = true, testLines = emptyList())
+        }
+        testJob = viewModelScope.launch {
+            val started = nowMillis
+            try {
+                assistant.selfTest(TRANSLATOR_HARDWARE_COMMAND) { _, report ->
+                    val now = nowMillis
+                    _state.update {
+                        it.copy(
+                            testLines =
+                            listOf(TranslatorTestLine("/sprzęt", report, (now - started).coerceAtLeast(1L))),
+                            history = it.history + TranslatorHistoryEntry("/sprzęt", report, now),
+                        )
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.w(tag = "TranslatorViewModel", throwable = e) { "Hardware report failed: ${e.message}" }
-                    _state.update { it.copy(error = TranslatorError.Failed) }
-                } finally {
-                    _state.update { it.copy(busy = false) }
-                    withContext(NonCancellable) { persist() }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(tag = "TranslatorViewModel", throwable = e) { "Hardware report failed: ${e.message}" }
+                _state.update { it.copy(error = TranslatorError.Failed) }
+            } finally {
+                _state.update { it.copy(busy = false) }
+                withContext(NonCancellable) { persist() }
             }
+        }
     }
 
     /** Saves the session after a translation (the translation itself must not wait for the disk). */
@@ -214,7 +234,12 @@ class TranslatorViewModel(
         val title = entries.first().source.lines().first().take(TITLE_LENGTH)
         runCatching {
             savedStore.save(
-                StoredChat(id, title, nowMillis, entries.flatMap { listOf(StoredLine(true, it.source, it.at), StoredLine(false, it.result, it.at)) }),
+                StoredChat(
+                    id,
+                    title,
+                    nowMillis,
+                    entries.flatMap { listOf(StoredLine(true, it.source, it.at), StoredLine(false, it.result, it.at)) },
+                ),
             )
         }
         refreshSaved()
@@ -224,15 +249,42 @@ class TranslatorViewModel(
     fun startNew() {
         testJob?.cancel()
         sessionId = null
-        _state.update { it.copy(input = "", output = "", busy = false, error = null, testLines = emptyList(), testing = false, history = emptyList()) }
+        _state.update {
+            it.copy(
+                input = "",
+                output = "",
+                busy = false,
+                error = null,
+                testLines = emptyList(),
+                testing = false,
+                history = emptyList(),
+            )
+        }
     }
 
-    /** Opens a saved session: its translations come back into the history of this screen and can be saved to a file again. */
+    /**
+     * Opens a saved session: its translations come back into the history of this screen and can be saved to a file
+     * again.
+     */
     fun open(chat: StoredChat) {
         testJob?.cancel()
         sessionId = chat.id
-        val entries = chat.lines.chunked(2).filter { it.size == 2 && it[0].fromUser && !it[1].fromUser }.map { TranslatorHistoryEntry(it[0].text, it[1].text, it[1].at) }
-        _state.update { it.copy(input = "", output = "", busy = false, error = null, testLines = emptyList(), testing = false, history = entries) }
+        val entries =
+            chat.lines
+                .chunked(2)
+                .filter { it.size == 2 && it[0].fromUser && !it[1].fromUser }
+                .map { TranslatorHistoryEntry(it[0].text, it[1].text, it[1].at) }
+        _state.update {
+            it.copy(
+                input = "",
+                output = "",
+                busy = false,
+                error = null,
+                testLines = emptyList(),
+                testing = false,
+                history = entries,
+            )
+        }
     }
 
     fun deleteSaved(id: String) {
@@ -245,35 +297,45 @@ class TranslatorViewModel(
 
     /**
      * The translation test of the assistant (the same sentences for every model, so results can be compared): each
-     * sentence appears here with its translation, a check that names, numbers and links stayed as they are, and its time.
+     * sentence appears here with its translation, a check that names, numbers and links stayed as they are, and its
+     * time.
      */
     private fun runTest() {
-        _state.update { it.copy(busy = true, testing = true, hardwareReport = false, testLines = emptyList(), input = "", output = "", error = null) }
-        testJob =
-            viewModelScope.launch {
-                var mark = nowMillis
-                try {
-                    assistant.selfTest(TEST_COMMAND) { source, result ->
-                        val now = nowMillis
-                        val took = (now - mark).coerceAtLeast(1L)
-                        mark = now
-                        _state.update {
-                            it.copy(
-                                testLines = it.testLines + TranslatorTestLine(source, result, took),
-                                history = it.history + TranslatorHistoryEntry(source, result, now),
-                            )
-                        }
+        _state.update {
+            it.copy(
+                busy = true,
+                testing = true,
+                hardwareReport = false,
+                testLines = emptyList(),
+                input = "",
+                output = "",
+                error = null,
+            )
+        }
+        testJob = viewModelScope.launch {
+            var mark = nowMillis
+            try {
+                assistant.selfTest(TEST_COMMAND) { source, result ->
+                    val now = nowMillis
+                    val took = (now - mark).coerceAtLeast(1L)
+                    mark = now
+                    _state.update {
+                        it.copy(
+                            testLines = it.testLines + TranslatorTestLine(source, result, took),
+                            history = it.history + TranslatorHistoryEntry(source, result, now),
+                        )
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.w(tag = "TranslatorViewModel", throwable = e) { "Translation test failed: ${e.message}" }
-                    _state.update { it.copy(error = TranslatorError.Failed) }
-                } finally {
-                    _state.update { it.copy(busy = false, testing = false) }
-                    withContext(NonCancellable) { persist() }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(tag = "TranslatorViewModel", throwable = e) { "Translation test failed: ${e.message}" }
+                _state.update { it.copy(error = TranslatorError.Failed) }
+            } finally {
+                _state.update { it.copy(busy = false, testing = false) }
+                withContext(NonCancellable) { persist() }
             }
+        }
     }
 
     /** Forgets the translations kept for saving. */
@@ -294,6 +356,16 @@ class TranslatorViewModel(
         private const val SESSION_PREFIX = "tr-"
         private const val TITLE_LENGTH = 48
         private val POLISH_TO_PLAIN =
-            mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
+            mapOf(
+                'ą' to 'a',
+                'ć' to 'c',
+                'ę' to 'e',
+                'ł' to 'l',
+                'ń' to 'n',
+                'ó' to 'o',
+                'ś' to 's',
+                'ź' to 'z',
+                'ż' to 'z',
+            )
     }
 }

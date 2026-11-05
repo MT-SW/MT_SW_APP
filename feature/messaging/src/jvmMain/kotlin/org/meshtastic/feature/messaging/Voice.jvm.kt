@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ktlint:standard:max-line-length")
+
 package org.meshtastic.feature.messaging
 
 import androidx.compose.runtime.Composable
@@ -47,16 +49,16 @@ private class DesktopSpeaker : Speaker {
                 else -> listOf("espeak-ng", "--stdin")
             }
         Thread {
-                try {
-                    val started = ProcessBuilder(command).redirectErrorStream(true).start()
-                    process = started
-                    started.outputStream.use { it.write(clean.toByteArray(Charsets.UTF_8)) }
-                    started.inputStream.readBytes()
-                    started.waitFor()
-                } catch (e: Exception) {
-                    Logger.w(tag = "DesktopSpeaker", throwable = e) { "Reading aloud failed: ${e.message}" }
-                }
+            try {
+                val started = ProcessBuilder(command).redirectErrorStream(true).start()
+                process = started
+                started.outputStream.use { it.write(clean.toByteArray(Charsets.UTF_8)) }
+                started.inputStream.readBytes()
+                started.waitFor()
+            } catch (e: Exception) {
+                Logger.w(tag = "DesktopSpeaker", throwable = e) { "Reading aloud failed: ${e.message}" }
             }
+        }
             .apply {
                 isDaemon = true
                 start()
@@ -94,12 +96,12 @@ private class DesktopMic(private val useHeadset: () -> Boolean) {
         opened.start()
         thread =
             Thread {
-                    val chunk = ByteArray(4096)
-                    while (running && buffer.size() < RATE * 2 * 30) {
-                        val read = opened.read(chunk, 0, chunk.size)
-                        if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
-                    }
+                val chunk = ByteArray(4096)
+                while (running && buffer.size() < RATE * 2 * 30) {
+                    val read = opened.read(chunk, 0, chunk.size)
+                    if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
                 }
+            }
                 .apply {
                     isDaemon = true
                     start()
@@ -125,7 +127,8 @@ private class DesktopMic(private val useHeadset: () -> Boolean) {
             val info = javax.sound.sampled.DataLine.Info(javax.sound.sampled.TargetDataLine::class.java, format)
             val inputs =
                 javax.sound.sampled.AudioSystem.getMixerInfo().filter { mixer ->
-                    runCatching { javax.sound.sampled.AudioSystem.getMixer(mixer).isLineSupported(info) }.getOrDefault(false)
+                    runCatching { javax.sound.sampled.AudioSystem.getMixer(mixer).isLineSupported(info) }
+                        .getOrDefault(false)
                 }
             val text = { m: javax.sound.sampled.Mixer.Info -> (m.name + " " + m.description).lowercase() }
             val pick =
@@ -134,7 +137,8 @@ private class DesktopMic(private val useHeadset: () -> Boolean) {
             if (pick != null) {
                 runCatching {
                     Logger.i(tag = "DesktopMic") { "Dictation records from ${pick.name}" }
-                    return javax.sound.sampled.AudioSystem.getMixer(pick).getLine(info) as javax.sound.sampled.TargetDataLine
+                    return javax.sound.sampled.AudioSystem.getMixer(pick).getLine(info)
+                        as javax.sound.sampled.TargetDataLine
                 }
             }
         }
@@ -150,7 +154,8 @@ private class DesktopMic(private val useHeadset: () -> Boolean) {
 
     private companion object {
         const val RATE = 16_000f
-        val HEADSET = Regex("headset|bluetooth|hands-?free|usb|airpods|buds|słuchawk|jabra|plantronics|poly|bose|sony|jbl")
+        val HEADSET =
+            Regex("headset|bluetooth|hands-?free|usb|airpods|buds|słuchawk|jabra|plantronics|poly|bose|sony|jbl")
         val BUILT_IN = Regex("built-?in|wbudowan|internal|macbook|default|primary|stereo mix|port |line in")
     }
 }

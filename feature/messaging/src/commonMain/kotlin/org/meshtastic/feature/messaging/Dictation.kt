@@ -108,7 +108,9 @@ fun rememberDictation(translator: Boolean = false, onText: (String) -> Unit): Di
                         if (phase == DictationPhase.LISTENING) finish()
                     }
                 }
+
             DictationPhase.LISTENING -> finish()
+
             DictationPhase.WORKING -> Unit
         }
     }

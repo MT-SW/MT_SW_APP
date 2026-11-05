@@ -41,8 +41,9 @@ sealed interface ImageUploadState {
 
 /**
  * Sends a chat picture to the image host and then the link as a message. It lives apart from the screen: a screen that
- * is left (another conversation, a turned phone) used to cancel the sending halfway. A failure is tried again on the next
- * image host (catbox.moe, then litterbox.catbox.moe, then uguu.se) before it is shown, and the progress is a flow the message field reads.
+ * is left (another conversation, a turned phone) used to cancel the sending halfway. A failure is tried again on the
+ * next image host (catbox.moe, then litterbox.catbox.moe, then uguu.se) before it is shown, and the progress is a flow
+ * the message field reads.
  */
 object ChatImageUploader {
     private const val RETRY_DELAY_MS = 2_000L
@@ -58,7 +59,9 @@ object ChatImageUploader {
 
     private class Pending(val bytes: ByteArray, val mimeType: String, val onUploaded: (String) -> Unit)
 
-    /** Starts sending; [onUploaded] gets the link on the main thread when it is done (the caller sends it as a message). */
+    /**
+     * Starts sending; [onUploaded] gets the link on the main thread when it is done (the caller sends it as a message).
+     */
     fun start(bytes: ByteArray, mimeType: String, onUploaded: (String) -> Unit) {
         run(Pending(bytes, mimeType, onUploaded))
     }
@@ -86,20 +89,19 @@ object ChatImageUploader {
     private fun run(pending: Pending) {
         job?.cancel()
         last = pending
-        job =
-            scope.launch {
-                try {
-                    val url = uploadWithRetries(pending.bytes, pending.mimeType)
-                    _state.value = ImageUploadState.Idle
-                    last = null
-                    withContext(Dispatchers.Main) { pending.onUploaded(url) }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.e(throwable = e) { "Image upload failed: ${e.message}" }
-                    _state.value = ImageUploadState.Failed(e.message ?: e::class.simpleName.orEmpty())
-                }
+        job = scope.launch {
+            try {
+                val url = uploadWithRetries(pending.bytes, pending.mimeType)
+                _state.value = ImageUploadState.Idle
+                last = null
+                withContext(Dispatchers.Main) { pending.onUploaded(url) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(throwable = e) { "Image upload failed: ${e.message}" }
+                _state.value = ImageUploadState.Failed(e.message ?: e::class.simpleName.orEmpty())
             }
+        }
     }
 
     private suspend fun uploadWithRetries(bytes: ByteArray, mime: String): String {

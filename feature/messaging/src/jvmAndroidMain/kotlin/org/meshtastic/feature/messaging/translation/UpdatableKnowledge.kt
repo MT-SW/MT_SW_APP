@@ -17,19 +17,19 @@
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
-import java.io.File
-import java.security.MessageDigest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.KnowledgeIndex
 import org.meshtastic.core.repository.UiPrefs
+import java.io.File
+import java.security.MessageDigest
 
 /**
- * Knowledge about the app that can be refreshed from our own repository. It works only while the user has switched
- * the assistant's internet access on; with the switch off nothing is downloaded and the knowledge built into the app
- * is used. Every downloaded file is checked against the SHA-1 that GitHub publishes for it, so a damaged or swapped
- * file is dropped. If anything fails, the built-in knowledge keeps working.
+ * Knowledge about the app that can be refreshed from our own repository. It works only while the user has switched the
+ * assistant's internet access on; with the switch off nothing is downloaded and the knowledge built into the app is
+ * used. Every downloaded file is checked against the SHA-1 that GitHub publishes for it, so a damaged or swapped file
+ * is dropped. If anything fails, the built-in knowledge keeps working.
  */
 class UpdatableKnowledge(
     private val builtIn: AssistantKnowledge,
@@ -72,7 +72,8 @@ class UpdatableKnowledge(
 
     override suspend fun coreFacts(language: String): String {
         val file = File(directory, "project/core.md")
-        val downloaded = withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
+        val downloaded =
+            withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
         val built = builtIn.coreFacts(language)
         if (downloaded.isBlank()) return built
         val fresh = org.meshtastic.core.repository.knowledgeSection(downloaded, language)
@@ -87,9 +88,17 @@ class UpdatableKnowledge(
     override suspend fun latestNews(maxChars: Int): String {
         val built = builtIn.latestNews(maxChars)
         val downloaded = withContext(Dispatchers.IO) { loadIndex() }?.latestNews(maxChars).orEmpty()
-        // The downloaded list is used only when it already has the newest entry of the built-in one (so it is not older).
+        // The downloaded list is used only when it already has the newest entry of the built-in one (so it is not
+        // older).
         val newestBuilt = built.lines().firstOrNull { it.trim().startsWith("•") }?.trim().orEmpty()
-        return if (downloaded.isNotBlank() && (built.isBlank() || (newestBuilt.isNotEmpty() && downloaded.contains(newestBuilt)))) downloaded else built
+        return if (
+            downloaded.isNotBlank() &&
+            (built.isBlank() || (newestBuilt.isNotEmpty() && downloaded.contains(newestBuilt)))
+        ) {
+            downloaded
+        } else {
+            built
+        }
     }
 
     private fun loadIndex(): KnowledgeIndex? {
@@ -97,15 +106,23 @@ class UpdatableKnowledge(
         if (stamp == 0L) return null
         if (stamp == loadedFrom && index != null) return index
         val docs = buildList {
-            File(directory, "docs").listFiles { f -> f.extension == "md" }?.sortedBy { it.name }?.forEach { f ->
-                add(KnowledgeIndex.Document(f.nameWithoutExtension, f.readText()))
-            }
-            File(directory, "project").listFiles { f -> f.extension == "md" }?.sortedBy { it.name }?.forEach { f ->
-                add(KnowledgeIndex.Document("MT_SW ${f.nameWithoutExtension}", f.readText()))
-            }
-            File(directory, "CHANGELOG.md").takeIf { it.exists() }?.let {
-                add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true))
-            }
+            File(directory, "docs")
+                .listFiles { f -> f.extension == "md" }
+                ?.sortedBy { it.name }
+                ?.forEach { f ->
+                    add(KnowledgeIndex.Document(f.nameWithoutExtension, f.readText()))
+                }
+            File(directory, "project")
+                .listFiles { f -> f.extension == "md" }
+                ?.sortedBy { it.name }
+                ?.forEach { f ->
+                    add(KnowledgeIndex.Document("MT_SW ${f.nameWithoutExtension}", f.readText()))
+                }
+            File(directory, "CHANGELOG.md")
+                .takeIf { it.exists() }
+                ?.let {
+                    add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true))
+                }
         }
         index = docs.takeIf { it.isNotEmpty() }?.let { KnowledgeIndex(it) }
         loadedFrom = stamp
@@ -160,7 +177,14 @@ class UpdatableKnowledge(
     ) {
         val sha =
             expectedSha
-                ?: ENTRY_SHA.find(WebAccess.fetch("https://api.github.com/repos/$repo/contents/${apiPath ?: path}", "application/json"))?.groupValues?.get(1)
+                ?: ENTRY_SHA.find(
+                    WebAccess.fetch(
+                        "https://api.github.com/repos/$repo/contents/${apiPath ?: path}",
+                        "application/json",
+                    ),
+                )
+                    ?.groupValues
+                    ?.get(1)
                 ?: error("No hash for $path")
         val bytes = WebAccess.fetchBytes("https://raw.githubusercontent.com/$repo/main/$path")
         check(gitSha(bytes) == sha) { "Hash mismatch for $path" }
@@ -187,8 +211,16 @@ class UpdatableKnowledge(
                 Triple("MT-SW/MT_SW_APP", "knowledge/achievements.md", "achievements"),
                 Triple("MT-SW/MT_SW_FIRMWARE", "README.md", "firmware"),
                 Triple("MT-SW/MT_SW_INTEGRATION", "README.md", "integration"),
-                Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/meshtastic_web/MTSW_WEB_CLIENT.md", "integration-web-client"),
-                Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/ha_frontend/planner/API.md", "integration-planner-api"),
+                Triple(
+                    "MT-SW/MT_SW_INTEGRATION",
+                    "custom_components/meshtastic/meshtastic_web/MTSW_WEB_CLIENT.md",
+                    "integration-web-client",
+                ),
+                Triple(
+                    "MT-SW/MT_SW_INTEGRATION",
+                    "custom_components/meshtastic/ha_frontend/planner/API.md",
+                    "integration-planner-api",
+                ),
             )
         val ENTRY = Regex("\"name\"\\s*:\\s*\"([^\"]+)\"[^{}]*?\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")
         val ENTRY_SHA = Regex("\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")

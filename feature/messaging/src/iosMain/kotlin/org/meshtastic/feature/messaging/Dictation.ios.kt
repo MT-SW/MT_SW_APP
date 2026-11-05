@@ -18,13 +18,10 @@ package org.meshtastic.feature.messaging
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
-import platform.AVFAudio.AVEncoderAudioQualityKey
 import platform.AVFAudio.AVFormatIDKey
 import platform.AVFAudio.AVLinearPCMBitDepthKey
 import platform.AVFAudio.AVLinearPCMIsBigEndianKey
@@ -38,6 +35,8 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.dataWithContentsOfFile
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /** Takes the raw samples out of a WAV file (looks for the "data" block). */
 private fun wavSamples(wav: ByteArray): ByteArray {
@@ -68,14 +67,15 @@ private class IosMic {
         val session = AVAudioSession.sharedInstance()
         session.setCategory(AVAudioSessionCategoryPlayAndRecord, error = null)
         session.setActive(true, error = null)
-        val settings: Map<Any?, Any?> = mapOf(
-            AVFormatIDKey to kAudioFormatLinearPCM.toInt(),
-            AVSampleRateKey to 16000.0,
-            AVNumberOfChannelsKey to 1,
-            AVLinearPCMBitDepthKey to 16,
-            AVLinearPCMIsFloatKey to false,
-            AVLinearPCMIsBigEndianKey to false,
-        )
+        val settings: Map<Any?, Any?> =
+            mapOf(
+                AVFormatIDKey to kAudioFormatLinearPCM.toInt(),
+                AVSampleRateKey to 16000.0,
+                AVNumberOfChannelsKey to 1,
+                AVLinearPCMBitDepthKey to 16,
+                AVLinearPCMIsFloatKey to false,
+                AVLinearPCMIsBigEndianKey to false,
+            )
         val rec = AVAudioRecorder(uRL = NSURL.fileURLWithPath(path), settings = settings, error = null)
         rec.record()
         recorder = rec

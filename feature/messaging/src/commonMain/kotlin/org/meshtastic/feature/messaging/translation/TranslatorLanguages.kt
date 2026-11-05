@@ -19,7 +19,9 @@ package org.meshtastic.feature.messaging.translation
 /** One language the offline translator can work with. [nllb] is the model's own language code. */
 data class TranslatorLanguage(val iso: String, val nllb: String, val polishName: String)
 
-/** The languages offered in the translator (the model knows ~200; these are the ones people on the mesh actually use). */
+/**
+ * The languages offered in the translator (the model knows ~200; these are the ones people on the mesh actually use).
+ */
 object TranslatorLanguages {
     val all: List<TranslatorLanguage> =
         listOf(

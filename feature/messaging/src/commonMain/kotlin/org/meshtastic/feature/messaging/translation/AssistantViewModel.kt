@@ -22,15 +22,15 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.UiPrefs
@@ -38,8 +38,17 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 
 /*  One bubble of the conversation. */
-/** [at] is when a question was sent or an answer received (milliseconds, 0 = not known); [tookMs] is how long an answer took. */
-data class AssistantLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L, val info: String = "")
+/**
+ * [at] is when a question was sent or an answer received (milliseconds, 0 = not known); [tookMs] is how long an answer
+ * took.
+ */
+data class AssistantLine(
+    val fromUser: Boolean,
+    val text: String,
+    val at: Long = 0L,
+    val tookMs: Long = 0L,
+    val info: String = "",
+)
 
 data class AssistantUiState(
     val lines: List<AssistantLine> = emptyList(),
@@ -49,9 +58,15 @@ data class AssistantUiState(
 )
 
 /** The steps of the compatibility test of the assistant, in order. */
-enum class CompatStep { QUESTION, HARDWARE, DICTATION }
+enum class CompatStep {
+    QUESTION,
+    HARDWARE,
+    DICTATION,
+}
 
-/** The compatibility test window: [Idle] nothing, [Asking] the offer, [Running] the test, [Done] the finished package. */
+/**
+ * The compatibility test window: [Idle] nothing, [Asking] the offer, [Running] the test, [Done] the finished package.
+ */
 sealed interface CompatUi {
     data object Idle : CompatUi
 
@@ -102,8 +117,8 @@ class AssistantViewModel(
     }
 
     /**
-     * The test: a very short question, then the hardware report, then the dictation check. The conversation is saved like
-     * any other and all the results are collected into files for the report window.
+     * The test: a very short question, then the hardware report, then the dictation check. The conversation is saved
+     * like any other and all the results are collected into files for the report window.
      */
     fun startCompat() {
         if (_state.value.busy || _compat.value is CompatUi.Running) return
@@ -121,10 +136,16 @@ class AssistantViewModel(
                 send()
                 _state.first { !it.busy }
                 val chat =
-                    _state.value.lines.joinToString("\n\n") { (if (it.fromUser) "> " else "") + it.text + (if (!it.fromUser && it.info.isNotBlank()) "\n[${it.info}]" else "") }
+                    _state.value.lines.joinToString("\n\n") {
+                        (if (it.fromUser) "> " else "") +
+                            it.text +
+                            (if (!it.fromUser && it.info.isNotBlank()) "\n[${it.info}]" else "")
+                    }
                 files += "asystent-rozmowa.txt" to chat.encodeToByteArray()
                 _compat.value = CompatUi.Running(CompatStep.DICTATION)
-                val speech = service.dictationCheck { step -> _compat.value = CompatUi.Running(CompatStep.DICTATION, step) }
+                val speech = service.dictationCheck { step ->
+                    _compat.value = CompatUi.Running(CompatStep.DICTATION, step)
+                }
                 files += "dyktowanie.txt" to speech.encodeToByteArray()
             } catch (e: CancellationException) {
                 throw e
@@ -141,7 +162,10 @@ class AssistantViewModel(
     }
 
     fun refreshSaved() {
-        viewModelScope.launch { _saved.value = runCatching { history.list() }.getOrDefault(emptyList()).filterNot { it.id.startsWith("tr-") } }
+        viewModelScope.launch {
+            _saved.value =
+                runCatching { history.list() }.getOrDefault(emptyList()).filterNot { it.id.startsWith("tr-") }
+        }
     }
 
     fun setInput(value: String) = _state.update { it.copy(input = value) }
@@ -168,54 +192,59 @@ class AssistantViewModel(
         }
         pending.value = ""
         val sentAt = nowMillis
-        _state.update { st -> st.copy(lines = st.lines.dropLast(2) + AssistantLine(true, question, at = sentAt) + st.lines.last()) }
-        val pump =
-            viewModelScope.launch {
-                while (true) {
-                    delay(FLUSH_MS)
-                    flushPieces()
-                }
+        _state.update { st ->
+            st.copy(lines = st.lines.dropLast(2) + AssistantLine(true, question, at = sentAt) + st.lines.last())
+        }
+        val pump = viewModelScope.launch {
+            while (true) {
+                delay(FLUSH_MS)
+                flushPieces()
             }
-        job =
-            viewModelScope.launch {
-                try {
-                    val answer = service.reply(history) { piece -> appendToAnswer(piece) }
-                    flushPieces()
-                    setAnswer(answer)
-                    // The user asked to go somewhere ("show node X on the map"): the app opens it right away.
-                    AssistantActions.parse(answer).second.firstOrNull { it.auto }?.let { action ->
+        }
+        job = viewModelScope.launch {
+            try {
+                val answer = service.reply(history) { piece -> appendToAnswer(piece) }
+                flushPieces()
+                setAnswer(answer)
+                // The user asked to go somewhere ("show node X on the map"): the app opens it right away.
+                AssistantActions.parse(answer)
+                    .second
+                    .firstOrNull { it.auto }
+                    ?.let { action ->
                         SettingHighlight.show(action.highlight)
                         AssistantLinks.open(action.uri)
                     }
-                } catch (e: CancellationException) {
-                    // Stopped by the user: keep what was written so far.
-                    throw e
-                } catch (e: Throwable) {
-                    Logger.w(tag = "AssistantViewModel", throwable = e) { "Assistant failed: ${e.message}" }
-                    _state.update { st ->
-                        val last = st.lines.lastOrNull()
-                        if (last != null && !last.fromUser && last.text.isBlank() && st.lines.size >= 2) {
-                            // Nothing came back: take the question back so it can be sent again.
-                            st.copy(
-                                lines = st.lines.dropLast(2),
-                                input = if (st.input.isBlank()) question else st.input,
-                                failed = true,
-                            )
-                        } else {
-                            st.copy(failed = true)
-                        }
+            } catch (e: CancellationException) {
+                // Stopped by the user: keep what was written so far.
+                throw e
+            } catch (e: Throwable) {
+                Logger.w(tag = "AssistantViewModel", throwable = e) { "Assistant failed: ${e.message}" }
+                _state.update { st ->
+                    val last = st.lines.lastOrNull()
+                    if (last != null && !last.fromUser && last.text.isBlank() && st.lines.size >= 2) {
+                        // Nothing came back: take the question back so it can be sent again.
+                        st.copy(
+                            lines = st.lines.dropLast(2),
+                            input = if (st.input.isBlank()) question else st.input,
+                            failed = true,
+                        )
+                    } else {
+                        st.copy(failed = true)
                     }
-                } finally {
-                    pump.cancel()
-                    flushPieces()
-                    stampAnswer(sentAt)
-                    _state.update { it.copy(busy = false) }
-                    withContext(NonCancellable) { persist() }
                 }
+            } finally {
+                pump.cancel()
+                flushPieces()
+                stampAnswer(sentAt)
+                _state.update { it.copy(busy = false) }
+                withContext(NonCancellable) { persist() }
             }
+        }
     }
 
-    /** The test command typed in [text] with or without Polish letters (/tłumacz = /tlumacz), or null when it is none. */
+    /**
+     * The test command typed in [text] with or without Polish letters (/tłumacz = /tlumacz), or null when it is none.
+     */
     private fun testCommand(text: String): String? {
         val plain = text.trim().lowercase().map { POLISH_TO_PLAIN[it] ?: it }.joinToString("")
         return SELF_TEST_COMMANDS.firstOrNull { it == plain }
@@ -227,30 +256,34 @@ class AssistantViewModel(
      */
     private fun runSelfTest(command: String) {
         _state.update { it.copy(input = "", busy = true, failed = false) }
-        job =
-            viewModelScope.launch {
-                try {
-                    // Every test answer gets its time and the model and route, like an answer in a normal conversation.
-                    var mark = nowMillis
-                    service.selfTest(command) { q, a ->
-                        val now = nowMillis
-                        val took = (now - mark).coerceAtLeast(1L)
-                        mark = now
-                        val info = service.lastInfo
-                        _state.update {
-                            it.copy(lines = it.lines + AssistantLine(true, q, at = now - took) + AssistantLine(false, a, at = now, tookMs = took, info = info))
-                        }
+        job = viewModelScope.launch {
+            try {
+                // Every test answer gets its time and the model and route, like an answer in a normal conversation.
+                var mark = nowMillis
+                service.selfTest(command) { q, a ->
+                    val now = nowMillis
+                    val took = (now - mark).coerceAtLeast(1L)
+                    mark = now
+                    val info = service.lastInfo
+                    _state.update {
+                        it.copy(
+                            lines =
+                            it.lines +
+                                AssistantLine(true, q, at = now - took) +
+                                AssistantLine(false, a, at = now, tookMs = took, info = info),
+                        )
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    Logger.w(tag = "AssistantViewModel", throwable = e) { "Self test failed: ${e.message}" }
-                    _state.update { it.copy(failed = true) }
-                } finally {
-                    _state.update { it.copy(busy = false) }
-                    withContext(NonCancellable) { persist() }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                Logger.w(tag = "AssistantViewModel", throwable = e) { "Self test failed: ${e.message}" }
+                _state.update { it.copy(failed = true) }
+            } finally {
+                _state.update { it.copy(busy = false) }
+                withContext(NonCancellable) { persist() }
             }
+        }
     }
 
     /** Asks the same question again: [index] is a question or the answer under it; the answer is replaced. */
@@ -277,7 +310,9 @@ class AssistantViewModel(
     fun open(chat: StoredChat) {
         job?.cancel()
         chatId = chat.id
-        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text, it.at, it.tookMs, it.info) }) }
+        _state.update {
+            AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text, it.at, it.tookMs, it.info) })
+        }
     }
 
     fun deleteSaved(id: String) {
@@ -294,7 +329,14 @@ class AssistantViewModel(
         val id = chatId ?: nowMillis.toString().also { chatId = it }
         val title = lines.first { it.fromUser }.text.lines().first().take(TITLE_LENGTH)
         runCatching {
-            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text, it.at, it.tookMs, it.info) }))
+            history.save(
+                StoredChat(
+                    id,
+                    title,
+                    nowMillis,
+                    lines.map { StoredLine(it.fromUser, it.text, it.at, it.tookMs, it.info) },
+                ),
+            )
         }
         refreshSaved()
     }
@@ -333,7 +375,17 @@ class AssistantViewModel(
         const val SELF_TEST = "/test"
 
         private val POLISH_TO_PLAIN =
-            mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
+            mapOf(
+                'ą' to 'a',
+                'ć' to 'c',
+                'ę' to 'e',
+                'ł' to 'l',
+                'ń' to 'n',
+                'ó' to 'o',
+                'ś' to 's',
+                'ź' to 'z',
+                'ż' to 'z',
+            )
 
         /** /test runs everything; the others run one group (tools, free chat, knowledge base, hardware report). */
         val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/szybki", "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")

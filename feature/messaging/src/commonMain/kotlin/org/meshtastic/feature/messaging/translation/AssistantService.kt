@@ -19,8 +19,8 @@ package org.meshtastic.feature.messaging.translation
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * The hardware report asked for from the translator screen (the /sprzęt command there): the same report as /sprzet of the
- * assistant, but for the translator's model. It is not typed by the user.
+ * The hardware report asked for from the translator screen (the /sprzęt command there): the same report as /sprzet of
+ * the assistant, but for the translator's model. It is not typed by the user.
  */
 const val TRANSLATOR_HARDWARE_COMMAND = "/sprzet-tlumacza"
 
@@ -46,14 +46,19 @@ interface AssistantService {
     suspend fun dictationCheck(onStep: (String) -> Unit): String = ""
 
     /** The short question the compatibility test asks (in the language of the app). */
-    val compatQuestion: String get() = "Co to jest zasięg LoRa?"
+    val compatQuestion: String
+        get() = "Co to jest zasięg LoRa?"
 
-    /** What the last answer was made with, "model|route", saved with the answer for diagnosis. Empty where not known. */
-    val lastInfo: String get() = ""
+    /**
+     * What the last answer was made with, "model|route", saved with the answer for diagnosis. Empty where not known.
+     */
+    val lastInfo: String
+        get() = ""
 
     /**
      * Asks all test questions one after another and reports each one to [onResult] (question, answer); also prints them
-     * and writes a results file where the platform can. Typed in the chat as /test (everything) or a shorter command (/narzedzia, /rozmowa, /baza, /sprzet); [command] says which. Does nothing where not supported.
+     * and writes a results file where the platform can. Typed in the chat as /test (everything) or a shorter command
+     * (/narzedzia, /rozmowa, /baza, /sprzet); [command] says which. Does nothing where not supported.
      */
     suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {}
 }

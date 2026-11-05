@@ -18,23 +18,6 @@ package org.meshtastic.feature.messaging.ui.translator
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
-import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.repository.FileService
-import org.meshtastic.core.ui.util.rememberSaveFileLauncher
-import org.meshtastic.core.resources.translator_save
-import org.meshtastic.core.resources.translator_info
-import org.meshtastic.core.resources.translator_history_empty
-import org.meshtastic.core.resources.assistant_save_done
-import org.meshtastic.core.resources.assistant_save_failed
-import org.meshtastic.core.resources.translator_export_title
-import org.meshtastic.core.resources.translator_history_clear
-import org.meshtastic.core.resources.translator_history_title
-import org.meshtastic.core.resources.translator_source_label
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,39 +38,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate_working
+import org.meshtastic.core.resources.assistant_save_done
+import org.meshtastic.core.resources.assistant_save_failed
+import org.meshtastic.core.resources.cancel
+import org.meshtastic.core.resources.read_aloud
+import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.core.resources.translator_action
 import org.meshtastic.core.resources.translator_auto
 import org.meshtastic.core.resources.translator_busy
 import org.meshtastic.core.resources.translator_error_failed
 import org.meshtastic.core.resources.translator_error_same
 import org.meshtastic.core.resources.translator_error_unknown
-import org.meshtastic.core.resources.translator_hardware_title
+import org.meshtastic.core.resources.translator_export_title
 import org.meshtastic.core.resources.translator_from
+import org.meshtastic.core.resources.translator_hardware_title
+import org.meshtastic.core.resources.translator_history_clear
+import org.meshtastic.core.resources.translator_history_empty
+import org.meshtastic.core.resources.translator_history_title
+import org.meshtastic.core.resources.translator_info
 import org.meshtastic.core.resources.translator_input_hint
 import org.meshtastic.core.resources.translator_loading_hint
 import org.meshtastic.core.resources.translator_long_warning
 import org.meshtastic.core.resources.translator_model_missing
 import org.meshtastic.core.resources.translator_off
-import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.translator_result
-import org.meshtastic.core.resources.translator_test_title
+import org.meshtastic.core.resources.translator_save
+import org.meshtastic.core.resources.translator_source_label
 import org.meshtastic.core.resources.translator_swap
+import org.meshtastic.core.resources.translator_test_title
 import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.core.resources.assistant_dictate
-import org.meshtastic.core.resources.assistant_dictate_stop
-import org.meshtastic.core.resources.assistant_dictate_working
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.messaging.DictationPhase
-import org.meshtastic.core.resources.read_aloud
-import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.translation.TranslatorError
@@ -103,7 +103,10 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
     val speaker = rememberSpeaker()
     var reading by remember(state.output) { mutableStateOf(false) }
-    val dictation = rememberDictation(translator = true) { text -> viewModel.setInput((viewModel.state.value.input + " " + text).trim()) }
+    val dictation =
+        rememberDictation(translator = true) { text ->
+            viewModel.setInput((viewModel.state.value.input + " " + text).trim())
+        }
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
@@ -225,13 +228,19 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                             }
                             CopyIconButton(
                                 valueToCopy =
-                                state.testLines.joinToString("\n\n") { "${it.source}\n${it.result}\n(${it.tookMs / 1000.0} s)" },
+                                state.testLines.joinToString("\n\n") {
+                                    "${it.source}\n${it.result}\n(${it.tookMs / 1000.0} s)"
+                                },
                             )
                         }
                     }
                     state.testLines.forEach { line ->
                         Column {
-                            Text(text = line.source, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = line.source,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                             Text(text = line.result, style = MaterialTheme.typography.bodyMedium)
                             Text(
                                 text = "${line.tookMs / 100 / 10.0} s",
@@ -297,48 +306,67 @@ private fun TranslatorSaveButton(history: List<TranslatorHistoryEntry>) {
     var saveMenu by remember { mutableStateOf(false) }
     var saveResult by remember { mutableStateOf<String?>(null) }
     var pendingBytes by remember { mutableStateOf<ByteArray?>(null) }
-    val saveLauncher =
-        rememberSaveFileLauncher { uri ->
-            val bytes = pendingBytes
-            if (bytes != null) {
-                scope.launch {
-                    val ok =
-                        try {
-                            fileService.write(uri) { sink -> sink.write(bytes) }
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                            false
-                        }
-                    saveResult = if (ok) savedText else failedText
-                    pendingBytes = null
-                }
+    val saveLauncher = rememberSaveFileLauncher { uri ->
+        val bytes = pendingBytes
+        if (bytes != null) {
+            scope.launch {
+                val ok =
+                    try {
+                        fileService.write(uri) { sink -> sink.write(bytes) }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                        false
+                    }
+                saveResult = if (ok) savedText else failedText
+                pendingBytes = null
             }
         }
+    }
     Box {
-        TextButton(onClick = { saveMenu = true }, enabled = history.isNotEmpty()) { Text(stringResource(Res.string.translator_save)) }
+        TextButton(onClick = { saveMenu = true }, enabled = history.isNotEmpty()) {
+            Text(stringResource(Res.string.translator_save))
+        }
         DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
             ExportFormat.entries.forEach { format ->
                 DropdownMenuItem(
                     text = { Text(format.label) },
                     onClick = {
                         saveMenu = false
-                        val entries =
-                            history.flatMap {
-                                listOf(
-                                    ExportEntry(fromUser = true, text = it.source, note = null, buttons = emptyList(), at = it.at),
-                                    ExportEntry(fromUser = false, text = it.result, note = null, buttons = emptyList(), at = it.at),
-                                )
-                            }
+                        val entries = history.flatMap {
+                            listOf(
+                                ExportEntry(
+                                    fromUser = true,
+                                    text = it.source,
+                                    note = null,
+                                    buttons = emptyList(),
+                                    at = it.at,
+                                ),
+                                ExportEntry(
+                                    fromUser = false,
+                                    text = it.result,
+                                    note = null,
+                                    buttons = emptyList(),
+                                    at = it.at,
+                                ),
+                            )
+                        }
                         val stamp = DateFormatter.formatDateTime(nowMillis)
                         pendingBytes =
                             when (format) {
                                 ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, sourceLabel, resultLabel)
+
                                 ExportFormat.MARKDOWN ->
-                                    AssistantExport.markdown(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
-                                ExportFormat.TEXT -> AssistantExport.text(entries, sourceLabel, resultLabel).encodeToByteArray()
+                                    AssistantExport.markdown(entries, title, stamp, sourceLabel, resultLabel)
+                                        .encodeToByteArray()
+
+                                ExportFormat.TEXT ->
+                                    AssistantExport.text(entries, sourceLabel, resultLabel).encodeToByteArray()
+
                                 ExportFormat.HTML ->
-                                    AssistantExport.html(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
+                                    AssistantExport.html(entries, title, stamp, sourceLabel, resultLabel)
+                                        .encodeToByteArray()
+
                                 ExportFormat.JSON -> AssistantExport.json(entries, title, stamp).encodeToByteArray()
                             }
                         saveResult = null
@@ -370,11 +398,17 @@ private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: ()
             }
             history.takeLast(HISTORY_SHOWN).forEach { entry ->
                 Column {
-                    Text(text = entry.source, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = entry.source,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     Text(text = entry.result, style = MaterialTheme.typography.bodyMedium)
                 }
             }
-            if (history.isNotEmpty()) TextButton(onClick = onClear) { Text(stringResource(Res.string.translator_history_clear)) }
+            if (history.isNotEmpty()) {
+                TextButton(onClick = onClear) { Text(stringResource(Res.string.translator_history_clear)) }
+            }
         }
     }
 }
@@ -390,7 +424,8 @@ private fun LanguagePicker(
     modifier: Modifier = Modifier,
 ) {
     var open by remember { mutableStateOf(false) }
-    val name = selected?.let { TranslatorLanguages.fromNllb(it)?.polishName } ?: stringResource(Res.string.translator_auto)
+    val name =
+        selected?.let { TranslatorLanguages.fromNllb(it)?.polishName } ?: stringResource(Res.string.translator_auto)
     Column(modifier = modifier) {
         Text(text = label, style = MaterialTheme.typography.labelMedium)
         OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) { Text(name) }

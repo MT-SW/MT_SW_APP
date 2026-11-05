@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ktlint:standard:backing-property-naming")
+
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
@@ -23,7 +25,6 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.HttpTimeoutConfig
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.contentLength
 import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +36,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
-import okio.buffer
 import okio.Path.Companion.toPath
+import okio.buffer
 import org.meshtastic.core.repository.AiFileKind
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
@@ -65,7 +66,9 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
     private fun initialStates(): Map<String, TranslatorModelState> =
         AiModels.all
             .filter { it.files.isNotEmpty() }
-            .associate { it.id to (if (isComplete(it.id)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded) }
+            .associate {
+                it.id to (if (isComplete(it.id)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded)
+            }
 
     /** Full path of the main model file when the model is on the device; null otherwise. */
     fun modelPath(id: String): String? {
@@ -92,12 +95,13 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
         }
         jobs[id] = currentCoroutineContext()[Job]!!
         setState(id, TranslatorModelState.Downloading(0f))
-        val client = HttpClient(Darwin) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
-                socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+        val client =
+            HttpClient(Darwin) {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                    socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                }
             }
-        }
         try {
             withContext(Dispatchers.Default) {
                 fs.createDirectories(root / id)
@@ -123,7 +127,12 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
                                 if (n == 0) continue
                                 sink.write(buffer, 0, n)
                                 written += n
-                                setState(id, TranslatorModelState.Downloading(((before + written).toFloat() / total).coerceIn(0f, 0.99f)))
+                                setState(
+                                    id,
+                                    TranslatorModelState.Downloading(
+                                        ((before + written).toFloat() / total).coerceIn(0f, 0.99f)
+                                    ),
+                                )
                             }
                         } finally {
                             sink.close()
@@ -158,5 +167,6 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
         setState(id, TranslatorModelState.NotDownloaded)
     }
 
-    override val loadedModels: StateFlow<Set<String>> get() = _loaded
+    override val loadedModels: StateFlow<Set<String>>
+        get() = _loaded
 }

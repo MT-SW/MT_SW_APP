@@ -47,14 +47,24 @@ import org.meshtastic.feature.messaging.translation.CompatUi
 fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
     when (compat) {
         CompatUi.Idle -> Unit
+
         CompatUi.Asking ->
             AlertDialog(
                 onDismissRequest = { viewModel.declineCompat() },
                 title = { Text(stringResource(Res.string.compat_offer_title)) },
                 text = { Text(stringResource(Res.string.compat_offer_body)) },
-                confirmButton = { TextButton(onClick = { viewModel.startCompat() }) { Text(stringResource(Res.string.compat_offer_yes)) } },
-                dismissButton = { TextButton(onClick = { viewModel.declineCompat() }) { Text(stringResource(Res.string.compat_offer_no)) } },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.startCompat() }) {
+                        Text(stringResource(Res.string.compat_offer_yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.declineCompat() }) {
+                        Text(stringResource(Res.string.compat_offer_no))
+                    }
+                },
             )
+
         is CompatUi.Running ->
             AlertDialog(
                 onDismissRequest = {},
@@ -76,6 +86,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                 },
                 confirmButton = {},
             )
+
         is CompatUi.Done ->
             ReportIssuesDialog(
                 onDismiss = { viewModel.closeCompat() },

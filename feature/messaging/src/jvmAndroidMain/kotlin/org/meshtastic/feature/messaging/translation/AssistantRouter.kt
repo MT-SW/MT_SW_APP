@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ktlint:standard:max-line-length")
+
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
@@ -42,8 +44,8 @@ internal data class AssistantIntent(
 
 /**
  * Understands the question with one short, quick run of the model whose answer is forced into a fixed JSON shape: the
- * model can only pick one of the known kinds of question and fill a few fields, so it cannot write a broken tool call or
- * invent a kind that does not exist. This replaces guessing the topic from fragments of words.
+ * model can only pick one of the known kinds of question and fill a few fields, so it cannot write a broken tool call
+ * or invent a kind that does not exist. This replaces guessing the topic from fragments of words.
  */
 internal class AssistantRouter(private val engine: AiTextEngine) {
 
@@ -59,7 +61,8 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         notes: String = "",
         lastNode: String = "",
     ): AssistantIntent? {
-        // A model that has not once written a usable answer in a row of questions (small ones often do not) is not asked again
+        // A model that has not once written a usable answer in a row of questions (small ones often do not) is not
+        // asked again
         // every time: the word rules decide at once, and it is tried once more after a while.
         if (brokenModel == modelId && failures >= MAX_FAILURES && skipped < RETRY_AFTER) {
             skipped++
@@ -70,13 +73,15 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
             failures = 0
         }
         skipped = 0
-        val ask =
-            buildString {
-                if (notes.isNotBlank()) append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
-                if (lastNode.isNotBlank()) append("Last node talked about: ").append(lastNode.take(LAST_NODE_CHARS)).append('\n')
-                if (conversation.isNotBlank()) append("Conversation so far:\n").append(conversation.takeLast(CONVERSATION_CHARS))
-                append("Question: ").append(question.take(QUESTION_CHARS))
-            }
+        val ask = buildString {
+            if (notes.isNotBlank())
+                append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
+            if (lastNode.isNotBlank())
+                append("Last node talked about: ").append(lastNode.take(LAST_NODE_CHARS)).append('\n')
+            if (conversation.isNotBlank())
+                append("Conversation so far:\n").append(conversation.takeLast(CONVERSATION_CHARS))
+            append("Question: ").append(question.take(QUESTION_CHARS))
+        }
         val raw =
             try {
                 engine.chat(
@@ -84,7 +89,8 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
                     messages = listOf("system" to RULES, "user" to ask),
                     maxTokens = MAX_TOKENS,
                     temperature = TEMPERATURE,
-                    // The forced JSON format of the library is not used: on the graphics chip it left the model's memory
+                    // The forced JSON format of the library is not used: on the graphics chip it left the model's
+                    // memory
                     // locked and the next answers failed. The model writes the JSON well from the examples, and the
                     // code below accepts only known kinds, so a wrong answer only falls back to the old way.
                 )
@@ -109,14 +115,26 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         val start = raw.indexOf('{')
         val end = raw.lastIndexOf('}')
         if (start < 0 || end <= start) return null
-        val obj: JsonObject = runCatching { Json.parseToJsonElement(raw.substring(start, end + 1)).jsonObject }.getOrNull() ?: return null
-        fun text(key: String): String = runCatching { obj[key]?.jsonPrimitive?.contentOrNull }.getOrNull().orEmpty().trim()
+        val obj: JsonObject =
+            runCatching { Json.parseToJsonElement(raw.substring(start, end + 1)).jsonObject }.getOrNull() ?: return null
+        fun text(key: String): String = runCatching {
+            obj[key]?.jsonPrimitive?.contentOrNull
+        }
+            .getOrNull()
+            .orEmpty()
+            .trim()
         val kind = text("intent")
         if (kind !in INTENTS) return null
         fun known(key: String, allowed: List<String>): String = text(key).lowercase().takeIf { it in allowed }.orEmpty()
-        // A summary of "the network" is about the nodes, not about messages; a kind written into a name field is a slip.
+        // A summary of "the network" is about the nodes, not about messages; a kind written into a name field is a
+        // slip.
         val channel = text("channel").takeUnless { it in INTENTS }.orEmpty()
-        if (kind == "summarize" && (text("topic").isNotBlank() || text("channel") in INTENTS || text("channel").lowercase() in NETWORK_WORDS)) {
+        if (
+            kind == "summarize" &&
+                (text("topic").isNotBlank() ||
+                    text("channel") in INTENTS ||
+                    text("channel").lowercase() in NETWORK_WORDS)
+        ) {
             return AssistantIntent(intent = "network_question", topic = "overview")
         }
         return AssistantIntent(
@@ -146,16 +164,49 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
 
         val INTENTS =
             listOf(
-                "chat", "app_help", "open_screen", "show_setting", "show_node_on_map", "nearest_node", "open_link_planner",
-                "draft_message", "count_messages", "search_messages", "summarize", "list_nodes", "signal_list",
-                "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question", "messages_to_me", "web_question",
+                "chat",
+                "app_help",
+                "open_screen",
+                "show_setting",
+                "show_node_on_map",
+                "nearest_node",
+                "open_link_planner",
+                "draft_message",
+                "count_messages",
+                "search_messages",
+                "summarize",
+                "list_nodes",
+                "signal_list",
+                "traceroute",
+                "neighbors",
+                "app_status",
+                "waypoints",
+                "weather",
+                "network_question",
+                "messages_to_me",
+                "web_question",
             )
         val NETWORK_WORDS = setOf("network", "sieć", "siec", "sieci", "mesh", "całą sieć", "cała sieć")
         val ROLES = listOf("any", "router", "repeater", "sensor", "tracker")
         val METRICS =
-            listOf("nearest", "farthest", "snr", "rx", "tx", "dupe", "bad", "heap", "battery", "channel_util", "uptime", "per_channel", "favorites")
+            listOf(
+                "nearest",
+                "farthest",
+                "snr",
+                "rx",
+                "tx",
+                "dupe",
+                "bad",
+                "heap",
+                "battery",
+                "channel_util",
+                "uptime",
+                "per_channel",
+                "favorites",
+            )
         val TOPICS = listOf("node", "radio", "ranking", "settings", "activity", "overview", "other")
-        val PERIODS = listOf("none", "today", "yesterday", "minutes", "hours", "days", "weeks", "months", "years", "all")
+        val PERIODS =
+            listOf("none", "today", "yesterday", "minutes", "hours", "days", "weeks", "months", "years", "all")
 
         private fun enumOf(values: List<String>) = values.joinToString(",", "[", "]") { "\"$it\"" }
 

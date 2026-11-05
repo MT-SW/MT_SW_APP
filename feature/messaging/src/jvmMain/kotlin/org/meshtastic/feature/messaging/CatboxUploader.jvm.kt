@@ -30,7 +30,13 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 
-actual suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: String, host: ImageHost, onProgress: (Float) -> Unit): String {
+actual suspend fun uploadToCatbox(
+    bytes: ByteArray,
+    mimeType: String,
+    fileName: String,
+    host: ImageHost,
+    onProgress: (Float) -> Unit,
+): String {
     // Without limits of its own a slow connection hit the engine's short defaults and the picture stopped part way.
     val client =
         HttpClient(OkHttp) {

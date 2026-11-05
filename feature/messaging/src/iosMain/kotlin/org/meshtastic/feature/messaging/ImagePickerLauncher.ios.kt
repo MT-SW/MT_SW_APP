@@ -21,15 +21,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.PhotosUI.PHPickerViewController
 import platform.PhotosUI.PHPickerConfiguration
 import platform.PhotosUI.PHPickerFilter
 import platform.PhotosUI.PHPickerResult
+import platform.PhotosUI.PHPickerViewController
 import platform.PhotosUI.PHPickerViewControllerDelegateProtocol
 import platform.darwin.NSObject
 
 private class PickerDelegate(var onPicked: (ByteArray, String) -> Unit) :
-    NSObject(), PHPickerViewControllerDelegateProtocol {
+    NSObject(),
+    PHPickerViewControllerDelegateProtocol {
     override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
         picker.dismissViewControllerAnimated(true, completion = null)
         val result = didFinishPicking.firstOrNull() as? PHPickerResult ?: return

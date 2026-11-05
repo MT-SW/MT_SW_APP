@@ -37,7 +37,8 @@ class IosTranslationRouter(
     private val gemma: GemmaTranslator,
     private val store: IosAiModelStore,
     private val uiPrefs: UiPrefs,
-) : MessageTranslationService, TranslatorModelManager {
+) : MessageTranslationService,
+    TranslatorModelManager {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override val state: StateFlow<TranslatorModelState> =
@@ -46,9 +47,11 @@ class IosTranslationRouter(
         }
             .stateIn(scope, SharingStarted.Eagerly, TranslatorModelState.NotDownloaded)
 
-    override val approximateSizeMb: Int get() = activeModel().sizeMb
+    override val approximateSizeMb: Int
+        get() = activeModel().sizeMb
 
-    override val approximateRamMb: Int get() = activeModel().ramMb
+    override val approximateRamMb: Int
+        get() = activeModel().ramMb
 
     override suspend fun isLanguageAvailable(locale: String): Boolean =
         uiPrefs.translatorEnabled.value && TranslatorLanguages.fromLocale(locale) != null

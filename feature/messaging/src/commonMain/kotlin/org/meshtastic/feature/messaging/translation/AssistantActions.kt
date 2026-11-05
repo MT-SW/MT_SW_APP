@@ -33,21 +33,31 @@ data class AssistantAction(
 
 /**
  * The actions travel inside the text of the answer as short marker lines, so they are saved with the conversation and
- * need no extra storage. [parse] cuts them out for display, [strip] removes them before the text goes back to the model.
+ * need no extra storage. [parse] cuts them out for display, [strip] removes them before the text goes back to the
+ * model.
  */
 object AssistantActions {
     private val marker = Regex("""\n?\[\[akcja\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)(\|auto)?(?:\|t=([^|\]]*))?]]""")
 
-    fun encode(action: AssistantAction): String =
-        "\n[[akcja|${clean(action.label)}|${clean(action.uri)}|${clean(action.highlight)}${if (action.auto) "|auto" else ""}" +
-            "${if (action.caption.isNotBlank()) "|t=" + clean(action.caption) else ""}]]"
+    fun encode(action: AssistantAction): String = "\n[[akcja|${clean(
+        action.label,
+    )}|${clean(action.uri)}|${clean(action.highlight)}${if (action.auto) "|auto" else ""}" +
+        "${if (action.caption.isNotBlank()) "|t=" + clean(action.caption) else ""}]]"
 
     /** The text without the markers and the actions found in it (no duplicates, in order). */
     fun parse(text: String): Pair<String, List<AssistantAction>> {
         val actions =
             marker
                 .findAll(text)
-                .map { AssistantAction(it.groupValues[1], it.groupValues[2], it.groupValues[3], it.groupValues[4].isNotEmpty(), it.groupValues[5]) }
+                .map {
+                    AssistantAction(
+                        it.groupValues[1],
+                        it.groupValues[2],
+                        it.groupValues[3],
+                        it.groupValues[4].isNotEmpty(),
+                        it.groupValues[5],
+                    )
+                }
                 .distinct()
                 .toList()
         return strip(text) to actions
@@ -65,7 +75,11 @@ object AssistantActions {
     fun encodeWeb(note: String): String = "\n[[internet|${clean(note)}]]"
 
     fun web(text: String): WebInfo? = webMarker.find(text)?.let {
-        if (it.groups[2] == null) WebInfo(it.groupValues[1].trim(), "", "") else WebInfo("", it.groupValues[1].trim(), it.groupValues[2].trim())
+        if (it.groups[2] == null) {
+            WebInfo(it.groupValues[1].trim(), "", "")
+        } else {
+            WebInfo("", it.groupValues[1].trim(), it.groupValues[2].trim())
+        }
     }
 
     private fun clean(value: String) = value.replace('|', ' ').replace("[[", "(").replace("]]", ")").replace('\n', ' ')

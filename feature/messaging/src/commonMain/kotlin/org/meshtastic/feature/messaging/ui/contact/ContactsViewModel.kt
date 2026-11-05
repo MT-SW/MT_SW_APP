@@ -122,7 +122,8 @@ class ContactsViewModel(
                     contactKey to data
                 }
 
-            // One query each for all conversations (not two per conversation), and one pass over the node list (not one
+            // One query each for all conversations (not two per conversation), and one pass over the node list (not
+            // one
             // per conversation): both used to grow with every conversation on every recalculation.
             val unreadCounts = packetRepository.getUnreadCounts()
             val messageCounts = packetRepository.getMessageCounts()

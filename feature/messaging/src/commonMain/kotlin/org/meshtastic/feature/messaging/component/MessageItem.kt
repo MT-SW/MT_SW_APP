@@ -89,7 +89,6 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
-import kotlin.time.Clock
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -104,11 +103,11 @@ import org.meshtastic.core.model.isAckProofForged
 import org.meshtastic.core.repository.MuteDurations
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.image_preview_loading
-import org.meshtastic.core.resources.image_preview_failed
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
+import org.meshtastic.core.resources.image_preview_failed
+import org.meshtastic.core.resources.image_preview_loading
 import org.meshtastic.core.resources.message_translated_label
 import org.meshtastic.core.resources.mute_1_hour
 import org.meshtastic.core.resources.mute_1_month
@@ -147,11 +146,12 @@ import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
-import org.meshtastic.feature.messaging.isOwnImageHost
 import org.meshtastic.feature.messaging.downloadImageBytes
+import org.meshtastic.feature.messaging.isOwnImageHost
 import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
+import kotlin.time.Clock
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 
@@ -602,7 +602,8 @@ fun MessageItem(
                     var linkImageFailed by remember(linkUrl) { mutableStateOf(false) }
                     var linkImageLoading by remember(linkUrl) { mutableStateOf(true) }
                     var linkImageAttempt by remember(linkUrl) { mutableStateOf(0) }
-                    // A picture of our own image host that does not load is shown as a failure that can be tried again;
+                    // A picture of our own image host that does not load is shown as a failure that can be tried
+                    // again;
                     // any other link is a guess at an image and is quietly hidden when it is none.
                     val ownHost = linkUrl?.let(::isOwnImageHost) == true
                     if (linkUrl != null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
@@ -621,7 +622,8 @@ fun MessageItem(
                         } else {
                             androidx.compose.runtime.key(linkImageAttempt) {
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalPlatformContext.current).data(linkUrl).build(),
+                                    model =
+                                    ImageRequest.Builder(LocalPlatformContext.current).data(linkUrl).build(),
                                     contentDescription = null,
                                     contentScale = ContentScale.Fit,
                                     onLoading = { linkImageLoading = true },
@@ -631,9 +633,12 @@ fun MessageItem(
                                         linkImageFailed = true
                                     },
                                     modifier =
-                                    Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
-                                        fullScreenImageUrl = linkUrl
-                                    },
+                                    Modifier.padding(top = 8.dp)
+                                        .fillMaxWidth()
+                                        .heightIn(max = 240.dp)
+                                        .clickable {
+                                            fullScreenImageUrl = linkUrl
+                                        },
                                 )
                             }
                             if (linkImageLoading && ownHost) {

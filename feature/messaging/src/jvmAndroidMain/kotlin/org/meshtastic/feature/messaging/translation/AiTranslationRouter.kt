@@ -34,8 +34,8 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 
 /**
- * Picks the engine for translation by the model chosen in the settings (NLLB or Gemma) and also answers for that
- * model in the model manager, so the translator screen and message actions follow the choice.
+ * Picks the engine for translation by the model chosen in the settings (NLLB or Gemma) and also answers for that model
+ * in the model manager, so the translator screen and message actions follow the choice.
  */
 class AiTranslationRouter(
     private val nllb: NllbTranslator,
