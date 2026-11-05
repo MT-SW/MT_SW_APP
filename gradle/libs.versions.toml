@@ -4,7 +4,6 @@ xmlutil = "1.0.2.1"
 # Android
 agp = "9.5.0"
 appcompat = "1.8.0"
-appfunctions = "1.0.0-rc01"
 
 # androidx
 androidx-sqlite-bundled = "2.8.0-alpha03"
@@ -70,15 +69,10 @@ jetbrains-adaptive = "1.3.0"
 # 2.8.0–2.8.1). KML is now read by the app's own xmlutil-based converter and that parser is unused, so
 # the pairing — and the canary test that guarded it — is gone. 7.0.0 is load-bearing again: the map's
 # cluster bubbles use DefaultClusterRenderer.showExactCount, which arrived with it.
-android-maps-utils = "7.0.0"
 maplibre-compose = "0.20.0"
 maps-compose = "9.0.1"
 
 # ML Kit
-mlkit-barcode-scanning = "17.3.0"
-mlkit-genai-prompt = "1.0.0-beta5"
-mlkit-language-id = "17.0.6"
-mlkit-translate = "17.0.3"
 
 # CameraX
 camerax = "1.7.0-rc02"
@@ -91,7 +85,6 @@ aboutlibraries = "15.3.0"
 jserialcomm = "2.11.4"
 coil = "3.6.3"
 datadog-gradle = "1.32.0"
-dd-sdk-android = "3.16.0"
 detekt = "2.0.0-alpha.6"
 dokka = "2.3.0-Beta"
 devtools-ksp = "2.3.13"
@@ -132,8 +125,6 @@ xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", v
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.14.0-alpha03" }
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.11.0" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-androidx-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "appfunctions" }
-androidx-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "appfunctions" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
@@ -187,8 +178,6 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 # that ref (stays aligned; Renovate bumps it with the compose group). Requested version-less by
 # maps-compose-widgets (google), declared explicitly so the version propagates to consumers of the
 # app's graph (e.g. :baselineprofile); see androidApp/build.gradle.kts.
-androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-compose-bom-aligned" }
-androidx-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "androidx-compose-bom-aligned" }
 
 # Compose Multiplatform
 compose-multiplatform-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "compose-multiplatform" }
@@ -209,10 +198,6 @@ jetbrains-compose-material3-adaptive-navigation3 = { module = "org.jetbrains.com
 jetbrains-compose-material3-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "compose-multiplatform-material3" }
 
 # Google
-firebase-ai = { module = "com.google.firebase:firebase-ai" }
-firebase-ai-ondevice = { module = "com.google.firebase:firebase-ai-ondevice", version = "16.0.0-beta07" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "35.1.0" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 location-services = { module = "com.google.android.gms:play-services-location", version = "21.4.0" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -221,7 +206,6 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
-android-maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "android-maps-utils" }
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibre-compose" }
 maplibre-compose-material3 = { module = "org.maplibre.compose:maplibre-compose-material3", version.ref = "maplibre-compose" }
 # Android native runtime. 0.15.0 moved Android onto the same maplibre-native FFI stack as desktop,
@@ -239,13 +223,7 @@ maplibre-compose-runtime-vulkan-linux-x64 = { module = "org.maplibre.compose:map
 maplibre-compose-runtime-vulkan-windows-arm64 = { module = "org.maplibre.compose:maplibre-compose-runtime-vulkan-windows-arm64", version.ref = "maplibre-compose" }
 maplibre-compose-runtime-vulkan-windows-x64 = { module = "org.maplibre.compose:maplibre-compose-runtime-vulkan-windows-x64", version.ref = "maplibre-compose" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
-maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "maps-compose" }
 maps-compose-widgets = { module = "com.google.maps.android:maps-compose-widgets", version.ref = "maps-compose" }
-mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
-mlkit-genai-prompt = { module = "com.google.mlkit:genai-prompt", version.ref = "mlkit-genai-prompt" }
-mlkit-language-id = { module = "com.google.mlkit:language-id", version.ref = "mlkit-language-id" }
-mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version = "20.1.0" }
 zxing-core = { module = "com.google.zxing:core", version = "3.5.4" }
 qrcode-kotlin = { module = "io.github.g0dkar:qrcode-kotlin", version.ref = "qrcode-kotlin" }
 
@@ -262,7 +240,6 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-okio", version.ref = "kotlinx-serialization" }
-kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlinx-serialization" }
 # Reads the PMTiles v3 container format (header + directory tree) for the offline terrain extractor and the Google
 # flavor's offline basemap extractor. MIT-licensed; see https://github.com/simonpoole/pmtiles-reader.
 pmtiles-reader = { module = "ch.poole.geo.pmtiles-reader:Reader", version = "0.3.7" }
@@ -300,12 +277,6 @@ coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 
-dd-sdk-android-logs = { module = "com.datadoghq:dd-sdk-android-logs", version.ref = "dd-sdk-android" }
-dd-sdk-android-okhttp = { module = "com.datadoghq:dd-sdk-android-okhttp", version.ref = "dd-sdk-android" }
-dd-sdk-android-rum = { module = "com.datadoghq:dd-sdk-android-rum", version.ref = "dd-sdk-android" }
-dd-sdk-android-session-replay = { module = "com.datadoghq:dd-sdk-android-session-replay", version.ref = "dd-sdk-android" }
-dd-sdk-android-trace = { module = "com.datadoghq:dd-sdk-android-trace", version.ref = "dd-sdk-android" }
-dd-sdk-android-trace-otel = { module = "com.datadoghq:dd-sdk-android-trace-otel", version.ref = "dd-sdk-android" }
 dokka-android-documentation-plugin = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "markdown" }
 markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdownRenderer" }
@@ -387,18 +358,6 @@ wire-runtime = { module = "com.squareup.wire:wire-runtime", version.ref = "wire"
 
 
 # SPIKE: unpublished; resolved from mavenLocal via -PuseMavenLocal.
-
-[bundles]
-# Datadog RUM/telemetry stack — always consumed together (androidApp google flavor)
-dd-sdk-android = [
-    "dd-sdk-android-logs",
-    "dd-sdk-android-okhttp",
-    "dd-sdk-android-rum",
-    "dd-sdk-android-session-replay",
-    "dd-sdk-android-trace",
-    "dd-sdk-android-trace-otel",
-]
-
 
 [plugins]
 # Android
