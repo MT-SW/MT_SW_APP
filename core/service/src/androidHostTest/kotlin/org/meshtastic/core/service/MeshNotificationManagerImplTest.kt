@@ -44,6 +44,7 @@ import org.meshtastic.core.common.state.RadioOperationLock
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
@@ -443,6 +444,8 @@ class MeshNotificationManagerImplTest {
         every { nodeRepository.onlineNodeCount } returns flowOf(online)
         every { nodeRepository.totalNodeCount } returns flowOf(total)
         every { nodeRepository.ourNodeInfo } returns MutableStateFlow<Node?>(null)
+        every { nodeRepository.localStats } returns MutableStateFlow(LocalStats())
+        every { nodeRepository.localStatsExtended } returns MutableStateFlow(LocalStatsExtended())
         every { packetRepository.getUnreadCountTotal() } returns flowOf(unread)
     }
 
