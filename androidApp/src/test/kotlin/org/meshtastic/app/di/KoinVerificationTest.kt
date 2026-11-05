@@ -66,6 +66,9 @@ class KoinVerificationTest {
                     // declared as known types even though they're never resolved from the graph.
                     BleLogLevel::class,
                     BleLogFormat::class,
+                    // AiStorageLocation is built by a factory function with the folders of the AI files; its File
+                    // parameters are introspected but never resolved from the graph.
+                    java.io.File::class,
                     okio.Path::class,
                     okio.FileSystem::class,
                 ),
