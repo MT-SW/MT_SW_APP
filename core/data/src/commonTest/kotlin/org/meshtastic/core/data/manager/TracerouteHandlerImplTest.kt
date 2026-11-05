@@ -33,6 +33,7 @@ import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.core.testing.FakeRadioInterfaceService
 import org.meshtastic.core.testing.FakeServiceRepository
 import org.meshtastic.core.testing.FakeTracerouteSnapshotRepository
+import org.meshtastic.core.testing.TestDataFactory
 import org.meshtastic.proto.Data
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.MeshPacket
@@ -53,6 +54,9 @@ class TracerouteHandlerImplTest {
     private val serviceRepository = FakeServiceRepository()
     private val meshLogRepository = FakeMeshLogRepository()
     private val snapshotRepository = FakeTracerouteSnapshotRepository()
+    // Sniffer guard of the fork: only responses addressed to our own node count, so the test node must be known.
+    private val nodeRepository =
+        FakeNodeRepository().apply { setMyNodeInfo(TestDataFactory.createMyNodeInfo(myNodeNum = LOCAL)) }
     private val session: RadioSessionContext
 
     init {
@@ -69,7 +73,7 @@ class TracerouteHandlerImplTest {
     private fun newHandler() = TracerouteHandlerImpl(
         serviceStateWriter = serviceRepository,
         tracerouteSnapshotRepository = snapshotRepository,
-        nodeRepository = FakeNodeRepository(),
+        nodeRepository = nodeRepository,
         radioInterfaceService = radio,
         meshLogRepository = lazy { meshLogRepository },
         scope = scope.asServiceScope(),
