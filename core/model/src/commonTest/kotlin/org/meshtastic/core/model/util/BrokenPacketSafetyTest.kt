@@ -45,13 +45,13 @@ class BrokenPacketSafetyTest {
     @Test
     fun hugeLengthBeforePortNumGivesZero() {
         // field 2 (length-delimited) with an overflowing length, so the port number tag is never reached.
-        val data = Data(unknownFields = bytes(0x12, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0x01))
+        val data = Data.Builder().apply { addUnknownFields(bytes(0x12, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0x01)) }.build()
         assertEquals(0, data.effectivePortNum())
     }
 
     @Test
     fun portNumStillReadFromUnknownFields() {
-        val data = Data(unknownFields = privatePortNumUnknownFields(ON_DEMAND_PORT_NUM))
+        val data = Data.Builder().apply { addUnknownFields(privatePortNumUnknownFields(ON_DEMAND_PORT_NUM)) }.build()
         assertEquals(ON_DEMAND_PORT_NUM, data.effectivePortNum())
     }
 }

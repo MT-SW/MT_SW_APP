@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.takserver
 
+import org.meshtastic.core.model.util.LocalStatsExtended
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -116,6 +117,10 @@ class TAKMeshIntegrationTest {
         override val totalNodeCount: Flow<Int> = MutableStateFlow(0)
 
         override fun updateLocalStats(stats: LocalStats) {}
+
+        override val localStatsExtended: StateFlow<LocalStatsExtended> = MutableStateFlow(LocalStatsExtended())
+
+        override fun updateLocalStatsExtended(stats: LocalStatsExtended) {}
 
         override fun effectiveLogNodeId(nodeNum: Int): Flow<Int> = MutableStateFlow(0)
 

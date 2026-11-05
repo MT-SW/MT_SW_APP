@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.data.repository
 
+import org.meshtastic.core.testing.FakeLocalStatsExtendedDataSource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -82,6 +83,7 @@ abstract class CommonNodeRepositoryTest {
                 writeDataSource,
                 dispatchers,
                 localStatsDataSource,
+                FakeLocalStatsExtendedDataSource(),
             )
     }
 
@@ -143,6 +145,7 @@ abstract class CommonNodeRepositoryTest {
                     failingWriteDataSource,
                     dispatchers,
                     localStatsDataSource,
+                    FakeLocalStatsExtendedDataSource(),
                 )
 
                 // Coroutine stack-trace recovery may report a copy, so compare what was reported, not identity.

@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.data.manager
 
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -93,6 +94,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
+                meshLogRepository = FakeMeshLogRepository(),
                 adminRequestRegistry = adminRequestRegistry,
                 scope = TestScope().asServiceScope(),
             )
@@ -143,6 +145,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
+                meshLogRepository = FakeMeshLogRepository(),
                 adminRequestRegistry = adminRequestRegistry,
                 scope = TestScope().asServiceScope(),
             )
@@ -670,6 +673,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
+                meshLogRepository = FakeMeshLogRepository(),
                 adminRequestRegistry = adminRequestRegistry,
                 scope = testScope.asServiceScope(),
             )

@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.data.datasource
 
+import org.meshtastic.core.testing.FakeLocalStatsExtendedDataSource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -78,6 +79,7 @@ class NodeDeletionDatabaseSwitchTest {
                 nodeInfoWriteDataSource = writeDataSourceWithoutStartupBackfill,
                 dispatchers = dispatchers,
                 localStatsDataSource = FakeLocalStatsDataSource(),
+                localStatsExtendedDataSource = FakeLocalStatsExtendedDataSource(),
             )
         provider.arm()
     }

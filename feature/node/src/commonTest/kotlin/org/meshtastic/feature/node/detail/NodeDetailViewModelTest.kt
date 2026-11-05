@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.node.detail
 
+import org.meshtastic.core.testing.FakeRadioController
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.answering.returns
@@ -90,6 +91,7 @@ class NodeDetailViewModelTest {
         nodeManagementActions = nodeManagementActions,
         nodeRequestActions = nodeRequestActions,
         queryController = queryController,
+        radioController = FakeRadioController(),
         getNodeDetailsUseCase = getNodeDetailsUseCase,
         packetRepository = packetRepository,
         ensureRemoteAdminSession = ensureRemoteAdminSession,

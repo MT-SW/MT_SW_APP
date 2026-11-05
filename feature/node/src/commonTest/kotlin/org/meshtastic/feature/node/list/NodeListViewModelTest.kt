@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.node.list
 
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.MockMode
@@ -110,6 +111,8 @@ class NodeListViewModelTest {
         radioConfigRepository = radioConfigRepository,
         connectionStateProvider = connectionStateProvider,
         adminController = radioController,
+        messagingController = radioController,
+        meshLogRepository = FakeMeshLogRepository(),
         radioInterfaceService = radioInterfaceService,
         deviceHardwareRepository = FakeDeviceHardwareRepository(),
         nodeManagementActions = nodeManagementActions,

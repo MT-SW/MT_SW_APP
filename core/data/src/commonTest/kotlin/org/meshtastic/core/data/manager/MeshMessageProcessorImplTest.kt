@@ -831,7 +831,8 @@ class MeshMessageProcessorImplTest {
 
         verifySuspend { meshLogRepository.insert(any()) }
         verifySuspend(mode = VerifyMode.exactly(0)) { serviceRepository.emitMeshPacket(any()) }
-        verifySuspend(mode = VerifyMode.exactly(0)) { nodeManager.updateNodeAndPersist(any(), any(), any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { nodeManager.updateNode(any(), any(), any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { nodeManager.updateNodeForSession(any(), any(), any(), any()) }
         verifySuspend(mode = VerifyMode.exactly(0)) {
             dataHandler.handleReceivedData(any(), any(), any(), any(), any())
         }
