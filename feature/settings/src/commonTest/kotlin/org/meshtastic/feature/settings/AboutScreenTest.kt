@@ -26,16 +26,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
-import org.meshtastic.core.ui.theme.AppTheme
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.meshtastic.core.ui.util.SnackbarManager
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.util.SnackbarManager
 
 @OptIn(ExperimentalTestApi::class)
 class AboutScreenTest {
@@ -72,12 +72,12 @@ class AboutScreenTest {
         // What is MT_SW section
         onNodeWithText("What is MT_SW?").assertIsDisplayed()
         onNodeWithText(
-            "MT_SW is an app and a community around an open LoRa mesh network that works without the internet or " +
-                "base stations: radios pass messages on from node to node. The app extends the original with a link " +
-                "planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node " +
-                "list and many more settings. We build it together with the local community of the Świętokrzyskie " +
-                "region, and anyone can join.",
-        )
+                "MT_SW is an app and a community around an open LoRa mesh network that works without the internet or " +
+                    "base stations: radios pass messages on from node to node. The app extends the original with a link " +
+                    "planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node " +
+                    "list and many more settings. We build it together with the local community of the Świętokrzyskie " +
+                    "region, and anyone can join."
+            )
             .performScrollTo()
             .assertIsDisplayed()
 
@@ -85,9 +85,9 @@ class AboutScreenTest {
         onNodeWithText("Apps").assertIsDisplayed()
         onNodeWithText("Need Hardware?").performScrollTo().assertIsDisplayed()
         onNodeWithText(
-            "MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation " +
-                "and the project website explain how to choose the hardware and set it up.",
-        )
+                "MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation " +
+                    "and the project website explain how to choose the hardware and set it up."
+            )
             .performScrollTo()
             .assertIsDisplayed()
         onNodeWithText("GitHub Repository").performScrollTo().assertIsDisplayed()
@@ -104,9 +104,9 @@ class AboutScreenTest {
         // Copyright footer
         onNodeWithText("Meshtastic® Copyright Meshtastic LLC").performScrollTo().assertIsDisplayed()
         onNodeWithText(
-            "Free software under the GNU General Public License v3, with no warranty. " +
-                "You may redistribute it under the same license.",
-        )
+                "Free software under the GNU General Public License v3, with no warranty. " +
+                    "You may redistribute it under the same license."
+            )
             .performScrollTo()
             .assertIsDisplayed()
 

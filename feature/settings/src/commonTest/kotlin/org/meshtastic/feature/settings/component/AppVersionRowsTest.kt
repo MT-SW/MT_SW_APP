@@ -23,10 +23,10 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
-import org.meshtastic.core.ui.theme.AppTheme
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.SnackbarManager
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
