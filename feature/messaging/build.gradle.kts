@@ -74,7 +74,11 @@ kotlin {
 
         commonTest.dependencies { implementation(libs.compose.multiplatform.ui.test) }
 
-        jvmTest.dependencies { implementation(compose.desktop.currentOs) }
+        jvmTest.dependencies {
+            implementation(compose.desktop.currentOs)
+            // Lifecycle-aware collection in the screens needs a Main dispatcher, which the desktop UI tests lack.
+            implementation(libs.kotlinx.coroutines.swing)
+        }
     }
 }
 
