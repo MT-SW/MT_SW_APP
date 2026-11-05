@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -120,6 +121,8 @@ class ContactsSelectionToolbarTest {
                 )
             }
         }
+        // Rows arrive from a flow combined on the Main dispatcher, so wait for the list rather than assume it.
+        waitUntil(timeoutMillis = 10_000) { onAllNodesWithText(CHANNEL_NAME).fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText(CHANNEL_NAME).performTouchInput { longClick() }
         waitForIdle()
     }
