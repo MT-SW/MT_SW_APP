@@ -193,14 +193,14 @@ class LlamaAssistantService(
                             "(NPU skipped).",
                     )
                     uiPrefs.setAiSkipNpu(true)
-                    unloadModels()
+                    store.unloadModels()
                     kotlinx.coroutines.delay(SKIP_NPU_SETTLE_MS)
                     val second = selfTestRun(command, onResult, label = "graphics-card")
                     if (second != null) onResult(command, comparison(first, second))
                 } finally {
                     uiPrefs.setAiSkipNpu(skipBefore)
                     kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
-                        unloadModels()
+                        store.unloadModels()
                     }
                 }
             }
