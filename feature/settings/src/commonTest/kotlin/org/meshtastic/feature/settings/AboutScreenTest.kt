@@ -110,7 +110,7 @@ class AboutScreenTest {
             .performScrollTo()
             .assertIsDisplayed()
 
-        onNodeWithText("Acknowledgements").performClick()
+        onNodeWithText("Acknowledgements").performScrollTo().performClick()
         assertTrue(navigatedToAcknowledgements)
 
         onNodeWithContentDescription("Navigate Back").performClick()
