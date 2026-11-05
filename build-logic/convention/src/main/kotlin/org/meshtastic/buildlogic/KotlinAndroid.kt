@@ -243,8 +243,9 @@ internal fun Project.configureKmpTestDependencies() {
     // (rather than on the dependency notation itself) is required here: a version-catalog accessor
     // (`libs.foo`) resolves to an immutable "minimal" dependency, and Gradle throws
     // "Minimal dependencies are immutable" if you try to call exclude()/get().exclude() on it directly.
+    // Only the iOS test configurations: the JVM and Android tests parse XML (CoT, KML) and need xmlutil at run time.
     configurations.configureEach {
-        if (name.contains("Test")) {
+        if (name.contains("Test") && name.contains("ios", ignoreCase = true)) {
             exclude(mapOf("group" to "io.github.pdvrieze.xmlutil"))
         }
     }
