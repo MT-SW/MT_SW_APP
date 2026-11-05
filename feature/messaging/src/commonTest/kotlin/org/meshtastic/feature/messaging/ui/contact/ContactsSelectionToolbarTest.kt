@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.messaging.ui.contact
 
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
+import org.meshtastic.feature.messaging.startMessagingTestKoin
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -72,6 +74,7 @@ class ContactsSelectionToolbarTest {
 
     @BeforeTest
     fun setUp() {
+        startMessagingTestKoin()
         Dispatchers.setMain(UnconfinedTestDispatcher())
         nodeRepository.setMyNodeInfo(TestDataFactory.createMyNodeInfo())
         every { connectionStateProvider.connectionState } returns MutableStateFlow(ConnectionState.Disconnected)
@@ -87,6 +90,7 @@ class ContactsSelectionToolbarTest {
 
     @AfterTest
     fun tearDown() {
+        stopMessagingTestKoin()
         Dispatchers.resetMain()
     }
 

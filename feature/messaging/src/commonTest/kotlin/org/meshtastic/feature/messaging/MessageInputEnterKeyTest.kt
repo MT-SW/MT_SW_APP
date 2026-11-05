@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.messaging
 
+import kotlin.test.BeforeTest
+import kotlin.test.AfterTest
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -40,6 +42,10 @@ import kotlin.test.assertTrue
  */
 @OptIn(ExperimentalTestApi::class)
 class MessageInputEnterKeyTest {
+
+    @BeforeTest fun startKoinForTest() = startMessagingTestKoin()
+
+    @AfterTest fun stopKoinAfterTest() = stopMessagingTestKoin()
 
     @Test
     fun enterSendsAndLeavesTheTextAlone() = runComposeUiTest {

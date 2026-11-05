@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.messaging
 
+import kotlin.test.BeforeTest
+import kotlin.test.AfterTest
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
@@ -47,6 +49,10 @@ import kotlin.test.assertEquals
  */
 @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
 class MessageInputImeSessionTest {
+
+    @BeforeTest fun startKoinForTest() = startMessagingTestKoin()
+
+    @AfterTest fun stopKoinAfterTest() = stopMessagingTestKoin()
 
     private fun candidates(longName: String): ImmutableMap<String, MentionCandidate> =
         persistentMapOf(NODE_ID to MentionCandidate(id = NODE_ID, longName = longName, shortName = "ALP"))

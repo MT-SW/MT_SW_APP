@@ -16,6 +16,10 @@
  */
 package org.meshtastic.feature.messaging.component
 
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
+import org.meshtastic.feature.messaging.startMessagingTestKoin
+import kotlin.test.BeforeTest
+import kotlin.test.AfterTest
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +60,10 @@ import kotlin.test.assertNull
  */
 @OptIn(ExperimentalTestApi::class)
 class QuickReactionsDismissTest {
+
+    @BeforeTest fun startKoinForTest() = startMessagingTestKoin()
+
+    @AfterTest fun stopKoinAfterTest() = stopMessagingTestKoin()
 
     private val node: Node = NodePreviewParameterProvider().minnieMouse
 

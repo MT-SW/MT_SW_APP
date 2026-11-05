@@ -16,6 +16,10 @@
  */
 package org.meshtastic.feature.messaging.component
 
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
+import org.meshtastic.feature.messaging.startMessagingTestKoin
+import kotlin.test.BeforeTest
+import kotlin.test.AfterTest
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -41,6 +45,10 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalTestApi::class)
 class MessageItemTest {
+
+    @BeforeTest fun startKoinForTest() = startMessagingTestKoin()
+
+    @AfterTest fun stopKoinAfterTest() = stopMessagingTestKoin()
 
     @Test
     fun mqttIconIsDisplayedWhenViaMqttIsTrue() = runComposeUiTest {
