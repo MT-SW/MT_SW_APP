@@ -19,6 +19,7 @@ targets:
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
         MTSWAppStoreBuild: $(MTSW_APP_STORE_BUILD)
+        ITSAppUsesNonExemptEncryption: false
         NSLocalNetworkUsageDescription: "MT_SW łączy się z radiem LoRa (mesh) przez Wi-Fi w sieci lokalnej."
         NSBonjourServices:
           - _meshtastic._tcp

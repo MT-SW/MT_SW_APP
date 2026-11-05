@@ -36,3 +36,6 @@ EN: The `MTSWApp/PrivacyInfo.xcprivacy` privacy manifest is part of the app. App
 
 PL: Wersja do App Store: Apple nie pozwala na link do zbiórki (Ko-fi) w aplikacji, więc przy `IPA_APP_STORE=YES ./scripts/build-ios-ipa.sh` sekcja „Wesprzyj projekt" jest ukryta (także w wyszukiwarce ustawień). Zwykły `.ipa` (AltStore/Sideloadly) i pozostałe platformy mają ją bez zmian. Link do Ko-fi umieść w opisie i w adresie wsparcia w App Store Connect.
 EN: App Store build: Apple does not allow a donation link (Ko-fi) inside the app, so with `IPA_APP_STORE=YES ./scripts/build-ios-ipa.sh` the "Support the project" section is hidden (also in settings search). The plain `.ipa` (AltStore/Sideloadly) and all other platforms keep it. Put the Ko-fi link in the description and the support URL in App Store Connect.
+
+PL: Szyfrowanie: w `Info.plist` jest `ITSAppUsesNonExemptEncryption = false` (aplikacja używa tylko standardowych, jawnych algorytmów), więc App Store Connect nie pyta o to przy każdej wersji. To deklaracja wysyłającego aplikację; przy wysyłce do sklepu sprawdź ją jeszcze raz.
+EN: Encryption: `Info.plist` has `ITSAppUsesNonExemptEncryption = false` (the app uses only standard, public algorithms), so App Store Connect does not ask about it for every build. It is a declaration by whoever submits the app; check it again before submitting to the store.
