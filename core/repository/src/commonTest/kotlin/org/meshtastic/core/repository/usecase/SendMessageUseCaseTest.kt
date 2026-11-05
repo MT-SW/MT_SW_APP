@@ -107,7 +107,7 @@ class SendMessageUseCaseTest {
         useCase("Hello", "0${NodeAddress.ID_BROADCAST}", null)
 
         // Assert
-        verify { analytics.trackAction("message_send", mapOf("num_bytes" to 5, "is_reply" to false)) }
+        verify { analytics.trackAction("message_send", mapOf("num_bytes" to 5, "is_reply" to false, "split_parts" to 1)) }
     }
 
     @Test
@@ -144,37 +144,6 @@ class SendMessageUseCaseTest {
         outcome shouldBe SendMessageOutcome.Refused
         verifySuspend(VerifyMode.exactly(0)) { packetRepository.savePacket(any(), any(), any(), any(), any(), any()) }
         verifySuspend(VerifyMode.exactly(0)) { messageQueue.enqueue(any()) }
-    }
-
-    @Test
-    fun `cancellation while sharing the contact propagates and nothing is queued`() = runTest {
-        setUpDirectMessage(firmwareVersion = "2.7.12")
-        radioController.sendSharedContactFailure = CancellationException("scope closed")
-
-        assertFailsWith<CancellationException> { useCase("Direct message", "!dest", null) }
-
-        verifySuspend(VerifyMode.exactly(0)) { messageQueue.enqueue(any()) }
-    }
-
-    @Test
-    fun `cancellation while favoriting propagates and nothing is queued`() = runTest {
-        setUpDirectMessage(firmwareVersion = "2.0.0")
-        radioController.setFavoriteFailure = CancellationException("scope closed")
-
-        assertFailsWith<CancellationException> { useCase("Direct message", "!dest", null) }
-
-        verifySuspend(VerifyMode.exactly(0)) { messageQueue.enqueue(any()) }
-    }
-
-    @Test
-    fun `a failed contact share still queues the message`() = runTest {
-        setUpDirectMessage(firmwareVersion = "2.7.12")
-        radioController.sendSharedContactFailure = RuntimeException("radio down")
-
-        val outcome = useCase("Direct message", "!dest", null)
-
-        assertIs<SendMessageOutcome.Queued>(outcome)
-        verifySuspend { messageQueue.enqueue(any()) }
     }
 
     @Test
@@ -258,7 +227,7 @@ class SendMessageUseCaseTest {
     }
 
     @Test
-    fun `invoke with direct message to older firmware triggers favoriteNode`() = runTest {
+    fun `invoke with direct message to older firmware does not favorite the node (disabled in the fork)`() = runTest {
         // Arrange
         val ourNode =
             Node(
@@ -283,12 +252,11 @@ class SendMessageUseCaseTest {
         useCase("Direct message", "!dest", null)
 
         // Assert
-        radioController.favoritedNodes.size shouldBe 1
-        radioController.favoritedNodes[0] shouldBe 12345
+        radioController.favoritedNodes.size shouldBe 0
     }
 
     @Test
-    fun `invoke with direct message to new firmware triggers sendSharedContact`() = runTest {
+    fun `invoke with direct message to new firmware does not share the contact (disabled in the fork)`() = runTest {
         // Arrange
         val ourNode =
             Node(
@@ -313,8 +281,7 @@ class SendMessageUseCaseTest {
         useCase("Direct message", "!dest", null)
 
         // Assert
-        radioController.sentSharedContacts.size shouldBe 1
-        radioController.sentSharedContacts[0] shouldBe 67890
+        radioController.sentSharedContacts.size shouldBe 0
     }
 
     @Test
@@ -334,7 +301,7 @@ class SendMessageUseCaseTest {
     }
 
     @Test
-    fun `invoke with PKI DM triggers sendSharedContact`() = runTest {
+    fun `invoke with PKI DM does not share the contact (disabled in the fork)`() = runTest {
         // Arrange: PKI DMs use contactKey = "8!nodeHex" (PKC_CHANNEL_INDEX = 8)
         val ourNode =
             Node(
@@ -358,9 +325,8 @@ class SendMessageUseCaseTest {
         // Act — PKI DM: channel 8 + node ID
         useCase("PKI direct message", "${NodeAddress.PKC_CHANNEL_INDEX}!70fdde9b", null)
 
-        // Assert — sendSharedContact should be called for PKI DMs
-        radioController.sentSharedContacts.size shouldBe 1
-        radioController.sentSharedContacts[0] shouldBe 0x70fdde9b.toInt()
+        // Assert — sharing the contact on a PKI DM is switched off in this fork
+        radioController.sentSharedContacts.size shouldBe 0
         radioController.favoritedNodes.size shouldBe 0
     }
 
