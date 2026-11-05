@@ -405,6 +405,10 @@ class BleRadioTransport(
         val state =
             bleConnection.connectAndAwait(device, if (waitsPending) PENDING_CONNECT_TIMEOUT else CONNECTION_TIMEOUT)
 
+        if (waitsPending) {
+            // For the logs sent in after a night: shows whether the system finished the pending request.
+            Logger.i { "[${address.anonymize()}] Pending connection request ended: $state" }
+        }
         if (state !is BleConnectionState.Connected) {
             throw RadioNotConnectedException("Failed to connect to device at address ${address.anonymize()}")
         }
