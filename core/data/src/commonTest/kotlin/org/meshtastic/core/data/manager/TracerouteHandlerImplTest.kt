@@ -85,10 +85,10 @@ class TracerouteHandlerImplTest {
         withContext(Dispatchers.Default) { withTimeout(TIMEOUT_MS) { job.children.toList().joinAll() } }
     }
 
-    private fun response(requestId: Int, from: Int = REMOTE) = MeshPacket.Builder()
+    private fun response(requestId: Int, from: Int = REMOTE, to: Int = LOCAL) = MeshPacket.Builder()
         .also { wb ->
             wb.from = from
-            wb.to = LOCAL
+            wb.to = to
             wb.hop_start = 3
             wb.decoded =
                 Data.Builder()
@@ -184,6 +184,17 @@ class TracerouteHandlerImplTest {
     }
 
     @Test
+    fun `a response addressed to another node is recorded as observed and raises no alert`() = runTest {
+        val handler = newHandler()
+        handler.recordStartTime(REQUEST_ID, REMOTE)
+
+        handler.handleAndSettle(response(REQUEST_ID, to = OTHER_NODE))
+
+        assertNull(serviceRepository.tracerouteResponse.value)
+        assertEquals(REQUEST_ID, snapshotRepository.lastRequestId("response-log"))
+    }
+
+    @Test
     fun `after a restart a response whose request row exists still raises the alert`() = runTest {
         // The request was sent and logged by a previous process, so this handler's timer never saw it.
         meshLogRepository.setLogs(listOf(requestLog(REQUEST_ID)))
@@ -208,6 +219,7 @@ class TracerouteHandlerImplTest {
         const val LOCAL = 1
         const val REMOTE = 2
         const val RELAY = 3
+        const val OTHER_NODE = 9
         const val SNR = 20
         const val REQUEST_ID = 4242
         const val OTHER_REQUEST_ID = 77

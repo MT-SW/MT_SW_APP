@@ -97,10 +97,10 @@ class TracerouteHandlerImpl(
         logInsertJob: Job?,
         session: RadioSessionContext,
     ) {
-        // Sniffer mode can deliver traceroute responses addressed to other nodes; only ones addressed
-        // to us are a genuine response to our own request, so ignore anything sniffed from others.
+        // Sniffer mode can deliver traceroute responses addressed to other nodes. They are recorded as observed
+        // (map snapshot, history) like any other, but only a response addressed to us can answer our own request.
         val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
-        if (myNodeNum == null || packet.to != myNodeNum) return
+        val addressedToUs = myNodeNum != null && packet.to == myNodeNum
 
         // Decode the route discovery once — avoids triple protobuf decode.
         val routeDiscovery = packet.fullRouteDiscovery ?: return
@@ -126,7 +126,7 @@ class TracerouteHandlerImpl(
 
             // A response we did not ask for (a trace started on the radio's screen, another client) is recorded in
             // history as observed and raises no alert.
-            if (!isOurRequest(requestId, packet.from)) {
+            if (!addressedToUs || !isOurRequest(requestId, packet.from)) {
                 Logger.d { "Traceroute response $requestId was not requested by this app; recorded as observed" }
                 return@launchSessionWork
             }
