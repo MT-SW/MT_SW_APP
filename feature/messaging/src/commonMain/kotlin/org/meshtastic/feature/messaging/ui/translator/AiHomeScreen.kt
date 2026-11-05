@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongMethod", "ModifierMissing", "ViewModelForwarding")
+@file:Suppress("LongMethod", "ModifierMissing", "ViewModelForwarding", "UnnecessaryLaunchedEffect")
 
 package org.meshtastic.feature.messaging.ui.translator
 

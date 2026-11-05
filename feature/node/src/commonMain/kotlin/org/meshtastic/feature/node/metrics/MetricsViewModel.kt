@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("InjectDispatcher")
+
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.layout.Column

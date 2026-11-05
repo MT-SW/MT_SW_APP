@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress("TooGenericExceptionCaught", "TooManyFunctions", "NoNameShadowing", "SuspendFunSwallowedCancellation")
 
 package org.meshtastic.feature.messaging.translation
 

@@ -14,7 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LoopWithTooManyJumpStatements", "ReturnCount", "TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress(
+    "LoopWithTooManyJumpStatements",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "ImplicitDefaultLocale",
+    "InjectDispatcher",
+)
 
 package org.meshtastic.feature.messaging.translation
 

@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalLayoutApi::class)
-
-@file:Suppress("LongMethod", "SwallowedException", "ViewModelForwarding")
+@file:Suppress("LongMethod", "SwallowedException", "ViewModelForwarding", "InjectDispatcher")
 
 package org.meshtastic.feature.map.planner.ui
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ReturnCount")
+@file:Suppress("ReturnCount", "VarsWithoutStateBacking")
 
 package org.meshtastic.feature.messaging
 

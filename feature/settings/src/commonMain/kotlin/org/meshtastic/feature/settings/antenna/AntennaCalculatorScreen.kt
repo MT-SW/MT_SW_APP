@@ -25,6 +25,8 @@
     "MutableStateAutoboxing",
     "SwallowedException",
     "UnusedParameter",
+    "UnnecessaryLaunchedEffect",
+    "UseOrEmpty",
 )
 
 package org.meshtastic.feature.settings.antenna

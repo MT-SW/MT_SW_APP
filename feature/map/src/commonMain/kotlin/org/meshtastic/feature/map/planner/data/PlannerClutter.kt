@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "ReturnCount")
+@file:Suppress("MagicNumber", "ReturnCount", "UseOrEmpty")
 
 package org.meshtastic.feature.map.planner.data
 

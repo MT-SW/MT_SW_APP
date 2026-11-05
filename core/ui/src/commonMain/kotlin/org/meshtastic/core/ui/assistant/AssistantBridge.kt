@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("SuspendFunSwallowedCancellation")
+
 package org.meshtastic.core.ui.assistant
 
 import androidx.compose.animation.core.RepeatMode

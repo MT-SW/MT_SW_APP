@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ReturnCount", "TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress(
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "SuspendFunSwallowedCancellation",
+    "UnusedPrivateProperty",
+)
 
 package org.meshtastic.feature.messaging.translation
 

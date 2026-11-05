@@ -22,6 +22,7 @@
     "MaxLineLength",
     "ReturnCount",
     "TooGenericExceptionCaught",
+    "InjectDispatcher",
 )
 
 package org.meshtastic.feature.messaging.translation

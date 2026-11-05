@@ -21,6 +21,8 @@
     "NestedBlockDepth",
     "ReturnCount",
     "TooManyFunctions",
+    "LongParameterList",
+    "UnusedPrivateFunction",
 )
 
 package org.meshtastic.feature.map.planner

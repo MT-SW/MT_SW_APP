@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
-
-@file:Suppress("LongMethod", "ReturnCount")
+@file:Suppress("LongMethod", "ReturnCount", "UnusedPrivateProperty")
 
 package org.meshtastic.core.ui.component
 

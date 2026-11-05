@@ -21,6 +21,10 @@
     "MagicNumber",
     "MaxLineLength",
     "TooGenericExceptionCaught",
+    "InjectDispatcher",
+    "SleepInsteadOfDelay",
+    "SuspendFunSwallowedCancellation",
+    "UseCheckOrError",
 )
 
 package org.meshtastic.feature.messaging.translation

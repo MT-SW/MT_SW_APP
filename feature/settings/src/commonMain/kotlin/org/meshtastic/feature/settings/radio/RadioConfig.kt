@@ -14,7 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ComposableParamOrder", "LambdaParameterInRestartableEffect", "ParameterNaming")
+@file:Suppress(
+    "ComposableParamOrder",
+    "LambdaParameterInRestartableEffect",
+    "ParameterNaming",
+    "UnnecessaryLaunchedEffect",
+)
 
 package org.meshtastic.feature.settings.radio
 

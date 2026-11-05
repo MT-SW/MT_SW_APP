@@ -14,7 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongMethod", "ReturnCount", "SwallowedException", "TooManyFunctions")
+@file:Suppress(
+    "LongMethod",
+    "ReturnCount",
+    "SwallowedException",
+    "TooManyFunctions",
+    "LongParameterList",
+    "UnusedPrivateProperty",
+)
 
 package org.meshtastic.feature.map.horizon
 

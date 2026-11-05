@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "NestedBlockDepth", "ReturnCount", "TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress(
+    "MagicNumber",
+    "NestedBlockDepth",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "InjectDispatcher",
+    "SuspendFunSwallowedCancellation",
+)
 
 package org.meshtastic.feature.messaging.translation
 

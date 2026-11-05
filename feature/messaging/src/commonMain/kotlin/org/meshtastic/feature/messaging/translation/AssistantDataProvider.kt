@@ -36,14 +36,16 @@
     "VariableNaming",
     "Wrapping",
     "ktlint:standard:property-naming",
+    "LongParameterList",
+    "RedundantSuspendModifier",
+    "SuspendFunSwallowedCancellation",
+    "UnsafeCallOnNullableType",
+    "UseOrEmpty",
 )
 
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
-import kotlin.concurrent.Volatile
-import kotlin.math.pow
-import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.offsetAt
@@ -185,6 +187,9 @@ import org.meshtastic.core.resources.ai_wp_none
 import org.meshtastic.core.resources.ai_wp_title
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
+import kotlin.concurrent.Volatile
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /**
  * Gives the assistant READ-ONLY access to what the app knows: the own node, the radio statistics and their trend, the
@@ -315,7 +320,7 @@ class AssistantDataProvider(
                 return ok(
                     safe("count") {
                         messageCountReport(channel, window ?: Win(0L, Long.MAX_VALUE, Res.string.ai_win_all))
-                    }
+                    },
                 )
             }
         }
@@ -325,8 +330,11 @@ class AssistantDataProvider(
         // 4. Routes and neighbours.
         if (q.hasAny(ROUTE_WORDS)) {
             val who = mentionedName
-            return if (q.hasAny(NEIGHBOUR_WORDS)) ok(safe("neighbors") { toolNeighbors(who, TRACE_SHOWN) })
-            else ok(safe("traceroute") { toolTraceroutes(who, TRACE_SHOWN) })
+            return if (q.hasAny(NEIGHBOUR_WORDS)) {
+                ok(safe("neighbors") { toolNeighbors(who, TRACE_SHOWN) })
+            } else {
+                ok(safe("traceroute") { toolTraceroutes(who, TRACE_SHOWN) })
+            }
         }
         val aboutNodes = q.hasAny(NODE_WORDS) || q.hasAny(ROLE_WORDS)
         // 5. Nearest / farthest nodes (also of one role, for example the nearest router).
@@ -338,7 +346,7 @@ class AssistantDataProvider(
                     aiString(Res.string.ai_low_battery_title, LOW_BATTERY) +
                         "\n" +
                         toolFindNodes(0, "", 0, LOW_BATTERY, 0, REPORT_SIGNAL)
-                }
+                },
             )
         }
         // 7. How many nodes were heard in a time window.
@@ -353,7 +361,7 @@ class AssistantDataProvider(
                             it.lastHeard * MILLIS_PER_SECOND < w.until
                     }
                     aiString(Res.string.ai_nodes_heard_title, w.title(), heard, all.size)
-                }
+                },
             )
         }
         return null
@@ -364,19 +372,19 @@ class AssistantDataProvider(
         val q = question.lowercase()
         return mentionedNodes(q).isNotEmpty() ||
             listOf(
-                    SENSOR_WORDS,
-                    SIGNAL_WORDS,
-                    NODE_WORDS,
-                    TREND_WORDS,
-                    RANK_WORDS,
-                    SETTINGS_WORDS,
-                    SUMMARY_WORDS,
-                    MESSAGE_WORDS,
-                    ACTIVITY_WORDS,
-                    ROUTE_WORDS,
-                    STATUS_WORDS,
-                    WAYPOINT_WORDS,
-                )
+                SENSOR_WORDS,
+                SIGNAL_WORDS,
+                NODE_WORDS,
+                TREND_WORDS,
+                RANK_WORDS,
+                SETTINGS_WORDS,
+                SUMMARY_WORDS,
+                MESSAGE_WORDS,
+                ACTIVITY_WORDS,
+                ROUTE_WORDS,
+                STATUS_WORDS,
+                WAYPOINT_WORDS,
+            )
                 .any { q.hasAny(it) }
     }
 
@@ -416,20 +424,29 @@ class AssistantDataProvider(
         val oldFirst =
             q.hasAny(listOf("offline", "nieaktyw", "dawno", "najdłuż", "najduz", "milcz", "cisz", "zniknęł", "zniknel"))
         val sorted =
-            if (oldFirst) nodes.filter { it.lastHeard != 0 }.sortedBy { it.lastHeard }
-            else nodes.sortedByDescending { it.lastHeard }
+            if (oldFirst) {
+                nodes.filter { it.lastHeard != 0 }.sortedBy { it.lastHeard }
+            } else {
+                nodes.sortedByDescending { it.lastHeard }
+            }
         fun age(n: org.meshtastic.core.model.Node): String {
             if (n.lastHeard == 0) return "never"
             val min = ((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)
-            return if (min >= MINUTES_PER_DAY)
+            return if (min >= MINUTES_PER_DAY) {
                 "${min / MINUTES_PER_DAY} d ${(min % MINUTES_PER_DAY) / MINUTES_PER_HOUR} h ago"
-            else if (min >= MINUTES_PER_HOUR) "${min / MINUTES_PER_HOUR} h ${min % MINUTES_PER_HOUR} min ago"
-            else "$min min ago"
+            } else if (min >= MINUTES_PER_HOUR) {
+                "${min / MINUTES_PER_HOUR} h ${min % MINUTES_PER_HOUR} min ago"
+            } else {
+                "$min min ago"
+            }
         }
         return buildString {
             appendLine(
-                if (oldFirst) "NODES NOT HEARD FOR THE LONGEST TIME (longest silence first):"
-                else "NODES HEARD MOST RECENTLY (newest first):"
+                if (oldFirst) {
+                    "NODES NOT HEARD FOR THE LONGEST TIME (longest silence first):"
+                } else {
+                    "NODES HEARD MOST RECENTLY (newest first):"
+                },
             )
             sorted.take(ACTIVITY_TOP).forEach {
                 appendLine("- ${it.user.short_name} (${it.user.long_name}): heard ${age(it)}")
@@ -483,15 +500,14 @@ class AssistantDataProvider(
 
     private fun String.fold(): String = lowercase().map { c -> FOLD[c] ?: c }.joinToString("")
 
-    private suspend fun safe(what: String, block: suspend () -> String): String =
-        try {
-            block()
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.w(tag = TAG, throwable = e) { "Assistant data '$what' unavailable" }
-            ""
-        }
+    private suspend fun safe(what: String, block: suspend () -> String): String = try {
+        block()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Logger.w(tag = TAG, throwable = e) { "Assistant data '$what' unavailable" }
+        ""
+    }
 
     /**
      * True when the user writes Polish: the fixed labels of the reports are then Polish too, so the model copies
@@ -506,11 +522,11 @@ class AssistantDataProvider(
         if (polish) {
             return buildString {
                 appendLine(
-                    "MÓJ WĘZEŁ: ${me?.user?.long_name ?: "nieznany"} (${me?.user?.short_name ?: "?"}), sprzęt ${me?.user?.hw_model}"
+                    "MÓJ WĘZEŁ: ${me?.user?.long_name ?: "nieznany"} (${me?.user?.short_name ?: "?"}), sprzęt ${me?.user?.hw_model}",
                 )
                 if (me != null) appendLine("Parametry urządzenia: ${me.deviceMetrics.toString().pretty()}")
                 appendLine(
-                    "Węzły aktywne/wszystkie: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}"
+                    "Węzły aktywne/wszystkie: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}",
                 )
                 appendLine("Statystyki radia: ${stats.toString().pretty()}")
                 appendLine("Statystyki rozszerzone (cpu, flash, psram, wifi): $extended")
@@ -518,11 +534,11 @@ class AssistantDataProvider(
         }
         return buildString {
             appendLine(
-                "OWN NODE: ${me?.user?.long_name ?: "unknown"} (${me?.user?.short_name ?: "?"}), hardware ${me?.user?.hw_model}"
+                "OWN NODE: ${me?.user?.long_name ?: "unknown"} (${me?.user?.short_name ?: "?"}), hardware ${me?.user?.hw_model}",
             )
             if (me != null) appendLine("Device metrics: ${me.deviceMetrics.toString().pretty()}")
             appendLine(
-                "Nodes online/total: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}"
+                "Nodes online/total: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}",
             )
             appendLine("Radio statistics: ${stats.toString().pretty()}")
             appendLine("Extended statistics (cpu, flash, psram, wifi): $extended")
@@ -557,7 +573,9 @@ class AssistantDataProvider(
             )
         return buildString {
             appendLine(
-                "TRENDS of $title, whole recorded history (${entries.size} samples, from ${spanText(entries.first().time)} ago until ${spanText(entries.last().time)} ago):"
+                "TRENDS of $title, whole recorded history (${entries.size} samples, from ${spanText(
+                    entries.first().time,
+                )} ago until ${spanText(entries.last().time)} ago):",
             )
             for ((name, unit, pick) in series) {
                 val values = entries.mapNotNull { e -> pick(e)?.let { e.time to it } }
@@ -566,10 +584,24 @@ class AssistantDataProvider(
                 val last = values.last().second
                 val change = last - first
                 val direction =
-                    if (kotlin.math.abs(change) < STABLE_DELTA) "stable" else if (change > 0) "rising" else "falling"
+                    if (kotlin.math.abs(change) < STABLE_DELTA) {
+                        "stable"
+                    } else if (change > 0) {
+                        "rising"
+                    } else {
+                        "falling"
+                    }
                 appendLine(
-                    "- $name: now ${fmt(last)}$unit, at start ${fmt(first)}$unit, min ${fmt(values.minOf { it.second })}, " +
-                        "max ${fmt(values.maxOf { it.second })}, change ${fmt(change)} ($direction), samples ${values.size}"
+                    "- $name: now ${fmt(last)}$unit, at start ${fmt(first)}$unit, min ${fmt(
+                        values.minOf {
+                            it.second
+                        },
+                    )}, " +
+                        "max ${fmt(
+                            values.maxOf {
+                                it.second
+                            },
+                        )}, change ${fmt(change)} ($direction), samples ${values.size}",
                 )
             }
         }
@@ -581,10 +613,18 @@ class AssistantDataProvider(
             if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
         val head = buildString {
             appendLine(
-                "NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${roleLabel(n.user.role.toString())}"
+                "NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${roleLabel(
+                    n.user.role.toString(),
+                )}",
             )
             appendLine(
-                "Heard $heard; hops=${n.hopsAway}; SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; favourite=${n.isFavorite}; via MQTT=${n.viaMqtt}"
+                "Heard $heard; hops=${n.hopsAway}; SNR=${if (n.snr == Float.MAX_VALUE) {
+                    "unknown"
+                } else {
+                    fmt(
+                        n.snr,
+                    ) + " dB"
+                }}; RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; favourite=${n.isFavorite}; via MQTT=${n.viaMqtt}",
             )
             appendLine("Position: ${n.position}")
             appendLine("Device metrics: ${n.deviceMetrics.toString().pretty()}")
@@ -613,8 +653,9 @@ class AssistantDataProvider(
             put(n.num, "air quality", time, n.airQualityMetrics.toString())
             put(n.num, "power", time, n.powerMetrics.toString())
             put(n.num, "soil/water", time, n.soilWaterMetrics.toString())
-            if (n.paxcounter.wifi != 0 || n.paxcounter.ble != 0)
+            if (n.paxcounter.wifi != 0 || n.paxcounter.ble != 0) {
                 put(n.num, "pax counter", time, n.paxcounter.toString())
+            }
         }
         for (entry in telemetry()) {
             val t = entry.telemetry
@@ -645,8 +686,9 @@ class AssistantDataProvider(
                         val d = m.groupValues[2].toDoubleOrNull() ?: return@forEach
                         val range = PLAUSIBLE[key]
                         // A current with the sign switch of its node is told with the sign the screens show.
-                        if (range == null || d in range)
+                        if (range == null || d in range) {
                             values[key] = if (key == "current" && d != 0.0 && num in invertedCurrent()) -d else d
+                        }
                     }
                 }
                 values.keys.retainAll(REPORT_KEYS.keys)
@@ -670,8 +712,9 @@ class AssistantDataProvider(
         val sb = StringBuilder(aiString(Res.string.ai_sensor_title, sorted.size)).append('\n')
         for (r in sorted.take(REPORT_LIMIT)) {
             val parts = ArrayList<String>()
-            for ((k, v) in r.values) parts +=
-                aiString(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
+            for ((k, v) in r.values) {
+                parts += aiString(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
+            }
             sb.append("• ${r.name} (${ago(r.ago)}): ${parts.joinToString(", ")}\n")
         }
         suspend fun extreme(key: String, label: StringResource, highest: Boolean) {
@@ -679,8 +722,11 @@ class AssistantDataProvider(
                 sorted
                     .filter { it.values.containsKey(key) }
                     .let { l ->
-                        if (highest) l.maxByOrNull { it.values.getValue(key) }
-                        else l.minByOrNull { it.values.getValue(key) }
+                        if (highest) {
+                            l.maxByOrNull { it.values.getValue(key) }
+                        } else {
+                            l.minByOrNull { it.values.getValue(key) }
+                        }
                     }
             if (best != null) {
                 val value =
@@ -700,15 +746,16 @@ class AssistantDataProvider(
         val nowS = nowMillis / MILLIS_PER_SECOND
         val found = collectSensors()
         // node number -> kind -> (time in ms, values text)
-        if (found.isEmpty())
+        if (found.isEmpty()) {
             return "SENSOR DATA: no node has reported weather, air quality, power or other sensor data."
+        }
         val lines =
             found.entries
                 .sortedWith(
                     compareByDescending<Map.Entry<Int, MutableMap<String, Pair<Long, String>>>> { e ->
-                            e.value.values.any { it.second.contains("temperature=") }
-                        }
-                        .thenByDescending { e -> e.value.values.maxOf { it.first } }
+                        e.value.values.any { it.second.contains("temperature=") }
+                    }
+                        .thenByDescending { e -> e.value.values.maxOf { it.first } },
                 )
                 .map { (num, kinds) ->
                     val n = nodeRepository.nodeDBbyNum.value[num]
@@ -717,7 +764,9 @@ class AssistantDataProvider(
                     "- $name: " +
                         kinds.entries.joinToString("; ") { (kind, v) ->
                             val ago = ((nowS - v.first / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
-                            "$kind (${ago} min ago): ${v.second.substringAfter('{').removeSuffix("}").pretty().replace("gas_resistance", "gas")}"
+                            "$kind ($ago min ago): ${v.second.substringAfter(
+                                '{',
+                            ).removeSuffix("}").pretty().replace("gas_resistance", "gas")}"
                         }
                 }
         return "SENSOR DATA from ${lines.size} nodes (weather, air quality, power; latest values):\n" +
@@ -740,11 +789,13 @@ class AssistantDataProvider(
         val sorted =
             when {
                 closest -> rows.filter { it.meters != null }.sortedBy { it.meters }
+
                 byDistance -> rows.filter { it.meters != null }.sortedByDescending { it.meters }
+
                 else ->
                     withSignal.sortedWith(
                         compareBy<Row> { it.n.hopsAway.let { h -> if (h < 0) Int.MAX_VALUE else h } }
-                            .thenByDescending { it.n.snr }
+                            .thenByDescending { it.n.snr },
                     )
             }
         val title =
@@ -758,26 +809,29 @@ class AssistantDataProvider(
         for (r in sorted.take(SIGNAL_SHOWN)) {
             val n = r.n
             val heard =
-                if (n.lastHeard == 0) aiString(Res.string.ai_never)
-                else ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                if (n.lastHeard == 0) {
+                    aiString(Res.string.ai_never)
+                } else {
+                    ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                }
             val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
             val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
             val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: none
             val where = position(n)?.let { aiString(Res.string.ai_sig_position, it) }.orEmpty()
             sb.append(
-                    aiString(
-                        Res.string.ai_sig_line,
-                        n.user.short_name,
-                        n.user.long_name,
-                        roleLabel(n.user.role.toString()),
-                        n.hopsAway.toString(),
-                        snr,
-                        rssi,
-                        dist,
-                        where,
-                        heard,
-                    )
-                )
+                aiString(
+                    Res.string.ai_sig_line,
+                    n.user.short_name,
+                    n.user.long_name,
+                    roleLabel(n.user.role.toString()),
+                    n.hopsAway.toString(),
+                    snr,
+                    rssi,
+                    dist,
+                    where,
+                    heard,
+                ),
+            )
                 .append('\n')
         }
         return sb.toString().trim()
@@ -799,29 +853,41 @@ class AssistantDataProvider(
         val sorted =
             when {
                 closest -> rows.filter { it.meters != null }.sortedBy { it.meters }
+
                 byDistance -> rows.filter { it.meters != null }.sortedByDescending { it.meters }
+
                 else ->
                     heardWithSignal.sortedWith(
                         compareBy<Row> { it.n.hopsAway.let { h -> if (h < 0) Int.MAX_VALUE else h } }
-                            .thenByDescending { it.n.snr }
+                            .thenByDescending { it.n.snr },
                     )
             }
         fun line(r: Row): String {
             val n = r.n
             val ago =
-                if (n.lastHeard == 0) "never"
-                else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            return "- ${n.user.short_name} (${n.user.long_name}), role ${roleLabel(n.user.role.toString())}: hops=${n.hopsAway}; " +
+                if (n.lastHeard == 0) {
+                    "never"
+                } else {
+                    "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
+                }
+            return "- ${n.user.short_name} (${n.user.long_name}), role ${roleLabel(
+                n.user.role.toString(),
+            )}: hops=${n.hopsAway}; " +
                 "SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; " +
                 "RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; " +
-                "distance=${r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "unknown"}; position=${position(n) ?: "unknown"}; heard $ago"
+                "distance=${r.meters?.let { m ->
+                    fmt(m / METERS_PER_KM) + " km"
+                } ?: "unknown"}; position=${position(n) ?: "unknown"}; heard $ago"
         }
         return buildString {
             appendLine(
                 "SIGNAL / RANGE from the own node (${rows.size} nodes; ${heardWithSignal.size} with a signal reading). " +
                     "Higher SNR is better; RSSI closer to 0 is better; hops 0 means heard directly. " +
-                    if (closest || byDistance) "Sorted by distance:"
-                    else "Best range = direct nodes (hops 0) with the highest SNR first:"
+                    if (closest || byDistance) {
+                        "Sorted by distance:"
+                    } else {
+                        "Best range = direct nodes (hops 0) with the highest SNR first:"
+                    },
             )
             sorted.take(top).forEach { appendLine(line(it)) }
         }
@@ -850,6 +916,7 @@ class AssistantDataProvider(
     }
 
     /*  The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
+
     /** The latest telemetry values every node reported in the last 3 days. */
     private suspend fun latestNodeRows(): HashMap<Int, NodeRow> {
         val rows = HashMap<Int, NodeRow>()
@@ -868,10 +935,12 @@ class AssistantDataProvider(
                     row.dropped = ls.num_tx_dropped
                     row.uptime = ls.uptime_seconds
                     row.heapUsed =
-                        if (ls.heap_total_bytes > 0)
+                        if (ls.heap_total_bytes > 0) {
                             (ls.heap_total_bytes - ls.heap_free_bytes).coerceAtLeast(0).toFloat() /
                                 ls.heap_total_bytes * PERCENT
-                        else null
+                        } else {
+                            null
+                        }
                 }
             }
             t.decodeLocalStatsExtended()?.let { ext ->
@@ -879,13 +948,18 @@ class AssistantDataProvider(
                     row.extTime = entry.time
                     row.cpu = ext.cpuUsagePercent.takeIf { it > 0 }
                     row.flashUsed =
-                        if (ext.flashTotalBytes > 0) ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT
-                        else null
+                        if (ext.flashTotalBytes > 0) {
+                            ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT
+                        } else {
+                            null
+                        }
                     row.psramUsed =
-                        if (ext.memoryPsramTotal > 0)
+                        if (ext.memoryPsramTotal > 0) {
                             (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toFloat() /
                                 ext.memoryPsramTotal * PERCENT
-                        else null
+                        } else {
+                            null
+                        }
                     row.wifi = ext.wifiRssi.takeIf { it != 0 }
                 }
             }
@@ -925,44 +999,59 @@ class AssistantDataProvider(
                     "least",
                     "fewest",
                     "worst",
-                )
+                ),
             )
         val wantsHigh =
             q.hasAny(listOf("najwięc", "najwiec", "najwyż", "najwyz", "najlepsz", "highest", "most ", "best"))
         val keys =
             when {
                 wantsTx && wantsRx -> listOf(rxKey, txKey)
+
                 wantsTx -> listOf(txKey)
+
                 q.hasAny(listOf("duplik", "dupe")) ->
                     listOf(Key("duplicate packets received", true) { it.dupe?.toFloat() })
+
                 q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) ->
                     listOf(Key("bad packets received", true) { it.bad?.toFloat() })
+
                 q.hasAny(listOf("napię", "napie", "volt")) ->
                     listOf(Key("battery voltage in volts (highest first)", true) { it.voltage })
+
                 q.hasAny(listOf("cpu", "procesor", "obciążeni", "obciazeni")) ->
                     listOf(Key("CPU load percent (highest first)", true) { it.cpu?.toFloat() })
+
                 q.hasAny(listOf("psram")) -> listOf(Key("used PSRAM percent (highest first)", true) { it.psramUsed })
+
                 q.hasAny(listOf("flash")) -> listOf(Key("used flash percent (highest first)", true) { it.flashUsed })
+
                 q.hasAny(listOf("wifi", "wi-fi")) ->
                     listOf(Key("Wi-Fi signal dBm (strongest first)", true) { it.wifi?.toFloat() })
+
                 q.hasAny(listOf("heap", "pamię", "pamie", " ram")) ->
                     listOf(Key("used RAM (heap) percent (highest first)", true) { it.heapUsed })
+
                 q.hasAny(listOf("bateri", "battery")) ->
                     listOf(Key("battery percent (lowest first)", false) { it.battery?.toFloat() })
+
                 q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) ->
                     listOf(Key("channel utilization percent", true) { it.chUtil })
+
                 q.hasAny(listOf("uptime", "czas pracy", "czasu pracy", "działa od", "dziala od", "restart")) ->
                     listOf(Key("uptime", true) { it.uptime?.toFloat() })
+
                 else -> listOf(rxKey)
             }.map { k ->
                 // Battery is listed lowest first by default; everything else highest first.
                 val high = if (k.label.startsWith("battery")) wantsHigh && !wantsLow else !wantsLow
-                if (high == k.descending) k
-                else
+                if (high == k.descending) {
+                    k
+                } else {
                     k.copy(
                         descending = high,
                         label = k.label.replace(" (lowest first)", "").replace(" (highest first)", ""),
                     )
+                }
             }
         fun line(r: NodeRow): String {
             val n = nodeRepository.nodeDBbyNum.value[r.num]
@@ -970,21 +1059,32 @@ class AssistantDataProvider(
                 n?.let { "${it.user.short_name} (${it.user.long_name}), id ${it.user.id}" }
                     ?: "!${r.num.toUInt().toString(HEX)}"
             return "- $name: rx=${r.rx ?: "?"}, tx=${r.tx ?: "?"}, bad=${r.bad ?: "?"}, dupe=${r.dupe ?: "?"}, " +
-                "ram_used=${r.heapUsed?.let { fmt(it) } ?: "?"}%, cpu=${r.cpu ?: "?"}%, flash_used=${r.flashUsed?.let { fmt(it) } ?: "?"}%, " +
-                "psram_used=${r.psramUsed?.let { fmt(it) } ?: "?"}%, wifi=${r.wifi ?: "?"} dBm, voltage=${r.voltage?.let { fmt(it) } ?: "?"} V, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
-                "air_tx=${r.airUtil?.let { fmt(it) } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
+                "ram_used=${r.heapUsed?.let {
+                    fmt(it)
+                } ?: "?"}%, cpu=${r.cpu ?: "?"}%, flash_used=${r.flashUsed?.let { fmt(it) } ?: "?"}%, " +
+                "psram_used=${r.psramUsed?.let {
+                    fmt(it)
+                } ?: "?"}%, wifi=${r.wifi ?: "?"} dBm, voltage=${r.voltage?.let {
+                    fmt(it)
+                } ?: "?"} V, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
+                "air_tx=${r.airUtil?.let {
+                    fmt(it)
+                } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
         }
         // With two keys (received AND sent) each list is shorter, so both fit in the small window.
         val limit = if (keys.size > 1) maxOf(top / 2, 3) else top
         return keys.joinToString("\n") { key ->
             val withValue = rows.values.filter { key.pick(it) != null }
             val sorted =
-                if (key.descending) withValue.sortedByDescending { key.pick(it) }
-                else withValue.sortedBy { key.pick(it) }
+                if (key.descending) {
+                    withValue.sortedByDescending { key.pick(it) }
+                } else {
+                    withValue.sortedBy { key.pick(it) }
+                }
             buildString {
                 appendLine(
                     "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals " +
-                        "since it started. Every value in a line belongs to THAT node only. In this order:"
+                        "since it started. Every value in a line belongs to THAT node only. In this order:",
                 )
                 sorted.firstOrNull()?.let { top1 ->
                     val n = nodeRepository.nodeDBbyNum.value[top1.num]
@@ -1072,7 +1172,11 @@ class AssistantDataProvider(
                 "Ulubione: ${favourites.ifBlank { "brak" }}. Słyszane przez MQTT: $mqtt."
         }
         return "NETWORK SUMMARY: ${nodes.size} nodes known, $recent heard in the last 24 h. Nodes by hops away (hops:count): $byHops. " +
-            "Low battery (<= $LOW_BATTERY%): ${low.ifBlank { "none" }}. Hardware: $hardware. Roles: $roles. Favourites: ${favourites.ifBlank { "none" }}. Heard via MQTT: $mqtt."
+            "Low battery (<= $LOW_BATTERY%): ${low.ifBlank {
+                "none"
+            }}. Hardware: $hardware. Roles: $roles. Favourites: ${favourites.ifBlank {
+                "none"
+            }}. Heard via MQTT: $mqtt."
     }
 
     /** Every known node in a few characters, so the assistant knows the whole network and can ask for details. */
@@ -1085,8 +1189,13 @@ class AssistantDataProvider(
 
     private fun spanText(timeMs: Long): String {
         val minutes = ((nowMillis - timeMs) / MILLIS_PER_SECOND / SECONDS_PER_MINUTE).coerceAtLeast(0)
-        return if (minutes >= MINUTES_PER_DAY) "${minutes / MINUTES_PER_DAY} d"
-        else if (minutes >= MINUTES_PER_HOUR) "${minutes / MINUTES_PER_HOUR} h" else "$minutes min"
+        return if (minutes >= MINUTES_PER_DAY) {
+            "${minutes / MINUTES_PER_DAY} d"
+        } else if (minutes >= MINUTES_PER_HOUR) {
+            "${minutes / MINUTES_PER_HOUR} h"
+        } else {
+            "$minutes min"
+        }
     }
 
     private suspend fun settings(): String {
@@ -1146,17 +1255,17 @@ class AssistantDataProvider(
         return Sample(
             time = received_date,
             heapUsed =
-                if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT else null,
+            if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT else null,
             psramUsed =
-                ext?.takeIf { it.memoryPsramTotal > 0 }
-                    ?.let {
-                        (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal *
-                            PERCENT
-                    },
+            ext?.takeIf { it.memoryPsramTotal > 0 }
+                ?.let {
+                    (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal *
+                        PERCENT
+                },
             cpu = ext?.cpuUsagePercent?.toFloat(),
             flashUsed =
-                ext?.takeIf { it.flashTotalBytes > 0 }
-                    ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT },
+            ext?.takeIf { it.flashTotalBytes > 0 }
+                ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT },
             battery = t.device_metrics?.battery_level?.toFloat(),
             channelUtil = t.device_metrics?.channel_utilization,
             airUtil = t.device_metrics?.air_util_tx,
@@ -1183,10 +1292,11 @@ class AssistantDataProvider(
         if (!NodeMetrics.asksAcrossNodes(question)) return null
         if (
             NodeMetrics.match(question).isEmpty() &&
-                !question.lowercase().contains("podsumowan") &&
-                !question.lowercase().contains("summary")
-        )
+            !question.lowercase().contains("podsumowan") &&
+            !question.lowercase().contains("summary")
+        ) {
             return null
+        }
         val telemetryRows = latestNodeRows()
         val me = nodeRepository.ourNodeInfo.value
         val now = nowMillis / MILLIS_PER_SECOND
@@ -1231,8 +1341,9 @@ class AssistantDataProvider(
                         put("dupe", t.dupe?.toFloat())
                         put("relayed", t.relayed?.toFloat())
                         put("dropped", t.dropped?.toFloat())
-                        if (!v.containsKey("uptime"))
+                        if (!v.containsKey("uptime")) {
                             put("uptime", t.uptime?.takeIf { it > 0 }?.let { it / SECONDS_PER_HOUR.toFloat() })
+                        }
                     }
                     val name = node.user.long_name.ifBlank { node.user.short_name }.ifBlank { node.user.id }
                     MetricRow(name, v)
@@ -1280,34 +1391,60 @@ class AssistantDataProvider(
             "rssi",
             "signal",
             "range",
-            "hops" -> signalReport("snr $role")
+            "hops",
+            -> signalReport("snr $role")
+
             "distance",
             "far",
-            "farthest" -> signalReport("odległ $role")
+            "farthest",
+            -> signalReport("odległ $role")
+
             "closest",
             "nearest",
-            "near" -> signalReport("najbliż $role")
+            "near",
+            -> signalReport("najbliż $role")
+
             "tx" -> ranking("wysł", top)
+
             "dupe",
-            "duplicates" -> ranking("dupe", top)
+            "duplicates",
+            -> ranking("dupe", top)
+
             "bad" -> ranking("bad ", top)
+
             "heap",
-            "ram" -> ranking("heap", top)
+            "ram",
+            -> ranking("heap", top)
+
             "heap_low",
-            "ram_low" -> ranking("heap najniż", top)
+            "ram_low",
+            -> ranking("heap najniż", top)
+
             "voltage" -> ranking("napięcie", top)
+
             "voltage_low" -> ranking("napięcie najniż", top)
+
             "cpu" -> ranking("cpu", top)
+
             "cpu_low" -> ranking("cpu najniż", top)
+
             "flash" -> ranking("flash", top)
+
             "psram" -> ranking("psram", top)
+
             "wifi" -> ranking("wifi", top)
+
             "battery_high" -> ranking("battery najwyż", top)
+
             "battery" -> ranking("battery", top)
+
             "channel_util",
             "channel",
-            "utilization" -> ranking("channel", top)
+            "utilization",
+            -> ranking("channel", top)
+
             "uptime" -> ranking("uptime", top)
+
             else -> ranking("odebran", top)
         }
     }
@@ -1348,9 +1485,11 @@ class AssistantDataProvider(
         val defaultName = aiString(Res.string.ai_scope_default)
         for (key in keys) {
             val label =
-                if (key.endsWith("^all"))
+                if (key.endsWith("^all")) {
                     key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { defaultName } } ?: key
-                else aiString(Res.string.ai_private_chat)
+                } else {
+                    aiString(Res.string.ai_private_chat)
+                }
             val list =
                 packetRepository
                     .getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }
@@ -1379,8 +1518,11 @@ class AssistantDataProvider(
             if (found.isNotEmpty()) break
         }
         if (found.isEmpty()) {
-            return if (needle.isNotEmpty() || senderNum != null) aiString(Res.string.ai_found_none_for, query.trim())
-            else aiString(Res.string.ai_found_none)
+            return if (needle.isNotEmpty() || senderNum != null) {
+                aiString(Res.string.ai_found_none_for, query.trim())
+            } else {
+                aiString(Res.string.ai_found_none)
+            }
         }
         val now = nowMillis
         return aiString(Res.string.ai_found_n, found.size) +
@@ -1453,6 +1595,7 @@ class AssistantDataProvider(
         val w =
             when {
                 hours < 0 -> Win(0L, Long.MAX_VALUE, Res.string.ai_win_all)
+
                 hours > 0 ->
                     Win(
                         now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR,
@@ -1460,6 +1603,7 @@ class AssistantDataProvider(
                         Res.string.ai_win_last_n_h,
                         hours,
                     )
+
                 else -> Win(todayStart(now), Long.MAX_VALUE, Res.string.ai_win_today)
             }
         return messageCountReport(channel, w)
@@ -1476,8 +1620,9 @@ class AssistantDataProvider(
     private fun timeWindow(q: String): Win? {
         val now = nowMillis
         val today = todayStart(now)
-        if (q.contains("wczoraj") || q.contains("yesterday"))
+        if (q.contains("wczoraj") || q.contains("yesterday")) {
             return Win(today - MILLIS_PER_DAY, today, Res.string.ai_win_yesterday)
+        }
         val unit =
             Regex("(\\d+)\\s*(minut|min\\b|godz|h\\b|hour|dni|dzie|dob|day|tydz|tygod|week|miesi|month|rok|lat|year)")
                 .find(q)
@@ -1486,35 +1631,51 @@ class AssistantDataProvider(
             val (ms, res) =
                 when (unit.groupValues[2]) {
                     "minut",
-                    "min" -> MILLIS_PER_MINUTE to Res.string.ai_win_last_n_min
+                    "min",
+                    -> MILLIS_PER_MINUTE to Res.string.ai_win_last_n_min
+
                     "godz",
                     "h",
-                    "hour" -> MILLIS_PER_HOUR to Res.string.ai_win_last_n_h
+                    "hour",
+                    -> MILLIS_PER_HOUR to Res.string.ai_win_last_n_h
+
                     "dni",
                     "dzie",
                     "dob",
-                    "day" -> MILLIS_PER_DAY to Res.string.ai_win_last_n_d
+                    "day",
+                    -> MILLIS_PER_DAY to Res.string.ai_win_last_n_d
+
                     "tydz",
                     "tygod",
-                    "week" -> 7 * MILLIS_PER_DAY to Res.string.ai_win_last_n_w
+                    "week",
+                    -> 7 * MILLIS_PER_DAY to Res.string.ai_win_last_n_w
+
                     "miesi",
-                    "month" -> 30 * MILLIS_PER_DAY to Res.string.ai_win_last_n_m
+                    "month",
+                    -> 30 * MILLIS_PER_DAY to Res.string.ai_win_last_n_m
+
                     else -> 365 * MILLIS_PER_DAY to Res.string.ai_win_last_n_y
                 }
             return Win(now - n * ms, Long.MAX_VALUE, res, n)
         }
         return when {
             q.hasAny(TODAY_WORDS) -> Win(today, Long.MAX_VALUE, Res.string.ai_win_today)
+
             q.contains("godzin") || q.contains("hour") ->
                 Win(now - MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_hour)
+
             q.contains("tydzie") || q.contains("tygodn") || q.contains("week") ->
                 Win(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_week)
+
             q.contains("miesi") || q.contains("month") ->
                 Win(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_month)
+
             q.contains("rok") || q.contains("year") ->
                 Win(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_year)
+
             q.contains("dobę") || q.contains("doba") || q.contains("dobe") ->
                 Win(now - MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_day)
+
             else -> null
         }
     }
@@ -1523,12 +1684,14 @@ class AssistantDataProvider(
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
         val wanted = channel.anyToEmpty()
         val index =
-            if (wanted.isEmpty()) null
-            else
+            if (wanted.isEmpty()) {
+                null
+            } else {
                 wanted.toIntOrNull()
                     ?: numberedChannel(wanted)
                     ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
                     ?: names.indexOfFirst { it.lowercase().contains(wanted) }.takeIf { it >= 0 }
+            }
         if (wanted.isNotEmpty() && index == null) {
             return aiString(
                 Res.string.ai_no_channel,
@@ -1553,20 +1716,25 @@ class AssistantDataProvider(
                 if (m.receivedTime < window.since || m.receivedTime >= window.until) continue
                 total++
                 val who =
-                    if (m.fromLocal) ownName.ifBlank { "me" }
-                    else m.node.user.long_name.ifBlank { m.node.user.short_name }
+                    if (m.fromLocal) {
+                        ownName.ifBlank { "me" }
+                    } else {
+                        m.node.user.long_name.ifBlank { m.node.user.short_name }
+                    }
                 if (m.fromLocal) mine++
                 perSender[who] = (perSender[who] ?: 0) + 1
             }
         }
         val scope =
-            if (index == null) aiString(Res.string.ai_scope_all)
-            else
+            if (index == null) {
+                aiString(Res.string.ai_scope_all)
+            } else {
                 aiString(
                     Res.string.ai_scope_channel,
                     names.getOrNull(index)?.ifBlank { null } ?: aiString(Res.string.ai_scope_default),
                     index,
                 )
+            }
         val sb = StringBuilder(aiString(Res.string.ai_cnt_line, window.title(), scope, total, mine))
         if (perSender.isNotEmpty()) {
             sb.append('\n').append(aiString(Res.string.ai_cnt_top))
@@ -1597,26 +1765,33 @@ class AssistantDataProvider(
         val all = nodeRepository.nodeDBbyNum.value.values
         val found =
             all.filter { n ->
-                    (activeHours <= 0 ||
-                        (n.lastHeard != 0 && nowS - n.lastHeard <= activeHours * SECONDS_PER_MINUTE * 60L)) &&
-                        (hw.isEmpty() || n.user.hw_model.toString().lowercase().contains(hw)) &&
-                        (onlyFavorites != 1 || n.isFavorite) &&
-                        (maxBattery !in 1..100 || (n.deviceMetrics.battery_level ?: Int.MAX_VALUE) <= maxBattery) &&
-                        (withPosition != 1 || n.validPosition != null)
-                }
+                (
+                    activeHours <= 0 ||
+                        (n.lastHeard != 0 && nowS - n.lastHeard <= activeHours * SECONDS_PER_MINUTE * 60L)
+                    ) &&
+                    (hw.isEmpty() || n.user.hw_model.toString().lowercase().contains(hw)) &&
+                    (onlyFavorites != 1 || n.isFavorite) &&
+                    (maxBattery !in 1..100 || (n.deviceMetrics.battery_level ?: Int.MAX_VALUE) <= maxBattery) &&
+                    (withPosition != 1 || n.validPosition != null)
+            }
                 .sortedByDescending { it.lastHeard }
         if (found.isEmpty()) return aiString(Res.string.ai_nodes_none, all.size)
         val sb = StringBuilder(aiString(Res.string.ai_nodes_match, found.size, all.size))
         for (n in found.take(top)) {
             val heard =
-                if (n.lastHeard == 0) aiString(Res.string.ai_never)
-                else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                if (n.lastHeard == 0) {
+                    aiString(Res.string.ai_never)
+                } else {
+                    ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                }
             val bat =
                 n.deviceMetrics.battery_level?.let {
                     if (it > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, it)
                 } ?: aiString(Res.string.ai_battery_unknown)
             sb.append(
-                "\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${roleLabel(n.user.role.toString())}, ${aiString(Res.string.ai_heard, heard)}, $bat"
+                "\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${roleLabel(
+                    n.user.role.toString(),
+                )}, ${aiString(Res.string.ai_heard, heard)}, $bat",
             )
         }
         if (found.size > top) sb.append("\n").append(aiString(Res.string.ai_more, found.size - top))
@@ -1634,8 +1809,9 @@ class AssistantDataProvider(
         for (key in keys) {
             val list =
                 packetRepository.getMessagesFrom(key, top) { nid -> nodeRepository.getNode(nid.orEmpty()) }.first()
-            for (m in list) all +=
-                m.receivedTime to "${if (m.fromLocal) "me" else n.user.long_name}: ${m.text.take(MESSAGE_CHARS)}"
+            for (m in list) {
+                all += m.receivedTime to "${if (m.fromLocal) "me" else n.user.long_name}: ${m.text.take(MESSAGE_CHARS)}"
+            }
         }
         if (all.isEmpty()) return "No direct messages with ${n.user.long_name}."
         val now = nowMillis
@@ -1648,13 +1824,12 @@ class AssistantDataProvider(
                 }
     }
 
-    private suspend fun ago(minutes: Long): String =
-        when {
-            minutes < 1 -> aiString(Res.string.ai_ago_now)
-            minutes < MINUTES_PER_HOUR -> aiString(Res.string.ai_ago_min, minutes.toInt())
-            minutes < MINUTES_PER_DAY -> aiString(Res.string.ai_ago_h, (minutes / MINUTES_PER_HOUR).toInt())
-            else -> aiString(Res.string.ai_ago_d, (minutes / MINUTES_PER_DAY).toInt())
-        }
+    private suspend fun ago(minutes: Long): String = when {
+        minutes < 1 -> aiString(Res.string.ai_ago_now)
+        minutes < MINUTES_PER_HOUR -> aiString(Res.string.ai_ago_min, minutes.toInt())
+        minutes < MINUTES_PER_DAY -> aiString(Res.string.ai_ago_h, (minutes / MINUTES_PER_HOUR).toInt())
+        else -> aiString(Res.string.ai_ago_d, (minutes / MINUTES_PER_DAY).toInt())
+    }
 
     private fun nameOf(num: Int): String = nodeNameFor(num).ifBlank { "!" + num.toUInt().toString(16) }
 
@@ -1672,24 +1847,26 @@ class AssistantDataProvider(
         for (log in logs.sortedByDescending { it.received_date }) {
             val rd = log.fromRadio.packet?.fullRouteDiscovery ?: continue
             if (num != null && num !in rd.route && num !in rd.route_back) continue
-            fun path(route: List<Int>, snr: List<Int>) =
-                route
-                    .mapIndexed { i, n ->
-                        val q = snr.getOrNull(i - 1)?.takeIf { it != Int.MIN_VALUE }
-                        nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
-                    }
-                    .joinToString(" → ")
+            fun path(route: List<Int>, snr: List<Int>) = route
+                .mapIndexed { i, n ->
+                    val q = snr.getOrNull(i - 1)?.takeIf { it != Int.MIN_VALUE }
+                    nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
+                }
+                .joinToString(" → ")
             val hops = aiString(Res.string.ai_trace_hops, (rd.route.size - 2).coerceAtLeast(0))
             lines += buildString {
                 append(
-                    "• ${ago(((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0))}, $hops\n   $there: ${path(rd.route, rd.snr_towards)}"
+                    "• ${ago(
+                        ((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0),
+                    )}, $hops\n   $there: ${path(rd.route, rd.snr_towards)}",
                 )
                 if (rd.route_back.isNotEmpty()) append("\n   $back: ${path(rd.route_back, rd.snr_back)}")
             }
             if (lines.size >= top) break
         }
-        if (lines.isEmpty())
+        if (lines.isEmpty()) {
             return aiString(if (num != null) Res.string.ai_trace_none_node else Res.string.ai_trace_none)
+        }
         return aiString(Res.string.ai_trace_title) + "\n" + lines.joinToString("\n")
     }
 
@@ -1715,12 +1892,16 @@ class AssistantDataProvider(
             if (num != null && owner != num && info.neighbors.none { it.node_id == num }) continue
             if ((newest[owner]?.first ?: -1L) < log.received_date) newest[owner] = log.received_date to info
         }
-        if (newest.isEmpty())
+        if (newest.isEmpty()) {
             return aiString(if (num != null) Res.string.ai_neigh_none_node else Res.string.ai_neigh_none)
+        }
         val nobody = aiString(Res.string.ai_neigh_nobody)
         val ordered =
-            if (rankByCount) newest.entries.sortedByDescending { it.value.second.neighbors.size }
-            else newest.entries.sortedByDescending { it.value.first }
+            if (rankByCount) {
+                newest.entries.sortedByDescending { it.value.second.neighbors.size }
+            } else {
+                newest.entries.sortedByDescending { it.value.first }
+            }
         return aiString(if (rankByCount) Res.string.ai_neigh_most_title else Res.string.ai_neigh_title) +
             "\n" +
             ordered
@@ -1759,13 +1940,14 @@ class AssistantDataProvider(
                 .take(UNREAD_SHOWN)
                 .forEach { (key, n) ->
                     val label =
-                        if (key.endsWith("^all"))
+                        if (key.endsWith("^all")) {
                             key.substringBefore('^').toIntOrNull()?.let {
                                 "${names.getOrNull(it).orEmpty().ifBlank { "#$it" }}"
                             } ?: key
-                        else
+                        } else {
                             findNode("!" + key.substringAfter('!', ""))?.user?.long_name
                                 ?: aiString(Res.string.ai_private_chat)
+                        }
                     sb.append("• $label: $n\n")
                 }
         }
@@ -1786,15 +1968,23 @@ class AssistantDataProvider(
                     val state =
                         when (it.second) {
                             org.meshtastic.core.model.MessageStatus.DELIVERED,
-                            org.meshtastic.core.model.MessageStatus.SFPP_CONFIRMED -> Res.string.ai_msg_delivered
+                            org.meshtastic.core.model.MessageStatus.SFPP_CONFIRMED,
+                            -> Res.string.ai_msg_delivered
+
                             org.meshtastic.core.model.MessageStatus.ENROUTE,
-                            org.meshtastic.core.model.MessageStatus.SFPP_ROUTING -> Res.string.ai_msg_enroute
+                            org.meshtastic.core.model.MessageStatus.SFPP_ROUTING,
+                            -> Res.string.ai_msg_enroute
+
                             org.meshtastic.core.model.MessageStatus.QUEUED -> Res.string.ai_msg_queued
+
                             org.meshtastic.core.model.MessageStatus.ERROR -> Res.string.ai_msg_error
+
                             else -> Res.string.ai_msg_other
                         }
                     sb.append(
-                        "• ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}: ${aiString(state)} — ${it.third}\n"
+                        "• ${ago(
+                            ((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0),
+                        )}: ${aiString(state)} — ${it.third}\n",
                     )
                 }
         }
@@ -1819,8 +2009,17 @@ class AssistantDataProvider(
                             ?: p.from.orEmpty()
                     val lat = (w?.latitude_i ?: 0) / WAYPOINT_SCALE
                     val lon = (w?.longitude_i ?: 0) / WAYPOINT_SCALE
-                    "• ${w?.name.orEmpty().ifBlank { noName }}${w?.description.orEmpty().take(MESSAGE_CHARS).let { d -> if (d.isBlank()) "" else " — $d" }} " +
-                        "(${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}), ${aiString(Res.string.ai_wp_from, sender)}, ${ago(((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0))}"
+                    "• ${w?.name.orEmpty().ifBlank {
+                        noName
+                    }}${w?.description.orEmpty().take(MESSAGE_CHARS).let { d -> if (d.isBlank()) "" else " — $d" }} " +
+                        "(${fmt(
+                            lat.toFloat(),
+                        )}, ${fmt(
+                            lon.toFloat(),
+                        )}), ${aiString(
+                            Res.string.ai_wp_from,
+                            sender,
+                        )}, ${ago(((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0))}"
                 }
                 .joinToString("\n")
     }
@@ -1831,8 +2030,10 @@ class AssistantDataProvider(
     fun sampleNodeName(): String {
         val me = nodeRepository.ourNodeInfo.value?.num
         val others = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me && it.user.long_name.isNotBlank() }
-        return (others.filter { it.validPosition != null }.maxByOrNull { it.lastHeard }
-                ?: others.maxByOrNull { it.lastHeard })
+        return (
+            others.filter { it.validPosition != null }.maxByOrNull { it.lastHeard }
+                ?: others.maxByOrNull { it.lastHeard }
+            )
             ?.user
             ?.long_name
             .orEmpty()
@@ -1868,12 +2069,13 @@ class AssistantDataProvider(
         // A name that is exactly a node's name wins; otherwise the words of the question that together name a node
         // ("unr base" is SP7UNR_base).
         val allNodes = nodeRepository.nodeDBbyNum.value.values
-        if (wanted.isNotEmpty())
+        if (wanted.isNotEmpty()) {
             allNodes
                 .firstOrNull { it.user.short_name.lowercase() == wanted || it.user.long_name.lowercase() == wanted }
                 ?.let {
                     return it.num
                 }
+        }
         phraseNode(question)?.let {
             return it.num
         }
@@ -1948,8 +2150,11 @@ class AssistantDataProvider(
         val (first, meters) = rows.firstOrNull() ?: return null
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard =
-            if (first.lastHeard == 0) aiString(Res.string.ai_never)
-            else ago(((nowS - first.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            if (first.lastHeard == 0) {
+                aiString(Res.string.ai_never)
+            } else {
+                ago(((nowS - first.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            }
         val sb =
             StringBuilder(
                 aiString(
@@ -1958,15 +2163,16 @@ class AssistantDataProvider(
                     first.user.short_name,
                     kilometres(meters),
                     heard,
-                )
+                ),
             )
         val next = rows.drop(1).take((shown - 1).coerceAtLeast(1))
         if (next.isNotEmpty()) {
             sb.append("\n\n").append(aiString(Res.string.ai_dist_next, "").trim())
             for ((n, m) in next) {
                 sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name })
-                if (n.user.short_name.isNotBlank() && n.user.short_name != n.user.long_name)
+                if (n.user.short_name.isNotBlank() && n.user.short_name != n.user.long_name) {
                     sb.append(" (").append(n.user.short_name).append(")")
+                }
                 sb.append(" — ").append(kilometres(m)).append(" km")
             }
         }
@@ -2000,24 +2206,32 @@ class AssistantDataProvider(
         val sb =
             StringBuilder(
                 s(
-                    if (farthest)
-                        "Najdalej od ${displayName(from)} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
-                    else
-                        "Najbliżej ${displayName(from)} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km.",
-                    if (farthest)
-                        "The farthest from ${displayName(from)} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
-                    else
-                        "The nearest to ${displayName(from)} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km.",
-                )
+                    if (farthest) {
+                        "Najdalej od ${displayName(
+                            from,
+                        )} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                    } else {
+                        "Najbliżej ${displayName(
+                            from,
+                        )} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                    },
+                    if (farthest) {
+                        "The farthest from ${displayName(
+                            from,
+                        )} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                    } else {
+                        "The nearest to ${displayName(
+                            from,
+                        )} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                    },
+                ),
             )
         val next = rows.drop(1).take(NEXT_SHOWN)
         if (next.isNotEmpty()) {
             sb.append("\n\n").append(s("Kolejne:", "Next:"))
-            for ((n, m) in next) sb.append("\n• ")
-                .append(displayName(n))
-                .append(" — ")
-                .append(kilometres(m))
-                .append(" km")
+            for ((n, m) in next) {
+                sb.append("\n• ").append(displayName(n)).append(" — ").append(kilometres(m)).append(" km")
+            }
         }
         return sb.toString()
     }
@@ -2041,36 +2255,40 @@ class AssistantDataProvider(
             when {
                 n.lastHeard == 0 ->
                     s("$name: radio jeszcze nigdy go nie słyszało.", "$name: the radio has never heard it.")
+
                 direct ->
                     s(
                         "Tak, $name słychać bezpośrednio, bez pośredników.",
                         "Yes, $name is heard directly, with no relays.",
                     )
+
                 else ->
                     s(
                         "$name nie jest słyszany bezpośrednio: pakiety dochodzą przez inne węzły (skoki: ${n.hopsAway}).",
                         "$name is not heard directly: packets arrive through other nodes (hops: ${n.hopsAway}).",
                     )
-            }
+            },
         )
-        if (n.lastHeard != 0)
+        if (n.lastHeard != 0) {
             sb.append("\n• ")
                 .append(s("ostatnio słyszany: ", "last heard: "))
                 .append(ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)))
+        }
         if (direct && n.snr != Float.MAX_VALUE) {
             sb.append("\n• ").append(s("ostatni sygnał: SNR ", "last signal: SNR ")).append(fmt(n.snr)).append(" dB")
             if (n.rssi != Int.MAX_VALUE) sb.append(", RSSI ").append(n.rssi).append(" dBm")
         }
         val meters = me?.let { n.distance(it) }
-        if (meters != null)
+        if (meters != null) {
             sb.append("\n• ").append(s("odległość: ", "distance: ")).append(kilometres(meters)).append(" km")
+        }
         if (!direct) {
             sb.append("\n\n")
                 .append(
                     s(
                         "Zasięgu do tego węzła nie da się ocenić z samego odbioru; policz łącze w planerze.",
                         "The range to this node cannot be judged from reception alone; work out the link in the planner.",
-                    )
+                    ),
                 )
         }
         return sb.toString()
@@ -2087,8 +2305,9 @@ class AssistantDataProvider(
         val sb = StringBuilder(s("Węzłów z tą rolą: ${found.size}.", "Nodes with this role: ${found.size}."))
         for (n in found.take(NAMES_SHOWN)) {
             sb.append("\n• ").append(displayName(n)).append(" (").append(roleLabel(n.user.role.toString())).append(")")
-            if (n.lastHeard != 0)
+            if (n.lastHeard != 0) {
                 sb.append(", ").append(ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)))
+            }
             if (n.hopsAway > 0) sb.append(s(", skoki ", ", hops ")).append(n.hopsAway)
             me?.let { n.distance(it) }?.let { sb.append(", ").append(kilometres(it)).append(" km") }
         }
@@ -2134,13 +2353,16 @@ class AssistantDataProvider(
         val none = aiString(Res.string.ai_none_value)
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard =
-            if (n.lastHeard == 0) aiString(Res.string.ai_never)
-            else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            if (n.lastHeard == 0) {
+                aiString(Res.string.ai_never)
+            } else {
+                ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            }
         val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
         val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
         val sb =
             StringBuilder(
-                aiString(Res.string.ai_snr_title, n.user.long_name.ifBlank { n.user.short_name }, n.user.short_name)
+                aiString(Res.string.ai_snr_title, n.user.long_name.ifBlank { n.user.short_name }, n.user.short_name),
             )
         sb.append("\n• ").append(aiString(Res.string.ai_snr_last, snr, rssi, n.hopsAway.toString(), heard))
         val days = (SIGNAL_WINDOW_MS / MILLIS_PER_DAY).toInt()
@@ -2167,21 +2389,20 @@ class AssistantDataProvider(
                         fmt(snrs.max()),
                         if (rssis.isEmpty()) none else rssis.average().roundToInt().toString(),
                         direct.size,
-                    )
+                    ),
                 )
         }
         return sb.toString()
     }
 
-    private suspend fun <T> safeList(block: suspend () -> List<T>): List<T> =
-        try {
-            block()
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.w(tag = TAG, throwable = e) { "Assistant list unavailable" }
-            emptyList()
-        }
+    private suspend fun <T> safeList(block: suspend () -> List<T>): List<T> = try {
+        block()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Logger.w(tag = TAG, throwable = e) { "Assistant list unavailable" }
+        emptyList()
+    }
 
     /**
      * The statistics of the user's own radio, written in code with plain labels (the model mixed up the raw field names
@@ -2207,7 +2428,7 @@ class AssistantDataProvider(
                 rx.toString(),
                 (ls.num_packets_rx_bad).toString(),
                 (ls.num_rx_dupe).toString(),
-            )
+            ),
         )
         line(
             aiString(
@@ -2215,7 +2436,7 @@ class AssistantDataProvider(
                 (ls.num_tx_relay).toString(),
                 (ls.num_tx_relay_canceled).toString(),
                 (ls.num_tx_dropped).toString(),
-            )
+            ),
         )
         line(aiString(Res.string.ai_radio_nodes, (ls.num_online_nodes).toString(), (ls.num_total_nodes).toString()))
         val heapTotal = ls.heap_total_bytes
@@ -2228,15 +2449,18 @@ class AssistantDataProvider(
                     fmt(used.toFloat() / heapTotal * PERCENT),
                     (used / BYTES_PER_KB).toString(),
                     (heapTotal / BYTES_PER_KB).toString(),
-                )
+                ),
             )
         }
         val noise = ls.noise_floor
         if (noise != 0) line(aiString(Res.string.ai_radio_noise, noise.toString()))
         if (ext.flashTotalBytes > 0 || ext.cpuUsagePercent > 0) {
             val flash =
-                if (ext.flashTotalBytes > 0) fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT)
-                else aiString(Res.string.ai_none_value)
+                if (ext.flashTotalBytes > 0) {
+                    fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT)
+                } else {
+                    aiString(Res.string.ai_none_value)
+                }
             line(aiString(Res.string.ai_radio_ext, ext.cpuUsagePercent.toString(), flash))
         }
         return sb.toString()
@@ -2256,9 +2480,11 @@ class AssistantDataProvider(
                 // chat.
                 val mine = list.filter { !it.fromLocal }
                 val senders =
-                    if (key.endsWith("^all"))
+                    if (key.endsWith("^all")) {
                         mine.groupBy { it.node.num }.values.map { group -> group.maxByOrNull { it.receivedTime }!! }
-                    else listOfNotNull(mine.maxByOrNull { it.receivedTime })
+                    } else {
+                        listOfNotNull(mine.maxByOrNull { it.receivedTime })
+                    }
                 for (newest in senders) {
                     val who = newest.node.user.long_name.ifBlank { newest.node.user.short_name }
                     found += Triple(newest.receivedTime, who, newest.text.take(MESSAGE_CHARS))
@@ -2295,17 +2521,25 @@ class AssistantDataProvider(
     suspend fun txPowerText(): String {
         val lora =
             radioConfigRepository.localConfigFlow.first().lora
-                ?: return if (polish) "Brak ustawień LoRa — połącz się z radiem."
-                else "No LoRa settings — connect to the radio."
+                ?: return if (polish) {
+                    "Brak ustawień LoRa — połącz się z radiem."
+                } else {
+                    "No LoRa settings — connect to the radio."
+                }
         val dbm = lora.tx_power
         if (dbm == 0) {
-            return if (polish)
+            return if (polish) {
                 "Moc nadawania jest ustawiona na 0, czyli radio używa największej mocy dozwolonej w Twoim regionie."
-            else "Transmit power is set to 0, which means the radio uses the highest power your region allows."
+            } else {
+                "Transmit power is set to 0, which means the radio uses the highest power your region allows."
+            }
         }
         val mw = 10.0.pow(dbm / 10.0).roundToInt()
-        return if (polish) "Moc nadawania w radiu: $dbm dBm (około $mw mW)."
-        else "Transmit power in the radio: $dbm dBm (about $mw mW)."
+        return if (polish) {
+            "Moc nadawania w radiu: $dbm dBm (około $mw mW)."
+        } else {
+            "Transmit power in the radio: $dbm dBm (about $mw mW)."
+        }
     }
 
     /** Nodes not heard for [hours] hours (the user's own radio left out), the longest silent first, counted in code. */
@@ -2317,22 +2551,26 @@ class AssistantDataProvider(
         val silent =
             all.filter { it.lastHeard == 0 || nowS - it.lastHeard >= hours * SECONDS_PER_HOUR }
                 .sortedBy { it.lastHeard }
-        if (silent.isEmpty())
+        if (silent.isEmpty()) {
             return s(
                 "Wszystkie znane węzły (${all.size}) odezwały się w ciągu ostatnich $hours godz.",
                 "All known nodes (${all.size}) were heard in the last $hours h.",
             )
+        }
         val sb =
             StringBuilder(
                 s(
                     "Węzły, które nie odezwały się od ponad $hours godz.: ${silent.size} z ${all.size} znanych.",
                     "Nodes not heard for more than $hours h: ${silent.size} of ${all.size} known.",
-                )
+                ),
             )
         for (n in silent.take(NAMES_SHOWN)) {
             val when_ =
-                if (n.lastHeard == 0) s("nigdy nie słyszany", "never heard")
-                else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                if (n.lastHeard == 0) {
+                    s("nigdy nie słyszany", "never heard")
+                } else {
+                    ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                }
             sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(when_)
         }
         if (silent.size > NAMES_SHOWN) sb.append('\n').append(aiString(Res.string.ai_more, silent.size - NAMES_SHOWN))
@@ -2349,7 +2587,8 @@ class AssistantDataProvider(
         val noRadio = s("Brak ustawień radia — połącz się z radiem.", "No radio settings — connect to the radio.")
         return when (kind) {
             "preset",
-            "region" -> {
+            "region",
+            -> {
                 val lora = radioConfigRepository.localConfigFlow.first().lora ?: return noRadio
                 val option = if (lora.use_preset) ChannelOption.from(lora.modem_preset) else null
                 val presetName = option?.name ?: s("własne ustawienia (bez presetu)", "custom settings (no preset)")
@@ -2358,6 +2597,7 @@ class AssistantDataProvider(
                     "Your radio is set to preset $presetName in region ${lora.region.name}.",
                 )
             }
+
             "hops" -> {
                 val lora = radioConfigRepository.localConfigFlow.first().lora ?: return noRadio
                 s(
@@ -2365,10 +2605,12 @@ class AssistantDataProvider(
                     "The hop limit in your radio: ${lora.hop_limit}.",
                 )
             }
+
             "role" -> {
                 val role = nodeRepository.ourNodeInfo.value?.user?.role?.toString() ?: return noRadio
                 s("Twoje urządzenie ma ustawioną rolę ${roleLabel(role)}.", "Your device is set to the role $role.")
             }
+
             "channels" -> {
                 val names = radioConfigRepository.channelSetFlow.first().settings
                 if (names.isEmpty()) return noRadio
@@ -2378,12 +2620,21 @@ class AssistantDataProvider(
                 }
                 val many = names.size
                 val plural =
-                    if (many == 1) "kanał" else if (many % 10 in 2..4 && many % 100 !in 12..14) "kanały" else "kanałów"
+                    if (many == 1) {
+                        "kanał"
+                    } else if (many % 10 in 2..4 && many % 100 !in 12..14) {
+                        "kanały"
+                    } else {
+                        "kanałów"
+                    }
                 s(
                     "Masz $many $plural. Kanał główny to ${names.first().name.ifBlank { fallback }}.\n",
-                    "You have ${names.size} channels. The primary channel is ${names.first().name.ifBlank { fallback }}.\n",
+                    "You have ${names.size} channels. The primary channel is ${names.first().name.ifBlank {
+                        fallback
+                    }}.\n",
                 ) + list.joinToString("\n")
             }
+
             else -> null
         }
     }
@@ -2401,11 +2652,16 @@ class AssistantDataProvider(
                 it > 0
             }
                 ?: node.deviceMetrics.uptime_seconds?.takeIf { it > 0 }
-                ?: return if (polish)
+                ?: return if (polish) {
                     "Węzeł $name nie przysłał czasu pracy (uptime) — nie każde urządzenie go wysyła, a ten jeszcze nie podał."
-                else "Node $name has not reported its uptime."
-        return if (polish) "Czas pracy węzła $name (uptime): ${duration(seconds.toLong())}."
-        else "Uptime of node $name: ${duration(seconds.toLong())}."
+                } else {
+                    "Node $name has not reported its uptime."
+                }
+        return if (polish) {
+            "Czas pracy węzła $name (uptime): ${duration(seconds.toLong())}."
+        } else {
+            "Uptime of node $name: ${duration(seconds.toLong())}."
+        }
     }
 
     /**
@@ -2420,8 +2676,11 @@ class AssistantDataProvider(
         val firmware = node.metadata?.firmware_version?.takeIf { it.isNotBlank() }
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard =
-            if (node.lastHeard == 0) aiString(Res.string.ai_never)
-            else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            if (node.lastHeard == 0) {
+                aiString(Res.string.ai_never)
+            } else {
+                ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            }
         val meters = if (own != null && node.num != own.num) node.distance(own) else null
         val unknown =
             if (polish) "brak danych (węzeł jeszcze tego nie podał)" else "unknown (the node has not reported it yet)"
@@ -2432,10 +2691,11 @@ class AssistantDataProvider(
             append(if (polish) "\n• firmware: " else "\n• firmware: ").append(firmware ?: unknown)
             append(if (polish) "\n• ostatnio słyszany: " else "\n• last heard: ").append(heard)
             if (node.hopsAway >= 0) append(if (polish) "\n• skoki: " else "\n• hops: ").append(node.hopsAway)
-            if (meters != null)
+            if (meters != null) {
                 append(if (polish) "\n• odległość: " else "\n• distance: ")
                     .append(roundTo(meters / 1000.0, 1))
                     .append(" km")
+            }
         }
     }
 
@@ -2452,8 +2712,11 @@ class AssistantDataProvider(
         val state = if (level > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, level)
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard =
-            if (node.lastHeard == 0) aiString(Res.string.ai_never)
-            else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            if (node.lastHeard == 0) {
+                aiString(Res.string.ai_never)
+            } else {
+                ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            }
         return if (voltage > 0f) {
             aiString(Res.string.ai_bat_line, name, state, roundTo(voltage.toDouble(), 2), heard)
         } else {
@@ -2493,7 +2756,7 @@ class AssistantDataProvider(
         sb.append("\n• ").append(aiString(Res.string.ai_net_roles, roles))
         sb.append("\n• ")
             .append(
-                aiString(Res.string.ai_net_low_battery, LOW_BATTERY, low.ifBlank { aiString(Res.string.ai_net_none) })
+                aiString(Res.string.ai_net_low_battery, LOW_BATTERY, low.ifBlank { aiString(Res.string.ai_net_none) }),
             )
         return sb.toString()
     }
@@ -2525,29 +2788,37 @@ class AssistantDataProvider(
             val ours = region == "EU_N_868" && option == ChannelOption.NARROW_FAST
             line(
                 s("region $region, preset $presetName", "region $region, preset $presetName") +
-                    if (ours) s(" — tak jak w naszej sieci", " — the same as our network")
-                    else
+                    if (ours) {
+                        s(" — tak jak w naszej sieci", " — the same as our network")
+                    } else {
                         s(
                             " — inne niż w naszej sieci (Narrow Fast, EU_N_868): inne radia Cię nie usłyszą",
                             " — not what our network uses (Narrow Fast, EU_N_868): other radios will not hear you",
                         )
+                    },
             )
-            if (!lora.tx_enabled)
+            if (!lora.tx_enabled) {
                 line(s("nadawanie jest WYŁĄCZONE — radio tylko słucha", "transmitting is OFF — the radio only listens"))
+            }
             line(
-                if (lora.tx_power == 0)
+                if (lora.tx_power == 0) {
                     s("moc nadawania: maksymalna dozwolona w regionie", "transmit power: the maximum the region allows")
-                else
+                } else {
                     s("moc nadawania: ${lora.tx_power} dBm", "transmit power: ${lora.tx_power} dBm") +
-                        if (lora.tx_power in 1..16)
+                        if (lora.tx_power in 1..16) {
                             s(" — dość mało, możesz ją zwiększyć", " — fairly low, you can raise it")
-                        else ""
+                        } else {
+                            ""
+                        }
+                },
             )
             line(
                 s("limit przeskoków: ${lora.hop_limit}", "hop limit: ${lora.hop_limit}") +
-                    if (lora.hop_limit in 1..2)
+                    if (lora.hop_limit in 1..2) {
                         s(" — mało, wiadomości nie dojdą daleko", " — low, messages will not travel far")
-                    else ""
+                    } else {
+                        ""
+                    },
             )
             val nowS = nowMillis / MILLIS_PER_SECOND
             val me = nodeRepository.ourNodeInfo.value?.num
@@ -2565,14 +2836,14 @@ class AssistantDataProvider(
                     s(
                         "przez ostatnią dobę radio nie słyszało bezpośrednio żadnego węzła — antena, położenie albo ustawienia",
                         "in the last day the radio heard no node directly — antenna, location or settings",
-                    )
+                    ),
                 )
             } else {
                 line(
                     s(
                         "węzły słyszane bezpośrednio przez ostatnią dobę: ${direct.size}",
                         "nodes heard directly in the last day: ${direct.size}",
-                    )
+                    ),
                 )
                 if (best != null) {
                     val name = best.first.user.long_name.ifBlank { best.first.user.short_name }
@@ -2590,7 +2861,7 @@ class AssistantDataProvider(
                         s(
                             "najlepszy sygnał: $name, SNR ${fmt(best.second)} dB",
                             "best signal: $name, SNR ${fmt(best.second)} dB",
-                        ) + extra
+                        ) + extra,
                     )
                 }
             }
@@ -2598,27 +2869,30 @@ class AssistantDataProvider(
             if (noise != 0) {
                 line(
                     s("szum: $noise dBm", "noise: $noise dBm") +
-                        if (noise > -100)
+                        if (noise > -100) {
                             s(
                                 " — wysoki, coś w pobliżu zakłóca (zasilacz, komputer, inne radio)",
                                 " — high, something nearby interferes (power supply, computer, another radio)",
                             )
-                        else s(" — w normie", " — normal")
+                        } else {
+                            s(" — w normie", " — normal")
+                        },
                 )
             }
             val util = ls.channel_utilization
-            if (util > 0f)
+            if (util > 0f) {
                 line(
                     s("zajętość kanału: ${fmt(util)} %", "channel use: ${fmt(util)} %") +
-                        if (util > 25f) s(" — kanał jest zatłoczony", " — the channel is crowded") else ""
+                        if (util > 25f) s(" — kanał jest zatłoczony", " — the channel is crowded") else "",
                 )
+            }
         }
         sb.append("\n\n")
             .append(
                 s(
                     "Sprawdź też sam: antena na właściwe pasmo (868 MHz), dobrze dokręcona, pionowo, jak najwyżej i z dala od metalu; krótki i dobry kabel; wyżej położone radio słyszy dużo dalej. Konkretne łącze do węzła sprawdzisz w planerze łącza.",
                     "Also check yourself: an antenna for the right band (868 MHz), screwed on firmly, vertical, as high as possible and away from metal; a short, good cable; a radio placed higher hears much further. Check a link to a node in the link planner.",
-                )
+                ),
             )
         return sb.toString()
     }
@@ -2635,15 +2909,16 @@ class AssistantDataProvider(
 
     /** The list of nodes by distance ([order] nearest / farthest) or by signal (anything else), for one role or all. */
     suspend fun signalListFor(role: String, order: String, shown: Int = 0): String {
-        if (order == "nearest" || order == "farthest")
+        if (order == "nearest" || order == "farthest") {
             distanceAnswer(
-                    role,
-                    order == "farthest",
-                    if (shown > 0) shown.coerceAtMost(MAX_TOOL_LIST) else NEXT_SHOWN + 1,
-                )
+                role,
+                order == "farthest",
+                if (shown > 0) shown.coerceAtMost(MAX_TOOL_LIST) else NEXT_SHOWN + 1,
+            )
                 ?.let {
                     return it
                 }
+        }
         val words =
             when (order) {
                 "farthest" -> "najdal"
@@ -2660,24 +2935,48 @@ class AssistantDataProvider(
         val n = amount.coerceIn(1, MAX_PERIOD_AMOUNT)
         return when (period.trim().lowercase()) {
             "today" -> Win(today, Long.MAX_VALUE, Res.string.ai_win_today)
+
             "yesterday" -> Win(today - MILLIS_PER_DAY, today, Res.string.ai_win_yesterday)
+
             "minutes" -> Win(now - n * MILLIS_PER_MINUTE, Long.MAX_VALUE, Res.string.ai_win_last_n_min, n)
+
             "hours" ->
-                if (n == 1) Win(now - MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_hour)
-                else Win(now - n * MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_n_h, n)
+                if (n == 1) {
+                    Win(now - MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_hour)
+                } else {
+                    Win(now - n * MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_n_h, n)
+                }
+
             "days" ->
-                if (n == 1) Win(now - MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_day)
-                else Win(now - n * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_d, n)
+                if (n == 1) {
+                    Win(now - MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_day)
+                } else {
+                    Win(now - n * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_d, n)
+                }
+
             "weeks" ->
-                if (n == 1) Win(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_week)
-                else Win(now - n * 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_w, n)
+                if (n == 1) {
+                    Win(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_week)
+                } else {
+                    Win(now - n * 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_w, n)
+                }
+
             "months" ->
-                if (n == 1) Win(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_month)
-                else Win(now - n * 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_m, n)
+                if (n == 1) {
+                    Win(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_month)
+                } else {
+                    Win(now - n * 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_m, n)
+                }
+
             "years" ->
-                if (n == 1) Win(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_year)
-                else Win(now - n * 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_y, n)
+                if (n == 1) {
+                    Win(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_year)
+                } else {
+                    Win(now - n * 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_n_y, n)
+                }
+
             "all" -> Win(0L, Long.MAX_VALUE, Res.string.ai_win_all)
+
             else -> null
         }
     }
@@ -2693,10 +2992,10 @@ class AssistantDataProvider(
             val all = nodeRepository.nodeDBbyNum.value.values
             val heard =
                 all.filter {
-                        it.lastHeard != 0 &&
-                            it.lastHeard * MILLIS_PER_SECOND >= window.since &&
-                            it.lastHeard * MILLIS_PER_SECOND < window.until
-                    }
+                    it.lastHeard != 0 &&
+                        it.lastHeard * MILLIS_PER_SECOND >= window.since &&
+                        it.lastHeard * MILLIS_PER_SECOND < window.until
+                }
                     .sortedByDescending { it.lastHeard }
             val sb = StringBuilder(aiString(Res.string.ai_nodes_heard_title, window.title(), heard.size, all.size))
             if (heard.isNotEmpty()) {
@@ -2710,8 +3009,9 @@ class AssistantDataProvider(
                         .append(" — ")
                         .append(heardAgo)
                 }
-                if (heard.size > NAMES_SHOWN)
+                if (heard.size > NAMES_SHOWN) {
                     sb.append('\n').append(aiString(Res.string.ai_more, heard.size - NAMES_SHOWN))
+                }
             }
             return sb.toString()
         }
@@ -2756,10 +3056,11 @@ class AssistantDataProvider(
                 wanted.toIntOrNull() != null ||
                     numberedChannel(wanted) != null ||
                     names.any { it.isNotBlank() && it.lowercase().contains(wanted) }
-            if (!isChannel)
+            if (!isChannel) {
                 findNode(wanted)?.let {
                     return toolDirectMessages(it.user.long_name.ifBlank { it.user.short_name }, limit)
                 }
+            }
         }
         return toolChannelMessages(wanted, limit)
     }
@@ -2811,9 +3112,11 @@ class AssistantDataProvider(
     fun nodeRoleFor(num: Int): String = nodeRepository.nodeDBbyNum.value[num]?.user?.role?.toString().orEmpty()
 
     /** The label of a button to the link planner: the planner itself, with the node when it is not the user's own. */
-    fun plannerLabel(num: Int): String =
-        if (num == nodeRepository.ourNodeInfo.value?.num) "Mesh Link Planer"
-        else "Mesh Link Planer: ${nodeNameFor(num)}"
+    fun plannerLabel(num: Int): String = if (num == nodeRepository.ourNodeInfo.value?.num) {
+        "Mesh Link Planer"
+    } else {
+        "Mesh Link Planer: ${nodeNameFor(num)}"
+    }
 
     fun nodeNameFor(num: Int): String =
         nodeRepository.nodeDBbyNum.value[num]?.let { it.user.long_name.ifBlank { it.user.short_name } }.orEmpty()
@@ -2856,12 +3159,13 @@ class AssistantDataProvider(
     }
 
     /** Words of a node's names that a spoken name can be compared with (the whole names and the words inside them). */
-    private fun nameWords(n: org.meshtastic.core.model.Node): List<String> =
-        (listOf(n.user.long_name, n.user.short_name) +
-                n.user.long_name.split(' ', '_', '-', '/', '.').filter { it.length >= NEAR_MIN_WORD })
-            .map { it.fold().trim() }
-            .filter { it.isNotEmpty() }
-            .distinct()
+    private fun nameWords(n: org.meshtastic.core.model.Node): List<String> = (
+        listOf(n.user.long_name, n.user.short_name) +
+            n.user.long_name.split(' ', '_', '-', '/', '.').filter { it.length >= NEAR_MIN_WORD }
+        )
+        .map { it.fold().trim() }
+        .filter { it.isNotEmpty() }
+        .distinct()
 
     /**
      * Nodes whose name is close to [q] although it is not written the same way: another Polish ending ("Karczówce" for
@@ -2917,15 +3221,20 @@ class AssistantDataProvider(
     suspend fun unknownNode(name: String): String {
         val q = name.trim().lowercase()
         val close =
-            if (q.isEmpty()) emptyList()
-            else
+            if (q.isEmpty()) {
+                emptyList()
+            } else {
                 nearNodes(q, loose = true)
                     .take(SUGGESTED_NODES)
                     .map { it.user.long_name.ifBlank { it.user.short_name } }
                     .distinct()
+            }
         val base = aiString(Res.string.ai_unknown_node, name)
-        return if (close.isEmpty()) base
-        else base + "\n" + aiString(Res.string.ai_unknown_node_maybe, close.joinToString(", "))
+        return if (close.isEmpty()) {
+            base
+        } else {
+            base + "\n" + aiString(Res.string.ai_unknown_node_maybe, close.joinToString(", "))
+        }
     }
 
     /**
@@ -2947,8 +3256,10 @@ class AssistantDataProvider(
             when {
                 key.endsWith("uptime_seconds") ->
                     number.toLongOrNull()?.let { "$key=$number (${duration(it)})" } ?: m.value
+
                 key.endsWith("_bytes") ->
                     number.toLongOrNull()?.let { "$key=$number (${it / BYTES_PER_KB} kB)" } ?: m.value
+
                 else -> UNITS[key]?.let { "$key=$number$it${plausibility(key, number.toDoubleOrNull())}" } ?: m.value
             }
         }
@@ -2970,8 +3281,13 @@ class AssistantDataProvider(
         val days = seconds / SECONDS_PER_DAY
         val hours = seconds % SECONDS_PER_DAY / SECONDS_PER_HOUR
         val minutes = seconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE
-        return if (days > 0) "${days} d ${hours} h"
-        else if (hours > 0) "${hours} h ${minutes} min" else "${minutes} min"
+        return if (days > 0) {
+            "$days d $hours h"
+        } else if (hours > 0) {
+            "$hours h $minutes min"
+        } else {
+            "$minutes min"
+        }
     }
 
     private fun roundTo(value: Double, decimals: Int): String {
@@ -2994,10 +3310,13 @@ class AssistantDataProvider(
         return { n -> roles.any { n.user.role.toString().uppercase().contains(it) } }
     }
 
-    private fun position(n: org.meshtastic.core.model.Node): String? =
-        n.validPosition?.let {
-            "${(kotlin.math.round(n.latitude * COORD_SCALE) / COORD_SCALE)}, ${(kotlin.math.round(n.longitude * COORD_SCALE) / COORD_SCALE)}"
-        }
+    private fun position(n: org.meshtastic.core.model.Node): String? = n.validPosition?.let {
+        "${(
+            kotlin.math.round(
+                n.latitude * COORD_SCALE,
+            ) / COORD_SCALE
+            )}, ${(kotlin.math.round(n.longitude * COORD_SCALE) / COORD_SCALE)}"
+    }
 
     private fun String.redacted(): String = replace(SECRET, "$1=<hidden>")
 

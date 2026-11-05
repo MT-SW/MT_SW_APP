@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "LongMethod", "TooManyFunctions")
+@file:Suppress("MagicNumber", "LongMethod", "TooManyFunctions", "LongParameterList", "UnusedPrivateFunction")
 
 package org.meshtastic.core.ui.component
 

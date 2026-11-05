@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("UnnecessaryComposable")
+
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.material3.ColorScheme

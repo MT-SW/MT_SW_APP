@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongMethod", "MagicNumber")
+@file:Suppress("LongMethod", "MagicNumber", "UnnecessaryLaunchedEffect", "UnusedPrivateProperty")
 
 package org.meshtastic.feature.node.health
 

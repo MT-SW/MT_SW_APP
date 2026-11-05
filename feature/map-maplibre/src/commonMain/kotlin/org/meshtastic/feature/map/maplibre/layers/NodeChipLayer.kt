@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongParameterList")
+
 package org.meshtastic.feature.map.maplibre.layers
 
 import androidx.compose.material3.MaterialTheme

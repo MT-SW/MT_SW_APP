@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
-
 @file:Suppress("ViewModelForwarding")
 
 package org.meshtastic.feature.map.planner.ui

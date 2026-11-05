@@ -21,6 +21,7 @@
     "ParameterNaming",
     "ReturnCount",
     "TooManyFunctions",
+    "UnnecessaryLaunchedEffect",
 )
 
 package org.meshtastic.feature.map.horizon

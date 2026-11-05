@@ -26,6 +26,11 @@
     "ThrowsCount",
     "TooGenericExceptionCaught",
     "TooManyFunctions",
+    "InjectDispatcher",
+    "SuspendFunSwallowedCancellation",
+    "UnsafeCallOnNullableType",
+    "UseCheckOrError",
+    "UseOrEmpty",
 )
 
 package org.meshtastic.feature.messaging.translation

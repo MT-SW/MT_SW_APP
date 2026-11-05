@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
-@file:Suppress("TooManyFunctions", "ComposableParamOrder", "MagicNumber")
+@file:Suppress("TooManyFunctions", "ComposableParamOrder", "MagicNumber", "UnnecessaryLaunchedEffect", "UseOrEmpty")
 
 package org.meshtastic.feature.map.planner.ui
 

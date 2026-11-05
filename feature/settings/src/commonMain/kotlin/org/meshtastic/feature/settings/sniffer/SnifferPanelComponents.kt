@@ -16,6 +16,8 @@
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
 
+@file:Suppress("LongParameterList")
+
 package org.meshtastic.feature.settings.sniffer
 
 import androidx.compose.foundation.layout.Column

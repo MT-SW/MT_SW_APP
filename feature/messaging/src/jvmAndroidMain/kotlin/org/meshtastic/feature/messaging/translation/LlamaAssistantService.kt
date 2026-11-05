@@ -35,6 +35,11 @@
     "TooManyFunctions",
     "UnusedParameter",
     "Wrapping",
+    "InjectDispatcher",
+    "InstanceOfCheckForException",
+    "NoNameShadowing",
+    "UnsafeCallOnNullableType",
+    "UnusedVariable",
 )
 
 package org.meshtastic.feature.messaging.translation

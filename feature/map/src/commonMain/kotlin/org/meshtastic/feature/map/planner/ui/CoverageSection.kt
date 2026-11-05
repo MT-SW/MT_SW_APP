@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-
 @file:Suppress("LongMethod", "MagicNumber", "ModifierNotUsedAtRoot", "ViewModelForwarding")
 
 package org.meshtastic.feature.map.planner.ui

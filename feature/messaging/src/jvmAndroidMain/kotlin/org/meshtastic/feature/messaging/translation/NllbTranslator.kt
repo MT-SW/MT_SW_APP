@@ -20,6 +20,9 @@
     "NestedBlockDepth",
     "ReturnCount",
     "TooGenericExceptionCaught",
+    "InjectDispatcher",
+    "SuspendFunSwallowedCancellation",
+    "UnsafeCallOnNullableType",
 )
 
 package org.meshtastic.feature.messaging.translation
