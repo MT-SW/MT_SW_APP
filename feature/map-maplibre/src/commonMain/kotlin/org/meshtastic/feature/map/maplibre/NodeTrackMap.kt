@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.serialization.json.JsonObject
@@ -51,6 +50,7 @@ import org.maplibre.spatialk.geojson.Point
 import org.meshtastic.core.common.util.latLongToMeter
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.feature.map.LastHeardFilter
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.component.NodeTrackFilterMenu

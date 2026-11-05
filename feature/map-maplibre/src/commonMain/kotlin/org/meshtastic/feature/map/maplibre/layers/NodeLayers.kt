@@ -280,9 +280,8 @@ private const val FOCUS_RING_RADIUS = 16
 private const val FOCUS_RING_STROKE = 3
 
 /**
- * What decides how a node is drawn: where it is, what it is called, and the flags that change its chip. Everything
- * else on a [Node] — last heard, SNR, battery, telemetry — changes with nearly every packet and changes nothing on the
- * map.
+ * What decides how a node is drawn: where it is, what it is called, and the flags that change its chip. Everything else
+ * on a [Node] — last heard, SNR, battery, telemetry — changes with nearly every packet and changes nothing on the map.
  */
 private data class NodeDrawKey(
     val num: Int,
@@ -295,17 +294,16 @@ private data class NodeDrawKey(
     val precisionBits: Int,
 )
 
-private fun Node.toDrawKey() =
-    NodeDrawKey(
-        num = num,
-        latitude = latitude,
-        longitude = longitude,
-        shortName = user.short_name,
-        longName = user.long_name,
-        isFavorite = isFavorite,
-        isIgnored = isIgnored,
-        precisionBits = position.precision_bits,
-    )
+private fun Node.toDrawKey() = NodeDrawKey(
+    num = num,
+    latitude = latitude,
+    longitude = longitude,
+    shortName = user.short_name,
+    longName = user.long_name,
+    isFavorite = isFavorite,
+    isIgnored = isIgnored,
+    precisionBits = position.precision_bits,
+)
 
 /**
  * The same list for as long as nothing visible about it has changed.

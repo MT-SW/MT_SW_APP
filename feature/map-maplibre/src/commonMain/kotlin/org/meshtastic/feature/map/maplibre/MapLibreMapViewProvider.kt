@@ -35,7 +35,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
@@ -48,6 +47,7 @@ import org.maplibre.compose.location.rememberLocationState
 import org.maplibre.compose.location.rememberSystemSettingsLauncher
 import org.maplibre.compose.map.MapState
 import org.maplibre.spatialk.geojson.Position
+import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.MapLinksViewModel
@@ -183,7 +183,8 @@ class MapLibreMapViewProvider(
                 basemap = basemaps.current,
                 onMapLongClick = waypoints.onLongPress,
                 onMapClick = { position ->
-                    // While the Planner is waiting for a point, the tap belongs to it rather than to the waypoint tools.
+                    // While the Planner is waiting for a point, the tap belongs to it rather than to the waypoint
+                    // tools.
                     if (plannerBridge.pickingSide != null) {
                         plannerBridge.deliverTap(position.latitude, position.longitude)
                     } else {

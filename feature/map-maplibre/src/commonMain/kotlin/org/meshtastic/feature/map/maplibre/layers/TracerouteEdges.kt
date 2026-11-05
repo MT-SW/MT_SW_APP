@@ -59,7 +59,8 @@ internal data class TracerouteEdge(val from: Position, val to: Position, val snr
     )
 
     val midpoint: Position
-        get() = Position(longitude = (from.longitude + to.longitude) / 2.0, latitude = (from.latitude + to.latitude) / 2.0)
+        get() =
+            Position(longitude = (from.longitude + to.longitude) / 2.0, latitude = (from.latitude + to.latitude) / 2.0)
 
     /** "-3.5 dB", or "?" when the radio did not report a value. */
     val label: String

@@ -22,7 +22,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -66,6 +65,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.safeCatching
 import org.meshtastic.core.ui.theme.LocalMonochrome
+import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.feature.map.kml.ICON_URL_PROPERTY
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.opacityOf
@@ -253,7 +253,8 @@ private fun GroundOverlayLayer(layerId: String, index: Int, overlay: LayerGround
 }
 
 /** What an import with no colours of its own is drawn in. */
-private val CustomLayerBlue: Color get() = Color(0xFF3F51B5).monoSafe()
+private val CustomLayerBlue: Color
+    get() = Color(0xFF3F51B5).monoSafe()
 
 /** True for a feature whose geometry is any of [types]. */
 private fun geometryIsOneOf(types: List<GeometryType>): Expression<BooleanValue> =

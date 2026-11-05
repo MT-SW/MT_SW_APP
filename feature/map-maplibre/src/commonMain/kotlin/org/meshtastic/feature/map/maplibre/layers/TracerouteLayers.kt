@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -44,6 +43,7 @@ import org.maplibre.spatialk.geojson.Point
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.determineSignalQuality
+import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
@@ -51,10 +51,10 @@ import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 /**
  * Forward and return traceroute paths, hop by hop.
  *
- * Every hop is its own line in the colour of the signal quality its SNR rates (the same bands and palette as the
- * signal indicators elsewhere in the app), with an arrowhead at its far end and the SNR written along it. The two
- * directions run side by side: each line is shifted a few pixels to the right of its own direction of travel, so the
- * pair always sits at equal distances on either side of the axis between the nodes, at every zoom and orientation.
+ * Every hop is its own line in the colour of the signal quality its SNR rates (the same bands and palette as the signal
+ * indicators elsewhere in the app), with an arrowhead at its far end and the SNR written along it. The two directions
+ * run side by side: each line is shifted a few pixels to the right of its own direction of travel, so the pair always
+ * sits at equal distances on either side of the axis between the nodes, at every zoom and orientation.
  */
 @Composable
 internal fun TracerouteLayers(
@@ -66,8 +66,10 @@ internal fun TracerouteLayers(
 ) {
     val preset = LocalModemPreset.current
     val palette = Quality.entries.associateWith { it.color.invoke().toCssHex() }
-    val forwardEdges = remember(forwardRoute, forwardSnr, nodeLookup) { tracerouteEdges(forwardRoute, forwardSnr, nodeLookup) }
-    val returnEdges = remember(returnRoute, returnSnr, nodeLookup) { tracerouteEdges(returnRoute, returnSnr, nodeLookup) }
+    val forwardEdges =
+        remember(forwardRoute, forwardSnr, nodeLookup) { tracerouteEdges(forwardRoute, forwardSnr, nodeLookup) }
+    val returnEdges =
+        remember(returnRoute, returnSnr, nodeLookup) { tracerouteEdges(returnRoute, returnSnr, nodeLookup) }
 
     DirectionLayers(id = "traceroute-forward", edges = forwardEdges, preset = preset, palette = palette)
     DirectionLayers(id = "traceroute-return", edges = returnEdges, preset = preset, palette = palette)
@@ -91,7 +93,8 @@ private fun DirectionLayers(
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.White)),
         width = const(LINE_WIDTH_DP.dp),
-        // Positive offsets are to the right of the line's own direction, so the opposite direction lands on the far side.
+        // Positive offsets are to the right of the line's own direction, so the opposite direction lands on the far
+        // side.
         offset = const(SEPARATION_DP.dp),
     )
     SymbolLayer(

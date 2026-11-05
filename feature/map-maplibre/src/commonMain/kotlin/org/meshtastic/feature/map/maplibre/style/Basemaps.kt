@@ -105,14 +105,13 @@ private const val GLYPHS_URL = "https://tiles.openfreemap.org/fonts/{fontstack}/
  *
  * No sources or layers of its own — the basemap itself is added at runtime as a raster layer over the top of this.
  */
-private val RasterBaseStyle: BaseStyle =
-    BaseStyle.Json {
-        put("version", STYLE_SPEC_VERSION)
-        put("name", "Meshtastic raster basemap")
-        put("glyphs", GLYPHS_URL)
-        putJsonObject("sources") {}
-        putJsonArray("layers") {}
-    }
+private val RasterBaseStyle: BaseStyle = BaseStyle.Json {
+    put("version", STYLE_SPEC_VERSION)
+    put("name", "Meshtastic raster basemap")
+    put("glyphs", GLYPHS_URL)
+    putJsonObject("sources") {}
+    putJsonArray("layers") {}
+}
 
 /** The MapLibre/Mapbox style specification version every style document here declares. */
 private const val STYLE_SPEC_VERSION = 8

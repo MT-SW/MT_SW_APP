@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.map.maplibre
 
-import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,6 +69,7 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy

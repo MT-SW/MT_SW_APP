@@ -125,11 +125,11 @@ internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (Boundin
                 scope.launch { createFailed = !manager.downloadVisibleArea(target, pixelRatio) }
             },
             enabled =
-                canDownloadOfflinePack(
-                    managerState is OfflineStorageState.Ready,
-                    target.styleUrl ?: target.rasterBasemap?.id,
-                    estimate,
-                ),
+            canDownloadOfflinePack(
+                managerState is OfflineStorageState.Ready,
+                target.styleUrl ?: target.rasterBasemap?.id,
+                estimate,
+            ),
             modifier = Modifier.padding(vertical = 8.dp),
         ) {
             Text(text = stringResource(Res.string.map_start_download))

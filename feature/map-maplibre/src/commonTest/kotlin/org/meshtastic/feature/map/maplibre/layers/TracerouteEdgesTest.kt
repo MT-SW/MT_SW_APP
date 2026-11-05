@@ -24,8 +24,11 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class TracerouteEdgesTest {
-    private fun edge(toLat: Double, toLon: Double, snr: Float? = null) =
-        TracerouteEdge(from = Position(longitude = 20.0, latitude = 50.0), to = Position(longitude = toLon, latitude = toLat), snrDb = snr)
+    private fun edge(toLat: Double, toLon: Double, snr: Float? = null) = TracerouteEdge(
+        from = Position(longitude = 20.0, latitude = 50.0),
+        to = Position(longitude = toLon, latitude = toLat),
+        snrDb = snr,
+    )
 
     @Test
     fun arrowRotationFollowsTheHop() {

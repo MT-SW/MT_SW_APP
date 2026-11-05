@@ -18,8 +18,8 @@ package org.meshtastic.feature.map.maplibre.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -167,7 +167,6 @@ private fun MapLayersSheet(
                 offlineTarget.showRegion(bounds)
             },
         )
-
     }
 }
 

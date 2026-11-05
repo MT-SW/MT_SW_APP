@@ -29,24 +29,29 @@ import org.meshtastic.core.ui.theme.monoSafe
 internal object MapColors {
     /** Cluster bubbles and traceroute hop markers. */
     private val SlateBase = Color(0xFF2C2D3C)
-    val Slate: Color get() = SlateBase.monoSafe()
+    val Slate: Color
+        get() = SlateBase.monoSafe()
 
     /** Geofence zones and the currently selected track point — carried over from the OSMdroid map. */
     private val HighlightBase = Color(0xFFFF8C00)
-    val Highlight: Color get() = HighlightBase.monoSafe()
+    val Highlight: Color
+        get() = HighlightBase.monoSafe()
 
     /** A node the scanner heard itself. The same green the Google discovery map uses. */
     private val DiscoveryDirectBase = Color(0xFF4CAF50)
-    val DiscoveryDirect: Color get() = DiscoveryDirectBase.monoSafe()
+    val DiscoveryDirect: Color
+        get() = DiscoveryDirectBase.monoSafe()
 
     /**
      * A node that reached the scanner through the mesh. Blue, as on the Google discovery map — the distinction is the
      * point of the screen, so it belongs on the markers and not only on the links.
      */
     private val DiscoveryMeshBase = Color(0xFF2196F3)
-    val DiscoveryMesh: Color get() = DiscoveryMeshBase.monoSafe()
+    val DiscoveryMesh: Color
+        get() = DiscoveryMeshBase.monoSafe()
 
     /** The scanner itself. */
     private val DiscoveryUserBase = Color(0xFFFF9800)
-    val DiscoveryUser: Color get() = DiscoveryUserBase.monoSafe()
+    val DiscoveryUser: Color
+        get() = DiscoveryUserBase.monoSafe()
 }

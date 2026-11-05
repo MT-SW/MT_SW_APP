@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre.geojson
 
+import androidx.compose.ui.graphics.toArgb
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -23,10 +24,9 @@ import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
-import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.util.precisionRadiusMetersOrNull
-import androidx.compose.ui.graphics.toArgb
 import org.meshtastic.core.ui.theme.monoSafe
 import kotlin.math.PI
 import kotlin.math.cos

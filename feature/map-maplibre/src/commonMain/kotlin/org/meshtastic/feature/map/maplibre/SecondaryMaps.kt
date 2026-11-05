@@ -45,12 +45,12 @@ import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
 import org.maplibre.compose.expressions.dsl.asBoolean
 import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.expressions.dsl.not
 import org.maplibre.compose.expressions.value.LineCap
 import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.interaction.MapInteractions
+import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.map.MapUiOptions
 import org.maplibre.spatialk.geojson.BoundingBox

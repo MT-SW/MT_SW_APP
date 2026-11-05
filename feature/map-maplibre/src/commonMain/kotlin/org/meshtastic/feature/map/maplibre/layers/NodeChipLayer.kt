@@ -19,7 +19,6 @@ package org.meshtastic.feature.map.maplibre.layers
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import org.meshtastic.core.ui.theme.LocalMonochrome
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -68,6 +67,7 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Temperature
+import org.meshtastic.core.ui.theme.LocalMonochrome
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.maplibre.geojson.MapChipGlyph
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey

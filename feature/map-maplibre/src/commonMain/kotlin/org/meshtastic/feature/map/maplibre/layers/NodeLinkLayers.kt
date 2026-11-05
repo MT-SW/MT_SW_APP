@@ -45,8 +45,8 @@ import org.meshtastic.feature.map.maplibre.geojson.toCssHex
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 
 /**
- * Lines between nodes that exchange packets, coloured by how good the link is (the same signal palette as the node
- * list and the traceroute map; grey when no signal reading is known).
+ * Lines between nodes that exchange packets, coloured by how good the link is (the same signal palette as the node list
+ * and the traceroute map; grey when no signal reading is known).
  *
  * Two layers, so the links the radio only deduced by hearing a node directly stay thinner and fainter than the ones a
  * node reported (neighbour info) or a traceroute walked. Drawn under the node chips and clusters, so a line never
@@ -60,12 +60,14 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
     val palette = Quality.entries.associateWith { it.color.invoke().toArgb().toCssHex() }
     val reported = remember(links) { links.filter { it.kind != MapLinkKind.DIRECT } }
     val heard = remember(links) { links.filter { it.kind == MapLinkKind.DIRECT } }
-    val reportedSource = rememberFeatureSource(reported, nodes, preset, palette) {
-        linksToLines(reported, nodes, preset, palette)
-    }
-    val heardSource = rememberFeatureSource(heard, nodes, preset, palette) {
-        linksToLines(heard, nodes, preset, palette)
-    }
+    val reportedSource =
+        rememberFeatureSource(reported, nodes, preset, palette) {
+            linksToLines(reported, nodes, preset, palette)
+        }
+    val heardSource =
+        rememberFeatureSource(heard, nodes, preset, palette) {
+            linksToLines(heard, nodes, preset, palette)
+        }
 
     LineLayer(
         id = "node-links-direct",
@@ -99,8 +101,7 @@ private fun linksToLines(
         links.mapNotNull { link ->
             val a = byNum[link.nodeA]?.takeIf { it.validPosition != null } ?: return@mapNotNull null
             val b = byNum[link.nodeB]?.takeIf { it.validPosition != null } ?: return@mapNotNull null
-            val color =
-                link.snrDb?.let { palette.getValue(determineSignalQuality(it, preset)) } ?: UNKNOWN_LINK_COLOR
+            val color = link.snrDb?.let { palette.getValue(determineSignalQuality(it, preset)) } ?: UNKNOWN_LINK_COLOR
             Feature<LineString, JsonObject?>(
                 geometry =
                 LineString(

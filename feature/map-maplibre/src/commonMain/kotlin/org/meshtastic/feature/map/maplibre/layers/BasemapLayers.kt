@@ -59,7 +59,11 @@ internal fun RasterBasemapLayer(basemap: Basemap.Raster) {
             tileSize = basemap.spec.tileSize,
         )
     // In the black-and-white themes the map tiles lose their colour too (-1 = fully desaturated).
-    RasterLayer(id = "basemap-${basemap.id}", source = source, saturation = const(if (LocalMonochrome.current) -1f else 0f))
+    RasterLayer(
+        id = "basemap-${basemap.id}",
+        source = source,
+        saturation = const(if (LocalMonochrome.current) -1f else 0f),
+    )
 }
 
 /**

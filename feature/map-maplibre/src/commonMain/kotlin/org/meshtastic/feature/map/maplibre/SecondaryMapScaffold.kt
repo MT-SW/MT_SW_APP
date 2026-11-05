@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.map.maplibre
 
-import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +37,7 @@ import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.overlay.include
 import org.maplibre.spatialk.geojson.BoundingBox
+import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.CollapsedAttributionOrnaments

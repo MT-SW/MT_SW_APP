@@ -82,7 +82,9 @@ fun MapLibreHorizonPickMap(
     val located = remember(nodes) { nodes.filter { it.latitude != 0.0 || it.longitude != 0.0 } }
     val chips =
         remember(located) {
-            located.map { MapChipKey(label = it.shortName.ifBlank { "?" }, background = it.background, foreground = it.foreground) }
+            located.map {
+                MapChipKey(label = it.shortName.ifBlank { "?" }, background = it.background, foreground = it.foreground)
+            }
         }
     val centre = GeoPosition(longitude = centerLongitude, latitude = centerLatitude)
 
@@ -114,7 +116,8 @@ fun MapLibreHorizonPickMap(
                         circles.map { node ->
                             Feature<Polygon, JsonObject?>(
                                 geometry = circlePolygon(node.latitude, node.longitude, node.precisionM ?: 0.0),
-                                properties = buildJsonObject { put(NodeFeatureKeys.BACKGROUND, node.background.toCssHex()) },
+                                properties =
+                                buildJsonObject { put(NodeFeatureKeys.BACKGROUND, node.background.toCssHex()) },
                             )
                         },
                     )
@@ -177,7 +180,9 @@ fun MapLibreHorizonPickMap(
 private fun zoomForRadius(radiusKm: Int, latitude: Double): Double {
     val metres = radiusKm.coerceAtLeast(1) * METRES_PER_KM
     val cosLat = kotlin.math.cos(latitude * kotlin.math.PI / HALF_TURN).coerceAtLeast(MIN_COS)
-    val zoom = kotlin.math.ln(EQUATOR_METRES_AT_ZOOM_0 * cosLat * FIT_PIXELS / (metres * 2.0 * TILE_PIXELS)) / kotlin.math.ln(2.0)
+    val zoom =
+        kotlin.math.ln(EQUATOR_METRES_AT_ZOOM_0 * cosLat * FIT_PIXELS / (metres * 2.0 * TILE_PIXELS)) /
+            kotlin.math.ln(2.0)
     return zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
 }
 

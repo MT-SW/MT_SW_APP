@@ -32,8 +32,9 @@ data class ClusterMember(val nodeNum: Int, val longName: String, val shortName: 
  * The names travel on the features themselves — see [nodesToFeatureCollection] — so listing a cluster needs no second
  * lookup against the node database.
  */
-internal fun FeatureCollection<*, *>.toClusterMembers(): List<ClusterMember> =
-    features.mapNotNull { feature -> (feature.properties as? JsonObject)?.toClusterMember() }
+internal fun FeatureCollection<*, *>.toClusterMembers(): List<ClusterMember> = features.mapNotNull { feature ->
+    (feature.properties as? JsonObject)?.toClusterMember()
+}
 
 private fun JsonObject.toClusterMember(): ClusterMember? {
     val nodeNum = this[NodeFeatureKeys.NODE_NUM].asInt() ?: return null

@@ -110,12 +110,13 @@ val syncDocsToComposeResources =
                     val keep =
                         Regex(
                             "name=\"(ai_[^\"]*|assistant_[^\"]*|schema_[^\"]*|node_color_[^\"]*|dictation_[^\"]*|" +
-                            "bottom_nav_settings|lora|device|display|bluetooth|network|position|power|mqtt|" +
-                            "telemetry|mt_sw_features_title|clean_node_database_title|filter_settings|debug_panel|" +
-                            "about|help_and_documentation|nodes|map|messages|channels|connections|firmware|" +
-                            "discovery_local_mesh|quick_chat|ui_scale|auto_load_chat_images|" +
-                            "import_menu_in_top_bar|theme|preferences_language|log_retention_days|" +
-                            "translator_title)\""
+                                "bottom_nav_settings|lora|device|display|bluetooth|network|position|power|mqtt|" +
+                                "telemetry|mt_sw_features_title|clean_node_database_title|" +
+                                "filter_settings|debug_panel|" +
+                                "about|help_and_documentation|nodes|map|messages|channels|connections|firmware|" +
+                                "discovery_local_mesh|quick_chat|ui_scale|auto_load_chat_images|" +
+                                "import_menu_in_top_bar|theme|preferences_language|log_retention_days|" +
+                                "translator_title)\""
                         )
                     if (keep.containsMatchIn(line)) line else ""
                 }
