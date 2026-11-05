@@ -50,7 +50,7 @@ class NodeItemZeroMetricsTest {
     }
 
     @Test
-    fun nodeItem_showsZeroVoltageAndCurrent() = runComposeUiTest {
+    fun nodeItem_showsZeroCurrentButHidesZeroVoltage() = runComposeUiTest {
         setNodeItem(
             EnvironmentMetrics.Builder()
                 .also { wb ->
@@ -59,7 +59,8 @@ class NodeItemZeroMetricsTest {
                 }
                 .build(),
         )
-        onNodeWithText("0.00 V").assertIsDisplayed()
+        // A zero voltage is not shown on purpose (the basic voltage belongs to the battery); a zero current is.
+        onNodeWithText("0.00 V").assertDoesNotExist()
         onNodeWithText("0.0 mA").assertIsDisplayed()
     }
 
