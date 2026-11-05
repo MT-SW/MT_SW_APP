@@ -16,8 +16,8 @@
  */
 package org.meshtastic.feature.map.planner.export
 
-import kotlin.math.min
 import org.meshtastic.core.ui.util.JsonText
+import kotlin.math.min
 
 /**
  * JSON export of everything the report holds, as data and not as a picture: the sections as label/value pairs, the
@@ -40,8 +40,13 @@ object PlannerJson {
         append("  \"points\": [")
         append(
             report.points.joinToString(", ") {
-                "{\"name\": ${q(it.name)}, \"lat\": ${Num.fmt(it.lat, 6)}, \"lon\": ${Num.fmt(it.lon, 6)}, \"description\": ${q(it.description)}}"
-            }
+                "{\"name\": ${q(
+                    it.name,
+                )}, \"lat\": ${Num.fmt(
+                    it.lat,
+                    6,
+                )}, \"lon\": ${Num.fmt(it.lon, 6)}, \"description\": ${q(it.description)}}"
+            },
         )
         append("],\n")
         append("  \"profile\": ")
@@ -79,7 +84,7 @@ object PlannerJson {
             append(
                 c.samples.joinToString(",") {
                     "[" + Num.fmt(it.lat, 5) + "," + Num.fmt(it.lon, 5) + "," + Num.fmt(it.marginDb.toDouble(), 1) + "]"
-                }
+                },
             )
             append("]}")
         }

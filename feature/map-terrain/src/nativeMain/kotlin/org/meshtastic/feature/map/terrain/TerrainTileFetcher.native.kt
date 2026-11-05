@@ -41,10 +41,10 @@ import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
 import platform.darwin.dispatch_time
 import platform.posix.memset
+import platform.zlib.ZLIB_VERSION
 import platform.zlib.Z_NO_FLUSH
 import platform.zlib.Z_OK
 import platform.zlib.Z_STREAM_END
-import platform.zlib.ZLIB_VERSION
 import platform.zlib.inflate
 import platform.zlib.inflateEnd
 import platform.zlib.inflateInit2_
@@ -97,7 +97,9 @@ private class IosPmtilesTerrainTileFetcher(private val url: String) : TerrainTil
     private fun loadHeader(): Header {
         lock.lock()
         try {
-            header?.let { return it }
+            header?.let {
+                return it
+            }
             val b = readRange(0, HEADER_BYTES) ?: error("PMTiles: no header")
             check(b.size >= HEADER_BYTES && b[0] == 'P'.code.toByte() && b[1] == 'M'.code.toByte()) {
                 "PMTiles: bad header"
@@ -121,7 +123,9 @@ private class IosPmtilesTerrainTileFetcher(private val url: String) : TerrainTil
     private fun loadDirectory(h: Header, offset: Long, length: Long): List<Entry> {
         lock.lock()
         try {
-            directories[offset]?.let { return it }
+            directories[offset]?.let {
+                return it
+            }
         } finally {
             lock.unlock()
         }
@@ -175,7 +179,13 @@ private class IosPmtilesTerrainTileFetcher(private val url: String) : TerrainTil
         while (m <= n) {
             val k = (n + m) ushr 1
             val c = id - entries[k].tileId
-            if (c > 0) m = k + 1 else if (c < 0) n = k - 1 else return entries[k]
+            if (c > 0) {
+                m = k + 1
+            } else if (c < 0) {
+                n = k - 1
+            } else {
+                return entries[k]
+            }
         }
         if (n >= 0) {
             val e = entries[n]
@@ -298,7 +308,6 @@ private class IosPmtilesTerrainTileFetcher(private val url: String) : TerrainTil
             return all
         }
     }
-
 
     private companion object {
         const val HEADER_BYTES = 127L

@@ -49,7 +49,8 @@ kotlin {
             implementation(libs.jetbrains.compose.material3.adaptive.navigation3)
         }
 
-        // The offline translator runs the same ONNX Runtime API on Android and on desktop; only the native build differs.
+        // The offline translator runs the same ONNX Runtime API on Android and on desktop; only the native build
+        // differs.
         // compileOnly here lets the shared code compile; each platform brings its own runtime below.
         getByName("jvmAndroidMain") {
             dependencies {
@@ -92,15 +93,15 @@ kotlin {
 // iPhone: the AI engine (llama.cpp) is linked in the app itself. It is built once by `scripts/build-llama-ios.sh`
 // into native/ios/llama.xcframework; without it the iPhone app still builds, only the on-device AI stays off.
 val llamaXcframework = rootDir.resolve("native/ios/llama.xcframework")
+
 if (llamaXcframework.isDirectory) {
     kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         if (konanTarget.family == Family.IOS) {
-            val slice =
-                if (konanTarget.name == "ios_arm64") "ios-arm64" else "ios-arm64_x86_64-simulator"
+            val slice = if (konanTarget.name == "ios_arm64") "ios-arm64" else "ios-arm64_x86_64-simulator"
             val frameworkDir = File(llamaXcframework, "$slice")
             compilations.getByName("main").cinterops.create("llama") {
                 defFile(project.file("src/nativeInterop/cinterop/llama.def"))
-                compilerOpts("-I${frameworkDir}/llama.framework/Headers")
+                compilerOpts("-I$frameworkDir/llama.framework/Headers")
             }
         }
     }

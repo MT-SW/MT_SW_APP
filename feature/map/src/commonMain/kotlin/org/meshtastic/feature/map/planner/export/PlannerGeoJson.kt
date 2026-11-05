@@ -34,7 +34,7 @@ object PlannerGeoJson {
                     Json.str(p.name) +
                     ",\"description\":" +
                     Json.str(p.description) +
-                    "}}"
+                    "}}",
             )
         }
         if (report.points.size >= 2) {
@@ -47,7 +47,7 @@ object PlannerGeoJson {
                     pos(b.lat, b.lon) +
                     "]},\"properties\":{\"name\":" +
                     Json.str(a.name + " - " + b.name) +
-                    "}}"
+                    "}}",
             )
         }
         val cov = report.coverage
@@ -57,7 +57,7 @@ object PlannerGeoJson {
                     pos(cov.centerLat, cov.centerLon) +
                     "},\"properties\":{\"name\":" +
                     Json.str(cov.title) +
-                    ",\"kind\":\"coverage_center\"}}"
+                    ",\"kind\":\"coverage_center\"}}",
             )
             for (s in cov.samples) {
                 if (s.marginDb.isNaN() || s.marginDb.isInfinite()) continue
@@ -71,7 +71,7 @@ object PlannerGeoJson {
                         Num.hex2((col shr 16) and 255) +
                         Num.hex2((col shr 8) and 255) +
                         Num.hex2(col and 255) +
-                        "\"}}"
+                        "\"}}",
                 )
             }
         }

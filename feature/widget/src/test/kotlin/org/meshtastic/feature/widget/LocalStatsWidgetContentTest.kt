@@ -35,8 +35,8 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.battery
 import org.meshtastic.core.resources.disconnected
-import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.getString
+import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.meshtastic_app_name
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.resources.updated

@@ -116,7 +116,7 @@ val syncDocsToComposeResources =
                                 "about|help_and_documentation|nodes|map|messages|channels|connections|firmware|" +
                                 "discovery_local_mesh|quick_chat|ui_scale|auto_load_chat_images|" +
                                 "import_menu_in_top_bar|theme|preferences_language|log_retention_days|" +
-                                "translator_title)\""
+                                "translator_title)\"",
                         )
                     if (keep.containsMatchIn(line)) line else ""
                 }

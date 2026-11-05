@@ -176,15 +176,17 @@ internal class Canvas(val w: Int, val h: Int, bg: Int = 0xFFFFFFFF.toInt()) {
         val dx = x1 - x0
         val dy = y1 - y0
         val l2 = dx * dx + dy * dy
-        for (y in max(0, by0)..min(h - 1, by1)) for (x in max(0, bx0)..min(w - 1, bx1)) {
-            val px0 = x + 0.5
-            val py0 = y + 0.5
-            val t = if (l2 == 0.0) 0.0 else (((px0 - x0) * dx + (py0 - y0) * dy) / l2).coerceIn(0.0, 1.0)
-            val ex = x0 + t * dx - px0
-            val ey = y0 + t * dy - py0
-            val d = sqrt(ex * ex + ey * ey)
-            val cov = (hw + 0.5 - d).coerceIn(0.0, 1.0)
-            if (cov > 0) blend(x, y, color, cov)
+        for (y in max(0, by0)..min(h - 1, by1)) {
+            for (x in max(0, bx0)..min(w - 1, bx1)) {
+                val px0 = x + 0.5
+                val py0 = y + 0.5
+                val t = if (l2 == 0.0) 0.0 else (((px0 - x0) * dx + (py0 - y0) * dy) / l2).coerceIn(0.0, 1.0)
+                val ex = x0 + t * dx - px0
+                val ey = y0 + t * dy - py0
+                val d = sqrt(ex * ex + ey * ey)
+                val cov = (hw + 0.5 - d).coerceIn(0.0, 1.0)
+                if (cov > 0) blend(x, y, color, cov)
+            }
         }
     }
 
@@ -241,8 +243,13 @@ internal class Canvas(val w: Int, val h: Int, bg: Int = 0xFFFFFFFF.toInt()) {
         var cx = x
         for (ch in s) {
             val g = BitmapFont.glyph(ch)
-            for (c in 0 until 5) for (r in 0 until 7) if (((g[c].toInt() shr r) and 1) != 0)
-                rect(cx + c * scale, y + r * scale, cx + (c + 1) * scale, y + (r + 1) * scale, color)
+            for (c in 0 until 5) {
+                for (r in 0 until 7) {
+                    if (((g[c].toInt() shr r) and 1) != 0) {
+                        rect(cx + c * scale, y + r * scale, cx + (c + 1) * scale, y + (r + 1) * scale, color)
+                    }
+                }
+            }
             cx += 6 * scale
         }
     }
@@ -252,10 +259,14 @@ internal class Canvas(val w: Int, val h: Int, bg: Int = 0xFFFFFFFF.toInt()) {
         var t = 0
         for (ch in s) {
             val g = BitmapFont.glyph(ch)
-            for (c in 0 until 5) for (r in 0 until 7) if (((g[c].toInt() shr r) and 1) != 0) {
-                val sx = x + r * scale
-                val sy = y - (t + c + 1) * scale
-                rect(sx, sy, sx + scale, sy + scale, color)
+            for (c in 0 until 5) {
+                for (r in 0 until 7) {
+                    if (((g[c].toInt() shr r) and 1) != 0) {
+                        val sx = x + r * scale
+                        val sy = y - (t + c + 1) * scale
+                        rect(sx, sy, sx + scale, sy + scale, color)
+                    }
+                }
             }
             t += 6
         }
@@ -266,7 +277,7 @@ internal object BitmapFont {
     /** Classic 5x7 font, ASCII 32..126, 5 columns per glyph, bit 0 = top row. */
     private const val DATA =
         "00,00,00,00,00;00,00,5F,00,00;00,07,00,07,00;14,7F,14,7F,14;24,2A,7F,2A,12;23,13,08,64,62;36,49,55,22,50;" +
-        "00,05,03,00,00;" +
+            "00,05,03,00,00;" +
             "00,1C,22,41,00;00,41,22,1C,00;14,08,3E,08,14;08,08,3E,08,08;00,50,30,00,00;08,08,08,08,08;" +
             "00,60,60,00,00;20,10,08,04,02;" +
             "3E,51,49,45,3E;00,42,7F,40,00;42,61,51,49,46;21,41,45,4B,31;18,14,12,7F,10;27,45,45,45,39;" +
@@ -303,7 +314,13 @@ internal object BitmapFont {
 
     fun fold(ch: Char): Char {
         val i = FOLD_FROM.indexOf(ch)
-        return if (i >= 0) FOLD_TO[i] else if (ch == '–' || ch == '−') '-' else ch
+        return if (i >= 0) {
+            FOLD_TO[i]
+        } else if (ch == '–' || ch == '−') {
+            '-'
+        } else {
+            ch
+        }
     }
 
     val count: Int
@@ -367,14 +384,16 @@ object PlannerProfileImage {
             gy[n + 1] = py0 + ph
             cv.polygon(gx, gy, TERRAIN)
             for (i in 0 until n - 1) cv.line(gx[i], gy[i], gx[i + 1], gy[i + 1], 1.6, TERRAIN_LINE)
-            for (i in 0 until n - 1) cv.line(
-                sx(chart.x[i]),
-                sy(chart.los[i]),
-                sx(chart.x[i + 1]),
-                sy(chart.los[i + 1]),
-                2.2,
-                LOS,
-            )
+            for (i in 0 until n - 1) {
+                cv.line(
+                    sx(chart.x[i]),
+                    sy(chart.los[i]),
+                    sx(chart.x[i + 1]),
+                    sy(chart.los[i + 1]),
+                    2.2,
+                    LOS,
+                )
+            }
         }
 
         // axes + ticks

@@ -16,10 +16,10 @@
  */
 package org.meshtastic.feature.map.planner.export
 
-import kotlin.math.abs
-import kotlin.math.max
 import org.meshtastic.core.ui.util.PdfFile
 import org.meshtastic.core.ui.util.PdfText
+import kotlin.math.abs
+import kotlin.math.max
 
 /** Minimal PDF 1.4 writer (A4 portrait, Helvetica, vector charts). */
 object PlannerPdf {
@@ -106,10 +106,9 @@ object PlannerPdf {
         fun polygon(xs: DoubleArray, ys: DoubleArray, color: Int) {
             if (xs.size < 3) return
             fill(color)
-            for (i in xs.indices) sb.append(f(xs[i]))
-                .append(' ')
-                .append(f(ys[i]))
-                .append(if (i == 0) " m\n" else " l\n")
+            for (i in xs.indices) {
+                sb.append(f(xs[i])).append(' ').append(f(ys[i])).append(if (i == 0) " m\n" else " l\n")
+            }
             sb.append("h f\n")
         }
 
@@ -117,10 +116,9 @@ object PlannerPdf {
             if (xs.size < 2) return
             stroke(color)
             width(lw)
-            for (i in xs.indices) sb.append(f(xs[i]))
-                .append(' ')
-                .append(f(ys[i]))
-                .append(if (i == 0) " m\n" else " l\n")
+            for (i in xs.indices) {
+                sb.append(f(xs[i])).append(' ').append(f(ys[i])).append(if (i == 0) " m\n" else " l\n")
+            }
             sb.append("S\n")
         }
 
@@ -184,11 +182,12 @@ object PlannerPdf {
             d.y -= 22.0
             d.text(ML, d.y, 20.0, true, l, 0x111111)
         }
-        if (report.subtitle.isNotEmpty())
+        if (report.subtitle.isNotEmpty()) {
             for (l in PdfText.wrap(report.subtitle, false, 11.0, CW)) {
                 d.y -= 14.0
                 d.text(ML, d.y, 11.0, false, l, 0x444444)
             }
+        }
         if (report.generatedAt.isNotEmpty()) {
             d.y -= 13.0
             d.text(ML, d.y, 9.0, false, report.generatedAt, 0x777777)
@@ -460,7 +459,18 @@ object PlannerPdf {
         val target = 2 * half / 5
         val mag = ChartData.pow10(kotlin.math.floor(kotlin.math.log10(target)).toInt())
         val f = target / mag
-        val barKm = (if (f < 1.5) 1.0 else if (f < 3.5) 2.0 else if (f < 7.5) 5.0 else 10.0) * mag
+        val barKm =
+            (
+                if (f < 1.5) {
+                    1.0
+                } else if (f < 3.5) {
+                    2.0
+                } else if (f < 7.5) {
+                    5.0
+                } else {
+                    10.0
+                }
+                ) * mag
         val barPt = barKm * scale
         val by = yBot + 12
         d.rect(x0 + 8, by - 3, barPt + 6, 20.0, 0xFFFFFF)

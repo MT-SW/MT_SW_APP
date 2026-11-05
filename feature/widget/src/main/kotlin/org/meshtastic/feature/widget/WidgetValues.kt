@@ -28,12 +28,12 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.battery
 import org.meshtastic.core.resources.distance
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.resources.hops_away
 import org.meshtastic.core.resources.local_stats_cpu
 import org.meshtastic.core.resources.local_stats_flash
 import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.local_stats_heap_value
 import org.meshtastic.core.resources.local_stats_psram
-import org.meshtastic.core.resources.hops_away
 import org.meshtastic.core.resources.node_sort_last_heard
 import org.meshtastic.core.resources.nodes
 import org.meshtastic.core.resources.noise_floor
@@ -99,7 +99,9 @@ internal fun readings(state: LocalStatsWidgetUiState, nodesInGrid: Boolean): Lis
         Reading(
             stringResource(Res.string.local_stats_heap),
             stringResource(Res.string.local_stats_heap_value, heapUsed, state.heapTotalBytes) +
-                " (" + MetricFormatter.usedPercent(heapUsed.toLong(), state.heapTotalBytes.toLong()) + ")",
+                " (" +
+                MetricFormatter.usedPercent(heapUsed.toLong(), state.heapTotalBytes.toLong()) +
+                ")",
         ),
     )
     if (state.hasStatsExtended) {
@@ -110,7 +112,9 @@ internal fun readings(state: LocalStatsWidgetUiState, nodesInGrid: Boolean): Lis
                 Reading(
                     stringResource(Res.string.local_stats_psram),
                     stringResource(Res.string.local_stats_heap_value, psramUsed, state.memoryPsramTotal) +
-                        " (" + MetricFormatter.usedPercent(psramUsed.toLong(), state.memoryPsramTotal.toLong()) + ")",
+                        " (" +
+                        MetricFormatter.usedPercent(psramUsed.toLong(), state.memoryPsramTotal.toLong()) +
+                        ")",
                 ),
             )
         }
@@ -119,7 +123,9 @@ internal fun readings(state: LocalStatsWidgetUiState, nodesInGrid: Boolean): Lis
                 Reading(
                     stringResource(Res.string.local_stats_flash),
                     stringResource(Res.string.local_stats_heap_value, state.flashUsedBytes, state.flashTotalBytes) +
-                        " (" + MetricFormatter.usedPercent(state.flashUsedBytes.toLong(), state.flashTotalBytes.toLong()) + ")",
+                        " (" +
+                        MetricFormatter.usedPercent(state.flashUsedBytes.toLong(), state.flashTotalBytes.toLong()) +
+                        ")",
                 ),
             )
         }

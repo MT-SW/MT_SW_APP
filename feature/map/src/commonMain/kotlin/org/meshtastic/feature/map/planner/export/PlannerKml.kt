@@ -21,11 +21,10 @@ package org.meshtastic.feature.map.planner.export
  * with one small Point placemark per sample styled by its legend class (robust for any grid shape).
  */
 object PlannerKml {
-    private fun kmlColor(argb: Int): String =
-        Num.hex2(argb ushr 24) +
-            Num.hex2(argb and 255) +
-            Num.hex2((argb shr 8) and 255) +
-            Num.hex2((argb shr 16) and 255)
+    private fun kmlColor(argb: Int): String = Num.hex2(argb ushr 24) +
+        Num.hex2(argb and 255) +
+        Num.hex2((argb shr 8) and 255) +
+        Num.hex2((argb shr 16) and 255)
 
     private fun coord(lat: Double, lon: Double) = Num.fmt(lon, 6) + "," + Num.fmt(lat, 6) + ",0"
 
@@ -37,7 +36,7 @@ object PlannerKml {
         val desc = listOf(report.subtitle, report.generatedAt).filter { it.isNotEmpty() }.joinToString("\n")
         if (desc.isNotEmpty()) sb.append("<description>").append(Xml.escape(desc)).append("</description>\n")
         sb.append(
-            "<Style id=\"pt\"><IconStyle><scale>1.1</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>\n"
+            "<Style id=\"pt\"><IconStyle><scale>1.1</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>\n",
         )
         sb.append("<Style id=\"link\"><LineStyle><color>ff0000ff</color><width>3</width></LineStyle></Style>\n")
         val cov = report.coverage
@@ -48,17 +47,18 @@ object PlannerKml {
                     .append("\"><IconStyle><color>")
                     .append(kmlColor(CoverageBins.color(cov, i)))
                     .append(
-                        "</color><scale>0.4</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>\n"
+                        "</color><scale>0.4</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>\n",
                     )
             }
             sb.append(
-                "<Style id=\"cov-1\"><IconStyle><color>ff8b7d60</color><scale>0.4</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>\n"
+                "<Style id=\"cov-1\"><IconStyle><color>ff8b7d60</color><scale>0.4</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>\n",
             )
         }
         for (p in report.points) {
             sb.append("<Placemark><name>").append(Xml.escape(p.name)).append("</name>")
-            if (p.description.isNotEmpty())
+            if (p.description.isNotEmpty()) {
                 sb.append("<description>").append(Xml.escape(p.description)).append("</description>")
+            }
             sb.append("<styleUrl>#pt</styleUrl><Point><coordinates>")
                 .append(coord(p.lat, p.lon))
                 .append("</coordinates></Point></Placemark>\n")
