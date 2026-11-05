@@ -32,8 +32,7 @@ import org.meshtastic.core.repository.RadioController
 /**
  * iPhone implementation of [MessageQueue].
  *
- * Sends at once through the active controller (no WorkManager on iPhone).
- * active controller to send the message.
+ * Sends at once through the active controller (no WorkManager on iPhone). active controller to send the message.
  */
 class IosMessageQueue(
     private val packetRepository: PacketRepository,

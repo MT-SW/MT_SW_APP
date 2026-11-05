@@ -19,20 +19,21 @@ package org.meshtastic.ios
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalDensity
-import org.meshtastic.core.ui.theme.rememberScaledDensity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.uikit.OnFocusBehavior
 import androidx.compose.ui.window.ComposeUIViewController
+import co.touchlab.kermit.Logger
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import co.touchlab.kermit.Logger
 import org.koin.core.Koin
 import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.common.util.CommonUri
@@ -43,19 +44,18 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.util.LocalTerminateApplication
-import platform.posix.exit
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
+import org.meshtastic.core.ui.theme.rememberScaledDensity
+import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+import platform.posix.exit
 
 /** Starts the dependency graph once for the whole life of the app process. */
 private val koin: Koin by lazy {
@@ -72,19 +72,21 @@ fun handleIosDeepLink(url: String) {
 }
 
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
+// The name is called from Swift (iosApp), so it has to start with a capital letter.
+@Suppress("FunctionName", "ktlint:standard:function-naming")
 fun MainViewController() =
     ComposeUIViewController(
         // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out of
         // sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
-        configure = { onFocusBehavior = OnFocusBehavior.DoNothing },
+        configure = { onFocusBehavior = OnFocusBehavior.DoNothing }
     ) {
-    val uiViewModel = sharedUiViewModel
-    org.koin.compose.KoinContext(koin) {
-        MeshServiceLifecycle()
-        BackgroundCleanup()
-        ThemedApp(uiViewModel)
+        val uiViewModel = sharedUiViewModel
+        org.koin.compose.KoinContext(koin) {
+            MeshServiceLifecycle()
+            BackgroundCleanup()
+            ThemedApp(uiViewModel)
+        }
     }
-}
 
 /** Starts the radio service with the screen and stops it with it. */
 @Composable
@@ -122,8 +124,10 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
     val themePref by uiPrefs.theme.collectAsState(initial = -1)
     val isDarkTheme =
         when (themePref) {
-            1, MODE_MONO_LIGHT -> false
-            2, MODE_MONO_DARK -> true
+            1,
+            MODE_MONO_LIGHT -> false
+            2,
+            MODE_MONO_DARK -> true
             else -> isSystemInDarkTheme()
         }
     val multiBackstack =
@@ -133,7 +137,7 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
                 TopLevelDestination.Connect.route
             } else {
                 TopLevelDestination.Nodes.route
-            },
+            }
         )
     val uiScale by uiViewModel.uiScale.collectAsState()
     // "Force stop" like on Android/desktop: disconnect the radio and stop the service, then end the process.
@@ -145,14 +149,14 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         LocalDensity provides rememberScaledDensity(percent = uiScale),
         LocalTerminateApplication provides terminate,
     ) {
-    AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
-        IosCoilSetup()
-        val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
-        if (introCompleted) {
-            ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
-        } else {
-            IosWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
+        AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
+            IosCoilSetup()
+            val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
+            if (introCompleted) {
+                ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
+            } else {
+                IosWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
+            }
         }
-    }
     }
 }

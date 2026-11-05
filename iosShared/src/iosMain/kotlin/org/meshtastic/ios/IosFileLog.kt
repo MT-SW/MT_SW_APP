@@ -19,16 +19,16 @@ package org.meshtastic.ios
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
-import kotlin.experimental.ExperimentalNativeApi
-import kotlin.native.setUnhandledExceptionHook
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
 import org.meshtastic.core.database.iosDataDir
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.setUnhandledExceptionHook
 
 /**
- * Keeps the app's log in `ios-app.log` in the app's folder (the previous run in `ios-app.old.log`), including the
- * crash that ends the app, so a problem can be read after the fact.
+ * Keeps the app's log in `ios-app.log` in the app's folder (the previous run in `ios-app.old.log`), including the crash
+ * that ends the app, so a problem can be read after the fact.
  */
 internal object IosFileLog : LogWriter() {
     private val file by lazy { (iosDataDir() + "/ios-app.log").toPath() }

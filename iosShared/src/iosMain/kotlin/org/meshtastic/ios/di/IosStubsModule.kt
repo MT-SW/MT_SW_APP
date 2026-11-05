@@ -47,7 +47,10 @@ class IosStubsModule {
     @Single fun meshWorkerManager(): MeshWorkerManager = NoopMeshWorkerManager()
 
     @Single
-    fun nodeCleanupScheduler(uiPrefs: UiPrefs, cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase): IosNodeCleanupScheduler =
+    fun nodeCleanupScheduler(
+        uiPrefs: UiPrefs,
+        cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase,
+    ): IosNodeCleanupScheduler =
         IosNodeCleanupScheduler(uiPrefs = uiPrefs, cleanNodeDatabaseUseCase = cleanNodeDatabaseUseCase)
 
     @Single fun locationRepository(): LocationRepository = NoopLocationRepository()

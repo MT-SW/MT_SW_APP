@@ -25,7 +25,9 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.BuildConfigProvider
 import org.meshtastic.core.common.di.PROCESS_LIFECYCLE
 
-/** Lifecycle of the whole app: on iPhone the process is treated as always resumed (the app keeps its Bluetooth link). */
+/**
+ * Lifecycle of the whole app: on iPhone the process is treated as always resumed (the app keeps its Bluetooth link).
+ */
 internal class IosProcessLifecycleOwner : LifecycleOwner {
     private val registry = LifecycleRegistry(this)
 

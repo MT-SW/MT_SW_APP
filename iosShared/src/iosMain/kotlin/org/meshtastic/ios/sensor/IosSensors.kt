@@ -44,9 +44,8 @@ import platform.Foundation.NSOperationQueue
 import platform.Foundation.timeIntervalSince1970
 import platform.darwin.NSObject
 
-private fun CLLocationManager.granted(): Boolean =
-    authorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse ||
-        authorizationStatus == kCLAuthorizationStatusAuthorizedAlways
+private fun CLLocationManager.granted(): Boolean = authorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse ||
+    authorizationStatus == kCLAuthorizationStatusAuthorizedAlways
 
 /** GPS of the iPhone: asks for permission, then reports every fix. */
 @OptIn(ExperimentalForeignApi::class)
@@ -101,20 +100,25 @@ class IosPhoneLocationProvider : PhoneLocationProvider {
             manager.stopUpdatingLocation()
             manager.delegate = null
         }
-    }.flowOn(Dispatchers.Main)
+    }
+        .flowOn(Dispatchers.Main)
 }
 
 /** Compass of the iPhone. */
 class IosCompassHeadingProvider : CompassHeadingProvider {
     override fun headingUpdates(): Flow<HeadingState> {
-        if (!CLLocationManager.headingAvailable()) return kotlinx.coroutines.flow.flowOf(HeadingState(hasSensor = false))
+        if (!CLLocationManager.headingAvailable()) {
+            return kotlinx.coroutines.flow.flowOf(HeadingState(hasSensor = false))
+        }
         return callbackFlow {
             val manager = CLLocationManager()
             val delegate =
                 object : NSObject(), CLLocationManagerDelegateProtocol {
                     override fun locationManager(manager: CLLocationManager, didUpdateHeading: CLHeading) {
                         val h = didUpdateHeading.trueHeading.takeIf { it >= 0 } ?: didUpdateHeading.magneticHeading
-                        trySend(HeadingState(heading = h.toFloat(), accuracy = didUpdateHeading.headingAccuracy.toInt()))
+                        trySend(
+                            HeadingState(heading = h.toFloat(), accuracy = didUpdateHeading.headingAccuracy.toInt()),
+                        )
                     }
                 }
             manager.delegate = delegate
@@ -123,7 +127,8 @@ class IosCompassHeadingProvider : CompassHeadingProvider {
                 manager.stopUpdatingHeading()
                 manager.delegate = null
             }
-        }.flowOn(Dispatchers.Main)
+        }
+            .flowOn(Dispatchers.Main)
     }
 }
 
@@ -133,7 +138,10 @@ class IosPhonePressureProvider : PhonePressureProvider {
         if (!CMAltimeter.isRelativeAltitudeAvailable()) return emptyFlow()
         return callbackFlow {
             val altimeter = CMAltimeter()
-            altimeter.startRelativeAltitudeUpdatesToQueue(NSOperationQueue.mainQueue) { data: CMAltitudeData?, _: NSError? ->
+            altimeter.startRelativeAltitudeUpdatesToQueue(NSOperationQueue.mainQueue) {
+                    data: CMAltitudeData?,
+                    _: NSError?,
+                ->
                 data?.pressure?.let { trySend(it.floatValue * 10f) }
             }
             awaitClose { altimeter.stopRelativeAltitudeUpdates() }

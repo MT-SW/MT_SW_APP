@@ -25,9 +25,9 @@ import org.meshtastic.feature.map.maplibre.component.ImportedLayersSlot
 import org.meshtastic.feature.map.maplibre.layers.rememberRenderableLayers
 
 /**
- * The iPhone map provider: the shared MapLibre surfaces (which include the native MT_SW Planner) and — through the
- * same imported-layer manager the Android flavours mount — the layers sheet that lets any KML/KMZ/GeoJSON be imported
- * on iPhone too.
+ * The iPhone map provider: the shared MapLibre surfaces (which include the native MT_SW Planner) and — through the same
+ * imported-layer manager the Android flavours mount — the layers sheet that lets any KML/KMZ/GeoJSON be imported on
+ * iPhone too.
  */
 internal fun iosMapViewProvider(): MapLibreMapViewProvider = MapLibreMapViewProvider(
     customLayers = {

@@ -52,6 +52,7 @@ class IosRadioTransportFactory(
                 scope = service.serviceScope,
                 address = address.removePrefix(InterfaceId.MOCK.id.toString()),
             )
+
         address.startsWith(InterfaceId.TCP.id) ->
             TcpRadioTransport(
                 callback = service,
@@ -59,6 +60,7 @@ class IosRadioTransportFactory(
                 dispatchers = dispatchers,
                 address = address.removePrefix(InterfaceId.TCP.id.toString()),
             )
+
         else -> error("Unsupported transport for address: ${address.anonymize()}")
     }
 }

@@ -17,7 +17,6 @@
 package org.meshtastic.ios.notification
 
 import co.touchlab.kermit.Logger
-import kotlin.coroutines.resume
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -39,9 +38,12 @@ import platform.UserNotifications.UNNotificationSound
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
+import kotlin.coroutines.resume
 
 /** Shows the banner also while the app is open (iOS hides it by default). */
-private class ForegroundBanner : NSObject(), UNUserNotificationCenterDelegateProtocol {
+private class ForegroundBanner :
+    NSObject(),
+    UNUserNotificationCenterDelegateProtocol {
     override fun userNotificationCenter(
         center: UNUserNotificationCenter,
         willPresentNotification: UNNotification,

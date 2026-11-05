@@ -23,10 +23,10 @@ import org.meshtastic.core.repository.UiPrefs
 import kotlin.time.Duration.Companion.days
 
 /**
- * iPhone equivalent of the Android `NodeCleanupWorker`. There is no WorkManager here, so the caller (see
- * the iPhone main screen) drives this with a simple periodic loop for the lifetime of the app process. The
- * last successful run is tracked in [UiPrefs.autoCleanNodesLastRunMillis] so runs stay spaced roughly
- * `AutoCleanNodesPolicy.checkIntervalDays` apart across app restarts.
+ * iPhone equivalent of the Android `NodeCleanupWorker`. There is no WorkManager here, so the caller (see the iPhone
+ * main screen) drives this with a simple periodic loop for the lifetime of the app process. The last successful run is
+ * tracked in [UiPrefs.autoCleanNodesLastRunMillis] so runs stay spaced roughly `AutoCleanNodesPolicy.checkIntervalDays`
+ * apart across app restarts.
  */
 class IosNodeCleanupScheduler(
     private val uiPrefs: UiPrefs,

@@ -38,7 +38,10 @@ import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 
-/** Hands every map place of the app (Map tab, node card, tracks, planner, discovery, traceroute) the shared MapLibre maps. */
+/**
+ * Hands every map place of the app (Map tab, node card, tracks, planner, discovery, traceroute) the shared MapLibre
+ * maps.
+ */
 @Composable
 fun ProvideIosMaps(content: @Composable () -> Unit) {
     CompositionLocalProvider(

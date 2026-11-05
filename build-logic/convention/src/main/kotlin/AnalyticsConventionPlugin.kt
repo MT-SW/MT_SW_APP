@@ -26,9 +26,9 @@ import org.gradle.kotlin.dsl.withType
 import java.io.File
 
 /**
- * Convention plugin for analytics (Google Services, Crashlytics, Datadog). In this fork none of these plugins is applied
- * in any flavor (the store build has no Google services either), so the code below only switches off their tasks if a
- * plugin ever gets applied again.
+ * Convention plugin for analytics (Google Services, Crashlytics, Datadog). In this fork none of these plugins is
+ * applied in any flavor (the store build has no Google services either), so the code below only switches off their
+ * tasks if a plugin ever gets applied again.
  */
 class AnalyticsConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {

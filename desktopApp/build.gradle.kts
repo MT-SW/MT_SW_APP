@@ -171,24 +171,25 @@ compose.desktop {
         // under the Gradle JVM, and every Build Desktop leg goes red with the jmods-less signature.
         // MT_SW: when JBR 25 is not installed (e.g. a fresh Mac), fall back to the JVM running
         // Gradle so project sync still works; packaging then needs JBR 25 to be installed.
-        // MT_SW: a JDK is only usable for packaging when it has `jpackage`. Android Studio's own JBR is found as a JBR 25
-        // toolchain on a Mac but has no jpackage, so then a Temurin 25 toolchain is used (Gradle downloads it by itself).
-        fun toolchainHome(vendor: JvmVendorSpec): String? =
-            try {
-                javaToolchains
-                    .launcherFor {
-                        languageVersion.set(JavaLanguageVersion.of(25))
-                        this.vendor.set(vendor)
-                    }
-                    .get()
-                    .metadata
-                    .installationPath
-                    .asFile
-                    .absolutePath
-            } catch (e: Exception) {
-                logger.warn("JDK 25 ($vendor) not found: ${e.message}")
-                null
-            }
+        // MT_SW: a JDK is only usable for packaging when it has `jpackage`. Android Studio's own JBR is found as a JBR
+        // 25
+        // toolchain on a Mac but has no jpackage, so then a Temurin 25 toolchain is used (Gradle downloads it by
+        // itself).
+        fun toolchainHome(vendor: JvmVendorSpec): String? = try {
+            javaToolchains
+                .launcherFor {
+                    languageVersion.set(JavaLanguageVersion.of(25))
+                    this.vendor.set(vendor)
+                }
+                .get()
+                .metadata
+                .installationPath
+                .asFile
+                .absolutePath
+        } catch (e: Exception) {
+            logger.warn("JDK 25 ($vendor) not found: ${e.message}")
+            null
+        }
         fun hasJpackage(home: String?): Boolean = home != null && File(home, "bin/jpackage").exists()
         javaHome =
             toolchainHome(JvmVendorSpec.JETBRAINS).takeIf { hasJpackage(it) }
@@ -196,7 +197,8 @@ compose.desktop {
                 ?: System.getProperty("java.home")
 
         val desktopJvmArgs = buildList {
-            // No fixed memory limit: the JVM may use up to 90% of the computer's memory (the assistant's model and the maps
+            // No fixed memory limit: the JVM may use up to 90% of the computer's memory (the assistant's model and the
+            // maps
             // need room; the JVM only takes what it uses).
             add("-XX:MaxRAMPercentage=90")
             // Starts with a bigger heap and compact object headers, so the first seconds spend less time growing the
@@ -344,15 +346,20 @@ compose.desktop {
             // always growing, max 65535), keeping major.minor of the app version. The app itself still shows
             // the normal version (e.g. 2.8.3) and the CI renames the installer files back to it.
             val configFile = isolated.rootProject.projectDirectory.file("config.properties").asFile
-            val windowsBuildNumber = versionInfo.versionCode - (configFile
-                .takeIf { it.exists() }
-                ?.readLines()
-                ?.firstOrNull { it.startsWith("VERSION_CODE_OFFSET=") }
-                ?.substringAfter('=')?.trim()?.toIntOrNull() ?: 0)
+            val windowsBuildNumber =
+                versionInfo.versionCode -
+                    (
+                        configFile
+                            .takeIf { it.exists() }
+                            ?.readLines()
+                            ?.firstOrNull { it.startsWith("VERSION_CODE_OFFSET=") }
+                            ?.substringAfter('=')
+                            ?.trim()
+                            ?.toIntOrNull() ?: 0
+                        )
             val majorMinor = sanitizedVersion.substringBeforeLast('.')
             packageVersion =
-                if (currentOs.contains("win") &&
-                    windowsBuildNumber in 1..65535) {
+                if (currentOs.contains("win") && windowsBuildNumber in 1..65535) {
                     "$majorMinor.$windowsBuildNumber"
                 } else {
                     sanitizedVersion

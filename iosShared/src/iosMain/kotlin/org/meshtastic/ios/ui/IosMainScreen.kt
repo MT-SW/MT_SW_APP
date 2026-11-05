@@ -17,21 +17,21 @@
 package org.meshtastic.ios.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -40,8 +40,8 @@ import org.meshtastic.core.ui.component.MeshtasticAppShell
 import org.meshtastic.core.ui.component.MeshtasticNavDisplay
 import org.meshtastic.core.ui.component.MeshtasticNavigationSuite
 import org.meshtastic.core.ui.viewmodel.UIViewModel
-import org.meshtastic.ios.navigation.iosNavGraph
 import org.meshtastic.feature.settings.navigation.rememberSettingsRadioConfigViewModelProvider
+import org.meshtastic.ios.navigation.iosNavGraph
 
 private val TOP_TRIM = 20.dp
 private val TABLET_WIDTH = 600.dp
@@ -60,50 +60,52 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
 
     // The background is painted over the whole screen, including the notch area; only the content stays inside it.
     Surface(modifier = modifier.fillMaxSize()) {
-      // The top gap is a bit smaller than the system's safe area (the content still stays clear of the notch).
-      // The trim is only for the iPhone; on a tablet (side bar) the whole safe area stays, so the bar clears the clock.
-      val wide = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= TABLET_WIDTH
-      val topGap =
-          (WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() - (if (wide) 0.dp else TOP_TRIM))
-              .coerceAtLeast(0.dp)
-      Box(
-          Modifier.fillMaxSize()
-              .padding(top = topGap)
-              .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
-              .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-              // The whole screen lifts above the keyboard, so the message field and the top bar stay in sight.
-              .imePadding(),
-      ) {
-        MeshtasticAppShell(
-            multiBackstack = multiBackstack,
-            uiViewModel = uiViewModel,
-            hostModifier = Modifier,
+        // The top gap is a bit smaller than the system's safe area (the content still stays clear of the notch).
+        // The trim is only for the iPhone; on a tablet (side bar) the whole safe area stays, so the bar clears the
+        // clock.
+        val wide = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= TABLET_WIDTH
+        val topGap =
+            (WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() - (if (wide) 0.dp else TOP_TRIM))
+                .coerceAtLeast(0.dp)
+        Box(
+            Modifier.fillMaxSize()
+                .padding(top = topGap)
+                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+                // The whole screen lifts above the keyboard, so the message field and the top bar stay in sight.
+                .imePadding(),
         ) {
-            MeshtasticNavigationSuite(
+            MeshtasticAppShell(
                 multiBackstack = multiBackstack,
                 uiViewModel = uiViewModel,
-                // The bar does not add space for the home indicator, so it sits at the bottom of the screen.
-                modifier = Modifier.fillMaxSize().consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
-                barHeight = BAR_HEIGHT,
-                barBottomGap = BAR_BOTTOM_GAP,
+                hostModifier = Modifier,
             ) {
-                val provider =
-                    entryProvider<NavKey> {
-                        iosNavGraph(
-                            backStack = backStack,
-                            uiViewModel = uiViewModel,
-                            multiBackstack = multiBackstack,
-                            settingsRadioConfigViewModel = settingsRadioConfigViewModelProvider,
-                        )
-                    }
-                MeshtasticNavDisplay(
+                MeshtasticNavigationSuite(
                     multiBackstack = multiBackstack,
-                    entryProvider = provider,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                    uiViewModel = uiViewModel,
+                    // The bar does not add space for the home indicator, so it sits at the bottom of the screen.
+                    modifier =
+                    Modifier.fillMaxSize()
+                        .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
+                    barHeight = BAR_HEIGHT,
+                    barBottomGap = BAR_BOTTOM_GAP,
+                ) {
+                    val provider =
+                        entryProvider<NavKey> {
+                            iosNavGraph(
+                                backStack = backStack,
+                                uiViewModel = uiViewModel,
+                                multiBackstack = multiBackstack,
+                                settingsRadioConfigViewModel = settingsRadioConfigViewModelProvider,
+                            )
+                        }
+                    MeshtasticNavDisplay(
+                        multiBackstack = multiBackstack,
+                        entryProvider = provider,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
         }
-      }
     }
 }
-

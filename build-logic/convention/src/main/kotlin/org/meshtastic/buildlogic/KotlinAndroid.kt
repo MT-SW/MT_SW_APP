@@ -102,29 +102,28 @@ private fun supportsKotlinNative(): Boolean {
 }
 
 /**
- * Opt-out from Apple/iOS native target registration, read from `meshtastic.skipIosNativeTargets=true` in
- * (normally) the root `gradle.properties` -- Gradle properties are inherited by every subproject, so setting
- * it once at the root disables iOS target registration for every module that applies this convention plugin.
- * A module could instead set it in its own `gradle.properties` to opt out on its own, since Gradle loads a
- * subproject's `gradle.properties` before its build script's `plugins {}` block applies this convention plugin
- * (a project.extra flag set later in the same build.gradle.kts would not be visible in time here).
+ * Opt-out from Apple/iOS native target registration, read from `meshtastic.skipIosNativeTargets=true` in (normally) the
+ * root `gradle.properties` -- Gradle properties are inherited by every subproject, so setting it once at the root
+ * disables iOS target registration for every module that applies this convention plugin. A module could instead set it
+ * in its own `gradle.properties` to opt out on its own, since Gradle loads a subproject's `gradle.properties` before
+ * its build script's `plugins {}` block applies this convention plugin (a project.extra flag set later in the same
+ * build.gradle.kts would not be visible in time here).
  *
- * Currently set project-wide because core:model -- api()/implementation()-depended-on from commonMain by
- * essentially every KMP module in this repo -- itself needs io.github.pdvrieze.xmlutil (via the external
- * takpacket-sdk artifact it api()-exports); core:takserver depends on xmlutil directly for CoT XML parsing.
- * As of the version pinned in gradle/libs.versions.toml (1.0.2.1), xmlutil publishes no Apple-native variant
- * at all (only jvm/js/wasmJs/wasmWasi/linuxX64/metadata -- confirmed from Gradle's own "no matching variant"
- * error output, and from Maven Central never publishing a core-iosarm64 or core-iossimulatorarm64 xmlutil artifact
- * past 0.91.1). Since core:model sits near the root of the dependency graph, that missing variant fails
- * iOS-target dependency resolution for nearly every module that transitively depends on it, not just
- * core:model/core:takserver themselves -- hence the project-wide (not per-module) opt-out.
+ * Currently set project-wide because core:model -- api()/implementation()-depended-on from commonMain by essentially
+ * every KMP module in this repo -- itself needs io.github.pdvrieze.xmlutil (via the external takpacket-sdk artifact it
+ * api()-exports); core:takserver depends on xmlutil directly for CoT XML parsing. As of the version pinned in
+ * gradle/libs.versions.toml (1.0.2.1), xmlutil publishes no Apple-native variant at all (only
+ * jvm/js/wasmJs/wasmWasi/linuxX64/metadata -- confirmed from Gradle's own "no matching variant" error output, and from
+ * Maven Central never publishing a core-iosarm64 or core-iossimulatorarm64 xmlutil artifact past 0.91.1). Since
+ * core:model sits near the root of the dependency graph, that missing variant fails iOS-target dependency resolution
+ * for nearly every module that transitively depends on it, not just core:model/core:takserver themselves -- hence the
+ * project-wide (not per-module) opt-out.
  *
- * iOS targets here are compile-only validation (see the comment below); that validation is simply impossible
- * while this incompatibility exists, so we skip registering the targets instead of leaving the build
- * permanently red. This only bites on hosts where supportsKotlinNative() is true (Windows/macOS/Linux
- * x86_64) -- CI's linux-aarch64 runners never register iOS targets at all, which is why this was never
- * caught there. Revisit (drop the opt-out) once xmlutil resumes publishing Apple-native klibs, or
- * takpacket-sdk drops its xmlutil dependency for the iOS target.
+ * iOS targets here are compile-only validation (see the comment below); that validation is simply impossible while this
+ * incompatibility exists, so we skip registering the targets instead of leaving the build permanently red. This only
+ * bites on hosts where supportsKotlinNative() is true (Windows/macOS/Linux x86_64) -- CI's linux-aarch64 runners never
+ * register iOS targets at all, which is why this was never caught there. Revisit (drop the opt-out) once xmlutil
+ * resumes publishing Apple-native klibs, or takpacket-sdk drops its xmlutil dependency for the iOS target.
  */
 private fun Project.skipsIosNativeTargets(): Boolean =
     providers.gradleProperty("meshtastic.skipIosNativeTargets").getOrElse("false").toBoolean()

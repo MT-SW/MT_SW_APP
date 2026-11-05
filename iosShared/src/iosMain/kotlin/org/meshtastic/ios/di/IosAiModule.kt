@@ -21,31 +21,30 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.database.iosDataDir
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModelStore
-import org.meshtastic.core.repository.AssistantKnowledge
-import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.feature.messaging.translation.AiTextEngine
-import org.meshtastic.feature.messaging.translation.GemmaTranslator
-import org.meshtastic.feature.messaging.translation.IosAiModelStore
-import org.meshtastic.feature.messaging.translation.IosAssistantService
-import org.meshtastic.feature.messaging.translation.IosDictationService
-import org.meshtastic.feature.messaging.translation.IosLlamaEngine
-import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.AiPlatform
+import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.AssistantMemory
 import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.discovery.ai.AlgorithmicSummaryProvider
 import org.meshtastic.feature.discovery.ai.DiscoverySummaryAiProvider
 import org.meshtastic.feature.docs.ai.AIDocAssistant
 import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
+import org.meshtastic.feature.messaging.translation.AiTextEngine
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
+import org.meshtastic.feature.messaging.translation.AssistantService
+import org.meshtastic.feature.messaging.translation.DictationService
+import org.meshtastic.feature.messaging.translation.GemmaTranslator
+import org.meshtastic.feature.messaging.translation.IosAiModelStore
 import org.meshtastic.feature.messaging.translation.IosAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.IosAssistantMemory
-import org.meshtastic.feature.messaging.translation.AssistantService
-import org.meshtastic.feature.messaging.translation.AssistantTurn
-import org.meshtastic.feature.messaging.translation.DictationService
+import org.meshtastic.feature.messaging.translation.IosAssistantService
+import org.meshtastic.feature.messaging.translation.IosDictationService
+import org.meshtastic.feature.messaging.translation.IosLlamaEngine
+import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 
 /**
@@ -70,7 +69,9 @@ class IosAiModule {
 
     @Single fun aiModelStore(impl: IosAiModelStore): AiModelStore = impl
 
-    @Single fun aiTextEngine(store: IosAiModelStore): AiTextEngine = IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
+    @Single
+    fun aiTextEngine(store: IosAiModelStore): AiTextEngine =
+        IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
 
     @Single
     fun iosTranslationRouter(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): IosTranslationRouter =
