@@ -17,7 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
-* Test asystenta: każdy test sam czyści zapamiętane nieudane próby uruchomienia modelu (NPU, karta graficzna), więc wynik zawsze pokazuje, co urządzenie naprawdę potrafi. Nie trzeba już robić tego ręcznie w ustawieniach.
+* Test asystenta: gdy model działa na NPU i test przejdzie bez błędów, ten sam test powtarza się na karcie graficznej (NPU pominięte), a na końcu jest krótkie porównanie obu wyników; ustawienie wraca potem do poprzedniego. Gdy na NPU wystąpią błędy, test na karcie graficznej jest pomijany. Każdy test sam czyści zapamiętane nieudane próby uruchomienia modelu (NPU, karta graficzna), więc wynik zawsze pokazuje, co urządzenie naprawdę potrafi. Nie trzeba już robić tego ręcznie w ustawieniach.
 * Asystent AI: dopisek „odpowiedź AI” ma kolor niebieski ze standardowej palety aplikacji, żeby był lepiej widoczny.
 * Tablet i komputer: w widoku czatów lista rozmów jest węższa, a kanał z wiadomościami szerszy (około 36% do 64%). Węzły i dokumentacja zachowują dotychczasowy podział. Wybranie innej rozmowy zastępuje otwartą, zamiast nakładać się na nią, więc można swobodnie przełączać kanały. Szerokość nadal można zmieniać przeciągnięciem.
 * iPhone i iPad: połączenie z radiem po przerwie (np. po nocy) wraca samo. Gdy radia nie widać w skanie, aplikacja zostawia u systemu długie żądanie połączenia (do 30 minut, ponawiane), które system dokończy także w tle, gdy tylko radio znów będzie w zasięgu, zamiast skanować co kilkanaście sekund.
@@ -552,7 +552,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
-* Assistant test: every test clears the remembered failed model starts (NPU, graphics card) by itself, so the result always shows what the device can really do. No need to do it by hand in the settings any more.
+* Assistant test: when the model runs on the NPU and the test finishes without errors, the same test is repeated on the graphics card (NPU skipped), and a short comparison of both results comes at the end; the setting then returns to what it was. When the NPU run has errors, the graphics card run is skipped. Every test clears the remembered failed model starts (NPU, graphics card) by itself, so the result always shows what the device can really do. No need to do it by hand in the settings any more.
 * AI assistant: the "AI answer" note is blue, from the app's standard palette, so it is easier to see.
 * Tablet and desktop: in the chats view the conversation list is narrower and the message channel wider (about 36% to 64%). Nodes and the documentation keep their usual split. Choosing another conversation replaces the open one instead of stacking on it, so channels can be switched freely. The width can still be changed by dragging.
 * iPhone and iPad: the link to the radio comes back by itself after a break (for example overnight). When the radio is not seen in a scan, the app leaves a long connection request with the system (up to 30 minutes, repeated), which the system finishes in the background as soon as the radio is in range again, instead of scanning every few seconds.

@@ -180,14 +180,66 @@ class LlamaAssistantService(
             // Every test starts clean: remembered failed starts (NPU, graphics card) from earlier runs would otherwise
             // make the model skip them and the result would not show what the device can really do.
             runCatching { store.clearFailedAttempts() }
-            selfTestRun(command, onResult)
+            val first = selfTestRun(command, onResult)
+            // When the model ran on the NPU and everything went well, the same test runs once more on the graphics
+            // card (NPU skipped), so both are measured; the setting goes back to what it was afterwards. After a
+            // failure there is nothing to compare, so the second run is left out.
+            if (first != null && first.clean && first.backend.startsWith("NPU")) {
+                val skipBefore = uiPrefs.aiSkipNpu.value
+                try {
+                    onResult(
+                        command,
+                        "The test on the NPU finished without errors. Now the same test on the graphics card " +
+                            "(NPU skipped).",
+                    )
+                    uiPrefs.setAiSkipNpu(true)
+                    unloadModels()
+                    kotlinx.coroutines.delay(SKIP_NPU_SETTLE_MS)
+                    val second = selfTestRun(command, onResult, label = "graphics-card")
+                    if (second != null) onResult(command, comparison(first, second))
+                } finally {
+                    uiPrefs.setAiSkipNpu(skipBefore)
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                        unloadModels()
+                    }
+                }
+            }
         } finally {
             testRunning = false
         }
     }
 
-    private suspend fun selfTestRun(command: String, onResult: (question: String, answer: String) -> Unit) {
-        withContext(Dispatchers.IO) {
+    /** What a test run found: where the model ran and whether every answer came without an error. */
+    private class SelfTestOutcome(
+        val backend: String,
+        val clean: Boolean,
+        val averageSeconds: String,
+        val wordsPerSecond: Double,
+    )
+
+    /** Both runs side by side: the one short block to send when the NPU and the graphics card are compared. */
+    private fun comparison(npu: SelfTestOutcome, gpu: SelfTestOutcome): String {
+        val faster =
+            when {
+                !gpu.clean -> "The graphics card run had errors; the NPU result is the reliable one."
+                gpu.wordsPerSecond > npu.wordsPerSecond -> "The graphics card was faster."
+                gpu.wordsPerSecond < npu.wordsPerSecond -> "The NPU was faster."
+                else -> "Both were equally fast."
+            }
+        return "# Comparison\n\n" +
+            "NPU: ${npu.backend}\n" +
+            "Average answer time: ${npu.averageSeconds} s, speed: ${npu.wordsPerSecond} words/s\n\n" +
+            "Graphics card: ${gpu.backend}\n" +
+            "Average answer time: ${gpu.averageSeconds} s, speed: ${gpu.wordsPerSecond} words/s\n" +
+            "Errors: ${if (gpu.clean) "none" else "yes"}\n\n$faster\n"
+    }
+
+    private suspend fun selfTestRun(
+        command: String,
+        onResult: (question: String, answer: String) -> Unit,
+        label: String = "",
+    ): SelfTestOutcome? {
+        return withContext(Dispatchers.IO) {
             val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
             if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
@@ -246,10 +298,10 @@ class LlamaAssistantService(
                             .orEmpty()
                 println("===== ASSISTANT HARDWARE =====\n$report")
                 onResult(command, report)
-                return@withContext
+                return@withContext null
             }
             val questions = AssistantSelfTest.questions(data.sampleNodeName(), data.sampleChannelName(), command)
-            val resultName =
+            val baseName =
                 if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true)) {
                     AssistantSelfTest.RESULT_FILE
                 } else if (command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true)) {
@@ -258,8 +310,14 @@ class LlamaAssistantService(
                 } else {
                     "assistant-test-${command.trim('/')}-results.md"
                 }
+            val resultName =
+                if (label.isEmpty()) baseName else baseName.substringBeforeLast('.') + "-$label." + baseName.substringAfterLast('.', "md")
             val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), resultName) }.getOrNull()
-            val report = StringBuilder("# Assistant test\n\nModel: $modelId, questions: ${questions.size}\n")
+            val report =
+                StringBuilder(
+                    "# Assistant test" + (if (label.isEmpty()) "" else " ($label)") +
+                        "\n\nModel: $modelId, questions: ${questions.size}\n",
+                )
             var totalSeconds = 0L
             var previous: List<AssistantTurn> = emptyList()
             // For the summary at the end: how long every answer took, how many were empty, only a pointer to a setting,
@@ -373,7 +431,8 @@ class LlamaAssistantService(
                     onResult("${c.from} -> ${c.to}: ${c.text}", "$out\n($verdict)")
                 }
             }
-            report.append("\nBackend: ${engine.activeBackend.ifBlank { "?" }}, total $totalSeconds s\n")
+            val backendUsed = engine.activeBackend
+            report.append("\nBackend: ${backendUsed.ifBlank { "?" }}, total $totalSeconds s\n")
             if (tookMs.isNotEmpty()) {
                 val sorted = tookMs.sorted()
                 val median = sorted[sorted.size / 2]
@@ -408,6 +467,8 @@ class LlamaAssistantService(
                 command,
                 aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString(),
             )
+            val speed = if (wordMs > 0) kotlin.math.round(words * 10_000.0 / wordMs) / 10 else 0.0
+            SelfTestOutcome(backend = backendUsed, clean = empty == 0, averageSeconds = average, wordsPerSecond = speed)
         }
     }
 
@@ -2958,6 +3019,7 @@ class LlamaAssistantService(
     private companion object {
         const val TAG = "AssistantPrompt"
         const val MILLIS_PER_SECOND = 1000L
+        const val SKIP_NPU_SETTLE_MS = 500L
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
 
         /** Below this many characters a second (about 3 words) the model is slow: smaller prompt, shorter answers. */
