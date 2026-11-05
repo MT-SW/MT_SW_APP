@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package org.meshtastic.feature.map.planner.data
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.retry
 import io.ktor.client.plugins.timeout
-import io.ktor.client.request.prepareGet
 import io.ktor.client.request.parameter
+import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
@@ -40,7 +40,8 @@ import kotlin.math.max
 
 /**
  * [PlannerClutterSource] that asks an Overpass API server (default: the public overpass-api.de instance) for the
- * buildings and forests of OpenStreetMap. Data © OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright).
+ * buildings and forests of OpenStreetMap. Data © OpenStreetMap contributors, ODbL
+ * (https://www.openstreetmap.org/copyright).
  *
  * Answers are kept in memory for [CACHE_MS], so changing power, height or any other parameter of the same link does not
  * download the same data again. One request at a time: the public server limits parallel use.
@@ -75,7 +76,9 @@ class PlannerOverpass(
                 polygons.addAll(fetch(query, seen).polygons)
             } catch (e: PlannerClutterException) {
                 // A server that timed out or dropped the connection once often answers the second time.
-                if (e.failure != PlannerClutterFailure.SERVER_LIMIT && e.failure != PlannerClutterFailure.NETWORK) throw e
+                if (e.failure != PlannerClutterFailure.SERVER_LIMIT && e.failure != PlannerClutterFailure.NETWORK) {
+                    throw e
+                }
                 delay(LINK_RETRY_WAIT_MS)
                 polygons.addAll(fetch(query, seen).polygons)
             }
@@ -137,8 +140,12 @@ class PlannerOverpass(
     }
 
     private fun worthAskingAnotherServer(e: PlannerClutterException): Boolean = when (e.failure) {
-        PlannerClutterFailure.NETWORK, PlannerClutterFailure.BAD_RESPONSE -> true
+        PlannerClutterFailure.NETWORK,
+        PlannerClutterFailure.BAD_RESPONSE,
+        -> true
+
         PlannerClutterFailure.SERVER_LIMIT -> e.detail?.startsWith("HTTP") == true
+
         PlannerClutterFailure.TOO_LARGE -> false
     }
 
@@ -151,12 +158,11 @@ class PlannerOverpass(
      * on the border of two tiles is kept once, outlines are thinned to fit in memory, and a server that says "too many
      * requests" is waited for. Everything or an error: half a map would look like open ground where it is not.
      */
-    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap =
-        try {
-            fetchTiledPieces(whole)
-        } finally {
-            _progress.value = null
-        }
+    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap = try {
+        fetchTiledPieces(whole)
+    } finally {
+        _progress.value = null
+    }
 
     private suspend fun fetchTiledPieces(whole: ClutterBox): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
@@ -168,37 +174,51 @@ class PlannerOverpass(
         val polygons = ArrayList<ClutterPolygon>()
         var points = 0L
         // The farther the area reaches, the coarser the picture needs to be: the coverage raster of 100 km has cells of
-        // hundreds of metres, so outlines are thinned (and woods smaller than that dropped) more the bigger the area is.
+        // hundreds of metres, so outlines are thinned (and woods smaller than that dropped) more the bigger the area
+        // is.
         val thinM = max(THIN_M, whole.maxSideKm / 2.0 * THIN_M_PER_KM)
         while (pending.isNotEmpty()) {
-            if (clockMs() > deadline) throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
-            val work = pending.removeFirst()
-            val part = try {
-                fetch(OsmQueries.box(work.box), seen, thinM)
-            } catch (e: PlannerClutterException) {
-                val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
-                val flaky = e.failure == PlannerClutterFailure.NETWORK
-                val splittable = (e.failure == PlannerClutterFailure.TOO_LARGE || e.failure == PlannerClutterFailure.SERVER_LIMIT) &&
-                    !busy && work.box.maxSideKm > MIN_TILE_KM
-                when {
-                    busy && work.tries < BUSY_RETRIES -> {
-                        delay(BUSY_WAIT_MS)
-                        pending.addFirst(TileWork(work.box, work.tries + 1))
-                    }
-                    flaky && work.tries < NETWORK_RETRIES -> {
-                        delay(NETWORK_RETRY_WAIT_MS)
-                        pending.addFirst(TileWork(work.box, work.tries + 1))
-                    }
-                    splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
-                    // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait and ask again.
-                    e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
-                        delay(OVERLOAD_WAIT_MS)
-                        pending.addFirst(TileWork(work.box, work.tries + 1))
-                    }
-                    else -> throw e
-                }
-                continue
+            if (clockMs() > deadline) {
+                throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
             }
+            val work = pending.removeFirst()
+            val part =
+                try {
+                    fetch(OsmQueries.box(work.box), seen, thinM)
+                } catch (e: PlannerClutterException) {
+                    val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
+                    val flaky = e.failure == PlannerClutterFailure.NETWORK
+                    val splittable =
+                        (
+                            e.failure == PlannerClutterFailure.TOO_LARGE ||
+                                e.failure == PlannerClutterFailure.SERVER_LIMIT
+                            ) &&
+                            !busy &&
+                            work.box.maxSideKm > MIN_TILE_KM
+                    when {
+                        busy && work.tries < BUSY_RETRIES -> {
+                            delay(BUSY_WAIT_MS)
+                            pending.addFirst(TileWork(work.box, work.tries + 1))
+                        }
+
+                        flaky && work.tries < NETWORK_RETRIES -> {
+                            delay(NETWORK_RETRY_WAIT_MS)
+                            pending.addFirst(TileWork(work.box, work.tries + 1))
+                        }
+
+                        splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
+
+                        // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait and
+                        // ask again.
+                        e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
+                            delay(OVERLOAD_WAIT_MS)
+                            pending.addFirst(TileWork(work.box, work.tries + 1))
+                        }
+
+                        else -> throw e
+                    }
+                    continue
+                }
             done++
             _progress.value = ClutterProgress(done, done + pending.size)
             for (polygon in part.polygons) {
@@ -206,7 +226,9 @@ class PlannerOverpass(
                 points += polygon.outer.size / 2
                 for (hole in polygon.holes) points += hole.size / 2
             }
-            if (points > MAX_POINTS) throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, detail = "too many points")
+            if (points > MAX_POINTS) {
+                throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, detail = "too many points")
+            }
             delay(PAUSE_BETWEEN_TILES_MS)
         }
         return ClutterMap(polygons)
@@ -214,20 +236,21 @@ class PlannerOverpass(
 
     @Suppress("TooGenericExceptionCaught")
     private suspend fun fetchFrom(url: String, query: String, seen: MutableSet<Long>?, thinM: Double): ClutterMap {
-        val body: String? = try {
-            withTimeoutOrNull(timeoutMs) { download(url, query) }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: PlannerClutterException) {
-            throw e
-        } catch (e: Exception) {
-            if (e::class.simpleName.orEmpty().contains("Timeout")) {
-                throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, e, "timeout")
+        val body: String? =
+            try {
+                withTimeoutOrNull(timeoutMs) { download(url, query) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PlannerClutterException) {
+                throw e
+            } catch (e: Exception) {
+                if (e::class.simpleName.orEmpty().contains("Timeout")) {
+                    throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, e, "timeout")
+                }
+                throw PlannerClutterException(PlannerClutterFailure.NETWORK, e, shortDetail(e.message))
+            } catch (e: Throwable) { // OutOfMemoryError is not an Exception: this one really is the device
+                throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
             }
-            throw PlannerClutterException(PlannerClutterFailure.NETWORK, e, shortDetail(e.message))
-        } catch (e: Throwable) { // OutOfMemoryError is not an Exception: this one really is the device
-            throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
-        }
         if (body == null) throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "timeout")
         return try {
             withContext(Dispatchers.Default) { OsmClutterParser.parse(body, seen, thinM) }
@@ -237,8 +260,14 @@ class PlannerOverpass(
             // The server's own "out of memory" / "timed out" remark is a refusal of THE SERVER, not a lack of memory
             // of this device, so it must not be reported as one.
             val msg = e.message.orEmpty().lowercase()
-            val serverRefused = msg.startsWith("overpass:") &&
-                (msg.contains("memory") || msg.contains("maxsize") || msg.contains("timed out") || msg.contains("rate"))
+            val serverRefused =
+                msg.startsWith("overpass:") &&
+                    (
+                        msg.contains("memory") ||
+                            msg.contains("maxsize") ||
+                            msg.contains("timed out") ||
+                            msg.contains("rate")
+                        )
             throw PlannerClutterException(
                 if (serverRefused) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.BAD_RESPONSE,
                 e,
@@ -250,15 +279,16 @@ class PlannerOverpass(
     }
 
     /**
-     * Reads the answer in chunks and gives up as soon as it passes [MAX_BODY_BYTES]: a dense area can answer with
-     * tens of megabytes, which a phone with a small heap cannot hold (and the parsed tree is several times larger).
-     * A status other than success is reported with its code: 429/502/503/504 mean the server is busy or gave up.
+     * Reads the answer in chunks and gives up as soon as it passes [MAX_BODY_BYTES]: a dense area can answer with tens
+     * of megabytes, which a phone with a small heap cannot hold (and the parsed tree is several times larger). A status
+     * other than success is reported with its code: 429/502/503/504 mean the server is busy or gave up.
      */
-    private suspend fun download(url: String, query: String): String? =
-        httpClient.prepareGet(url) {
+    private suspend fun download(url: String, query: String): String? = httpClient
+        .prepareGet(url) {
             parameter("data", query)
             // The shared client waits 30 s for data and repeats a failed request up to three times. Overpass sends
-            // nothing until the whole answer is computed, so a heavy tile would be cut off and asked again and again.
+            // nothing until the whole answer is computed, so a heavy tile would be cut off and asked again and
+            // again.
             timeout {
                 connectTimeoutMillis = CONNECT_TIMEOUT_MS
                 socketTimeoutMillis = READ_TIMEOUT_MS
@@ -268,7 +298,8 @@ class PlannerOverpass(
                 retryOnServerErrors(maxRetries = 0)
                 retryOnException(maxRetries = 0, retryOnTimeout = true)
             }
-        }.execute { response ->
+        }
+        .execute { response ->
             if (!response.status.isSuccess()) {
                 val code = response.status.value
                 val busy = code == 429 || code == 502 || code == 503 || code == 504
@@ -333,10 +364,11 @@ class PlannerOverpass(
         private const val DETAIL_MAX_CHARS = 140
 
         /** Public mirrors tried when the main server refuses, is busy or does not answer. */
-        val FALLBACK_URLS = listOf(
-            "https://overpass.kumi.systems/api/interpreter",
-            "https://overpass.private.coffee/api/interpreter",
-        )
+        val FALLBACK_URLS =
+            listOf(
+                "https://overpass.kumi.systems/api/interpreter",
+                "https://overpass.private.coffee/api/interpreter",
+            )
 
         /** One line, trimmed: it is shown to the user under the failure message. */
         internal fun shortDetail(message: String?): String? {

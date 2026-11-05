@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,28 +20,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
-import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.precisionRadiusMetersOrNull
 import org.meshtastic.core.repository.HorizonPrefs
-import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MagneticFieldProvider
-import org.meshtastic.feature.map.hud.CameraPoseProvider
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.map
+import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
+import org.meshtastic.feature.map.hud.CameraPoseProvider
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
@@ -71,7 +71,17 @@ sealed interface HorizonObserver {
     data class Point(val lat: Double, val lon: Double) : HorizonObserver
 }
 
-data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0, val precisionM: Double? = null, val favorite: Boolean = false)
+data class HorizonNodeChoice(
+    val num: Int,
+    val name: String,
+    val shortName: String = "",
+    val lat: Double = 0.0,
+    val lon: Double = 0.0,
+    val color: Int = 0,
+    val textColor: Int = 0,
+    val precisionM: Double? = null,
+    val favorite: Boolean = false,
+)
 
 data class TerrainHorizonState(
     val loading: Boolean = true,
@@ -165,7 +175,9 @@ class TerrainHorizonViewModel(
         if (opened && _state.value.focusNodeNum == focusNodeNum) return
         opened = true
         _state.update { it.copy(focusNodeNum = focusNodeNum) }
-        viewModelScope.launch { _state.update { it.copy(savedBytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }) } }
+        viewModelScope.launch {
+            _state.update { it.copy(savedBytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }) }
+        }
         // The range, antenna heights and radio-horizon factor picked last time come back before the first drawing.
         viewModelScope.launch {
             val saved = mapPrefs.awaitHorizonPrefs()
@@ -212,7 +224,10 @@ class TerrainHorizonViewModel(
 
     fun setSaveRadius(km: Int) = _state.update { it.copy(saveRadiusKm = km, saveOk = null) }
 
-    /** Saves the terrain around the place looked from, up to the chosen range (100 km at most), for use without the internet. */
+    /**
+     * Saves the terrain around the place looked from, up to the chosen range (100 km at most), for use without the
+     * internet.
+     */
     fun saveTerrain() {
         val here = _state.value
         val lat = here.observerLat ?: return
@@ -282,89 +297,160 @@ class TerrainHorizonViewModel(
 
     private fun reload() {
         job?.cancel()
-        job =
-            viewModelScope.launch {
-                _state.update { it.copy(loading = true, failure = null) }
-                val settings = _state.value
-                val spot = spot(settings.observer)
-                _state.update { it.copy(nodeChoices = nodeChoices()) }
-                if (spot == null) {
-                    _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NO_POSITION, profile = null, targets = emptyList(), observerName = "") }
-                    return@launch
+        job = viewModelScope.launch {
+            _state.update { it.copy(loading = true, failure = null) }
+            val settings = _state.value
+            val spot = spot(settings.observer)
+            _state.update { it.copy(nodeChoices = nodeChoices()) }
+            if (spot == null) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        failure = TerrainHorizonFailure.NO_POSITION,
+                        profile = null,
+                        targets = emptyList(),
+                        observerName = "",
+                    )
                 }
-                val nodes = nodes(settings.focusNodeNum, spot.nodeNum, settings.onlyFavorites)
-                var radiusKm = settings.radiusKm
-                // A node asked for that lies beyond the range gets the smallest range that reaches it.
-                if (settings.focusNodeNum != null) {
-                    nodes.firstOrNull()?.let { (_, _, at) ->
-                        val need = HORIZON_RADII_KM.firstOrNull { it * METRES_PER_KM >= Geodesy.distanceM(spot.at, at) } ?: HORIZON_RADII_KM.last()
-                        if (need > radiusKm) radiusKm = need
-                    }
-                }
-                try {
-                    val ground = elevation.prepareArea(spot.at, radiusKm.toDouble())
-                    val auto = spot.altitudeM?.let { it - ground(spot.at.lat, spot.at.lon) }?.takeIf { it in MIN_AUTO_HEIGHT_M..MAX_AUTO_HEIGHT_M }
-                    val height = if (settings.antennaAuto && auto != null) auto else settings.antennaM.toDouble()
-                    val (profile, targets) =
-                        withContext(dispatchers.default) {
-                            val built = HorizonPanorama.build(ground, spot.at, height, radiusKm * METRES_PER_KM, k = settings.refraction)
-                            built to HorizonPanorama.place(built, ground, nodes, settings.targetAntennaM.toDouble(), settings.refraction, maxOf(settings.nodeRangeKm, radiusKm) * METRES_PER_KM)
-                        }
-                    _state.update {
-                        it.copy(
-                            loading = false,
-                            profile = profile,
-                            targets = targets,
-                            radiusKm = radiusKm,
-                            observerName = spot.name,
-                            observerLat = spot.at.lat,
-                            observerLon = spot.at.lon,
-                            autoAntennaM = auto?.let { a -> kotlin.math.round(a).toInt() },
-                            usedAntennaM = kotlin.math.round(height).toInt(),
-                        )
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: PlannerElevationException) {
-                    _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NETWORK, profile = null, targets = emptyList()) }
-                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                    // Any other failure (a tile that cannot be read, say) must end the loading, never leave it spinning.
-                    _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NETWORK, profile = null, targets = emptyList()) }
+                return@launch
+            }
+            val nodes = nodes(settings.focusNodeNum, spot.nodeNum, settings.onlyFavorites)
+            var radiusKm = settings.radiusKm
+            // A node asked for that lies beyond the range gets the smallest range that reaches it.
+            if (settings.focusNodeNum != null) {
+                nodes.firstOrNull()?.let { (_, _, at) ->
+                    val need =
+                        HORIZON_RADII_KM.firstOrNull { it * METRES_PER_KM >= Geodesy.distanceM(spot.at, at) }
+                            ?: HORIZON_RADII_KM.last()
+                    if (need > radiusKm) radiusKm = need
                 }
             }
+            try {
+                val ground = elevation.prepareArea(spot.at, radiusKm.toDouble())
+                val auto =
+                    spot.altitudeM
+                        ?.let { it - ground(spot.at.lat, spot.at.lon) }
+                        ?.takeIf { it in MIN_AUTO_HEIGHT_M..MAX_AUTO_HEIGHT_M }
+                val height = if (settings.antennaAuto && auto != null) auto else settings.antennaM.toDouble()
+                val (profile, targets) =
+                    withContext(dispatchers.default) {
+                        val built =
+                            HorizonPanorama.build(
+                                ground,
+                                spot.at,
+                                height,
+                                radiusKm * METRES_PER_KM,
+                                k = settings.refraction,
+                            )
+                        built to
+                            HorizonPanorama.place(
+                                built,
+                                ground,
+                                nodes,
+                                settings.targetAntennaM.toDouble(),
+                                settings.refraction,
+                                maxOf(settings.nodeRangeKm, radiusKm) * METRES_PER_KM,
+                            )
+                    }
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        profile = profile,
+                        targets = targets,
+                        radiusKm = radiusKm,
+                        observerName = spot.name,
+                        observerLat = spot.at.lat,
+                        observerLon = spot.at.lon,
+                        autoAntennaM = auto?.let { a -> kotlin.math.round(a).toInt() },
+                        usedAntennaM = kotlin.math.round(height).toInt(),
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PlannerElevationException) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        failure = TerrainHorizonFailure.NETWORK,
+                        profile = null,
+                        targets = emptyList(),
+                    )
+                }
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                // Any other failure (a tile that cannot be read, say) must end the loading, never leave it spinning.
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        failure = TerrainHorizonFailure.NETWORK,
+                        profile = null,
+                        targets = emptyList(),
+                    )
+                }
+            }
+        }
     }
 
-    private suspend fun spot(observer: HorizonObserver): Spot? =
-        when (observer) {
-            HorizonObserver.MyNode -> nodeSpot(nodeRepository.ourNodeInfo.value) ?: phoneSpot()
-            HorizonObserver.Phone -> phoneSpot() ?: nodeSpot(nodeRepository.ourNodeInfo.value)
-            is HorizonObserver.OtherNode -> nodeSpot(nodeRepository.nodeDBbyNum.value[observer.num])
-            is HorizonObserver.Point -> Spot(GeoPoint(observer.lat, observer.lon), "", null)
+    private suspend fun spot(observer: HorizonObserver): Spot? = when (observer) {
+        HorizonObserver.MyNode -> nodeSpot(nodeRepository.ourNodeInfo.value) ?: phoneSpot()
+        HorizonObserver.Phone -> phoneSpot() ?: nodeSpot(nodeRepository.ourNodeInfo.value)
+        is HorizonObserver.OtherNode -> nodeSpot(nodeRepository.nodeDBbyNum.value[observer.num])
+        is HorizonObserver.Point -> Spot(GeoPoint(observer.lat, observer.lon), "", null)
+    }
+
+    private fun nodeSpot(node: Node?): Spot? = node
+        ?.takeIf { it.validPosition != null }
+        ?.let {
+            Spot(
+                GeoPoint(it.latitude, it.longitude),
+                it.user.short_name.ifBlank { it.user.long_name },
+                it.position.altitude?.takeIf { a -> a != 0 }?.toDouble(),
+                it.num,
+            )
         }
 
-    private fun nodeSpot(node: Node?): Spot? =
-        node?.takeIf { it.validPosition != null }?.let {
-            Spot(GeoPoint(it.latitude, it.longitude), it.user.short_name.ifBlank { it.user.long_name }, it.position.altitude?.takeIf { a -> a != 0 }?.toDouble(), it.num)
-        }
-
-    /** This phone's fix, when the permission is given and there is one; null otherwise (it does not ask for the permission). */
+    /**
+     * This phone's fix, when the permission is given and there is one; null otherwise (it does not ask for the
+     * permission).
+     */
     private suspend fun phoneSpot(): Spot? {
         val fix =
             withTimeoutOrNull(LOCATION_WAIT_MS) {
                 phoneLocationProvider.locationUpdates().first { it.location != null || !it.permissionGranted }
-            }?.location ?: return null
+            }
+                ?.location ?: return null
         return Spot(GeoPoint(fix.latitude, fix.longitude), "", fix.mslAltitude)
     }
 
-    private fun nodeChoices(): List<HorizonNodeChoice> =
-        nodeRepository.nodeDBbyNum.value.values
-            .filter { it.validPosition != null }
-            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first, precisionRadiusMetersOrNull(it.position.precision_bits), it.isFavorite) }
-            .sortedBy { it.name.lowercase() }
+    private fun nodeChoices(): List<HorizonNodeChoice> = nodeRepository.nodeDBbyNum.value.values
+        .filter { it.validPosition != null }
+        .map {
+            HorizonNodeChoice(
+                it.num,
+                it.user.long_name.ifBlank { it.user.short_name },
+                it.user.short_name,
+                it.latitude,
+                it.longitude,
+                it.colors.second,
+                it.colors.first,
+                precisionRadiusMetersOrNull(it.position.precision_bits),
+                it.isFavorite,
+            )
+        }
+        .sortedBy { it.name.lowercase() }
 
-    private fun nodes(focus: Int?, lookingFrom: Int?, onlyFavorites: Boolean): List<Triple<Int, String, GeoPoint>> {
-        return nodeRepository.nodeDBbyNum.value.values
-            .filter { it.num != lookingFrom && it.validPosition != null && (focus == null || it.num == focus) && (!onlyFavorites || focus != null || it.isFavorite) }
-            .map { node -> Triple(node.num, node.user.short_name.ifBlank { node.user.long_name }, GeoPoint(node.latitude, node.longitude)) }
-    }
+    private fun nodes(focus: Int?, lookingFrom: Int?, onlyFavorites: Boolean): List<Triple<Int, String, GeoPoint>> =
+        nodeRepository.nodeDBbyNum.value.values
+            .filter {
+                it.num != lookingFrom &&
+                    it.validPosition != null &&
+                    (focus == null || it.num == focus) &&
+                    (!onlyFavorites || focus != null || it.isFavorite)
+            }
+            .map { node ->
+                Triple(
+                    node.num,
+                    node.user.short_name.ifBlank { node.user.long_name },
+                    GeoPoint(node.latitude, node.longitude),
+                )
+            }
 }

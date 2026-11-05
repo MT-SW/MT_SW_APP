@@ -33,11 +33,11 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter
+import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.orient_north
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.resources.toggle_my_position
-import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.LocationDisabled
@@ -47,9 +47,15 @@ import org.meshtastic.core.ui.icon.MyLocation
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
+import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.theme.monochromeLayer
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
+
+/**
+ * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so
+ * the button sits in the map's own controls next to the planner whichever map engine draws them.
+ */
+val LocalOpenMeshHud = compositionLocalOf<(() -> Unit)?> { null }
 
 /**
  * Shared map controls overlay using [HorizontalFloatingToolbar] for Material 3 Expressive styling. Provides compass,
@@ -71,12 +77,6 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusRed
  * @param onRefresh Callback when the refresh button is clicked.
  */
 @Suppress("LongParameterList")
-/**
- * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so
- * the button sits in the map's own controls next to the planner whichever map engine draws them.
- */
-val LocalOpenMeshHud = compositionLocalOf<(() -> Unit)?> { null }
-
 @Composable
 fun MapControlsOverlay(
     modifier: Modifier = Modifier,

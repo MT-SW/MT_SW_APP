@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -149,25 +149,30 @@ data class PlannerReportStrings(
     val noteWeatherUsed: String = "Weather data used:",
     val noteWeatherNotUsed: String = "Weather not used: standard atmosphere (k = 4/3).",
     val noteWeatherFailed: String = "Weather unavailable: standard atmosphere (k = 4/3) was used.",
-    /** Licence and attribution lines (MeshMap Planner GPLv3, Meshtastic Site Planner, SPLAT!, NTIA ITM, Mapterhorn, Open-Meteo, OpenStreetMap). */
-    val credits: List<String> = listOf(
-        "Concepts: MeshMap Planner (GPL v3), Meshtastic Site Planner, SPLAT!",
-        "Propagation model: NTIA Irregular Terrain Model (public domain)",
-        "Terrain data: Mapterhorn",
-        "Weather: Open-Meteo (CC BY 4.0)",
-    ),
+    /**
+     * Licence and attribution lines (MeshMap Planner GPLv3, Meshtastic Site Planner, SPLAT!, NTIA ITM, Mapterhorn,
+     * Open-Meteo, OpenStreetMap).
+     */
+    val credits: List<String> =
+        listOf(
+            "Concepts: MeshMap Planner (GPL v3), Meshtastic Site Planner, SPLAT!",
+            "Propagation model: NTIA Irregular Terrain Model (public domain)",
+            "Terrain data: Mapterhorn",
+            "Weather: Open-Meteo (CC BY 4.0)",
+        ),
 )
 
 /** Pure conversion of a [PlannerUiState] into the export model. */
 object PlannerReportBuilder {
 
-    private val COLORS = intArrayOf(
-        0xFF1B5E20.toInt(),
-        0xFF66BB6A.toInt(),
-        0xFFFFEB3B.toInt(),
-        0xFFEF6C00.toInt(),
-        0xFFB71C1C.toInt(),
-    )
+    private val COLORS =
+        intArrayOf(
+            0xFF1B5E20.toInt(),
+            0xFF66BB6A.toInt(),
+            0xFFFFEB3B.toInt(),
+            0xFFEF6C00.toInt(),
+            0xFFB71C1C.toInt(),
+        )
 
     fun build(state: PlannerUiState, s: PlannerReportStrings): PlannerReport {
         val sections = ArrayList<ReportSection>()
@@ -190,11 +195,18 @@ object PlannerReportBuilder {
             }
             pathRows += kv(s.lblTotalLoss, db(link.totalPathLossDb, s))
             pathRows += kv(s.lblLineOfSight, if (link.lineOfSightClear) s.yes else s.no)
-            pathRows += kv(
-                s.lblFresnel,
-                Num.fmt(link.worstFresnelClearanceM, 1) + " " + s.unitM + " (" + Num.fmt(link.worstFresnelRatio * 100.0, 0) +
-                    " " + s.unitPercent + ")",
-            )
+            pathRows +=
+                kv(
+                    s.lblFresnel,
+                    Num.fmt(link.worstFresnelClearanceM, 1) +
+                        " " +
+                        s.unitM +
+                        " (" +
+                        Num.fmt(link.worstFresnelRatio * 100.0, 0) +
+                        " " +
+                        s.unitPercent +
+                        ")",
+                )
             pathRows += kv(s.lblKFactor, Num.fmt(state.kFactor, 3))
             pathRows += kv(s.lblRefractivity, Num.fmt(state.surfaceRefractivity, 1))
             sections += ReportSection(s.sectionLink, pathRows)
@@ -258,24 +270,37 @@ object PlannerReportBuilder {
         pointOf(state.b, nameB, s)?.let { points += it }
 
         val series = state.series
-        val profile = if (series != null) {
-            ReportProfile(
-                distancesM = series.distancesM,
-                groundM = series.groundM,
-                losM = series.losM,
-                fresnelUpperM = series.fresnelUpperM,
-                fresnelLowerM = series.fresnelLowerM,
-                labelA = s.chartLabelA + ": " + nameA,
-                labelB = s.chartLabelB + ": " + nameB,
-                xAxisLabel = s.chartXAxis,
-                yAxisLabel = s.chartYAxis,
-            )
-        } else {
-            null
-        }
+        val profile =
+            if (series != null) {
+                ReportProfile(
+                    distancesM = series.distancesM,
+                    groundM = series.groundM,
+                    losM = series.losM,
+                    fresnelUpperM = series.fresnelUpperM,
+                    fresnelLowerM = series.fresnelLowerM,
+                    labelA = s.chartLabelA + ": " + nameA,
+                    labelB = s.chartLabelB + ": " + nameB,
+                    xAxisLabel = s.chartXAxis,
+                    yAxisLabel = s.chartYAxis,
+                )
+            } else {
+                null
+            }
 
-        val subtitle = nameA + " - " + nameB + " | " + Num.fmtTrim(state.frequencyMHz, 5) + " " + s.unitMHz + " | " +
-            Num.fmtTrim(state.bandwidthKhz, 3) + " " + s.unitKHz + " | SF" + state.spreadingFactor
+        val subtitle =
+            nameA +
+                " - " +
+                nameB +
+                " | " +
+                Num.fmtTrim(state.frequencyMHz, 5) +
+                " " +
+                s.unitMHz +
+                " | " +
+                Num.fmtTrim(state.bandwidthKhz, 3) +
+                " " +
+                s.unitKHz +
+                " | SF" +
+                state.spreadingFactor
 
         return PlannerReport(
             title = s.title,
@@ -300,13 +325,14 @@ object PlannerReportBuilder {
                 cells += ReportCoverageCell(p.lat, p.lon, cov.marginDb[r][j])
             }
         }
-        val legend = listOf(
-            s.legendExcellent to COLORS[0],
-            s.legendGood to COLORS[1],
-            s.legendMarginal to COLORS[2],
-            s.legendWeak to COLORS[3],
-            s.legendNone to COLORS[4],
-        )
+        val legend =
+            listOf(
+                s.legendExcellent to COLORS[0],
+                s.legendGood to COLORS[1],
+                s.legendMarginal to COLORS[2],
+                s.legendWeak to COLORS[3],
+                s.legendNone to COLORS[4],
+            )
         val rangeM = if (cov.ringsM.isEmpty()) 0.0 else cov.ringsM.last()
         return ReportCoverage(
             centerLat = cov.center.lat,
@@ -322,12 +348,27 @@ object PlannerReportBuilder {
     private fun pointOf(e: PlannerEnd, name: String, s: PlannerReportStrings): ReportPoint? {
         val lat = e.lat ?: return null
         val lon = e.lon ?: return null
-        val desc = Num.fmtTrim(e.txPowerDbm, 1) + " " + s.unitDbm + ", " + Num.fmtTrim(e.antennaGainDbi, 2) + " " +
-            s.unitDbi + ", " + Num.fmtTrim(e.antennaHeightM, 1) + " " + s.unitM
+        val desc =
+            Num.fmtTrim(e.txPowerDbm, 1) +
+                " " +
+                s.unitDbm +
+                ", " +
+                Num.fmtTrim(e.antennaGainDbi, 2) +
+                " " +
+                s.unitDbi +
+                ", " +
+                Num.fmtTrim(e.antennaHeightM, 1) +
+                " " +
+                s.unitM
         return ReportPoint(name, lat, lon, desc)
     }
 
-    private fun endRows(e: PlannerEnd, s: PlannerReportStrings, defaultName: String, fMHz: Double): List<ReportKeyValue> {
+    private fun endRows(
+        e: PlannerEnd,
+        s: PlannerReportStrings,
+        defaultName: String,
+        fMHz: Double,
+    ): List<ReportKeyValue> {
         val rows = ArrayList<ReportKeyValue>()
         rows += kv(s.lblName, e.name.ifBlank { defaultName })
         val lat = e.lat
@@ -339,10 +380,18 @@ object PlannerReportBuilder {
         val g = e.groundAltM
         if (g != null) rows += kv(s.lblGroundAlt, Num.fmt(g, 1) + " " + s.unitM)
         rows += kv(s.lblAntennaHeight, Num.fmtTrim(e.antennaHeightM, 1) + " " + s.unitM)
-        rows += kv(
-            s.lblTxPower,
-            Num.fmtTrim(e.txPowerDbm, 1) + " " + s.unitDbm + " (" + Num.fmtTrim(e.txPowerW, 3) + " " + s.unitW + ")",
-        )
+        rows +=
+            kv(
+                s.lblTxPower,
+                Num.fmtTrim(e.txPowerDbm, 1) +
+                    " " +
+                    s.unitDbm +
+                    " (" +
+                    Num.fmtTrim(e.txPowerW, 3) +
+                    " " +
+                    s.unitW +
+                    ")",
+            )
         rows += kv(s.lblAntennaGain, Num.fmtTrim(e.antennaGainDbi, 2) + " " + s.unitDbi)
         rows += kv(s.lblFeederLoss, db(e.feederLossDb, s))
         if (e.feederPrecise) {
@@ -354,11 +403,12 @@ object PlannerReportBuilder {
     }
 
     private fun radioRows(state: PlannerUiState, s: PlannerReportStrings): List<ReportKeyValue> {
-        val sens = org.meshtastic.feature.map.planner.Sensitivity.dbm(
-            state.bandwidthKhz,
-            state.spreadingFactor,
-            state.noiseFigureDb,
-        )
+        val sens =
+            org.meshtastic.feature.map.planner.Sensitivity.dbm(
+                state.bandwidthKhz,
+                state.spreadingFactor,
+                state.noiseFigureDb,
+            )
         return listOf(
             kv(s.lblFrequency, Num.fmtTrim(state.frequencyMHz, 5) + " " + s.unitMHz),
             kv(s.lblBandwidth, Num.fmtTrim(state.bandwidthKhz, 3) + " " + s.unitKHz),

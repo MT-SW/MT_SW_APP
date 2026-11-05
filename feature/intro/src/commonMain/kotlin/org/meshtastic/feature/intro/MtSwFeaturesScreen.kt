@@ -39,51 +39,51 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.intro_mtsw_ai_subtitle
+import org.meshtastic.core.resources.intro_mtsw_ai_title
 import org.meshtastic.core.resources.intro_mtsw_diag_subtitle
 import org.meshtastic.core.resources.intro_mtsw_diag_title
 import org.meshtastic.core.resources.intro_mtsw_header
 import org.meshtastic.core.resources.intro_mtsw_health_subtitle
 import org.meshtastic.core.resources.intro_mtsw_health_title
+import org.meshtastic.core.resources.intro_mtsw_kb_subtitle
+import org.meshtastic.core.resources.intro_mtsw_kb_title
+import org.meshtastic.core.resources.intro_mtsw_layout_subtitle
+import org.meshtastic.core.resources.intro_mtsw_layout_title
 import org.meshtastic.core.resources.intro_mtsw_map_subtitle
 import org.meshtastic.core.resources.intro_mtsw_map_title
 import org.meshtastic.core.resources.intro_mtsw_messages_subtitle
 import org.meshtastic.core.resources.intro_mtsw_messages_title
-import org.meshtastic.core.resources.intro_mtsw_ai_subtitle
-import org.meshtastic.core.resources.intro_mtsw_ai_title
-import org.meshtastic.core.resources.intro_mtsw_terrain_subtitle
-import org.meshtastic.core.resources.intro_mtsw_terrain_title
-import org.meshtastic.core.resources.intro_mtsw_kb_subtitle
-import org.meshtastic.core.resources.intro_mtsw_kb_title
-import org.meshtastic.core.resources.intro_mtsw_report_subtitle
-import org.meshtastic.core.resources.intro_mtsw_report_title
 import org.meshtastic.core.resources.intro_mtsw_notifications_subtitle
 import org.meshtastic.core.resources.intro_mtsw_notifications_title
-import org.meshtastic.core.resources.intro_mtsw_layout_subtitle
-import org.meshtastic.core.resources.intro_mtsw_layout_title
-import org.meshtastic.core.resources.intro_mtsw_update_subtitle
-import org.meshtastic.core.resources.intro_mtsw_update_title
 import org.meshtastic.core.resources.intro_mtsw_planner_subtitle
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.intro_mtsw_remote_subtitle
 import org.meshtastic.core.resources.intro_mtsw_remote_title
+import org.meshtastic.core.resources.intro_mtsw_report_subtitle
+import org.meshtastic.core.resources.intro_mtsw_report_title
 import org.meshtastic.core.resources.intro_mtsw_scale_subtitle
 import org.meshtastic.core.resources.intro_mtsw_scale_title
 import org.meshtastic.core.resources.intro_mtsw_signal_subtitle
 import org.meshtastic.core.resources.intro_mtsw_signal_title
+import org.meshtastic.core.resources.intro_mtsw_terrain_subtitle
+import org.meshtastic.core.resources.intro_mtsw_terrain_title
+import org.meshtastic.core.resources.intro_mtsw_update_subtitle
+import org.meshtastic.core.resources.intro_mtsw_update_title
 import org.meshtastic.core.resources.next
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
-import org.meshtastic.core.ui.icon.Chart
-import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.CenterFocusStrong
+import org.meshtastic.core.ui.icon.Chart
+import org.meshtastic.core.ui.icon.Device
+import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
-import org.meshtastic.core.ui.icon.Notifications
+import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.List
-import org.meshtastic.core.ui.icon.Download
-import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
+import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Settings
@@ -191,11 +191,10 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
             Column(
                 modifier =
-                Modifier
-                        .widthIn(max = maxContentWidth)
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()),
+                Modifier.widthIn(max = maxContentWidth)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(

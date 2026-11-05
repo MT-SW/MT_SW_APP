@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,12 +104,13 @@ class ClutterPolygon(
     }
 
     fun heightM(heights: ClutterHeights): Double {
-        val h = when (kind) {
-            ClutterKind.BUILDING -> explicitHeightM ?: heights.buildingM
-            ClutterKind.FOREST -> heights.forestM
-            ClutterKind.RESIDENTIAL -> heights.residentialM
-            ClutterKind.COMMERCIAL -> heights.commercialM
-        }
+        val h =
+            when (kind) {
+                ClutterKind.BUILDING -> explicitHeightM ?: heights.buildingM
+                ClutterKind.FOREST -> heights.forestM
+                ClutterKind.RESIDENTIAL -> heights.residentialM
+                ClutterKind.COMMERCIAL -> heights.commercialM
+            }
         return h.coerceIn(0.0, ClutterHeights.MAX_HEIGHT_M)
     }
 
@@ -135,13 +136,15 @@ class ClutterPolygon(
 
 /** How many obstacles of each kind a [ClutterMap] holds. */
 data class ClutterStats(val buildings: Int, val forests: Int, val areas: Int) {
-    val total: Int get() = buildings + forests + areas
+    val total: Int
+        get() = buildings + forests + areas
 }
 
 /**
  * Obstacles around a path or an area, indexed on a grid for fast point lookups.
  *
- * [heightAt] answers "how tall is whatever stands on this spot", the tallest one when several overlap. Open ground is 0.
+ * [heightAt] answers "how tall is whatever stands on this spot", the tallest one when several overlap. Open ground
+ * is 0.
  */
 class ClutterMap(val polygons: List<ClutterPolygon>) {
     private val cells = HashMap<Long, MutableList<Int>>()
@@ -158,8 +161,12 @@ class ClutterMap(val polygons: List<ClutterPolygon>) {
         for ((i, p) in polygons.withIndex()) {
             when (p.kind) {
                 ClutterKind.BUILDING -> buildings++
+
                 ClutterKind.FOREST -> forests++
-                ClutterKind.RESIDENTIAL, ClutterKind.COMMERCIAL -> areas++
+
+                ClutterKind.RESIDENTIAL,
+                ClutterKind.COMMERCIAL,
+                -> areas++
             }
             val ix0 = floor(p.minLon / CELL_DEG).toInt()
             val ix1 = floor(p.maxLon / CELL_DEG).toInt()
@@ -235,8 +242,11 @@ private val noClutterProgress: StateFlow<ClutterProgress?> = MutableStateFlow(nu
 
 /** Obstacle data (buildings, forests) for the planner. Throws [PlannerClutterException] when it cannot be loaded. */
 interface PlannerClutterSource {
-    /** Progress of a large-area download while one runs, otherwise null. Sources that load in one go keep the default. */
-    val progress: StateFlow<ClutterProgress?> get() = noClutterProgress
+    /**
+     * Progress of a large-area download while one runs, otherwise null. Sources that load in one go keep the default.
+     */
+    val progress: StateFlow<ClutterProgress?>
+        get() = noClutterProgress
 
     /** Obstacles along the straight path between [a] and [b]. */
     suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap

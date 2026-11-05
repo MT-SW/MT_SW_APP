@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,7 +135,11 @@ internal fun PlannerNotice(text: String, modifier: Modifier = Modifier, isError:
         colors =
         CardDefaults.cardColors(
             containerColor =
-            if (isError) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
+            if (isError) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            },
             contentColor =
             if (isError) {
                 MaterialTheme.colorScheme.onErrorContainer
@@ -184,7 +188,9 @@ internal fun PlannerNumberField(
             text = ""
         } else {
             val parsed = PlannerInput.parseNumber(text)
-            if (parsed == null || !PlannerInput.sameValue(parsed, value)) text = PlannerInput.formatField(value, decimals)
+            if (parsed == null || !PlannerInput.sameValue(parsed, value)) {
+                text = PlannerInput.formatField(value, decimals)
+            }
         }
     }
     val parsedNow = PlannerInput.parseNumber(text)
@@ -223,19 +229,13 @@ internal fun PlannerNumberField(
         isError = invalid,
         suffix = suffix?.let { s -> { Text(s) } },
         supportingText = supportText?.let { st -> { Text(st) } },
-        keyboardOptions =
-        KeyboardOptions(keyboardType = if (min < 0.0) KeyboardType.Text else KeyboardType.Decimal),
+        keyboardOptions = KeyboardOptions(keyboardType = if (min < 0.0) KeyboardType.Text else KeyboardType.Decimal),
     )
 }
 
 /** A plain text field with local text state. */
 @Composable
-internal fun PlannerTextField(
-    label: String,
-    value: String,
-    onValue: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun PlannerTextField(label: String, value: String, onValue: (String) -> Unit, modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf(value) }
     LaunchedEffect(value) { if (value != text) text = value }
     OutlinedTextField(

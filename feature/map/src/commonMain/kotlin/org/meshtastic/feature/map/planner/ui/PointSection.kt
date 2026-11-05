@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,7 +139,9 @@ internal fun PointSection(
             )
             PointSourceLine(end = end, onClear = { vm.clearPoint(side) })
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SourceChip(MeshtasticIcons.Nodes, stringResource(Res.string.planner_source_pick_node)) { showPicker = true }
+                SourceChip(MeshtasticIcons.Nodes, stringResource(Res.string.planner_source_pick_node)) {
+                    showPicker = true
+                }
                 SourceChip(MeshtasticIcons.PinDrop, stringResource(Res.string.planner_source_tap_map)) {
                     bridge.pickingSide = side
                 }
@@ -241,8 +243,12 @@ private fun CoordinateFields(side: PlannerSide, end: PlannerEnd, vm: PlannerView
         } else {
             val pLat = PlannerInput.parseCoordinate(latText, true)
             val pLon = PlannerInput.parseCoordinate(lonText, false)
-            if (pLat == null || !PlannerInput.sameValue(pLat, lat)) latText = PlannerInput.formatField(lat, COORD_DECIMALS)
-            if (pLon == null || !PlannerInput.sameValue(pLon, lon)) lonText = PlannerInput.formatField(lon, COORD_DECIMALS)
+            if (pLat == null || !PlannerInput.sameValue(pLat, lat)) {
+                latText = PlannerInput.formatField(lat, COORD_DECIMALS)
+            }
+            if (pLon == null || !PlannerInput.sameValue(pLon, lon)) {
+                lonText = PlannerInput.formatField(lon, COORD_DECIMALS)
+            }
         }
     }
 
@@ -347,7 +353,11 @@ private fun NodePickerDialog(
         remember(nodes, query) {
             val q = query.trim()
             nodes
-                .filter { q.isEmpty() || it.displayName.contains(q, ignoreCase = true) || it.shortName.contains(q, ignoreCase = true) }
+                .filter {
+                    q.isEmpty() ||
+                        it.displayName.contains(q, ignoreCase = true) ||
+                        it.shortName.contains(q, ignoreCase = true)
+                }
                 .sortedWith(
                     compareByDescending<PlannerNodeOption> { it.isOurs }
                         .thenBy { it.hopsAway }

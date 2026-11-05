@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,16 +90,15 @@ internal fun ExportSection(
     var pending by remember { mutableStateOf<PendingExport?>(null) }
     var outcome by remember { mutableStateOf<ExportOutcome?>(null) }
 
-    val launcher =
-        rememberSaveFileLauncher { uri ->
-            val p = pending
-            if (p != null) {
-                scope.launch {
-                    outcome = if (writeBytes(uri, p.bytes)) ExportOutcome.SAVED else ExportOutcome.FAILED
-                    pending = null
-                }
+    val launcher = rememberSaveFileLauncher { uri ->
+        val p = pending
+        if (p != null) {
+            scope.launch {
+                outcome = if (writeBytes(uri, p.bytes)) ExportOutcome.SAVED else ExportOutcome.FAILED
+                pending = null
             }
         }
+    }
 
     fun export(extension: String, mime: String, produce: suspend (PlannerReportStrings) -> ByteArray?) {
         scope.launch {
@@ -168,26 +167,31 @@ internal fun ExportSection(
             }
         }
         when (outcome) {
-            ExportOutcome.SAVED -> Text(stringResource(Res.string.planner_export_saved), style = MaterialTheme.typography.bodySmall)
+            ExportOutcome.SAVED ->
+                Text(stringResource(Res.string.planner_export_saved), style = MaterialTheme.typography.bodySmall)
+
             ExportOutcome.FAILED ->
                 Text(
                     stringResource(Res.string.planner_export_failed),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
+
             ExportOutcome.NOTHING ->
                 Text(
                     stringResource(Res.string.planner_export_nothing),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
-            null -> if (!hasAnything) {
-                Text(
-                    stringResource(Res.string.planner_export_unavailable),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+
+            null ->
+                if (!hasAnything) {
+                    Text(
+                        stringResource(Res.string.planner_export_unavailable),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
         }
     }
 }

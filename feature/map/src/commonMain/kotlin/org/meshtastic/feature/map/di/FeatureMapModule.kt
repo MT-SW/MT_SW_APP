@@ -27,11 +27,11 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.map.layers.MapLayersManager
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevation
-import org.meshtastic.feature.map.planner.data.TerrainStore
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
 import org.meshtastic.feature.map.planner.data.PlannerOverpass
 import org.meshtastic.feature.map.planner.data.PlannerWeather
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
+import org.meshtastic.feature.map.planner.data.TerrainStore
 import org.meshtastic.feature.map.planner.state.PlannerNodeSource
 import org.meshtastic.feature.map.planner.state.RepositoryPlannerNodeSource
 
@@ -51,17 +51,14 @@ class FeatureMapModule {
     ): MapLayersManager = MapLayersManager(dispatchers, httpClient, mapPrefs)
 
     /** Terrain for the native planner: one instance so the decoded-tile LRU is shared across planner sessions. */
-    @Single
-    fun provideTerrainStore(): TerrainStore = TerrainStore()
+    @Single fun provideTerrainStore(): TerrainStore = TerrainStore()
 
     @Single
     fun providePlannerElevationSource(store: TerrainStore): PlannerElevationSource = PlannerElevation(store = store)
 
-    @Single
-    fun providePlannerWeatherSource(httpClient: HttpClient): PlannerWeatherSource = PlannerWeather(httpClient)
+    @Single fun providePlannerWeatherSource(httpClient: HttpClient): PlannerWeatherSource = PlannerWeather(httpClient)
 
-    @Single
-    fun providePlannerClutterSource(httpClient: HttpClient): PlannerClutterSource = PlannerOverpass(httpClient)
+    @Single fun providePlannerClutterSource(httpClient: HttpClient): PlannerClutterSource = PlannerOverpass(httpClient)
 
     @Single
     fun providePlannerNodeSource(nodeRepository: NodeRepository, uiPrefs: UiPrefs): PlannerNodeSource =

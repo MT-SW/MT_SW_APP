@@ -28,8 +28,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map
 import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.feature.map.component.LocalOpenMeshHud
 import org.meshtastic.core.ui.util.LocalMapViewProvider
+import org.meshtastic.feature.map.component.LocalOpenMeshHud
 
 @Composable
 fun MapScreen(

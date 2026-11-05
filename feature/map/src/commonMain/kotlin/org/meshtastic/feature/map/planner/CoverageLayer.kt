@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.map.planner
 
 import org.meshtastic.feature.map.planner.export.Num
@@ -41,13 +40,14 @@ object CoverageLayer {
 
     // Weakest → strongest, picked to match the familiar MeshMap look.
     private val stopPos = doubleArrayOf(0.0, 0.3, 0.55, 0.78, 1.0)
-    private val stopRgb = arrayOf(
-        intArrayOf(0x7a, 0x3c, 0xb5),
-        intArrayOf(0xb6, 0x4f, 0xa8),
-        intArrayOf(0xee, 0x7f, 0x5c),
-        intArrayOf(0xfb, 0xa7, 0x3a),
-        intArrayOf(0xe9, 0xf0, 0x3b),
-    )
+    private val stopRgb =
+        arrayOf(
+            intArrayOf(0x7a, 0x3c, 0xb5),
+            intArrayOf(0xb6, 0x4f, 0xa8),
+            intArrayOf(0xee, 0x7f, 0x5c),
+            intArrayOf(0xfb, 0xa7, 0x3a),
+            intArrayOf(0xe9, 0xf0, 0x3b),
+        )
 
     fun classOf(marginDb: Float): Int {
         if (marginDb.isNaN() || marginDb < 0f) return -1
@@ -93,7 +93,8 @@ object CoverageLayer {
                         continue
                     }
                     var end = col
-                    while (end + 1 < rows &&
+                    while (
+                        end + 1 < rows &&
                         classOf(coverage.marginAt(latC, lon0 + dLon * (end + 1.5)) ?: Float.NaN) == cls
                     ) {
                         end++
@@ -105,19 +106,38 @@ object CoverageLayer {
         }
         features.add(
             "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":" +
-                pos(coverage.center.lat, coverage.center.lon) + "},\"properties\":{\"name\":" + str(name) +
+                pos(coverage.center.lat, coverage.center.lon) +
+                "},\"properties\":{\"name\":" +
+                str(name) +
                 ",\"marker-color\":\"#1565c0\"}}",
         )
-        return "{\"type\":\"FeatureCollection\",\"name\":" + str(name) + ",\"features\":[\n" +
-            features.joinToString(",\n") + "\n]}\n"
+        return "{\"type\":\"FeatureCollection\",\"name\":" +
+            str(name) +
+            ",\"features\":[\n" +
+            features.joinToString(",\n") +
+            "\n]}\n"
     }
 
     private fun cell(south: Double, north: Double, west: Double, east: Double, cls: Int, opacity: Double): String {
-        val ring = pos(south, west) + "," + pos(south, east) + "," + pos(north, east) + "," + pos(north, west) + "," +
-            pos(south, west)
-        return "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[" + ring +
-            "]]},\"properties\":{\"fill\":\"" + colorOf(cls) + "\",\"fill-opacity\":" + opacity.toString() +
-            ",\"stroke-width\":0,\"stroke-opacity\":0,\"class\":" + cls + "}}"
+        val ring =
+            pos(south, west) +
+                "," +
+                pos(south, east) +
+                "," +
+                pos(north, east) +
+                "," +
+                pos(north, west) +
+                "," +
+                pos(south, west)
+        return "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[" +
+            ring +
+            "]]},\"properties\":{\"fill\":\"" +
+            colorOf(cls) +
+            "\",\"fill-opacity\":" +
+            opacity.toString() +
+            ",\"stroke-width\":0,\"stroke-opacity\":0,\"class\":" +
+            cls +
+            "}}"
     }
 
     private const val METERS_PER_DEG_LAT = 111_320.0

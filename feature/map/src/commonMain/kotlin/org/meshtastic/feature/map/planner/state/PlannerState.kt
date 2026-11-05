@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  */
 package org.meshtastic.feature.map.planner.state
 
-import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.FeederResult
+import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PlannerBands
@@ -29,8 +29,8 @@ import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.ClutterStats
 import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
-import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.feature.map.planner.data.PlannerWeatherError
+import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.math.log10
 import kotlin.math.pow
@@ -41,7 +41,8 @@ enum class PlannerSide {
     B,
     ;
 
-    val other: PlannerSide get() = if (this == A) B else A
+    val other: PlannerSide
+        get() = if (this == A) B else A
 }
 
 /** Where the coordinates of a link end came from. */
@@ -149,18 +150,23 @@ data class PlannerEnd(
     /** True when "use station" failed for this end (drives [PlannerHint.STATION_NO_POSITION]). */
     val stationUnavailable: Boolean = false,
 ) {
-    val isComplete: Boolean get() = lat != null && lon != null
+    val isComplete: Boolean
+        get() = lat != null && lon != null
 
-    val point: GeoPoint? get() = if (lat != null && lon != null) GeoPoint(lat, lon) else null
+    val point: GeoPoint?
+        get() = if (lat != null && lon != null) GeoPoint(lat, lon) else null
 
     /** Feeder loss that enters the link budget. */
-    val feederLossDb: Double get() = if (feederPrecise) feederResult.totalDb else feederManualDb
+    val feederLossDb: Double
+        get() = if (feederPrecise) feederResult.totalDb else feederManualDb
 
     /** Transmit power in watts. */
-    val txPowerW: Double get() = dbmToWatts(txPowerDbm)
+    val txPowerW: Double
+        get() = dbmToWatts(txPowerDbm)
 
     /** Id of the matching [FeederBuilder.presets] entry, or null for a custom configuration. */
-    val feederPresetId: String? get() = FeederBuilder.presets.firstOrNull { it.config == feederConfig }?.id
+    val feederPresetId: String?
+        get() = FeederBuilder.presets.firstOrNull { it.config == feederConfig }?.id
 
     companion object {
         const val DEFAULT_HEIGHT_M = 2.0
@@ -255,17 +261,16 @@ data class PlannerUiState(
     val coverageError: PlannerError? = null,
 ) {
     /** Heights assumed for map obstacles. */
-    val clutterHeights: ClutterHeights get() = ClutterHeights(forestM = forestHeightM, buildingM = buildingHeightM)
+    val clutterHeights: ClutterHeights
+        get() = ClutterHeights(forestM = forestHeightM, buildingM = buildingHeightM)
 
     /**
      * Extra loss applied by the calculation. With the OpenStreetMap option the preset is replaced by the real
-     * obstacles; if the map data failed to load the preset
-     * is used after all.
+     * obstacles; if the map data failed to load the preset is used after all.
      */
     val effectiveExtraLossDb: Double
         get() {
-            val replaced = preciseTerrain &&
-                clutter !is PlannerClutterStatus.Failed
+            val replaced = preciseTerrain && clutter !is PlannerClutterStatus.Failed
             return if (replaced) 0.0 else extraLossDb
         }
 
@@ -275,10 +280,12 @@ data class PlannerUiState(
         if (side == PlannerSide.A) copy(a = end) else copy(b = end)
 
     /** Both ends have coordinates, so a link can be calculated. */
-    val isLinkReady: Boolean get() = a.isComplete && b.isComplete
+    val isLinkReady: Boolean
+        get() = a.isComplete && b.isComplete
 
     /** Noise floor (dBm) = -174 + 10 log10(BW) + NF. */
-    val noiseFloorDbm: Double get() = -174.0 + 10.0 * log10(bandwidthKhz * 1000.0) + noiseFigureDb
+    val noiseFloorDbm: Double
+        get() = -174.0 + 10.0 * log10(bandwidthKhz * 1000.0) + noiseFigureDb
 
     companion object {
         const val DEFAULT_K = 4.0 / 3.0
@@ -300,5 +307,6 @@ data class PlannerNodeOption(
     val isOurs: Boolean,
 ) {
     /** Best display name. */
-    val displayName: String get() = longName.ifBlank { shortName.ifBlank { "!" + num.toUInt().toString(16) } }
+    val displayName: String
+        get() = longName.ifBlank { shortName.ifBlank { "!" + num.toUInt().toString(16) } }
 }

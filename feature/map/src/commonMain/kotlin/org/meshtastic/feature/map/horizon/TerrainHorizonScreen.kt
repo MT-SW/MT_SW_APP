@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  */
 package org.meshtastic.feature.map.horizon
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -35,17 +38,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -62,16 +64,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -81,32 +83,12 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
-import org.meshtastic.core.ui.util.HorizonMapNode
-import org.meshtastic.core.ui.icon.Info
-import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.resources.close
-import org.meshtastic.core.resources.terrain_horizon_info_body
-import org.meshtastic.core.resources.terrain_horizon_info_title
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.terrain_horizon_save_range
-import org.meshtastic.core.resources.terrain_horizon_saved
-import org.meshtastic.core.resources.terrain_horizon_save_failed
-import org.meshtastic.core.resources.terrain_horizon_saving
-import org.meshtastic.core.resources.terrain_horizon_save_clear
-import org.meshtastic.core.resources.terrain_horizon_save
-import org.meshtastic.core.resources.terrain_horizon_offline_hint
-import org.meshtastic.core.resources.terrain_horizon_offline
-import org.meshtastic.core.resources.terrain_horizon_move_back
-import org.meshtastic.core.resources.terrain_horizon_move_hint
-import org.meshtastic.core.resources.terrain_horizon_move
-import org.meshtastic.core.resources.terrain_horizon_compass
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.gestures.detectDragGestures
-import kotlinx.coroutines.flow.emptyFlow
 import org.meshtastic.core.resources.cancel
+import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.latitude
 import org.meshtastic.core.resources.longitude
 import org.meshtastic.core.resources.mesh_hud_cardinal_east
@@ -119,33 +101,50 @@ import org.meshtastic.core.resources.terrain_horizon_antenna
 import org.meshtastic.core.resources.terrain_horizon_antenna_auto
 import org.meshtastic.core.resources.terrain_horizon_apply
 import org.meshtastic.core.resources.terrain_horizon_camera
+import org.meshtastic.core.resources.terrain_horizon_compass
+import org.meshtastic.core.resources.terrain_horizon_favorites
 import org.meshtastic.core.resources.terrain_horizon_fov
 import org.meshtastic.core.resources.terrain_horizon_from
 import org.meshtastic.core.resources.terrain_horizon_hint
 import org.meshtastic.core.resources.terrain_horizon_in_sight
+import org.meshtastic.core.resources.terrain_horizon_info_body
+import org.meshtastic.core.resources.terrain_horizon_info_title
 import org.meshtastic.core.resources.terrain_horizon_labels
 import org.meshtastic.core.resources.terrain_horizon_loading
+import org.meshtastic.core.resources.terrain_horizon_move
+import org.meshtastic.core.resources.terrain_horizon_move_back
+import org.meshtastic.core.resources.terrain_horizon_move_hint
 import org.meshtastic.core.resources.terrain_horizon_network
 import org.meshtastic.core.resources.terrain_horizon_no_position
+import org.meshtastic.core.resources.terrain_horizon_node_range
 import org.meshtastic.core.resources.terrain_horizon_none
 import org.meshtastic.core.resources.terrain_horizon_observer_my_node
 import org.meshtastic.core.resources.terrain_horizon_observer_node
 import org.meshtastic.core.resources.terrain_horizon_observer_phone
 import org.meshtastic.core.resources.terrain_horizon_observer_point
 import org.meshtastic.core.resources.terrain_horizon_observer_title
+import org.meshtastic.core.resources.terrain_horizon_offline
+import org.meshtastic.core.resources.terrain_horizon_offline_hint
 import org.meshtastic.core.resources.terrain_horizon_only_visible
 import org.meshtastic.core.resources.terrain_horizon_options
-import org.meshtastic.core.resources.terrain_horizon_node_range
-import org.meshtastic.core.resources.terrain_horizon_favorites
 import org.meshtastic.core.resources.terrain_horizon_precision
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
+import org.meshtastic.core.resources.terrain_horizon_save
+import org.meshtastic.core.resources.terrain_horizon_save_clear
+import org.meshtastic.core.resources.terrain_horizon_save_failed
+import org.meshtastic.core.resources.terrain_horizon_save_range
+import org.meshtastic.core.resources.terrain_horizon_saved
+import org.meshtastic.core.resources.terrain_horizon_saving
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Settings
+import org.meshtastic.core.ui.util.HorizonMapNode
+import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -219,21 +218,38 @@ fun TerrainHorizonScreen(
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onNavigateUp) {
-                Icon(MeshtasticIcons.ArrowBack, stringResource(Res.string.navigate_back), tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    MeshtasticIcons.ArrowBack,
+                    stringResource(Res.string.navigate_back),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
             }
-            Text(stringResource(Res.string.terrain_horizon_title), color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+            Text(
+                stringResource(Res.string.terrain_horizon_title),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.weight(1f),
+            )
             IconButton(onClick = { showInfo = true }) {
-                Icon(MeshtasticIcons.Info, stringResource(Res.string.terrain_horizon_info_title), tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    MeshtasticIcons.Info,
+                    stringResource(Res.string.terrain_horizon_info_title),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
             }
             IconButton(onClick = { moreOptions = !moreOptions }) {
                 Icon(
                     MeshtasticIcons.Settings,
                     stringResource(Res.string.terrain_horizon_options),
-                    tint = if (moreOptions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                    tint =
+                    if (moreOptions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                 )
             }
             IconButton(onClick = onOpenCamera) {
-                Icon(MeshtasticIcons.PhotoCamera, stringResource(Res.string.terrain_horizon_camera), tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    MeshtasticIcons.PhotoCamera,
+                    stringResource(Res.string.terrain_horizon_camera),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
             }
         }
         Row(
@@ -247,17 +263,33 @@ fun TerrainHorizonScreen(
                 label = { Text(observerLabel(state)) },
                 modifier = Modifier.weight(1f, fill = false),
             )
-            BrandChip(selected = compass, onClick = { compass = !compass }, label = { Text(stringResource(Res.string.terrain_horizon_compass)) })
-            BrandChip(selected = moving, onClick = { moving = !moving }, label = { Text(stringResource(Res.string.terrain_horizon_move)) })
+            BrandChip(
+                selected = compass,
+                onClick = { compass = !compass },
+                label = { Text(stringResource(Res.string.terrain_horizon_compass)) },
+            )
+            BrandChip(
+                selected = moving,
+                onClick = { moving = !moving },
+                label = { Text(stringResource(Res.string.terrain_horizon_move)) },
+            )
         }
         ChipRow(stringResource(Res.string.terrain_horizon_range)) {
             HORIZON_RADII_KM.forEach { km ->
-                BrandChip(selected = state.radiusKm == km, onClick = { viewModel.setRadius(km) }, label = { Text("$km km") })
+                BrandChip(
+                    selected = state.radiusKm == km,
+                    onClick = { viewModel.setRadius(km) },
+                    label = { Text("$km km") },
+                )
             }
         }
         ChipRow(stringResource(Res.string.terrain_horizon_node_range)) {
             HORIZON_NODE_RANGES_KM.forEach { km ->
-                BrandChip(selected = state.nodeRangeKm == km, onClick = { viewModel.setNodeRange(km) }, label = { Text("$km km") })
+                BrandChip(
+                    selected = state.nodeRangeKm == km,
+                    onClick = { viewModel.setNodeRange(km) },
+                    label = { Text("$km km") },
+                )
             }
         }
         ChipRow(stringResource(Res.string.terrain_horizon_antenna)) {
@@ -279,7 +311,11 @@ fun TerrainHorizonScreen(
         if (moreOptions) {
             ChipRow(stringResource(Res.string.terrain_horizon_target_antenna)) {
                 HORIZON_ANTENNAS_M.forEach { m ->
-                    BrandChip(selected = state.targetAntennaM == m, onClick = { viewModel.setTargetAntenna(m) }, label = { Text("$m m") })
+                    BrandChip(
+                        selected = state.targetAntennaM == m,
+                        onClick = { viewModel.setTargetAntenna(m) },
+                        label = { Text("$m m") },
+                    )
                 }
             }
             ChipRow(stringResource(Res.string.terrain_horizon_refraction)) {
@@ -296,11 +332,24 @@ fun TerrainHorizonScreen(
                     BrandChip(selected = fieldOfView == deg, onClick = { fieldOfView = deg }, label = { Text("$deg°") })
                 }
             }
-            OfflineTerrain(state = state, onRadius = viewModel::setSaveRadius, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
-            ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) { Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it }) }
-            ChipRow(stringResource(Res.string.terrain_horizon_favorites)) { Switch(checked = state.onlyFavorites, onCheckedChange = viewModel::setOnlyFavorites) }
-            ChipRow(stringResource(Res.string.terrain_horizon_precision)) { Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles) }
-            ChipRow(stringResource(Res.string.terrain_horizon_labels)) { Switch(checked = names, onCheckedChange = { names = it }) }
+            OfflineTerrain(
+                state = state,
+                onRadius = viewModel::setSaveRadius,
+                onSave = viewModel::saveTerrain,
+                onClear = viewModel::clearSavedTerrain,
+            )
+            ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) {
+                Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it })
+            }
+            ChipRow(stringResource(Res.string.terrain_horizon_favorites)) {
+                Switch(checked = state.onlyFavorites, onCheckedChange = viewModel::setOnlyFavorites)
+            }
+            ChipRow(stringResource(Res.string.terrain_horizon_precision)) {
+                Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles)
+            }
+            ChipRow(stringResource(Res.string.terrain_horizon_labels)) {
+                Switch(checked = names, onCheckedChange = { names = it })
+            }
         }
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             val profile = state.profile
@@ -308,10 +357,18 @@ fun TerrainHorizonScreen(
                 state.loading ->
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
-                        Text(stringResource(Res.string.terrain_horizon_loading), color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(top = 8.dp))
+                        Text(
+                            stringResource(Res.string.terrain_horizon_loading),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
                     }
+
                 state.failure != null ->
-                    Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        Modifier.align(Alignment.Center).padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
                         Text(
                             stringResource(
                                 if (state.failure == TerrainHorizonFailure.NO_POSITION) {
@@ -322,8 +379,11 @@ fun TerrainHorizonScreen(
                             ),
                             color = MaterialTheme.colorScheme.onBackground,
                         )
-                        Button(onClick = viewModel::retry, modifier = Modifier.padding(top = 12.dp)) { Text(stringResource(Res.string.retry)) }
+                        Button(onClick = viewModel::retry, modifier = Modifier.padding(top = 12.dp)) {
+                            Text(stringResource(Res.string.retry))
+                        }
                     }
+
                 profile != null ->
                     Panorama(
                         profile = profile,
@@ -332,7 +392,12 @@ fun TerrainHorizonScreen(
                         fieldOfView = fieldOfView.toFloat(),
                         names = names,
                         markers = state.nodeChoices.associate { it.num to (Color(it.color) to Color(it.textColor)) },
-                        precisions = if (state.precisionCircles) state.nodeChoices.mapNotNull { c -> c.precisionM?.let { c.num to it } }.toMap() else emptyMap(),
+                        precisions =
+                        if (state.precisionCircles) {
+                            state.nodeChoices.mapNotNull { c -> c.precisionM?.let { c.num to it } }.toMap()
+                        } else {
+                            emptyMap()
+                        },
                         compass = compass,
                         heading = heading,
                         onManualTurn = { compass = false },
@@ -353,12 +418,20 @@ fun TerrainHorizonScreen(
                     if (state.targets.isEmpty()) {
                         stringResource(Res.string.terrain_horizon_none)
                     } else {
-                        stringResource(Res.string.terrain_horizon_in_sight, state.targets.count { it.visible }, state.targets.size)
+                        stringResource(
+                            Res.string.terrain_horizon_in_sight,
+                            state.targets.count { it.visible },
+                            state.targets.size,
+                        )
                     },
                     color = MaterialTheme.colorScheme.onBackground,
                 )
             }
-            Text(stringResource(Res.string.terrain_horizon_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+            Text(
+                stringResource(Res.string.terrain_horizon_hint),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp,
+            )
         }
     }
 }
@@ -368,11 +441,20 @@ private fun observerLabel(state: TerrainHorizonState): String {
     val kind =
         when (state.observer) {
             HorizonObserver.MyNode -> stringResource(Res.string.terrain_horizon_observer_my_node)
+
             HorizonObserver.Phone -> stringResource(Res.string.terrain_horizon_observer_phone)
-            is HorizonObserver.OtherNode -> state.observerName.ifBlank { stringResource(Res.string.terrain_horizon_observer_node) }
+
+            is HorizonObserver.OtherNode ->
+                state.observerName.ifBlank { stringResource(Res.string.terrain_horizon_observer_node) }
+
             is HorizonObserver.Point -> stringResource(Res.string.terrain_horizon_observer_point)
         }
-    val name = if (state.observer == HorizonObserver.MyNode && state.observerName.isNotBlank()) " (${state.observerName})" else ""
+    val name =
+        if (state.observer == HorizonObserver.MyNode && state.observerName.isNotBlank()) {
+            " (${state.observerName})"
+        } else {
+            ""
+        }
     return stringResource(Res.string.terrain_horizon_from) + ": " + kind + name + " · " + state.usedAntennaM + " m"
 }
 
@@ -394,9 +476,16 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
     var step by rememberSaveable { mutableStateOf(0) }
     var lat by rememberSaveable { mutableStateOf("") }
     var lon by rememberSaveable { mutableStateOf("") }
-    val point = lat.replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }?.let { la ->
-        lon.replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }?.let { lo -> HorizonObserver.Point(la, lo) }
-    }
+    val point =
+        lat.replace(',', '.')
+            .toDoubleOrNull()
+            ?.takeIf { it in -90.0..90.0 }
+            ?.let { la ->
+                lon.replace(',', '.')
+                    .toDoubleOrNull()
+                    ?.takeIf { it in -180.0..180.0 }
+                    ?.let { lo -> HorizonObserver.Point(la, lo) }
+            }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.terrain_horizon_observer_title)) },
@@ -404,7 +493,10 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
             Column {
                 @Composable
                 fun Choice(text: String, onClick: () -> Unit) {
-                    Row(Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.fillMaxWidth().clickable(onClick = onClick),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         RadioButton(selected = false, onClick = onClick)
                         Text(text)
                     }
@@ -412,8 +504,11 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
                 when (step) {
                     1 ->
                         LazyColumn(Modifier.heightIn(max = LIST_HEIGHT_DP.dp)) {
-                            items(nodes, key = { it.num }) { node -> Choice(node.name) { onPick(HorizonObserver.OtherNode(node.num)) } }
+                            items(nodes, key = { it.num }) { node ->
+                                Choice(node.name) { onPick(HorizonObserver.OtherNode(node.num)) }
+                            }
                         }
+
                     2 -> {
                         OutlinedTextField(
                             value = lat,
@@ -431,9 +526,14 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
                             modifier = Modifier.padding(top = 8.dp),
                         )
                     }
+
                     else -> {
-                        Choice(stringResource(Res.string.terrain_horizon_observer_my_node)) { onPick(HorizonObserver.MyNode) }
-                        Choice(stringResource(Res.string.terrain_horizon_observer_phone)) { onPick(HorizonObserver.Phone) }
+                        Choice(stringResource(Res.string.terrain_horizon_observer_my_node)) {
+                            onPick(HorizonObserver.MyNode)
+                        }
+                        Choice(stringResource(Res.string.terrain_horizon_observer_phone)) {
+                            onPick(HorizonObserver.Phone)
+                        }
                         Choice(stringResource(Res.string.terrain_horizon_observer_node)) { step = 1 }
                         Choice(stringResource(Res.string.terrain_horizon_observer_point)) { step = 2 }
                     }
@@ -442,7 +542,9 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
         },
         confirmButton = {
             if (step == 2) {
-                TextButton(onClick = { point?.let(onPick) }, enabled = point != null) { Text(stringResource(Res.string.terrain_horizon_apply)) }
+                TextButton(onClick = { point?.let(onPick) }, enabled = point != null) {
+                    Text(stringResource(Res.string.terrain_horizon_apply))
+                }
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
@@ -466,9 +568,12 @@ private fun Panorama(
     var centre by rememberSaveable { mutableFloatStateOf(0f) }
     // Opened for one node: the view starts turned to it.
     LaunchedEffect(focusNodeNum, targets) {
-        if (focusNodeNum != null) targets.firstOrNull { it.nodeNum == focusNodeNum }?.let { centre = it.bearingDeg.toFloat() }
+        if (focusNodeNum != null) {
+            targets.firstOrNull { it.nodeNum == focusNodeNum }?.let { centre = it.bearingDeg.toFloat() }
+        }
     }
-    // The phone turning turns the view; a finger on the picture takes the turning over until the compass is switched on again.
+    // The phone turning turns the view; a finger on the picture takes the turning over until the compass is switched on
+    // again.
     LaunchedEffect(compass, heading) { if (compass && heading != null) centre = heading }
     val range = remember(profile, targets) { angleRange(profile, targets) }
     val sky = MaterialTheme.colorScheme.background
@@ -499,7 +604,13 @@ private fun Panorama(
                 detectTapGestures { tap ->
                     val perDeg = size.width / currentFov
                     currentTargets
-                        .map { it to Offset(xOf(it.bearingDeg, currentCentre, perDeg, size.width.toFloat()), yOf(it.angleDeg, range, size.height.toFloat())) }
+                        .map {
+                            it to
+                                Offset(
+                                    xOf(it.bearingDeg, currentCentre, perDeg, size.width.toFloat()),
+                                    yOf(it.angleDeg, range, size.height.toFloat()),
+                                )
+                        }
                         .minByOrNull { (_, at) -> (at - tap).getDistance() }
                         ?.takeIf { (_, at) -> (at - tap).getDistance() <= TAP_RADIUS_PX }
                         ?.let { (target, _) -> onOpenNode(target.nodeNum) }
@@ -513,7 +624,10 @@ private fun Panorama(
     }
 }
 
-/** The vertical range of the picture in degrees above the horizontal: the whole skyline and every node, never less than a few degrees. */
+/**
+ * The vertical range of the picture in degrees above the horizontal: the whole skyline and every node, never less than
+ * a few degrees.
+ */
 private fun angleRange(profile: HorizonProfile, targets: List<HorizonTarget>): ClosedFloatingPointRange<Double> {
     val skyline = profile.points.map { it.angleDeg }
     val low = max(MIN_ANGLE_FLOOR, min(-3.0, (skyline.minOrNull() ?: 0.0) - 1.0))
@@ -535,7 +649,13 @@ private fun xOf(bearingDeg: Double, centre: Float, perDeg: Float, width: Float):
 }
 
 /** The ridges, far ones light and near ones dark, each drawn over the one behind it. */
-private fun DrawScope.drawBands(profile: HorizonProfile, bands: List<Color>, centre: Float, perDeg: Float, range: ClosedFloatingPointRange<Double>) {
+private fun DrawScope.drawBands(
+    profile: HorizonProfile,
+    bands: List<Color>,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+) {
     val w = size.width
     val h = size.height
     for (band in bands.indices) {
@@ -546,7 +666,12 @@ private fun DrawScope.drawBands(profile: HorizonProfile, bands: List<Color>, cen
         var x = 0f
         while (x <= w + COLUMN_STEP_PX) {
             val bearing = centre + (x - w / 2) / perDeg
-            val angle = profile.at(bearing.toDouble()).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull { it.angleDeg }
+            val angle =
+                profile
+                    .at(bearing.toDouble())
+                    .crests
+                    .filter { it.distanceM >= from && it.distanceM < to }
+                    .maxOfOrNull { it.angleDeg }
             path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
             x += COLUMN_STEP_PX
         }
@@ -574,7 +699,14 @@ private fun DrawScope.drawGuides(
         val bearing = ((step * 15f) % FULL_TURN + FULL_TURN) % FULL_TURN
         val x = xOf(bearing.toDouble(), centre, perDeg, w)
         if (x < 0f || x > w) continue
-        val label = if (bearing % 90f == 0f) cardinals[(bearing / 90f).toInt() % 4] else if (bearing % 45f == 0f) "${bearing.roundToInt()}°" else ""
+        val label =
+            if (bearing % 90f == 0f) {
+                cardinals[(bearing / 90f).toInt() % 4]
+            } else if (bearing % 45f == 0f) {
+                "${bearing.roundToInt()}°"
+            } else {
+                ""
+            }
         drawLine(Color(0x44FFFFFF), Offset(x, 0f), Offset(x, if (label.isEmpty()) 10f else 18f), strokeWidth = 1f)
         if (label.isNotEmpty()) {
             val layout = measurer.measure(label, TextStyle(color = Color.White, fontSize = 12.sp))
@@ -616,7 +748,15 @@ private fun DrawScope.drawTargets(
                 drawOval(background.copy(alpha = PRECISION_LINE_ALPHA), topLeft, oval, style = Stroke(1.5f))
             }
         }
-        drawNodeMarker(measurer, if (names && (target in labelled || focus)) target.name else null, Offset(x, y), background, text, ring, focus)
+        drawNodeMarker(
+            measurer,
+            if (names && (target in labelled || focus)) target.name else null,
+            Offset(x, y),
+            background,
+            text,
+            ring,
+            focus,
+        )
     }
 }
 
@@ -637,14 +777,41 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
         // The same map as the main one, with the nodes drawn as there; a cross in the middle marks the place.
         val mapNodes =
             remember(state.nodeChoices, state.precisionCircles, state.onlyFavorites) {
-                state.nodeChoices.filter { c -> !state.onlyFavorites || c.favorite }.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor, it.precisionM.takeIf { _ -> state.precisionCircles }) }
+                state.nodeChoices
+                    .filter { c -> !state.onlyFavorites || c.favorite }
+                    .map {
+                        HorizonMapNode(
+                            it.lat,
+                            it.lon,
+                            it.shortName,
+                            it.color,
+                            it.textColor,
+                            it.precisionM.takeIf { _ -> state.precisionCircles },
+                        )
+                    }
             }
         Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(Res.string.terrain_horizon_move_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, modifier = Modifier.weight(1f))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(Res.string.terrain_horizon_move_hint),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 11.sp,
+                    modifier = Modifier.weight(1f),
+                )
                 TextButton(onClick = onReset) { Text(stringResource(Res.string.terrain_horizon_move_back)) }
             }
-            pickMap(lat0, lon0, state.radiusKm, mapNodes, onMoved, Modifier.fillMaxWidth().height(PICK_MAP_HEIGHT_DP.dp))
+            pickMap(
+                lat0,
+                lon0,
+                state.radiusKm,
+                mapNodes,
+                onMoved,
+                Modifier.fillMaxWidth().height(PICK_MAP_HEIGHT_DP.dp),
+            )
         }
         return
     }
@@ -655,32 +822,45 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
     val accent = MaterialTheme.colorScheme.primary
     val halfSpanM = state.radiusKm * MAP_METRES_PER_KM
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(Res.string.terrain_horizon_move_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, modifier = Modifier.weight(1f))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                stringResource(Res.string.terrain_horizon_move_hint),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp,
+                modifier = Modifier.weight(1f),
+            )
             TextButton(onClick = onReset) { Text(stringResource(Res.string.terrain_horizon_move_back)) }
         }
         Canvas(
             modifier =
-            Modifier.fillMaxWidth().heightIn(max = MAP_HEIGHT_DP.dp).height(MAP_HEIGHT_DP.dp).background(MaterialTheme.colorScheme.surfaceContainer).pointerInput(lat0, lon0, state.radiusKm) {
-                val metresPerPx = halfSpanM / (minOf(size.width, size.height) / 2f)
-                detectDragGestures(
-                    onDragEnd = {
-                        // The map follows the finger, so the place to look from goes the other way.
-                        val eastM = -dx * metresPerPx
-                        val northM = dy * metresPerPx
-                        if (dx != 0f || dy != 0f) {
-                            onMoved(
-                                (lat0 + northM / METRES_PER_DEGREE).coerceIn(-MAX_LAT, MAX_LAT),
-                                lon0 + eastM / (METRES_PER_DEGREE * cosLat),
-                            )
-                        }
-                    },
-                ) { change, drag ->
-                    change.consume()
-                    dx += drag.x
-                    dy += drag.y
-                }
-            },
+            Modifier.fillMaxWidth()
+                .heightIn(max = MAP_HEIGHT_DP.dp)
+                .height(MAP_HEIGHT_DP.dp)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .pointerInput(lat0, lon0, state.radiusKm) {
+                    val metresPerPx = halfSpanM / (minOf(size.width, size.height) / 2f)
+                    detectDragGestures(
+                        onDragEnd = {
+                            // The map follows the finger, so the place to look from goes the other way.
+                            val eastM = -dx * metresPerPx
+                            val northM = dy * metresPerPx
+                            if (dx != 0f || dy != 0f) {
+                                onMoved(
+                                    (lat0 + northM / METRES_PER_DEGREE).coerceIn(-MAX_LAT, MAX_LAT),
+                                    lon0 + eastM / (METRES_PER_DEGREE * cosLat),
+                                )
+                            }
+                        },
+                    ) { change, drag ->
+                        change.consume()
+                        dx += drag.x
+                        dy += drag.y
+                    }
+                },
         ) {
             val centre = Offset(size.width / 2f, size.height / 2f)
             val radiusPx = minOf(size.width, size.height) / 2f
@@ -693,7 +873,15 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
                 val north = (node.lat - lat0) * METRES_PER_DEGREE
                 val at = centre + shift + Offset((east / metresPerPx).toFloat(), (-north / metresPerPx).toFloat())
                 if (at.x in 0f..size.width && at.y in 0f..size.height) {
-                    drawNodeMarker(measurer, node.shortName.ifBlank { null }, at, Color(node.color), Color(node.textColor), Color.White, false)
+                    drawNodeMarker(
+                        measurer,
+                        node.shortName.ifBlank { null },
+                        at,
+                        Color(node.color),
+                        Color(node.textColor),
+                        Color.White,
+                        false,
+                    )
                 }
             }
             // Where the panorama is drawn from now (hollow) and where the finger is taking it (the cross).
@@ -722,7 +910,11 @@ private fun BrandChip(selected: Boolean, onClick: () -> Unit, label: @Composable
             selectedContainerColor = primary.copy(alpha = SELECTED_FILL),
             selectedLabelColor = primary,
         ),
-        border = BorderStroke(if (selected) SELECTED_BORDER_DP.dp else 1.dp, if (selected) primary else MaterialTheme.colorScheme.outlineVariant),
+        border =
+        BorderStroke(
+            if (selected) SELECTED_BORDER_DP.dp else 1.dp,
+            if (selected) primary else MaterialTheme.colorScheme.outlineVariant,
+        ),
     )
 }
 
@@ -746,7 +938,12 @@ private fun DrawScope.drawNodeMarker(
     val dot = CHIP_DOT_DP.dp.toPx()
     drawCircle(background, radius = dot, center = at)
     // A dot alone (no name shown) takes the ring colour, so what stands above the ridge can still be told.
-    drawCircle(if (label == null) ring else Color.White, radius = dot, center = at, style = Stroke(CHIP_DOT_RING_DP.dp.toPx()))
+    drawCircle(
+        if (label == null) ring else Color.White,
+        radius = dot,
+        center = at,
+        style = Stroke(CHIP_DOT_RING_DP.dp.toPx()),
+    )
     if (label == null) return
     val layout = measurer.measure(label, TextStyle(color = text, fontSize = 11.sp))
     val width = max(CHIP_MIN_WIDTH_DP.dp.toPx(), layout.size.width + 2 * CHIP_PAD_DP.dp.toPx())
@@ -758,7 +955,13 @@ private fun DrawScope.drawNodeMarker(
     val corner = CornerRadius(CHIP_CORNER_DP.dp.toPx())
     drawRoundRect(background, top, Size(width, bodyH), corner)
     val border = (if (focus) CHIP_FOCUS_RING_DP else CHIP_RING_DP).dp.toPx()
-    drawRoundRect(ring, Offset(top.x + border / 2f, top.y + border / 2f), Size(width - border, bodyH - border), corner, style = Stroke(border))
+    drawRoundRect(
+        ring,
+        Offset(top.x + border / 2f, top.y + border / 2f),
+        Size(width - border, bodyH - border),
+        corner,
+        style = Stroke(border),
+    )
     val tail =
         Path().apply {
             moveTo(at.x - tailHalf, top.y + bodyH)
@@ -767,11 +970,19 @@ private fun DrawScope.drawNodeMarker(
             close()
         }
     drawPath(tail, background)
-    drawPath(tail, background, style = Stroke(CHIP_TAIL_ROUND_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round))
-    drawText(layout, topLeft = Offset(top.x + (width - layout.size.width) / 2f, top.y + (bodyH - layout.size.height) / 2f))
+    drawPath(
+        tail,
+        background,
+        style = Stroke(CHIP_TAIL_ROUND_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+    )
+    drawText(
+        layout,
+        topLeft = Offset(top.x + (width - layout.size.width) / 2f, top.y + (bodyH - layout.size.height) / 2f),
+    )
 }
 
-// The main map's chip, in dp: Material's small corner, a body 20 tall and at least 44 wide, a 6 x 8 tail, 8 of gap and a
+// The main map's chip, in dp: Material's small corner, a body 20 tall and at least 44 wide, a 6 x 8 tail, 8 of gap and
+// a
 // dot of 4 with a 2 ring.
 private const val CHIP_DOT_DP = 4
 private const val CHIP_DOT_RING_DP = 2
@@ -792,10 +1003,23 @@ private const val MAP_METRES_PER_KM = 1_000.0
 
 /** Saving the terrain on the device, so the planner and the panorama work there without the internet. */
 @Composable
-private fun OfflineTerrain(state: TerrainHorizonState, onRadius: (Int) -> Unit, onSave: () -> Unit, onClear: () -> Unit) {
+private fun OfflineTerrain(
+    state: TerrainHorizonState,
+    onRadius: (Int) -> Unit,
+    onSave: () -> Unit,
+    onClear: () -> Unit,
+) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
-        Text(stringResource(Res.string.terrain_horizon_offline), color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp)
-        Text(stringResource(Res.string.terrain_horizon_offline_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+        Text(
+            stringResource(Res.string.terrain_horizon_offline),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 13.sp,
+        )
+        Text(
+            stringResource(Res.string.terrain_horizon_offline_hint),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 11.sp,
+        )
         ChipRow(stringResource(Res.string.terrain_horizon_save_range)) {
             HORIZON_RADII_KM.forEach { km ->
                 BrandChip(selected = state.saveRadiusKm == km, onClick = { onRadius(km) }, label = { Text("$km km") })
@@ -810,9 +1034,26 @@ private fun OfflineTerrain(state: TerrainHorizonState, onRadius: (Int) -> Unit, 
             }
         }
         when {
-            state.saving -> Text(stringResource(Res.string.terrain_horizon_saving, state.saveDone, state.saveTotal), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
-            state.saveOk == false -> Text(stringResource(Res.string.terrain_horizon_save_failed), color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
-            state.savedBytes > 0L -> Text(stringResource(Res.string.terrain_horizon_saved, megabytes(state.savedBytes)), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            state.saving ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_saving, state.saveDone, state.saveTotal),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 12.sp,
+                )
+
+            state.saveOk == false ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_save_failed),
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 12.sp,
+                )
+
+            state.savedBytes > 0L ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_saved, megabytes(state.savedBytes)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                )
         }
     }
 }

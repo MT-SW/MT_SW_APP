@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,12 +34,23 @@ class PlannerReportBuilderTest {
 
     @Test
     fun reportContainsAllSectionsAndTexts() = runTest {
-        val s = PlannerReportStrings(title = "T", sectionLink = "Trasa", lblDistance = "Odleglosc", verdictExcellent = "Doskonale")
+        val s =
+            PlannerReportStrings(
+                title = "T",
+                sectionLink = "Trasa",
+                lblDistance = "Odleglosc",
+                verdictExcellent = "Doskonale",
+            )
         val report = PlannerReportBuilder.build(stateWithLink(), s)
         assertEquals("T", report.title)
         val titles = report.sections.map { it.title }
         assertTrue("Trasa" in titles)
-        assertTrue(report.sections.first { it.title == "Trasa" }.rows.any { it.label == "Odleglosc" && it.value.endsWith(" km") })
+        assertTrue(
+            report.sections
+                .first { it.title == "Trasa" }
+                .rows
+                .any { it.label == "Odleglosc" && it.value.endsWith(" km") },
+        )
         assertTrue(report.sections.first { it.title == s.sectionResults }.rows.any { it.value == "Doskonale" })
         assertTrue(report.notes.contains(s.noteWeatherNotUsed))
         assertTrue(report.notes.containsAll(s.credits))

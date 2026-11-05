@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,12 +125,16 @@ class PlannerComputerTest {
     @Test
     fun feederAndExtraLossLowerTheMargin() = runTest {
         val base = computer.compute(readyState()).link!!
-        val lossy = computer.compute(
-            readyState().copy(
-                a = endAt(POINT_A).copy(feederManualDb = 3.0),
-                extraLossDb = 6.0,
-            ),
-        ).link!!
+        val lossy =
+            computer
+                .compute(
+                    readyState()
+                        .copy(
+                            a = endAt(POINT_A).copy(feederManualDb = 3.0),
+                            extraLossDb = 6.0,
+                        ),
+                )
+                .link!!
         assertEquals(base.aToB.marginDb - 9.0, lossy.aToB.marginDb, 1e-6)
         // the feeder at A (3 dB) acts on both directions: as transmit loss and as receive loss
         assertEquals(base.bToA.marginDb - 9.0, lossy.bToA.marginDb, 1e-6)
@@ -138,14 +142,16 @@ class PlannerComputerTest {
 
     @Test
     fun comparisonWithMeasuredNode() = runTest {
-        val nodes = listOf(
-            nodeOption(1, POINT_A, ours = true),
-            nodeOption(2, POINT_B, snr = 5.5f, rssi = -100),
-        )
-        val st = PlannerUiState(
-            a = endAt(POINT_A, PlannerPointSource.Station),
-            b = endAt(POINT_B, PlannerPointSource.Node(2)),
-        )
+        val nodes =
+            listOf(
+                nodeOption(1, POINT_A, ours = true),
+                nodeOption(2, POINT_B, snr = 5.5f, rssi = -100),
+            )
+        val st =
+            PlannerUiState(
+                a = endAt(POINT_A, PlannerPointSource.Station),
+                b = endAt(POINT_B, PlannerPointSource.Node(2)),
+            )
         val r = computer.compute(st, nodes)
         val link = assertNotNull(r.link)
         val cmp = assertNotNull(r.comparison)
@@ -200,11 +206,13 @@ class PlannerComputerTest {
 
     @Test
     fun preciseTerrainReplacesThePreset() = runTest {
-        val st = readyState().copy(
-            preciseTerrain = true,
-            clutterPreset = PlannerClutterPreset.URBAN,
-            extraLossDb = 12.0,
-        )
+        val st =
+            readyState()
+                .copy(
+                    preciseTerrain = true,
+                    clutterPreset = PlannerClutterPreset.URBAN,
+                    extraLossDb = 12.0,
+                )
         val precise = assertNotNull(computer.compute(st).link).aToB.marginDb
         val bare = assertNotNull(computer.compute(readyState()).link).aToB.marginDb
         // empty map: no obstacles, and the 12 dB of the preset must not be applied on top
@@ -214,11 +222,13 @@ class PlannerComputerTest {
     @Test
     fun preciseTerrainFailureFallsBackToThePreset() = runTest {
         clutter.failure = PlannerClutterFailure.NETWORK
-        val st = readyState().copy(
-            preciseTerrain = true,
-            clutterPreset = PlannerClutterPreset.URBAN,
-            extraLossDb = 12.0,
-        )
+        val st =
+            readyState()
+                .copy(
+                    preciseTerrain = true,
+                    clutterPreset = PlannerClutterPreset.URBAN,
+                    extraLossDb = 12.0,
+                )
         val r = computer.compute(st)
         assertNull(r.error)
         assertEquals(PlannerClutterStatus.Failed(PlannerClutterFailure.NETWORK), r.clutter)

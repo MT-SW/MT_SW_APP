@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
-import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.data.ClutterHeights
 import org.meshtastic.feature.map.planner.data.PlannerClutter
@@ -58,8 +58,8 @@ import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
  * planner sheet being dismissed while the host stays.
  *
  * Usage: collect [uiState] and [nodesWithPosition]; call the setters; every change that affects the result triggers a
- * debounced recalculation ([DEBOUNCE_MS]). Coverage is computed on demand with [computeCoverage]. Exports are
- * available through [buildReport] and the `export*` functions.
+ * debounced recalculation ([DEBOUNCE_MS]). Coverage is computed on demand with [computeCoverage]. Exports are available
+ * through [buildReport] and the `export*` functions.
  */
 @KoinViewModel
 @Suppress("TooManyFunctions")
@@ -111,14 +111,20 @@ class PlannerViewModel(
     /** Takes position and name from mesh node [nodeNum] (ignored when the node has no position). */
     fun setPointFromNode(side: PlannerSide, nodeNum: Int) {
         val node = nodesWithPosition.value.firstOrNull { it.num == nodeNum } ?: return
-        mutate { st -> st.withEnd(side, placed(st.end(side), PlannerPointSource.Node(nodeNum), node.lat, node.lon, node.displayName)) }
+        mutate { st ->
+            st.withEnd(
+                side,
+                placed(st.end(side), PlannerPointSource.Node(nodeNum), node.lat, node.lon, node.displayName),
+            )
+        }
     }
 
     /** Sets a point picked on the map. */
     fun setPointFromMap(side: PlannerSide, lat: Double, lon: Double) = setPoint(side, PlannerPointSource.Map, lat, lon)
 
     /** Sets a point typed by the user. */
-    fun setPointManual(side: PlannerSide, lat: Double, lon: Double) = setPoint(side, PlannerPointSource.Manual, lat, lon)
+    fun setPointManual(side: PlannerSide, lat: Double, lon: Double) =
+        setPoint(side, PlannerPointSource.Manual, lat, lon)
 
     /** Uses the connected node; marks [PlannerHint.STATION_NO_POSITION] when it has no position or is not connected. */
     fun useStation(side: PlannerSide) {
@@ -127,26 +133,30 @@ class PlannerViewModel(
             mutate(recompute = false) { st -> st.withEnd(side, st.end(side).copy(stationUnavailable = true)) }
             return
         }
-        mutate { st -> st.withEnd(side, placed(st.end(side), PlannerPointSource.Station, ours.lat, ours.lon, ours.displayName)) }
+        mutate { st ->
+            st.withEnd(side, placed(st.end(side), PlannerPointSource.Station, ours.lat, ours.lon, ours.displayName))
+        }
     }
 
     /** Removes the point of [side] (radio parameters of the end are kept). */
     fun clearPoint(side: PlannerSide) = mutate { st ->
         st.withEnd(
             side,
-            st.end(side).copy(
-                pointSource = PlannerPointSource.None,
-                lat = null,
-                lon = null,
-                name = "",
-                groundAltM = null,
-                groundAltManual = false,
-                stationUnavailable = false,
-            ),
+            st.end(side)
+                .copy(
+                    pointSource = PlannerPointSource.None,
+                    lat = null,
+                    lon = null,
+                    name = "",
+                    groundAltM = null,
+                    groundAltManual = false,
+                    stationUnavailable = false,
+                ),
         )
     }
 
-    fun setName(side: PlannerSide, name: String) = mutate(recompute = false) { st -> st.withEnd(side, st.end(side).copy(name = name)) }
+    fun setName(side: PlannerSide, name: String) =
+        mutate(recompute = false) { st -> st.withEnd(side, st.end(side).copy(name = name)) }
 
     /** Manual ground height (m ASL); null returns to the terrain model value. */
     fun setGroundAlt(side: PlannerSide, meters: Double?) = mutate { st ->
@@ -163,26 +173,32 @@ class PlannerViewModel(
 
     // ------------------------------------------------------------------ end parameters
 
-    fun setAntennaHeight(side: PlannerSide, meters: Double) = editEnd(side, meters) { e, v -> e.copy(antennaHeightM = v.coerceIn(0.0, 2000.0)) }
+    fun setAntennaHeight(side: PlannerSide, meters: Double) =
+        editEnd(side, meters) { e, v -> e.copy(antennaHeightM = v.coerceIn(0.0, 2000.0)) }
 
-    fun setTxPowerDbm(side: PlannerSide, dbm: Double) = editEnd(side, dbm) { e, v -> e.copy(txPowerDbm = v.coerceIn(-10.0, 50.0)) }
+    fun setTxPowerDbm(side: PlannerSide, dbm: Double) =
+        editEnd(side, dbm) { e, v -> e.copy(txPowerDbm = v.coerceIn(-10.0, 50.0)) }
 
     /** Transmit power in watts (stored as dBm). */
     fun setTxPowerW(side: PlannerSide, watts: Double) =
         editEnd(side, watts) { e, v -> e.copy(txPowerDbm = PlannerEnd.wattsToDbm(v).coerceIn(-10.0, 50.0)) }
 
-    fun setAntennaGain(side: PlannerSide, dbi: Double) = editEnd(side, dbi) { e, v -> e.copy(antennaGainDbi = v.coerceIn(-10.0, 60.0)) }
+    fun setAntennaGain(side: PlannerSide, dbi: Double) =
+        editEnd(side, dbi) { e, v -> e.copy(antennaGainDbi = v.coerceIn(-10.0, 60.0)) }
 
     /** Simple feeder loss in dB. Does not change [PlannerEnd.feederPrecise]; the value is kept when switching modes. */
-    fun setFeederManualDb(side: PlannerSide, db: Double) = editEnd(side, db) { e, v -> e.copy(feederManualDb = v.coerceIn(0.0, 100.0)) }
+    fun setFeederManualDb(side: PlannerSide, db: Double) =
+        editEnd(side, db) { e, v -> e.copy(feederManualDb = v.coerceIn(0.0, 100.0)) }
 
     /** Switches between the manual loss (false) and the connector/cable breakdown (true). */
-    fun setFeederPrecise(side: PlannerSide, precise: Boolean) =
-        mutate { st -> st.withEnd(side, st.end(side).copy(feederPrecise = precise)) }
+    fun setFeederPrecise(side: PlannerSide, precise: Boolean) = mutate { st ->
+        st.withEnd(side, st.end(side).copy(feederPrecise = precise))
+    }
 
     /** Sets the detailed feeder and switches the end to precise mode. */
-    fun setFeederConfig(side: PlannerSide, config: FeederConfig) =
-        mutate { st -> st.withEnd(side, st.end(side).copy(feederConfig = config, feederPrecise = true)) }
+    fun setFeederConfig(side: PlannerSide, config: FeederConfig) = mutate { st ->
+        st.withEnd(side, st.end(side).copy(feederConfig = config, feederPrecise = true))
+    }
 
     /** Applies a [FeederBuilder.presets] entry by id (unknown ids are ignored) and switches to precise mode. */
     fun applyFeederPreset(side: PlannerSide, presetId: String) {
@@ -191,31 +207,37 @@ class PlannerViewModel(
     }
 
     /** Resizes the feeder to [connectorCount] connectors (see [FeederBuilder.resize]) and switches to precise mode. */
-    fun resizeFeederConnectors(side: PlannerSide, connectorCount: Int) =
-        mutate { st ->
-            val e = st.end(side)
-            st.withEnd(side, e.copy(feederConfig = FeederBuilder.resize(e.feederConfig, connectorCount), feederPrecise = true))
-        }
+    fun resizeFeederConnectors(side: PlannerSide, connectorCount: Int) = mutate { st ->
+        val e = st.end(side)
+        st.withEnd(
+            side,
+            e.copy(feederConfig = FeederBuilder.resize(e.feederConfig, connectorCount), feederPrecise = true),
+        )
+    }
 
-    /** Takes power, gain and the whole feed line of an antenna saved in the calculator (the antenna height is not touched). */
-    fun applyAntennaSetup(side: PlannerSide, setup: AntennaSetup) =
-        mutate { st ->
-            st.withEnd(
-                side,
-                st.end(side).copy(
+    /**
+     * Takes power, gain and the whole feed line of an antenna saved in the calculator (the antenna height is not
+     * touched).
+     */
+    fun applyAntennaSetup(side: PlannerSide, setup: AntennaSetup) = mutate { st ->
+        st.withEnd(
+            side,
+            st.end(side)
+                .copy(
                     txPowerDbm = setup.txDbm.coerceIn(-10.0, 50.0),
                     antennaGainDbi = setup.gainDbi.coerceIn(-10.0, 60.0),
                     feederConfig = setup.feeder,
                     feederPrecise = true,
                 ),
-            )
-        }
+        )
+    }
 
     /** Copies power, gain, height and the whole feeder (manual and precise) from A to B. Points are untouched. */
     fun copyAToB() = mutate { st ->
         val a = st.a
         st.copy(
-            b = st.b.copy(
+            b =
+            st.b.copy(
                 txPowerDbm = a.txPowerDbm,
                 antennaGainDbi = a.antennaGainDbi,
                 antennaHeightM = a.antennaHeightM,
@@ -260,15 +282,15 @@ class PlannerViewModel(
         mutate { st ->
             val radio = base.copy(bandwidthKhz = base.bandwidthKhz * PlannerBands.bandwidthScale(st.bandId))
             // A frequency still sitting on the previous preset's default follows the new preset.
-            val followsDefault = kotlin.math.abs(
-                st.frequencyMHz - PlannerBands.defaultFrequencyMHz(st.bandId, st.bandwidthKhz),
-            ) < 1.0e-6
+            val followsDefault =
+                kotlin.math.abs(st.frequencyMHz - PlannerBands.defaultFrequencyMHz(st.bandId, st.bandwidthKhz)) < 1.0e-6
             st.copy(
                 bandwidthKhz = radio.bandwidthKhz,
                 spreadingFactor = radio.spreadingFactor,
                 modemPreset = preset,
                 radioOverride = false,
-                frequencyMHz = if (followsDefault && st.bandId != PlannerBands.FREE_ID) {
+                frequencyMHz =
+                if (followsDefault && st.bandId != PlannerBands.FREE_ID) {
                     PlannerBands.defaultFrequencyMHz(st.bandId, radio.bandwidthKhz)
                 } else {
                     st.frequencyMHz
@@ -278,8 +300,8 @@ class PlannerViewModel(
     }
 
     /**
-     * Keeps the preset's bandwidth in step with the band: entering or leaving 2.4 GHz rescales it (wide LoRa x3.25).
-     * A hand-typed bandwidth ([PlannerUiState.radioOverride]) is left alone.
+     * Keeps the preset's bandwidth in step with the band: entering or leaving 2.4 GHz rescales it (wide LoRa x3.25). A
+     * hand-typed bandwidth ([PlannerUiState.radioOverride]) is left alone.
      */
     private fun withBandRadio(st: PlannerUiState, previousBandId: String): PlannerUiState {
         val preset = st.modemPreset
@@ -295,8 +317,9 @@ class PlannerViewModel(
     }
 
     /** Manual spreading factor 5..12 (sets [PlannerUiState.radioOverride]). */
-    fun setSpreadingFactor(sf: Int) =
-        mutate { st -> st.copy(spreadingFactor = sf.coerceIn(5, 12), modemPreset = null, radioOverride = true) }
+    fun setSpreadingFactor(sf: Int) = mutate { st ->
+        st.copy(spreadingFactor = sf.coerceIn(5, 12), modemPreset = null, radioOverride = true)
+    }
 
     fun setNoiseFigure(db: Double) {
         if (db.isNaN()) return
@@ -333,7 +356,11 @@ class PlannerViewModel(
 
     /** Applies a clutter preset's extra loss; CUSTOM only marks the loss as hand-typed. */
     fun setClutterPreset(preset: PlannerClutterPreset) = mutate { st ->
-        if (preset == PlannerClutterPreset.CUSTOM) st.copy(clutterPreset = preset) else st.copy(clutterPreset = preset, extraLossDb = preset.extraDb)
+        if (preset == PlannerClutterPreset.CUSTOM) {
+            st.copy(clutterPreset = preset)
+        } else {
+            st.copy(clutterPreset = preset, extraLossDb = preset.extraDb)
+        }
     }
 
     /** Switches the real buildings / forests (OpenStreetMap) on or off; off keeps the preset behaviour. */
@@ -341,7 +368,12 @@ class PlannerViewModel(
 
     fun setClutterRadius(km: Double) {
         if (km.isNaN()) return
-        mutate { it.copy(clutterRadiusKm = km.coerceIn(1.0, PlannerClutter.MAX_AREA_RADIUS_KM), clutter = PlannerClutterStatus.Idle) }
+        mutate {
+            it.copy(
+                clutterRadiusKm = km.coerceIn(1.0, PlannerClutter.MAX_AREA_RADIUS_KM),
+                clutter = PlannerClutterStatus.Idle,
+            )
+        }
     }
 
     fun setForestHeight(m: Double) {
@@ -368,7 +400,8 @@ class PlannerViewModel(
         mutate(recompute = false) { it.copy(coverageMaxRangeKm = km.coerceIn(1.0, 300.0)) }
     }
 
-    fun setCoverageOpacity(value: Double) = mutate(recompute = false) { it.copy(coverageOpacity = value.coerceIn(0.15, 1.0)) }
+    fun setCoverageOpacity(value: Double) =
+        mutate(recompute = false) { it.copy(coverageOpacity = value.coerceIn(0.15, 1.0)) }
 
     fun setCoverageRadials(count: Int) = mutate(recompute = false) { it.copy(coverageRadials = count.coerceIn(8, 360)) }
 
@@ -382,7 +415,10 @@ class PlannerViewModel(
         mutate(recompute = false) { it.copy(coverageRxGainDbi = dbi.coerceIn(-10.0, 30.0)) }
     }
 
-    /** Starts the coverage calculation for [PlannerUiState.coverageSide] (progress in [PlannerUiState.coverageProgress]). */
+    /**
+     * Starts the coverage calculation for [PlannerUiState.coverageSide] (progress in
+     * [PlannerUiState.coverageProgress]).
+     */
     fun computeCoverage() {
         val snapshot = _uiState.value
         if (!snapshot.end(snapshot.coverageSide).isComplete) {
@@ -396,13 +432,22 @@ class PlannerViewModel(
                 val result =
                     computer.computeCoverage(
                         snapshot,
-                        onClutterFailure = { f, d -> _uiState.update { it.copy(clutter = PlannerClutterStatus.Failed(f, d)) } },
-                    ) { p -> _uiState.update { it.copy(coverageProgress = p) } }
+                        onClutterFailure = { f, d ->
+                            _uiState.update { it.copy(clutter = PlannerClutterStatus.Failed(f, d)) }
+                        },
+                    ) { p ->
+                        _uiState.update { it.copy(coverageProgress = p) }
+                    }
                 _uiState.update { it.copy(coverage = result, coverageComputing = false, coverageProgress = 1f) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: PlannerElevationException) {
-                val err = if (e.failure == PlannerElevationFailure.NETWORK) PlannerError.ELEVATION_OFFLINE else PlannerError.ELEVATION_DECODE
+                val err =
+                    if (e.failure == PlannerElevationFailure.NETWORK) {
+                        PlannerError.ELEVATION_OFFLINE
+                    } else {
+                        PlannerError.ELEVATION_DECODE
+                    }
                 _uiState.update { it.copy(coverageComputing = false, coverageError = err) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(coverageComputing = false, coverageError = PlannerError.COMPUTE_FAILED) }
@@ -416,7 +461,9 @@ class PlannerViewModel(
     fun clearCoverage() {
         coverageJob?.cancel()
         coverageJob = null
-        _uiState.update { it.copy(coverage = null, coverageComputing = false, coverageProgress = 0f, coverageError = null) }
+        _uiState.update {
+            it.copy(coverage = null, coverageComputing = false, coverageProgress = 0f, coverageError = null)
+        }
     }
 
     /** Back to defaults (keeps nothing). */
@@ -484,21 +531,24 @@ class PlannerViewModel(
         if (lat.isNaN() || lon.isNaN() || lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) return
         mutate { st ->
             val e = st.end(side)
-            val keepName = e.pointSource is PlannerPointSource.Map || e.pointSource is PlannerPointSource.Manual ||
-                e.pointSource is PlannerPointSource.None
+            val keepName =
+                e.pointSource is PlannerPointSource.Map ||
+                    e.pointSource is PlannerPointSource.Manual ||
+                    e.pointSource is PlannerPointSource.None
             st.withEnd(side, placed(e, source, lat, lon, if (keepName) e.name else ""))
         }
     }
 
-    private fun placed(e: PlannerEnd, source: PlannerPointSource, lat: Double, lon: Double, name: String): PlannerEnd = e.copy(
-        pointSource = source,
-        lat = lat,
-        lon = lon,
-        name = name,
-        groundAltM = null,
-        groundAltManual = false,
-        stationUnavailable = false,
-    )
+    private fun placed(e: PlannerEnd, source: PlannerPointSource, lat: Double, lon: Double, name: String): PlannerEnd =
+        e.copy(
+            pointSource = source,
+            lat = lat,
+            lon = lon,
+            name = name,
+            groundAltM = null,
+            groundAltManual = false,
+            stationUnavailable = false,
+        )
 
     private fun editEnd(side: PlannerSide, value: Double, f: (PlannerEnd, Double) -> PlannerEnd) {
         if (value.isNaN()) return

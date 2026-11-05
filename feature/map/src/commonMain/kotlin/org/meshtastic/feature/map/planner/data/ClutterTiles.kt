@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,14 @@ import kotlin.math.max
 
 /** A latitude/longitude rectangle (degrees) for which obstacle data is requested in one piece. */
 data class ClutterBox(val south: Double, val west: Double, val north: Double, val east: Double) {
-    val heightKm: Double get() = (north - south) * KM_PER_DEG_LAT
+    val heightKm: Double
+        get() = (north - south) * KM_PER_DEG_LAT
 
     val widthKm: Double
         get() = (east - west) * KM_PER_DEG_LON_AT_EQUATOR * max(MIN_COS, cos((north + south) / 2.0 * PI / 180.0))
 
-    val maxSideKm: Double get() = max(heightKm, widthKm)
+    val maxSideKm: Double
+        get() = max(heightKm, widthKm)
 
     /** The four quarters of this box (used to split a box the server found too heavy). */
     fun quarters(): List<ClutterBox> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,9 +49,10 @@ class ClutterTest {
 
     @Test
     fun explicitHeightBeatsLevels() {
-        val m = OsmClutterParser.parse(
-            answer(way(""""building":"house","height":"12,5 m","building:levels":"2"""", *square)),
-        )
+        val m =
+            OsmClutterParser.parse(
+                answer(way(""""building":"house","height":"12,5 m","building:levels":"2"""", *square)),
+            )
         assertEquals(12.5, m.heightAt(50.001, 20.001), 1e-9)
     }
 
@@ -72,12 +73,13 @@ class ClutterTest {
 
     @Test
     fun areasAndUnknownTags() {
-        val m = OsmClutterParser.parse(
-            answer(
-                way(""""landuse":"residential"""", *square),
-                way(""""landuse":"meadow"""", 51.0, 21.0, 51.0, 21.1, 51.1, 21.1, 51.1, 21.0, 51.0, 21.0),
-            ),
-        )
+        val m =
+            OsmClutterParser.parse(
+                answer(
+                    way(""""landuse":"residential"""", *square),
+                    way(""""landuse":"meadow"""", 51.0, 21.0, 51.0, 21.1, 51.1, 21.1, 51.1, 21.0, 51.0, 21.0),
+                ),
+            )
         assertEquals(1, m.polygons.size)
         assertEquals(1, m.stats.areas)
         assertEquals(8.0, m.heightAt(50.001, 20.001), 1e-9)
@@ -85,12 +87,13 @@ class ClutterTest {
 
     @Test
     fun tallestOverlappingObstacleWins() {
-        val m = OsmClutterParser.parse(
-            answer(
-                way(""""natural":"wood"""", *square),
-                way(""""building":"yes","height":"30"""", *square),
-            ),
-        )
+        val m =
+            OsmClutterParser.parse(
+                answer(
+                    way(""""natural":"wood"""", *square),
+                    way(""""building":"yes","height":"30"""", *square),
+                ),
+            )
         assertEquals(30.0, m.heightAt(50.001, 20.001), 1e-9)
     }
 
@@ -103,14 +106,18 @@ class ClutterTest {
     @Test
     fun multipolygonJoinsPiecesAndHonoursHoles() {
         // outer ring in two pieces given in opposite directions, plus one inner ring (a clearing)
-        val outerA = """{"type":"way","role":"outer","geometry":[
+        val outerA =
+            """{"type":"way","role":"outer","geometry":[
             {"lat":50.0,"lon":20.0},{"lat":50.0,"lon":20.01},{"lat":50.01,"lon":20.01}]}"""
-        val outerB = """{"type":"way","role":"outer","geometry":[
+        val outerB =
+            """{"type":"way","role":"outer","geometry":[
             {"lat":50.0,"lon":20.0},{"lat":50.01,"lon":20.0},{"lat":50.01,"lon":20.01}]}"""
-        val inner = """{"type":"way","role":"inner","geometry":[
+        val inner =
+            """{"type":"way","role":"inner","geometry":[
             {"lat":50.004,"lon":20.004},{"lat":50.004,"lon":20.006},{"lat":50.006,"lon":20.006},
             {"lat":50.006,"lon":20.004},{"lat":50.004,"lon":20.004}]}"""
-        val rel = """{"type":"relation","id":9,"tags":{"type":"multipolygon","landuse":"forest"},
+        val rel =
+            """{"type":"relation","id":9,"tags":{"type":"multipolygon","landuse":"forest"},
             "members":[$outerA,$outerB,$inner]}"""
         val m = OsmClutterParser.parse(answer(rel))
         assertEquals(1, m.polygons.size)
@@ -133,9 +140,7 @@ class ClutterTest {
         }
         assertFailsWith<Exception> { OsmClutterParser.parse("<html>busy</html>") }
         // a harmless remark with data is fine
-        val ok = OsmClutterParser.parse(
-            """{"elements":[${way(""""building":"yes"""", *square)}],"remark":"hello"}""",
-        )
+        val ok = OsmClutterParser.parse("""{"elements":[${way(""""building":"yes"""", *square)}],"remark":"hello"}""")
         assertEquals(1, ok.polygons.size)
     }
 
@@ -287,10 +292,20 @@ class ClutterTest {
     }
 
     private fun input() = CoverageInput(
-        center = GeoPoint(50.0, 20.0), groundAltM = 250.0, antennaHeightM = 10.0, txPowerDbm = 20.0,
-        antennaGainDbi = 3.0, feederLossDb = 1.0, frequencyMHz = 868.0, bandwidthKhz = 125.0,
-        spreadingFactor = 9, kFactor = 4.0 / 3.0, surfaceRefractivity = 301.0, maxRangeKm = 20.0,
-        radials = 8, stepM = 200.0,
+        center = GeoPoint(50.0, 20.0),
+        groundAltM = 250.0,
+        antennaHeightM = 10.0,
+        txPowerDbm = 20.0,
+        antennaGainDbi = 3.0,
+        feederLossDb = 1.0,
+        frequencyMHz = 868.0,
+        bandwidthKhz = 125.0,
+        spreadingFactor = 9,
+        kFactor = 4.0 / 3.0,
+        surfaceRefractivity = 301.0,
+        maxRangeKm = 20.0,
+        radials = 8,
+        stepM = 200.0,
     )
 
     @Test
@@ -306,7 +321,10 @@ class ClutterTest {
         }
         val blocked = Coverage.compute(input(), flat, wall)
         val last = bare.ringsM.size - 1
-        assertTrue(blocked.marginDb[2][last] < bare.marginDb[2][last] - 3f, "${blocked.marginDb[2][last]} vs ${bare.marginDb[2][last]}")
+        assertTrue(
+            blocked.marginDb[2][last] < bare.marginDb[2][last] - 3f,
+            "${blocked.marginDb[2][last]} vs ${bare.marginDb[2][last]}",
+        )
         // nothing changes in the opposite direction or before the wall
         assertEquals(bare.marginDb[6][last], blocked.marginDb[6][last], 0.001f)
         assertEquals(bare.marginDb[2][0], blocked.marginDb[2][0], 0.001f)

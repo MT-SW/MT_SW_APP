@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  */
 package org.meshtastic.feature.map.planner
 
@@ -68,8 +67,8 @@ object Coverage {
 
     /**
      * @param clutterAt height (m above ground) of buildings and trees at a point, or null for bare terrain. It is added
-     *   to the terrain of the in-between samples only: the centre's neighbourhood ([PlannerClutter.CLEAR_AROUND_ANTENNA_M])
-     *   and the receiving point itself stay on the ground.
+     *   to the terrain of the in-between samples only: the centre's neighbourhood
+     *   ([PlannerClutter.CLEAR_AROUND_ANTENNA_M]) and the receiving point itself stay on the ground.
      */
     fun compute(
         input: CoverageInput,
@@ -106,19 +105,21 @@ object Coverage {
                 val sub = DoubleArray(idx + 1) { ground[it] + obstacle[it] }
                 sub[0] = ground[0]
                 sub[idx] = ground[idx]
-                val res = Itm.pointToPoint(
-                    elevationsM = sub,
-                    stepM = step,
-                    txHeightM = input.antennaHeightM,
-                    rxHeightM = input.rxAntennaHeightM,
-                    frequencyMHz = input.frequencyMHz,
-                    surfaceRefractivityNUnits = input.surfaceRefractivity,
-                )
-                val m = if (res.returnCode <= 1 && !res.lossDb.isNaN()) {
-                    (eirpMinusLosses - res.lossDb - sens).toFloat()
-                } else {
-                    ERROR_MARGIN_DB
-                }
+                val res =
+                    Itm.pointToPoint(
+                        elevationsM = sub,
+                        stepM = step,
+                        txHeightM = input.antennaHeightM,
+                        rxHeightM = input.rxAntennaHeightM,
+                        frequencyMHz = input.frequencyMHz,
+                        surfaceRefractivityNUnits = input.surfaceRefractivity,
+                    )
+                val m =
+                    if (res.returnCode <= 1 && !res.lossDb.isNaN()) {
+                        (eirpMinusLosses - res.lossDb - sens).toFloat()
+                    } else {
+                        ERROR_MARGIN_DB
+                    }
                 margin[r][j] = m
                 if (m >= 0f) reach[r] = ringsM[j]
             }

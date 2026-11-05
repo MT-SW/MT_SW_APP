@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,14 +45,15 @@ class PlannerWeatherTest {
         assertEquals(62.0, c.rhPct)
         // hourly precipitation of the 12:00 hour wins over current.precipitation
         assertEquals(0.2, c.rainMmH)
-        val expected = Atmosphere.analyzeProfile(
-            listOf(
-                AtmosphereSample(260.0, 14.3, 983.4, 62.0),
-                AtmosphereSample(760.0, 12.1, 925.0, 55.0),
-                AtmosphereSample(1480.0, 8.0, 850.0, 48.0),
-                AtmosphereSample(3090.0, -2.5, 700.0, 40.0),
-            ),
-        )
+        val expected =
+            Atmosphere.analyzeProfile(
+                listOf(
+                    AtmosphereSample(260.0, 14.3, 983.4, 62.0),
+                    AtmosphereSample(760.0, 12.1, 925.0, 55.0),
+                    AtmosphereSample(1480.0, 8.0, 850.0, 48.0),
+                    AtmosphereSample(3090.0, -2.5, 700.0, 40.0),
+                ),
+            )
         assertEquals(expected, c.analysis)
         assertEquals(expected.level, c.level)
         assertTrue(c.analysis.kFactor in 1.0..2.5, "k=${c.analysis.kFactor}")
@@ -62,9 +63,10 @@ class PlannerWeatherTest {
     fun levelsBelowGroundAreIgnored() {
         val c = parseOpenMeteo(sample(elevation = 1500.0))
         assertNotNull(c)
-        val expected = Atmosphere.analyzeProfile(
-            listOf(AtmosphereSample(1500.0, 14.3, 983.4, 62.0), AtmosphereSample(3090.0, -2.5, 700.0, 40.0)),
-        )
+        val expected =
+            Atmosphere.analyzeProfile(
+                listOf(AtmosphereSample(1500.0, 14.3, 983.4, 62.0), AtmosphereSample(3090.0, -2.5, 700.0, 40.0)),
+            )
         assertEquals(expected, c.analysis)
     }
 
@@ -95,9 +97,11 @@ class PlannerWeatherTest {
     }
 
     private companion object {
-        const val CURRENT = """{"time":"2026-10-01T12:15","interval":900,"temperature_2m":14.3,
+        const val CURRENT =
+            """{"time":"2026-10-01T12:15","interval":900,"temperature_2m":14.3,
             "relative_humidity_2m":62,"surface_pressure":983.4,"precipitation":0.0}"""
-        const val HOURLY = """{"time":["2026-10-01T11:00","2026-10-01T12:00","2026-10-01T13:00"],
+        const val HOURLY =
+            """{"time":["2026-10-01T11:00","2026-10-01T12:00","2026-10-01T13:00"],
             "precipitation":[0.0,0.2,0.0],
             "temperature_925hPa":[12.0,12.1,12.3],"relative_humidity_925hPa":[54,55,56],
             "geopotential_height_925hPa":[755.0,760.0,762.0],

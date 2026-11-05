@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,11 @@ import kotlin.math.pow
 data class AtmosphereSample(val heightM: Double, val tempC: Double, val pressureHpa: Double, val rhPct: Double)
 
 /** Ducting classification derived from the vertical refractivity gradient. */
-enum class DuctingLevel { NORMAL, ELEVATED, POSSIBLE_DUCT }
+enum class DuctingLevel {
+    NORMAL,
+    ELEVATED,
+    POSSIBLE_DUCT,
+}
 
 /**
  * Result of [Atmosphere.analyzeProfile]. [surfaceN] is the refractivity at the lowest sample, [seaLevelN] the same
@@ -73,15 +77,15 @@ object Atmosphere {
     }
 
     /**
-     * Reduce station refractivity [stationN] at [stationHeightM] to sea level (N0 = Ns * exp(h_km / 7.35)) and clamp
-     * to the 250..400 range ITM accepts.
+     * Reduce station refractivity [stationN] at [stationHeightM] to sea level (N0 = Ns * exp(h_km / 7.35)) and clamp to
+     * the 250..400 range ITM accepts.
      */
     fun surfaceRefractivityForItm(stationN: Double, stationHeightM: Double = 0.0): Double =
         (stationN * exp(stationHeightM / 1000.0 / 7.35)).coerceIn(250.0, 400.0)
 
     /**
-     * dN/dh > -40: normal / sub-refraction; -40..-79: normal; -79..-157: super-refraction (ELEVATED);
-     * < -157: trapping (POSSIBLE_DUCT).
+     * dN/dh > -40: normal / sub-refraction; -40..-79: normal; -79..-157: super-refraction (ELEVATED); < -157: trapping
+     * (POSSIBLE_DUCT).
      */
     fun classify(dnDhPerKm: Double): DuctingLevel = when {
         dnDhPerKm < -157.0 -> DuctingLevel.POSSIBLE_DUCT
@@ -102,12 +106,13 @@ object Atmosphere {
         val n1 = refractivityN(low.tempC, low.pressureHpa, low.rhPct)
         val sea = surfaceRefractivityForItm(n1, low.heightM)
         val upper = samples.filter { it.heightM - low.heightM >= 100.0 }
-        val grad = if (upper.isEmpty()) {
-            -39.2
-        } else {
-            val hi = upper.minByOrNull { abs(it.heightM - low.heightM - 1000.0) }!!
-            gradientNPerKm(n1, low.heightM, refractivityN(hi.tempC, hi.pressureHpa, hi.rhPct), hi.heightM)
-        }
+        val grad =
+            if (upper.isEmpty()) {
+                -39.2
+            } else {
+                val hi = upper.minByOrNull { abs(it.heightM - low.heightM - 1000.0) }!!
+                gradientNPerKm(n1, low.heightM, refractivityN(hi.tempC, hi.pressureHpa, hi.rhPct), hi.heightM)
+            }
         return AtmosphereAnalysis(n1, sea, grad, kFactorFromGradient(grad), classify(grad))
     }
 
@@ -129,18 +134,21 @@ object Atmosphere {
         val e = vapourPressureHpa(tempC, rhPct)
         val rho = 216.7 * e / (273.15 + tempC)
 
-        val oxygen = if (f <= 54.0) {
-            val x1 = phi(rp, rt, 0.0717, -1.8132, 0.0156, -1.6515)
-            val x2 = phi(rp, rt, 0.5146, -4.6368, -0.1921, -5.7416)
-            val x3 = phi(rp, rt, 0.3414, -6.5851, 0.2130, -8.5854)
-            (7.2 * rt.pow(2.8) / (f * f + 0.34 * rp * rp * rt.pow(1.6)) +
-                0.62 * x3 / ((54.0 - f).pow(1.16 * x1) + 0.83 * x2)) * f * f * rp * rp * 1e-3
-        } else {
-            var i = 0
-            while (i < oxyF.size - 2 && f > oxyF[i + 1]) i++
-            val t = ((f - oxyF[i]) / (oxyF[i + 1] - oxyF[i])).coerceIn(0.0, 1.0)
-            (oxyA[i] + t * (oxyA[i + 1] - oxyA[i])) * rp * rp
-        }
+        val oxygen =
+            if (f <= 54.0) {
+                val x1 = phi(rp, rt, 0.0717, -1.8132, 0.0156, -1.6515)
+                val x2 = phi(rp, rt, 0.5146, -4.6368, -0.1921, -5.7416)
+                val x3 = phi(rp, rt, 0.3414, -6.5851, 0.2130, -8.5854)
+                (
+                    7.2 * rt.pow(2.8) / (f * f + 0.34 * rp * rp * rt.pow(1.6)) +
+                        0.62 * x3 / ((54.0 - f).pow(1.16 * x1) + 0.83 * x2)
+                    ) * f * f * rp * rp * 1e-3
+            } else {
+                var i = 0
+                while (i < oxyF.size - 2 && f > oxyF[i + 1]) i++
+                val t = ((f - oxyF[i]) / (oxyF[i + 1] - oxyF[i])).coerceIn(0.0, 1.0)
+                (oxyA[i] + t * (oxyA[i + 1] - oxyA[i])) * rp * rp
+            }
 
         val eta1 = 0.955 * rp * rt.pow(0.68) + 0.006 * rho
         val g22 = 1.0 + ((f - 22.0) / (f + 22.0)).let { it * it }
@@ -155,22 +163,74 @@ object Atmosphere {
     // ---- rain (ITU-R P.838-3 power law gamma = k R^alpha) ----
 
     private val rainF = doubleArrayOf(1.0, 2.0, 4.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0)
-    private val kH = doubleArrayOf(
-        0.0000259, 0.0000847, 0.0001071, 0.0007056, 0.001915, 0.004115, 0.01217, 0.02386, 0.04481, 0.09164,
-        0.1571, 0.2403, 0.4431, 0.5911,
-    )
-    private val aH = doubleArrayOf(
-        0.9691, 1.0664, 1.6009, 1.5900, 1.4810, 1.3905, 1.2571, 1.1825, 1.1233, 1.0568, 0.9991, 0.9485, 0.8673,
-        0.8355,
-    )
-    private val kV = doubleArrayOf(
-        0.0000308, 0.0000998, 0.0002461, 0.0004878, 0.001425, 0.003450, 0.01129, 0.02455, 0.05008, 0.09611,
-        0.1533, 0.2291, 0.4274, 0.5796,
-    )
-    private val aV = doubleArrayOf(
-        0.8592, 0.9490, 1.2476, 1.5728, 1.4745, 1.3797, 1.2156, 1.1216, 1.0440, 0.9847, 0.9491, 0.9129, 0.8421,
-        0.8130,
-    )
+    private val kH =
+        doubleArrayOf(
+            0.0000259,
+            0.0000847,
+            0.0001071,
+            0.0007056,
+            0.001915,
+            0.004115,
+            0.01217,
+            0.02386,
+            0.04481,
+            0.09164,
+            0.1571,
+            0.2403,
+            0.4431,
+            0.5911,
+        )
+    private val aH =
+        doubleArrayOf(
+            0.9691,
+            1.0664,
+            1.6009,
+            1.5900,
+            1.4810,
+            1.3905,
+            1.2571,
+            1.1825,
+            1.1233,
+            1.0568,
+            0.9991,
+            0.9485,
+            0.8673,
+            0.8355,
+        )
+    private val kV =
+        doubleArrayOf(
+            0.0000308,
+            0.0000998,
+            0.0002461,
+            0.0004878,
+            0.001425,
+            0.003450,
+            0.01129,
+            0.02455,
+            0.05008,
+            0.09611,
+            0.1533,
+            0.2291,
+            0.4274,
+            0.5796,
+        )
+    private val aV =
+        doubleArrayOf(
+            0.8592,
+            0.9490,
+            1.2476,
+            1.5728,
+            1.4745,
+            1.3797,
+            1.2156,
+            1.1216,
+            1.0440,
+            0.9847,
+            0.9491,
+            0.9129,
+            0.8421,
+            0.8130,
+        )
 
     /** Rain attenuation in dB/km for [rainRateMmH]; 0 below 1 GHz or without rain. Vertical polarization by default. */
     fun rainAttenuationDbPerKm(fMHz: Double, rainRateMmH: Double, vertical: Boolean = true): Double {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,10 @@ class LinkBudgetTest {
         assertEquals(10000.0, r.distanceM, 1e-6)
         assertEquals(90.0, r.bearingAToBDeg, 0.1)
         assertEquals(270.0, r.bearingBToADeg, 0.5)
-        assertTrue(r.itmLossDb >= r.freeSpaceLossDb - 1.0 && r.itmLossDb < r.freeSpaceLossDb + 25.0, "itm=${r.itmLossDb} fs=${r.freeSpaceLossDb}")
+        assertTrue(
+            r.itmLossDb >= r.freeSpaceLossDb - 1.0 && r.itmLossDb < r.freeSpaceLossDb + 25.0,
+            "itm=${r.itmLossDb} fs=${r.freeSpaceLossDb}",
+        )
         assertTrue(r.lineOfSightClear)
         assertTrue(r.worstFresnelRatio > 0.0, "ratio=${r.worstFresnelRatio}")
         assertEquals(r.totalPathLossDb, r.itmLossDb, 1e-9)
@@ -89,8 +92,13 @@ class LinkBudgetTest {
 
     @Test
     fun blockedByHill() {
-        val g = DoubleArray(101) { i -> val x = (i - 50) / 10.0; 300.0 * kotlin.math.exp(-x * x) }
-        g[0] = 0.0; g[100] = 0.0
+        val g =
+            DoubleArray(101) { i ->
+                val x = (i - 50) / 10.0
+                300.0 * kotlin.math.exp(-x * x)
+            }
+        g[0] = 0.0
+        g[100] = 0.0
         val p = PathProfile(100.0, g)
         val r = LinkBudget.analyze(input(sf = 7, bw = 250.0), p)
         assertFalse(r.lineOfSightClear)
@@ -122,7 +130,8 @@ class LinkBudgetTest {
         val prof = PathProfile.fromSampler(pa, pb) { _, _ -> 120.0 }
         assertEquals(334, prof.intervals)
         assertEquals(10000.0, prof.distanceM, 1.0)
-        val coarse = PathProfile.fromSampler(pa, Geodesy.destination(pa, 0.0, 100000.0), maxSamples = 400) { _, _ -> 0.0 }
+        val coarse =
+            PathProfile.fromSampler(pa, Geodesy.destination(pa, 0.0, 100000.0), maxSamples = 400) { _, _ -> 0.0 }
         assertEquals(399, coarse.intervals)
     }
 }

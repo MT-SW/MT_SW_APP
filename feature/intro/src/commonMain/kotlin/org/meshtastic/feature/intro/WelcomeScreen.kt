@@ -97,8 +97,7 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
             Column(
                 modifier =
-                Modifier
-                    .widthIn(max = maxContentWidth)
+                Modifier.widthIn(max = maxContentWidth)
                     .fillMaxSize()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),

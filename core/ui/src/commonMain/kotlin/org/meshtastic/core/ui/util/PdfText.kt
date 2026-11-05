@@ -76,19 +76,32 @@ object PdfText {
     private fun expand(s: String): String {
         if (s.none { it in SYMBOLS }) return s
         val sb = StringBuilder(s.length + 8)
-        for (c in s) when (c) {
-            '\u03BB' -> sb.append("lambda")
-            '\u03A9',
-            '\u2126' -> sb.append("ohm")
-            '\u221A' -> sb.append("sqrt ")
-            '\u2212' -> sb.append('-')
-            '\u03BC' -> sb.append('\u00B5')
-            '\u2265' -> sb.append(">=")
-            '\u2264' -> sb.append("<=")
-            '\u2248' -> sb.append('~')
-            '\u2192' -> sb.append("->")
-            '\u2260' -> sb.append("!=")
-            else -> sb.append(c)
+        for (c in s) {
+            when (c) {
+                '\u03BB' -> sb.append("lambda")
+
+                '\u03A9',
+                '\u2126',
+                -> sb.append("ohm")
+
+                '\u221A' -> sb.append("sqrt ")
+
+                '\u2212' -> sb.append('-')
+
+                '\u03BC' -> sb.append('\u00B5')
+
+                '\u2265' -> sb.append(">=")
+
+                '\u2264' -> sb.append("<=")
+
+                '\u2248' -> sb.append('~')
+
+                '\u2192' -> sb.append("->")
+
+                '\u2260' -> sb.append("!=")
+
+                else -> sb.append(c)
+            }
         }
         return sb.toString()
     }
@@ -118,10 +131,12 @@ object PdfText {
                     sb.append('\\')
                     sb.append(c)
                 }
+
                 v < 32 || v > 126 -> {
                     sb.append('\\')
                     sb.append(('0' + ((v shr 6) and 7))).append(('0' + ((v shr 3) and 7))).append(('0' + (v and 7)))
                 }
+
                 else -> sb.append(c)
             }
         }
@@ -133,14 +148,14 @@ object PdfText {
 
     private const val REG =
         "278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556," +
-        "278,278,584,584,584,556," +
+            "278,278,584,584,584,556," +
             "1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944," +
             "667,667,611,278,278,278,469,556,333," +
             "556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500," +
             "500,334,260,334,584"
     private const val BLD =
         "278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556," +
-        "333,333,584,584,584,611," +
+            "333,333,584,584,584,611," +
             "975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667," +
             "667,611,333,278,333,584,556,333," +
             "556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556," +
@@ -171,25 +186,44 @@ object PdfText {
         fun ascii(ch: Char) = t[ch.code - 32]
         return when {
             code in 32..126 -> t[code - 32]
+
             code in 1..16 -> {
                 val base = "acelnszz"[(code - 1) % 8]
                 if (code - 1 >= 8) {
                     if (base == 'l') (if (bold) 611 else 556) else ascii("ACELNSZZ"[(code - 1) % 8])
-                } else if (base == 'l') (if (bold) 278 else 222) else ascii(base)
+                } else if (base == 'l') {
+                    (if (bold) 278 else 222)
+                } else {
+                    ascii(base)
+                }
             }
+
             code == 0x80 -> 556
+
             code == 0x85 || code == 0x97 || code == 0x99 -> 1000
+
             code == 0x91 || code == 0x92 || code == 0x82 -> if (bold) 278 else 222
+
             code == 0x84 -> if (bold) 500 else 333
+
             code == 0x86 -> 556
+
             code == 0x93 || code == 0x94 -> if (bold) 500 else 333
+
             code == 0x95 -> 350
+
             code == 0x96 -> 556
+
             code == 0xB0 -> 400
+
             code == 0xB1 || code == 0xD7 || code == 0xF7 -> 584
+
             code in 0xC0..0xDF -> if (LAT_U[code - 0xC0] == '*') 584 else ascii(LAT_U[code - 0xC0])
+
             code in 0xE0..0xFF -> if (LAT_L[code - 0xE0] == '/') 584 else ascii(LAT_L[code - 0xE0])
+
             code in 0xA0..0xBF -> if (code == 0xA0) 278 else 556
+
             else -> 556
         }
     }
@@ -223,7 +257,9 @@ object PdfText {
                 if (line.isNotEmpty() && width(cand, bold, size) > maxW) {
                     out.add(line)
                     line = word
-                } else line = cand
+                } else {
+                    line = cand
+                }
             }
             out.add(line)
         }
@@ -242,14 +278,14 @@ object PdfFile {
         objs.add("<< /Type /Pages /Kids [$kids] /Count $np >>")
         objs.add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica ${PdfText.widthsEntry(false)} /Encoding 5 0 R >>")
         objs.add(
-            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold ${PdfText.widthsEntry(true)} /Encoding 5 0 R >>"
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold ${PdfText.widthsEntry(true)} /Encoding 5 0 R >>",
         )
         objs.add("<< /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [${PdfText.differences()}] >>")
         objs.add("<< /Title ${utf16Hex(title)} /Creator ${utf16Hex(creator)} >>")
         for (i in 0 until np) {
             objs.add(
                 "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents ${8 + 2 * i} 0 R " +
-                    "/Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> >>"
+                    "/Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> >>",
             )
             val c = contents[i]
             objs.add("<< /Length ${c.length} >>\nstream\n$c\nendstream")

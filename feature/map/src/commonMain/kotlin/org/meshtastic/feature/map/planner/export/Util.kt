@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ import kotlin.math.sqrt
 object Num {
     /** Fixed [decimals] (0..9) with '.' as decimal separator. NaN/Infinity render as "0". */
     fun fmt(value: Double, decimals: Int): String {
-        if (value.isNaN() || value.isInfinite()) return if (decimals > 0) "0." + "0".repeat(decimals.coerceAtMost(9)) else "0"
+        if (value.isNaN() || value.isInfinite()) {
+            return if (decimals > 0) "0." + "0".repeat(decimals.coerceAtMost(9)) else "0"
+        }
         val d = decimals.coerceIn(0, 9)
         var p = 1.0
         repeat(d) { p *= 10.0 }
@@ -93,18 +95,29 @@ internal object Json {
         for (c in s) {
             when {
                 c == '"' -> sb.append("\\\"")
+
                 c == '\\' -> sb.append("\\\\")
+
                 c == '\n' -> sb.append("\\n")
+
                 c == '\r' -> sb.append("\\r")
+
                 c == '\t' -> sb.append("\\t")
+
                 c == '\b' -> sb.append("\\b")
+
                 c.code == 12 -> sb.append("\\f")
+
                 c.code < 0x20 || c.code == 0x2028 || c.code == 0x2029 -> {
                     sb.append("\\u")
                     val h = "0123456789abcdef"
                     val v = c.code
-                    sb.append(h[(v shr 12) and 15]).append(h[(v shr 8) and 15]).append(h[(v shr 4) and 15]).append(h[v and 15])
+                    sb.append(h[(v shr 12) and 15])
+                        .append(h[(v shr 8) and 15])
+                        .append(h[(v shr 4) and 15])
+                        .append(h[v and 15])
                 }
+
                 else -> sb.append(c)
             }
         }
@@ -132,7 +145,9 @@ internal object CoverageBins {
     }
 
     /** Equirectangular offsets from the centre in km: x east, y north. */
-    fun xKm(c: ReportCoverage, lon: Double): Double = (lon - c.centerLon) * cos(c.centerLat * 0.017453292519943295) * 111.320
+    fun xKm(c: ReportCoverage, lon: Double): Double =
+        (lon - c.centerLon) * cos(c.centerLat * 0.017453292519943295) * 111.320
+
     fun yKm(c: ReportCoverage, lat: Double): Double = (lat - c.centerLat) * 110.574
 
     /** Median nearest-neighbour distance (km) of (a subset of) the points; 0 if undeterminable. */
@@ -163,7 +178,9 @@ internal object CoverageBins {
 /** Shared geometry of the terrain chart (used by the PDF and the PNG renderers). */
 internal class ChartData(p: ReportProfile) {
     val n: Int = minOf(p.distancesM.size, p.groundM.size, p.losM.size, p.fresnelUpperM.size, p.fresnelLowerM.size)
-    val valid: Boolean get() = n >= 2
+    val valid: Boolean
+        get() = n >= 2
+
     val x = p.distancesM
     val ground = p.groundM
     val los = p.losM
@@ -176,22 +193,41 @@ internal class ChartData(p: ReportProfile) {
 
     init {
         if (n >= 1) {
-            var x0 = Double.MAX_VALUE; var x1 = -Double.MAX_VALUE
-            var y0 = Double.MAX_VALUE; var y1 = -Double.MAX_VALUE
+            var x0 = Double.MAX_VALUE
+            var x1 = -Double.MAX_VALUE
+            var y0 = Double.MAX_VALUE
+            var y1 = -Double.MAX_VALUE
             for (i in 0 until n) {
-                if (x[i].isFinite()) { x0 = min(x0, x[i]); x1 = max(x1, x[i]) }
-                for (v in doubleArrayOf(ground[i], los[i], up[i], lo[i])) if (v.isFinite()) { y0 = min(y0, v); y1 = max(y1, v) }
+                if (x[i].isFinite()) {
+                    x0 = min(x0, x[i])
+                    x1 = max(x1, x[i])
+                }
+                for (v in doubleArrayOf(ground[i], los[i], up[i], lo[i])) {
+                    if (v.isFinite()) {
+                        y0 = min(y0, v)
+                        y1 = max(y1, v)
+                    }
+                }
             }
-            if (x0 <= x1) { xMin = x0; xMax = x1 }
-            if (y0 <= y1) { yMin = y0; yMax = y1 }
+            if (x0 <= x1) {
+                xMin = x0
+                xMax = x1
+            }
+            if (y0 <= y1) {
+                yMin = y0
+                yMax = y1
+            }
         }
-        if (xMax - xMin < 1e-9) { xMax = xMin + 1.0 }
+        if (xMax - xMin < 1e-9) {
+            xMax = xMin + 1.0
+        }
         val pad = max((yMax - yMin) * 0.06, 1.0)
         yMin -= pad
         yMax += pad
     }
 
     fun xTicks(): DoubleArray = niceTicks(xMin, xMax, 8)
+
     fun yTicks(): DoubleArray = niceTicks(yMin, yMax, 6)
 
     companion object {
@@ -201,11 +237,25 @@ internal class ChartData(p: ReportProfile) {
             val raw = range / target
             val mag = pow10(floor(log10(raw)).toInt())
             val f = raw / mag
-            val step = (if (f <= 1.0) 1.0 else if (f <= 2.0) 2.0 else if (f <= 5.0) 5.0 else 10.0) * mag
+            val step =
+                (
+                    if (f <= 1.0) {
+                        1.0
+                    } else if (f <= 2.0) {
+                        2.0
+                    } else if (f <= 5.0) {
+                        5.0
+                    } else {
+                        10.0
+                    }
+                    ) * mag
             val out = ArrayList<Double>()
             var v = ceil(lo / step - 1e-9) * step
             var guard = 0
-            while (v <= hi + step * 1e-9 && guard++ < 200) { out.add(v); v += step }
+            while (v <= hi + step * 1e-9 && guard++ < 200) {
+                out.add(v)
+                v += step
+            }
             return out.toDoubleArray()
         }
 

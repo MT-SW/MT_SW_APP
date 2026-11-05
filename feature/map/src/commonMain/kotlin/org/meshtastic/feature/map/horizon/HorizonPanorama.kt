@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  */
 package org.meshtastic.feature.map.horizon
 
-import kotlin.math.abs
-import kotlin.math.atan2
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
+import kotlin.math.abs
+import kotlin.math.atan2
 
 /*
  * The 360° skyline from one station, with nodes placed against it. The method follows the Horizon view of MeshRF
@@ -32,8 +32,15 @@ import org.meshtastic.feature.map.planner.Geodesy
 /** A ridge that stood as the skyline for a while and was then overtopped by something further out. */
 data class HorizonCrest(val angleDeg: Double, val distanceM: Double)
 
-/** The skyline in one direction: [angleDeg] above the horizontal at [distanceM], with every [crests] seen on the way. */
-data class HorizonPoint(val bearingDeg: Double, val angleDeg: Double, val distanceM: Double, val crests: List<HorizonCrest>)
+/**
+ * The skyline in one direction: [angleDeg] above the horizontal at [distanceM], with every [crests] seen on the way.
+ */
+data class HorizonPoint(
+    val bearingDeg: Double,
+    val angleDeg: Double,
+    val distanceM: Double,
+    val crests: List<HorizonCrest>,
+)
 
 /** The skyline all round: [points] in order of bearing, one every `360 / points.size` degrees. */
 class HorizonProfile(
@@ -63,10 +70,12 @@ data class HorizonTarget(
     val angleDeg: Double,
     val occludingDeg: Double,
 ) {
-    val visible: Boolean get() = angleDeg > occludingDeg
+    val visible: Boolean
+        get() = angleDeg > occludingDeg
 
     /** How far above (positive) or below (negative) the ridge in front of it the node stands, in degrees. */
-    val clearanceDeg: Double get() = angleDeg - occludingDeg
+    val clearanceDeg: Double
+        get() = angleDeg - occludingDeg
 }
 
 object HorizonPanorama {
@@ -106,7 +115,8 @@ object HorizonPanorama {
                     val at = Geodesy.destination(centre, bearing, distance)
                     val angle = angleDeg(observer, ground(at.lat, at.lon), distance, effectiveRadius)
                     if (angle <= bestAngle) {
-                        // Lower ground after a rise: whatever raised it last is an edge seen against the country beyond.
+                        // Lower ground after a rise: whatever raised it last is an edge seen against the country
+                        // beyond.
                         if (standing) {
                             crests += HorizonCrest(bestAngle, bestDistance)
                             standing = false
@@ -118,7 +128,9 @@ object HorizonPanorama {
                     standing = true
                 }
                 // A direction with no ground standing in it reports the geometric horizon of a featureless earth.
-                if (bestAngle == Double.NEGATIVE_INFINITY) bestAngle = angleDeg(observer, centreGround, radiusM, effectiveRadius)
+                if (bestAngle == Double.NEGATIVE_INFINITY) {
+                    bestAngle = angleDeg(observer, centreGround, radiusM, effectiveRadius)
+                }
                 // The sweep ended on rising ground: the skyline itself is not in the list yet.
                 if (standing || crests.isEmpty()) crests += HorizonCrest(bestAngle, bestDistance)
                 HorizonPoint(bearing, bestAngle, bestDistance, crests)
@@ -134,8 +146,8 @@ object HorizonPanorama {
 
     /**
      * Places [nodes] (number, name, position) against [profile]; [targetAntennaM] is the height of their antennas above
-     * the ground. Nodes at the station itself or beyond [maxDistanceM] are left out; the terrain hiding a node is taken only
-     * from inside the profile radius.
+     * the ground. Nodes at the station itself or beyond [maxDistanceM] are left out; the terrain hiding a node is taken
+     * only from inside the profile radius.
      */
     fun place(
         profile: HorizonProfile,
@@ -153,7 +165,8 @@ object HorizonPanorama {
             val angle = angleDeg(profile.observerM, ground(at.lat, at.lon) + targetAntennaM, distance, effectiveRadius)
             var highest = Double.NEGATIVE_INFINITY
             var d = profile.stepM
-            // Terrain is known only as far as the profile reaches; farther nodes are hidden only by what lies inside it.
+            // Terrain is known only as far as the profile reaches; farther nodes are hidden only by what lies inside
+            // it.
             val known = minOf(distance, profile.radiusM)
             while (d < known) {
                 val p = Geodesy.destination(profile.centre, bearing, d)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PngTest {
-    private fun u32(b: ByteArray, o: Int) = ((b[o].toInt() and 255) shl 24) or ((b[o + 1].toInt() and 255) shl 16) or ((b[o + 2].toInt() and 255) shl 8) or (b[o + 3].toInt() and 255)
+    private fun u32(b: ByteArray, o: Int) = ((b[o].toInt() and 255) shl 24) or
+        ((b[o + 1].toInt() and 255) shl 16) or
+        ((b[o + 2].toInt() and 255) shl 8) or
+        (b[o + 3].toInt() and 255)
 
     private class Chunk(val type: String, val off: Int, val len: Int)
 
@@ -74,26 +77,41 @@ class PngTest {
 
     @Test
     fun roundTripSmall() {
-        val w = 3; val h = 2
-        val px = intArrayOf(0xFF112233.toInt(), 0x80445566.toInt(), 0x00778899, 0xFFAABBCC.toInt(), 0xFFDDEEFF.toInt(), 0x01020304)
+        val w = 3
+        val h = 2
+        val px =
+            intArrayOf(
+                0xFF112233.toInt(),
+                0x80445566.toInt(),
+                0x00778899,
+                0xFFAABBCC.toInt(),
+                0xFFDDEEFF.toInt(),
+                0x01020304,
+            )
         val png = PlannerPng.encode(w, h, px)
         val cs = chunks(png)
         assertEquals(listOf("IHDR", "IDAT", "IEND"), cs.map { it.type })
         val ih = cs[0]
         assertEquals(13, ih.len)
-        assertEquals(w, u32(png, ih.off)); assertEquals(h, u32(png, ih.off + 4))
-        assertEquals(8, png[ih.off + 8].toInt()); assertEquals(6, png[ih.off + 9].toInt())
+        assertEquals(w, u32(png, ih.off))
+        assertEquals(h, u32(png, ih.off + 4))
+        assertEquals(8, png[ih.off + 8].toInt())
+        assertEquals(6, png[ih.off + 9].toInt())
         val raw = inflateStored(png, cs[1].off, cs[1].len)
         assertEquals(h * (1 + w * 4), raw.size)
         assertEquals(0, raw[0].toInt())
-        assertEquals(0x11, raw[1].toInt()); assertEquals(0x22, raw[2].toInt()); assertEquals(0x33, raw[3].toInt() and 255); assertEquals(0xFF, raw[4].toInt() and 255)
+        assertEquals(0x11, raw[1].toInt())
+        assertEquals(0x22, raw[2].toInt())
+        assertEquals(0x33, raw[3].toInt() and 255)
+        assertEquals(0xFF, raw[4].toInt() and 255)
         assertEquals(0x80, raw[8].toInt() and 255)
         assertEquals(0, cs[2].len)
     }
 
     @Test
     fun largeImageUsesMultipleBlocks() {
-        val w = 300; val h = 300
+        val w = 300
+        val h = 300
         val png = PlannerPng.encode(w, h, IntArray(w * h) { it * 2654435761L.toInt() })
         val cs = chunks(png)
         val raw = inflateStored(png, cs[1].off, cs[1].len)
@@ -105,7 +123,8 @@ class PngTest {
     fun profileImage() {
         val bytes = PlannerProfileImage.render(SampleData.profile())
         val cs = chunks(bytes)
-        assertEquals(1200, u32(bytes, cs[0].off)); assertEquals(600, u32(bytes, cs[0].off + 4))
+        assertEquals(1200, u32(bytes, cs[0].off))
+        assertEquals(600, u32(bytes, cs[0].off + 4))
         val raw = inflateStored(bytes, cs[1].off, cs[1].len)
         assertEquals(600 * (1 + 1200 * 4), raw.size)
         var nonWhite = 0

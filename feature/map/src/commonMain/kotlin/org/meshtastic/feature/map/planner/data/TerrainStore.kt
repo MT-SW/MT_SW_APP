@@ -46,22 +46,24 @@ class TerrainStore(
     }
 
     /** Saves a tile; false when the disk refused (full, no access). */
-    fun write(tile: TileIndex, bytes: ByteArray?): Boolean =
-        try {
-            fileSystem.createDirectories(directory)
-            fileSystem.write(pathOf(tile)) { write(bytes ?: ByteArray(0)) }
-            true
-        } catch (_: Exception) {
-            false
-        }
+    fun write(tile: TileIndex, bytes: ByteArray?): Boolean = try {
+        fileSystem.createDirectories(directory)
+        fileSystem.write(pathOf(tile)) { write(bytes ?: ByteArray(0)) }
+        true
+    } catch (_: Exception) {
+        false
+    }
 
     /** The space the saved terrain takes, in bytes. */
-    fun sizeBytes(): Long =
-        try {
-            if (fileSystem.exists(directory)) fileSystem.list(directory).sumOf { fileSystem.metadataOrNull(it)?.size ?: 0L } else 0L
-        } catch (_: Exception) {
+    fun sizeBytes(): Long = try {
+        if (fileSystem.exists(directory)) {
+            fileSystem.list(directory).sumOf { fileSystem.metadataOrNull(it)?.size ?: 0L }
+        } else {
             0L
         }
+    } catch (_: Exception) {
+        0L
+    }
 
     /** Deletes all saved terrain. */
     fun clear() {

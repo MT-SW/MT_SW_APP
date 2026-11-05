@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  */
 package org.meshtastic.feature.map.planner.export
 
-import kotlin.test.Test
 import org.meshtastic.core.ui.util.PdfText
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -84,7 +84,11 @@ class PdfTest {
     @Test
     fun polishEncoding() {
         val s = pdf()
-        assertTrue(s.contains("/Differences [1 /aogonek /cacute /eogonek /lslash /nacute /sacute /zacute /zdotaccent /Aogonek /Cacute /Eogonek /Lslash /Nacute /Sacute /Zacute /Zdotaccent]"))
+        assertTrue(
+            s.contains(
+                "/Differences [1 /aogonek /cacute /eogonek /lslash /nacute /sacute /zacute /zdotaccent /Aogonek /Cacute /Eogonek /Lslash /Nacute /Sacute /Zacute /Zdotaccent]",
+            ),
+        )
         assertTrue(s.contains("/BaseEncoding /WinAnsiEncoding"))
         assertEquals(4, PdfText.polishCode('ł'))
         assertEquals(12, PdfText.polishCode('Ł'))
@@ -120,13 +124,27 @@ class PdfTest {
 
     @Test
     fun emptyReportStillValid() {
-        val s = bytesToLatin1(PlannerPdf.render(PlannerReport("", "", "", emptyList(), null, null, emptyList(), emptyList(), "")))
+        val s =
+            bytesToLatin1(
+                PlannerPdf.render(PlannerReport("", "", "", emptyList(), null, null, emptyList(), emptyList(), "")),
+            )
         assertTrue(s.startsWith("%PDF-1.4") && s.trimEnd().endsWith("%%EOF"))
     }
 
     @Test
     fun degenerateProfileAndCoverage() {
-        val p = ReportProfile(doubleArrayOf(0.0), doubleArrayOf(1.0), doubleArrayOf(2.0), doubleArrayOf(3.0), doubleArrayOf(0.0), "A", "B", "x", "y")
+        val p =
+            ReportProfile(
+                doubleArrayOf(0.0),
+                doubleArrayOf(1.0),
+                doubleArrayOf(2.0),
+                doubleArrayOf(3.0),
+                doubleArrayOf(0.0),
+                "A",
+                "B",
+                "x",
+                "y",
+            )
         val c = ReportCoverage(50.0, 20.0, emptyList(), 0.0, emptyList(), "t")
         val r = SampleData.report().copy(profile = p, coverage = c)
         assertTrue(pdf(r).trimEnd().endsWith("%%EOF"))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,19 +55,21 @@ class AtmosphereTest {
 
     @Test
     fun analyzeProfile() {
-        val std = listOf(
-            AtmosphereSample(0.0, 15.0, 1013.25, 60.0),
-            AtmosphereSample(1000.0, 8.5, 898.7, 60.0),
-        )
+        val std =
+            listOf(
+                AtmosphereSample(0.0, 15.0, 1013.25, 60.0),
+                AtmosphereSample(1000.0, 8.5, 898.7, 60.0),
+            )
         val a = Atmosphere.analyzeProfile(std)
         assertTrue(a.surfaceN in 315.0..325.0)
         assertTrue(a.gradientNPerKm < -20 && a.gradientNPerKm > -80, "g=${a.gradientNPerKm}")
         assertEquals(DuctingLevel.NORMAL, a.level)
         // strong inversion with dry air above
-        val inv = listOf(
-            AtmosphereSample(0.0, 15.0, 1013.0, 95.0),
-            AtmosphereSample(200.0, 25.0, 990.0, 10.0),
-        )
+        val inv =
+            listOf(
+                AtmosphereSample(0.0, 15.0, 1013.0, 95.0),
+                AtmosphereSample(200.0, 25.0, 990.0, 10.0),
+            )
         assertEquals(DuctingLevel.POSSIBLE_DUCT, Atmosphere.analyzeProfile(inv).level)
         assertEquals(DuctingLevel.NORMAL, Atmosphere.analyzeProfile(emptyList()).level)
     }

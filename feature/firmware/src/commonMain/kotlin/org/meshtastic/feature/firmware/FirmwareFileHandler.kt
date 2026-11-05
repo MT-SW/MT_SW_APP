@@ -325,9 +325,9 @@ internal fun localFirmwarePayloadExtension(hardware: DeviceHardware, updateMetho
     }
 
 /**
- * Own-file check: only the file type must fit the connection (Nordic DFU `.zip`, ESP32 `.bin`, USB `.uf2`); the name
- * is not compared with the device's model, so self-generated firmware can be flashed under any name. A device of
- * unknown architecture accepts either `.zip` (nRF52) or `.bin` (ESP32) over Bluetooth.
+ * Own-file check: only the file type must fit the connection (Nordic DFU `.zip`, ESP32 `.bin`, USB `.uf2`); the name is
+ * not compared with the device's model, so self-generated firmware can be flashed under any name. A device of unknown
+ * architecture accepts either `.zip` (nRF52) or `.bin` (ESP32) over Bluetooth.
  */
 private fun validateExtensionOnly(
     fileName: String,

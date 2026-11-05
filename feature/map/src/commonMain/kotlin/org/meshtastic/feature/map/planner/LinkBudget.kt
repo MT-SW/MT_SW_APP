@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package org.meshtastic.feature.map.planner
 
 import kotlin.math.log10
-import kotlin.math.max
 import kotlin.math.min
 
 data class LinkEnd(
@@ -112,8 +111,8 @@ object LinkBudget {
     }
 
     /**
-     * Analyse a link over [profile]. Antenna heights are taken above the profile's terrain at each end (the profile
-     * is authoritative for ground elevation; [LinkEnd.groundAltM] is informational). ITM loss is reciprocal.
+     * Analyse a link over [profile]. Antenna heights are taken above the profile's terrain at each end (the profile is
+     * authoritative for ground elevation; [LinkEnd.groundAltM] is informational). ITM loss is reciprocal.
      */
     fun analyze(input: LinkInput, profile: PathProfile): LinkResult {
         val a = input.a
@@ -121,17 +120,18 @@ object LinkBudget {
         val dist = profile.distanceM
         val fsl = freeSpaceLossDb(dist, input.frequencyMHz)
 
-        val itm = Itm.pointToPoint(
-            elevationsM = profile.groundM,
-            stepM = profile.stepM,
-            txHeightM = a.antennaHeightM,
-            rxHeightM = b.antennaHeightM,
-            frequencyMHz = input.frequencyMHz,
-            surfaceRefractivityNUnits = input.surfaceRefractivity,
-            timePct = input.timePct,
-            locationPct = input.locationPct,
-            situationPct = input.situationPct,
-        )
+        val itm =
+            Itm.pointToPoint(
+                elevationsM = profile.groundM,
+                stepM = profile.stepM,
+                txHeightM = a.antennaHeightM,
+                rxHeightM = b.antennaHeightM,
+                frequencyMHz = input.frequencyMHz,
+                surfaceRefractivityNUnits = input.surfaceRefractivity,
+                timePct = input.timePct,
+                locationPct = input.locationPct,
+                situationPct = input.situationPct,
+            )
         val itmOk = itm.returnCode <= 1 && !itm.lossDb.isNaN()
         val itmLoss = if (itmOk) itm.lossDb else ITM_ERROR_LOSS_DB
         val total = itmLoss + input.extraLossDb

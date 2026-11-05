@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,8 +94,9 @@ internal class FakeElevation(var heightM: Double = 250.0, var failure: PlannerEl
     }
 }
 
-internal class FakeWeather(var result: PlannerWeatherResult = PlannerWeatherResult.Failure(PlannerWeatherError.OFFLINE)) :
-    PlannerWeatherSource {
+internal class FakeWeather(
+    var result: PlannerWeatherResult = PlannerWeatherResult.Failure(PlannerWeatherError.OFFLINE),
+) : PlannerWeatherSource {
     var calls = 0
 
     override suspend fun fetch(lat: Double, lon: Double): PlannerWeatherResult {
@@ -110,9 +111,10 @@ internal class FakeNodes(initial: List<PlannerNodeOption> = emptyList()) : Plann
 }
 
 internal fun conditions(): PropagationConditions {
-    val analysis = Atmosphere.analyzeProfile(
-        listOf(AtmosphereSample(250.0, 10.0, 990.0, 70.0), AtmosphereSample(1250.0, 5.0, 880.0, 50.0)),
-    )
+    val analysis =
+        Atmosphere.analyzeProfile(
+            listOf(AtmosphereSample(250.0, 10.0, 990.0, 70.0), AtmosphereSample(1250.0, 5.0, 880.0, 50.0)),
+        )
     return PropagationConditions(
         fetchedAtIso = "2026-10-01 12:00",
         analysis = analysis,

@@ -160,14 +160,15 @@ class MapLayersManager(
     }
 
     /**
-     * Import a GeoJSON string (e.g. a coverage estimate produced by the Planner) as a visible local overlay,
-     * reusing the same storage-backed layer plumbing as file imports.
+     * Import a GeoJSON string (e.g. a coverage estimate produced by the Planner) as a visible local overlay, reusing
+     * the same storage-backed layer plumbing as file imports.
      */
     fun addGeoJsonLayer(name: String, geoJson: String) {
         scope.launch {
             // At the limit the oldest planner result makes room; without one nothing is added.
             if (_mapLayers.value.size >= MAX_MAP_LAYERS) {
-                val oldest = _mapLayers.value.filter { it.layerType == LayerType.COVERAGE }.minByOrNull { it.createdAt ?: 0L }
+                val oldest =
+                    _mapLayers.value.filter { it.layerType == LayerType.COVERAGE }.minByOrNull { it.createdAt ?: 0L }
                 if (oldest == null) return@launch
                 removeMapLayer(oldest.id)
             }

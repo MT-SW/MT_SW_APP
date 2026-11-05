@@ -21,13 +21,13 @@ import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.zoom_in
 import org.meshtastic.core.resources.zoom_out
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
+import org.meshtastic.core.ui.theme.monochromeLayer
 
 /**
  * Zoom in and out, stacked, for the corner of a map.

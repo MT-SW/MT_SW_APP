@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,14 +54,13 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_cancel
-import org.meshtastic.core.resources.planner_precise_progress
 import org.meshtastic.core.resources.planner_coverage_clear
 import org.meshtastic.core.resources.planner_coverage_compute
 import org.meshtastic.core.resources.planner_coverage_extent
 import org.meshtastic.core.resources.planner_coverage_need_point
+import org.meshtastic.core.resources.planner_coverage_opacity
 import org.meshtastic.core.resources.planner_coverage_radials
 import org.meshtastic.core.resources.planner_coverage_range
-import org.meshtastic.core.resources.planner_coverage_opacity
 import org.meshtastic.core.resources.planner_coverage_rx_gain
 import org.meshtastic.core.resources.planner_coverage_rx_height
 import org.meshtastic.core.resources.planner_coverage_side
@@ -71,6 +70,7 @@ import org.meshtastic.core.resources.planner_legend_good
 import org.meshtastic.core.resources.planner_legend_marginal
 import org.meshtastic.core.resources.planner_legend_none
 import org.meshtastic.core.resources.planner_legend_weak
+import org.meshtastic.core.resources.planner_precise_progress
 import org.meshtastic.core.resources.planner_section_coverage
 import org.meshtastic.core.resources.planner_show_on_map
 import org.meshtastic.core.resources.planner_unit_dbi
@@ -176,7 +176,8 @@ internal fun CoverageSection(
             )
         }
         Text(
-            text = stringResource(Res.string.planner_coverage_opacity, "${(state.coverageOpacity * 100).roundToInt()}%"),
+            text =
+            stringResource(Res.string.planner_coverage_opacity, "${(state.coverageOpacity * 100).roundToInt()}%"),
             style = MaterialTheme.typography.labelLarge,
         )
         Slider(
@@ -195,7 +196,11 @@ internal fun CoverageSection(
                 OutlinedButton(onClick = { vm.clearCoverage() }) {
                     Text(
                         stringResource(
-                            if (state.coverageComputing) Res.string.planner_cancel else Res.string.planner_coverage_clear,
+                            if (state.coverageComputing) {
+                                Res.string.planner_cancel
+                            } else {
+                                Res.string.planner_coverage_clear
+                            },
                         ),
                     )
                 }
@@ -321,7 +326,12 @@ internal fun CoveragePlan(coverage: CoverageResult, modifier: Modifier = Modifie
             val pxPerKm = if (radiusKm > 0.0) (size.width / 2f) / radiusKm.toFloat() else 0f
             ringKm.forEachIndexed { i, km ->
                 val r = km.toFloat() * pxPerKm
-                drawCircle(onSurface.copy(alpha = 0.35f), radius = r, center = centre, style = Stroke(width = 1.dp.toPx()))
+                drawCircle(
+                    onSurface.copy(alpha = 0.35f),
+                    radius = r,
+                    center = centre,
+                    style = Stroke(width = 1.dp.toPx()),
+                )
                 val layout = textMeasurer.measure(text = ringLabels[i], style = labelStyle)
                 drawText(layout, topLeft = Offset(centre.x + 2.dp.toPx(), centre.y - r - layout.size.height))
             }
@@ -334,7 +344,12 @@ internal fun CoveragePlan(coverage: CoverageResult, modifier: Modifier = Modifie
             val x0 = 10.dp.toPx()
             drawLine(Color.Black, Offset(x0, y), Offset(x0 + barLen, y), strokeWidth = 3.dp.toPx())
             drawLine(Color.Black, Offset(x0, y - 4.dp.toPx()), Offset(x0, y + 4.dp.toPx()), strokeWidth = 2.dp.toPx())
-            drawLine(Color.Black, Offset(x0 + barLen, y - 4.dp.toPx()), Offset(x0 + barLen, y + 4.dp.toPx()), strokeWidth = 2.dp.toPx())
+            drawLine(
+                Color.Black,
+                Offset(x0 + barLen, y - 4.dp.toPx()),
+                Offset(x0 + barLen, y + 4.dp.toPx()),
+                strokeWidth = 2.dp.toPx(),
+            )
             val label = textMeasurer.measure(text = scaleLabel, style = labelStyle.copy(color = Color.Black))
             drawText(label, topLeft = Offset(x0, y - label.size.height - 6.dp.toPx()))
         }

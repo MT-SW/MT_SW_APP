@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 package org.meshtastic.feature.map.planner.export
 
 /**
- * CSV export. Separator is a semicolon (`;`), decimal separator is a point (`.`), line break is CRLF (RFC 4180),
- * fields containing `;`, `"`, CR/LF or leading/trailing blanks are quoted with `"` (quotes doubled).
+ * CSV export. Separator is a semicolon (`;`), decimal separator is a point (`.`), line break is CRLF (RFC 4180), fields
+ * containing `;`, `"`, CR/LF or leading/trailing blanks are quoted with `"` (quotes doubled).
  */
 object PlannerCsv {
     private const val SEP = ';'
@@ -31,11 +31,16 @@ object PlannerCsv {
         val p = report.profile ?: return sb.toString()
         val c = ChartData(p)
         for (i in 0 until c.n) {
-            sb.append(Num.fmt(c.x[i], 1)).append(SEP)
-                .append(Num.fmt(c.ground[i], 1)).append(SEP)
-                .append(Num.fmt(c.los[i], 2)).append(SEP)
-                .append(Num.fmt(c.up[i], 2)).append(SEP)
-                .append(Num.fmt(c.lo[i], 2)).append(EOL)
+            sb.append(Num.fmt(c.x[i], 1))
+                .append(SEP)
+                .append(Num.fmt(c.ground[i], 1))
+                .append(SEP)
+                .append(Num.fmt(c.los[i], 2))
+                .append(SEP)
+                .append(Num.fmt(c.up[i], 2))
+                .append(SEP)
+                .append(Num.fmt(c.lo[i], 2))
+                .append(EOL)
         }
         return sb.toString()
     }

@@ -1193,8 +1193,7 @@ class FirmwareUpdateViewModel(
             return
         }
         trackUpdateStart(currentState, LOCAL_RELEASE_ID)
-        originalDeviceAddress =
-            if (currentState.isRecovery) pendingRecovery?.fullAddress else radioPrefs.devAddr.value
+        originalDeviceAddress = if (currentState.isRecovery) pendingRecovery?.fullAddress else radioPrefs.devAddr.value
         val hardware = currentState.deviceHardware.forOwnFile(fileName)
         val localRelease = FirmwareRelease(id = LOCAL_RELEASE_ID, zipUrl = "", releaseNotes = "")
 
@@ -1434,18 +1433,17 @@ class FirmwareUpdateViewModel(
     /**
      * Never null: a model the catalogue lacks (or a lookup that failed offline) yields a placeholder with no
      * architecture, which the screen treats as "own file only" -- see [isUnidentified]. This is what lets self-built
-     * firmware for unlisted boards be flashed, and it no longer leaves the screen hanging on "Checking" when the
-     * lookup comes back empty.
+     * firmware for unlisted boards be flashed, and it no longer leaves the screen hanging on "Checking" when the lookup
+     * comes back empty.
      */
     private suspend fun getDeviceHardware(ourNode: MyNodeInfo): DeviceHardware {
         val nodeInfo = nodeRepository.ourNodeInfo.value
         val hwModelInt = nodeInfo?.user?.hw_model?.value
         val target = ourNode.pioEnv
 
-        val known =
-            hwModelInt?.let {
-                safeCatching { deviceHardwareRepository.getDeviceHardwareByModel(it, target).getOrNull() }.getOrNull()
-            }
+        val known = hwModelInt?.let {
+            safeCatching { deviceHardwareRepository.getDeviceHardwareByModel(it, target).getOrNull() }.getOrNull()
+        }
         return known
             ?: DeviceHardware(
                 displayName =

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,14 +80,16 @@ object OsmQueries {
 
     /**
      * The same obstacles as [link], as several lighter requests: the forests of the whole path, then the buildings of
-     * each stretch on its own. One heavy request used to run into the server's time limit on a long link; the parts
-     * are answered one by one and each gets the longer [LINK_SERVER_TIMEOUT_S].
+     * each stretch on its own. One heavy request used to run into the server's time limit on a long link; the parts are
+     * answered one by one and each gets the longer [LINK_SERVER_TIMEOUT_S].
      */
     fun linkParts(a: GeoPoint, b: GeoPoint): List<String> {
         val parts = ArrayList<String>()
         parts.add(header(LINK_SERVER_TIMEOUT_S) + "(" + forestStatements(polyline(a, b, 0.0, 1.0)) + ");out tags geom;")
         for ((f0, f1) in buildingStretches(a, b)) {
-            parts.add(header(LINK_SERVER_TIMEOUT_S) + "(" + buildingStatements(polyline(a, b, f0, f1)) + ");out tags geom;")
+            parts.add(
+                header(LINK_SERVER_TIMEOUT_S) + "(" + buildingStatements(polyline(a, b, f0, f1)) + ");out tags geom;",
+            )
         }
         return parts
     }
@@ -103,7 +105,8 @@ object OsmQueries {
         val b = box.asQueryBox()
         val sb = StringBuilder(header()).append('(')
         // Exact key=value matches, not a regular expression on the value: the server answers those from its index and
-        // looks only at woods and built-up land, while a pattern makes it read every landuse (all the fields and meadows).
+        // looks only at woods and built-up land, while a pattern makes it read every landuse (all the fields and
+        // meadows).
         sb.append("way[\"natural\"=\"wood\"]($b);")
         for (v in AREA_LANDUSE) sb.append("way[\"landuse\"=\"$v\"]($b);")
         sb.append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"]($b);")

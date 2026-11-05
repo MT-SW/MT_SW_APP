@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  */
 package org.meshtastic.feature.map.planner
 
-import org.meshtastic.core.model.antenna.ConnectorType
 import org.meshtastic.core.model.antenna.CableDb
-import org.meshtastic.core.model.antenna.FeederSection
-import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.ConnectorType
 import org.meshtastic.core.model.antenna.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.FeederSection
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -41,11 +41,31 @@ class FeederTest {
 
     @Test
     fun allRequiredCablesPresent() {
-        val ids = listOf(
-            "rg174", "rg178", "rg316", "rg58", "rg59", "rg8x", "rg213", "lmr100", "lmr195", "lmr200", "lmr240",
-            "lmr400", "lmr600", "h155", "h1000", "aircell5", "aircell7", "ecoflex10", "ecoflex15", "semirigid085",
-            "semirigid141", "ldf4_50a",
-        )
+        val ids =
+            listOf(
+                "rg174",
+                "rg178",
+                "rg316",
+                "rg58",
+                "rg59",
+                "rg8x",
+                "rg213",
+                "lmr100",
+                "lmr195",
+                "lmr200",
+                "lmr240",
+                "lmr400",
+                "lmr600",
+                "h155",
+                "h1000",
+                "aircell5",
+                "aircell7",
+                "ecoflex10",
+                "ecoflex15",
+                "semirigid085",
+                "semirigid141",
+                "ldf4_50a",
+            )
         for (id in ids) assertNotNull(CableDb.cable(id), id)
         assertEquals(ids.size, CableDb.cables.size)
         assertEquals(CableDb.cables.size, CableDb.cables.map { it.id }.toSet().size)
@@ -160,9 +180,11 @@ class FeederTest {
         assertEquals(1.5, r.lines[1].lossDb, 1e-12)
         assertEquals("custom · 5 m", r.lines[1].label)
         assertTrue(!r.approximate)
-        val bad = FeederBuilder.compute(
-            FeederConfig(listOf("sma", "n"), listOf(FeederSection(FeederBuilder.CUSTOM_ID, 5.0, null))), 868.0,
-        )
+        val bad =
+            FeederBuilder.compute(
+                FeederConfig(listOf("sma", "n"), listOf(FeederSection(FeederBuilder.CUSTOM_ID, 5.0, null))),
+                868.0,
+            )
         assertTrue("CUSTOM_LOSS_MISSING" in bad.warnings)
     }
 
@@ -172,7 +194,8 @@ class FeederTest {
         val r = FeederBuilder.compute(extra, 868.0)
         assertTrue("SECTION_COUNT_MISMATCH" in r.warnings)
         assertEquals(3, r.lines.size)
-        val missing = FeederBuilder.compute(FeederConfig(listOf("sma", "n", "n"), listOf(FeederSection("rg316", 1.0))), 868.0)
+        val missing =
+            FeederBuilder.compute(FeederConfig(listOf("sma", "n", "n"), listOf(FeederSection("rg316", 1.0))), 868.0)
         assertTrue("SECTION_COUNT_MISMATCH" in missing.warnings)
         val none = FeederBuilder.compute(FeederConfig(emptyList(), listOf(FeederSection("rg316", 1.0))), 868.0)
         assertEquals(0.0, none.totalDb, 0.0)
@@ -181,13 +204,15 @@ class FeederTest {
         assertTrue("UNKNOWN_CONNECTOR:zzz" in unk.warnings && "UNKNOWN_CABLE:qqq" in unk.warnings && unk.approximate)
         val neg = FeederBuilder.compute(FeederConfig(listOf("sma", "n"), listOf(FeederSection("rg316", -2.0))), 868.0)
         assertTrue("INVALID_LENGTH" in neg.warnings)
-        val many = FeederBuilder.compute(FeederConfig(List(10) { "sma" }, List(9) { FeederSection("rg316", 0.1) }), 868.0)
+        val many =
+            FeederBuilder.compute(FeederConfig(List(10) { "sma" }, List(9) { FeederSection("rg316", 0.1) }), 868.0)
         assertTrue("CONNECTOR_COUNT_EXCEEDS_MAX" in many.warnings)
     }
 
     @Test
     fun resizeKeepsData() {
-        val base = FeederConfig(listOf("ufl", "sma", "n"), listOf(FeederSection("rg316", 0.2), FeederSection("lmr400", 10.0)))
+        val base =
+            FeederConfig(listOf("ufl", "sma", "n"), listOf(FeederSection("rg316", 0.2), FeederSection("lmr400", 10.0)))
         val bigger = FeederBuilder.resize(base, 5)
         assertEquals(listOf("ufl", "sma", "n", "sma", "sma"), bigger.connectorIds)
         assertEquals(4, bigger.sections.size)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,11 +177,17 @@ private fun LinkDetails(state: PlannerUiState, link: LinkResult) {
     PlannerValueRow(
         label = stringResource(Res.string.planner_los),
         value = stringResource(if (link.lineOfSightClear) Res.string.planner_yes else Res.string.planner_no),
-        valueColor = if (link.lineOfSightClear) MaterialTheme.colorScheme.StatusGreen else MaterialTheme.colorScheme.StatusOrange,
+        valueColor =
+        if (link.lineOfSightClear) {
+            MaterialTheme.colorScheme.StatusGreen
+        } else {
+            MaterialTheme.colorScheme.StatusOrange
+        },
     )
     PlannerValueRow(
         label = stringResource(Res.string.planner_fresnel),
-        value = fmt(link.worstFresnelClearanceM, 1) + " " + unitM + " (" + fmt(link.worstFresnelRatio * 100.0, 0) + " %)",
+        value =
+        fmt(link.worstFresnelClearanceM, 1) + " " + unitM + " (" + fmt(link.worstFresnelRatio * 100.0, 0) + " %)",
         valueColor =
         if (link.worstFresnelRatio >= RECOMMENDED_FRESNEL_RATIO) {
             MaterialTheme.colorScheme.StatusGreen
@@ -211,12 +217,20 @@ private fun DirectionCard(title: String, dir: DirectionResult, modifier: Modifie
         Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(text = title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
             Text(
-                text = stringResource(Res.string.planner_rx_power) + ": " + fmt(dir.rxPowerDbm, 1) + " " +
+                text =
+                stringResource(Res.string.planner_rx_power) +
+                    ": " +
+                    fmt(dir.rxPowerDbm, 1) +
+                    " " +
                     stringResource(Res.string.planner_unit_dbm),
                 style = MaterialTheme.typography.bodySmall,
             )
             Text(
-                text = stringResource(Res.string.planner_margin) + ": " + fmtSigned(dir.marginDb, 1) + " " +
+                text =
+                stringResource(Res.string.planner_margin) +
+                    ": " +
+                    fmtSigned(dir.marginDb, 1) +
+                    " " +
                     stringResource(Res.string.planner_unit_db),
                 style = MaterialTheme.typography.titleMedium,
                 color = color,
@@ -239,7 +253,8 @@ private fun MeasuredCard(cmp: MeasuredComparison) {
     PlannerCard(title = stringResource(Res.string.planner_section_measured), info = PlannerInfoTopic.MEASURED) {
         PlannerValueRow(
             label = stringResource(Res.string.planner_measured_node),
-            value = cmp.nodeName.ifBlank { "!" + cmp.nodeNum.toUInt().toString(16) } + " (" + sideName(cmp.nodeSide) + ")",
+            value =
+            cmp.nodeName.ifBlank { "!" + cmp.nodeNum.toUInt().toString(16) } + " (" + sideName(cmp.nodeSide) + ")",
         )
         if (!cmp.direct) PlannerNotice(text = stringResource(Res.string.planner_measured_not_direct))
         PlannerValueRow(
@@ -250,7 +265,13 @@ private fun MeasuredCard(cmp: MeasuredComparison) {
             stringResource(Res.string.planner_measured_meas_rssi),
             cmp.measuredRssiDbm?.let { it.toString() + " " + unitDbm } ?: missing,
         )
-        cmp.rssiDeltaDb?.let { PlannerValueRow(stringResource(Res.string.planner_measured_delta_rssi), fmtSigned(it, 1) + " " + unitDb, bold = true) }
+        cmp.rssiDeltaDb?.let {
+            PlannerValueRow(
+                stringResource(Res.string.planner_measured_delta_rssi),
+                fmtSigned(it, 1) + " " + unitDb,
+                bold = true,
+            )
+        }
         PlannerValueRow(
             stringResource(Res.string.planner_measured_pred_snr),
             fmt(cmp.predictedSnrDb, 1) + " " + unitDb,
@@ -259,7 +280,13 @@ private fun MeasuredCard(cmp: MeasuredComparison) {
             stringResource(Res.string.planner_measured_meas_snr),
             cmp.measuredSnrDb?.let { fmt(it.toDouble(), 2) + " " + unitDb } ?: missing,
         )
-        cmp.snrDeltaDb?.let { PlannerValueRow(stringResource(Res.string.planner_measured_delta_snr), fmtSigned(it, 1) + " " + unitDb, bold = true) }
+        cmp.snrDeltaDb?.let {
+            PlannerValueRow(
+                stringResource(Res.string.planner_measured_delta_snr),
+                fmtSigned(it, 1) + " " + unitDb,
+                bold = true,
+            )
+        }
         Text(
             text = stringResource(Res.string.planner_measured_note),
             style = MaterialTheme.typography.bodySmall,

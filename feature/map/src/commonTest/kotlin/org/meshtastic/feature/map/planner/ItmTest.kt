@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Regression vectors generated with the NTIA C++ reference (ITM_P2P_TLS_Ex).
- * Row format: `id htx hrx climate N0 fMHz pol eps sigma mdvar time loc sit n step v0..vn | rc A mode warn Aref dh`
+ * Regression vectors generated with the NTIA C++ reference (ITM_P2P_TLS_Ex). Row format: `id htx hrx climate N0 fMHz
+ * pol eps sigma mdvar time loc sit n step v0..vn | rc A mode warn Aref dh`
  */
 class ItmTest {
     @Test
@@ -36,22 +36,23 @@ class ItmTest {
             val id = t[0]
             val n = t[13].toInt()
             val elev = DoubleArray(n + 1) { t[15 + it].toDouble() }
-            val r = Itm.pointToPoint(
-                elevationsM = elev,
-                stepM = t[14].toDouble(),
-                txHeightM = t[1].toDouble(),
-                rxHeightM = t[2].toDouble(),
-                frequencyMHz = t[5].toDouble(),
-                surfaceRefractivityNUnits = t[4].toDouble(),
-                climate = t[3].toInt(),
-                polarization = if (t[6].toInt() == 1) ItmPolarization.VERTICAL else ItmPolarization.HORIZONTAL,
-                epsilon = t[7].toDouble(),
-                sigma = t[8].toDouble(),
-                mdvar = t[9].toInt(),
-                timePct = t[10].toDouble(),
-                locationPct = t[11].toDouble(),
-                situationPct = t[12].toDouble(),
-            )
+            val r =
+                Itm.pointToPoint(
+                    elevationsM = elev,
+                    stepM = t[14].toDouble(),
+                    txHeightM = t[1].toDouble(),
+                    rxHeightM = t[2].toDouble(),
+                    frequencyMHz = t[5].toDouble(),
+                    surfaceRefractivityNUnits = t[4].toDouble(),
+                    climate = t[3].toInt(),
+                    polarization = if (t[6].toInt() == 1) ItmPolarization.VERTICAL else ItmPolarization.HORIZONTAL,
+                    epsilon = t[7].toDouble(),
+                    sigma = t[8].toDouble(),
+                    mdvar = t[9].toInt(),
+                    timePct = t[10].toDouble(),
+                    locationPct = t[11].toDouble(),
+                    situationPct = t[12].toDouble(),
+                )
             val expMode = e[2].toInt()
             seen += expMode
             assertEquals(e[0].toInt(), r.returnCode, "$id rc")
@@ -75,7 +76,8 @@ class ItmTest {
     }
 
     private companion object {
-        val VECTORS = """
+        val VECTORS =
+            """
 c000 2 2 5 301 433 1 15 0.005 12 0.5 0.5 0.5 60 100 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 214.77 | 0 119.912453 1 0 39.465832 0.000000
 c008 10 5 5 301 868 1 15 0.005 12 0.5 0.5 0.5 60 100 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 254.70 | 0 103.775412 1 0 10.263937 0.000000
 c016 30 2 5 301 2400 1 15 0.005 12 0.5 0.5 0.5 60 100 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 162.13 | 0 111.376650 1 0 0.476977 0.000000

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,7 +182,8 @@ private fun ProfileChart(series: ProfileSeries) {
 
             fun px(xMeters: Double): Float = left + (xMeters / scale.xMax * (right - left)).toFloat()
 
-            fun py(yMeters: Double): Float = bottom - ((yMeters - scale.yMin) / (scale.yMax - scale.yMin) * (bottom - top)).toFloat()
+            fun py(yMeters: Double): Float =
+                bottom - ((yMeters - scale.yMin) / (scale.yMax - scale.yMin) * (bottom - top)).toFloat()
 
             // Grid and tick labels.
             scale.yTicks.forEachIndexed { i, v ->
@@ -212,14 +213,22 @@ private fun ProfileChart(series: ProfileSeries) {
                 drawPath(terrain, TERRAIN_FILL.copy(alpha = 0.55f))
                 val terrainLine = Path()
                 for (i in 0 until n) {
-                    if (i == 0) terrainLine.moveTo(px(d[i]), py(series.groundM[i])) else terrainLine.lineTo(px(d[i]), py(series.groundM[i]))
+                    if (i == 0) {
+                        terrainLine.moveTo(px(d[i]), py(series.groundM[i]))
+                    } else {
+                        terrainLine.lineTo(px(d[i]), py(series.groundM[i]))
+                    }
                 }
                 drawPath(terrainLine, TERRAIN_LINE, style = Stroke(width = 1.5.dp.toPx()))
 
                 // First Fresnel zone.
                 val fresnel = Path()
                 for (i in 0 until n) {
-                    if (i == 0) fresnel.moveTo(px(d[i]), py(series.fresnelUpperM[i])) else fresnel.lineTo(px(d[i]), py(series.fresnelUpperM[i]))
+                    if (i == 0) {
+                        fresnel.moveTo(px(d[i]), py(series.fresnelUpperM[i]))
+                    } else {
+                        fresnel.lineTo(px(d[i]), py(series.fresnelUpperM[i]))
+                    }
                 }
                 for (i in n - 1 downTo 0) fresnel.lineTo(px(d[i]), py(series.fresnelLowerM[i]))
                 fresnel.close()

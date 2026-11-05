@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  */
 package org.meshtastic.feature.map.planner
 
@@ -27,9 +26,20 @@ class CoverageTest {
     private val c = GeoPoint(50.8661, 20.6286)
 
     private fun inp(tx: Double = 20.0, hill: Boolean = false) = CoverageInput(
-        center = c, groundAltM = 250.0, antennaHeightM = 15.0, txPowerDbm = tx, antennaGainDbi = 3.0,
-        feederLossDb = 1.0, frequencyMHz = 868.0, bandwidthKhz = 125.0, spreadingFactor = 9,
-        kFactor = 4.0 / 3.0, surfaceRefractivity = 301.0, maxRangeKm = 40.0, radials = 24, stepM = 200.0,
+        center = c,
+        groundAltM = 250.0,
+        antennaHeightM = 15.0,
+        txPowerDbm = tx,
+        antennaGainDbi = 3.0,
+        feederLossDb = 1.0,
+        frequencyMHz = 868.0,
+        bandwidthKhz = 125.0,
+        spreadingFactor = 9,
+        kFactor = 4.0 / 3.0,
+        surfaceRefractivity = 301.0,
+        maxRangeKm = 40.0,
+        radials = 24,
+        stepM = 200.0,
     )
 
     private val flat: (Double, Double) -> Double = { _, _ -> 250.0 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,13 @@ object PlannerClock {
     fun formatUtcMinute(epochMillis: Long): String {
         val (y, m, d) = civil(epochMillis)
         val minuteOfDay = epochMillis.mod(MS_PER_DAY) / MS_PER_MINUTE
-        return "${pad(y, 4)}-${pad(m, 2)}-${pad(d, 2)} ${pad(minuteOfDay / MINUTES_PER_HOUR, 2)}:${pad(minuteOfDay % MINUTES_PER_HOUR, 2)}"
+        return "${pad(
+            y,
+            4,
+        )}-${pad(
+            m,
+            2,
+        )}-${pad(d, 2)} ${pad(minuteOfDay / MINUTES_PER_HOUR, 2)}:${pad(minuteOfDay % MINUTES_PER_HOUR, 2)}"
     }
 
     /** "yyyyMMdd_HHmm" (UTC) for file names. */

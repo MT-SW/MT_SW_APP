@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,43 +23,83 @@ import kotlin.test.assertTrue
 
 internal fun assertJson(s: String) {
     var i = 0
-    fun ws() { while (i < s.length && s[i] in " \n\r\t") i++ }
+    fun ws() {
+        while (i < s.length && s[i] in " \n\r\t") i++
+    }
     fun str() {
-        assertEquals('"', s[i]); i++
-        while (s[i] != '"') { assertTrue(s[i].code >= 0x20, "raw control char"); if (s[i] == '\\') i++; i++ }
+        assertEquals('"', s[i])
+        i++
+        while (s[i] != '"') {
+            assertTrue(s[i].code >= 0x20, "raw control char")
+            if (s[i] == '\\') i++
+            i++
+        }
         i++
     }
     fun value() {
         ws()
         when (val c = s[i]) {
             '{' -> {
-                i++; ws()
-                if (s[i] == '}') { i++; return }
+                i++
+                ws()
+                if (s[i] == '}') {
+                    i++
+                    return
+                }
                 while (true) {
-                    ws(); assertEquals('"', s[i]); str(); ws(); assertEquals(':', s[i]); i++; value(); ws()
-                    if (s[i] == ',') { i++; continue }
-                    assertEquals('}', s[i]); i++; return
+                    ws()
+                    assertEquals('"', s[i])
+                    str()
+                    ws()
+                    assertEquals(':', s[i])
+                    i++
+                    value()
+                    ws()
+                    if (s[i] == ',') {
+                        i++
+                        continue
+                    }
+                    assertEquals('}', s[i])
+                    i++
+                    return
                 }
             }
+
             '[' -> {
-                i++; ws()
-                if (s[i] == ']') { i++; return }
+                i++
+                ws()
+                if (s[i] == ']') {
+                    i++
+                    return
+                }
                 while (true) {
-                    value(); ws()
-                    if (s[i] == ',') { i++; continue }
-                    assertEquals(']', s[i]); i++; return
+                    value()
+                    ws()
+                    if (s[i] == ',') {
+                        i++
+                        continue
+                    }
+                    assertEquals(']', s[i])
+                    i++
+                    return
                 }
             }
+
             '"' -> str()
+
             else -> {
                 val st = i
                 while (i < s.length && s[i] !in ",]} \n\r\t") i++
                 val t = s.substring(st, i)
-                assertTrue(t == "true" || t == "false" || t == "null" || Regex("-?\\d+(\\.\\d+)?").matches(t), "bad token '$t' ($c)")
+                assertTrue(
+                    t == "true" || t == "false" || t == "null" || Regex("-?\\d+(\\.\\d+)?").matches(t),
+                    "bad token '$t' ($c)",
+                )
             }
         }
     }
-    value(); ws()
+    value()
+    ws()
     assertEquals(s.length, i, "trailing data")
 }
 
@@ -115,7 +155,12 @@ class ExportFormatsTest {
             if (lt < 0) break
             val text = s.substring(i, lt)
             assertFalse(text.contains('>') || text.contains('<'), "raw bracket in text")
-            for (m in Regex("&[^;\\s]*;?").findAll(text)) assertTrue(m.value in listOf("&amp;", "&lt;", "&gt;", "&quot;", "&apos;"), "entity ${m.value}")
+            for (m in Regex("&[^;\\s]*;?").findAll(text)) {
+                assertTrue(
+                    m.value in listOf("&amp;", "&lt;", "&gt;", "&quot;", "&apos;"),
+                    "entity ${m.value}",
+                )
+            }
             val gt = s.indexOf('>', lt)
             val tag = s.substring(lt + 1, gt)
             assertFalse(tag.contains('<'))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,9 +99,8 @@ internal fun verdictText(verdict: LinkVerdict): String = stringResource(
 )
 
 @Composable
-internal fun sideName(side: PlannerSide): String = stringResource(
-    if (side == PlannerSide.A) Res.string.planner_point_a else Res.string.planner_point_b,
-)
+internal fun sideName(side: PlannerSide): String =
+    stringResource(if (side == PlannerSide.A) Res.string.planner_point_a else Res.string.planner_point_b)
 
 @Composable
 internal fun errorText(error: PlannerError): String = stringResource(

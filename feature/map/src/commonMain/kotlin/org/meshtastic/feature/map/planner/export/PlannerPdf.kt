@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,8 @@
  */
 package org.meshtastic.feature.map.planner.export
 
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
 import org.meshtastic.core.ui.util.PdfFile
 import org.meshtastic.core.ui.util.PdfText
 
@@ -39,55 +35,164 @@ object PlannerPdf {
         var sb = StringBuilder()
         var y = TOP
 
-        init { pages.add(sb) }
+        init {
+            pages.add(sb)
+        }
 
-        fun newPage() { sb = StringBuilder(); pages.add(sb); y = TOP }
-        fun ensure(h: Double): Boolean { if (y - h < BOTTOM) { newPage(); return true }; return false }
+        fun newPage() {
+            sb = StringBuilder()
+            pages.add(sb)
+            y = TOP
+        }
+
+        fun ensure(h: Double): Boolean {
+            if (y - h < BOTTOM) {
+                newPage()
+                return true
+            }
+            return false
+        }
 
         fun f(v: Double) = Num.fmt(v, 2)
-        fun fill(c: Int) { sb.append(col((c shr 16) and 255)).append(' ').append(col((c shr 8) and 255)).append(' ').append(col(c and 255)).append(" rg\n") }
-        fun stroke(c: Int) { sb.append(col((c shr 16) and 255)).append(' ').append(col((c shr 8) and 255)).append(' ').append(col(c and 255)).append(" RG\n") }
+
+        fun fill(c: Int) {
+            sb.append(col((c shr 16) and 255))
+                .append(' ')
+                .append(col((c shr 8) and 255))
+                .append(' ')
+                .append(col(c and 255))
+                .append(" rg\n")
+        }
+
+        fun stroke(c: Int) {
+            sb.append(col((c shr 16) and 255))
+                .append(' ')
+                .append(col((c shr 8) and 255))
+                .append(' ')
+                .append(col(c and 255))
+                .append(" RG\n")
+        }
+
         private fun col(v: Int) = Num.fmt(v / 255.0, 3)
-        fun width(w: Double) { sb.append(f(w)).append(" w\n") }
-        fun rect(x: Double, y: Double, w: Double, h: Double, color: Int) { fill(color); sb.append(f(x)).append(' ').append(f(y)).append(' ').append(f(w)).append(' ').append(f(h)).append(" re f\n") }
-        fun strokeRect(x: Double, y: Double, w: Double, h: Double, color: Int, lw: Double) { stroke(color); width(lw); sb.append(f(x)).append(' ').append(f(y)).append(' ').append(f(w)).append(' ').append(f(h)).append(" re S\n") }
-        fun line(x0: Double, y0: Double, x1: Double, y1: Double, color: Int, lw: Double) { stroke(color); width(lw); sb.append(f(x0)).append(' ').append(f(y0)).append(" m ").append(f(x1)).append(' ').append(f(y1)).append(" l S\n") }
+
+        fun width(w: Double) {
+            sb.append(f(w)).append(" w\n")
+        }
+
+        fun rect(x: Double, y: Double, w: Double, h: Double, color: Int) {
+            fill(color)
+            sb.append(f(x)).append(' ').append(f(y)).append(' ').append(f(w)).append(' ').append(f(h)).append(" re f\n")
+        }
+
+        fun strokeRect(x: Double, y: Double, w: Double, h: Double, color: Int, lw: Double) {
+            stroke(color)
+            width(lw)
+            sb.append(f(x)).append(' ').append(f(y)).append(' ').append(f(w)).append(' ').append(f(h)).append(" re S\n")
+        }
+
+        fun line(x0: Double, y0: Double, x1: Double, y1: Double, color: Int, lw: Double) {
+            stroke(color)
+            width(lw)
+            sb.append(f(x0))
+                .append(' ')
+                .append(f(y0))
+                .append(" m ")
+                .append(f(x1))
+                .append(' ')
+                .append(f(y1))
+                .append(" l S\n")
+        }
+
         fun polygon(xs: DoubleArray, ys: DoubleArray, color: Int) {
             if (xs.size < 3) return
             fill(color)
-            for (i in xs.indices) sb.append(f(xs[i])).append(' ').append(f(ys[i])).append(if (i == 0) " m\n" else " l\n")
+            for (i in xs.indices) sb.append(f(xs[i]))
+                .append(' ')
+                .append(f(ys[i]))
+                .append(if (i == 0) " m\n" else " l\n")
             sb.append("h f\n")
         }
+
         fun polyline(xs: DoubleArray, ys: DoubleArray, color: Int, lw: Double) {
             if (xs.size < 2) return
-            stroke(color); width(lw)
-            for (i in xs.indices) sb.append(f(xs[i])).append(' ').append(f(ys[i])).append(if (i == 0) " m\n" else " l\n")
+            stroke(color)
+            width(lw)
+            for (i in xs.indices) sb.append(f(xs[i]))
+                .append(' ')
+                .append(f(ys[i]))
+                .append(if (i == 0) " m\n" else " l\n")
             sb.append("S\n")
         }
+
         fun text(x: Double, y: Double, size: Double, bold: Boolean, s: String, color: Int = 0x222222) {
             if (s.isEmpty()) return
             fill(color)
-            sb.append("BT /").append(if (bold) "F2 " else "F1 ").append(f(size)).append(" Tf ").append(f(x)).append(' ').append(f(y)).append(" Td ").append(PdfText.literal(s)).append(" Tj ET\n")
+            sb.append("BT /")
+                .append(if (bold) "F2 " else "F1 ")
+                .append(f(size))
+                .append(" Tf ")
+                .append(f(x))
+                .append(' ')
+                .append(f(y))
+                .append(" Td ")
+                .append(PdfText.literal(s))
+                .append(" Tj ET\n")
         }
+
         fun textRight(xr: Double, y: Double, size: Double, bold: Boolean, s: String, color: Int = 0x222222) =
             text(xr - PdfText.width(s, bold, size), y, size, bold, s, color)
+
         fun textCenter(xc: Double, y: Double, size: Double, bold: Boolean, s: String, color: Int = 0x222222) =
             text(xc - PdfText.width(s, bold, size) / 2, y, size, bold, s, color)
+
         fun textUp(x: Double, y: Double, size: Double, bold: Boolean, s: String, color: Int = 0x222222) {
             if (s.isEmpty()) return
             fill(color)
-            sb.append("BT /").append(if (bold) "F2 " else "F1 ").append(f(size)).append(" Tf 0 1 -1 0 ").append(f(x)).append(' ').append(f(y)).append(" Tm ").append(PdfText.literal(s)).append(" Tj ET\n")
+            sb.append("BT /")
+                .append(if (bold) "F2 " else "F1 ")
+                .append(f(size))
+                .append(" Tf 0 1 -1 0 ")
+                .append(f(x))
+                .append(' ')
+                .append(f(y))
+                .append(" Tm ")
+                .append(PdfText.literal(s))
+                .append(" Tj ET\n")
         }
-        fun clipRect(x: Double, y: Double, w: Double, h: Double) { sb.append("q ").append(f(x)).append(' ').append(f(y)).append(' ').append(f(w)).append(' ').append(f(h)).append(" re W n\n") }
-        fun restore() { sb.append("Q\n") }
+
+        fun clipRect(x: Double, y: Double, w: Double, h: Double) {
+            sb.append("q ")
+                .append(f(x))
+                .append(' ')
+                .append(f(y))
+                .append(' ')
+                .append(f(w))
+                .append(' ')
+                .append(f(h))
+                .append(" re W n\n")
+        }
+
+        fun restore() {
+            sb.append("Q\n")
+        }
     }
 
     fun render(report: PlannerReport): ByteArray {
         val d = Doc()
         // title block
-        for (l in PdfText.wrap(report.title, true, 20.0, CW)) { d.y -= 22.0; d.text(ML, d.y, 20.0, true, l, 0x111111) }
-        if (report.subtitle.isNotEmpty()) for (l in PdfText.wrap(report.subtitle, false, 11.0, CW)) { d.y -= 14.0; d.text(ML, d.y, 11.0, false, l, 0x444444) }
-        if (report.generatedAt.isNotEmpty()) { d.y -= 13.0; d.text(ML, d.y, 9.0, false, report.generatedAt, 0x777777) }
+        for (l in PdfText.wrap(report.title, true, 20.0, CW)) {
+            d.y -= 22.0
+            d.text(ML, d.y, 20.0, true, l, 0x111111)
+        }
+        if (report.subtitle.isNotEmpty())
+            for (l in PdfText.wrap(report.subtitle, false, 11.0, CW)) {
+                d.y -= 14.0
+                d.text(ML, d.y, 11.0, false, l, 0x444444)
+            }
+        if (report.generatedAt.isNotEmpty()) {
+            d.y -= 13.0
+            d.text(ML, d.y, 9.0, false, report.generatedAt, 0x777777)
+        }
         d.y -= 8.0
         d.line(ML, d.y, ML + CW, d.y, 0x1565C0, 1.5)
         d.y -= 14.0
@@ -131,13 +236,22 @@ object PlannerPdf {
             val lab = PdfText.wrap(r.label, true, 9.0, labelW - 2 * pad - 2)
             val vals = PdfText.wrap(r.value, false, 9.0, CW - labelW - 2 * pad - 2)
             val h = max(lab.size, vals.size) * lh + 2 * pad
-            if (d.ensure(h)) { heading(); shade = false }
+            if (d.ensure(h)) {
+                heading()
+                shade = false
+            }
             if (shade) d.rect(ML, d.y - h, CW, h, 0xF5F5F5)
             shade = !shade
             var ty = d.y - pad - 8.0
-            for (l in lab) { d.text(ML + pad + 1, ty, 9.0, true, l, 0x333333); ty -= lh }
+            for (l in lab) {
+                d.text(ML + pad + 1, ty, 9.0, true, l, 0x333333)
+                ty -= lh
+            }
             ty = d.y - pad - 8.0
-            for (l in vals) { d.text(ML + labelW + pad, ty, 9.0, false, l, 0x111111); ty -= lh }
+            for (l in vals) {
+                d.text(ML + labelW + pad, ty, 9.0, false, l, 0x111111)
+                ty -= lh
+            }
             d.y -= h
         }
         d.line(ML, d.y, ML + CW, d.y, 0xCCCCCC, 0.5)
@@ -156,7 +270,10 @@ object PlannerPdf {
         d.y -= 8.0
         val ox = ML
         val oyTop = d.y
-        val left = 52.0; val right = 10.0; val top = 22.0; val bottom = 34.0
+        val left = 52.0
+        val right = 10.0
+        val top = 22.0
+        val bottom = 34.0
         val px0 = ox + left
         val pw = CW - left - right
         val ph = h - top - bottom
@@ -165,24 +282,41 @@ object PlannerPdf {
         val c = ChartData(p)
         fun sx(v: Double) = px0 + (v - c.xMin) / (c.xMax - c.xMin) * pw
         fun sy(v: Double) = pyBot + (v - c.yMin) / (c.yMax - c.yMin) * ph
-        val xt = c.xTicks(); val yt = c.yTicks()
-        val xd = ChartData.decimalsFor(xt); val yd = ChartData.decimalsFor(yt)
+        val xt = c.xTicks()
+        val yt = c.yTicks()
+        val xd = ChartData.decimalsFor(xt)
+        val yd = ChartData.decimalsFor(yt)
         d.rect(px0, pyBot, pw, ph, 0xFFFFFF)
         for (t in yt) d.line(px0, sy(t), px0 + pw, sy(t), 0xE0E0E0, 0.4)
         for (t in xt) d.line(sx(t), pyBot, sx(t), pyTop, 0xE0E0E0, 0.4)
         if (c.valid) {
             val n = c.n
             d.clipRect(px0, pyBot, pw, ph)
-            val fx = DoubleArray(2 * n); val fy = DoubleArray(2 * n)
-            for (i in 0 until n) { fx[i] = sx(c.x[i]); fy[i] = sy(c.up[i]) }
-            for (i in 0 until n) { fx[n + i] = sx(c.x[n - 1 - i]); fy[n + i] = sy(c.lo[n - 1 - i]) }
+            val fx = DoubleArray(2 * n)
+            val fy = DoubleArray(2 * n)
+            for (i in 0 until n) {
+                fx[i] = sx(c.x[i])
+                fy[i] = sy(c.up[i])
+            }
+            for (i in 0 until n) {
+                fx[n + i] = sx(c.x[n - 1 - i])
+                fy[n + i] = sy(c.lo[n - 1 - i])
+            }
             d.polygon(fx, fy, 0xBFD9F2)
-            val gx = DoubleArray(n + 2); val gy = DoubleArray(n + 2)
-            for (i in 0 until n) { gx[i] = sx(c.x[i]); gy[i] = sy(c.ground[i]) }
-            gx[n] = gx[n - 1]; gy[n] = pyBot; gx[n + 1] = gx[0]; gy[n + 1] = pyBot
+            val gx = DoubleArray(n + 2)
+            val gy = DoubleArray(n + 2)
+            for (i in 0 until n) {
+                gx[i] = sx(c.x[i])
+                gy[i] = sy(c.ground[i])
+            }
+            gx[n] = gx[n - 1]
+            gy[n] = pyBot
+            gx[n + 1] = gx[0]
+            gy[n + 1] = pyBot
             d.polygon(gx, gy, 0xB89F78)
             d.polyline(gx.copyOf(n), gy.copyOf(n), 0x6B5636, 0.8)
-            val lx = DoubleArray(n) { sx(c.x[it]) }; val ly = DoubleArray(n) { sy(c.los[it]) }
+            val lx = DoubleArray(n) { sx(c.x[it]) }
+            val ly = DoubleArray(n) { sy(c.los[it]) }
             d.polyline(lx, ly, 0xD32F2F, 1.4)
             d.restore()
         }
@@ -197,7 +331,14 @@ object PlannerPdf {
             d.textRight(px0 - 5, sy(t) - 2.5, 7.0, false, Num.fmt(t, yd), 0x333333)
         }
         d.textCenter(px0 + pw / 2, pyBot - 25, 8.0, false, p.xAxisLabel, 0x222222)
-        d.textUp(ox + 9, pyBot + ph / 2 - PdfText.width(p.yAxisLabel, false, 8.0) / 2, 8.0, false, p.yAxisLabel, 0x222222)
+        d.textUp(
+            ox + 9,
+            pyBot + ph / 2 - PdfText.width(p.yAxisLabel, false, 8.0) / 2,
+            8.0,
+            false,
+            p.yAxisLabel,
+            0x222222,
+        )
         d.text(px0, pyTop + 6, 11.0, true, p.labelA, 0x111111)
         d.textRight(px0 + pw, pyTop + 6, 11.0, true, p.labelB, 0x111111)
         d.y = oyTop - h - 6
@@ -226,27 +367,87 @@ object PlannerPdf {
         val scale = size / (2 * half)
         val cellKm = CoverageBins.cellKm(xs, ys)
         val side = max(1.2, cellKm * scale * 1.02)
-        val cx = x0 + size / 2; val cy = yBot + size / 2
+        val cx = x0 + size / 2
+        val cy = yBot + size / 2
 
         d.clipRect(x0, yBot, size, size)
-        val order = cov.samples.indices.filter { !cov.samples[it].marginDb.isNaN() }.groupBy { CoverageBins.index(cov, cov.samples[it].marginDb) }
+        val order =
+            cov.samples.indices
+                .filter { !cov.samples[it].marginDb.isNaN() }
+                .groupBy { CoverageBins.index(cov, cov.samples[it].marginDb) }
         for (idx in order.keys.sorted().reversed()) {
             d.fill(CoverageBins.color(cov, idx))
             for (i in order[idx]!!) {
-                d.sb.append(d.f(cx + xs[i] * scale - side / 2)).append(' ').append(d.f(cy + ys[i] * scale - side / 2)).append(' ')
-                    .append(d.f(side)).append(' ').append(d.f(side)).append(" re f\n")
+                d.sb
+                    .append(d.f(cx + xs[i] * scale - side / 2))
+                    .append(' ')
+                    .append(d.f(cy + ys[i] * scale - side / 2))
+                    .append(' ')
+                    .append(d.f(side))
+                    .append(' ')
+                    .append(d.f(side))
+                    .append(" re f\n")
             }
         }
         // range ring
         if (cov.maxRangeKm > 0) {
             val r = cov.maxRangeKm * scale
             val k = 0.5523 * r
-            d.stroke(0x555555); d.width(0.6)
+            d.stroke(0x555555)
+            d.width(0.6)
             d.sb.append("[3 3] 0 d ").append(d.f(cx + r)).append(' ').append(d.f(cy)).append(" m ")
-            d.sb.append(d.f(cx + r)).append(' ').append(d.f(cy + k)).append(' ').append(d.f(cx + k)).append(' ').append(d.f(cy + r)).append(' ').append(d.f(cx)).append(' ').append(d.f(cy + r)).append(" c ")
-            d.sb.append(d.f(cx - k)).append(' ').append(d.f(cy + r)).append(' ').append(d.f(cx - r)).append(' ').append(d.f(cy + k)).append(' ').append(d.f(cx - r)).append(' ').append(d.f(cy)).append(" c ")
-            d.sb.append(d.f(cx - r)).append(' ').append(d.f(cy - k)).append(' ').append(d.f(cx - k)).append(' ').append(d.f(cy - r)).append(' ').append(d.f(cx)).append(' ').append(d.f(cy - r)).append(" c ")
-            d.sb.append(d.f(cx + k)).append(' ').append(d.f(cy - r)).append(' ').append(d.f(cx + r)).append(' ').append(d.f(cy - k)).append(' ').append(d.f(cx + r)).append(' ').append(d.f(cy)).append(" c S [] 0 d\n")
+            d.sb
+                .append(d.f(cx + r))
+                .append(' ')
+                .append(d.f(cy + k))
+                .append(' ')
+                .append(d.f(cx + k))
+                .append(' ')
+                .append(d.f(cy + r))
+                .append(' ')
+                .append(d.f(cx))
+                .append(' ')
+                .append(d.f(cy + r))
+                .append(" c ")
+            d.sb
+                .append(d.f(cx - k))
+                .append(' ')
+                .append(d.f(cy + r))
+                .append(' ')
+                .append(d.f(cx - r))
+                .append(' ')
+                .append(d.f(cy + k))
+                .append(' ')
+                .append(d.f(cx - r))
+                .append(' ')
+                .append(d.f(cy))
+                .append(" c ")
+            d.sb
+                .append(d.f(cx - r))
+                .append(' ')
+                .append(d.f(cy - k))
+                .append(' ')
+                .append(d.f(cx - k))
+                .append(' ')
+                .append(d.f(cy - r))
+                .append(' ')
+                .append(d.f(cx))
+                .append(' ')
+                .append(d.f(cy - r))
+                .append(" c ")
+            d.sb
+                .append(d.f(cx + k))
+                .append(' ')
+                .append(d.f(cy - r))
+                .append(' ')
+                .append(d.f(cx + r))
+                .append(' ')
+                .append(d.f(cy - k))
+                .append(' ')
+                .append(d.f(cx + r))
+                .append(' ')
+                .append(d.f(cy))
+                .append(" c S [] 0 d\n")
         }
         // centre marker
         d.rect(cx - 4, cy - 4, 8.0, 8.0, 0xFFFFFF)
@@ -276,15 +477,20 @@ object PlannerPdf {
             d.rect(lx, ly - 2, 12.0, 12.0, CoverageBins.color(cov, i))
             d.strokeRect(lx, ly - 2, 12.0, 12.0, 0x666666, 0.4)
             var ty = ly
-            for (l in lines) { d.text(lx + 18, ty, 9.0, false, l, 0x222222); ty -= 11 }
+            for (l in lines) {
+                d.text(lx + 18, ty, 9.0, false, l, 0x222222)
+                ty -= 11
+            }
             ly -= max(18.0, lines.size * 11.0 + 6)
         }
         d.y = yBot - 12
     }
 
     private fun pointsBlock(d: Doc, pts: List<ReportPoint>) {
-        val w1 = 150.0; val w2 = 115.0
-        val lh = 11.0; val pad = 3.0
+        val w1 = 150.0
+        val w2 = 115.0
+        val lh = 11.0
+        val pad = 3.0
         d.ensure(30.0)
         d.y -= 6.0
         var shade = false
@@ -297,10 +503,16 @@ object PlannerPdf {
             if (shade) d.rect(ML, d.y - h, CW, h, 0xF5F5F5)
             shade = !shade
             var ty = d.y - pad - 8
-            for (l in n) { d.text(ML + pad, ty, 9.0, true, l, 0x111111); ty -= lh }
+            for (l in n) {
+                d.text(ML + pad, ty, 9.0, true, l, 0x111111)
+                ty -= lh
+            }
             d.text(ML + w1, d.y - pad - 8, 9.0, false, coord, 0x333333)
             ty = d.y - pad - 8
-            for (l in ds) { d.text(ML + w1 + w2, ty, 9.0, false, l, 0x333333); ty -= lh }
+            for (l in ds) {
+                d.text(ML + w1 + w2, ty, 9.0, false, l, 0x333333)
+                ty -= lh
+            }
             d.y -= h
         }
         d.line(ML, d.y, ML + CW, d.y, 0xCCCCCC, 0.5)
@@ -316,7 +528,10 @@ object PlannerPdf {
             d.ensure(h)
             d.text(ML, d.y - 8, 8.0, false, "•", 0x555555)
             var ty = d.y - 8
-            for (l in lines) { d.text(ML + 10, ty, 8.0, false, l, 0x555555); ty -= 10 }
+            for (l in lines) {
+                d.text(ML + 10, ty, 8.0, false, l, 0x555555)
+                ty -= 10
+            }
             d.y -= h
         }
     }
@@ -325,5 +540,4 @@ object PlannerPdf {
 
     private fun assemble(contents: List<String>, title: String): ByteArray =
         PdfFile.assemble(contents, title, "Planer MT_SW")
-
 }

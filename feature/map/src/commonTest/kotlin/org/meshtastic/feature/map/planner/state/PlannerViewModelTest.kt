@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,12 +39,13 @@ class PlannerViewModelTest {
     private val elevation = FakeElevation()
     private val weather = FakeWeather()
     private val clutter = FakeClutter()
-    private val nodes = FakeNodes(
-        listOf(
-            nodeOption(1, POINT_A, ours = true),
-            nodeOption(2, POINT_B, snr = 4.0f, rssi = -105),
-        ),
-    )
+    private val nodes =
+        FakeNodes(
+            listOf(
+                nodeOption(1, POINT_A, ours = true),
+                nodeOption(2, POINT_B, snr = 4.0f, rssi = -105),
+            ),
+        )
 
     @BeforeTest
     fun setUp() {
@@ -63,7 +64,8 @@ class PlannerViewModelTest {
         return vm
     }
 
-    private val PlannerViewModel.state get() = uiState.value
+    private val PlannerViewModel.state
+        get() = uiState.value
 
     @Test
     fun defaults() {

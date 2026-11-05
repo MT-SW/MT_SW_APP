@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PathProfile
 import org.meshtastic.feature.map.planner.ProfileSeries
 import org.meshtastic.feature.map.planner.data.ClutterMap
+import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.NoClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerClutter
-import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.PlannerClutterException
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
@@ -67,8 +67,8 @@ data class PlannerResults(
 )
 
 /**
- * The calculation pipeline as a plain suspend function (no ViewModel involved, so it is testable with fakes):
- * terrain -> optional weather -> ITM link budget -> chart series -> comparison with a measured node.
+ * The calculation pipeline as a plain suspend function (no ViewModel involved, so it is testable with fakes): terrain
+ * -> optional weather -> ITM link budget -> chart series -> comparison with a measured node.
  *
  * @param computeDispatcher where the CPU heavy ITM runs.
  * @param clockMs time source for the weather cache.
@@ -82,7 +82,8 @@ class PlannerComputer(
     private val clutter: PlannerClutterSource = NoClutterSource,
 ) {
     /** Progress of a large OpenStreetMap download (null when none runs); shown while the coverage is being prepared. */
-    val clutterProgress: StateFlow<ClutterProgress?> get() = clutter.progress
+    val clutterProgress: StateFlow<ClutterProgress?>
+        get() = clutter.progress
 
     private var cachedKey: String? = null
     private var cachedAtMs: Long = 0L
@@ -111,19 +112,21 @@ class PlannerComputer(
                     k = r.conditions.analysis.kFactor
                     n0 = r.conditions.analysis.seaLevelN
                 }
+
                 is PlannerWeatherResult.Failure -> status = PlannerWeatherStatus.Failed(r.error)
             }
         }
 
-        val profile: PathProfile = try {
-            elevation.profile(pa, pb)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: PlannerElevationException) {
-            return empty(mapElevation(e), status, k, n0)
-        } catch (e: Exception) {
-            return empty(PlannerError.COMPUTE_FAILED, status, k, n0)
-        }
+        val profile: PathProfile =
+            try {
+                elevation.profile(pa, pb)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PlannerElevationException) {
+                return empty(mapElevation(e), status, k, n0)
+            } catch (e: Exception) {
+                return empty(PlannerError.COMPUTE_FAILED, status, k, n0)
+            }
 
         val n = profile.intervals
         val autoA = profile.groundM[0]
@@ -140,18 +143,20 @@ class PlannerComputer(
                 val heights = state.clutterHeights
                 val totalM = profile.stepM * n
                 val clearM = PlannerClutter.CLEAR_AROUND_ANTENNA_M
-                val withObstacles = withContext(computeDispatcher) {
-                    PlannerClutter.withClutter(
-                        ground = ground,
-                        stepM = profile.stepM,
-                        clutterAt = { i ->
-                            val p = Geodesy.interpolate(pa, pb, if (totalM > 0.0) i * profile.stepM / totalM else 0.0)
-                            map.heightAt(p.lat, p.lon, heights)
-                        },
-                        clearStartM = clearM,
-                        clearEndM = clearM,
-                    )
-                }
+                val withObstacles =
+                    withContext(computeDispatcher) {
+                        PlannerClutter.withClutter(
+                            ground = ground,
+                            stepM = profile.stepM,
+                            clutterAt = { i ->
+                                val p =
+                                    Geodesy.interpolate(pa, pb, if (totalM > 0.0) i * profile.stepM / totalM else 0.0)
+                                map.heightAt(p.lat, p.lon, heights)
+                            },
+                            clearStartM = clearM,
+                            clearEndM = clearM,
+                        )
+                    }
                 withObstacles.copyInto(ground)
                 clutterStatus = PlannerClutterStatus.Ready(map.stats)
             } catch (e: CancellationException) {
@@ -159,9 +164,10 @@ class PlannerComputer(
             } catch (e: PlannerClutterException) {
                 clutterStatus = PlannerClutterStatus.Failed(e.failure, e.detail)
             } catch (e: Exception) {
-                clutterStatus = PlannerClutterStatus.Failed(
-                    org.meshtastic.feature.map.planner.data.PlannerClutterFailure.BAD_RESPONSE,
-                )
+                clutterStatus =
+                    PlannerClutterStatus.Failed(
+                        org.meshtastic.feature.map.planner.data.PlannerClutterFailure.BAD_RESPONSE,
+                    )
             }
         }
         val used = PathProfile(profile.stepM, ground)
@@ -170,22 +176,24 @@ class PlannerComputer(
         val distKm = used.distanceM / 1000.0
         val atmo = atmosphericLossDb(state.frequencyMHz, conditions, distKm)
 
-        val input = LinkInput(
-            a = linkEnd(state.a, pa, ground[0]),
-            b = linkEnd(state.b, pb, ground[n]),
-            frequencyMHz = state.frequencyMHz,
-            bandwidthKhz = state.bandwidthKhz,
-            spreadingFactor = state.spreadingFactor,
-            noiseFigureDb = state.noiseFigureDb,
-            kFactor = k,
-            surfaceRefractivity = n0,
-            extraLossDb = extraDb + atmo,
-        )
+        val input =
+            LinkInput(
+                a = linkEnd(state.a, pa, ground[0]),
+                b = linkEnd(state.b, pb, ground[n]),
+                frequencyMHz = state.frequencyMHz,
+                bandwidthKhz = state.bandwidthKhz,
+                spreadingFactor = state.spreadingFactor,
+                noiseFigureDb = state.noiseFigureDb,
+                kFactor = k,
+                surfaceRefractivity = n0,
+                extraLossDb = extraDb + atmo,
+            )
         return try {
-            val (link, series) = withContext(computeDispatcher) {
-                val l = LinkBudget.analyze(input, used)
-                l to LinkBudget.series(input, used)
-            }
+            val (link, series) =
+                withContext(computeDispatcher) {
+                    val l = LinkBudget.analyze(input, used)
+                    l to LinkBudget.series(input, used)
+                }
             PlannerResults(
                 link = link,
                 series = series,
@@ -221,43 +229,49 @@ class PlannerComputer(
         var clutterMap: ClutterMap? = null
         if (state.preciseTerrain) {
             // Only within the radius OpenStreetMap data is requested for; farther out the preset loss still applies.
-            clutterMap = try {
-                clutter.forArea(center, min(state.coverageMaxRangeKm, state.clutterRadiusKm))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: PlannerClutterException) {
-                onClutterFailure(e.failure, e.detail)
-                null
-            } catch (e: Exception) {
-                onClutterFailure(PlannerClutterFailure.BAD_RESPONSE, null)
-                null
-            }
+            clutterMap =
+                try {
+                    clutter.forArea(center, min(state.coverageMaxRangeKm, state.clutterRadiusKm))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: PlannerClutterException) {
+                    onClutterFailure(e.failure, e.detail)
+                    null
+                } catch (e: Exception) {
+                    onClutterFailure(PlannerClutterFailure.BAD_RESPONSE, null)
+                    null
+                }
         }
         val heights = state.clutterHeights
-        val clutterAt: ((Double, Double) -> Double)? = clutterMap?.let { m -> { lat, lon -> m.heightAt(lat, lon, heights) } }
+        val clutterAt: ((Double, Double) -> Double)? = clutterMap?.let { m ->
+            { lat, lon -> m.heightAt(lat, lon, heights) }
+        }
         val manualGround = end.groundAltM
         val ground = if (end.groundAltManual && manualGround != null) manualGround else sampler(center.lat, center.lon)
-        val input = CoverageInput(
-            center = center,
-            groundAltM = ground,
-            antennaHeightM = end.antennaHeightM,
-            txPowerDbm = end.txPowerDbm,
-            antennaGainDbi = end.antennaGainDbi,
-            feederLossDb = end.feederLossDb,
-            rxAntennaHeightM = state.coverageRxHeightM,
-            rxGainDbi = state.coverageRxGainDbi,
-            frequencyMHz = state.frequencyMHz,
-            bandwidthKhz = state.bandwidthKhz,
-            spreadingFactor = state.spreadingFactor,
-            noiseFigureDb = state.noiseFigureDb,
-            kFactor = state.kFactor,
-            surfaceRefractivity = state.surfaceRefractivity,
-            extraLossDb = if (clutterMap != null) state.effectiveExtraLossDb else state.extraLossDb,
-            maxRangeKm = state.coverageMaxRangeKm,
-            radials = state.coverageRadials,
-            rangeSteps = (state.coverageMaxRangeKm * 2.0).toInt().coerceIn(60, 150),
-        )
-        return withContext(computeDispatcher) { Coverage.compute(input, sampler, clutterAt = clutterAt, onProgress = onProgress) }
+        val input =
+            CoverageInput(
+                center = center,
+                groundAltM = ground,
+                antennaHeightM = end.antennaHeightM,
+                txPowerDbm = end.txPowerDbm,
+                antennaGainDbi = end.antennaGainDbi,
+                feederLossDb = end.feederLossDb,
+                rxAntennaHeightM = state.coverageRxHeightM,
+                rxGainDbi = state.coverageRxGainDbi,
+                frequencyMHz = state.frequencyMHz,
+                bandwidthKhz = state.bandwidthKhz,
+                spreadingFactor = state.spreadingFactor,
+                noiseFigureDb = state.noiseFigureDb,
+                kFactor = state.kFactor,
+                surfaceRefractivity = state.surfaceRefractivity,
+                extraLossDb = if (clutterMap != null) state.effectiveExtraLossDb else state.extraLossDb,
+                maxRangeKm = state.coverageMaxRangeKm,
+                radials = state.coverageRadials,
+                rangeSteps = (state.coverageMaxRangeKm * 2.0).toInt().coerceIn(60, 150),
+            )
+        return withContext(computeDispatcher) {
+            Coverage.compute(input, sampler, clutterAt = clutterAt, onProgress = onProgress)
+        }
     }
 
     // ---- helpers ----
@@ -267,8 +281,16 @@ class PlannerComputer(
         val ga = if (pa != null) altitudeOrNull(pa) else null
         val gb = if (pb != null) altitudeOrNull(pb) else null
         return PlannerResults(
-            null, null, ga, gb, PlannerWeatherStatus.Idle, PlannerUiState.DEFAULT_K, PlannerUiState.DEFAULT_N0,
-            0.0, null, null,
+            null,
+            null,
+            ga,
+            gb,
+            PlannerWeatherStatus.Idle,
+            PlannerUiState.DEFAULT_K,
+            PlannerUiState.DEFAULT_N0,
+            0.0,
+            null,
+            null,
         )
     }
 
@@ -338,7 +360,11 @@ class PlannerComputer(
          * Prediction versus the last measurement: applies when one end is a mesh node (not ours) with a measurement and
          * the other end is our station. Pure, so the ViewModel can refresh it cheaply when node data changes.
          */
-        fun compareMeasured(state: PlannerUiState, link: LinkResult, nodes: List<PlannerNodeOption>): MeasuredComparison? {
+        fun compareMeasured(
+            state: PlannerUiState,
+            link: LinkResult,
+            nodes: List<PlannerNodeOption>,
+        ): MeasuredComparison? {
             val ourNum = nodes.firstOrNull { it.isOurs }?.num
             fun isOurs(end: PlannerEnd): Boolean {
                 val s = end.pointSource

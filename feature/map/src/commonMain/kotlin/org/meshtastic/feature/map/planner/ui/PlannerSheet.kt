@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,8 +64,8 @@ import org.meshtastic.core.resources.planner_close
 import org.meshtastic.core.resources.planner_credits_button
 import org.meshtastic.core.resources.planner_disclaimer
 import org.meshtastic.core.resources.planner_pick_banner
-import org.meshtastic.core.resources.planner_title_by
 import org.meshtastic.core.resources.planner_title
+import org.meshtastic.core.resources.planner_title_by
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.planner.state.PlannerNodeOption
@@ -112,8 +112,8 @@ class PlannerMapBridge(
 }
 
 /**
- * "Tap a point on the map" banner for the host map; draws nothing unless [PlannerMapBridge.pickingSide] is set.
- * Place it on top of the map (for example aligned to the top centre).
+ * "Tap a point on the map" banner for the host map; draws nothing unless [PlannerMapBridge.pickingSide] is set. Place
+ * it on top of the map (for example aligned to the top centre).
  */
 @Composable
 fun PlannerMapPickBanner(bridge: PlannerMapBridge, modifier: Modifier = Modifier) {
@@ -146,8 +146,8 @@ fun PlannerMapPickBanner(bridge: PlannerMapBridge, modifier: Modifier = Modifier
 }
 
 /**
- * The MT_SW Planner as a full-height bottom sheet. While [PlannerMapBridge.pickingSide] is set the sheet is hidden
- * (its state lives in the [PlannerViewModel]) so the user can tap the map; the tap sets the point and the sheet returns.
+ * The MT_SW Planner as a full-height bottom sheet. While [PlannerMapBridge.pickingSide] is set the sheet is hidden (its
+ * state lives in the [PlannerViewModel]) so the user can tap the map; the tap sets the point and the sheet returns.
  *
  * [nodeNum]: when given, side A is preset from that node every time the sheet opens; otherwise side A is preset from
  * the connected station on first use (when it has a position).
@@ -186,7 +186,8 @@ fun PlannerSheet(visible: Boolean, nodeNum: Int?, bridge: PlannerMapBridge, onDi
             return@LaunchedEffect
         }
         if (nodeNum != null) {
-            val found = withTimeoutOrNull(NODE_WAIT_MS) { vm.nodesWithPosition.first { l -> l.any { it.num == nodeNum } } }
+            val found =
+                withTimeoutOrNull(NODE_WAIT_MS) { vm.nodesWithPosition.first { l -> l.any { it.num == nodeNum } } }
             vm.selectSide(PlannerSide.A)
             if (found != null) vm.setPointFromNode(PlannerSide.A, nodeNum)
         } else if (!vm.uiState.value.a.isComplete) {

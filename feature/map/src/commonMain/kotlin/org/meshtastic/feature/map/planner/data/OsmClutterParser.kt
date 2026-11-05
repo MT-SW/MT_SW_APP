@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ object OsmClutterParser {
      * Throws when [text] is not an Overpass answer, or when the server says it gave up (`remark`).
      *
      * @param seen keys (`id * 2 + 1` for a relation, `id * 2` for a way) of the elements taken from earlier pieces of a
-     *   large area: an element crossing the border of two pieces is answered by both and must be counted once. The
-     *   keys of this answer are added only when the whole answer was read.
+     *   large area: an element crossing the border of two pieces is answered by both and must be counted once. The keys
+     *   of this answer are added only when the whole answer was read.
      * @param thinM when above zero, outline points closer than this (m) to the previously kept one are dropped: a
      *   forest outline of a large area does not need a point every few metres, and the points are what fills memory.
      */
@@ -86,7 +86,12 @@ object OsmClutterParser {
         if (tags["natural"] == "wood" || tags["landuse"] == "forest") return ClutterKind.FOREST
         return when (tags["landuse"]) {
             "residential" -> ClutterKind.RESIDENTIAL
-            "commercial", "industrial", "retail" -> ClutterKind.COMMERCIAL
+
+            "commercial",
+            "industrial",
+            "retail",
+            -> ClutterKind.COMMERCIAL
+
             else -> null
         }
     }
@@ -154,7 +159,10 @@ object OsmClutterParser {
             if ((mo["type"] as? JsonPrimitive)?.content != "way") continue
             val geom = geometryOf(mo["geometry"]) ?: continue
             when ((mo["role"] as? JsonPrimitive)?.content) {
-                "outer", "" -> outers.add(geom)
+                "outer",
+                "",
+                -> outers.add(geom)
+
                 "inner" -> inners.add(geom)
             }
         }
@@ -181,8 +189,8 @@ object OsmClutterParser {
     }
 
     /**
-     * [ring] without the points that lie closer than [tolM] metres to the previously kept one; the first point (which is
-     * also the last of a closed ring) always stays. A ring that would be left with fewer than four points (a small
+     * [ring] without the points that lie closer than [tolM] metres to the previously kept one; the first point (which
+     * is also the last of a closed ring) always stays. A ring that would be left with fewer than four points (a small
      * building, say) is returned as it was.
      */
     internal fun thinRing(ring: DoubleArray, tolM: Double): DoubleArray {
@@ -218,8 +226,8 @@ object OsmClutterParser {
     }
 
     /**
-     * Joins way pieces that share end points into closed rings (the pieces of a multipolygon outline come in any
-     * order and direction). Pieces that never close are dropped.
+     * Joins way pieces that share end points into closed rings (the pieces of a multipolygon outline come in any order
+     * and direction). Pieces that never close are dropped.
      */
     internal fun assembleRings(pieces: List<DoubleArray>): List<DoubleArray> {
         val open = ArrayList<DoubleArray>(pieces.filter { it.size >= 4 })

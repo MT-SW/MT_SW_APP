@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package org.meshtastic.feature.map.horizon
 
+import org.meshtastic.feature.map.planner.GeoPoint
+import org.meshtastic.feature.map.planner.Geodesy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.meshtastic.feature.map.planner.GeoPoint
-import org.meshtastic.feature.map.planner.Geodesy
 
 class HorizonPanoramaTest {
     private val centre = GeoPoint(50.0, 20.0)
@@ -35,7 +35,8 @@ class HorizonPanoramaTest {
 
     @Test
     fun flatGroundHasNoSkylineAboveTheHorizontal() {
-        val profile = HorizonPanorama.build({ _, _ -> 200.0 }, centre, antennaM = 2.0, radiusM = 10_000.0, bearings = 36)
+        val profile =
+            HorizonPanorama.build({ _, _ -> 200.0 }, centre, antennaM = 2.0, radiusM = 10_000.0, bearings = 36)
         assertTrue(profile.points.all { it.angleDeg < 0.0 })
     }
 
@@ -52,7 +53,12 @@ class HorizonPanoramaTest {
         val behind = Geodesy.destination(centre, 90.0, 8_000.0)
         val beside = Geodesy.destination(centre, 270.0, 8_000.0)
         val placed =
-            HorizonPanorama.place(profile, ridgeEast, listOf(Triple(1, "behind", behind), Triple(2, "beside", beside)), targetAntennaM = 2.0)
+            HorizonPanorama.place(
+                profile,
+                ridgeEast,
+                listOf(Triple(1, "behind", behind), Triple(2, "beside", beside)),
+                targetAntennaM = 2.0,
+            )
         assertFalse(placed.first { it.nodeNum == 1 }.visible)
         assertTrue(placed.first { it.nodeNum == 2 }.visible)
     }

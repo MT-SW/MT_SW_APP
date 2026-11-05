@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.map.planner.ui
 
 import androidx.compose.runtime.Composable
@@ -45,8 +44,6 @@ import org.meshtastic.core.resources.planner_report_lbl_ducting
 import org.meshtastic.core.resources.planner_report_lbl_elevation_a
 import org.meshtastic.core.resources.planner_report_lbl_elevation_b
 import org.meshtastic.core.resources.planner_report_lbl_extra_loss
-import org.meshtastic.core.resources.planner_report_lbl_terrain_data
-import org.meshtastic.core.resources.planner_report_val_terrain_osm
 import org.meshtastic.core.resources.planner_report_lbl_feeder_approx
 import org.meshtastic.core.resources.planner_report_lbl_feeder_loss
 import org.meshtastic.core.resources.planner_report_lbl_frequency
@@ -77,6 +74,7 @@ import org.meshtastic.core.resources.planner_report_lbl_rx_power_ba
 import org.meshtastic.core.resources.planner_report_lbl_sensitivity
 import org.meshtastic.core.resources.planner_report_lbl_spreading_factor
 import org.meshtastic.core.resources.planner_report_lbl_temperature
+import org.meshtastic.core.resources.planner_report_lbl_terrain_data
 import org.meshtastic.core.resources.planner_report_lbl_total_loss
 import org.meshtastic.core.resources.planner_report_lbl_tx_power
 import org.meshtastic.core.resources.planner_report_lbl_verdict_ab
@@ -100,6 +98,7 @@ import org.meshtastic.core.resources.planner_report_section_station_a
 import org.meshtastic.core.resources.planner_report_section_station_b
 import org.meshtastic.core.resources.planner_report_section_weather
 import org.meshtastic.core.resources.planner_report_title
+import org.meshtastic.core.resources.planner_report_val_terrain_osm
 import org.meshtastic.core.resources.planner_verdict_excellent
 import org.meshtastic.core.resources.planner_verdict_good
 import org.meshtastic.core.resources.planner_verdict_marginal
@@ -109,12 +108,13 @@ import org.meshtastic.core.resources.planner_yes
 import org.meshtastic.feature.map.planner.state.PlannerReportStrings
 
 /** "Generated: yyyy-MM-dd HH:mm UTC" for the report header. */
-internal fun plannerGeneratedAt(prefix: String): String = prefix + " " + PlannerClock.formatUtcMinute(nowMillis) + " UTC"
+internal fun plannerGeneratedAt(prefix: String): String =
+    prefix + " " + PlannerClock.formatUtcMinute(nowMillis) + " UTC"
 
 /**
  * All texts of the exported reports (PDF, CSV, KML, GeoJSON, PNG) in the current app language. The time stamp
- * ([PlannerReportStrings.generatedAt]) is taken when this is called; export code refreshes it with
- * [plannerGeneratedAt] right before writing.
+ * ([PlannerReportStrings.generatedAt]) is taken when this is called; export code refreshes it with [plannerGeneratedAt]
+ * right before writing.
  */
 @Composable
 @Suppress("LongMethod")
@@ -226,5 +226,4 @@ fun rememberPlannerReportStrings(): PlannerReportStrings {
 }
 
 /** Prefix of [PlannerReportStrings.generatedAt] ("Generated:"). */
-@Composable
-internal fun plannerGeneratedPrefix(): String = stringResource(Res.string.planner_report_generated)
+@Composable internal fun plannerGeneratedPrefix(): String = stringResource(Res.string.planner_report_generated)

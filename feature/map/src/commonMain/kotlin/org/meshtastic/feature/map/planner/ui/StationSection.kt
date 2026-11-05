@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,23 +40,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.model.antenna.AntennaPrefill
+import org.meshtastic.core.model.antenna.AntennaSetups
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_antenna_gain
 import org.meshtastic.core.resources.planner_antenna_gain_title
+import org.meshtastic.core.resources.planner_calc_open
+import org.meshtastic.core.resources.planner_calc_pick
+import org.meshtastic.core.resources.planner_calc_pick_hint
+import org.meshtastic.core.resources.planner_calc_title
 import org.meshtastic.core.resources.planner_eirp
 import org.meshtastic.core.resources.planner_section_station
 import org.meshtastic.core.resources.planner_tx_power_dbm
 import org.meshtastic.core.resources.planner_tx_power_title
 import org.meshtastic.core.resources.planner_tx_power_w
 import org.meshtastic.core.resources.planner_unit_dbi
-import org.koin.compose.koinInject
-import org.meshtastic.core.model.antenna.AntennaPrefill
-import org.meshtastic.core.model.antenna.AntennaSetups
-import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.resources.planner_calc_open
-import org.meshtastic.core.resources.planner_calc_pick
-import org.meshtastic.core.resources.planner_calc_pick_hint
-import org.meshtastic.core.resources.planner_calc_title
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.feature.map.planner.state.PlannerEnd
 import org.meshtastic.feature.map.planner.state.PlannerSide
@@ -140,16 +140,17 @@ private fun AntennaFromCalculator(state: PlannerUiState, side: PlannerSide, end:
 private fun wattsText(watts: Double): String = fmt(watts, if (watts >= 1.0) 2 else WATT_DECIMALS)
 
 @Composable
-private fun TxPowerFields(side: org.meshtastic.feature.map.planner.state.PlannerSide, end: PlannerEnd, vm: PlannerViewModel) {
+private fun TxPowerFields(
+    side: org.meshtastic.feature.map.planner.state.PlannerSide,
+    end: PlannerEnd,
+    vm: PlannerViewModel,
+) {
     var inWatts by remember { mutableStateOf(false) }
     PlannerSubheading(text = stringResource(Res.string.planner_tx_power_title), info = PlannerInfoTopic.TX_POWER)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
         key(inWatts) {
             PlannerNumberField(
-                label =
-                stringResource(
-                    if (inWatts) Res.string.planner_tx_power_w else Res.string.planner_tx_power_dbm,
-                ),
+                label = stringResource(if (inWatts) Res.string.planner_tx_power_w else Res.string.planner_tx_power_dbm),
                 value = if (inWatts) end.txPowerW else end.txPowerDbm,
                 onValue = { if (inWatts) vm.setTxPowerW(side, it) else vm.setTxPowerDbm(side, it) },
                 modifier = Modifier.weight(1f),

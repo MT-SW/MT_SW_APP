@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@ import kotlin.math.sqrt
 @Suppress("ArrayInDataClass")
 class PathProfile(val stepM: Double, val groundM: DoubleArray) {
     /** Number of intervals (samples - 1). */
-    val intervals: Int get() = groundM.size - 1
+    val intervals: Int
+        get() = groundM.size - 1
 
-    val distanceM: Double get() = stepM * intervals
+    val distanceM: Double
+        get() = stepM * intervals
 
     fun distanceAt(i: Int): Double = stepM * i
 
@@ -46,14 +48,16 @@ class PathProfile(val stepM: Double, val groundM: DoubleArray) {
             val d = Geodesy.distanceM(a, b)
             val n = min(max(2, maxSamples - 1), max(2, ceil(d / minStepM).toInt()))
             val step = d / n
-            val g = DoubleArray(n + 1) { i ->
-                val p = when (i) {
-                    0 -> a
-                    n -> b
-                    else -> Geodesy.interpolate(a, b, i.toDouble() / n)
+            val g =
+                DoubleArray(n + 1) { i ->
+                    val p =
+                        when (i) {
+                            0 -> a
+                            n -> b
+                            else -> Geodesy.interpolate(a, b, i.toDouble() / n)
+                        }
+                    elevationAt(p.lat, p.lon)
                 }
-                elevationAt(p.lat, p.lon)
-            }
             return PathProfile(step, g)
         }
     }

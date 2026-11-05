@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.antenna.CableDb
+import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_feeder_approximate
 import org.meshtastic.core.resources.planner_feeder_breakdown
@@ -48,8 +50,8 @@ import org.meshtastic.core.resources.planner_feeder_fewer
 import org.meshtastic.core.resources.planner_feeder_length
 import org.meshtastic.core.resources.planner_feeder_manual
 import org.meshtastic.core.resources.planner_feeder_more
-import org.meshtastic.core.resources.planner_feeder_precise
 import org.meshtastic.core.resources.planner_feeder_no_cable
+import org.meshtastic.core.resources.planner_feeder_precise
 import org.meshtastic.core.resources.planner_feeder_preset
 import org.meshtastic.core.resources.planner_feeder_preset_adapter_n_n
 import org.meshtastic.core.resources.planner_feeder_preset_adapter_sma_n
@@ -75,8 +77,6 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
-import org.meshtastic.core.model.antenna.CableDb
-import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.feature.map.planner.state.PlannerEnd
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
@@ -106,8 +106,7 @@ internal fun FeederSection(side: PlannerSide, end: PlannerEnd, vm: PlannerViewMo
             )
         }
         Row(
-            modifier =
-            Modifier.fillMaxWidth().clickable { vm.setFeederPrecise(side, !end.feederPrecise) },
+            modifier = Modifier.fillMaxWidth().clickable { vm.setFeederPrecise(side, !end.feederPrecise) },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(checked = end.feederPrecise, onCheckedChange = null)
@@ -146,7 +145,8 @@ private fun FeederBuilderUi(side: PlannerSide, end: PlannerEnd, vm: PlannerViewM
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         PlannerDropdown(
             label = stringResource(Res.string.planner_feeder_preset),
-            selectedLabel = end.feederPresetId?.let { presetName(it) } ?: stringResource(Res.string.planner_feeder_preset_custom),
+            selectedLabel =
+            end.feederPresetId?.let { presetName(it) } ?: stringResource(Res.string.planner_feeder_preset_custom),
             options = FeederBuilder.presets.map { it.id to presetName(it.id) },
             onSelect = { vm.applyFeederPreset(side, it) },
         )
@@ -174,7 +174,9 @@ private fun FeederBuilderUi(side: PlannerSide, end: PlannerEnd, vm: PlannerViewM
             val connectorId = cfg.connectorIds[i]
             PlannerDropdown(
                 label = stringResource(Res.string.planner_feeder_connector_n, (i + 1).toString()),
-                selectedLabel = CableDb.connector(connectorId)?.let { connectorLabel(it.name, it.approximate, approxMark) } ?: connectorId,
+                selectedLabel =
+                CableDb.connector(connectorId)?.let { connectorLabel(it.name, it.approximate, approxMark) }
+                    ?: connectorId,
                 options = CableDb.connectors.map { it.id to connectorLabel(it.name, it.approximate, approxMark) },
                 onSelect = { id ->
                     val ids = cfg.connectorIds.toMutableList()
@@ -185,7 +187,8 @@ private fun FeederBuilderUi(side: PlannerSide, end: PlannerEnd, vm: PlannerViewM
             if (i < count - 1) {
                 SectionEditor(
                     index = i,
-                    section = cfg.sections.getOrNull(i) ?: FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_LENGTH_M),
+                    section =
+                    cfg.sections.getOrNull(i) ?: FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_LENGTH_M),
                     customLabel = customLabel,
                     approxMark = approxMark,
                     onChange = { updated ->
@@ -239,33 +242,39 @@ private fun SectionEditor(
                     section.copy(
                         cableId = id,
                         customDbPerM =
-                        if (id == FeederBuilder.CUSTOM_ID) section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M else section.customDbPerM,
+                        if (id == FeederBuilder.CUSTOM_ID) {
+                            section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M
+                        } else {
+                            section.customDbPerM
+                        },
                     ),
                 )
             },
         )
-        if (!isNone) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
-            PlannerNumberField(
-                label = stringResource(Res.string.planner_feeder_length),
-                value = section.lengthM,
-                onValue = { onChange(section.copy(lengthM = it)) },
-                modifier = Modifier.weight(1f),
-                decimals = 2,
-                suffix = stringResource(Res.string.planner_unit_m),
-                min = 0.0,
-                max = MAX_SECTION_LENGTH_M,
-            )
-            if (isCustom) {
+        if (!isNone) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
                 PlannerNumberField(
-                    label = stringResource(Res.string.planner_feeder_custom_loss),
-                    value = section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M,
-                    onValue = { onChange(section.copy(customDbPerM = it)) },
+                    label = stringResource(Res.string.planner_feeder_length),
+                    value = section.lengthM,
+                    onValue = { onChange(section.copy(lengthM = it)) },
                     modifier = Modifier.weight(1f),
-                    decimals = 3,
-                    suffix = stringResource(Res.string.planner_unit_db_per_m),
+                    decimals = 2,
+                    suffix = stringResource(Res.string.planner_unit_m),
                     min = 0.0,
-                    max = MAX_CUSTOM_DB_PER_M,
+                    max = MAX_SECTION_LENGTH_M,
                 )
+                if (isCustom) {
+                    PlannerNumberField(
+                        label = stringResource(Res.string.planner_feeder_custom_loss),
+                        value = section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M,
+                        onValue = { onChange(section.copy(customDbPerM = it)) },
+                        modifier = Modifier.weight(1f),
+                        decimals = 3,
+                        suffix = stringResource(Res.string.planner_unit_db_per_m),
+                        min = 0.0,
+                        max = MAX_CUSTOM_DB_PER_M,
+                    )
+                }
             }
         }
     }
@@ -301,7 +310,11 @@ private fun FeederBreakdown(end: PlannerEnd, customLabel: String) {
 
 /** Engine labels carry display names of the database; only the neutral word "custom" is localized. */
 internal fun localizeFeederLabel(label: String, customLabel: String): String =
-    if (label.startsWith(FeederBuilder.CUSTOM_ID + " ")) customLabel + label.substring(FeederBuilder.CUSTOM_ID.length) else label
+    if (label.startsWith(FeederBuilder.CUSTOM_ID + " ")) {
+        customLabel + label.substring(FeederBuilder.CUSTOM_ID.length)
+    } else {
+        label
+    }
 
 @Composable
 private fun feederWarningText(code: String): String = stringResource(

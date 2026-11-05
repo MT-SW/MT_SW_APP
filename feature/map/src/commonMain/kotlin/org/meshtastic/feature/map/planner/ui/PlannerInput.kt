@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import kotlin.math.max
 /**
  * Pure, locale independent parsing and formatting helpers of the planner forms (no Compose, unit tested).
  *
- * Parsing accepts what people really type: a comma or a dot as the decimal mark, spaces, hemisphere letters
- * (N/S/E/W) before or after the number and degrees-minutes-seconds. Formatting always uses a dot.
+ * Parsing accepts what people really type: a comma or a dot as the decimal mark, spaces, hemisphere letters (N/S/E/W)
+ * before or after the number and degrees-minutes-seconds. Formatting always uses a dot.
  */
 object PlannerInput {
     private const val LAT_LIMIT = 90.0
@@ -48,7 +48,9 @@ object PlannerInput {
                     val dec = max(lastDot, lastComma)
                     s0.substring(0, dec).filterNot { it == '.' || it == ',' } + "." + s0.substring(dec + 1)
                 }
+
                 lastComma >= 0 -> s0.replace(',', '.')
+
                 else -> s0
             }
         if (s.count { it == '.' } > 1) return null
@@ -59,8 +61,8 @@ object PlannerInput {
 
     /**
      * Parses a latitude ([isLatitude] true, +-90) or longitude (+-180). Accepts a plain number, a number with a
-     * hemisphere letter (`52.1N`, `S 12,5`, `19.2 E`) and degrees-minutes-seconds (`52°12'30"N`). A hemisphere
-     * letter of the wrong axis (E for a latitude) is rejected, and so is a letter combined with a negative number.
+     * hemisphere letter (`52.1N`, `S 12,5`, `19.2 E`) and degrees-minutes-seconds (`52°12'30"N`). A hemisphere letter
+     * of the wrong axis (E for a latitude) is rejected, and so is a letter combined with a negative number.
      */
     fun parseCoordinate(text: String, isLatitude: Boolean): Double? {
         var s = text.trim()
@@ -79,7 +81,8 @@ object PlannerInput {
             if (latitudeLetter != isLatitude) return null
             if (hemisphere == 'S' || hemisphere == 'W') sign = -1.0
         }
-        val raw = (if (s.contains('°') || s.contains('º') || s.contains('˚')) parseDms(s) else parseNumber(s)) ?: return null
+        val raw =
+            (if (s.contains('°') || s.contains('º') || s.contains('˚')) parseDms(s) else parseNumber(s)) ?: return null
         if (hemisphere != null && raw < 0.0) return null
         val v = sign * raw
         val limit = if (isLatitude) LAT_LIMIT else LON_LIMIT
@@ -96,11 +99,20 @@ object PlannerInput {
         val parts: List<String> =
             when {
                 t.contains(';') -> t.split(';')
+
                 else -> {
                     val bySpace = t.split(Regex("""\s*,\s+|\s+"""))
-                    if (bySpace.size == 2) bySpace else if (t.count { it == ',' } == 1) t.split(',') else bySpace
+                    if (bySpace.size == 2) {
+                        bySpace
+                    } else if (t.count { it == ',' } == 1) {
+                        t.split(',')
+                    } else {
+                        bySpace
+                    }
                 }
-            }.map { it.trim() }.filter { it.isNotEmpty() }
+            }
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
         if (parts.size != 2) return null
         val lat = parseCoordinate(parts[0], true)
         val lon = parseCoordinate(parts[1], false)
@@ -121,13 +133,21 @@ object PlannerInput {
     fun formatWatts(watts: Double): String = Num.fmtTrim(watts, if (watts >= 1.0) 2 else 4)
 
     /** True when [a] and [b] are equal for the purpose of "has the text field changed the model value". */
-    fun sameValue(a: Double, b: Double): Boolean = (a - b).absoluteValue <= 1.0e-6 * max(1.0, max(a.absoluteValue, b.absoluteValue))
+    fun sameValue(a: Double, b: Double): Boolean =
+        (a - b).absoluteValue <= 1.0e-6 * max(1.0, max(a.absoluteValue, b.absoluteValue))
 
     private fun isHemisphere(c: Char): Boolean = c.uppercaseChar() in "NSEW"
 
     private fun parseDms(input: String): Double? {
-        val s = input.replace('′', '\'').replace('’', '\'').replace('″', '"').replace('”', '"')
-            .replace('º', '°').replace('˚', '°').trim()
+        val s =
+            input
+                .replace('′', '\'')
+                .replace('’', '\'')
+                .replace('″', '"')
+                .replace('”', '"')
+                .replace('º', '°')
+                .replace('˚', '°')
+                .trim()
         val degEnd = s.indexOf('°')
         if (degEnd <= 0) return null
         val negative = s.startsWith("-")

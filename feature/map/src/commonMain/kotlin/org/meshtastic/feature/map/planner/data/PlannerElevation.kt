@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,16 +53,16 @@ class PlannerElevationException(val failure: PlannerElevationFailure, cause: Thr
     Exception("Planner elevation unavailable: $failure", cause)
 
 /**
- * Terrain access for the planner. Heights are metres above sea level; sea and missing data are 0.
- * Implementations throw [PlannerElevationException] when data cannot be loaded.
+ * Terrain access for the planner. Heights are metres above sea level; sea and missing data are 0. Implementations throw
+ * [PlannerElevationException] when data cannot be loaded.
  */
 interface PlannerElevationSource {
     /** Uniformly sampled terrain profile between [a] and [b] (see [PathProfile.fromSampler]). */
     suspend fun profile(a: GeoPoint, b: GeoPoint): PathProfile
 
     /**
-     * Loads the terrain around [center] within [radiusKm] and returns a fast synchronous sampler
-     * `(lat, lon) -> metres` for [org.meshtastic.feature.map.planner.Coverage]. Outside the loaded area it returns 0.
+     * Loads the terrain around [center] within [radiusKm] and returns a fast synchronous sampler `(lat, lon) -> metres`
+     * for [org.meshtastic.feature.map.planner.Coverage]. Outside the loaded area it returns 0.
      */
     suspend fun prepareArea(center: GeoPoint, radiusKm: Double): (Double, Double) -> Double
 
@@ -73,8 +73,11 @@ interface PlannerElevationSource {
      * Saves on the device the terrain around [center] for every range up to [maxRadiusKm], so it is not fetched from
      * the internet again. [onProgress] gets tiles done and tiles in all. Returns false when it could not be saved.
      */
-    suspend fun saveArea(center: GeoPoint, maxRadiusKm: Double, onProgress: (done: Int, total: Int) -> Unit = { _, _ -> }): Boolean =
-        false
+    suspend fun saveArea(
+        center: GeoPoint,
+        maxRadiusKm: Double,
+        onProgress: (done: Int, total: Int) -> Unit = { _, _ -> },
+    ): Boolean = false
 }
 
 /**
@@ -96,7 +99,8 @@ class PlannerElevation(
     private val ioContext: CoroutineDispatcher = ioDispatcher,
     private val cacheCapacity: Int = DEFAULT_CACHE_TILES,
     private val store: TerrainStore? = null,
-) : PlannerElevationSource, AutoCloseable {
+) : PlannerElevationSource,
+    AutoCloseable {
 
     private val lock = Mutex()
     private val fetcherLock = Mutex()
@@ -126,15 +130,21 @@ class PlannerElevation(
         return zoom
     }
 
-    override suspend fun saveArea(center: GeoPoint, maxRadiusKm: Double, onProgress: (done: Int, total: Int) -> Unit): Boolean {
+    override suspend fun saveArea(
+        center: GeoPoint,
+        maxRadiusKm: Double,
+        onProgress: (done: Int, total: Int) -> Unit,
+    ): Boolean {
         val disk = store ?: return false
         // Every range the views offer, up to the one asked for, each at the zoom it is drawn at.
         val groups =
-            SAVE_RADII_KM.filter { it <= maxRadiusKm }.ifEmpty { listOf(maxRadiusKm) }.map { r ->
-                val bounds = areaBounds(center, r)
-                val zoom = areaZoom(bounds)
-                Triple(bounds, zoom, LinkedHashSet<TileIndex>(TerrainTileMath.tilesAt(zoom, bounds)))
-            }
+            SAVE_RADII_KM.filter { it <= maxRadiusKm }
+                .ifEmpty { listOf(maxRadiusKm) }
+                .map { r ->
+                    val bounds = areaBounds(center, r)
+                    val zoom = areaZoom(bounds)
+                    Triple(bounds, zoom, LinkedHashSet<TileIndex>(TerrainTileMath.tilesAt(zoom, bounds)))
+                }
         val total = groups.sumOf { it.third.size }
         var done = 0
         onProgress(0, total)
@@ -181,7 +191,9 @@ class PlannerElevation(
         var zoom = preferredZoom.coerceIn(MapterhornEndpoints.GLOBAL_MAX_ZOOM, MapterhornEndpoints.REGIONAL_MAX_ZOOM)
         if (zoom <= MapterhornEndpoints.GLOBAL_MAX_ZOOM) return MapterhornEndpoints.GLOBAL_MAX_ZOOM
         if (MapterhornEndpoints.regionalUrlFor(bounds) == null) return MapterhornEndpoints.GLOBAL_MAX_ZOOM
-        while (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM && TerrainTileMath.tileCountAt(zoom, bounds) > maxTiles) zoom--
+        while (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM && TerrainTileMath.tileCountAt(zoom, bounds) > maxTiles) {
+            zoom--
+        }
         return zoom
     }
 
@@ -242,41 +254,45 @@ class PlannerElevation(
             }
         }
         if (missing.isEmpty()) return result
-        val url = if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
-            MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
-        } else {
-            MapterhornEndpoints.GLOBAL_PMTILES_URL
-        }
-        val fetched = withContext(ioContext) {
-            fetcherLock.withLock {
-                val out = ArrayList<Pair<TileIndex, ElevationTile?>>()
-                val fetcher = fetcherFor(url)
-                for (t in missing) {
-                    val bytes = try {
-                        fetcher.fetchTile(t.zoom, t.x, t.y)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        dropFetcher(url)
-                        throw PlannerElevationException(PlannerElevationFailure.NETWORK, e)
-                    }
-                    if (persist) store?.write(t, bytes)
-                    val tile = if (bytes == null) {
-                        null
-                    } else {
-                        try {
-                            tileDecoder(bytes)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            throw PlannerElevationException(PlannerElevationFailure.DECODE, e)
-                        }
-                    }
-                    out.add(t to tile)
-                }
-                out
+        val url =
+            if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
+                MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
+            } else {
+                MapterhornEndpoints.GLOBAL_PMTILES_URL
             }
-        }
+        val fetched =
+            withContext(ioContext) {
+                fetcherLock.withLock {
+                    val out = ArrayList<Pair<TileIndex, ElevationTile?>>()
+                    val fetcher = fetcherFor(url)
+                    for (t in missing) {
+                        val bytes =
+                            try {
+                                fetcher.fetchTile(t.zoom, t.x, t.y)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                dropFetcher(url)
+                                throw PlannerElevationException(PlannerElevationFailure.NETWORK, e)
+                            }
+                        if (persist) store?.write(t, bytes)
+                        val tile =
+                            if (bytes == null) {
+                                null
+                            } else {
+                                try {
+                                    tileDecoder(bytes)
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    throw PlannerElevationException(PlannerElevationFailure.DECODE, e)
+                                }
+                            }
+                        out.add(t to tile)
+                    }
+                    out
+                }
+            }
         lock.withLock {
             for ((t, tile) in fetched) {
                 cache.remove(t)
@@ -295,13 +311,14 @@ class PlannerElevation(
     private fun fetcherFor(url: String): TerrainTileFetcher {
         val existing = fetchers[url]
         if (existing != null) return existing
-        val created = try {
-            fetcherFactory(url)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            throw PlannerElevationException(PlannerElevationFailure.NETWORK, e)
-        }
+        val created =
+            try {
+                fetcherFactory(url)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                throw PlannerElevationException(PlannerElevationFailure.NETWORK, e)
+            }
         fetchers[url] = created
         return created
     }
@@ -352,8 +369,8 @@ class PlannerElevation(
         }
 
         /**
-         * Bilinear elevation at [lat]/[lon] from [tiles] (keyed by tile index at [zoom]). A tile that is absent
-         * from the map or null gives 0 m.
+         * Bilinear elevation at [lat]/[lon] from [tiles] (keyed by tile index at [zoom]). A tile that is absent from
+         * the map or null gives 0 m.
          */
         internal fun sampleBilinear(
             zoom: Int,

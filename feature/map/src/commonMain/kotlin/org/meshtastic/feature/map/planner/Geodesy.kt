@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ object Geodesy {
     const val EARTH_RADIUS_M = 6371008.8
 
     private fun rad(d: Double) = d * PI / 180.0
+
     private fun deg(r: Double) = r * 180.0 / PI
 
     /** Haversine great-circle distance in metres. */
@@ -87,8 +88,8 @@ object Geodesy {
     }
 
     /**
-     * Antenna elevation angle (degrees, positive = up) at a station at [fromAltM] pointing to a station at
-     * [toAltM] [distM] away, including earth-curvature drop d^2/(2kR) of the far end; terrain is ignored.
+     * Antenna elevation angle (degrees, positive = up) at a station at [fromAltM] pointing to a station at [toAltM]
+     * [distM] away, including earth-curvature drop d^2/(2kR) of the far end; terrain is ignored.
      */
     fun elevationAngleDeg(fromAltM: Double, toAltM: Double, distM: Double, k: Double): Double {
         if (distM <= 0.0) return 0.0

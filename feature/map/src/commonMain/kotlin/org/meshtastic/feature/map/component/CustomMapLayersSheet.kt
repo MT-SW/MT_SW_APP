@@ -120,7 +120,11 @@ fun CustomMapLayersSheet(
 
         item {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(modifier = Modifier.fillMaxWidth(), enabled = mapLayers.size < MAX_MAP_LAYERS, onClick = onAddLayerClicked) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = mapLayers.size < MAX_MAP_LAYERS,
+                    onClick = onAddLayerClicked,
+                ) {
                     Text(stringResource(Res.string.add_layer))
                 }
                 Button(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -164,8 +164,7 @@ private fun SideSummaryCard(
 }
 
 @Composable
-private fun summaryName(end: PlannerEnd): String =
-    end.name.ifBlank { stringResource(Res.string.planner_point_unnamed) }
+private fun summaryName(end: PlannerEnd): String = end.name.ifBlank { stringResource(Res.string.planner_point_unnamed) }
 
 @Composable
 private fun summaryCoordinates(end: PlannerEnd): String {

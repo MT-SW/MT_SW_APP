@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,20 @@ import org.meshtastic.core.resources.planner_modem_preset
 import org.meshtastic.core.resources.planner_modem_title
 import org.meshtastic.core.resources.planner_noise_figure
 import org.meshtastic.core.resources.planner_noise_floor
+import org.meshtastic.core.resources.planner_precise_building_height
+import org.meshtastic.core.resources.planner_precise_coverage_note
+import org.meshtastic.core.resources.planner_precise_failed_data
+import org.meshtastic.core.resources.planner_precise_failed_large
+import org.meshtastic.core.resources.planner_precise_failed_network
+import org.meshtastic.core.resources.planner_precise_failed_server
+import org.meshtastic.core.resources.planner_precise_forest_height
+import org.meshtastic.core.resources.planner_precise_loading
+import org.meshtastic.core.resources.planner_precise_radius
+import org.meshtastic.core.resources.planner_precise_radius_hint
+import org.meshtastic.core.resources.planner_precise_radius_value
+import org.meshtastic.core.resources.planner_precise_ready
+import org.meshtastic.core.resources.planner_precise_terrain
+import org.meshtastic.core.resources.planner_precise_warning
 import org.meshtastic.core.resources.planner_refractivity
 import org.meshtastic.core.resources.planner_section_environment
 import org.meshtastic.core.resources.planner_section_radio
@@ -67,26 +81,9 @@ import org.meshtastic.core.resources.planner_spreading_factor
 import org.meshtastic.core.resources.planner_unit_db
 import org.meshtastic.core.resources.planner_unit_dbm
 import org.meshtastic.core.resources.planner_unit_khz
+import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_unit_mhz
 import org.meshtastic.core.resources.planner_use_weather
-import org.meshtastic.core.resources.planner_precise_radius
-import org.meshtastic.core.resources.planner_precise_radius_hint
-import org.meshtastic.core.resources.planner_precise_radius_value
-import org.meshtastic.core.resources.planner_precise_terrain
-import org.meshtastic.core.resources.planner_precise_warning
-import org.meshtastic.core.resources.planner_precise_forest_height
-import org.meshtastic.core.resources.planner_precise_building_height
-import org.meshtastic.core.resources.planner_precise_loading
-import org.meshtastic.core.resources.planner_precise_ready
-import org.meshtastic.core.resources.planner_precise_failed_large
-import org.meshtastic.core.resources.planner_precise_failed_network
-import org.meshtastic.core.resources.planner_precise_failed_data
-import org.meshtastic.core.resources.planner_precise_failed_server
-import org.meshtastic.core.resources.planner_precise_coverage_note
-import org.meshtastic.core.resources.planner_unit_m
-import org.meshtastic.feature.map.planner.data.ClutterHeights
-import org.meshtastic.feature.map.planner.data.PlannerClutter
-import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.core.resources.planner_weather_failed
 import org.meshtastic.core.resources.planner_weather_idle
 import org.meshtastic.core.resources.planner_weather_loading
@@ -97,7 +94,9 @@ import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.feature.map.planner.DuctingLevel
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.Sensitivity
-import org.meshtastic.feature.map.planner.export.Num
+import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.PlannerClutter
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.state.PlannerClutterPreset
 import org.meshtastic.feature.map.planner.state.PlannerClutterStatus
 import org.meshtastic.feature.map.planner.state.PlannerUiState
@@ -117,8 +116,7 @@ internal fun RadioSection(state: PlannerUiState, vm: PlannerViewModel) {
     EnvironmentCard(state = state, vm = vm)
 }
 
-private fun presetLabel(option: ChannelOption): String =
-    option.modemPreset.name
+private fun presetLabel(option: ChannelOption): String = option.modemPreset.name
 
 @Composable
 private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {
@@ -130,7 +128,13 @@ private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {
                     selected = state.bandId == band.id,
                     onClick = { vm.setBand(band.id) },
                     label = {
-                        Text(if (band.id == PlannerBands.FREE_ID) stringResource(Res.string.planner_band_free) else band.name)
+                        Text(
+                            if (band.id == PlannerBands.FREE_ID) {
+                                stringResource(Res.string.planner_band_free)
+                            } else {
+                                band.name
+                            },
+                        )
                     },
                 )
             }
@@ -181,7 +185,10 @@ private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {
             )
         }
 
-        PlannerSubheading(text = stringResource(Res.string.planner_sensitivity_title), info = PlannerInfoTopic.SENSITIVITY)
+        PlannerSubheading(
+            text = stringResource(Res.string.planner_sensitivity_title),
+            info = PlannerInfoTopic.SENSITIVITY,
+        )
         PlannerNumberField(
             label = stringResource(Res.string.planner_noise_figure),
             value = state.noiseFigureDb,
@@ -199,7 +206,8 @@ private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {
             label = stringResource(Res.string.planner_sensitivity),
             value =
             fmt(Sensitivity.dbm(state.bandwidthKhz, state.spreadingFactor, state.noiseFigureDb), 1) +
-                " " + stringResource(Res.string.planner_unit_dbm),
+                " " +
+                stringResource(Res.string.planner_unit_dbm),
             bold = true,
         )
     }
@@ -234,7 +242,10 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
 
         PlannerSubheading(text = stringResource(Res.string.planner_k_factor_title), info = PlannerInfoTopic.K_FACTOR)
         PlannerValueRow(label = stringResource(Res.string.planner_k_factor), value = fmt(state.kFactor, 3))
-        PlannerValueRow(label = stringResource(Res.string.planner_refractivity), value = fmt(state.surfaceRefractivity, 1))
+        PlannerValueRow(
+            label = stringResource(Res.string.planner_refractivity),
+            value = fmt(state.surfaceRefractivity, 1),
+        )
         if (state.atmosphericLossDb > 0.0) {
             PlannerValueRow(
                 label = stringResource(Res.string.planner_atmospheric_loss),
@@ -324,6 +335,7 @@ private fun ClutterStatusBlock(status: PlannerClutterStatus) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         when (status) {
             PlannerClutterStatus.Idle -> Unit
+
             PlannerClutterStatus.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                 Text(
@@ -332,9 +344,11 @@ private fun ClutterStatusBlock(status: PlannerClutterStatus) {
                     modifier = Modifier.weight(1f),
                 )
             }
+
             is PlannerClutterStatus.Ready ->
                 Text(
-                    text = stringResource(
+                    text =
+                    stringResource(
                         Res.string.planner_precise_ready,
                         status.stats.buildings,
                         status.stats.forests,
@@ -343,15 +357,17 @@ private fun ClutterStatusBlock(status: PlannerClutterStatus) {
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
+
             is PlannerClutterStatus.Failed -> {
-                val message = stringResource(
-                    when (status.failure) {
-                        PlannerClutterFailure.NETWORK -> Res.string.planner_precise_failed_network
-                        PlannerClutterFailure.TOO_LARGE -> Res.string.planner_precise_failed_large
-                        PlannerClutterFailure.BAD_RESPONSE -> Res.string.planner_precise_failed_data
-                        PlannerClutterFailure.SERVER_LIMIT -> Res.string.planner_precise_failed_server
-                    },
-                )
+                val message =
+                    stringResource(
+                        when (status.failure) {
+                            PlannerClutterFailure.NETWORK -> Res.string.planner_precise_failed_network
+                            PlannerClutterFailure.TOO_LARGE -> Res.string.planner_precise_failed_large
+                            PlannerClutterFailure.BAD_RESPONSE -> Res.string.planner_precise_failed_data
+                            PlannerClutterFailure.SERVER_LIMIT -> Res.string.planner_precise_failed_server
+                        },
+                    )
                 Text(
                     // the reason given by the server / connection, when there is one, helps to tell what happened
                     text = status.detail?.let { "$message ($it)" } ?: message,
@@ -375,6 +391,7 @@ private fun WeatherStatusBlock(state: PlannerUiState, vm: PlannerViewModel) {
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
+
             PlannerWeatherStatus.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                 Text(
@@ -383,6 +400,7 @@ private fun WeatherStatusBlock(state: PlannerUiState, vm: PlannerViewModel) {
                     modifier = Modifier.weight(1f),
                 )
             }
+
             is PlannerWeatherStatus.Ready -> {
                 val c = status.conditions
                 Text(
@@ -398,6 +416,7 @@ private fun WeatherStatusBlock(state: PlannerUiState, vm: PlannerViewModel) {
                     modifier = Modifier.weight(1f),
                 )
             }
+
             is PlannerWeatherStatus.Failed ->
                 Text(
                     text = stringResource(Res.string.planner_weather_failed, weatherErrorText(status.error)),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,13 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Derived from the NTIA/ITS Irregular Terrain Model (public domain,
- * https://github.com/NTIA/itm); modified: ported from C++ to Kotlin.
- *
- * NTIA/ITS disclaimer (short): the original software is provided "as is" by the
- * U.S. Government, which makes no warranty of any kind and assumes no liability
- * for its use. It is not subject to copyright protection in the United States.
  */
 package org.meshtastic.feature.map.planner
 
@@ -43,13 +36,18 @@ enum class ItmPolarization(val code: Int) {
 }
 
 /** Dominant propagation mode reported by the model. */
-enum class ItmMode { NOT_SET, LINE_OF_SIGHT, DIFFRACTION, TROPOSCATTER }
+enum class ItmMode {
+    NOT_SET,
+    LINE_OF_SIGHT,
+    DIFFRACTION,
+    TROPOSCATTER,
+}
 
 /**
  * Result of a point-to-point ITM prediction.
  *
- * [returnCode]: 0 = success, 1 = success with warnings ([warnings] bit flags), other values are errors
- * (then [lossDb] is NaN).
+ * [returnCode]: 0 = success, 1 = success with warnings ([warnings] bit flags), other values are errors (then [lossDb]
+ * is NaN).
  */
 @Suppress("ArrayInDataClass")
 data class ItmResult(
@@ -176,15 +174,34 @@ object Itm {
         val warn = Warn()
 
         fun error(code: Int) = ItmResult(
-            code, Double.NaN, ItmMode.NOT_SET, warn.flags, Double.NaN, Double.NaN, Double.NaN,
-            doubleArrayOf(Double.NaN, Double.NaN), doubleArrayOf(Double.NaN, Double.NaN),
+            code,
+            Double.NaN,
+            ItmMode.NOT_SET,
+            warn.flags,
+            Double.NaN,
+            Double.NaN,
+            Double.NaN,
+            doubleArrayOf(Double.NaN, Double.NaN),
+            doubleArrayOf(Double.NaN, Double.NaN),
             doubleArrayOf(Double.NaN, Double.NaN),
         )
 
-        var rtn = validateInputs(
-            txHeightM, rxHeightM, climate, timePct, locationPct, situationPct, surfaceRefractivityNUnits,
-            frequencyMHz, polarization.code, epsilon, sigma, mdvar, warn,
-        )
+        var rtn =
+            validateInputs(
+                txHeightM,
+                rxHeightM,
+                climate,
+                timePct,
+                locationPct,
+                situationPct,
+                surfaceRefractivityNUnits,
+                frequencyMHz,
+                polarization.code,
+                epsilon,
+                sigma,
+                mdvar,
+                warn,
+            )
         if (rtn != 0) return error(rtn)
 
         // not part of the reference implementation: guard against unusable profiles
@@ -223,22 +240,48 @@ object Itm {
 
         val aRef = DoubleArray(1)
         val propMode = IntArray(1)
-        rtn = longleyRice(
-            thetaHzn, frequencyMHz, zG, dHzn, hE, gammaE, nS, deltaH, h, d, MODE_P2P, aRef, warn, propMode,
-        )
+        rtn =
+            longleyRice(
+                thetaHzn,
+                frequencyMHz,
+                zG,
+                dHzn,
+                hE,
+                gammaE,
+                nS,
+                deltaH,
+                h,
+                d,
+                MODE_P2P,
+                aRef,
+                warn,
+                propMode,
+            )
         if (rtn != 0) return error(rtn)
 
         val aFs = freeSpaceLoss(d, frequencyMHz)
-        val loss = variability(
-            timePct, locationPct, situationPct, hE, deltaH, frequencyMHz, d, aRef[0], climate, mdvar, warn,
-        ) + aFs
+        val loss =
+            variability(
+                timePct,
+                locationPct,
+                situationPct,
+                hE,
+                deltaH,
+                frequencyMHz,
+                d,
+                aRef[0],
+                climate,
+                mdvar,
+                warn,
+            ) + aFs
 
-        val mode = when (propMode[0]) {
-            1 -> ItmMode.LINE_OF_SIGHT
-            2 -> ItmMode.DIFFRACTION
-            3 -> ItmMode.TROPOSCATTER
-            else -> ItmMode.NOT_SET
-        }
+        val mode =
+            when (propMode[0]) {
+                1 -> ItmMode.LINE_OF_SIGHT
+                2 -> ItmMode.DIFFRACTION
+                3 -> ItmMode.TROPOSCATTER
+                else -> ItmMode.NOT_SET
+            }
         return ItmResult(
             returnCode = if (warn.flags != 0) 1 else 0,
             lossDb = loss,
@@ -256,8 +299,19 @@ object Itm {
     // ---- ValidateInputs ----
 
     private fun validateInputs(
-        hTx: Double, hRx: Double, climate: Int, time: Double, location: Double, situation: Double,
-        n0: Double, fMhz: Double, pol: Int, epsilon: Double, sigma: Double, mdvar: Int, warn: Warn,
+        hTx: Double,
+        hRx: Double,
+        climate: Int,
+        time: Double,
+        location: Double,
+        situation: Double,
+        n0: Double,
+        fMhz: Double,
+        pol: Int,
+        epsilon: Double,
+        sigma: Double,
+        mdvar: Int,
+        warn: Warn,
     ): Int {
         if (hTx < 1.0 || hTx > 1000.0) warn.flags = warn.flags or WARN_TX_TERMINAL_HEIGHT
         if (hTx < 0.5 || hTx > 3000.0) return ERROR_TX_TERMINAL_HEIGHT
@@ -277,8 +331,12 @@ object Itm {
         if (epsilon < 1) return ERROR_EPSILON
         if (sigma <= 0) return ERROR_SIGMA
 
-        if (mdvar < 0 || (mdvar > 3 && mdvar < 10) || (mdvar > 13 && mdvar < 20) ||
-            (mdvar > 23 && mdvar < 30) || mdvar > 33
+        if (
+            mdvar < 0 ||
+            (mdvar > 3 && mdvar < 10) ||
+            (mdvar > 13 && mdvar < 20) ||
+            (mdvar > 23 && mdvar < 30) ||
+            mdvar > 33
         ) {
             return ERROR_MDVAR
         }
@@ -292,8 +350,14 @@ object Itm {
     // ---- QuickPfl ----
 
     private fun quickPfl(
-        pfl: DoubleArray, gammaE: Double, h: DoubleArray, thetaHzn: DoubleArray, dHzn: DoubleArray,
-        hE: DoubleArray, deltaHOut: DoubleArray, dOut: DoubleArray,
+        pfl: DoubleArray,
+        gammaE: Double,
+        h: DoubleArray,
+        thetaHzn: DoubleArray,
+        dHzn: DoubleArray,
+        hE: DoubleArray,
+        deltaHOut: DoubleArray,
+        dOut: DoubleArray,
     ) {
         val d = pfl[0] * pfl[1]
         dOut[0] = d
@@ -475,9 +539,20 @@ object Itm {
     // ---- LongleyRice (lrprop) ----
 
     private fun longleyRice(
-        thetaHzn: DoubleArray, fMhz: Double, zG: Cx, dHzn: DoubleArray, hE: DoubleArray, gammaE: Double,
-        nS: Double, deltaH: Double, h: DoubleArray, d: Double, mode: Int, aRefOut: DoubleArray,
-        warn: Warn, propMode: IntArray,
+        thetaHzn: DoubleArray,
+        fMhz: Double,
+        zG: Cx,
+        dHzn: DoubleArray,
+        hE: DoubleArray,
+        gammaE: Double,
+        nS: Double,
+        deltaH: Double,
+        h: DoubleArray,
+        d: Double,
+        mode: Int,
+        aRefOut: DoubleArray,
+        warn: Warn,
+        propMode: IntArray,
     ): Int {
         val aE = 1 / gammaE
 
@@ -546,11 +621,12 @@ object Itm {
                 val a0 = lineOfSightLoss(d0, hE, zG, deltaH, mD, aD0, dSML, fMhz)
                 val q = ln(dSML / d0)
 
-                k2 = max(
-                    0.0,
-                    ((dSML - d0) * (a1 - a0) - (d1 - d0) * (aSML - a0)) /
-                        ((dSML - d0) * ln(d1 / d0) - (d1 - d0) * q),
-                )
+                k2 =
+                    max(
+                        0.0,
+                        ((dSML - d0) * (a1 - a0) - (d1 - d0) * (aSML - a0)) /
+                            ((dSML - d0) * ln(d1 / d0) - (d1 - d0) * q),
+                    )
 
                 flag = aD0 > 0.0 || k2 > 0.0
 
@@ -587,10 +663,11 @@ object Itm {
 
             if (a5 < 1000.0) {
                 mS = (a6 - a5) / 200e3
-                dX = max(
-                    max(dSML, dML + 1.088 * (aE.pow(2.0) / fMhz).pow(1.0 / 3.0) * ln(fMhz)),
-                    (a5 - aD0 - mS * d5) / (mD - mS),
-                )
+                dX =
+                    max(
+                        max(dSML, dML + 1.088 * (aE.pow(2.0) / fMhz).pow(1.0 / 3.0) * ln(fMhz)),
+                        (a5 - aD0 - mS * d5) / (mD - mS),
+                    )
                 aS0 = (mD - mS) * dX + aD0
             } else {
                 mS = mD
@@ -617,8 +694,17 @@ object Itm {
     // ---- Diffraction ----
 
     private fun diffractionLoss(
-        d: Double, dHzn: DoubleArray, hE: DoubleArray, zG: Cx, aE: Double, deltaH: Double,
-        h: DoubleArray, mode: Int, thetaLos: Double, dSML: Double, fMhz: Double,
+        d: Double,
+        dHzn: DoubleArray,
+        hE: DoubleArray,
+        zG: Cx,
+        aE: Double,
+        deltaH: Double,
+        h: DoubleArray,
+        mode: Int,
+        thetaLos: Double,
+        dSML: Double,
+        fMhz: Double,
     ): Double {
         val aK = knifeEdgeDiffraction(d, fMhz, aE, thetaLos, dHzn)
         val aSe = smoothEarthDiffraction(d, fMhz, aE, thetaLos, dHzn, hE, zG)
@@ -645,7 +731,13 @@ object Itm {
     }
 
     private fun smoothEarthDiffraction(
-        d: Double, fMhz: Double, aE: Double, thetaLos: Double, dHzn: DoubleArray, hE: DoubleArray, zG: Cx,
+        d: Double,
+        fMhz: Double,
+        aE: Double,
+        thetaLos: Double,
+        dHzn: DoubleArray,
+        hE: DoubleArray,
+        zG: Cx,
     ): Double {
         val a = DoubleArray(3)
         val dKm = DoubleArray(3)
@@ -720,7 +812,14 @@ object Itm {
     // ---- Line of sight ----
 
     private fun lineOfSightLoss(
-        d: Double, hE: DoubleArray, zG: Cx, deltaH: Double, mD: Double, aD0: Double, dSML: Double, fMhz: Double,
+        d: Double,
+        hE: DoubleArray,
+        zG: Cx,
+        deltaH: Double,
+        mD: Double,
+        aD0: Double,
+        dSML: Double,
+        fMhz: Double,
     ): Double {
         val deltaHD = terrainRoughness(d, deltaH)
         val sigmaHD = sigmaH(deltaHD)
@@ -756,13 +855,27 @@ object Itm {
         val b = doubleArrayOf(0.332e-3, 0.212e-3, 0.157e-3)
         val c = doubleArrayOf(-10.0, -2.5, 5.0)
 
-        val i = if (td <= 10e3) 0 else if (td <= 70e3) 1 else 2
+        val i =
+            if (td <= 10e3) {
+                0
+            } else if (td <= 70e3) {
+                1
+            } else {
+                2
+            }
         return a[i] + b[i] * td + c[i] * log10(td)
     }
 
     private fun troposcatterLoss(
-        d: Double, thetaHzn: DoubleArray, dHzn: DoubleArray, hE: DoubleArray, aE: Double, nS: Double,
-        fMhz: Double, thetaLos: Double, h0: DoubleArray,
+        d: Double,
+        thetaHzn: DoubleArray,
+        dHzn: DoubleArray,
+        hE: DoubleArray,
+        aE: Double,
+        nS: Double,
+        fMhz: Double,
+        thetaLos: Double,
+        h0: DoubleArray,
     ): Double {
         var hZero: Double
         val wn = fMhz / 47.7
@@ -794,8 +907,9 @@ object Itm {
 
             val z0 = 1.7556e3
             val z1 = 8.0e3
-            val etaS = (h0Meter / z0) *
-                (1.0 + (0.031 - nS * 2.32e-3 + nS.pow(2.0) * 5.67e-6) * exp(-min(1.7, h0Meter / z1).pow(6.0)))
+            val etaS =
+                (h0Meter / z0) *
+                    (1.0 + (0.031 - nS * 2.32e-3 + nS.pow(2.0) * 5.67e-6) * exp(-min(1.7, h0Meter / z1).pow(6.0)))
 
             val hH00 = (h0Function(r1, etaS) + h0Function(r2, etaS)) / 2
             val deltaH0 = min(hH00, 6.0 * (0.6 - log10(max(etaS, 1.0))) * log10(s) * log10(q))
@@ -804,7 +918,10 @@ object Itm {
             hZero = max(hZero, 0.0)
 
             if (etaS < 1.0) {
-                hZero = etaS * hZero + (1.0 - etaS) * 10 *
+                hZero =
+                    etaS * hZero +
+                    (1.0 - etaS) *
+                    10 *
                     log10(
                         ((1.0 + SQRT2 / r1) * (1.0 + SQRT2 / r2)).pow(2.0) * (r1 + r2) / (r1 + r2 + 2 * SQRT2),
                     )
@@ -818,8 +935,8 @@ object Itm {
 
         val d0 = 40e3
         val hMeter = 47.7
-        return fFunction(th * d) + 10 * log10(wn * hMeter * th.pow(4.0)) -
-            0.1 * (nS - 301.0) * exp(-th * d / d0) + hZero
+        return fFunction(th * d) + 10 * log10(wn * hMeter * th.pow(4.0)) - 0.1 * (nS - 301.0) * exp(-th * d / d0) +
+            hZero
     }
 
     private fun h0Curve(j: Int, r: Double): Double {
@@ -844,8 +961,7 @@ object Itm {
 
     private fun terrainRoughness(d: Double, deltaH: Double): Double = deltaH * (1.0 - 0.8 * exp(-d / 50e3))
 
-    private fun freeSpaceLoss(d: Double, fMhz: Double): Double =
-        32.45 + 20.0 * log10(fMhz) + 20.0 * log10(d / 1000.0)
+    private fun freeSpaceLoss(d: Double, fMhz: Double): Double = 32.45 + 20.0 * log10(fMhz) + 20.0 * log10(d / 1000.0)
 
     private fun inverseCcdf(q: Double): Double {
         val c0 = 2.515516
@@ -868,13 +984,14 @@ object Itm {
 
     // ---- Variability ----
 
-    private val allYear = arrayOf(
-        doubleArrayOf(-9.67, -0.62, 1.26, -9.21, -0.62, -0.39, 3.15),
-        doubleArrayOf(12.7, 9.19, 15.5, 9.05, 9.19, 2.86, 857.9),
-        doubleArrayOf(144.9e3, 228.9e3, 262.6e3, 84.1e3, 228.9e3, 141.7e3, 2222.0e3),
-        doubleArrayOf(190.3e3, 205.2e3, 185.2e3, 101.1e3, 205.2e3, 315.9e3, 164.8e3),
-        doubleArrayOf(133.8e3, 143.6e3, 99.8e3, 98.6e3, 143.6e3, 167.4e3, 116.3e3),
-    )
+    private val allYear =
+        arrayOf(
+            doubleArrayOf(-9.67, -0.62, 1.26, -9.21, -0.62, -0.39, 3.15),
+            doubleArrayOf(12.7, 9.19, 15.5, 9.05, 9.19, 2.86, 857.9),
+            doubleArrayOf(144.9e3, 228.9e3, 262.6e3, 84.1e3, 228.9e3, 141.7e3, 2222.0e3),
+            doubleArrayOf(190.3e3, 205.2e3, 185.2e3, 101.1e3, 205.2e3, 315.9e3, 164.8e3),
+            doubleArrayOf(133.8e3, 143.6e3, 99.8e3, 98.6e3, 143.6e3, 167.4e3, 116.3e3),
+        )
     private val bsm1 = doubleArrayOf(2.13, 2.66, 6.11, 1.98, 2.68, 6.86, 8.51)
     private val bsm2 = doubleArrayOf(159.5, 7.67, 6.65, 13.11, 7.16, 10.38, 169.8)
     private val xsm1 = doubleArrayOf(762.2e3, 100.4e3, 138.2e3, 139.1e3, 93.7e3, 187.8e3, 609.8e3)
@@ -898,8 +1015,17 @@ object Itm {
         (c1 + c2 / (1.0 + ((de - x2) / x3).pow(2.0))) * (de / x1).pow(2.0) / (1.0 + (de / x1).pow(2.0))
 
     private fun variability(
-        time: Double, location: Double, situation: Double, hE: DoubleArray, deltaH: Double, fMhz: Double,
-        d: Double, aRef: Double, climate: Int, mdvar: Int, warn: Warn,
+        time: Double,
+        location: Double,
+        situation: Double,
+        hE: DoubleArray,
+        deltaH: Double,
+        fMhz: Double,
+        d: Double,
+        aRef: Double,
+        climate: Int,
+        mdvar: Int,
+        warn: Warn,
     ): Double {
         var zT = inverseCcdf(time / 100)
         var zL = inverseCcdf(location / 100)
@@ -929,7 +1055,9 @@ object Itm {
                 zT = zS
                 zL = zS
             }
+
             1 -> zL = zS
+
             2 -> zL = zT
         }
 
@@ -956,13 +1084,14 @@ object Itm {
         val sigmaTD = cD[ci] * sigmaTPlus
         val tgtd = (sigmaTPlus - sigmaTD) * zD[ci]
 
-        val sigmaT = if (zT < 0.0) {
-            sigmaTMinus
-        } else if (zT <= zD[ci]) {
-            sigmaTPlus
-        } else {
-            sigmaTD + tgtd / zT
-        }
+        val sigmaT =
+            if (zT < 0.0) {
+                sigmaTMinus
+            } else if (zT <= zD[ci]) {
+                sigmaTPlus
+            } else {
+                sigmaTD + tgtd / zT
+            }
         val yT = sigmaT * zT
 
         val ySTemp = sigmaS.pow(2.0) + yT.pow(2.0) / (7.8 + zS.pow(2.0)) + yL.pow(2.0) / (24.0 + zS.pow(2.0))
@@ -974,14 +1103,17 @@ object Itm {
                 yR = 0.0
                 yS = sqrt(sigmaT.pow(2.0) + sigmaL.pow(2.0) + ySTemp) * zS
             }
+
             1 -> {
                 yR = yT
                 yS = sqrt(sigmaL.pow(2.0) + ySTemp) * zS
             }
+
             2 -> {
                 yR = sqrt(sigmaT.pow(2.0) + sigmaL.pow(2.0)) * zT
                 yS = sqrt(ySTemp) * zS
             }
+
             else -> {
                 yR = yT + yL
                 yS = sqrt(ySTemp) * zS

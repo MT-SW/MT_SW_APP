@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ import org.meshtastic.feature.map.planner.DuctingLevel
 import org.meshtastic.feature.map.planner.export.Num
 
 /**
- * Propagation-relevant weather at a point. [fetchedAtIso] is the UTC time of the data, "yyyy-MM-dd HH:mm".
- * [analysis] holds k-factor, ITM sea-level refractivity and ducting level derived from the vertical profile.
+ * Propagation-relevant weather at a point. [fetchedAtIso] is the UTC time of the data, "yyyy-MM-dd HH:mm". [analysis]
+ * holds k-factor, ITM sea-level refractivity and ducting level derived from the vertical profile.
  */
 data class PropagationConditions(
     val fetchedAtIso: String,
@@ -82,24 +82,26 @@ class PlannerWeather(
 
     override suspend fun fetch(lat: Double, lon: Double): PlannerWeatherResult {
         val url = buildUrl(baseUrl, lat, lon)
-        val body: String? = try {
-            withTimeoutOrNull(timeoutMs) {
-                val response = httpClient.get(url)
-                if (response.status.isSuccess()) response.bodyAsText() else null
+        val body: String? =
+            try {
+                withTimeoutOrNull(timeoutMs) {
+                    val response = httpClient.get(url)
+                    if (response.status.isSuccess()) response.bodyAsText() else null
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
-        }
         if (body == null) return PlannerWeatherResult.Failure(PlannerWeatherError.OFFLINE)
-        val parsed = try {
-            parseOpenMeteo(body)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
-        }
+        val parsed =
+            try {
+                parseOpenMeteo(body)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
+            }
         return if (parsed == null) {
             PlannerWeatherResult.Failure(PlannerWeatherError.BAD_RESPONSE)
         } else {
@@ -147,19 +149,20 @@ private fun JsonObject.hourly(key: String, index: Int): Double? {
 }
 
 /**
- * Parses an Open-Meteo forecast answer (request with `timezone=GMT`, `current=...`, hourly pressure-level variables
- * for 925/850/700 hPa) into [PropagationConditions]; null when the surface values are missing or the JSON is invalid.
+ * Parses an Open-Meteo forecast answer (request with `timezone=GMT`, `current=...`, hourly pressure-level variables for
+ * 925/850/700 hPa) into [PropagationConditions]; null when the surface values are missing or the JSON is invalid.
  *
  * The hourly entry used is the one matching the hour of `current.time`; pressure levels lying below ground
  * (geopotential height under station height + 20 m) or with missing values are ignored, and without any usable level
  * the standard atmosphere is assumed by [Atmosphere.analyzeProfile].
  */
 fun parseOpenMeteo(json: String): PropagationConditions? {
-    val root = try {
-        Json.parseToJsonElement(json).jsonObject
-    } catch (e: Exception) {
-        return null
-    }
+    val root =
+        try {
+            Json.parseToJsonElement(json).jsonObject
+        } catch (e: Exception) {
+            return null
+        }
     val current = root["current"] as? JsonObject ?: return null
     val temp = current.number("temperature_2m") ?: return null
     val pressure = current.number("surface_pressure") ?: return null
@@ -185,9 +188,10 @@ fun parseOpenMeteo(json: String): PropagationConditions? {
         }
     }
 
-    val rain = (if (hourlyObj != null && index >= 0) hourlyObj.hourly("precipitation", index) else null)
-        ?: current.number("precipitation")
-        ?: 0.0
+    val rain =
+        (if (hourlyObj != null && index >= 0) hourlyObj.hourly("precipitation", index) else null)
+            ?: current.number("precipitation")
+            ?: 0.0
 
     val samples = ArrayList<AtmosphereSample>()
     samples.add(AtmosphereSample(station, temp, pressure, rh))

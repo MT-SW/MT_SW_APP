@@ -66,12 +66,16 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
 
     private fun ensureTempDir() = fs.createDirectories(tempDir)
 
-    private fun artifactFor(path: Path) =
-        FirmwareArtifact(uri = CommonUri.parse(NSURL.fileURLWithPath(path.toString()).absoluteString.orEmpty()), fileName = path.name, isTemporary = true)
+    private fun artifactFor(path: Path) = FirmwareArtifact(
+        uri = CommonUri.parse(NSURL.fileURLWithPath(path.toString()).absoluteString.orEmpty()),
+        fileName = path.name,
+        isTemporary = true,
+    )
 
     private fun pathOf(artifact: FirmwareArtifact): Path? = pathOf(artifact.uri)
 
-    private fun pathOf(uri: CommonUri): Path? = NSURL.URLWithString(uri.toString())?.takeIf { it.fileURL }?.path?.toPath()
+    private fun pathOf(uri: CommonUri): Path? =
+        NSURL.URLWithString(uri.toString())?.takeIf { it.fileURL }?.path?.toPath()
 
     override fun cleanupAllTemporaryFiles() {
         runCatching {
@@ -86,26 +90,24 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
         pathOf(file)?.let { runCatching { fs.delete(it, mustExist = false) } }
     }
 
-    override suspend fun checkUrlExists(url: String): Boolean =
-        try {
-            client.head(url).status.isSuccess()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Logger.w(e) { "Failed to check URL existence: $url" }
-            false
-        }
+    override suspend fun checkUrlExists(url: String): Boolean = try {
+        client.head(url).status.isSuccess()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+        Logger.w(e) { "Failed to check URL existence: $url" }
+        false
+    }
 
-    override suspend fun fetchText(url: String): String? =
-        try {
-            val response = client.get(url)
-            if (response.status.isSuccess()) response.bodyAsText() else null
-        } catch (e: CancellationException) {
-            throw e
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Logger.w(e) { "Failed to fetch text from: $url" }
-            null
-        }
+    override suspend fun fetchText(url: String): String? = try {
+        val response = client.get(url)
+        if (response.status.isSuccess()) response.bodyAsText() else null
+    } catch (e: CancellationException) {
+        throw e
+    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+        Logger.w(e) { "Failed to fetch text from: $url" }
+        null
+    }
 
     override suspend fun downloadFile(url: String, fileName: String, onProgress: (Float) -> Unit): FirmwareArtifact? =
         withContext(Dispatchers.Default) {
@@ -175,7 +177,8 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
         }
     }
 
-    override suspend fun getDisplayName(uri: CommonUri): String? = NSURL.URLWithString(uri.toString())?.lastPathComponent
+    override suspend fun getDisplayName(uri: CommonUri): String? =
+        NSURL.URLWithString(uri.toString())?.lastPathComponent
 
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun copyToUri(source: FirmwareArtifact, destinationUri: CommonUri): Long {
@@ -223,17 +226,20 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
         if (target.isEmpty() && preferredFilename == null) return@withContext null
         try {
             val zipFs = fs.openZip(zipPath)
-            val files = zipFs.listRecursively("/".toPath()).filter { zipFs.metadataOrNull(it)?.isDirectory == false }.toList()
+            val files =
+                zipFs
+                    .listRecursively("/".toPath())
+                    .filter { zipFs.metadataOrNull(it)?.isDirectory == false }
+                    .toList()
             require(files.size <= MAX_ENTRIES) { "Firmware archive has more than $MAX_ENTRIES entries" }
-            val matches =
-                files.filter { entry ->
-                    val name = entry.toString().removePrefix("/").lowercase()
-                    if (preferredFilename != null) {
-                        name.substringAfterLast('/') == preferredFilename.lowercase()
-                    } else {
-                        isValidFirmwareFile(name, target.lowercase(), fileExtension)
-                    }
+            val matches = files.filter { entry ->
+                val name = entry.toString().removePrefix("/").lowercase()
+                if (preferredFilename != null) {
+                    name.substringAfterLast('/') == preferredFilename.lowercase()
+                } else {
+                    isValidFirmwareFile(name, target.lowercase(), fileExtension)
                 }
+            }
             val chosen = matches.minByOrNull { it.toString().length } ?: return@withContext null
             require((zipFs.metadata(chosen).size ?: 0L) <= MAX_FILE_BYTES) { "Firmware entry is too large" }
             ensureTempDir()
@@ -258,7 +264,8 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
         withContext(Dispatchers.Default) {
             val zipPath = pathOf(artifact) ?: return@withContext emptyMap()
             val zipFs = fs.openZip(zipPath)
-            val files = zipFs.listRecursively("/".toPath()).filter { zipFs.metadataOrNull(it)?.isDirectory == false }.toList()
+            val files =
+                zipFs.listRecursively("/".toPath()).filter { zipFs.metadataOrNull(it)?.isDirectory == false }.toList()
             require(files.size <= MAX_ENTRIES) { "Firmware archive has more than $MAX_ENTRIES entries" }
             var remaining = MAX_TOTAL_BYTES
             val entries = LinkedHashMap<String, ByteArray>()
