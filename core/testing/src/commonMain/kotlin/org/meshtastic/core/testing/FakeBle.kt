@@ -116,6 +116,16 @@ class FakeBleConnection :
     /** Number of times [invalidateServiceCache] has been invoked. */
     var invalidateServiceCacheCalls: Int = 0
 
+    /**
+     * Number of refreshes the transport asked for beyond its routine one. The fork refreshes the cache once after every
+     * successful connect; any further call before the next connect is a reactive refresh (post-OTA, GATT 133, a stale
+     * cache after a failure streak), and only those are counted here.
+     */
+    var reactiveInvalidateServiceCacheCalls: Int = 0
+        private set
+
+    private var routineRefreshDone = false
+
     /** Optional callback invoked at the end of [disconnect] (e.g. seed freshly-discovered services on reconnect). */
     var onDisconnect: (() -> Unit)? = null
 
@@ -161,6 +171,7 @@ class FakeBleConnection :
 
     override suspend fun connectAndAwait(device: BleDevice, timeout: Duration): BleConnectionState {
         connectAndAwaitCalls++
+        routineRefreshDone = false
         connectException?.let { throw it }
         if (failNextN > 0) {
             failNextN--
@@ -201,6 +212,7 @@ class FakeBleConnection :
 
     override fun invalidateServiceCache(): Boolean {
         invalidateServiceCacheCalls++
+        if (routineRefreshDone) reactiveInvalidateServiceCacheCalls++ else routineRefreshDone = true
         return invalidateServiceCacheResult
     }
 }

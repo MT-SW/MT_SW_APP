@@ -629,7 +629,7 @@ class BleRadioTransportTest {
                 "GATT cache invalidation flag must have been consumed by the transport",
             )
             assertTrue(
-                connection.invalidateServiceCacheCalls >= 1,
+                connection.reactiveInvalidateServiceCacheCalls >= 1,
                 "invalidateServiceCache must be called after consuming the flag",
             )
             assertTrue(
@@ -697,7 +697,7 @@ class BleRadioTransportTest {
 
             assertEquals(
                 1,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "the cache must be refreshed exactly once for the streak, not on every retry",
             )
             assertTrue(
@@ -741,7 +741,7 @@ class BleRadioTransportTest {
             )
             assertEquals(
                 0,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "an ordinary out-of-range gap must not throw away a valid GATT cache",
             )
         } finally {
@@ -778,7 +778,7 @@ class BleRadioTransportTest {
         try {
             // First streak: threshold failures, then the next attempt connects and refreshes the cache at ~t = 216 s.
             advanceTimeBy(240_000)
-            assertEquals(1, connection.invalidateServiceCacheCalls, "the first streak must refresh the cache once")
+            assertEquals(1, connection.reactiveInvalidateServiceCacheCalls, "the first streak must refresh the cache once")
 
             // End the streak with a disconnect the policy treats as non-failing, then arm a second streak behind it.
             connection.failNextN = GattCacheInvalidationGate.DEFAULT_FAILURE_THRESHOLD
@@ -787,7 +787,7 @@ class BleRadioTransportTest {
             advanceTimeBy(240_000)
             assertEquals(
                 2,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "a streak that follows an ended streak must earn its own cache refresh",
             )
         } finally {
@@ -822,7 +822,7 @@ class BleRadioTransportTest {
         bleTransport.start()
         try {
             advanceTimeBy(20_000)
-            assertEquals(1, connection.invalidateServiceCacheCalls, "the post-OTA flag must refresh the cache once")
+            assertEquals(1, connection.reactiveInvalidateServiceCacheCalls, "the post-OTA flag must refresh the cache once")
 
             // An unstable (non-intentional, sub-minStableConnection) disconnect starts a streak, so the gate is never
             // re-armed between the post-OTA refresh and the stale-cache refresh under test.
@@ -832,7 +832,7 @@ class BleRadioTransportTest {
             advanceTimeBy(300_000)
             assertEquals(
                 2,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "the streak that followed the OTA must still earn its own stale-cache refresh",
             )
         } finally {
@@ -874,7 +874,7 @@ class BleRadioTransportTest {
 
             assertEquals(
                 1,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "the streak must earn exactly one refresh, and that refresh must have been enough",
             )
 
@@ -915,9 +915,9 @@ class BleRadioTransportTest {
             advanceTimeBy(1_200_000)
 
             assertTrue(
-                connection.invalidateServiceCacheCalls > 1,
+                connection.reactiveInvalidateServiceCacheCalls > 1,
                 "a refresh that never happened must not burn the allowance, so the gate must keep asking " +
-                    "(got ${connection.invalidateServiceCacheCalls} calls)",
+                    "(got ${connection.reactiveInvalidateServiceCacheCalls} calls)",
             )
             assertTrue(
                 SERVICE_UUID in connection.missingServices,
@@ -965,7 +965,7 @@ class BleRadioTransportTest {
             )
             assertEquals(
                 0,
-                connection.invalidateServiceCacheCalls,
+                connection.reactiveInvalidateServiceCacheCalls,
                 "a probe miss never reaches a link, so the GATT cache path must stay untouched",
             )
 
