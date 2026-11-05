@@ -54,16 +54,20 @@ class DesktopLoggingTest {
     }
 
     @Test
-    fun `debug build keeps every level in the exportable buffer`() {
+    fun `debug build also keeps Verbose and Debug lines out of the exportable buffer`() {
+        // The fork keeps Info and above in every build; the deeper levels go only to the optional log files.
         installDesktopLogging(isDebug = true)
         val verbose = marker("verbose")
         val debug = marker("debug")
+        val info = marker("info")
 
         Logger.v { verbose }
         Logger.d { debug }
+        Logger.i { info }
 
         val buffer = InMemoryLogBuffer.snapshot()
-        assertTrue(verbose in buffer, "Verbose line is missing from the debug buffer")
-        assertTrue(debug in buffer, "Debug line is missing from the debug buffer")
+        assertFalse(verbose in buffer, "Verbose line reached the debug buffer")
+        assertFalse(debug in buffer, "Debug line reached the debug buffer")
+        assertTrue(info in buffer, "Info line is missing from the debug buffer")
     }
 }
