@@ -251,9 +251,12 @@ class LocalStatsWidgetContentTest {
     }
 
     @Test
-    fun `free memory is shown in bytes units`() =
-        render(WidgetSizes.EXTRA_BIG, createMockWidgetState().copy(heapFreeBytes = 130_172)) {
-            onNode(hasText("130 kB")).assertExists()
+    fun `used memory is shown as used and total bytes`() =
+        render(
+            WidgetSizes.EXTRA_BIG,
+            createMockWidgetState().copy(heapFreeBytes = 130_172, heapTotalBytes = 200_000),
+        ) {
+            onNode(hasText("69828 / 200000", substring = true)).assertExists()
         }
 
     @Test
