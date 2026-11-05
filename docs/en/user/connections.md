@@ -2,7 +2,7 @@
 title: Connections
 parent: User Guide
 nav_order: 2
-last_updated: 2026-10-22
+last_updated: 2026-11-04
 description: Connect your phone or desktop to a Meshtastic node over Bluetooth, USB, or TCP/IP.
 aliases:
   - bluetooth
@@ -152,6 +152,8 @@ On Android 16 and newer, **Settings** has an **Adaptive notifications** row just
 - **Track a node:** the chosen node's battery, signal, role, channel load and airtime, traffic and processor and memory load (what that node last sent), when it was last heard, its hops and its distance from your node. The status bar shows its battery, or how long ago it was heard when it reports no battery. Pick the node from a list with favorites first, then the most recently heard, or search it by name.
 
 Tap the row to start one, switch to the other, or stop it. Only one runs at a time, and it is off until you start it. On a node's details, **Track in adaptive notifications** starts tracking that node directly.
+
+While one runs, the row says what it shows and has a **Stop** button, and the service notification itself has a **Stop adaptive notifications** action. Either ends it and leaves the radio connected; the notification goes back to its usual connection state and mesh statistics.
 
 A dropped link keeps it running and shows the connection state until the node is back. Disconnecting, switching nodes, or deleting or ignoring the tracked node stops it. If the row says adaptive notifications are turned off for the app, Android shows it as an ordinary notification until you allow them in system settings.
 

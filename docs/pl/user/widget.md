@@ -2,7 +2,7 @@
 title: Widżet ekranu głównego
 parent: Przewodnik użytkownika
 nav_order: 20
-last_updated: 2026-10-21
+last_updated: 2026-11-04
 description: Dodaj widżety MT_SW na ekran główny, aby zerknąć na lokalne statystyki połączonego węzła albo śledzić jeden wybrany węzeł, bez otwierania aplikacji.
 aliases:
   - widget
@@ -24,17 +24,21 @@ Możesz umieścić dowolną liczbę każdego z nich. Każdy Node Tracker pamięt
 
 Widżet **MT_SW_APP** wyświetla bieżące lokalne statystyki **połączonego węzła**:
 
-- **Znacznik węzła** u góry, zawierający krótką nazwę węzła w jego własnych kolorach
-- **Bateria** — poziom naładowania baterii węzła lub *Zasilanie*, gdy węzeł pracuje na zasilaniu zewnętrznym
+- **Znacznik węzła** z krótką nazwą węzła w jego własnych kolorach, a obok **bateria** — poziom naładowania lub *Zasilanie*, gdy węzeł pracuje na zasilaniu zewnętrznym
 - **ChUtil** — wykorzystanie kanału (jak bardzo zajęty jest kanał LoRa, w procentach)
 - **AirUtil** — procent czasu antenowego, który ten węzeł wykorzystał na nadawanie w ostatniej godzinie
-- **Ruch** — pakiety wysłane / odebrane oraz zauważone duplikaty
-- **Przekaźniki** — pakiety przekazane dalej i anulowane przekazania (pokazywane, gdy węzeł przekazuje pakiety)
-- **Diagnostyka** — połączona linia zawierająca **Szum** (poziom szumu tła w dBm), **Błędne** (odebrane uszkodzone pakiety) i **Odrzucone** (pakiety odrzucone przez węzeł). Błędne i Odrzucone pojawiają się dopiero, gdy są większe od zera, więc spokojne radio może pokazywać samą wartość szumu
-- **Sterta** — wolna i całkowita pamięć węzła, przedstawiona jako pasek
 - **Węzły** — ile węzłów jest online spośród wszystkich znanych
-- **Czas pracy** — jak długo węzeł pracuje od ostatniego restartu, pokazany obok Węzłów
-- **Zaktualizowano** — czas ostatniego odświeżenia statystyk, u dołu widżetu
+- **Czas pracy** — jak długo węzeł pracuje od ostatniego restartu
+- **Wysłane** i **Odebrane** — liczniki pakietów węzła
+- **Szum** — poziom szumu tła w dBm
+- **Pamięć** — zajęta pamięć jako procent całości; przy rozszerzonych statystykach także **CPU**, **PSRAM** i **Flash** (to, co węzeł podaje)
+- **Przekazane** — pakiety przekazane dalej dla innych
+- **Błędne** — odebrane uszkodzone pakiety
+- **Odrzucone** — pakiety odrzucone przez węzeł
+- **Anulowane przekazania** — przekazania, które węzeł zaczął, a potem anulował
+- **Zaktualizowano** — czas ostatniego odświeżenia statystyk, u dołu widżetu o wysokości trzech wierszy
+
+Widżet pokazuje tyle z tych odczytów, ile mieści jego rozmiar, w tej kolejności, więc mały widżet zachowuje te, na które patrzy się najczęściej. Widżet 2×2 pokazuje węzeł, baterię, wykorzystanie i kilka pierwszych odczytów; przy szerokości czterech komórek odczyty układają się w dwie kolumny, a wyższy widżet dodaje kolejne wiersze, aż wszystkie odczyty są na ekranie.
 
 Dotknij widżetu, aby otworzyć aplikację, lub użyj jego przycisku odświeżania, aby zażądać nowych statystyk.
 
@@ -48,11 +52,13 @@ Widżet **Node Tracker** pokazuje jeden węzeł z Twojej listy węzłów:
 - **Baterię**: ostatni zgłoszony poziom baterii węzła albo _Zasilany_, gdy węzeł jest na zasilaniu zewnętrznym
 - **Ostatnio słyszany**: czas, kiedy Twój połączony węzeł ostatnio go słyszał, albo data, jeśli było to ponad dobę temu
 
-Poszerz widżet, aby dodać drugą kolumnę:
+Od wysokości dwóch wierszy dodaje, w tej kolejności, tyle odczytów, ile się zmieści (szeroki widżet niższy niż dwa wiersze pokazuje Skoki obok nazwy):
 
-- **SNR** i **RSSI**: sygnał ostatniego pakietu węzła, pokazywany tylko wtedy, gdy węzeł jest słyszany bezpośrednio, a nie przez inne węzły lub MQTT
 - **Skoki**: ile skoków dzieli węzeł od Ciebie albo _Bezpośrednio_
 - **Odległość**: jak daleko węzeł jest od połączonego węzła. Pojawia się tylko przy połączeniu i gdy oba węzły mają pozycję
+- **SNR** i **RSSI**: sygnał ostatniego pakietu węzła, pokazywany tylko wtedy, gdy węzeł jest słyszany bezpośrednio, a nie przez inne węzły lub MQTT
+
+Przy szerokości czterech komórek odczyty układają się w dwie kolumny, więc przy domyślnym rozmiarze czcionki mieszczą się wszystkie w widżecie o dwóch wierszach. Większa czcionka odcina odczyty od końca tej listy, najpierw RSSI.
 
 Gdy węzeł nie był słyszany w ciągu ostatnich dwóch godzin, widżet przyciemnia jego odczyty, żeby nie wyglądały na aktualne. Dotknij widżetu, aby otworzyć szczegóły tego węzła w aplikacji.
 

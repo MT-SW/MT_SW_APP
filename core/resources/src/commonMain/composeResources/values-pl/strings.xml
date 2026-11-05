@@ -454,7 +454,16 @@
     <string name="live_update_mesh_status_summary">Wszystko o Twoim węźle: połączenie, węzły online, nieprzeczytane wiadomości, bateria, czas pracy, obciążenie kanału, ruch, CPU, RAM, flash, PSRAM i Wi‑Fi</string>
     <string name="live_update_no_nodes">Brak węzłów do śledzenia</string>
     <string name="live_update_nodes_online">%1$d z %2$d węzłów online</string>
-    <string name="live_update_off_summary">Pokaż sieć lub jeden węzeł w pasku stanu</string>
+    <string name="live_update_mesh_status_shown">Stan sieci w pasku stanu i w panelu powiadomień</string>
+    <string name="live_update_mesh_status_shown_shade">Stan sieci w panelu powiadomień</string>
+    <string name="live_update_stop_action">Zatrzymaj powiadomienia adaptacyjne</string>
+    <string name="live_update_tracking_shown">Śledzenie: %1$s w pasku stanu i w panelu powiadomień</string>
+    <string name="live_update_tracking_shown_shade">Śledzenie: %1$s w panelu powiadomień</string>
+    <string name="widget_packets_dropped">Odrzucone</string>
+    <string name="widget_packets_received">Odebrane</string>
+    <string name="widget_packets_sent">Wysłane</string>
+    <string name="widget_relays">Przekazane</string>
+    <string name="live_update_off_summary">Pokaż sieć lub jeden węzeł w pasku stanu i w panelu powiadomień</string>
     <string name="live_update_promotion_off">Powiadomienia adaptacyjne są wyłączone dla MT_SW_APP w ustawieniach systemu</string>
     <string name="live_update_cpu">Procesor (CPU): %1$s</string>
     <string name="live_update_ram">RAM: %1$s</string>
@@ -2727,6 +2736,8 @@
     <string name="weight">Waga</string>
     <string name="what_is_meshtastic">Czym jest MT_SW?</string>
     <string name="what_is_meshtastic_description">MT_SW to aplikacja i społeczność wokół otwartej sieci mesh LoRa, która działa bez internetu i bez stacji bazowych: radia przekazują sobie wiadomości z węzła do węzła. Aplikacja rozbudowuje oryginał o m.in. planer łączy, panoramę terenu, asystenta AI i tłumacza działających offline, dodatkowe statystyki, bogatszą listę węzłów i wiele ustawień. Tworzymy ją razem z lokalną społecznością z Świętokrzyskiego, a dołączyć może każdy.</string>
+    <!-- WIDGET -->
+    <string name="widget_packets_bad">słaby</string>
     <!-- WIFI -->
     <string name="widget_node_tracker_choose">Wybierz węzeł do śledzenia</string>
     <string name="widget_node_tracker_not_found">Nie znaleziono węzła. Dotknij, aby wybrać węzeł.</string>

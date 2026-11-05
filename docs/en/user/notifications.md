@@ -2,7 +2,7 @@
 title: Notifications
 parent: User Guide
 nav_order: 18
-last_updated: 2026-10-21
+last_updated: 2026-11-04
 description: What each Meshtastic notification is for, how to silence one kind without the others, and what you can do from a message notification or a watch.
 aliases:
   - notifications

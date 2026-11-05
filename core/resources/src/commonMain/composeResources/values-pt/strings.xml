@@ -596,7 +596,6 @@
     <string name="firmware_update_unknown_hardware">Modelo de hardware desconhecido: %1$d</string>
     <string name="fixed_position">Posição fixa</string>
     <!-- FORMAT -->
-    <string name="free_memory">Memória livre</string>
     <string name="freq">Freq</string>
     <!-- GEOFENCE -->
     <string name="good">Bom</string>
@@ -916,6 +915,7 @@
     <string name="waypoint_received">Ponto de passagem recebido %1$s</string>
     <string name="weight">Peso</string>
     <!-- WIDGET -->
+    <string name="widget_packets_bad">Mau</string>
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">Endereço IP</string>
     <string name="wifi_provision_success_username">Utilizador</string>

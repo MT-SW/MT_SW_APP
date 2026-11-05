@@ -1365,7 +1365,7 @@
     <string name="format_link">Link</string>
     <string name="format_strikethrough">Strikethrough</string>
     <string name="fr_HT" translatable="false">Kreyòl ayisyen</string>
-    <string name="free_memory">Free Memory</string>
+    <string name="free_memory">Free memory</string>
     <string name="free_memory_description">Available system memory in bytes</string>
     <string name="freq">Freq</string>
     <string name="gas_resistance">Gas Resistance</string>
@@ -1599,10 +1599,12 @@
     <string name="live_update_heard_now">Heard just now</string>
     <string name="live_update_hops">Hops away: %1$d</string>
     <string name="live_update_mesh_status">Mesh status</string>
+    <string name="live_update_mesh_status_shown">Mesh status in the status bar and notification shade</string>
+    <string name="live_update_mesh_status_shown_shade">Mesh status in the notification shade</string>
     <string name="live_update_mesh_status_summary">Everything about your node: connection, nodes online, unread messages, battery, uptime, channel load, traffic, CPU, RAM, flash, PSRAM and Wi-Fi</string>
     <string name="live_update_no_nodes">No nodes to track</string>
     <string name="live_update_nodes_online">%1$d of %2$d nodes online</string>
-    <string name="live_update_off_summary">Show the mesh or one node in the status bar</string>
+    <string name="live_update_off_summary">Show the mesh or one node in the status bar and notification shade</string>
     <string name="live_update_promotion_off">Adaptive notifications are turned off for MT_SW_APP in system settings</string>
     <string name="live_update_psram">PSRAM: %1$s</string>
     <string name="live_update_ram">RAM: %1$s</string>
@@ -1611,11 +1613,14 @@
     <string name="live_update_signal">SNR %1$s, RSSI %2$s</string>
     <string name="live_update_start">Start</string>
     <string name="live_update_stop">Stop</string>
+    <string name="live_update_stop_action">Stop Live Update</string>
     <string name="live_update_switch">Switch</string>
     <string name="live_update_track_in">Track in adaptive notifications</string>
     <string name="live_update_track_node">Track a node</string>
     <string name="live_update_track_node_summary">One node's battery, signal, role, channel load, traffic, CPU and memory, last heard, hops and distance</string>
     <string name="live_update_tracking">Tracking %1$s</string>
+    <string name="live_update_tracking_shown">Tracking %1$s in the status bar and notification shade</string>
+    <string name="live_update_tracking_shown_shade">Tracking %1$s in the notification shade</string>
     <string name="live_update_unread">%1$d unread</string>
     <string name="live_update_wifi">Wi-Fi: %1$d dBm</string>
     <string name="lna_gain_correction">LNA gain correction</string>
@@ -2297,7 +2302,7 @@
     <string name="nodes_unheard_banner_one">1 node not heard on your current LoRa settings</string>
     <string name="nodes_unheard_keep">Keep</string>
     <string name="nodes_unheard_remove">Remove</string>
-    <string name="noise_floor">Noise Floor</string>
+    <string name="noise_floor">Noise floor</string>
     <string name="noise_floor_definition">The background RF noise measured by the radio receiver. Lower values usually indicate a quieter receiver environment; -90 dBm is a busy reference point, not a hard failure threshold.</string>
     <string name="noise_floor_no_reading">Noise Floor: No reading</string>
     <string name="none">None (disable)</string>
@@ -3315,13 +3320,15 @@
     <string name="what_is_meshtastic">What is MT_SW?</string>
     <string name="what_is_meshtastic_description">MT_SW is an app and a community around an open LoRa mesh network that works without the internet or base stations: radios pass messages on from node to node. The app extends the original with a link planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node list and many more settings. We build it together with the local community of the Świętokrzyskie region, and anyone can join.</string>
     <!-- WIDGET -->
-    <string name="widget_bad_dropped">Bad / dropped</string>
     <string name="widget_node_tracker_choose">Choose a node to track</string>
     <string name="widget_node_tracker_not_found">Node not found. Tap to choose a node.</string>
     <string name="widget_node_tracker_title">Node Tracker</string>
-    <string name="widget_pair_value">%1$d / %2$d</string>
-    <string name="widget_relays_canceled">Relays / canceled</string>
-    <string name="widget_traffic">TX / RX</string>
+    <string name="widget_packets_bad">Bad</string>
+    <string name="widget_packets_dropped">Dropped</string>
+    <string name="widget_packets_received">Received</string>
+    <string name="widget_packets_sent">Sent</string>
+    <string name="widget_relays">Relayed</string>
+    <string name="widget_relays_canceled">Relays canceled</string>
     <!-- WIFI -->
     <string name="wifi_config">Wi-Fi Options</string>
     <string name="wifi_devices">Wi-Fi Provisioning for mPWRD-OS</string>

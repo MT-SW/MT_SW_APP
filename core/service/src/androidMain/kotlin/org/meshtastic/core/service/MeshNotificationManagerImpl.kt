@@ -118,6 +118,7 @@ import org.meshtastic.core.resources.live_update_ram
 import org.meshtastic.core.resources.live_update_role
 import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.live_update_signal
+import org.meshtastic.core.resources.live_update_stop_action
 import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_battery
@@ -225,6 +226,7 @@ class MeshNotificationManagerImpl(
         private const val MAIN_ACTIVITY_CLASS = "org.meshtastic.app.MainActivity"
         private const val THUMBS_UP = "👍"
         private const val CONNECTIONS_REQUEST_CODE = 0x4C55
+        private const val STOP_LIVE_UPDATE_REQUEST_CODE = 0x4C56
         private const val LIVE_UPDATE_SEPARATOR = " · "
         private val LIVE_UPDATE_MIN_INTERVAL = 2.seconds
         private const val TRACK_NODE_TELEMETRY_WINDOW = 60
@@ -1132,7 +1134,7 @@ class MeshNotificationManagerImpl(
      * A user-started Live Update on the service notification. Promotion needs an ongoing notification with a title, no
      * custom views and no colorization, on a channel above MIN; BigTextStyle is one of the allowed styles.
      */
-    private fun createLiveUpdateNotification(
+    private suspend fun createLiveUpdateNotification(
         title: String,
         subText: String?,
         lines: List<String>,
@@ -1150,6 +1152,7 @@ class MeshNotificationManagerImpl(
                 .setStyle(NotificationCompat.BigTextStyle().bigText(lines.joinToString("\n")))
                 .setShowWhen(false)
                 .setRequestPromotedOngoing(true)
+                .addAction(createStopLiveUpdateAction())
         subText?.let { builder.setSubText(it) }
         chip?.let { builder.setShortCriticalText(it) }
         return builder.build()
@@ -1180,6 +1183,22 @@ class MeshNotificationManagerImpl(
             }
             if (ext.wifiRssi != 0) add(getStringSuspend(Res.string.live_update_wifi, ext.wifiRssi))
         }
+    }
+
+    /** Named in full: the system's own Stop on this foreground-service notification disconnects the radio. */
+    private suspend fun createStopLiveUpdateAction(): NotificationCompat.Action {
+        val label = getStringSuspend(Res.string.live_update_stop_action)
+        val intent = Intent(LiveUpdateStopReceiver.ACTION_STOP, null, context, LiveUpdateStopReceiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                STOP_LIVE_UPDATE_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        return NotificationCompat.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel, label, pendingIntent)
+            .setShowsUserInterface(false)
+            .build()
     }
 
     private suspend fun batteryText(level: Int): String = if (level > MAX_BATTERY_LEVEL) {

@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-10-22
+last_updated: 2026-11-04
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -152,6 +152,8 @@ Na Androidzie 16 i nowszym w **Ustawieniach**, tuż nad sekcją informacji (obok
 - **Śledzenie węzła:** bateria wybranego węzła, sygnał, rola, obciążenie kanału i czas nadawania, ruch oraz obciążenie procesora i pamięci (to, co ten węzeł ostatnio nadał), kiedy był ostatnio słyszany, liczba skoków i odległość od Twojego węzła. Pasek stanu pokazuje jego baterię albo, gdy węzeł nie podaje baterii, jak dawno był słyszany. Węzeł wybierasz z listy (najpierw ulubione, potem ostatnio słyszane) albo wyszukujesz po nazwie.
 
 Dotknij wiersza, aby uruchomić jedną z tych funkcji, przełączyć się na drugą albo ją zatrzymać. Działa tylko jedna naraz i jest wyłączona, dopóki jej nie uruchomisz. W szczegółach węzła przycisk **Śledź w powiadomieniach adaptacyjnych** od razu zaczyna śledzić ten węzeł.
+
+Gdy jedna z nich działa, wiersz mówi, co pokazuje, i ma przycisk **Zatrzymaj**, a samo powiadomienie usługi ma akcję **Zatrzymaj powiadomienia adaptacyjne**. Każda z nich kończy funkcję i zostawia radio połączone; powiadomienie wraca do zwykłego stanu połączenia i statystyk sieci.
 
 Zerwane połączenie nie zatrzymuje funkcji i pokazuje stan połączenia, dopóki węzeł nie wróci. Rozłączenie, zmiana węzła albo usunięcie lub zignorowanie śledzonego węzła ją zatrzymuje. Jeśli wiersz informuje, że powiadomienia adaptacyjne są wyłączone dla MT_SW_APP, Android pokazuje je jako zwykłe powiadomienie, dopóki nie zezwolisz na nie w ustawieniach systemu.
 

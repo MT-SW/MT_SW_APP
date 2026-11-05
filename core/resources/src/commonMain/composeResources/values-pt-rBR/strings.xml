@@ -253,7 +253,6 @@
     <string name="firmware_update_failed">Atualização falhou</string>
     <string name="firmware_version">Versão do firmware: %1$s</string>
     <!-- FORMAT -->
-    <string name="free_memory">Memória Livre</string>
     <string name="freq">Freq</string>
     <string name="gas_resistance">Resistência ao gás</string>
     <!-- GEOFENCE -->
@@ -666,6 +665,7 @@
     <string name="waypoint_received">Ponto de referência recebido: %1$s</string>
     <string name="weight">Peso</string>
     <!-- WIDGET -->
+    <string name="widget_packets_bad">Ruim</string>
     <!-- WIFI -->
     <string name="wifi_provision_success_done">Concluído</string>
     <string name="wifi_provision_success_ip_address">Endereço IP</string>

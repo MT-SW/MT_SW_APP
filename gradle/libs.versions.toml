@@ -4,7 +4,7 @@ xmlutil = "1.0.2.1"
 # Android
 agp = "9.5.0"
 appcompat = "1.8.0"
-appfunctions = "1.0.0-beta01"
+appfunctions = "1.0.0-rc01"
 
 # androidx
 androidx-sqlite-bundled = "2.8.0-alpha03"
@@ -17,7 +17,7 @@ navigation3 = "1.2.0"
 # navigation3-runtime is AndroidX's own KMP artifact, separate from the JetBrains
 # navigation3-ui mirror above; the two refs move independently and the mirror does not
 # publish every AndroidX version, so they are not always equal.
-navigation3-runtime = "1.2.0"
+navigation3-runtime = "1.2.1"
 navigationevent = "1.1.0"
 paging = "3.5.3"
 room = "3.1.0-alpha03"
@@ -47,7 +47,7 @@ compose-screenshot = "0.0.1-alpha16"
 # Gradle plugin (same coordinates/version). The stable 1.4.x line predates AGP 9 support.
 benchmark = "1.6.0-alpha01"
 profileinstaller = "1.4.1"
-androidx-uiautomator = "2.4.0"
+androidx-uiautomator = "2.4.1"
 
 # Compose Multiplatform
 compose-multiplatform = "1.12.2"
@@ -82,7 +82,7 @@ mlkit-translate = "17.0.3"
 onnxruntime = "1.22.0"
 
 # CameraX
-camerax = "1.7.0-rc01"
+camerax = "1.7.0-rc02"
 
 # Networking
 ktor = "3.6.1"
@@ -104,7 +104,7 @@ okio = "3.18.2"
 bouncycastle = "1.86"
 uri-kmp = "0.0.21"
 spotless = "8.11.0"
-sceneview = "4.65.0"
+sceneview = "4.66.0"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
