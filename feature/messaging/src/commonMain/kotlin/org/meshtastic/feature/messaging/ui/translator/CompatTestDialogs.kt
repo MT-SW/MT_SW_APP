@@ -16,28 +16,28 @@
  */
 package org.meshtastic.feature.messaging.ui.translator
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.resources.StringResource
-import kotlinx.coroutines.delay
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.animation.Crossfade
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.compat_cancel
@@ -52,7 +52,12 @@ import org.meshtastic.core.resources.compat_offer_title
 import org.meshtastic.core.resources.compat_offer_yes
 import org.meshtastic.core.resources.compat_report_note
 import org.meshtastic.core.resources.compat_running_title
+import org.meshtastic.core.resources.compat_step_dictation
+import org.meshtastic.core.resources.compat_step_graphics
+import org.meshtastic.core.resources.compat_step_hardware
+import org.meshtastic.core.resources.compat_step_question
 import org.meshtastic.core.resources.compat_tip_1
+import org.meshtastic.core.resources.compat_tip_10
 import org.meshtastic.core.resources.compat_tip_2
 import org.meshtastic.core.resources.compat_tip_3
 import org.meshtastic.core.resources.compat_tip_4
@@ -61,12 +66,7 @@ import org.meshtastic.core.resources.compat_tip_6
 import org.meshtastic.core.resources.compat_tip_7
 import org.meshtastic.core.resources.compat_tip_8
 import org.meshtastic.core.resources.compat_tip_9
-import org.meshtastic.core.resources.compat_tip_10
 import org.meshtastic.core.resources.compat_tips_title
-import org.meshtastic.core.resources.compat_step_dictation
-import org.meshtastic.core.resources.compat_step_graphics
-import org.meshtastic.core.resources.compat_step_hardware
-import org.meshtastic.core.resources.compat_step_question
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.CompatStep
@@ -132,35 +132,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                 },
             )
 
-        is CompatUi.Running ->
-            AlertDialog(
-                onDismissRequest = {},
-                title = { Text(stringResource(Res.string.compat_running_title)) },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            stringResource(
-                                when (compat.step) {
-                                    CompatStep.QUESTION -> Res.string.compat_step_question
-                                    CompatStep.HARDWARE -> Res.string.compat_step_hardware
-                                    CompatStep.GRAPHICS -> Res.string.compat_step_graphics
-                                    CompatStep.DICTATION -> Res.string.compat_step_dictation
-                                },
-                            ),
-                        )
-                        if (compat.detail.isNotBlank()) Text(compat.detail)
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                        CompatTips()
-                    }
-                },
-                // The window cannot be closed by accident; the only way out is to stop the test.
-                confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { viewModel.cancelCompat() }) {
-                        Text(stringResource(Res.string.compat_cancel))
-                    }
-                },
-            )
+        is CompatUi.Running -> CompatRunningDialog(compat, viewModel)
 
         is CompatUi.Done ->
             ReportIssuesDialog(
@@ -204,4 +176,36 @@ private fun CompatTips() {
             Text(stringResource(compatTips[i]), style = MaterialTheme.typography.bodyMedium)
         }
     }
+}
+
+@Composable
+private fun CompatRunningDialog(compat: CompatUi.Running, viewModel: AssistantViewModel) {
+    AlertDialog(
+        onDismissRequest = {},
+        title = { Text(stringResource(Res.string.compat_running_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(
+                        when (compat.step) {
+                            CompatStep.QUESTION -> Res.string.compat_step_question
+                            CompatStep.HARDWARE -> Res.string.compat_step_hardware
+                            CompatStep.GRAPHICS -> Res.string.compat_step_graphics
+                            CompatStep.DICTATION -> Res.string.compat_step_dictation
+                        },
+                    ),
+                )
+                if (compat.detail.isNotBlank()) Text(compat.detail)
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                CompatTips()
+            }
+        },
+        // The window cannot be closed by accident; the only way out is to stop the test.
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = { viewModel.cancelCompat() }) {
+                Text(stringResource(Res.string.compat_cancel))
+            }
+        },
+    )
 }

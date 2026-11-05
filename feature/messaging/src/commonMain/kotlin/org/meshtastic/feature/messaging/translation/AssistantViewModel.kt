@@ -143,9 +143,9 @@ class AssistantViewModel(
     }
 
     /**
-     * The test: a longer question, then the hardware report (once more on the graphics card after a clean NPU run), then
-     * the dictation check when it was agreed to. The conversation is saved
-     * like any other and all the results are collected into files for the report window.
+     * The test: a longer question, then the hardware report (once more on the graphics card after a clean NPU
+     * run), then the dictation check when it was agreed to. The conversation is saved like any other and all the
+     * results are collected into files for the report window.
      */
     fun startCompat(withDictation: Boolean) {
         if (_state.value.busy || _compat.value is CompatUi.Running) return
@@ -250,7 +250,7 @@ class AssistantViewModel(
         )
     }
 
-    private fun roundTenth(value: Double): String = (kotlin.math.round(value * 10) / 10).toString()
+    private fun roundTenth(value: Double): String = (kotlin.math.round(value * ROUND_FACTOR) / ROUND_FACTOR).toString()
 
     init {
         refreshSaved()
@@ -491,3 +491,5 @@ class AssistantViewModel(
 private const val SKIP_NPU_SETTLE_MS = 500L
 
 private const val MILLIS_PER_SECOND_DOUBLE = 1000.0
+
+private const val ROUND_FACTOR = 10.0
