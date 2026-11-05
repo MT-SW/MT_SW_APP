@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Asystent AI: dopisek „odpowiedź AI” ma kolor niebieski ze standardowej palety aplikacji, żeby był lepiej widoczny.
 * Tablet i komputer: w widoku czatów lista rozmów jest węższa, a kanał z wiadomościami szerszy (około 36% do 64%). Węzły i dokumentacja zachowują dotychczasowy podział. Wybranie innej rozmowy zastępuje otwartą, zamiast nakładać się na nią, więc można swobodnie przełączać kanały. Szerokość nadal można zmieniać przeciągnięciem.
 * iPhone i iPad: połączenie z radiem po przerwie (np. po nocy) wraca samo. Gdy radia nie widać w skanie, aplikacja zostawia u systemu długie żądanie połączenia (do 30 minut, ponawiane), które system dokończy także w tle, gdy tylko radio znów będzie w zasięgu, zamiast skanować co kilkanaście sekund.
 * Historia tras (traceroute): każdy wpis ma opis, czy trasa została zlecona ręcznie, czy odebrana automatycznie. W trybie sniffer odpowiedzi adresowane do innych węzłów też zapisują się jako zaobserwowane (bez alarmu); alarm powstaje tylko dla naszych własnych zleceń.
@@ -550,6 +551,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* AI assistant: the "AI answer" note is blue, from the app's standard palette, so it is easier to see.
 * Tablet and desktop: in the chats view the conversation list is narrower and the message channel wider (about 36% to 64%). Nodes and the documentation keep their usual split. Choosing another conversation replaces the open one instead of stacking on it, so channels can be switched freely. The width can still be changed by dragging.
 * iPhone and iPad: the link to the radio comes back by itself after a break (for example overnight). When the radio is not seen in a scan, the app leaves a long connection request with the system (up to 30 minutes, repeated), which the system finishes in the background as soon as the radio is in range again, instead of scanning every few seconds.
 * Traceroute history: every entry says whether the trace was requested manually or received automatically. In sniffer mode, responses addressed to other nodes are also recorded as observed (with no alert); an alert is raised only for our own requests.

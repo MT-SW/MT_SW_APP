@@ -123,6 +123,7 @@ import org.meshtastic.core.resources.resend
 import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
+import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
@@ -378,7 +379,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                 Text(
                                     text = stringResource(Res.string.assistant_ai_label),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = MaterialTheme.colorScheme.StatusBlue,
                                 )
                             }
                             if (web != null) {
