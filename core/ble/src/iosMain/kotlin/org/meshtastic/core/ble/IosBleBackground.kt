@@ -21,9 +21,9 @@ import com.juul.kable.CentralManager
 
 /**
  * Turns on Core Bluetooth state restoration for the whole app (iPhone and iPad). With it, iPadOS/iOS keeps the radio
- * connection request alive even after the system has closed the app in the background, and starts the app again when the
- * radio is back in range. It has to be called once, before anything else uses Bluetooth (scanning, connecting); a second
- * call or a call after the first use is harmless and only logged.
+ * connection request alive even after the system has closed the app in the background, and starts the app again when
+ * the radio is back in range. It has to be called once, before anything else uses Bluetooth (scanning, connecting); a
+ * second call or a call after the first use is harmless and only logged.
  */
 fun configureIosBleBackground() {
     try {
