@@ -36,4 +36,6 @@ internal fun iosMapViewProvider(): MapLibreMapViewProvider = MapLibreMapViewProv
         rememberRenderableLayers(layersManager, importedLayers.filter { it.isVisible })
     },
     layersSheetExtra = { ImportedLayersSlot() },
+    // MapLibre Native on iPhone and iPad downloads offline packs the same way as on Android.
+    offlineMapsSupported = true,
 )
