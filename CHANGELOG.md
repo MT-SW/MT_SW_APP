@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Listopad 2026
 
 * Logi: połączenie Bluetooth nie zapisuje już osobnej linii dla każdego odebranego i wysłanego pakietu (to były setki wpisów na sekundę, przez które trudno było znaleźć prawdziwy błąd). Zamiast tego jest jedno podsumowanie na minutę (liczba pakietów i bajtów); zdarzenia, błędy i zmiany połączenia zapisują się jak dotąd.
+* Scalenie z oryginałem (kolejne, drobne): narzędzie do dokumentacji Dokka 2.3.0 i odświeżone profile startowe aplikacji. Nic nie zmienia się w działaniu ani w naszych funkcjach.
 * Scalenie z oryginałem — wersja 2.8.5: numer wersji aplikacji 2.8.5, nowsze biblioteki narzędziowe Androida (AGP 9.5.1, android tools 32.5.1), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Nasze tłumaczenia PL bez zmian. Wydanie MT_SW_APP v5(2.8.5).test.1.
 * Budowanie: dostosowanie do nowego Gradle (konfiguracja `androidApp` nie sięga już do głównego projektu), włączone łączenie bibliotek natywnych iOS (cinterop commonization).
 
@@ -563,6 +564,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### November 2026
 
 * Logs: the Bluetooth connection no longer writes a separate line for every received and sent packet (hundreds of entries per second, which made the real error hard to find). Instead there is one summary per minute (packets and bytes); events, errors and connection changes are logged as before.
+* Merge with the original (another small one): the Dokka 2.3.0 documentation tool and refreshed app startup profiles. Nothing changes in how the app works or in our features.
 * Merge with the original — version 2.8.5: app version number 2.8.5, newer Android build tools (AGP 9.5.1, android tools 32.5.1), refreshed hardware and firmware data, translations and store screenshots. Our Polish translations are unchanged. MT_SW_APP release v5(2.8.5).test.1.
 * Build: adapted to the new Gradle (the `androidApp` configuration no longer reaches into the root project), iOS native library sharing enabled (cinterop commonization).
 
