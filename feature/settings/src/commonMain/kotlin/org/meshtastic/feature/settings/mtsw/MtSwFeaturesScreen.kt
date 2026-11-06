@@ -47,8 +47,8 @@ import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
-import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.import_menu_in_top_bar
