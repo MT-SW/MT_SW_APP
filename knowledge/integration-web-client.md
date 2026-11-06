@@ -3,7 +3,7 @@
 ## 🇵🇱 Polski
 
 Folder `static/` to zbudowany klient [meshtastic/web](https://github.com/meshtastic/web)
-(monorepo, `apps/web`) z commita `1c66c50` (20.09.2026), dostosowany do MT_SW.
+(monorepo, `apps/web`) z commita `fe233b50` (19.10.2026), dostosowany do MT_SW.
 Zmiany w źródłach są w pliku `mtsw-web-client.patch`:
 
 - ścieżka bazowa `/meshtastic/web/` (Vite `base`) oraz router na adresach z `#`,
@@ -13,12 +13,11 @@ Zmiany w źródłach są w pliku `mtsw-web-client.patch`:
   `@meshtastic/sdk` i pakiet z workspace), żeby dało się zbudować bez dostępu do JSR,
 - kolorystyka MT_SW (złoto #F5C839, granat #2C2D3C) dopisana na końcu `src/index.css`,
 - logo i ikony MT_SW w `public/`, nazwa „MT_SW” w tłumaczeniach, pełne
-  polskie tłumaczenie (`public/i18n/locales/pl-PL/`).
+  polskie tłumaczenie (`public/i18n/locales/pl-PL/`); tłumaczenia (`public/i18n/locales/`) nie są w pliku patcha — po aktualizacji wyjściowego klienta trzeba w nich ponownie podmienić „Meshtastic” na „MT_SW” w sześciu miejscach (`common`: `app.title`, `app.fullTitle`; `connections`: `page.title`; `ui`: `app.title`, `app.logo`, początek `footer.text`) i dotłumaczyć nowe klucze w `pl-PL`.
 
 Mapa: w komponencie mapy styl `mapStyle` jest wpisany w kodzie (standardowa mapa OpenStreetMap,
 kafle `tile.openstreetmap.org`, bez klucza), a kafle są pobierane z `referrerPolicy: "origin"`
-(`transformRequest`) — tak samo jak w mapie panelu. Zmiana jest w gotowym
-`static/index-*.js`; po ponownym zbudowaniu klienta trzeba ją powtórzyć w źródłach.
+(`transformRequest`) — tak samo jak w mapie panelu. Zmiana jest w `apps/web/src/components/Map.tsx` (jest w pliku `mtsw-web-client.patch`).
 
 Budowanie: `pnpm install` (bez lockfile, `minimumReleaseAge: 0`), potem w `apps/web`
 `vite build`; zawartość `apps/web/dist/` kopiuje się do `static/`.
@@ -30,7 +29,7 @@ trwałej bazy.
 ## 🇬🇧 English
 
 `static/` is a build of [meshtastic/web](https://github.com/meshtastic/web)
-(monorepo, `apps/web`) at commit `1c66c50` (2026-09-20), adapted for MT_SW.
+(monorepo, `apps/web`) at commit `fe233b50` (2026-10-19), adapted for MT_SW.
 Source changes are in `mtsw-web-client.patch`:
 
 - base path `/meshtastic/web/` (Vite `base`) and a hash-based router, because
@@ -40,12 +39,11 @@ Source changes are in `mtsw-web-client.patch`:
   to `@meshtastic/sdk` and the workspace package), so it builds without JSR access,
 - MT_SW colours (gold #F5C839, navy #2C2D3C) appended to `src/index.css`,
 - MT_SW logo and icons in `public/`, "MT_SW" in the translations, and a full
-  Polish translation (`public/i18n/locales/pl-PL/`).
+  Polish translation (`public/i18n/locales/pl-PL/`); translations (`public/i18n/locales/`) are not in the patch — after updating the upstream client, "Meshtastic" has to be replaced with "MT_SW" again in six places (`common`: `app.title`, `app.fullTitle`; `connections`: `page.title`; `ui`: `app.title`, `app.logo`, start of `footer.text`) and new `pl-PL` keys translated.
 
 Map: in the map component the `mapStyle` is inlined (standard OpenStreetMap map, tiles from
 `tile.openstreetmap.org`, no key) and tiles are fetched with `referrerPolicy: "origin"`
-(`transformRequest`) — same as the panel map. The change is in the built
-`static/index-*.js`; after rebuilding the client it has to be repeated in the sources.
+(`transformRequest`) — same as the panel map. The change is in `apps/web/src/components/Map.tsx` (it is in `mtsw-web-client.patch`).
 
 Build: `pnpm install` (no lockfile, `minimumReleaseAge: 0`), then `vite build` in
 `apps/web`; copy `apps/web/dist/` into `static/`.
