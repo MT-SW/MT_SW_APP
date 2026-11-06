@@ -419,7 +419,16 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     if (isWindowReady) {
         // Hide via `visible` rather than dropping the Window from composition so the UI tree
         // (navigation backstack, scroll positions) survives a hide-to-tray round trip.
-        MeshtasticWindow(uiViewModel, isDarkTheme, monochrome, appIcon, windowState, visible = isAppVisible) {
+        MeshtasticWindow(
+            uiViewModel,
+            isDarkTheme,
+            monochrome,
+            seedColor,
+            seedIntensity,
+            appIcon,
+            windowState,
+            visible = isAppVisible,
+        ) {
             // Minimize to the tray on close — but only where the tray icon can actually be clicked
             // back. Where it cannot, there is nowhere to minimize to, so quit instead; otherwise the
             // process is stranded with no window, no reachable tray menu and no key handler either.
@@ -504,6 +513,8 @@ private fun ApplicationScope.MeshtasticWindow(
     uiViewModel: UIViewModel,
     isDarkTheme: Boolean,
     monochrome: Boolean,
+    seedColor: Int?,
+    seedIntensity: Int,
     appIcon: Painter,
     windowState: WindowState,
     visible: Boolean,
