@@ -34,6 +34,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.koin.core.Koin
 import org.koin.plugin.module.dsl.startKoin
+import org.meshtastic.core.ble.configureIosBleBackground
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
@@ -63,6 +64,7 @@ private val koin: Koin by lazy {
     IosFileLog.install()
     AppLogControls.current = IosLogControl
     IosLogControl.start()
+    configureIosBleBackground()
     startKoin<IosKoinApp> {}.koin
 }
 
