@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
@@ -46,6 +47,7 @@ import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
+import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.debug_panel
@@ -112,6 +114,7 @@ import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
+import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -227,6 +230,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.Antenna,
                 ) {
                     onNavigate(SettingsRoute.AntennaCalculator)
+                }
+            }
+
+            // Only where the platform installs it (iPhone and iPad); hidden elsewhere.
+            if (AppBackgroundControls.current != null) {
+                ExpressiveSection(title = stringResource(Res.string.background_section_title)) {
+                    AppBackgroundSettings()
                 }
             }
 

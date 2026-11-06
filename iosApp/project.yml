@@ -25,8 +25,10 @@ targets:
           - _meshtastic._tcp
         UIBackgroundModes:
           - bluetooth-central
+          - location
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
         NSMicrophoneUsageDescription: "MT_SW używa mikrofonu do dyktowania wiadomości."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie i w kompasie, może ją wysłać do sieci mesh, a po włączeniu „Praca w tle” utrzymuje połączenie z radiem i zbieranie danych, gdy aplikacja nie jest na wierzchu."
         NSLocationWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie, w kompasie i może ją wysłać do sieci mesh."
         NSMotionUsageDescription: "MT_SW odczytuje ciśnienie powietrza (barometr) telefonu."
         CFBundleURLTypes:

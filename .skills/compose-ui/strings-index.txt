@@ -582,6 +582,10 @@ auto_clean_nodes_title
 auto_load_chat_images
 available_pins
 back
+background_keepalive_permission
+background_keepalive_summary
+background_keepalive_title
+background_section_title
 backup_app_database
 backup_keys
 backup_keys_confirmation
