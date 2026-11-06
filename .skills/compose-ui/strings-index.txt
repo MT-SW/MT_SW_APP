@@ -3076,6 +3076,17 @@ terrain_horizon_target_antenna
 terrain_horizon_title
 ### THEME ###
 theme
+theme_color_dark
+theme_color_hue
+theme_color_intensity
+theme_color_intensity_hint
+theme_color_light
+theme_color_pick
+theme_color_presets
+theme_color_saturation
+theme_color_summary
+theme_color_system
+theme_color_title
 theme_dark
 theme_light
 theme_mono_dark

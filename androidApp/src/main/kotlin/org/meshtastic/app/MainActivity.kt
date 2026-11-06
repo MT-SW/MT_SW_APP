@@ -88,9 +88,12 @@ import org.meshtastic.core.ui.theme.EventTheme
 import org.meshtastic.core.ui.theme.EventThemeToggle
 import org.meshtastic.core.ui.theme.LocalEventTheme
 import org.meshtastic.core.ui.theme.LocalEventThemeToggle
+import org.meshtastic.core.ui.theme.MODE_COLOR_DARK
+import org.meshtastic.core.ui.theme.MODE_COLOR_LIGHT
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
+import org.meshtastic.core.ui.theme.isColorMode
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
@@ -164,14 +167,19 @@ class MainActivity : AppCompatActivity() {
             val theme by model.theme.collectAsStateWithLifecycle()
             val dynamic = theme == MODE_DYNAMIC
             val monochrome = isMonochromeMode(theme)
+            val colorTheme = isColorMode(theme)
+            val themeSeed by model.themeSeed.collectAsStateWithLifecycle()
+            val themeIntensity by model.themeIntensity.collectAsStateWithLifecycle()
             val dark =
                 when (theme) {
                     AppCompatDelegate.MODE_NIGHT_YES,
                     MODE_MONO_DARK,
+                    MODE_COLOR_DARK,
                     -> true
 
                     AppCompatDelegate.MODE_NIGHT_NO,
                     MODE_MONO_LIGHT,
+                    MODE_COLOR_LIGHT,
                     -> false
 
                     else -> isSystemInDarkTheme()
@@ -186,7 +194,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             AppCompositionLocals {
-                AppTheme(dynamicColor = dynamic, darkTheme = dark, monochrome = monochrome) {
+                AppTheme(
+                    dynamicColor = dynamic,
+                    darkTheme = dark,
+                    monochrome = monochrome,
+                    seedColor = themeSeed.takeIf { colorTheme },
+                    seedIntensity = themeIntensity,
+                ) {
                     val appIntroCompleted by model.appIntroCompleted.collectAsStateWithLifecycle()
 
                     // Signal to the system that the initial UI is "fully drawn"

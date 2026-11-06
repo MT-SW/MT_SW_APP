@@ -142,6 +142,10 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
         ThemePickerDialog(
             onClickTheme = { settingsViewModel.setTheme(it) },
             onDismiss = { showThemePicker = false },
+            themeSeed = settingsViewModel.themeSeed.collectAsStateWithLifecycle().value,
+            themeIntensity = settingsViewModel.themeIntensity.collectAsStateWithLifecycle().value,
+            onThemeSeedChange = { settingsViewModel.setThemeSeed(it) },
+            onThemeIntensityChange = { settingsViewModel.setThemeIntensity(it) },
         )
     }
     if (showUiScalePicker) {

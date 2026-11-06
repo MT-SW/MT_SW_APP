@@ -37,6 +37,7 @@ import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.ble.configureIosBleBackground
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
@@ -45,8 +46,12 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.MODE_COLOR
+import org.meshtastic.core.ui.theme.MODE_COLOR_DARK
+import org.meshtastic.core.ui.theme.MODE_COLOR_LIGHT
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
+import org.meshtastic.core.ui.theme.isColorMode
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalTerminateApplication
@@ -62,6 +67,8 @@ import kotlin.time.Duration.Companion.minutes
 
 /** Starts the dependency graph once for the whole life of the app process. */
 private val koin: Koin by lazy {
+    // No wallpaper colours on an iPhone: the colour theme is the default look (before the preferences are first read).
+    UiPrefsDefaults.theme = MODE_COLOR
     IosFileLog.install()
     AppLogControls.current = IosLogControl
     IosLogControl.start()
@@ -128,15 +135,17 @@ private fun BackgroundCleanup() {
 @Composable
 private fun ThemedApp(uiViewModel: UIViewModel) {
     val uiPrefs = remember { koin.get<UiPrefs>(UiPrefs::class) }
-    val themePref by uiPrefs.theme.collectAsState(initial = -1)
+    val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
     val isDarkTheme =
         when (themePref) {
             1,
             MODE_MONO_LIGHT,
+            MODE_COLOR_LIGHT,
             -> false
 
             2,
             MODE_MONO_DARK,
+            MODE_COLOR_DARK,
             -> true
 
             else -> isSystemInDarkTheme()
@@ -160,7 +169,14 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         LocalDensity provides rememberScaledDensity(percent = uiScale),
         LocalTerminateApplication provides terminate,
     ) {
-        AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
+        val themeSeed by uiPrefs.themeSeed.collectAsState()
+        val themeIntensity by uiPrefs.themeIntensity.collectAsState()
+        AppTheme(
+            darkTheme = isDarkTheme,
+            monochrome = isMonochromeMode(themePref),
+            seedColor = themeSeed.takeIf { isColorMode(themePref) },
+            seedIntensity = themeIntensity,
+        ) {
             IosCoilSetup()
             val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
             if (introCompleted) {

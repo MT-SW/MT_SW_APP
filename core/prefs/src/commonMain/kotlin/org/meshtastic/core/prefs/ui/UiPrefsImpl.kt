@@ -58,11 +58,30 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_APP_INTRO_COMPLETED] = completed } }
     }
 
+    // The default theme comes from the platform ([UiPrefsDefaults]): the phone's own colours on Android, the colour theme
+    // on iPhone and computer, where the system gives no colours.
     override val theme: StateFlow<Int> =
-        dataStore.data.map { it[KEY_THEME] ?: -1 }.stateIn(scope, SharingStarted.Lazily, -1)
+        dataStore.data
+            .map { it[KEY_THEME] ?: UiPrefsDefaults.theme }
+            .stateIn(scope, SharingStarted.Lazily, UiPrefsDefaults.theme)
 
     override fun setTheme(value: Int) {
         scope.launch { dataStore.edit { it[KEY_THEME] = value } }
+    }
+
+    // Eagerly: the first frame of a colour theme already needs the colour.
+    override val themeSeed: StateFlow<Int> =
+        dataStore.data.map { it[KEY_THEME_SEED] ?: DEFAULT_SEED }.stateIn(scope, SharingStarted.Eagerly, DEFAULT_SEED)
+
+    override fun setThemeSeed(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_THEME_SEED] = value } }
+    }
+
+    override val themeIntensity: StateFlow<Int> =
+        dataStore.data.map { it[KEY_THEME_INTENSITY] ?: DEFAULT_INTENSITY }.stateIn(scope, SharingStarted.Eagerly, DEFAULT_INTENSITY)
+
+    override fun setThemeIntensity(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_THEME_INTENSITY] = value } }
     }
 
     // Eagerly: the first frame already needs the scale, otherwise the UI would jump once after start.
@@ -760,6 +779,10 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
+        val KEY_THEME_SEED = intPreferencesKey("theme-seed")
+        val KEY_THEME_INTENSITY = intPreferencesKey("theme-intensity")
+        private const val DEFAULT_SEED = 0xFFF5C839.toInt()
+        private const val DEFAULT_INTENSITY = 100
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
         val KEY_HEALTH_HERO_LOCKED = booleanPreferencesKey("health-hero-locked")
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")

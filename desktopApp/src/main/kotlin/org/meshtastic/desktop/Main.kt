@@ -103,8 +103,13 @@ import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
+import org.meshtastic.core.ui.theme.MODE_COLOR
+import org.meshtastic.core.ui.theme.MODE_COLOR_DARK
+import org.meshtastic.core.ui.theme.MODE_COLOR_LIGHT
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
+import org.meshtastic.core.ui.theme.isColorMode
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
@@ -182,6 +187,8 @@ fun main(args: Array<String>) {
     // Before anything is opened: a requested move of the data folder is made now (with a progress window).
     prepareDataFolder()
     installQuitHandler()
+    // No wallpaper colours on a computer: the colour theme is the default look.
+    UiPrefsDefaults.theme = MODE_COLOR
     // exitProcessOnExit = false is what makes the shutdown block below reachable at all: with the default (true),
     // application() calls System.exit(0) itself as soon as the Compose loop ends, and control never returns here.
     // Do not "simplify" this back to a bare application {} — that silently disables every teardown that follows.
@@ -301,7 +308,7 @@ private fun NodeCleanupLifecycle() {
 private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
     val systemLocale = remember { Locale.getDefault() }
     val uiPrefs = koinInject<UiPrefs>()
-    val themePref by uiPrefs.theme.collectAsState(initial = -1)
+    val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
     val localePref by uiPrefs.locale.collectAsState(initial = "")
     Locale.setDefault(resolveLocale(localePref, systemLocale))
 
@@ -309,16 +316,26 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
         when (themePref) {
             1,
             MODE_MONO_LIGHT,
+            MODE_COLOR_LIGHT,
             -> false
 
             2,
             MODE_MONO_DARK,
+            MODE_COLOR_DARK,
             -> true
 
             else -> isSystemInDarkTheme()
         }
 
-    MeshtasticDesktopApp(uiViewModel, isDarkTheme, isMonochromeMode(themePref))
+    val themeSeed by uiPrefs.themeSeed.collectAsState()
+    val themeIntensity by uiPrefs.themeIntensity.collectAsState()
+    MeshtasticDesktopApp(
+        uiViewModel,
+        isDarkTheme,
+        isMonochromeMode(themePref),
+        seedColor = themeSeed.takeIf { isColorMode(themePref) },
+        seedIntensity = themeIntensity,
+    )
 }
 
 // ----- Application chrome (tray, window, navigation) -----
@@ -331,6 +348,8 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     uiViewModel: UIViewModel,
     isDarkTheme: Boolean,
     monochrome: Boolean,
+    seedColor: Int?,
+    seedIntensity: Int,
 ) {
     var isAppVisible by remember { mutableStateOf(true) }
     var isWindowReady by remember { mutableStateOf(false) }
@@ -562,7 +581,12 @@ private fun ApplicationScope.MeshtasticWindow(
             ) {
                 val uiScale by uiViewModel.uiScale.collectAsState()
                 CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
-                    AppTheme(darkTheme = isDarkTheme, monochrome = monochrome) {
+                    AppTheme(
+                        darkTheme = isDarkTheme,
+                        monochrome = monochrome,
+                        seedColor = seedColor,
+                        seedIntensity = seedIntensity,
+                    ) {
                         // First start: show the welcome screen once, then the app.
                         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
                         if (introCompleted) {

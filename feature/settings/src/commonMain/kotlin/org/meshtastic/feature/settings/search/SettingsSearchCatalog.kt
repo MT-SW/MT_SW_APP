@@ -37,6 +37,7 @@ import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.background_keepalive_title
+import org.meshtastic.core.resources.theme_color_title
 import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
@@ -191,6 +192,7 @@ object SettingsSearchCatalog {
             Res.string.debug_panel to SettingsRoute.DebugPanel,
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.background_keepalive_title to SettingsRoute.MtSwFeatures,
+            Res.string.theme_color_title to SettingsRoute.MtSwFeatures,
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,

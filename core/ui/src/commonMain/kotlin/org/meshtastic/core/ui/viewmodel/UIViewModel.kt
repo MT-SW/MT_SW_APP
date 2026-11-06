@@ -191,6 +191,10 @@ class UIViewModel(
 
     val theme: StateFlow<Int> = uiPrefs.theme
 
+    val themeSeed: StateFlow<Int> = uiPrefs.themeSeed
+
+    val themeIntensity: StateFlow<Int> = uiPrefs.themeIntensity
+
     val uiScale: StateFlow<Int> = uiPrefs.uiScale
 
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
