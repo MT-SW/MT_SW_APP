@@ -114,7 +114,14 @@ internal object NodeMetrics {
                 "sygnał Bluetooth telefonu",
                 "Bluetooth signal of the phone",
                 "dBm",
-                listOf("ble rssi", "sygnał ble", "sygnal ble", "bluetooth rssi", "sygnał bluetooth", "sygnal bluetooth"),
+                listOf(
+                    "ble rssi",
+                    "sygnał ble",
+                    "sygnal ble",
+                    "bluetooth rssi",
+                    "sygnał bluetooth",
+                    "sygnal bluetooth",
+                ),
                 decimals = 0,
             ),
             MetricDef(

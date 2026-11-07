@@ -1031,7 +1031,11 @@ class AssistantDataProvider(
                     listOf(Key("Wi-Fi signal dBm (strongest first)", true) { it.wifi?.toFloat() })
 
                 q.hasAny(BLE_SIGNAL_WORDS) ->
-                    listOf(Key("Bluetooth signal of the connected phone dBm (strongest first)", true) { it.ble?.toFloat() })
+                    listOf(
+                        Key("Bluetooth signal of the connected phone dBm (strongest first)", true) {
+                            it.ble?.toFloat()
+                        },
+                    )
 
                 q.hasAny(listOf("heap", "pamię", "pamie", " ram")) ->
                     listOf(Key("used RAM (heap) percent (highest first)", true) { it.heapUsed })
@@ -3565,9 +3569,19 @@ class AssistantDataProvider(
             )
         const val COORD_SCALE = 100000.0
 
-        /** Phrases that ask for the Bluetooth signal of the phone connected to a node (not for Bluetooth in general). */
+        /**
+         * Phrases that ask for the Bluetooth signal of the phone connected to a node (not for Bluetooth in general).
+         */
         private val BLE_SIGNAL_WORDS =
-            listOf("ble rssi", "sygnał ble", "sygnal ble", "bluetooth rssi", "sygnał bluetooth", "sygnal bluetooth", "bluetooth signal")
+            listOf(
+                "ble rssi",
+                "sygnał ble",
+                "sygnal ble",
+                "bluetooth rssi",
+                "sygnał bluetooth",
+                "sygnal bluetooth",
+                "bluetooth signal",
+            )
         const val MIN_STEM_WORD = 5
         const val MAX_STEM_HITS = 3
         val GENERIC_WORDS =

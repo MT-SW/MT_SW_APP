@@ -60,6 +60,7 @@ import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.ui.icon.AirQuality
 import org.meshtastic.core.ui.icon.AirUtilization
+import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.DataUsage
 import org.meshtastic.core.ui.icon.DetectionSensor
@@ -80,7 +81,6 @@ import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.icon.Weight
-import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.icon.WindDirection
 import org.meshtastic.core.ui.util.LnaCorrection

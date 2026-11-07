@@ -45,7 +45,9 @@ data class LocalStatsExtended(
     val wifiDrops: Int = 0,
     /** ESP-IDF code of the last WiFi drop, 0 = none yet. */
     val wifiDropReason: Int = 0,
-    /** Bluetooth signal strength in dBm, as the device hears the connected phone; 0 = not reported (no phone connected). */
+    /**
+     * Bluetooth signal strength in dBm, as the device hears the connected phone; 0 = not reported (no phone connected).
+     */
     val bleRssi: Int = 0,
 ) {
     /** True when the device reported anything about WiFi in this sample. */
@@ -68,8 +70,8 @@ private const val WIRE_TYPE_FIXED32 = 5
 
 /**
  * Scans these [ByteString] unknown fields (from [org.meshtastic.proto.Telemetry.unknownFields]) for the
- * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s, the 3 WiFi ones and the Bluetooth signal) by
- * hand. Returns null if the field is absent (e.g. stock firmware) or malformed.
+ * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s, the 3 WiFi ones and the
+ * Bluetooth signal) by hand. Returns null if the field is absent (e.g. stock firmware) or malformed.
  */
 fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
     val submessage = findLengthDelimitedField(toByteArray(), LOCAL_STATS_EXTENDED_TAG) ?: return null

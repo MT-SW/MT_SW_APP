@@ -95,7 +95,8 @@ data class NodeExtraStats(
         heapUsedPercent = heapUsedPercent ?: older.heapUsedPercent,
         flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
         psramUsedPercent = psramUsedPercent ?: older.psramUsedPercent,
-        // WiFi and Bluetooth replace each other: the newest reading of either one wins, and the older ones are kept only
+        // WiFi and Bluetooth replace each other: the newest reading of either one wins, and the older ones are kept
+        // only
         // while no newer packet reported any of the two.
         wifiRssi = if (hasLinkSignal) wifiRssi else older.wifiRssi,
         bleRssi = if (hasLinkSignal) bleRssi else older.bleRssi,

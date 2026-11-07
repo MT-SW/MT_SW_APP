@@ -580,7 +580,12 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.POWER -> listOf(listOf("Napięcie", "Prąd"), listOf("Bateria"))
 
     NetworkHealthMetric.SIGNAL ->
-        listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"), listOf("WiFi RSSI", "Zerwania WiFi"), listOf("BLE RSSI"))
+        listOf(
+            listOf("SNR"),
+            listOf("RSSI", "Noise Floor"),
+            listOf("WiFi RSSI", "Zerwania WiFi"),
+            listOf("BLE RSSI"),
+        )
 
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
 

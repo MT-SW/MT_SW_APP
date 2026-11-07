@@ -484,7 +484,16 @@ private fun SignalMetricsChart(
         val wifiLabel = stringResource(Res.string.wifi_rssi_signal)
         val bleLabel = stringResource(Res.string.ble_rssi_signal)
 
-        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, wifiRssiData, bleRssiData, snrData, noiseGain, rssiGain) {
+        LaunchedEffect(
+            noiseFloorData,
+            busyFloorData,
+            rssiData,
+            wifiRssiData,
+            bleRssiData,
+            snrData,
+            noiseGain,
+            rssiGain,
+        ) {
             modelProducer.runTransaction {
                 if (noiseFloorData.isNotEmpty()) {
                     lineModel {
@@ -832,7 +841,8 @@ private fun WifiCard(sample: WifiSample, isSelected: Boolean, onClick: () -> Uni
                 Spacer(modifier = Modifier.height(if (sample.stats.hasWifi) 4.dp else 8.dp))
                 MetricValueRow(
                     color = SignalMetric.BLE_RSSI.color,
-                    text = "${stringResource(Res.string.ble_rssi_signal)}: ${MetricFormatter.rssi(sample.stats.bleRssi)}",
+                    text =
+                    "${stringResource(Res.string.ble_rssi_signal)}: ${MetricFormatter.rssi(sample.stats.bleRssi)}",
                     textColor = MaterialTheme.colorScheme.onSurface,
                 )
             }
