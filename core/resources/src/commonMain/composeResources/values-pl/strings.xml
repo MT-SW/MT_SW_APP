@@ -2572,17 +2572,6 @@
     <string name="ui_scale">Skalowanie aplikacji</string>
     <string name="ui_scale_follow_system">Zgodnie z systemem</string>
     <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w systemie.</string>
-    <string name="theme_color_dark">Kolorowy, ciemny</string>
-    <string name="theme_color_hue">Odcień</string>
-    <string name="theme_color_intensity">Siła kolorów</string>
-    <string name="theme_color_intensity_hint">Lewo: łagodne, prawo: bardzo ostre</string>
-    <string name="theme_color_light">Kolorowy, jasny</string>
-    <string name="theme_color_pick">Kolor motywu…</string>
-    <string name="theme_color_presets">Gotowe kolory</string>
-    <string name="theme_color_saturation">Nasycenie koloru</string>
-    <string name="theme_color_summary">Cała paleta jest wyliczana z wybranego koloru, tak jak robi to Material You z tapety. Używają jej motywy „Kolorowy”. Zmiany działają od razu.</string>
-    <string name="theme_color_system">Kolorowy (jasny lub ciemny jak w systemie)</string>
-    <string name="theme_color_title">Kolor motywu</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_light">Jasny</string>
     <string name="theme_mono_dark">Czarno-biały (ciemny)</string>

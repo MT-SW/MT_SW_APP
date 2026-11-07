@@ -166,18 +166,6 @@ class SettingsViewModel(
         uiPrefs.setTheme(theme)
     }
 
-    val themeSeed = uiPrefs.themeSeed
-
-    val themeIntensity = uiPrefs.themeIntensity
-
-    fun setThemeSeed(value: Int) {
-        uiPrefs.setThemeSeed(value)
-    }
-
-    fun setThemeIntensity(value: Int) {
-        uiPrefs.setThemeIntensity(value)
-    }
-
     val uiScale = uiPrefs.uiScale
 
     fun setUiScale(percent: Int) {

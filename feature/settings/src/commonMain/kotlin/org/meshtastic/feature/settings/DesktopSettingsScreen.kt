@@ -161,10 +161,6 @@ fun DesktopSettingsScreen(
         ThemePickerDialog(
             onClickTheme = { settingsViewModel.setTheme(it) },
             onDismiss = { showThemePickerDialog = false },
-            themeSeed = settingsViewModel.themeSeed.collectAsStateWithLifecycle().value,
-            themeIntensity = settingsViewModel.themeIntensity.collectAsStateWithLifecycle().value,
-            onThemeSeedChange = { settingsViewModel.setThemeSeed(it) },
-            onThemeIntensityChange = { settingsViewModel.setThemeIntensity(it) },
         )
     }
 

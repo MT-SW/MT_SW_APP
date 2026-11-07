@@ -35,12 +35,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.theme.MODE_COLOR_DARK
-import org.meshtastic.core.ui.theme.MODE_COLOR_LIGHT
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
-import org.meshtastic.core.ui.theme.isColorMode
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.messaging.MessageScreen
@@ -76,18 +73,14 @@ class BubbleActivity : AppCompatActivity() {
 
         setContent {
             val theme by model.theme.collectAsStateWithLifecycle()
-            val themeSeed by model.themeSeed.collectAsStateWithLifecycle()
-            val themeIntensity by model.themeIntensity.collectAsStateWithLifecycle()
             val dark =
                 when (theme) {
                     AppCompatDelegate.MODE_NIGHT_YES,
                     MODE_MONO_DARK,
-                    MODE_COLOR_DARK,
                     -> true
 
                     AppCompatDelegate.MODE_NIGHT_NO,
                     MODE_MONO_LIGHT,
-                    MODE_COLOR_LIGHT,
                     -> false
 
                     else -> isSystemInDarkTheme()
@@ -98,13 +91,7 @@ class BubbleActivity : AppCompatActivity() {
                     isAppearanceLightNavigationBars = !dark
                 }
             }
-            AppTheme(
-                dynamicColor = theme == MODE_DYNAMIC,
-                darkTheme = dark,
-                monochrome = isMonochromeMode(theme),
-                seedColor = themeSeed.takeIf { isColorMode(theme) },
-                seedIntensity = themeIntensity,
-            ) {
+            AppTheme(dynamicColor = theme == MODE_DYNAMIC, darkTheme = dark, monochrome = isMonochromeMode(theme)) {
                 // Edge to edge, only this padding keeps the composer clear of the keyboard and the navigation bar.
                 Box(Modifier.fillMaxSize().recalculateWindowInsets().safeDrawingPadding()) {
                     MessageScreen(

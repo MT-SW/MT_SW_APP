@@ -110,16 +110,6 @@ interface UiPrefs {
 
     fun setTheme(value: Int)
 
-    /** The colour (ARGB) the colour themes work their whole palette out from. */
-    val themeSeed: StateFlow<Int>
-
-    fun setThemeSeed(value: Int)
-
-    /** How strong the colour themes are in percent: 100 is normal, lower is softer, higher is sharper. */
-    val themeIntensity: StateFlow<Int>
-
-    fun setThemeIntensity(value: Int)
-
     /** In-app scale in percent (text and elements together); 0 follows the phone's own size settings. */
     val uiScale: StateFlow<Int>
 

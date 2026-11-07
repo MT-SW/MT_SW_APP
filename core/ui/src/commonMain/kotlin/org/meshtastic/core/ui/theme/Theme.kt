@@ -301,9 +301,6 @@ fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     monochrome: Boolean = false,
-    /** When set, the whole scheme is worked out from this colour ("colour theme"); wins over [dynamicColor]. */
-    seedColor: Int? = null,
-    seedIntensity: Int = DEFAULT_THEME_INTENSITY,
     content:
     @Composable()
     () -> Unit,
@@ -311,13 +308,6 @@ fun AppTheme(
     val colorScheme =
         if (monochrome) {
             if (darkTheme) monoDarkScheme else monoLightScheme
-        } else if (seedColor != null) {
-            seedColorScheme(
-                seed = Color(seedColor),
-                dark = darkTheme,
-                intensity = seedIntensity,
-                base = if (darkTheme) darkScheme else lightScheme,
-            )
         } else {
             if (dynamicColor) {
                 dynamicColorScheme(darkTheme)
@@ -362,17 +352,6 @@ const val MODE_DYNAMIC = 6969420
 /** The two black-and-white themes: white background with dark text, and black background with light text. */
 const val MODE_MONO_LIGHT = 6969421
 const val MODE_MONO_DARK = 6969422
-
-/**
- * The colour themes: the whole palette is worked out from one chosen colour; follows the system, or forced light or
- * dark.
- */
-const val MODE_COLOR = 6969423
-const val MODE_COLOR_LIGHT = 6969424
-const val MODE_COLOR_DARK = 6969425
-
-/** True when [mode] is one of the colour themes. */
-fun isColorMode(mode: Int): Boolean = mode == MODE_COLOR || mode == MODE_COLOR_LIGHT || mode == MODE_COLOR_DARK
 
 /** True when [mode] is one of the black-and-white themes. */
 fun isMonochromeMode(mode: Int): Boolean = mode == MODE_MONO_LIGHT || mode == MODE_MONO_DARK

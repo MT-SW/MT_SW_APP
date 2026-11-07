@@ -56,7 +56,6 @@ import org.meshtastic.core.resources.report_issues_title
 import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
-import org.meshtastic.core.resources.theme_color_title
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed
@@ -192,7 +191,6 @@ object SettingsSearchCatalog {
             Res.string.debug_panel to SettingsRoute.DebugPanel,
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.background_keepalive_title to SettingsRoute.MtSwFeatures,
-            Res.string.theme_color_title to SettingsRoute.MtSwFeatures,
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,

@@ -3145,17 +3145,6 @@
     <string name="terrain_horizon_title">Terrain panorama</string>
     <!-- THEME -->
     <string name="theme">Theme</string>
-    <string name="theme_color_dark">Colour, dark</string>
-    <string name="theme_color_hue">Hue</string>
-    <string name="theme_color_intensity">Strength of the colours</string>
-    <string name="theme_color_intensity_hint">Left: soft, right: very sharp</string>
-    <string name="theme_color_light">Colour, light</string>
-    <string name="theme_color_pick">Theme colour…</string>
-    <string name="theme_color_presets">Ready colours</string>
-    <string name="theme_color_saturation">Saturation of the colour</string>
-    <string name="theme_color_summary">The whole palette is worked out from the colour you choose, like Material You does from a wallpaper. It is used by the "Colour" themes. Changes apply at once.</string>
-    <string name="theme_color_system">Colour (light or dark like the system)</string>
-    <string name="theme_color_title">Theme colour</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_mono_dark">Black and white (dark)</string>

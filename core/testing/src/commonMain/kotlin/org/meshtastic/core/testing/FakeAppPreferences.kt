@@ -99,18 +99,6 @@ class FakeUiPrefs : UiPrefs {
         theme.value = value
     }
 
-    override val themeSeed = MutableStateFlow(0)
-
-    override fun setThemeSeed(value: Int) {
-        themeSeed.value = value
-    }
-
-    override val themeIntensity = MutableStateFlow(100)
-
-    override fun setThemeIntensity(value: Int) {
-        themeIntensity.value = value
-    }
-
     override val uiScale = MutableStateFlow(0)
 
     override fun setUiScale(value: Int) {
