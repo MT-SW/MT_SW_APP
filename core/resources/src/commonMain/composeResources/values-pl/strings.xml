@@ -3646,4 +3646,16 @@
     <string name="app_log_choose_folder">Wybierz folder na logi</string>
     <string name="app_log_folder_none">Nie wybrano folderu. Logi możesz wysłać przyciskiem zgłoszenia.</string>
     <string name="app_log_folder_clear">Nie zapisuj logów w folderze</string>
+    <string name="font_family">Czcionka</string>
+    <string name="font_weight">Pogrubienie czcionki</string>
+    <string name="font_size">Rozmiar tekstu</string>
+    <string name="font_default">Domyślna (systemowa)</string>
+    <string name="font_sans">Bezszeryfowa</string>
+    <string name="font_serif">Szeryfowa</string>
+    <string name="font_mono">Stała szerokość</string>
+    <string name="font_weight_much_lighter">Dużo cieńsza</string>
+    <string name="font_weight_lighter">Cieńsza</string>
+    <string name="font_weight_designed">Domyślna</string>
+    <string name="font_weight_bolder">Grubsza</string>
+    <string name="font_weight_much_bolder">Dużo grubsza</string>
 </resources>

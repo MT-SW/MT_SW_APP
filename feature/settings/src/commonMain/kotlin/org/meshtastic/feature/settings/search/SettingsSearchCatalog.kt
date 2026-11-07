@@ -42,6 +42,9 @@ import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
+import org.meshtastic.core.resources.font_family
+import org.meshtastic.core.resources.font_size
+import org.meshtastic.core.resources.font_weight
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_title
@@ -191,6 +194,9 @@ object SettingsSearchCatalog {
             Res.string.debug_panel to SettingsRoute.DebugPanel,
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.background_keepalive_title to SettingsRoute.MtSwFeatures,
+            Res.string.font_family to SettingsRoute.MtSwFeatures,
+            Res.string.font_weight to SettingsRoute.MtSwFeatures,
+            Res.string.font_size to SettingsRoute.MtSwFeatures,
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,

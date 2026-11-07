@@ -77,6 +77,28 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_UI_SCALE] = value } }
     }
 
+    // Eagerly as well: the first frame already needs the typeface.
+    override val fontFamily: StateFlow<Int> =
+        dataStore.data.map { it[KEY_FONT_FAMILY] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun setFontFamily(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_FONT_FAMILY] = value } }
+    }
+
+    override val fontWeightShift: StateFlow<Int> =
+        dataStore.data.map { it[KEY_FONT_WEIGHT_SHIFT] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun setFontWeightShift(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_FONT_WEIGHT_SHIFT] = value } }
+    }
+
+    override val fontSizePercent: StateFlow<Int> =
+        dataStore.data.map { it[KEY_FONT_SIZE_PERCENT] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun setFontSizePercent(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_FONT_SIZE_PERCENT] = value } }
+    }
+
     override val healthHeroLocked: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_HEALTH_HERO_LOCKED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
 
@@ -765,6 +787,9 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
+        val KEY_FONT_FAMILY = intPreferencesKey("font-family")
+        val KEY_FONT_WEIGHT_SHIFT = intPreferencesKey("font-weight-shift")
+        val KEY_FONT_SIZE_PERCENT = intPreferencesKey("font-size-percent")
         val KEY_HEALTH_HERO_LOCKED = booleanPreferencesKey("health-hero-locked")
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")
         val KEY_LOCALE = stringPreferencesKey("locale")

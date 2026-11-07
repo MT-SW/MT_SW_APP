@@ -172,6 +172,16 @@ class SettingsViewModel(
         uiPrefs.setUiScale(percent)
     }
 
+    val fontFamily = uiPrefs.fontFamily
+    val fontWeightShift = uiPrefs.fontWeightShift
+    val fontSizePercent = uiPrefs.fontSizePercent
+
+    fun setFontFamily(value: Int) = uiPrefs.setFontFamily(value)
+
+    fun setFontWeightShift(value: Int) = uiPrefs.setFontWeightShift(value)
+
+    fun setFontSizePercent(value: Int) = uiPrefs.setFontSizePercent(value)
+
     val unitsOverride = uiPrefs.unitsOverride
 
     fun setUnitsOverride(override: UnitsOverride) {

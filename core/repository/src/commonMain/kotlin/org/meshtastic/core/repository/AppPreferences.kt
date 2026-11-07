@@ -115,6 +115,21 @@ interface UiPrefs {
 
     fun setUiScale(value: Int)
 
+    /** Typeface of the whole app: 0 as designed, 1 sans-serif, 2 serif, 3 monospace. */
+    val fontFamily: StateFlow<Int>
+
+    fun setFontFamily(value: Int)
+
+    /** Weight of all text relative to the design, in steps of 100 (-200..+200); 0 as designed. */
+    val fontWeightShift: StateFlow<Int>
+
+    fun setFontWeightShift(value: Int)
+
+    /** Size of the text only (not the elements) in percent; 0 follows the phone. */
+    val fontSizePercent: StateFlow<Int>
+
+    fun setFontSizePercent(value: Int)
+
     /** Network health: when true (default) the summary card stays put instead of folding away on scroll. */
     val healthHeroLocked: StateFlow<Boolean>
 

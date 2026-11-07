@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme.Companion.expressive
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -42,7 +43,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.unit.Density
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlin.concurrent.Volatile
@@ -324,7 +327,11 @@ fun AppTheme(
     // When a device is on event firmware (and the event theme isn't opted out), swap the whole typescale to the event
     // typeface. Null everywhere else (desktop, F-Droid, non-event, opted out) → default typography.
     val eventFonts = LocalEventTheme.current?.fonts
-    val typography = remember(eventFonts) { eventFonts?.let { AppTypography.withEventFonts(it) } ?: AppTypography }
+    val fontSettings by AppFontSettings.state.collectAsState()
+    val typography =
+        remember(eventFonts, fontSettings) {
+            (eventFonts?.let { AppTypography.withEventFonts(it) } ?: AppTypography).withFontSettings(fontSettings)
+        }
 
     // Downloadable (Google) fonts referenced only through the theme's Typography are NOT auto-fetched during text
     // layout — Compose silently renders the fallback. Preloading them into the font cache is the documented way to make
@@ -345,9 +352,20 @@ fun AppTheme(
     }
 
     MonochromeState.on = monochrome
-    MaterialExpressiveTheme(colorScheme = colorScheme, typography = typography, motionScheme = expressive()) {
-        CompositionLocalProvider(LocalMonochrome provides monochrome, LocalColorSaturation provides saturation) {
-            if (monochrome) GrayscaleLayer(content) else content()
+    val density = LocalDensity.current
+    val textDensity =
+        remember(density, fontSettings.sizePercent) {
+            if (fontSettings.sizePercent <= 0) {
+                density
+            } else {
+                Density(density.density, fontScale = fontSettings.sizePercent / 100f)
+            }
+        }
+    CompositionLocalProvider(LocalDensity provides textDensity) {
+        MaterialExpressiveTheme(colorScheme = colorScheme, typography = typography, motionScheme = expressive()) {
+            CompositionLocalProvider(LocalMonochrome provides monochrome, LocalColorSaturation provides saturation) {
+                if (monochrome) GrayscaleLayer(content) else content()
+            }
         }
     }
 }

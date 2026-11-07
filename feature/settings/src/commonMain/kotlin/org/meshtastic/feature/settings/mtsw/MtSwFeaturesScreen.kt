@@ -122,6 +122,7 @@ import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
+import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
@@ -264,6 +265,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
                     showThemePicker = true
                 }
+                FontSettingsItems(settingsViewModel)
                 val pickColor = stringResource(Res.string.node_color_pick)
                 ListItem(
                     text = stringResource(Res.string.node_color_title),

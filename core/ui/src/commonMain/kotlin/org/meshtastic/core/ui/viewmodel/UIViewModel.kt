@@ -29,6 +29,11 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import org.meshtastic.core.ui.theme.AppFontSettings
+import org.meshtastic.core.ui.theme.FontSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -192,6 +197,15 @@ class UIViewModel(
     val theme: StateFlow<Int> = uiPrefs.theme
 
     val uiScale: StateFlow<Int> = uiPrefs.uiScale
+
+    // The typeface settings reach the theme through one shared holder, so no platform entry point needs to pass them.
+    @Suppress("unused")
+    private val fontSync =
+        combine(uiPrefs.fontFamily, uiPrefs.fontWeightShift, uiPrefs.fontSizePercent) { family, weight, size ->
+            FontSettings(family, weight, size)
+        }
+            .onEach { AppFontSettings.state.value = it }
+            .launchIn(viewModelScope)
 
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
     val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled

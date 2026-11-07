@@ -105,6 +105,24 @@ class FakeUiPrefs : UiPrefs {
         uiScale.value = value
     }
 
+    override val fontFamily = MutableStateFlow(0)
+
+    override fun setFontFamily(value: Int) {
+        fontFamily.value = value
+    }
+
+    override val fontWeightShift = MutableStateFlow(0)
+
+    override fun setFontWeightShift(value: Int) {
+        fontWeightShift.value = value
+    }
+
+    override val fontSizePercent = MutableStateFlow(0)
+
+    override fun setFontSizePercent(value: Int) {
+        fontSizePercent.value = value
+    }
+
     override val healthHeroLocked = MutableStateFlow(true)
 
     override fun setHealthHeroLocked(value: Boolean) {
