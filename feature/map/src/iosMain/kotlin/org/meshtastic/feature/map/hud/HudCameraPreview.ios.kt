@@ -21,13 +21,12 @@ package org.meshtastic.feature.map.hud
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.viewinterop.UIKitView
-import kotlin.math.tan
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
@@ -35,7 +34,6 @@ import platform.AVFoundation.AVAuthorizationStatusNotDetermined
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureDevicePositionBack
-import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPresetPhoto
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
@@ -52,6 +50,7 @@ import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
+import kotlin.math.tan
 
 private const val SENSOR_LONG_MM = 10f
 
@@ -93,10 +92,9 @@ actual fun HudCameraPreview(
         currentOnStill(null)
         fun start() {
             val device =
-                AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
-                    .filterIsInstance<AVCaptureDevice>()
-                    .firstOrNull { it.position == AVCaptureDevicePositionBack }
-                    ?: AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
+                AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo).filterIsInstance<AVCaptureDevice>().firstOrNull {
+                    it.position == AVCaptureDevicePositionBack
+                } ?: AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
             val input = device?.let { AVCaptureDeviceInput.deviceInputWithDevice(it, error = null) }
             if (device == null || input == null || !session.canAddInput(input)) {
                 currentOnAvailable(false)
@@ -129,10 +127,12 @@ actual fun HudCameraPreview(
         }
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
             AVAuthorizationStatusAuthorized -> start()
+
             AVAuthorizationStatusNotDetermined ->
                 AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { granted ->
                     dispatch_async(dispatch_get_main_queue()) { if (granted) start() else currentOnAvailable(false) }
                 }
+
             else -> currentOnAvailable(false)
         }
         onDispose {

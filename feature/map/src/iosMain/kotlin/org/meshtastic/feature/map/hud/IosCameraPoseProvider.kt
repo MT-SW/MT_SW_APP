@@ -92,9 +92,9 @@ private fun CMDeviceMotion.calibrationLevel(): Int = when (magneticField.useCont
 private operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
 
 /**
- * The rows of the rotation matrix are the device axes in the reference frame (north, west, up); the world of the view is
- * (east, north, up). The back camera looks down device -Z; which device axis is the screen's right depends on how the
- * interface is rotated (the same mapping as on Android).
+ * The rows of the rotation matrix are the device axes in the reference frame (north, west, up); the world of the view
+ * is (east, north, up). The back camera looks down device -Z; which device axis is the screen's right depends on how
+ * the interface is rotated (the same mapping as on Android).
  */
 private fun CMDeviceMotion.toCameraPose(orientation: Long): CameraPose = attitude.rotationMatrix.useContents {
     fun axis(north: Double, west: Double, up: Double) = Vec3(-west, north, up)

@@ -49,6 +49,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.animateFloatingActionButton
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -161,6 +163,8 @@ internal data class OwnNodeMenuItems(val updateStatus: Boolean, val editName: Bo
 
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalFoundationApi::class)
+private const val KEYBOARD_CLOSE_DELAY_MS = 250L
+
 @Composable
 fun NodeListScreen(
     navigateToNodeDetails: (Int) -> Unit,
@@ -417,6 +421,9 @@ fun NodeListScreen(
                     items(nodes, key = { it.num }) { node ->
                         var expanded by remember { mutableStateOf(false) }
                         var showDisplayNameDialog by remember { mutableStateOf(false) }
+                        val menuScope = rememberCoroutineScope()
+                        val focusManager = LocalFocusManager.current
+                        val keyboardController = LocalSoftwareKeyboardController.current
 
                         if (showDisplayNameDialog) {
                             DisplayNameDialog(
@@ -431,9 +438,19 @@ fun NodeListScreen(
                             val canEditStatus = canEditStatusMessage(node, ourNode, connectionState)
                             // Our own node only earns a long press while it has something to offer, or it opens an
                             // empty menu.
+                            // The keyboard of the search field is closed first: with it open, the menu on iPhone made the
+                            // whole list disappear.
                             val longClick =
                                 if (!isThisNode || canEditStatus) {
-                                    { expanded = true }
+                                    {
+                                        menuScope.launch {
+                                            keyboardController?.hide()
+                                            focusManager.clearFocus()
+                                            delay(KEYBOARD_CLOSE_DELAY_MS)
+                                            expanded = true
+                                        }
+                                        Unit
+                                    }
                                 } else {
                                     null
                                 }
