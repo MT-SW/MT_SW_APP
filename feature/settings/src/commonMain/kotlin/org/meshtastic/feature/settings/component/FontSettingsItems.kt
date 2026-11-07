@@ -168,7 +168,12 @@ private fun FontSizeDialog(current: Int, onPick: (Int) -> Unit, onDismiss: () ->
     )
 }
 
-private enum class FontDialogKind { None, Family, Weight, Size }
+private enum class FontDialogKind {
+    None,
+    Family,
+    Weight,
+    Size,
+}
 
 /** Three rows (font, weight, text size) with their pickers; they apply to the whole app on every platform. */
 @Composable

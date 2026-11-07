@@ -30,7 +30,6 @@ import org.meshtastic.feature.map.hud.CameraPoseProvider
 import org.meshtastic.feature.map.hud.PhonePressureProvider
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.ios.stub.NoopAppWidgetUpdater
-import org.meshtastic.ios.stub.NoopCameraPoseProvider
 import org.meshtastic.ios.stub.NoopLocationRepository
 import org.meshtastic.ios.stub.NoopMagneticFieldProvider
 import org.meshtastic.ios.stub.NoopMeshWorkerManager
@@ -61,7 +60,7 @@ class IosStubsModule {
 
     @Single fun magneticFieldProvider(): MagneticFieldProvider = NoopMagneticFieldProvider()
 
-    @Single fun cameraPoseProvider(): CameraPoseProvider = NoopCameraPoseProvider()
+    @Single fun cameraPoseProvider(): CameraPoseProvider = org.meshtastic.feature.map.hud.IosCameraPoseProvider()
 
     @Single fun phonePressureProvider(): PhonePressureProvider = org.meshtastic.ios.sensor.IosPhonePressureProvider()
 }
