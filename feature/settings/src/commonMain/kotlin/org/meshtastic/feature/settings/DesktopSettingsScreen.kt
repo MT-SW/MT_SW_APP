@@ -75,6 +75,9 @@ import org.meshtastic.core.resources.zh_TW
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.resources.provide_location_to_mesh
+import org.meshtastic.core.ui.icon.LocationOn
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.Distance
@@ -125,7 +128,10 @@ fun DesktopSettingsScreen(
     settingsViewModel: SettingsViewModel,
     onNavigate: (Route) -> Unit,
     onBack: (() -> Unit)? = null,
+    /** True on iPhone/iPad, where the phone's own position can be sent to the radio (as on Android). */
+    showProvideLocation: Boolean = false,
 ) {
+    val provideLocation by settingsViewModel.provideLocation.collectAsStateWithLifecycle()
     val state by radioConfigViewModel.radioConfigState.collectAsStateWithLifecycle()
     val databaseBackup = rememberDatabaseBackupActions()
     val destNode by radioConfigViewModel.destNode.collectAsStateWithLifecycle()
@@ -318,6 +324,15 @@ fun DesktopSettingsScreen(
                             trailingIcon = null,
                         ) {
                             showUnitsPickerDialog = true
+                        }
+
+                        if (showProvideLocation) {
+                            SwitchListItem(
+                                text = stringResource(Res.string.provide_location_to_mesh),
+                                leadingIcon = MeshtasticIcons.LocationOn,
+                                checked = provideLocation,
+                                onClick = { settingsViewModel.setProvideLocation(!provideLocation) },
+                            )
                         }
 
                         FullMessageTimestampsSetting(

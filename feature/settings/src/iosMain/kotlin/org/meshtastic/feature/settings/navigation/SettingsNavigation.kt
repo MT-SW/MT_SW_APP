@@ -35,5 +35,6 @@ actual fun SettingsMainScreen(
         radioConfigViewModel = radioConfigViewModel,
         onNavigate = onNavigate,
         onBack = onBack,
+        showProvideLocation = true,
     )
 }
