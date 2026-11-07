@@ -106,6 +106,7 @@ import org.meshtastic.core.resources.firmware_update_in_progress
 import org.meshtastic.core.resources.firmware_update_notification_android
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.live_update_ble
 import org.meshtastic.core.resources.live_update_cpu
 import org.meshtastic.core.resources.live_update_direct
 import org.meshtastic.core.resources.live_update_distance
