@@ -162,8 +162,6 @@ internal data class OwnNodeMenuItems(val updateStatus: Boolean, val editName: Bo
         get() = updateStatus || editName || shareContact
 }
 
-@Suppress("LongMethod", "CyclomaticComplexMethod")
-@OptIn(ExperimentalFoundationApi::class)
 private const val KEYBOARD_CLOSE_DELAY_MS = 250L
 
 /**
@@ -187,6 +185,8 @@ private fun rememberMenuOpener(open: () -> Unit): () -> Unit {
     }
 }
 
+@Suppress("LongMethod", "CyclomaticComplexMethod")
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeListScreen(
     navigateToNodeDetails: (Int) -> Unit,
