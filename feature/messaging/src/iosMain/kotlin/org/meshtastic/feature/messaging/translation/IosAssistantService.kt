@@ -57,6 +57,29 @@ class IosAssistantService(
         combine(store.states, uiPrefs.assistantModelId) { states, id -> pick(states, id) != null }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
+    /** Typed `/sprzet`: no questions, only which model runs where and on what device (no other test commands here). */
+    override suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {
+        if (!command.equals("/sprzet", ignoreCase = true)) return
+        val polish = (NSLocale.preferredLanguages.firstOrNull() as? String)?.startsWith("pl") != false
+        fun t(pl: String, en: String) = if (polish) pl else en
+        val modelId = pick(store.states.value, uiPrefs.assistantModelId.value)
+        val info = modelId?.let { AiModels.byId(it) }
+        val notStarted = t("jeszcze nie uruchomiony (zadaj najpierw pytanie)", "not started yet (ask a question first)")
+        val where = engine.activeBackend.takeIf { it.isNotBlank() } ?: notStarted
+        val report = buildString {
+            append(t("Model", "Model")).append(": ").append(info?.name ?: modelId ?: "-")
+            append(" (").append(info?.family.orEmpty()).append(")\n")
+            append(t("Rozmiar", "Size")).append(": ").append(info?.sizeMb ?: 0).append(" MB, ")
+            append(t("pamięć podczas pracy", "memory while running")).append(": ")
+            append(t("około", "about")).append(' ').append(info?.ramMb ?: 0).append(" MB\n")
+            append(t("Gdzie działa", "Where it runs")).append(": ").append(where).append('\n')
+            append(t("Okno tekstu", "Context")).append(": ")
+            append(modelId?.let { engine.contextTokens(it) } ?: 0).append(' ').append(t("tokenów", "tokens"))
+            engine.deviceSummary.takeIf { it.isNotBlank() }?.let { append('\n').append(it) }
+        }
+        onResult(command, report)
+    }
+
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val model = checkNotNull(pick(store.states.value, uiPrefs.assistantModelId.value)) { "No assistant model" }
         val polish = (NSLocale.preferredLanguages.firstOrNull() as? String)?.startsWith("pl") != false

@@ -117,6 +117,7 @@ private const val BATCH_TOKENS = 512
 private const val GPU_LAYERS = 99
 private const val MAX_PIECE_BYTES = 256
 private const val MAX_TRANSCRIPT_TOKENS = 600
+private const val BYTES_PER_MB = 1024L * 1024L
 private const val TRANSCRIBE_RULE =
     "You are a speech-to-text engine. You write down exactly what is said in the recording, in the language " +
         "that is spoken, with normal punctuation. You never answer, translate, explain or add anything."
@@ -142,6 +143,15 @@ class IosLlamaEngine(
         get() = backend
 
     override fun contextTokens(modelId: String): Int = CONTEXT_TOKENS
+
+    /** The system, memory and processor count of this iPhone, for the `/sprzet` report. */
+    override val deviceSummary: String
+        get() {
+            val info = NSProcessInfo.processInfo
+            val memoryMb = info.physicalMemory.toLong() / BYTES_PER_MB
+            val kind = if (isSimulator()) "iOS Simulator" else "iPhone/iPad"
+            return "$kind, ${info.operatingSystemVersionString}, ${info.activeProcessorCount} CPU, $memoryMb MB RAM"
+        }
 
     private fun isSimulator() = NSProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != null
 
@@ -301,7 +311,10 @@ class IosLlamaEngine(
                         }
                         done += part
                     }
-                    generate(c, vocab, sampler, count, limit, onPiece)
+                    // The model's hidden thinking (also an empty "<think></think>") must not reach the chat.
+                    val filter = ThinkTagFilter(onPiece)
+                    generate(c, vocab, sampler, count, limit, filter::feed)
+                    filter.result()
                 }
             } finally {
                 llama_sampler_free(sampler)
