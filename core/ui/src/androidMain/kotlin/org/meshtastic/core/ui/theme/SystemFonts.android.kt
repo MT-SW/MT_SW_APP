@@ -50,5 +50,5 @@ actual fun systemFontFamily(name: String, weight: Int): FontFamily? {
         } else {
             AndroidTypeface.create(base, if (weight >= BOLD_FROM) AndroidTypeface.BOLD else AndroidTypeface.NORMAL)
         }
-    return Typeface(typeface)
+    return FontFamily(Typeface(typeface))
 }

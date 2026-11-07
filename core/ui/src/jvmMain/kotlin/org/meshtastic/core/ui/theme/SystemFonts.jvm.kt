@@ -30,4 +30,4 @@ actual fun systemFontNames(): List<String> =
         .sorted()
 
 actual fun systemFontFamily(name: String, weight: Int): FontFamily? =
-    FontMgr.default.matchFamilyStyle(name, FontStyle(weight, FontWidth.NORMAL, FontSlant.UPRIGHT))?.let { Typeface(it) }
+    FontMgr.default.matchFamilyStyle(name, FontStyle(weight, FontWidth.NORMAL, FontSlant.UPRIGHT))?.let { FontFamily(Typeface(it)) }
