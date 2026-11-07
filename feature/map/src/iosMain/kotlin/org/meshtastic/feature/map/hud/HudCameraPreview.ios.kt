@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalForeignApi::class)
 @file:Suppress("MagicNumber")
 
 package org.meshtastic.feature.map.hud
@@ -21,6 +22,7 @@ package org.meshtastic.feature.map.hud
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
@@ -42,7 +44,7 @@ import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.position
 import platform.AVFoundation.requestAccessForMediaType
-import platform.CoreGraphics.CGRectZero
+import platform.CoreGraphics.CGRectMake
 import platform.CoreMedia.CMVideoFormatDescriptionGetDimensions
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
@@ -54,8 +56,7 @@ import platform.darwin.dispatch_get_main_queue
 private const val SENSOR_LONG_MM = 10f
 
 /** A view whose only content is the camera's live picture, kept the size of the view. */
-@OptIn(ExperimentalForeignApi::class)
-private class PreviewView(session: AVCaptureSession) : UIView(frame = CGRectZero.readValue()) {
+private class PreviewView(session: AVCaptureSession) : UIView(frame = CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     val previewLayer = AVCaptureVideoPreviewLayer(session = session)
 
     init {
@@ -75,7 +76,6 @@ private class PreviewView(session: AVCaptureSession) : UIView(frame = CGRectZero
  * active format, which is turned into the intrinsics the overlay needs (a sensor of a fixed size and the focal length
  * that gives the same angle).
  */
-@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun HudCameraPreview(
     onIntrinsics: (CameraIntrinsics?) -> Unit,

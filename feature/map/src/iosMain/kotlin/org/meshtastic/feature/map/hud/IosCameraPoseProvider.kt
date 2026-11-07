@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalForeignApi::class)
 @file:Suppress("MagicNumber")
 
 package org.meshtastic.feature.map.hud
@@ -30,9 +31,6 @@ import platform.CoreMotion.CMDeviceMotion
 import platform.CoreMotion.CMMotionManager
 import platform.Foundation.NSError
 import platform.Foundation.NSOperationQueue
-import platform.Foundation.NSProcessInfo
-import platform.Foundation.NSProcessInfoThermalStateCritical
-import platform.Foundation.NSProcessInfoThermalStateSerious
 import platform.UIKit.UIApplication
 import platform.UIKit.UIInterfaceOrientationLandscapeLeft
 import platform.UIKit.UIInterfaceOrientationLandscapeRight
@@ -40,13 +38,11 @@ import platform.UIKit.UIInterfaceOrientationPortraitUpsideDown
 import platform.UIKit.UIWindowScene
 
 private const val NORMAL_INTERVAL_S = 1.0 / 30
-private const val HOT_INTERVAL_S = 1.0 / 15
 
 /**
  * Orientation of the iPhone for the view with the camera: the motion sensors fused by the system, referenced to true
  * north when location is available (the system then applies the declination itself), otherwise to magnetic north.
  */
-@OptIn(ExperimentalForeignApi::class)
 class IosCameraPoseProvider : CameraPoseProvider {
     override fun poseUpdates(): Flow<CameraPoseState> {
         val frames = CMMotionManager.availableAttitudeReferenceFrames()
@@ -66,16 +62,12 @@ class IosCameraPoseProvider : CameraPoseProvider {
                     motion: CMDeviceMotion?,
                     _: NSError?,
                 ->
-                val thermal = currentThermal()
-                manager.deviceMotionUpdateInterval =
-                    if (thermal == HudThermal.NORMAL) NORMAL_INTERVAL_S else HOT_INTERVAL_S
                 motion?.let {
                     trySend(
                         CameraPoseState(
                             pose = it.toCameraPose(interfaceOrientation()),
                             calibration = it.calibrationLevel(),
                             trueNorth = trueNorth,
-                            thermal = thermal,
                         ),
                     )
                 }
@@ -83,12 +75,6 @@ class IosCameraPoseProvider : CameraPoseProvider {
             awaitClose { manager.stopDeviceMotionUpdates() }
         }
     }
-}
-
-private fun currentThermal(): HudThermal = when (NSProcessInfo.processInfo.thermalState) {
-    NSProcessInfoThermalStateCritical -> HudThermal.CRITICAL
-    NSProcessInfoThermalStateSerious -> HudThermal.HOT
-    else -> HudThermal.NORMAL
 }
 
 private fun interfaceOrientation(): Long =
