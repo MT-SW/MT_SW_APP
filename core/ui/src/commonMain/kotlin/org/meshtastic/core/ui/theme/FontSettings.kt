@@ -22,61 +22,61 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/** Typeface choices: 0 as designed (the system font), then the generic families every platform has built in. */
-val FONT_FAMILY_OPTIONS = listOf(0, 1, 2, 3)
-
-/** Weight steps relative to the design, in hundreds. */
-val FONT_WEIGHT_SHIFT_OPTIONS = listOf(-200, -100, 0, 100, 200)
+/** Weight slider range relative to the design, in steps of [FONT_WEIGHT_STEP]. */
+const val FONT_WEIGHT_MIN = -300
+const val FONT_WEIGHT_MAX = 300
+const val FONT_WEIGHT_STEP = 50
 
 /** Text size choices in percent; 0 follows the phone. */
-val FONT_SIZE_OPTIONS = listOf(0, 80, 90, 100, 110, 120, 135, 150)
+val FONT_SIZE_OPTIONS = listOf(0, 50, 60, 70, 80, 90, 100, 110, 120, 135, 150)
 
 private const val MIN_WEIGHT = 100
 private const val MAX_WEIGHT = 900
 
-/** [family] see [FONT_FAMILY_OPTIONS], [weightShift] see [FONT_WEIGHT_SHIFT_OPTIONS], [sizePercent] 0 = phone's own. */
-data class FontSettings(val family: Int = 0, val weightShift: Int = 0, val sizePercent: Int = 0)
+/**
+ * [family] name of an installed font, empty for the design's own; [weightShift] see [FONT_WEIGHT_MIN]; [sizePercent] 0
+ * follows the phone.
+ */
+data class FontSettings(val family: String = "", val weightShift: Int = 0, val sizePercent: Int = 0)
 
 /** The current typeface settings of the app; kept in step with the saved settings by the main view model. */
 object AppFontSettings {
     val state = MutableStateFlow(FontSettings())
 }
 
-private fun TextStyle.withFont(settings: FontSettings): TextStyle {
-    val family =
-        when (settings.family) {
-            1 -> FontFamily.SansSerif
-            2 -> FontFamily.Serif
-            3 -> FontFamily.Monospace
-            else -> null
-        }
+private fun TextStyle.withFont(settings: FontSettings, cache: MutableMap<Int, FontFamily?>): TextStyle {
     val weight =
-        if (settings.weightShift == 0) {
-            null
+        ((fontWeight?.weight ?: FontWeight.Normal.weight) + settings.weightShift).coerceIn(MIN_WEIGHT, MAX_WEIGHT)
+    val family =
+        if (settings.family.isBlank()) {
+            fontFamily
         } else {
-            FontWeight(((fontWeight?.weight ?: FontWeight.Normal.weight) + settings.weightShift).coerceIn(MIN_WEIGHT, MAX_WEIGHT))
+            cache.getOrPut(weight) { systemFontFamily(settings.family, weight) } ?: fontFamily
         }
-    return copy(fontFamily = family ?: fontFamily, fontWeight = weight ?: fontWeight)
+    return copy(fontFamily = family, fontWeight = FontWeight(weight))
 }
 
-/** The whole typescale with the chosen typeface family and weight shift; unchanged for the default settings. */
+/** The whole typescale with the chosen installed font and weight shift; unchanged for the default settings. */
 fun Typography.withFontSettings(settings: FontSettings): Typography {
-    if (settings.family == 0 && settings.weightShift == 0) return this
+    if (settings.family.isBlank() && settings.weightShift == 0) return this
+    val cache = mutableMapOf<Int, FontFamily?>()
+
+    fun TextStyle.f() = withFont(settings, cache)
     return copy(
-        displayLarge = displayLarge.withFont(settings),
-        displayMedium = displayMedium.withFont(settings),
-        displaySmall = displaySmall.withFont(settings),
-        headlineLarge = headlineLarge.withFont(settings),
-        headlineMedium = headlineMedium.withFont(settings),
-        headlineSmall = headlineSmall.withFont(settings),
-        titleLarge = titleLarge.withFont(settings),
-        titleMedium = titleMedium.withFont(settings),
-        titleSmall = titleSmall.withFont(settings),
-        bodyLarge = bodyLarge.withFont(settings),
-        bodyMedium = bodyMedium.withFont(settings),
-        bodySmall = bodySmall.withFont(settings),
-        labelLarge = labelLarge.withFont(settings),
-        labelMedium = labelMedium.withFont(settings),
-        labelSmall = labelSmall.withFont(settings),
+        displayLarge = displayLarge.f(),
+        displayMedium = displayMedium.f(),
+        displaySmall = displaySmall.f(),
+        headlineLarge = headlineLarge.f(),
+        headlineMedium = headlineMedium.f(),
+        headlineSmall = headlineSmall.f(),
+        titleLarge = titleLarge.f(),
+        titleMedium = titleMedium.f(),
+        titleSmall = titleSmall.f(),
+        bodyLarge = bodyLarge.f(),
+        bodyMedium = bodyMedium.f(),
+        bodySmall = bodySmall.f(),
+        labelLarge = labelLarge.f(),
+        labelMedium = labelMedium.f(),
+        labelSmall = labelSmall.f(),
     )
 }

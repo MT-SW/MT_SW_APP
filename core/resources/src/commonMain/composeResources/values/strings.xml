@@ -1384,18 +1384,13 @@
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
     <!-- FONT -->
-    <string name="font_default">As designed (system)</string>
+    <string name="font_default">As designed</string>
     <string name="font_family">Font</string>
-    <string name="font_mono">Monospace</string>
-    <string name="font_sans">Sans-serif</string>
-    <string name="font_serif">Serif</string>
+    <string name="font_preview">Sample text: The quick brown fox, Zażółć gęślą jaźń 0123</string>
+    <string name="font_search">Search fonts</string>
     <string name="font_size">Text size</string>
     <string name="font_weight">Font weight</string>
-    <string name="font_weight_bolder">Bolder</string>
     <string name="font_weight_designed">As designed</string>
-    <string name="font_weight_lighter">Lighter</string>
-    <string name="font_weight_much_bolder">Much bolder</string>
-    <string name="font_weight_much_lighter">Much lighter</string>
     <string name="for_more_information_see_our_privacy_policy">For more information, see our privacy policy.</string>
     <!-- FORMAT -->
     <string name="format_bold">Bold</string>

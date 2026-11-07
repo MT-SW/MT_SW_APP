@@ -1350,16 +1350,11 @@ fixed_position
 ### FONT ###
 font_default
 font_family
-font_mono
-font_sans
-font_serif
+font_preview
+font_search
 font_size
 font_weight
-font_weight_bolder
 font_weight_designed
-font_weight_lighter
-font_weight_much_bolder
-font_weight_much_lighter
 for_more_information_see_our_privacy_policy
 ### FORMAT ###
 format_bold

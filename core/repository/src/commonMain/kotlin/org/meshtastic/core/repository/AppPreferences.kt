@@ -115,12 +115,12 @@ interface UiPrefs {
 
     fun setUiScale(value: Int)
 
-    /** Typeface of the whole app: 0 as designed, 1 sans-serif, 2 serif, 3 monospace. */
-    val fontFamily: StateFlow<Int>
+    /** Name of the installed font used in the whole app; empty keeps the design's own. */
+    val fontFamily: StateFlow<String>
 
-    fun setFontFamily(value: Int)
+    fun setFontFamily(value: String)
 
-    /** Weight of all text relative to the design, in steps of 100 (-200..+200); 0 as designed. */
+    /** Weight of all text relative to the design, in steps of 50 (-300..+300); 0 as designed. */
     val fontWeightShift: StateFlow<Int>
 
     fun setFontWeightShift(value: Int)

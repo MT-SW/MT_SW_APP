@@ -176,7 +176,7 @@ class SettingsViewModel(
     val fontWeightShift = uiPrefs.fontWeightShift
     val fontSizePercent = uiPrefs.fontSizePercent
 
-    fun setFontFamily(value: Int) = uiPrefs.setFontFamily(value)
+    fun setFontFamily(value: String) = uiPrefs.setFontFamily(value)
 
     fun setFontWeightShift(value: Int) = uiPrefs.setFontWeightShift(value)
 

@@ -78,10 +78,10 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     // Eagerly as well: the first frame already needs the typeface.
-    override val fontFamily: StateFlow<Int> =
-        dataStore.data.map { it[KEY_FONT_FAMILY] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+    override val fontFamily: StateFlow<String> =
+        dataStore.data.map { it[KEY_FONT_FAMILY] ?: "" }.stateIn(scope, SharingStarted.Eagerly, "")
 
-    override fun setFontFamily(value: Int) {
+    override fun setFontFamily(value: String) {
         scope.launch { dataStore.edit { it[KEY_FONT_FAMILY] = value } }
     }
 
@@ -787,7 +787,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
-        val KEY_FONT_FAMILY = intPreferencesKey("font-family")
+        val KEY_FONT_FAMILY = stringPreferencesKey("font-family-name")
         val KEY_FONT_WEIGHT_SHIFT = intPreferencesKey("font-weight-shift")
         val KEY_FONT_SIZE_PERCENT = intPreferencesKey("font-size-percent")
         val KEY_HEALTH_HERO_LOCKED = booleanPreferencesKey("health-hero-locked")

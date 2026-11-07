@@ -3650,12 +3650,7 @@
     <string name="font_weight">Pogrubienie czcionki</string>
     <string name="font_size">Rozmiar tekstu</string>
     <string name="font_default">Domyślna (systemowa)</string>
-    <string name="font_sans">Bezszeryfowa</string>
-    <string name="font_serif">Szeryfowa</string>
-    <string name="font_mono">Stała szerokość</string>
-    <string name="font_weight_much_lighter">Dużo cieńsza</string>
-    <string name="font_weight_lighter">Cieńsza</string>
-    <string name="font_weight_designed">Domyślna</string>
-    <string name="font_weight_bolder">Grubsza</string>
-    <string name="font_weight_much_bolder">Dużo grubsza</string>
+    <string name="font_weight_designed">Domyślne</string>
+    <string name="font_search">Szukaj czcionki</string>
+    <string name="font_preview">Przykładowy tekst: Zażółć gęślą jaźń, 0123</string>
 </resources>

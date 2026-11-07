@@ -105,9 +105,9 @@ class FakeUiPrefs : UiPrefs {
         uiScale.value = value
     }
 
-    override val fontFamily = MutableStateFlow(0)
+    override val fontFamily = MutableStateFlow("")
 
-    override fun setFontFamily(value: Int) {
+    override fun setFontFamily(value: String) {
         fontFamily.value = value
     }
 
