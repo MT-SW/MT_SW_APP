@@ -88,6 +88,13 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         scope.launch { dataStore.edit { it[KEY_LOW_BATTERY_ENABLED] = enabled } }
     }
 
+    override val soundWhileOpen: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_SOUND_WHILE_OPEN] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setSoundWhileOpen(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_SOUND_WHILE_OPEN] = enabled } }
+    }
+
     override val reactionsEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_REACTIONS_ENABLED] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
 
@@ -141,6 +148,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private val KEY_LOW_BATTERY_ENABLED = booleanPreferencesKey("notif_low_battery_enabled")
         private val KEY_REACTIONS_ENABLED = booleanPreferencesKey("notif_reactions_enabled")
         private val KEY_NEW_WAYPOINTS_ENABLED = booleanPreferencesKey("notif_new_waypoints_enabled")
+        private val KEY_SOUND_WHILE_OPEN = booleanPreferencesKey("notif_sound_while_open")
         private val KEY_GEOFENCE_ALERT_OPT_INS = stringPreferencesKey("notif_geofence_alert_opt_ins")
     }
 }

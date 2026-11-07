@@ -2952,6 +2952,7 @@
     <string name="on_demand_no_errors">Brak błędów routingu</string>
     <string name="on_demand_hero_progress">Sprawdzono %1$d z %2$d</string>
     <string name="wifi_rssi_signal">WiFi RSSI</string>
+    <string name="notification_sound_while_open">Dźwięk powiadomień, gdy aplikacja jest otwarta</string>
     <string name="ble_rssi_signal">Bluetooth RSSI</string>
     <string name="ble_rssi_definition">Siła sygnału Bluetooth, z jaką urządzenie słyszy połączony z nim telefon, w dBm, raportowana przez firmware tylko wtedy, gdy telefon jest połączony. Im bliżej 0, tym silniejszy sygnał; wartości poniżej około -85 dBm zwykle oznaczają niestabilne połączenie.</string>
     <string name="wifi_rssi_definition">Siła połączenia WiFi samego urządzenia w dBm, raportowana przez firmware tylko wtedy, gdy jest połączone z siecią. Im bliżej 0, tym silniejszy sygnał; wartości poniżej około -80 dBm zwykle oznaczają niestabilne połączenie.</string>

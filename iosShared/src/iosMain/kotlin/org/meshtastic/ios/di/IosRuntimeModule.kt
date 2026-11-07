@@ -37,6 +37,7 @@ import org.meshtastic.core.network.HttpClientDefaults
 import org.meshtastic.core.network.configureDefaultRetry
 import org.meshtastic.core.network.service.ApiService
 import org.meshtastic.core.network.service.ApiServiceImpl
+import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageQueue
@@ -83,7 +84,9 @@ class IosRuntimeModule {
         connectionFactory = connectionFactory,
     )
 
-    @Single fun notificationManager(prefs: NotificationPrefs): NotificationManager = IosNotificationManager(prefs)
+    @Single
+    fun notificationManager(prefs: NotificationPrefs, tracker: ActiveConversationTracker): NotificationManager =
+        IosNotificationManager(prefs, tracker)
 
     @Single
     fun meshNotificationManager(notificationManager: NotificationManager): MeshNotificationManager =

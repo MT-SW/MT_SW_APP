@@ -579,6 +579,14 @@ interface NotificationPrefs {
 
     fun setLowBatteryEnabled(enabled: Boolean)
 
+    /**
+     * iPhone and iPad: play the notification sound also while the app is open on another screen. Off by default: with
+     * the app open the notification is posted quietly.
+     */
+    val soundWhileOpen: StateFlow<Boolean>
+
+    fun setSoundWhileOpen(enabled: Boolean)
+
     /** Desktop opt-in for emoji reaction notifications; Android uses the system channel setting instead. */
     val reactionsEnabled: StateFlow<Boolean>
 

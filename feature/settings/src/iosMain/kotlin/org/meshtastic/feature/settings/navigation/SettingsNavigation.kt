@@ -36,5 +36,6 @@ actual fun SettingsMainScreen(
         onNavigate = onNavigate,
         onBack = onBack,
         showProvideLocation = true,
+        showNotificationSound = true,
     )
 }

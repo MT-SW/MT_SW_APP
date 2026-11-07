@@ -58,6 +58,12 @@ class FakeNotificationPrefs : NotificationPrefs {
         lowBatteryEnabled.value = enabled
     }
 
+    override val soundWhileOpen = MutableStateFlow(false)
+
+    override fun setSoundWhileOpen(enabled: Boolean) {
+        soundWhileOpen.value = enabled
+    }
+
     override val reactionsEnabled = MutableStateFlow(true)
 
     override fun setReactionsEnabled(enabled: Boolean) {

@@ -130,6 +130,7 @@ fun DesktopSettingsScreen(
     onBack: (() -> Unit)? = null,
     /** True on iPhone/iPad, where the phone's own position can be sent to the radio (as on Android). */
     showProvideLocation: Boolean = false,
+    showNotificationSound: Boolean = false,
 ) {
     val provideLocation by settingsViewModel.provideLocation.collectAsStateWithLifecycle()
     val state by radioConfigViewModel.radioConfigState.collectAsStateWithLifecycle()
@@ -386,6 +387,10 @@ fun DesktopSettingsScreen(
                         onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
                         newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
                         onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
+                        showSoundWhileOpen = showNotificationSound,
+                        soundWhileOpen =
+                        settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,
+                        onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
                     )
 
                     ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {

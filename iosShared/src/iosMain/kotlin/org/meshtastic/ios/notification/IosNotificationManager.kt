@@ -20,10 +20,15 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSUUID
+import platform.UIKit.UIApplicationDidBecomeActiveNotification
+import platform.UIKit.UIApplicationWillResignActiveNotification
 import platform.UserNotifications.UNAuthorizationOptionAlert
 import platform.UserNotifications.UNAuthorizationOptionBadge
 import platform.UserNotifications.UNAuthorizationOptionSound
@@ -59,16 +64,34 @@ private class ForegroundBanner :
 
 /** Local notifications on iPhone: gated by the user's notification settings, shown by the system. */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class IosNotificationManager(private val prefs: NotificationPrefs) : NotificationManager {
+class IosNotificationManager(
+    private val prefs: NotificationPrefs,
+    private val conversationTracker: ActiveConversationTracker,
+) : NotificationManager {
     private val center = UNUserNotificationCenter.currentNotificationCenter()
     private val delegate = ForegroundBanner()
 
     init {
+        // On iPhone the process lifecycle is always "resumed" (the app keeps its Bluetooth link), so it cannot tell a
+        // locked or backgrounded app from an open one. Without this, every message was posted as "app is open" and
+        // therefore without sound. The real screen state decides here.
+        observe(UIApplicationDidBecomeActiveNotification) { conversationTracker.setAppForeground(true) }
+        observe(UIApplicationWillResignActiveNotification) { conversationTracker.setAppForeground(false) }
         center.delegate = delegate
         center.requestAuthorizationWithOptions(
             UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge,
         ) { granted, error ->
             Logger.i { "Notification permission: granted=$granted error=${error?.localizedDescription}" }
+        }
+    }
+
+    private fun observe(name: String?, block: () -> Unit) {
+        NSNotificationCenter.defaultCenter.addObserverForName(
+            name = name,
+            `object` = null,
+            queue = NSOperationQueue.mainQueue,
+        ) { _ ->
+            block()
         }
     }
 
@@ -90,7 +113,8 @@ class IosNotificationManager(private val prefs: NotificationPrefs) : Notificatio
             UNMutableNotificationContent().apply {
                 setTitle(notification.title)
                 setBody(notification.message)
-                if (!notification.isSilent) setSound(UNNotificationSound.defaultSound)
+                // A quiet notification (app open on another screen) gets a sound only if the user switched that on.
+                if (!notification.isSilent || prefs.soundWhileOpen.value) setSound(UNNotificationSound.defaultSound)
             }
         val id = notification.id?.toString() ?: NSUUID().UUIDString
         val request = UNNotificationRequest.requestWithIdentifier(id, content, trigger = null)
