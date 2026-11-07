@@ -522,6 +522,7 @@ private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtr
 private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStats {
     if (ext == null) return this
     val reportsCpu = ext.cpuUsagePercent > 0 || ext.memoryTotal > 0 || ext.flashTotalBytes > 0
+    val reportsLink = ext.wifiRssi != 0 || ext.bleRssi != 0
     return copy(
         cpuPercent = if (reportsCpu) ext.cpuUsagePercent else cpuPercent,
         flashUsedPercent =
@@ -531,8 +532,9 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
         ext.takeIf { it.memoryPsramTotal > 0 }
             ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
             ?: psramUsedPercent,
-        wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
-        bleRssi = ext.bleRssi.takeIf { it != 0 } ?: bleRssi,
+        // A packet with either link signal replaces both old readings (WiFi and Bluetooth swap places).
+        wifiRssi = if (reportsLink) ext.wifiRssi.takeIf { it != 0 } else wifiRssi,
+        bleRssi = if (reportsLink) ext.bleRssi.takeIf { it != 0 } else bleRssi,
     )
 }
 

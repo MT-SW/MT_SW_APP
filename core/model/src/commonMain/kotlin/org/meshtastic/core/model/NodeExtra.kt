@@ -69,6 +69,10 @@ data class NodeExtraStats(
                 wifiRssi != null ||
                 bleRssi != null
 
+    /** The node reported the signal of one of its links (WiFi or Bluetooth). */
+    val hasLinkSignal: Boolean
+        get() = wifiRssi != null || bleRssi != null
+
     /** Every reading a node can send is present, so older packets cannot add anything. */
     val isComplete: Boolean
         get() =
@@ -77,8 +81,7 @@ data class NodeExtraStats(
                 heapUsedPercent != null &&
                 flashUsedPercent != null &&
                 psramUsedPercent != null &&
-                wifiRssi != null &&
-                bleRssi != null &&
+                hasLinkSignal &&
                 noiseFloor != null
 
     /** This reading, with every gap filled from an [older] one. */
@@ -92,8 +95,10 @@ data class NodeExtraStats(
         heapUsedPercent = heapUsedPercent ?: older.heapUsedPercent,
         flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
         psramUsedPercent = psramUsedPercent ?: older.psramUsedPercent,
-        wifiRssi = wifiRssi ?: older.wifiRssi,
-        bleRssi = bleRssi ?: older.bleRssi,
+        // WiFi and Bluetooth replace each other: the newest reading of either one wins, and the older ones are kept only
+        // while no newer packet reported any of the two.
+        wifiRssi = if (hasLinkSignal) wifiRssi else older.wifiRssi,
+        bleRssi = if (hasLinkSignal) bleRssi else older.bleRssi,
         noiseFloor = noiseFloor ?: older.noiseFloor,
     )
 }
