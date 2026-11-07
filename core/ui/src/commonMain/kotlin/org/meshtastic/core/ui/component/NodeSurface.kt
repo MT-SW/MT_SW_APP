@@ -19,11 +19,11 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
-import org.meshtastic.core.ui.theme.LocalColorSaturation
-import org.meshtastic.core.ui.theme.saturated
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.theme.LocalColorSaturation
+import org.meshtastic.core.ui.theme.saturated
 
 /**
  * Shared node-tinted surface treatment so node cards and message bubbles match. A node's identity color is applied as a

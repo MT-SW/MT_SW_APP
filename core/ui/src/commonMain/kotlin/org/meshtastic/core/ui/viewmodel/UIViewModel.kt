@@ -29,11 +29,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import org.meshtastic.core.ui.theme.AppFontSettings
-import org.meshtastic.core.ui.theme.FontSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -98,6 +93,8 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.import_pending_channels_connect
 import org.meshtastic.core.resources.import_pending_contact_connect
 import org.meshtastic.core.ui.component.ScrollToTopEvent
+import org.meshtastic.core.ui.theme.AppFontSettings
+import org.meshtastic.core.ui.theme.FontSettings
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.ComposableContent
 import org.meshtastic.core.ui.util.SnackbarManager

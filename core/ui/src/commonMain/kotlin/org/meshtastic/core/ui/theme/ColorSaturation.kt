@@ -34,7 +34,8 @@ private const val BACK_OFF = 0.8
 /**
  * The same palette with stronger colours: the chroma of every colour of the scheme is multiplied in the perceptual
  * OKLCH space, hue and lightness stay, so gold stays gold and a text stays as readable. Backgrounds, surfaces, outlines
- * and the grey secondary colours stay untouched, so grey stays grey; only accent colours get stronger. [percent] 100 changes nothing.
+ * and the grey secondary colours stay untouched, so grey stays grey; only accent colours get stronger. [percent] 100
+ * changes nothing.
  */
 fun ColorScheme.withSaturation(percent: Int): ColorScheme {
     val k = percent / 100.0

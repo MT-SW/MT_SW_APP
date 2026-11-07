@@ -23,11 +23,13 @@ import org.jetbrains.skia.FontSlant
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontWidth
 
-actual fun systemFontNames(): List<String> =
-    FontMgr.default.let { mgr -> (0 until mgr.familiesCount).map { mgr.getFamilyName(it) } }
-        .filter { it.isNotBlank() && !it.startsWith(".") }
-        .distinct()
-        .sorted()
+actual fun systemFontNames(): List<String> = FontMgr.default
+    .let { mgr -> (0 until mgr.familiesCount).map { mgr.getFamilyName(it) } }
+    .filter { it.isNotBlank() && !it.startsWith(".") }
+    .distinct()
+    .sorted()
 
 actual fun systemFontFamily(name: String, weight: Int): FontFamily? =
-    FontMgr.default.matchFamilyStyle(name, FontStyle(weight, FontWidth.NORMAL, FontSlant.UPRIGHT))?.let { FontFamily(Typeface(it)) }
+    FontMgr.default.matchFamilyStyle(name, FontStyle(weight, FontWidth.NORMAL, FontSlant.UPRIGHT))?.let {
+        FontFamily(Typeface(it))
+    }

@@ -18,9 +18,9 @@ package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -31,13 +31,13 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.font_default
@@ -58,7 +58,6 @@ import org.meshtastic.core.ui.theme.FONT_WEIGHT_MIN
 import org.meshtastic.core.ui.theme.FONT_WEIGHT_STEP
 import org.meshtastic.core.ui.theme.systemFontFamily
 import org.meshtastic.core.ui.theme.systemFontNames
-import org.meshtastic.feature.settings.SettingsViewModel
 
 private const val LIST_HEIGHT_DP = 360
 private const val BASE_WEIGHT = 400
@@ -104,10 +103,13 @@ private fun FontFamilyDialog(current: String, onPick: (String) -> Unit, onDismis
                         Text(
                             text = name + if (name == current) "  ✓" else "",
                             style = MaterialTheme.typography.bodyLarge.merge(TextStyle(fontFamily = family)),
-                            modifier = Modifier.fillMaxWidth().clickable {
-                                onPick(name)
-                                onDismiss()
-                            }.padding(vertical = 12.dp),
+                            modifier =
+                            Modifier.fillMaxWidth()
+                                .clickable {
+                                    onPick(name)
+                                    onDismiss()
+                                }
+                                .padding(vertical = 12.dp),
                         )
                     }
                 }
@@ -119,7 +121,7 @@ private fun FontFamilyDialog(current: String, onPick: (String) -> Unit, onDismis
 /** Slider that changes the weight of all text live, with a sample line that shows the result. */
 @Composable
 private fun FontWeightDialog(current: Int, onChange: (Int) -> Unit, onDismiss: () -> Unit) {
-    var value by remember { mutableStateOf(current) }
+    var value by remember { mutableIntStateOf(current) }
     val steps = (FONT_WEIGHT_MAX - FONT_WEIGHT_MIN) / FONT_WEIGHT_STEP - 1
     MeshtasticDialog(
         title = stringResource(Res.string.font_weight),
@@ -153,7 +155,10 @@ private fun FontSizeDialog(current: Int, onPick: (Int) -> Unit, onDismiss: () ->
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 FONT_SIZE_OPTIONS.forEach { percent ->
-                    ListItem(text = fontSizeLabel(percent) + if (percent == current) "  ✓" else "", trailingIcon = null) {
+                    ListItem(
+                        text = fontSizeLabel(percent) + if (percent == current) "  ✓" else "",
+                        trailingIcon = null,
+                    ) {
                         onPick(percent)
                         onDismiss()
                     }
@@ -163,38 +168,49 @@ private fun FontSizeDialog(current: Int, onPick: (Int) -> Unit, onDismiss: () ->
     )
 }
 
+private enum class FontDialogKind { None, Family, Weight, Size }
+
 /** Three rows (font, weight, text size) with their pickers; they apply to the whole app on every platform. */
 @Composable
-fun FontSettingsItems(settingsViewModel: SettingsViewModel) {
-    val family by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
-    val weight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
-    val size by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
-    var open by remember { mutableStateOf(0) }
+fun FontSettingsItems(
+    family: String,
+    weight: Int,
+    size: Int,
+    onFamily: (String) -> Unit,
+    onWeight: (Int) -> Unit,
+    onSize: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var open by remember { mutableStateOf(FontDialogKind.None) }
+    val close = { open = FontDialogKind.None }
 
-    when (open) {
-        1 -> FontFamilyDialog(family, { settingsViewModel.setFontFamily(it) }) { open = 0 }
-        2 -> FontWeightDialog(weight, { settingsViewModel.setFontWeightShift(it) }) { open = 0 }
-        3 -> FontSizeDialog(size, { settingsViewModel.setFontSizePercent(it) }) { open = 0 }
-    }
-    ListItem(
-        text = stringResource(Res.string.font_family),
-        supportingText = family.ifEmpty { stringResource(Res.string.font_default) },
-        leadingIcon = MeshtasticIcons.FormatPaint,
-    ) {
-        open = 1
-    }
-    ListItem(
-        text = stringResource(Res.string.font_weight),
-        supportingText = fontWeightLabel(weight),
-        leadingIcon = MeshtasticIcons.FormatPaint,
-    ) {
-        open = 2
-    }
-    ListItem(
-        text = stringResource(Res.string.font_size),
-        supportingText = fontSizeLabel(size),
-        leadingIcon = MeshtasticIcons.FormatPaint,
-    ) {
-        open = 3
+    Column(modifier) {
+        when (open) {
+            FontDialogKind.Family -> FontFamilyDialog(family, onFamily, close)
+            FontDialogKind.Weight -> FontWeightDialog(weight, onWeight, close)
+            FontDialogKind.Size -> FontSizeDialog(size, onSize, close)
+            FontDialogKind.None -> Unit
+        }
+        ListItem(
+            text = stringResource(Res.string.font_family),
+            supportingText = family.ifEmpty { stringResource(Res.string.font_default) },
+            leadingIcon = MeshtasticIcons.FormatPaint,
+        ) {
+            open = FontDialogKind.Family
+        }
+        ListItem(
+            text = stringResource(Res.string.font_weight),
+            supportingText = fontWeightLabel(weight),
+            leadingIcon = MeshtasticIcons.FormatPaint,
+        ) {
+            open = FontDialogKind.Weight
+        }
+        ListItem(
+            text = stringResource(Res.string.font_size),
+            supportingText = fontSizeLabel(size),
+            leadingIcon = MeshtasticIcons.FormatPaint,
+        ) {
+            open = FontDialogKind.Size
+        }
     }
 }

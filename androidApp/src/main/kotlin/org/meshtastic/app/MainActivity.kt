@@ -94,8 +94,8 @@ import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
-import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.theme.rememberScaledDensity
+import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerSupported

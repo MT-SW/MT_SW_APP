@@ -94,6 +94,7 @@ import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.network.update.AppUpdateService
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.desktop_tray_quit
@@ -102,16 +103,15 @@ import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
-import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
+import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
-import org.meshtastic.core.ui.theme.saturationFor
-import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.rememberScaledDensity
+import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider

@@ -16,11 +16,11 @@
  */
 package org.meshtastic.core.ui.theme
 
-import android.graphics.Typeface as AndroidTypeface
 import android.os.Build
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Typeface
 import java.io.File
+import android.graphics.Typeface as AndroidTypeface
 
 private const val BOLD_FROM = 600
 private val FONT_FILES =
@@ -33,11 +33,10 @@ private val FONT_FILES =
 private val FAMILY_NAME = Regex("<family[^>]*\\sname=\"([^\"]+)\"")
 
 /** Family names listed in the system's font configuration files (there is no public list on Android). */
-actual fun systemFontNames(): List<String> = FONT_FILES
-    .flatMap { path ->
-        runCatching { FAMILY_NAME.findAll(File(path).readText()).map { it.groupValues[1] }.toList() }
-            .getOrDefault(emptyList())
-    }
+actual fun systemFontNames(): List<String> = FONT_FILES.flatMap { path ->
+    runCatching { FAMILY_NAME.findAll(File(path).readText()).map { it.groupValues[1] }.toList() }
+        .getOrDefault(emptyList())
+}
     .filter { it.isNotBlank() }
     .distinct()
     .sorted()

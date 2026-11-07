@@ -31,14 +31,14 @@ import org.meshtastic.core.resources.dynamic
 import org.meshtastic.core.resources.theme_dark
 import org.meshtastic.core.resources.theme_light
 import org.meshtastic.core.resources.theme_mono_dark
+import org.meshtastic.core.resources.theme_mono_light
+import org.meshtastic.core.resources.theme_system
 import org.meshtastic.core.resources.theme_very_vivid
 import org.meshtastic.core.resources.theme_very_vivid_dark
 import org.meshtastic.core.resources.theme_very_vivid_light
 import org.meshtastic.core.resources.theme_vivid
 import org.meshtastic.core.resources.theme_vivid_dark
 import org.meshtastic.core.resources.theme_vivid_light
-import org.meshtastic.core.resources.theme_mono_light
-import org.meshtastic.core.resources.theme_system
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC

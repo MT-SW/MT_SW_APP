@@ -118,11 +118,11 @@ import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
@@ -136,6 +136,9 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
+    val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
+    val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
     val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
@@ -265,7 +268,14 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
                     showThemePicker = true
                 }
-                FontSettingsItems(settingsViewModel)
+                FontSettingsItems(
+                    family = fontFamily,
+                    weight = fontWeight,
+                    size = fontSize,
+                    onFamily = { settingsViewModel.setFontFamily(it) },
+                    onWeight = { settingsViewModel.setFontWeightShift(it) },
+                    onSize = { settingsViewModel.setFontSizePercent(it) },
+                )
                 val pickColor = stringResource(Res.string.node_color_pick)
                 ListItem(
                     text = stringResource(Res.string.node_color_title),

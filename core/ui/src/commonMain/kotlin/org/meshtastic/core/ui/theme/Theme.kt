@@ -24,12 +24,12 @@ import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme.Companion.expressive
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -388,8 +388,16 @@ const val MODE_VERY_VIVID_DARK = 6969428
 
 /** How strong the palette is for [mode], in percent: 100 for the ordinary themes. */
 fun saturationFor(mode: Int): Int = when (mode) {
-    MODE_VIVID, MODE_VIVID_LIGHT, MODE_VIVID_DARK -> SATURATION_VIVID
-    MODE_VERY_VIVID, MODE_VERY_VIVID_LIGHT, MODE_VERY_VIVID_DARK -> SATURATION_VERY_VIVID
+    MODE_VIVID,
+    MODE_VIVID_LIGHT,
+    MODE_VIVID_DARK,
+    -> SATURATION_VIVID
+
+    MODE_VERY_VIVID,
+    MODE_VERY_VIVID_LIGHT,
+    MODE_VERY_VIVID_DARK,
+    -> SATURATION_VERY_VIVID
+
     else -> 100
 }
 
