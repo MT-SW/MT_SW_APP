@@ -33,8 +33,8 @@ private const val BACK_OFF = 0.8
 
 /**
  * The same palette with stronger colours: the chroma of every colour of the scheme is multiplied in the perceptual
- * OKLCH space, hue and lightness stay, so gold stays gold and a text stays as readable. Greys without any tint stay
- * grey; only the scrim is left alone. [percent] 100 changes nothing.
+ * OKLCH space, hue and lightness stay, so gold stays gold and a text stays as readable. Backgrounds, surfaces, outlines
+ * and the grey secondary colours stay untouched, so grey stays grey; only accent colours get stronger. [percent] 100 changes nothing.
  */
 fun ColorScheme.withSaturation(percent: Int): ColorScheme {
     val k = percent / 100.0
@@ -45,41 +45,20 @@ fun ColorScheme.withSaturation(percent: Int): ColorScheme {
         primaryContainer = primaryContainer.saturated(k),
         onPrimaryContainer = onPrimaryContainer.saturated(k),
         inversePrimary = inversePrimary.saturated(k),
-        secondary = secondary.saturated(k),
-        onSecondary = onSecondary.saturated(k),
-        secondaryContainer = secondaryContainer.saturated(k),
-        onSecondaryContainer = onSecondaryContainer.saturated(k),
         tertiary = tertiary.saturated(k),
         onTertiary = onTertiary.saturated(k),
         tertiaryContainer = tertiaryContainer.saturated(k),
         onTertiaryContainer = onTertiaryContainer.saturated(k),
-        background = background.saturated(k),
-        onBackground = onBackground.saturated(k),
-        surface = surface.saturated(k),
-        onSurface = onSurface.saturated(k),
-        surfaceVariant = surfaceVariant.saturated(k),
-        onSurfaceVariant = onSurfaceVariant.saturated(k),
         surfaceTint = surfaceTint.saturated(k),
-        inverseSurface = inverseSurface.saturated(k),
-        inverseOnSurface = inverseOnSurface.saturated(k),
         error = error.saturated(k),
         onError = onError.saturated(k),
         errorContainer = errorContainer.saturated(k),
         onErrorContainer = onErrorContainer.saturated(k),
-        outline = outline.saturated(k),
-        outlineVariant = outlineVariant.saturated(k),
-        surfaceBright = surfaceBright.saturated(k),
-        surfaceDim = surfaceDim.saturated(k),
-        surfaceContainer = surfaceContainer.saturated(k),
-        surfaceContainerHigh = surfaceContainerHigh.saturated(k),
-        surfaceContainerHighest = surfaceContainerHighest.saturated(k),
-        surfaceContainerLow = surfaceContainerLow.saturated(k),
-        surfaceContainerLowest = surfaceContainerLowest.saturated(k),
     )
 }
 
 /** This colour with its chroma multiplied by [k]; when that leaves the screen's range, as much as still fits. */
-private fun Color.saturated(k: Double): Color {
+fun Color.saturated(k: Double): Color {
     val (l, a, b) = toOklab()
     var factor = k
     repeat(GAMUT_STEPS) {

@@ -210,6 +210,9 @@ private val monoDarkScheme =
 /** True while one of the two black-and-white themes is active; maps and charts can read it to drop their colour too. */
 val LocalMonochrome = compositionLocalOf { false }
 
+/** Colour strength of the chosen theme in percent (100 = as designed); the device colours follow it. */
+val LocalColorSaturation = compositionLocalOf { 100 }
+
 /**
  * Counts the native views (maps, camera) that are on screen. They draw on a surface of their own, which the grayscale
  * layer would turn into a black hole, so while one is shown the layer is paused. Those views take care of their own
@@ -343,7 +346,7 @@ fun AppTheme(
 
     MonochromeState.on = monochrome
     MaterialExpressiveTheme(colorScheme = colorScheme, typography = typography, motionScheme = expressive()) {
-        CompositionLocalProvider(LocalMonochrome provides monochrome) {
+        CompositionLocalProvider(LocalMonochrome provides monochrome, LocalColorSaturation provides saturation) {
             if (monochrome) GrayscaleLayer(content) else content()
         }
     }
