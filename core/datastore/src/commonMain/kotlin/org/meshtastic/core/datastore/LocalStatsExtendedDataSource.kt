@@ -39,6 +39,7 @@ data class LocalStatsExtendedPrefs(
     val wifiRssi: Int = 0,
     val wifiDrops: Int = 0,
     val wifiDropReason: Int = 0,
+    val bleRssi: Int = 0,
 )
 
 /**
@@ -59,6 +60,7 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
         val WIFI_RSSI = intPreferencesKey("local-stats-extended-wifi-rssi")
         val WIFI_DROPS = intPreferencesKey("local-stats-extended-wifi-drops")
         val WIFI_DROP_REASON = intPreferencesKey("local-stats-extended-wifi-drop-reason")
+        val BLE_RSSI = intPreferencesKey("local-stats-extended-ble-rssi")
     }
 
     open val localStatsExtendedFlow: Flow<LocalStatsExtendedPrefs> =
@@ -74,6 +76,7 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
                 wifiRssi = prefs[PreferencesKeys.WIFI_RSSI] ?: 0,
                 wifiDrops = prefs[PreferencesKeys.WIFI_DROPS] ?: 0,
                 wifiDropReason = prefs[PreferencesKeys.WIFI_DROP_REASON] ?: 0,
+                bleRssi = prefs[PreferencesKeys.BLE_RSSI] ?: 0,
             )
         }
 
@@ -89,6 +92,7 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
             prefs[PreferencesKeys.WIFI_RSSI] = stats.wifiRssi
             prefs[PreferencesKeys.WIFI_DROPS] = stats.wifiDrops
             prefs[PreferencesKeys.WIFI_DROP_REASON] = stats.wifiDropReason
+            prefs[PreferencesKeys.BLE_RSSI] = stats.bleRssi
         }
     }
 }

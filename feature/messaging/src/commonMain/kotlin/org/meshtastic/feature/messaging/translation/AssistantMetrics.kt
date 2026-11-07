@@ -110,6 +110,14 @@ internal object NodeMetrics {
             MetricDef("psram", "zajęty PSRAM", "PSRAM used", "%", listOf("psram"), decimals = 0),
             MetricDef("wifi", "sygnał Wi-Fi", "Wi-Fi signal", "dBm", listOf("wifi", "wi-fi"), decimals = 0),
             MetricDef(
+                "ble",
+                "sygnał Bluetooth telefonu",
+                "Bluetooth signal of the phone",
+                "dBm",
+                listOf("ble rssi", "sygnał ble", "sygnal ble", "bluetooth rssi", "sygnał bluetooth", "sygnal bluetooth"),
+                decimals = 0,
+            ),
+            MetricDef(
                 "rx",
                 "odebrane pakiety",
                 "packets received",

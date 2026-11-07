@@ -527,13 +527,13 @@ open class MetricsViewModel(
     internal fun saveWifiSignalCSV(uri: CommonUri, data: List<WifiSample>) {
         exportCsv(
             uri = uri,
-            header = "\"date\",\"time\",\"wifiRssi\",\"wifiDrops\",\"wifiDropReason\"\n",
+            header = "\"date\",\"time\",\"wifiRssi\",\"wifiDrops\",\"wifiDropReason\",\"bleRssi\"\n",
             rows = data,
             epochSeconds = { it.time.toLong() },
         ) { w ->
             // No WiFi link right now exports an empty strength, not 0 dBm.
             "\"${w.stats.wifiRssi.takeIf { it != 0 } ?: ""}\",\"${w.stats.wifiDrops}\"," +
-                "\"${w.stats.wifiDropReason}\""
+                "\"${w.stats.wifiDropReason}\",\"${w.stats.bleRssi.takeIf { it != 0 } ?: ""}\""
         }
     }
 

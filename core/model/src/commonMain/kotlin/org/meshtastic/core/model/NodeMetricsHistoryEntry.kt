@@ -52,4 +52,6 @@ data class NodeMetricsHistoryEntry(
     val wifiRssi: Int? = null,
     /** WiFi drops since the node started (fw+ extended stats). */
     val wifiDrops: Int? = null,
+    /** Bluetooth signal strength in dBm as the node hears its connected phone (fw+ extended stats). */
+    val bleRssi: Int? = null,
 )

@@ -31,11 +31,15 @@ import org.meshtastic.core.resources.wifi_reason_self
 import org.meshtastic.core.resources.wifi_reason_signal_lost
 import org.meshtastic.proto.Telemetry
 
-/** One sample of the device's own WiFi link (fw+ extended stats), taken at [time] (seconds). */
+/** One sample of the device's own WiFi link and Bluetooth signal (fw+ extended stats), taken at [time] (seconds). */
 internal data class WifiSample(val time: Int, val stats: LocalStatsExtended) {
     /** The device reports a WiFi signal only while it is connected. */
     val isConnected: Boolean
         get() = stats.wifiRssi != 0
+
+    /** The device reports the Bluetooth signal of its phone only while one is connected. */
+    val isBleConnected: Boolean
+        get() = stats.bleRssi != 0
 }
 
 // ESP-IDF disconnect reasons the firmware most often reports at the edge of coverage.
@@ -64,8 +68,8 @@ internal fun wifiDropReasonText(code: Int): String = when (code) {
     else -> stringResource(Res.string.wifi_reason_other, code)
 }
 
-/** Keeps only the telemetry that carries WiFi data, decoded once, oldest to newest as given. */
+/** Keeps only the telemetry that carries WiFi or Bluetooth data, decoded once, oldest to newest as given. */
 internal fun List<Telemetry>.toWifiSamples(sinceSeconds: Long): List<WifiSample> = mapNotNull { t ->
     if (t.time.toLong() < sinceSeconds) return@mapNotNull null
-    t.decodeLocalStatsExtended()?.takeIf { it.hasWifi }?.let { WifiSample(t.time, it) }
+    t.decodeLocalStatsExtended()?.takeIf { it.hasWifi || it.hasBle }?.let { WifiSample(t.time, it) }
 }

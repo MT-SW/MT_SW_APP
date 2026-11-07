@@ -318,6 +318,7 @@ class NodeRepositoryImpl(
         wifiRssi = wifiRssi,
         wifiDrops = wifiDrops,
         wifiDropReason = wifiDropReason,
+        bleRssi = bleRssi,
     )
 
     private fun LocalStatsExtended.toPrefs() = LocalStatsExtendedPrefs(
@@ -331,5 +332,6 @@ class NodeRepositoryImpl(
         wifiRssi = wifiRssi,
         wifiDrops = wifiDrops,
         wifiDropReason = wifiDropReason,
+        bleRssi = bleRssi,
     )
 }

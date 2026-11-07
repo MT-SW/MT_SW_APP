@@ -1203,6 +1203,7 @@ class MeshNotificationManagerImpl(
                 )
             }
             if (ext.wifiRssi != 0) add(getStringSuspend(Res.string.live_update_wifi, ext.wifiRssi))
+            if (ext.bleRssi != 0) add(getStringSuspend(Res.string.live_update_ble, ext.bleRssi))
         }
     }
 

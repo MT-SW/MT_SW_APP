@@ -508,6 +508,8 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         // The device's own WiFi link: the strength only while connected, the drop counter whenever WiFi is reported.
         wifiRssi = localStatsExtended?.wifiRssi?.takeIf { it != 0 },
         wifiDrops = localStatsExtended?.takeIf { it.hasWifi }?.wifiDrops,
+        // The Bluetooth link to the phone, only while one is connected to the node.
+        bleRssi = localStatsExtended?.bleRssi?.takeIf { it != 0 },
     )
 }
 
@@ -560,7 +562,7 @@ private fun NetworkHealthMetric.rawHistoryValue(entry: org.meshtastic.core.model
 /** Sub-series labels for a metric tab's detail chart. Most metrics have one; several tabs have multiple. */
 internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.POWER -> listOf("Bateria", "Napięcie", "Prąd")
-    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Noise Floor", "WiFi RSSI", "Zerwania WiFi")
+    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Noise Floor", "WiFi RSSI", "Zerwania WiFi", "BLE RSSI")
     NetworkHealthMetric.ETHER -> listOf("Ch. Util", "Air Util")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
@@ -578,7 +580,7 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.POWER -> listOf(listOf("Napięcie", "Prąd"), listOf("Bateria"))
 
     NetworkHealthMetric.SIGNAL ->
-        listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"), listOf("WiFi RSSI", "Zerwania WiFi"))
+        listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"), listOf("WiFi RSSI", "Zerwania WiFi"), listOf("BLE RSSI"))
 
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
 
@@ -611,6 +613,7 @@ internal fun NetworkHealthMetric.historySeriesValue(
             "Noise Floor" -> entry.noiseFloor?.toFloat()
             "WiFi RSSI" -> entry.wifiRssi?.toFloat()
             "Zerwania WiFi" -> entry.wifiDrops?.toFloat()
+            "BLE RSSI" -> entry.bleRssi?.toFloat()
             else -> null
         }
 

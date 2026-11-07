@@ -325,6 +325,7 @@ private fun previewSampleExtraStats(): NodeExtraStats = NodeExtraStats(
     heapUsedPercent = 59f,
     flashUsedPercent = 63f,
     wifiRssi = -67,
+    bleRssi = -58,
     noiseFloor = -112,
 )
 

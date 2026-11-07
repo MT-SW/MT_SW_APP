@@ -45,10 +45,16 @@ data class LocalStatsExtended(
     val wifiDrops: Int = 0,
     /** ESP-IDF code of the last WiFi drop, 0 = none yet. */
     val wifiDropReason: Int = 0,
+    /** Bluetooth signal strength in dBm, as the device hears the connected phone; 0 = not reported (no phone connected). */
+    val bleRssi: Int = 0,
 ) {
     /** True when the device reported anything about WiFi in this sample. */
     val hasWifi: Boolean
         get() = wifiRssi != 0 || wifiDrops != 0 || wifiDropReason != 0
+
+    /** True when the device reported a Bluetooth signal in this sample. */
+    val hasBle: Boolean
+        get() = bleRssi != 0
 }
 
 /** Convenience wrapper so existing call sites keep decoding straight off a [Telemetry] packet. */
@@ -62,7 +68,7 @@ private const val WIRE_TYPE_FIXED32 = 5
 
 /**
  * Scans these [ByteString] unknown fields (from [org.meshtastic.proto.Telemetry.unknownFields]) for the
- * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s plus the 3 WiFi ones) by
+ * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s, the 3 WiFi ones and the Bluetooth signal) by
  * hand. Returns null if the field is absent (e.g. stock firmware) or malformed.
  */
 fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
@@ -80,6 +86,8 @@ fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
         wifiRssi = fields[8]?.toInt() ?: 0,
         wifiDrops = fields[9]?.toInt() ?: 0,
         wifiDropReason = fields[10]?.toInt() ?: 0,
+        // ble_rssi is a negative int32 too (field 11); 0 is never sent.
+        bleRssi = fields[11]?.toInt() ?: 0,
     )
 }
 

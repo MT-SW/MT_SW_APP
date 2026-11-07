@@ -470,6 +470,7 @@
     <string name="live_update_flash">Flash: %1$s</string>
     <string name="live_update_psram">PSRAM: %1$s</string>
     <string name="live_update_wifi">Wi-Fi: %1$d dBm</string>
+    <string name="live_update_ble">Bluetooth: %1$d dBm</string>
     <string name="live_update_role">Rola: %1$s</string>
     <string name="live_update_search_nodes">Szukaj węzłów</string>
     <string name="live_update_signal">SNR %1$s, RSSI %2$s</string>
@@ -2951,6 +2952,8 @@
     <string name="on_demand_no_errors">Brak błędów routingu</string>
     <string name="on_demand_hero_progress">Sprawdzono %1$d z %2$d</string>
     <string name="wifi_rssi_signal">WiFi RSSI</string>
+    <string name="ble_rssi_signal">Bluetooth RSSI</string>
+    <string name="ble_rssi_definition">Siła sygnału Bluetooth, z jaką urządzenie słyszy połączony z nim telefon, w dBm, raportowana przez firmware tylko wtedy, gdy telefon jest połączony. Im bliżej 0, tym silniejszy sygnał; wartości poniżej około -85 dBm zwykle oznaczają niestabilne połączenie.</string>
     <string name="wifi_rssi_definition">Siła połączenia WiFi samego urządzenia w dBm, raportowana przez firmware tylko wtedy, gdy jest połączone z siecią. Im bliżej 0, tym silniejszy sygnał; wartości poniżej około -80 dBm zwykle oznaczają niestabilne połączenie.</string>
     <string name="wifi_drops_label">Zerwania WiFi</string>
     <string name="wifi_drop_reason_label">Powód ostatniego zerwania WiFi</string>

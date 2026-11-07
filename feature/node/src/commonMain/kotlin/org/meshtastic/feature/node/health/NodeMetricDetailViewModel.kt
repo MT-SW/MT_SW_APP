@@ -194,7 +194,8 @@ class NodeMetricDetailViewModel(
                             val noiseFloorSeries = series.find { it.label == "Noise Floor" && it.points.isNotEmpty() }
                             // The WiFi series are the device's own report too, so they stay as well.
                             val wifiSeries = series.filter {
-                                (it.label == "WiFi RSSI" || it.label == "Zerwania WiFi") && it.points.isNotEmpty()
+                                (it.label == "WiFi RSSI" || it.label == "Zerwania WiFi" || it.label == "BLE RSSI") &&
+                                    it.points.isNotEmpty()
                             }
                             listOfNotNull(hopsSeries, noiseFloorSeries) + wifiSeries
                         } else {

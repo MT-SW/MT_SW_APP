@@ -50,6 +50,7 @@ message NodeStats {
     optional int32 wifi_rssi = 35;
     optional uint32 wifi_drops = 36;
     optional uint32 wifi_drop_reason = 37;
+    optional int32 ble_rssi = 38;
 }
 
 message RxPacketHistory {

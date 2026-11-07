@@ -80,6 +80,7 @@ import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.icon.Weight
+import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.icon.WindDirection
 import org.meshtastic.core.ui.util.LnaCorrection
@@ -155,6 +156,7 @@ val nodeExtraLegend: List<Pair<(@Composable () -> ImageVector)?, String>> =
         legend(null, "D: duplikaty"),
         legend(null, "Przek.: pakiety przekazane dalej"),
         legend({ MeshtasticIcons.Wifi }, "Siła sygnału Wi-Fi węzła (z jego pakietu)"),
+        legend({ MeshtasticIcons.Bluetooth }, "Siła sygnału Bluetooth telefonu połączonego z węzłem (z jego pakietu)"),
         legend({ MeshtasticIcons.Memory }, "Procesor (CPU)"),
         legend({ MeshtasticIcons.DataUsage }, "Wolna pamięć"),
         legend({ MeshtasticIcons.Storage }, "Zajęta pamięć flash / PSRAM"),
@@ -291,6 +293,8 @@ private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
     }
     // Shown exactly as the node sent it in its last packet.
     stats?.wifiRssi?.let { add(ExtraChip({ MeshtasticIcons.Wifi }, "Wi-Fi", "$it dBm")) }
+    // The Bluetooth link to the phone, as the node hears it; present only while a phone is connected.
+    stats?.bleRssi?.let { add(ExtraChip({ MeshtasticIcons.Bluetooth }, "BLE", "$it dBm")) }
 }
 
 /**

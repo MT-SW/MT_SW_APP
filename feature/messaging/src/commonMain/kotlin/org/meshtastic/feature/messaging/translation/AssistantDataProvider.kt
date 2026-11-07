@@ -911,6 +911,7 @@ class AssistantDataProvider(
         var flashUsed: Float? = null
         var psramUsed: Float? = null
         var wifi: Int? = null
+        var ble: Int? = null
         var relayed: Int? = null
         var dropped: Int? = null
     }
@@ -961,6 +962,7 @@ class AssistantDataProvider(
                             null
                         }
                     row.wifi = ext.wifiRssi.takeIf { it != 0 }
+                    row.ble = ext.bleRssi.takeIf { it != 0 }
                 }
             }
             t.device_metrics?.let { dm ->
@@ -1028,6 +1030,9 @@ class AssistantDataProvider(
                 q.hasAny(listOf("wifi", "wi-fi")) ->
                     listOf(Key("Wi-Fi signal dBm (strongest first)", true) { it.wifi?.toFloat() })
 
+                q.hasAny(BLE_SIGNAL_WORDS) ->
+                    listOf(Key("Bluetooth signal of the connected phone dBm (strongest first)", true) { it.ble?.toFloat() })
+
                 q.hasAny(listOf("heap", "pamię", "pamie", " ram")) ->
                     listOf(Key("used RAM (heap) percent (highest first)", true) { it.heapUsed })
 
@@ -1064,7 +1069,7 @@ class AssistantDataProvider(
                 } ?: "?"}%, cpu=${r.cpu ?: "?"}%, flash_used=${r.flashUsed?.let { fmt(it) } ?: "?"}%, " +
                 "psram_used=${r.psramUsed?.let {
                     fmt(it)
-                } ?: "?"}%, wifi=${r.wifi ?: "?"} dBm, voltage=${r.voltage?.let {
+                } ?: "?"}%, wifi=${r.wifi ?: "?"} dBm, ble=${r.ble ?: "?"} dBm, voltage=${r.voltage?.let {
                     fmt(it)
                 } ?: "?"} V, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
                 "air_tx=${r.airUtil?.let {
@@ -1335,6 +1340,7 @@ class AssistantDataProvider(
                         put("flash", t.flashUsed)
                         put("psram", t.psramUsed)
                         put("wifi", t.wifi?.toFloat())
+                        put("ble", t.ble?.toFloat())
                         put("rx", t.rx?.toFloat())
                         put("tx", t.tx?.toFloat())
                         put("bad", t.bad?.toFloat())
@@ -1433,6 +1439,8 @@ class AssistantDataProvider(
             "psram" -> ranking("psram", top)
 
             "wifi" -> ranking("wifi", top)
+
+            "ble" -> ranking("ble rssi", top)
 
             "battery_high" -> ranking("battery najwyż", top)
 
@@ -3556,6 +3564,10 @@ class AssistantDataProvider(
                 "hop",
             )
         const val COORD_SCALE = 100000.0
+
+        /** Phrases that ask for the Bluetooth signal of the phone connected to a node (not for Bluetooth in general). */
+        private val BLE_SIGNAL_WORDS =
+            listOf("ble rssi", "sygnał ble", "sygnal ble", "bluetooth rssi", "sygnał bluetooth", "sygnal bluetooth", "bluetooth signal")
         const val MIN_STEM_WORD = 5
         const val MAX_STEM_HITS = 3
         val GENERIC_WORDS =

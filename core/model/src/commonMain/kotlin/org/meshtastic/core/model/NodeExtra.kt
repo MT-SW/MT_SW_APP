@@ -52,6 +52,8 @@ data class NodeExtraStats(
     val psramUsedPercent: Float? = null,
     /** Wi-Fi signal of the node in dBm, exactly as the node sent it in its last packet. */
     val wifiRssi: Int? = null,
+    /** Bluetooth signal in dBm, as the node hears the phone connected to it, exactly as the node sent it. */
+    val bleRssi: Int? = null,
     /** Noise floor in dBm as the node reported it (before any LNA correction). */
     val noiseFloor: Int? = null,
 ) {
@@ -64,7 +66,8 @@ data class NodeExtraStats(
                 heapUsedPercent != null ||
                 flashUsedPercent != null ||
                 psramUsedPercent != null ||
-                wifiRssi != null
+                wifiRssi != null ||
+                bleRssi != null
 
     /** Every reading a node can send is present, so older packets cannot add anything. */
     val isComplete: Boolean
@@ -75,6 +78,7 @@ data class NodeExtraStats(
                 flashUsedPercent != null &&
                 psramUsedPercent != null &&
                 wifiRssi != null &&
+                bleRssi != null &&
                 noiseFloor != null
 
     /** This reading, with every gap filled from an [older] one. */
@@ -89,6 +93,7 @@ data class NodeExtraStats(
         flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
         psramUsedPercent = psramUsedPercent ?: older.psramUsedPercent,
         wifiRssi = wifiRssi ?: older.wifiRssi,
+        bleRssi = bleRssi ?: older.bleRssi,
         noiseFloor = noiseFloor ?: older.noiseFloor,
     )
 }

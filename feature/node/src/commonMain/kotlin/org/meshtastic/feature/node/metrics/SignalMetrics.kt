@@ -68,6 +68,8 @@ import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ble_rssi_definition
+import org.meshtastic.core.resources.ble_rssi_signal
 import org.meshtastic.core.resources.busy_noise_floor
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.formatDuration
@@ -133,6 +135,7 @@ private enum class SignalMetric(val color: Color) {
     SNR(Green),
     RSSI(Blue),
     WIFI_RSSI(Orange),
+    BLE_RSSI(StatusPurple),
 }
 
 private val LEGEND_DATA =
@@ -140,6 +143,7 @@ private val LEGEND_DATA =
         LegendData(nameRes = Res.string.noise_floor, color = SignalMetric.NOISE_FLOOR.color, isLine = true),
         LegendData(nameRes = Res.string.rssi, color = SignalMetric.RSSI.color),
         LegendData(nameRes = Res.string.wifi_rssi_signal, color = SignalMetric.WIFI_RSSI.color),
+        LegendData(nameRes = Res.string.ble_rssi_signal, color = SignalMetric.BLE_RSSI.color),
         LegendData(nameRes = Res.string.snr, color = SignalMetric.SNR.color),
     )
 
@@ -210,6 +214,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
     val wifiData = remember(state.hostMetrics, threshold) { state.hostMetrics.toWifiSamples(threshold) }
     val data = remember(signalData, localStatsData, wifiData) { buildSignalLog(signalData, localStatsData, wifiData) }
     val hasWifiRssi = remember(wifiData) { wifiData.any { it.isConnected } }
+    val hasBleRssi = remember(wifiData) { wifiData.any { it.isBleConnected } }
     val hasNoiseFloor = remember(localStatsData) { localStatsData.any { it.local_stats?.noiseFloorOrNull != null } }
     val hasRssi = remember(signalData) { signalData.any { it.rx_rssi != null } }
     val hasSnr = remember(signalData) { signalData.any { it.snrOrNull() != null } }
@@ -258,6 +263,15 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                         Res.string.wifi_rssi_signal,
                         Res.string.wifi_rssi_definition,
                         SignalMetric.WIFI_RSSI.color,
+                    ),
+                )
+            }
+            if (hasBleRssi) {
+                add(
+                    InfoDialogData(
+                        Res.string.ble_rssi_signal,
+                        Res.string.ble_rssi_definition,
+                        SignalMetric.BLE_RSSI.color,
                     ),
                 )
             }
@@ -437,21 +451,23 @@ private fun SignalMetricsChart(
     val rssiData = remember(meshPackets) { meshPackets.filter { it.rx_rssi != null } }
     val snrData = remember(meshPackets) { meshPackets.filter { it.snrOrNull() != null } }
     val wifiRssiData = remember(wifi) { wifi.filter { it.isConnected } }
+    val bleRssiData = remember(wifi) { wifi.filter { it.isBleConnected } }
     val legendData =
-        remember(noiseFloorData, rssiData, snrData, wifiRssiData) {
+        remember(noiseFloorData, rssiData, snrData, wifiRssiData, bleRssiData) {
             LEGEND_DATA.filter { legend ->
                 when (legend.nameRes) {
                     Res.string.noise_floor -> noiseFloorData.isNotEmpty()
                     Res.string.rssi -> rssiData.isNotEmpty()
                     Res.string.snr -> snrData.isNotEmpty()
                     Res.string.wifi_rssi_signal -> wifiRssiData.isNotEmpty()
+                    Res.string.ble_rssi_signal -> bleRssiData.isNotEmpty()
                     else -> true
                 }
             }
         }
 
     MetricChartScaffold(
-        isEmpty = meshPackets.isEmpty() && localStats.isEmpty() && wifiRssiData.isEmpty(),
+        isEmpty = meshPackets.isEmpty() && localStats.isEmpty() && wifiRssiData.isEmpty() && bleRssiData.isEmpty(),
         legendData = legendData,
         modifier = modifier,
     ) { modelProducer, chartModifier ->
@@ -460,13 +476,15 @@ private fun SignalMetricsChart(
         val rssiColor = SignalMetric.RSSI.color
         val snrColor = SignalMetric.SNR.color
         val wifiColor = SignalMetric.WIFI_RSSI.color
+        val bleColor = SignalMetric.BLE_RSSI.color
         val noiseFloorLabel = stringResource(Res.string.noise_floor)
         val busyFloorLabel = stringResource(Res.string.busy_noise_floor)
         val rssiLabel = stringResource(Res.string.rssi)
         val snrLabel = stringResource(Res.string.snr)
         val wifiLabel = stringResource(Res.string.wifi_rssi_signal)
+        val bleLabel = stringResource(Res.string.ble_rssi_signal)
 
-        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, wifiRssiData, snrData, noiseGain, rssiGain) {
+        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, wifiRssiData, bleRssiData, snrData, noiseGain, rssiGain) {
             modelProducer.runTransaction {
                 if (noiseFloorData.isNotEmpty()) {
                     lineModel {
@@ -493,6 +511,9 @@ private fun SignalMetricsChart(
                     // The WiFi link is the device's own, so the LNA correction of the LoRa radio does not apply.
                     lineModel { series(x = wifiRssiData.map { it.time }, y = wifiRssiData.map { it.stats.wifiRssi }) }
                 }
+                if (bleRssiData.isNotEmpty()) {
+                    lineModel { series(x = bleRssiData.map { it.time }, y = bleRssiData.map { it.stats.bleRssi }) }
+                }
                 if (snrData.isNotEmpty()) {
                     /* Use a separate lineModel call to associate SNR with the right axis. */
                     lineModel {
@@ -511,6 +532,7 @@ private fun SignalMetricsChart(
                         busyFloorColor -> "$busyFloorLabel: ${MetricFormatter.rssi(value.toInt())}"
                         rssiColor -> "$rssiLabel: ${MetricFormatter.rssi(value.toInt())}"
                         wifiColor -> "$wifiLabel: ${MetricFormatter.rssi(value.toInt())}"
+                        bleColor -> "$bleLabel: ${MetricFormatter.rssi(value.toInt())}"
                         snrColor -> "$snrLabel: ${MetricFormatter.snr(value.toFloat())}"
                         else -> value.toString()
                     }
@@ -548,6 +570,13 @@ private fun SignalMetricsChart(
                 verticalAxisPosition = Axis.Position.Vertical.Start,
                 rangeProvider = dbmRangeProvider,
             )
+        val bleLayer =
+            rememberConditionalLayer(
+                hasData = bleRssiData.isNotEmpty(),
+                lineProvider = LineCartesianLayer.LineProvider.series(ChartStyling.createDashedLine(bleColor)),
+                verticalAxisPosition = Axis.Position.Vertical.Start,
+                rangeProvider = dbmRangeProvider,
+            )
         val snrLayer =
             rememberConditionalLayer(
                 hasData = snrData.isNotEmpty(),
@@ -556,8 +585,8 @@ private fun SignalMetricsChart(
             )
 
         val layers =
-            remember(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, snrLayer) {
-                listOfNotNull(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, snrLayer)
+            remember(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, bleLayer, snrLayer) {
+                listOfNotNull(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, bleLayer, snrLayer)
             }
 
         if (layers.isNotEmpty()) {
@@ -566,7 +595,12 @@ private fun SignalMetricsChart(
                 modifier = chartModifier,
                 layers = layers,
                 startAxis =
-                if (noiseFloorData.isNotEmpty() || rssiData.isNotEmpty() || wifiRssiData.isNotEmpty()) {
+                if (
+                    noiseFloorData.isNotEmpty() ||
+                    rssiData.isNotEmpty() ||
+                    wifiRssiData.isNotEmpty() ||
+                    bleRssiData.isNotEmpty()
+                ) {
                     VerticalAxis.rememberStart(
                         label =
                         ChartStyling.rememberAxisLabel(
@@ -574,7 +608,8 @@ private fun SignalMetricsChart(
                             when {
                                 noiseFloorData.isNotEmpty() -> noiseFloorColor
                                 rssiData.isNotEmpty() -> rssiColor
-                                else -> wifiColor
+                                wifiRssiData.isNotEmpty() -> wifiColor
+                                else -> bleColor
                             },
                         ),
                         valueFormatter = { _, value, _ -> MetricFormatter.rssi(value.toInt()) },
@@ -750,38 +785,55 @@ private fun WifiCard(sample: WifiSample, isSelected: Boolean, onClick: () -> Uni
                     style = MaterialTheme.typography.titleMediumEmphasized,
                     fontWeight = FontWeight.Bold,
                 )
+                // A report with only the Bluetooth signal (a device without WiFi) shows that signal in the header.
+                val bleOnly = !sample.stats.hasWifi
                 Text(
                     text =
-                    if (sample.isConnected) {
-                        MetricFormatter.rssi(sample.stats.wifiRssi)
-                    } else {
-                        stringResource(Res.string.wifi_disconnected_now)
+                    when {
+                        bleOnly -> MetricFormatter.rssi(sample.stats.bleRssi)
+                        sample.isConnected -> MetricFormatter.rssi(sample.stats.wifiRssi)
+                        else -> stringResource(Res.string.wifi_disconnected_now)
                     },
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = wifiRssiTextColor(sample.stats.wifiRssi.takeIf { sample.isConnected }),
+                    color =
+                    if (bleOnly) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        wifiRssiTextColor(sample.stats.wifiRssi.takeIf { sample.isConnected })
+                    },
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            MetricValueRow(
-                color = SignalMetric.WIFI_RSSI.color,
-                text = stringResource(Res.string.wifi_rssi_signal),
-                textColor = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "${stringResource(Res.string.wifi_drops_label)}: ${sample.stats.wifiDrops}",
-                style = MaterialTheme.typography.labelLarge,
-            )
-            if (sample.stats.wifiDropReason != 0) {
+            if (sample.stats.hasWifi) {
+                Spacer(modifier = Modifier.height(8.dp))
+                MetricValueRow(
+                    color = SignalMetric.WIFI_RSSI.color,
+                    text = stringResource(Res.string.wifi_rssi_signal),
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text =
-                    "${stringResource(Res.string.wifi_drop_reason_label)}: " +
-                        wifiDropReasonText(sample.stats.wifiDropReason),
+                    text = "${stringResource(Res.string.wifi_drops_label)}: ${sample.stats.wifiDrops}",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (sample.stats.wifiDropReason != 0) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text =
+                        "${stringResource(Res.string.wifi_drop_reason_label)}: " +
+                            wifiDropReasonText(sample.stats.wifiDropReason),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            if (sample.isBleConnected) {
+                Spacer(modifier = Modifier.height(if (sample.stats.hasWifi) 4.dp else 8.dp))
+                MetricValueRow(
+                    color = SignalMetric.BLE_RSSI.color,
+                    text = "${stringResource(Res.string.ble_rssi_signal)}: ${MetricFormatter.rssi(sample.stats.bleRssi)}",
+                    textColor = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

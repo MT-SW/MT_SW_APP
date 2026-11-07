@@ -623,6 +623,8 @@
     <string name="battery_invert_description">Turn this on if a power monitor on the bus is wired backwards: the node then shows powered while it runs on battery, and a battery percentage while it charges. Only this indication is swapped, nothing else. The percentage is estimated from the voltage.</string>
     <string name="biochemical_oxygen_demand">BOD</string>
     <string name="ble_devices">Bluetooth Devices</string>
+    <string name="ble_rssi_definition">Strength of the Bluetooth signal with which the device hears the phone connected to it, in dBm, reported by firmware only while a phone is connected. Closer to 0 is stronger; values below about -85 dBm usually mean an unstable connection.</string>
+    <string name="ble_rssi_signal">Bluetooth RSSI</string>
     <string name="ble_scan_needs_location_services">Bluetooth scanning also needs location services switched on for this version of Android. Your position is not used.</string>
     <!-- BLUETOOTH -->
     <string name="bluetooth">Bluetooth</string>
@@ -1627,6 +1629,7 @@
     <string name="lightning_strikes_1h">Lightning (1h)</string>
     <!-- LIVE -->
     <string name="live_update">Adaptive notifications</string>
+    <string name="live_update_ble">Bluetooth: %1$d dBm</string>
     <string name="live_update_cpu">CPU: %1$s</string>
     <string name="live_update_direct">Direct</string>
     <string name="live_update_distance">%1$s away</string>

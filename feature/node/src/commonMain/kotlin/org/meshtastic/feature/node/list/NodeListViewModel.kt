@@ -532,6 +532,7 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
             ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
             ?: psramUsedPercent,
         wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
+        bleRssi = ext.bleRssi.takeIf { it != 0 } ?: bleRssi,
     )
 }
 

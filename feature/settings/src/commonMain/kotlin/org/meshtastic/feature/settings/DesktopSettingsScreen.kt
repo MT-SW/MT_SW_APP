@@ -64,6 +64,7 @@ import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.intro_show
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.preferences_system_default
+import org.meshtastic.core.resources.provide_location_to_mesh
 import org.meshtastic.core.resources.pt_BR
 import org.meshtastic.core.resources.supportedLocaleTags
 import org.meshtastic.core.resources.theme
@@ -76,8 +77,6 @@ import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
-import org.meshtastic.core.resources.provide_location_to_mesh
-import org.meshtastic.core.ui.icon.LocationOn
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.Distance
@@ -85,6 +84,7 @@ import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
+import org.meshtastic.core.ui.icon.LocationOn
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.WavingHand

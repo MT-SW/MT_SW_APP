@@ -70,6 +70,7 @@ import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.shortFirmwareVersion
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ble_rssi_signal
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.on_demand_air_activity
 import org.meshtastic.core.resources.on_demand_air_activity_desc
@@ -845,6 +846,7 @@ private fun NodeStatsVisual(stats: NodeStats) {
                         Res.string.on_demand_nexthop_counter,
                         Res.string.on_demand_blocked_hoplimit,
                         Res.string.wifi_rssi_signal,
+                        Res.string.ble_rssi_signal,
                         Res.string.wifi_drops_label,
                         Res.string.wifi_drop_reason_label,
                         Res.string.on_demand_firmware_version,
@@ -1187,6 +1189,7 @@ private fun iconForLabel(label: StringResource): ImageVector = when (label) {
 
     Res.string.on_demand_rssi,
     Res.string.wifi_rssi_signal,
+    Res.string.ble_rssi_signal,
     -> MeshtasticIcons.Rssi
 
     Res.string.on_demand_snr -> MeshtasticIcons.Snr
@@ -1291,6 +1294,7 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
     stats.nexthop_counter?.let { add(Res.string.on_demand_nexthop_counter to "$it") }
     stats.blocked_by_hoplimit?.let { add(Res.string.on_demand_blocked_hoplimit to "$it") }
     stats.wifi_rssi?.let { add(Res.string.wifi_rssi_signal to MetricFormatter.rssi(it)) }
+    stats.ble_rssi?.let { add(Res.string.ble_rssi_signal to MetricFormatter.rssi(it)) }
     stats.wifi_drops?.let { add(Res.string.wifi_drops_label to "$it") }
     // Only the ESP-IDF code here; the signal quality screen spells out what it means.
     stats.wifi_drop_reason?.takeIf { it != 0 }?.let { add(Res.string.wifi_drop_reason_label to "$it") }

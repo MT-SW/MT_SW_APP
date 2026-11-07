@@ -602,6 +602,8 @@ battery_invert
 battery_invert_description
 biochemical_oxygen_demand
 ble_devices
+ble_rssi_definition
+ble_rssi_signal
 ble_scan_needs_location_services
 ### BLUETOOTH ###
 bluetooth
@@ -1591,6 +1593,7 @@ lightning_distance
 lightning_strikes_1h
 ### LIVE ###
 live_update
+live_update_ble
 live_update_cpu
 live_update_direct
 live_update_distance
