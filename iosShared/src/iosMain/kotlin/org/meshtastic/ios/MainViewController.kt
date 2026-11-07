@@ -37,11 +37,11 @@ import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.ble.configureIosBleBackground
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.log.AppLogControls
-import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator

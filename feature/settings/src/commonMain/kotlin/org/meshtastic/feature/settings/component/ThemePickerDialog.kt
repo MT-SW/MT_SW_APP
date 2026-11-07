@@ -162,6 +162,7 @@ fun ThemePickerDialog(
  * soft to very sharp). Every change applies at once, so the app behind the window shows the result.
  */
 @OptIn(ExperimentalLayoutApi::class)
+@Suppress("LongMethod")
 @Composable
 private fun ThemeColorDialog(
     seed: Int,
@@ -205,7 +206,10 @@ private fun ThemeColorDialog(
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                 )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     PRESET_COLORS.forEach { preset ->
                         val hsv = preset.toHsv()
                         Box(
@@ -224,9 +228,15 @@ private fun ThemeColorDialog(
                     modifier = Modifier.padding(top = 12.dp),
                 )
                 Slider(value = hue, onValueChange = { applySeed(it, saturation) }, valueRange = 0f..360f)
-                Text(text = stringResource(Res.string.theme_color_saturation), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = stringResource(Res.string.theme_color_saturation),
+                    style = MaterialTheme.typography.titleSmall,
+                )
                 Slider(value = saturation, onValueChange = { applySeed(hue, it) }, valueRange = 0f..1f)
-                Text(text = stringResource(Res.string.theme_color_intensity), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = stringResource(Res.string.theme_color_intensity),
+                    style = MaterialTheme.typography.titleSmall,
+                )
                 Slider(
                     value = strength,
                     onValueChange = {

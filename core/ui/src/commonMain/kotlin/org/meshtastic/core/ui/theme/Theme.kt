@@ -363,7 +363,10 @@ const val MODE_DYNAMIC = 6969420
 const val MODE_MONO_LIGHT = 6969421
 const val MODE_MONO_DARK = 6969422
 
-/** The colour themes: the whole palette is worked out from one chosen colour; follows the system, or forced light or dark. */
+/**
+ * The colour themes: the whole palette is worked out from one chosen colour; follows the system, or forced light or
+ * dark.
+ */
 const val MODE_COLOR = 6969423
 const val MODE_COLOR_LIGHT = 6969424
 const val MODE_COLOR_DARK = 6969425

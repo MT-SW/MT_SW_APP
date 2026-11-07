@@ -58,7 +58,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_APP_INTRO_COMPLETED] = completed } }
     }
 
-    // The default theme comes from the platform ([UiPrefsDefaults]): the phone's own colours on Android, the colour theme
+    // The default theme comes from the platform ([UiPrefsDefaults]): the phone's own colours on Android, the colour
+    // theme
     // on iPhone and computer, where the system gives no colours.
     override val theme: StateFlow<Int> =
         dataStore.data
@@ -78,7 +79,9 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val themeIntensity: StateFlow<Int> =
-        dataStore.data.map { it[KEY_THEME_INTENSITY] ?: DEFAULT_INTENSITY }.stateIn(scope, SharingStarted.Eagerly, DEFAULT_INTENSITY)
+        dataStore.data
+            .map { it[KEY_THEME_INTENSITY] ?: DEFAULT_INTENSITY }
+            .stateIn(scope, SharingStarted.Eagerly, DEFAULT_INTENSITY)
 
     override fun setThemeIntensity(value: Int) {
         scope.launch { dataStore.edit { it[KEY_THEME_INTENSITY] = value } }

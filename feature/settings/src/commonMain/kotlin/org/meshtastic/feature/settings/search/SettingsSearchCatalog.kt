@@ -37,7 +37,6 @@ import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.background_keepalive_title
-import org.meshtastic.core.resources.theme_color_title
 import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
@@ -57,6 +56,7 @@ import org.meshtastic.core.resources.report_issues_title
 import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
+import org.meshtastic.core.resources.theme_color_title
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed

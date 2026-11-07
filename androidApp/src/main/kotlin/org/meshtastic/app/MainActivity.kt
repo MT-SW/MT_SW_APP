@@ -141,6 +141,7 @@ class MainActivity : AppCompatActivity() {
     private val isSupportedDevice: Boolean
         get() = (application as? MeshUtilApplication)?.isSupportedDevice != false
 
+    @Suppress("LongMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 

@@ -94,6 +94,7 @@ import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.network.update.AppUpdateService
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.desktop_tray_quit
@@ -103,7 +104,6 @@ import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.ui.theme.MODE_COLOR
 import org.meshtastic.core.ui.theme.MODE_COLOR_DARK
 import org.meshtastic.core.ui.theme.MODE_COLOR_LIGHT

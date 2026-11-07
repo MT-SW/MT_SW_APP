@@ -52,13 +52,26 @@ fun seedColorScheme(seed: Color, dark: Boolean, intensity: Int, base: ColorSchem
     val k = intensity.coerceIn(MIN_THEME_INTENSITY, MAX_THEME_INTENSITY) / 100.0
     val accent = (maxOf(seedChroma, MIN_ACCENT_CHROMA) * k).coerceAtMost(MAX_ACCENT_CHROMA)
 
-    val primary = Palette(hue, accent)
-    val secondary = Palette(hue, accent / 3.0)
-    val tertiary = Palette((hue + 60.0) % FULL_TURN, accent * 0.55)
-    val neutral = Palette(hue, (0.006 + accent * 0.045).coerceAtMost(0.02))
-    val neutralVariant = Palette(hue, (0.012 + accent * 0.09).coerceAtMost(0.04))
+    val palettes =
+        SeedPalettes(
+            primary = Palette(hue, accent),
+            secondary = Palette(hue, accent / 3.0),
+            tertiary = Palette((hue + 60.0) % FULL_TURN, accent * 0.55),
+            neutral = Palette(hue, (0.006 + accent * 0.045).coerceAtMost(0.02)),
+            neutralVariant = Palette(hue, (0.012 + accent * 0.09).coerceAtMost(0.04)),
+        )
+    return if (dark) palettes.darkScheme(base) else palettes.lightScheme(base)
+}
 
-    return if (dark) {
+/** The five tonal palettes of a scheme. */
+private class SeedPalettes(
+    val primary: Palette,
+    val secondary: Palette,
+    val tertiary: Palette,
+    val neutral: Palette,
+    val neutralVariant: Palette,
+) {
+    fun darkScheme(base: ColorScheme): ColorScheme = with(this) {
         base.copy(
             primary = primary.tone(80),
             onPrimary = primary.tone(20),
@@ -93,7 +106,9 @@ fun seedColorScheme(seed: Color, dark: Boolean, intensity: Int, base: ColorSchem
             surfaceContainerHigh = neutral.tone(17),
             surfaceContainerHighest = neutral.tone(22),
         )
-    } else {
+    }
+
+    fun lightScheme(base: ColorScheme): ColorScheme = with(this) {
         base.copy(
             primary = primary.tone(40),
             onPrimary = primary.tone(100),
@@ -133,20 +148,26 @@ fun seedColorScheme(seed: Color, dark: Boolean, intensity: Int, base: ColorSchem
 
 /** One hue and chroma in OKLCH; [tone] gives its colour at a Material tone (0 black … 100 white). */
 private class Palette(private val hue: Double, private val chroma: Double) {
-    fun tone(tone: Int): Color {
-        if (tone <= 0) return Color.Black
-        if (tone >= 100) return Color.White
+    fun tone(tone: Int): Color = when {
+        tone <= 0 -> Color.Black
+        tone >= 100 -> Color.White
+        else -> toneColor(tone)
+    }
+
+    private fun toneColor(tone: Int): Color {
         // Material's tone is CIE L*; for a grey that is OKLab lightness (L* + 16) / 116 (a cube root of luminance).
         val lightness = if (tone > 8) (tone + 16) / 116.0 else (tone / 903.3).pow(1.0 / 3.0)
         val radians = Math2.radians(hue)
         // A colour that does not fit the screen's range loses chroma until it does.
         var c = chroma
-        repeat(24) {
-            val color = oklabToColor(lightness, c * cos(radians), c * sin(radians))
-            if (color != null) return color
+        var found: Color? = null
+        var tries = 0
+        while (found == null && tries < 24) {
+            found = oklabToColor(lightness, c * cos(radians), c * sin(radians))
             c *= 0.9
+            tries++
         }
-        return oklabToColor(lightness, 0.0, 0.0) ?: Color.Gray
+        return found ?: oklabToColor(lightness, 0.0, 0.0) ?: Color.Gray
     }
 }
 
@@ -178,14 +199,15 @@ private fun oklabToColor(lightness: Double, a: Double, b: Double): Color? {
     val r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
     val g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
     val bl = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
-    val eps = 0.0005
-    if (r < -eps || r > 1 + eps || g < -eps || g > 1 + eps || bl < -eps || bl > 1 + eps) return null
+    if (!fits(r) || !fits(g) || !fits(bl)) return null
     return Color(
         red = linearToSrgb(r.coerceIn(0.0, 1.0)).toFloat(),
         green = linearToSrgb(g.coerceIn(0.0, 1.0)).toFloat(),
         blue = linearToSrgb(bl.coerceIn(0.0, 1.0)).toFloat(),
     )
 }
+
+private fun fits(channel: Double) = channel >= -0.0005 && channel <= 1.0005
 
 private fun srgbToLinear(c: Double) = if (c <= 0.04045) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
 
