@@ -112,6 +112,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Blue
 import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Orange
+import org.meshtastic.core.ui.theme.GraphColors.Purple
 import org.meshtastic.core.ui.theme.GraphColors.Red
 import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
@@ -135,7 +136,7 @@ private enum class SignalMetric(val color: Color) {
     SNR(Green),
     RSSI(Blue),
     WIFI_RSSI(Orange),
-    BLE_RSSI(StatusPurple),
+    BLE_RSSI(Purple),
 }
 
 private val LEGEND_DATA =
