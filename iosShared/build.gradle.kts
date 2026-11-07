@@ -87,6 +87,8 @@ kotlin {
     targets.withType<KotlinNativeTarget>().configureEach {
         binaries.framework {
             baseName = "MTSWShared"
+            // Names the framework bundle explicitly (otherwise Kotlin warns that it cannot infer one).
+            binaryOption("bundleId", "pl.sw.mt.shared")
             isStatic = true
             // The AI engine (see scripts/build-llama-ios.sh) is a separate framework that Xcode embeds in the app.
             val llama = rootDir.resolve("native/ios/llama.xcframework")
