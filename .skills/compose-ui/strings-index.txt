@@ -3081,6 +3081,12 @@ theme_light
 theme_mono_dark
 theme_mono_light
 theme_system
+theme_very_vivid
+theme_very_vivid_dark
+theme_very_vivid_light
+theme_vivid
+theme_vivid_dark
+theme_vivid_light
 time
 timeout
 timestamp

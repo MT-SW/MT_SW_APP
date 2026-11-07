@@ -301,6 +301,8 @@ fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     monochrome: Boolean = false,
+    /** Strength of the app's own palette in percent (not the wallpaper colours); 100 changes nothing. */
+    saturation: Int = 100,
     content:
     @Composable()
     () -> Unit,
@@ -313,7 +315,7 @@ fun AppTheme(
                 dynamicColorScheme(darkTheme)
             } else {
                 null
-            } ?: if (darkTheme) darkScheme else lightScheme
+            } ?: (if (darkTheme) darkScheme else lightScheme).withSaturation(saturation)
         }
 
     // When a device is on event firmware (and the event theme isn't opted out), swap the whole typescale to the event
@@ -352,6 +354,29 @@ const val MODE_DYNAMIC = 6969420
 /** The two black-and-white themes: white background with dark text, and black background with light text. */
 const val MODE_MONO_LIGHT = 6969421
 const val MODE_MONO_DARK = 6969422
+
+/** The saturated themes: the whole palette with stronger colours; follows the system, or forced light or dark. */
+const val MODE_VIVID = 6969423
+const val MODE_VIVID_LIGHT = 6969424
+const val MODE_VIVID_DARK = 6969425
+
+/** The same, stronger still. */
+const val MODE_VERY_VIVID = 6969426
+const val MODE_VERY_VIVID_LIGHT = 6969427
+const val MODE_VERY_VIVID_DARK = 6969428
+
+/** How strong the palette is for [mode], in percent: 100 for the ordinary themes. */
+fun saturationFor(mode: Int): Int = when (mode) {
+    MODE_VIVID, MODE_VIVID_LIGHT, MODE_VIVID_DARK -> SATURATION_VIVID
+    MODE_VERY_VIVID, MODE_VERY_VIVID_LIGHT, MODE_VERY_VIVID_DARK -> SATURATION_VERY_VIVID
+    else -> 100
+}
+
+/** True when [mode] is a saturated theme that is always light. */
+fun isVividLight(mode: Int): Boolean = mode == MODE_VIVID_LIGHT || mode == MODE_VERY_VIVID_LIGHT
+
+/** True when [mode] is a saturated theme that is always dark. */
+fun isVividDark(mode: Int): Boolean = mode == MODE_VIVID_DARK || mode == MODE_VERY_VIVID_DARK
 
 /** True when [mode] is one of the black-and-white themes. */
 fun isMonochromeMode(mode: Int): Boolean = mode == MODE_MONO_LIGHT || mode == MODE_MONO_DARK

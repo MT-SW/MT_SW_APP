@@ -39,6 +39,9 @@ import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
+import org.meshtastic.core.ui.theme.isVividDark
+import org.meshtastic.core.ui.theme.isVividLight
+import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.messaging.MessageScreen
 import org.meshtastic.feature.messaging.MessageViewModel
@@ -83,7 +86,7 @@ class BubbleActivity : AppCompatActivity() {
                     MODE_MONO_LIGHT,
                     -> false
 
-                    else -> isSystemInDarkTheme()
+                    else -> isVividDark(theme) || (!isVividLight(theme) && isSystemInDarkTheme())
                 }
             SideEffect {
                 WindowCompat.getInsetsController(window, window.decorView).apply {
@@ -91,7 +94,12 @@ class BubbleActivity : AppCompatActivity() {
                     isAppearanceLightNavigationBars = !dark
                 }
             }
-            AppTheme(dynamicColor = theme == MODE_DYNAMIC, darkTheme = dark, monochrome = isMonochromeMode(theme)) {
+            AppTheme(
+                dynamicColor = theme == MODE_DYNAMIC,
+                darkTheme = dark,
+                monochrome = isMonochromeMode(theme),
+                saturation = saturationFor(theme),
+            ) {
                 // Edge to edge, only this padding keeps the composer clear of the keyboard and the navigation bar.
                 Box(Modifier.fillMaxSize().recalculateWindowInsets().safeDrawingPadding()) {
                     MessageScreen(

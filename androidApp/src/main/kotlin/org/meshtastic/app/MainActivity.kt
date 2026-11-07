@@ -92,6 +92,9 @@ import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
+import org.meshtastic.core.ui.theme.isVividDark
+import org.meshtastic.core.ui.theme.isVividLight
+import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
@@ -174,7 +177,7 @@ class MainActivity : AppCompatActivity() {
                     MODE_MONO_LIGHT,
                     -> false
 
-                    else -> isSystemInDarkTheme()
+                    else -> isVividDark(theme) || (!isVividLight(theme) && isSystemInDarkTheme())
                 }
 
             // Update system bar style when theme changes
@@ -186,7 +189,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             AppCompositionLocals {
-                AppTheme(dynamicColor = dynamic, darkTheme = dark, monochrome = monochrome) {
+                AppTheme(
+                    dynamicColor = dynamic,
+                    darkTheme = dark,
+                    monochrome = monochrome,
+                    saturation = saturationFor(theme),
+                ) {
                     val appIntroCompleted by model.appIntroCompleted.collectAsStateWithLifecycle()
 
                     // Signal to the system that the initial UI is "fully drawn"

@@ -3150,6 +3150,12 @@
     <string name="theme_mono_dark">Black and white (dark)</string>
     <string name="theme_mono_light">Black and white (light)</string>
     <string name="theme_system">System default</string>
+    <string name="theme_very_vivid">Very saturated (light or dark like the system)</string>
+    <string name="theme_very_vivid_dark">Very saturated, dark</string>
+    <string name="theme_very_vivid_light">Very saturated, light</string>
+    <string name="theme_vivid">Saturated (light or dark like the system)</string>
+    <string name="theme_vivid_dark">Saturated, dark</string>
+    <string name="theme_vivid_light">Saturated, light</string>
     <string name="time">Time</string>
     <string name="timeout">Timeout</string>
     <string name="timestamp">Timestamp</string>

@@ -37,6 +37,7 @@ import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.ble.configureIosBleBackground
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
@@ -48,6 +49,10 @@ import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
+import org.meshtastic.core.ui.theme.isVividDark
+import org.meshtastic.core.ui.theme.isVividLight
+import org.meshtastic.core.ui.theme.saturationFor
+import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.viewmodel.UIViewModel
@@ -62,6 +67,8 @@ import kotlin.time.Duration.Companion.minutes
 
 /** Starts the dependency graph once for the whole life of the app process. */
 private val koin: Koin by lazy {
+    // The system gives no wallpaper colours on an iPhone: the saturated theme is the default look.
+    UiPrefsDefaults.theme = MODE_VIVID
     IosFileLog.install()
     AppLogControls.current = IosLogControl
     IosLogControl.start()
@@ -128,7 +135,7 @@ private fun BackgroundCleanup() {
 @Composable
 private fun ThemedApp(uiViewModel: UIViewModel) {
     val uiPrefs = remember { koin.get<UiPrefs>(UiPrefs::class) }
-    val themePref by uiPrefs.theme.collectAsState(initial = -1)
+    val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
     val isDarkTheme =
         when (themePref) {
             1,
@@ -139,7 +146,7 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
             MODE_MONO_DARK,
             -> true
 
-            else -> isSystemInDarkTheme()
+            else -> isVividDark(themePref) || (!isVividLight(themePref) && isSystemInDarkTheme())
         }
     val multiBackstack =
         rememberMultiBackstack(
@@ -160,7 +167,11 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         LocalDensity provides rememberScaledDensity(percent = uiScale),
         LocalTerminateApplication provides terminate,
     ) {
-        AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
+        AppTheme(
+            darkTheme = isDarkTheme,
+            monochrome = isMonochromeMode(themePref),
+            saturation = saturationFor(themePref),
+        ) {
             IosCoilSetup()
             val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
             if (introCompleted) {

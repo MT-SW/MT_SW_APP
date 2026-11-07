@@ -2572,6 +2572,12 @@
     <string name="ui_scale">Skalowanie aplikacji</string>
     <string name="ui_scale_follow_system">Zgodnie z systemem</string>
     <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w systemie.</string>
+    <string name="theme_very_vivid">Bardzo nasycony (jasny lub ciemny jak w systemie)</string>
+    <string name="theme_very_vivid_dark">Bardzo nasycony, ciemny</string>
+    <string name="theme_very_vivid_light">Bardzo nasycony, jasny</string>
+    <string name="theme_vivid">Nasycony (jasny lub ciemny jak w systemie)</string>
+    <string name="theme_vivid_dark">Nasycony, ciemny</string>
+    <string name="theme_vivid_light">Nasycony, jasny</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_light">Jasny</string>
     <string name="theme_mono_dark">Czarno-biały (ciemny)</string>

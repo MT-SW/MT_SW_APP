@@ -58,8 +58,12 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_APP_INTRO_COMPLETED] = completed } }
     }
 
+    // The default comes from the platform ([UiPrefsDefaults]): the system theme on Android, the saturated theme on
+    // iPhone and computer, where the system gives no wallpaper colours.
     override val theme: StateFlow<Int> =
-        dataStore.data.map { it[KEY_THEME] ?: -1 }.stateIn(scope, SharingStarted.Lazily, -1)
+        dataStore.data
+            .map { it[KEY_THEME] ?: UiPrefsDefaults.theme }
+            .stateIn(scope, SharingStarted.Lazily, UiPrefsDefaults.theme)
 
     override fun setTheme(value: Int) {
         scope.launch { dataStore.edit { it[KEY_THEME] = value } }

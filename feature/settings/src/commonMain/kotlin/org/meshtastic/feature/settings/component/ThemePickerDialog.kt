@@ -19,7 +19,10 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -28,6 +31,12 @@ import org.meshtastic.core.resources.dynamic
 import org.meshtastic.core.resources.theme_dark
 import org.meshtastic.core.resources.theme_light
 import org.meshtastic.core.resources.theme_mono_dark
+import org.meshtastic.core.resources.theme_very_vivid
+import org.meshtastic.core.resources.theme_very_vivid_dark
+import org.meshtastic.core.resources.theme_very_vivid_light
+import org.meshtastic.core.resources.theme_vivid
+import org.meshtastic.core.resources.theme_vivid_dark
+import org.meshtastic.core.resources.theme_vivid_light
 import org.meshtastic.core.resources.theme_mono_light
 import org.meshtastic.core.resources.theme_system
 import org.meshtastic.core.ui.component.ListItem
@@ -35,10 +44,22 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
+import org.meshtastic.core.ui.theme.MODE_VERY_VIVID
+import org.meshtastic.core.ui.theme.MODE_VERY_VIVID_DARK
+import org.meshtastic.core.ui.theme.MODE_VERY_VIVID_LIGHT
+import org.meshtastic.core.ui.theme.MODE_VIVID
+import org.meshtastic.core.ui.theme.MODE_VIVID_DARK
+import org.meshtastic.core.ui.theme.MODE_VIVID_LIGHT
 
 /** Theme modes that match AppCompatDelegate constants for cross-platform use. */
 enum class ThemeOption(val label: StringResource, val mode: Int) {
     DYNAMIC(label = Res.string.dynamic, mode = MODE_DYNAMIC),
+    VIVID(label = Res.string.theme_vivid, mode = MODE_VIVID),
+    VIVID_LIGHT(label = Res.string.theme_vivid_light, mode = MODE_VIVID_LIGHT),
+    VIVID_DARK(label = Res.string.theme_vivid_dark, mode = MODE_VIVID_DARK),
+    VERY_VIVID(label = Res.string.theme_very_vivid, mode = MODE_VERY_VIVID),
+    VERY_VIVID_LIGHT(label = Res.string.theme_very_vivid_light, mode = MODE_VERY_VIVID_LIGHT),
+    VERY_VIVID_DARK(label = Res.string.theme_very_vivid_dark, mode = MODE_VERY_VIVID_DARK),
     LIGHT(label = Res.string.theme_light, mode = 1), // AppCompatDelegate.MODE_NIGHT_NO
     DARK(label = Res.string.theme_dark, mode = 2), // AppCompatDelegate.MODE_NIGHT_YES
     SYSTEM(label = Res.string.theme_system, mode = -1), // AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -53,7 +74,7 @@ fun ThemePickerDialog(onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
         title = stringResource(Res.string.choose_theme),
         onDismiss = onDismiss,
         text = {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ThemeOption.entries.forEach { option ->
                     ListItem(text = stringResource(option.label), trailingIcon = null) {
                         onClickTheme(option.mode)

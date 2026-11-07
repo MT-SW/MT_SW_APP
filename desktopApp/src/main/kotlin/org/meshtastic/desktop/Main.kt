@@ -102,10 +102,15 @@ import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
+import org.meshtastic.core.ui.theme.isVividDark
+import org.meshtastic.core.ui.theme.isVividLight
+import org.meshtastic.core.ui.theme.saturationFor
+import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
@@ -182,6 +187,8 @@ fun main(args: Array<String>) {
     // Before anything is opened: a requested move of the data folder is made now (with a progress window).
     prepareDataFolder()
     installQuitHandler()
+    // No wallpaper colours on a computer: the saturated theme is the default look.
+    UiPrefsDefaults.theme = MODE_VIVID
     // exitProcessOnExit = false is what makes the shutdown block below reachable at all: with the default (true),
     // application() calls System.exit(0) itself as soon as the Compose loop ends, and control never returns here.
     // Do not "simplify" this back to a bare application {} — that silently disables every teardown that follows.
@@ -301,7 +308,7 @@ private fun NodeCleanupLifecycle() {
 private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
     val systemLocale = remember { Locale.getDefault() }
     val uiPrefs = koinInject<UiPrefs>()
-    val themePref by uiPrefs.theme.collectAsState(initial = -1)
+    val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
     val localePref by uiPrefs.locale.collectAsState(initial = "")
     Locale.setDefault(resolveLocale(localePref, systemLocale))
 
@@ -315,10 +322,10 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
             MODE_MONO_DARK,
             -> true
 
-            else -> isSystemInDarkTheme()
+            else -> isVividDark(themePref) || (!isVividLight(themePref) && isSystemInDarkTheme())
         }
 
-    MeshtasticDesktopApp(uiViewModel, isDarkTheme, isMonochromeMode(themePref))
+    MeshtasticDesktopApp(uiViewModel, isDarkTheme, isMonochromeMode(themePref), saturationFor(themePref))
 }
 
 // ----- Application chrome (tray, window, navigation) -----
@@ -331,6 +338,7 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     uiViewModel: UIViewModel,
     isDarkTheme: Boolean,
     monochrome: Boolean,
+    saturation: Int,
 ) {
     var isAppVisible by remember { mutableStateOf(true) }
     var isWindowReady by remember { mutableStateOf(false) }
@@ -400,7 +408,15 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     if (isWindowReady) {
         // Hide via `visible` rather than dropping the Window from composition so the UI tree
         // (navigation backstack, scroll positions) survives a hide-to-tray round trip.
-        MeshtasticWindow(uiViewModel, isDarkTheme, monochrome, appIcon, windowState, visible = isAppVisible) {
+        MeshtasticWindow(
+            uiViewModel,
+            isDarkTheme,
+            monochrome,
+            saturation,
+            appIcon,
+            windowState,
+            visible = isAppVisible,
+        ) {
             // Minimize to the tray on close — but only where the tray icon can actually be clicked
             // back. Where it cannot, there is nowhere to minimize to, so quit instead; otherwise the
             // process is stranded with no window, no reachable tray menu and no key handler either.
@@ -485,6 +501,7 @@ private fun ApplicationScope.MeshtasticWindow(
     uiViewModel: UIViewModel,
     isDarkTheme: Boolean,
     monochrome: Boolean,
+    saturation: Int,
     appIcon: Painter,
     windowState: WindowState,
     visible: Boolean,
@@ -562,7 +579,7 @@ private fun ApplicationScope.MeshtasticWindow(
             ) {
                 val uiScale by uiViewModel.uiScale.collectAsState()
                 CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
-                    AppTheme(darkTheme = isDarkTheme, monochrome = monochrome) {
+                    AppTheme(darkTheme = isDarkTheme, monochrome = monochrome, saturation = saturation) {
                         // First start: show the welcome screen once, then the app.
                         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
                         if (introCompleted) {
