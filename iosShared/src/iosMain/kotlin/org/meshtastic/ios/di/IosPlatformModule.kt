@@ -45,7 +45,7 @@ class IosPlatformModule {
     @Single
     fun buildConfigProvider(): BuildConfigProvider = object : BuildConfigProvider {
         override val isDebug: Boolean = false
-        override val applicationId: String = "pl.mtsw.mtswapp"
+        override val applicationId: String = "pl.sw.mt"
         override val versionCode: Int = 1
         override val versionName: String = "2.8.5"
         override val absoluteMinFwVersion: String = "2.3.15"
