@@ -35,9 +35,10 @@ import platform.Foundation.NSURL
 class IosFileService(private val dispatchers: CoroutineDispatchers) : FileService {
     override suspend fun write(uri: CommonUri, block: suspend (BufferedSink) -> Unit): Boolean =
         withContext(dispatchers.io) {
+            val scope = uri.openSecurityScope()
             try {
                 val path = uri.toFilePath().toPath()
-                path.parent?.let { FileSystem.SYSTEM.createDirectories(it) }
+                path.parent?.takeIf { !FileSystem.SYSTEM.exists(it) }?.let { FileSystem.SYSTEM.createDirectories(it) }
                 val sink = FileSystem.SYSTEM.sink(path).buffer()
                 try {
                     block(sink)
@@ -50,11 +51,14 @@ class IosFileService(private val dispatchers: CoroutineDispatchers) : FileServic
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 Logger.e(e) { "Failed to write to URI: $uri" }
                 false
+            } finally {
+                scope()
             }
         }
 
     override suspend fun read(uri: CommonUri, block: suspend (BufferedSource) -> Unit): Boolean =
         withContext(dispatchers.io) {
+            val scope = uri.openSecurityScope()
             try {
                 val source = FileSystem.SYSTEM.source(uri.toFilePath().toPath()).buffer()
                 try {
@@ -68,8 +72,20 @@ class IosFileService(private val dispatchers: CoroutineDispatchers) : FileServic
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 Logger.e(e) { "Failed to read from URI: $uri" }
                 false
+            } finally {
+                scope()
             }
         }
+
+    /**
+     * A place chosen in the Files picker lies outside the app's own folder, and iOS lets the app touch it only between
+     * these two calls. Returns the call that ends the access.
+     */
+    private fun CommonUri.openSecurityScope(): () -> Unit {
+        val url = toString().takeIf { it.startsWith("file:") }?.let { NSURL.URLWithString(it) } ?: return {}
+        val opened = url.startAccessingSecurityScopedResource()
+        return { if (opened) url.stopAccessingSecurityScopedResource() }
+    }
 
     private fun CommonUri.toFilePath(): String {
         val text = toString()
