@@ -52,7 +52,7 @@ import platform.zlib.inflateEnd
 import platform.zlib.inflateInit2_
 import platform.zlib.z_stream
 
-actual fun TerrainTileFetcher(pmtilesUrl: String): TerrainTileFetcher = IosPmtilesTerrainTileFetcher(pmtilesUrl)
+actual fun openTerrainTileFetcher(pmtilesUrl: String): TerrainTileFetcher? = IosPmtilesTerrainTileFetcher(pmtilesUrl)
 
 /**
  * iPhone/iPad: a small PMTiles v3 reader over HTTP range requests (NSURLSession), so only the bytes of the requested
@@ -71,6 +71,9 @@ private class IosPmtilesTerrainTileFetcher(private val url: String) : TerrainTil
     )
 
     private class Entry(val tileId: Long, val offset: Long, val length: Long, val runLength: Long)
+
+    /** The archive version is not tracked on iPhone/iPad (the server tag is not read), so it is always unknown. */
+    override val version: String? = null
 
     private val lock = NSLock()
     private var header: Header? = null

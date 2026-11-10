@@ -73,6 +73,9 @@ import org.meshtastic.core.resources.intro_mtsw_terrain_title
 import org.meshtastic.core.resources.intro_mtsw_update_subtitle
 import org.meshtastic.core.resources.intro_mtsw_update_title
 import org.meshtastic.core.resources.next
+import org.meshtastic.core.ui.component.OnboardingBottomBar
+import org.meshtastic.core.ui.component.OnboardingFeature
+import org.meshtastic.core.ui.component.OnboardingFeatureRow
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.CenterFocusStrong
@@ -101,77 +104,77 @@ import org.meshtastic.core.ui.theme.AppTheme
 internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp.Unspecified) {
     val features =
         listOf(
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Device,
                 titleRes = Res.string.intro_mtsw_remote_title,
                 subtitleRes = Res.string.intro_mtsw_remote_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Chart,
                 titleRes = Res.string.intro_mtsw_health_title,
                 subtitleRes = Res.string.intro_mtsw_health_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.PinDrop,
                 titleRes = Res.string.intro_mtsw_map_title,
                 subtitleRes = Res.string.intro_mtsw_map_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Antenna,
                 titleRes = Res.string.intro_mtsw_planner_title,
                 subtitleRes = Res.string.intro_mtsw_planner_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.CenterFocusStrong,
                 titleRes = Res.string.intro_mtsw_terrain_title,
                 subtitleRes = Res.string.intro_mtsw_terrain_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.BugReport,
                 titleRes = Res.string.intro_mtsw_diag_title,
                 subtitleRes = Res.string.intro_mtsw_diag_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Rssi,
                 titleRes = Res.string.intro_mtsw_signal_title,
                 subtitleRes = Res.string.intro_mtsw_signal_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Message,
                 titleRes = Res.string.intro_mtsw_messages_title,
                 subtitleRes = Res.string.intro_mtsw_messages_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Language,
                 titleRes = Res.string.intro_mtsw_ai_title,
                 subtitleRes = Res.string.intro_mtsw_ai_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.HelpOutline,
                 titleRes = Res.string.intro_mtsw_kb_title,
                 subtitleRes = Res.string.intro_mtsw_kb_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Info,
                 titleRes = Res.string.intro_mtsw_report_title,
                 subtitleRes = Res.string.intro_mtsw_report_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Notifications,
                 titleRes = Res.string.intro_mtsw_notifications_title,
                 subtitleRes = Res.string.intro_mtsw_notifications_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.List,
                 titleRes = Res.string.intro_mtsw_layout_title,
                 subtitleRes = Res.string.intro_mtsw_layout_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Download,
                 titleRes = Res.string.intro_mtsw_update_title,
                 subtitleRes = Res.string.intro_mtsw_update_subtitle,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Settings,
                 titleRes = Res.string.intro_mtsw_scale_title,
                 subtitleRes = Res.string.intro_mtsw_scale_subtitle,
@@ -180,14 +183,7 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
 
     Scaffold(
         bottomBar = {
-            IntroBottomBar(
-                onSkip = {},
-                onConfigure = onContinue,
-                maxContentWidth = maxContentWidth,
-                skipButtonText = "",
-                configureButtonText = stringResource(Res.string.next),
-                showSkipButton = false,
-            )
+            OnboardingBottomBar(primaryText = stringResource(Res.string.next), onPrimary = onContinue)
         },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
@@ -207,7 +203,7 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 features.forEach { feature ->
-                    FeatureRow(feature = feature)
+                    OnboardingFeatureRow(feature = feature)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }

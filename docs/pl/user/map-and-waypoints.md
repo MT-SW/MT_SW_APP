@@ -2,7 +2,7 @@
 title: Mapa i punkty trasy
 parent: Przewodnik użytkownika
 nav_order: 6
-last_updated: 2026-10-26
+last_updated: 2026-11-10
 description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy i Site Planner oraz kontrola udostępniania pozycji i prywatności.
 aliases:
   - map
@@ -185,7 +185,7 @@ W **Google Play** sekcja **Menedżer map offline** w arkuszu warstw pobiera zami
 — wodę, drogi i granice administracyjne wyodrębnione z publicznego zbioru danych Protomaps, rysowane
 bezpośrednio jako kształty mapy, a nie kafelki rastrowe. Ustaw obszar, który chcesz mieć, dotknij **Rozpocznij pobieranie**, a po
 zakończeniu włącz **Pokaż na mapie**, aby go narysować. Przełącznik jest domyślnie wyłączony, żeby pobranie nie zasłaniało
-mapy na żywo bez Twojej wiedzy. **Desktop** nie ma pobierania map bazowych offline, choć
+mapy na żywo bez Twojej wiedzy. Bez sieci nazywa też widoczne miejsca i zbiorniki wodne. **Desktop** nie ma pobierania map bazowych offline, choć
 opisany niżej teren offline działa tam bez problemu.
 
 ### Teren offline
@@ -193,9 +193,7 @@ opisany niżej teren offline działa tam bez problemu.
 Cieniowanie rzeźby terenu i warstwice można również pobrać do użytku offline, aby pobrany obszar nadal
 pokazywał, dlaczego łącze nie działa, gdy nie ma sieci. Dane terenu pochodzą z Mapterhorn i są wskazane jako źródło na
 mapie. W **Google Play** każdy pobrany region na liście **Menedżer map offline** ma przycisk **Pobierz teren**. Teren jest dołączany do tego regionu i dzieli jego limit miejsca, a obszar
-zbyt duży dla terenu prosi o przybliżenie lub wybranie mniejszego regionu. Gdy teren jest pobrany, przycisk ustępuje miejsca przełącznikom **Cieniowanie rzeźby terenu** i **Warstwice**, obu wyłączonym, dopóki ich nie włączysz. W **F-Droid** i **Desktop**
-arkusz warstw ma własną sekcję **Teren offline**: ustaw obszar, dotknij **Rozpocznij pobieranie**, a
-cieniowanie rzeźby terenu i warstwice będą od tej pory rysowane automatycznie z pobranych kafelków, gdy pobrany obszar jest w widoku.
+zbyt duży dla terenu prosi o przybliżenie lub wybranie mniejszego regionu. Gdy teren jest pobrany, przycisk ustępuje miejsca przełącznikom **Cieniowanie rzeźby terenu** i **Warstwice**, obu wyłączonym, dopóki ich nie włączysz. Cieniowanie rysuje się z pełną siłą do jednego poziomu przybliżenia poza najgłębszym pobranym terenem w danym miejscu, zanika na następnym poziomie i potem się kończy; warstwice rysują się dalej. W **Google Play** włączenie **Cieniowania rzeźby terenu** oferuje też **Cieniowanie dolin**, domyślnie wyłączone, które przyciemnia doliny i wąwozy tym mocniej, im mniej nieba widzą, niezależnie od tego, w którą stronę są zwrócone do światła. W **F-Droid** i na **Desktopie** arkusz warstw ma własną sekcję **Teren offline**: ustaw obszar, dotknij **Rozpocznij pobieranie**, a cieniowanie rzeźby terenu i warstwice będą od tej pory rysowane automatycznie z pobranych kafelków, gdy pobrany obszar jest w widoku.
 
 ### Praca offline
 

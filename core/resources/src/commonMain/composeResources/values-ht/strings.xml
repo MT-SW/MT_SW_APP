@@ -212,7 +212,9 @@
     <string name="quick_chat_edit">Modifye chat rapid</string>
     <string name="quick_chat_instant">Voye imedyatman</string>
     <string name="quick_chat_new">Nouvo chat rapid</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Konfigirasyon radyo</string>
+    <string name="radio_setup_name_headline">Non</string>
     <string name="reboot">Rekòmanse</string>
     <!-- REMOTE -->
     <string name="remote_admin">Administrasyon Remote</string>
@@ -232,7 +234,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Rekòmanse avèk yon refi negatif</string>
     <string name="routing_error_no_route">Pa gen wout</string>
-    <string name="routing_error_none">Rekonekte</string>
     <string name="routing_error_timeout">Tan pase</string>
     <string name="rssi_definition">Endikatè Fòs Siynal Resevwa, yon mezi ki itilize pou detèmine nivo pouvwa siynal ki resevwa pa antèn nan. Yon RSSI pi wo jeneralman endike yon koneksyon pi fò ak plis estab.</string>
     <string name="save">Sove</string>
@@ -283,5 +284,6 @@
     <string name="wifi_provision_success_ip_address">Adrès IP</string>
     <!-- WIND -->
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Ou</string>
 </resources>

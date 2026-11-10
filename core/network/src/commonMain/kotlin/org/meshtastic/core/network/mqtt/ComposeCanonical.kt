@@ -14,20 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.feature.intro
-
-import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.StringResource
+package org.meshtastic.core.network.mqtt
 
 /**
- * Data class representing the UI elements for a feature row in the app introduction.
- *
- * @param icon The vector asset for the feature icon.
- * @param titleRes Optional string resource ID for the feature title.
- * @param subtitleRes String resource ID for the feature subtitle.
+ * Canonical composition (NFC), so a letter typed as a base letter plus a combining mark ("u" + "\u0308") matches the
+ * precomposed letter ("ü") a community writes in its root.
  */
-internal data class FeatureUIData(
-    val icon: ImageVector,
-    val titleRes: StringResource? = null,
-    val subtitleRes: StringResource,
-)
+internal expect fun composeCanonical(text: String): String

@@ -219,7 +219,9 @@
     <string name="quick_chat_edit">Redakto bisedën e shpejtë</string>
     <string name="quick_chat_instant">Dërgo menjëherë</string>
     <string name="quick_chat_new">Bisedë e re e shpejtë</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Konfigurimi i radios</string>
+    <string name="radio_setup_name_headline">Emri</string>
     <string name="reboot">Rindiz</string>
     <!-- REMOTE -->
     <string name="remote_admin">Administratë e Largët</string>
@@ -239,7 +241,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Marrë një njohje negative</string>
     <string name="routing_error_no_route">Nuk ka rrugë</string>
-    <string name="routing_error_none">Pranuar</string>
     <string name="routing_error_timeout">Koha e skaduar</string>
     <string name="rssi_definition">Indikatori i Fuqisë së Sinjalit të Marrë, një matje e përdorur për të përcaktuar nivelin e energjisë që po merret nga antena. Një vlerë më e lartë RSSI zakonisht tregon një lidhje më të fortë dhe më të qëndrueshme.</string>
     <string name="save">Ruaj</string>
@@ -290,5 +291,6 @@
     <string name="wifi_provision_success_ip_address">Adresa IP</string>
     <!-- WIND -->
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Ju</string>
 </resources>

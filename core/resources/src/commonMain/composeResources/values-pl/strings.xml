@@ -2068,9 +2068,11 @@
     <string name="quick_chat_new">Nowy szablon</string>
     <string name="quick_chat_show">Pokaż menu szybkiego wyboru</string>
     <string name="radiation">Promieniowanie</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Ustawienia urządzenia</string>
     <string name="rainfall_1h">Deszcz (1h)</string>
     <string name="rainfall_24h">Deszcz (24h)</string>
+    <string name="radio_setup_name_headline">Przyjazna nazwa</string>
     <string name="range_test">Test zasięgu</string>
     <string name="range_test_config">Konfiguracja testu zasięgu</string>
     <string name="range_test_enabled">Test zasięgu włączony</string>
@@ -2804,6 +2806,7 @@
     <string name="write_nfc_subtext">Zapis zapisuje ten link udostępniania na fizycznym tagu NFC. Każdy może dotknąć tagu telefonem, aby go otworzyć.</string>
     <string name="write_nfc_success">Zapisano na tagu</string>
     <string name="write_nfc_text">Przyłóż zapisywalny tag NFC do tyłu telefonu.</string>
+    <!-- XR -->
     <string name="you">Ty</string>
     <string name="zh_CN" translatable="false">简体中文</string>
     <string name="zh_TW" translatable="false">繁體中文</string>
@@ -3684,4 +3687,60 @@
     <string name="db_sync_done">Gotowe: zsynchronizowano wpisów: %1$d.</string>
     <string name="db_sync_failed">Synchronizacja się nie udała.</string>
     <string name="db_sync_info">Każde podłączane radio ma własną bazę danych. Gdy ten sam węzeł jest znany dwóm bazom, ta funkcja uaktualnia jego statystyki w obu: historię telemetrii, pozycję i ostatnie odczyty. Synchronizowane są tylko węzły znane obu bazom; węzeł znany tylko jednej bazie nigdy nie jest kopiowany do drugiej. Twoje notatki, nazwy, ulubione oraz ignorowanie i wyciszenie zostają w każdej bazie bez zmian.\n\nSynchronizacja automatyczna działa chwilę po zmianie połączenia na inne radio. Przycisk Synchronizuj teraz robi to od razu.</string>
+    <string name="channel_slots_used">Używane miejsca na kanały: %1$d z %2$d</string>
+    <string name="connect_code_invalid">Ten kod nie jest kodem połączenia mesh.</string>
+    <string name="device_model_banana_for_scale">Banan dla porównania skali</string>
+    <string name="device_model_in_space_hint">Stoi obok aplikacji, w prawdziwym rozmiarze. Ściśnij i przeciągnij palcami, aby go przesunąć.</string>
+    <string name="firmware_maintenance_ble_upgrade_text">Aktualizuje bootloader na %1$s przez Bluetooth, a potem instaluje firmware od nowa. Trwa około dziesięciu minut. Najpierw odłącz USB: przy podłączonym kablu nowy bootloader czeka na USB.</string>
+    <string name="firmware_update_bootloader_downloading">Pobieranie bootloadera...</string>
+    <string name="firmware_update_bootloader_installed">Bootloader: %1$s</string>
+    <string name="firmware_update_bootloader_installing">Instalowanie bootloadera. To potrwa kilka minut.</string>
+    <string name="firmware_update_bootloader_latest">Najnowszy bootloader: %1$s</string>
+    <string name="firmware_update_bootloader_mismatch">Bootloader zgłasza %1$s, ale ta paczka jest dla %2$s. Nic nie zostało zapisane.</string>
+    <string name="firmware_update_bootloader_model_unknown">Bootloader nie podał modelu, więc ta paczka dla %1$s nie została zapisana.</string>
+    <string name="firmware_update_bootloader_not_back">Urządzenie nie wróciło przez Bluetooth. Na USB czeka jako dysk: zainstaluj tam firmware albo odłącz je, zresetuj i użyj odzyskiwania.</string>
+    <string name="firmware_update_bootloader_not_upgraded">Firmware zainstalowano od nowa, ale bootloader zgłasza %1$s zamiast %2$s.</string>
+    <string name="firmware_update_bootloader_older_than">Bootloader: starszy niż %1$s</string>
+    <string name="firmware_update_bootloader_unverified">Paczka bootloadera %1$s nie przeszła weryfikacji. Nic nie zostało zapisane.</string>
+    <string name="firmware_update_bootloader_uploading">Wysyłanie bootloadera, krok 1 z 2...</string>
+    <string name="firmware_update_downloading">Pobieranie firmware...</string>
+    <string name="firmware_update_keep_going">Kontynuuj</string>
+    <string name="firmware_update_stop">Zatrzymaj</string>
+    <string name="firmware_update_stop_text">Jeśli urządzenie jest w trakcie aktualizacji, zostanie w trybie aktualizacji, dopóki jej nie dokończysz lub nie odzyskasz urządzenia.</string>
+    <string name="firmware_update_stop_title">Zatrzymać aktualizację?</string>
+    <string name="firmware_update_uploading_after_bootloader">Wysyłanie firmware, krok 2 z 2...</string>
+    <string name="managed_mode_recovery">Jeśli zgubisz wszystkie klucze administratora, węzła w trybie zarządzanym nie da się zmienić. Jedyny powrót to wymazanie go przez web flasher: https://flasher.meshtastic.org.</string>
+    <string name="map_offline_terrain_shade_valleys">Cieniowanie dolin</string>
+    <string name="radio_setup_beacons_body">Pobliskie radia mogą zapraszać Cię do swojej sieci mesh. Nasłuch zachowuje zaproszenia słyszane przez Twoje radio; dołącz do jednego, aby użyć jego kanału.</string>
+    <string name="radio_setup_beacons_headline">Pobliskie sieci mesh</string>
+    <string name="radio_setup_beacons_listening">Nasłuchuje sygnałów zaproszeń</string>
+    <string name="radio_setup_beacons_none">Nie słychać jeszcze żadnych zaproszeń.</string>
+    <string name="radio_setup_beacons_settings">Ustawienia Mesh Beacon</string>
+    <string name="radio_setup_beacons_waiting">Czekam na ustawienia sygnału zaproszeń z radia…</string>
+    <string name="radio_setup_done_body">Radio nadaje z tymi ustawieniami. Możesz je zmienić w każdej chwili w konfiguracji radia.</string>
+    <string name="radio_setup_done_headline">Gotowe</string>
+    <string name="radio_setup_intro_body">Radio potrzebuje regionu, zanim zacznie nadawać. Kolejne strony ustawią region, preset modemu i nazwę widoczną dla innych.</string>
+    <string name="radio_setup_intro_headline">Skonfiguruj radio</string>
+    <string name="radio_setup_name_body">Inni widzą te nazwy na swoich listach węzłów i na mapach.</string>
+    <string name="radio_setup_preset_body">Preset ustala zasięg i szybkość sieci mesh. Wszyscy w jednej sieci używają tego samego.</string>
+    <string name="radio_setup_preset_custom">To radio ma własne ustawienia modemu. Zostają, dopóki nie wybierzesz presetu.</string>
+    <string name="radio_setup_reconnecting">Czekam, aż radio połączy się ponownie…</string>
+    <string name="radio_setup_region_body">Wybierz region, w którym używasz tego radia. Ustala on częstotliwości i moc, jakich radio może używać.</string>
+    <string name="radio_setup_region_none">Żaden region nie pasuje.</string>
+    <string name="radio_setup_region_search">Szukaj regionów</string>
+    <string name="radio_setup_region_suggested">Zaproponowano na podstawie regionu telefonu. Potwierdź go albo wybierz inny.</string>
+    <string name="radio_setup_restart_notice">Radio uruchomi się ponownie po zapisaniu. Konfiguracja będzie kontynuowana po ponownym połączeniu.</string>
+    <string name="radio_setup_title">Konfiguracja radia</string>
+    <string name="scan_connect_code">Zeskanuj kod połączenia</string>
+    <string name="traceroute_available_in">Trasa za %1$d s</string>
+    <string name="traceroute_rate_limited">Limit szybkości: radio wysyła jedną trasę (traceroute) co 30 sekund</string>
+    <string name="traceroute_waiting">Czekam na odpowiedź</string>
+    <string name="xr_full_space">Pełna przestrzeń</string>
+    <string name="xr_home_space">Przestrzeń domowa</string>
+    <string name="xr_terrain_empty">Nie ma jeszcze węzłów z pozycją, więc nie ma obszaru do pokazania.</string>
+    <string name="xr_terrain_flat">Brak danych terenu dla tego obszaru, więc ziemia jest płaska.</string>
+    <string name="xr_terrain_loading">Budowanie terenu…</string>
+    <string name="xr_terrain_map">Mapa 3D</string>
+    <string name="xr_terrain_unavailable">Nie udało się wczytać terenu. Sprawdź połączenie i spróbuj ponownie.</string>
+    <string name="xr_terrain_zoom">Przybliżenie</string>
 </resources>

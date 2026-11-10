@@ -35,6 +35,8 @@ import kotlin.test.assertTrue
 private class FakeFetcher(var fail: Boolean = false, var absent: Boolean = false) : TerrainTileFetcher {
     var calls = 0
 
+    override val version: String? = null
+
     override fun fetchTile(zoom: Int, x: Int, y: Int): ByteArray? {
         calls++
         if (fail) throw Exception("offline")

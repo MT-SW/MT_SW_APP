@@ -536,7 +536,6 @@
     <string name="firmware_maintenance_upgrade_confirm_title">Mettre à jour le chargeur de démarrage ?</string>
     <string name="firmware_old">Le micrologiciel de la radio est trop ancien pour communiquer avec cette application. Pour des informations, voir <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">Guide d'installation du micrologiciel</a>.</string>
     <string name="firmware_recovery_banner">Fin de la mise à jour %1$s</string>
-    <string name="firmware_recovery_ble_failed">Impossible de terminer la mise à jour via le Bluetooth. Le programme d'amorçage par défaut ne peut pas correctement effectuer une mise à jour OTA. Connectez l'appareil sur un ordinateur via USB et tentez de flasher en utilisant les outils DFU du vendeur (par exemple, adafruit-nrfutil) pour restaurer l'appareil.</string>
     <string name="firmware_recovery_button">Reprendre la mise à jour du micrologiciel</string>
     <string name="firmware_too_old">Mise à jour du micrologiciel requise.</string>
     <string name="firmware_update_almost_there">On y est presque...</string>
@@ -610,7 +609,6 @@
     <string name="firmware_update_unsupported_transport">Les mises à jour du microprogramme ne sont pas prises en charge par cette connexion pour cet appareil. Connectez une autre manière (par exemple Bluetooth) pour mettre à jour.</string>
     <string name="firmware_update_unsupported_update_method">Les fichiers du firmware local ne sont pas pris en charge pour cette méthode de mise à jour.</string>
     <string name="firmware_update_uploading">Transfert du Firmware...</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s est généralement livré avec un chargeur d'amorçage qui ne prend pas en charge les mises à jour via Bluetooth (OTA ou Over The Air). Vous devrez peut-être flasher un chargeur d'amorçage compatible OTA via USB avant de flasher OTA.</string>
     <string name="firmware_update_usb_failed">Échec de la mise à jour USB</string>
     <string name="firmware_update_usb_instruction_text">Votre appareil a redémarré en mode DFU et devrait apparaître comme une clé USB (par exemple, RAK4631).\n\nLorsque le sélecteur de fichier s'ouvre, veuillez sélectionner la racine de ce lecteur pour enregistrer le fichier firmware.</string>
     <string name="firmware_update_usb_instruction_title">Sélectionnez un lecteur USB DFU</string>
@@ -1078,7 +1076,9 @@
     <string name="quick_chat_new">Nouveau clavardage</string>
     <string name="quick_chat_show">Afficher le menu de discussion rapide</string>
     <string name="radiation">Radiation</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Réglages de l'appareil</string>
+    <string name="radio_setup_name_headline">Nom convivial</string>
     <string name="rainfall_1h">Pluie (1h)</string>
     <string name="rainfall_24h">Pluie (24h)</string>
     <string name="range_test">Tests de portée</string>
@@ -1159,7 +1159,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Accusé de réception négatif</string>
     <string name="routing_error_no_route">Pas de routage</string>
-    <string name="routing_error_none">Entendu par un autre nœud (mais dans le cas d'un message direct, nous n'avons pas reçu la confirmation de réception par le destinataire : soit il n'a pas reçu le message, soit sa confirmation ne nous est pas parvenue)</string>
     <string name="routing_error_timeout">Délai dépassé</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">Indicateur de force du signal reçu, une mesure utilisée pour déterminer le niveau de puissance reçu par l'antenne. Une valeur RSSI plus élevée indique généralement une connexion plus forte et plus stable.</string>
@@ -1406,6 +1405,7 @@
     <string name="wind_lull">Vent à la traîne</string>
     <string name="wind_speed">Vitesse du vent</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Vous</string>
     <string name="zoom_in">Zoom +</string>
     <string name="zoom_out">Zoom -</string>

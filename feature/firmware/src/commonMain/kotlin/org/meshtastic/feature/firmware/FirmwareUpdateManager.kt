@@ -60,4 +60,16 @@ interface FirmwareUpdateManager {
         updateState: (FirmwareUpdateState) -> Unit,
         firmwareUri: CommonUri? = null,
     ): FirmwareArtifact?
+
+    /**
+     * Upgrade an nRF52 node's SoftDevice and bootloader over BLE with [bootloader], then reinstall [release], which the
+     * upgrade erases.
+     */
+    suspend fun upgradeBootloaderOverBle(
+        release: FirmwareRelease,
+        hardware: DeviceHardware,
+        address: String,
+        bootloader: BootloaderDfuZip,
+        updateState: (FirmwareUpdateState) -> Unit,
+    ): FirmwareArtifact?
 }

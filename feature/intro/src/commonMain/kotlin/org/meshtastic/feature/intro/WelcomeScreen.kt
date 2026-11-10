@@ -48,6 +48,9 @@ import org.meshtastic.core.resources.meshtastic
 import org.meshtastic.core.resources.share_your_location_in_real_time
 import org.meshtastic.core.resources.stay_connected_anywhere
 import org.meshtastic.core.resources.track_and_share_locations
+import org.meshtastic.core.ui.component.OnboardingBottomBar
+import org.meshtastic.core.ui.component.OnboardingFeature
+import org.meshtastic.core.ui.component.OnboardingFeatureRow
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -65,17 +68,17 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
     val analyticsIntro = LocalAnalyticsIntroProvider.current
     val features =
         listOf(
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.Antenna,
                 titleRes = Res.string.stay_connected_anywhere,
                 subtitleRes = Res.string.communicate_off_the_grid,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.MeshHub,
                 titleRes = Res.string.create_your_own_networks,
                 subtitleRes = Res.string.easily_set_up_private_mesh_networks,
             ),
-            FeatureUIData(
+            OnboardingFeature(
                 icon = MeshtasticIcons.NearMe,
                 titleRes = Res.string.track_and_share_locations,
                 subtitleRes = Res.string.share_your_location_in_real_time,
@@ -84,14 +87,7 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
 
     Scaffold(
         bottomBar = {
-            IntroBottomBar(
-                onSkip = {},
-                onConfigure = onGetStarted,
-                maxContentWidth = maxContentWidth,
-                skipButtonText = "",
-                configureButtonText = stringResource(Res.string.get_started),
-                showSkipButton = false,
-            )
+            OnboardingBottomBar(primaryText = stringResource(Res.string.get_started), onPrimary = onGetStarted)
         },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
@@ -115,7 +111,7 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 features.forEach { feature ->
-                    FeatureRow(feature = feature)
+                    OnboardingFeatureRow(feature = feature)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 Spacer(modifier = Modifier.weight(1f))

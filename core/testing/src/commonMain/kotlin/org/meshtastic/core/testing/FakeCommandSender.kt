@@ -191,6 +191,18 @@ class FakeCommandSender :
         return null
     }
 
+    override suspend fun sendAdminAwaitResultForConnection(
+        destNum: Int,
+        expectedConnectionVersion: Long,
+        requestId: Int,
+        wantResponse: Boolean,
+        initFn: () -> AdminMessage,
+    ): AwaitedSendResult {
+        failCommandIfConfigured()
+        mutableAdminRequests += AdminRequest(destNum, requestId, wantResponse, initFn(), expectedConnectionVersion)
+        return awaitedAdminResult
+    }
+
     override suspend fun sendPosition(pos: org.meshtastic.proto.Position, destNum: Int?, wantResponse: Boolean) {
         failCommandIfConfigured()
     }

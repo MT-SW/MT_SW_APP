@@ -463,7 +463,6 @@
     <string name="firmware_update_unknown_hardware">未知的硬體型號: %1$d</string>
     <string name="firmware_update_unknown_release">無法識別的遠端版本</string>
     <string name="firmware_update_uploading">正在上傳韌體⋯⋯</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s 裝置出廠時預載的開機載入程式通常不支援 OTA 更新功能。在執行 OTA 韌體更新前,您可能需要先透過 USB 連線刷入具備 OTA 功能的開機載入程式。</string>
     <string name="firmware_update_usb_failed">USB 更新失敗</string>
     <string name="firmware_update_usb_instruction_text">您的裝置已重新啟動進入 DFU 模式，應該會顯示為 USB 磁碟機（例如：RAK4631）。\n\n當檔案管理器開啟時，請選擇該磁碟機的根目錄以儲存韌體檔案。</string>
     <string name="firmware_update_usb_instruction_title">選擇 DFU USB 磁碟機</string>
@@ -968,7 +967,9 @@ You can find detailed instructions and documentation on the official Meshtastic 
     <string name="quick_chat_new">新的快速聊天</string>
     <string name="quick_chat_show">顯示快速聊天選單</string>
     <string name="radiation">輻射</string>
+    <!-- RADIO -->
     <string name="radio_configuration">設備設定</string>
+    <string name="radio_setup_name_headline">顯示名稱</string>
     <string name="rainfall_1h">降雨（1h）</string>
     <string name="rainfall_24h">降雨（24h）</string>
     <string name="range_test">範圍測試</string>
@@ -1048,7 +1049,6 @@ You can find detailed instructions and documentation on the official Meshtastic 
     <!-- ROUTING -->
     <string name="routing_error_got_nak">接收到拒絕確認</string>
     <string name="routing_error_no_route">無路徑</string>
-    <string name="routing_error_none">已確認</string>
     <string name="routing_error_timeout">逾時</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">接收信號強度指示（RSSI）用於測量天線所接收到信號的功率強度。 RSSI 值越高通常代表連線越強且穩定。</string>
@@ -1307,6 +1307,7 @@ You can find detailed instructions and documentation on the official Meshtastic 
     <string name="wind_lull">風停</string>
     <string name="wind_speed">風速</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">你</string>
     <string name="zoom_in">放大</string>
     <string name="zoom_out">縮小</string>

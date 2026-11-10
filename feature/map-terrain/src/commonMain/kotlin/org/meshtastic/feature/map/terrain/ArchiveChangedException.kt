@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.core.network.mqtt
+package org.meshtastic.feature.map.terrain
 
-import platform.Foundation.NSString
-import platform.Foundation.decomposedStringWithCanonicalMapping
+import okio.IOException
 
-@Suppress("CAST_NEVER_SUCCEEDS")
-internal actual fun decomposeCanonical(text: String): String = (text as NSString).decomposedStringWithCanonicalMapping
+/** The remote archive was replaced partway through a download, so tiles already fetched may be from another build. */
+class ArchiveChangedException : IOException("Remote archive changed during download")

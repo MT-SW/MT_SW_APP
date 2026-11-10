@@ -389,7 +389,9 @@
     <string name="quick_chat_instant">Hemen gönder</string>
     <string name="quick_chat_new">Yeni hızlı mesaj</string>
     <string name="radiation">Radyasyon</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Cihaz ayarları</string>
+    <string name="radio_setup_name_headline">Arkadaşça isim</string>
     <string name="range_test">Mesafe Testi</string>
     <string name="range_test_config">Menzi Test Ayarı</string>
     <string name="reboot">Yeniden başlat</string>
@@ -418,7 +420,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Negatif bir onay alındı</string>
     <string name="routing_error_no_route">Rota yok</string>
-    <string name="routing_error_none">Onaylandı</string>
     <string name="routing_error_timeout">Zaman Aşımı</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">Alınan Sinyal Gücü Göstergesi, anten tarafından alınan güç seviyesini belirlemek için kullanılan bir ölçüdür. Daha yüksek bir RSSI değeri genellikle daha güçlü ve daha istikrarlı bir bağlantıya işaret eder.</string>
@@ -528,5 +529,6 @@
     <!-- WIND -->
     <string name="wind">Rüzgar</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Siz</string>
 </resources>

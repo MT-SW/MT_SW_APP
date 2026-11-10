@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-11-04
+last_updated: 2026-11-10
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -28,6 +28,12 @@ Bluetooth Low Energy to domyślna i najczęstsza metoda połączenia na Androidz
 5. Android poprosi o sparowanie. Jeśli Twoje radio ma ekran, pokaże on sześciocyfrowy PIN — wpisz go w oknie Androida. Jeśli radio nie ma ekranu, PIN to `123456`.
 
 ![Skanowanie urządzeń Bluetooth, z wykrytym radiem na liście](../../assets/screenshots/connections_bluetooth_scan.png)
+
+### Łączenie z kodu QR lub tagu NFC
+
+Niektóre węzły mają kod połączenia, wydrukowany na naklejce albo pokazany na ekranie węzła. Zeskanuj go aparatem telefonu, przyłóż telefon do tagu NFC z tym samym linkiem albo dotknij ikony skanowania u góry karty **Połącz**. Aplikacja zapyta, czy się połączyć, i pokaże adres węzła oraz jego PIN do parowania, jeśli kod go zawiera. Dotknij **Połącz**, a aplikacja skopiuje PIN i sparuje urządzenia. Do Androida 16 aplikacja sama wpisuje PIN; na Androidzie 17 okno parowania o niego prosi i trzeba go wkleić.
+
+Kod, który nie jest kodem połączenia Meshtastic, albo kod z adresem nieobsługiwanym przez aplikację, nie połączy z niczym.
 
 Metodę parowania możesz zmienić, lub włączyć Bluetooth w radiu dostarczanym z wyłączonym, w **Ustawienia → Konfiguracja urządzenia → Bluetooth** — zobacz [Ustawienia — Radio i użytkownik](settings-radio-user). Więcej informacji znajdziesz w [konfiguracji Bluetooth](https://meshtastic.org/docs/configuration/radio/bluetooth) na meshtastic.org.
 

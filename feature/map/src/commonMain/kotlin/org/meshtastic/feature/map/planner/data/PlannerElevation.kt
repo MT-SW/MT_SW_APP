@@ -40,6 +40,7 @@ import org.meshtastic.feature.map.terrain.TerrainTileFetcher
 import org.meshtastic.feature.map.terrain.TerrainTileMath
 import org.meshtastic.feature.map.terrain.TileIndex
 import org.meshtastic.feature.map.terrain.decodeTerrariumTile
+import org.meshtastic.feature.map.terrain.openTerrainTileFetcher
 import kotlin.math.PI
 import kotlin.math.asinh
 import kotlin.math.cos
@@ -103,7 +104,7 @@ interface PlannerElevationSource {
  */
 class PlannerElevation(
     private val preferredZoom: Int = MapterhornEndpoints.GLOBAL_MAX_ZOOM,
-    private val fetcherFactory: (String) -> TerrainTileFetcher = { url -> TerrainTileFetcher(url) },
+    private val fetcherFactory: (String) -> TerrainTileFetcher = { url -> openTerrainTileFetcher(url) ?: error("No terrain archive at $url") },
     private val tileDecoder: (ByteArray) -> ElevationTile = { bytes -> decodeTerrariumTile(bytes) },
     private val ioContext: CoroutineDispatcher = ioDispatcher,
     private val cacheCapacity: Int = DEFAULT_CACHE_TILES,

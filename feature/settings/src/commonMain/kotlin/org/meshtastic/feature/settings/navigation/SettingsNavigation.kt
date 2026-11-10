@@ -91,6 +91,7 @@ import org.meshtastic.feature.settings.radio.component.TakServerScreen
 import org.meshtastic.feature.settings.radio.component.TelemetryConfigScreen
 import org.meshtastic.feature.settings.radio.component.TrafficManagementConfigScreen
 import org.meshtastic.feature.settings.radio.component.UserConfigScreen
+import org.meshtastic.feature.settings.radio.setup.RadioSetupScreen
 import org.meshtastic.feature.settings.search.LocalSettingsFieldFocus
 import org.meshtastic.feature.settings.search.SettingsFieldFocus
 import org.meshtastic.feature.settings.sniffer.SnifferLogViewModel
@@ -259,6 +260,7 @@ private fun NavKey.usesRadioConfigSettingsSession(): Boolean = this is SettingsR
     this == SettingsRoute.DeviceConfiguration ||
     this == SettingsRoute.ModuleConfiguration ||
     this == SettingsRoute.Administration ||
+    this is SettingsRoute.RadioSetup ||
     ConfigRoute.entries.any { it.route == this } ||
     ModuleRoute.entries.any { it.route == this }
 
@@ -310,6 +312,15 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         AdministrationScreen(
             viewModel = radioConfigViewModelProvider(null),
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+        )
+    }
+
+    entry<SettingsRoute.RadioSetup> { args ->
+        RadioSetupScreen(
+            viewModel = radioConfigViewModelProvider(null),
+            boundAddress = args.address,
+            onDone = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigate = backStack::addSettingsRoute,
         )
     }
 

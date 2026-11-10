@@ -375,7 +375,9 @@
     <string name="quick_chat_instant">즉시 보내기</string>
     <string name="quick_chat_new">새로운 빠른 대화</string>
     <string name="radiation">복사</string>
+    <!-- RADIO -->
     <string name="radio_configuration">무선 설정</string>
+    <string name="radio_setup_name_headline">식별 이름</string>
     <string name="range_test">거리 테스트</string>
     <string name="range_test_config">거리 테스트 설정</string>
     <string name="react">반응</string>
@@ -407,7 +409,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">수락 거부됨</string>
     <string name="routing_error_no_route">루트 없음</string>
-    <string name="routing_error_none">수락 됨</string>
     <string name="routing_error_timeout">시간 초과됨</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">수신 신호 강도 지표 Received Signal Strength Indicator, RSSI는 안테나가 수신하는 신호의 전력 수준을 측정하는 데 사용되는 지표입니다. RSSI 값이 높을수록 일반적으로 더 강력하고 안정적인 연결을 나타냅니다.</string>
@@ -514,6 +515,7 @@
     <!-- WIND -->
     <string name="wind">바람</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">나</string>
     <string name="zoom_in">확대</string>
     <string name="zoom_out">축소</string>

@@ -42,6 +42,7 @@ import org.meshtastic.core.model.util.privatePortNumUnknownFields
 import org.meshtastic.core.repository.AdminRequestRegistry
 import org.meshtastic.core.repository.AwaitedSendResult
 import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.LocalNodeUnavailableException
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NeighborInfoHandler
@@ -94,6 +95,7 @@ class CommandSenderImpl(
     private val sessionManager: SessionManager,
     private val meshLogRepository: MeshLogRepository,
     private val adminRequestRegistry: AdminRequestRegistry,
+    private val connectionStateProvider: ConnectionStateProvider,
     private val scope: ServiceScope,
 ) : CommandSender {
     private val currentPacketId = atomic(Random(nowMillis).nextLong().absoluteValue)
@@ -252,8 +254,12 @@ class CommandSenderImpl(
         initFn().newBuilder().also { wb -> wb.session_passkey = sessionManager.getPasskey(destNum) }.build(),
     )
 
+    // Admin writes are bound to the lifecycle version current at the call, so one queued behind a radio switch is
+    // rejected rather than sent through the replacement transport with the old session's passkey.
+    private fun currentConnectionVersion(): Long = connectionStateProvider.connectionLifecycle.value.version
+
     override suspend fun sendAdmin(destNum: Int, requestId: Int, wantResponse: Boolean, initFn: () -> AdminMessage) {
-        enqueueOrThrow(buildAdminMessagePacket(destNum, requestId, wantResponse, initFn), "Admin command")
+        sendAdminForConnection(destNum, currentConnectionVersion(), requestId, wantResponse, initFn)
     }
 
     override suspend fun sendAdminForConnection(
@@ -283,7 +289,18 @@ class CommandSenderImpl(
         wantResponse: Boolean,
         initFn: () -> AdminMessage,
     ): AwaitedSendResult =
-        packetHandler.sendToRadioAndAwaitResult(buildAdminMessagePacket(destNum, requestId, wantResponse, initFn))
+        sendAdminAwaitResultForConnection(destNum, currentConnectionVersion(), requestId, wantResponse, initFn)
+
+    override suspend fun sendAdminAwaitResultForConnection(
+        destNum: Int,
+        expectedConnectionVersion: Long,
+        requestId: Int,
+        wantResponse: Boolean,
+        initFn: () -> AdminMessage,
+    ): AwaitedSendResult = packetHandler.sendToRadioAndAwaitResultForConnection(
+        buildAdminMessagePacket(destNum, requestId, wantResponse, initFn),
+        expectedConnectionVersion,
+    )
 
     override suspend fun sendAdminAndAwaitDelivery(destNum: Int, requestId: Int, initFn: () -> AdminMessage): Boolean {
         val adminMsg =

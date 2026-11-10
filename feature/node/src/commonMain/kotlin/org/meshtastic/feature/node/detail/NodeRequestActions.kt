@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.node.detail
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
@@ -25,6 +26,10 @@ import org.meshtastic.proto.OnDemandType
 interface NodeRequestActions {
     val lastTracerouteTime: StateFlow<Long?>
     val lastRequestNeighborTimes: StateFlow<Map<Int, Long>>
+
+    /** Routing error of each traceroute request the radio or mesh refused, by request id, for this app run. */
+    val tracerouteNaks: StateFlow<Map<Int, Int>>
+        get() = NO_NAKS
 
     suspend fun requestUserInfo(destNum: Int, longName: String)
 
@@ -38,3 +43,5 @@ interface NodeRequestActions {
 
     suspend fun requestOnDemand(destNum: Int, longName: String, requestType: OnDemandType)
 }
+
+private val NO_NAKS: StateFlow<Map<Int, Int>> = MutableStateFlow(emptyMap())

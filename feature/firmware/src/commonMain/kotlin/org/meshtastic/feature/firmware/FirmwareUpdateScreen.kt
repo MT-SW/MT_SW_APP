@@ -82,18 +82,21 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.mikepenz.markdown.m3.Markdown
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceHardware
 import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.FirmwareReleaseType
+import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.back
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.chirpy
 import org.meshtastic.core.resources.dont_show_again_for_device
+import org.meshtastic.core.resources.firmware_maintenance_ble_upgrade_text
 import org.meshtastic.core.resources.firmware_maintenance_bootloader_available
 import org.meshtastic.core.resources.firmware_maintenance_bootloader_installed
 import org.meshtastic.core.resources.firmware_maintenance_bootloader_last_fault
@@ -108,6 +111,9 @@ import org.meshtastic.core.resources.firmware_recovery_button
 import org.meshtastic.core.resources.firmware_recovery_explanation
 import org.meshtastic.core.resources.firmware_update_almost_there
 import org.meshtastic.core.resources.firmware_update_alpha
+import org.meshtastic.core.resources.firmware_update_bootloader_installed
+import org.meshtastic.core.resources.firmware_update_bootloader_latest
+import org.meshtastic.core.resources.firmware_update_bootloader_older_than
 import org.meshtastic.core.resources.firmware_update_checking
 import org.meshtastic.core.resources.firmware_update_confirm_file_button
 import org.meshtastic.core.resources.firmware_update_confirm_file_message
@@ -127,6 +133,7 @@ import org.meshtastic.core.resources.firmware_update_esp_full_bin_body
 import org.meshtastic.core.resources.firmware_update_esp_full_bin_title
 import org.meshtastic.core.resources.firmware_update_hang_tight
 import org.meshtastic.core.resources.firmware_update_keep_device_close
+import org.meshtastic.core.resources.firmware_update_keep_going
 import org.meshtastic.core.resources.firmware_update_latest
 import org.meshtastic.core.resources.firmware_update_local_file
 import org.meshtastic.core.resources.firmware_update_method_detail
@@ -141,6 +148,9 @@ import org.meshtastic.core.resources.firmware_update_select_file
 import org.meshtastic.core.resources.firmware_update_slow_bootloader_hint
 import org.meshtastic.core.resources.firmware_update_source_local
 import org.meshtastic.core.resources.firmware_update_stable
+import org.meshtastic.core.resources.firmware_update_stop
+import org.meshtastic.core.resources.firmware_update_stop_text
+import org.meshtastic.core.resources.firmware_update_stop_title
 import org.meshtastic.core.resources.firmware_update_success
 import org.meshtastic.core.resources.firmware_update_success_wiped
 import org.meshtastic.core.resources.firmware_update_taking_a_while
@@ -245,11 +255,13 @@ fun FirmwareUpdateScreen(onNavigateUp: () -> Unit, viewModel: FirmwareUpdateView
                 },
                 onPickVolume = volumePickerLauncher,
                 onBootloaderUpgrade = viewModel::startBootloaderUpgrade,
+                onBleBootloaderUpgrade = viewModel::startBleBootloaderUpgrade,
                 onConfirmBootloaderUpgrade = viewModel::confirmBootloaderUpgrade,
                 onSkipBootloaderUpgrade = viewModel::skipBootloaderUpgrade,
                 onConfirmLocalFile = viewModel::confirmLocalFirmwareFile,
                 onDismissLocalFile = viewModel::dismissLocalFirmwareFile,
                 onRetry = viewModel::checkForUpdates,
+                onRetryVerification = viewModel::retryVerification,
                 onCancel = { showExitConfirmation = true },
                 onPlayChirpyHop = { showChirpyHop = true },
                 onDone = { onNavigateUp() },
@@ -270,15 +282,15 @@ fun FirmwareUpdateScreen(onNavigateUp: () -> Unit, viewModel: FirmwareUpdateView
     if (showExitConfirmation) {
         MeshtasticDialog(
             onDismiss = { showExitConfirmation = false },
-            title = stringResource(Res.string.firmware_update_disclaimer_title),
-            message = stringResource(Res.string.firmware_update_disconnect_warning),
-            confirmText = stringResource(Res.string.firmware_update_retry),
+            title = stringResource(Res.string.firmware_update_stop_title),
+            message = stringResource(Res.string.firmware_update_stop_text),
+            confirmText = stringResource(Res.string.firmware_update_stop),
             onConfirm = {
                 showExitConfirmation = false
                 viewModel.cancelUpdate()
                 onNavigateUp()
             },
-            dismissText = stringResource(Res.string.back),
+            dismissText = stringResource(Res.string.firmware_update_keep_going),
         )
     }
 
@@ -422,6 +434,7 @@ private fun FirmwareUpdateScaffold(
                     release = selectedRelease,
                     currentFirmwareVersion = currentVersion,
                     selectedReleaseType = selectedReleaseType,
+                    bootloader = (state as? FirmwareUpdateState.Ready)?.bootloader,
                 )
                 Spacer(Modifier.height(16.dp))
             }
@@ -501,9 +514,12 @@ private fun FirmwareUpdateContent(
             is FirmwareUpdateState.Verifying -> VerifyingState(onPlayChirpyHop = onPlayChirpyHop)
 
             is FirmwareUpdateState.VerificationFailed ->
-                VerificationFailedState(onRetry = { actions.onStartUpdate(false) }, onIgnore = actions.onDone)
+                VerificationFailedState(onRetry = actions.onRetryVerification, onIgnore = actions.onDone)
 
             is FirmwareUpdateState.Error -> ErrorState(error = state.error, onRetry = actions.onRetry)
+
+            // A handler reports Success before the app has reconnected; the update is not final until verified.
+            is FirmwareUpdateState.Success if !state.verified -> VerifyingState(onPlayChirpyHop = onPlayChirpyHop)
 
             is FirmwareUpdateState.Success ->
                 SuccessState(
@@ -600,10 +616,20 @@ private fun ReadyState(
     }
 
     if (state.maintenance.showBootloaderUpgrade) {
-        UsbMaintenanceCard(
+        BootloaderUpgradeCard(
             deviceName = device.displayName,
             latestBootloader = state.maintenance.latestBootloader,
             onBootloaderUpgrade = actions.onBootloaderUpgrade,
+        )
+        Spacer(Modifier.height(16.dp))
+    }
+
+    if (state.bleBootloaderUpgrade != null && !state.isRecovery) {
+        BootloaderUpgradeCard(
+            deviceName = device.displayName,
+            latestBootloader = null,
+            onBootloaderUpgrade = actions.onBleBootloaderUpgrade,
+            confirmText = Res.string.firmware_maintenance_ble_upgrade_text,
         )
         Spacer(Modifier.height(16.dp))
     }
@@ -992,7 +1018,7 @@ private fun ChirpyCard() {
 
 @Composable
 private fun DeviceHardwareImage(deviceHardware: DeviceHardware, modifier: Modifier = Modifier) {
-    val hwImg = deviceHardware.images?.getOrNull(1) ?: deviceHardware.images?.getOrNull(0) ?: "unknown.svg"
+    val hwImg = deviceHardware.heroImageFile ?: "unknown.svg"
     val imageUrl = "https://flasher.meshtastic.org/img/devices/$hwImg"
     val fallbackPainter = painterResource(Res.drawable.img_hw_unknown)
 
@@ -1025,11 +1051,12 @@ private fun ReleaseNotesCard(releaseNotes: String) {
 }
 
 @Composable
-private fun DeviceInfoCard(
+internal fun DeviceInfoCard(
     deviceHardware: DeviceHardware,
     release: FirmwareRelease?,
     currentFirmwareVersion: String? = null,
     selectedReleaseType: FirmwareReleaseType = FirmwareReleaseType.STABLE,
+    bootloader: BootloaderStatus? = null,
 ) {
     val target = deviceHardware.hwModelSlug.ifEmpty { deviceHardware.platformioTarget }
 
@@ -1079,6 +1106,38 @@ private fun DeviceInfoCard(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
+            bootloader?.let { BootloaderVersionLines(it) }
+        }
+    }
+}
+
+/** Installed bootloader against the latest release, as the running device reports it in its metadata. */
+@Composable
+private fun BootloaderVersionLines(bootloader: BootloaderStatus) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text =
+            when (val installed = bootloader.installed) {
+                is InstalledBootloader.Known ->
+                    stringResource(Res.string.firmware_update_bootloader_installed, installed.version.toString())
+
+                InstalledBootloader.OlderThanFirstNumbered ->
+                    stringResource(
+                        Res.string.firmware_update_bootloader_older_than,
+                        FIRST_NUMBERED_BOOTLOADER.toString(),
+                    )
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        bootloader.latest?.let {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.firmware_update_bootloader_latest, it.toString()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -1093,14 +1152,19 @@ private fun DeviceInfoCard(
  * on.
  */
 @Composable
-internal fun UsbMaintenanceCard(deviceName: String, latestBootloader: String?, onBootloaderUpgrade: () -> Unit) {
+internal fun BootloaderUpgradeCard(
+    deviceName: String,
+    latestBootloader: String?,
+    onBootloaderUpgrade: () -> Unit,
+    confirmText: StringResource = Res.string.firmware_maintenance_upgrade_confirm_text,
+) {
     var showUpgradeConfirmation by rememberSaveable { mutableStateOf(false) }
 
     if (showUpgradeConfirmation) {
         MeshtasticDialog(
             onDismiss = { showUpgradeConfirmation = false },
             title = stringResource(Res.string.firmware_maintenance_upgrade_confirm_title),
-            message = stringResource(Res.string.firmware_maintenance_upgrade_confirm_text, deviceName),
+            message = stringResource(confirmText, deviceName),
             confirmText = stringResource(Res.string.firmware_maintenance_upgrade_bootloader_action),
             onConfirm = {
                 showUpgradeConfirmation = false
@@ -1141,8 +1205,8 @@ internal fun BootloaderFaultLine(fault: BootloaderFault) {
 }
 
 /**
- * Installed against latest bootloader, read from the drive before an upgrade is written. The running firmware cannot
- * report its bootloader, so this is the first point the app knows the installed version.
+ * Installed against latest bootloader, read from the drive before an upgrade is written. The drive's full tag tells
+ * pre-2.6.0 builds apart, which the running firmware's packed `bootloader_version` cannot.
  */
 @Composable
 internal fun BootloaderReviewState(versions: BootloaderVersions, onUpgrade: () -> Unit, onSkip: () -> Unit) {
@@ -1308,11 +1372,11 @@ private fun ProgressContent(
                 modifier = Modifier.size(48.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
+        } else if (isUpdating) {
+            CircularWavyProgressIndicator(progress = { progressState.progress }, modifier = Modifier.size(64.dp))
         } else {
-            CircularWavyProgressIndicator(
-                progress = { if (isUpdating) progressState.progress else 1f },
-                modifier = Modifier.size(64.dp),
-            )
+            // Waits (reboot, bootloader swap) have no measure of progress; a full static ring read as stalled.
+            CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
         }
 
         Spacer(Modifier.height(24.dp))

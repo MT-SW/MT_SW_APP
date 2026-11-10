@@ -101,6 +101,14 @@ interface PacketHandler {
      * processed.
      */
     suspend fun completeGpioReply(fromNum: Int, gpioValue: Long)
+     * [sendToRadioAndAwaitResult] admitted only while [expectedConnectionVersion] still owns the connected lifecycle
+     * generation, as [sendToRadioForConnection] does for queued sends. A stale generation is reported as
+     * [AwaitedSendStatus.TRANSPORT_STOPPED] with `dispatched == false`.
+     */
+    suspend fun sendToRadioAndAwaitResultForConnection(
+        packet: MeshPacket,
+        expectedConnectionVersion: Long,
+    ): AwaitedSendResult
 
     /** Processes queue status updates from the radio. */
     fun handleQueueStatus(queueStatus: QueueStatus)

@@ -561,7 +561,6 @@
     <string name="firmware_gate_update">更新固件</string>
     <string name="firmware_old">版本过旧，无法与此应用程序通讯。欲了解更多信息，请参阅 Meshtastic 网站上的<a href="https://meshtastic.org/docs/getting-started/flashing-firmware">韧体安装指南</a>。</string>
     <string name="firmware_recovery_banner">完成更新 %1$s</string>
-    <string name="firmware_recovery_ble_failed">无法通过蓝牙完成更新该设备的原生引导程序无法可靠地完成被中断的无线更新。请使用 USB 数据线将其连接到电脑，并使用厂商提供的串口 DFU 工具（例如 adafruit-nrfutil）重新刷入固件，以恢复设备。</string>
     <string name="firmware_recovery_button">继续固件升级</string>
     <string name="firmware_recovery_dismiss">取消固件恢复</string>
     <string name="firmware_recovery_explanation">此设备目前处于引导程序模式，原因是之前的固件更新未能完成请将其保持在手机附近系统将重新刷入固件以完成更新。</string>
@@ -644,7 +643,6 @@
     <string name="firmware_update_unsupported_transport">此设备不支持通过当前连接进行固件更新.请通过其他方式 (例如蓝牙) 连接以进行更新。</string>
     <string name="firmware_update_unsupported_update_method">此更新方法不支持本地固件文件。</string>
     <string name="firmware_update_uploading">正在上传固件……</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s通常配备的引导加载程序不支持OTA更新。在进行OTA刷写之前，您可能需要通过USB刷写一个支持OTA的引导加载程序。</string>
     <string name="firmware_update_usb_failed">USB 更新失败</string>
     <string name="firmware_update_usb_instruction_text">您的设备已经重启到 DFU 模式并应显示为 USB 驱动器(如RAK4631)。\n\n当文件选择器打开时，请选择该驱动器的根目录来保存固件文件。</string>
     <string name="firmware_update_usb_instruction_title">选择 DFU USB 驱动器</string>
@@ -1218,7 +1216,9 @@
     <string name="quick_chat_new">新的快速聊天</string>
     <string name="quick_chat_show">显示快速聊天菜单</string>
     <string name="radiation">辐射</string>
+    <!-- RADIO -->
     <string name="radio_configuration">设备配置</string>
+    <string name="radio_setup_name_headline">易记名称</string>
     <string name="rainfall_1h">雨量 (1小时)</string>
     <string name="rainfall_24h">雨量 (24小时)</string>
     <string name="range_test">距离测试</string>
@@ -1300,7 +1300,7 @@
     <string name="routing_error_got_nak">接收到否定确认</string>
     <string name="routing_error_max_retransmit">发送至MESH失败</string>
     <string name="routing_error_no_route">无路径</string>
-    <string name="routing_error_none">已确认</string>
+    <string name="routing_error_none">正在发送</string>
     <string name="routing_error_pki_failed">无法发送加密消息</string>
     <string name="routing_error_pki_send_fail_public_key">接收方密钥不可用</string>
     <string name="routing_error_pki_unknown_pubkey">接收方需要你的密钥</string>
@@ -1621,6 +1621,7 @@
     <string name="write_nfc_failed">无法写入标签请使用一张可写入的空白 NFC 标签，并保持手机与标签贴合稳定。</string>
     <string name="write_nfc_success">数据已成功写入标签</string>
     <string name="write_nfc_text">请将一张可写入的 NFC 标签贴在手机背面。</string>
+    <!-- XR -->
     <string name="you">你</string>
     <string name="zoom_in">放大</string>
     <string name="zoom_out">缩小</string>

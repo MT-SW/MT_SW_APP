@@ -363,7 +363,6 @@
     <string name="firmware_update_unknown_hardware">Model hardware necunoscut: %1$d</string>
     <string name="firmware_update_unknown_release">Lansare la distanţă necunoscută</string>
     <string name="firmware_update_uploading">Încărcare firmware...</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s de obicei este livrat cu un bootloader care nu acceptă actualizări OTA. Este posibil să fie nevoie să instalați un bootloader OTA prin USB înainte de a instala OTA.</string>
     <string name="firmware_update_usb_failed">Actualizare USB nereuşită</string>
     <string name="firmware_update_usb_instruction_text">Dispozitivul dvs. a repornit în modul DFU şi ar trebui să apară ca un dispozitiv USB (de exemplu, RAK4631).\n\nCând se deschide selectorul de fişiere, vă rugăm să selectaţi rădăcina acelui disc pentru a salva fişierul de firmwar.</string>
     <string name="firmware_update_usb_instruction_title">Selectați DFU USB disk</string>
@@ -742,7 +741,9 @@
     <string name="quick_chat_new">Chat rapid nou</string>
     <string name="quick_chat_show">Arată meniul de chat rapid</string>
     <string name="radiation">Radiație</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Configurare radio</string>
+    <string name="radio_setup_name_headline">Nume comun</string>
     <string name="rainfall_1h">Ploaie (1h)</string>
     <string name="rainfall_24h">Ploaie (24h)</string>
     <string name="range_test">Test de rază</string>
@@ -809,7 +810,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">S-a primit o confirmare negativă</string>
     <string name="routing_error_no_route">Nici o rută</string>
-    <string name="routing_error_none">Confirmat</string>
     <string name="routing_error_timeout">Expirat</string>
     <string name="rssi"> RSSI</string>
     <string name="rssi_definition">Indicatorul intensității semnalului recepționat (Received Signal Strength Indicator), o măsurătoare utilizată pentru a determina nivelul de putere recepționat de antenă. O valoare RSSI mai mare indică, în general, o conexiune mai puternică și mai stabilă.</string>
@@ -1025,5 +1025,6 @@
     <string name="wind_lull">Vânt critic</string>
     <string name="wind_speed">Viteza vântului</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Tu</string>
 </resources>

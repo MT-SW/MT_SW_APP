@@ -518,7 +518,6 @@
     <string name="firmware_gate_title">Firmware-Aktualisierung erforderlich</string>
     <string name="firmware_gate_update">Firmware updaten</string>
     <string name="firmware_old">Die Funkgerät-Firmware ist zu alt, um mit dieser App kommunizieren zu können. Für mehr Informationen darüber besuchen Sie <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">unsere Firmware-Installationsanleitung</a>.</string>
-    <string name="firmware_recovery_ble_failed">Das Update konnte nicht über Bluetooth abgeschlossen werden. Der Standard-Bootloader dieses Geräts kann ein unterbrochenes Over-the-Air-Update nicht zuverlässig zu Ende führen. Schließen Sie das Gerät per USB an einen Computer an und flashen Sie es neu mit dem seriellen DFU-Tool des Herstellers (z. B. adafruit-nrfutil), um es wiederherzustellen.</string>
     <string name="firmware_recovery_button">Firmware-Update fortführen</string>
     <string name="firmware_too_old">Firmware Aktualisierung erforderlich.</string>
     <string name="firmware_update_almost_there">Fast fertig...</string>
@@ -587,7 +586,6 @@
     <string name="firmware_update_unsupported_transport">Firmware Updates sind auf diesem Gerät über diese Verbindung nicht unterstützt. Verbinde dich auf eine andere Art (z.B. Bluetooth) zum Updaten.</string>
     <string name="firmware_update_unsupported_update_method">Lokale Firmware-Dateien sind für diese Update-Methode nicht unterstützt.</string>
     <string name="firmware_update_uploading">Firmware aktualisieren...</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s wird üblicherweise mit einem Bootloader ausgeliefert, der keine OTA Aktualisierung unterstützt. Möglicherweise müssen Sie vor dem Programmieren einer OTA Aktualisierung einen OTA fähigen Bootloader über USB programmieren.</string>
     <string name="firmware_update_usb_failed">USB Aktualisierung fehlgeschlagen</string>
     <string name="firmware_update_usb_instruction_text">Ihr Gerät wurde im DFU Modus neu gestartet und sollte als USB Laufwerk (z. B. RAK4631) angezeigt werden.\n\nWenn sich die Dateiauswahl öffnet, wählen Sie bitte das Stammverzeichnis dieses Laufwerks aus, um die Firmware Datei zu speichern.</string>
     <string name="firmware_update_usb_instruction_title">DFU USB Laufwerk auswählen</string>
@@ -1111,7 +1109,9 @@
     <string name="quick_chat_new">Neuer Schnell-Chat</string>
     <string name="quick_chat_show">Schnell-Chat Menü anzeigen</string>
     <string name="radiation">Strahlung</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Geräteeinstellungen</string>
+    <string name="radio_setup_name_headline">Anzeigename</string>
     <string name="rainfall_1h">Regen (1 Std.)</string>
     <string name="rainfall_24h">Regen (24 Std.)</string>
     <string name="range_test">Reichweitentest</string>
@@ -1193,7 +1193,7 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">negative Bestätigung erhalten</string>
     <string name="routing_error_no_route">Keine Route</string>
-    <string name="routing_error_none">Bestätigt</string>
+    <string name="routing_error_none">An den Empfänger zugestellt</string>
     <string name="routing_error_pki_failed">Konnte verschlüsselte Nachricht nicht senden</string>
     <string name="routing_error_pki_send_fail_public_key">Empfängerschlüssel nicht verfügbar</string>
     <string name="routing_error_pki_unknown_pubkey">Empfänger benötigt deinen Schlüssel</string>
@@ -1497,6 +1497,7 @@
     <string name="write_nfc_failed">Konnte nicht auf Tag schreiben. Verwende einen schreibbaren, leeren NFC-Tag und halte ihn still.</string>
     <string name="write_nfc_success">Auf Tag geschrieben</string>
     <string name="write_nfc_text">Halte einen schreibbaren NFC-Tag gegen die Hinterseite deines Handys.</string>
+    <!-- XR -->
     <string name="you">Du</string>
     <string name="zoom_in">Vergrößern</string>
     <string name="zoom_out">Verkleinern</string>

@@ -220,7 +220,9 @@
     <string name="quick_chat_edit">Endre enkelchat</string>
     <string name="quick_chat_instant">Send øyeblikkelig</string>
     <string name="quick_chat_new">Ny enkelchat</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Radiokonfigurasjon</string>
+    <string name="radio_setup_name_headline">Navn</string>
     <string name="reboot">Omstart</string>
     <!-- REMOTE -->
     <string name="remote_admin">Fjernadministrasjon</string>
@@ -240,7 +242,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Mottok negativ bekreftelse</string>
     <string name="routing_error_no_route">Ingen rute</string>
-    <string name="routing_error_none">Bekreftet</string>
     <string name="routing_error_timeout">Tidsavbrudd</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">"Received Signal Strength Indicator", en måling som brukes til å bestemme strømnivået som mottas av antennen. Høyere RSSI verdi indikerer generelt en sterkere og mer stabil forbindelse.</string>
@@ -302,5 +303,6 @@
     <string name="wifi_provision_success_ip_address">IP-adresse</string>
     <!-- WIND -->
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Deg</string>
 </resources>

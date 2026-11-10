@@ -93,6 +93,12 @@ class FakeUiPrefs : UiPrefs {
         appIntroCompleted.value = completed
     }
 
+    override val radioSetupOfferedNodes = MutableStateFlow<Set<Int>>(emptySet())
+
+    override fun markRadioSetupOffered(nodeNum: Int) {
+        radioSetupOfferedNodes.update { it + nodeNum }
+    }
+
     override val theme = MutableStateFlow(0)
 
     override fun setTheme(value: Int) {

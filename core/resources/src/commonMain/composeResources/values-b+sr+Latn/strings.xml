@@ -353,7 +353,9 @@
     <string name="quick_chat_edit">Измени брзо ћаскање</string>
     <string name="quick_chat_instant">Моментално пошаљи</string>
     <string name="quick_chat_new">Ново брзо ћаскање</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Конфигурација радио уређаја</string>
+    <string name="radio_setup_name_headline">Пријатељски назив</string>
     <string name="range_test">Тест домета</string>
     <string name="range_test_config">Конфигурација теста домета</string>
     <string name="reboot">Поново покрени</string>
@@ -394,7 +396,6 @@
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Primljena negativna potvrda</string>
     <string name="routing_error_no_route">Nema rute</string>
-    <string name="routing_error_none">Potvrđeno</string>
     <string name="routing_error_timeout">Isteklo vreme</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">Indikator jačine primljenog signala RSSI, merenje koje se koristi za određivanje nivoa snage koji antena prima. Viša vrednost RSSI generalno ukazuje na jaču i stabilniju vezu.</string>
@@ -492,5 +493,6 @@
     <!-- WIND -->
     <string name="wind_speed">Брзина ветра</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Ti</string>
 </resources>

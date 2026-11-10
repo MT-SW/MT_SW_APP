@@ -447,7 +447,6 @@
     <string name="firmware_gate_update">Актуализиране на фърмуера</string>
     <string name="firmware_maintenance_bootloader_available">Последен: %1$s</string>
     <string name="firmware_maintenance_bootloader_installed">Инсталиран: %1$s</string>
-    <string name="firmware_maintenance_bootloader_latest_hint">Последна версия: %1$s. Инсталираната версия се показва, след като устройството се рестартира в режим на актуализация.</string>
     <string name="firmware_maintenance_bootloader_up_to_date">Буутлоудърът е актуален</string>
     <string name="firmware_maintenance_no_release">Първо изберете версия на фърмуера, за да може устройството да бъде преинсталирано след изтриване.</string>
     <string name="firmware_maintenance_unsupported_device">Това устройство не поддържа изтриване от приложението.</string>
@@ -517,7 +516,6 @@
     <string name="firmware_update_unsupported_transport">Актуализациите на фърмуера не се поддържат чрез тази връзка за това устройство. За да извършите актуализация, използвайте друг начин на свързване (напр. Bluetooth).</string>
     <string name="firmware_update_unsupported_update_method">Локални файлове с фърмуер не се поддържат за този метод на актуализация.</string>
     <string name="firmware_update_uploading">Качване на фърмуера...</string>
-    <string name="firmware_update_usb_bootloader_warning">%1$s обикновено се доставя с буутлоудър, който не поддържа OTA актуализации. Може да се наложи да флашнете OTA - съвместим буутлоудър през USB, преди да флашнете OTA.</string>
     <string name="firmware_update_usb_failed">Актуализацията през USB не е успешна</string>
     <string name="firmware_update_usb_instruction_title">Изберете DFU USB устройство</string>
     <string name="firmware_update_validating">Валидиране на фърмуера...</string>
@@ -534,6 +532,7 @@
     <string name="format_code">Код</string>
     <string name="format_italic">Наклонен</string>
     <string name="format_link">Връзка</string>
+    <string name="free_memory">Свободна памет</string>
     <string name="free_memory_description">Налична системна памет в байтове</string>
     <string name="freq">Чест.</string>
     <string name="generate_qr_code">Генериране на QR код</string>
@@ -616,6 +615,7 @@
     <string name="licensed_mode_enable_title">Да се ​​активира лицензиран (Радиолюбителски) режим?</string>
     <!-- LIVE -->
     <string name="live_update_direct">Директно</string>
+    <string name="live_update_signal">SNR %1$s, RSSI %2$s</string>
     <string name="live_update_unread">%1$d непрочетени</string>
     <!-- LOAD -->
     <string name="load">Натоварване</string>
@@ -731,6 +731,7 @@
     <string name="max">Макс</string>
     <!-- MESH -->
     <string name="mesh_beacon_channel_number">Канал %1$d</string>
+    <string name="mesh_beacon_interval_error">Изберете интервал от поне един час</string>
     <string name="mesh_beacon_listen">Слушане за маяци</string>
     <string name="mesh_beacon_no_channels">Няма налични канали</string>
     <string name="mesh_beacon_offer_add">Добавяне на канал</string>
@@ -746,6 +747,8 @@
     <string name="mesh_beacon_target_default">По подразбиране</string>
     <string name="mesh_beacon_target_remove">Премахване на целта</string>
     <string name="mesh_hud_joined">%1$s · %2$s</string>
+    <string name="mesh_hud_no_nodes">Няма възли с позиция</string>
+    <string name="mesh_hud_radar_description">%1$s, %2$s</string>
     <string name="mesh_map_location">Местоположение на mesh карта</string>
     <string name="mesh_map_location_description">Активира синята точка за местоположение на телефона ви в mesh карта.</string>
     <!-- MESHTASTIC -->
@@ -789,6 +792,7 @@
     <!-- MIRROR -->
     <string name="mirror_back">Назад</string>
     <string name="mirror_key_ok">Добре</string>
+    <string name="mirror_keyboard">Клавиатура</string>
     <string name="modem_preset">Предварително зададени</string>
     <string name="module_settings">Конфигуриране на модулите</string>
     <string name="modules_already_unlocked">Модулите вече са отключени</string>
@@ -813,6 +817,9 @@
     <string name="mqtt_topic_finder_connecting">Свързване…</string>
     <string name="mqtt_topic_finder_level_country">Държава</string>
     <string name="mqtt_topic_finder_level_region">Регион</string>
+    <string name="mqtt_topic_finder_level_subdivision">Щат или провинция</string>
+    <string name="mqtt_topic_finder_nodes">възли</string>
+    <string name="mqtt_topic_finder_nothing_heard"></string>
     <string name="must_set_region">Трябва да зададете регион!</string>
     <string name="must_update">Трябва да актуализирате това приложение в магазина за приложения (или GitHub). Приложението е твърде старо, за да говори с този фърмуер на радиото. Моля, прочетете нашите <a href="https://meshtastic.org/docs/software/android/installation">документи</a> по тази тема.</string>
     <!-- MUTE -->
@@ -944,6 +951,7 @@
     <string name="open_source_libraries">Библиотеки с отворен код</string>
     <string name="open_wifi_settings">Отваряне на настройките на Wi-Fi</string>
     <string name="options">Опции</string>
+    <string name="orp">ORP</string>
     <!-- PACKET -->
     <string name="packet_authenticity_level">Ниво на защита</string>
     <string name="password">Парола</string>
@@ -1024,7 +1032,9 @@
     <string name="quick_chat_new">Нов бърз разговор</string>
     <string name="quick_chat_show">Показване на менюто за бърз чат</string>
     <string name="radiation">Радиация</string>
+    <!-- RADIO -->
     <string name="radio_configuration">Конфигурация на радиото</string>
+    <string name="radio_setup_name_headline">Име</string>
     <string name="rainfall_1h">Дъжд (1ч)</string>
     <string name="rainfall_24h">Дъжд (24 ч)</string>
     <string name="range_test">Тест на обхвата</string>
@@ -1100,7 +1110,7 @@
     <string name="routing_error_max_retransmit">Неуспешно доставяне към mesh</string>
     <string name="routing_error_no_interface">Няма радио интерфейс</string>
     <string name="routing_error_no_route">Няма маршрут</string>
-    <string name="routing_error_none">Признато</string>
+    <string name="routing_error_none">Доставено на получателя</string>
     <string name="routing_error_pki_failed">Не можа да се изпрати криптирано съобщение</string>
     <string name="routing_error_pki_send_fail_public_key">Ключът на получателя не е наличен</string>
     <string name="routing_error_pki_unknown_pubkey">Получателят се нуждае от вашия ключ</string>
@@ -1309,6 +1319,7 @@
     <!-- WIFI -->
     <string name="wifi_config">Опции за Wi-Fi</string>
     <string name="wifi_devices">Осигуряване на Wi-Fi за mPWRD-OS</string>
+    <string name="wifi_ip">Wi-Fi IP:</string>
     <string name="wifi_provision_available_networks">Налични мрежи</string>
     <string name="wifi_provision_connect_failed">Не можа да се свърже: %1$s</string>
     <string name="wifi_provision_description">Предоставете идентификационни данни за Wi-Fi на вашето mPWRD-OS устройство чрез Bluetooth.</string>
@@ -1338,6 +1349,7 @@
     <string name="wind_gust">Порив на вятъра</string>
     <string name="wind_speed">Скорост на вятъра</string>
     <!-- WRITE -->
+    <!-- XR -->
     <string name="you">Вие</string>
     <string name="zoom_in">Увеличаване</string>
     <string name="zoom_out">Намаляване</string>

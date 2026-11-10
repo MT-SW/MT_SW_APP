@@ -70,7 +70,7 @@ Temat regionu (`msh/US`) obejmuje wszystkie bramki w regionie. Przycisk **Znajd�
 
 - **W pobliżu** pokazuje region, potem kraj, gdy broker go używa (`msh/EU_868/DE`), następnie Twoje województwo lub stan i miasto, nazwane na podstawie pozycji węzła albo, gdy jej brak, lokalizacji telefonu. Geokoder telefonu zamienia lokalizację na nazwy miejsc; sama lokalizacja nigdy nie trafia do brokera. Tematy społeczności, których nazwy nie mówią, gdzie są (`msh/US/DMV`), pojawiają się, gdy obejmują Twoją okolicę, z katalogu odświeżanego z API Meshtastic.
 - **Aktywne tematy** pokazuje wszystkie pozostałe usłyszane tematy główne. Najpierw tematy w Twoim województwie lub mieście, potem w sąsiednich, na końcu reszta.
-- **Własny temat** przyjmuje dowolny temat główny akceptowany przez węzeł: do 31 znaków ASCII, bez ukośnika na początku i na końcu, bez `+` i `#`.
+- **Własny temat** przyjmuje dowolny temat główny akceptowany przez węzeł: do 31 bajtów (litery takie jak æ, ø i å zajmują dwa), bez ukośnika na początku i na końcu, bez `+` i `#`. Podpowiedzi zachowują litery z nazwy Twojego miejsca, więc temat jak `msh/EU_868/NO/Østlandet` jest proponowany i zapisywany dokładnie tak.
 
 Wyszukiwarka tylko subskrybuje i niczego nie publikuje. Wybranie tematu wypełnia pole tematu głównego, a do węzła nic nie trafia, dopóki nie zapiszesz. Wymaga ustawionego regionu LoRa. Bez lokalizacji lub na komputerze nadal pokazuje region i wszystkie usłyszane tematy główne.
 
