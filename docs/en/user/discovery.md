@@ -153,7 +153,7 @@ Each `⇊` line between two nodes is one relay hop, and the SNR on that line is 
 | Many hops (4+) | Long path — consider repositioning a node to shorten it |
 | Different path on retry | Mesh is adapting — multiple routes exist, a sign of redundancy |
 
-Run traceroute several times over a few minutes, waiting out the 30-second cooldown between requests. If the path changes, your mesh has redundant routes, a sign of a well-connected network. A relay that didn't record itself in the route shows as **Unknown hop**.
+Run traceroute several times over a few minutes, waiting out the 10-second cooldown between requests. If the path changes, your mesh has redundant routes, a sign of a well-connected network. A relay that didn't record itself in the route shows as **Unknown hop**.
 
 #### Troubleshooting with Traceroute
 

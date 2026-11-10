@@ -145,7 +145,7 @@ Ekran szczegółów węzła pokazuje karty dla kanałów od 1 do 3. Użyj przyci
 
 Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 
-1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, Aplikacja wysyła najwyżej jeden traceroute na 30 sekund, do dowolnego węzła, a **Śledzenie trasy** w menu po dotknięciu i przytrzymaniu na liście węzłów dzieli tę samą blokadę.
+1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, Aplikacja wysyła najwyżej jeden traceroute na 10 sekund, do dowolnego węzła, a **Śledzenie trasy** w menu po dotknięciu i przytrzymaniu na liście węzłów dzieli tę samą blokadę.
 2. Aplikacja wysyła żądanie traceroute do docelowego węzła.
 3. Wyniki pokazują każdy skok wraz z jego SNR.
 
@@ -160,7 +160,7 @@ Historia zawiera też traceroute, których ta aplikacja nie zlecała:
 - **Zaobserwowany** oznacza odpowiedź tego węzła na żądanie wysłane gdzie indziej, na przykład z ekranu Twojego węzła. Ma liczby skoków, ale nie ma czasu podróży w obie strony, a jego punkty na wykresie są pustymi kółkami.
 - **Śledzone przez** *węzeł* oznacza traceroute, który ten węzeł wykonał do Twojego. Pokazuje trasę przychodzącą z SNR każdego skoku, ale bez trasy powrotnej, bez czasu podróży w obie strony i bez mapy, i nie pojawia się na wykresie.
 
-Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nigdy nie odpowiedział. Może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 30-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
+Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nigdy nie odpowiedział. Może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 10-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
 
 ## Dziennik pozycji
 

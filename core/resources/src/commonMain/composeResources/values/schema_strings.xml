@@ -180,7 +180,7 @@
     <string name="schema_clientnotification_notificationtype_traceroute_broadcast_rejected">Broadcast Traceroute Rejected</string>
     <string name="schema_clientnotification_notificationtype_traceroute_broadcast_rejected_description">Multi-hop traceroute to the broadcast address is not allowed.</string>
     <string name="schema_clientnotification_notificationtype_traceroute_rate_limited">Traceroute Rate Limited</string>
-    <string name="schema_clientnotification_notificationtype_traceroute_rate_limited_description">Only one traceroute can be sent every 30 seconds.</string>
+    <string name="schema_clientnotification_notificationtype_traceroute_rate_limited_description">Only one traceroute can be sent every 10 seconds.</string>
     <string name="schema_clientnotification_notificationtype_unset">Notification</string>
     <string name="schema_clientnotification_notificationtype_unset_description">A notification from the device.</string>
     <string name="schema_clientnotification_notificationtype_unsigned_identity_update_ignored">Unsigned Update Ignored</string>

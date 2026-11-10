@@ -145,7 +145,7 @@ The node detail screen shows cards for channels 1 to 3. Use the chart button on 
 
 Traceroute shows the path a message takes through the mesh:
 
-1. From the node detail screen's **Telemetry** section, tap the refresh button on the **Traceroute** row. You cannot traceroute your own node. The app sends at most one traceroute every 30 seconds, to any node, and **Trace Route** in the node list's touch & hold menu shares that cooldown.
+1. From the node detail screen's **Telemetry** section, tap the refresh button on the **Traceroute** row. You cannot traceroute your own node. The app sends at most one traceroute every 10 seconds, to any node, and **Trace Route** in the node list's touch & hold menu shares that cooldown.
 2. The app sends a traceroute request to the target node.
 3. Results show each hop with its SNR.
 
@@ -160,7 +160,7 @@ The history also keeps traceroutes this app didn't request:
 - **Observed** marks a response from this node to a request made elsewhere, such as one started from your node's own screen. It has hop counts but no round-trip time, and its points on the chart are hollow rings.
 - **Traced by** *node* marks a traceroute that node ran to yours. It shows the inbound route with the SNR of each hop, but no return route, no round-trip time, and no map, and it stays off the chart.
 
-A result marked **No Response** means the target never answered. It may be out of range, asleep, or configured not to reply. Wait for the 30-second cooldown to clear and try again; if it keeps failing, send a direct message first to confirm the node is reachable at all.
+A result marked **No Response** means the target never answered. It may be out of range, asleep, or configured not to reply. Wait for the 10-second cooldown to clear and try again; if it keeps failing, send a direct message first to confirm the node is reachable at all.
 
 ## Position Log
 

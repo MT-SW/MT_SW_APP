@@ -3272,7 +3272,7 @@
     <string name="traceroute_observed">Observed</string>
     <string name="traceroute_outgoing_route">Outgoing route</string>
     <string name="traceroute_probably_hop">Probably: %1$s</string>
-    <string name="traceroute_rate_limited">Rate limited: the radio sends one traceroute every 30 seconds</string>
+    <string name="traceroute_rate_limited">Rate limited: the radio sends one traceroute every 10 seconds</string>
     <string name="traceroute_received_automatically">Received automatically</string>
     <string name="traceroute_relays_missing">The map is available only when every node on the route has a position, and at least one relay has none.</string>
     <string name="traceroute_requested_manually">Requested manually</string>

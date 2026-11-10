@@ -153,7 +153,7 @@ Każdy wiersz `⇊` między dwoma węzłami to jeden skok przez przekaźnik, a S
 | Wiele skoków (4+) | Długa ścieżka — rozważ przestawienie węzła, aby ją skrócić |
 | Inna ścieżka przy ponownej próbie | Sieć mesh dostosowuje się — istnieje wiele tras (to znak, że są trasy zapasowe) |
 
-Uruchom traceroute kilka razy w ciągu kilku minut, czekając 30 sekund przerwy między żądaniami. Jeśli ścieżka się zmienia, Twoja sieć mesh ma nadmiarowe trasy — to znak dobrze połączonej sieci. Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**.
+Uruchom traceroute kilka razy w ciągu kilku minut, czekając 10 sekund przerwy między żądaniami. Jeśli ścieżka się zmienia, Twoja sieć mesh ma nadmiarowe trasy — to znak dobrze połączonej sieci. Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**.
 
 #### Rozwiązywanie problemów za pomocą traceroute
 

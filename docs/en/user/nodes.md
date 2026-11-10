@@ -155,7 +155,7 @@ From the node list, you can:
   - **Add to favorites** or **Remove from favorites**
   - **Mute notifications** or **Unmute**, shown only once that node has reported firmware 2.7.18 or newer
   - **Message**, to open a direct message
-  - **Trace Route**, which stays disabled for 30 seconds after any traceroute request
+  - **Trace Route**, which stays disabled for 10 seconds after any traceroute request
   - **Open Compass**, for a node with a position
   - **Open mesh view**, for a node with a position on a phone that supports the [AR mesh view](map-and-waypoints#ar-mesh-view)
   - **Ignore** or **Remove from ignored**

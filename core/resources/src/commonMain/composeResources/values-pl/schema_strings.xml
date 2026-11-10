@@ -647,7 +647,7 @@
     <string name="schema_clientnotification_notificationtype_traceroute_broadcast_rejected">Odrzucono trasę na adres rozgłoszeniowy</string>
     <string name="schema_clientnotification_notificationtype_traceroute_broadcast_rejected_description">Wieloskokowa trasa (traceroute) na adres rozgłoszeniowy jest niedozwolona.</string>
     <string name="schema_clientnotification_notificationtype_traceroute_rate_limited">Limit szybkości trasy</string>
-    <string name="schema_clientnotification_notificationtype_traceroute_rate_limited_description">Można wysłać tylko jedną trasę (traceroute) co 30 sekund.</string>
+    <string name="schema_clientnotification_notificationtype_traceroute_rate_limited_description">Można wysłać tylko jedną trasę (traceroute) co 10 sekund.</string>
     <string name="schema_clientnotification_notificationtype_unset">Powiadomienie</string>
     <string name="schema_clientnotification_notificationtype_unset_description">Powiadomienie z urządzenia.</string>
     <string name="schema_clientnotification_notificationtype_unsigned_identity_update_ignored">Zignorowano niepodpisaną aktualizację</string>

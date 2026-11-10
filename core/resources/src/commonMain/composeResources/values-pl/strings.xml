@@ -3733,7 +3733,7 @@
     <string name="radio_setup_title">Konfiguracja radia</string>
     <string name="scan_connect_code">Zeskanuj kod połączenia</string>
     <string name="traceroute_available_in">Trasa za %1$d s</string>
-    <string name="traceroute_rate_limited">Limit szybkości: radio wysyła jedną trasę (traceroute) co 30 sekund</string>
+    <string name="traceroute_rate_limited">Limit szybkości: radio wysyła jedną trasę (traceroute) co 10 sekund</string>
     <string name="traceroute_waiting">Czekam na odpowiedź</string>
     <string name="xr_full_space">Pełna przestrzeń</string>
     <string name="xr_home_space">Przestrzeń domowa</string>

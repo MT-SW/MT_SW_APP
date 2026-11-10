@@ -164,7 +164,7 @@ Z listy węzłów możesz:
   - **Dodaj do ulubionych** lub **Usuń z ulubionych**
   - **Wycisz powiadomienia** lub **Włącz powiadomienia**, pokazywane dopiero wtedy, gdy ten węzeł zgłosi firmware 2.7.18 lub nowsze
   - **Wiadomość**, aby otworzyć wiadomość bezpośrednią
-  - **Śledzenie trasy**, wyłączone na 30 sekund po każdym żądaniu traceroute
+  - **Śledzenie trasy**, wyłączone na 10 sekund po każdym żądaniu traceroute
   - **Otwórz kompas** (dla węzła z pozycją)
   - **Otwórz widok sieci** (dla węzła z pozycją, na telefonie, który go obsługuje) — zobacz [widok AR sieci](map-and-waypoints#widok-ar-sieci)
   - **Ignoruj** lub **Usuń z ignorowanych**
