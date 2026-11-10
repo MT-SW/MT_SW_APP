@@ -66,12 +66,15 @@ object MeshStatsLines {
     ): List<String> = buildList {
         add(getStringSuspend(Res.string.live_update_nodes_online, nodesOnline, nodesTotal))
         add(getStringSuspend(Res.string.live_update_unread, unread))
+        // Grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime, traffic,
+        // diagnostics), the resources (CPU, RAM, flash, PSRAM) and the connections (Wi-Fi, Bluetooth).
         if (localStats != null) {
             addAll(localStatsLines(localStats, radioBattery, lnaGain))
         } else {
             radioBattery?.let { add(batteryText(it)) }
         }
-        addAll(extendedLines(extended, ramAlreadyShown = localStats != null && localStats.heap_total_bytes > 0))
+        val heapLine = localStats?.let { heapLine(it) }
+        addAll(extendedLines(extended, ramAlreadyShown = heapLine != null, ramLine = heapLine))
     }
 
     suspend fun batteryText(level: Int): String = if (level > MAX_BATTERY_LEVEL) {
@@ -91,21 +94,6 @@ object MeshStatsLines {
                 NumberFormatter.format(stats.air_util_tx.toDouble(), 2),
             ),
         )
-        if (stats.heap_free_bytes > 0 || stats.heap_total_bytes > 0) {
-            val used = (stats.heap_total_bytes - stats.heap_free_bytes).coerceAtLeast(0)
-            add(
-                getStringSuspend(Res.string.local_stats_heap) +
-                    ": " +
-                    getStringSuspend(
-                        Res.string.local_stats_heap_value_kb,
-                        NumberFormatter.format(used / BYTES_PER_KB, 2),
-                        NumberFormatter.format(stats.heap_total_bytes / BYTES_PER_KB, 2),
-                    ) +
-                    " (" +
-                    MetricFormatter.usedPercent(used.toLong(), stats.heap_total_bytes.toLong()) +
-                    ")",
-            )
-        }
         if (stats.num_packets_tx > 0 || stats.num_packets_rx > 0) {
             add(
                 getStringSuspend(
@@ -132,9 +120,25 @@ object MeshStatsLines {
         }
     }
 
+    /** The RAM line from the node's own counters (used and total heap), or null when the node does not report it. */
+    private suspend fun heapLine(stats: LocalStats): String? {
+        if (stats.heap_free_bytes <= 0 && stats.heap_total_bytes <= 0) return null
+        val used = (stats.heap_total_bytes - stats.heap_free_bytes).coerceAtLeast(0)
+        return getStringSuspend(Res.string.local_stats_heap) +
+            ": " +
+            getStringSuspend(
+                Res.string.local_stats_heap_value_kb,
+                NumberFormatter.format(used / BYTES_PER_KB, 2),
+                NumberFormatter.format(stats.heap_total_bytes / BYTES_PER_KB, 2),
+            ) +
+            " (" +
+            MetricFormatter.usedPercent(used.toLong(), stats.heap_total_bytes.toLong()) +
+            ")"
+    }
+
     @Suppress("CyclomaticComplexMethod")
-    suspend fun extendedLines(ext: LocalStatsExtended?, ramAlreadyShown: Boolean): List<String> {
-        if (ext == null) return emptyList()
+    suspend fun extendedLines(ext: LocalStatsExtended?, ramAlreadyShown: Boolean, ramLine: String? = null): List<String> {
+        if (ext == null) return listOfNotNull(ramLine)
         return buildList {
             if (ext.cpuUsagePercent > 0) {
                 add(
@@ -144,6 +148,7 @@ object MeshStatsLines {
                     ),
                 )
             }
+            ramLine?.let { add(it) }
             if (!ramAlreadyShown && ext.memoryTotal > 0) {
                 val used = (ext.memoryTotal - ext.memoryFreeCheap).toLong()
                 add(
