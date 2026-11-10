@@ -113,6 +113,8 @@ object IosDictationLanguage {
 }
 
 private const val CONTEXT_TOKENS = 4096
+private const val SMALL_CONTEXT_TOKENS = 2048
+private const val TINY_CONTEXT_TOKENS = 1024
 private const val BATCH_TOKENS = 512
 private const val GPU_LAYERS = 99
 private const val MAX_PIECE_BYTES = 256
@@ -142,7 +144,10 @@ class IosLlamaEngine(
     override val activeBackend: String
         get() = backend
 
-    override fun contextTokens(modelId: String): Int = CONTEXT_TOKENS
+    /** The context the loaded model really got: smaller than [CONTEXT_TOKENS] when the phone is short of memory. */
+    private var activeContext = CONTEXT_TOKENS
+
+    override fun contextTokens(modelId: String): Int = activeContext
 
     /** The system, memory and processor count of this iPhone, for the `/sprzet` report. */
     override val deviceSummary: String
@@ -176,7 +181,7 @@ class IosLlamaEngine(
 
     /** Device memory for the error text: shows at once whether the memory limit is the cause. */
     private fun memoryNote(): String =
-        "RAM ${NSProcessInfo.processInfo.physicalMemory.toLong() / BYTES_PER_MB} MB, context $CONTEXT_TOKENS"
+        "RAM ${NSProcessInfo.processInfo.physicalMemory.toLong() / BYTES_PER_MB} MB, context $activeContext"
 
     private fun ensureLoaded(modelId: String) {
         if (loadedId == modelId && ctx != null) return
@@ -184,26 +189,43 @@ class IosLlamaEngine(
         val path = modelPath(modelId) ?: error("Model $modelId is not downloaded")
         IosEngineLog.install()
         llama_backend_init()
-        val gpu = if (isSimulator()) 0 else GPU_LAYERS
-        val loaded =
-            llama_model_load_from_file(path, llama_model_default_params().copy { n_gpu_layers = gpu })
-                ?: error("Could not load the model file (${memoryNote()})")
-        val context =
-            llama_init_from_model(
-                loaded,
-                llama_context_default_params().copy {
-                    n_ctx = CONTEXT_TOKENS.convert()
-                    n_batch = BATCH_TOKENS.convert()
-                },
-            )
-        if (context == null) {
-            llama_model_free(loaded)
-            error("Could not create the model context (${memoryNote()})")
+        // A big model can be refused for lack of memory. Instead of giving up, try again with a smaller context and,
+        // as the last resort, on the processor only (the weights are then read from the file, not copied to the GPU).
+        val gpuLayers = if (isSimulator()) 0 else GPU_LAYERS
+        val attempts =
+            if (gpuLayers > 0) {
+                listOf(
+                    gpuLayers to CONTEXT_TOKENS,
+                    gpuLayers to SMALL_CONTEXT_TOKENS,
+                    0 to SMALL_CONTEXT_TOKENS,
+                    0 to TINY_CONTEXT_TOKENS,
+                )
+            } else {
+                listOf(0 to CONTEXT_TOKENS, 0 to SMALL_CONTEXT_TOKENS, 0 to TINY_CONTEXT_TOKENS)
+            }
+        for ((gpu, contextTokens) in attempts) {
+            activeContext = contextTokens
+            val loaded = llama_model_load_from_file(path, llama_model_default_params().copy { n_gpu_layers = gpu })
+            if (loaded == null) continue
+            val context =
+                llama_init_from_model(
+                    loaded,
+                    llama_context_default_params().copy {
+                        n_ctx = contextTokens.convert()
+                        n_batch = BATCH_TOKENS.convert()
+                    },
+                )
+            if (context == null) {
+                llama_model_free(loaded)
+                continue
+            }
+            model = loaded
+            ctx = context
+            loadedId = modelId
+            backend = if (gpu > 0) "GPU (Metal)" else "CPU"
+            return
         }
-        model = loaded
-        ctx = context
-        loadedId = modelId
-        backend = if (gpu > 0) "GPU (Metal)" else "CPU"
+        error("Could not load the model: not enough memory (${memoryNote()})")
     }
 
     private fun prompt(m: CPointer<llama_model>, messages: List<Pair<String, String>>): String = memScoped {
@@ -242,7 +264,7 @@ class IosLlamaEngine(
         var emitted = 0
         var produced = 0
         var position = startPosition
-        while (produced < limit && position < CONTEXT_TOKENS - 1) {
+        while (produced < limit && position < activeContext - 1) {
             currentCoroutineContext().ensureActive()
             val token = llama_sampler_sample(sampler, c, -1)
             if (llama_vocab_is_eog(vocab, token)) break
@@ -290,7 +312,7 @@ class IosLlamaEngine(
             val c = ctx!!
             val vocab = llama_model_get_vocab(m)
             val text = prompt(m, messages)
-            val limit = if (maxTokens > 0) maxTokens else CONTEXT_TOKENS
+            val limit = if (maxTokens > 0) maxTokens else activeContext
             llama_memory_clear(llama_get_memory(c), true)
             val sampler = newSampler(temperature)
             try {
@@ -304,7 +326,7 @@ class IosLlamaEngine(
                         tokens = allocArray(cap)
                         count = llama_tokenize(vocab, text, bytes.size, tokens, cap, needsStartMark(text), true)
                     }
-                    if (count <= 0 || count >= CONTEXT_TOKENS - 8) error("The question is too long for this model")
+                    if (count <= 0 || count >= activeContext - 8) error("The question is too long for this model")
                     // The question goes in pieces that fit one batch.
                     var done = 0
                     while (done < count) {
