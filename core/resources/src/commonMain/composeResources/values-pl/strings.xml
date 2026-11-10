@@ -3616,6 +3616,10 @@
     <string name="terrain_horizon_refraction">Horyzont radiowy (współczynnik ziemi)</string>
     <string name="terrain_horizon_only_visible">Tylko widoczne węzły</string>
     <string name="terrain_horizon_labels">Nazwy</string>
+    <string name="map_filter_max_hops_summary">Pokazuje tylko węzły oddalone o tyle skoków lub mniej. Węzły o nieznanej liczbie skoków są ukryte, gdy limit jest ustawiony.</string>
+    <string name="map_filter_max_distance_summary">Pokazuje tylko węzły oddalone od Twojego węzła o tyle lub mniej. Wymaga pozycji Twojego węzła; węzły bez pozycji są ukryte, gdy limit jest ustawiony.</string>
+    <string name="mt_sw_map_filter_summary">Ogranicza mapę do węzłów w zadanej liczbie skoków i odległości od Twojego węzła. Otwiera mapę; limity są w jej filtrach.</string>
+    <string name="mt_sw_map_filter_title">Filtr mapy: skoki i odległość</string>
     <string name="mt_sw_map_title">Planowanie sieci</string>
     <string name="mt_sw_planner_open_summary">Symuluje łącze radiowe między dwoma punktami, z terenem i bilansem łącza. Jest też wśród przycisków mapy i na stronie węzła</string>
     <string name="mt_sw_terrain_open_summary">Sylwetka terenu dookoła z węzłami: zielone w zasięgu wzroku, czerwone zasłonięte; widok z aparatem jest dodatkiem. Jest też pod przyciskiem widoku sieci obok planera na mapie</string>

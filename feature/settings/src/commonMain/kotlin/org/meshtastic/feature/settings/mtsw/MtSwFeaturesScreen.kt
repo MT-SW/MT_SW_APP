@@ -64,6 +64,8 @@ import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
+import org.meshtastic.core.resources.mt_sw_map_filter_summary
+import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title
 import org.meshtastic.core.resources.mt_sw_other_calls_body
 import org.meshtastic.core.resources.mt_sw_other_calls_title
@@ -105,6 +107,7 @@ import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
+import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
@@ -235,6 +238,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.CenterFocusStrong,
                 ) {
                     onNavigate(MapRoute.MeshHud())
+                }
+                ListItem(
+                    text = stringResource(Res.string.mt_sw_map_filter_title),
+                    supportingText = stringResource(Res.string.mt_sw_map_filter_summary),
+                    leadingIcon = MeshtasticIcons.FilterList,
+                ) {
+                    onNavigate(MapRoute.Map())
                 }
                 ListItem(
                     text = stringResource(Res.string.antenna_calc_title),

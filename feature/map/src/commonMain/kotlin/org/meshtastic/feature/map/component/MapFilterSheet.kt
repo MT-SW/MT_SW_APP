@@ -44,7 +44,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter_all_roles
 import org.meshtastic.core.resources.map_filter_distance_km
+import org.meshtastic.core.resources.map_filter_max_distance_summary
 import org.meshtastic.core.resources.map_filter_max_distance_title
+import org.meshtastic.core.resources.map_filter_max_hops_summary
 import org.meshtastic.core.resources.map_filter_max_hops_title
 import org.meshtastic.core.resources.map_filter_no_limit
 import org.meshtastic.core.resources.map_filter_display_title
@@ -152,6 +154,7 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
         HorizontalDivider()
 
         SectionTitle(stringResource(Res.string.map_filter_max_hops_title))
+        SectionSummary(stringResource(Res.string.map_filter_max_hops_summary))
         LimitChips(
             options = HOP_LIMITS,
             selected = filterState.maxHops,
@@ -161,6 +164,7 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
         )
 
         SectionTitle(stringResource(Res.string.map_filter_max_distance_title))
+        SectionSummary(stringResource(Res.string.map_filter_max_distance_summary))
         LimitChips(
             options = DISTANCE_LIMITS_KM.map { it * METERS_PER_KM },
             selected = filterState.maxDistanceMeters,
@@ -281,6 +285,16 @@ private fun LimitChips(
             )
         }
     }
+}
+
+@Composable
+private fun SectionSummary(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp),
+    )
 }
 
 @Composable

@@ -1861,7 +1861,9 @@
     <string name="map_filter_all_roles">All</string>
     <string name="map_filter_display_title">Display</string>
     <string name="map_filter_distance_km">%1$d km</string>
+    <string name="map_filter_max_distance_summary">Shows only nodes up to this far from your own node. Needs your node's position; nodes without a position are hidden while a limit is set.</string>
     <string name="map_filter_max_distance_title">Max distance from my node</string>
+    <string name="map_filter_max_hops_summary">Shows only nodes up to this many hops away. Nodes with an unknown distance in hops are hidden while a limit is set.</string>
     <string name="map_filter_max_hops_title">Max hops (0 = direct only)</string>
     <string name="map_filter_no_limit">No limit</string>
     <string name="map_filter_nodes_title">Nodes</string>
@@ -2216,6 +2218,8 @@
     <string name="mt_sw_features_summary">Everything MT_SW_APP adds, in one place</string>
     <string name="mt_sw_features_switches">Switches</string>
     <string name="mt_sw_features_title">MT_SW features</string>
+    <string name="mt_sw_map_filter_summary">Limit the map to nodes within a number of hops and a distance from your node. Opens the map; the limits are in its filters.</string>
+    <string name="mt_sw_map_filter_title">Map filter: hops and distance</string>
     <string name="mt_sw_map_title">Network planning</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>

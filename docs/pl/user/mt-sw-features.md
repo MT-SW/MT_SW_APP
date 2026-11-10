@@ -58,7 +58,7 @@ Zakładka **Zdrowie sieci** jest w dolnej nawigacji, między Węzłami a Mapą. 
 
 ## Mapa
 
-- **Filtr mapy: skoki i odległość** — ogranicz węzły do maks. liczby skoków i maks. odległości od własnego węzła. Dotknięcie kilku węzłów w tym samym miejscu otwiera listę „wybierz węzeł”.
+- **Filtr mapy: skoki i odległość** — Opcja dodatkowa w filtrach mapy; skrót jest też w Funkcje MT_SW → Planowanie sieci. ogranicz węzły do maks. liczby skoków i maks. odległości od własnego węzła. Dotknięcie kilku węzłów w tym samym miejscu otwiera listę „wybierz węzeł”.
 - **Połączenia między węzłami** — cienkie linie łączą węzły, które wymieniają pakiety, w kolorze jakości sygnału (SNR). Linie pochodzą z raportów sąsiadów, z traceroute z ostatniej doby i z węzłów słyszanych bezpośrednio. Włączają się w filtrach mapy („Pokaż połączenia między węzłami”); domyślnie są włączone.
 - **Pokaż na mapie** — w szczegółach węzła, pod jego pozycją, jest przycisk **Pokaż na mapie**. Przenosi na główną mapę, przybliża do węzła i rysuje go na wierzchu, ponad innymi węzłami stojącymi w tym samym miejscu.
 - **Trasa traceroute na mapie** — każdy skok jest osobną linią w kolorze jakości sygnału, ze strzałką i wartością SNR.
