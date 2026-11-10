@@ -20,10 +20,6 @@
 package org.meshtastic.core.takserver
 
 import co.touchlab.kermit.Logger
-import kotlin.random.Random
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Instant
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
@@ -45,6 +41,10 @@ import platform.darwin.dispatch_data_apply
 import platform.darwin.dispatch_data_create
 import platform.darwin.dispatch_data_t
 import platform.darwin.dispatch_queue_t
+import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 /**
  * One connected TAK client (ATAK / iTAK on this phone) on the iOS listener. Same behaviour as the Android and computer
@@ -79,7 +79,8 @@ internal class IosTakConnection(
                     }
 
                 nw_connection_state_failed,
-                nw_connection_state_cancelled -> finish(TAKConnectionEvent.Disconnected)
+                nw_connection_state_cancelled,
+                -> finish(TAKConnectionEvent.Disconnected)
 
                 else -> Unit
             }
@@ -183,11 +184,7 @@ internal class IosTakConnection(
         val point =
             "<point lat=\"0\" lon=\"0\" hae=\"0\" ce=\"$TAK_UNKNOWN_POINT_VALUE\" le=\"$TAK_UNKNOWN_POINT_VALUE\"/>"
         val header = "<event version=\"2.0\" uid=\"$uid\" type=\"$type\" time=\"$now\" start=\"$now\" "
-        return header +
-            "stale=\"$stale\" how=\"m-g\">" +
-            point +
-            detailContent +
-            "</event>"
+        return header + "stale=\"$stale\" how=\"m-g\">" + point + detailContent + "</event>"
     }
 
     private fun finish(event: TAKConnectionEvent) {

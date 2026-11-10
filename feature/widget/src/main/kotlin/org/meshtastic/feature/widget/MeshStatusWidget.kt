@@ -101,7 +101,7 @@ class MeshStatusWidget :
                         )
                         if (!snapshot?.chip.isNullOrEmpty()) {
                             Text(
-                                text = snapshot?.chip.orEmpty(),
+                                text = snapshot.chip,
                                 maxLines = 1,
                                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
                             )

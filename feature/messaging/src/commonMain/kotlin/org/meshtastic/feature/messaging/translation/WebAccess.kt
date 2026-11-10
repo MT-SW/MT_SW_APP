@@ -18,14 +18,14 @@
 
 package org.meshtastic.feature.messaging.translation
 
+/** The platform's web client: Java's HTTP on Android and the computer, Ktor on iPhone and iPad. */
+internal expect fun platformWebTransport(): WebAccess.Transport
+
 /**
  * The only door through which the assistant reaches the internet, used for web search, reading a page and for keeping
  * the knowledge about the app up to date. Only https, never to this computer or the local network, small answers, no
  * cookies and nothing about the user in the request except the text of the query itself.
  */
-/** The platform's web client: Java's HTTP on Android and the computer, Ktor on iPhone and iPad. */
-internal expect fun platformWebTransport(): WebAccess.Transport
-
 internal object WebAccess {
     private const val MAX_BYTES = 400_000
     private const val MAX_REDIRECTS = 3
@@ -139,8 +139,7 @@ internal object WebAccess {
             a >= 224
     }
 
-    private fun resolve(base: String, next: String): String =
-        when {
+    private fun resolve(base: String, next: String): String = when {
             next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
             next.startsWith("//") -> "https:$next"
             next.startsWith("/") -> "https://" + hostPartOf(base) + next
@@ -150,8 +149,7 @@ internal object WebAccess {
     private fun hostPartOf(url: String): String = url.substringAfter("://").substringBefore('/').substringBefore('?')
 
     /** Plain readable text of an HTML page, without scripts, styles and tags. */
-    fun htmlToText(html: String): String =
-        html
+    fun htmlToText(html: String): String = html
             .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
             .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
             .replace(Regex("<[^>]+>"), " ")
@@ -286,8 +284,7 @@ internal object WebAccess {
         return if (decoded.startsWith("//")) "https:$decoded" else decoded
     }
 
-    fun hostOf(url: String): String =
-        hostPartOf(url).substringAfter('@').let {
+    fun hostOf(url: String): String = hostPartOf(url).substringAfter('@').let {
             if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':')
         }
 
@@ -299,8 +296,10 @@ internal object WebAccess {
             val v = b.toInt() and 0xFF
             val c = v.toChar()
             when {
-                c.isLetterOrDigit() && v < 128 || c in "-_.~" -> append(c)
+                (c.isLetterOrDigit() && v < 128) || c in "-_.~" -> append(c)
+
                 c == ' ' -> append('+')
+
                 else -> append('%').append(HEX[v shr 4]).append(HEX[v and 0xF])
             }
         }
@@ -317,10 +316,12 @@ internal object WebAccess {
                     out.add(code.toByte())
                     i += 3
                 }
+
                 c == '+' -> {
                     out.add(' '.code.toByte())
                     i++
                 }
+
                 else -> {
                     out.addAll(c.toString().encodeToByteArray().toList())
                     i++

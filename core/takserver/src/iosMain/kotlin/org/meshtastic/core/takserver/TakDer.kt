@@ -33,8 +33,7 @@ internal object Der {
         return out
     }
 
-    private fun length(n: Int): ByteArray =
-        when {
+    private fun length(n: Int): ByteArray = when {
             n < 0x80 -> byteArrayOf(n.toByte())
             n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
             n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())

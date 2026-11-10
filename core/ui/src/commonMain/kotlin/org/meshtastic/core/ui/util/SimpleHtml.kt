@@ -78,7 +78,10 @@ fun simpleAnnotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): An
                     if (closing) {
                         null
                     } else {
-                        Regex("href\\s*=\\s*[\"']([^\"']*)[\"']").find(match.groupValues[ATTRIBUTES_GROUP])?.groupValues?.get(1)
+                        Regex("href\\s*=\\s*[\"']([^\"']*)[\"']")
+                            .find(match.groupValues[ATTRIBUTES_GROUP])
+                            ?.groupValues
+                            ?.get(1)
                     }
         }
     }

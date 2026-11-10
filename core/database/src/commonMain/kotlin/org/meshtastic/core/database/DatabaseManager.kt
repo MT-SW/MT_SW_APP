@@ -939,6 +939,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
                 @Suppress("TooGenericExceptionCaught")
                 try {
                     syncSharedNodeStats()
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     Logger.w(e) { "Statistics sync between device databases failed" }
                 }

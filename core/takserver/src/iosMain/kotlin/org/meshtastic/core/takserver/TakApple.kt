@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalForeignApi::class)
-
 @file:Suppress("MagicNumber")
 
 package org.meshtastic.core.takserver
