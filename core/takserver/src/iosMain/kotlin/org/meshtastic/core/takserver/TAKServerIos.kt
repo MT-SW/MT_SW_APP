@@ -96,7 +96,7 @@ internal class TAKServerIos(
     private val restartMutex = Mutex()
     private val connections = mutableMapOf<String, IosTakConnection>()
 
-    private var listener: nw_listener_t? = null
+    private var listener: nw_listener_t = null
     private var serverScope: CoroutineScope? = null
     private var keepaliveJob: Job? = null
 
@@ -172,7 +172,7 @@ internal class TAKServerIos(
         return newListener
     }
 
-    private fun configureTls(tlsOptions: platform.Network.nw_protocol_options_t?, loaded: TakIosPki.Loaded) {
+    private fun configureTls(tlsOptions: platform.Network.nw_protocol_options_t, loaded: TakIosPki.Loaded) {
         val options = nw_tls_copy_sec_protocol_options(tlsOptions)
         sec_protocol_options_set_local_identity(options, sec_identity_create(loaded.identity))
         sec_protocol_options_set_min_tls_protocol_version(options, tls_protocol_version_TLSv12)
@@ -193,7 +193,7 @@ internal class TAKServerIos(
 
     /** True when the chain leads to this install's CA and the leaf is exactly the client certificate it issued. */
     @Suppress("DEPRECATION")
-    private fun verifyClient(trust: sec_trust_t?, loaded: TakIosPki.Loaded): Boolean = memScoped {
+    private fun verifyClient(trust: sec_trust_t, loaded: TakIosPki.Loaded): Boolean = memScoped {
         val secTrust = trust?.let { sec_trust_copy_ref(it) } ?: return@memScoped false
         val anchors = CFArrayCreate(null, allocArrayOf(loaded.ca).reinterpret(), 1, null)
         SecTrustSetAnchorCertificates(secTrust, anchors)

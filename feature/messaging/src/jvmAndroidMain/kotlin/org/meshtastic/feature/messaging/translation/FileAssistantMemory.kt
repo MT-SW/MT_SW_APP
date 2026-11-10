@@ -92,7 +92,6 @@ class FileAssistantMemory(private val dir: File) : AssistantMemory {
         const val LEARNED_MAX = 700
         const val MAX_LEARNED = 8
 
-        fun safeName(name: String): String =
-            name.trim().lowercase().map { if (it.isLetterOrDigit()) it else '-' }.joinToString("").trim('-').take(40)
+        fun safeName(name: String): String = safeAssistantMemoryName(name)
     }
 }

@@ -1477,6 +1477,3 @@ class LlamaCppEngine(
         const val TRANSCRIBE_ASK = "Write down exactly what is said in this recording. Reply with the text only."
     }
 }
-
-/** The model thought quietly for too long without starting its answer. */
-class ThinkingTooLongException : IllegalStateException("The model kept reasoning without answering")

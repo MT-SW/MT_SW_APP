@@ -48,6 +48,7 @@ import org.meshtastic.core.common.util.nowMillis
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import org.meshtastic.core.common.util.ioDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -186,7 +187,7 @@ class LlamaAssistantService(
     }
 
     private suspend fun selfTestRun(command: String, onResult: (question: String, answer: String) -> Unit) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
             if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
@@ -438,7 +439,7 @@ class LlamaAssistantService(
                     "Answer in three or four sentences."
             }
 
-    override suspend fun dictationCheck(onStep: (String) -> Unit): String = withContext(Dispatchers.IO) {
+    override suspend fun dictationCheck(onStep: (String) -> Unit): String = withContext(ioDispatcher) {
         val pl = appLanguage() == "pl"
         fun t(polish: String, english: String) = if (pl) polish else english
         val candidates = AiModels.forRole(AiRole.DICTATION)
@@ -549,7 +550,7 @@ class LlamaAssistantService(
     private val engineLock = kotlinx.coroutines.sync.Mutex()
 
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String =
-        withContext(Dispatchers.IO) { engineLock.withLock { replyLocked(history, onPiece) } }
+        withContext(ioDispatcher) { engineLock.withLock { replyLocked(history, onPiece) } }
 
     override var lastInfo: String = ""
         private set
@@ -2895,7 +2896,7 @@ class LlamaAssistantService(
         for (block in out.split(Regex("(?m)^###\\s*")).drop(1)) {
             val name = block.lineSequence().first().trim()
             val text = block.lines().drop(1).joinToString("\n").trim()
-            val safe = FileAssistantMemory.safeName(name)
+            val safe = safeAssistantMemoryName(name)
             if (safe.isEmpty() || safe == org.meshtastic.core.repository.AssistantMemory.USER_NOTE) continue
             if (text.isNotEmpty()) store.save(safe, text)
         }
