@@ -2847,6 +2847,7 @@
     <string name="mt_sw_features_title">Funkcje MT_SW</string>
     <string name="mt_sw_features_summary">Wszystko, co dodaje MT_SW_APP, w jednym miejscu</string>
     <string name="mt_sw_features_switches">Przełączniki</string>
+    <string name="mt_sw_features_own">Wygląd, widżet i dane</string>
     <string name="mt_sw_features_links">Skróty</string>
     <string name="mt_sw_features_links_hint">Te ustawienia zostają w swoich zwykłych miejscach. Wiersze poniżej tylko je otwierają.</string>
     <string name="mt_sw_features_lora_summary">Korekta wzmocnienia LNA, przesunięcie częstotliwości (kHz)</string>
@@ -3717,7 +3718,7 @@
     <string name="db_sync_working">Synchronizacja…</string>
     <string name="db_sync_done">Gotowe: zsynchronizowano wpisów: %1$d.</string>
     <string name="db_sync_failed">Synchronizacja się nie udała.</string>
-    <string name="db_sync_info">Każde podłączane radio ma własną bazę danych. Gdy ten sam węzeł jest znany dwóm bazom, ta funkcja uaktualnia jego statystyki w obu: historię telemetrii, pozycję i ostatnie odczyty. Synchronizowane są tylko węzły znane obu bazom; węzeł znany tylko jednej bazie nigdy nie jest kopiowany do drugiej. Twoje notatki, nazwy, ulubione oraz ignorowanie i wyciszenie zostają w każdej bazie bez zmian.\n\nSynchronizacja automatyczna działa chwilę po zmianie połączenia na inne radio. Przycisk Synchronizuj teraz robi to od razu.</string>
+    <string name="db_sync_info">Po co to jest: każde radio podłączane do aplikacji ma w telefonie własną bazę (własną pamięć o węzłach i ich statystykach). Gdy używasz kilku radii, każde widzi sieć trochę inaczej i zapisuje inne odczyty. Ta funkcja łączy to, co wiedzą obie bazy, żeby wykresy i historia nie miały dziur po zmianie radia.\n\nPrzykład: tydzień używasz radia A, potem przełączasz się na radio B. Dzięki synchronizacji B dostaje historię węzłów, które znało też A, więc wykresy zdrowia sieci są ciągłe.\n\nCo jest synchronizowane: historia telemetrii (bateria, napięcie, obciążenie kanału, szum i inne), historia pozycji oraz ostatnie odczyty tych węzłów, które znają OBIE bazy. Pakiet usłyszany przez oba radia liczy się raz (bez dubli).\n\nCzego nie rusza: węzły znane tylko jednej bazie nie są kopiowane do drugiej; notatki, nazwy, ulubione, ignorowanie i wyciszenie zostają bez zmian. Niczego nie usuwa.\n\nKiedy działa: sama po zmianie radia, jeśli włączysz „Synchronizuj statystyki automatycznie” (domyślnie wyłączone). Przyciskiem „Synchronizuj teraz” możesz ją uruchomić w każdej chwili; przy dużych bazach trwa chwilę.</string>
     <string name="channel_slots_used">Używane miejsca na kanały: %1$d z %2$d</string>
     <string name="connect_code_invalid">Ten kod nie jest kodem połączenia mesh.</string>
     <string name="device_model_banana_for_scale">Banan dla porównania skali</string>

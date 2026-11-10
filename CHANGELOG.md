@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: ekran Funkcje MT_SW ma osobno prawdziwe ustawienia („Wygląd, widżet i dane”: skala, motyw, ikona, widżet, synchronizacja statystyk, czcionka) i osobno „Skróty”, które tylko otwierają ustawienia w innych miejscach. Opis „Synchronizacji statystyk urządzeń” jest rozbudowany: po co jest, przykład, co jest synchronizowane, czego nie rusza i kiedy działa.
+
 * Wszystkie wersje: nowe zapytanie „Statystyki sieci LAN” w Diagnostyce na żądanie (MT_SW_FIRMWARE v4 i nowszy): adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Wynik trafia też do raportu.
 * Wszystkie wersje: zdalna administracja pyta teraz o wersję MT_SW_FIRMWARE i ustawienia statystyk także węzeł zdalny. Wcześniej pytała tylko własne radio, więc zdalny węzeł był uznawany za nieobsługujący tej funkcji.
 
@@ -607,6 +609,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* All versions: the MT_SW features screen now keeps real settings ("Looks, widget and data": scale, theme, icon, widget, statistics sync, font) apart from "Shortcuts", which only open settings elsewhere. The description of "Device statistics sync" is expanded: what it is for, an example, what is synchronized, what it leaves alone and when it runs.
 
 * All versions: the new "LAN statistics" query in On-demand diagnostics (MT_SW_FIRMWARE v4 and newer): the node's IP address on Wi-Fi or Ethernet, UDP on the local network, MQTT and the broker connection. The result is in the report too.
 * All versions: remote administration now asks a remote node for its MT_SW_FIRMWARE version and statistics settings too. Before it asked only the connected radio, so a remote node was treated as not supporting the feature.

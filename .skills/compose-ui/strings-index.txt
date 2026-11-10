@@ -2164,6 +2164,7 @@ mqtt_topic_finder_use
 mt_sw_features_links
 mt_sw_features_links_hint
 mt_sw_features_lora_summary
+mt_sw_features_own
 mt_sw_features_summary
 mt_sw_features_switches
 mt_sw_features_title

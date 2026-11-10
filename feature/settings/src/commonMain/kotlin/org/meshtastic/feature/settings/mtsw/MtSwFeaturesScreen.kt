@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
+import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_switches
@@ -274,13 +275,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
 
             SupportProjectSection()
 
-            ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
-                Text(
-                    text = stringResource(Res.string.mt_sw_features_links_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                )
+            // Real settings that live here (not just links elsewhere): looks, the widget and the statistics sync.
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_features_own)) {
                 ListItem(
                     text = stringResource(Res.string.ui_scale),
                     supportingText = uiScaleLabel(uiScale),
@@ -305,6 +301,15 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onFamily = { settingsViewModel.setFontFamily(it) },
                     onWeight = { settingsViewModel.setFontWeightShift(it) },
                     onSize = { settingsViewModel.setFontSizePercent(it) },
+                )
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
+                Text(
+                    text = stringResource(Res.string.mt_sw_features_links_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 )
                 val pickColor = stringResource(Res.string.node_color_pick)
                 ListItem(

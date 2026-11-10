@@ -887,7 +887,7 @@
     <string name="db_sync_auto">Sync statistics automatically</string>
     <string name="db_sync_done">Done: %1$d entries synchronized.</string>
     <string name="db_sync_failed">Syncing failed.</string>
-    <string name="db_sync_info">Each radio you connect has its own database. When the same node is known to two databases, this brings the statistics of that node up to date in both: telemetry history, position and the latest readings. Only nodes known to both databases are synchronized; a node known to one database only is never copied to the other. Your notes, names, favourites, ignore and mute settings stay as they are in each database.\n\nAutomatic sync runs a while after the connection changes to another radio. The button Sync now does it at once.</string>
+    <string name="db_sync_info">What it is for: every radio you connect to the app has its own database on the phone (its own memory of the nodes and their statistics). When you use several radios, each one sees the mesh a little differently and records different readings. This feature merges what both databases know, so charts and history have no gaps after you change the radio.\n\nExample: you use radio A for a week, then switch to radio B. With the sync, B gets the history of the nodes A knew too, so the network health charts are continuous.\n\nWhat is synchronized: telemetry history (battery, voltage, channel load, noise and more), position history and the last readings of the nodes that BOTH databases know. A packet heard by both radios counts once (no duplicates).\n\nWhat it leaves alone: nodes known to only one database are not copied to the other; notes, names, favorites, ignored and muted stay as they are. It deletes nothing.\n\nWhen it runs: by itself after you change the radio, if you turn on \"Synchronize statistics automatically\" (off by default). The \"Synchronize now\" button runs it at any time; with large databases it takes a moment.</string>
     <string name="db_sync_now">Sync now</string>
     <string name="db_sync_summary">Statistics of nodes shared by the databases of your radios</string>
     <string name="db_sync_title">Device statistics sync</string>
@@ -2215,6 +2215,7 @@
     <string name="mt_sw_features_links">Shortcuts</string>
     <string name="mt_sw_features_links_hint">These settings stay in their usual places. The rows below only open them.</string>
     <string name="mt_sw_features_lora_summary">LNA gain correction, frequency offset (kHz)</string>
+    <string name="mt_sw_features_own">Looks, widget and data</string>
     <string name="mt_sw_features_summary">Everything MT_SW_APP adds, in one place</string>
     <string name="mt_sw_features_switches">Switches</string>
     <string name="mt_sw_features_title">MT_SW features</string>
