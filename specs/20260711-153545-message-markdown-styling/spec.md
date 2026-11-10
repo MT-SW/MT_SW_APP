@@ -4,7 +4,7 @@
 **Created**: 2026-07-11
 **Status**: Draft
 **Input**: "Investigate the iOS message-input markdown styling feature and develop a parity spec for Android."
-**Cross-Platform Reference**: meshtastic-apple PR [#1771 — Add message formatting toolbar (iOS 18+)](https://github.com/meshtastic/meshtastic-apple/pull/1771)
+**Cross-Platform Reference**: meshtastic-apple PR [#1771 — Add message formatting toolbar (iOS 17+)](https://github.com/meshtastic/meshtastic-apple/pull/1771)
 
 ## Clarifications
 
@@ -20,7 +20,7 @@
 
 iOS renders and lets users author lightweight **inline markdown** in mesh text messages — **bold**, *italic*, ~~strikethrough~~, `inline code`, and `[links](url)` — plus automatic linkification of URLs, email addresses, phone numbers, and postal addresses. Android today renders none of the styling: it auto-links URLs/email/phone (via `AutoLinkText`) but shows the raw delimiter characters (`**bold**`, `~~strike~~`) as literal text.
 
-**Because iOS transmits the raw markdown delimiters over the mesh**, every Android user in a channel with an iOS 18+ user *already receives* messages full of literal asterisks and tildes today. Closing the **render** gap is therefore the higher-value, lower-risk half of parity. The **authoring** half (a formatting toolbar + live in-field styling over the compose field) matches iOS's editor.
+**Because iOS transmits the raw markdown delimiters over the mesh**, every Android user in a channel with an iOS 17+ user *already receives* messages full of literal asterisks and tildes today. Closing the **render** gap is therefore the higher-value, lower-risk half of parity. The **authoring** half (a formatting toolbar + live in-field styling over the compose field) matches iOS's editor.
 
 This spec covers all three prioritized user stories — **P1 render, P2 authoring toolbar, P3 draft styling** — as a single delivery (per Clarifications). Priorities denote build/verification order within that effort, not separate PRs.
 
@@ -30,7 +30,7 @@ Two independent halves:
 
 **Rendering (all iOS versions).** Message bubbles render `AttributedString(markdown:options:.init(interpretedSyntax: .inlineOnlyPreservingWhitespace))` — inline styling only (no headers, lists, blockquotes, images), whitespace/newlines preserved. Parse failure falls back to plain text. Links are underlined and tinted. A derived, persisted field (`messagePayloadMarkdown`) additionally auto-linkifies detected URLs / `tel:` / `mailto:` / `maps.apple.com?address=` via `NSDataDetector`, skipping matches already inside an existing `[…](…)` link. Emoji-only messages skip markdown entirely.
 
-**Authoring (iOS 18+ / macOS 15+ only — gated on the new selection-observing `TextEditor`).**
+**Authoring (iOS 17+ / macOS 15+ only — gated on the new selection-observing `TextEditor`).**
 - A 5-button toolbar over the compose field: bold `**`, italic `*`, strikethrough `~~`, code `` ` ``, link `[](url)`. Shown when the field is focused and holds ≥3 characters; buttons disabled when there is no text selection.
 - Toggle semantics: wrapping a selection that is *already* wrapped removes the delimiters; a collapsed cursor inserts an empty delimiter pair and places the caret between them. Wrapping trims whitespace so delimiters hug content, absorbs adjacent delimiter characters the selection cuts through, and cleans orphaned unpaired delimiters.
 - Link button opens a URL-entry alert and wraps the selection as `[selected](url)`; re-invoking on an existing link unwraps it to plain display text.
@@ -59,7 +59,7 @@ Two independent halves:
 
 As an Android user in a channel with iOS users, I see **bold**, *italic*, ~~strikethrough~~, `code`, and links rendered with styling instead of raw `**`/`*`/`~~`/`` ` ``/`[](…)` characters.
 
-**Why this priority**: Highest value, lowest risk, independently shippable. iOS 18+ users are *already* emitting markdown onto the mesh; this is a pure display fix in shared code with no wire/DB/compose changes. Delivers cross-client parity by itself.
+**Why this priority**: Highest value, lowest risk, independently shippable. iOS 17+ users are *already* emitting markdown onto the mesh; this is a pure display fix in shared code with no wire/DB/compose changes. Delivers cross-client parity by itself.
 
 **Independent Test**: Inject (or receive) a message `Meet at **noon** by the ~~old~~ new *bridge* — see \`README\` and [map](https://example.com)`. The bubble renders bold "noon", struck "old", italic "bridge", monospaced "README", and a tappable "map" link; no literal delimiter characters remain.
 

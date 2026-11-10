@@ -2,7 +2,7 @@
 
 ## Why
 
-Because iOS transmits **raw markdown delimiters over the mesh** (styling is presentation-only — there is no separate formatted payload), every Android user in a channel with an iOS 18+ user *already receives* messages full of literal `**asterisks**` and `~~tildes~~` today, and renders them as garbled literal text. Closing the **render** gap is the higher-value, lower-risk half of parity; the **authoring** half (a formatting toolbar + live in-field styling) matches the iOS compose editor.
+Because iOS transmits **raw markdown delimiters over the mesh** (styling is presentation-only — there is no separate formatted payload), every Android user in a channel with an iOS 17+ user *already receives* messages full of literal `**asterisks**` and `~~tildes~~` today, and renders them as garbled literal text. Closing the **render** gap is the higher-value, lower-risk half of parity; the **authoring** half (a formatting toolbar + live in-field styling) matches the iOS compose editor.
 
 Cross-platform reference: meshtastic-apple PR [#1771](https://github.com/meshtastic/meshtastic-apple/pull/1771).
 

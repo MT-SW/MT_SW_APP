@@ -4,7 +4,7 @@ name: MTSWApp
 options:
   bundleIdPrefix: pl.sw
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "17.5"
   createIntermediateGroups: true
 targets:
   MTSWApp:
