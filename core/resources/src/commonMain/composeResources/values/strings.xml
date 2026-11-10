@@ -487,6 +487,8 @@
     <string name="app_database_backup_failed">Could not write the backup.</string>
     <string name="app_database_backup_no_device">Connect to a radio first. There is no app data to back up or restore yet.</string>
     <string name="app_database_backup_saved">Backup saved.</string>
+    <string name="app_database_merge_done">Done. Statistics of nodes known to both this app and the backup were completed (%1$d entries). Nodes missing here were not added.</string>
+    <string name="app_database_merge_failed">Could not merge: the file is not a usable backup from this app version.</string>
     <string name="app_database_restore_confirmation">Restoring replaces this radio's messages and nodes stored in the app with the contents of the backup. The change takes effect after you restart the app and reconnect to this radio.</string>
     <string name="app_database_restore_corrupt">That backup is damaged or incomplete.</string>
     <string name="app_database_restore_failed">Could not read the backup.</string>
@@ -1878,6 +1880,7 @@
     <string name="match_all">Match All | Any</string>
     <string name="match_any">Match Any | All</string>
     <string name="max">Max</string>
+    <string name="merge_app_database">Merge data from a backup</string>
     <!-- MESH -->
     <string name="mesh_beacon">Mesh Beacon</string>
     <string name="mesh_beacon_broadcast">Broadcast a beacon</string>

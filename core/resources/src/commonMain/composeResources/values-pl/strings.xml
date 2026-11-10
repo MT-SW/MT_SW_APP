@@ -2985,6 +2985,9 @@
     <string name="firmware_gate_update">Aktualizuj firmware</string>
     <string name="lora_preset_custom">Własny</string>
     <string name="lora_preset_region">%1$s · %2$s</string>
+    <string name="merge_app_database">Dołącz dane z kopii</string>
+    <string name="app_database_merge_done">Gotowe. Uzupełniono statystyki węzłów, które zna zarówno ta aplikacja, jak i kopia (%1$d wpisów). Węzły, których tu brakuje, nie zostały dodane.</string>
+    <string name="app_database_merge_failed">Nie udało się dołączyć: plik nie jest użyteczną kopią z tej wersji aplikacji.</string>
     <string name="restore_app_database">Przywróć dane aplikacji</string>
     <string name="device_model_capture">Zrób zdjęcie</string>
     <string name="device_model_capture_failed">Nie udało się zapisać zdjęcia</string>

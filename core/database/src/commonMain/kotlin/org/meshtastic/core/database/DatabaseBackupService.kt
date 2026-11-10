@@ -54,6 +54,12 @@ interface DatabaseBackupOperations {
     suspend fun export(dbName: String, sink: BufferedSink): Long
 
     suspend fun stageRestore(dbName: String, source: BufferedSource): RestoreStageResult
+
+    /**
+     * Merges the statistics of the nodes that [dbName] and the backup in [source] both know. Null when the file is not
+     * a usable backup, otherwise the number of entries written.
+     */
+    suspend fun mergeFromBackup(dbName: String, source: BufferedSource): Int? = null
 }
 
 /**
@@ -84,6 +90,34 @@ class DatabaseBackupService(private val manager: DatabaseManager, private val di
      * Streams [source] beside the database [dbName], checks it with SQLite, then atomically renames it into place as
      * the staged restore. Nothing the live database reads changes.
      */
+    override suspend fun mergeFromBackup(dbName: String, source: BufferedSource): Int? = withContext(dispatchers.io) {
+        val tempName = "merge_import_tmp"
+        val temp = getDatabaseFile(tempName)
+        val files = DatabaseBackup.databaseFiles(temp)
+        files.forEach { fileSystem.delete(it) }
+        try {
+            if (DatabaseBackup.validateHeader(DatabaseBackup.readHeader(source)) != Validation.Valid) {
+                return@withContext null
+            }
+            fileSystem.write(temp) { writeAll(source) }
+            if (validateBackupFile(temp, fileSystem) != Validation.Valid) return@withContext null
+            val backup = getDatabaseBuilder(tempName).build()
+            try {
+                manager.mergeBackupStats(dbName, backup)
+            } finally {
+                backup.close()
+            }
+        } catch (e: IOException) {
+            Logger.w(e) { "Merging a backup failed" }
+            null
+        } catch (e: SQLiteException) {
+            Logger.w(e) { "Merging a backup failed" }
+            null
+        } finally {
+            files.forEach { fileSystem.delete(it) }
+        }
+    }
+
     override suspend fun stageRestore(dbName: String, source: BufferedSource): RestoreStageResult =
         withContext(dispatchers.io) {
             val dbFile = getDatabaseFile(dbName)

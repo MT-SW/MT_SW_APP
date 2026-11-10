@@ -72,6 +72,7 @@ import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.reboot_into_dfu
+import org.meshtastic.core.resources.merge_app_database
 import org.meshtastic.core.resources.restore_app_database
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
@@ -105,6 +106,7 @@ fun RadioConfigItemList(
     databaseBackupAvailable: Boolean = true,
     onBackupDatabase: () -> Unit = {},
     onRestoreDatabase: () -> Unit = {},
+    onMergeDatabase: () -> Unit = {},
     onNavigate: (Route) -> Unit,
     onSetSnifferEnabled: (Boolean) -> Unit = {},
     onClearResponse: () -> Unit = {},
@@ -155,6 +157,7 @@ fun RadioConfigItemList(
                 databaseBackupAvailable = databaseBackupAvailable,
                 onBackupDatabase = onBackupDatabase,
                 onRestoreDatabase = onRestoreDatabase,
+                onMergeDatabase = onMergeDatabase,
             )
             AdvancedSection(
                 isManaged = isManaged,
@@ -224,6 +227,7 @@ private fun BackupRestoreSection(
     databaseBackupAvailable: Boolean,
     onBackupDatabase: () -> Unit,
     onRestoreDatabase: () -> Unit,
+    onMergeDatabase: () -> Unit,
 ) {
     ExpressiveSection(title = stringResource(Res.string.backup_restore)) {
         if (isManaged) {
@@ -260,6 +264,12 @@ private fun BackupRestoreSection(
             leadingIcon = MeshtasticIcons.Download,
             enabled = databaseBackupAvailable,
             onClick = onRestoreDatabase,
+        )
+        ListItem(
+            text = stringResource(Res.string.merge_app_database),
+            leadingIcon = MeshtasticIcons.Download,
+            enabled = databaseBackupAvailable,
+            onClick = onMergeDatabase,
         )
     }
 }

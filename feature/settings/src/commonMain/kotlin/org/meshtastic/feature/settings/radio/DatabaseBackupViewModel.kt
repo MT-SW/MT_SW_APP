@@ -36,6 +36,8 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_database_backup_disconnect_confirmation
 import org.meshtastic.core.resources.app_database_backup_failed
 import org.meshtastic.core.resources.app_database_backup_saved
+import org.meshtastic.core.resources.app_database_merge_done
+import org.meshtastic.core.resources.app_database_merge_failed
 import org.meshtastic.core.resources.app_database_restore_confirmation
 import org.meshtastic.core.resources.app_database_restore_corrupt
 import org.meshtastic.core.resources.app_database_restore_failed
@@ -136,6 +138,21 @@ class DatabaseBackupViewModel(
             var result: RestoreStageResult = RestoreStageResult.Failed(IllegalStateException("file not readable"))
             fileService.read(uri) { source -> result = backupService.stageRestore(dbName, source) }
             alertManager.showAlert(message = restoreMessage(result))
+        }
+    }
+
+    /** Merges the statistics of the nodes both this app's database and the chosen backup know; no restart needed. */
+    fun mergeFromBackup(uri: CommonUri) {
+        safeLaunch(tag = "databaseMerge") {
+            val dbName = backupService.backupTargetName()
+            var written: Int? = null
+            if (dbName != null) fileService.read(uri) { source -> written = backupService.mergeFromBackup(dbName, source) }
+            val count = written
+            alertManager.showAlert(
+                message =
+                if (count == null) getString(Res.string.app_database_merge_failed)
+                else getString(Res.string.app_database_merge_done, count),
+            )
         }
     }
 

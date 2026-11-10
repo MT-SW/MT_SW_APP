@@ -275,6 +275,7 @@ fun DesktopSettingsScreen(
                     databaseBackupAvailable = databaseBackup.available,
                     onBackupDatabase = databaseBackup.onBackup,
                     onRestoreDatabase = databaseBackup.onRestore,
+                    onMergeDatabase = databaseBackup.onMerge,
                     onNavigate = onNavigate,
                     onImport = {
                         radioConfigViewModel.clearPacketResponse()

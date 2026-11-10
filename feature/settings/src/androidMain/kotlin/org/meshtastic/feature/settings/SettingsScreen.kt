@@ -278,6 +278,7 @@ fun SettingsScreen(
                 databaseBackupAvailable = databaseBackup.available,
                 onBackupDatabase = databaseBackup.onBackup,
                 onRestoreDatabase = databaseBackup.onRestore,
+                onMergeDatabase = databaseBackup.onMerge,
                 onNavigate = onNavigate,
                 onSetSnifferEnabled = { viewModel.setSnifferEnabled(it) },
             )

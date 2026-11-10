@@ -29,7 +29,7 @@ import org.meshtastic.core.ui.util.rememberSaveFileLauncher
  * Picker-backed entry points for the Backup & Restore section's app database items. [available] is false until some
  * device has a database.
  */
-class DatabaseBackupActions(val available: Boolean, val onBackup: () -> Unit, val onRestore: () -> Unit)
+class DatabaseBackupActions(val available: Boolean, val onBackup: () -> Unit, val onRestore: () -> Unit, val onMerge: () -> Unit)
 
 @Composable
 fun rememberDatabaseBackupActions(): DatabaseBackupActions {
@@ -37,12 +37,14 @@ fun rememberDatabaseBackupActions(): DatabaseBackupActions {
     val available by viewModel.hasDeviceDatabase.collectAsStateWithLifecycle()
     val saveFile = rememberSaveFileLauncher { uri -> viewModel.backup(uri) }
     val openFile = rememberOpenFileLauncher { uri -> if (uri != null) viewModel.restore(uri) }
-    return remember(viewModel, available, saveFile, openFile) {
+    val mergeFile = rememberOpenFileLauncher { uri -> if (uri != null) viewModel.mergeFromBackup(uri) }
+    return remember(viewModel, available, saveFile, openFile, mergeFile) {
         DatabaseBackupActions(
             available = available,
             onBackup = {
                 viewModel.runWhenDisconnected { saveFile(viewModel.suggestedFileName(), DatabaseBackup.MIME_TYPE) }
             },
+            onMerge = { mergeFile(DatabaseBackup.MIME_TYPE) },
             onRestore = {
                 viewModel.runWhenDisconnected { viewModel.confirmRestore { openFile(DatabaseBackup.MIME_TYPE) } }
             },

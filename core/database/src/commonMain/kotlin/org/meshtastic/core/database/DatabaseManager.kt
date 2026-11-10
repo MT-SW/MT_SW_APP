@@ -319,6 +319,14 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         }
     }
 
+    /**
+     * Completes the statistics of the nodes that the database [dbName] and the opened backup copy [backup] both know.
+     * Nodes known to one of them only are not copied. Returns how many entries were written.
+     */
+    suspend fun mergeBackupStats(dbName: String, backup: MeshtasticDatabase): Int = withManagerOperation {
+        withContext(dispatchers.io) { mutex.withLock { DatabaseStatsSync.sync(getOrOpenDatabase(dbName), backup) } }
+    }
+
     override fun setCacheLimit(limit: Int) {
         val clamped = limit.coerceIn(DatabaseConstants.MIN_CACHE_LIMIT, DatabaseConstants.MAX_CACHE_LIMIT)
         launchManagerWork {
