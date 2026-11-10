@@ -143,7 +143,9 @@ fun LiveUpdateCard(
     val summary =
         when (mode) {
             LiveUpdateMode.Off ->
-                stringResource(if (widget) Res.string.widget_adaptive_off_summary else Res.string.live_update_off_summary)
+                stringResource(
+                    if (widget) Res.string.widget_adaptive_off_summary else Res.string.live_update_off_summary,
+                )
 
             LiveUpdateMode.MeshStatus ->
                 if (widget) {

@@ -45,11 +45,10 @@ import org.meshtastic.core.resources.direct_message
 import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.ignore
 import org.meshtastic.core.resources.live_update_track_in
-import org.meshtastic.core.resources.widget_adaptive_track_in
-import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.core.resources.mute_notifications
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.share_contact
+import org.meshtastic.core.resources.widget_adaptive_track_in
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.Delete
@@ -62,6 +61,7 @@ import org.meshtastic.core.ui.icon.QrCode2
 import org.meshtastic.core.ui.icon.VolumeMute
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.icon.VolumeUp
+import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.NodeDetailAction
 import org.meshtastic.feature.node.model.showsDirectMessageAction

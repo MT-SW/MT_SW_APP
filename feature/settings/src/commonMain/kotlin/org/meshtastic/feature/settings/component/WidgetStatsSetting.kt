@@ -36,35 +36,36 @@ import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.FormatPaint
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
-import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /** The row "Widżet statystyk": a scrollable information window about the widget and how to add it. */
 @Composable
 fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
     var open by remember { mutableStateOf(false) }
-    if (open) {
-        MeshtasticDialog(
-            title = stringResource(Res.string.widget_stats_title),
-            onDismiss = { open = false },
-            text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Text(stringResource(Res.string.widget_stats_info))
-                }
-            },
-        )
-    }
-    // Where the adaptive display is a widget (iPhone, iPad) its choice (whole mesh or one node) is made right here.
-    if (rememberLiveUpdateSupport().widget) {
-        LiveUpdateSection(modifier = modifier.padding(horizontal = 16.dp, vertical = 4.dp))
-    }
-    ListItem(
-        modifier = modifier,
-        text = stringResource(Res.string.widget_stats_title),
-        supportingText = stringResource(Res.string.widget_stats_summary),
-        leadingIcon = MeshtasticIcons.FormatPaint,
-    ) {
-        open = true
+    Column(modifier = modifier) {
+        if (open) {
+            MeshtasticDialog(
+                title = stringResource(Res.string.widget_stats_title),
+                onDismiss = { open = false },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                        Text(stringResource(Res.string.widget_stats_info))
+                    }
+                },
+            )
+        }
+        // Where the adaptive display is a widget (iPhone, iPad) its choice (whole mesh or one node) is made right here.
+        if (rememberLiveUpdateSupport().widget) {
+            LiveUpdateSection(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+        }
+        ListItem(
+            text = stringResource(Res.string.widget_stats_title),
+            supportingText = stringResource(Res.string.widget_stats_summary),
+            leadingIcon = MeshtasticIcons.FormatPaint,
+        ) {
+            open = true
+        }
     }
 }
