@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: napis „Zaktualizowano” i godzina na widżecie są w języku aplikacji, a nie telefonu.
+
 * iPhone i iPad: w ustawieniach asystenta pozycja „Zwolnij pamięć” pokazuje teraz, który model jest w pamięci (wcześniej zawsze pisała, że żaden), a dotknięcie jej zwalnia model, tak jak na Androidzie i komputerze.
 
 * Wszystkie wersje: ekran Funkcje MT_SW ma osobno prawdziwe ustawienia („Wygląd, widżet i dane”: skala, motyw, ikona, widżet, synchronizacja statystyk, czcionka) i osobno „Skróty”, które tylko otwierają ustawienia w innych miejscach. Opis „Synchronizacji statystyk urządzeń” jest rozbudowany: po co jest, przykład, co jest synchronizowane, czego nie rusza i kiedy działa.
@@ -611,6 +613,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* iPhone and iPad: the "Updated" label and time on the widget follow the app's language, not the phone's.
 
 * iPhone and iPad: in the assistant settings the "Free memory" row now shows which model is in memory (it always said none before), and tapping it frees the model, as on Android and desktop.
 

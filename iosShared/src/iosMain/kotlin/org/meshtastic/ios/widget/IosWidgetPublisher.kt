@@ -20,7 +20,12 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.conflate
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.widget_updated
 import org.meshtastic.core.service.stats.MeshStatsFeed
+import platform.Foundation.NSDate
+import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSString
@@ -51,15 +56,23 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
         feed.snapshots().conflate().collect { snapshot ->
-            runCatching { write(json(snapshot.title, snapshot.chip, snapshot.lines, snapshot.connected)) }
+            runCatching {
+                // The words on the widget follow the language of the app, not of the phone: the app writes them.
+                val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
+                write(json(snapshot.title, snapshot.chip, snapshot.lines, snapshot.connected, updated))
+            }
                 .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
             delay(MIN_PUBLISH_INTERVAL)
         }
     }
 
-    private fun json(title: String, chip: String, lines: List<String>, connected: Boolean): String =
+    private fun clockTime(): String =
+        NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
+
+    private fun json(title: String, chip: String, lines: List<String>, connected: Boolean, updatedText: String): String =
         "{\"title\":${quote(title)},\"chip\":${quote(chip)},\"connected\":$connected," +
-            "\"updated\":${Clock.System.now().epochSeconds},\"lines\":[${lines.joinToString(",") { quote(it) }}]}"
+            "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
+            "\"lines\":[${lines.joinToString(",") { quote(it) }}]}"
 
     private fun quote(text: String): String = buildString {
         append('"')

@@ -3416,6 +3416,7 @@ widget_relays_canceled
 widget_stats_info
 widget_stats_summary
 widget_stats_title
+widget_updated
 ### WIFI ###
 wifi_config
 wifi_devices

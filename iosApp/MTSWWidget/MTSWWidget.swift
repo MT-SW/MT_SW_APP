@@ -26,6 +26,7 @@ struct StatsData {
     var chip: String
     var connected: Bool
     var updated: Date
+    var updatedText: String?
     var lines: [String]
 }
 
@@ -43,6 +44,7 @@ private func readStats() -> StatsData? {
         chip: json["chip"] as? String ?? "",
         connected: json["connected"] as? Bool ?? false,
         updated: Date(timeIntervalSince1970: json["updated"] as? Double ?? 0),
+        updatedText: json["updatedText"] as? String,
         lines: json["lines"] as? [String] ?? []
     )
 }
@@ -51,7 +53,7 @@ private var isPolish: Bool { Locale.current.language.languageCode?.identifier ==
 
 struct StatsProvider: TimelineProvider {
     func placeholder(in context: Context) -> StatsEntry {
-        StatsEntry(date: Date(), data: StatsData(title: "MT_SW", chip: "3/9", connected: true, updated: Date(),
+        StatsEntry(date: Date(), data: StatsData(title: "MT_SW", chip: "3/9", connected: true, updated: Date(), updatedText: nil,
                                                  lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"]))
     }
 
@@ -85,7 +87,8 @@ struct StatsView: View {
                     }
                 }
                 Spacer(minLength: 0)
-                Text((isPolish ? "Zaktualizowano " : "Updated ") + data.updated.formatted(date: .omitted, time: .shortened))
+                // The app writes this text in its own language; the phone's language is only the fallback.
+                Text(data.updatedText ?? ((isPolish ? "Zaktualizowano " : "Updated ") + data.updated.formatted(date: .omitted, time: .shortened)))
                     .font(.system(size: 9)).foregroundStyle(.secondary)
             }
         } else {
