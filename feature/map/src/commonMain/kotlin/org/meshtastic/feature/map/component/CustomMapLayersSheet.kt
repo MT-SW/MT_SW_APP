@@ -114,22 +114,20 @@ fun CustomMapLayersSheet(
             style = MaterialTheme.typography.bodySmall,
         )
 
-        item {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = mapLayers.size < MAX_MAP_LAYERS,
-                    onClick = onAddLayerClicked,
-                ) {
-                    Text(stringResource(Res.string.add_layer))
-                }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = mapLayers.size < MAX_MAP_LAYERS,
-                    onClick = { showAddNetworkLayerDialog = true },
-                ) {
-                    Text(stringResource(Res.string.add_network_layer))
-                }
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = mapLayers.size < MAX_MAP_LAYERS,
+                onClick = onAddLayerClicked,
+            ) {
+                Text(stringResource(Res.string.add_layer))
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = mapLayers.size < MAX_MAP_LAYERS,
+                onClick = { showAddNetworkLayerDialog = true },
+            ) {
+                Text(stringResource(Res.string.add_network_layer))
             }
         }
 

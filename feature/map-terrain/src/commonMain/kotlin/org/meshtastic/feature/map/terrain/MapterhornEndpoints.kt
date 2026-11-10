@@ -63,6 +63,16 @@ object MapterhornEndpoints {
     }
 
     /**
+     * The regional archive URL for [bounds], or `null` if [bounds] doesn't fit inside one z6 tile (then only global
+     * terrain is used, never an error). Used by the link planner; builds the URL through [regionalArchiveUrl].
+     */
+    fun regionalUrlFor(bounds: GeoBounds): String? {
+        val nw = TerrainTileMath.tileAt(REGIONAL_ARCHIVE_ZOOM, bounds.north, bounds.west)
+        val se = TerrainTileMath.tileAt(REGIONAL_ARCHIVE_ZOOM, bounds.south, bounds.east)
+        return if (nw == se) regionalArchiveUrl(nw) else null
+    }
+
+    /**
      * What to show on screen whenever terrain (hillshade or contours) is actively rendering.
      *
      * Deliberately generic rather than an enumerated per-source credit: Mapterhorn's data is a mosaic of 100+ regional
