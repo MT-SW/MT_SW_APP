@@ -182,7 +182,7 @@ class DesktopAiModule {
         data,
         memoryStore = memory,
         testReports = org.meshtastic.feature.messaging.translation.JvmAssistantTestReports(),
-        knowledge = UpdatableKnowledge(knowledge, File(AppDataRoot.dir, "knowledge"), uiPrefs),
+        knowledge = UpdatableKnowledge(knowledge, File(AppDataRoot.dir, "knowledge").absolutePath, uiPrefs),
     )
 
     @Single

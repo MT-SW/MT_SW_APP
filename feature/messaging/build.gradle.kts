@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.atomicfu)
+            implementation(libs.okio)
 
             // JetBrains Material 3 Adaptive (multiplatform ListDetailPaneScaffold)
             implementation(libs.jetbrains.compose.material3.adaptive)

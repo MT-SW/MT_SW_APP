@@ -178,7 +178,7 @@ class FdroidAiModule {
         data,
         memoryStore = memory,
         testReports = org.meshtastic.feature.messaging.translation.JvmAssistantTestReports(),
-        knowledge = UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge"), uiPrefs),
+        knowledge = UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge").absolutePath, uiPrefs),
     )
 
     @Single

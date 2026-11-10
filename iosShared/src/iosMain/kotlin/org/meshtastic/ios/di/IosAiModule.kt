@@ -55,6 +55,7 @@ import org.meshtastic.feature.messaging.translation.IosEngineLog
 import org.meshtastic.feature.messaging.translation.IosLlamaEngine
 import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
+import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 
 /**
  * AI on iPhone: the assistant and the translator run on-device in llama.cpp; dictation (speech recognition) is not
@@ -123,7 +124,7 @@ class IosAiModule {
         uiPrefs,
         data,
         memoryStore = memory,
-        knowledge = knowledge,
+        knowledge = UpdatableKnowledge(knowledge, iosDataDir() + "/knowledge", uiPrefs),
         testReports = IosAssistantTestReports(),
     )
 

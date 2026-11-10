@@ -31,8 +31,14 @@ import kotlinx.coroutines.withContext
 import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.KnowledgeIndex
 import org.meshtastic.core.repository.UiPrefs
-import java.io.File
-import java.security.MessageDigest
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.ByteString.Companion.toByteString
+import org.meshtastic.core.common.util.nowMillis
+import kotlin.concurrent.Volatile
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 
 /**
  * Knowledge about the app that can be refreshed from our own repository. It works only while the user has switched the
@@ -42,9 +48,28 @@ import java.security.MessageDigest
  */
 class UpdatableKnowledge(
     private val builtIn: AssistantKnowledge,
-    private val directory: File,
+    directoryPath: String,
     private val uiPrefs: UiPrefs,
 ) : AssistantKnowledge {
+
+    private val directory: Path = directoryPath.toPath()
+    private val fs = FileSystem.SYSTEM
+    private val lock = SynchronizedObject()
+
+    private fun file(name: String): Path = directory / name
+
+    private fun Path.exists() = fs.exists(this)
+
+    private fun Path.readText(): String = fs.read(this) { readUtf8() }
+
+    private fun Path.readBytes(): ByteArray = fs.read(this) { readByteArray() }
+
+    private fun Path.writeBytes(bytes: ByteArray) = fs.write(this) { write(bytes) }
+
+    private fun Path.lastModified(): Long = fs.metadataOrNull(this)?.lastModifiedAtMillis ?: 0L
+
+    private fun Path.mdFiles(): List<Path> =
+        if (exists()) fs.list(this).filter { it.name.endsWith(".md") }.sortedBy { it.name } else emptyList()
 
     @Volatile private var index: KnowledgeIndex? = null
 
@@ -52,21 +77,21 @@ class UpdatableKnowledge(
 
     override suspend fun lookup(question: String, maxChars: Int): String {
         if (uiPrefs.assistantInternetEnabled.value) {
-            withContext(Dispatchers.IO) { refreshIfDue() }
+            withContext(Dispatchers.Default) { refreshIfDue() }
         }
         // With the switch off the downloaded copy is still used: it was verified, it is just not refreshed.
-        val downloaded = withContext(Dispatchers.IO) { loadIndex() }
+        val downloaded = withContext(Dispatchers.Default) { loadIndex() }
         val fromDownloaded = downloaded?.lookup(question, maxChars).orEmpty()
         return fromDownloaded.ifBlank { builtIn.lookup(question, maxChars) }
     }
 
     override suspend fun lookup(question: String, maxChars: Int, language: String?): String {
-        if (uiPrefs.assistantInternetEnabled.value) withContext(Dispatchers.IO) { refreshIfDue() }
+        if (uiPrefs.assistantInternetEnabled.value) withContext(Dispatchers.Default) { refreshIfDue() }
         // The manual built into this app first (a test build is newer than the repository); the downloaded copy
         // fills in what the built-in one does not have.
         val builtInText = builtIn.lookup(question, maxChars, language)
         if (builtInText.isNotBlank()) return builtInText
-        val downloaded = withContext(Dispatchers.IO) { loadIndex() }
+        val downloaded = withContext(Dispatchers.Default) { loadIndex() }
         return downloaded?.lookup(question, maxChars).orEmpty()
     }
 
@@ -80,9 +105,9 @@ class UpdatableKnowledge(
         builtIn.lookupBaseOnly(question, maxChars, language)
 
     override suspend fun coreFacts(language: String): String {
-        val file = File(directory, "project/core.md")
+        val file = file("project/core.md")
         val downloaded =
-            withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
+            withContext(Dispatchers.Default) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
         val built = builtIn.coreFacts(language)
         if (downloaded.isBlank()) return built
         val fresh = org.meshtastic.core.repository.knowledgeSection(downloaded, language)
@@ -96,7 +121,7 @@ class UpdatableKnowledge(
 
     override suspend fun latestNews(maxChars: Int): String {
         val built = builtIn.latestNews(maxChars)
-        val downloaded = withContext(Dispatchers.IO) { loadIndex() }?.latestNews(maxChars).orEmpty()
+        val downloaded = withContext(Dispatchers.Default) { loadIndex() }?.latestNews(maxChars).orEmpty()
         // The downloaded list is used only when it already has the newest entry of the built-in one (so it is not
         // older).
         val newestBuilt = built.lines().firstOrNull { it.trim().startsWith("•") }?.trim().orEmpty()
@@ -111,62 +136,48 @@ class UpdatableKnowledge(
     }
 
     private fun loadIndex(): KnowledgeIndex? {
-        val stamp = File(directory, STAMP).lastModified()
+        val stamp = file(STAMP).lastModified()
         if (stamp == 0L) return null
         if (stamp == loadedFrom && index != null) return index
         val docs = buildList {
-            File(directory, "docs")
-                .listFiles { f -> f.extension == "md" }
-                ?.sortedBy { it.name }
-                ?.forEach { f ->
-                    add(KnowledgeIndex.Document(f.nameWithoutExtension, f.readText()))
-                }
-            File(directory, "project")
-                .listFiles { f -> f.extension == "md" }
-                ?.sortedBy { it.name }
-                ?.forEach { f ->
-                    add(KnowledgeIndex.Document("MT_SW ${f.nameWithoutExtension}", f.readText()))
-                }
-            File(directory, "CHANGELOG.md")
-                .takeIf { it.exists() }
-                ?.let {
-                    add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true))
-                }
+            file("docs").mdFiles().forEach { f -> add(KnowledgeIndex.Document(f.name.removeSuffix(".md"), f.readText())) }
+            file("project").mdFiles().forEach { f ->
+                add(KnowledgeIndex.Document("MT_SW ${f.name.removeSuffix(".md")}", f.readText()))
+            }
+            file("CHANGELOG.md").takeIf { it.exists() }?.let { add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true)) }
         }
         index = docs.takeIf { it.isNotEmpty() }?.let { KnowledgeIndex(it) }
         loadedFrom = stamp
         return index
     }
 
-    @Synchronized
-    private fun refreshIfDue() {
-        val stamp = File(directory, STAMP)
-        if (System.currentTimeMillis() - stamp.lastModified() < DAY_MS) return
+    private fun refreshIfDue() = synchronized(lock) {
+        val stamp = file(STAMP)
+        if (nowMillis - stamp.lastModified() < DAY_MS) return@synchronized
         try {
-            directory.mkdirs()
-            File(directory, "docs").mkdirs()
-            download("CHANGELOG.md", File(directory, "CHANGELOG.md"), "CHANGELOG.md")
+            fs.createDirectories(directory)
+            fs.createDirectories(file("docs"))
+            download("CHANGELOG.md", file("CHANGELOG.md"), "CHANGELOG.md")
             for (lang in listOf("pl", "en")) {
                 val listing = WebAccess.fetch("$API/docs/$lang/user", "application/json")
                 val entries = ENTRY.findAll(listing).map { it.groupValues[1] to it.groupValues[2] }.toList()
                 for ((name, sha) in entries) {
                     if (!name.endsWith(".md")) continue
-                    val target = File(directory, "docs/$lang-$name")
+                    val target = file("docs/$lang-$name")
                     if (target.exists() && gitSha(target.readBytes()) == sha) continue
                     download("docs/$lang/user/$name", target, null, sha)
                 }
             }
             // The other parts of the project (firmware, integration) come from their own repositories.
-            File(directory, "project").mkdirs()
+            fs.createDirectories(file("project"))
             for ((repo, path, name) in PROJECT_SOURCES) {
                 try {
-                    download(repo, path, File(directory, "project/$name.md"), path)
+                    download(repo, path, file("project/$name.md"), path)
                 } catch (e: Exception) {
                     Logger.w { "Assistant knowledge: $repo/$path skipped: ${e.message}" }
                 }
             }
-            stamp.writeText(System.currentTimeMillis().toString())
-            stamp.setLastModified(System.currentTimeMillis())
+            fs.write(stamp) { writeUtf8(nowMillis.toString()) }
             Logger.i { "Assistant knowledge updated from the repository" }
         } catch (e: Exception) {
             Logger.w { "Assistant knowledge update skipped: ${e.message}" }
@@ -174,12 +185,12 @@ class UpdatableKnowledge(
     }
 
     /** Downloads one file and keeps it only if its git blob hash matches [expectedSha] (looked up when null). */
-    private fun download(repo: String, path: String, target: File, apiPath: String?) =
+    private fun download(repo: String, path: String, target: Path, apiPath: String?) =
         download(path, target, apiPath, null, repo)
 
     private fun download(
         path: String,
-        target: File,
+        target: Path,
         apiPath: String?,
         expectedSha: String? = null,
         repo: String = REPO,
@@ -201,10 +212,8 @@ class UpdatableKnowledge(
     }
 
     private fun gitSha(bytes: ByteArray): String {
-        val digest = MessageDigest.getInstance("SHA-1")
-        digest.update("blob ${bytes.size}\u0000".toByteArray())
-        digest.update(bytes)
-        return digest.digest().joinToString("") { "%02x".format(it) }
+        val header = "blob ${bytes.size}\u0000".encodeToByteArray()
+        return (header + bytes).toByteString().sha1().hex()
     }
 
     private companion object {
