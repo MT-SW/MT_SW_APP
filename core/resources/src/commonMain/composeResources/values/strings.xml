@@ -2480,7 +2480,7 @@
     <string name="on_demand_lan_no">No</string>
     <string name="on_demand_lan_no_ip">No address</string>
     <string name="on_demand_lan_stats">LAN statistics</string>
-    <string name="on_demand_lan_stats_desc">The node's address on the local network (Wi-Fi or Ethernet), whether UDP on the local network and MQTT are on, and whether it reaches the MQTT broker itself. Needs MT_SW_FIRMWARE v4 or newer.</string>
+    <string name="on_demand_lan_stats_desc">The node's address on the local network (Wi-Fi or Ethernet), whether UDP on the local network and MQTT are on, and whether it reaches the MQTT broker itself. Needs MT_SW_FIRMWARE v3 or newer.</string>
     <string name="on_demand_lan_udp">UDP on the local network</string>
     <string name="on_demand_lan_yes">Yes</string>
     <string name="on_demand_log_title">On-Demand Diagnostics</string>

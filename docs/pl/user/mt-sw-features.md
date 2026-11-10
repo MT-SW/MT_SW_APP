@@ -104,7 +104,7 @@ Tor antenowy liczy się tak samo jak w Mesh Link Planerze: dowolna liczba złąc
 
 ## Diagnostyka na żądanie
 
-W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru, wersja firmware MT_SW oraz (od MT_SW_FIRMWARE v4) statystyki sieci LAN: adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.
+W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru, wersja firmware MT_SW oraz (od MT_SW_FIRMWARE v3) statystyki sieci LAN: adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.
 
 ## Sniffer
 

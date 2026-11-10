@@ -1674,7 +1674,7 @@
     <string name="on_demand_lan_no">Nie</string>
     <string name="on_demand_lan_no_ip">Brak adresu</string>
     <string name="on_demand_lan_stats">Statystyki sieci LAN</string>
-    <string name="on_demand_lan_stats_desc">Adres węzła w sieci lokalnej (Wi-Fi lub Ethernet), czy UDP w sieci lokalnej i MQTT są włączone oraz czy węzeł sam łączy się z brokerem MQTT. Wymaga MT_SW_FIRMWARE v4 lub nowszego.</string>
+    <string name="on_demand_lan_stats_desc">Adres węzła w sieci lokalnej (Wi-Fi lub Ethernet), czy UDP w sieci lokalnej i MQTT są włączone oraz czy węzeł sam łączy się z brokerem MQTT. Wymaga MT_SW_FIRMWARE v3 lub nowszego.</string>
     <string name="on_demand_lan_udp">UDP w sieci lokalnej</string>
     <string name="on_demand_lan_yes">Tak</string>
     <string name="on_demand_fw_plus_version">Wersja MT_SW Firmware</string>
