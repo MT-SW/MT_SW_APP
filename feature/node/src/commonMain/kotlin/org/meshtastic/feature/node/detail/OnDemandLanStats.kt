@@ -34,10 +34,11 @@ import org.meshtastic.proto.LanStats
 
 private const val OCTET_MASK = 0xFF
 private const val BITS_PER_OCTET = 8
+private const val IPV4_OCTETS = 4
 
 /** The IPv4 address of [LanStats.ip_address], whose first octet sits in the lowest byte; null when there is none. */
 internal fun LanStats.ipText(): String? = ip_address?.let { value ->
-    (0 until 4).joinToString(".") { index -> ((value ushr (index * BITS_PER_OCTET)) and OCTET_MASK).toString() }
+    (0 until IPV4_OCTETS).joinToString(".") { index -> ((value ushr (index * BITS_PER_OCTET)) and OCTET_MASK).toString() }
 }
 
 /** One label and value per line, in the order the card and the report show them. */
