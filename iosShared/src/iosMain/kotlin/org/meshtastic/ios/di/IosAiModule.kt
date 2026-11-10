@@ -59,8 +59,8 @@ import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 
 /**
- * AI on iPhone: the assistant and the translator run on-device in llama.cpp; dictation (speech recognition) is not
- * ported yet; the guide search and the discovery summary work without a model.
+ * AI on iPhone: the assistant, the translator and the dictation run on-device in llama.cpp; the guide search and the
+ * discovery summary work without a model.
  */
 @Module
 class IosAiModule {
