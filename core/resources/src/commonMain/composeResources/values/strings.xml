@@ -3388,6 +3388,9 @@
     <string name="widget_packets_sent">Sent</string>
     <string name="widget_relays">Relayed</string>
     <string name="widget_relays_canceled">Relays canceled</string>
+    <string name="widget_stats_info">The widget shows the same statistics as the permanent notification on Android: nodes online, unread messages, battery, uptime, channel load, traffic and the rest your radio reports. What it shows (the whole mesh or one chosen node) is set in the adaptive display on the Connections screen.\n\niPhone and iPad: hold the home screen, tap +, choose MT_SW statistics (medium size, 4x2). The widget is refreshed while the app runs and every few minutes by the system.\n\nAndroid: the app widgets and the permanent notification. Computer: a widget is not available yet.</string>
+    <string name="widget_stats_summary">Radio and mesh statistics on the home screen</string>
+    <string name="widget_stats_title">Statistics widget</string>
     <!-- WIFI -->
     <string name="wifi_config">Wi-Fi Options</string>
     <string name="wifi_devices">Wi-Fi Provisioning for mPWRD-OS</string>

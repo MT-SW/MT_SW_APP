@@ -57,9 +57,14 @@ import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
+import org.meshtastic.core.repository.LiveUpdatePrefs
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
+import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.posix.exit
 import kotlin.time.Duration.Companion.hours
@@ -98,6 +103,7 @@ fun MainViewController() = ComposeUIViewController(
     org.koin.compose.KoinContext(koin) {
         MeshServiceLifecycle()
         BackgroundCleanup()
+        WidgetPublishing()
         ThemedApp(uiViewModel)
     }
 }
@@ -128,6 +134,20 @@ private fun BackgroundCleanup() {
             delay(NODE_CLEANUP_CHECK_INTERVAL)
         }
     }
+}
+
+/** Keeps the statistics for the widget up to date while the app runs (the widget reads them from the App Group). */
+@Composable
+private fun WidgetPublishing() {
+    val publisher = remember {
+        IosWidgetPublisher(
+            nodes = koin.get<NodeRepository>(NodeRepository::class),
+            packets = koin.get<PacketRepository>(PacketRepository::class),
+            prefs = koin.get<LiveUpdatePrefs>(LiveUpdatePrefs::class),
+            service = koin.get<ServiceRepository>(ServiceRepository::class),
+        )
+    }
+    LaunchedEffect(Unit) { withContext(Dispatchers.Default) { publisher.run() } }
 }
 
 /** Applies the theme chosen in the settings and shows the app. */

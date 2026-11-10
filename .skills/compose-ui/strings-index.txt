@@ -3316,6 +3316,9 @@ widget_packets_received
 widget_packets_sent
 widget_relays
 widget_relays_canceled
+widget_stats_info
+widget_stats_summary
+widget_stats_title
 ### WIFI ###
 wifi_config
 wifi_devices

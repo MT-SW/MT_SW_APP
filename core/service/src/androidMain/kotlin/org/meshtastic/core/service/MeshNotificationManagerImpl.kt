@@ -79,6 +79,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
+import org.meshtastic.core.service.stats.MeshStatsLines
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
@@ -1031,22 +1032,18 @@ class MeshNotificationManagerImpl(
         state: ConnectionState,
         reading: LiveUpdateReading.MeshStatus,
     ): Notification {
-        val lines = buildList {
-            add(getStringSuspend(Res.string.live_update_nodes_online, reading.nodesOnline, reading.nodesTotal))
-            add(getStringSuspend(Res.string.live_update_unread, reading.unread))
-            val stats = reading.localStats
-            if (stats != null) {
-                // Everything our own node reports: battery, uptime, channel load, RAM, traffic, relays, diagnostics.
-                addAll(
-                    stats.formatToStringSuspend(reading.radioBattery, includeNodes = false).lines().map {
-                        it.removePrefix(BULLET)
-                    },
-                )
-            } else {
-                reading.radioBattery?.let { add(batteryText(it)) }
-            }
-            addAll(extendedLines(reading.extended, ramAlreadyShown = stats != null && stats.heap_total_bytes > 0))
-        }
+        val lnaGain =
+            nodeRepository.value.myNodeInfo.value?.myNodeNum?.let { uiPrefs.value.lnaGains.value[it] } ?: 0
+        val lines =
+            MeshStatsLines.meshStatus(
+                nodesOnline = reading.nodesOnline,
+                nodesTotal = reading.nodesTotal,
+                unread = reading.unread,
+                radioBattery = reading.radioBattery,
+                localStats = reading.localStats,
+                extended = reading.extended,
+                lnaGain = lnaGain,
+            )
         val chip = "${reading.nodesOnline}/${reading.nodesTotal}".takeIf { state is ConnectionState.Connected }
         return createLiveUpdateNotification(
             title = title,

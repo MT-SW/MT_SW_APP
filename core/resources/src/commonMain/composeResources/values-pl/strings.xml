@@ -3668,4 +3668,7 @@
     <string name="app_icon_clear">Przezroczysta</string>
     <string name="app_icon_tinted">Jednokolorowa (zabarwiana)</string>
     <string name="app_icon_hint">Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie. Przy zmianie ikony system może pokazać komunikat.</string>
+    <string name="widget_stats_title">Widżet statystyk</string>
+    <string name="widget_stats_summary">Statystyki radia i sieci mesh na ekranie głównym</string>
+    <string name="widget_stats_info">Widżet pokazuje te same statystyki co stałe powiadomienie na Androidzie: węzły online, nieprzeczytane wiadomości, baterię, czas pracy, obciążenie kanału, ruch i resztę, co zgłasza radio. Co pokazuje (całą sieć mesh albo jeden wybrany węzeł), ustawiasz w wyświetlaniu adaptacyjnym na ekranie Połączenia.\n\niPhone i iPad: przytrzymaj ekran główny, dotknij +, wybierz „Statystyki MT_SW” (rozmiar średni, 4x2). Widżet odświeża się, gdy aplikacja działa, oraz co kilka minut przez system.\n\nAndroid: widżety aplikacji i stałe powiadomienie. Komputer: widżet jeszcze niedostępny.</string>
 </resources>

@@ -116,6 +116,7 @@ import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppIconSettingsItem
+import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -271,6 +272,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     showThemePicker = true
                 }
                 AppIconSettingsItem(current = appIconStyle, onPick = { settingsViewModel.setAppIconStyle(it) })
+                WidgetStatsSettingItem()
                 FontSettingsItems(
                     family = fontFamily,
                     weight = fontWeight,

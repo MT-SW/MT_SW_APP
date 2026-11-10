@@ -27,5 +27,15 @@ build "$CONFIG"
 APP="$ROOT/build/xcode-device/Build/Products/${CONFIG}-iphoneos/MTSWApp.app"
 rm -rf "$ROOT/build/ipa" && mkdir -p "$ROOT/build/ipa/Payload"
 cp -R "$APP" "$ROOT/build/ipa/Payload/"
+# Bez podpisu Xcode nie wpisuje uprawnień (większy limit pamięci, App Group widżetu) do plików: jeśli jest ldid, wpisujemy je tu,
+# a narzędzie do wgrywania (AltStore/SideStore) odczyta je i podpisze po swojemu.
+if command -v ldid >/dev/null 2>&1; then
+  for appex in "$ROOT/build/ipa/Payload/MTSWApp.app/PlugIns/"*.appex; do
+    [ -d "$appex" ] && ldid -S"$ROOT/iosApp/MTSWWidget/MTSWWidget.entitlements" "$appex"
+  done
+  ldid -S"$ROOT/iosApp/MTSWApp/MTSWApp.entitlements" "$ROOT/build/ipa/Payload/MTSWApp.app"
+else
+  echo "Uwaga: brak ldid (brew install ldid): plik .ipa nie będzie miał uprawnień (większa pamięć, widżet)."
+fi
 (cd "$ROOT/build/ipa" && zip -qry "$ROOT/build/MT_SW_APP-iOS.ipa" Payload)
 echo "Gotowe: $ROOT/build/MT_SW_APP-iOS.ipa"

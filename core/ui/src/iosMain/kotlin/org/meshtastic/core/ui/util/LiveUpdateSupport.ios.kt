@@ -18,4 +18,7 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 
-@Composable actual fun rememberLiveUpdateSupport(): LiveUpdateSupport = LiveUpdateSupport.Unavailable
+/** On iPhone/iPad the adaptive display is shown by the widget (there is no permanent notification), always allowed. */
+@Composable
+actual fun rememberLiveUpdateSupport(): LiveUpdateSupport =
+    LiveUpdateSupport(available = true, turnedOff = false, openSettings = {})

@@ -45,6 +45,10 @@ W Ustawienia → Funkcje MT_SW jest wpis „Ikona aplikacji”. Do wyboru: Autom
 Słowa: ikona aplikacji, zmienić ikonę, ciemna ikona, czarna ikona, przezroczysta ikona, styl ikony, ikona na ekranie głównym
 Źródło: Dokumentacja aplikacji: ikona aplikacji (sprawdzono 2026-11)
 
+W Ustawienia → Funkcje MT_SW jest wpis „Widżet statystyk”. Widżet 4x2 na ekranie głównym iPhone'a/iPada pokazuje te same statystyki co stałe powiadomienie na Androidzie i je zastępuje; co pokazuje (cała sieć mesh albo jeden węzeł), wybiera się w wyświetlaniu adaptacyjnym na ekranie Połączenia. Dodanie: przytrzymaj ekran główny, +, „Statystyki MT_SW”. Na komputerze widżet jeszcze nie jest dostępny.
+Słowa: widżet, widget, statystyki na ekranie głównym, powiadomienie stałe iPhone, ekran główny
+Źródło: Dokumentacja aplikacji: widżet statystyk (sprawdzono 2026-11)
+
 ### Jak powiększyć interfejs aplikacji?
 Rozmiar tekstu i elementów zmieniasz w ustawieniach aplikacji przez skalowanie aplikacji: od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie jest „Zgodnie z systemem”. Skrót do skalowania jest też w Ustawienia → Funkcje MT_SW. Działa także w wersji na komputer.
 Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, rozmiar czcionki, wielkość czcionki, zmienić czcionkę, większa czcionka, zoom, mniejszy interfejs, skala

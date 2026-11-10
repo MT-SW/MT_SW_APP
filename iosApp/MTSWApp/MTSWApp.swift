@@ -17,9 +17,17 @@
 
 import SwiftUI
 import MTSWShared
+import WidgetKit
 
 @main
 struct MTSWApp: App {
+    init() {
+        // Kotlin zapisuje nowe statystyki i daje znać tym powiadomieniem: widżet odświeża się od razu.
+        NotificationCenter.default.addObserver(forName: Notification.Name("MTSWWidgetRefresh"), object: nil, queue: .main) { _ in
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

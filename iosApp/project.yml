@@ -49,6 +49,8 @@ targets:
       - framework: ../native/ios/llama.xcframework
         embed: true
         codeSign: true
+      - target: MTSWWidget
+        embed: true
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -73,3 +75,26 @@ targets:
           case "$SDK_NAME" in iphonesimulator*) export ARCHS=arm64 ;; esac
           # MTSW_GRADLE_ARGS: dodatkowe ustawienia (np. więcej pamięci dla kompilatora) przekazywane przez scripts/build-ios-ipa.sh
           ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode $MTSW_GRADLE_ARGS
+  MTSWWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: MTSWWidget
+        excludes:
+          - "*.entitlements"
+    info:
+      path: MTSWWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Statystyki MT_SW
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.sw.mt.widget
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: MTSWWidget/MTSWWidget.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES

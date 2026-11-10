@@ -31,6 +31,7 @@ import org.meshtastic.core.resources.allStringResources
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_icon_title
+import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.app_settings
@@ -196,6 +197,7 @@ object SettingsSearchCatalog {
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.background_keepalive_title to SettingsRoute.MtSwFeatures,
             Res.string.app_icon_title to SettingsRoute.MtSwFeatures,
+            Res.string.widget_stats_title to SettingsRoute.MtSwFeatures,
             Res.string.font_family to SettingsRoute.MtSwFeatures,
             Res.string.font_weight to SettingsRoute.MtSwFeatures,
             Res.string.font_size to SettingsRoute.MtSwFeatures,
