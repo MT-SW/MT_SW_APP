@@ -154,6 +154,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_AUTO_LOAD_CHAT_IMAGES] = value } }
     }
 
+    override val skipBadTimeChartPoints: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_SKIP_BAD_TIME_CHART_POINTS] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setSkipBadTimeChartPoints(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_SKIP_BAD_TIME_CHART_POINTS] = value } }
+    }
+
     override val importMenuInTopBar: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_IMPORT_MENU_IN_TOP_BAR] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -830,6 +837,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
         val KEY_EXCLUDE_UNHEARD = booleanPreferencesKey("exclude-unheard")
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
+        val KEY_SKIP_BAD_TIME_CHART_POINTS = booleanPreferencesKey("skip-bad-time-chart-points")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")

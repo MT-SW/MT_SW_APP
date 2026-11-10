@@ -49,6 +49,7 @@ import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
@@ -145,6 +146,7 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
+    val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
     val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
@@ -191,6 +193,12 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.LinkIcon,
                     checked = autoLoadChatImages,
                     onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
+                )
+                SwitchListItem(
+                    text = stringResource(Res.string.skip_bad_time_chart_points),
+                    leadingIcon = MeshtasticIcons.LinkIcon,
+                    checked = skipBadTimes,
+                    onClick = { settingsViewModel.setSkipBadTimeChartPoints(!skipBadTimes) },
                 )
                 SwitchListItem(
                     text = stringResource(Res.string.import_menu_in_top_bar),

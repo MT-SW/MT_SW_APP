@@ -175,6 +175,14 @@ interface UiPrefs {
      */
     val autoLoadChatImages: StateFlow<Boolean>
 
+    /**
+     * MT_SW: node charts leave out readings with a wrong time (a node with a wrong clock): more than 30 days in the
+     * future, more than a year older than the newest one, and repeats of the same moment. On by default.
+     */
+    val skipBadTimeChartPoints: StateFlow<Boolean>
+
+    fun setSkipBadTimeChartPoints(value: Boolean)
+
     /** MT_SW: the import / share / add-contact button sits in the top bar instead of floating over the list. */
     val importMenuInTopBar: StateFlow<Boolean>
 

@@ -3049,6 +3049,7 @@
     <string name="signal">Signal</string>
     <string name="signal_quality">Signal Quality</string>
     <string name="skip">Skip</string>
+    <string name="skip_bad_time_chart_points">Skip readings with a wrong time in charts</string>
     <string name="slot">Slot</string>
     <string name="slot_auto">Auto</string>
     <string name="smart_features_description">AI assistant, message and text translator and voice dictation. Everything runs entirely on the device and offline (the assistant can optionally get internet access for lookups). Each function has its own switch; the model choice is visible but only available once the function is switched on.</string>

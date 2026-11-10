@@ -31,6 +31,7 @@ import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
@@ -52,6 +53,7 @@ class MeshStatsFeed(
     private val packets: PacketRepository,
     private val prefs: LiveUpdatePrefs,
     private val service: ServiceRepository,
+    private val uiPrefs: UiPrefs,
 ) {
     private data class Basics(val online: Int, val total: Int, val unread: Int, val connected: Boolean)
 
@@ -67,7 +69,8 @@ class MeshStatsFeed(
             }
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
-        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }) { b, s, mode, _ ->
+        // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
+        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) { b, s, mode, _, _ ->
             Triple(b, s, mode)
         }
             .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode) }
@@ -81,6 +84,8 @@ class MeshStatsFeed(
         our: Node?,
         mode: LiveUpdateMode,
     ): MeshStatsSnapshot {
+        // Same display-only correction as in the app: the noise floor minus the gain of our own radio.
+        val lnaGain = our?.num?.let { uiPrefs.lnaGains.value[it] } ?: 0
         val tracked = (mode as? LiveUpdateMode.TrackNode)?.let { nodes.nodeDBbyNum.value[it.nodeNum] }
         val title: String
         val lines: List<String>
@@ -97,6 +102,7 @@ class MeshStatsFeed(
                     radioBattery = our?.deviceMetrics?.battery_level,
                     localStats = stats.takeIf { it.uptime_seconds != 0 },
                     extended = extended.takeIf { it != LocalStatsExtended() },
+                    lnaGain = lnaGain,
                 )
         }
         return MeshStatsSnapshot(title, if (b.connected) "${b.online}/${b.total}" else "", b.connected, lines)

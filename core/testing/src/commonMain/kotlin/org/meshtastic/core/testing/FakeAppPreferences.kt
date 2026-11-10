@@ -396,6 +396,12 @@ class FakeUiPrefs : UiPrefs {
         importMenuInTopBar.value = value
     }
 
+    override val skipBadTimeChartPoints = MutableStateFlow(true)
+
+    override fun setSkipBadTimeChartPoints(value: Boolean) {
+        skipBadTimeChartPoints.value = value
+    }
+
     override val autoLoadChatImages = MutableStateFlow(false)
 
     override fun setAutoLoadChatImages(value: Boolean) {

@@ -2977,6 +2977,7 @@ shutdown_warning
 signal
 signal_quality
 skip
+skip_bad_time_chart_points
 slot
 slot_auto
 smart_features_description

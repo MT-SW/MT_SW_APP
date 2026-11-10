@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: nowy przełącznik w Funkcjach MT_SW „Pomijaj w wykresach odczyty ze złym czasem” (domyślnie włączony; wyłączony pokazuje w wykresach wszystkie odczyty).
+* Wszystkie wersje: widżet pokazuje szum z korektą wzmacniacza (LNA), tak jak aplikacja i powiadomienie.
+* Wszystkie wersje: w menu wyboru motywu nazwy kategorii są złote i większe niż pozycje.
 * iPhone i iPad: napis „Zaktualizowano” i godzina na widżecie są w języku aplikacji, a nie telefonu.
 
 * iPhone i iPad: w ustawieniach asystenta pozycja „Zwolnij pamięć” pokazuje teraz, który model jest w pamięci (wcześniej zawsze pisała, że żaden), a dotknięcie jej zwalnia model, tak jak na Androidzie i komputerze.
@@ -614,6 +617,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: new switch in MT_SW features "Skip readings with a wrong time in charts" (on by default; off shows every reading in the charts).
+* All versions: the widget shows the noise floor with the amplifier (LNA) correction, like the app and the notification.
+* All versions: in the theme picker the category names are gold and larger than the options.
 * iPhone and iPad: the "Updated" label and time on the widget follow the app's language, not the phone's.
 
 * iPhone and iPad: in the assistant settings the "Free memory" row now shows which model is in memory (it always said none before), and tapping it frees the model, as on Android and desktop.

@@ -222,6 +222,10 @@ class SettingsViewModel(
 
     val autoLoadChatImages = uiPrefs.autoLoadChatImages
 
+    val skipBadTimeChartPoints = uiPrefs.skipBadTimeChartPoints
+
+    fun setSkipBadTimeChartPoints(value: Boolean) = uiPrefs.setSkipBadTimeChartPoints(value)
+
     val importMenuInTopBar = uiPrefs.importMenuInTopBar
 
     fun setImportMenuInTopBar(value: Boolean) {

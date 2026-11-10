@@ -37,6 +37,7 @@ import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_keepalive_title
 import org.meshtastic.core.resources.db_sync_auto
@@ -191,6 +192,7 @@ object SettingsSearchCatalog {
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
+            Res.string.skip_bad_time_chart_points to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,

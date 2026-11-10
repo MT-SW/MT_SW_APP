@@ -39,6 +39,9 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.core.repository.UiPrefs
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -93,7 +96,12 @@ internal fun LineAreaChart(
     scale: LevelScale? = null,
     palette: Map<HealthLevel, Color> = emptyMap(),
 ) {
-    val sorted = remember(points) { points.filter { it.value.isFinite() }.withSaneTimes() }
+    val skipBadTimes by koinInject<UiPrefs>().skipBadTimeChartPoints.collectAsStateWithLifecycle()
+    val sorted =
+        remember(points, skipBadTimes) {
+            val finite = points.filter { it.value.isFinite() }
+            if (skipBadTimes) finite.withSaneTimes() else finite.sortedBy { it.timestampMillis }
+        }
     if (sorted.size < 2) return
     val minV = sorted.minOf { it.value }
     val maxV = sorted.maxOf { it.value }

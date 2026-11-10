@@ -42,6 +42,7 @@ import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.bluetooth
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.channels
@@ -729,6 +730,12 @@ class AssistantGuideTools(private val data: AssistantDataProvider, private val c
                     "settings/mt-sw-features",
                     Res.string.auto_load_chat_images,
                     listOf("zdjęci", "obrazk", "images", "podgląd link"),
+                ),
+                Target(
+                    "skip_bad_time",
+                    "settings/mt-sw-features",
+                    Res.string.skip_bad_time_chart_points,
+                    listOf("zły czas", "zegar", "szum", "wykres", "odczyty", "wrong time", "clock", "chart"),
                 ),
                 Target(
                     "import_menu",

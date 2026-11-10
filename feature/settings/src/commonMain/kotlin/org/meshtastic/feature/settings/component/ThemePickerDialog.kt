@@ -104,8 +104,9 @@ fun ThemePickerDialog(onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
                 ThemeGroup.entries.forEach { group ->
                     Text(
                         text = stringResource(group.title),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        // Category headers: gold (the theme's primary colour) and larger than the options below.
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                     )
                     group.options.forEach { option ->

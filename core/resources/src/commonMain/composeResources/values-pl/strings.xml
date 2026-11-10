@@ -157,6 +157,7 @@
     <string name="auto_clean_nodes_enabled">Włącz automatyczne czyszczenie</string>
     <string name="auto_clean_nodes_inactivity_days">Usuwaj węzły nieaktywne dłużej niż %1$d dni</string>
     <string name="auto_clean_nodes_title">Automatyczne czyszczenie</string>
+    <string name="skip_bad_time_chart_points">Pomijaj w wykresach odczyty ze złym czasem</string>
     <string name="auto_load_chat_images">Automatycznie ładuj obrazki z linków w czacie</string>
     <!-- AQI -->
     <string name="aqi">AQI</string>
