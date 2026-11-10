@@ -63,7 +63,7 @@ class AndroidAppWidgetUpdater(
         }
 
         scope.launch {
-            meshStatusProvider.state.distinctUntilChanged().collect {
+            meshStatusProvider.state.collect {
                 if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
             }
         }
