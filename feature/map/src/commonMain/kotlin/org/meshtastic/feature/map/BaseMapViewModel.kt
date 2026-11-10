@@ -32,9 +32,9 @@ import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.core.model.NodeMapFilter
 import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.decodeExcludedRoles

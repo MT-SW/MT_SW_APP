@@ -264,7 +264,9 @@ private const val MAX_AGE_MILLIS = 365L * 24 * 60 * 60 * 1000
  * otherwise stretch the time axis until the real readings squash into a line. Only the chart is trimmed; tables and
  * exports keep every reading.
  */
-internal fun List<MetricPoint>.withSaneTimes(nowMillis: Long = Clock.System.now().toEpochMilliseconds()): List<MetricPoint> {
+internal fun List<MetricPoint>.withSaneTimes(
+    nowMillis: Long = Clock.System.now().toEpochMilliseconds(),
+): List<MetricPoint> {
     val notFuture = filter { it.timestampMillis <= nowMillis + MAX_FUTURE_MILLIS }
     val newest = notFuture.maxOfOrNull { it.timestampMillis } ?: return emptyList()
     return notFuture

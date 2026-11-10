@@ -70,8 +70,8 @@ private fun String.withNumber(n: Long): String = replace("%1\$d", n.toString())
 
 /**
  * Formats a given Unix timestamp (in seconds) into a relative "time ago" string in the app's language, e.g. "5 min
- * temu", "2 godz. temu", "wczoraj", "przedwczoraj", "3 dni temu". Under a minute it returns [AgoLabels.now]; older than 7 days it is a date such
- * as "7 listopada".
+ * temu", "2 godz. temu", "wczoraj", "przedwczoraj", "3 dni temu". Under a minute it returns [AgoLabels.now]; older than
+ * 7 days it is a date such as "7 listopada".
  *
  * @param lastSeenUnixSeconds The Unix timestamp in seconds to be formatted.
  * @param labels Localized texts, see [rememberAgoLabels].

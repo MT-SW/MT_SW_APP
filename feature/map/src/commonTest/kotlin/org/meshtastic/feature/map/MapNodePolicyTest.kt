@@ -111,7 +111,12 @@ class MapNodePolicyTest {
 
     @Test
     fun `hop limit keeps nodes up to that many hops`() {
-        val nodes = listOf(node(1, 45.0, -122.0, hopsAway = 0), node(2, 45.0, -122.0, hopsAway = 2), node(3, 45.0, -122.0, hopsAway = 5))
+        val nodes =
+            listOf(
+                node(1, 45.0, -122.0, hopsAway = 0),
+                node(2, 45.0, -122.0, hopsAway = 2),
+                node(3, 45.0, -122.0, hopsAway = 5),
+            )
         assertEquals(listOf(1, 2), visible(nodes, filters(maxHops = 2)))
         assertEquals(listOf(1, 2, 3), visible(nodes, filters()))
     }

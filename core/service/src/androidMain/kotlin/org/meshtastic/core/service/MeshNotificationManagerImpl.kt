@@ -240,6 +240,7 @@ class MeshNotificationManagerImpl(
         private const val SECONDS_PER_MINUTE = 60L
         private const val SECONDS_PER_HOUR = 3_600L
         private const val SECONDS_PER_DAY = 86_400L
+        private const val THREE_DAYS_SECONDS = 3 * SECONDS_PER_DAY
     }
 
     private data class ServiceNotificationSnapshot(
@@ -1240,7 +1241,7 @@ class MeshNotificationManagerImpl(
 
                 secondsAgo < 2 * SECONDS_PER_DAY -> getStringSuspend(Res.string.last_heard_ago_day_one)
 
-                secondsAgo < 3 * SECONDS_PER_DAY -> getStringSuspend(Res.string.last_heard_ago_day_two)
+                secondsAgo < THREE_DAYS_SECONDS -> getStringSuspend(Res.string.last_heard_ago_day_two)
 
                 else -> getStringSuspend(Res.string.last_heard_ago_d, secondsAgo / SECONDS_PER_DAY)
             }

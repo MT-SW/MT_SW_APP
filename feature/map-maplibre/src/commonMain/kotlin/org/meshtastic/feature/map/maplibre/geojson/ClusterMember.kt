@@ -62,7 +62,9 @@ internal fun stackedMembers(features: List<Feature<*, *>>, top: Feature<*, *>): 
     return if (members.size > 1) members else emptyList()
 }
 
-/** About 30 m of latitude: the spread radius for coincident nodes (8 m) with room to spare, nothing like a neighbour. */
+/**
+ * About 30 m of latitude: the spread radius for coincident nodes (8 m) with room to spare, nothing like a neighbour.
+ */
 private const val SAME_SPOT_DEGREES = 0.00027
 
 private fun JsonObject.toClusterMember(): ClusterMember? {

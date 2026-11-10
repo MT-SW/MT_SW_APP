@@ -71,12 +71,12 @@ import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.theme.LocalMonochrome
 import org.meshtastic.feature.map.MapNodePolicy
+import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.MapChipGlyph
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey
-import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
-import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
+import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
 
 /**

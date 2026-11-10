@@ -41,15 +41,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter_all_roles
+import org.meshtastic.core.resources.map_filter_display_title
 import org.meshtastic.core.resources.map_filter_distance_km
 import org.meshtastic.core.resources.map_filter_max_distance_summary
 import org.meshtastic.core.resources.map_filter_max_distance_title
 import org.meshtastic.core.resources.map_filter_max_hops_summary
 import org.meshtastic.core.resources.map_filter_max_hops_title
 import org.meshtastic.core.resources.map_filter_no_limit
-import org.meshtastic.core.resources.map_filter_display_title
 import org.meshtastic.core.resources.map_filter_nodes_title
 import org.meshtastic.core.resources.map_filter_roles_title
 import org.meshtastic.core.resources.map_filter_show_ignored
@@ -72,7 +73,6 @@ import org.meshtastic.core.ui.icon.Lens
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.core.ui.icon.role
-import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.proto.Config
 
