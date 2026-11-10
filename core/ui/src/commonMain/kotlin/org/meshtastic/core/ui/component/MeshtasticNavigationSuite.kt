@@ -259,9 +259,14 @@ private fun handleNavigation(
     uiViewModel: UIViewModel,
 ) {
     val isRepress = destination == topLevelDestination
-    val wasOnRoot = isRepress && multiBackstack.activeBackStack.size <= 1
-    // A press on a bottom button always brings the tab back to its first screen, also when it comes from another tab.
-    multiBackstack.navigateTopLevel(destination.route, resetStack = true)
+    if (!isRepress) {
+        // Another tab opens where it was left, with its own screens and state.
+        multiBackstack.navigateTopLevel(destination.route)
+        return
+    }
+    // Pressing the button of the tab already open brings it back to its first screen.
+    val wasOnRoot = multiBackstack.activeBackStack.size <= 1
+    multiBackstack.navigateTopLevel(destination.route)
     val event =
         when (destination) {
             TopLevelDestination.Nodes -> ScrollToTopEvent.NodesTabPressed
@@ -269,7 +274,7 @@ private fun handleNavigation(
             else -> null
         }
     if (event != null) {
-        // On the same list the screen is already there; after a switch it has to be built first.
+        // On the list itself the screen is already there; after going back to it, it has to be built first.
         if (wasOnRoot) uiViewModel.emitScrollToTopEvent(event) else uiViewModel.emitScrollToTopEventDelayed(event)
     }
 }
