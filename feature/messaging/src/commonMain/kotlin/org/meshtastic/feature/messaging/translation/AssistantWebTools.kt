@@ -40,7 +40,8 @@ class AssistantWebTools : AiToolSet {
             AiToolSpec(
                 name = "web_search",
                 description =
-                    "Searches the internet. Use it only for general knowledge that is not in the app or in the user's own data. " +
+                    "Searches the internet. Use it only for general knowledge that is not in the app or in the user's " +
+                        "own data. " +
                         "Put only general search words in the query, never names, positions or messages of the user.",
                 params = listOf(AiToolSpec.Param("query", "General search words")),
             ) { a ->

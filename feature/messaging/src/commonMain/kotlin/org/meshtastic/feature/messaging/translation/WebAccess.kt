@@ -29,8 +29,6 @@ internal expect fun platformWebTransport(): WebAccess.Transport
 internal object WebAccess {
     private const val MAX_BYTES = 400_000
     private const val MAX_REDIRECTS = 3
-    private const val CONNECT_MS = 8_000
-    private const val READ_MS = 12_000
     private const val USER_AGENT = "MT_SW_APP assistant (offline-first; text only)"
     private val QUESTION_WORDS =
         setOf(
@@ -140,29 +138,29 @@ internal object WebAccess {
     }
 
     private fun resolve(base: String, next: String): String = when {
-            next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
-            next.startsWith("//") -> "https:$next"
-            next.startsWith("/") -> "https://" + hostPartOf(base) + next
-            else -> base.substringBefore('?').substringBeforeLast('/') + "/" + next
-        }
+        next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
+        next.startsWith("//") -> "https:$next"
+        next.startsWith("/") -> "https://" + hostPartOf(base) + next
+        else -> base.substringBefore('?').substringBeforeLast('/') + "/" + next
+    }
 
     private fun hostPartOf(url: String): String = url.substringAfter("://").substringBefore('/').substringBefore('?')
 
     /** Plain readable text of an HTML page, without scripts, styles and tags. */
     fun htmlToText(html: String): String = html
-            .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
-            .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
-            .replace(Regex("<[^>]+>"), " ")
-            .replace("&nbsp;", " ")
-            .replace("&amp;", "&")
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&quot;", "\"")
-            .replace("&#39;", "'")
-            .lines()
-            .map { it.replace(Regex("\\s+"), " ").trim() }
-            .filter { it.isNotEmpty() }
-            .joinToString("\n")
+        .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
+        .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
+        .replace(Regex("<[^>]+>"), " ")
+        .replace("&nbsp;", " ")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'")
+        .lines()
+        .map { it.replace(Regex("\\s+"), " ").trim() }
+        .filter { it.isNotEmpty() }
+        .joinToString("\n")
 
     /** Search results of DuckDuckGo's plain HTML page as `title - address` and a short snippet. */
     fun search(query: String, limit: Int): List<String> {
@@ -229,7 +227,8 @@ internal object WebAccess {
                 when (val n = text[i + 1]) {
                     'n',
                     't',
-                    'r' -> {
+                    'r',
+                    -> {
                         out.append(' ')
                         i += 2
                     }
@@ -285,8 +284,8 @@ internal object WebAccess {
     }
 
     fun hostOf(url: String): String = hostPartOf(url).substringAfter('@').let {
-            if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':')
-        }
+        if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':')
+    }
 
     private const val HEX = "0123456789ABCDEF"
 
@@ -297,9 +296,7 @@ internal object WebAccess {
             val c = v.toChar()
             when {
                 (c.isLetterOrDigit() && v < 128) || c in "-_.~" -> append(c)
-
                 c == ' ' -> append('+')
-
                 else -> append('%').append(HEX[v shr 4]).append(HEX[v and 0xF])
             }
         }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "TooManyFunctions", "MatchingDeclarationName")
+@file:Suppress("MagicNumber", "TooManyFunctions")
 
 package org.meshtastic.core.takserver
 
@@ -33,7 +33,9 @@ internal object Der {
         return out
     }
 
-    private fun length(n: Int): ByteArray = when {
+    @Suppress("FunctionSignature")
+    private fun length(n: Int): ByteArray =
+        when {
             n < 0x80 -> byteArrayOf(n.toByte())
             n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
             n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())

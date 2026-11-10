@@ -22,7 +22,12 @@ package org.meshtastic.feature.messaging.translation
 class ThinkingTooLongException : IllegalStateException("The model kept reasoning without answering")
 
 /** A safe file/note name for an assistant memory entry: letters and digits only, at most 40 characters. */
-internal fun safeAssistantMemoryName(name: String): String =
-    name.trim().lowercase().map { if (it.isLetterOrDigit()) it else '-' }.joinToString("").trim('-').take(MEMORY_NAME_MAX)
+internal fun safeAssistantMemoryName(name: String): String = name
+    .trim()
+    .lowercase()
+    .map { if (it.isLetterOrDigit()) it else '-' }
+    .joinToString("")
+    .trim('-')
+    .take(MEMORY_NAME_MAX)
 
 private const val MEMORY_NAME_MAX = 40
