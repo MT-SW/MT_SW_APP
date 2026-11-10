@@ -49,6 +49,12 @@ W Ustawienia → Funkcje MT_SW jest wpis „Widżet statystyk”. Widżet 4x2 na
 Słowa: widżet, widget, statystyki na ekranie głównym, powiadomienie stałe iPhone, ekran główny
 Źródło: Dokumentacja aplikacji: widżet statystyk (sprawdzono 2026-11)
 
+### Jak zsynchronizować statystyki między bazami różnych radii?
+
+W Ustawienia → Funkcje MT_SW jest „Synchronizacja statystyk urządzeń”. Każde radio ma własną bazę danych; synchronizacja uaktualnia statystyki (telemetrię, pozycję) tylko tych węzłów, które znają obie bazy. Węzły znane jednej bazie nie są kopiowane do drugiej. Można ją włączyć automatycznie albo użyć przycisku „Synchronizuj teraz”.
+Słowa: synchronizacja, synchronizować, bazy danych, statystyki węzłów, dwa radia, wiele radii
+Źródło: Dokumentacja aplikacji: synchronizacja statystyk urządzeń (sprawdzono 2026-11)
+
 ### Jak powiększyć interfejs aplikacji?
 Rozmiar tekstu i elementów zmieniasz w ustawieniach aplikacji przez skalowanie aplikacji: od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie jest „Zgodnie z systemem”. Skrót do skalowania jest też w Ustawienia → Funkcje MT_SW. Działa także w wersji na komputer.
 Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, rozmiar czcionki, wielkość czcionki, zmienić czcionkę, większa czcionka, zoom, mniejszy interfejs, skala

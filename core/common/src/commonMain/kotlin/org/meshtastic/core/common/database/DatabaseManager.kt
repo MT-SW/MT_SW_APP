@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.common.database
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /** Interface for managing database instances and cache limits. */
@@ -56,4 +57,16 @@ interface DatabaseManager {
 
     /** Returns true if a database exists for the given device address. */
     fun hasDatabaseFor(address: String?): Boolean
+
+    /** Whether the statistics of nodes shared by several device databases are synchronized automatically. */
+    val statsSyncEnabled: StateFlow<Boolean>
+        get() = MutableStateFlow(false)
+
+    fun setStatsSyncEnabled(enabled: Boolean) {}
+
+    /**
+     * Synchronizes the statistics of the nodes that two or more device databases both know (nodes known to one database
+     * only are not copied). Returns how many entries were written.
+     */
+    suspend fun syncSharedNodeStats(): Int = 0
 }

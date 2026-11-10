@@ -116,6 +116,7 @@ import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppIconSettingsItem
+import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
@@ -137,6 +138,7 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
+    val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
     val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
     val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
@@ -273,6 +275,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 AppIconSettingsItem(current = appIconStyle, onPick = { settingsViewModel.setAppIconStyle(it) })
                 WidgetStatsSettingItem()
+                DatabaseSyncSettingItems(
+                    autoEnabled = dbStatsSyncEnabled,
+                    onAutoChange = { settingsViewModel.setDbStatsSyncEnabled(it) },
+                    syncNow = { settingsViewModel.syncDbStatsNow() },
+                )
                 FontSettingsItems(
                     family = fontFamily,
                     weight = fontWeight,

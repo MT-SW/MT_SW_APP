@@ -869,6 +869,15 @@
     <string name="date">Date</string>
     <string name="date_separator_today">Today</string>
     <string name="date_separator_yesterday">Yesterday</string>
+    <!-- DB -->
+    <string name="db_sync_auto">Sync statistics automatically</string>
+    <string name="db_sync_done">Done: %1$d entries synchronized.</string>
+    <string name="db_sync_failed">Syncing failed.</string>
+    <string name="db_sync_info">Each radio you connect has its own database. When the same node is known to two databases, this brings the statistics of that node up to date in both: telemetry history, position and the latest readings. Only nodes known to both databases are synchronized; a node known to one database only is never copied to the other. Your notes, names, favourites, ignore and mute settings stay as they are in each database.\n\nAutomatic sync runs a while after the connection changes to another radio. The button Sync now does it at once.</string>
+    <string name="db_sync_now">Sync now</string>
+    <string name="db_sync_summary">Statistics of nodes shared by the databases of your radios</string>
+    <string name="db_sync_title">Device statistics sync</string>
+    <string name="db_sync_working">Syncing…</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debug</string>

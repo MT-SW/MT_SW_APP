@@ -120,6 +120,16 @@ class SettingsViewModel(
         databaseManager.setCacheLimit(limit)
     }
 
+    /** Automatic sync of the statistics of nodes that several device databases share. */
+    val dbStatsSyncEnabled: StateFlow<Boolean> = databaseManager.statsSyncEnabled
+
+    fun setDbStatsSyncEnabled(enabled: Boolean) {
+        databaseManager.setStatsSyncEnabled(enabled)
+    }
+
+    /** Synchronizes now; returns how many entries were written. */
+    suspend fun syncDbStatsNow(): Int = databaseManager.syncSharedNodeStats()
+
     /** How many currently-cached device databases would be evicted if the cache limit were lowered to [limit]. */
     suspend fun cachedDeviceCountExceeding(limit: Int): Int =
         (databaseManager.cachedDeviceDbCount() - limit).coerceAtLeast(0)

@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: nowa „Synchronizacja statystyk urządzeń” w Funkcje MT_SW. Każde radio ma własną bazę; synchronizacja uzupełnia w obu bazach historię telemetrii i pozycji oraz ostatnie odczyty tych węzłów, które znają obie bazy (bez dubli: pakiet usłyszany przez oba radia liczy się raz). Węzły znane tylko jednej bazie nie są kopiowane do drugiej; notatki, nazwy, ulubione, ignorowanie i wyciszenie zostają bez zmian. Działa automatycznie (opcja, domyślnie wyłączona) po zmianie radia albo przyciskiem „Synchronizuj teraz”.
 * iPhone i iPad: każda kolejna wiadomość (reakcja, alarm) z tej samej rozmowy znów dzwoni i wibruje także na zegarku. Wcześniej nowe powiadomienie zastępowało poprzednie po cichu, bo system nie powiadamia o podmienionym. Teraz powiadomienia jednej rozmowy układają się w stos, a odczytanie rozmowy czyści cały stos.
 * iPhone i iPad: sprawdzanie nowych wersji aplikacji (jak na Androidzie i komputerze): minutę po starcie i potem dwa razy na dobę, z powiadomieniem i oknem z przyciskiem do strony wydań; włączane i wyłączane w ustawieniach aktualizacji.
 * iPhone, iPad i komputer: raport Discovery eksportuje się teraz do PDF (wcześniej tylko tekst), tak jak na Androidzie. Litery spoza zachodnioeuropejskich (np. „ł”) są w PDF zapisane bez ogonków.
@@ -589,6 +590,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: new "Device statistics sync" in MT_SW features. Every radio has its own database; the sync completes in both databases the telemetry and position history and the latest readings of the nodes both databases know (no duplicates: a packet heard by both radios counts once). Nodes known to one database only are not copied to the other; notes, names, favourites, ignore and mute stay unchanged. It runs automatically (an option, off by default) after the radio changes, or with the "Sync now" button.
 * iPhone and iPad: every next message (reaction, alert) from the same conversation rings and vibrates again, on the watch too. Before, a new notification silently replaced the previous one, because the system does not alert for a replaced notification. Now the notifications of one conversation stack, and reading the conversation clears the whole stack.
 * iPhone and iPad: checking for new app versions (like on Android and desktop): a minute after the start and then twice a day, with a notification and a window with a button to the releases page; switched on and off in the update settings.
 * iPhone, iPad and desktop: the Discovery report now exports to PDF (text only before), like on Android. Letters outside Western European (e.g. Polish "ł") are written without accents in the PDF.

@@ -117,6 +117,9 @@ internal const val FLOW_FIRST_EMISSION_TIMEOUT_MS = 45_000L
  */
 internal const val MAX_WEDGE_POOL_RECOVERIES_PER_WINDOW = 3
 
+/** Pause after a database switch before the optional statistics sync, so the connection settles first. */
+private const val STATS_SYNC_DELAY_MS = 30_000L
+
 /** Returns database names that form either side of an unfinished, crash-recoverable association route. */
 internal fun pendingRouteDbNames(preferences: Preferences): Set<String> = preferences
     .asMap()
@@ -293,6 +296,28 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
             .stateIn(managerScope, SharingStarted.Eagerly, DatabaseConstants.DEFAULT_CACHE_LIMIT)
 
     override fun getCurrentCacheLimit(): Int = cacheLimit.value
+
+    private val statsSyncKey = booleanPreferencesKey("db_stats_sync_enabled")
+
+    override val statsSyncEnabled: StateFlow<Boolean> =
+        datastore.data.map { it[statsSyncKey] ?: false }.stateIn(managerScope, SharingStarted.Eagerly, false)
+
+    override fun setStatsSyncEnabled(enabled: Boolean) {
+        launchManagerWork { datastore.edit { it[statsSyncKey] = enabled } }
+    }
+
+    override suspend fun syncSharedNodeStats(): Int = withManagerOperation {
+        withContext(dispatchers.io) {
+            mutex.withLock {
+                val databases = deviceDbNamesLocked().map { getOrOpenDatabase(it) }
+                var written = 0
+                for (i in databases.indices) {
+                    for (j in i + 1 until databases.size) written += DatabaseStatsSync.sync(databases[i], databases[j])
+                }
+                written
+            }
+        }
+    }
 
     override fun setCacheLimit(limit: Int) {
         val clamped = limit.coerceIn(DatabaseConstants.MIN_CACHE_LIMIT, DatabaseConstants.MAX_CACHE_LIMIT)
@@ -899,6 +924,18 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * must not access platform context singletons (e.g. `ContextServices.app`).
      */
     protected open fun schedulePostSwitchMaintenance(dbName: String, db: MeshtasticDatabase) {
+        // Optional: bring the statistics of nodes shared with the other device databases up to date.
+        launchManagerWork(dispatchers.io) {
+            delay(STATS_SYNC_DELAY_MS)
+            if (statsSyncEnabled.value) {
+                @Suppress("TooGenericExceptionCaught")
+                try {
+                    syncSharedNodeStats()
+                } catch (e: Exception) {
+                    Logger.w(e) { "Statistics sync between device databases failed" }
+                }
+            }
+        }
         // Defer LRU eviction so switch is not blocked by filesystem work
         launchManagerWork(dispatchers.io) { enforceCacheLimit() }
 

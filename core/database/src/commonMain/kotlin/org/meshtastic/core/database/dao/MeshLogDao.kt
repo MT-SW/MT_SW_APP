@@ -186,6 +186,10 @@ interface MeshLogDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(logs: List<MeshLog>)
 
+    /** The packets of the given nodes on the given ports (telemetry, position, ...), for the statistics sync. */
+    @Query("SELECT * FROM log WHERE from_num IN (:nodeNums) AND port_num IN (:portNums)")
+    suspend fun getLogsFromNodesOnPorts(nodeNums: List<Int>, portNums: List<Int>): List<MeshLog>
+
     @Query("DELETE FROM log")
     suspend fun deleteAll()
 
