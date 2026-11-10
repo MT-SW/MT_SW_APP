@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: każda kolejna wiadomość (reakcja, alarm) z tej samej rozmowy znów dzwoni i wibruje także na zegarku. Wcześniej nowe powiadomienie zastępowało poprzednie po cichu, bo system nie powiadamia o podmienionym. Teraz powiadomienia jednej rozmowy układają się w stos, a odczytanie rozmowy czyści cały stos.
 * iPhone i iPad: sprawdzanie nowych wersji aplikacji (jak na Androidzie i komputerze): minutę po starcie i potem dwa razy na dobę, z powiadomieniem i oknem z przyciskiem do strony wydań; włączane i wyłączane w ustawieniach aktualizacji.
 * iPhone, iPad i komputer: raport Discovery eksportuje się teraz do PDF (wcześniej tylko tekst), tak jak na Androidzie. Litery spoza zachodnioeuropejskich (np. „ł”) są w PDF zapisane bez ogonków.
 * Android: nowy widżet „Statystyki MT_SW” (4x2) z tymi samymi liniami co stałe powiadomienie (cała sieć albo jeden śledzony węzeł, zależnie od wyświetlania adaptacyjnego). Dane dla widżetów Androida i iPhone'a pochodzą teraz z jednego wspólnego kodu, więc pokazują dokładnie to samo.
@@ -588,6 +589,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* iPhone and iPad: every next message (reaction, alert) from the same conversation rings and vibrates again, on the watch too. Before, a new notification silently replaced the previous one, because the system does not alert for a replaced notification. Now the notifications of one conversation stack, and reading the conversation clears the whole stack.
 * iPhone and iPad: checking for new app versions (like on Android and desktop): a minute after the start and then twice a day, with a notification and a window with a button to the releases page; switched on and off in the update settings.
 * iPhone, iPad and desktop: the Discovery report now exports to PDF (text only before), like on Android. Letters outside Western European (e.g. Polish "ł") are written without accents in the PDF.
 * Android: new "MT_SW statistics" widget (4x2) with the same lines as the permanent notification (the whole mesh or one tracked node, depending on the adaptive display). The data for the Android and iPhone widgets now comes from one shared piece of code, so they show exactly the same.

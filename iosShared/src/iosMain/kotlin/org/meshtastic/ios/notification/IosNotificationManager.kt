@@ -49,6 +49,17 @@ import kotlin.coroutines.resume
 
 private const val USER_INFO_DEEP_LINK = "deepLink"
 
+private val STACKING_CATEGORIES =
+    setOf(
+        Notification.Category.Message,
+        Notification.Category.Reaction,
+        Notification.Category.Waypoint,
+        Notification.Category.NodeEvent,
+        Notification.Category.MeshBeacon,
+        Notification.Category.Alert,
+        Notification.Category.Battery,
+    )
+
 /**
  * Shows the banner also while the app is open (iOS hides it by default), and opens the conversation (or other screen) a
  * notification points to when the user taps it.
@@ -131,10 +142,20 @@ class IosNotificationManager(
                 setTitle(notification.title)
                 setBody(notification.message)
                 notification.deepLink?.let { setUserInfo(mapOf<Any?, Any?>(USER_INFO_DEEP_LINK to it)) }
+                // Notifications of one conversation (or kind) are stacked together in the list.
+                notification.id?.let { setThreadIdentifier(it.toString()) }
                 // A quiet notification (app open on another screen) gets a sound only if the user switched that on.
                 if (!notification.isSilent || prefs.soundWhileOpen.value) setSound(UNNotificationSound.defaultSound)
             }
-        val id = notification.id?.toString() ?: NSUUID().UUIDString
+        // A notification posted under an identifier that is already shown only replaces it, silently: no sound and no
+        // vibration on the watch. So every message, reaction, waypoint and alert gets its own identifier (they stack
+        // by thread); only the service notices, which are meant to be updated in place, keep a fixed one.
+        val id =
+            if (notification.id == null || notification.category in STACKING_CATEGORIES) {
+                NSUUID().UUIDString
+            } else {
+                notification.id.toString()
+            }
         val request = UNNotificationRequest.requestWithIdentifier(id, content, trigger = null)
         return suspendCancellableCoroutine { cont ->
             center.addNotificationRequest(request) { error ->
@@ -147,6 +168,16 @@ class IosNotificationManager(
     override fun cancel(id: Int) {
         center.removeDeliveredNotificationsWithIdentifiers(listOf(id.toString()))
         center.removePendingNotificationRequestsWithIdentifiers(listOf(id.toString()))
+        // The stacked notifications of this conversation carry their own identifiers; find them by thread.
+        center.getDeliveredNotificationsWithCompletionHandler { delivered ->
+            val ids =
+                delivered
+                    ?.mapNotNull { it as? UNNotification }
+                    ?.filter { it.request.content.threadIdentifier == id.toString() }
+                    ?.map { it.request.identifier }
+                    .orEmpty()
+            if (ids.isNotEmpty()) center.removeDeliveredNotificationsWithIdentifiers(ids)
+        }
     }
 
     override fun cancelAll() {
