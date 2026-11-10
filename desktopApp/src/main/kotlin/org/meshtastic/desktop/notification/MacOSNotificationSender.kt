@@ -118,6 +118,7 @@ internal interface NotificationResponseCallback : Callback {
     fun invoke(self: Pointer?, cmd: Pointer?, center: Pointer?, response: Pointer?, completion: Pointer?)
 }
 
+@Suppress("TooManyFunctions")
 private class JnaMacNotificationBridge : MacNotificationBridge {
     private val objc: NativeLibrary?
     private val objcGetClass: Function?
@@ -224,8 +225,7 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
             val cls =
                 runtime
                     .getFunction("objc_allocateClassPair")
-                    .invoke(Pointer::class.java, arrayOf(superclass, DELEGATE_CLASS_NAME, 0L)) as? Pointer
-                    ?: return
+                    .invoke(Pointer::class.java, arrayOf(superclass, DELEGATE_CLASS_NAME, 0L)) as? Pointer ?: return
             val callback =
                 object : NotificationResponseCallback {
                     override fun invoke(
@@ -237,7 +237,7 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
                     ) {
                         try {
                             deepLinkOf(response)?.let(onClick)
-                        } catch (e: Exception) {
+                        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                             Logger.w(e) { "Failed to read a tapped notification" }
                         } finally {
                             completion?.let { callBlock(it) }
@@ -296,15 +296,14 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
 
         if (deepLink != null) {
             val dictionaryClass = classRef("NSDictionary")
-            val info =
-                dictionaryClass?.let {
-                    msg(
-                        it,
-                        selector("dictionaryWithObject:forKey:"),
-                        nsString(deepLink) ?: return false,
-                        nsString(USER_INFO_DEEP_LINK) ?: return false,
-                    )
-                }
+            val info = dictionaryClass?.let {
+                msg(
+                    it,
+                    selector("dictionaryWithObject:forKey:"),
+                    nsString(deepLink) ?: return false,
+                    nsString(USER_INFO_DEEP_LINK) ?: return false,
+                )
+            }
             if (info != null) msg(content, selector("setUserInfo:"), info)
         }
 

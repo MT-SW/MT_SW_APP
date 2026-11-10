@@ -16,6 +16,7 @@
  */
 package org.meshtastic.desktop.notification
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,6 +39,7 @@ object NotificationClicks {
         _links.tryEmit(link)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun consumed() {
         _links.resetReplayCache()
     }

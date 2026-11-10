@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -43,6 +42,7 @@ import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -305,11 +305,14 @@ private fun setTaskbarIcon(file: String?) {
 /** Restores and raises the app window (it may be minimized or behind others when a notification is tapped). */
 private fun bringWindowToFront() {
     java.awt.EventQueue.invokeLater {
-        java.awt.Window.getWindows().filterIsInstance<java.awt.Frame>().filter { it.isDisplayable }.forEach { frame ->
-            frame.extendedState = frame.extendedState and java.awt.Frame.ICONIFIED.inv()
-            frame.toFront()
-            frame.requestFocus()
-        }
+        java.awt.Window.getWindows()
+            .filterIsInstance<java.awt.Frame>()
+            .filter { it.isDisplayable }
+            .forEach { frame ->
+                frame.extendedState = frame.extendedState and java.awt.Frame.ICONIFIED.inv()
+                frame.toFront()
+                frame.requestFocus()
+            }
     }
 }
 

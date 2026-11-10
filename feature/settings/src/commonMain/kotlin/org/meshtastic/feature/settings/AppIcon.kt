@@ -17,7 +17,8 @@
 package org.meshtastic.feature.settings
 
 /**
- * Puts the icon of the chosen style on the home screen (Android: icon alias, iPhone: alternate icon; "" on iPhone is the
- * main icon, which follows the style set in the system) or in the window (desktop, which reads the saved style itself).
+ * Puts the icon of the chosen style on the home screen (Android: icon alias, iPhone: alternate icon; "" on iPhone is
+ * the main icon, which follows the style set in the system) or in the window (desktop, which reads the saved style
+ * itself).
  */
 expect fun applyAppIcon(style: String)

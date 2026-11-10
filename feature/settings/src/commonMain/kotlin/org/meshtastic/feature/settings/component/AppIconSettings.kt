@@ -58,7 +58,7 @@ private fun appIconLabel(key: String): String =
 
 /** One row "Ikona aplikacji" with a picker of the icon styles (also found by the settings search). */
 @Composable
-fun AppIconSettingsItem(current: String, onPick: (String) -> Unit) {
+fun AppIconSettingsItem(current: String, onPick: (String) -> Unit, modifier: Modifier = Modifier) {
     var open by remember { mutableStateOf(false) }
     if (open) {
         MeshtasticDialog(
@@ -85,6 +85,7 @@ fun AppIconSettingsItem(current: String, onPick: (String) -> Unit) {
         )
     }
     ListItem(
+        modifier = modifier,
         text = stringResource(Res.string.app_icon_title),
         supportingText = appIconLabel(current),
         leadingIcon = MeshtasticIcons.FormatPaint,

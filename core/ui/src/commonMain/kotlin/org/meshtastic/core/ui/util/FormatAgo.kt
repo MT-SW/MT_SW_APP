@@ -81,10 +81,15 @@ fun formatAgo(lastSeenUnixSeconds: Int, labels: AgoLabels): String {
 
     return when {
         diff < 1.minutes -> labels.now
+
         diff < 1.hours -> labels.minutes.withNumber(diff.inWholeMinutes)
+
         diff < HOURS_PER_DAY.hours -> labels.hours.withNumber(diff.inWholeHours)
+
         diff < 2.days -> labels.oneDay
+
         diff <= MAX_RELATIVE_DAYS.days -> labels.days.withNumber(diff.inWholeDays)
+
         else ->
             DateFormatter.formatDayMonth(
                 timestampMillis = lastSeenDuration.inWholeMilliseconds,
@@ -94,5 +99,4 @@ fun formatAgo(lastSeenUnixSeconds: Int, labels: AgoLabels): String {
 }
 
 /** Composable convenience overload that resolves string resources automatically. */
-@Composable
-fun formatAgo(lastSeenUnixSeconds: Int): String = formatAgo(lastSeenUnixSeconds, rememberAgoLabels())
+@Composable fun formatAgo(lastSeenUnixSeconds: Int): String = formatAgo(lastSeenUnixSeconds, rememberAgoLabels())

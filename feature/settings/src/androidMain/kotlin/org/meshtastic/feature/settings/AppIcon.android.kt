@@ -34,15 +34,16 @@ actual fun applyAppIcon(style: String) {
             else -> "Standard"
         }
     // The new icon is switched on first, so the app never has no icon on the home screen.
-    ALIASES.sortedBy { it != chosen }.forEach { name ->
-        packageManager.setComponentEnabledSetting(
-            ComponentName(context.packageName, ALIAS_PREFIX + name),
-            if (name == chosen) {
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } else {
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            },
-            PackageManager.DONT_KILL_APP,
-        )
-    }
+    ALIASES.sortedBy { it != chosen }
+        .forEach { name ->
+            packageManager.setComponentEnabledSetting(
+                ComponentName(context.packageName, ALIAS_PREFIX + name),
+                if (name == chosen) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                },
+                PackageManager.DONT_KILL_APP,
+            )
+        }
 }

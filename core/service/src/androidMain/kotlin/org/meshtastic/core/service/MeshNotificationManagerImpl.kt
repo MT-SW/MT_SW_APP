@@ -105,15 +105,15 @@ import org.meshtastic.core.resources.firmware_update_in_progress
 import org.meshtastic.core.resources.firmware_update_notification_android
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.last_heard_ago_d
+import org.meshtastic.core.resources.last_heard_ago_day_one
+import org.meshtastic.core.resources.last_heard_ago_h
+import org.meshtastic.core.resources.last_heard_ago_min
 import org.meshtastic.core.resources.live_update_ble
 import org.meshtastic.core.resources.live_update_cpu
 import org.meshtastic.core.resources.live_update_direct
 import org.meshtastic.core.resources.live_update_distance
 import org.meshtastic.core.resources.live_update_flash
-import org.meshtastic.core.resources.last_heard_ago_d
-import org.meshtastic.core.resources.last_heard_ago_day_one
-import org.meshtastic.core.resources.last_heard_ago_h
-import org.meshtastic.core.resources.last_heard_ago_min
 import org.meshtastic.core.resources.live_update_heard
 import org.meshtastic.core.resources.live_update_heard_now
 import org.meshtastic.core.resources.live_update_hops
@@ -1239,9 +1239,12 @@ class MeshNotificationManagerImpl(
             when {
                 secondsAgo < SECONDS_PER_HOUR ->
                     getStringSuspend(Res.string.last_heard_ago_min, secondsAgo / SECONDS_PER_MINUTE)
+
                 secondsAgo < SECONDS_PER_DAY ->
                     getStringSuspend(Res.string.last_heard_ago_h, secondsAgo / SECONDS_PER_HOUR)
+
                 secondsAgo < 2 * SECONDS_PER_DAY -> getStringSuspend(Res.string.last_heard_ago_day_one)
+
                 else -> getStringSuspend(Res.string.last_heard_ago_d, secondsAgo / SECONDS_PER_DAY)
             }
         getStringSuspend(Res.string.live_update_heard, agoText)

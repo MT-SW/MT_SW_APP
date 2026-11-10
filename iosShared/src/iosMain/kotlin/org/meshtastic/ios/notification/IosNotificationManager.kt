@@ -50,8 +50,8 @@ import kotlin.coroutines.resume
 private const val USER_INFO_DEEP_LINK = "deepLink"
 
 /**
- * Shows the banner also while the app is open (iOS hides it by default), and opens the conversation (or other screen)
- * a notification points to when the user taps it.
+ * Shows the banner also while the app is open (iOS hides it by default), and opens the conversation (or other screen) a
+ * notification points to when the user taps it.
  */
 private class ForegroundBanner :
     NSObject(),

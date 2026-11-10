@@ -185,9 +185,13 @@ class LinuxNotificationSender(
     @Volatile private var tapActionSupported = true
 
     private val notifySend: String? by lazy {
-        System.getenv("PATH").orEmpty().split(File.pathSeparator).map { File(it, "notify-send") }.firstOrNull {
-            it.canExecute()
-        }
+        System.getenv("PATH")
+            .orEmpty()
+            .split(File.pathSeparator)
+            .map { File(it, "notify-send") }
+            .firstOrNull {
+                it.canExecute()
+            }
             ?.path
     }
 

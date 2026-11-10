@@ -30,6 +30,7 @@ import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.allStringResources
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_data_title
+import org.meshtastic.core.resources.app_icon_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.app_settings
@@ -42,7 +43,6 @@ import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
-import org.meshtastic.core.resources.app_icon_title
 import org.meshtastic.core.resources.font_family
 import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight

@@ -91,10 +91,16 @@ class WindowsNotificationSender(private val appName: String = "Meshtastic") : Na
             if (waitForClick) {
                 // Stays alive until the toast is tapped or dismissed (or the wait ends); the app reads the marks.
                 append("; [Console]::Out.WriteLine('$SHOWN_MARK'); ")
-                append("Register-ObjectEvent -InputObject \$toast -EventName Activated -SourceIdentifier ToastTap > \$null; ")
-                append("Register-ObjectEvent -InputObject \$toast -EventName Dismissed -SourceIdentifier ToastGone > \$null; ")
+                append(
+                    "Register-ObjectEvent -InputObject \$toast -EventName Activated -SourceIdentifier ToastTap > \$null; ",
+                )
+                append(
+                    "Register-ObjectEvent -InputObject \$toast -EventName Dismissed -SourceIdentifier ToastGone > \$null; ",
+                )
                 append("\$e = Wait-Event -Timeout $CLICK_WAIT_SECONDS; ")
-                append("if (\$e -and \$e.SourceIdentifier -eq 'ToastTap') { [Console]::Out.WriteLine('$ACTIVATED_MARK') }")
+                append(
+                    "if (\$e -and \$e.SourceIdentifier -eq 'ToastTap') { [Console]::Out.WriteLine('$ACTIVATED_MARK') }",
+                )
             }
         }
 

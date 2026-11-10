@@ -115,10 +115,10 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppBackgroundSettings
+import org.meshtastic.feature.settings.component.AppIconSettingsItem
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
-import org.meshtastic.feature.settings.component.AppIconSettingsItem
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ReportIssuesSection

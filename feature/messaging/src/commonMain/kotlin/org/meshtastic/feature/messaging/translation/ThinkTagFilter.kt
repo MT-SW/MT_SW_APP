@@ -54,12 +54,12 @@ class ThinkTagFilter(private val emit: (String) -> Unit) {
                     var end = text.length
                     if (!final) end -= partialOpenTagLength(text.substring(i))
                     out.append(text, i, end)
-                    break
+                    i = text.length
+                } else {
+                    out.append(text, i, open)
+                    val close = text.indexOf(CLOSE_TAG, open + OPEN_TAG.length)
+                    i = if (close < 0) text.length else close + CLOSE_TAG.length
                 }
-                out.append(text, i, open)
-                val close = text.indexOf(CLOSE_TAG, open + OPEN_TAG.length)
-                if (close < 0) break
-                i = close + CLOSE_TAG.length
             }
             return out.toString().trimStart()
         }

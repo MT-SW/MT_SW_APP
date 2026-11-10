@@ -56,7 +56,9 @@ class MultiBackstackTest {
         val multiBackstack = createMultiBackstack(TopLevelDestination.Nodes.route)
         val nodesStack = NavBackStack<NavKey>().apply { add(TopLevelDestination.Nodes.route) }
         val mapStack =
-            NavBackStack<NavKey>().apply { addAll(listOf(TopLevelDestination.Map.route, TopLevelDestination.Nodes.route)) }
+            NavBackStack<NavKey>().apply {
+                addAll(listOf(TopLevelDestination.Map.route, TopLevelDestination.Nodes.route))
+            }
         multiBackstack.backStacks =
             mapOf(TopLevelDestination.Nodes.route to nodesStack, TopLevelDestination.Map.route to mapStack)
 
