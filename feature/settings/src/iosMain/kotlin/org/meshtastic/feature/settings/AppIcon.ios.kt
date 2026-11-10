@@ -16,9 +16,12 @@
  */
 package org.meshtastic.feature.settings
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSSelectorFromString
+import platform.Foundation.valueForKey
 import platform.UIKit.UIApplication
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun applyAppIcon(style: String) {
     // "" is the main icon, which the system shows in the style (default, dark, tinted) chosen in iOS.
     val name =
