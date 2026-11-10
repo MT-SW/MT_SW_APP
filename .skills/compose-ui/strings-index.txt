@@ -589,6 +589,8 @@ auto_clean_nodes_enabled
 auto_clean_nodes_inactivity_days
 auto_clean_nodes_title
 auto_load_chat_images
+autostart_summary
+autostart_title
 available_pins
 back
 background_keepalive_permission

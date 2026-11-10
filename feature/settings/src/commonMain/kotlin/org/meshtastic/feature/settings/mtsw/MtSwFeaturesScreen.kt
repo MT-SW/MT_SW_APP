@@ -38,12 +38,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AppBackgroundControls
+import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_section_title
+import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
@@ -116,6 +118,7 @@ import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppIconSettingsItem
+import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.AppLogSettings
@@ -247,6 +250,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ExpressiveSection(title = stringResource(Res.string.background_section_title)) {
                     AppBackgroundSettings()
                 }
+            }
+
+            // Only on the computer app (installed from its own launcher); hidden elsewhere.
+            if (AutostartControls.current != null) {
+                ExpressiveSection(title = stringResource(Res.string.autostart_title)) { AutostartSettings() }
             }
 
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }

@@ -84,6 +84,7 @@ import org.koin.plugin.module.dsl.startKoin
 import org.maplibre.compose.desktop.ProvideMapPresentationHost
 import org.maplibre.compose.desktop.rememberAwtComposeMapPresentationHost
 import org.meshtastic.core.common.BuildConfigProvider
+import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
@@ -189,6 +190,7 @@ fun main(args: Array<String>) {
     // Before anything is opened: a requested move of the data folder is made now (with a progress window).
     prepareDataFolder()
     installQuitHandler()
+    AutostartControls.current = DesktopAutostart.create()
     // No wallpaper colours on a computer: the saturated theme is the default look.
     UiPrefsDefaults.theme = MODE_VIVID
     // exitProcessOnExit = false is what makes the shutdown block below reachable at all: with the default (true),

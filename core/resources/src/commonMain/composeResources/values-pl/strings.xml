@@ -3455,6 +3455,8 @@
     <string name="background_keepalive_permission">Brakuje zgody na lokalizację „Zawsze”. Zezwól na nią w ustawieniach systemu dla tej aplikacji (Lokalizacja → Zawsze).</string>
     <string name="background_keepalive_summary">Domyślnie wyłączone. iPhone i iPad usypiają aplikację, której nie ma na ekranie, co zrywa połączenie z radiem przez Wi-Fi/TCP (także przez Tailscale) i przerywa zbieranie danych. Po włączeniu aplikacja działa dalej w tle dzięki lokalizacji w tle, tak samo jak oryginalna aplikacja Meshtastic na urządzenia Apple. Pozycja jest odczytywana rzadko i tylko po to, żeby aplikacja nie została uśpiona; nigdzie nie jest wysyłana. Wymaga zgody na lokalizację „Zawsze”. Zużywa więcej baterii, a system pokazuje strzałkę lokalizacji.</string>
     <string name="background_keepalive_title">Działaj w tle</string>
+    <string name="autostart_title">Uruchamiaj z komputerem</string>
+    <string name="autostart_summary">Uruchamia aplikację po zalogowaniu do komputera, dzięki czemu dane z radia są dalej zbierane. Domyślnie wyłączone. Działa w zainstalowanej aplikacji.</string>
     <string name="background_section_title">Praca w tle</string>
     <string name="app_log_level">Zbieranie logów</string>
     <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja sama, na bieżąco zapisuje do plików wszystko, co robi (od startu do zamknięcia), w częściach po ok. 400 KB, żeby łatwiej znajdować problemy. Wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>

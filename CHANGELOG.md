@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Komputer (macOS, Windows, Linux): nowa opcja „Uruchamiaj z komputerem” w Funkcje MT_SW — start aplikacji po zalogowaniu (domyślnie wyłączona, działa w zainstalowanej aplikacji). Android ma już start po restarcie telefonu; iPhone i iPad nie mogą startować same.
+
 * Wszystkie wersje: nowa pozycja „Dołącz dane z kopii” w Kopia zapasowa i przywracanie. Wybierasz plik kopii (z dowolnego systemu) i aplikacja uzupełnia statystyki tylko węzłów znanych jej i kopii, bez dodawania nowych węzłów i bez restartu. Kopie działają tak samo na Androidzie, komputerze i iPhone/iPad (jeden format), więc dane można przenieść ze starego telefonu na nowy.
 
 * Wszystkie wersje: nowa „Synchronizacja statystyk urządzeń” w Funkcje MT_SW. Każde radio ma własną bazę; synchronizacja uzupełnia w obu bazach historię telemetrii i pozycji oraz ostatnie odczyty tych węzłów, które znają obie bazy (bez dubli: pakiet usłyszany przez oba radia liczy się raz). Węzły znane tylko jednej bazie nie są kopiowane do drugiej; notatki, nazwy, ulubione, ignorowanie i wyciszenie zostają bez zmian. Działa automatycznie (opcja, domyślnie wyłączona) po zmianie radia albo przyciskiem „Synchronizuj teraz”.
@@ -591,6 +593,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* Desktop (macOS, Windows, Linux): new "Start with the computer" option in MT_SW features — starts the app at login (off by default, works in the installed app). Android already starts after a phone restart; iPhone and iPad cannot start by themselves.
 
 * All versions: new "Merge data from a backup" in Backup and restore. Pick a backup file (from any system) and the app completes the statistics only of nodes known to both it and the backup, adding no new nodes and needing no restart. Backups work the same on Android, desktop and iPhone/iPad (one format), so data can move from an old phone to a new one.
 

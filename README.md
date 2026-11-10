@@ -16,6 +16,7 @@ Oryginalna aplikacja Meshtastic-Android nie ma wersji na iOS. Ten fork ma własn
 - **Widżet statystyk (iPhone/iPad):** widżet 4x2 z tymi samymi statystykami co stałe powiadomienie na Androidzie; zastępuje powiadomienie adaptacyjne.
 - **Synchronizacja statystyk urządzeń:** statystyki węzłów wspólnych dla baz różnych radii na jednym telefonie (automatycznie albo przyciskiem), bez kopiowania węzłów znanych tylko jednej bazie.
 - **Dołącz dane z kopii:** statystyki węzłów wspólnych z plikiem kopii (z dowolnego systemu), bez dodawania nowych węzłów; całą bazę na nowy telefon przenosi „Przywróć dane aplikacji”.
+- **Uruchamianie z komputerem:** opcjonalny start aplikacji po zalogowaniu (macOS, Windows, Linux).
 - **Czcionki:** w Funkcje MT_SW można wybrać czcionkę spośród wszystkich zainstalowanych w urządzeniu, ustawić suwakiem jej pogrubienie (na bieżąco) i rozmiar tekstu od 50% we wszystkich wersjach; pomaga to na iPhonie, gdzie domyślna czcionka wygląda grubiej niż na Androidzie. W motywach nasyconych tła zostają szare, a kolory urządzeń są mocniejsze.
 - **iPad:** ten sam plik aplikacji działa na iPhonie i iPadzie, w pionie i w poziomie. Ekrany z wykresami mają wykres u góry, a listę pod spodem, także na dużych ekranach.
 - **Czego nie ma:** funkcji tylko dla Androida (widżet, kafelek szybkich ustawień), widoku AR z aparatem oraz przechowywania haseł w Keychain (na razie prywatny folder aplikacji). Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone lub iPad.

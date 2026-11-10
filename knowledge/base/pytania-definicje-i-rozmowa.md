@@ -56,6 +56,9 @@ Słowa: synchronizacja, synchronizować, bazy danych, statystyki węzłów, dwa 
 
 W Ustawienia → Kopia zapasowa i przywracanie jest „Dołącz dane z kopii”. Wybierasz plik kopii danych aplikacji (działa między Androidem, komputerem i iPhone/iPad); uzupełnia statystyki tylko węzłów, które zna aplikacja i kopia, bez restartu. Całą bazę na nowy telefon przenosisz przez „Przywróć dane aplikacji”.
 Słowa: dołącz dane, kopia zapasowa, przenieść dane, nowy telefon, scalić bazy
+
+W Ustawienia → Funkcje MT_SW (aplikacja na komputer) jest „Uruchamiaj z komputerem” — start aplikacji po zalogowaniu. Android startuje sam po restarcie telefonu; iPhone i iPad nie mogą.
+Słowa: autostart, uruchamiaj z komputerem, start po zalogowaniu, rozruch, po restarcie
 Źródło: Dokumentacja aplikacji: synchronizacja statystyk urządzeń (sprawdzono 2026-11)
 
 ### Jak powiększyć interfejs aplikacji?

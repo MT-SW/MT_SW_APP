@@ -610,6 +610,8 @@
     <string name="auto_clean_nodes_inactivity_days">Remove nodes inactive for more than %1$d days</string>
     <string name="auto_clean_nodes_title">Automatic Cleanup</string>
     <string name="auto_load_chat_images">Automatically load images from links in chat</string>
+    <string name="autostart_summary">Starts the app when you log in to the computer, so the radio data keeps being collected. Off by default. Works in the installed app.</string>
+    <string name="autostart_title">Start with the computer</string>
     <string name="available_pins">Available pins</string>
     <string name="back">Back</string>
     <string name="background_keepalive_permission">The "Always" location permission is missing. Allow it in the system settings of this app (Location → Always).</string>
