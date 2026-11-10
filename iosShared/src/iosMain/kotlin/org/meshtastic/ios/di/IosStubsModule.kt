@@ -30,7 +30,6 @@ import org.meshtastic.feature.map.hud.CameraPoseProvider
 import org.meshtastic.feature.map.hud.PhonePressureProvider
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.ios.stub.NoopAppWidgetUpdater
-import org.meshtastic.ios.stub.NoopLocationRepository
 import org.meshtastic.ios.stub.NoopMagneticFieldProvider
 import org.meshtastic.ios.stub.NoopMeshWorkerManager
 import org.meshtastic.ios.stub.NoopPlatformAnalytics
@@ -52,7 +51,9 @@ class IosStubsModule {
     ): IosNodeCleanupScheduler =
         IosNodeCleanupScheduler(uiPrefs = uiPrefs, cleanNodeDatabaseUseCase = cleanNodeDatabaseUseCase)
 
-    @Single fun locationRepository(): LocationRepository = NoopLocationRepository()
+    @Single
+    fun locationRepository(provider: PhoneLocationProvider): LocationRepository =
+        org.meshtastic.ios.sensor.IosLocationRepository(provider)
 
     @Single fun compassHeadingProvider(): CompassHeadingProvider = org.meshtastic.ios.sensor.IosCompassHeadingProvider()
 

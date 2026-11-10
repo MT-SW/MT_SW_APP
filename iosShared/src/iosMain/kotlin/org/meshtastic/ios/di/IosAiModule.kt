@@ -27,6 +27,7 @@ import org.meshtastic.core.repository.AiPlatform
 import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.AssistantMemory
 import org.meshtastic.core.repository.ConnectionStateProvider
+import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
@@ -98,6 +99,7 @@ class IosAiModule {
         meshLogRepository: MeshLogRepository,
         packetRepository: PacketRepository,
         connection: ConnectionStateProvider,
+        locationRepository: LocationRepository,
         uiPrefs: UiPrefs,
     ): AssistantDataProvider = AssistantDataProvider(
         nodeRepository,
@@ -105,7 +107,7 @@ class IosAiModule {
         meshLogRepository,
         packetRepository,
         connection,
-        null,
+        locationRepository,
     ) {
         uiPrefs.currentInverted.value
     }
