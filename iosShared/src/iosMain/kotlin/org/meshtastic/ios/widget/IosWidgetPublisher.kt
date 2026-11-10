@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.ios.widget
 
 import co.touchlab.kermit.Logger
@@ -69,7 +68,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
                 c == '"' -> append("\\\"")
                 c == '\\' -> append("\\\\")
                 c == '\n' -> append("\\n")
-                c.code < 0x20 -> append(' ')
+                c.code < FIRST_PRINTABLE -> append(' ')
                 else -> append(c)
             }
         }
@@ -88,3 +87,5 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
         NSNotificationCenter.defaultCenter.postNotificationName(WIDGET_REFRESH, null)
     }
 }
+
+private const val FIRST_PRINTABLE = 0x20

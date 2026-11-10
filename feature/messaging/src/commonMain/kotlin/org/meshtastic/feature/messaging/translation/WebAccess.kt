@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "ReturnCount")
+@file:Suppress("MagicNumber", "ReturnCount", "TooManyFunctions")
 
 package org.meshtastic.feature.messaging.translation
-
 
 /**
  * The only door through which the assistant reaches the internet, used for web search, reading a page and for keeping
@@ -131,34 +130,41 @@ internal object WebAccess {
         val parts = host.split('.').mapNotNull { it.toIntOrNull() }
         if (parts.size != 4) return false
         val (a, b) = parts
-        return a == 0 || a == 10 || a == 127 || (a == 169 && b == 254) || (a == 172 && b in 16..31) ||
-            (a == 192 && b == 168) || a >= 224
+        return a == 0 ||
+            a == 10 ||
+            a == 127 ||
+            (a == 169 && b == 254) ||
+            (a == 172 && b in 16..31) ||
+            (a == 192 && b == 168) ||
+            a >= 224
     }
 
-    private fun resolve(base: String, next: String): String = when {
-        next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
-        next.startsWith("//") -> "https:$next"
-        next.startsWith("/") -> "https://" + hostPartOf(base) + next
-        else -> base.substringBefore('?').substringBeforeLast('/') + "/" + next
-    }
+    private fun resolve(base: String, next: String): String =
+        when {
+            next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
+            next.startsWith("//") -> "https:$next"
+            next.startsWith("/") -> "https://" + hostPartOf(base) + next
+            else -> base.substringBefore('?').substringBeforeLast('/') + "/" + next
+        }
 
     private fun hostPartOf(url: String): String = url.substringAfter("://").substringBefore('/').substringBefore('?')
 
     /** Plain readable text of an HTML page, without scripts, styles and tags. */
-    fun htmlToText(html: String): String = html
-        .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
-        .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
-        .replace(Regex("<[^>]+>"), " ")
-        .replace("&nbsp;", " ")
-        .replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
-        .replace("&#39;", "'")
-        .lines()
-        .map { it.replace(Regex("\\s+"), " ").trim() }
-        .filter { it.isNotEmpty() }
-        .joinToString("\n")
+    fun htmlToText(html: String): String =
+        html
+            .replace(Regex("(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\\1>"), " ")
+            .replace(Regex("(?i)<br\\s*/?>|</p>|</div>|</li>|</h[1-6]>|</tr>"), "\n")
+            .replace(Regex("<[^>]+>"), " ")
+            .replace("&nbsp;", " ")
+            .replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .lines()
+            .map { it.replace(Regex("\\s+"), " ").trim() }
+            .filter { it.isNotEmpty() }
+            .joinToString("\n")
 
     /** Search results of DuckDuckGo's plain HTML page as `title - address` and a short snippet. */
     fun search(query: String, limit: Int): List<String> {
@@ -225,8 +231,7 @@ internal object WebAccess {
                 when (val n = text[i + 1]) {
                     'n',
                     't',
-                    'r',
-                    -> {
+                    'r' -> {
                         out.append(' ')
                         i += 2
                     }
@@ -282,7 +287,9 @@ internal object WebAccess {
     }
 
     fun hostOf(url: String): String =
-        hostPartOf(url).substringAfter('@').let { if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':') }
+        hostPartOf(url).substringAfter('@').let {
+            if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':')
+        }
 
     private const val HEX = "0123456789ABCDEF"
 

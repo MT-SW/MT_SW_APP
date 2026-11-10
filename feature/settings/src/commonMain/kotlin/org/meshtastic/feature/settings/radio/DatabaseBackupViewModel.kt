@@ -146,12 +146,17 @@ class DatabaseBackupViewModel(
         safeLaunch(tag = "databaseMerge") {
             val dbName = backupService.backupTargetName()
             var written: Int? = null
-            if (dbName != null) fileService.read(uri) { source -> written = backupService.mergeFromBackup(dbName, source) }
+            if (dbName != null) {
+                fileService.read(uri) { source -> written = backupService.mergeFromBackup(dbName, source) }
+            }
             val count = written
             alertManager.showAlert(
                 message =
-                if (count == null) getString(Res.string.app_database_merge_failed)
-                else getString(Res.string.app_database_merge_done, count),
+                if (count == null) {
+                    getString(Res.string.app_database_merge_failed)
+                } else {
+                    getString(Res.string.app_database_merge_done, count)
+                },
             )
         }
     }

@@ -66,13 +66,13 @@ import org.meshtastic.core.resources.ic_schedule
 import org.meshtastic.core.resources.ic_storage
 import org.meshtastic.core.resources.ic_system_update
 import org.meshtastic.core.resources.import_configuration
+import org.meshtastic.core.resources.merge_app_database
 import org.meshtastic.core.resources.message_device_managed
 import org.meshtastic.core.resources.module_settings
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.reboot_into_dfu
-import org.meshtastic.core.resources.merge_app_database
 import org.meshtastic.core.resources.restore_app_database
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown

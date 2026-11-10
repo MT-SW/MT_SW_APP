@@ -55,15 +55,14 @@ internal class TakIosPki(private val store: TakCertificateStore) {
                         Logger.w(e) { "TAK: could not read stored certificates, issuing a new set" }
                         null
                     }
-                val loaded =
-                    stored?.let {
-                        try {
-                            load(it)
-                        } catch (e: Exception) {
-                            Logger.w(e) { "TAK: stored certificates are unusable, issuing a new set" }
-                            null
-                        }
+                val loaded = stored?.let {
+                    try {
+                        load(it)
+                    } catch (e: Exception) {
+                        Logger.w(e) { "TAK: stored certificates are unusable, issuing a new set" }
+                        null
                     }
+                }
                 (loaded ?: issue()).also { cached = it }
             }
     }

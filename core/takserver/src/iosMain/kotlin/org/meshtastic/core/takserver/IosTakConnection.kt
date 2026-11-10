@@ -48,8 +48,8 @@ import platform.darwin.dispatch_queue_t
 
 /**
  * One connected TAK client (ATAK / iTAK on this phone) on the iOS listener. Same behaviour as the Android and computer
- * `TAKClientConnection`: the TAK protocol handshake (`t-x-takp-v` / `-q` / `-r`), `<event>` framing, ping replies and
- * a keepalive. Everything runs on the server's serial [queue], so no locking is needed.
+ * `TAKClientConnection`: the TAK protocol handshake (`t-x-takp-v` / `-q` / `-r`), `<event>` framing, ping replies and a
+ * keepalive. Everything runs on the server's serial [queue], so no locking is needed.
  */
 internal class IosTakConnection(
     private val connection: nw_connection_t,
@@ -79,8 +79,7 @@ internal class IosTakConnection(
                     }
 
                 nw_connection_state_failed,
-                nw_connection_state_cancelled,
-                -> finish(TAKConnectionEvent.Disconnected)
+                nw_connection_state_cancelled -> finish(TAKConnectionEvent.Disconnected)
 
                 else -> Unit
             }
@@ -93,13 +92,17 @@ internal class IosTakConnection(
     fun send(cotMessage: CoTMessage) = sendXml(cotMessage.toXml())
 
     fun sendXml(xml: String) {
-        if (closed) return
         val bytes = xml.encodeToByteArray()
-        if (bytes.isEmpty()) return
         val data =
-            bytes.usePinned { dispatch_data_create(it.addressOf(0), bytes.size.convert(), queue, null) } ?: return
-        nw_connection_send(connection, data, context, true) { error ->
-            if (error != null) finish(TAKConnectionEvent.Error(IllegalStateException("TAK send failed")))
+            if (closed || bytes.isEmpty()) {
+                null
+            } else {
+                bytes.usePinned { dispatch_data_create(it.addressOf(0), bytes.size.convert(), queue, null) }
+            }
+        if (data != null) {
+            nw_connection_send(connection, data, context, true) { error ->
+                if (error != null) finish(TAKConnectionEvent.Error(IllegalStateException("TAK send failed")))
+            }
         }
     }
 
@@ -123,7 +126,9 @@ internal class IosTakConnection(
     private fun readBytes(data: dispatch_data_t): ByteArray {
         val chunks = ArrayList<ByteArray>()
         dispatch_data_apply(data) { _, _, buffer, size ->
-            if (buffer != null && size > 0u) chunks += buffer.reinterpret<kotlinx.cinterop.ByteVar>().readBytes(size.toInt())
+            if (buffer != null && size > 0u) {
+                chunks += buffer.reinterpret<kotlinx.cinterop.ByteVar>().readBytes(size.toInt())
+            }
             true
         }
         return Der.concat(*chunks.toTypedArray())
@@ -148,8 +153,7 @@ internal class IosTakConnection(
                     return@onSuccess
                 }
                 cot.contact?.let { contact ->
-                    val updated =
-                        info.copy(callsign = info.callsign ?: contact.callsign, uid = info.uid ?: cot.uid)
+                    val updated = info.copy(callsign = info.callsign ?: contact.callsign, uid = info.uid ?: cot.uid)
                     if (updated != info) {
                         info = updated
                         onEvent(TAKConnectionEvent.ClientInfoUpdated(updated))
@@ -176,8 +180,11 @@ internal class IosTakConnection(
 
     private fun eventXml(uid: String, type: String, now: Instant, stale: Instant, detail: String): String {
         val detailContent = if (detail.isBlank()) "<detail/>" else "<detail>$detail</detail>"
-        val point = "<point lat=\"0\" lon=\"0\" hae=\"0\" ce=\"$TAK_UNKNOWN_POINT_VALUE\" le=\"$TAK_UNKNOWN_POINT_VALUE\"/>"
-        return "<event version=\"2.0\" uid=\"$uid\" type=\"$type\" time=\"$now\" start=\"$now\" stale=\"$stale\" how=\"m-g\">" +
+        val point =
+            "<point lat=\"0\" lon=\"0\" hae=\"0\" ce=\"$TAK_UNKNOWN_POINT_VALUE\" le=\"$TAK_UNKNOWN_POINT_VALUE\"/>"
+        val header = "<event version=\"2.0\" uid=\"$uid\" type=\"$type\" time=\"$now\" start=\"$now\" "
+        return header +
+            "stale=\"$stale\" how=\"m-g\">" +
             point +
             detailContent +
             "</event>"

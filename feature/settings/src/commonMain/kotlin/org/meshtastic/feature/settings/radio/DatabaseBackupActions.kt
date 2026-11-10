@@ -29,7 +29,12 @@ import org.meshtastic.core.ui.util.rememberSaveFileLauncher
  * Picker-backed entry points for the Backup & Restore section's app database items. [available] is false until some
  * device has a database.
  */
-class DatabaseBackupActions(val available: Boolean, val onBackup: () -> Unit, val onRestore: () -> Unit, val onMerge: () -> Unit)
+class DatabaseBackupActions(
+    val available: Boolean,
+    val onBackup: () -> Unit,
+    val onRestore: () -> Unit,
+    val onMerge: () -> Unit,
+)
 
 @Composable
 fun rememberDatabaseBackupActions(): DatabaseBackupActions {

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.widget
 
 import android.content.Context
@@ -29,10 +28,10 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -52,9 +51,9 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.service.stats.MeshStatsSnapshot
 
-private val LINE_HEIGHT_DP = 15
-private val HEADER_DP = 30
-private val TWO_COLUMNS_FROM_DP = 220
+private const val LINE_HEIGHT_DP = 15
+private const val HEADER_DP = 30
+private const val TWO_COLUMNS_FROM_DP = 220
 
 /**
  * Widget "Statystyki MT_SW" (4x2): the same lines as the permanent notification (the whole mesh, or one tracked node
@@ -85,9 +84,7 @@ class MeshStatusWidget :
                         context.packageManager.getLaunchIntentForPackage(context.packageName)
                             ?: Intent().setClassName(context.packageName, "org.meshtastic.app.MainActivity"),
                     )
-                Column(
-                    modifier = GlanceModifier.fillMaxSize().padding(8.dp).clickable(actionStartActivity(open)),
-                ) {
+                Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp).clickable(actionStartActivity(open))) {
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         WidgetMark(16.dp)
                         Spacer(GlanceModifier.width(6.dp))
@@ -123,7 +120,10 @@ class MeshStatusWidget :
                         val perColumn = (shown.size + columns - 1) / columns
                         Row(modifier = GlanceModifier.fillMaxWidth()) {
                             shown.chunked(perColumn).forEachIndexed { index, part ->
-                                Column(modifier = GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp)) {
+                                Column(
+                                    modifier =
+                                    GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp),
+                                ) {
                                     part.forEach { line ->
                                         Text(
                                             text = line,

@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.core.takserver
 
-import kotlin.time.Clock
 import org.meshtastic.core.repository.TakCertificateMaterial
+import kotlin.time.Clock
 
 /**
  * Issues the same per-install PKI as the Android / computer generator (private CA, server identity for 127.0.0.1, one
@@ -40,13 +42,14 @@ internal object TakIosCertificateGenerator {
                 .joinToString("")
 
         val caName = name("CN" to "Meshtastic TAK CA $installId", "O" to "Meshtastic")
-        val ca = issue(caName, caName, null) { ski, _ ->
-            listOf(
-                extension("2.5.29.19", true, Der.seq(Der.bool(true), Der.int(0))),
-                extension("2.5.29.15", true, keyUsage(0x06, 1)),
-                extension("2.5.29.14", false, Der.octet(ski)),
-            )
-        }
+        val ca =
+            issue(caName, caName, null) { ski, _ ->
+                listOf(
+                    extension("2.5.29.19", true, Der.seq(Der.bool(true), Der.int(0))),
+                    extension("2.5.29.15", true, keyUsage(0x06, 1)),
+                    extension("2.5.29.14", false, Der.octet(ski)),
+                )
+            }
         val server =
             issue(caName, name("CN" to "localhost", "OU" to "TAK Server", "O" to "Meshtastic"), ca) { ski, caSki ->
                 listOf(
@@ -83,17 +86,17 @@ internal object TakIosCertificateGenerator {
         val caEntry = TakPkcs12.Cert(ca.der, "meshtastic-tak-ca")
         return TakCertificateMaterial(
             serverP12 =
-                TakPkcs12.build(
-                    password,
-                    listOf(TakPkcs12.Cert(server.der, "meshtastic-tak-server", server.ski), caEntry),
-                    TakPkcs12.Key(server.key.privatePkcs1, "meshtastic-tak-server", server.ski),
-                ),
+            TakPkcs12.build(
+                password,
+                listOf(TakPkcs12.Cert(server.der, "meshtastic-tak-server", server.ski), caEntry),
+                TakPkcs12.Key(server.key.privatePkcs1, "meshtastic-tak-server", server.ski),
+            ),
             clientP12 =
-                TakPkcs12.build(
-                    password,
-                    listOf(TakPkcs12.Cert(client.der, "meshtastic-tak-client", client.ski), caEntry),
-                    TakPkcs12.Key(client.key.privatePkcs1, "meshtastic-tak-client", client.ski),
-                ),
+            TakPkcs12.build(
+                password,
+                listOf(TakPkcs12.Cert(client.der, "meshtastic-tak-client", client.ski), caEntry),
+                TakPkcs12.Key(client.key.privatePkcs1, "meshtastic-tak-client", client.ski),
+            ),
             truststoreP12 = TakPkcs12.build(password, listOf(caEntry), null),
             password = password,
         )
@@ -133,12 +136,11 @@ internal object TakIosCertificateGenerator {
         return Der.seq(*parts.map { (k, v) -> Der.set(Der.seq(Der.oid(oids.getValue(k)), Der.utf8(v))) }.toTypedArray())
     }
 
-    private fun extension(oid: String, critical: Boolean, value: ByteArray): ByteArray =
-        if (critical) {
-            Der.seq(Der.oid(oid), Der.bool(true), Der.octet(value))
-        } else {
-            Der.seq(Der.oid(oid), Der.octet(value))
-        }
+    private fun extension(oid: String, critical: Boolean, value: ByteArray): ByteArray = if (critical) {
+        Der.seq(Der.oid(oid), Der.bool(true), Der.octet(value))
+    } else {
+        Der.seq(Der.oid(oid), Der.octet(value))
+    }
 
     private fun keyUsage(bits: Int, unused: Int): ByteArray = Der.bitString(byteArrayOf(bits.toByte()), unused)
 }

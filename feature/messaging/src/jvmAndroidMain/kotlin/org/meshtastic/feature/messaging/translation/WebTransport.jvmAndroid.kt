@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber")
+@file:Suppress("MagicNumber", "ReturnCount")
 
 package org.meshtastic.feature.messaging.translation
 
@@ -59,8 +59,12 @@ private object JavaWebTransport : WebAccess.Transport {
 
     override fun resolvesToLocalNetwork(host: String): Boolean = runCatching {
         InetAddress.getAllByName(host).any {
-            it.isAnyLocalAddress || it.isLoopbackAddress || it.isLinkLocalAddress || it.isSiteLocalAddress ||
+            it.isAnyLocalAddress ||
+                it.isLoopbackAddress ||
+                it.isLinkLocalAddress ||
+                it.isSiteLocalAddress ||
                 it.isMulticastAddress
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 }

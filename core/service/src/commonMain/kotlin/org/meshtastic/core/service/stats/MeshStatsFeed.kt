@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.service.stats
 
 import kotlinx.coroutines.flow.Flow
@@ -58,12 +57,12 @@ class MeshStatsFeed(
 
     fun snapshots(): Flow<MeshStatsSnapshot> {
         val basics: Flow<Basics> =
-            combine(nodes.onlineNodeCount, nodes.totalNodeCount, packets.getUnreadCountTotal(), service.connectionState) {
-                    online,
-                    total,
-                    unread,
-                    state,
-                ->
+            combine(
+                nodes.onlineNodeCount,
+                nodes.totalNodeCount,
+                packets.getUnreadCountTotal(),
+                service.connectionState,
+            ) { online, total, unread, state ->
                 Basics(online, total, unread, state is ConnectionState.Connected)
             }
         val stats =

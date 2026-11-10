@@ -37,7 +37,10 @@ annotation class AiToolParam(val name: String, val description: String)
 
 /** A class whose [AiTool] functions can be offered to a model (they all take text and return text). */
 interface AiToolSet {
-    /** The tools of this set as ready-to-offer specs (written out by hand: no reflection, it must work on every platform). */
+    /**
+     * The tools of this set as ready-to-offer specs (written out by hand: no reflection, it must work on every
+     * platform).
+     */
     fun specs(): List<AiToolSpec>
 }
 

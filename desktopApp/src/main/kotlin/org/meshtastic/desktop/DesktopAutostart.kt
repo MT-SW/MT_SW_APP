@@ -16,11 +16,11 @@
  */
 package org.meshtastic.desktop
 
-import java.io.File
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.common.background.AutostartControl
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 /**
  * Start at login on the three desktop systems: a LaunchAgent on macOS, the `Run` registry key on Windows and an
@@ -43,7 +43,8 @@ internal class DesktopAutostart private constructor(private val launcher: String
             os.contains("mac") -> macPlist().exists()
             else -> linuxEntry().exists()
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun register() {
         when {
@@ -88,7 +89,8 @@ internal class DesktopAutostart private constructor(private val launcher: String
     private fun macPlist() = File(System.getProperty("user.home"), "Library/LaunchAgents/$LABEL.plist")
 
     private fun linuxEntry(): File {
-        val base = System.getenv("XDG_CONFIG_HOME")?.takeIf { it.isNotBlank() } ?: "${System.getProperty("user.home")}/.config"
+        val base =
+            System.getenv("XDG_CONFIG_HOME")?.takeIf { it.isNotBlank() } ?: "${System.getProperty("user.home")}/.config"
         return File(base, "autostart/mt_sw.desktop")
     }
 

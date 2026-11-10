@@ -14,9 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "LongMethod")
+
 package org.meshtastic.core.takserver
 
-/** SHA-1, HMAC-SHA-1 and the PKCS#12 key derivation (RFC 7292 appendix B). Pure Kotlin; only used to write containers. */
+/**
+ * SHA-1, HMAC-SHA-1 and the PKCS#12 key derivation (RFC 7292 appendix B). Pure Kotlin; only used to write containers.
+ */
 internal object TakHash {
     private const val BLOCK = 64
 
@@ -38,9 +42,9 @@ internal object TakHash {
                 val p = chunk + i * 4
                 w[i] =
                     ((msg[p].toInt() and 0xFF) shl 24) or
-                        ((msg[p + 1].toInt() and 0xFF) shl 16) or
-                        ((msg[p + 2].toInt() and 0xFF) shl 8) or
-                        (msg[p + 3].toInt() and 0xFF)
+                    ((msg[p + 1].toInt() and 0xFF) shl 16) or
+                    ((msg[p + 2].toInt() and 0xFF) shl 8) or
+                    (msg[p + 3].toInt() and 0xFF)
             }
             for (i in 16 until 80) w[i] = (w[i - 3] xor w[i - 8] xor w[i - 14] xor w[i - 16]).rotateLeft(1)
             var a = h0
@@ -56,14 +60,17 @@ internal object TakHash {
                         f = (b and c) or (b.inv() and d)
                         k = 0x5A827999
                     }
+
                     i < 40 -> {
                         f = b xor c xor d
                         k = 0x6ED9EBA1
                     }
+
                     i < 60 -> {
                         f = (b and c) or (b and d) or (c and d)
                         k = 0x8F1BBCDCL.toInt()
                     }
+
                     else -> {
                         f = b xor c xor d
                         k = 0xCA62C1D6L.toInt()

@@ -52,8 +52,14 @@ private object KtorWebTransport : WebAccess.Transport {
                 header(HttpHeaders.Accept, accept)
             }
         val code = response.status.value
-        if (code in 300..399) return@runBlocking WebAccess.Response(code, response.headers[HttpHeaders.Location], ByteArray(0))
+        if (code in 300..399) {
+            return@runBlocking WebAccess.Response(code, response.headers[HttpHeaders.Location], ByteArray(0))
+        }
         if (code !in 200..299) return@runBlocking WebAccess.Response(code, null, ByteArray(0))
-        WebAccess.Response(code, null, response.bodyAsBytes().let { if (it.size > maxBytes) it.copyOf(maxBytes) else it })
+        WebAccess.Response(
+            code,
+            null,
+            response.bodyAsBytes().let { if (it.size > maxBytes) it.copyOf(maxBytes) else it },
+        )
     }
 }

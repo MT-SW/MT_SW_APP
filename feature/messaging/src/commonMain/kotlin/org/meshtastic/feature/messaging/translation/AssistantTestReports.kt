@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.messaging.translation
 
 /** Where the result files of the assistant self-test go (each platform keeps them in its own place). */

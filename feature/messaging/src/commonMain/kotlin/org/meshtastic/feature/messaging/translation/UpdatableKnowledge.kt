@@ -26,19 +26,19 @@
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.meshtastic.core.repository.AssistantKnowledge
-import org.meshtastic.core.repository.KnowledgeIndex
-import org.meshtastic.core.repository.UiPrefs
+import okio.ByteString.Companion.toByteString
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
-import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.repository.AssistantKnowledge
+import org.meshtastic.core.repository.KnowledgeIndex
+import org.meshtastic.core.repository.UiPrefs
 import kotlin.concurrent.Volatile
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 
 /**
  * Knowledge about the app that can be refreshed from our own repository. It works only while the user has switched the
@@ -107,7 +107,9 @@ class UpdatableKnowledge(
     override suspend fun coreFacts(language: String): String {
         val file = file("project/core.md")
         val downloaded =
-            withContext(Dispatchers.Default) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
+            withContext(Dispatchers.Default) {
+                runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("")
+            }
         val built = builtIn.coreFacts(language)
         if (downloaded.isBlank()) return built
         val fresh = org.meshtastic.core.repository.knowledgeSection(downloaded, language)
@@ -140,11 +142,15 @@ class UpdatableKnowledge(
         if (stamp == 0L) return null
         if (stamp == loadedFrom && index != null) return index
         val docs = buildList {
-            file("docs").mdFiles().forEach { f -> add(KnowledgeIndex.Document(f.name.removeSuffix(".md"), f.readText())) }
+            file("docs").mdFiles().forEach { f ->
+                add(KnowledgeIndex.Document(f.name.removeSuffix(".md"), f.readText()))
+            }
             file("project").mdFiles().forEach { f ->
                 add(KnowledgeIndex.Document("MT_SW ${f.name.removeSuffix(".md")}", f.readText()))
             }
-            file("CHANGELOG.md").takeIf { it.exists() }?.let { add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true)) }
+            file("CHANGELOG.md")
+                .takeIf { it.exists() }
+                ?.let { add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true)) }
         }
         index = docs.takeIf { it.isNotEmpty() }?.let { KnowledgeIndex(it) }
         loadedFrom = stamp

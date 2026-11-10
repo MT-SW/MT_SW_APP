@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.core.takserver
 
 /** Writes PKCS#12 containers in the legacy encoding (pbeWithSHAAnd3-KeyTripleDES-CBC, SHA-1 MAC) that ATAK reads. */
@@ -59,15 +61,17 @@ internal object TakPkcs12 {
             )
 
         if (key != null) {
-            val pkcs8 =
-                Der.seq(Der.int(0), Der.seq(Der.oid(OID_RSA), Der.nullValue()), Der.octet(key.pkcs1))
+            val pkcs8 = Der.seq(Der.int(0), Der.seq(Der.oid(OID_RSA), Der.nullValue()), Der.octet(key.pkcs1))
             val keySalt = TakApple.randomBytes(8)
             val keyBag =
                 Der.seq(
                     Der.oid(OID_SHROUDED_KEY_BAG),
                     Der.explicit(
                         0,
-                        Der.seq(Der.seq(Der.oid(OID_PBE_3DES), params(keySalt)), Der.octet(encrypt(pkcs8, pw, keySalt))),
+                        Der.seq(
+                            Der.seq(Der.oid(OID_PBE_3DES), params(keySalt)),
+                            Der.octet(encrypt(pkcs8, pw, keySalt)),
+                        ),
                     ),
                     attributes(key.name, key.keyId),
                 )
@@ -88,12 +92,11 @@ internal object TakPkcs12 {
         )
     }
 
-    private fun certBag(cert: Cert): ByteArray =
-        Der.seq(
-            Der.oid(OID_CERT_BAG),
-            Der.explicit(0, Der.seq(Der.oid(OID_X509_CERT), Der.explicit(0, Der.octet(cert.der)))),
-            attributes(cert.name, cert.keyId),
-        )
+    private fun certBag(cert: Cert): ByteArray = Der.seq(
+        Der.oid(OID_CERT_BAG),
+        Der.explicit(0, Der.seq(Der.oid(OID_X509_CERT), Der.explicit(0, Der.octet(cert.der)))),
+        attributes(cert.name, cert.keyId),
+    )
 
     private fun attributes(name: String, keyId: ByteArray?): ByteArray {
         val friendly = Der.seq(Der.oid(OID_FRIENDLY_NAME), Der.set(Der.bmp(name)))

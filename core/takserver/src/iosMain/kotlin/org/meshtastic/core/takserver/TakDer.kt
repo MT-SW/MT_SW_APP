@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "TooManyFunctions", "MatchingDeclarationName")
+
 package org.meshtastic.core.takserver
 
 /**
@@ -31,12 +33,13 @@ internal object Der {
         return out
     }
 
-    private fun length(n: Int): ByteArray = when {
-        n < 0x80 -> byteArrayOf(n.toByte())
-        n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
-        n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())
-        else -> byteArrayOf(0x83.toByte(), (n shr 16).toByte(), (n shr 8).toByte(), n.toByte())
-    }
+    private fun length(n: Int): ByteArray =
+        when {
+            n < 0x80 -> byteArrayOf(n.toByte())
+            n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
+            n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())
+            else -> byteArrayOf(0x83.toByte(), (n shr 16).toByte(), (n shr 8).toByte(), n.toByte())
+        }
 
     fun tlv(tag: Int, content: ByteArray): ByteArray = concat(byteArrayOf(tag.toByte()), length(content.size), content)
 
@@ -46,7 +49,8 @@ internal object Der {
 
     fun octet(bytes: ByteArray): ByteArray = tlv(0x04, bytes)
 
-    fun bitString(bytes: ByteArray, unusedBits: Int = 0): ByteArray = tlv(0x03, concat(byteArrayOf(unusedBits.toByte()), bytes))
+    fun bitString(bytes: ByteArray, unusedBits: Int = 0): ByteArray =
+        tlv(0x03, concat(byteArrayOf(unusedBits.toByte()), bytes))
 
     fun nullValue(): ByteArray = byteArrayOf(0x05, 0x00)
 
@@ -64,7 +68,8 @@ internal object Der {
         return tlv(0x1E, out)
     }
 
-    fun int(value: Int): ByteArray = unsigned(byteArrayOf((value shr 24).toByte(), (value shr 16).toByte(), (value shr 8).toByte(), value.toByte()))
+    fun int(value: Int): ByteArray =
+        unsigned(byteArrayOf((value shr 24).toByte(), (value shr 16).toByte(), (value shr 8).toByte(), value.toByte()))
 
     /** A non-negative big-endian number: leading zeros dropped, one zero added when the top bit is set. */
     fun unsigned(bytes: ByteArray): ByteArray {

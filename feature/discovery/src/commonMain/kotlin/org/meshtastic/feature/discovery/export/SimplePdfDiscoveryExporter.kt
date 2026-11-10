@@ -36,9 +36,9 @@ private const val LABEL_COLUMN_WIDTH = 160f
 private const val AVERAGE_CHAR_WIDTH = 0.52f
 
 /**
- * The report as a PDF on iPhone/iPad and on the computer (Android draws it with the system's own PDF writer). Written in
- * plain Kotlin with the standard Helvetica fonts, so it needs no library: letters outside Western European are written
- * without their accents (for example Polish "ł" becomes "l") and symbols the font has not got become "?".
+ * The report as a PDF on iPhone/iPad and on the computer (Android draws it with the system's own PDF writer). Written
+ * in plain Kotlin with the standard Helvetica fonts, so it needs no library: letters outside Western European are
+ * written without their accents (for example Polish "ł" becomes "l") and symbols the font has not got become "?".
  */
 class SimplePdfDiscoveryExporter : DiscoveryExporter {
     @Suppress("TooGenericExceptionCaught")
@@ -84,6 +84,7 @@ class SimplePdfDiscoveryExporter : DiscoveryExporter {
 }
 
 /** Lays the lines out on pages and writes them as a PDF 1.4 file (one byte per character, so offsets are exact). */
+@Suppress("TooManyFunctions")
 private class PdfPages {
     private class Page(val content: StringBuilder = StringBuilder())
 
@@ -113,12 +114,23 @@ private class PdfPages {
         // The PDF's origin is the lower left corner, the layout counts from the top.
         page.content
             .append("BT ")
-            .append(gray).append(" g /").append(if (bold) "F2 " else "F1 ").append(size).append(" Tf ")
-            .append(x).append(' ').append(PAGE_HEIGHT - top).append(" Td (")
-            .append(escape(text)).append(") Tj ET\n")
+            .append(gray)
+            .append(" g /")
+            .append(if (bold) "F2 " else "F1 ")
+            .append(size)
+            .append(" Tf ")
+            .append(x)
+            .append(' ')
+            .append(PAGE_HEIGHT - top)
+            .append(" Td (")
+            .append(escape(text))
+            .append(") Tj ET\n")
     }
 
-    fun title(t: String) = ensure().let { text(it, t, MARGIN_LEFT, y, TITLE_SIZE, true, 0f); y += LINE_HEIGHT + SECTION_GAP }
+    fun title(t: String) = ensure().let {
+        text(it, t, MARGIN_LEFT, y, TITLE_SIZE, true, 0f)
+        y += LINE_HEIGHT + SECTION_GAP
+    }
 
     fun heading(t: String) {
         breakIfNeeded(2)
@@ -219,19 +231,37 @@ private class PdfPages {
     /** Letters the standard font has not got, written without their accents. */
     private fun fold(c: Char): Char = when (c) {
         'ą' -> 'a'
+
         'ć' -> 'c'
+
         'ę' -> 'e'
+
         'ł' -> 'l'
+
         'ń' -> 'n'
+
         'ś' -> 's'
-        'ź', 'ż' -> 'z'
+
+        'ź',
+        'ż',
+        -> 'z'
+
         'Ą' -> 'A'
+
         'Ć' -> 'C'
+
         'Ę' -> 'E'
+
         'Ł' -> 'L'
+
         'Ń' -> 'N'
+
         'Ś' -> 'S'
-        'Ź', 'Ż' -> 'Z'
+
+        'Ź',
+        'Ż',
+        -> 'Z'
+
         else -> c
     }
 }

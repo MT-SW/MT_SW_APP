@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.service.stats
 
 import org.meshtastic.core.common.util.MetricFormatter
@@ -50,8 +49,8 @@ private const val MAX_BATTERY_LEVEL = 100
 private const val BYTES_PER_KB = 1024.0
 
 /**
- * The lines of the "mesh status" statistics: the same text on every system (the Android permanent notification and
- * the widgets of iPhone/iPad and the computer).
+ * The lines of the "mesh status" statistics: the same text on every system (the Android permanent notification and the
+ * widgets of iPhone/iPad and the computer).
  */
 object MeshStatsLines {
     /** [lnaGain] is the display-only correction of the noise floor (the same as in the app). */
@@ -147,7 +146,12 @@ object MeshStatsLines {
             }
             if (!ramAlreadyShown && ext.memoryTotal > 0) {
                 val used = (ext.memoryTotal - ext.memoryFreeCheap).toLong()
-                add(getStringSuspend(Res.string.live_update_ram, MetricFormatter.usedPercent(used, ext.memoryTotal.toLong())))
+                add(
+                    getStringSuspend(
+                        Res.string.live_update_ram,
+                        MetricFormatter.usedPercent(used, ext.memoryTotal.toLong()),
+                    ),
+                )
             }
             if (ext.flashTotalBytes > 0) {
                 add(

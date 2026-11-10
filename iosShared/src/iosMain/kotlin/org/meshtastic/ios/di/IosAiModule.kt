@@ -41,6 +41,7 @@ import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.AiTextEngine
+import org.meshtastic.feature.messaging.translation.AssistantDataProvider
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.DictationService
@@ -49,12 +50,11 @@ import org.meshtastic.feature.messaging.translation.IosAiModelStore
 import org.meshtastic.feature.messaging.translation.IosAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.IosAssistantMemory
 import org.meshtastic.feature.messaging.translation.IosAssistantTestReports
-import org.meshtastic.feature.messaging.translation.AssistantDataProvider
-import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.IosDictationService
 import org.meshtastic.feature.messaging.translation.IosEngineLog
 import org.meshtastic.feature.messaging.translation.IosLlamaEngine
 import org.meshtastic.feature.messaging.translation.IosTranslationRouter
+import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 

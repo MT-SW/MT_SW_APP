@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
@@ -50,6 +49,7 @@ import org.meshtastic.core.ui.icon.Refresh
  * Statistics sync between the device databases of this phone: the switch for the automatic sync and a scrollable
  * information window with the button "Synchronizuj teraz". Only nodes known to both databases are synchronized.
  */
+@Suppress("MultipleEmitters")
 @Composable
 fun DatabaseSyncSettingItems(
     autoEnabled: Boolean,
@@ -82,7 +82,7 @@ fun DatabaseSyncSettingItems(
                         result =
                             try {
                                 done.replace("%1\$d", syncNow().toString())
-                            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                            } catch (@Suppress("TooGenericExceptionCaught", "SwallowedException") e: Exception) {
                                 failed
                             }
                         busy = false

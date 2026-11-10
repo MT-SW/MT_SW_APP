@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.ios
 
 import androidx.compose.runtime.Composable
@@ -43,8 +42,8 @@ private val APP_UPDATE_START_DELAY = 1.minutes
 
 /**
  * Checks GitHub for a newer MT_SW_APP release a minute after the start and then twice a day while the app is open (the
- * same as on the computer; Android does it with a background job), and shows the window with the button to the
- * releases page.
+ * same as on the computer; Android does it with a background job), and shows the window with the button to the releases
+ * page.
  */
 @Composable
 internal fun AppUpdateLifecycle() {

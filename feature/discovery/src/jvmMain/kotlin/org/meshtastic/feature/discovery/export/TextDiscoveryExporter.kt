@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.discovery.export
 
-
 private const val SEPARATOR_LENGTH = 60
 
 class TextDiscoveryExporter : DiscoveryExporter {

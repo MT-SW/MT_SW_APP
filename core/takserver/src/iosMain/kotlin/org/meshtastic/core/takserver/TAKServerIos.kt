@@ -20,8 +20,6 @@
 package org.meshtastic.core.takserver
 
 import co.touchlab.kermit.Logger
-import kotlin.concurrent.Volatile
-import kotlin.random.Random
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.allocArrayOf
 import kotlinx.cinterop.memScoped
@@ -73,6 +71,8 @@ import platform.Security.sec_trust_t
 import platform.Security.tls_protocol_version_TLSv12
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_queue_create
+import kotlin.concurrent.Volatile
+import kotlin.random.Random
 
 /** Pause between stopping a listener and binding the same port again (regenerating the certificates). */
 private const val REBIND_DELAY_MS = 400L
@@ -113,6 +113,7 @@ internal class TAKServerIos(
     override var onMessage: ((CoTMessage, TAKClientInfo?) -> Unit)? = null
     override var onClientConnected: (() -> Unit)? = null
 
+    @Suppress("ReturnCount")
     override suspend fun start(scope: CoroutineScope): Result<Unit> {
         if (running) return Result.success(Unit)
         return try {
@@ -136,7 +137,9 @@ internal class TAKServerIos(
                 scope.launch(dispatchers.io) {
                     while (isActive) {
                         delay(TAK_KEEPALIVE_INTERVAL_MS)
-                        dispatch_async(queue) { connections.values.filter { it.isReady }.forEach { it.sendKeepalive() } }
+                        dispatch_async(queue) {
+                            connections.values.filter { it.isReady }.forEach { it.sendKeepalive() }
+                        }
                     }
                 }
             Result.success(Unit)
@@ -152,8 +155,7 @@ internal class TAKServerIos(
     }
 
     private fun buildListener(loaded: TakIosPki.Loaded, ready: CompletableDeferred<Result<Unit>>): nw_listener_t {
-        val parameters =
-            nw_parameters_create_secure_tcp({ tlsOptions -> configureTls(tlsOptions, loaded) }, { _ -> })
+        val parameters = nw_parameters_create_secure_tcp({ tlsOptions -> configureTls(tlsOptions, loaded) }, { _ -> })
         nw_parameters_set_local_endpoint(parameters, nw_endpoint_create_host("127.0.0.1", port.toString()))
         nw_parameters_set_reuse_local_address(parameters, true)
         val newListener = nw_listener_create(parameters) ?: error("Could not create the TAK listener")
@@ -161,8 +163,10 @@ internal class TAKServerIos(
         nw_listener_set_state_changed_handler(newListener) { state, _ ->
             when (state) {
                 nw_listener_state_ready -> ready.complete(Result.success(Unit))
+
                 nw_listener_state_failed ->
                     ready.complete(Result.failure(IllegalStateException("TAK listener failed on port $port")))
+
                 else -> Unit
             }
         }

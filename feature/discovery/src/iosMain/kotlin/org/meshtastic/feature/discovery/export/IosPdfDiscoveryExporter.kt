@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.discovery.export
 
 import org.koin.core.annotation.Single
 
 /** The report as a PDF, like on Android. */
-@Single
-class IosPdfDiscoveryExporter : DiscoveryExporter by SimplePdfDiscoveryExporter()
+@Single class IosPdfDiscoveryExporter : DiscoveryExporter by SimplePdfDiscoveryExporter()

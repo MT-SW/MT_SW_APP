@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.messaging.translation
 
 import java.io.File
@@ -25,5 +24,6 @@ class JvmAssistantTestReports : AssistantTestReports {
         val file = File(System.getProperty("user.dir") ?: ".", name)
         file.writeText(text)
         file.absolutePath
-    }.getOrNull()
+    }
+        .getOrNull()
 }

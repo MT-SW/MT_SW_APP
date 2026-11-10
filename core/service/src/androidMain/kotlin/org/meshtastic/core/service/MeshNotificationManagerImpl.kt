@@ -79,7 +79,6 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
-import org.meshtastic.core.service.stats.MeshStatsLines
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
@@ -118,13 +117,11 @@ import org.meshtastic.core.resources.live_update_flash
 import org.meshtastic.core.resources.live_update_heard
 import org.meshtastic.core.resources.live_update_heard_now
 import org.meshtastic.core.resources.live_update_hops
-import org.meshtastic.core.resources.live_update_nodes_online
 import org.meshtastic.core.resources.live_update_psram
 import org.meshtastic.core.resources.live_update_ram
 import org.meshtastic.core.resources.live_update_role
 import org.meshtastic.core.resources.live_update_signal
 import org.meshtastic.core.resources.live_update_stop_action
-import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_battery
@@ -150,6 +147,7 @@ import org.meshtastic.core.resources.powered
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.you
+import org.meshtastic.core.service.stats.MeshStatsLines
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetrics
@@ -1032,8 +1030,7 @@ class MeshNotificationManagerImpl(
         state: ConnectionState,
         reading: LiveUpdateReading.MeshStatus,
     ): Notification {
-        val lnaGain =
-            nodeRepository.value.myNodeInfo.value?.myNodeNum?.let { uiPrefs.value.lnaGains.value[it] } ?: 0
+        val lnaGain = nodeRepository.value.myNodeInfo.value?.myNodeNum?.let { uiPrefs.value.lnaGains.value[it] } ?: 0
         val lines =
             MeshStatsLines.meshStatus(
                 nodesOnline = reading.nodesOnline,

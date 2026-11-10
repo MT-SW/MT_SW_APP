@@ -45,11 +45,11 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_section_title
-import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.debug_panel
@@ -118,11 +118,10 @@ import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppIconSettingsItem
-import org.meshtastic.feature.settings.component.AutostartSettings
-import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
-import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
+import org.meshtastic.feature.settings.component.AutostartSettings
+import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
@@ -130,6 +129,7 @@ import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
+import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
 /**

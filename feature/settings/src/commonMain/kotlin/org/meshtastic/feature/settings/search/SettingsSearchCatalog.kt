@@ -31,7 +31,6 @@ import org.meshtastic.core.resources.allStringResources
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_icon_title
-import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.app_settings
@@ -65,6 +64,7 @@ import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed
 import org.meshtastic.feature.settings.navigation.ConfigRoute

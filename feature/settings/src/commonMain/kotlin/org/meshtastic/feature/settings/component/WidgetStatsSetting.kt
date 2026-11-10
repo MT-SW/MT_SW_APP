@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,11 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
         MeshtasticDialog(
             title = stringResource(Res.string.widget_stats_title),
             onDismiss = { open = false },
-            text = { Column(Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.widget_stats_info)) } },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(stringResource(Res.string.widget_stats_info))
+                }
+            },
         )
     }
     ListItem(

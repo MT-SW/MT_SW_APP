@@ -54,14 +54,32 @@ fun simpleAnnotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): An
         val closing = match.groupValues[1] == "/"
         val name = match.groupValues[2].lowercase()
         when (name) {
-            "b", "strong" -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontWeight = FontWeight.Bold)
-            "i", "em" -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontStyle = FontStyle.Italic)
-            "u" -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(textDecoration = TextDecoration.Underline)
+            "b",
+            "strong",
+            -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontWeight = FontWeight.Bold)
+
+            "i",
+            "em",
+            -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontStyle = FontStyle.Italic)
+
+            "u" ->
+                if (closing) {
+                    styles.removeLastOrNull()
+                } else {
+                    styles += SpanStyle(textDecoration = TextDecoration.Underline)
+                }
+
             "br" -> append("\n")
+
             "p" -> if (closing) append("\n\n")
+
             "a" ->
                 linkUrl =
-                    if (closing) null else Regex("href\\s*=\\s*[\"']([^\"']*)[\"']").find(match.groupValues[3])?.groupValues?.get(1)
+                    if (closing) {
+                        null
+                    } else {
+                        Regex("href\\s*=\\s*[\"']([^\"']*)[\"']").find(match.groupValues[ATTRIBUTES_GROUP])?.groupValues?.get(1)
+                    }
         }
     }
     appendText(html.substring(position))
@@ -75,3 +93,5 @@ private fun decodeEntities(text: String): String = text
     .replace("&#39;", "'")
     .replace("&apos;", "'")
     .replace("&amp;", "&")
+
+private const val ATTRIBUTES_GROUP = 3

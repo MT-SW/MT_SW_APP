@@ -45,6 +45,7 @@ import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
+import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
@@ -60,7 +61,6 @@ import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
-import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.posix.exit

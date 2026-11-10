@@ -44,11 +44,9 @@
 
 package org.meshtastic.feature.messaging.translation
 
-import org.meshtastic.core.common.util.nowMillis
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import org.meshtastic.core.common.util.ioDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -57,6 +55,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.meshtastic.core.common.util.ioDispatcher
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.antenna.AntennaPrefill
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.AiModels

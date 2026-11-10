@@ -16,6 +16,8 @@
  */
 @file:OptIn(ExperimentalForeignApi::class)
 
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.core.takserver
 
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -104,28 +106,27 @@ internal object TakApple {
     fun tripleDes(encrypt: Boolean, key: ByteArray, iv: ByteArray, data: ByteArray): ByteArray = memScoped {
         val out = ByteArray(data.size + 16)
         val moved = alloc<size_tVar>()
-        val status =
-            key.usePinned { k ->
-                iv.usePinned { v ->
-                    data.usePinned { d ->
-                        out.usePinned { o ->
-                            CCCrypt(
-                                (if (encrypt) 0 else 1).convert(),
-                                2.convert(),
-                                1.convert(),
-                                k.addressOf(0),
-                                key.size.convert(),
-                                v.addressOf(0),
-                                if (data.isEmpty()) null else d.addressOf(0),
-                                data.size.convert(),
-                                o.addressOf(0),
-                                out.size.convert(),
-                                moved.ptr,
-                            )
-                        }
+        val status = key.usePinned { k ->
+            iv.usePinned { v ->
+                data.usePinned { d ->
+                    out.usePinned { o ->
+                        CCCrypt(
+                            (if (encrypt) 0 else 1).convert(),
+                            2.convert(),
+                            1.convert(),
+                            k.addressOf(0),
+                            key.size.convert(),
+                            v.addressOf(0),
+                            if (data.isEmpty()) null else d.addressOf(0),
+                            data.size.convert(),
+                            o.addressOf(0),
+                            out.size.convert(),
+                            moved.ptr,
+                        )
                     }
                 }
             }
+        }
         check(status == 0) { "3DES failed: $status" }
         out.copyOf(moved.value.toInt())
     }
