@@ -282,6 +282,7 @@ class MeshHudViewModel(
         ) { location, nodes, myNode, settings, waypointPackets ->
             val now = nowSeconds
             val filter = settings.filters.toNodeMapFilter()
+            val ourNode = myNode?.myNodeNum?.let { nodes[it] }
             val solo = settings.solo
             val shownNodes =
                 nodes.values
@@ -293,7 +294,7 @@ class MeshHudViewModel(
                             } else {
                                 HudSubject.NodeSubject(node).key == settings.focusKey ||
                                     node.num in settings.pinned ||
-                                    node.passesMapFilter(filter, now)
+                                    node.passesMapFilter(filter, now, ourNode)
                             }
                     }
             val waypoints =

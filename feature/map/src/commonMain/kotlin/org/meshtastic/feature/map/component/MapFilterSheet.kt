@@ -43,6 +43,10 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter_all_roles
+import org.meshtastic.core.resources.map_filter_distance_km
+import org.meshtastic.core.resources.map_filter_max_distance_title
+import org.meshtastic.core.resources.map_filter_max_hops_title
+import org.meshtastic.core.resources.map_filter_no_limit
 import org.meshtastic.core.resources.map_filter_display_title
 import org.meshtastic.core.resources.map_filter_nodes_title
 import org.meshtastic.core.resources.map_filter_roles_title
@@ -66,6 +70,7 @@ import org.meshtastic.core.ui.icon.Lens
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.core.ui.icon.role
+import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.proto.Config
 
@@ -143,6 +148,26 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
 
         SectionTitle(stringResource(Res.string.map_filter_nodes_title))
         NodeFilterToggles(filterState = filterState, actions = actions)
+
+        HorizontalDivider()
+
+        SectionTitle(stringResource(Res.string.map_filter_max_hops_title))
+        LimitChips(
+            options = HOP_LIMITS,
+            selected = filterState.maxHops,
+            noLimitValue = MAP_FILTER_NO_HOP_LIMIT,
+            label = { it.toString() },
+            onSelect = actions.onSelectMaxHops,
+        )
+
+        SectionTitle(stringResource(Res.string.map_filter_max_distance_title))
+        LimitChips(
+            options = DISTANCE_LIMITS_KM.map { it * METERS_PER_KM },
+            selected = filterState.maxDistanceMeters,
+            noLimitValue = 0,
+            label = { stringResource(Res.string.map_filter_distance_km, it / METERS_PER_KM) },
+            onSelect = actions.onSelectMaxDistance,
+        )
     }
 }
 
@@ -221,6 +246,38 @@ private fun RoleFilterChips(
                 label = { Text(stringResource(role.label)) },
                 leadingIcon = { Icon(imageVector = MeshtasticIcons.role(role), contentDescription = null) },
                 modifier = Modifier.testTag(roleFilterChipTestTag(role)),
+            )
+        }
+    }
+}
+
+private val HOP_LIMITS = (0..7).toList()
+private val DISTANCE_LIMITS_KM = listOf(1, 2, 5, 10, 25, 50, 100, 250)
+private const val METERS_PER_KM = 1000
+
+/** A row of chips: "no limit" first, then one per value. Selected means that is the limit in force. */
+@Composable
+private fun LimitChips(
+    options: List<Int>,
+    selected: Int,
+    noLimitValue: Int,
+    label: @Composable (Int) -> String,
+    onSelect: (Int) -> Unit,
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilterChip(
+            selected = selected == noLimitValue,
+            onClick = { onSelect(noLimitValue) },
+            label = { Text(stringResource(Res.string.map_filter_no_limit)) },
+        )
+        options.forEach { value ->
+            FilterChip(
+                selected = selected == value,
+                onClick = { onSelect(value) },
+                label = { Text(label(value)) },
             )
         }
     }

@@ -1392,6 +1392,10 @@
     <string name="map_download_status_downloading">Pobieranie</string>
     <string name="map_download_status_paused">Wstrzymano</string>
     <string name="map_filter">Filtr mapy\n</string>
+    <string name="map_filter_distance_km">%1$d km</string>
+    <string name="map_filter_max_distance_title">Maks. odległość od mojego węzła</string>
+    <string name="map_filter_max_hops_title">Maks. liczba skoków (0 = tylko bezpośrednio)</string>
+    <string name="map_filter_no_limit">Bez limitu</string>
     <string name="map_filter_all_roles">Wszystkie</string>
     <string name="map_filter_display_title">Wyświetlacz</string>
     <string name="map_filter_nodes_title">Węzeł</string>

@@ -1860,6 +1860,10 @@
     <string name="map_filter">Map Filter\n</string>
     <string name="map_filter_all_roles">All</string>
     <string name="map_filter_display_title">Display</string>
+    <string name="map_filter_distance_km">%1$d km</string>
+    <string name="map_filter_max_distance_title">Max distance from my node</string>
+    <string name="map_filter_max_hops_title">Max hops (0 = direct only)</string>
+    <string name="map_filter_no_limit">No limit</string>
     <string name="map_filter_nodes_title">Nodes</string>
     <string name="map_filter_roles_title">Node roles</string>
     <string name="map_filter_show_ignored">Show ignored nodes</string>

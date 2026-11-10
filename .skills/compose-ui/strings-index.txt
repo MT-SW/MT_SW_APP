@@ -1812,6 +1812,10 @@ map_engine_unavailable_detail
 map_filter
 map_filter_all_roles
 map_filter_display_title
+map_filter_distance_km
+map_filter_max_distance_title
+map_filter_max_hops_title
+map_filter_no_limit
 map_filter_nodes_title
 map_filter_roles_title
 map_filter_show_ignored

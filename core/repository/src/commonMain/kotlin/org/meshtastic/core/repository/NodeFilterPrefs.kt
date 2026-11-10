@@ -72,6 +72,10 @@ data class MapFilterPrefs(
     val excludedRoles: Set<String> = emptySet(),
     /** Draw lines between nodes that exchange packets (neighbour reports, traceroutes, direct receptions). */
     val showLinks: Boolean = true,
+    /** Furthest hop count shown (0 = direct only); `-1` means no limit. */
+    val maxHops: Int = -1,
+    /** Furthest distance in metres from your own node; `0` means no limit. */
+    val maxDistanceMeters: Int = 0,
 )
 
 /** The node-level part of these filters, for views that draw nodes without the map's filter sheet. */
@@ -86,4 +90,6 @@ fun MapFilterPrefs.toNodeMapFilter() = NodeMapFilter(
     lastHeardSeconds = lastHeardSeconds,
     onlySigned = onlySigned,
     onlyEncrypted = onlyEncrypted,
+    maxHops = maxHops,
+    maxDistanceMeters = maxDistanceMeters,
 )

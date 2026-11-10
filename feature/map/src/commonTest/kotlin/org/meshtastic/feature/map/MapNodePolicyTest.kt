@@ -81,6 +81,8 @@ class MapNodePolicyTest {
         excludeMqtt: Boolean = false,
         showIgnored: Boolean = false,
         includeUnknown: Boolean = true,
+        maxHops: Int = -1,
+        maxDistanceMeters: Int = 0,
     ) = BaseMapViewModel.MapFilterState(
         onlyFavorites = onlyFavorites,
         showWaypoints = true,
@@ -95,10 +97,34 @@ class MapNodePolicyTest {
         excludeMqtt = excludeMqtt,
         showIgnored = showIgnored,
         includeUnknown = includeUnknown,
+        maxHops = maxHops,
+        maxDistanceMeters = maxDistanceMeters,
     )
 
-    private fun visible(nodes: List<Node>, state: BaseMapViewModel.MapFilterState, now: Long = 0, mine: Int? = null) =
-        MapNodePolicy.visibleNodes(nodes, state, now, mine).map { it.num }
+    private fun visible(
+        nodes: List<Node>,
+        state: BaseMapViewModel.MapFilterState,
+        now: Long = 0,
+        mine: Int? = null,
+        origin: Node? = null,
+    ) = MapNodePolicy.visibleNodes(nodes, state, now, mine, origin).map { it.num }
+
+    @Test
+    fun `hop limit keeps nodes up to that many hops`() {
+        val nodes = listOf(node(1, 45.0, -122.0, hopsAway = 0), node(2, 45.0, -122.0, hopsAway = 2), node(3, 45.0, -122.0, hopsAway = 5))
+        assertEquals(listOf(1, 2), visible(nodes, filters(maxHops = 2)))
+        assertEquals(listOf(1, 2, 3), visible(nodes, filters()))
+    }
+
+    @Test
+    fun `distance limit is measured from your own node`() {
+        val mine = node(9, 45.0, -122.0)
+        val near = node(1, 45.001, -122.0)
+        val far = node(2, 46.0, -122.0)
+        assertEquals(listOf(1), visible(listOf(near, far), filters(maxDistanceMeters = 5_000), origin = mine))
+        // Without a position to measure from, the limit cannot apply.
+        assertEquals(listOf(1, 2), visible(listOf(near, far), filters(maxDistanceMeters = 5_000)))
+    }
 
     @Test
     fun `nodes without a fix never reach the map`() {

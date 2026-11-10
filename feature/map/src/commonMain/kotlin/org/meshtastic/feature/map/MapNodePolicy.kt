@@ -53,6 +53,8 @@ object MapNodePolicy {
      * yourself and whether or not you have heard from yourself lately — the Google map has always done this, and the
      * MapLibre map's own copy of these rules did not, so filtering to favorites there hid you from yourself.
      *
+     * [origin] is your own node, from which the distance limit is measured.
+     *
      * Nodes without a fix are dropped up front. They cannot be drawn, and leaving them in drags a camera that fits to
      * these bounds toward (0, 0) — which is how the OSMdroid map used to open in the Atlantic.
      */
@@ -61,10 +63,11 @@ object MapNodePolicy {
         filterState: BaseMapViewModel.MapFilterState,
         nowSeconds: Long,
         myNodeNum: Int?,
+        origin: Node? = null,
     ): List<Node> {
         val filter = filterState.toNodeMapFilter()
         return nodes.filter { node ->
-            node.validPosition != null && (node.num == myNodeNum || node.passesMapFilter(filter, nowSeconds))
+            node.validPosition != null && (node.num == myNodeNum || node.passesMapFilter(filter, nowSeconds, origin))
         }
     }
 }

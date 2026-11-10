@@ -35,7 +35,14 @@ data class NodeMapFilter(
     val lastHeardSeconds: Long = 0,
     val onlySigned: Boolean = false,
     val onlyEncrypted: Boolean = false,
+    /** Furthest hop count shown (0 = direct only); [MAP_FILTER_NO_HOP_LIMIT] means no limit. */
+    val maxHops: Int = MAP_FILTER_NO_HOP_LIMIT,
+    /** Furthest distance in metres from your own node; 0 means no limit. */
+    val maxDistanceMeters: Int = 0,
 )
+
+/** [NodeMapFilter.maxHops] value that keeps every hop count. */
+const val MAP_FILTER_NO_HOP_LIMIT = -1
 
 /**
  * One node against every filter.
@@ -48,11 +55,12 @@ data class NodeMapFilter(
  * showIgnored`, so switching it on shows *only* ignored nodes); here it reads literally and adds them, because a map of
  * nothing but ignored nodes is not a view anyone asked for.
  */
-fun Node.passesMapFilter(filter: NodeMapFilter, nowSeconds: Long): Boolean {
+fun Node.passesMapFilter(filter: NodeMapFilter, nowSeconds: Long, origin: Node? = null): Boolean {
     val secondsSinceHeard = nowSeconds - lastHeard
     return passesIdentityFilters(filter) &&
         passesSecurityFilters(filter) &&
-        passesReachabilityFilters(filter, secondsSinceHeard)
+        passesReachabilityFilters(filter, secondsSinceHeard) &&
+        passesRangeFilters(filter, origin)
 }
 
 /**
@@ -76,6 +84,14 @@ private fun Node.passesReachabilityFilters(filter: NodeMapFilter, secondsSinceHe
         (!filter.onlyDirect || (hopsAway == 0 && !viaMqtt)) &&
         (!filter.excludeMqtt || !viaMqtt) &&
         (filter.lastHeardSeconds == 0L || secondsSinceHeard <= filter.lastHeardSeconds)
+
+/**
+ * How far the node is: hop count and distance from [origin] (your own node). A node whose hop count is unknown (-1)
+ * does not pass a hop limit. Without a position for [origin] the distance cannot be measured, so it does not filter.
+ */
+private fun Node.passesRangeFilters(filter: NodeMapFilter, origin: Node?): Boolean =
+    (filter.maxHops == MAP_FILTER_NO_HOP_LIMIT || hopsAway in 0..filter.maxHops) &&
+        (filter.maxDistanceMeters <= 0 || (origin?.distance(this)?.let { it <= filter.maxDistanceMeters } ?: true))
 
 /**
  * The two security filters (design#149).

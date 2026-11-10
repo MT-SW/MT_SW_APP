@@ -44,6 +44,8 @@ class MapFilterActions(
     val onToggleShowIgnored: () -> Unit,
     val onToggleIncludeUnknown: () -> Unit,
     val onToggleShowLinks: () -> Unit = {},
+    val onSelectMaxHops: (Int) -> Unit = {},
+    val onSelectMaxDistance: (Int) -> Unit = {},
 )
 
 /**
@@ -68,4 +70,6 @@ fun BaseMapViewModel.mapFilterActions(): MapFilterActions = MapFilterActions(
     onToggleShowIgnored = ::toggleShowIgnored,
     onToggleIncludeUnknown = ::toggleIncludeUnknown,
     onToggleShowLinks = ::toggleShowLinksOnMap,
+    onSelectMaxHops = ::setMaxHops,
+    onSelectMaxDistance = ::setMaxDistanceMeters,
 )

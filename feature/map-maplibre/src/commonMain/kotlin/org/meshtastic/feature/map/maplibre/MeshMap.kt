@@ -154,6 +154,7 @@ fun rememberMeshMapState(
     val waypoints by viewModel.waypoints.collectAsStateWithLifecycle()
     val filterState by viewModel.mapFilterStateFlow.collectAsStateWithLifecycle()
     val myNodeInfo by viewModel.myNodeInfo.collectAsStateWithLifecycle()
+    val ourNode by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
     val displayUnits by viewModel.displayUnits.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
@@ -161,8 +162,8 @@ fun rememberMeshMapState(
     // The style block recomposes on every camera frame (it reads the viewport below); the mesh-wide filter should not.
     // `nowSeconds` is deliberately not a key: a packet arriving already changes the node list.
     val visibleNodes =
-        remember(nodes, filterState, myNodeInfo) {
-            MapNodePolicy.visibleNodes(nodes, filterState, nowSeconds, myNodeInfo?.myNodeNum)
+        remember(nodes, filterState, myNodeInfo, ourNode) {
+            MapNodePolicy.visibleNodes(nodes, filterState, nowSeconds, myNodeInfo?.myNodeNum, ourNode)
         }
 
     InstallRadarSmoothing()

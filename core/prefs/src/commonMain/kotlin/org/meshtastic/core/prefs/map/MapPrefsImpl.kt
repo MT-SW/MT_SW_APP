@@ -80,6 +80,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
             lastHeardTrackSeconds = this[KEY_LAST_HEARD_TRACK_FILTER_PREF] ?: defaults.lastHeardTrackSeconds,
             excludedRoles = this[KEY_EXCLUDED_ROLES_PREF] ?: defaults.excludedRoles,
             showLinks = this[KEY_SHOW_LINKS_PREF] ?: defaults.showLinks,
+            maxHops = this[KEY_MAX_HOPS_PREF] ?: defaults.maxHops,
+            maxDistanceMeters = this[KEY_MAX_DISTANCE_PREF] ?: defaults.maxDistanceMeters,
         )
     }
 
@@ -98,6 +100,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         this[KEY_LAST_HEARD_TRACK_FILTER_PREF] = prefs.lastHeardTrackSeconds
         this[KEY_EXCLUDED_ROLES_PREF] = prefs.excludedRoles
         this[KEY_SHOW_LINKS_PREF] = prefs.showLinks
+        this[KEY_MAX_HOPS_PREF] = prefs.maxHops
+        this[KEY_MAX_DISTANCE_PREF] = prefs.maxDistanceMeters
     }
 
     override val hiddenLayerUrls: StateFlow<Set<String>> =
@@ -216,6 +220,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_LAYER_OPACITY_PREF = stringSetPreferencesKey("layer_opacity")
         val KEY_ONLY_ONLINE_PREF = booleanPreferencesKey("map_only_online")
         val KEY_ONLY_DIRECT_PREF = booleanPreferencesKey("map_only_direct")
+        val KEY_MAX_HOPS_PREF = intPreferencesKey("map_max_hops")
+        val KEY_MAX_DISTANCE_PREF = intPreferencesKey("map_max_distance_m")
         val KEY_ONLY_SIGNED_PREF = booleanPreferencesKey("map_only_signed")
         val KEY_ONLY_ENCRYPTED_PREF = booleanPreferencesKey("map_only_encrypted")
         val KEY_EXCLUDE_MQTT_PREF = booleanPreferencesKey("map_exclude_mqtt")

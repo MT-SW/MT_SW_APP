@@ -34,6 +34,7 @@ import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.MAP_FILTER_NO_HOP_LIMIT
 import org.meshtastic.core.model.NodeMapFilter
 import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.decodeExcludedRoles
@@ -169,6 +170,10 @@ open class BaseMapViewModel(
 
     fun toggleOnlyDirect() = mapPrefs.updateMapFilters { it.copy(onlyDirect = !it.onlyDirect) }
 
+    fun setMaxHops(hops: Int) = mapPrefs.updateMapFilters { it.copy(maxHops = hops) }
+
+    fun setMaxDistanceMeters(meters: Int) = mapPrefs.updateMapFilters { it.copy(maxDistanceMeters = meters) }
+
     fun toggleOnlySigned() = mapPrefs.updateMapFilters { it.copy(onlySigned = !it.onlySigned) }
 
     fun toggleOnlyEncrypted() = mapPrefs.updateMapFilters { it.copy(onlyEncrypted = !it.onlyEncrypted) }
@@ -263,6 +268,10 @@ open class BaseMapViewModel(
         val includeUnknown: Boolean = true,
         /** Draw lines between nodes that exchange packets. */
         val showLinks: Boolean = true,
+        /** Furthest hop count shown (0 = direct only); [MAP_FILTER_NO_HOP_LIMIT] means no limit. */
+        val maxHops: Int = MAP_FILTER_NO_HOP_LIMIT,
+        /** Furthest distance in metres from your own node; 0 means no limit. */
+        val maxDistanceMeters: Int = 0,
     ) {
         /** True when anything here is narrowing the node set, so the filter button can show it. */
         val isNarrowing: Boolean
@@ -271,6 +280,8 @@ open class BaseMapViewModel(
                     excludedRoles.isNotEmpty() ||
                     onlyOnline ||
                     onlyDirect ||
+                    maxHops != MAP_FILTER_NO_HOP_LIMIT ||
+                    maxDistanceMeters > 0 ||
                     onlySigned ||
                     onlyEncrypted ||
                     excludeMqtt ||
@@ -288,6 +299,8 @@ open class BaseMapViewModel(
             lastHeardSeconds = lastHeardFilter.seconds,
             onlySigned = onlySigned,
             onlyEncrypted = onlyEncrypted,
+            maxHops = maxHops,
+            maxDistanceMeters = maxDistanceMeters,
         )
     }
 
@@ -310,6 +323,8 @@ open class BaseMapViewModel(
         excludeMqtt = prefs.excludeMqtt,
         showIgnored = prefs.showIgnored,
         includeUnknown = prefs.includeUnknown,
+        maxHops = prefs.maxHops,
+        maxDistanceMeters = prefs.maxDistanceMeters,
     )
 }
 
