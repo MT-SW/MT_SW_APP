@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: na ekranie Połączenia pozycja „Konfiguracja radia” pokazuje się tylko wtedy, gdy radio nie jest jeszcze skonfigurowane (brak regionu; wtedy jako „Ustaw swój region”). Wcześniej zajmowała miejsce cały czas.
+
 * iPhone i iPad: gdy model AI (np. Gemma) nie mieści się w pamięci, aplikacja nie przerywa, tylko próbuje dalej z mniejszym oknem tekstu, a na końcu na samym procesorze. Wcześniej od razu pokazywała błąd braku pamięci.
 
 * iPhone i iPad: wyświetlanie adaptacyjne jest teraz opisane jako widżet („Widżet adaptacyjny”, „Śledź na widżecie”), bo na iPhonie nie ma stałego powiadomienia. W Funkcje MT_SW pozycja „Statystyki widżetu” ma teraz własny wybór: cała sieć albo jeden węzeł. Wczoraj i Przedwczoraj w liście aktywności są pisane wielką literą.
@@ -602,6 +604,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* All versions: on the Connections screen the "Radio setup" row is shown only while the radio is not configured yet (no region; then as "Set your region"). It used to take room all the time.
 
 * iPhone and iPad: when an AI model (e.g. Gemma) does not fit in memory, the app no longer gives up at once but retries with a smaller text window and, as a last resort, on the processor only.
 

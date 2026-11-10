@@ -112,7 +112,6 @@ import org.meshtastic.core.resources.open_bluetooth_settings
 import org.meshtastic.core.resources.open_location_settings
 import org.meshtastic.core.resources.open_settings
 import org.meshtastic.core.resources.open_wifi_settings
-import org.meshtastic.core.resources.radio_setup_title
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.scan_connect_code
 import org.meshtastic.core.resources.set_your_region
@@ -231,14 +230,18 @@ internal fun ConfigurationWarningCards(
         )
 
     // Emitted only when there is a card to show: an empty column would still take a gap in the caller's spacing.
-    if (!showWarnings) return
+    if (!showWarnings || (!regionUnset && !txDisabled)) return
     Column(verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing)) {
-        Card(modifier = Modifier.fillMaxWidth()) {
-            ListItem(
-                leadingIcon = MeshtasticIcons.Language,
-                text = stringResource(if (regionUnset) Res.string.set_your_region else Res.string.radio_setup_title),
-                onClick = { onConfigNavigate(SettingsRoute.RadioSetup(radioSetupAddress)) },
-            )
+        // The radio setup row is only offered while the radio is not configured yet (no region); afterwards it just
+        // takes room, and the setup stays reachable from Settings.
+        if (regionUnset) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                ListItem(
+                    leadingIcon = MeshtasticIcons.Language,
+                    text = stringResource(Res.string.set_your_region),
+                    onClick = { onConfigNavigate(SettingsRoute.RadioSetup(radioSetupAddress)) },
+                )
+            }
         }
 
         // An unset region already disables transmit and has its own card, so do not blame one root cause twice.
