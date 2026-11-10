@@ -22,7 +22,13 @@ import androidx.compose.runtime.Composable
  * Whether this device can show a Live Update (Android 16 and later), and whether the user has turned them off for the
  * app in system settings, where [openSettings] takes them.
  */
-data class LiveUpdateSupport(val available: Boolean, val turnedOff: Boolean, val openSettings: () -> Unit) {
+data class LiveUpdateSupport(
+    val available: Boolean,
+    val turnedOff: Boolean,
+    val openSettings: () -> Unit,
+    /** True where the adaptive display is a home-screen widget (iPhone, iPad) and not a notification. */
+    val widget: Boolean = false,
+) {
     companion object {
         val Unavailable = LiveUpdateSupport(available = false, turnedOff = false, openSettings = {})
     }

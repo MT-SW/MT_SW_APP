@@ -21,4 +21,4 @@ import androidx.compose.runtime.Composable
 /** On iPhone/iPad the adaptive display is shown by the widget (there is no permanent notification), always allowed. */
 @Composable
 actual fun rememberLiveUpdateSupport(): LiveUpdateSupport =
-    LiveUpdateSupport(available = true, turnedOff = false, openSettings = {})
+    LiveUpdateSupport(available = true, turnedOff = false, openSettings = {}, widget = true)

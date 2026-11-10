@@ -3463,6 +3463,11 @@
     <string name="what_is_meshtastic">What is MT_SW?</string>
     <string name="what_is_meshtastic_description">MT_SW is an app and a community around an open LoRa mesh network that works without the internet or base stations: radios pass messages on from node to node. The app extends the original with a link planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node list and many more settings. We build it together with the local community of the Świętokrzyskie region, and anyone can join.</string>
     <!-- WIDGET -->
+    <string name="widget_adaptive_mesh_status_shown">Mesh status on the home-screen widget</string>
+    <string name="widget_adaptive_off_summary">Show the whole mesh or one node on the home-screen widget</string>
+    <string name="widget_adaptive_title">Adaptive widget</string>
+    <string name="widget_adaptive_track_in">Track on the widget</string>
+    <string name="widget_adaptive_tracking_shown">Tracking %1$s on the home-screen widget</string>
     <string name="widget_node_tracker_choose">Choose a node to track</string>
     <string name="widget_node_tracker_not_found">Node not found. Tap to choose a node.</string>
     <string name="widget_node_tracker_title">Node Tracker</string>
@@ -3472,7 +3477,7 @@
     <string name="widget_packets_sent">Sent</string>
     <string name="widget_relays">Relayed</string>
     <string name="widget_relays_canceled">Relays canceled</string>
-    <string name="widget_stats_info">The widget shows the same statistics as the permanent notification on Android: nodes online, unread messages, battery, uptime, channel load, traffic and the rest your radio reports. What it shows (the whole mesh or one chosen node) is set in the adaptive display on the Connections screen.\n\niPhone and iPad: hold the home screen, tap +, choose MT_SW statistics (medium size, 4x2). The widget is refreshed while the app runs and every few minutes by the system.\n\nAndroid: hold the home screen, choose Widgets, then MT_SW statistics (4x2); the permanent notification shows the same lines. Computer: there are no widgets in the system; the statistics are in the tray icon and the main window.</string>
+    <string name="widget_stats_info">The widget shows the same statistics as the permanent notification on Android: nodes online, unread messages, battery, uptime, channel load, traffic and the rest your radio reports. What it shows (the whole mesh or one chosen node) is set in the "Adaptive widget" item (iPhone and iPad) or in the adaptive display on the Connections screen (Android).\n\niPhone and iPad: hold the home screen, tap +, choose MT_SW statistics (medium size, 4x2). The widget is refreshed while the app runs and every few minutes by the system.\n\nAndroid: hold the home screen, choose Widgets, then MT_SW statistics (4x2); the permanent notification shows the same lines. Computer: there are no widgets in the system; the statistics are in the tray icon and the main window.</string>
     <string name="widget_stats_summary">Radio and mesh statistics on the home screen</string>
     <string name="widget_stats_title">Statistics widget</string>
     <!-- WIFI -->

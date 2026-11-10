@@ -17,6 +17,7 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.widget_stats_info
@@ -34,6 +36,8 @@ import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.FormatPaint
+import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
+import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /** The row "Widżet statystyk": a scrollable information window about the widget and how to add it. */
@@ -50,6 +54,10 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
                 }
             },
         )
+    }
+    // Where the adaptive display is a widget (iPhone, iPad) its choice (whole mesh or one node) is made right here.
+    if (rememberLiveUpdateSupport().widget) {
+        LiveUpdateSection(modifier = modifier.padding(horizontal = 16.dp, vertical = 4.dp))
     }
     ListItem(
         modifier = modifier,

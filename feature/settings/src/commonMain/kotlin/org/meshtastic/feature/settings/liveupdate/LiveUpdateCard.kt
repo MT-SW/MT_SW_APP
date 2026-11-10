@@ -71,6 +71,10 @@ import org.meshtastic.core.resources.live_update_track_node_summary
 import org.meshtastic.core.resources.live_update_tracking_shown
 import org.meshtastic.core.resources.live_update_tracking_shown_shade
 import org.meshtastic.core.resources.open_settings
+import org.meshtastic.core.resources.widget_adaptive_mesh_status_shown
+import org.meshtastic.core.resources.widget_adaptive_off_summary
+import org.meshtastic.core.resources.widget_adaptive_title
+import org.meshtastic.core.resources.widget_adaptive_tracking_shown
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.icon
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -99,6 +103,7 @@ fun LiveUpdateSection(modifier: Modifier = Modifier) {
         onClick = { showChooser = true },
         onStop = { viewModel.setMode(LiveUpdateMode.Off) },
         onOpenSettings = support.openSettings,
+        widget = support.widget,
         modifier = modifier,
     )
     if (showChooser) {
@@ -114,6 +119,7 @@ fun LiveUpdateSection(modifier: Modifier = Modifier) {
                 showChooser = false
             },
             onDismiss = { showChooser = false },
+            widget = support.widget,
         )
     }
 }
@@ -131,14 +137,18 @@ fun LiveUpdateCard(
     onStop: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
+    widget: Boolean = false,
 ) {
     // With promotion off, Android keeps the update out of the status bar and shows it in the shade only.
     val summary =
         when (mode) {
-            LiveUpdateMode.Off -> stringResource(Res.string.live_update_off_summary)
+            LiveUpdateMode.Off ->
+                stringResource(if (widget) Res.string.widget_adaptive_off_summary else Res.string.live_update_off_summary)
 
             LiveUpdateMode.MeshStatus ->
-                if (turnedOffInSettings) {
+                if (widget) {
+                    stringResource(Res.string.widget_adaptive_mesh_status_shown)
+                } else if (turnedOffInSettings) {
                     stringResource(Res.string.live_update_mesh_status_shown_shade)
                 } else {
                     stringResource(Res.string.live_update_mesh_status_shown)
@@ -146,7 +156,9 @@ fun LiveUpdateCard(
 
             is LiveUpdateMode.TrackNode -> {
                 val name = trackedNode?.listName() ?: NodeAddress.numToDefaultId(mode.nodeNum)
-                if (turnedOffInSettings) {
+                if (widget) {
+                    stringResource(Res.string.widget_adaptive_tracking_shown, name)
+                } else if (turnedOffInSettings) {
                     stringResource(Res.string.live_update_tracking_shown_shade, name)
                 } else {
                     stringResource(Res.string.live_update_tracking_shown, name)
@@ -155,7 +167,7 @@ fun LiveUpdateCard(
         }
     Card(modifier = modifier.fillMaxWidth()) {
         BasicListItem(
-            text = stringResource(Res.string.live_update),
+            text = stringResource(if (widget) Res.string.widget_adaptive_title else Res.string.live_update),
             supportingText = summary,
             leadingIcon = MeshtasticIcons.Notifications,
             trailingContent =
@@ -201,6 +213,7 @@ fun LiveUpdateChooserSheet(
     onStart: (LiveUpdateMode) -> Unit,
     onStop: () -> Unit,
     onDismiss: () -> Unit,
+    widget: Boolean = false,
 ) {
     var choice by rememberSaveable {
         mutableStateOf(
@@ -220,7 +233,10 @@ fun LiveUpdateChooserSheet(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(text = stringResource(Res.string.live_update), style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = stringResource(if (widget) Res.string.widget_adaptive_title else Res.string.live_update),
+                style = MaterialTheme.typography.titleLarge,
+            )
             Column(modifier = Modifier.selectableGroup()) {
                 ChoiceRow(
                     selected = choice == LiveUpdateChoice.MeshStatus,

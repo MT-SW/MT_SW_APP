@@ -45,6 +45,8 @@ import org.meshtastic.core.resources.direct_message
 import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.ignore
 import org.meshtastic.core.resources.live_update_track_in
+import org.meshtastic.core.resources.widget_adaptive_track_in
+import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.core.resources.mute_notifications
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.share_contact
@@ -181,7 +183,14 @@ private fun ManagementActions(
         // Null where Live Updates do not exist; an ignored node cannot be tracked.
         if (trackedInLiveUpdate != null && !node.isIgnored) {
             SwitchListItem(
-                text = stringResource(Res.string.live_update_track_in),
+                text =
+                stringResource(
+                    if (rememberLiveUpdateSupport().widget) {
+                        Res.string.widget_adaptive_track_in
+                    } else {
+                        Res.string.live_update_track_in
+                    },
+                ),
                 leadingIcon = MeshtasticIcons.Notifications,
                 checked = trackedInLiveUpdate,
                 onClick = { onAction(NodeDetailAction.TrackInLiveUpdate(node.num, track = !trackedInLiveUpdate)) },

@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: wyświetlanie adaptacyjne jest teraz opisane jako widżet („Widżet adaptacyjny”, „Śledź na widżecie”), bo na iPhonie nie ma stałego powiadomienia. W Funkcje MT_SW pozycja „Statystyki widżetu” ma teraz własny wybór: cała sieć albo jeden węzeł. Wczoraj i Przedwczoraj w liście aktywności są pisane wielką literą.
+
 * iPhone i iPad: aplikacja zgłasza systemowi wszystkie swoje języki (wcześniej tylko angielski), więc okna systemowe, np. pytanie o wklejenie ze schowka, pokazują się w języku telefonu, także po polsku.
 
 * Wszystkie wersje: filtr mapy ma dwa nowe ograniczenia: „Maks. liczba skoków” (bez limitu albo 0–7) i „Maks. odległość od mojego węzła” (bez limitu albo 1–250 km). Pomysł z aplikacji Meshtastic na Apple. Ustawienia są zapamiętywane, działają też w obrazie sieci (HUD) i wliczają się do kropki aktywnego filtra.
@@ -598,6 +600,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* iPhone and iPad: the adaptive display is now described as a widget ("Adaptive widget", "Track on the widget"), because the iPhone has no permanent notification. In MT_SW features the "Statistics widget" item now has its own choice: the whole mesh or one node. Yesterday and Day before yesterday in the activity list start with a capital letter.
 
 * iPhone and iPad: the app now tells the system all its languages (it declared only English before), so system prompts such as the clipboard paste question show in the phone's language, Polish included.
 

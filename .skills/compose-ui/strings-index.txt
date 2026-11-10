@@ -3385,6 +3385,11 @@ weight
 what_is_meshtastic
 what_is_meshtastic_description
 ### WIDGET ###
+widget_adaptive_mesh_status_shown
+widget_adaptive_off_summary
+widget_adaptive_title
+widget_adaptive_track_in
+widget_adaptive_tracking_shown
 widget_node_tracker_choose
 widget_node_tracker_not_found
 widget_node_tracker_title
