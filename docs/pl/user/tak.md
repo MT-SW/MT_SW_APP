@@ -54,7 +54,7 @@ Kolory zespołów to standardowe kolory zespołów TAK, więc uzgodnij ze swoim 
 
 ### Lokalny serwer TAK
 
-Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK na **tym samym telefonie** albo WinTAK na tym samym komputerze, na którym działa aplikacja na komputer, mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
+Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK na **tym samym telefonie** albo WinTAK na tym samym komputerze, na którym działa aplikacja na komputer, albo ATAK/iTAK na tym samym iPhonie czy iPadzie, mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
 
 Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0. W Androidzie 17 i nowszych włączenie serwera prosi o uprawnienie do sieci lokalnej, którego potrzebuje do otwarcia gniazda. Jeśli to uprawnienie zostanie odmówione na stałe, aplikacja wyłącza serwer z powrotem i proponuje otwarcie ustawień aplikacji:
 

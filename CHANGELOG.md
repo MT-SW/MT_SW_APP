@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: lokalny serwer TAK działa tak samo jak na Androidzie i komputerze. Nasłuch tylko na 127.0.0.1:8089 z TLS i wzajemnym uwierzytelnianiem (przyjmowany tylko certyfikat klienta wydany przez tę instalację), własne certyfikaty tworzone przy pierwszym starcie, ten sam pakiet danych dla ATAK/iTAK.
+
 * Komputer (macOS, Windows, Linux): nowa opcja „Uruchamiaj z komputerem” w Funkcje MT_SW — start aplikacji po zalogowaniu (domyślnie wyłączona, działa w zainstalowanej aplikacji). Android ma już start po restarcie telefonu; iPhone i iPad nie mogą startować same.
 
 * Wszystkie wersje: nowa pozycja „Dołącz dane z kopii” w Kopia zapasowa i przywracanie. Wybierasz plik kopii (z dowolnego systemu) i aplikacja uzupełnia statystyki tylko węzłów znanych jej i kopii, bez dodawania nowych węzłów i bez restartu. Kopie działają tak samo na Androidzie, komputerze i iPhone/iPad (jeden format), więc dane można przenieść ze starego telefonu na nowy.
@@ -593,6 +595,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* iPhone and iPad: the local TAK server works the same as on Android and desktop. It listens on 127.0.0.1:8089 only, with TLS and mutual authentication (only the client certificate issued by this install is accepted), creates its own certificates on first start and exports the same data package for ATAK/iTAK.
 
 * Desktop (macOS, Windows, Linux): new "Start with the computer" option in MT_SW features — starts the app at login (off by default, works in the installed app). Android already starts after a phone restart; iPhone and iPad cannot start by themselves.
 
