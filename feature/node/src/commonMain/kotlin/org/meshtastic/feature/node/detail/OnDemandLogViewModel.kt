@@ -32,6 +32,7 @@ import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.proto.AirActivityEntry
 import org.meshtastic.proto.ExchangeEntry
 import org.meshtastic.proto.FwPlusVersion
+import org.meshtastic.proto.LanStats
 import org.meshtastic.proto.NodeEntry
 import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemand
@@ -58,6 +59,7 @@ data class OnDemandLogUiState(
     val rxAvgTimeHistory: List<Int> = emptyList(),
     val rxPacketHistory: List<Int> = emptyList(),
     val fwPlusVersion: FwPlusVersion? = null,
+    val lanStats: LanStats? = null,
     val receivedAt: Map<OnDemandType, Long> = emptyMap(),
 )
 
@@ -166,6 +168,7 @@ class OnDemandLogViewModel(
             rxPacketHistory =
             latest(OnDemandType.RESPONSE_PACKET_RX_HISTORY) { it.rx_packet_history }?.rx_packet_history.orEmpty(),
             fwPlusVersion = latest(OnDemandType.RESPONSE_FW_PLUS_VERSION) { it.fw_plus_version },
+            lanStats = latest(OnDemandType.RESPONSE_LAN_STATS) { it.lan_stats },
             receivedAt =
             decoded
                 .mapNotNull { (od, ts) -> od.response?.response_type?.let { it to ts } }
@@ -246,6 +249,8 @@ class OnDemandLogViewModel(
     fun requestRxPacketHistory() = requestOnDemand(OnDemandType.REQUEST_PACKET_RX_HISTORY)
 
     fun requestFwPlusVersion() = requestOnDemand(OnDemandType.REQUEST_FW_PLUS_VERSION)
+
+    fun requestLanStats() = requestOnDemand(OnDemandType.REQUEST_LAN_STATS)
 
     private fun requestOnDemand(type: OnDemandType) =
         safeLaunch(tag = "requestOnDemand-${type.name}") { nodeRequestActions.requestOnDemand(destNum, longName, type) }

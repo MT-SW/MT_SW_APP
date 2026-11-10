@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.on_demand_air_activity
 import org.meshtastic.core.resources.on_demand_exchange_log
 import org.meshtastic.core.resources.on_demand_fw_plus_version
+import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_no_errors
@@ -71,6 +72,7 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
     val avgTitle = stringResource(Res.string.on_demand_rx_avg_time)
     val historyTitle = stringResource(Res.string.on_demand_rx_packet_history)
     val fwTitle = stringResource(Res.string.on_demand_fw_plus_version)
+    val lanTitle = stringResource(Res.string.on_demand_lan_stats)
     val roundTrip = stringResource(Res.string.on_demand_round_trip)
     val snr = stringResource(Res.string.on_demand_snr)
     val rssi = stringResource(Res.string.on_demand_rssi)
@@ -192,6 +194,14 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                         fwTitle,
                         lines =
                         stamp(OnDemandType.RESPONSE_FW_PLUS_VERSION) + ReportLine(fwTitle, "v${it.version_number}"),
+                    ),
+                )
+            }
+            uiState.lanStats?.let { lan ->
+                add(
+                    ReportSection(
+                        lanTitle,
+                        lines = stamp(OnDemandType.RESPONSE_LAN_STATS) + lan.lines().map { (l, v) -> ReportLine(l, v) },
                     ),
                 )
             }

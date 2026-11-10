@@ -152,6 +152,10 @@ enum OnDemandType {
     REQUEST_LOCAL_STATS_BROADCAST_CONFIG = 30;
     RESPONSE_LOCAL_STATS_BROADCAST_CONFIG = 31;
     REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG = 32;
+    // Get this node's LAN address and UDP/MQTT switches (see LanStats). Answered for any node in range. A node
+    // that predates these (fw+ version below 4) answers with response_type UNKNOWN_TYPE.
+    REQUEST_LAN_STATS = 33;
+    RESPONSE_LAN_STATS = 34;
 }
 
 // Periodic broadcast of the node's own statistics: the basic ones and the extended ones, each with its own interval.
@@ -160,6 +164,26 @@ message LocalStatsBroadcastConfig {
     uint32 local_stats_interval_secs = 2;
     bool local_stats_extended_enabled = 3;
     uint32 local_stats_extended_interval_secs = 4;
+}
+
+// This node's LAN address and whether it bridges the mesh onto that LAN.
+message LanStats {
+    enum Link {
+        NONE = 0;
+        WIFI = 1;
+        ETHERNET = 2;
+    }
+    // IPv4 address on `link`, first octet in the lowest byte (192.168.1.10 = 0x0A01A8C0), the same layout as
+    // DeviceConnectionStatus' ip_address. Absent while no link has an address.
+    optional fixed32 ip_address = 1;
+    // Link ip_address belongs to: Ethernet when it is up, else Wi-Fi station. NONE when ip_address is absent.
+    Link link = 2;
+    // config.network.enabled_protocols has UDP_BROADCAST, and this build supports UDP multicast.
+    bool udp_enabled = 3;
+    // moduleConfig.mqtt.enabled, and this build supports MQTT.
+    bool mqtt_enabled = 4;
+    // Connected to the MQTT broker over this node's own network link (not proxied through the phone).
+    bool mqtt_connected = 5;
 }
 
 message OnDemandRequest {
@@ -187,6 +211,7 @@ message OnDemandResponse {
         RoutingErrorsHistory routing_errors = 11;
         SnifferState sniffer_state = 12;
         LocalStatsBroadcastConfig local_stats_broadcast_config = 14;
+        LanStats lan_stats = 15;
     }
 }
 

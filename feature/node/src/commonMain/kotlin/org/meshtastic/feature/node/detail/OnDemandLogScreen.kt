@@ -93,6 +93,8 @@ import org.meshtastic.core.resources.on_demand_flash
 import org.meshtastic.core.resources.on_demand_flood_counter
 import org.meshtastic.core.resources.on_demand_fw_plus_version
 import org.meshtastic.core.resources.on_demand_fw_plus_version_desc
+import org.meshtastic.core.resources.on_demand_lan_stats
+import org.meshtastic.core.resources.on_demand_lan_stats_desc
 import org.meshtastic.core.resources.on_demand_heap_total
 import org.meshtastic.core.resources.on_demand_heap_used
 import org.meshtastic.core.resources.on_demand_hero_hint
@@ -497,6 +499,25 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                     }
                 }
             }
+
+            item(key = "lan-stats") {
+                QueryCard(
+                    title = stringResource(Res.string.on_demand_lan_stats),
+                    description = stringResource(Res.string.on_demand_lan_stats_desc),
+                    icon = MeshtasticIcons.MeshHub,
+                    accent = purple,
+                    onRequest = viewModel::requestLanStats,
+                    receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_LAN_STATS],
+                ) {
+                    uiState.lanStats?.let { lan ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            lan.lines().forEach { (label, value) ->
+                                Text(text = "$label: $value", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -554,6 +575,7 @@ private fun OnDemandHero(answered: Set<OnDemandType>) {
                 MeshtasticIcons.MeshRadio,
                 OnDemandType.RESPONSE_FW_PLUS_VERSION,
             ),
+            Triple(Res.string.on_demand_lan_stats, MeshtasticIcons.MeshHub, OnDemandType.RESPONSE_LAN_STATS),
         )
     val done = capabilities.count { it.third in answered }
     val brush =
