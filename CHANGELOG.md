@@ -23,22 +23,14 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Wszystkie wersje: widżet pokazuje szum z korektą wzmacniacza (LNA), tak jak aplikacja i powiadomienie.
 * Wszystkie wersje: w menu wyboru motywu nazwy kategorii są złote i większe niż pozycje.
 * iPhone i iPad: napis „Zaktualizowano” i godzina na widżecie są w języku aplikacji, a nie telefonu.
-
 * iPhone i iPad: w ustawieniach asystenta pozycja „Zwolnij pamięć” pokazuje teraz, który model jest w pamięci (wcześniej zawsze pisała, że żaden), a dotknięcie jej zwalnia model, tak jak na Androidzie i komputerze.
-
 * Wszystkie wersje: ekran Funkcje MT_SW ma osobno prawdziwe ustawienia („Wygląd, widżet i dane”: skala, motyw, ikona, widżet, synchronizacja statystyk, czcionka) i osobno „Skróty”, które tylko otwierają ustawienia w innych miejscach. Opis „Synchronizacji statystyk urządzeń” jest rozbudowany: po co jest, przykład, co jest synchronizowane, czego nie rusza i kiedy działa.
-
 * Wszystkie wersje: nowe zapytanie „Statystyki sieci LAN” w Diagnostyce na żądanie (MT_SW_FIRMWARE v3 i nowszy): adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Wynik trafia też do raportu.
 * Wszystkie wersje: zdalna administracja pyta teraz o wersję MT_SW_FIRMWARE i ustawienia statystyk także węzeł zdalny. Wcześniej pytała tylko własne radio, więc zdalny węzeł był uznawany za nieobsługujący tej funkcji.
-
 * Wszystkie wersje: na ekranie Połączenia pozycja „Konfiguracja radia” pokazuje się tylko wtedy, gdy radio nie jest jeszcze skonfigurowane (brak regionu; wtedy jako „Ustaw swój region”). Wcześniej zajmowała miejsce cały czas.
-
 * iPhone i iPad: gdy model AI (np. Gemma) nie mieści się w pamięci, aplikacja nie przerywa, tylko próbuje dalej z mniejszym oknem tekstu, a na końcu na samym procesorze. Wcześniej od razu pokazywała błąd braku pamięci.
-
 * iPhone i iPad: wyświetlanie adaptacyjne jest teraz opisane jako widżet („Widżet adaptacyjny”, „Śledź na widżecie”), bo na iPhonie nie ma stałego powiadomienia. W Funkcje MT_SW pozycja „Statystyki widżetu” ma teraz własny wybór: cała sieć albo jeden węzeł. Wczoraj i Przedwczoraj w liście aktywności są pisane wielką literą.
-
 * iPhone i iPad: aplikacja zgłasza systemowi wszystkie swoje języki (wcześniej tylko angielski), więc okna systemowe, np. pytanie o wklejenie ze schowka, pokazują się w języku telefonu, także po polsku.
-
 * Wszystkie wersje: filtr mapy ma dwa nowe ograniczenia: „Maks. liczba skoków” (bez limitu albo 0–7) i „Maks. odległość od mojego węzła” (bez limitu albo 1–250 km). Pomysł z aplikacji Meshtastic na Apple. Ustawienia są zapamiętywane, działają też w obrazie sieci (HUD) i wliczają się do kropki aktywnego filtra.
 * Wszystkie wersje: dotknięcie kilku węzłów stojących w tym samym miejscu na mapie otwiera listę „wybierz węzeł” (jak przy skupisku), bo ich plakietki się nakładają i wcześniej dało się otworzyć tylko wierzchni.
 * Wszystkie wersje: wykresy zdrowia sieci (np. szum) pomijają odczyty z błędnym zegarem węzła: z przyszłości o ponad 30 dni, starsze o ponad rok od najnowszego i powtórzone znaczniki czasu. Tabele i eksport zostają z pełnymi danymi.
@@ -623,33 +615,21 @@ The entries below describe only what this fork adds on top of the original, from
 * All versions: the widget shows the noise floor with the amplifier (LNA) correction, like the app and the notification.
 * All versions: in the theme picker the category names are gold and larger than the options.
 * iPhone and iPad: the "Updated" label and time on the widget follow the app's language, not the phone's.
-
 * iPhone and iPad: in the assistant settings the "Free memory" row now shows which model is in memory (it always said none before), and tapping it frees the model, as on Android and desktop.
-
 * All versions: the MT_SW features screen now keeps real settings ("Looks, widget and data": scale, theme, icon, widget, statistics sync, font) apart from "Shortcuts", which only open settings elsewhere. The description of "Device statistics sync" is expanded: what it is for, an example, what is synchronized, what it leaves alone and when it runs.
-
 * All versions: the new "LAN statistics" query in On-demand diagnostics (MT_SW_FIRMWARE v3 and newer): the node's IP address on Wi-Fi or Ethernet, UDP on the local network, MQTT and the broker connection. The result is in the report too.
 * All versions: remote administration now asks a remote node for its MT_SW_FIRMWARE version and statistics settings too. Before it asked only the connected radio, so a remote node was treated as not supporting the feature.
-
 * All versions: on the Connections screen the "Radio setup" row is shown only while the radio is not configured yet (no region; then as "Set your region"). It used to take room all the time.
-
 * iPhone and iPad: when an AI model (e.g. Gemma) does not fit in memory, the app no longer gives up at once but retries with a smaller text window and, as a last resort, on the processor only.
-
 * iPhone and iPad: the adaptive display is now described as a widget ("Adaptive widget", "Track on the widget"), because the iPhone has no permanent notification. In MT_SW features the "Statistics widget" item now has its own choice: the whole mesh or one node. Yesterday and Day before yesterday in the activity list start with a capital letter.
-
 * iPhone and iPad: the app now tells the system all its languages (it declared only English before), so system prompts such as the clipboard paste question show in the phone's language, Polish included.
-
 * All versions: the map filter has two new limits: "Max hops" (no limit or 0-7) and "Max distance from my node" (no limit or 1-250 km). Idea from the Meshtastic app for Apple. The settings are remembered, also apply to the network view (HUD) and count towards the active-filter dot.
 * All versions: tapping several nodes standing on the same spot on the map opens a "pick a node" list (as for a cluster), because their chips overlap and only the top one could be opened before.
 * All versions: network health charts (e.g. noise) skip readings from a node with a wrong clock: more than 30 days in the future, more than a year older than the newest, and repeated timestamps. Tables and exports keep the full data.
 * All versions: the theme picker has categories (dark, light, system-matching, other) and shorter theme names; "min" instead of "minute"; in the node list an inactive node shows "yesterday" and "day before yesterday" instead of "1 day ago" and "2 days ago".
-
 * iPhone and iPad: the local TAK server works the same as on Android and desktop. It listens on 127.0.0.1:8089 only, with TLS and mutual authentication (only the client certificate issued by this install is accepted), creates its own certificates on first start and exports the same data package for ATAK/iTAK.
-
 * Desktop (macOS, Windows, Linux): new "Start with the computer" option in MT_SW features — starts the app at login (off by default, works in the installed app). Android already starts after a phone restart; iPhone and iPad cannot start by themselves.
-
 * All versions: new "Merge data from a backup" in Backup and restore. Pick a backup file (from any system) and the app completes the statistics only of nodes known to both it and the backup, adding no new nodes and needing no restart. Backups work the same on Android, desktop and iPhone/iPad (one format), so data can move from an old phone to a new one.
-
 * All versions: new "Device statistics sync" in MT_SW features. Every radio has its own database; the sync completes in both databases the telemetry and position history and the latest readings of the nodes both databases know (no duplicates: a packet heard by both radios counts once). Nodes known to one database only are not copied to the other; notes, names, favourites, ignore and mute stay unchanged. It runs automatically (an option, off by default) after the radio changes, or with the "Sync now" button.
 * iPhone and iPad: every next message (reaction, alert) from the same conversation rings and vibrates again, on the watch too. Before, a new notification silently replaced the previous one, because the system does not alert for a replaced notification. Now the notifications of one conversation stack, and reading the conversation clears the whole stack.
 * iPhone and iPad: checking for new app versions (like on Android and desktop): a minute after the start and then twice a day, with a notification and a window with a button to the releases page; switched on and off in the update settings.
@@ -676,7 +656,6 @@ The entries below describe only what this fork adds on top of the original, from
 * iPhone and iPad: the radio connection survives the app being closed in the background. Bluetooth state restoration is on, so when the system closes the app and the radio comes back in range, the system starts the app again and the connection resumes (before, the connection was gone after a background close until the app was opened by hand).
 * Merge with the original — version 2.8.5: app version number 2.8.5, newer Android build tools (AGP 9.5.1, android tools 32.5.1), refreshed hardware and firmware data, translations and store screenshots. Our Polish translations are unchanged. MT_SW_APP release v5(2.8.5).test.1.
 * Build: adapted to the new Gradle (the `androidApp` configuration no longer reaches into the root project), iOS native library sharing enabled (cinterop commonization).
-
 * Logs on iPhone/iPad work like on Android: a switch for collecting logs (off by default), a separate switch for the automatic log of the last 24 hours (on by default), every entry with the date and time to the millisecond, the log in consecutive parts of about 400 KB (`mt_sw_log_<session>_<number>.txt`), older parts replaced, the crash cause in its own file a choice of a folder in the Files app that gets a fresh zip of the logs on its own (at start, every few minutes and when the app goes to the background; instead of the Downloads folder, which the iPhone does not have), app lifecycle events and memory warnings, the thread name in every line, an entry on how the earlier run ended (in the background, in the foreground, normal close), the AI engine's own logs (llama, whisper) in the package, the same log detail level as on Android, a richer crash record, orientation changes and a periodic resource entry, and a report package to send on demand (Discord, WhatsApp, Signal). The in-memory log on desktop (Debug screen) also has the time on every entry.
 * Assistant compatibility test: the dictation check uses the app language, the screen stays on during the test, and the NPU and graphics card runs share one conversation (one file with the whole chat). Tips reworded.
 * Assistant compatibility test: the intro text now explains why the test matters (improving the assistant on many different devices).
