@@ -61,6 +61,7 @@ targets:
         FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../iosShared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
         OTHER_LDFLAGS: "$(inherited) -lsqlite3"
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: MTSWApp/MTSWApp.entitlements
         MTSW_APP_STORE_BUILD: NO
         "ARCHS[sdk=iphonesimulator*]": arm64
     preBuildScripts:

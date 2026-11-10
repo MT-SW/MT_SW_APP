@@ -174,6 +174,10 @@ class IosLlamaEngine(
         backend = ""
     }
 
+    /** Device memory for the error text: shows at once whether the memory limit is the cause. */
+    private fun memoryNote(): String =
+        "RAM ${NSProcessInfo.processInfo.physicalMemory.toLong() / BYTES_PER_MB} MB, context $CONTEXT_TOKENS"
+
     private fun ensureLoaded(modelId: String) {
         if (loadedId == modelId && ctx != null) return
         release()
@@ -183,7 +187,7 @@ class IosLlamaEngine(
         val gpu = if (isSimulator()) 0 else GPU_LAYERS
         val loaded =
             llama_model_load_from_file(path, llama_model_default_params().copy { n_gpu_layers = gpu })
-                ?: error("Could not load the model file")
+                ?: error("Could not load the model file (${memoryNote()})")
         val context =
             llama_init_from_model(
                 loaded,
@@ -194,7 +198,7 @@ class IosLlamaEngine(
             )
         if (context == null) {
             llama_model_free(loaded)
-            error("Could not create the model context")
+            error("Could not create the model context (${memoryNote()})")
         }
         model = loaded
         ctx = context

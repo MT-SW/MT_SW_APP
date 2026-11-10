@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: aplikacja prosi system o większy limit pamięci (uprawnienie „increased memory limit”), żeby duże modele AI (np. Gemma 4 E2B) mogły się załadować. Przy błędzie ładowania modelu komunikat pokazuje teraz ilość pamięci urządzenia.
 * iPhone i iPad: ikona aplikacji ma warianty pod style ikon systemu (iOS 18 i nowszy): ciemny (czarne tło, obrys województwa i napis żółte) oraz kolorowy (czarne tło, jasny rysunek, który system zabarwia). Dodatkowo nowe ustawienie „Ikona aplikacji” w Funkcje MT_SW (wszystkie wersje): Automatycznie (domyślnie; na iPhonie wg stylu z systemu), Standardowa (jak dotąd), Ciemna, Przezroczysta, Jednokolorowa. Android zmienia ikonę na ekranie głównym, iPhone używa zapasowych ikon (na iPhonie „przezroczysta” jest jasna, bo iOS nie przyjmuje przezroczystych ikon), komputer zmienia ikonę okna i Docka/paska zadań.
 * Wszystkie wersje: kliknięcie powiadomienia o wiadomości, reakcji lub alarmie otwiera rozmowę, z której przyszło. Android robił to już wcześniej; teraz tak samo działa na iPhonie/iPadzie oraz na komputerach (macOS, Windows i Linux), a okno aplikacji wraca na wierzch.
 * Wszystkie wersje (Android, komputer, iPhone/iPad): dolne przyciski (zakładki) zawsze przywracają pierwszy ekran strony, także po przejściu z innej zakładki: z rozmowy wraca do listy rozmów, ze szczegółów węzła, ustawień czy mapy na ich główny ekran. Na liście węzłów przycisk dodatkowo czyści wyszukiwanie i przewija na górę; lista rozmów też przewija się na górę.
@@ -581,6 +582,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* iPhone and iPad: the app asks the system for a higher memory limit (the "increased memory limit" entitlement) so large AI models (for example Gemma 4 E2B) can load. When a model fails to load, the error now shows the device memory.
 * iPhone and iPad: the app icon has variants for the system icon styles (iOS 18 and later): dark (black background, outline and lettering yellow) and tinted (black background, light drawing that the system colours). Also a new "App icon" setting in MT_SW features (all versions): Automatic (default; on iPhone per the system style), Standard (as before), Dark, Clear, Tinted. Android changes the home screen icon, iPhone uses alternate icons (on iPhone "clear" is light, because iOS does not accept transparent icons), the desktop app changes the window and Dock/taskbar icon.
 * All versions: tapping a notification about a message, reaction or alert opens the conversation it came from. Android already did this; now iPhone/iPad and the desktop apps (macOS, Windows and Linux) do the same, and the app window comes to the front.
 * All versions (Android, desktop, iPhone/iPad): the bottom buttons (tabs) always bring a page back to its first screen, also when coming from another tab: from a conversation back to the conversation list, from node details, settings or map to their main screen. On the node list the button also clears the search and scrolls to the top; the conversation list scrolls to the top too.
