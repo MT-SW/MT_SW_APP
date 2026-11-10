@@ -48,8 +48,11 @@ class MultiBackstack(val startTab: NavKey, private val currentTabState: MutableS
             return stack
         }
 
-    /** Switches to a new top-level tab route. */
-    fun navigateTopLevel(route: NavKey) {
+    /**
+     * Switches to a new top-level tab route. With [resetStack] the tab always opens at its root (a press on a bottom
+     * button), also when it is another tab than the current one; without it a tab keeps the screens it was left on.
+     */
+    fun navigateTopLevel(route: NavKey, resetStack: Boolean = false) {
         val rootKey = TopLevelDestination.fromNavKey(route)?.route ?: route
 
         if (currentTabRoute == rootKey) {
@@ -58,6 +61,7 @@ class MultiBackstack(val startTab: NavKey, private val currentTabState: MutableS
         } else {
             // Switching to a different tab
             currentTabRoute = rootKey
+            if (resetStack) backStacks[rootKey]?.replaceAll(listOf(rootKey))
         }
     }
 

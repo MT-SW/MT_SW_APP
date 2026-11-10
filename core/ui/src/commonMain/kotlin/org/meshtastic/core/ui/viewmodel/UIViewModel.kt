@@ -104,6 +104,8 @@ import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.SharedContact
 import kotlin.random.Random
 
+private const val TAB_OPENED_EVENT_DELAY_MS = 150L
+
 /**
  * Shared base for the application-level ViewModel.
  *
@@ -263,6 +265,14 @@ class UIViewModel(
 
     fun emitScrollToTopEvent(event: ScrollToTopEvent) {
         _scrollToTopEventFlow.tryEmit(event)
+    }
+
+    /** Same, but after the screen of a tab that was just opened has had time to start listening. */
+    fun emitScrollToTopEventDelayed(event: ScrollToTopEvent) {
+        viewModelScope.launch {
+            delay(TAB_OPENED_EVENT_DELAY_MS)
+            _scrollToTopEventFlow.tryEmit(event)
+        }
     }
 
     fun tracerouteMapAvailability(forwardRoute: List<Int>, returnRoute: List<Int>): TracerouteMapAvailability =

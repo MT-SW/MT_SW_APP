@@ -246,6 +246,8 @@ fun NodeListScreen(
     LaunchedEffect(scrollToTopEvents) {
         scrollToTopEvents?.collectLatest { event ->
             if (event == ScrollToTopEvent.NodesTabPressed) {
+                // The bottom button brings the list back to how it first looked: no search text, top of the list.
+                viewModel.nodeFilterText = ""
                 listState.smartScrollToTop(coroutineScope)
             }
         }

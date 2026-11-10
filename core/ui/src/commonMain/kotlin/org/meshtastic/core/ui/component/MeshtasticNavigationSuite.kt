@@ -70,9 +70,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshActivity
-import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MultiBackstack
-import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_tab_ai
@@ -261,35 +259,18 @@ private fun handleNavigation(
     uiViewModel: UIViewModel,
 ) {
     val isRepress = destination == topLevelDestination
-    if (isRepress) {
-        val currentKey = multiBackstack.activeBackStack.lastOrNull()
+    val wasOnRoot = isRepress && multiBackstack.activeBackStack.size <= 1
+    // A press on a bottom button always brings the tab back to its first screen, also when it comes from another tab.
+    multiBackstack.navigateTopLevel(destination.route, resetStack = true)
+    val event =
         when (destination) {
-            TopLevelDestination.Nodes -> {
-                val onNodesList = currentKey is NodesRoute.Nodes
-                if (!onNodesList) {
-                    multiBackstack.navigateTopLevel(destination.route)
-                } else {
-                    uiViewModel.emitScrollToTopEvent(ScrollToTopEvent.NodesTabPressed)
-                }
-            }
-
-            TopLevelDestination.Messages -> {
-                val onConversationsList = currentKey is ContactsRoute.Contacts
-                if (!onConversationsList) {
-                    multiBackstack.navigateTopLevel(destination.route)
-                } else {
-                    uiViewModel.emitScrollToTopEvent(ScrollToTopEvent.ConversationsTabPressed)
-                }
-            }
-
-            else -> {
-                if (currentKey != destination.route) {
-                    multiBackstack.navigateTopLevel(destination.route)
-                }
-            }
+            TopLevelDestination.Nodes -> ScrollToTopEvent.NodesTabPressed
+            TopLevelDestination.Messages -> ScrollToTopEvent.ConversationsTabPressed
+            else -> null
         }
-    } else {
-        multiBackstack.navigateTopLevel(destination.route)
+    if (event != null) {
+        // On the same list the screen is already there; after a switch it has to be built first.
+        if (wasOnRoot) uiViewModel.emitScrollToTopEvent(event) else uiViewModel.emitScrollToTopEventDelayed(event)
     }
 }
 

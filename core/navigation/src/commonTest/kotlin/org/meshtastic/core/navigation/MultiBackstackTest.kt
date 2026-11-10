@@ -52,6 +52,21 @@ class MultiBackstackTest {
     }
 
     @Test
+    fun `navigateTopLevel with resetStack opens another tab at its root`() {
+        val multiBackstack = createMultiBackstack(TopLevelDestination.Nodes.route)
+        val nodesStack = NavBackStack<NavKey>().apply { add(TopLevelDestination.Nodes.route) }
+        val mapStack =
+            NavBackStack<NavKey>().apply { addAll(listOf(TopLevelDestination.Map.route, TopLevelDestination.Nodes.route)) }
+        multiBackstack.backStacks =
+            mapOf(TopLevelDestination.Nodes.route to nodesStack, TopLevelDestination.Map.route to mapStack)
+
+        multiBackstack.navigateTopLevel(TopLevelDestination.Map.route, resetStack = true)
+
+        assertEquals(TopLevelDestination.Map.route, multiBackstack.currentTabRoute)
+        assertEquals(listOf<NavKey>(TopLevelDestination.Map.route), mapStack.toList())
+    }
+
+    @Test
     fun `navigateTopLevel to same tab resets stack to root`() {
         val startTab = TopLevelDestination.Nodes.route
         val multiBackstack = createMultiBackstack(startTab)
