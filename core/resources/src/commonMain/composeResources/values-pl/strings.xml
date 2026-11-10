@@ -3661,4 +3661,11 @@
     <string name="last_heard_ago_d">%1$d dni temu</string>
     <string name="last_heard_ago_h">%1$d godz. temu</string>
     <string name="last_heard_ago_min">%1$d min temu</string>
+    <string name="app_icon_title">Ikona aplikacji</string>
+    <string name="app_icon_auto">Automatycznie</string>
+    <string name="app_icon_standard">Standardowa (żółta)</string>
+    <string name="app_icon_dark">Ciemna</string>
+    <string name="app_icon_clear">Przezroczysta</string>
+    <string name="app_icon_tinted">Jednokolorowa (zabarwiana)</string>
+    <string name="app_icon_hint">Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie. Przy zmianie ikony system może pokazać komunikat.</string>
 </resources>

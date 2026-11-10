@@ -118,6 +118,7 @@ import org.meshtastic.feature.settings.component.AppBackgroundSettings
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.AppIconSettingsItem
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ReportIssuesSection
@@ -139,6 +140,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
     val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
     val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
+    val appIconStyle by settingsViewModel.appIconStyle.collectAsStateWithLifecycle()
     val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
@@ -268,6 +270,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
                     showThemePicker = true
                 }
+                AppIconSettingsItem(current = appIconStyle, onPick = { settingsViewModel.setAppIconStyle(it) })
                 FontSettingsItems(
                     family = fontFamily,
                     weight = fontWeight,

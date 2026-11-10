@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.meshtastic.feature.settings.component
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.app_icon_auto
+import org.meshtastic.core.resources.app_icon_clear
+import org.meshtastic.core.resources.app_icon_dark
+import org.meshtastic.core.resources.app_icon_hint
+import org.meshtastic.core.resources.app_icon_standard
+import org.meshtastic.core.resources.app_icon_tinted
+import org.meshtastic.core.resources.app_icon_title
+import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.icon.FormatPaint
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+
+/** Icon styles; the key is what is saved ("" is automatic). The same on every platform. */
+private val ICON_STYLES: List<Pair<String, StringResource>> =
+    listOf(
+        "" to Res.string.app_icon_auto,
+        "standard" to Res.string.app_icon_standard,
+        "dark" to Res.string.app_icon_dark,
+        "clear" to Res.string.app_icon_clear,
+        "tinted" to Res.string.app_icon_tinted,
+    )
+
+@Composable
+private fun appIconLabel(key: String): String =
+    stringResource((ICON_STYLES.firstOrNull { it.first == key } ?: ICON_STYLES.first()).second)
+
+/** One row "Ikona aplikacji" with a picker of the icon styles (also found by the settings search). */
+@Composable
+fun AppIconSettingsItem(current: String, onPick: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    if (open) {
+        MeshtasticDialog(
+            title = stringResource(Res.string.app_icon_title),
+            onDismiss = { open = false },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    ICON_STYLES.forEach { (key, label) ->
+                        ListItem(
+                            text = stringResource(label) + if (key == current) "  ✓" else "",
+                            trailingIcon = null,
+                        ) {
+                            onPick(key)
+                            open = false
+                        }
+                    }
+                    Text(
+                        text = stringResource(Res.string.app_icon_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+        )
+    }
+    ListItem(
+        text = stringResource(Res.string.app_icon_title),
+        supportingText = appIconLabel(current),
+        leadingIcon = MeshtasticIcons.FormatPaint,
+    ) {
+        open = true
+    }
+}

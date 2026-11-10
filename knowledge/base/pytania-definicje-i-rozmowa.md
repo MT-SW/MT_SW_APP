@@ -40,6 +40,11 @@ Lekkie ciepło podczas ładowania akumulatora jest normalne. Jeśli obudowa robi
 Słowa: grzeje się, gorący, ładowanie, akumulator, Li-ion, puchnięcie, nagrzewanie, bezpieczeństwo baterii
 Źródło: Baza wiedzy: akumulatory Li-ion (wiedza ogólna, opracowanie własne, 2026-10)
 
+### Jak zmienić ikonę aplikacji?
+W Ustawienia → Funkcje MT_SW jest wpis „Ikona aplikacji”. Do wyboru: Automatycznie (domyślnie), Standardowa (żółta), Ciemna (czarne tło, żółty obrys i napis), Przezroczysta i Jednokolorowa (zabarwiana). Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie; na Androidzie zmienia się ikona na ekranie głównym, a na komputerze ikona okna i Docka lub paska zadań. Przy zmianie ikony iPhone może pokazać komunikat systemu.
+Słowa: ikona aplikacji, zmienić ikonę, ciemna ikona, czarna ikona, przezroczysta ikona, styl ikony, ikona na ekranie głównym
+Źródło: Dokumentacja aplikacji: ikona aplikacji (sprawdzono 2026-11)
+
 ### Jak powiększyć interfejs aplikacji?
 Rozmiar tekstu i elementów zmieniasz w ustawieniach aplikacji przez skalowanie aplikacji: od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie jest „Zgodnie z systemem”. Skrót do skalowania jest też w Ustawienia → Funkcje MT_SW. Działa także w wersji na komputer.
 Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, rozmiar czcionki, wielkość czcionki, zmienić czcionkę, większa czcionka, zoom, mniejszy interfejs, skala

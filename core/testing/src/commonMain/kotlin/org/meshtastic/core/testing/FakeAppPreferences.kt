@@ -123,6 +123,12 @@ class FakeUiPrefs : UiPrefs {
         fontSizePercent.value = value
     }
 
+    override val appIconStyle = MutableStateFlow("")
+
+    override fun setAppIconStyle(value: String) {
+        appIconStyle.value = value
+    }
+
     override val healthHeroLocked = MutableStateFlow(true)
 
     override fun setHealthHeroLocked(value: Boolean) {

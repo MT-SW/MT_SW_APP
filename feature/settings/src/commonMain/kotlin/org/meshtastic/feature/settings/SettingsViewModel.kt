@@ -185,6 +185,14 @@ class SettingsViewModel(
 
     fun setFontSizePercent(value: Int) = uiPrefs.setFontSizePercent(value)
 
+    val appIconStyle = uiPrefs.appIconStyle
+
+    /** Saves the icon style and puts the matching icon on the home screen (Android, iPhone) or in the window. */
+    fun setAppIconStyle(value: String) {
+        uiPrefs.setAppIconStyle(value)
+        applyAppIcon(value)
+    }
+
     val unitsOverride = uiPrefs.unitsOverride
 
     fun setUnitsOverride(override: UnitsOverride) {

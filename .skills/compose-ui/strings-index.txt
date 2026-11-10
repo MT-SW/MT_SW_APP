@@ -487,6 +487,13 @@ app_functions_send_message
 app_functions_settings
 app_functions_settings_summary
 app_functions_write_section
+app_icon_auto
+app_icon_clear
+app_icon_dark
+app_icon_hint
+app_icon_standard
+app_icon_tinted
+app_icon_title
 app_log_choose_folder
 app_log_folder
 app_log_folder_clear

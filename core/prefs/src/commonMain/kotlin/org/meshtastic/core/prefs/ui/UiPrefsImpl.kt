@@ -99,6 +99,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_FONT_SIZE_PERCENT] = value } }
     }
 
+    override val appIconStyle: StateFlow<String> =
+        dataStore.data.map { it[KEY_APP_ICON_STYLE] ?: "" }.stateIn(scope, SharingStarted.Eagerly, "")
+
+    override fun setAppIconStyle(value: String) {
+        scope.launch { dataStore.edit { it[KEY_APP_ICON_STYLE] = value } }
+    }
+
     override val healthHeroLocked: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_HEALTH_HERO_LOCKED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
 
@@ -790,6 +797,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_FONT_FAMILY = stringPreferencesKey("font-family-name")
         val KEY_FONT_WEIGHT_SHIFT = intPreferencesKey("font-weight-shift")
         val KEY_FONT_SIZE_PERCENT = intPreferencesKey("font-size-percent")
+        val KEY_APP_ICON_STYLE = stringPreferencesKey("app-icon-style")
         val KEY_HEALTH_HERO_LOCKED = booleanPreferencesKey("health-hero-locked")
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")
         val KEY_LOCALE = stringPreferencesKey("locale")

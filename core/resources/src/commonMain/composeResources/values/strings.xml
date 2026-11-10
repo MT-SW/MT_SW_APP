@@ -508,6 +508,13 @@
     <string name="app_functions_settings">System AI</string>
     <string name="app_functions_settings_summary">Control which functions are available to AI assistants</string>
     <string name="app_functions_write_section">Write functions</string>
+    <string name="app_icon_auto">Automatic</string>
+    <string name="app_icon_clear">Clear</string>
+    <string name="app_icon_dark">Dark</string>
+    <string name="app_icon_hint">On iPhone, Automatic follows the icon style set in the system. The system may show a notice when the icon changes.</string>
+    <string name="app_icon_standard">Standard (yellow)</string>
+    <string name="app_icon_tinted">Tinted (one colour)</string>
+    <string name="app_icon_title">App icon</string>
     <string name="app_log_choose_folder">Choose a log folder</string>
     <string name="app_log_folder">Logs are saved on their own in: %1$s</string>
     <string name="app_log_folder_clear">Stop saving logs to the folder</string>

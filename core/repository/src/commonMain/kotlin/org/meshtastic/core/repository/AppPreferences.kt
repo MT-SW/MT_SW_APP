@@ -130,6 +130,11 @@ interface UiPrefs {
 
     fun setFontSizePercent(value: Int)
 
+    /** App icon style: empty is automatic (on iPhone it follows the style set in the system), else a style key. */
+    val appIconStyle: StateFlow<String>
+
+    fun setAppIconStyle(value: String)
+
     /** Network health: when true (default) the summary card stays put instead of folding away on scroll. */
     val healthHeroLocked: StateFlow<Boolean>
 

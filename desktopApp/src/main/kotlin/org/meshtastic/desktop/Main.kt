@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -277,6 +278,30 @@ private fun ApplicationScope.DeepLinkHandler(
     }
 }
 
+/** Resource file of the icon for a saved style; null (automatic) keeps the usual window icon. */
+private fun appIconFile(style: String): String? = when (style) {
+    "standard" -> "icon.png"
+    "dark" -> "icon_dark.png"
+    "clear" -> "icon_clear.png"
+    "tinted" -> "icon_tinted.png"
+    else -> null
+}
+
+/** Sets the Dock / taskbar icon where the system allows it (macOS Dock, most Windows and Linux desktops). */
+private fun setTaskbarIcon(file: String?) {
+    if (file == null) return
+    runCatching {
+        if (java.awt.Taskbar.isTaskbarSupported()) {
+            val taskbar = java.awt.Taskbar.getTaskbar()
+            if (taskbar.isSupported(java.awt.Taskbar.Feature.ICON_IMAGE)) {
+                val stream = object {}.javaClass.getResourceAsStream("/$file") ?: return
+                taskbar.iconImage = stream.use { javax.imageio.ImageIO.read(it) }
+            }
+        }
+    }
+        .onFailure { Logger.w(it) { "Could not set the taskbar icon" } }
+}
+
 /** Restores and raises the app window (it may be minimized or behind others when a notification is tapped). */
 private fun bringWindowToFront() {
     java.awt.EventQueue.invokeLater {
@@ -365,7 +390,11 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     var isWindowReady by remember { mutableStateOf(false) }
     val trayState = rememberTrayState()
     val density = LocalDensity.current
-    val appIcon = svgPainterResource(TRAY_ICON_DARK, density)
+    // The window icon follows the style picked in Funkcje MT_SW → Ikona aplikacji; automatic keeps the usual one.
+    val iconStyle by koinInject<UiPrefs>().appIconStyle.collectAsState()
+    val iconFile = appIconFile(iconStyle)
+    val appIcon = if (iconFile == null) svgPainterResource(TRAY_ICON_DARK, density) else painterResource(iconFile)
+    LaunchedEffect(iconFile) { setTaskbarIcon(iconFile) }
 
     val trayIcon = svgPainterResource(if (isSystemInDarkTheme()) TRAY_ICON_LIGHT else TRAY_ICON_DARK, density)
 

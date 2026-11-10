@@ -293,11 +293,6 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
@@ -367,6 +362,62 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </activity>
+
+        <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
+        <activity-alias
+            android:name="org.meshtastic.app.IconStandard"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
+        <activity-alias
+            android:name="org.meshtastic.app.IconDark"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:icon="@mipmap/ic_launcher_dark"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
+        <activity-alias
+            android:name="org.meshtastic.app.IconClear"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:icon="@mipmap/ic_launcher_clear"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
+        <activity-alias
+            android:name="org.meshtastic.app.IconTinted"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:icon="@mipmap/ic_launcher_tinted"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <receiver android:name="org.meshtastic.core.service.BootCompleteReceiver"
             android:exported="false">
