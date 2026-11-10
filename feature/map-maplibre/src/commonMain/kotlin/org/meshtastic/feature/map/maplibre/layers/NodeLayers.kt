@@ -250,6 +250,7 @@ fun NodeLayers(
         nodes = chipNodes,
         onNodeClick = onNodeClick,
         chipFilter = !feature.has("point_count"),
+        onStack = onClusterMembers,
     )
 
     focusedNode?.let { FocusedNodeLayer(node = it, myNodeNum = myNodeNum, onNodeClick = onNodeClick) }

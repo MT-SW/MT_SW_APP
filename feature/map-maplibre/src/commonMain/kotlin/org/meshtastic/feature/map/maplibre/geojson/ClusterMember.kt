@@ -21,7 +21,10 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
+import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
+import org.maplibre.spatialk.geojson.Point
+import kotlin.math.abs
 
 /** One node inside a tapped cluster. */
 data class ClusterMember(val nodeNum: Int, val longName: String, val shortName: String)
@@ -35,6 +38,32 @@ data class ClusterMember(val nodeNum: Int, val longName: String, val shortName: 
 internal fun FeatureCollection<*, *>.toClusterMembers(): List<ClusterMember> = features.mapNotNull { feature ->
     (feature.properties as? JsonObject)?.toClusterMember()
 }
+
+/**
+ * The nodes drawn on the same spot as [top] under one tap, when there is more than one.
+ *
+ * Coincident nodes are nudged a few metres apart (see `spreadCoincidentPositions`), which only separates their chips
+ * once the map is zoomed in close. Until then the chips overlap and a tap reaches only the top one, so the others
+ * cannot be opened. Listing them lets the user pick. Chips that merely touch at their edges, with their fixes further
+ * apart than [SAME_SPOT_DEGREES], are not a stack and are not listed. Fewer than two nodes returns an empty list.
+ */
+internal fun stackedMembers(features: List<Feature<*, *>>, top: Feature<*, *>): List<ClusterMember> {
+    val topPoint = (top.geometry as? Point)?.coordinates ?: return emptyList()
+    val members =
+        features
+            .filter { feature ->
+                val point = (feature.geometry as? Point)?.coordinates
+                point != null &&
+                    abs(point.latitude - topPoint.latitude) <= SAME_SPOT_DEGREES &&
+                    abs(point.longitude - topPoint.longitude) <= SAME_SPOT_DEGREES
+            }
+            .mapNotNull { (it.properties as? JsonObject)?.toClusterMember() }
+            .distinctBy { it.nodeNum }
+    return if (members.size > 1) members else emptyList()
+}
+
+/** About 30 m of latitude: the spread radius for coincident nodes (8 m) with room to spare, nothing like a neighbour. */
+private const val SAME_SPOT_DEGREES = 0.00027
 
 private fun JsonObject.toClusterMember(): ClusterMember? {
     val nodeNum = this[NodeFeatureKeys.NODE_NUM].asInt() ?: return null

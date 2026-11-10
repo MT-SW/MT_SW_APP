@@ -73,7 +73,9 @@ import org.meshtastic.core.ui.theme.LocalMonochrome
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.maplibre.geojson.MapChipGlyph
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey
+import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
+import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
 
@@ -102,6 +104,7 @@ internal fun NodeChipLayer(
     nodes: List<Node>,
     onNodeClick: ((Int) -> Unit)? = null,
     chipFilter: Expression<BooleanValue>? = null,
+    onStack: ((List<ClusterMember>) -> Unit)? = null,
 ) = MapChipLayer(
     id = id,
     source = source,
@@ -114,14 +117,18 @@ internal fun NodeChipLayer(
         { features ->
             // The chip the user sees on top is the one they meant. Query order is not that order, so pick
             // by the rank [chipSortKey] draws by — on the Google map the highest zIndex marker takes the tap.
-            features
-                .maxByOrNull { it.properties.chipRank() }
-                ?.properties
-                ?.get(NodeFeatureKeys.NODE_NUM)
-                ?.let { nodeNum ->
+            val top = features.maxByOrNull { it.properties.chipRank() }
+            val stack = if (onStack != null && top != null) stackedMembers(features, top) else emptyList()
+            if (stack.isNotEmpty()) {
+                // Several nodes on one spot: the chips overlap, so let the user choose rather than guess.
+                onStack?.invoke(stack)
+                ClickResult.Consume
+            } else {
+                top?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
                     click(nodeNum.jsonPrimitive.int)
                     ClickResult.Consume
                 } ?: ClickResult.Pass
+            }
         }
     },
 )
