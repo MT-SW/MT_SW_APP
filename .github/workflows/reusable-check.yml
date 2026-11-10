@@ -273,7 +273,6 @@ jobs:
               :core:database:allTests
               :core:network:allTests
               :feature:widget:testDebugUnitTest
-              :feature:xr:testDebugUnitTest
               :feature:node:allTests
               :feature:wifi-provision:allTests
               :schema-strings:test
@@ -286,7 +285,6 @@ jobs:
               :core:database:koverXmlReport
               :core:network:koverXmlReport
               :feature:widget:koverXmlReportDebug
-              :feature:xr:koverXmlReportDebug
               :feature:node:koverXmlReport
               :feature:wifi-provision:koverXmlReport
 
