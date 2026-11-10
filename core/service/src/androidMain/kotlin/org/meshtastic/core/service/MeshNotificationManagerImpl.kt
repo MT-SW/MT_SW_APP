@@ -1239,9 +1239,9 @@ class MeshNotificationManagerImpl(
                 secondsAgo < SECONDS_PER_DAY ->
                     getStringSuspend(Res.string.last_heard_ago_h, secondsAgo / SECONDS_PER_HOUR)
 
-                secondsAgo < 2 * SECONDS_PER_DAY -> getStringSuspend(Res.string.last_heard_ago_day_one)
+                secondsAgo < 2 * SECONDS_PER_DAY -> getStringSuspend(Res.string.last_heard_ago_day_one).replaceFirstChar { it.lowercase() }
 
-                secondsAgo < THREE_DAYS_SECONDS -> getStringSuspend(Res.string.last_heard_ago_day_two)
+                secondsAgo < THREE_DAYS_SECONDS -> getStringSuspend(Res.string.last_heard_ago_day_two).replaceFirstChar { it.lowercase() }
 
                 else -> getStringSuspend(Res.string.last_heard_ago_d, secondsAgo / SECONDS_PER_DAY)
             }

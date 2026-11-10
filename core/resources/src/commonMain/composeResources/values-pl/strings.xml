@@ -3677,8 +3677,8 @@
     <string name="font_weight_designed">Domyślne</string>
     <string name="font_search">Szukaj czcionki</string>
     <string name="font_preview">Przykładowy tekst: Zażółć gęślą jaźń, 0123</string>
-    <string name="last_heard_ago_day_two">przedwczoraj</string>
-    <string name="last_heard_ago_day_one">wczoraj</string>
+    <string name="last_heard_ago_day_two">Przedwczoraj</string>
+    <string name="last_heard_ago_day_one">Wczoraj</string>
     <string name="last_heard_ago_d">%1$d dni temu</string>
     <string name="last_heard_ago_h">%1$d godz. temu</string>
     <string name="last_heard_ago_min">%1$d min temu</string>

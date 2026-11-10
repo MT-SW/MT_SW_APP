@@ -1654,8 +1654,8 @@
     <string name="label_with_unit">%1$s (%2$s)</string>
     <!-- LAST -->
     <string name="last_heard_ago_d">%1$d days ago</string>
-    <string name="last_heard_ago_day_one">yesterday</string>
-    <string name="last_heard_ago_day_two">day before yesterday</string>
+    <string name="last_heard_ago_day_one">Yesterday</string>
+    <string name="last_heard_ago_day_two">Day before yesterday</string>
     <string name="last_heard_ago_h">%1$d h ago</string>
     <string name="last_heard_ago_min">%1$d min ago</string>
     <string name="last_heard_filter_label">Filter by Last Heard time: %1$s</string>
