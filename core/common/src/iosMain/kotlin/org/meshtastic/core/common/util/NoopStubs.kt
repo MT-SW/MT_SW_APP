@@ -57,6 +57,13 @@ actual object DateFormatter {
         }
     }
 
+    actual fun formatDayMonth(timestampMillis: Long, withYear: Boolean): String {
+        val formatter = NSDateFormatter()
+        formatter.locale = NSLocale.currentLocale
+        formatter.setLocalizedDateFormatFromTemplate(if (withYear) "dMMMMy" else "dMMMM")
+        return formatter.stringFromDate(NSDate.dateWithTimeIntervalSince1970(timestampMillis / 1000.0))
+    }
+
     actual fun formatDateTime(timestampMillis: Long): String =
         format(timestampMillis, NSDateFormatterShortStyle, NSDateFormatterShortStyle)
 

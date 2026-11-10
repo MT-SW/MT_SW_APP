@@ -52,6 +52,12 @@ actual object DateFormatter {
         }
     }
 
+    actual fun formatDayMonth(timestampMillis: Long, withYear: Boolean): String {
+        val pattern = if (withYear) "d MMMM yyyy" else "d MMMM"
+        return DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
+            .format(java.time.Instant.ofEpochMilli(timestampMillis).atZone(zoneId))
+    }
+
     actual fun formatDateTime(timestampMillis: Long): String =
         shortDateTimeFormatter.localized().format(java.time.Instant.ofEpochMilli(timestampMillis).atZone(zoneId))
 

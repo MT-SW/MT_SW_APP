@@ -40,6 +40,9 @@ expect object DateFormatter {
     /** Formats a timestamp into a localized date string. */
     fun formatDate(timestampMillis: Long): String
 
+    /** Formats a timestamp as a day and a full month name in the app's language, e.g. "7 listopada" or "November 7". */
+    fun formatDayMonth(timestampMillis: Long, withYear: Boolean): String
+
     /** Formats a timestamp into a localized short date and medium time string. */
     fun formatDateTimeShort(timestampMillis: Long): String
 }

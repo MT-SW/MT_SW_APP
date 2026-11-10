@@ -1603,7 +1603,8 @@
     <string name="label_very_long_slow">Very Long Slow</string>
     <string name="label_with_unit">%1$s (%2$s)</string>
     <!-- LAST -->
-    <string name="last_heard_ago_d">%1$d d ago</string>
+    <string name="last_heard_ago_d">%1$d days ago</string>
+    <string name="last_heard_ago_day_one">1 day ago</string>
     <string name="last_heard_ago_h">%1$d h ago</string>
     <string name="last_heard_ago_min">%1$d min ago</string>
     <string name="last_heard_filter_label">Filter by Last Heard time: %1$s</string>

@@ -19,6 +19,9 @@ package org.meshtastic.core.common.util
 import android.text.format.DateUtils
 import org.meshtastic.core.common.ContextServices
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 actual object DateFormatter {
     actual fun formatRelativeTime(timestampMillis: Long): String = DateUtils.getRelativeTimeSpanString(
@@ -28,6 +31,13 @@ actual object DateFormatter {
         DateUtils.FORMAT_ABBREV_RELATIVE,
     )
         .toString()
+
+    actual fun formatDayMonth(timestampMillis: Long, withYear: Boolean): String {
+        val locale = Locale.getDefault()
+        val skeleton = if (withYear) "d MMMM y" else "d MMMM"
+        val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, skeleton)
+        return SimpleDateFormat(pattern, locale).format(Date(timestampMillis))
+    }
 
     actual fun formatDateTime(timestampMillis: Long): String = DateUtils.formatDateTime(
         ContextServices.app,
