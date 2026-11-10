@@ -16,6 +16,48 @@ targets:
       path: MTSWApp/Info.plist
       properties:
         CFBundleDisplayName: MT_SW_APP
+        CFBundleLocalizations:
+          - en
+          - pl
+          - ar
+          - sr-Latn
+          - be
+          - bg
+          - ca
+          - cs
+          - de
+          - el
+          - es
+          - et
+          - fi
+          - fr
+          - fr-CA
+          - ga
+          - gl
+          - he
+          - hr
+          - ht
+          - hu
+          - is
+          - it
+          - ja
+          - ko
+          - lt
+          - nb
+          - nl
+          - pt
+          - pt-BR
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sv
+          - tr
+          - uk
+          - zh-Hans
+          - zh-Hant
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
         MTSWAppStoreBuild: $(MTSW_APP_STORE_BUILD)

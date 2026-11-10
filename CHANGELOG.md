@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: aplikacja zgłasza systemowi wszystkie swoje języki (wcześniej tylko angielski), więc okna systemowe, np. pytanie o wklejenie ze schowka, pokazują się w języku telefonu, także po polsku.
+
 * Wszystkie wersje: filtr mapy ma dwa nowe ograniczenia: „Maks. liczba skoków” (bez limitu albo 0–7) i „Maks. odległość od mojego węzła” (bez limitu albo 1–250 km). Pomysł z aplikacji Meshtastic na Apple. Ustawienia są zapamiętywane, działają też w obrazie sieci (HUD) i wliczają się do kropki aktywnego filtra.
 * Wszystkie wersje: dotknięcie kilku węzłów stojących w tym samym miejscu na mapie otwiera listę „wybierz węzeł” (jak przy skupisku), bo ich plakietki się nakładają i wcześniej dało się otworzyć tylko wierzchni.
 * Wszystkie wersje: wykresy zdrowia sieci (np. szum) pomijają odczyty z błędnym zegarem węzła: z przyszłości o ponad 30 dni, starsze o ponad rok od najnowszego i powtórzone znaczniki czasu. Tabele i eksport zostają z pełnymi danymi.
@@ -596,6 +598,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* iPhone and iPad: the app now tells the system all its languages (it declared only English before), so system prompts such as the clipboard paste question show in the phone's language, Polish included.
 
 * All versions: the map filter has two new limits: "Max hops" (no limit or 0-7) and "Max distance from my node" (no limit or 1-250 km). Idea from the Meshtastic app for Apple. The settings are remembered, also apply to the network view (HUD) and count towards the active-filter dot.
 * All versions: tapping several nodes standing on the same spot on the map opens a "pick a node" list (as for a cluster), because their chips overlap and only the top one could be opened before.
