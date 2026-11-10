@@ -58,6 +58,7 @@ The **Network health** tab is in the bottom navigation, between Nodes and Map. I
 
 ## Map
 
+- **Map filter: hops and distance** — limit nodes to a maximum number of hops and a maximum distance from your own node. Tapping several nodes on the same spot opens a "pick a node" list.
 - **Links between nodes** — thin lines join nodes that exchange packets, coloured by signal quality (SNR). Lines come from neighbor reports, traceroutes from the last day and directly heard nodes. They are switched in the map filters ("Show links between nodes"); on by default.
 - **Show on map** — in the node details, under its position, there is a **Show on map** button. It switches to the main map, zooms to the node and draws it on top of other nodes standing at the same place.
 - **Traceroute on the map** — every hop is a separate line coloured by signal quality, with an arrow and the SNR value.

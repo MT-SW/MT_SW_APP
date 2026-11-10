@@ -18,6 +18,11 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: filtr mapy ma dwa nowe ograniczenia: „Maks. liczba skoków” (bez limitu albo 0–7) i „Maks. odległość od mojego węzła” (bez limitu albo 1–250 km). Pomysł z aplikacji Meshtastic na Apple. Ustawienia są zapamiętywane, działają też w obrazie sieci (HUD) i wliczają się do kropki aktywnego filtra.
+* Wszystkie wersje: dotknięcie kilku węzłów stojących w tym samym miejscu na mapie otwiera listę „wybierz węzeł” (jak przy skupisku), bo ich plakietki się nakładają i wcześniej dało się otworzyć tylko wierzchni.
+* Wszystkie wersje: wykresy zdrowia sieci (np. szum) pomijają odczyty z błędnym zegarem węzła: z przyszłości o ponad 30 dni, starsze o ponad rok od najnowszego i powtórzone znaczniki czasu. Tabele i eksport zostają z pełnymi danymi.
+* Wszystkie wersje: menu wyboru motywu ma kategorie (ciemne, jasne, zgodne z systemem, inne), krótsze nazwy motywów; „min” zamiast „minuta”; na liście aktywności nieaktywny węzeł ma „wczoraj” i „przedwczoraj” zamiast „1 dzień temu” i „2 dni temu”.
+
 * iPhone i iPad: lokalny serwer TAK działa tak samo jak na Androidzie i komputerze. Nasłuch tylko na 127.0.0.1:8089 z TLS i wzajemnym uwierzytelnianiem (przyjmowany tylko certyfikat klienta wydany przez tę instalację), własne certyfikaty tworzone przy pierwszym starcie, ten sam pakiet danych dla ATAK/iTAK.
 
 * Komputer (macOS, Windows, Linux): nowa opcja „Uruchamiaj z komputerem” w Funkcje MT_SW — start aplikacji po zalogowaniu (domyślnie wyłączona, działa w zainstalowanej aplikacji). Android ma już start po restarcie telefonu; iPhone i iPad nie mogą startować same.
@@ -596,6 +601,11 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* All versions: the map filter has two new limits: "Max hops" (no limit or 0-7) and "Max distance from my node" (no limit or 1-250 km). Idea from the Meshtastic app for Apple. The settings are remembered, also apply to the network view (HUD) and count towards the active-filter dot.
+* All versions: tapping several nodes standing on the same spot on the map opens a "pick a node" list (as for a cluster), because their chips overlap and only the top one could be opened before.
+* All versions: network health charts (e.g. noise) skip readings from a node with a wrong clock: more than 30 days in the future, more than a year older than the newest, and repeated timestamps. Tables and exports keep the full data.
+* All versions: the theme picker has categories (dark, light, system-matching, other) and shorter theme names; "min" instead of "minute"; in the node list an inactive node shows "yesterday" and "day before yesterday" instead of "1 day ago" and "2 days ago".
 
 * iPhone and iPad: the local TAK server works the same as on Android and desktop. It listens on 127.0.0.1:8089 only, with TLS and mutual authentication (only the client certificate issued by this install is accepted), creates its own certificates on first start and exports the same data package for ATAK/iTAK.
 
