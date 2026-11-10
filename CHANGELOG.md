@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: kliknięcie powiadomienia o wiadomości, reakcji lub alarmie otwiera rozmowę, z której przyszło. Android robił to już wcześniej; teraz tak samo działa na iPhonie/iPadzie oraz na komputerach (macOS, Windows i Linux), a okno aplikacji wraca na wierzch.
 * Wszystkie wersje (Android, komputer, iPhone/iPad): dolne przyciski (zakładki) zawsze przywracają pierwszy ekran strony, także po przejściu z innej zakładki: z rozmowy wraca do listy rozmów, ze szczegółów węzła, ustawień czy mapy na ich główny ekran. Na liście węzłów przycisk dodatkowo czyści wyszukiwanie i przewija na górę; lista rozmów też przewija się na górę.
 * Wszystkie wersje (Android, komputer, iPhone/iPad): czas „ostatnio słyszany” (lista węzłów, szczegóły, mapa, powiadomienie adaptacyjne, opis dla TalkBack) jest po polsku, np. „15 min temu”, „2 godz. temu”, „3 dni temu”; starsze niż 7 dni pokazuje datę, np. „7 listopada”. Wcześniej komputer i iPhone pokazywały zawsze angielskie „ago”, a Android język systemu telefonu zamiast języka ustawionego w aplikacji.
 * iPhone i iPad: asystent nie pokazuje już na górze odpowiedzi pustych znaczników myślenia modelu (`<think>`). Komenda `/sprzet` działa też na iPhonie: pokazuje model, jego rozmiar i pamięć, gdzie działa (procesor lub GPU), okno tekstu oraz system, liczbę rdzeni i pamięć urządzenia.
@@ -579,6 +580,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: tapping a notification about a message, reaction or alert opens the conversation it came from. Android already did this; now iPhone/iPad and the desktop apps (macOS, Windows and Linux) do the same, and the app window comes to the front.
 * All versions (Android, desktop, iPhone/iPad): the bottom buttons (tabs) always bring a page back to its first screen, also when coming from another tab: from a conversation back to the conversation list, from node details, settings or map to their main screen. On the node list the button also clears the search and scrolls to the top; the conversation list scrolls to the top too.
 * All versions (Android, desktop, iPhone/iPad): the "last heard" time (node list, details, map, adaptive notification, TalkBack description) now follows the language set in the app, e.g. "15 min ago", "2 h ago", "3 days ago"; anything older than 7 days shows a date such as "November 7". Before, desktop and iPhone always showed English "ago", and Android used the phone's system language instead of the app's.
 * iPhone and iPad: the assistant no longer shows the model's empty thinking marks (`<think>`) at the top of an answer. The `/sprzet` command works on iPhone too: it shows the model, its size and memory, where it runs (processor or GPU), the context window, and the device's system, cores and memory.

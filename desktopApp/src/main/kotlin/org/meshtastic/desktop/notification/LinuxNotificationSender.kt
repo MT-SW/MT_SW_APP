@@ -23,6 +23,9 @@ import com.sun.jna.Pointer
 import com.sun.jna.Structure
 import com.sun.jna.ptr.PointerByReference
 import org.meshtastic.core.repository.Notification
+import java.io.File
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * JNA bindings for libnotify (libnotify.so / libnotify-4.so).
@@ -86,6 +89,9 @@ class GErrorStruct(p: Pointer?) : Structure(p) {
         get() = message?.getString(0) ?: "unknown error"
 }
 
+private const val MAX_TAP_WAITERS = 5
+private const val TAP_START_CHECK_MS = 800L
+
 /** libnotify urgency levels matching `NotifyUrgency` enum. */
 private object NotifyUrgency {
     const val LOW = 0
@@ -140,6 +146,9 @@ class LinuxNotificationSender(
     override fun send(notification: Notification): Boolean {
         val libnotify = lib ?: return false
 
+        // A notification with a link (a message) goes through notify-send, which can report a tap on it.
+        notification.deepLink?.let { link -> if (sendWithTapAction(notification, link)) return true }
+
         val ptr =
             libnotify.notify_notification_new(
                 notification.title,
@@ -169,6 +178,80 @@ class LinuxNotificationSender(
             errorRef.value?.let { libnotify.g_error_free(it) }
             libnotify.g_object_unref(ptr)
         }
+    }
+
+    private val tapWaiters = AtomicInteger(0)
+
+    @Volatile private var tapActionSupported = true
+
+    private val notifySend: String? by lazy {
+        System.getenv("PATH").orEmpty().split(File.pathSeparator).map { File(it, "notify-send") }.firstOrNull {
+            it.canExecute()
+        }
+            ?.path
+    }
+
+    /**
+     * Shows [notification] with `notify-send --action --wait`, which prints the action name when the user taps the
+     * notification; the tap opens [link]. Returns false (so the plain libnotify path runs) when `notify-send` is
+     * missing or too old to know `--action` (libnotify-bin before 0.7.10), or too many are already waiting.
+     *
+     * libnotify itself cannot be used for the tap: its callbacks need a running GLib main loop, which a JVM does not
+     * provide.
+     */
+    @Suppress("ReturnCount")
+    private fun sendWithTapAction(notification: Notification, link: String): Boolean {
+        val exe = notifySend ?: return false
+        if (!tapActionSupported || tapWaiters.get() >= MAX_TAP_WAITERS) return false
+        val urgency =
+            when (notification.type) {
+                Notification.Type.Error -> "critical"
+                Notification.Type.Warning -> "normal"
+                else -> "low"
+            }
+        val command =
+            listOf(
+                exe,
+                "--app-name=$appName",
+                "--urgency=$urgency",
+                "--hint=string:desktop-entry:$desktopEntry",
+                "--action=default=Open",
+                "--wait",
+                "--",
+                notification.title,
+                notification.message,
+            )
+        val process =
+            try {
+                ProcessBuilder(command).redirectErrorStream(true).start()
+            } catch (e: java.io.IOException) {
+                Logger.w(e) { "notify-send could not be started" }
+                return false
+            }
+        tapWaiters.incrementAndGet()
+        Thread {
+            try {
+                process.inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach { line -> if (line.trim() == "default") NotificationClicks.clicked(link) }
+                }
+            } finally {
+                tapWaiters.decrementAndGet()
+                process.destroyForcibly()
+            }
+        }
+            .apply {
+                isDaemon = true
+                name = "notify-send-tap-waiter"
+            }
+            .start()
+        // Still running after a moment means it was shown and is waiting; an early exit means it did not work.
+        val exited = process.waitFor(TAP_START_CHECK_MS, TimeUnit.MILLISECONDS)
+        if (exited && process.exitValue() != 0) {
+            Logger.w { "notify-send does not support --action; links in notifications disabled" }
+            tapActionSupported = false
+            return false
+        }
+        return true
     }
 
     /**

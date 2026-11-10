@@ -24,6 +24,8 @@ data class Notification(
     val category: Category = Category.Message,
     val isSilent: Boolean = false,
     val id: Int? = null,
+    /** Link (meshtastic://...) opened when the notification is tapped, e.g. the conversation it came from. */
+    val deepLink: String? = null,
 ) {
     enum class Type {
         None,

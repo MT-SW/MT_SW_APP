@@ -21,6 +21,7 @@ import org.meshtastic.core.model.FirmwareUpdateNotice
 import org.meshtastic.core.model.MeshBeaconOffer
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
@@ -40,6 +41,9 @@ import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Telemetry
 
 private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
+
+/** The same link Android uses: a tap opens the conversation the notification came from. */
+private fun openMessageLink(contactKey: String) = "$DEEP_LINK_BASE_URI/messages/$contactKey"
 
 /**
  * Desktop implementation of [MeshNotificationManager]: turns each mesh event into a [Notification] record and hands it
@@ -84,6 +88,7 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
                 category = Notification.Category.Message,
                 isSilent = isSilent,
                 id = contactKey.hashCode(),
+                deepLink = openMessageLink(contactKey),
             ),
         )
     }
@@ -114,13 +119,24 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
         isSilent: Boolean,
     ) {
         notificationManager.dispatch(
-            Notification(title = name, message = emoji, category = Notification.Category.Reaction, isSilent = isSilent),
+            Notification(
+                title = name,
+                message = emoji,
+                category = Notification.Category.Reaction,
+                isSilent = isSilent,
+                deepLink = openMessageLink(contactKey),
+            ),
         )
     }
 
     override suspend fun showAlertNotification(contactKey: String, name: String, alert: String) {
         notificationManager.dispatch(
-            Notification(title = name, message = alert, category = Notification.Category.Alert),
+            Notification(
+                title = name,
+                message = alert,
+                category = Notification.Category.Alert,
+                deepLink = openMessageLink(contactKey),
+            ),
         )
     }
 

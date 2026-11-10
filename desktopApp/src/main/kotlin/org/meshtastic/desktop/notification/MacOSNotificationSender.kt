@@ -17,6 +17,7 @@
 package org.meshtastic.desktop.notification
 
 import co.touchlab.kermit.Logger
+import com.sun.jna.Callback
 import com.sun.jna.Function
 import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
@@ -34,6 +35,11 @@ class MacOSNotificationSender private constructor(private val bridge: MacNotific
     internal constructor(bridge: MacNotificationBridge, unused: Unit = Unit) : this(bridge)
 
     @Volatile private var authorizationRequested = false
+
+    init {
+        // A tap on a notification (also the one that started the app) reports the link it carries.
+        bridge.installClickHandler { link -> NotificationClicks.clicked(link) }
+    }
 
     override fun send(notification: Notification): Boolean {
         if (!bridge.isAvailable) return false
@@ -55,6 +61,7 @@ class MacOSNotificationSender private constructor(private val bridge: MacNotific
             message = notification.message,
             subtitle = categorySubtitle(notification.category),
             playSound = !notification.isSilent,
+            deepLink = notification.deepLink,
         )
     }
 
@@ -90,6 +97,25 @@ internal interface MacNotificationBridge {
     fun requestAuthorization(options: Long): Boolean
 
     fun post(title: String, message: String, subtitle: String, playSound: Boolean): Boolean
+
+    /** Same as [post], with a link the notification carries (reported to the click handler when it is tapped). */
+    fun post(title: String, message: String, subtitle: String, playSound: Boolean, deepLink: String?): Boolean =
+        post(title, message, subtitle, playSound)
+
+    /** Starts reporting taps on notifications to [onClick] with the link they carry. */
+    fun installClickHandler(onClick: (String) -> Unit) {}
+}
+
+/** Key of the link in a notification's user info. */
+private const val USER_INFO_DEEP_LINK = "deepLink"
+
+/** Offset of the function pointer in an Objective-C block (isa 8, flags 4, reserved 4). */
+private const val BLOCK_INVOKE_OFFSET = 16L
+
+/** Callback behind `userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:`. */
+internal interface NotificationResponseCallback : Callback {
+    @Suppress("unused")
+    fun invoke(self: Pointer?, cmd: Pointer?, center: Pointer?, response: Pointer?, completion: Pointer?)
 }
 
 private class JnaMacNotificationBridge : MacNotificationBridge {
@@ -184,7 +210,81 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
             false
         }
 
-    override fun post(title: String, message: String, subtitle: String, playSound: Boolean): Boolean = runCatching {
+    // Kept in fields: a callback that is garbage collected would crash the process on the next tap.
+    private var responseCallback: NotificationResponseCallback? = null
+    private var clickDelegate: Pointer? = null
+
+    @Synchronized
+    @Suppress("ReturnCount")
+    override fun installClickHandler(onClick: (String) -> Unit) {
+        if (!isAvailable || clickDelegate != null) return
+        runCatching {
+            val runtime = objc ?: return
+            val superclass = classRef("NSObject") ?: return
+            val cls =
+                runtime
+                    .getFunction("objc_allocateClassPair")
+                    .invoke(Pointer::class.java, arrayOf(superclass, DELEGATE_CLASS_NAME, 0L)) as? Pointer
+                    ?: return
+            val callback =
+                object : NotificationResponseCallback {
+                    override fun invoke(
+                        self: Pointer?,
+                        cmd: Pointer?,
+                        center: Pointer?,
+                        response: Pointer?,
+                        completion: Pointer?,
+                    ) {
+                        try {
+                            deepLinkOf(response)?.let(onClick)
+                        } catch (e: Exception) {
+                            Logger.w(e) { "Failed to read a tapped notification" }
+                        } finally {
+                            completion?.let { callBlock(it) }
+                        }
+                    }
+                }
+            runtime
+                .getFunction("class_addMethod")
+                .invoke(
+                    Int::class.java,
+                    arrayOf(cls, selector(DID_RECEIVE_SELECTOR), callback, "v@:@@@"),
+                )
+            runtime.getFunction("objc_registerClassPair").invoke(Void::class.java, arrayOf(cls))
+            val instance = msg(msg(cls, selector("alloc")), selector("init")) ?: return
+            val centerClass = classRef("UNUserNotificationCenter") ?: return
+            val center = msg(centerClass, selector("currentNotificationCenter")) ?: return
+            msg(center, selector("setDelegate:"), instance)
+            responseCallback = callback
+            clickDelegate = instance
+        }
+            .onFailure { e -> Logger.w(e) { "Failed to install the macOS notification click handler" } }
+    }
+
+    private fun deepLinkOf(response: Pointer?): String? {
+        val notification = msg(response, selector("notification"))
+        val request = msg(notification, selector("request"))
+        val content = msg(request, selector("content"))
+        val info = msg(content, selector("userInfo"))
+        val value = msg(info, selector("objectForKey:"), nsString(USER_INFO_DEEP_LINK) ?: return null)
+        return msg(value, selector("UTF8String"))?.getString(0)
+    }
+
+    /** Calls an Objective-C block (the completion handler UserNotifications hands over) with no arguments. */
+    private fun callBlock(block: Pointer) {
+        Function.getFunction(block.getPointer(BLOCK_INVOKE_OFFSET)).invoke(Void::class.java, arrayOf(block))
+    }
+
+    override fun post(title: String, message: String, subtitle: String, playSound: Boolean): Boolean =
+        post(title, message, subtitle, playSound, null)
+
+    override fun post(
+        title: String,
+        message: String,
+        subtitle: String,
+        playSound: Boolean,
+        deepLink: String?,
+    ): Boolean = runCatching {
         val contentClass = classRef("UNMutableNotificationContent") ?: return false
         val requestClass = classRef("UNNotificationRequest") ?: return false
         val centerClass = classRef("UNUserNotificationCenter") ?: return false
@@ -193,6 +293,20 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
         msg(content, selector("setTitle:"), nsString(title) ?: return false)
         msg(content, selector("setBody:"), nsString(message) ?: return false)
         msg(content, selector("setSubtitle:"), nsString(subtitle) ?: return false)
+
+        if (deepLink != null) {
+            val dictionaryClass = classRef("NSDictionary")
+            val info =
+                dictionaryClass?.let {
+                    msg(
+                        it,
+                        selector("dictionaryWithObject:forKey:"),
+                        nsString(deepLink) ?: return false,
+                        nsString(USER_INFO_DEEP_LINK) ?: return false,
+                    )
+                }
+            if (info != null) msg(content, selector("setUserInfo:"), info)
+        }
 
         if (playSound) {
             val soundClass = classRef("UNNotificationSound")
@@ -255,3 +369,6 @@ private class JnaMacNotificationBridge : MacNotificationBridge {
 
 /** macOS application bundles are directories with this suffix; a Gradle-launched JVM is not one. */
 private const val APP_BUNDLE_SUFFIX = ".app"
+
+private const val DELEGATE_CLASS_NAME = "MTSWNotificationDelegate"
+private const val DID_RECEIVE_SELECTOR = "userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:"

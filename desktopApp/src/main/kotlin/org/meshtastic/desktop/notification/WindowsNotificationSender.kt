@@ -18,9 +18,17 @@ package org.meshtastic.desktop.notification
 
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.repository.Notification
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 private const val PROCESS_TIMEOUT_SECONDS = 5L
+
+/** How long a toast with a link is waited for (a tap on it opens the link), and how many wait at once. */
+private const val CLICK_WAIT_SECONDS = 180
+private const val MAX_CLICK_WAITERS = 5
+private const val SHOWN_MARK = "SHOWN"
+private const val ACTIVATED_MARK = "ACTIVATED"
 
 /**
  * Sends toast notifications on Windows via PowerShell and the WinRT ToastNotificationManager API.
@@ -31,9 +39,18 @@ private const val PROCESS_TIMEOUT_SECONDS = 5L
  */
 class WindowsNotificationSender(private val appName: String = "Meshtastic") : NativeNotificationSender {
 
-    override fun send(notification: Notification): Boolean = runCommand(buildCommand(notification))
+    private val clickWaiters = AtomicInteger(0)
 
-    internal fun buildCommand(notification: Notification): List<String> = buildList {
+    override fun send(notification: Notification): Boolean {
+        val link = notification.deepLink
+        // Every waiting toast is a PowerShell process kept alive, so only a few at once; the rest are shown plainly.
+        if (link != null && clickWaiters.get() < MAX_CLICK_WAITERS) {
+            return runCommandWithClick(buildCommand(notification, waitForClick = true), link)
+        }
+        return runCommand(buildCommand(notification))
+    }
+
+    internal fun buildCommand(notification: Notification, waitForClick: Boolean = false): List<String> = buildList {
         add("powershell.exe")
         add("-NoProfile")
         add("-NonInteractive")
@@ -71,6 +88,14 @@ class WindowsNotificationSender(private val appName: String = "Meshtastic") : Na
             append("CreateToastNotifier('$safeAppName'); ")
             append("\$toast = [Windows.UI.Notifications.ToastNotification]::new(\$xml); ")
             append("\$notifier.Show(\$toast)")
+            if (waitForClick) {
+                // Stays alive until the toast is tapped or dismissed (or the wait ends); the app reads the marks.
+                append("; [Console]::Out.WriteLine('$SHOWN_MARK'); ")
+                append("Register-ObjectEvent -InputObject \$toast -EventName Activated -SourceIdentifier ToastTap > \$null; ")
+                append("Register-ObjectEvent -InputObject \$toast -EventName Dismissed -SourceIdentifier ToastGone > \$null; ")
+                append("\$e = Wait-Event -Timeout $CLICK_WAIT_SECONDS; ")
+                append("if (\$e -and \$e.SourceIdentifier -eq 'ToastTap') { [Console]::Out.WriteLine('$ACTIVATED_MARK') }")
+            }
         }
 
         add(script)
@@ -78,6 +103,38 @@ class WindowsNotificationSender(private val appName: String = "Meshtastic") : Na
         // Title and message as positional arguments
         add(notification.title)
         add(notification.message)
+    }
+
+    /** Starts the script, reports success once the toast is shown, and opens [link] if the toast is tapped later. */
+    private fun runCommandWithClick(command: List<String>, link: String): Boolean = try {
+        val process = ProcessBuilder(command).redirectErrorStream(true).start()
+        val shown = CompletableFuture<Boolean>()
+        clickWaiters.incrementAndGet()
+        Thread {
+            try {
+                process.inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach { line ->
+                        when (line.trim()) {
+                            SHOWN_MARK -> shown.complete(true)
+                            ACTIVATED_MARK -> NotificationClicks.clicked(link)
+                        }
+                    }
+                }
+            } finally {
+                clickWaiters.decrementAndGet()
+                shown.complete(false)
+                process.destroyForcibly()
+            }
+        }
+            .apply {
+                isDaemon = true
+                name = "toast-click-waiter"
+            }
+            .start()
+        runCatching { shown.get(PROCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS) }.getOrDefault(false)
+    } catch (e: java.io.IOException) {
+        Logger.w(e) { "Failed to run powershell toast" }
+        false
     }
 
     private fun runCommand(command: List<String>): Boolean = try {

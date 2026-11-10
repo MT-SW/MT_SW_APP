@@ -24,6 +24,7 @@ import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.ios.handleIosDeepLink
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSUUID
@@ -39,13 +40,19 @@ import platform.UserNotifications.UNNotificationPresentationOptionList
 import platform.UserNotifications.UNNotificationPresentationOptionSound
 import platform.UserNotifications.UNNotificationPresentationOptions
 import platform.UserNotifications.UNNotificationRequest
+import platform.UserNotifications.UNNotificationResponse
 import platform.UserNotifications.UNNotificationSound
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
-/** Shows the banner also while the app is open (iOS hides it by default). */
+private const val USER_INFO_DEEP_LINK = "deepLink"
+
+/**
+ * Shows the banner also while the app is open (iOS hides it by default), and opens the conversation (or other screen)
+ * a notification points to when the user taps it.
+ */
 private class ForegroundBanner :
     NSObject(),
     UNUserNotificationCenterDelegateProtocol {
@@ -59,6 +66,16 @@ private class ForegroundBanner :
                 UNNotificationPresentationOptionList or
                 UNNotificationPresentationOptionSound,
         )
+    }
+
+    override fun userNotificationCenter(
+        center: UNUserNotificationCenter,
+        didReceiveNotificationResponse: UNNotificationResponse,
+        withCompletionHandler: () -> Unit,
+    ) {
+        val link = didReceiveNotificationResponse.notification.request.content.userInfo[USER_INFO_DEEP_LINK] as? String
+        if (link != null) handleIosDeepLink(link)
+        withCompletionHandler()
     }
 }
 
@@ -113,6 +130,7 @@ class IosNotificationManager(
             UNMutableNotificationContent().apply {
                 setTitle(notification.title)
                 setBody(notification.message)
+                notification.deepLink?.let { setUserInfo(mapOf<Any?, Any?>(USER_INFO_DEEP_LINK to it)) }
                 // A quiet notification (app open on another screen) gets a sound only if the user switched that on.
                 if (!notification.isSilent || prefs.soundWhileOpen.value) setSound(UNNotificationSound.defaultSound)
             }

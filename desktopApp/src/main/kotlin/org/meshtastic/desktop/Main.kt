@@ -131,6 +131,7 @@ import org.meshtastic.desktop.map.DesktopTracerouteMap
 import org.meshtastic.desktop.map.desktopMapViewProvider
 import org.meshtastic.desktop.notification.DesktopOS
 import org.meshtastic.desktop.notification.NativeNotificationSender
+import org.meshtastic.desktop.notification.NotificationClicks
 import org.meshtastic.desktop.tray.SniTrayEffect
 import org.meshtastic.desktop.tray.TRAY_ICON_DARK
 import org.meshtastic.desktop.tray.TRAY_ICON_LIGHT
@@ -255,6 +256,15 @@ private fun ApplicationScope.DeepLinkHandler(
         }
     }
 
+    // A tap on a notification opens the conversation it came from and brings the window forward.
+    LaunchedEffect(Unit) {
+        NotificationClicks.links.collect { link ->
+            uiViewModel.handleDeepLink(CommonUri.parse(link)) { Logger.e { "Invalid link from a notification: $link" } }
+            NotificationClicks.consumed()
+            bringWindowToFront()
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_OPEN_URI)) {
             Desktop.getDesktop().setOpenURIHandler { event ->
@@ -263,6 +273,17 @@ private fun ApplicationScope.DeepLinkHandler(
                 val uriStr = event.uri.toString()
                 uiViewModel.handleDeepLink(CommonUri.parse(uriStr)) { Logger.e { "Invalid URI from OS: $uriStr" } }
             }
+        }
+    }
+}
+
+/** Restores and raises the app window (it may be minimized or behind others when a notification is tapped). */
+private fun bringWindowToFront() {
+    java.awt.EventQueue.invokeLater {
+        java.awt.Window.getWindows().filterIsInstance<java.awt.Frame>().filter { it.isDisplayable }.forEach { frame ->
+            frame.extendedState = frame.extendedState and java.awt.Frame.ICONIFIED.inv()
+            frame.toFront()
+            frame.requestFocus()
         }
     }
 }
