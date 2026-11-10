@@ -66,13 +66,17 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
         }
     }
 
-    private fun clockTime(): String =
-        NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
+    private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
 
-    private fun json(title: String, chip: String, lines: List<String>, connected: Boolean, updatedText: String): String =
-        "{\"title\":${quote(title)},\"chip\":${quote(chip)},\"connected\":$connected," +
-            "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
-            "\"lines\":[${lines.joinToString(",") { quote(it) }}]}"
+    private fun json(
+        title: String,
+        chip: String,
+        lines: List<String>,
+        connected: Boolean,
+        updatedText: String,
+    ): String = "{\"title\":${quote(title)},\"chip\":${quote(chip)},\"connected\":$connected," +
+        "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
+        "\"lines\":[${lines.joinToString(",") { quote(it) }}]}"
 
     private fun quote(text: String): String = buildString {
         append('"')

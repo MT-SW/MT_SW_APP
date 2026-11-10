@@ -26,8 +26,8 @@ import org.meshtastic.core.resources.on_demand_lan_link_none
 import org.meshtastic.core.resources.on_demand_lan_link_wifi
 import org.meshtastic.core.resources.on_demand_lan_mqtt
 import org.meshtastic.core.resources.on_demand_lan_mqtt_connected
-import org.meshtastic.core.resources.on_demand_lan_no_ip
 import org.meshtastic.core.resources.on_demand_lan_no
+import org.meshtastic.core.resources.on_demand_lan_no_ip
 import org.meshtastic.core.resources.on_demand_lan_udp
 import org.meshtastic.core.resources.on_demand_lan_yes
 import org.meshtastic.proto.LanStats

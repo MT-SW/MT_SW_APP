@@ -49,7 +49,6 @@ import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.auto_load_chat_images
-import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
@@ -61,9 +60,9 @@ import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
-import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
+import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
@@ -91,6 +90,7 @@ import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_description
 import org.meshtastic.core.resources.smart_features_summary
 import org.meshtastic.core.resources.smart_features_title

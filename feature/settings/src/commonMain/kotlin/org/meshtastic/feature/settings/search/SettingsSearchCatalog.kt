@@ -37,7 +37,6 @@ import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.auto_load_chat_images
-import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_keepalive_title
 import org.meshtastic.core.resources.db_sync_auto
@@ -61,6 +60,7 @@ import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.report_issues_title
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title

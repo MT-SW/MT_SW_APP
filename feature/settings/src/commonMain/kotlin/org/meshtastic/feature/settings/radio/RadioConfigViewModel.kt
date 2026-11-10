@@ -538,7 +538,8 @@ open class RadioConfigViewModel(
         // Firmware edition version and local stats broadcast settings (version 3 and newer). They are asked of the node
         // being administered, the connected one or a remote one: the firmware answers a read from any node in range,
         // and a save from our own phone or a node with an admin key. Only answers logged after the moment of choosing
-        // the node count, like the Sniffer state above. (Sniffer itself stays local: the firmware ignores it otherwise.)
+        // the node count, like the Sniffer state above. (Sniffer itself stays local: the firmware ignores it
+        // otherwise.)
         val targetNumIfConnected =
             combine(
                 nodeRepository.myNodeInfo,

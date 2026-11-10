@@ -54,6 +54,7 @@ import org.meshtastic.core.repository.TranslatorModelState
 private const val CHUNK_BYTES = 256 * 1024
 
 /** Models of the on-device AI for the iPhone: downloaded to the app's own folder, one folder per model. */
+@Suppress("TooManyFunctions")
 class IosAiModelStore(baseDir: String) : AiModelStore {
     private val fs = FileSystem.SYSTEM
     private val root: Path = (baseDir + "/ai-models").toPath().also { fs.createDirectories(it) }

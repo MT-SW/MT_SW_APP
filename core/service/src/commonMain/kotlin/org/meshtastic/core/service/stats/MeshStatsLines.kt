@@ -137,7 +137,11 @@ object MeshStatsLines {
     }
 
     @Suppress("CyclomaticComplexMethod")
-    suspend fun extendedLines(ext: LocalStatsExtended?, ramAlreadyShown: Boolean, ramLine: String? = null): List<String> {
+    suspend fun extendedLines(
+        ext: LocalStatsExtended?,
+        ramAlreadyShown: Boolean,
+        ramLine: String? = null,
+    ): List<String> {
         if (ext == null) return listOfNotNull(ramLine)
         return buildList {
             if (ext.cpuUsagePercent > 0) {

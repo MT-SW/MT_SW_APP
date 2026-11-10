@@ -70,7 +70,13 @@ class MeshStatsFeed(
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
         // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
-        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) { b, s, mode, _, _ ->
+        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) {
+                b,
+                s,
+                mode,
+                _,
+                _,
+            ->
             Triple(b, s, mode)
         }
             .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode) }

@@ -42,7 +42,6 @@ import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.auto_load_chat_images
-import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.bluetooth
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.channels
@@ -109,6 +108,7 @@ import org.meshtastic.core.resources.schema_power_is_power_saving
 import org.meshtastic.core.resources.schema_telemetry_device_update_interval
 import org.meshtastic.core.resources.schema_telemetry_environment_measurement_enabled
 import org.meshtastic.core.resources.schema_telemetry_environment_update_interval
+import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.telemetry
 import org.meshtastic.core.resources.theme

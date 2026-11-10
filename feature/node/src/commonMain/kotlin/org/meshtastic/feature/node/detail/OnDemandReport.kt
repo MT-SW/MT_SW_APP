@@ -27,8 +27,8 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.on_demand_air_activity
 import org.meshtastic.core.resources.on_demand_exchange_log
 import org.meshtastic.core.resources.on_demand_fw_plus_version
-import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_hops
+import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_no_errors
 import org.meshtastic.core.resources.on_demand_node_stats

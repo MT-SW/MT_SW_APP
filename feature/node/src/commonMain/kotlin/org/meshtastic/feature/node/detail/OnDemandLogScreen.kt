@@ -93,13 +93,13 @@ import org.meshtastic.core.resources.on_demand_flash
 import org.meshtastic.core.resources.on_demand_flood_counter
 import org.meshtastic.core.resources.on_demand_fw_plus_version
 import org.meshtastic.core.resources.on_demand_fw_plus_version_desc
-import org.meshtastic.core.resources.on_demand_lan_stats
-import org.meshtastic.core.resources.on_demand_lan_stats_desc
 import org.meshtastic.core.resources.on_demand_heap_total
 import org.meshtastic.core.resources.on_demand_heap_used
 import org.meshtastic.core.resources.on_demand_hero_hint
 import org.meshtastic.core.resources.on_demand_hero_progress
 import org.meshtastic.core.resources.on_demand_hops
+import org.meshtastic.core.resources.on_demand_lan_stats
+import org.meshtastic.core.resources.on_demand_lan_stats_desc
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_nexthop_counter
 import org.meshtastic.core.resources.on_demand_no_answer

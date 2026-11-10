@@ -129,8 +129,10 @@ fun RadioConfigItemList(
     // Sniffer is only ever switched from the connected phone, so a remote node never offers it.
     val snifferSupported =
         state.isLocal &&
-            (state.snifferEnabled != null ||
-                (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true))
+            (
+                state.snifferEnabled != null ||
+                    (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true)
+                )
 
     LaunchedEffect(state.responseState) {
         if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {
