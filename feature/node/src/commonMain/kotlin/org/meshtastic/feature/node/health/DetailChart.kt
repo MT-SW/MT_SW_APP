@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.abs
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 private const val GROW_MILLIS = 900
@@ -92,7 +93,7 @@ internal fun LineAreaChart(
     scale: LevelScale? = null,
     palette: Map<HealthLevel, Color> = emptyMap(),
 ) {
-    val sorted = remember(points) { points.filter { it.value.isFinite() }.sortedBy { it.timestampMillis } }
+    val sorted = remember(points) { points.filter { it.value.isFinite() }.withSaneTimes() }
     if (sorted.size < 2) return
     val minV = sorted.minOf { it.value }
     val maxV = sorted.maxOf { it.value }
@@ -252,4 +253,22 @@ private fun DrawScope.drawChart(
         drawCircle(color, radius = 8f, center = Offset(x(it), y(it)))
         drawCircle(Color.White, radius = 3.5f, center = Offset(x(it), y(it)))
     }
+}
+
+private const val MAX_FUTURE_MILLIS = 30L * 24 * 60 * 60 * 1000
+private const val MAX_AGE_MILLIS = 365L * 24 * 60 * 60 * 1000
+
+/**
+ * Sorted points with the ones a node with a wrong clock would add left out: readings more than 30 days in the future,
+ * readings more than a year older than the newest sane one, and repeats of the same timestamp. A stray point would
+ * otherwise stretch the time axis until the real readings squash into a line. Only the chart is trimmed; tables and
+ * exports keep every reading.
+ */
+internal fun List<MetricPoint>.withSaneTimes(nowMillis: Long = Clock.System.now().toEpochMilliseconds()): List<MetricPoint> {
+    val notFuture = filter { it.timestampMillis <= nowMillis + MAX_FUTURE_MILLIS }
+    val newest = notFuture.maxOfOrNull { it.timestampMillis } ?: return emptyList()
+    return notFuture
+        .filter { it.timestampMillis >= newest - MAX_AGE_MILLIS }
+        .distinctBy { it.timestampMillis }
+        .sortedBy { it.timestampMillis }
 }
