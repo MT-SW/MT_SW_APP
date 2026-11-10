@@ -44,11 +44,10 @@ class RelativeDayTest {
     }
 
     @Test
-    fun `classifies today yesterday day before yesterday and older`() {
+    fun `classifies today yesterday and older`() {
         val now = dayStart + 12 * oneHour
         assertEquals(RelativeDay.Today, relativeDayOf(dayStart + oneHour, now, utc))
         assertEquals(RelativeDay.Yesterday, relativeDayOf(dayStart - oneHour, now, utc))
-        assertEquals(RelativeDay.DayBeforeYesterday, relativeDayOf(dayStart - 2 * oneDay, now, utc))
-        assertEquals(RelativeDay.Older, relativeDayOf(dayStart - 2 * oneDay - oneHour, now, utc))
+        assertEquals(RelativeDay.Older, relativeDayOf(dayStart - 2 * oneDay, now, utc))
     }
 }

@@ -416,7 +416,6 @@
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Data</string>
     <string name="date_separator_today">Dziś</string>
-    <string name="date_separator_day_before_yesterday">Przedwczoraj</string>
     <string name="date_separator_yesterday">Wczoraj</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
@@ -3670,7 +3669,8 @@
     <string name="font_weight_designed">Domyślne</string>
     <string name="font_search">Szukaj czcionki</string>
     <string name="font_preview">Przykładowy tekst: Zażółć gęślą jaźń, 0123</string>
-    <string name="last_heard_ago_day_one">1 dzień temu</string>
+    <string name="last_heard_ago_day_two">przedwczoraj</string>
+    <string name="last_heard_ago_day_one">wczoraj</string>
     <string name="last_heard_ago_d">%1$d dni temu</string>
     <string name="last_heard_ago_h">%1$d godz. temu</string>
     <string name="last_heard_ago_min">%1$d min temu</string>

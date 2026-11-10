@@ -24,6 +24,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.last_heard_ago_d
 import org.meshtastic.core.resources.last_heard_ago_day_one
+import org.meshtastic.core.resources.last_heard_ago_day_two
 import org.meshtastic.core.resources.last_heard_ago_h
 import org.meshtastic.core.resources.last_heard_ago_min
 import org.meshtastic.core.resources.now
@@ -50,6 +51,7 @@ class AgoLabels(
     val hours: String,
     val days: String,
     val oneDay: String = days.replace("%1\$d", "1"),
+    val twoDays: String = days.replace("%1\$d", "2"),
 )
 
 /** Resolves [AgoLabels] from the string resources in the language set in the app. */
@@ -61,13 +63,14 @@ fun rememberAgoLabels(): AgoLabels = AgoLabels(
     hours = stringResource(Res.string.last_heard_ago_h),
     days = stringResource(Res.string.last_heard_ago_d),
     oneDay = stringResource(Res.string.last_heard_ago_day_one),
+    twoDays = stringResource(Res.string.last_heard_ago_day_two),
 )
 
 private fun String.withNumber(n: Long): String = replace("%1\$d", n.toString())
 
 /**
  * Formats a given Unix timestamp (in seconds) into a relative "time ago" string in the app's language, e.g. "5 min
- * temu", "2 godz. temu", "3 dni temu". Under a minute it returns [AgoLabels.now]; older than 7 days it is a date such
+ * temu", "2 godz. temu", "wczoraj", "przedwczoraj", "3 dni temu". Under a minute it returns [AgoLabels.now]; older than 7 days it is a date such
  * as "7 listopada".
  *
  * @param lastSeenUnixSeconds The Unix timestamp in seconds to be formatted.
@@ -87,6 +90,8 @@ fun formatAgo(lastSeenUnixSeconds: Int, labels: AgoLabels): String {
         diff < HOURS_PER_DAY.hours -> labels.hours.withNumber(diff.inWholeHours)
 
         diff < 2.days -> labels.oneDay
+
+        diff < 3.days -> labels.twoDays
 
         diff <= MAX_RELATIVE_DAYS.days -> labels.days.withNumber(diff.inWholeDays)
 

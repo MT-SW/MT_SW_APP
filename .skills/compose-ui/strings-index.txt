@@ -845,7 +845,6 @@ current_invert_description
 currently
 datadog_link
 date
-date_separator_day_before_yesterday
 date_separator_today
 date_separator_yesterday
 ### DB ###
@@ -1614,6 +1613,7 @@ label_with_unit
 ### LAST ###
 last_heard_ago_d
 last_heard_ago_day_one
+last_heard_ago_day_two
 last_heard_ago_h
 last_heard_ago_min
 last_heard_filter_label
