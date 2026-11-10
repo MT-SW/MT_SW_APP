@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package org.meshtastic.core.service.stats
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.util.LocalStatsExtended
+import org.meshtastic.core.repository.LiveUpdateMode
+import org.meshtastic.core.repository.LiveUpdatePrefs
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.formatDurationSuspend
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.live_update_signal
+import org.meshtastic.core.resources.local_stats_uptime
+import org.meshtastic.core.resources.local_stats_utilization
+import org.meshtastic.proto.LocalStats
+
+/** What a widget shows: a title, a short chip (nodes online/all), whether the radio is connected, and the lines. */
+data class MeshStatsSnapshot(val title: String, val chip: String, val connected: Boolean, val lines: List<String>)
+
+/**
+ * The statistics of the permanent notification on Android (mesh status, or one tracked node when chosen in the adaptive
+ * notifications) as a flow, for the widgets of every system, so they all show exactly the same lines.
+ */
+@Single
+class MeshStatsFeed(
+    private val nodes: NodeRepository,
+    private val packets: PacketRepository,
+    private val prefs: LiveUpdatePrefs,
+    private val service: ServiceRepository,
+) {
+    private data class Basics(val online: Int, val total: Int, val unread: Int, val connected: Boolean)
+
+    fun snapshots(): Flow<MeshStatsSnapshot> {
+        val basics: Flow<Basics> =
+            combine(nodes.onlineNodeCount, nodes.totalNodeCount, packets.getUnreadCountTotal(), service.connectionState) {
+                    online,
+                    total,
+                    unread,
+                    state,
+                ->
+                Basics(online, total, unread, state is ConnectionState.Connected)
+            }
+        val stats =
+            combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
+        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }) { b, s, mode, _ ->
+            Triple(b, s, mode)
+        }
+            .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode) }
+    }
+
+    @Suppress("LongParameterList")
+    private suspend fun build(
+        b: Basics,
+        stats: LocalStats,
+        extended: LocalStatsExtended,
+        our: Node?,
+        mode: LiveUpdateMode,
+    ): MeshStatsSnapshot {
+        val tracked = (mode as? LiveUpdateMode.TrackNode)?.let { nodes.nodeDBbyNum.value[it.nodeNum] }
+        val title: String
+        val lines: List<String>
+        if (tracked != null) {
+            title = tracked.effectiveLongName
+            lines = trackedLines(tracked)
+        } else {
+            title = our?.effectiveLongName?.takeIf { it.isNotBlank() } ?: "MT_SW"
+            lines =
+                MeshStatsLines.meshStatus(
+                    nodesOnline = b.online,
+                    nodesTotal = b.total,
+                    unread = b.unread,
+                    radioBattery = our?.deviceMetrics?.battery_level,
+                    localStats = stats.takeIf { it.uptime_seconds != 0 },
+                    extended = extended.takeIf { it != LocalStatsExtended() },
+                )
+        }
+        return MeshStatsSnapshot(title, if (b.connected) "${b.online}/${b.total}" else "", b.connected, lines)
+    }
+
+    private suspend fun trackedLines(node: Node): List<String> = buildList {
+        node.deviceMetrics.battery_level?.let { add(MeshStatsLines.batteryText(it)) }
+        val snr = node.snrOrNull
+        val rssi = node.rssiOrNull
+        if (snr != null || rssi != null) {
+            add(getStringSuspend(Res.string.live_update_signal, MetricFormatter.snr(snr), MetricFormatter.rssi(rssi)))
+        }
+        val metrics = node.deviceMetrics
+        metrics.uptime_seconds?.let {
+            add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.toLong())))
+        }
+        if (metrics.channel_utilization != null || metrics.air_util_tx != null) {
+            add(
+                getStringSuspend(
+                    Res.string.local_stats_utilization,
+                    NumberFormatter.format((metrics.channel_utilization ?: 0f).toDouble(), 2),
+                    NumberFormatter.format((metrics.air_util_tx ?: 0f).toDouble(), 2),
+                ),
+            )
+        }
+    }
+}

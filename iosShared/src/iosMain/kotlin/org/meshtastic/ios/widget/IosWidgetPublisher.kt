@@ -20,25 +20,8 @@ package org.meshtastic.ios.widget
 import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.map
-import org.meshtastic.core.common.util.NumberFormatter
-import org.meshtastic.core.model.ConnectionState
-import org.meshtastic.core.model.effectiveLongName
-import org.meshtastic.core.repository.LiveUpdateMode
-import org.meshtastic.core.repository.LiveUpdatePrefs
-import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.repository.PacketRepository
-import org.meshtastic.core.repository.ServiceRepository
-import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.formatDurationSuspend
-import org.meshtastic.core.resources.getStringSuspend
-import org.meshtastic.core.resources.live_update_signal
-import org.meshtastic.core.resources.local_stats_uptime
-import org.meshtastic.core.resources.local_stats_utilization
-import org.meshtastic.core.service.stats.MeshStatsLines
+import org.meshtastic.core.service.stats.MeshStatsFeed
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSString
@@ -61,96 +44,17 @@ private const val WIDGET_REFRESH = "MTSWWidgetRefresh"
 private val MIN_PUBLISH_INTERVAL = 30.seconds
 
 /**
- * Publishes the statistics for the widget of iPhone/iPad: the same lines as the permanent notification on Android
- * (mesh status, or one tracked node when chosen in "powiadomienia adaptacyjne"). Without the App Group (for example a
- * build signed without it) nothing is written and the widget shows a hint to open the app.
+ * Publishes the statistics for the widget of iPhone/iPad: the same lines as the permanent notification on Android (the
+ * shared [MeshStatsFeed]). Without the App Group (for example a build signed without it) nothing is written and the
+ * widget shows a hint to open the app.
  */
-@Suppress("LongParameterList")
-class IosWidgetPublisher(
-    private val nodes: NodeRepository,
-    private val packets: PacketRepository,
-    private val prefs: LiveUpdatePrefs,
-    private val service: ServiceRepository,
-) {
-    private data class Basics(val online: Int, val total: Int, val unread: Int, val connected: Boolean)
-
+class IosWidgetPublisher(private val feed: MeshStatsFeed) {
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
-        val basics: Flow<Basics> =
-            combine(
-                nodes.onlineNodeCount,
-                nodes.totalNodeCount,
-                packets.getUnreadCountTotal(),
-                service.connectionState,
-            ) { online, total, unread, state ->
-                Basics(online, total, unread, state is ConnectionState.Connected)
-            }
-        val stats = combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
-        combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }) { b, s, mode, _ -> Triple(b, s, mode) }
-            .conflate()
-            .collect { (b, s, mode) ->
-                runCatching { publish(b, s.first, s.second, s.third?.deviceMetrics?.battery_level, s.third?.effectiveLongName, mode) }
-                    .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
-                delay(MIN_PUBLISH_INTERVAL)
-            }
-    }
-
-    @Suppress("LongParameterList")
-    private suspend fun publish(
-        b: Basics,
-        stats: org.meshtastic.proto.LocalStats,
-        extended: org.meshtastic.core.model.util.LocalStatsExtended,
-        battery: Int?,
-        ourName: String?,
-        mode: LiveUpdateMode,
-    ) {
-        val tracked = (mode as? LiveUpdateMode.TrackNode)?.let { nodes.nodeDBbyNum.value[it.nodeNum] }
-        val title: String
-        val lines: List<String>
-        if (tracked != null) {
-            title = tracked.effectiveLongName
-            lines = trackedLines(tracked)
-        } else {
-            title = ourName?.takeIf { it.isNotBlank() } ?: "MT_SW"
-            lines =
-                MeshStatsLines.meshStatus(
-                    nodesOnline = b.online,
-                    nodesTotal = b.total,
-                    unread = b.unread,
-                    radioBattery = battery,
-                    localStats = stats.takeIf { it.uptime_seconds != 0 },
-                    extended = extended.takeIf { it != org.meshtastic.core.model.util.LocalStatsExtended() },
-                )
-        }
-        val chip = if (b.connected) "${b.online}/${b.total}" else ""
-        write(json(title, chip, lines, b.connected))
-    }
-
-    private suspend fun trackedLines(node: org.meshtastic.core.model.Node): List<String> = buildList {
-        node.deviceMetrics.battery_level?.let { add(MeshStatsLines.batteryText(it)) }
-        val snr = node.snrOrNull
-        val rssi = node.rssiOrNull
-        if (snr != null || rssi != null) {
-            add(
-                getStringSuspend(
-                    Res.string.live_update_signal,
-                    org.meshtastic.core.common.util.MetricFormatter.snr(snr),
-                    org.meshtastic.core.common.util.MetricFormatter.rssi(rssi),
-                ),
-            )
-        }
-        val metrics = node.deviceMetrics
-        metrics.uptime_seconds?.let {
-            add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.toLong())))
-        }
-        if (metrics.channel_utilization != null || metrics.air_util_tx != null) {
-            add(
-                getStringSuspend(
-                    Res.string.local_stats_utilization,
-                    NumberFormatter.format((metrics.channel_utilization ?: 0f).toDouble(), 2),
-                    NumberFormatter.format((metrics.air_util_tx ?: 0f).toDouble(), 2),
-                ),
-            )
+        feed.snapshots().conflate().collect { snapshot ->
+            runCatching { write(json(snapshot.title, snapshot.chip, snapshot.lines, snapshot.connected)) }
+                .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
+            delay(MIN_PUBLISH_INTERVAL)
         }
     }
 

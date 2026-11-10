@@ -45,6 +45,7 @@ class AndroidAppWidgetUpdater(
     private val context: Context,
     stateProvider: LocalStatsWidgetStateProvider,
     trackerDataSource: NodeTrackerWidgetDataSource,
+    meshStatusProvider: MeshStatusWidgetStateProvider,
 ) : AppWidgetUpdater {
     @Suppress("InjectDispatcher") // feature:widget does not depend on core:di, where CoroutineDispatchers lives
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -59,6 +60,12 @@ class AndroidAppWidgetUpdater(
                 .debounce(WIDGET_UPDATE_DEBOUNCE_MS)
                 .distinctUntilChanged { old, new -> old.copy(updateTimeMillis = 0) == new.copy(updateTimeMillis = 0) }
                 .collect { if (hasInstances(LocalStatsWidget::class.java)) update(LocalStatsWidget()) }
+        }
+
+        scope.launch {
+            meshStatusProvider.state.distinctUntilChanged().collect {
+                if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
+            }
         }
 
         // Sampled rather than debounced: on a busy mesh the node DB changes faster than any debounce window, which
@@ -84,6 +91,7 @@ class AndroidAppWidgetUpdater(
     override suspend fun updateAll() {
         update(LocalStatsWidget())
         update(NodeTrackerWidget())
+        update(MeshStatusWidget())
     }
 
     private suspend fun update(widget: GlanceAppWidget) {

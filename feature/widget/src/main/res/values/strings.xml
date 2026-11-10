@@ -21,4 +21,6 @@
     <string name="widget_local_stats_description">Channel use, battery, nodes online and uptime for your connected radio</string>
     <string name="widget_node_tracker_label">Node Tracker</string>
     <string name="widget_node_tracker_description">Battery, signal and last heard for one node you pick</string>
+    <string name="widget_mesh_status_label">MT_SW statistics</string>
+    <string name="widget_mesh_status_description">The same statistics as the permanent notification: mesh status or one tracked node</string>
 </resources>

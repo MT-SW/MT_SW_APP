@@ -20,4 +20,6 @@
     <!-- Not in Crowdin: the picker label must be an Android resource, and crowdin.yml sources composeResources only. -->
     <string name="widget_local_stats_description">Wykorzystanie kanału, bateria, węzły online i czas pracy połączonego radia</string>
     <string name="widget_node_tracker_label">Śledzenie węzła</string>
+    <string name="widget_mesh_status_label">Statystyki MT_SW</string>
+    <string name="widget_mesh_status_description">Te same statystyki co w stałym powiadomieniu: stan sieci albo jeden śledzony węzeł</string>
 </resources>

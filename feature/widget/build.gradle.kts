@@ -37,6 +37,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.navigation)
     implementation(projects.core.resources)
+    implementation(projects.core.service)
     implementation(projects.core.repository)
     implementation(projects.core.ui)
 

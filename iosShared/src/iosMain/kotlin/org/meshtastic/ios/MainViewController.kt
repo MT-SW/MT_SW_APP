@@ -57,13 +57,10 @@ import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
-import org.meshtastic.core.repository.LiveUpdatePrefs
-import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.repository.PacketRepository
-import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
+import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.posix.exit
@@ -140,12 +137,7 @@ private fun BackgroundCleanup() {
 @Composable
 private fun WidgetPublishing() {
     val publisher = remember {
-        IosWidgetPublisher(
-            nodes = koin.get<NodeRepository>(NodeRepository::class),
-            packets = koin.get<PacketRepository>(PacketRepository::class),
-            prefs = koin.get<LiveUpdatePrefs>(LiveUpdatePrefs::class),
-            service = koin.get<ServiceRepository>(ServiceRepository::class),
-        )
+        IosWidgetPublisher(koin.get<MeshStatsFeed>(MeshStatsFeed::class))
     }
     LaunchedEffect(Unit) { withContext(Dispatchers.Default) { publisher.run() } }
 }
