@@ -34,13 +34,12 @@ internal object Der {
     }
 
     @Suppress("FunctionSignature")
-    private fun length(n: Int): ByteArray =
-        when {
-            n < 0x80 -> byteArrayOf(n.toByte())
-            n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
-            n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())
-            else -> byteArrayOf(0x83.toByte(), (n shr 16).toByte(), (n shr 8).toByte(), n.toByte())
-        }
+    private fun length(n: Int): ByteArray = when {
+        n < 0x80 -> byteArrayOf(n.toByte())
+        n < 0x100 -> byteArrayOf(0x81.toByte(), n.toByte())
+        n < 0x10000 -> byteArrayOf(0x82.toByte(), (n shr 8).toByte(), n.toByte())
+        else -> byteArrayOf(0x83.toByte(), (n shr 16).toByte(), (n shr 8).toByte(), n.toByte())
+    }
 
     fun tlv(tag: Int, content: ByteArray): ByteArray = concat(byteArrayOf(tag.toByte()), length(content.size), content)
 
