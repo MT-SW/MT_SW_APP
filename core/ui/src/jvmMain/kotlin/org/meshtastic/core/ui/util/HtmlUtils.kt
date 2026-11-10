@@ -19,5 +19,6 @@ package org.meshtastic.core.ui.util
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLinkStyles
 
-/** JVM stub — returns the raw HTML as plain text (no HTML rendering on Desktop). */
-actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString = AnnotatedString(html)
+/** Renders the basic HTML tags of the app texts (bold, italic, links, line breaks). */
+actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString =
+    simpleAnnotatedStringFromHtml(html, linkStyles)

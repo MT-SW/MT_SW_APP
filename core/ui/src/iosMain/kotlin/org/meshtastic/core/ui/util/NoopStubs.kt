@@ -27,9 +27,10 @@ import org.meshtastic.core.common.util.CommonUri
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun createClipEntry(text: String, label: String, sensitive: Boolean): ClipEntry = ClipEntry.withPlainText(text)
 
-actual fun ClipEntry.plainText(): String? = null
+actual fun ClipEntry.plainText(): String? = platform.UIKit.UIPasteboard.generalPasteboard.string
 
-actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString = AnnotatedString(html)
+actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString =
+    simpleAnnotatedStringFromHtml(html, linkStyles)
 
 @Composable actual fun rememberOpenNfcSettings(): () -> Unit = {}
 
