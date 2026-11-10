@@ -32,12 +32,13 @@ import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.RelativeDay
 import org.meshtastic.core.common.util.relativeDayOf
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.date_separator_day_before_yesterday
 import org.meshtastic.core.resources.date_separator_today
 import org.meshtastic.core.resources.date_separator_yesterday
 import org.meshtastic.core.ui.theme.AppTheme
 
 /**
- * Day boundary marker between message runs — "Today", "Yesterday", or the localized date.
+ * Day boundary marker between message runs — "Today", "Yesterday", "Day before yesterday", or the localized date.
  *
  * Scrolling back through a channel otherwise runs Tuesday into last month with nothing between them but a clock time,
  * because the per-message timestamp carries no date until full timestamps are switched on.
@@ -48,6 +49,7 @@ internal fun DateSeparator(timestampMillis: Long, modifier: Modifier = Modifier)
         when (relativeDayOf(timestampMillis)) {
             RelativeDay.Today -> stringResource(Res.string.date_separator_today)
             RelativeDay.Yesterday -> stringResource(Res.string.date_separator_yesterday)
+            RelativeDay.DayBeforeYesterday -> stringResource(Res.string.date_separator_day_before_yesterday)
             RelativeDay.Older -> DateFormatter.formatDate(timestampMillis)
         }
     Box(modifier = modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {

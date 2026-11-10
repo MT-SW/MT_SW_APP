@@ -416,6 +416,7 @@
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Data</string>
     <string name="date_separator_today">Dziś</string>
+    <string name="date_separator_day_before_yesterday">Przedwczoraj</string>
     <string name="date_separator_yesterday">Wczoraj</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
@@ -1988,10 +1989,10 @@
         <item quantity="other">%1$d milisekundy</item>
     </plurals>
     <plurals name="plurals_minutes">
-        <item quantity="one">%1$d minuta</item>
-        <item quantity="few">%1$d minuty</item>
-        <item quantity="many">%1$d minut</item>
-        <item quantity="other">%1$d minuty</item>
+        <item quantity="one">%1$d min</item>
+        <item quantity="few">%1$d min</item>
+        <item quantity="many">%1$d min</item>
+        <item quantity="other">%1$d min</item>
     </plurals>
     <plurals name="plurals_seconds">
         <item quantity="one">%1$d sekunda</item>
@@ -2575,16 +2576,20 @@
     <string name="ui_scale">Skalowanie aplikacji</string>
     <string name="ui_scale_follow_system">Zgodnie z systemem</string>
     <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w systemie.</string>
-    <string name="theme_very_vivid">Bardzo nasycony (jasny lub ciemny jak w systemie)</string>
-    <string name="theme_very_vivid_dark">Bardzo nasycony, ciemny</string>
-    <string name="theme_very_vivid_light">Bardzo nasycony, jasny</string>
-    <string name="theme_vivid">Nasycony (jasny lub ciemny jak w systemie)</string>
-    <string name="theme_vivid_dark">Nasycony, ciemny</string>
-    <string name="theme_vivid_light">Nasycony, jasny</string>
-    <string name="theme_dark">Ciemny</string>
-    <string name="theme_light">Jasny</string>
-    <string name="theme_mono_dark">Czarno-biały (ciemny)</string>
-    <string name="theme_mono_light">Czarno-biały (jasny)</string>
+    <string name="theme_very_vivid">Bardzo nasycony</string>
+    <string name="theme_very_vivid_dark">Bardzo nasycony</string>
+    <string name="theme_very_vivid_light">Bardzo nasycony</string>
+    <string name="theme_vivid">Nasycony</string>
+    <string name="theme_vivid_dark">Nasycony</string>
+    <string name="theme_vivid_light">Nasycony</string>
+    <string name="theme_group_dark">Ciemne</string>
+    <string name="theme_group_light">Jasne</string>
+    <string name="theme_group_other">Inne</string>
+    <string name="theme_group_system">Zgodne z systemem</string>
+    <string name="theme_dark">Standardowy</string>
+    <string name="theme_light">Standardowy</string>
+    <string name="theme_mono_dark">Czarno-biały</string>
+    <string name="theme_mono_light">Czarno-biały</string>
     <string name="theme_system">Domyślne ustawienie systemowe</string>
     <string name="time">Czas</string>
     <string name="timeout">Limit czasu</string>

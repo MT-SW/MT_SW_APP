@@ -845,6 +845,7 @@ current_invert_description
 currently
 datadog_link
 date
+date_separator_day_before_yesterday
 date_separator_today
 date_separator_yesterday
 ### DB ###
@@ -3163,6 +3164,10 @@ terrain_horizon_title
 ### THEME ###
 theme
 theme_dark
+theme_group_dark
+theme_group_light
+theme_group_other
+theme_group_system
 theme_light
 theme_mono_dark
 theme_mono_light

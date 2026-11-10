@@ -25,6 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 enum class RelativeDay {
     Today,
     Yesterday,
+    DayBeforeYesterday,
     Older,
 }
 
@@ -47,6 +48,7 @@ fun relativeDayOf(
     return when (day) {
         today -> RelativeDay.Today
         today.minus(DatePeriod(days = 1)) -> RelativeDay.Yesterday
+        today.minus(DatePeriod(days = 2)) -> RelativeDay.DayBeforeYesterday
         else -> RelativeDay.Older
     }
 }

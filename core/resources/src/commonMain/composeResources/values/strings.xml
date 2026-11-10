@@ -881,6 +881,7 @@
     <string name="currently">Currently:</string>
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Date</string>
+    <string name="date_separator_day_before_yesterday">Day before yesterday</string>
     <string name="date_separator_today">Today</string>
     <string name="date_separator_yesterday">Yesterday</string>
     <!-- DB -->
@@ -2579,8 +2580,8 @@
         <item quantity="other">%1$d milliseconds</item>
     </plurals>
     <plurals name="plurals_minutes">
-        <item quantity="one">%1$d minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">%1$d min</item>
+        <item quantity="other">%1$d min</item>
     </plurals>
     <plurals name="plurals_seconds">
         <item quantity="one">%1$d second</item>
@@ -3237,17 +3238,21 @@
     <string name="terrain_horizon_title">Terrain panorama</string>
     <!-- THEME -->
     <string name="theme">Theme</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_mono_dark">Black and white (dark)</string>
-    <string name="theme_mono_light">Black and white (light)</string>
+    <string name="theme_dark">Standard</string>
+    <string name="theme_group_dark">Dark</string>
+    <string name="theme_group_light">Light</string>
+    <string name="theme_group_other">Other</string>
+    <string name="theme_group_system">Like the system</string>
+    <string name="theme_light">Standard</string>
+    <string name="theme_mono_dark">Black and white</string>
+    <string name="theme_mono_light">Black and white</string>
     <string name="theme_system">System default</string>
-    <string name="theme_very_vivid">Very saturated (light or dark like the system)</string>
-    <string name="theme_very_vivid_dark">Very saturated, dark</string>
-    <string name="theme_very_vivid_light">Very saturated, light</string>
-    <string name="theme_vivid">Saturated (light or dark like the system)</string>
-    <string name="theme_vivid_dark">Saturated, dark</string>
-    <string name="theme_vivid_light">Saturated, light</string>
+    <string name="theme_very_vivid">Very saturated</string>
+    <string name="theme_very_vivid_dark">Very saturated</string>
+    <string name="theme_very_vivid_light">Very saturated</string>
+    <string name="theme_vivid">Saturated</string>
+    <string name="theme_vivid_dark">Saturated</string>
+    <string name="theme_vivid_light">Saturated</string>
     <string name="time">Time</string>
     <string name="timeout">Timeout</string>
     <string name="timestamp">Timestamp</string>
