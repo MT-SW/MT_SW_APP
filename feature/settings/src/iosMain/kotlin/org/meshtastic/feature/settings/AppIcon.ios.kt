@@ -16,7 +16,7 @@
  */
 package org.meshtastic.feature.settings
 
-import co.touchlab.kermit.Logger
+import platform.Foundation.NSSelectorFromString
 import platform.UIKit.UIApplication
 
 actual fun applyAppIcon(style: String) {
@@ -29,9 +29,8 @@ actual fun applyAppIcon(style: String) {
             "tinted" -> "AppIcon-Tinted"
             else -> null
         }
+    // Kotlin/Native does not expose the alternate-icon calls of UIApplication, so they go through the selector.
     val application = UIApplication.sharedApplication
-    if (application.alternateIconName == name) return
-    application.setAlternateIconName(name) { error ->
-        if (error != null) Logger.w { "Changing the app icon failed: ${error.localizedDescription}" }
-    }
+    if (application.valueForKey("alternateIconName") as? String == name) return
+    application.performSelector(NSSelectorFromString("setAlternateIconName:completionHandler:"), name, null)
 }
