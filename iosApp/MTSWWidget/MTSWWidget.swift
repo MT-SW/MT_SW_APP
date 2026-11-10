@@ -67,21 +67,51 @@ struct StatsProvider: TimelineProvider {
 
 struct StatsView: View {
     let entry: StatsEntry
+    @Environment(\.widgetFamily) private var family
+
+    /// Ile wierszy i kolumn mieści się w danym rozmiarze widżetu (widżet dopasowuje się do rozmiaru).
+    private var layout: (lines: Int, columns: Int, font: CGFloat) {
+        switch family {
+        case .systemSmall: return (4, 1, 10)
+        case .systemMedium: return (14, 2, 10)
+        case .systemLarge: return (28, 2, 12)
+        case .systemExtraLarge: return (40, 3, 13)
+        default: return (3, 1, 10)
+        }
+    }
+
+    private var emptyText: String {
+        isPolish ? "Otwórz aplikację MT_SW, aby zobaczyć statystyki." : "Open the MT_SW app to see the statistics."
+    }
 
     var body: some View {
-        if let data = entry.data {
+        if #available(iOS 16.0, *), family == .accessoryInline {
+            Text(entry.data.map { "\($0.title) \($0.chip)" } ?? "MT_SW")
+        } else if #available(iOS 16.0, *), family == .accessoryRectangular {
+            VStack(alignment: .leading, spacing: 1) {
+                if let data = entry.data {
+                    Text(data.title + (data.chip.isEmpty ? "" : "  " + data.chip)).font(.system(size: 12, weight: .semibold))
+                    ForEach(Array(data.lines.prefix(layout.lines).enumerated()), id: \.offset) { _, line in
+                        Text(line).font(.system(size: 10)).lineLimit(1)
+                    }
+                } else {
+                    Text(emptyText).font(.system(size: 10))
+                }
+            }
+        } else if let data = entry.data {
+            let l = layout
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(data.title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                    Text(data.title).font(.system(size: l.font + 3, weight: .semibold)).lineLimit(1)
                     Spacer()
                     if !data.chip.isEmpty {
-                        Text(data.chip).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
+                        Text(data.chip).font(.system(size: l.font + 2, weight: .medium)).foregroundStyle(.secondary)
                     }
                 }
-                let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
+                let columns = Array(repeating: GridItem(.flexible(), alignment: .topLeading), count: l.columns)
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
-                    ForEach(Array(data.lines.prefix(14).enumerated()), id: \.offset) { _, line in
-                        Text(line).font(.system(size: 10)).lineLimit(2).minimumScaleFactor(0.8)
+                    ForEach(Array(data.lines.prefix(l.lines).enumerated()), id: \.offset) { _, line in
+                        Text(line).font(.system(size: l.font)).lineLimit(2).minimumScaleFactor(0.8)
                     }
                 }
                 Spacer(minLength: 0)
@@ -89,10 +119,15 @@ struct StatsView: View {
                     .font(.system(size: 9)).foregroundStyle(.secondary)
             }
         } else {
-            Text(isPolish ? "Otwórz aplikację MT_SW, aby zobaczyć statystyki." : "Open the MT_SW app to see the statistics.")
-                .font(.system(size: 12)).foregroundStyle(.secondary)
+            Text(emptyText).font(.system(size: 12)).foregroundStyle(.secondary)
         }
     }
+}
+
+private var families: [WidgetFamily] {
+    var all: [WidgetFamily] = [.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge]
+    if #available(iOS 16.0, *) { all += [.accessoryRectangular, .accessoryInline] }
+    return all
 }
 
 struct MTSWStatsWidget: Widget {
@@ -106,7 +141,7 @@ struct MTSWStatsWidget: Widget {
         }
         .configurationDisplayName(isPolish ? "Statystyki MT_SW" : "MT_SW statistics")
         .description(isPolish ? "Statystyki radia i sieci mesh, jak w powiadomieniu na Androidzie." : "Radio and mesh statistics, like the notification on Android.")
-        .supportedFamilies([.systemMedium])
+        .supportedFamilies(families)
     }
 }
 
