@@ -152,6 +152,7 @@ private val LOCAL_STATS_SAVE_TIMEOUT: Duration = 6.seconds
 /** How many times, and how far apart, the Sniffer state is asked after a (re)connect until the radio answers. */
 private const val SNIFFER_STATE_ASK_ATTEMPTS = 4
 private val SNIFFER_STATE_ASK_INTERVAL: Duration = 3.seconds
+private val REMOTE_STATS_ASK_INTERVAL: Duration = 10.seconds
 
 /**
  * Bounded retry for the Sniffer OnDemand requests below, mirroring MeshConnectionManagerImpl's
@@ -515,14 +516,11 @@ open class RadioConfigViewModel(
         localNumIfConnected
             .flatMapLatest { localNum ->
                 if (localNum == null) {
-                    _radioConfigState.update {
-                        it.copy(snifferEnabled = null, snifferLoading = false, fwPlusVersion = null)
-                    }
+                    _radioConfigState.update { it.copy(snifferEnabled = null, snifferLoading = false) }
                     flowOf(null)
                 } else {
                     val since = nowMillis
                     requestSnifferState(localNum)
-                    requestFwPlusVersion(localNum)
                     snifferControlUseCase.snifferEnabledFlow(localNum, since)
                 }
             }
@@ -537,17 +535,31 @@ open class RadioConfigViewModel(
             }
             .launchIn(viewModelScope)
 
-        // Local stats broadcast settings (fw+ version 3 and newer): read on every (re)connect once the radio has said
-        // it is new enough, and shown only from answers logged after that connect, like the Sniffer state above.
-        localNumIfConnected
-            .flatMapLatest { localNum ->
-                if (localNum == null) {
-                    _radioConfigState.update { it.copy(localStatsConfig = null, localStatsLoading = false) }
+        // Firmware edition version and local stats broadcast settings (version 3 and newer). They are asked of the node
+        // being administered, the connected one or a remote one: the firmware answers a read from any node in range,
+        // and a save from our own phone or a node with an admin key. Only answers logged after the moment of choosing
+        // the node count, like the Sniffer state above. (Sniffer itself stays local: the firmware ignores it otherwise.)
+        val targetNumIfConnected =
+            combine(
+                nodeRepository.myNodeInfo,
+                activeDestNum,
+                serviceRepository.connectionState.map { it == ConnectionState.Connected }.distinctUntilChanged(),
+            ) { ni, dest, connected ->
+                if (connected) dest ?: ni?.myNodeNum else null
+            }
+                .distinctUntilChanged()
+        targetNumIfConnected
+            .flatMapLatest { targetNum ->
+                if (targetNum == null) {
+                    _radioConfigState.update {
+                        it.copy(localStatsConfig = null, localStatsLoading = false, fwPlusVersion = null)
+                    }
                     flowOf(null)
                 } else {
                     val since = nowMillis
-                    requestLocalStatsConfig(localNum)
-                    snifferControlUseCase.localStatsConfigFlow(localNum, since)
+                    requestFwPlusVersion(targetNum)
+                    requestLocalStatsConfig(targetNum)
+                    snifferControlUseCase.localStatsConfigFlow(targetNum, since)
                 }
             }
             .onEach { config ->
@@ -560,12 +572,9 @@ open class RadioConfigViewModel(
             }
             .launchIn(viewModelScope)
 
-        combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest ->
-            val isLocal = (dest == null) || (dest == ni?.myNodeNum)
-            if (isLocal) ni?.myNodeNum else null
-        }
+        combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest -> dest ?: ni?.myNodeNum }
             .distinctUntilChanged()
-            .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::fwPlusVersionFlow) ?: flowOf(null) }
+            .flatMapLatest { targetNum -> targetNum?.let(snifferControlUseCase::fwPlusVersionFlow) ?: flowOf(null) }
             .onEach { version -> _radioConfigState.update { it.copy(fwPlusVersion = version) } }
             .launchIn(viewModelScope)
 
@@ -854,10 +863,10 @@ open class RadioConfigViewModel(
      * Sends REQUEST_FW_PLUS_VERSION for [localNum]; see [SnifferControlUseCase.requestFwPlusVersion] and
      * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER] for how the answer feeds Sniffer support detection.
      */
-    private fun requestFwPlusVersion(localNum: Int) {
+    private fun requestFwPlusVersion(targetNum: Int) {
         safeLaunch(tag = "requestFwPlusVersion") {
-            requestWithQueueRetry("requestFwPlusVersion", localNum) {
-                snifferControlUseCase.requestFwPlusVersion(localNum)
+            requestWithQueueRetry("requestFwPlusVersion", targetNum) {
+                snifferControlUseCase.requestFwPlusVersion(targetNum)
             }
         }
     }
@@ -867,7 +876,7 @@ open class RadioConfigViewModel(
      * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS] or newer, so older firmware is not sent a request it
      * cannot answer. Gives up quietly when the radio never reports a version.
      */
-    private fun requestLocalStatsConfig(localNum: Int) {
+    private fun requestLocalStatsConfig(targetNum: Int) {
         safeLaunch(tag = "requestLocalStatsConfig") {
             val supported =
                 withTimeoutOrNull(LOCAL_STATS_VERSION_WAIT) {
@@ -878,11 +887,15 @@ open class RadioConfigViewModel(
             if (supported == null) return@safeLaunch
             _radioConfigState.update { it.copy(localStatsLoading = true) }
             repeat(SNIFFER_STATE_ASK_ATTEMPTS) {
-                if (myNodeNum != localNum || _radioConfigState.value.localStatsConfig != null) return@repeat
-                requestWithQueueRetry("requestLocalStatsConfig", localNum) {
-                    snifferControlUseCase.requestLocalStatsConfig(localNum)
+                // Stop when the user moved to another node or the answer is already here.
+                if ((destNum ?: myNodeNum) != targetNum || _radioConfigState.value.localStatsConfig != null) {
+                    return@repeat
                 }
-                delay(SNIFFER_STATE_ASK_INTERVAL)
+                requestWithQueueRetry("requestLocalStatsConfig", targetNum) {
+                    snifferControlUseCase.requestLocalStatsConfig(targetNum)
+                }
+                // A node far away answers over several hops, so give it longer than the connected one.
+                delay(if (targetNum == myNodeNum) SNIFFER_STATE_ASK_INTERVAL else REMOTE_STATS_ASK_INTERVAL)
             }
             _radioConfigState.update { if (it.localStatsConfig == null) it.copy(localStatsLoading = false) else it }
         }

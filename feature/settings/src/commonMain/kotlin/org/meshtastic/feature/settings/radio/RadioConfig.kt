@@ -126,9 +126,11 @@ fun RadioConfigItemList(
     // version (RESPONSE_FW_PLUS_VERSION) is at or past MIN_FW_PLUS_VERSION_FOR_SNIFFER -- letting fw+ builds that
     // know they support Sniffer say so immediately, instead of waiting out the state-request timeout below. A
     // firmware that answers neither settles to false once that timeout elapses.
+    // Sniffer is only ever switched from the connected phone, so a remote node never offers it.
     val snifferSupported =
-        state.snifferEnabled != null ||
-            (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true)
+        state.isLocal &&
+            (state.snifferEnabled != null ||
+                (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true))
 
     LaunchedEffect(state.responseState) {
         if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {
