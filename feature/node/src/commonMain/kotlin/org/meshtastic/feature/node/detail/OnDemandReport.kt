@@ -94,10 +94,12 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
             val to = NodeAddress.numToDefaultId(entry.to_node)
             ReportLine("$from -> $to", "${portInfo(entry.port_num).label} (${entry.port_num})")
         }
+    // The texts of the LAN card need the string resources, so they are read here and not inside remember.
+    val lanLines = uiState.lanStats?.lines().orEmpty()
     val receivedLabel = stringResource(Res.string.on_demand_received_label)
     val received = uiState.receivedAt.mapValues { DateFormatter.formatDateTime(it.value) }
 
-    return remember(uiState, title, statsLines, ports, exchanges) {
+    return remember(uiState, title, statsLines, ports, exchanges, lanLines) {
         fun stamp(type: OnDemandType): List<ReportLine> =
             received[type]?.let { listOf(ReportLine(receivedLabel, it)) }.orEmpty()
 
@@ -197,11 +199,11 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                     ),
                 )
             }
-            uiState.lanStats?.let { lan ->
+            uiState.lanStats?.let {
                 add(
                     ReportSection(
                         lanTitle,
-                        lines = stamp(OnDemandType.RESPONSE_LAN_STATS) + lan.lines().map { (l, v) -> ReportLine(l, v) },
+                        lines = stamp(OnDemandType.RESPONSE_LAN_STATS) + lanLines.map { (l, v) -> ReportLine(l, v) },
                     ),
                 )
             }
