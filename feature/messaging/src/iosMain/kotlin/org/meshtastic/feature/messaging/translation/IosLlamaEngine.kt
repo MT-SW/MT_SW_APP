@@ -130,6 +130,8 @@ private const val TRANSCRIBE_ASK = "Write down exactly what is said in this reco
 class IosLlamaEngine(
     private val modelPath: (String) -> String?,
     private val hearingPath: (String) -> String? = { null },
+    /** Tells the model list which model this engine holds in memory: ("llama" or "whisper", model id or null). */
+    private val reportLoaded: (String, String?) -> Unit = { _, _ -> },
 ) : AiTextEngine {
     private var mtmdContext: CPointer<mtmd_context>? = null
     private var whisperContext: CPointer<whisper_context>? = null
@@ -164,6 +166,7 @@ class IosLlamaEngine(
         whisperContext?.let { whisper_free(it) }
         whisperContext = null
         whisperFor = null
+        reportLoaded("whisper", null)
     }
 
     private fun release() {
@@ -177,6 +180,7 @@ class IosLlamaEngine(
         model = null
         loadedId = null
         backend = ""
+        reportLoaded("llama", null)
     }
 
     /** Device memory for the error text: shows at once whether the memory limit is the cause. */
@@ -223,6 +227,7 @@ class IosLlamaEngine(
             ctx = context
             loadedId = modelId
             backend = if (gpu > 0) "GPU (Metal)" else "CPU"
+            reportLoaded("llama", modelId)
             return
         }
         error("Could not load the model: not enough memory (${memoryNote()})")
@@ -363,6 +368,7 @@ class IosLlamaEngine(
             whisperContext =
                 whisper_init_from_file_with_params(path, params) ?: error("Could not load the speech model")
             whisperFor = modelId
+            reportLoaded("whisper", modelId)
         }
         val w = whisperContext!!
         return memScoped {

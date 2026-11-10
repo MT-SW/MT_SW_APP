@@ -81,7 +81,15 @@ class IosAiModule {
     @Single
     fun aiTextEngine(store: IosAiModelStore): AiTextEngine {
         IosEngineLog.dir = iosDataDir() + "/engine-logs"
-        return IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
+        val engine =
+            IosLlamaEngine(
+                modelPath = { store.modelPath(it) },
+                hearingPath = { store.hearingPath(it) },
+                reportLoaded = { engineName, modelId -> store.reportLoaded(engineName, modelId) },
+            )
+        // The "free memory" row in Settings stops what this engine holds.
+        store.unloadAll = { engine.unloadNow() }
+        return engine
     }
 
     @Single

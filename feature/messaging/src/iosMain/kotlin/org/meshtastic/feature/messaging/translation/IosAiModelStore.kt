@@ -60,7 +60,17 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
     private val jobs = HashMap<String, Job>()
     private val _states = MutableStateFlow(initialStates())
     override val states: StateFlow<Map<String, TranslatorModelState>> = _states
+    private val loadedBy = MutableStateFlow<Map<String, String>>(emptyMap())
     private val _loaded = MutableStateFlow<Set<String>>(emptySet())
+
+    /** Set by the engine: frees every model it holds in memory. */
+    var unloadAll: (suspend () -> Unit)? = null
+
+    /** An engine ([engine] names it) says which model it now holds in memory; null when it holds none. */
+    fun reportLoaded(engine: String, modelId: String?) {
+        loadedBy.update { if (modelId == null) it - engine else it + (engine to modelId) }
+        _loaded.value = loadedBy.value.values.toSet()
+    }
 
     private fun filesOf(id: String) = AiModels.byId(id)?.activeFiles.orEmpty()
 
@@ -176,4 +186,8 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
 
     override val loadedModels: StateFlow<Set<String>>
         get() = _loaded
+
+    override suspend fun unloadModels() {
+        unloadAll?.invoke()
+    }
 }

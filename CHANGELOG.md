@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: w ustawieniach asystenta pozycja „Zwolnij pamięć” pokazuje teraz, który model jest w pamięci (wcześniej zawsze pisała, że żaden), a dotknięcie jej zwalnia model, tak jak na Androidzie i komputerze.
+
 * Wszystkie wersje: ekran Funkcje MT_SW ma osobno prawdziwe ustawienia („Wygląd, widżet i dane”: skala, motyw, ikona, widżet, synchronizacja statystyk, czcionka) i osobno „Skróty”, które tylko otwierają ustawienia w innych miejscach. Opis „Synchronizacji statystyk urządzeń” jest rozbudowany: po co jest, przykład, co jest synchronizowane, czego nie rusza i kiedy działa.
 
 * Wszystkie wersje: nowe zapytanie „Statystyki sieci LAN” w Diagnostyce na żądanie (MT_SW_FIRMWARE v4 i nowszy): adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Wynik trafia też do raportu.
@@ -609,6 +611,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+
+* iPhone and iPad: in the assistant settings the "Free memory" row now shows which model is in memory (it always said none before), and tapping it frees the model, as on Android and desktop.
 
 * All versions: the MT_SW features screen now keeps real settings ("Looks, widget and data": scale, theme, icon, widget, statistics sync, font) apart from "Shortcuts", which only open settings elsewhere. The description of "Device statistics sync" is expanded: what it is for, an example, what is synchronized, what it leaves alone and when it runs.
 
