@@ -104,7 +104,9 @@ interface PlannerElevationSource {
  */
 class PlannerElevation(
     private val preferredZoom: Int = MapterhornEndpoints.GLOBAL_MAX_ZOOM,
-    private val fetcherFactory: (String) -> TerrainTileFetcher = { url -> openTerrainTileFetcher(url) ?: error("No terrain archive at $url") },
+    private val fetcherFactory: (String) -> TerrainTileFetcher = { url ->
+        openTerrainTileFetcher(url) ?: error("No terrain archive at $url")
+    },
     private val tileDecoder: (ByteArray) -> ElevationTile = { bytes -> decodeTerrariumTile(bytes) },
     private val ioContext: CoroutineDispatcher = ioDispatcher,
     private val cacheCapacity: Int = DEFAULT_CACHE_TILES,

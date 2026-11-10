@@ -47,10 +47,10 @@ import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.NodeSortOption
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
-import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.DeviceHardwareRepository

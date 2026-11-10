@@ -40,8 +40,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.koin.compose.koinInject
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.navigation.DiscoveryRoute
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.Route

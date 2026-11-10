@@ -46,8 +46,8 @@ import org.meshtastic.core.resources.config_security_private_key
 import org.meshtastic.core.resources.config_security_private_key_remote
 import org.meshtastic.core.resources.direct_message_key
 import org.meshtastic.core.resources.logs
-import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.managed_mode_recovery
+import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.redacted
 import org.meshtastic.core.resources.regenerate_keys_confirmation
 import org.meshtastic.core.resources.regenerate_private_key

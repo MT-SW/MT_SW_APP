@@ -143,6 +143,7 @@ fun RouteDiscovery.withLikelyLastRelay(relayNode: Int, nodes: Collection<Node>, 
 
 private const val RELAY_BYTE_MASK = 0xFF
 private const val MIN_BACK_ROUTE = 3
+
 /** The suffix the node DB already appends to a long name that arrived over MQTT. */
 private const val MQTT_MARK = "(MQTT)"
 
