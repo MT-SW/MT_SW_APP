@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje (Android, komputer, iPhone/iPad): czas „ostatnio słyszany” (lista węzłów, szczegóły, mapa, powiadomienie adaptacyjne, opis dla TalkBack) jest po polsku, np. „15 min temu”, „2 godz. temu”, „3 dn. temu”. Wcześniej komputer i iPhone pokazywały zawsze angielskie „ago”, a Android język systemu telefonu zamiast języka ustawionego w aplikacji.
 * iPhone i iPad: asystent nie pokazuje już na górze odpowiedzi pustych znaczników myślenia modelu (`<think>`). Komenda `/sprzet` działa też na iPhonie: pokazuje model, jego rozmiar i pamięć, gdzie działa (procesor lub GPU), okno tekstu oraz system, liczbę rdzeni i pamięć urządzenia.
 * iPhone i iPad: najstarszy obsługiwany system to teraz iOS 17 (wcześniej 16). Biblioteka silnika AI wymagała i tak iOS 16.4, co dawało ostrzeżenie przy budowaniu; usunięte też ostrzeżenie o braku identyfikatora biblioteki.
 * iPhone i iPad: powiadomienia o wiadomościach znów mają dźwięk, gdy telefon jest zablokowany lub aplikacja jest w tle. Wcześniej aplikacja uznawała się zawsze za otwartą, więc każde powiadomienie było ciche (dźwięk grał tylko na zegarku). Nowe ustawienie „Dźwięk powiadomień, gdy aplikacja jest otwarta” (Ustawienia → Powiadomienia), domyślnie wyłączone. Używany jest dźwięk systemowy; głośność zależy od głośności dzwonka w telefonie.
@@ -577,6 +578,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions (Android, desktop, iPhone/iPad): the "last heard" time (node list, details, map, adaptive notification, TalkBack description) now follows the language set in the app, e.g. "15 min ago", "2 h ago", "3 d ago". Before, desktop and iPhone always showed English "ago", and Android used the phone's system language instead of the app's.
 * iPhone and iPad: the assistant no longer shows the model's empty thinking marks (`<think>`) at the top of an answer. The `/sprzet` command works on iPhone too: it shows the model, its size and memory, where it runs (processor or GPU), the context window, and the device's system, cores and memory.
 * iPhone and iPad: the oldest supported system is now iOS 17 (it was 16). The AI engine library needed iOS 16.4 anyway, which gave a build warning; the warning about the missing library identifier is gone too.
 * iPhone and iPad: message notifications play a sound again when the phone is locked or the app is in the background. The app used to treat itself as always open, so every notification was quiet (the sound played only on the watch). A new setting "Notification sound while the app is open" (Settings → Notifications), off by default. The system sound is used; the volume follows the phone's ringer volume.

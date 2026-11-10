@@ -17,42 +17,68 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.last_heard_ago_d
+import org.meshtastic.core.resources.last_heard_ago_h
+import org.meshtastic.core.resources.last_heard_ago_min
 import org.meshtastic.core.resources.now
 import org.meshtastic.core.resources.unknown
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+private const val HOURS_PER_DAY = 24
+
 /**
- * Formats a given Unix timestamp (in seconds) into a relative "time ago" string.
- *
- * For durations less than a minute, it returns [nowText]. For longer durations, it uses DateFormatter to generate a
- * concise, localized representation (e.g., "5m ago", "2h ago").
+ * Texts for [formatAgo], resolved from the app's language (not the system's) on every platform. The three unit
+ * templates carry one `%1$d`; they are abbreviations, so they need no plural forms.
+ */
+@Immutable
+class AgoLabels(
+    val unknown: String,
+    val now: String,
+    val minutes: String,
+    val hours: String,
+    val days: String,
+)
+
+/** Resolves [AgoLabels] from the string resources in the language set in the app. */
+@Composable
+fun rememberAgoLabels(): AgoLabels = AgoLabels(
+    unknown = stringResource(Res.string.unknown),
+    now = stringResource(Res.string.now),
+    minutes = stringResource(Res.string.last_heard_ago_min),
+    hours = stringResource(Res.string.last_heard_ago_h),
+    days = stringResource(Res.string.last_heard_ago_d),
+)
+
+private fun String.withNumber(n: Long): String = replace("%1\$d", n.toString())
+
+/**
+ * Formats a given Unix timestamp (in seconds) into a relative "time ago" string in the app's language, e.g. "5 min
+ * temu", "2 godz. temu", "3 dn. temu". Under a minute it returns [AgoLabels.now].
  *
  * @param lastSeenUnixSeconds The Unix timestamp in seconds to be formatted.
- * @param unknownText Text to display when the timestamp is invalid (≤ 0).
- * @param nowText Text to display when the duration is less than a minute.
- * @return A [String] representing the relative time that has passed.
+ * @param labels Localized texts, see [rememberAgoLabels].
  */
-fun formatAgo(lastSeenUnixSeconds: Int, unknownText: String, nowText: String): String {
-    if (lastSeenUnixSeconds <= 0) return unknownText
+fun formatAgo(lastSeenUnixSeconds: Int, labels: AgoLabels): String {
+    if (lastSeenUnixSeconds <= 0) return labels.unknown
 
     val lastSeenDuration = lastSeenUnixSeconds.seconds
-    val currentDuration = nowMillis.milliseconds
-    val diff = (currentDuration - lastSeenDuration).absoluteValue
+    val diff = (nowMillis.milliseconds - lastSeenDuration).absoluteValue
 
-    return if (diff < 1.minutes) {
-        nowText
-    } else {
-        DateFormatter.formatRelativeTime(lastSeenDuration.inWholeMilliseconds)
+    return when {
+        diff < 1.minutes -> labels.now
+        diff < 1.hours -> labels.minutes.withNumber(diff.inWholeMinutes)
+        diff < HOURS_PER_DAY.hours -> labels.hours.withNumber(diff.inWholeHours)
+        else -> labels.days.withNumber(diff.inWholeDays)
     }
 }
 
 /** Composable convenience overload that resolves string resources automatically. */
 @Composable
-fun formatAgo(lastSeenUnixSeconds: Int): String =
-    formatAgo(lastSeenUnixSeconds, stringResource(Res.string.unknown), stringResource(Res.string.now))
+fun formatAgo(lastSeenUnixSeconds: Int): String = formatAgo(lastSeenUnixSeconds, rememberAgoLabels())

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.common.util.formatString
+import org.meshtastic.core.ui.util.AgoLabels
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.feature.map.trackFadeAlpha
 import org.meshtastic.feature.map.trackRecency
@@ -149,7 +150,7 @@ private fun MutableList<Vec3>.extend(leg: List<Vec3>) {
 internal class RouteLabels(val skippedTemplate: String, val snrTemplate: String)
 
 /** The words a track's time tags fall back on, read in composition like [RouteLabels]. */
-internal class TrackLabels(val unknown: String, val now: String)
+internal class TrackLabels(val ago: AgoLabels)
 
 /** A small label on a dark plate, centered on [at]. */
 private fun DrawScope.drawTag(text: String, at: Offset, textMeasurer: TextMeasurer, style: TextStyle) {
@@ -298,7 +299,7 @@ internal fun DrawScope.drawTrack(
         // Two tags that close would overlap; the first, the oldest, wins.
         if (placed.any { (it - at).getDistance() < minGap }) return@forEach
         placed += at
-        val text = formatAgo(time.toInt(), labels.unknown, labels.now)
+        val text = formatAgo(time.toInt(), labels.ago)
         drawTag(text, at - Offset(0f, TagLift.toPx()), textMeasurer, labelStyle)
     }
 }

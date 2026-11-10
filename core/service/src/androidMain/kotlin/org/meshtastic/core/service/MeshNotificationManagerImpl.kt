@@ -57,7 +57,6 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
 import org.meshtastic.core.common.state.RadioOperation
 import org.meshtastic.core.common.state.RadioOperationLock
-import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -111,6 +110,9 @@ import org.meshtastic.core.resources.live_update_cpu
 import org.meshtastic.core.resources.live_update_direct
 import org.meshtastic.core.resources.live_update_distance
 import org.meshtastic.core.resources.live_update_flash
+import org.meshtastic.core.resources.last_heard_ago_d
+import org.meshtastic.core.resources.last_heard_ago_h
+import org.meshtastic.core.resources.last_heard_ago_min
 import org.meshtastic.core.resources.live_update_heard
 import org.meshtastic.core.resources.live_update_heard_now
 import org.meshtastic.core.resources.live_update_hops
@@ -237,7 +239,6 @@ class MeshNotificationManagerImpl(
         private const val SECONDS_PER_MINUTE = 60L
         private const val SECONDS_PER_HOUR = 3_600L
         private const val SECONDS_PER_DAY = 86_400L
-        private const val MILLIS_PER_SECOND = 1_000L
     }
 
     private data class ServiceNotificationSnapshot(
@@ -1074,7 +1075,7 @@ class MeshNotificationManagerImpl(
                     ),
                 )
             }
-            heardSecondsAgo?.let { add(heardText(node.lastHeard, it)) }
+            heardSecondsAgo?.let { add(heardText(it)) }
             if (node.user.role != Config.DeviceConfig.Role.CLIENT) {
                 add(getStringSuspend(Res.string.live_update_role, node.user.role.name))
             }
@@ -1230,13 +1231,18 @@ class MeshNotificationManagerImpl(
         getStringSuspend(Res.string.local_stats_battery, level)
     }
 
-    private suspend fun heardText(lastHeard: Int, secondsAgo: Long): String = if (secondsAgo < SECONDS_PER_MINUTE) {
+    private suspend fun heardText(secondsAgo: Long): String = if (secondsAgo < SECONDS_PER_MINUTE) {
         getStringSuspend(Res.string.live_update_heard_now)
     } else {
-        getStringSuspend(
-            Res.string.live_update_heard,
-            DateFormatter.formatRelativeTime(lastHeard.toLong() * MILLIS_PER_SECOND),
-        )
+        val agoText =
+            when {
+                secondsAgo < SECONDS_PER_HOUR ->
+                    getStringSuspend(Res.string.last_heard_ago_min, secondsAgo / SECONDS_PER_MINUTE)
+                secondsAgo < SECONDS_PER_DAY ->
+                    getStringSuspend(Res.string.last_heard_ago_h, secondsAgo / SECONDS_PER_HOUR)
+                else -> getStringSuspend(Res.string.last_heard_ago_d, secondsAgo / SECONDS_PER_DAY)
+            }
+        getStringSuspend(Res.string.live_update_heard, agoText)
     }
 
     /** One unit is enough for the status-bar chip, which the platform cuts at a few characters. */

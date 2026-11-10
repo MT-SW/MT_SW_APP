@@ -35,7 +35,9 @@ import org.meshtastic.core.resources.a11y_node_signal
 import org.meshtastic.core.resources.node_incomplete
 import org.meshtastic.core.resources.now
 import org.meshtastic.core.resources.unknown
+import org.meshtastic.core.ui.util.AgoLabels
 import org.meshtastic.core.ui.util.formatAgo
+import org.meshtastic.core.ui.util.rememberAgoLabels
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 
 private const val MAX_BATTERY_PERCENT = 100
@@ -55,6 +57,7 @@ internal data class NodeDescriptionStrings(
     val unknown: String,
     val now: String,
     val incomplete: String,
+    val ago: AgoLabels = AgoLabels(unknown, now, "%1\$d min", "%1\$d h", "%1\$d d"),
 )
 
 /** Resolves [NodeDescriptionStrings] from Compose string resources, with the hop count's plural for [hopsAway]. */
@@ -72,6 +75,7 @@ internal fun rememberNodeDescriptionStrings(hopsAway: Int): NodeDescriptionStrin
     unknown = stringResource(Res.string.unknown),
     now = stringResource(Res.string.now),
     incomplete = stringResource(Res.string.node_incomplete),
+    ago = rememberAgoLabels(),
 )
 
 /** Builds a TalkBack-friendly description aggregating node state. Shared between [NodeItem] and [NodeItemCompact]. */
@@ -106,7 +110,7 @@ internal fun buildNodeDescription(
     if (lastHeard > 0) {
         val timeText =
             if (lastHeardIsRelative) {
-                formatAgo(lastHeard, strings.unknown, strings.now)
+                formatAgo(lastHeard, strings.ago)
             } else {
                 DateFormatter.formatDateTime(lastHeard.toLong() * TimeConstants.MS_PER_SEC)
             }
