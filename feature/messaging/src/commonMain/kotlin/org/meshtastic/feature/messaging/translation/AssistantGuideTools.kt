@@ -27,6 +27,8 @@
 
 package org.meshtastic.feature.messaging.translation
 
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -114,28 +116,27 @@ import org.meshtastic.core.resources.ui_scale
 
 /** Collects the buttons the assistant wants to show under its next answer. */
 class AssistantActionCollector {
+    private val lock = SynchronizedObject()
     private val actions = ArrayList<AssistantAction>()
 
-    @Synchronized
-    fun add(action: AssistantAction) {
+    fun add(action: AssistantAction) = synchronized(lock) {
         if (actions.size < MAX_ACTIONS && actions.none { it.uri == action.uri && it.highlight == action.highlight }) {
             actions += action
         }
     }
 
-    @Synchronized fun size(): Int = actions.size
+    fun size(): Int = synchronized(lock) { actions.size }
 
     /** The newest button, or null. */
-    @Synchronized fun last(): AssistantAction? = actions.lastOrNull()
+    fun last(): AssistantAction? = synchronized(lock) { actions.lastOrNull() }
 
     /** The newest button opens by itself right after the answer (the user asked to go there). */
-    @Synchronized
-    fun autoOpenLast() {
+    fun autoOpenLast() = synchronized(lock) {
         if (actions.isNotEmpty()) actions[actions.lastIndex] = actions.last().copy(auto = true)
     }
 
     /** Returns the collected buttons and forgets them. */
-    @Synchronized fun drain(): List<AssistantAction> = actions.toList().also { actions.clear() }
+    fun drain(): List<AssistantAction> = synchronized(lock) { actions.toList().also { actions.clear() } }
 
     private companion object {
         const val MAX_ACTIONS = 4
@@ -150,6 +151,42 @@ class AssistantActionCollector {
 @Suppress("FunctionName", "LargeClass")
 class AssistantGuideTools(private val data: AssistantDataProvider, private val collector: AssistantActionCollector) :
     AiToolSet {
+
+    override fun specs(): List<AiToolSpec> =
+        listOf(
+        AiToolSpec(
+            name = "open_screen",
+            description = "Adds a button that opens a screen of the app (settings pages such as LoRa, device, display, bluetooth, network, " +
+            "position, power, MQTT, telemetry, MT_SW features, or the nodes, map, messages, channels, connections, " +
+            "firmware and local mesh discovery screens). Use it when the user asks where something is or wants to open a screen.",
+            params = listOf(AiToolSpec.Param("screen", "Name of the screen, for example \"lora\", \"display\", \"map\", \"nodes\"")),
+        ) { a -> open_screen(a["screen"].orEmpty()) },
+        AiToolSpec(
+            name = "show_setting",
+            description = "Adds a button that opens the page of a radio or app setting and makes that setting blink with a yellow frame. " +
+            "Use it for questions like where a setting is or how to change it (region, preset, hop limit, role, " +
+            "screen timeout, Wi-Fi, MQTT, telemetry interval, app scale, theme, language, ...). It cannot change the setting.",
+            params = listOf(AiToolSpec.Param("setting", "What the user wants to find, for example \"hop limit\", \"app scale\", \"region\"")),
+        ) { a -> show_setting(a["setting"].orEmpty()) },
+        AiToolSpec(
+            name = "show_node_on_map",
+            description = "Adds a button that shows a node on the map. Give the node's short or long name, or \"me\" for the own node.",
+            params = listOf(AiToolSpec.Param("node", "Node name")),
+        ) { a -> show_node_on_map(a["node"].orEmpty()) },
+        AiToolSpec(
+            name = "open_link_planner",
+            description = "Adds a button that opens the link planner (range and terrain calculation) on the map for a node. Use it when the " +
+            "user wants to check range or a radio link to or from a node.",
+            params = listOf(AiToolSpec.Param("node", "Node name, or \"me\"")),
+        ) { a -> open_link_planner(a["node"].orEmpty()) },
+        AiToolSpec(
+            name = "draft_message",
+            description = "Prepares a message: adds a button that opens the conversation with the text already in the message box. The " +
+            "message is NOT sent; the user checks it and sends it himself. Use it when the user asks to write or send a message.",
+            params = listOf(AiToolSpec.Param("text", "The text of the message"), AiToolSpec.Param("to", "Channel name or number, or a node name for a direct message; the word main for the main channel")),
+        ) { a -> draft_message(a["text"].orEmpty(), a["to"].orEmpty()) },
+        )
+
 
     @AiTool(
         description =

@@ -177,6 +177,7 @@ class FdroidAiModule {
         uiPrefs,
         data,
         memoryStore = memory,
+        testReports = org.meshtastic.feature.messaging.translation.JvmAssistantTestReports(),
         knowledge = UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge"), uiPrefs),
     )
 

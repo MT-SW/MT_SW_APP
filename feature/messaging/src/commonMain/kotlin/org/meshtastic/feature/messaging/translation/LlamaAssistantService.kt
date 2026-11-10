@@ -44,6 +44,7 @@
 
 package org.meshtastic.feature.messaging.translation
 
+import org.meshtastic.core.common.util.nowMillis
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,11 +99,12 @@ import org.meshtastic.core.resources.assistant_web_used
  */
 class LlamaAssistantService(
     private val engine: AiTextEngine,
-    private val store: AiModelStoreImpl,
+    private val store: org.meshtastic.core.repository.AiModelStore,
     private val uiPrefs: UiPrefs,
     private val data: AssistantDataProvider,
     private val knowledge: AssistantKnowledge? = null,
     private val memoryStore: org.meshtastic.core.repository.AssistantMemory? = null,
+    private val testReports: AssistantTestReports? = null,
 ) : AssistantService {
 
     private val collector = AssistantActionCollector()
@@ -123,7 +125,7 @@ class LlamaAssistantService(
     private var memorized = 0
 
     // The language of the answer being written ("pl", "en", ...).
-    @Volatile private var answerLang = "pl"
+    @kotlin.concurrent.Volatile private var answerLang = "pl"
 
     /**
      * The language to answer in: Polish for Polish letters or plain Polish words, English for plain English words; when
@@ -159,7 +161,7 @@ class LlamaAssistantService(
         .ifEmpty { "en" }
 
     // How the router understood the newest question, for the test report.
-    @Volatile private var lastRoute = ""
+    @kotlin.concurrent.Volatile private var lastRoute = ""
 
     // The whole conversation as the router sees it: older turns are folded into a short summary (a few at a time), the
     // newest ones stay as short lines, so the assistant keeps the thread of a long conversation, not only the last
@@ -169,10 +171,10 @@ class LlamaAssistantService(
     private var convFolded = 0
 
     // The node talked about last in this conversation, so "a jaka jest tam bateria?" knows which node "tam" is.
-    @Volatile private var lastNode = ""
+    @kotlin.concurrent.Volatile private var lastNode = ""
 
     /** True while a test (/test, /szybki, ...) runs. */
-    @Volatile private var testRunning = false
+    @kotlin.concurrent.Volatile private var testRunning = false
 
     override suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {
         testRunning = true
@@ -255,7 +257,6 @@ class LlamaAssistantService(
                 } else {
                     "assistant-test-${command.trim('/')}-results.md"
                 }
-            val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), resultName) }.getOrNull()
             val report = StringBuilder("# Assistant test\n\nModel: $modelId, questions: ${questions.size}\n")
             var totalSeconds = 0L
             var previous: List<AssistantTurn> = emptyList()
@@ -319,7 +320,7 @@ class LlamaAssistantService(
                 }
                 println("===== ASSISTANT TEST ${i + 1}/${questions.size} =====$block")
                 report.append(block)
-                file?.let { f -> runCatching { f.writeText(report.toString()) } }
+                runCatching { testReports?.write(resultName, report.toString()) }
                 onResult(q.text, answer)
                 previous = history + AssistantTurn(false, text)
             }
@@ -366,7 +367,7 @@ class LlamaAssistantService(
                         "\n## T${i + 1}. ${c.from} -> ${c.to}\nTime: $seconds s\nText: ${c.text}\nTranslation: $out\nCheck: $verdict\n"
                     println("===== TRANSLATION TEST ${i + 1}/${cases.size} =====$block")
                     report.append(block)
-                    file?.let { f -> runCatching { f.writeText(report.toString()) } }
+                    runCatching { testReports?.write(resultName, report.toString()) }
                     onResult("${c.from} -> ${c.to}: ${c.text}", "$out\n($verdict)")
                 }
             }
@@ -390,8 +391,7 @@ class LlamaAssistantService(
                         "Average answer length: ${words / tookMs.size} words, speed: $perSecond words/s\n",
                 )
             }
-            file?.let { f -> runCatching { f.writeText(report.toString()) } }
-            val where = file?.takeIf { it.exists() }?.absolutePath ?: "(not saved)"
+            val where = runCatching { testReports?.write(resultName, report.toString()) }.getOrNull() ?: "(not saved)"
             println("===== ASSISTANT TEST DONE: $where =====")
             // The whole report also lands in the chat as the last answer, so it can be copied on any device (a phone
             // has no project folder to save it to).
@@ -460,9 +460,9 @@ class LlamaAssistantService(
                 store.download(model.id)
             }
             onStep(t("Sprawdzam dyktowanie…", "Checking dictation…"))
-            val started = System.currentTimeMillis()
+            val started = nowMillis
             val text = engine.transcribe(model.id, silentWav())
-            val took = System.currentTimeMillis() - started
+            val took = nowMillis - started
             t("Dyktowanie", "Dictation") +
                 ": " +
                 t("działa", "works") +
@@ -495,31 +495,23 @@ class LlamaAssistantService(
      */
     private fun silentWav(): ByteArray {
         val data = 32_000
-        val out = java.io.ByteArrayOutputStream()
-        fun i32(v: Int) {
-            out.write(v and 0xFF)
-            out.write((v shr 8) and 0xFF)
-            out.write((v shr 16) and 0xFF)
-            out.write((v shr 24) and 0xFF)
-        }
-        fun i16(v: Int) {
-            out.write(v and 0xFF)
-            out.write((v shr 8) and 0xFF)
-        }
-        out.write("RIFF".toByteArray())
-        i32(36 + data)
-        out.write("WAVE".toByteArray())
-        out.write("fmt ".toByteArray())
-        i32(16)
-        i16(1)
-        i16(1)
-        i32(16_000)
-        i32(32_000)
-        i16(2)
-        i16(16)
-        out.write("data".toByteArray())
-        i32(data)
-        out.write(ByteArray(data))
+        val out = ArrayList<Byte>(data + 44)
+        fun bytes(v: Int, count: Int) = repeat(count) { out.add(((v shr (8 * it)) and 0xFF).toByte()) }
+        fun text(t: String) = t.forEach { out.add(it.code.toByte()) }
+        text("RIFF")
+        bytes(36 + data, 4)
+        text("WAVE")
+        text("fmt ")
+        bytes(16, 4)
+        bytes(1, 2)
+        bytes(1, 2)
+        bytes(16_000, 4)
+        bytes(32_000, 4)
+        bytes(2, 2)
+        bytes(16, 2)
+        text("data")
+        bytes(data, 4)
+        repeat(data) { out.add(0) }
         return out.toByteArray()
     }
 
@@ -551,7 +543,7 @@ class LlamaAssistantService(
     }
 
     // Turned off for this run of the app when the model file cannot think quietly.
-    @Volatile private var thinkingWorks = true
+    @kotlin.concurrent.Volatile private var thinkingWorks = true
 
     // The model works on one thing at a time: an answer waits for a running notes update and the other way round.
     private val engineLock = kotlinx.coroutines.sync.Mutex()
@@ -2523,7 +2515,7 @@ class LlamaAssistantService(
     }
 
     /** Characters a second of the last answers (about 7 characters are a word); 0 = not measured yet. */
-    @Volatile private var charsPerSecond = 0.0
+    @kotlin.concurrent.Volatile private var charsPerSecond = 0.0
 
     /** True when the model on this device writes slowly: then the prompt is smaller and the answer shorter. */
     private val slow: Boolean

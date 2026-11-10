@@ -18,19 +18,15 @@
 
 package org.meshtastic.feature.messaging.translation
 
-import java.io.ByteArrayOutputStream
-import java.net.HttpURLConnection
-import java.net.InetAddress
-import java.net.URI
-import java.net.URL
-import java.net.URLDecoder
-import java.net.URLEncoder
 
 /**
  * The only door through which the assistant reaches the internet, used for web search, reading a page and for keeping
  * the knowledge about the app up to date. Only https, never to this computer or the local network, small answers, no
  * cookies and nothing about the user in the request except the text of the query itself.
  */
+/** The platform's web client: Java's HTTP on Android and the computer, Ktor on iPhone and iPad. */
+internal expect fun platformWebTransport(): WebAccess.Transport
+
 internal object WebAccess {
     private const val MAX_BYTES = 400_000
     private const val MAX_REDIRECTS = 3
@@ -73,6 +69,21 @@ internal object WebAccess {
         )
     private const val BROWSER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 
+    /** The answer of one request without redirects: [location] is set for a 3xx answer. */
+    class Response(val code: Int, val location: String?, val body: ByteArray)
+
+    /**
+     * The platform part: one plain GET, no redirects, at most [maxBytes] of the body, with the given timeouts.
+     * [resolvesToLocalNetwork] says whether the host name points to this device or the local network (null = unknown).
+     */
+    interface Transport {
+        fun get(url: String, accept: String, agent: String, maxBytes: Int): Response
+
+        fun resolvesToLocalNetwork(host: String): Boolean = false
+    }
+
+    private val transport: Transport by lazy { platformWebTransport() }
+
     /** Downloads [url] as text. Throws when the address is not allowed or the server does not answer properly. */
     fun fetch(
         url: String,
@@ -82,34 +93,13 @@ internal object WebAccess {
         var current = url
         repeat(MAX_REDIRECTS + 1) {
             checkAllowed(current)
-            @Suppress("DEPRECATION")
-            val connection = URL(current).openConnection() as HttpURLConnection
-            try {
-                connection.instanceFollowRedirects = false
-                connection.connectTimeout = CONNECT_MS
-                connection.readTimeout = READ_MS
-                connection.setRequestProperty("User-Agent", agent)
-                connection.setRequestProperty("Accept", accept)
-                val code = connection.responseCode
-                if (code in 300..399) {
-                    val next = connection.getHeaderField("Location") ?: error("Redirect without a target")
-                    current = URI(current).resolve(next).toString()
-                    return@repeat
-                }
-                if (code !in 200..299) error("HTTP $code")
-                val out = ByteArrayOutputStream()
-                connection.inputStream.use { stream ->
-                    val buffer = ByteArray(8192)
-                    while (out.size() < MAX_BYTES) {
-                        val read = stream.read(buffer)
-                        if (read < 0) break
-                        out.write(buffer, 0, read)
-                    }
-                }
-                return out.toString(Charsets.UTF_8.name())
-            } finally {
-                connection.disconnect()
+            val response = transport.get(current, accept, agent, MAX_BYTES)
+            if (response.code in 300..399) {
+                current = resolve(current, response.location ?: error("Redirect without a target"))
+                return@repeat
             }
+            if (response.code !in 200..299) error("HTTP ${response.code}")
+            return response.body.decodeToString()
         }
         error("Too many redirects")
     }
@@ -117,49 +107,42 @@ internal object WebAccess {
     /** Raw bytes of [url] for checks that need the exact content (same rules as [fetch]). */
     fun fetchBytes(url: String): ByteArray {
         checkAllowed(url)
-        @Suppress("DEPRECATION")
-        val connection = URL(url).openConnection() as HttpURLConnection
-        try {
-            connection.instanceFollowRedirects = false
-            connection.connectTimeout = CONNECT_MS
-            connection.readTimeout = READ_MS
-            connection.setRequestProperty("User-Agent", USER_AGENT)
-            if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
-            val out = ByteArrayOutputStream()
-            connection.inputStream.use { stream ->
-                val buffer = ByteArray(8192)
-                while (out.size() <= MAX_BYTES) {
-                    val read = stream.read(buffer)
-                    if (read < 0) break
-                    out.write(buffer, 0, read)
-                }
-            }
-            check(out.size() <= MAX_BYTES) { "File too large" }
-            return out.toByteArray()
-        } finally {
-            connection.disconnect()
-        }
+        val response = transport.get(url, "*/*", USER_AGENT, MAX_BYTES + 1)
+        if (response.code !in 200..299) error("HTTP ${response.code}")
+        check(response.body.size <= MAX_BYTES) { "File too large" }
+        return response.body
     }
 
     fun checkAllowed(url: String) {
-        val uri = URI(url)
-        require(uri.scheme.equals("https", ignoreCase = true)) { "Only https addresses are allowed" }
-        val host = uri.host ?: error("No host")
+        require(url.startsWith("https://", ignoreCase = true)) { "Only https addresses are allowed" }
+        val host = hostOf(url).ifEmpty { error("No host") }
         require(!host.equals("localhost", ignoreCase = true) && !host.endsWith(".local", ignoreCase = true)) {
             "Local addresses are not allowed"
         }
-        for (address in InetAddress.getAllByName(host)) {
-            require(
-                !address.isLoopbackAddress &&
-                    !address.isSiteLocalAddress &&
-                    !address.isLinkLocalAddress &&
-                    !address.isAnyLocalAddress &&
-                    !address.isMulticastAddress,
-            ) {
-                "Local addresses are not allowed"
-            }
-        }
+        require(!isLocalAddress(host) && !transport.resolvesToLocalNetwork(host)) { "Local addresses are not allowed" }
     }
+
+    /** True for an address written as numbers that points to this device or the local network. */
+    private fun isLocalAddress(host: String): Boolean {
+        if (host.contains(':')) {
+            val h = host.trim('[', ']').lowercase()
+            return h == "::1" || h == "::" || h.startsWith("fe80") || h.startsWith("fc") || h.startsWith("fd")
+        }
+        val parts = host.split('.').mapNotNull { it.toIntOrNull() }
+        if (parts.size != 4) return false
+        val (a, b) = parts
+        return a == 0 || a == 10 || a == 127 || (a == 169 && b == 254) || (a == 172 && b in 16..31) ||
+            (a == 192 && b == 168) || a >= 224
+    }
+
+    private fun resolve(base: String, next: String): String = when {
+        next.startsWith("https://", ignoreCase = true) || next.startsWith("http://", ignoreCase = true) -> next
+        next.startsWith("//") -> "https:$next"
+        next.startsWith("/") -> "https://" + hostPartOf(base) + next
+        else -> base.substringBefore('?').substringBeforeLast('/') + "/" + next
+    }
+
+    private fun hostPartOf(url: String): String = url.substringAfter("://").substringBefore('/').substringBefore('?')
 
     /** Plain readable text of an HTML page, without scripts, styles and tags. */
     fun htmlToText(html: String): String = html
@@ -198,7 +181,7 @@ internal object WebAccess {
     private fun searchWikipedia(query: String, limit: Int, language: String): List<String> {
         val address =
             "https://$language.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" +
-                URLEncoder.encode(query, Charsets.UTF_8.name()) +
+                percentEncode(query) +
                 "&gsrlimit=$limit&prop=extracts&exintro=1&explaintext=1&exsentences=4&redirects=1&format=json"
         val json = fetch(address, "application/json")
         val title = Regex(""""title":"((?:[^"\\]|\\.)*)"""")
@@ -225,7 +208,7 @@ internal object WebAccess {
                     null
                 } else {
                     "$name - https://$language.wikipedia.org/wiki/" +
-                        URLEncoder.encode(name.replace(' ', '_'), Charsets.UTF_8.name()) +
+                        percentEncode(name.replace(' ', '_')) +
                         "\n" +
                         text
                 }
@@ -272,7 +255,7 @@ internal object WebAccess {
     private fun searchDuckDuckGo(query: String, limit: Int): List<String> {
         val page =
             fetch(
-                "https://html.duckduckgo.com/html/?kl=pl-pl&q=" + URLEncoder.encode(query, Charsets.UTF_8.name()),
+                "https://html.duckduckgo.com/html/?kl=pl-pl&q=" + percentEncode(query),
                 agent = BROWSER_AGENT,
             )
         val links =
@@ -294,9 +277,49 @@ internal object WebAccess {
     /** DuckDuckGo wraps every result address in a redirect; this takes the real address out. */
     private fun realAddress(href: String): String {
         val wrapped = Regex("[?&]uddg=([^&]+)").find(href)?.groupValues?.get(1)
-        val decoded = wrapped?.let { URLDecoder.decode(it, Charsets.UTF_8.name()) } ?: href
+        val decoded = wrapped?.let { percentDecode(it) } ?: href
         return if (decoded.startsWith("//")) "https:$decoded" else decoded
     }
 
-    fun hostOf(url: String): String = runCatching { URI(url).host.orEmpty() }.getOrDefault("")
+    fun hostOf(url: String): String =
+        hostPartOf(url).substringAfter('@').let { if (it.startsWith("[")) it.substringBefore(']') + "]" else it.substringBefore(':') }
+
+    private const val HEX = "0123456789ABCDEF"
+
+    /** UTF-8 percent encoding (a space becomes +), like the form encoding of a query. */
+    private fun percentEncode(text: String): String = buildString {
+        for (b in text.encodeToByteArray()) {
+            val v = b.toInt() and 0xFF
+            val c = v.toChar()
+            when {
+                c.isLetterOrDigit() && v < 128 || c in "-_.~" -> append(c)
+                c == ' ' -> append('+')
+                else -> append('%').append(HEX[v shr 4]).append(HEX[v and 0xF])
+            }
+        }
+    }
+
+    private fun percentDecode(text: String): String {
+        val out = ArrayList<Byte>()
+        var i = 0
+        while (i < text.length) {
+            val c = text[i]
+            val code = if (c == '%' && i + 2 < text.length) text.substring(i + 1, i + 3).toIntOrNull(16) else null
+            when {
+                code != null -> {
+                    out.add(code.toByte())
+                    i += 3
+                }
+                c == '+' -> {
+                    out.add(' '.code.toByte())
+                    i++
+                }
+                else -> {
+                    out.addAll(c.toString().encodeToByteArray().toList())
+                    i++
+                }
+            }
+        }
+        return out.toByteArray().decodeToString()
+    }
 }

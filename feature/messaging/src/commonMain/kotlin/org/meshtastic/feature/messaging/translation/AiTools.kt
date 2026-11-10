@@ -36,7 +36,10 @@ annotation class AiTool(val description: String)
 annotation class AiToolParam(val name: String, val description: String)
 
 /** A class whose [AiTool] functions can be offered to a model (they all take text and return text). */
-interface AiToolSet
+interface AiToolSet {
+    /** The tools of this set as ready-to-offer specs (written out by hand: no reflection, it must work on every platform). */
+    fun specs(): List<AiToolSpec>
+}
 
 /** One tool as the model sees it, plus the code that runs when the model calls it. */
 class AiToolSpec(
@@ -69,19 +72,5 @@ class AiToolSpec(
     }
 }
 
-/** All [AiTool] functions of this set as ready-to-offer tools. */
-fun AiToolSet.toSpecs(): List<AiToolSpec> = javaClass.methods
-    .mapNotNull { method ->
-        val tool = method.getAnnotation(AiTool::class.java) ?: return@mapNotNull null
-        val params = method.parameterAnnotations.map { a -> a.filterIsInstance<AiToolParam>().firstOrNull() }
-        if (params.any { it == null }) return@mapNotNull null
-        AiToolSpec(
-            name = method.name,
-            description = tool.description,
-            params = params.map { AiToolSpec.Param(it!!.name, it.description) },
-        ) { arguments ->
-            val values = params.map { arguments[it!!.name].orEmpty() }.toTypedArray()
-            method.invoke(this, *values) as? String ?: ""
-        }
-    }
-    .sortedBy { it.name }
+/** All tools of this set, in name order. */
+fun AiToolSet.toSpecs(): List<AiToolSpec> = specs().sortedBy { it.name }

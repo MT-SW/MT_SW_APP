@@ -26,6 +26,11 @@ import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.AiPlatform
 import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.AssistantMemory
+import org.meshtastic.core.repository.ConnectionStateProvider
+import org.meshtastic.core.repository.MeshLogRepository
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.discovery.ai.AlgorithmicSummaryProvider
@@ -42,7 +47,9 @@ import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.IosAiModelStore
 import org.meshtastic.feature.messaging.translation.IosAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.IosAssistantMemory
-import org.meshtastic.feature.messaging.translation.IosAssistantService
+import org.meshtastic.feature.messaging.translation.IosAssistantTestReports
+import org.meshtastic.feature.messaging.translation.AssistantDataProvider
+import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.IosDictationService
 import org.meshtastic.feature.messaging.translation.IosEngineLog
 import org.meshtastic.feature.messaging.translation.IosLlamaEngine
@@ -84,12 +91,41 @@ class IosAiModule {
     @Single fun translatorModelManager(router: IosTranslationRouter): TranslatorModelManager = router
 
     @Single
+    fun assistantDataProvider(
+        nodeRepository: NodeRepository,
+        radioConfigRepository: RadioConfigRepository,
+        meshLogRepository: MeshLogRepository,
+        packetRepository: PacketRepository,
+        connection: ConnectionStateProvider,
+        uiPrefs: UiPrefs,
+    ): AssistantDataProvider = AssistantDataProvider(
+        nodeRepository,
+        radioConfigRepository,
+        meshLogRepository,
+        packetRepository,
+        connection,
+        null,
+    ) {
+        uiPrefs.currentInverted.value
+    }
+
+    @Single
     fun assistantService(
         engine: AiTextEngine,
         store: IosAiModelStore,
         uiPrefs: UiPrefs,
+        data: AssistantDataProvider,
         knowledge: AssistantKnowledge,
-    ): AssistantService = IosAssistantService(engine, store, uiPrefs, knowledge)
+        memory: AssistantMemory,
+    ): AssistantService = LlamaAssistantService(
+        engine,
+        store,
+        uiPrefs,
+        data,
+        memoryStore = memory,
+        knowledge = knowledge,
+        testReports = IosAssistantTestReports(),
+    )
 
     @Single
     fun dictationService(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): DictationService =

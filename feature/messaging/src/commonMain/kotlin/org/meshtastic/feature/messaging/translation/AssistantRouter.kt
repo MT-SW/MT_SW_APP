@@ -117,11 +117,11 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         return intent
     }
 
-    @Volatile private var brokenModel = ""
+    @kotlin.concurrent.Volatile private var brokenModel = ""
 
-    @Volatile private var failures = 0
+    @kotlin.concurrent.Volatile private var failures = 0
 
-    @Volatile private var skipped = 0
+    @kotlin.concurrent.Volatile private var skipped = 0
 
     private fun parse(raw: String): AssistantIntent? {
         val start = raw.indexOf('{')
