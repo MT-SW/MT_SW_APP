@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: sprawdzanie nowych wersji aplikacji (jak na Androidzie i komputerze): minutę po starcie i potem dwa razy na dobę, z powiadomieniem i oknem z przyciskiem do strony wydań; włączane i wyłączane w ustawieniach aktualizacji.
+* iPhone, iPad i komputer: raport Discovery eksportuje się teraz do PDF (wcześniej tylko tekst), tak jak na Androidzie. Litery spoza zachodnioeuropejskich (np. „ł”) są w PDF zapisane bez ogonków.
 * Android: nowy widżet „Statystyki MT_SW” (4x2) z tymi samymi liniami co stałe powiadomienie (cała sieć albo jeden śledzony węzeł, zależnie od wyświetlania adaptacyjnego). Dane dla widżetów Androida i iPhone'a pochodzą teraz z jednego wspólnego kodu, więc pokazują dokładnie to samo.
 * iPhone i iPad: asystent sam odświeża swoją wiedzę o aplikacji z internetu (raz na dobę, tylko gdy włączony jest dostęp asystenta do internetu; pliki sprawdzane sumą kontrolną), tak jak na Androidzie i komputerze. Lokalizacja telefonu (CoreLocation) jest teraz dostępna dla całej aplikacji, np. dla podpowiedzi regionu LoRa u asystenta.
 * iPhone i iPad: pełny asystent AI jak na Androidzie i komputerze: te same narzędzia (przewodnik, pokazywanie ustawień i węzłów na mapie, szkic wiadomości, wyszukiwanie w internecie i czytanie stron), pamięć, historia, samotest (`/test`, `/sprzet`) i dane o sieci. Kod asystenta jest teraz wspólny dla wszystkich systemów; na iPhonie internet idzie przez systemowy klient sieci (tylko https, bez adresów lokalnych), a pliki z wynikami testów trafiają do folderu dokumentów aplikacji.
@@ -586,6 +588,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* iPhone and iPad: checking for new app versions (like on Android and desktop): a minute after the start and then twice a day, with a notification and a window with a button to the releases page; switched on and off in the update settings.
+* iPhone, iPad and desktop: the Discovery report now exports to PDF (text only before), like on Android. Letters outside Western European (e.g. Polish "ł") are written without accents in the PDF.
 * Android: new "MT_SW statistics" widget (4x2) with the same lines as the permanent notification (the whole mesh or one tracked node, depending on the adaptive display). The data for the Android and iPhone widgets now comes from one shared piece of code, so they show exactly the same.
 * iPhone and iPad: the assistant refreshes its knowledge about the app from the internet by itself (once a day, only when the assistant's internet access is on; files are checked with a checksum), like on Android and desktop. The phone's location (CoreLocation) is now available to the whole app, e.g. for the assistant's LoRa region advice.
 * iPhone and iPad: the full AI assistant like on Android and desktop: the same tools (guide, showing settings and nodes on the map, message draft, web search and reading pages), memory, history, self-test (`/test`, `/sprzet`) and mesh data. The assistant code is now shared by all systems; on iPhone the internet goes through the system network client (https only, no local addresses), and test result files go to the app's documents folder.

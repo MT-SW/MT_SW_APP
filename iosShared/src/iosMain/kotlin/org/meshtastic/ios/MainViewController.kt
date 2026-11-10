@@ -101,6 +101,7 @@ fun MainViewController() = ComposeUIViewController(
         MeshServiceLifecycle()
         BackgroundCleanup()
         WidgetPublishing()
+        AppUpdateLifecycle()
         ThemedApp(uiViewModel)
     }
 }

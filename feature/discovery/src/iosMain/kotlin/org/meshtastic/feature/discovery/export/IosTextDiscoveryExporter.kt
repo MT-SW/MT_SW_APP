@@ -16,11 +16,9 @@
  */
 package org.meshtastic.feature.discovery.export
 
-import org.koin.core.annotation.Single
 
 private const val SEPARATOR_LENGTH = 60
 
-@Single
 class IosTextDiscoveryExporter : DiscoveryExporter {
 
     @Suppress("TooGenericExceptionCaught")
