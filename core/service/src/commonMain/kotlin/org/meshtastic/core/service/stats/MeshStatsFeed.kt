@@ -176,7 +176,13 @@ class MeshStatsFeed(
         }
         val others = nodes.nodeDBbyNum.value.values.filter { it.num != our?.num }
         val favorites = others.filter { it.isFavorite }.sortedBy { it.effectiveLongName }.take(CARD_LIMIT)
-        val rest = others.filter { !it.isFavorite && it.lastHeard > 0 }.sortedByDescending { it.lastHeard }
+        val picked = uiPrefs.widgetOthersPicked.value
+        val limit = uiPrefs.widgetOthersLimit.value.let { if (it <= 0) CARD_LIMIT else it }
+        // Hand-picked nodes win; otherwise the latest `limit` (0 in the setting means all of them).
+        val rest =
+            others
+                .filter { !it.isFavorite && it.lastHeard > 0 && (picked.isEmpty() || it.num in picked) }
+                .sortedByDescending { it.lastHeard }
         return MeshStatsSnapshot(
             title,
             chip,
@@ -184,12 +190,12 @@ class MeshStatsFeed(
             lines,
             groups,
             favorites = favorites.map { card(it) },
-            others = rest.take(CARD_LIMIT).map { card(it) },
+            others = rest.take(limit).map { card(it) },
             network =
             others
-                .filter { it.lastHeard > 0 }
+                .filter { it.lastHeard > 0 && (picked.isEmpty() || it.num in picked || it.isFavorite) }
                 .sortedByDescending { it.lastHeard }
-                .take(CARD_LIMIT)
+                .take(limit.coerceAtLeast(favorites.size))
                 .map { card(it) },
             shortName = ownShort,
             color = ownColors?.second ?: 0,

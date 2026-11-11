@@ -16,7 +16,28 @@
  */
 package org.meshtastic.feature.settings.liveupdate
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.widget_others_all
+import org.meshtastic.core.resources.widget_others_clear
+import org.meshtastic.core.resources.widget_others_info
+import org.meshtastic.core.resources.widget_others_latest
+import org.meshtastic.core.resources.widget_others_pick
+import org.meshtastic.core.resources.widget_others_pick_title
+import org.meshtastic.core.resources.widget_others_picked_summary
+import org.meshtastic.core.resources.widget_others_title
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -115,4 +136,87 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
             onDismiss = { chooser = 0 },
         )
     }
+    WidgetOthersItem()
+}
+
+private val OTHERS_LIMITS = listOf(10, 20, 50, 100)
+
+/** MT_SW: how many other nodes the widget rotates through: all, the latest N, or nodes picked by hand. */
+@Composable
+private fun WidgetOthersItem() {
+    val uiPrefs: UiPrefs = koinInject()
+    val limit by uiPrefs.widgetOthersLimit.collectAsStateWithLifecycle()
+    val picked by uiPrefs.widgetOthersPicked.collectAsStateWithLifecycle()
+    var dialog by rememberSaveable { mutableIntStateOf(0) }
+    val summary =
+        when {
+            picked.isNotEmpty() -> stringResource(Res.string.widget_others_picked_summary, picked.size)
+            limit > 0 -> stringResource(Res.string.widget_others_latest, limit)
+            else -> stringResource(Res.string.widget_others_all)
+        }
+    BasicListItem(
+        text = stringResource(Res.string.widget_others_title),
+        supportingText = summary,
+        leadingIcon = MeshtasticIcons.Notifications,
+        trailingContent = MeshtasticIcons.ChevronRight.icon(),
+        onClick = { dialog = 1 },
+    )
+    if (dialog == 1) {
+        val choices = linkedMapOf<String, () -> Unit>()
+        choices[stringResource(Res.string.widget_others_all)] = {
+            uiPrefs.setWidgetOthersLimit(0)
+            uiPrefs.setWidgetOthersPicked(emptySet())
+        }
+        OTHERS_LIMITS.forEach { n ->
+            choices[stringResource(Res.string.widget_others_latest, n)] = {
+                uiPrefs.setWidgetOthersLimit(n)
+                uiPrefs.setWidgetOthersPicked(emptySet())
+            }
+        }
+        choices[stringResource(Res.string.widget_others_pick)] = { dialog = 2 }
+        MeshtasticDialog(
+            title = stringResource(Res.string.widget_others_title),
+            message = stringResource(Res.string.widget_others_info),
+            choices = choices,
+            onDismiss = { if (dialog == 1) dialog = 0 },
+        )
+    }
+    if (dialog == 2) WidgetOthersPicker(picked = picked, onDone = { dialog = 0 })
+}
+
+@Composable
+private fun WidgetOthersPicker(picked: Set<Int>, onDone: () -> Unit) {
+    val uiPrefs: UiPrefs = koinInject()
+    val nodes: NodeRepository = koinInject()
+    val all by nodes.nodeDBbyNum.collectAsStateWithLifecycle()
+    val list = remember(all) { all.values.filter { !it.isFavorite }.sortedBy { it.effectiveLongName.lowercase() } }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(stringResource(Res.string.widget_others_pick_title)) },
+        text = {
+            LazyColumn {
+                items(list, key = { it.num }) { node ->
+                    val on = node.num in picked
+                    Row(
+                        modifier =
+                        Modifier.fillMaxWidth()
+                            .clickable {
+                                uiPrefs.setWidgetOthersPicked(if (on) picked - node.num else picked + node.num)
+                            }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(checked = on, onCheckedChange = null)
+                        Text(node.effectiveLongName, modifier = Modifier.padding(start = 12.dp), maxLines = 1)
+                    }
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { uiPrefs.setWidgetOthersPicked(emptySet()) }) {
+                Text(stringResource(Res.string.widget_others_clear))
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(stringResource(Res.string.close)) } },
+    )
 }

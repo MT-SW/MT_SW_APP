@@ -650,7 +650,6 @@ private fun ApplicationScope.MeshtasticWindow(
                             // Still reading the stored consent: show nothing rather than flash the notice.
                         } else if (dataNoticeAcceptedAt == 0L) {
                             DataNoticeScreen(
-                                offerWipe = introCompleted,
                                 onAccept = { uiViewModel.onDataNoticeAccepted() },
                             )
                         } else if (introCompleted) {

@@ -209,6 +209,16 @@ interface UiPrefs {
 
     fun setAndroidWidgetSecond(content: Int)
 
+    /** MT_SW: how many other nodes the widgets rotate through: 0 is all of them, any other number is the latest N. */
+    val widgetOthersLimit: StateFlow<Int>
+
+    fun setWidgetOthersLimit(limit: Int)
+
+    /** MT_SW: when not empty, the widgets show only these other nodes (chosen by hand) and ignore the limit. */
+    val widgetOthersPicked: StateFlow<Set<Int>>
+
+    fun setWidgetOthersPicked(nodeNums: Set<Int>)
+
     /** MT_SW: the import / share / add-contact button sits in the top bar instead of floating over the list. */
     val importMenuInTopBar: StateFlow<Boolean>
 

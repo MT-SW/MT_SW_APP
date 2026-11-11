@@ -859,6 +859,7 @@ data_notice_settings_title
 data_notice_shortcut_summary
 data_notice_title
 data_notice_wait
+data_wipe_back
 data_wipe_body
 data_wipe_cancel
 data_wipe_close_only
@@ -3510,6 +3511,14 @@ widget_no_nodes
 widget_node_tracker_choose
 widget_node_tracker_not_found
 widget_node_tracker_title
+widget_others_all
+widget_others_clear
+widget_others_info
+widget_others_latest
+widget_others_pick
+widget_others_pick_title
+widget_others_picked_summary
+widget_others_title
 widget_packets_bad
 widget_packets_dropped
 widget_packets_received

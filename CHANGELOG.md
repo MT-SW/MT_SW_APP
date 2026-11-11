@@ -130,6 +130,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
+* Widżet: nowe ustawienie „Inne węzły w widżecie”: wszystkie (domyślnie), ostatnie 10/20/50/100 albo węzły wybrane ręcznie z listy.
+* Zgoda na warunki: dopisano, że jedyne dane, jakie mogą trafić do deweloperów, to logi z aplikacji lub naszego innego oprogramowania udostępnione przez Ciebie dobrowolnie w celu diagnozy. „Nie zgadzam się” zawsze otwiera osobne ostrzeżenie z odliczaniem 10 s przed usunięciem danych; można też wrócić do zgody albo tylko zamknąć aplikację.
 * Mapa: dotknięcie dymka z nazwą węzła działa na całym dymku, przy każdym przybliżeniu i obrocie mapy, tak samo na Androidzie, iPhonie i komputerze (trafienie liczone na ekranie, bez niewidocznych kółek na mapie).
 * Mapa: lista „Węzły w tej lokalizacji” jest zwarta (jeden wiersz na węzeł, bez powtarzania skróconej nazwy, cienkie separatory), a obszar dotyku węzła jest większy, więc łatwiej w niego trafić.
 * Widget: listy „Inny węzeł sieci” i całej sieci pokazują wszystkie węzły (wcześniej tylko 12). Karty węzłów mają odczyty czujników: temperaturę, wilgotność, ciśnienie oraz napięcie i natężenie z czujnika (nie systemowe).

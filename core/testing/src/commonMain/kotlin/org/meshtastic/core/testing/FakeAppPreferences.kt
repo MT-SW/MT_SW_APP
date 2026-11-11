@@ -420,6 +420,18 @@ class FakeUiPrefs : UiPrefs {
         androidWidgetSecond.value = content
     }
 
+    override val widgetOthersLimit = MutableStateFlow(0)
+
+    override fun setWidgetOthersLimit(limit: Int) {
+        widgetOthersLimit.value = limit
+    }
+
+    override val widgetOthersPicked = MutableStateFlow(emptySet<Int>())
+
+    override fun setWidgetOthersPicked(nodeNums: Set<Int>) {
+        widgetOthersPicked.value = nodeNums
+    }
+
     override val androidWidgetNode = MutableStateFlow(0)
 
     override fun setAndroidWidgetNode(nodeNum: Int) {

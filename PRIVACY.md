@@ -17,7 +17,7 @@
 
 ## Jakie dane przetwarza i po co
 
-Wszystko jest zapisane lokalnie na twoim urządzeniu (wiadomości, węzły, ustawienia, logi), dopóki sam tego nie usuniesz.
+Wszystko jest zapisane lokalnie na twoim urządzeniu (wiadomości, węzły, ustawienia, logi), dopóki sam tego nie usuniesz. Jedyne dane, jakie mogą trafić do deweloperów, to logi z aplikacji lub naszego innego oprogramowania, które sam(a) dobrowolnie udostępnisz w celu diagnozy problemów.
 
 - **Wiadomości, pozycje i dane węzłów** — idą przez twoje radio do sieci mesh. Inni użytkownicy sieci mogą je odebrać. Jeśli radio ma włączone szyfrowanie kanału, treść jest szyfrowana kluczem kanału. Aplikacja nie ma wpływu na to, co zrobią z nimi odbiorcy.
 - **Lokalizacja telefonu** — tylko jeśli ją włączysz: do pokazania twojej pozycji na mapie i (opcjonalnie) do wysłania jej do sieci mesh.

@@ -201,6 +201,24 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ANDROID_WIDGET_SECOND] = content } }
     }
 
+    override val widgetOthersLimit: StateFlow<Int> =
+        dataStore.data.map { it[KEY_WIDGET_OTHERS_LIMIT] ?: 0 }.stateIn(scope, SharingStarted.Lazily, 0)
+
+    override fun setWidgetOthersLimit(limit: Int) {
+        scope.launch { dataStore.edit { it[KEY_WIDGET_OTHERS_LIMIT] = limit } }
+    }
+
+    override val widgetOthersPicked: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs ->
+                prefs[KEY_WIDGET_OTHERS_PICKED].orEmpty().split(',').mapNotNull { it.toIntOrNull() }.toSet()
+            }
+            .stateIn(scope, SharingStarted.Lazily, emptySet())
+
+    override fun setWidgetOthersPicked(nodeNums: Set<Int>) {
+        scope.launch { dataStore.edit { it[KEY_WIDGET_OTHERS_PICKED] = nodeNums.joinToString(",") } }
+    }
+
     override val importMenuInTopBar: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_IMPORT_MENU_IN_TOP_BAR] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -883,6 +901,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ANDROID_WIDGET_NODE = intPreferencesKey("android-widget-node")
         val KEY_ANDROID_WIDGET_SMALL = intPreferencesKey("android-widget-small")
         val KEY_ANDROID_WIDGET_SECOND = intPreferencesKey("android-widget-second")
+        val KEY_WIDGET_OTHERS_LIMIT = intPreferencesKey("widget-others-limit")
+        val KEY_WIDGET_OTHERS_PICKED = stringPreferencesKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")

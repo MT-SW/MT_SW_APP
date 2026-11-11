@@ -203,7 +203,7 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
             if (dataNoticeAcceptedAt == null) {
                 // Still reading the stored consent: show nothing rather than flash the notice.
             } else if (dataNoticeAcceptedAt == 0L) {
-                DataNoticeScreen(offerWipe = introCompleted, onAccept = { uiViewModel.onDataNoticeAccepted() })
+                DataNoticeScreen(onAccept = { uiViewModel.onDataNoticeAccepted() })
             } else if (introCompleted) {
                 ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
             } else {

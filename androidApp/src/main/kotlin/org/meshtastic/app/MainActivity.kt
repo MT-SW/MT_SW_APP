@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
                     if (!launchOptions.skipOnboarding && dataNoticeAcceptedAt == null) {
                         // Still reading the stored consent: show nothing rather than flash the notice.
                     } else if (!launchOptions.skipOnboarding && dataNoticeAcceptedAt == 0L) {
-                        DataNoticeScreen(offerWipe = appIntroCompleted, onAccept = { model.onDataNoticeAccepted() })
+                        DataNoticeScreen(onAccept = { model.onDataNoticeAccepted() })
                     } else if (appIntroCompleted || launchOptions.skipOnboarding) {
                         AppSpatialShell { MainScreen() }
 

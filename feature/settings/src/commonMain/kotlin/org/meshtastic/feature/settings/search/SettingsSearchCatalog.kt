@@ -65,6 +65,7 @@ import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed
@@ -207,6 +208,7 @@ object SettingsSearchCatalog {
             Res.string.autostart_title to SettingsRoute.MtSwFeatures,
             Res.string.app_icon_title to SettingsRoute.MtSwFeatures,
             Res.string.widget_stats_title to SettingsRoute.MtSwFeatures,
+            Res.string.widget_others_title to SettingsRoute.MtSwFeatures,
             Res.string.db_sync_title to SettingsRoute.MtSwFeatures,
             Res.string.db_sync_auto to SettingsRoute.MtSwFeatures,
             Res.string.font_family to SettingsRoute.MtSwFeatures,
