@@ -312,11 +312,17 @@ struct NodeCardView: View {
     }
 }
 
-/// Średni widżet: nasz węzeł jest pierwszą kartą, po niej kolejno wybrane węzły (ulubione albo cała sieć).
-private func withOwn(favorite: [NodeCard], label: String, entry: StatsEntry, data: StatsData) -> NodeCardView {
-    let own = NodeCard(title: data.title, lines: Array(data.lines.prefix(8)))
-    return NodeCardView(label: label, cards: [own] + favorite, step: entry.step,
-                        empty: isPolish ? "Brak węzłów." : "No nodes.")
+/// Średni widżet: w pierwszym okresie pełne statystyki naszego węzła (jak zawsze), potem kolejno wybrane węzły
+/// (ulubione albo cała sieć), i od nowa.
+@ViewBuilder
+private func withOwn(cards: [NodeCard], label: String, entry: StatsEntry, data: StatsData) -> some View {
+    let position = entry.step % (cards.count + 1)
+    if position == 0 {
+        OwnStatsView(data: data)
+    } else {
+        NodeCardView(label: label, cards: cards, step: position - 1,
+                     empty: isPolish ? "Brak węzłów." : "No nodes.")
+    }
 }
 
 struct StatsView: View {
@@ -370,8 +376,8 @@ struct StatsView: View {
             default:
                 switch entry.config.small {
                 case .own: OwnStatsView(data: data)
-                case .favorites: withOwn(favorite: data.favorites, label: favorite.label, entry: entry, data: data)
-                case .network: withOwn(favorite: data.network, label: network.label, entry: entry, data: data)
+                case .favorites: withOwn(cards: data.favorites, label: isPolish ? "Ulubiony węzeł" : "Favorite node", entry: entry, data: data)
+                case .network: withOwn(cards: data.network, label: isPolish ? "Węzeł sieci" : "Network node", entry: entry, data: data)
                 }
             }
         } else {
