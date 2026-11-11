@@ -57,6 +57,7 @@ Od wysokości dwóch wierszy dodaje, w tej kolejności, tyle odczytów, ile się
 - **Skoki**: ile skoków dzieli węzeł od Ciebie albo _Bezpośrednio_
 - **Odległość**: jak daleko węzeł jest od połączonego węzła. Pojawia się tylko przy połączeniu i gdy oba węzły mają pozycję
 - **SNR** i **RSSI**: sygnał ostatniego pakietu węzła, pokazywany tylko wtedy, gdy węzeł jest słyszany bezpośrednio, a nie przez inne węzły lub MQTT
+- **Napięcie** i **Prąd**: z czujnika węzła (nie systemowe), w jednej linii, z tymi samymi skrótami co na liście szczegółów węzła. Pod nimi, jeśli węzeł je wysyła, **Temperatura**, **Wilgotność** i **Ciśnienie**.
 
 Przy szerokości czterech komórek odczyty układają się w dwie kolumny, więc przy domyślnym rozmiarze czcionki mieszczą się wszystkie w widżecie o dwóch wierszach. Większa czcionka odcina odczyty od końca tej listy, najpierw RSSI.
 

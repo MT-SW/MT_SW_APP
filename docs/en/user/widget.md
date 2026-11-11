@@ -57,6 +57,7 @@ From two rows tall it adds, in this order, as many as fit (a wide widget under t
 - **Hops Away**: how many hops away the node is, or *Direct*
 - **Distance**: how far the node is from your connected node. It appears only while you are connected and both nodes have a position
 - **SNR** and **RSSI**: the signal of the node's last packet, shown only when the node is heard directly rather than through other nodes or MQTT
+- **Voltage** and **Current**: from the node's sensor (not the system's), on one line, with the same short labels as the node details list. Below them, when the node sends them, **Temperature**, **Humidity** and **Pressure**.
 
 Four cells wide lays the readings out in two columns, so at the default font size every one fits in a two-row widget. A larger font size drops readings from the end of that list, RSSI first.
 
