@@ -47,7 +47,9 @@ class HorizonBuilding(
 object HorizonBuildings {
     private const val MAX_BUILDINGS = 2500
     private const val METRES_PER_DEGREE = 111_320.0
-    // Closer than this a building would only fill the picture with one huge wall; the own roof and the street are skipped.
+
+    // Closer than this a building would only fill the picture with one huge wall; the own roof and the street are
+    // skipped.
     private const val OWN_BUILDING_M = 100.0
     private const val MIN_HEIGHT_M = 2.0
 

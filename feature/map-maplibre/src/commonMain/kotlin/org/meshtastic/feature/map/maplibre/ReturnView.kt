@@ -20,8 +20,8 @@ import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.map.MapState
 
 /**
- * The view the map had before it flew in on a node or a cluster, so a tap on the empty map can take the user back to
- * it (the view they had on entering the map). Only the first view is kept while zooming in step by step.
+ * The view the map had before it flew in on a node or a cluster, so a tap on the empty map can take the user back to it
+ * (the view they had on entering the map). Only the first view is kept while zooming in step by step.
  */
 internal object ReturnView {
     private val saved = mutableMapOf<MapState, CameraPosition>()

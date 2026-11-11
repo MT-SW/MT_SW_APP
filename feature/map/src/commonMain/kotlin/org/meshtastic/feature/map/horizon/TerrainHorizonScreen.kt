@@ -788,8 +788,8 @@ private fun angleRange(profile: HorizonProfile, targets: List<HorizonTarget>): C
 }
 
 /**
- * The vertical range actually drawn: [range] widened (around the horizon line) when it would stretch the picture
- * more than [MAX_VERTICAL_STRETCH] times its horizontal scale, which is what turned hills into needles.
+ * The vertical range actually drawn: [range] widened (around the horizon line) when it would stretch the picture more
+ * than [MAX_VERTICAL_STRETCH] times its horizontal scale, which is what turned hills into needles.
  */
 private fun fitRange(
     range: ClosedFloatingPointRange<Double>,

@@ -22,11 +22,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -79,6 +79,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
+import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy
@@ -88,12 +89,10 @@ import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
-import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeLayers
-import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
 import org.meshtastic.feature.map.maplibre.layers.NodeLinkLayers
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
@@ -101,6 +100,7 @@ import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
+import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.Basemaps
 import org.meshtastic.feature.map.maplibre.style.MapColors
@@ -583,7 +583,6 @@ private fun BoxCornerMarker(corner: Position?) {
 private const val CHIP_VIEW_PADDING = 0.5
 
 private const val PROPAGATION_SETTLE_MS = 1500L
-
 
 /** Room kept free on the right for the zoom buttons (their width and margin) plus a small gap. */
 private const val PROPAGATION_END_CLEARANCE_DP = 88

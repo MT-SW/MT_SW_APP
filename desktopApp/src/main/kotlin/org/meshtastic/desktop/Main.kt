@@ -649,9 +649,7 @@ private fun ApplicationScope.MeshtasticWindow(
                         if (dataNoticeAcceptedAt == null) {
                             // Still reading the stored consent: show nothing rather than flash the notice.
                         } else if (dataNoticeAcceptedAt == 0L) {
-                            DataNoticeScreen(
-                                onAccept = { uiViewModel.onDataNoticeAccepted() },
-                            )
+                            DataNoticeScreen(onAccept = { uiViewModel.onDataNoticeAccepted() })
                         } else if (introCompleted) {
                             DesktopMainScreen(uiViewModel, multiBackstack)
                             AppUpdateDialog()

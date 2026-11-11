@@ -78,8 +78,9 @@ private const val MAX_TEXT_WIDTH_DP = 640
 
 /**
  * Terms of use and data notice shown before anything else. The accept button stays locked until the whole text was
- * scrolled to the end and a 10-second countdown has run out. Declining opens a warning with its own 10-second
- * countdown before everything can be erased; from there the user can also go back to the terms; the app cannot be closed without either.
+ * scrolled to the end and a 10-second countdown has run out. Declining opens a warning with its own 10-second countdown
+ * before everything can be erased; from there the user can also go back to the terms; the app cannot be closed without
+ * either.
  */
 @Composable
 @Suppress("LongMethod")

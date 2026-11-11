@@ -43,6 +43,8 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
@@ -62,13 +64,11 @@ import org.maplibre.compose.expressions.value.SymbolAnchor
 import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.layers.FeaturesClickHandler
 import org.maplibre.compose.layers.SymbolLayer
+import org.maplibre.compose.map.MapState
 import org.maplibre.compose.sources.VectorSource
 import org.maplibre.spatialk.geojson.Feature
-import org.maplibre.spatialk.geojson.Position
 import org.maplibre.spatialk.geojson.Point
-import org.maplibre.compose.map.MapState
-import kotlin.math.sqrt
-import androidx.compose.ui.unit.DpRect
+import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
@@ -84,6 +84,7 @@ import org.meshtastic.feature.map.maplibre.geojson.lenientBoolean
 import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
+import kotlin.math.sqrt
 
 /**
  * Node markers drawn as chips — the rounded, node-coloured badge with the short name in it that
@@ -413,7 +414,6 @@ private const val TAIL_ROUNDING_DP = 2
  */
 private const val MAX_CHIP_IMAGES = 250
 
-
 /** Half the width and the height of the area a chip covers above its node, used to find the chip a tap landed on. */
 private const val TAP_HALF_WIDTH_DP = 40f
 private const val TAP_HEIGHT_DP = 32f
@@ -437,6 +437,30 @@ internal suspend fun nodeTapAt(
     onStack: (List<ClusterMember>) -> Unit,
 ): Boolean {
     val at = state.screenLocationFromPosition(tap) ?: return false
+    val candidates = chipCandidates(state, at)
+    val best = candidates.maxByOrNull { it.second * RANK_WEIGHT - it.third }
+    val near = best?.let { top -> candidates.filter { it.third <= top.third + STACK_TOLERANCE_DP }.map { it.first } }
+    val stack = if (best != null && near != null) stackedMembers(near, best.first) else emptyList()
+    val nodeNum = best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt()
+    return when {
+        best == null -> false
+
+        stack.isNotEmpty() -> {
+            onStack(stack)
+            true
+        }
+
+        nodeNum != null -> {
+            click(nodeNum)
+            true
+        }
+
+        else -> false
+    }
+}
+
+/** The dots just below the tap, each with its rank (favourites on top) and its distance from the bubble's centre. */
+private suspend fun chipCandidates(state: MapState, at: DpOffset): List<Triple<Feature<*, JsonObject?>, Int, Float>> {
     val box =
         DpRect(
             left = at.x - TAP_HALF_WIDTH_DP.dp,
@@ -444,22 +468,13 @@ internal suspend fun nodeTapAt(
             right = at.x + TAP_HALF_WIDTH_DP.dp,
             bottom = at.y + TAP_HEIGHT_DP.dp,
         )
-    val candidates =
-        state.queryRenderedFeatures(box, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
-            val spot = (feature.geometry as? Point)?.coordinates ?: return@mapNotNull null
-            val dot = state.screenLocationFromPosition(spot) ?: return@mapNotNull null
-            val dx = dot.x.value - at.x.value
-            val dy = dot.y.value - TAP_HEIGHT_DP / 2f - at.y.value
+    return state.queryRenderedFeatures(box, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
+        val spot = (feature.geometry as? Point)?.coordinates
+        val dot = spot?.let { state.screenLocationFromPosition(it) }
+        dot?.let {
+            val dx = it.x.value - at.x.value
+            val dy = it.y.value - TAP_HEIGHT_DP / 2f - at.y.value
             Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy))
         }
-    val best = candidates.maxByOrNull { it.second * RANK_WEIGHT - it.third } ?: return false
-    val near = candidates.filter { it.third <= best.third + STACK_TOLERANCE_DP }.map { it.first }
-    val stack = stackedMembers(near, best.first)
-    if (stack.isNotEmpty()) {
-        onStack(stack)
-        return true
     }
-    val nodeNum = best.first.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt() ?: return false
-    click(nodeNum)
-    return true
 }

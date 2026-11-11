@@ -18,13 +18,14 @@ package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -76,27 +77,29 @@ fun ClusterMembersDialog(
 
 @Composable
 private fun ClusterMemberRow(member: ClusterMemberEntry, onClick: () -> Unit) {
-    Row(
-        modifier =
-        Modifier.fillMaxWidth()
-            .heightIn(min = MIN_TOUCH_TARGET.dp)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-    ) {
-        member.node?.let { NodeChip(node = it) }
-        Spacer(Modifier.width(12.dp))
-        // One line: the short name is already on the chip, so a subtitle that only repeats it is dropped.
-        val extra = member.subtitle.takeIf { it.isNotBlank() && it != member.node?.user?.short_name }
-        Text(
-            text = if (extra != null) "${member.title} · $extra" else member.title,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+    Column {
+        Row(
+            modifier =
+            Modifier.fillMaxWidth()
+                .heightIn(min = MIN_TOUCH_TARGET.dp)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            member.node?.let { NodeChip(node = it) }
+            Spacer(Modifier.width(12.dp))
+            // One line: the short name is already on the chip, so a subtitle that only repeats it is dropped.
+            val extra = member.subtitle.takeIf { it.isNotBlank() && it != member.node?.user?.short_name }
+            Text(
+                text = if (extra != null) "${member.title} · $extra" else member.title,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
     }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 }
 
 /** Material's minimum touch target, matching the 48dp the shared nav display uses. */
