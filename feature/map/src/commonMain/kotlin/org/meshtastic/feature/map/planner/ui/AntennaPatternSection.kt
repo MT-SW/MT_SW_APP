@@ -106,7 +106,12 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
             Switch(checked = end.aimAtOther, onCheckedChange = { vm.setAimAtOther(side, it) })
             Text(stringResource(Res.string.planner_pattern_aim_other), style = MaterialTheme.typography.bodyMedium)
         }
-        AimFields(side, end, vm)
+        AimFields(
+            azimuthDeg = end.azimuthDeg,
+            tiltDeg = end.tiltDeg,
+            onAzimuth = { vm.setAzimuth(side, it) },
+            onTilt = { vm.setTilt(side, it) },
+        )
         PlannerNumberField(
             label = stringResource(Res.string.planner_pattern_beamwidth),
             value = end.beamwidthDeg,
@@ -137,11 +142,11 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
 /** The direction (azimuth) and the tilt of a directional antenna. */
 @Composable
 @Suppress("MultipleEmitters")
-private fun AimFields(side: PlannerSide, end: PlannerEnd, vm: PlannerViewModel) {
+private fun AimFields(azimuthDeg: Double, tiltDeg: Double, onAzimuth: (Double) -> Unit, onTilt: (Double) -> Unit) {
     PlannerNumberField(
         label = stringResource(Res.string.planner_pattern_azimuth),
-        value = end.azimuthDeg,
-        onValue = { vm.setAzimuth(side, it) },
+        value = azimuthDeg,
+        onValue = onAzimuth,
         decimals = 0,
         suffix = "°",
         min = 0.0,
@@ -149,8 +154,8 @@ private fun AimFields(side: PlannerSide, end: PlannerEnd, vm: PlannerViewModel) 
     )
     PlannerNumberField(
         label = stringResource(Res.string.planner_pattern_tilt),
-        value = end.tiltDeg,
-        onValue = { vm.setTilt(side, it) },
+        value = tiltDeg,
+        onValue = onTilt,
         decimals = 1,
         suffix = "°",
         min = -60.0,
