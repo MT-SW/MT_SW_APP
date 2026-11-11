@@ -39,6 +39,7 @@ import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.feature.settings.liveupdate.AndroidWidgetChoiceItem
+import org.meshtastic.feature.settings.liveupdate.AndroidWidgetContentItems
 import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 
 /** The row "Widżet statystyk": a scrollable information window about the widget and how to add it. */
@@ -64,6 +65,7 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
         } else if (support.available) {
             // Android: the widget has its own choice, apart from the adaptive notification.
             AndroidWidgetChoiceItem()
+            AndroidWidgetContentItems()
         }
         ListItem(
             text = stringResource(Res.string.widget_stats_title),

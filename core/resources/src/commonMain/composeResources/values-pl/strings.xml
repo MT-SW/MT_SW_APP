@@ -3717,6 +3717,16 @@
     <string name="widget_adaptive_mesh_status_shown">Stan sieci na widżecie ekranu głównego</string>
     <string name="widget_adaptive_off_summary">Pokaż na widżecie ekranu głównego całą sieć albo jeden węzeł</string>
     <string name="widget_adaptive_title">Widżet adaptacyjny</string>
+    <string name="widget_content_small_title">Mały widżet pokazuje</string>
+    <string name="widget_content_second_title">Drugie pole większych widżetów</string>
+    <string name="widget_content_own">Nasz węzeł</string>
+    <string name="widget_content_favorites">Ulubione na zmianę</string>
+    <string name="widget_content_network">Cała sieć na zmianę</string>
+    <string name="widget_content_info">Widżet ma trzy rozmiary (zmieniasz je, przeciągając róg widżetu).\n\nMały (4x2): do wyboru nasz węzeł, ulubione na zmianę albo cała sieć na zmianę (cała sieć to wszystkie węzły bez naszego, razem z ulubionymi). Przy ulubionych i sieci najpierw są pełne statystyki naszego węzła, potem kolejne węzły, zmieniane co 5 minut.\n\nŚredni (4x4): u góry nasz węzeł, niżej do wyboru ulubione albo cała sieć, na zmianę.\n\nDuży (4x6): u góry nasz węzeł, pod nim ulubione, a pod nimi reszta sieci (bez ulubionych i bez naszego węzła), na zmianę.</string>
+    <string name="widget_label_favorite">Ulubiony węzeł</string>
+    <string name="widget_label_network">Węzeł sieci</string>
+    <string name="widget_label_other">Inny węzeł sieci</string>
+    <string name="widget_no_nodes">Brak węzłów.</string>
     <string name="widget_adaptive_track_in">Śledź na widżecie</string>
     <string name="widget_adaptive_tracking_shown">Śledzenie %1$s na widżecie ekranu głównego</string>
     <string name="widget_updated">Zaktualizowano</string>

@@ -168,6 +168,20 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ANDROID_WIDGET_NODE] = nodeNum } }
     }
 
+    override val androidWidgetSmall: StateFlow<Int> =
+        dataStore.data.map { it[KEY_ANDROID_WIDGET_SMALL] ?: 0 }.stateIn(scope, SharingStarted.Lazily, 0)
+
+    override fun setAndroidWidgetSmall(content: Int) {
+        scope.launch { dataStore.edit { it[KEY_ANDROID_WIDGET_SMALL] = content } }
+    }
+
+    override val androidWidgetSecond: StateFlow<Int> =
+        dataStore.data.map { it[KEY_ANDROID_WIDGET_SECOND] ?: 0 }.stateIn(scope, SharingStarted.Lazily, 0)
+
+    override fun setAndroidWidgetSecond(content: Int) {
+        scope.launch { dataStore.edit { it[KEY_ANDROID_WIDGET_SECOND] = content } }
+    }
+
     override val importMenuInTopBar: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_IMPORT_MENU_IN_TOP_BAR] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -846,6 +860,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
         val KEY_SKIP_BAD_TIME_CHART_POINTS = booleanPreferencesKey("skip-bad-time-chart-points")
         val KEY_ANDROID_WIDGET_NODE = intPreferencesKey("android-widget-node")
+        val KEY_ANDROID_WIDGET_SMALL = intPreferencesKey("android-widget-small")
+        val KEY_ANDROID_WIDGET_SECOND = intPreferencesKey("android-widget-second")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")

@@ -3490,6 +3490,16 @@
     <string name="widget_adaptive_mesh_status_shown">Mesh status on the home-screen widget</string>
     <string name="widget_adaptive_off_summary">Show the whole mesh or one node on the home-screen widget</string>
     <string name="widget_adaptive_title">Adaptive widget</string>
+    <string name="widget_content_small_title">Small widget shows</string>
+    <string name="widget_content_second_title">Second area of the bigger widgets</string>
+    <string name="widget_content_own">Our node</string>
+    <string name="widget_content_favorites">Favorites in turn</string>
+    <string name="widget_content_network">Whole network in turn</string>
+    <string name="widget_content_info">The widget has three sizes (drag its corner to change it).\n\nSmall (4x2): your choice. Our node, or favorites in turn, or the whole network in turn (the whole network is all nodes except ours, favorites included). With favorites or the network, the full statistics of our node come first, then the nodes one after another every 5 minutes.\n\nMedium (4x4): our node on top; below, your choice of favorites or the whole network, in turn.\n\nLarge (4x6): our node on top, favorites below it, and under them the rest of the network (without favorites and without our node), in turn.</string>
+    <string name="widget_label_favorite">Favorite node</string>
+    <string name="widget_label_network">Network node</string>
+    <string name="widget_label_other">Other node</string>
+    <string name="widget_no_nodes">No nodes.</string>
     <string name="widget_adaptive_track_in">Track on the widget</string>
     <string name="widget_adaptive_tracking_shown">Tracking %1$s on the home-screen widget</string>
     <string name="widget_group_connections">Connections</string>

@@ -402,6 +402,18 @@ class FakeUiPrefs : UiPrefs {
         skipBadTimeChartPoints.value = value
     }
 
+    override val androidWidgetSmall = MutableStateFlow(0)
+
+    override fun setAndroidWidgetSmall(content: Int) {
+        androidWidgetSmall.value = content
+    }
+
+    override val androidWidgetSecond = MutableStateFlow(0)
+
+    override fun setAndroidWidgetSecond(content: Int) {
+        androidWidgetSecond.value = content
+    }
+
     override val androidWidgetNode = MutableStateFlow(0)
 
     override fun setAndroidWidgetNode(nodeNum: Int) {

@@ -191,6 +191,16 @@ interface UiPrefs {
 
     fun setAndroidWidgetNode(nodeNum: Int)
 
+    /** MT_SW: what the smallest (4x2) Android widget shows: 0 our node, 1 favorites in turn, 2 the whole network. */
+    val androidWidgetSmall: StateFlow<Int>
+
+    fun setAndroidWidgetSmall(content: Int)
+
+    /** MT_SW: the second area of the bigger Android widgets: 0 favorites in turn, 1 the whole network in turn. */
+    val androidWidgetSecond: StateFlow<Int>
+
+    fun setAndroidWidgetSecond(content: Int)
+
     /** MT_SW: the import / share / add-contact button sits in the top bar instead of floating over the list. */
     val importMenuInTopBar: StateFlow<Boolean>
 
