@@ -219,7 +219,7 @@ W **Ustawienia → Konfiguracja urządzenia → Bluetooth**, w węzłach z Bluet
 | Ustawienie | Opis | Domyślnie |
 |---------|-------------|---------|
 | Bluetooth włączony | Włącza lub wyłącza Bluetooth węzła | Włączony, oprócz niektórych węzłów z kolorowym ekranem |
-| Stały PIN (Fixed PIN) | Kod PIN do parowania, używany z `FIXED_PIN`. Musi mieć **dokładnie sześć cyfr** — pole odrzuca wszystko inne | 123456 |
+| Stały PIN (Fixed PIN) | Kod PIN do parowania, używany z `FIXED_PIN`. Musi mieć **sześć cyfr, od 100000 do 999999** — pole odrzuca wszystko inne | 123456 |
 | Tryb parowania | Wymieniony pod nazwami z firmware: `RANDOM_PIN`, `FIXED_PIN` lub `NO_PIN` | `RANDOM_PIN` w węzłach z ekranem, `FIXED_PIN` w węzłach bez ekranu |
 
 ## Konfiguracja bezpieczeństwa

@@ -33,7 +33,7 @@ Bluetooth Low Energy to domyślna i najczęstsza metoda połączenia na Androidz
 
 Niektóre węzły mają kod połączenia, wydrukowany na naklejce albo pokazany na ekranie węzła. Zeskanuj go aparatem telefonu, przyłóż telefon do tagu NFC z tym samym linkiem albo dotknij ikony skanowania u góry karty **Połącz**. Aplikacja zapyta, czy się połączyć, i pokaże adres węzła oraz jego PIN do parowania, jeśli kod go zawiera. Dotknij **Połącz**, a aplikacja skopiuje PIN i sparuje urządzenia. Do Androida 16 aplikacja sama wpisuje PIN; na Androidzie 17 okno parowania o niego prosi i trzeba go wkleić.
 
-Kod, który nie jest kodem połączenia Meshtastic, albo kod z adresem nieobsługiwanym przez aplikację, nie połączy z niczym.
+Kod, który nie jest kodem połączenia Meshtastic, albo kod z adresem nieobsługiwanym przez aplikację, nie połączy z niczym. PIN w kodzie, który nie jest sześcioma cyframi od 100000 do 999999, jest pomijany, a parowanie pyta o niego jak zwykle.
 
 Metodę parowania możesz zmienić, lub włączyć Bluetooth w radiu dostarczanym z wyłączonym, w **Ustawienia → Konfiguracja urządzenia → Bluetooth** — zobacz [Ustawienia — Radio i użytkownik](settings-radio-user). Więcej informacji znajdziesz w [konfiguracji Bluetooth](https://meshtastic.org/docs/configuration/radio/bluetooth) na meshtastic.org.
 

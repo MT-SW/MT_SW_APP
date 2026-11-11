@@ -202,6 +202,7 @@
     <string name="bluetooth_feature_config_description">Zarządzaj bezprzewodowo ustawieniami i kanałami swojego urządzenia.</string>
     <string name="bluetooth_feature_discovery">Odkrywanie</string>
     <string name="bluetooth_feature_discovery_description">Znajdź i zidentyfikuj urządzenia mesh w pobliżu.</string>
+    <string name="bluetooth_fixed_pin_range">Sześć cyfr, od 100000 do 999999</string>
     <string name="bluetooth_permission">Bluetooth</string>
     <string name="bluetooth_permission_blocked_notice">Dostęp do pobliskich urządzeń jest wyłączony i Android nie zapyta ponownie. Włącz go w ustawieniach aplikacji, aby połączyć się przez Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
     <string name="bluetooth_permission_blocked_notice_pre31">Uprawnienie lokalizacji jest wyłączone i Android nie zapyta ponownie. Włącz je w ustawieniach aplikacji, aby wyszukiwać urządzenia Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
