@@ -253,7 +253,7 @@ private fun OwnSection(snapshot: MeshStatsSnapshot?, metrics: Metrics, heightDp:
             Text(
                 text = snapshot?.title ?: "MT_SW",
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )
             if (snapshot != null) NodeChip(snapshot.shortName, snapshot.color, snapshot.textColor)
@@ -301,7 +301,7 @@ private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: In
                     text = card.title,
                     maxLines = 1,
                     style =
-                    TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                    TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 12.sp, fontWeight = FontWeight.Bold),
                     modifier = GlanceModifier.defaultWeight(),
                 )
                 NodeChip(card.shortName, card.color, card.textColor)
