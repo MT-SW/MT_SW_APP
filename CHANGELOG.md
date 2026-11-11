@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Mapa: dotyk w dymek trafia teraz dokładnie w narysowany dymek (obszar dotyku i środek dymka wyliczone z jego rzeczywistego położenia nad węzłem).
+* Panorama: jakość automatyczna schodzi niżej dopiero przy naprawdę długim zacinaniu (dłuższe okno pomiaru, wyższy próg).
+* Panorama: nowa tekstura gór i lasów — miękkie, bezkierunkowe plamy zamiast pionowych kresek, gładkie cieniowanie zboczy.
+* Panorama: budynki mają zachowane proporcje (wysokość skalowana przy rysowaniu, bez sztywnego limitu), szerokość zgadza się z wysokością.
 * Panorama: budynki są niższe w stosunku do gór (ograniczona wysokość), teren mocniej wyeksponowany, a rysowanie budynków znacznie szybsze (podział na pasma raz, a nie co klatkę, pomijanie niewidocznych).
 * Mapa propagacji: pełny opis legendy (bez ucinania).
 * Mapa: wybór dymka przy dotknięciu najpierw według odległości, szerszy obszar dotyku.
@@ -664,6 +668,10 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Map: a tap on a bubble now lands exactly on the drawn bubble (tap area and bubble centre computed from its real position above the node).
+* Panorama: the automatic quality steps down only after really long stutter (longer measuring window, higher threshold).
+* Panorama: new texture for mountains and forests — soft, directionless blotches instead of vertical streaks, smooth slope shading.
+* Panorama: buildings keep their proportions (height scaled at draw time, no fixed cap), width matches height.
 * Panorama: buildings are lower relative to the mountains (capped height), terrain exaggerated more, and building drawing much faster (bands built once, off-screen ones skipped).
 * Propagation map: full legend text (no clipping).
 * Map: tapped bubble chosen by distance first, wider tap area.

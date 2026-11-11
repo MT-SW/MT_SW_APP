@@ -210,6 +210,9 @@ private const val BUILDING_BAND_BOOST = 0.2f
 
 /** The vertical scale may be at most this many times the horizontal one, so mountains look like mountains. */
 private const val MAX_VERTICAL_STRETCH = 4.5
+
+/** How much taller than wide (against true proportions) a building may be drawn. */
+private const val BUILDING_MAX_STRETCH = 2f
 private const val BUILDING_SHADE_STEP = 0.05f
 private const val BUILDING_SHADE_VARIANTS = 5
 private const val BUILDING_SHADE_PRIME = 7
@@ -233,15 +236,18 @@ private const val SHADE_MAX = 0.5f
 private const val SMOOTH_PASSES = 2
 private const val GRAIN_TILE_W = 128
 private const val GRAIN_TILE_H = 64
-private const val GRAIN_STREAK_SHARE = 0.6f
-private const val GRAIN_ALPHA = 0.16f
+private const val GRAIN_CELL_BIG = 32
+private const val GRAIN_CELL_MID = 16
+private const val GRAIN_CELL_SMALL = 8
+private const val SMOOTH_NOISE_COLUMNS = 8
+private const val GRAIN_ALPHA = 0.10f
 private const val GRAIN_FADE = 0.22f
 private const val GOOD_QUALITY_BUILDINGS = 800
 private const val NOTICE_MS = 4_000L
 private const val LEVEL_BEST = 0
 private const val LEVEL_GOOD = 2
-private const val AUTO_WINDOW_FRAMES = 45
-private const val AUTO_SLOW_FRAME_MS = 28
+private const val AUTO_WINDOW_FRAMES = 90
+private const val AUTO_SLOW_FRAME_MS = 55
 private const val AUTO_IDLE_GAP_MS = 250
 private val PANORAMA_LEVELS =
     listOf(
@@ -258,7 +264,7 @@ private const val FOREST_ALPHA = 0.5f
 private const val FOREST_GRAIN_ALPHA = 0.22f
 private const val BUILDING_GRAIN_ALPHA = 0.14f
 private const val BUILDING_GRAIN_MIN_PX = 8f
-private const val GRAIN = 0.35f
+private const val GRAIN = 0.18f
 private const val LOW_SUN_DEG = 15.0
 private const val LOW_SUN_CONTRAST = 0.5f
 private const val VALLEY_FOG_SHARE = 0.7f
@@ -1011,7 +1017,7 @@ private class AutoLevel {
         if (gapMs > AUTO_SLOW_FRAME_MS) slow++
         if (frames < AUTO_WINDOW_FRAMES) return
         Logger.i { "Panorama: klatek $frames, wolnych $slow, poziom $level" }
-        if (slow * 2 > frames && level < LEVEL_GOOD) {
+        if (slow * 10 > frames * 7 && level < LEVEL_GOOD) {
             level++
             lowered = true
         }
@@ -1071,7 +1077,7 @@ private fun DrawScope.drawSlopeShading(
                 val rise = previous - y
                 // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
                 val sunny = light.sunFacing(if (rise > 0f) bearing - 90.0 else bearing + 90.0)
-                val grain = 1f - GRAIN + 2f * GRAIN * columnNoise(i, band)
+                val grain = 1f - GRAIN + 2f * GRAIN * smoothNoise(i, band)
                 val slope = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
                 val strength = slope * abs(sunny).toFloat() * grain * light.contrast()
                 if (strength > 0.02f && y < h) {
@@ -1097,7 +1103,7 @@ private fun DrawScope.drawForest(path: Path, outline: FloatArray, band: Int, col
     forest.moveTo(0f, h)
     for (i in outline.indices) {
         val crest = outline[i]
-        val drop = FOREST_TOP_PX * (0.5f + columnNoise(i / 4, band + 7))
+        val drop = FOREST_TOP_PX * (0.5f + smoothNoise(i, band + 7))
         forest.lineTo((i * COLUMN_STEP_PX).toFloat(), if (crest.isNaN()) h else (crest + drop).coerceAtMost(h))
     }
     forest.lineTo((outline.size * COLUMN_STEP_PX).toFloat(), h)
@@ -1118,15 +1124,47 @@ private fun rockGrain(): Brush {
     val canvas = GraphicsCanvas(image)
     val paint = Paint()
     for (x in 0 until GRAIN_TILE_W) {
-        val streak = columnNoise(x, 1)
         for (y in 0 until GRAIN_TILE_H) {
-            val tone = GRAIN_STREAK_SHARE * streak + (1f - GRAIN_STREAK_SHARE) * columnNoise(x * GRAIN_TILE_H + y, 2)
+            // Three scales of soft, wrapping noise plus a fine speckle: blotches like rock, scree and moss, with no
+            // direction to them, so nothing reads as stripes.
+            val tone =
+                0.45f * tileNoise(x, y, GRAIN_CELL_BIG) +
+                    0.30f * tileNoise(x, y, GRAIN_CELL_MID) +
+                    0.15f * tileNoise(x, y, GRAIN_CELL_SMALL) +
+                    0.10f * columnNoise(x * GRAIN_TILE_H + y, 2)
             val strength = abs(tone - 0.5f) * 2f
             paint.color = (if (tone < 0.5f) Color.Black else Color.White).copy(alpha = strength)
             canvas.drawRect(x.toFloat(), y.toFloat(), x + 1f, y + 1f, paint)
         }
     }
     return ShaderBrush(ImageShader(image, TileMode.Repeated, TileMode.Repeated))
+}
+
+/** Soft value noise that wraps at the tile's edges, with lattice cells of [cell] pixels. */
+private fun tileNoise(x: Int, y: Int, cell: Int): Float {
+    val cols = GRAIN_TILE_W / cell
+    val rows = GRAIN_TILE_H / cell
+    val fx = x.toFloat() / cell
+    val fy = y.toFloat() / cell
+    val x0 = fx.toInt()
+    val y0 = fy.toInt()
+    val tx = smoothStep(fx - x0)
+    val ty = smoothStep(fy - y0)
+    fun at(cx: Int, cy: Int) = columnNoise((cx % cols) * 977 + (cy % rows), cell)
+    val top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * tx
+    val bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * tx
+    return top + (bottom - top) * ty
+}
+
+private fun smoothStep(t: Float): Float = t * t * (3f - 2f * t)
+
+/** Noise along the columns of a band that changes gently from one column to the next, so it never shows as bars. */
+private fun smoothNoise(column: Int, band: Int): Float {
+    val f = column.toFloat() / SMOOTH_NOISE_COLUMNS
+    val c0 = f.toInt()
+    val t = smoothStep(f - c0)
+    val a = columnNoise(c0, band)
+    return a + (columnNoise(c0 + 1, band) - a) * t
 }
 
 /** A repeatable pseudo-random value from 0 to 1 for a column of a band (the same every frame: no flicker). */
@@ -1235,6 +1273,11 @@ private fun DrawScope.drawBuildingShapes(
     val w = size.width
     val h = size.height
     val path = Path()
+    // The picture is stretched upwards to fit the terrain; a building is stretched only up to a point, so its height
+    // stays in proportion to its width however tall the picture is.
+    val vertical = h / (range.endInclusive - range.start).toFloat()
+    val stretch = vertical / perDeg
+    val scale = (BUILDING_MAX_STRETCH / stretch).coerceAtMost(1f)
     // [shapes] is this band's, far to near: only the buildings of one band are walked, not all of them.
     for (i in shapes.indices) {
         val b = shapes[i]
@@ -1263,20 +1306,23 @@ private fun DrawScope.drawBuildingShapes(
             path.reset()
             path.moveTo(xs[k], yOf(b.footDeg[k], range, h))
             path.lineTo(xs[m], yOf(b.footDeg[m], range, h))
-            path.lineTo(xs[m], yOf(b.roofDeg[m], range, h))
-            path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
+            path.lineTo(xs[m], yOf(b.roofOf(m, scale), range, h))
+            path.lineTo(xs[k], yOf(b.roofOf(k, scale), range, h))
             path.close()
             drawPath(path, lerp(darkWall, base, facing))
             texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
         }
         path.reset()
-        path.moveTo(xs[0], yOf(b.roofDeg[0], range, h))
-        for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
+        path.moveTo(xs[0], yOf(b.roofOf(0, scale), range, h))
+        for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofOf(k, scale), range, h))
         path.close()
         drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
         texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
     }
 }
+
+/** The roof angle of corner [k], its height above the foot scaled by [scale]. */
+private fun HorizonBuilding.roofOf(k: Int, scale: Float): Double = footDeg[k] + (roofDeg[k] - footDeg[k]) * scale
 
 /** The highest crest of [profile] in distance band [band] (0 is the nearest) at [bearing], or null when it has none. */
 private fun bandAngle(profile: HorizonProfile, band: Int, bearing: Double): Double? {

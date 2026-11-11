@@ -26,7 +26,6 @@ import org.meshtastic.feature.map.planner.data.ClutterMap
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -71,7 +70,6 @@ class HorizonBuilding(
 /** Projects the saved buildings around [centre] into [HorizonBuilding]s (nearest [MAX_BUILDINGS], within [maxM]). */
 object HorizonBuildings {
     private const val MAX_BUILDINGS = 1500
-    private const val MAX_ROOF_DEG = 2.5
     private const val METRES_PER_DEGREE = 111_320.0
 
     // Closer than this a building would only fill the picture with one huge wall; the own roof and the street are
@@ -115,9 +113,7 @@ object HorizonBuildings {
                 corner[i] = d
                 bearings[i] = (atan2(dx, dy) * 180.0 / PI + 360.0) % 360.0
                 foot[i] = HorizonPanorama.angleDeg(observerM, ground(lat, lon), d, effective)
-                // A building is never drawn taller than this above its foot, so near towers do not dwarf the hills.
-                val rawRoof = HorizonPanorama.angleDeg(observerM, roofZ, d, effective)
-                roof[i] = foot[i] + min(rawRoof - foot[i], MAX_ROOF_DEG)
+                roof[i] = HorizonPanorama.angleDeg(observerM, roofZ, d, effective)
             }
             if (nearest < OWN_BUILDING_M || nearest > maxM) continue
             out += HorizonBuilding(bearings, foot, roof, corner, nearest)
