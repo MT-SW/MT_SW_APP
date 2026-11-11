@@ -184,6 +184,9 @@ private const val COLUMN_STEP_PX = 3
 private const val MAX_LABELS = 40
 private const val LIST_HEIGHT_DP = 220
 
+/** The options above the panorama scroll when they are taller than this. */
+private const val OPTIONS_MAX_HEIGHT_DP = 320
+
 /**
  * The terrain panorama: the skyline all round with the mesh's nodes placed against it, green where a node stands above
  * the ridge in front of it and red where a ridge hides it. It is the first view of the mesh view; the camera is the
@@ -328,6 +331,7 @@ fun TerrainHorizonScreen(
             }
         }
         if (moreOptions) {
+          Column(Modifier.heightIn(max = OPTIONS_MAX_HEIGHT_DP.dp).verticalScroll(rememberScrollState())) {
             ChipRow(stringResource(Res.string.terrain_horizon_target_antenna)) {
                 HORIZON_ANTENNAS_M.forEach { m ->
                     BrandChip(
@@ -376,6 +380,7 @@ fun TerrainHorizonScreen(
             ChipRow(stringResource(Res.string.terrain_horizon_labels)) {
                 Switch(checked = names, onCheckedChange = { names = it })
             }
+          }
         }
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             val profile = state.profile

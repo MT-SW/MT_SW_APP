@@ -234,6 +234,8 @@ class TerrainHorizonViewModel(
                     antennaM = saved.antennaM,
                     targetAntennaM = saved.targetAntennaM,
                     refraction = saved.refraction,
+                    buildings = saved.buildings,
+                    buildingsRadiusKm = saved.buildingsRadiusKm,
                 )
             }
             reload()
@@ -265,7 +267,10 @@ class TerrainHorizonViewModel(
 
     fun setBuildings(on: Boolean) = change { it.copy(buildings = on) }
 
-    fun setBuildingsRadius(km: Int) = _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
+    fun setBuildingsRadius(km: Int) {
+        _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
+        mapPrefs.updateHorizonPrefs { it.copy(buildingsRadiusKm = km) }
+    }
 
     /**
      * Downloads the buildings around the connected radio, up to the chosen range, and keeps them on the device, so the
@@ -294,6 +299,9 @@ class TerrainHorizonViewModel(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (_: PlannerClutterException) {
+                    false
+                } catch (_: Exception) {
+                    // Whatever else goes wrong (a dropped connection, a full disk), the button must not stay "saving".
                     false
                 }
             val bytes = withContext(dispatchers.io) { buildingStore.sizeBytes() }
@@ -381,6 +389,8 @@ class TerrainHorizonViewModel(
                 antennaM = after.antennaM,
                 targetAntennaM = after.targetAntennaM,
                 refraction = after.refraction,
+                buildings = after.buildings,
+                buildingsRadiusKm = after.buildingsRadiusKm,
             )
         }
         reload()

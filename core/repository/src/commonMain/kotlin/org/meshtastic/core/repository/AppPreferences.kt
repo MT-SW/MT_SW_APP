@@ -721,6 +721,8 @@ data class HorizonPrefs(
     val antennaM: Int = 2,
     val targetAntennaM: Int = 2,
     val refraction: Double = 4.0 / 3.0,
+    val buildings: Boolean = false,
+    val buildingsRadiusKm: Int = 5,
 )
 
 data class MapCameraPosition(val latitude: Double, val longitude: Double, val zoom: Double)

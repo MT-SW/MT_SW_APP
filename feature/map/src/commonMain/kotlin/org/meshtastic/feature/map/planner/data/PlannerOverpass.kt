@@ -105,12 +105,11 @@ class PlannerOverpass(
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
         val key = "B" + (if (tallOnly) "T" else "A") + ":" + pointKey(center) + ":" + Num.fmt(r, 1)
         val whole = ClutterBox.around(center.lat, center.lon, r)
-        return if (r <= SINGLE_REQUEST_KM) {
-            cached(key) { fetch(OsmQueries.buildings(whole, tallOnly)) }
-        } else {
-            // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not
-            // needed.
-            cached(key) { fetchTiled(whole, { OsmQueries.buildings(it, tallOnly) }, thinM = 0.0) }
+        // Always in pieces: a town of a few kilometres is already a heavy answer for one request, and a piece the
+        // server finds too heavy is cut smaller (down to a kilometre) and asked again.
+        // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not needed.
+        return cached(key) {
+            fetchTiled(whole, { OsmQueries.buildings(it, tallOnly) }, thinM = 0.0, minTileKm = BUILDINGS_MIN_TILE_KM)
         }
     }
 
@@ -178,8 +177,9 @@ class PlannerOverpass(
         whole: ClutterBox,
         query: (ClutterBox) -> String = OsmQueries::box,
         thinM: Double? = null,
+        minTileKm: Double = MIN_TILE_KM,
     ): ClutterMap = try {
-        fetchTiledPieces(whole, query, thinM)
+        fetchTiledPieces(whole, query, thinM, minTileKm)
     } finally {
         _progress.value = null
     }
@@ -188,6 +188,7 @@ class PlannerOverpass(
         whole: ClutterBox,
         query: (ClutterBox) -> String,
         thinOverride: Double?,
+        minTileKm: Double,
     ): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
@@ -218,7 +219,7 @@ class PlannerOverpass(
                                 e.failure == PlannerClutterFailure.SERVER_LIMIT
                             ) &&
                             !busy &&
-                            work.box.maxSideKm > MIN_TILE_KM
+                            work.box.maxSideKm > minTileKm
                     when {
                         busy && work.tries < BUSY_RETRIES -> {
                             delay(BUSY_WAIT_MS)
@@ -372,6 +373,7 @@ class PlannerOverpass(
         /** Size of the first tiles of a large area, and the smallest tile a heavy one is cut down to (km on a side). */
         private const val TILE_START_KM = 30.0
         private const val MIN_TILE_KM = 4.0
+        private const val BUILDINGS_MIN_TILE_KM = 1.0
 
         /** Outline points closer than this (m) are dropped in tiled areas, and more so for a larger radius. */
         private const val THIN_M = 25.0
