@@ -95,6 +95,12 @@ class PlannerViewModel(
     /** The whole planner state. */
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 
+    private val snapshotStore = PlanSnapshotStore()
+
+    init {
+        _uiState.update { it.copy(snapshots = snapshotStore.read()) }
+    }
+
     /** Mesh nodes that have a position (for the node pickers); [PlannerNodeOption.isOurs] marks the connected node. */
     val nodesWithPosition: StateFlow<List<PlannerNodeOption>> =
         nodeSource.nodes.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -662,10 +668,12 @@ class PlannerViewModel(
                 heightBM = st.b.antennaHeightM,
             )
         _uiState.update { it.copy(snapshots = (it.snapshots + shot).takeLast(MAX_SNAPSHOTS)) }
+        snapshotStore.write(_uiState.value.snapshots)
     }
 
     fun clearSnapshots() {
         _uiState.update { it.copy(snapshots = emptyList()) }
+        snapshotStore.write(emptyList())
     }
 
     /**
@@ -790,7 +798,7 @@ class PlannerViewModel(
 
     companion object {
         private const val METERS_PER_KM = 1000.0
-        private const val MAX_SNAPSHOTS = 6
+        private const val MAX_SNAPSHOTS = 12
         private const val SNAPSHOT_PREFIX = "#"
         private const val MIN_ANTENNA_M = 0.5
         private const val TENTH = 10.0

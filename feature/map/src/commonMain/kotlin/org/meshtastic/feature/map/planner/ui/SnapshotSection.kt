@@ -39,7 +39,7 @@ private const val KM = 1000.0
 /**
  * Keeps results of the link next to each other: "remember" stores the current result (distance, margins both ways, loss,
  * radio and antenna heights), and every remembered one is listed, so a change of antenna, height or radio can be
- * compared with what it was before. The list lasts while the app runs.
+ * compared with what it was before. The list is kept on the device.
  */
 @Composable
 internal fun SnapshotSection(state: PlannerUiState, vm: PlannerViewModel) {

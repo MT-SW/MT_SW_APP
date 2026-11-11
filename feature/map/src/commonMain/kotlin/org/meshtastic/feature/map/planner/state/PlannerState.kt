@@ -288,7 +288,7 @@ data class PlannerUiState(
     val link: LinkResult? = null,
     val series: ProfileSeries? = null,
     val comparison: MeasuredComparison? = null,
-    /** Results the user chose to keep for comparison (kept while the app runs). */
+    /** Results the user chose to keep for comparison (kept on the device). */
     val snapshots: List<PlanSnapshot> = emptyList(),
     val error: PlannerError? = null,
     val hintsBySide: Map<PlannerSide, List<PlannerHint>> = emptyMap(),

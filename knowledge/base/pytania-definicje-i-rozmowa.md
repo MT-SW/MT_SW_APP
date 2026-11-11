@@ -182,7 +182,7 @@ Słowa: planer, pokaż na mapie, budynki na mapie, odbicie od ziemi, warstwa odb
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
 
 ### Jak porównać wyniki łącza w planerze?
-W planerze pod wynikiem jest karta „Porównanie wyników”. „Zapamiętaj ten wynik” zapisuje odległość, zapas w obu kierunkach, SF, częstotliwość i wysokości anten. Zmieniasz antenę, wysokość albo radio, zapamiętujesz kolejny wynik i widzisz je obok siebie. Lista ma do 6 pozycji i trwa do zamknięcia aplikacji, „Wyczyść listę” ją czyści.
+W planerze pod wynikiem jest karta „Porównanie wyników”. „Zapamiętaj ten wynik” zapisuje odległość, zapas w obu kierunkach, SF, częstotliwość i wysokości anten. Zmieniasz antenę, wysokość albo radio, zapamiętujesz kolejny wynik i widzisz je obok siebie. Lista ma do 12 pozycji i jest zapisana na urządzeniu, „Wyczyść listę” ją czyści.
 Słowa: planer, porównanie wyników, zapamiętaj wynik, porównać anteny, porównać wysokości, zapas łącza
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
 
