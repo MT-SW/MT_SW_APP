@@ -26,6 +26,7 @@
 
 package org.meshtastic.feature.map.horizon
 
+import co.touchlab.kermit.Logger
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -106,6 +107,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -114,6 +116,7 @@ import org.meshtastic.core.resources.terrain_horizon_quality
 import org.meshtastic.core.resources.terrain_horizon_quality_auto
 import org.meshtastic.core.resources.terrain_horizon_quality_best
 import org.meshtastic.core.resources.terrain_horizon_quality_good
+import org.meshtastic.core.resources.terrain_horizon_quality_lowered
 import org.meshtastic.core.resources.terrain_horizon_quality_very_good
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
@@ -236,6 +239,7 @@ private const val GRAIN_STREAK_SHARE = 0.6f
 private const val GRAIN_ALPHA = 0.16f
 private const val GRAIN_FADE = 0.22f
 private const val GOOD_QUALITY_BUILDINGS = 800
+private const val NOTICE_MS = 4_000L
 private const val LEVEL_BEST = 0
 private const val LEVEL_GOOD = 2
 private const val AUTO_WINDOW_FRAMES = 45
@@ -746,6 +750,13 @@ private fun Panorama(
     val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
     // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
     var autoLevel by remember { mutableIntStateOf(LEVEL_BEST) }
+    var lowered by remember { mutableStateOf(false) }
+    LaunchedEffect(lowered) {
+        if (lowered) {
+            delay(NOTICE_MS)
+            lowered = false
+        }
+    }
     val level = if (quality < 0) autoLevel else quality
     LaunchedEffect(quality) {
         if (quality >= 0) return@LaunchedEffect
@@ -761,7 +772,11 @@ private fun Panorama(
                     frames++
                     if (gap > AUTO_SLOW_FRAME_MS) slow++
                     if (frames >= AUTO_WINDOW_FRAMES) {
-                        if (slow * 2 > frames && autoLevel < LEVEL_GOOD) autoLevel++
+                        Logger.i { "Panorama: klatek $frames, wolnych $slow, poziom $autoLevel" }
+                        if (slow * 2 > frames && autoLevel < LEVEL_GOOD) {
+                            autoLevel++
+                            lowered = true
+                        }
                         frames = 0
                         slow = 0
                     }
@@ -785,6 +800,17 @@ private fun Panorama(
     val currentTargets by rememberUpdatedState(targets)
     val currentFov by rememberUpdatedState(fieldOfView)
     Box(Modifier.fillMaxSize()) {
+        if (lowered) {
+            Text(
+                text = stringResource(Res.string.terrain_horizon_quality_lowered),
+                style = MaterialTheme.typography.labelMedium,
+                modifier =
+                Modifier.align(Alignment.TopCenter)
+                    .padding(top = 8.dp)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), MaterialTheme.shapes.small)
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
         Canvas(
             modifier =
             Modifier.fillMaxSize()

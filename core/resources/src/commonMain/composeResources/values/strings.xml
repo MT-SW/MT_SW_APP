@@ -3335,6 +3335,7 @@
     <string name="terrain_horizon_quality_auto">Automatic</string>
     <string name="terrain_horizon_quality_best">Best</string>
     <string name="terrain_horizon_quality_good">Good</string>
+    <string name="terrain_horizon_quality_lowered">Panorama quality lowered automatically</string>
     <string name="terrain_horizon_quality_very_good">Very good</string>
     <string name="terrain_horizon_range">Range</string>
     <string name="terrain_horizon_refraction">Radio horizon (earth factor)</string>

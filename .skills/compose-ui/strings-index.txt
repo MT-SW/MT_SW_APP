@@ -3260,6 +3260,7 @@ terrain_horizon_quality
 terrain_horizon_quality_auto
 terrain_horizon_quality_best
 terrain_horizon_quality_good
+terrain_horizon_quality_lowered
 terrain_horizon_quality_very_good
 terrain_horizon_range
 terrain_horizon_refraction
