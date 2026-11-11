@@ -3808,4 +3808,22 @@
     <string name="xr_terrain_map">Mapa 3D</string>
     <string name="xr_terrain_unavailable">Nie udało się wczytać terenu. Sprawdź połączenie i spróbuj ponownie.</string>
     <string name="xr_terrain_zoom">Przybliżenie</string>
+    <string name="planner_pattern_title">Charakterystyka anteny</string>
+    <string name="planner_pattern_kind_omni">Dookólna</string>
+    <string name="planner_pattern_kind_yagi">Yagi</string>
+    <string name="planner_pattern_kind_moxon">Moxon</string>
+    <string name="planner_pattern_kind_panel">Panelowa</string>
+    <string name="planner_pattern_kind_biquad">Biquad</string>
+    <string name="planner_pattern_kind_helix">Helikalna</string>
+    <string name="planner_pattern_kind_dish">Czasza</string>
+    <string name="planner_pattern_kind_sector">Sektorowa</string>
+    <string name="planner_pattern_elements">Liczba elementów</string>
+    <string name="planner_pattern_aim_other">Kieruj na drugi koniec</string>
+    <string name="planner_pattern_azimuth">Kierunek anteny (azymut)</string>
+    <string name="planner_pattern_beamwidth">Szerokość wiązki (−3 dB)</string>
+    <string name="planner_pattern_front_to_back">Tłumienie z tyłu</string>
+    <string name="planner_pattern_reset">Wartości typowe dla tego rodzaju</string>
+    <string name="planner_ground_reflection">Uwzględnij odbicia od ziemi (wzmacniają lub osłabiają sygnał)</string>
+    <string name="planner_clutter_reflections">Uwzględnij odbicia od budynków i drzew (przybliżony zapas, wymaga dokładnego terenu)</string>
+    <string name="antenna_pattern_title">Charakterystyka promieniowania (widok z góry)</string>
 </resources>

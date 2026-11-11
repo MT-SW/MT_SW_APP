@@ -400,6 +400,7 @@ antenna_note_tune_swr
 antenna_note_yagi_boom
 antenna_note_yagi_driven
 antenna_open_calculator
+antenna_pattern_title
 antenna_planner_name
 antenna_pol_circular
 antenna_pol_either
@@ -2538,6 +2539,24 @@ phone_location
 phone_location_description
 phosphorus
 pin_selected
+### PLANNER ###
+planner_clutter_reflections
+planner_ground_reflection
+planner_pattern_aim_other
+planner_pattern_azimuth
+planner_pattern_beamwidth
+planner_pattern_elements
+planner_pattern_front_to_back
+planner_pattern_kind_biquad
+planner_pattern_kind_dish
+planner_pattern_kind_helix
+planner_pattern_kind_moxon
+planner_pattern_kind_omni
+planner_pattern_kind_panel
+planner_pattern_kind_sector
+planner_pattern_kind_yagi
+planner_pattern_reset
+planner_pattern_title
 play
 plurals_hours
 plurals_milliseconds

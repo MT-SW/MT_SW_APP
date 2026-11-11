@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.planner
 
+import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.feature.map.planner.data.PlannerClutter
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -32,6 +33,11 @@ data class CoverageInput(
     val txPowerDbm: Double,
     val antennaGainDbi: Double,
     val feederLossDb: Double,
+    /** Directional antenna: its main direction (compass degrees), beamwidth and front-to-back ratio. */
+    val directional: Boolean = false,
+    val azimuthDeg: Double = 0.0,
+    val beamwidthDeg: Double = 360.0,
+    val frontToBackDb: Double = 0.0,
     val rxAntennaHeightM: Double = 2.0,
     val rxGainDbi: Double = 0.0,
     val frequencyMHz: Double,
@@ -41,6 +47,7 @@ data class CoverageInput(
     val kFactor: Double,
     val surfaceRefractivity: Double,
     val extraLossDb: Double = 0.0,
+    val groundReflection: Boolean = false,
     val maxRangeKm: Double,
     val radials: Int = 72,
     val stepM: Double = 200.0,
@@ -63,6 +70,18 @@ class CoverageResult(
 )
 
 object Coverage {
+    private fun reflectionAt(input: CoverageInput, distM: Double): Double = if (input.groundReflection) {
+        GroundReflection.gainDb(
+            distM,
+            input.antennaHeightM,
+            input.rxAntennaHeightM,
+            input.frequencyMHz,
+            GroundReflection.DEFAULT_COEFFICIENT,
+        )
+    } else {
+        0.0
+    }
+
     private const val MAX_PROFILE_SAMPLES = 600
     private const val DEFAULT_RINGS = 40
     private const val ERROR_MARGIN_DB = -200f
@@ -93,6 +112,16 @@ object Coverage {
         val reach = DoubleArray(radials)
         for (r in 0 until radials) {
             val bearing = 360.0 * r / radials
+            val patternLoss =
+                if (input.directional) {
+                    AntennaPatterns.lossDb(
+                        AntennaPatterns.angleBetweenDeg(bearing, input.azimuthDeg),
+                        input.beamwidthDeg,
+                        input.frontToBackDb,
+                    )
+                } else {
+                    0.0
+                }
             val ground = DoubleArray(n + 1)
             val obstacle = DoubleArray(n + 1)
             for (i in 0..n) {
@@ -118,7 +147,7 @@ object Coverage {
                     )
                 val m =
                     if (res.returnCode <= 1 && !res.lossDb.isNaN()) {
-                        (eirpMinusLosses - res.lossDb - sens).toFloat()
+                        (eirpMinusLosses - patternLoss - res.lossDb + reflectionAt(input, ringsM[j]) - sens).toFloat()
                     } else {
                         ERROR_MARGIN_DB
                     }

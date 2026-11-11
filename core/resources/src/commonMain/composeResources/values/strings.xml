@@ -421,6 +421,7 @@
     <string name="antenna_note_yagi_boom">Lengths of elements through a metal boom are lengthened; with elements insulated from the boom switch that off.</string>
     <string name="antenna_note_yagi_driven">The driven element is given as a plain dipole; in a Yagi its impedance drops, so a folded dipole or gamma match is usually used and tuned.</string>
     <string name="antenna_open_calculator">Antenna calculator</string>
+    <string name="antenna_pattern_title">Radiation pattern (seen from above)</string>
     <string name="antenna_planner_name">Antenna from the calculator</string>
     <string name="antenna_pol_circular">Polarisation: circular</string>
     <string name="antenna_pol_either">Polarisation: as mounted (vertical for our network)</string>
@@ -2592,6 +2593,24 @@
     <string name="phone_location_description">MT_SW_APP uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
     <string name="phosphorus">Phosphorus</string>
     <string name="pin_selected">Pin</string>
+    <!-- PLANNER -->
+    <string name="planner_clutter_reflections">Include reflections off buildings and trees (rough allowance, needs the precise terrain)</string>
+    <string name="planner_ground_reflection">Include ground reflections (they strengthen or weaken the signal)</string>
+    <string name="planner_pattern_aim_other">Point at the other end</string>
+    <string name="planner_pattern_azimuth">Antenna direction (azimuth)</string>
+    <string name="planner_pattern_beamwidth">Beamwidth (−3 dB)</string>
+    <string name="planner_pattern_elements">Number of elements</string>
+    <string name="planner_pattern_front_to_back">Front-to-back ratio</string>
+    <string name="planner_pattern_kind_biquad">Biquad</string>
+    <string name="planner_pattern_kind_dish">Dish</string>
+    <string name="planner_pattern_kind_helix">Helical</string>
+    <string name="planner_pattern_kind_moxon">Moxon</string>
+    <string name="planner_pattern_kind_omni">Omnidirectional</string>
+    <string name="planner_pattern_kind_panel">Panel</string>
+    <string name="planner_pattern_kind_sector">Sector</string>
+    <string name="planner_pattern_kind_yagi">Yagi</string>
+    <string name="planner_pattern_reset">Typical values for this kind</string>
+    <string name="planner_pattern_title">Antenna pattern</string>
     <string name="play">Play</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d hour</item>

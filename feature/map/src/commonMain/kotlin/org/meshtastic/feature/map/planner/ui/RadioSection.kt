@@ -50,7 +50,9 @@ import org.meshtastic.core.resources.planner_clutter_title
 import org.meshtastic.core.resources.planner_ducting_warning
 import org.meshtastic.core.resources.planner_extra_loss
 import org.meshtastic.core.resources.planner_frequency
+import org.meshtastic.core.resources.planner_clutter_reflections
 import org.meshtastic.core.resources.planner_frequency_title
+import org.meshtastic.core.resources.planner_ground_reflection
 import org.meshtastic.core.resources.planner_k_factor
 import org.meshtastic.core.resources.planner_k_factor_title
 import org.meshtastic.core.resources.planner_modem_custom
@@ -254,6 +256,28 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
             )
         }
 
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable { vm.setGroundReflection(!state.groundReflection) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = state.groundReflection, onCheckedChange = null)
+            Text(
+                text = stringResource(Res.string.planner_ground_reflection),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable { vm.setClutterReflections(!state.clutterReflections) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = state.clutterReflections, onCheckedChange = null)
+            Text(
+                text = stringResource(Res.string.planner_clutter_reflections),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+        }
         PlannerSubheading(text = stringResource(Res.string.planner_clutter_title), info = PlannerInfoTopic.CLUTTER)
         Row(
             modifier = Modifier.fillMaxWidth().clickable { vm.setPreciseTerrain(!state.preciseTerrain) },

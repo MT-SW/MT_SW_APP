@@ -94,6 +94,7 @@ internal fun StationSection(state: PlannerUiState, vm: PlannerViewModel) {
                 min = MIN_GAIN,
                 max = MAX_GAIN,
             )
+            AntennaPatternSection(side = side, end = end, vm = vm)
             FeederSection(side = side, end = end, vm = vm)
             val eirp = end.txPowerDbm + end.antennaGainDbi - end.feederLossDb
             Text(

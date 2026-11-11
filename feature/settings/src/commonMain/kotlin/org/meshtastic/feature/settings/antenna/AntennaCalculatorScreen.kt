@@ -88,6 +88,8 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.antenna.AntennaDesign
 import org.meshtastic.core.model.antenna.AntennaInput
 import org.meshtastic.core.model.antenna.AntennaMath
+import org.meshtastic.core.model.antenna.AntennaPatterns
+import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.core.model.antenna.AntennaPrefill
 import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.AntennaSetups
@@ -157,6 +159,7 @@ import org.meshtastic.core.resources.antenna_feed_title
 import org.meshtastic.core.resources.antenna_freq_ours
 import org.meshtastic.core.resources.antenna_frequency
 import org.meshtastic.core.resources.antenna_gain
+import org.meshtastic.core.resources.antenna_pattern_title
 import org.meshtastic.core.resources.antenna_gain_override
 import org.meshtastic.core.resources.antenna_hint_cable
 import org.meshtastic.core.resources.antenna_hint_worst
@@ -267,6 +270,7 @@ import org.meshtastic.core.resources.planner_point_b
 import org.meshtastic.core.resources.planner_unit_db_per_m
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.component.AntennaPatternPlot
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -590,6 +594,19 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     propertyLines.forEach { Line(it) }
+                    val kind = PatternKind.of(type)
+                    if (kind.directional) {
+                        // The more elements a Yagi has, the narrower its beam and the better it suppresses the back.
+                        Text(
+                            text = stringResource(Res.string.antenna_pattern_title),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                        AntennaPatternPlot(
+                            beamwidthDeg = AntennaPatterns.presetBeamwidthDeg(kind, design.gainDbi),
+                            frontToBackDb = AntennaPatterns.presetFrontToBackDb(kind, input.elements),
+                            modifier = Modifier.fillMaxWidth(0.6f),
+                        )
+                    }
                 }
             }
 

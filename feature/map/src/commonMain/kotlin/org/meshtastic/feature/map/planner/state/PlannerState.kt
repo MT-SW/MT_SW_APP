@@ -18,11 +18,14 @@
 
 package org.meshtastic.feature.map.planner.state
 
+import org.meshtastic.core.model.antenna.AntennaPatterns
+import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.FeederResult
 import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.feature.map.planner.GeoPoint
+import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.ProfileSeries
@@ -36,6 +39,8 @@ import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.math.log10
 import kotlin.math.pow
+import kotlin.math.log2
+import kotlin.math.min
 
 /** The two link ends. */
 enum class PlannerSide {
@@ -142,6 +147,18 @@ data class PlannerEnd(
     val antennaHeightM: Double = DEFAULT_HEIGHT_M,
     val txPowerDbm: Double = DEFAULT_TX_DBM,
     val antennaGainDbi: Double = DEFAULT_GAIN_DBI,
+    /** How the antenna radiates around the horizon: the same everywhere, or one of the directional kinds. */
+    val patternKind: PatternKind = PatternKind.OMNI,
+    /** Number of elements of a Yagi (it changes gain, beamwidth and front-to-back). */
+    val patternElements: Int = AntennaPatterns.DEFAULT_ELEMENTS,
+    /** Compass bearing the directional antenna points at, used while [aimAtOther] is false. */
+    val azimuthDeg: Double = 0.0,
+    /** A link end points at the other end; the coverage of one station uses [azimuthDeg]. */
+    val aimAtOther: Boolean = true,
+    /** Beamwidth typed by the user; null takes the typical value of the kind. */
+    val beamwidthManualDeg: Double? = null,
+    /** Front-to-back ratio typed by the user; null takes the typical value of the kind. */
+    val frontToBackManualDb: Double? = null,
     /** Feeder loss typed by the user (used while [feederPrecise] is false). */
     val feederManualDb: Double = 0.0,
     /** When true the loss is computed from [feederConfig] instead of [feederManualDb]. */
@@ -154,6 +171,25 @@ data class PlannerEnd(
 ) {
     val isComplete: Boolean
         get() = lat != null && lon != null
+
+    /** Beamwidth in degrees: typed, or the typical one of the kind for this gain. */
+    val beamwidthDeg: Double
+        get() = beamwidthManualDeg ?: AntennaPatterns.presetBeamwidthDeg(patternKind, antennaGainDbi)
+
+    /** Front-to-back ratio in dB: typed, or the typical one of the kind. */
+    val frontToBackDb: Double
+        get() = frontToBackManualDb ?: AntennaPatterns.presetFrontToBackDb(patternKind, patternElements)
+
+    /**
+     * How many dB less than the full gain this antenna radiates towards [target] from [from], given that it is turned
+     * towards [aimAt] (the other end of a link, or the typed bearing when null).
+     */
+    fun patternLossDb(from: GeoPoint, target: GeoPoint, aimAt: GeoPoint?): Double {
+        if (!patternKind.directional) return 0.0
+        val axis = if (aimAtOther && aimAt != null) Geodesy.bearingDeg(from, aimAt) else azimuthDeg
+        val off = AntennaPatterns.angleBetweenDeg(Geodesy.bearingDeg(from, target), axis)
+        return AntennaPatterns.lossDb(off, beamwidthDeg, frontToBackDb)
+    }
 
     val point: GeoPoint?
         get() = if (lat != null && lon != null) GeoPoint(lat, lon) else null
@@ -172,6 +208,8 @@ data class PlannerEnd(
 
     companion object {
         const val DEFAULT_HEIGHT_M = 2.0
+        const val MAX_MULTIPATH_DB = 6.0
+        const val MULTIPATH_DB_PER_OCTAVE = 1.5
         const val DEFAULT_TX_DBM = 20.0
         const val DEFAULT_GAIN_DBI = 2.15
         val DEFAULT_FEEDER: FeederConfig = FeederBuilder.presets.first { it.id == "direct" }.config
@@ -231,6 +269,10 @@ data class PlannerUiState(
      * calculation). Off by default.
      */
     val preciseTerrain: Boolean = false,
+    /** Adds the effect of the reflection from the ground to the link and the coverage. */
+    val groundReflection: Boolean = false,
+    /** Adds a rough allowance for the reflections and scattering of buildings and trees (needs the map data). */
+    val clutterReflections: Boolean = false,
     /** How far (km) around the coverage centre obstacle data is loaded; the rest keeps the preset loss. */
     val clutterRadiusKm: Double = PlannerClutter.DEFAULT_AREA_RADIUS_KM,
     val forestHeightM: Double = ClutterHeights.DEFAULT_FOREST_M,
@@ -274,6 +316,14 @@ data class PlannerUiState(
         get() {
             val replaced = preciseTerrain && clutter !is PlannerClutterStatus.Failed
             return if (replaced) 0.0 else extraLossDb
+        }
+
+    /** The allowance (dB) for reflections off buildings and trees, for what [stats] found: more of them, more of it. */
+    fun multipathDb(stats: ClutterStats): Double =
+        if (clutterReflections) {
+            min(MAX_MULTIPATH_DB, MULTIPATH_DB_PER_OCTAVE * log2(1.0 + stats.buildings / 20.0 + stats.forests / 5.0))
+        } else {
+            0.0
         }
 
     fun end(side: PlannerSide): PlannerEnd = if (side == PlannerSide.A) a else b

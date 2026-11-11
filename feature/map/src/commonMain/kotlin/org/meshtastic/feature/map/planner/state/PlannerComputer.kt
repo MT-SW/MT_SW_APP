@@ -181,15 +181,17 @@ class PlannerComputer(
             }
         }
         val used = PathProfile(profile.stepM, ground)
-        val extraDb = state.copy(clutter = clutterStatus).effectiveExtraLossDb
+        val linkStats = (clutterStatus as? PlannerClutterStatus.Ready)?.stats
+        val extraDb =
+            state.copy(clutter = clutterStatus).effectiveExtraLossDb + (linkStats?.let { state.multipathDb(it) } ?: 0.0)
 
         val distKm = used.distanceM / 1000.0
         val atmo = atmosphericLossDb(state.frequencyMHz, conditions, distKm)
 
         val input =
             LinkInput(
-                a = linkEnd(state.a, pa, ground[0]),
-                b = linkEnd(state.b, pb, ground[n]),
+                a = linkEnd(state.a, pa, ground[0], pb),
+                b = linkEnd(state.b, pb, ground[n], pa),
                 frequencyMHz = state.frequencyMHz,
                 bandwidthKhz = state.bandwidthKhz,
                 spreadingFactor = state.spreadingFactor,
@@ -197,6 +199,7 @@ class PlannerComputer(
                 kFactor = k,
                 surfaceRefractivity = n0,
                 extraLossDb = extraDb + atmo,
+                groundReflection = state.groundReflection,
             )
         return try {
             val (link, series) =
@@ -256,6 +259,9 @@ class PlannerComputer(
         val clutterAt: ((Double, Double) -> Double)? = clutterMap?.let { m ->
             { lat, lon -> m.heightAt(lat, lon, heights) }
         }
+        val otherPoint = state.end(state.coverageSide.other).point
+        val coverageAzimuth =
+            if (end.aimAtOther && otherPoint != null) Geodesy.bearingDeg(center, otherPoint) else end.azimuthDeg
         val manualGround = end.groundAltM
         val ground = if (end.groundAltManual && manualGround != null) manualGround else sampler(center.lat, center.lon)
         val input =
@@ -266,6 +272,10 @@ class PlannerComputer(
                 txPowerDbm = end.txPowerDbm,
                 antennaGainDbi = end.antennaGainDbi,
                 feederLossDb = end.feederLossDb,
+                directional = end.patternKind.directional,
+                azimuthDeg = coverageAzimuth,
+                beamwidthDeg = end.beamwidthDeg,
+                frontToBackDb = end.frontToBackDb,
                 rxAntennaHeightM = state.coverageRxHeightM,
                 rxGainDbi = state.coverageRxGainDbi,
                 frequencyMHz = state.frequencyMHz,
@@ -274,7 +284,13 @@ class PlannerComputer(
                 noiseFigureDb = state.noiseFigureDb,
                 kFactor = state.kFactor,
                 surfaceRefractivity = state.surfaceRefractivity,
-                extraLossDb = if (clutterMap != null) state.effectiveExtraLossDb else state.extraLossDb,
+                extraLossDb =
+                    if (clutterMap != null) {
+                        state.effectiveExtraLossDb + state.multipathDb(clutterMap.stats)
+                    } else {
+                        state.extraLossDb
+                    },
+                groundReflection = state.groundReflection,
                 maxRangeKm = state.coverageMaxRangeKm,
                 radials = state.coverageRadials,
                 rangeSteps = (state.coverageMaxRangeKm * 2.0).toInt().coerceIn(60, 150),
@@ -324,13 +340,14 @@ class PlannerComputer(
         PlannerElevationFailure.DECODE -> PlannerError.ELEVATION_DECODE
     }
 
-    private fun linkEnd(end: PlannerEnd, point: GeoPoint, groundM: Double): LinkEnd = LinkEnd(
+    private fun linkEnd(end: PlannerEnd, point: GeoPoint, groundM: Double, other: GeoPoint): LinkEnd = LinkEnd(
         point = point,
         groundAltM = groundM,
         antennaHeightM = end.antennaHeightM,
         txPowerDbm = end.txPowerDbm,
         antennaGainDbi = end.antennaGainDbi,
         feederLossDb = end.feederLossDb,
+        patternLossDb = end.patternLossDb(point, other, other),
     )
 
     private suspend fun fetchWeather(p: GeoPoint): PlannerWeatherResult {

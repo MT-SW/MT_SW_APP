@@ -25,6 +25,8 @@
 
 package org.meshtastic.feature.map.planner.state
 
+import org.meshtastic.core.model.antenna.AntennaPatterns
+import org.meshtastic.core.model.antenna.PatternKind
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
@@ -195,6 +197,59 @@ class PlannerViewModel(
     fun setAntennaGain(side: PlannerSide, dbi: Double) =
         editEnd(side, dbi) { e, v -> e.copy(antennaGainDbi = v.coerceIn(-10.0, 60.0)) }
 
+    /** Changes the kind of antenna; its typical gain is taken, and the typed beamwidth and back suppression dropped. */
+    fun setPatternKind(side: PlannerSide, kind: PatternKind) = mutate { st ->
+        val e = st.end(side)
+        st.withEnd(
+            side,
+            e.copy(
+                patternKind = kind,
+                antennaGainDbi = AntennaPatterns.presetGainDbi(kind, e.patternElements),
+                beamwidthManualDeg = null,
+                frontToBackManualDb = null,
+            ),
+        )
+    }
+
+    /** Number of elements of a Yagi; its typical gain follows. */
+    fun setPatternElements(side: PlannerSide, count: Int) = mutate { st ->
+        val e = st.end(side)
+        val n = count.coerceIn(AntennaPatterns.MIN_ELEMENTS, AntennaPatterns.MAX_ELEMENTS)
+        st.withEnd(
+            side,
+            e.copy(
+                patternElements = n,
+                antennaGainDbi =
+                if (e.patternKind == PatternKind.YAGI) {
+                    AntennaPatterns.presetGainDbi(e.patternKind, n)
+                } else {
+                    e.antennaGainDbi
+                },
+                frontToBackManualDb = null,
+            ),
+        )
+    }
+
+    fun setAzimuth(side: PlannerSide, deg: Double) =
+        editEnd(side, deg) { e, v -> e.copy(azimuthDeg = ((v % 360.0) + 360.0) % 360.0) }
+
+    fun setClutterReflections(on: Boolean) = mutate { st -> st.copy(clutterReflections = on, coverage = null) }
+
+    fun setGroundReflection(on: Boolean) = mutate { st -> st.copy(groundReflection = on, coverage = null) }
+
+    fun setAimAtOther(side: PlannerSide, on: Boolean) = mutate { st -> st.withEnd(side, st.end(side).copy(aimAtOther = on)) }
+
+    fun setBeamwidth(side: PlannerSide, deg: Double) =
+        editEnd(side, deg) { e, v -> e.copy(beamwidthManualDeg = v.coerceIn(5.0, 360.0)) }
+
+    fun setFrontToBack(side: PlannerSide, db: Double) =
+        editEnd(side, db) { e, v -> e.copy(frontToBackManualDb = v.coerceIn(0.0, 60.0)) }
+
+    /** Back to the typical beamwidth and back suppression of the kind. */
+    fun resetPattern(side: PlannerSide) = mutate { st ->
+        st.withEnd(side, st.end(side).copy(beamwidthManualDeg = null, frontToBackManualDb = null))
+    }
+
     /** Simple feeder loss in dB. Does not change [PlannerEnd.feederPrecise]; the value is kept when switching modes. */
     fun setFeederManualDb(side: PlannerSide, db: Double) =
         editEnd(side, db) { e, v -> e.copy(feederManualDb = v.coerceIn(0.0, 100.0)) }
@@ -235,6 +290,10 @@ class PlannerViewModel(
                 .copy(
                     txPowerDbm = setup.txDbm.coerceIn(-10.0, 50.0),
                     antennaGainDbi = setup.gainDbi.coerceIn(-10.0, 60.0),
+                    patternKind = PatternKind.of(setup.input.type),
+                    patternElements = setup.input.elements.coerceIn(AntennaPatterns.MIN_ELEMENTS, AntennaPatterns.MAX_ELEMENTS),
+                    beamwidthManualDeg = null,
+                    frontToBackManualDb = null,
                     feederConfig = setup.feeder,
                     feederPrecise = true,
                 ),
@@ -249,6 +308,12 @@ class PlannerViewModel(
             st.b.copy(
                 txPowerDbm = a.txPowerDbm,
                 antennaGainDbi = a.antennaGainDbi,
+                patternKind = a.patternKind,
+                patternElements = a.patternElements,
+                azimuthDeg = a.azimuthDeg,
+                aimAtOther = a.aimAtOther,
+                beamwidthManualDeg = a.beamwidthManualDeg,
+                frontToBackManualDb = a.frontToBackManualDb,
                 antennaHeightM = a.antennaHeightM,
                 feederManualDb = a.feederManualDb,
                 feederPrecise = a.feederPrecise,

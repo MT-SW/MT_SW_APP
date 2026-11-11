@@ -28,6 +28,8 @@ data class LinkEnd(
     val txPowerDbm: Double,
     val antennaGainDbi: Double,
     val feederLossDb: Double,
+    /** How many dB less than the full gain the antenna radiates towards the other end (a directional antenna). */
+    val patternLossDb: Double = 0.0,
 )
 
 data class LinkInput(
@@ -41,6 +43,8 @@ data class LinkInput(
     val surfaceRefractivity: Double = 301.0,
     /** Clutter, gas, rain etc. */
     val extraLossDb: Double = 0.0,
+    /** Adds the effect of the ground reflection (see [GroundReflection]). */
+    val groundReflection: Boolean = false,
     val timePct: Double = 50.0,
     val locationPct: Double = 50.0,
     val situationPct: Double = 50.0,
@@ -136,11 +140,25 @@ object LinkBudget {
             )
         val itmOk = itm.returnCode <= 1 && !itm.lossDb.isNaN()
         val itmLoss = if (itmOk) itm.lossDb else ITM_ERROR_LOSS_DB
-        val total = itmLoss + input.extraLossDb
+        val reflection =
+            if (input.groundReflection && itmOk) {
+                GroundReflection.gainDb(
+                    dist,
+                    a.antennaHeightM,
+                    b.antennaHeightM,
+                    input.frequencyMHz,
+                    GroundReflection.DEFAULT_COEFFICIENT,
+                )
+            } else {
+                0.0
+            }
+        val total = itmLoss + input.extraLossDb - reflection
         val sens = Sensitivity.dbm(input.bandwidthKhz, input.spreadingFactor, input.noiseFigureDb)
 
         fun dir(tx: LinkEnd, rx: LinkEnd): DirectionResult {
-            val rxP = tx.txPowerDbm + tx.antennaGainDbi - tx.feederLossDb - total + rx.antennaGainDbi - rx.feederLossDb
+            val rxP =
+                tx.txPowerDbm + tx.antennaGainDbi - tx.patternLossDb - tx.feederLossDb - total +
+                    rx.antennaGainDbi - rx.patternLossDb - rx.feederLossDb
             val margin = rxP - sens - input.fadeMarginDb
             return DirectionResult(rxP, margin, if (itmOk) LinkVerdict.fromMargin(margin) else LinkVerdict.NO_LINK)
         }
