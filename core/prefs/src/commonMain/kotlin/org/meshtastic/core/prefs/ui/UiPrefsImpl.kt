@@ -41,6 +41,7 @@ import org.meshtastic.core.prefs.cachedFlow
 import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.AppUpdatePrefs
 import org.meshtastic.core.repository.AutoCleanNodesPolicy
+import org.meshtastic.core.repository.DATA_NOTICE_VERSION
 import org.meshtastic.core.repository.NodeFilterPrefs
 import org.meshtastic.core.repository.UiPrefs
 
@@ -60,10 +61,21 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val dataNoticeAcceptedAt: StateFlow<Long?> =
-        dataStore.data.map { it[KEY_DATA_NOTICE_ACCEPTED_AT] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, null)
+        dataStore.data
+            .map { prefs ->
+                // An acceptance of an older version of the text no longer counts.
+                val outdated = (prefs[KEY_DATA_NOTICE_VERSION] ?: 0) < DATA_NOTICE_VERSION
+                if (outdated) 0L else prefs[KEY_DATA_NOTICE_ACCEPTED_AT] ?: 0L
+            }
+            .stateIn(scope, SharingStarted.Eagerly, null)
 
     override fun setDataNoticeAcceptedAt(value: Long) {
-        scope.launch { dataStore.edit { it[KEY_DATA_NOTICE_ACCEPTED_AT] = value } }
+        scope.launch {
+            dataStore.edit {
+                it[KEY_DATA_NOTICE_ACCEPTED_AT] = value
+                it[KEY_DATA_NOTICE_VERSION] = if (value > 0L) DATA_NOTICE_VERSION else 0
+            }
+        }
     }
 
     // The default comes from the platform ([UiPrefsDefaults]): the system theme on Android, the saturated theme on
@@ -841,6 +853,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_DATA_NOTICE_ACCEPTED_AT = longPreferencesKey("data_notice_accepted_at")
+        val KEY_DATA_NOTICE_VERSION = intPreferencesKey("data_notice_version")
         val KEY_THEME = intPreferencesKey("theme")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
         val KEY_FONT_FAMILY = stringPreferencesKey("font-family-name")

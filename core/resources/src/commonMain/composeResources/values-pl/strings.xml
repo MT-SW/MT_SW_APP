@@ -3877,4 +3877,5 @@
     <string name="data_notice_close">Zamknij</string>
     <string name="data_notice_read_again">Przeczytaj warunki korzystania</string>
     <string name="data_notice_shortcut_summary">Zgoda, data zgody i czyszczenie danych są w „O aplikacji”</string>
+    <string name="data_notice_copy">Kopiuj tekst</string>
 </resources>

@@ -39,21 +39,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.data_notice_accept
 import org.meshtastic.core.resources.data_notice_body
 import org.meshtastic.core.resources.data_notice_close
+import org.meshtastic.core.resources.data_notice_copy
 import org.meshtastic.core.resources.data_notice_decline
 import org.meshtastic.core.resources.data_notice_ready
 import org.meshtastic.core.resources.data_notice_scroll_hint
@@ -66,6 +70,7 @@ import org.meshtastic.core.resources.data_wipe_confirm_wait
 import org.meshtastic.core.resources.data_wipe_title
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalWipeApplicationData
+import org.meshtastic.core.ui.util.createClipEntry
 
 private const val COUNTDOWN_SECONDS = 10
 private const val LAYOUT_SETTLE_MS = 500L
@@ -195,6 +200,10 @@ fun DataWipeDialog(secondaryLabel: StringResource, onSecondary: () -> Unit) {
 /** The terms of use again, for reading later (About screen). */
 @Composable
 fun DataNoticeReadDialog(onClose: () -> Unit) {
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    val title = stringResource(Res.string.data_notice_title)
+    val body = stringResource(Res.string.data_notice_body)
     AlertDialog(
         onDismissRequest = onClose,
         title = { Text(stringResource(Res.string.data_notice_title)) },
@@ -206,5 +215,10 @@ fun DataNoticeReadDialog(onClose: () -> Unit) {
             )
         },
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(Res.string.data_notice_close)) } },
+        dismissButton = {
+            TextButton(onClick = { scope.launch { clipboard.setClipEntry(createClipEntry("$title\n\n$body")) } }) {
+                Text(stringResource(Res.string.data_notice_copy))
+            }
+        },
     )
 }

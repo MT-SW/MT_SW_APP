@@ -849,6 +849,7 @@ data_notice_accept
 data_notice_accepted_on
 data_notice_body
 data_notice_close
+data_notice_copy
 data_notice_decline
 data_notice_not_accepted
 data_notice_read_again
