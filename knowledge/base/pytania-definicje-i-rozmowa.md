@@ -171,6 +171,11 @@ Widok sieci otwiera się najpierw jako panorama terenu: sylwetka terenu dookoła
 Słowa: panorama terenu, widok sieci, horyzont, linia horyzontu, teren, węzły w zasięgu wzroku, zasłonięty węzeł, aparat, AR, Mesh HUD, widoczność węzła
 Źródło: Dokumentacja aplikacji: Mapa i punkty trasy, widok sieci (sprawdzono 2026-11)
 
+### Co to jest warstwa propagacji na mapie?
+W ustawieniach warstw mapy (przycisk warstw) jest sekcja „Propagacja (prognoza pogody)”. Włączona rysuje na mapie kolorową warstwę, która pokazuje, gdzie aktualna pogoda wydłuża zasięg radia na Twoim paśmie: niebieski to normalnie, zielony trochę dalej, żółty do czerwonego dużo dalej, fioletowy to sygnał uwięziony w kanale w atmosferze. Wybierasz rodzaj (pełna skala, tylko wydłużony zasięg albo współczynnik k), ustawiasz przezroczystość suwakiem i godzinę w prognozie na 24 godziny. Przycisk „Pobierz dla tego widoku” (potem „Aktualizuj”) pobiera prognozę dla fragmentu widocznego na mapie i zapisuje ją na urządzeniu, a „Odświeżaj automatycznie” pobiera ją ponownie, gdy ma ponad 3 godziny albo gdy przesuniesz mapę poza pobrany obszar. To prognoza pogody, nie pomiar, i nie uwzględnia terenu ani anten; zasięg konkretnego łącza liczy planer. Dane pogodowe: Open-Meteo.com (CC BY 4.0).
+Słowa: propagacja, warstwa propagacji, kanał troposferyczny, ducting, prognoza zasięgu, pogoda, refrakcja, współczynnik k, warstwy mapy
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Propagacja na mapie (sprawdzono 2026-11)
+
 ### Dlaczego nie wysyła się zdjęcie w czacie (błąd 412 „uploads paused”)?
 Zdjęcia w czacie idą na publiczny serwer zdjęć, nie przez LoRa. Błąd „412 uploads paused” znaczy, że główny serwer (catbox.moe) chwilowo nie przyjmuje plików. Aplikacja sama próbuje wtedy kolejnych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin). Jeśli wszystkie serwisy odmówią, pokaże się powód i przycisk „Spróbuj ponownie”.
 Słowa: 412, uploads paused, zdjęcie się nie wysyła, nie wysyła zdjęcia, catbox, litterbox, uguu, serwer zdjęć, błąd wysyłania zdjęcia

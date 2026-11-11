@@ -226,3 +226,7 @@ packs, so the pill is informational there too.
 - [Node Metrics](node-metrics) — signal quality and position history for individual nodes
 - [Local Mesh Discovery](discovery) — traceroute and neighbor info for understanding mesh topology
 - [Units & Locale](units-and-locale) — distance and coordinate display formats
+
+## Propagation layer
+
+The map layers settings have a **Propagation (weather forecast)** section: a coloured layer shows where the weather extends the range of your radio band. It has a choice of kind, a transparency slider, an hour slider (a 24-hour forecast), a **Download / Update for this view** button (the forecast is saved on the device) and automatic refresh. Description: [MT_SW features](mt-sw-features). Data: Open-Meteo.com (CC BY 4.0).

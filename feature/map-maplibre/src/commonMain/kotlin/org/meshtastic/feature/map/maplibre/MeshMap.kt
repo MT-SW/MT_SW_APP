@@ -26,6 +26,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import org.meshtastic.feature.map.propagation.PropagationController
+import org.meshtastic.feature.map.propagation.GeoBounds
+import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
+import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
+import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
+import org.koin.compose.koinInject
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.FlowPreview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -157,6 +165,9 @@ fun rememberMeshMapState(
     val ourNode by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
     val displayUnits by viewModel.displayUnits.collectAsStateWithLifecycle()
 
+    val propagationController: PropagationController = koinInject()
+    val propagation by propagationController.state.collectAsStateWithLifecycle()
+
     val scope = rememberCoroutineScope()
     val focusedNode = remember(nodes, focusNodeNum) { focusNodeNum?.let { num -> nodes.firstOrNull { it.num == num } } }
     // The style block recomposes on every camera frame (it reads the viewport below); the mesh-wide filter should not.
@@ -178,6 +189,7 @@ fun rememberMeshMapState(
                 RasterBasemapLayer(basemap)
             }
             MapOverlayLayers(overlays, layerOpacity)
+            PropagationLayer(propagation, layerOpacity[PROPAGATION_LAYER_ID] ?: PROPAGATION_DEFAULT_OPACITY)
             TerrainLayers(
                 viewportBounds = viewportBounds,
                 zoom = state.cameraPosition.zoom,
@@ -214,6 +226,20 @@ fun rememberMeshMapState(
     // content in a subcomposition keyed on the loaded style and disposes it on every base-style switch, so a
     // `remember` in there is lost whenever the user changes basemap — which would reset FrameOnce's latch and
     // re-frame the mesh over wherever they had panned to.
+    // The propagation forecast follows the map: downloaded again when it is old or the view leaves it.
+    LaunchedEffect(mapState, propagation.enabled, propagation.autoRefresh) {
+        if (propagation.enabled && propagation.autoRefresh) {
+            @OptIn(FlowPreview::class)
+            snapshotFlow { mapState.viewport?.visibleBounds?.toBoundingBox() }
+                .filterNotNull()
+                .debounce(PROPAGATION_SETTLE_MS)
+                .collect { box ->
+                    propagationController.ensureFor(
+                        GeoBounds(south = box.south, west = box.west, north = box.north, east = box.east),
+                    )
+                }
+        }
+    }
     FrameOnce(enabled = frameOnNodes, nodes = visibleNodes, mapState = mapState)
     FlyToFocusedNode(focusNodeNum = focusNodeNum, focusedNode = focusedNode, mapState = mapState)
 
@@ -516,3 +542,5 @@ private fun BoxCornerMarker(corner: Position?) {
  * a dense mesh does not blow the image budget on nodes well off screen.
  */
 private const val CHIP_VIEW_PADDING = 0.5
+
+private const val PROPAGATION_SETTLE_MS = 1500L

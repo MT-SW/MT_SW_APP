@@ -719,7 +719,16 @@ interface MapPrefs {
 
     /** Applies [transform] to the terrain panorama's saved settings. */
     fun updateHorizonPrefs(transform: (HorizonPrefs) -> HorizonPrefs)
+
+    /** The propagation map layer's saved settings. */
+    suspend fun awaitPropagationPrefs(): PropagationPrefs = PropagationPrefs()
+
+    /** Applies [transform] to the propagation layer's saved settings. */
+    fun updatePropagationPrefs(transform: (PropagationPrefs) -> PropagationPrefs) {}
 }
+
+/** What the propagation map layer remembers: on/off, the kind of picture and how often it refreshes on its own. */
+data class PropagationPrefs(val enabled: Boolean = false, val kind: Int = 0, val autoRefresh: Boolean = true)
 
 /** What the terrain panorama remembers between visits: the range, the antenna heights and the radio-horizon factor. */
 data class HorizonPrefs(

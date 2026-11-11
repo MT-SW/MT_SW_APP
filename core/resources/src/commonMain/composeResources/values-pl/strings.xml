@@ -3828,4 +3828,19 @@
     <string name="antenna_pattern_title">Charakterystyka promieniowania (widok z góry)</string>
     <string name="planner_result_ground_reflection">Zysk z odbicia od ziemi</string>
     <string name="planner_result_pattern_loss">Strata kierunkowości anten (A / B)</string>
+    <string name="propagation_title">Propagacja (prognoza pogody)</string>
+    <string name="propagation_kind_gradient">Pełna skala</string>
+    <string name="propagation_kind_enhanced">Tylko wydłużony zasięg</string>
+    <string name="propagation_kind_k">Współczynnik k</string>
+    <string name="propagation_hour_now">Teraz</string>
+    <string name="propagation_hour_ahead">Za %1$d godz.</string>
+    <string name="propagation_auto">Odświeżaj automatycznie</string>
+    <string name="propagation_download">Pobierz dla tego widoku</string>
+    <string name="propagation_update">Aktualizuj dla tego widoku</string>
+    <string name="propagation_loading">Pobieranie…</string>
+    <string name="propagation_failed">Nie udało się pobrać prognozy</string>
+    <string name="propagation_none">Brak prognozy</string>
+    <string name="propagation_age">Prognoza sprzed %1$d min</string>
+    <string name="propagation_legend">Niebieski: normalnie, zielony: trochę dalej, żółty do czerwonego: dużo dalej, fioletowy: sygnał uwięziony w kanale</string>
+    <string name="propagation_source">Dane pogodowe: Open-Meteo.com (CC BY 4.0)</string>
 </resources>

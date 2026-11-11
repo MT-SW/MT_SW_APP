@@ -210,3 +210,7 @@ więc plakietka jest tam także tylko informacyjna.
 - [Metryki węzła](node-metrics) — jakość sygnału i historia pozycji pojedynczych węzłów
 - [Lokalne odkrywanie sieci mesh](discovery) — traceroute i informacje o sąsiadach do zrozumienia topologii sieci mesh
 - [Jednostki i lokalizacja](units-and-locale) — formaty wyświetlania odległości i współrzędnych
+
+## Warstwa propagacji
+
+W ustawieniach warstw mapy jest sekcja **Propagacja (prognoza pogody)**: kolorowa warstwa pokazuje, gdzie pogoda wydłuża zasięg radia na Twoim paśmie. Ma wybór rodzaju, suwak przezroczystości, suwak godziny (prognoza na 24 godziny), przycisk **Pobierz / Aktualizuj dla tego widoku** (prognoza jest zapisywana na urządzeniu) i automatyczne odświeżanie. Opis: [Funkcje MT_SW](mt-sw-features). Dane: Open-Meteo.com (CC BY 4.0).

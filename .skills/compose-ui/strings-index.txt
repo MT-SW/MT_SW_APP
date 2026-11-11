@@ -2661,6 +2661,22 @@ primary
 primary_channel_feature
 privacy_url
 project_information
+### PROPAGATION ###
+propagation_age
+propagation_auto
+propagation_download
+propagation_failed
+propagation_hour_ahead
+propagation_hour_now
+propagation_kind_enhanced
+propagation_kind_gradient
+propagation_kind_k
+propagation_legend
+propagation_loading
+propagation_none
+propagation_source
+propagation_title
+propagation_update
 provide_location_to_mesh
 provider_name_exists
 psk

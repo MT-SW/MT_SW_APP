@@ -81,11 +81,26 @@ The planner simulates the range of a radio link between two points, **A** and **
 - It computes the ITM (Longley-Rice) model, Earth curvature and the first Fresnel zone, draws a terrain profile and gives the link budget plus antenna bearings and angles.
 - **Exact terrain** — optionally downloads real buildings and forests from OpenStreetMap and takes their height into account.
 - **Live weather** — optionally includes propagation conditions from the current weather (Open-Meteo).
+- **Antenna kind and pattern** — for each end you choose the antenna kind (omni, Yagi with a chosen number of elements, Moxon, panel, biquad, helix, dish, sector); the planner takes its directivity (gain, beamwidth, front-to-back) and aiming into account, also in the range all around. The same pattern plot is in the antenna calculator.
+- **Reflections** — separate options: ground reflection and building and tree reflections (a multipath allowance); the link result shows the reflection gain and the directivity loss.
 - **Range all around** — draws the coverage as a coloured raster on the map, with an opacity slider.
 - **Comparison with a measurement** — the result can be compared with the last measured SNR and RSSI.
 - **Export** to PDF, CSV, KML, GeoJSON, JSON (all the data of the report: sections, terrain profile, points and coverage cells) and PNG.
 
 The planner is opened with the **Planner** button in the node details, next to the compass.
+
+## Propagation on the map
+
+An extra map layer shows how **the current weather changes the range** of your radio band (868 MHz and other UHF/VHF): where a signal travels further than usual and where it can be trapped in an atmospheric "duct".
+
+- Turn it on in the **map layers settings** (the layers button), in the "Propagation (weather forecast)" section; the choice is remembered.
+- **Kind**: full scale (from normal air to a duct), only extended range, or the Earth radius factor k.
+- Set the **transparency** with the slider (60% by default); the hour slider moves the picture forward in the 24-hour forecast.
+- **Download / Update for this view**: the forecast is downloaded for the part of the map on screen and saved on the device, so the layer also works without the internet for as long as the forecast covers those hours. With "Refresh automatically" on, it is downloaded again when it is over 3 hours old or when you move the map outside the downloaded area.
+- It computes the radio refractivity gradient from air temperature, humidity and pressure at several heights (ITU-R P.453). About -40 N-units/km is normal, below -79 a signal travels further, below -157 a duct is possible.
+- It is a weather forecast, not a measurement: it does not include terrain, antennas or buildings. The range of a particular link with terrain, antennas and reflections is calculated by the planner.
+
+Weather data by Open-Meteo.com (CC BY 4.0).
 
 ## Antenna calculator
 
@@ -272,3 +287,4 @@ All help and documentation in the app are available in Polish. You can change th
 - [Map and waypoints](map-and-waypoints) — the map, layers and waypoints
 - [Node metrics](node-metrics) — telemetry charts that Network health is based on
 - [Help and documentation](help-and-docs) — how to use in-app help
+

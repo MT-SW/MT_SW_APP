@@ -81,11 +81,26 @@ Planer symuluje zasięg łącza radiowego między dwoma punktami **A** i **B**, 
 - Liczy model ITM (Longley-Rice), krzywiznę Ziemi i pierwszą strefę Fresnela, rysuje przekrój terenu i podaje bilans łącza oraz kąty i namiary anten.
 - **Dokładny teren** — opcjonalnie pobiera z OpenStreetMap prawdziwe budynki i lasy i uwzględnia ich wysokość.
 - **Pogoda na żądanie** — opcjonalnie uwzględnia warunki propagacji z bieżącej pogody (Open-Meteo).
+- **Rodzaj anteny i charakterystyka** — dla każdej strony wybierasz rodzaj anteny (dookólna, Yagi z wybraną liczbą elementów, Moxon, panelowa, biquad, helisa, czasza, sektorowa); planer uwzględnia jej kierunkowość (zysk, szerokość wiązki, tłumienie do tyłu) i kierunek ustawienia, także w zasięgu dookoła. Ten sam wykres charakterystyki jest w kalkulatorze anten.
+- **Odbicia** — osobne opcje: odbicie od ziemi oraz odbicia od budynków i drzew (zapas na wielodrogowość); wynik trasy pokazuje zysk z odbicia i stratę kierunkowości.
 - **Zasięg dookoła** — rysuje zasięg jako kolorowy raster na mapie, z suwakiem krycia.
 - **Porównanie z pomiarem** — wynik można porównać z ostatnim zmierzonym SNR i RSSI.
 - **Eksport** do PDF, CSV, KML, GeoJSON, JSON (wszystkie dane raportu: sekcje, profil terenu, punkty i komórki zasięgu) i PNG.
 
 Planer otwiera przycisk **Planer** w szczegółach węzła, obok kompasu.
+
+## Propagacja na mapie
+
+Dodatkowa warstwa mapy pokazuje, jak **aktualna pogoda zmienia zasięg** radia na Twoim paśmie (868 MHz i inne UHF/VHF): gdzie sygnał niesie się dalej niż zwykle, a gdzie może zostać uwięziony w „kanale” w atmosferze.
+
+- Włączasz ją w **ustawieniach warstw mapy** (przycisk warstw) w sekcji „Propagacja (prognoza pogody)”; wybór jest zapamiętany na stałe.
+- **Rodzaj**: pełna skala (od normalnego powietrza do kanału), tylko wydłużony zasięg albo współczynnik k (promień Ziemi).
+- **Przezroczystość** ustawiasz suwakiem (domyślnie 60%), a suwak godziny przesuwa obraz do przodu w prognozie na 24 godziny.
+- **Pobierz / Aktualizuj dla tego widoku**: prognoza jest pobierana dla fragmentu, który widać na mapie, i zapisywana na urządzeniu, więc warstwa działa też bez internetu, dopóki prognoza obejmuje dane godziny. Przy włączonym „Odświeżaj automatycznie” aplikacja pobiera ją ponownie, gdy ma ponad 3 godziny albo gdy przesuniesz mapę poza pobrany obszar.
+- Liczy gradient refrakcji radiowej z temperatury, wilgotności i ciśnienia powietrza na kilku wysokościach (ITU-R P.453). Około −40 jednostek N/km to norma, poniżej −79 sygnał niesie się dalej, poniżej −157 możliwy jest kanał.
+- To prognoza pogodowa, a nie pomiar: nie uwzględnia terenu, anten ani budynków. Zasięg konkretnego łącza z terenem, antenami i odbiciami liczy planer.
+
+Dane pogodowe: Open-Meteo.com (licencja CC BY 4.0).
 
 ## Kalkulator anten
 
