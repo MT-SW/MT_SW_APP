@@ -17,7 +17,10 @@
 package org.meshtastic.core.service.stats
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.MetricFormatter
@@ -97,6 +100,7 @@ class MeshStatsFeed(
      * [ownChoice]: follow the widget's own choice (Android Settings) instead of the adaptive notification's mode, which
      * the iPhone widget still uses.
      */
+    @OptIn(FlowPreview::class)
     fun snapshots(ownChoice: Boolean = false, withNodes: Boolean = false): Flow<MeshStatsSnapshot> {
         val modeFlow: Flow<LiveUpdateMode> =
             if (ownChoice) {
@@ -118,7 +122,7 @@ class MeshStatsFeed(
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
         // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
-        return combine(basics, stats, modeFlow, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) {
+        return combine(basics, stats, modeFlow, nodes.nodeDBbyNum.map { it.size }.distinctUntilChanged(), uiPrefs.lnaGains) {
                 b,
                 s,
                 mode,
@@ -127,6 +131,8 @@ class MeshStatsFeed(
             ->
             Triple(b, s, mode)
         }
+            // Every packet touches the node list; the widget is rebuilt at most every few seconds, not on each one.
+            .sample(WIDGET_REFRESH_MS)
             .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode, withNodes) }
     }
 
@@ -272,3 +278,6 @@ private suspend fun MutableList<String>.addSensorLines(node: Node) {
 
 /** How many nodes of one kind the bigger widgets rotate through (all of them, within reason). */
 private const val CARD_LIMIT = 500
+
+/** The widget's data is rebuilt at most this often (ms). */
+private const val WIDGET_REFRESH_MS = 3_000L
