@@ -112,17 +112,17 @@ import org.meshtastic.core.resources.terrain_horizon_antenna
 import org.meshtastic.core.resources.terrain_horizon_antenna_auto
 import org.meshtastic.core.resources.terrain_horizon_apply
 import org.meshtastic.core.resources.terrain_horizon_buildings
+import org.meshtastic.core.resources.terrain_horizon_buildings_age
+import org.meshtastic.core.resources.terrain_horizon_buildings_age_days
 import org.meshtastic.core.resources.terrain_horizon_buildings_clear
 import org.meshtastic.core.resources.terrain_horizon_buildings_failed
 import org.meshtastic.core.resources.terrain_horizon_buildings_hint
 import org.meshtastic.core.resources.terrain_horizon_buildings_none_here
-import org.meshtastic.core.resources.terrain_horizon_buildings_age
-import org.meshtastic.core.resources.terrain_horizon_buildings_age_days
 import org.meshtastic.core.resources.terrain_horizon_buildings_range
 import org.meshtastic.core.resources.terrain_horizon_buildings_save
 import org.meshtastic.core.resources.terrain_horizon_buildings_saved
-import org.meshtastic.core.resources.terrain_horizon_buildings_update
 import org.meshtastic.core.resources.terrain_horizon_buildings_saving
+import org.meshtastic.core.resources.terrain_horizon_buildings_update
 import org.meshtastic.core.resources.terrain_horizon_camera
 import org.meshtastic.core.resources.terrain_horizon_compass
 import org.meshtastic.core.resources.terrain_horizon_favorites
@@ -158,10 +158,10 @@ import org.meshtastic.core.resources.terrain_horizon_save_clear
 import org.meshtastic.core.resources.terrain_horizon_save_failed
 import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
-import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.resources.terrain_horizon_saving
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
+import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -1112,7 +1112,11 @@ private fun OfflineTerrain(
             Button(onClick = onSave, enabled = !state.saving && state.observerLat != null) {
                 Text(
                     stringResource(
-                        if (state.savedBytes > 0L) Res.string.terrain_horizon_update else Res.string.terrain_horizon_save,
+                        if (state.savedBytes > 0L) {
+                            Res.string.terrain_horizon_update
+                        } else {
+                            Res.string.terrain_horizon_save
+                        },
                         state.saveRadiusKm,
                     ),
                 )

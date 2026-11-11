@@ -102,6 +102,7 @@ interface PlannerElevationSource {
  * @param fetcherFactory opens a PMTiles archive by URL (injectable for tests).
  * @param tileDecoder decodes a tile (injectable for tests).
  */
+@Suppress("TooManyFunctions")
 class PlannerElevation(
     private val preferredZoom: Int = MapterhornEndpoints.GLOBAL_MAX_ZOOM,
     private val fetcherFactory: (String) -> TerrainTileFetcher = { url ->
@@ -335,12 +336,11 @@ class PlannerElevation(
         return created
     }
 
-    private fun archiveUrl(bounds: GeoBounds, zoom: Int): String =
-        if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
-            MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
-        } else {
-            MapterhornEndpoints.GLOBAL_PMTILES_URL
-        }
+    private fun archiveUrl(bounds: GeoBounds, zoom: Int): String = if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
+        MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
+    } else {
+        MapterhornEndpoints.GLOBAL_PMTILES_URL
+    }
 
     /** Tiles already tried for a refresh in this run: a device without the internet is not asked again and again. */
     private val refreshTried = HashSet<TileIndex>()
