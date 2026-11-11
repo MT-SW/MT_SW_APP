@@ -426,7 +426,7 @@ class FakeUiPrefs : UiPrefs {
         widgetOthersLimit.value = limit
     }
 
-    override val panoramaQuality = MutableStateFlow(0)
+    override val panoramaQuality = MutableStateFlow(-1)
 
     override fun setPanoramaQuality(quality: Int) {
         panoramaQuality.value = quality

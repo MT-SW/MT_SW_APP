@@ -209,7 +209,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val panoramaQuality: StateFlow<Int> =
-        dataStore.data.map { it[KEY_PANORAMA_QUALITY] ?: 0 }.stateIn(scope, SharingStarted.Lazily, 0)
+        dataStore.data.map { it[KEY_PANORAMA_QUALITY] ?: -1 }.stateIn(scope, SharingStarted.Lazily, -1)
 
     override fun setPanoramaQuality(quality: Int) {
         scope.launch { dataStore.edit { it[KEY_PANORAMA_QUALITY] = quality } }
@@ -909,7 +909,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ANDROID_WIDGET_SMALL = intPreferencesKey("android-widget-small")
         val KEY_ANDROID_WIDGET_SECOND = intPreferencesKey("android-widget-second")
         val KEY_WIDGET_OTHERS_LIMIT = intPreferencesKey("widget-others-limit")
-        val KEY_PANORAMA_QUALITY = intPreferencesKey("panorama-quality")
+        val KEY_PANORAMA_QUALITY = intPreferencesKey("panorama-level")
         val KEY_WIDGET_OTHERS_PICKED = stringPreferencesKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")

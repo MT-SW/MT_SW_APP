@@ -214,7 +214,10 @@ interface UiPrefs {
 
     fun setWidgetOthersLimit(limit: Int)
 
-    /** MT_SW: quality of the terrain panorama: 0 is very good (the default, with textures and forests), 1 is good. */
+    /**
+     * MT_SW: quality of the terrain panorama: -1 is automatic (the default: starts at the best and steps down by itself
+     * when the picture stutters), 0 best, 1 very good, 2 good.
+     */
     val panoramaQuality: StateFlow<Int>
 
     fun setPanoramaQuality(quality: Int)

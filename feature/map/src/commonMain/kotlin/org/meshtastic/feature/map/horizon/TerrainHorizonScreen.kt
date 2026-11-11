@@ -68,8 +68,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -109,6 +111,8 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.terrain_horizon_quality
+import org.meshtastic.core.resources.terrain_horizon_quality_auto
+import org.meshtastic.core.resources.terrain_horizon_quality_best
 import org.meshtastic.core.resources.terrain_horizon_quality_good
 import org.meshtastic.core.resources.terrain_horizon_quality_very_good
 import org.meshtastic.core.resources.Res
@@ -195,6 +199,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 import kotlin.time.Clock
+import kotlin.time.TimeSource
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -231,6 +236,18 @@ private const val GRAIN_STREAK_SHARE = 0.6f
 private const val GRAIN_ALPHA = 0.16f
 private const val GRAIN_FADE = 0.22f
 private const val GOOD_QUALITY_BUILDINGS = 800
+private const val LEVEL_BEST = 0
+private const val LEVEL_GOOD = 2
+private const val AUTO_WINDOW_FRAMES = 45
+private const val AUTO_SLOW_FRAME_MS = 28
+private const val AUTO_IDLE_GAP_MS = 250
+private val PANORAMA_LEVELS =
+    listOf(
+        -1 to Res.string.terrain_horizon_quality_auto,
+        0 to Res.string.terrain_horizon_quality_best,
+        1 to Res.string.terrain_horizon_quality_very_good,
+        2 to Res.string.terrain_horizon_quality_good,
+    )
 private const val FOREST_BANDS = 2
 private const val FOREST_TOP_PX = 26f
 private const val FOREST_GREEN = 0xFF2E4A32
@@ -437,16 +454,13 @@ fun TerrainHorizonScreen(
                     }
                 }
                 ChipRow(stringResource(Res.string.terrain_horizon_quality)) {
-                    BrandChip(
-                        selected = quality == 0,
-                        onClick = { uiPrefs.setPanoramaQuality(0) },
-                        label = { Text(stringResource(Res.string.terrain_horizon_quality_very_good)) },
-                    )
-                    BrandChip(
-                        selected = quality != 0,
-                        onClick = { uiPrefs.setPanoramaQuality(1) },
-                        label = { Text(stringResource(Res.string.terrain_horizon_quality_good)) },
-                    )
+                    PANORAMA_LEVELS.forEach { (level, label) ->
+                        BrandChip(
+                            selected = quality == level,
+                            onClick = { uiPrefs.setPanoramaQuality(level) },
+                            label = { Text(stringResource(label)) },
+                        )
+                    }
                 }
                 OfflineTerrain(
                     state = state,
@@ -713,8 +727,8 @@ private fun Panorama(
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
     // The buildings sorted into their distance bands once, far to near, not on every frame.
     val shapesByBand =
-        remember(shapes, profile.radiusM, quality) {
-            val usable = if (quality == 0) shapes else shapes.take(GOOD_QUALITY_BUILDINGS)
+        remember(shapes, profile.radiusM, level) {
+            val usable = if (level < LEVEL_GOOD) shapes else shapes.take(GOOD_QUALITY_BUILDINGS)
             List(BandEdges.size - 1) { band ->
                 val from = BandEdges[band] * profile.radiusM
                 val to = BandEdges[band + 1] * profile.radiusM
@@ -730,9 +744,33 @@ private fun Panorama(
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
     val uiPrefs: UiPrefs = koinInject()
     val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
+    // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
+    var autoLevel by remember { mutableIntStateOf(LEVEL_BEST) }
+    val level = if (quality < 0) autoLevel else quality
+    LaunchedEffect(quality) {
+        if (quality >= 0) return@LaunchedEffect
+        // Time between two successive pictures while the view is being turned (pauses are not counted).
+        var mark = TimeSource.Monotonic.markNow()
+        var frames = 0
+        var slow = 0
+        snapshotFlow { centre }
+            .collect {
+                val gap = mark.elapsedNow().inWholeMilliseconds
+                mark = TimeSource.Monotonic.markNow()
+                if (gap < AUTO_IDLE_GAP_MS) {
+                    frames++
+                    if (gap > AUTO_SLOW_FRAME_MS) slow++
+                    if (frames >= AUTO_WINDOW_FRAMES) {
+                        if (slow * 2 > frames && autoLevel < LEVEL_GOOD) autoLevel++
+                        frames = 0
+                        slow = 0
+                    }
+                }
+            }
+    }
     // Very good (0) has the rock texture and forests; good keeps the shapes and the light but not the textures.
-    val grain = remember(quality) { if (quality == 0) rockGrain() else null }
-    val light = remember(sky, sun, grain) { ReliefLight(sky, HazeShares, sun, grain) }
+    val grain = remember(level) { if (level < LEVEL_GOOD) rockGrain() else null }
+    val light = remember(sky, sun, grain, level) { ReliefLight(sky, HazeShares, sun, grain, level == LEVEL_BEST) }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
     val measurer = rememberTextMeasurer()
@@ -899,7 +937,7 @@ private fun DrawScope.drawBands(
             if (shapesByBand.all { it.isEmpty() }) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
-                val grain = light.grain.takeIf { index < 2 }
+                val grain = light.grain.takeIf { index < 2 && light.extras }
                 drawBuildingShapes(shapesByBand[index], buildingBands[index], grain, centre, perDeg, range)
             }
         } else {
@@ -980,7 +1018,7 @@ private fun DrawScope.drawRelief(
         clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
     }
     // Forest on the lower slopes of the near ridges: dark speckled ground that starts a little below the crest.
-    if (band < FOREST_BANDS && light.grain != null) {
+    if (band < FOREST_BANDS && light.extras && light.grain != null) {
         val forest = Path()
         forest.moveTo(0f, h)
         for (i in outline.indices) {
@@ -1055,7 +1093,14 @@ private fun columnNoise(column: Int, band: Int): Float {
 }
 
 /** How the terrain is lit and veiled: the colour of the sky, the haze of every band, and where the sun is. */
-private class ReliefLight(val sky: Color, val haze: List<Float>, val sun: SunPosition?, val grain: Brush? = null) {
+private class ReliefLight(
+    val sky: Color,
+    val haze: List<Float>,
+    val sun: SunPosition?,
+    val grain: Brush? = null,
+    /** Forests and the texture of buildings: only at the best level. */
+    val extras: Boolean = true,
+) {
     /** How low the sun is, from 0 (high or unknown) to 1 (on the horizon): sunrise and sunset light. */
     private fun lowSun(): Float {
         val e = sun?.elevationDeg ?: return 0f
@@ -1192,7 +1237,14 @@ private fun DrawScope.drawBuildingShapes(
 private fun bandAngle(profile: HorizonProfile, band: Int, bearing: Double): Double? {
     val from = BandEdges[band] * profile.radiusM
     val to = BandEdges[band + 1] * profile.radiusM
-    return profile.at(bearing).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull { it.angleDeg }
+    var best: Double? = null
+    // A plain loop: this runs for every column of every band on every frame, so it must not allocate.
+    for (crest in profile.at(bearing).crests) {
+        if (crest.distanceM >= from && crest.distanceM < to && (best == null || crest.angleDeg > best)) {
+            best = crest.angleDeg
+        }
+    }
+    return best
 }
 
 /**

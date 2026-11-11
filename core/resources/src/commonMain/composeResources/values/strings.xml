@@ -3332,6 +3332,8 @@
     <string name="terrain_horizon_options">Options</string>
     <string name="terrain_horizon_precision">Accuracy circles</string>
     <string name="terrain_horizon_quality">Panorama quality</string>
+    <string name="terrain_horizon_quality_auto">Automatic</string>
+    <string name="terrain_horizon_quality_best">Best</string>
     <string name="terrain_horizon_quality_good">Good</string>
     <string name="terrain_horizon_quality_very_good">Very good</string>
     <string name="terrain_horizon_range">Range</string>
