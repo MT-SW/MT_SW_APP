@@ -63,7 +63,6 @@ import org.maplibre.compose.location.LocationTrackingEffect
 import org.maplibre.compose.location.updateCamera
 import org.maplibre.compose.map.CameraConstraints
 import org.maplibre.compose.map.LocalMapState
-import org.maplibre.compose.map.LocalViewport
 import org.maplibre.compose.map.MapEvent
 import org.maplibre.compose.map.MapState
 import org.maplibre.compose.map.MaplibreMap
@@ -181,7 +180,7 @@ fun rememberMeshMapState(
 
     val scope = rememberCoroutineScope()
     val focusedNode = remember(nodes, focusNodeNum) { focusNodeNum?.let { num -> nodes.firstOrNull { it.num == num } } }
-    // The style block recomposes on every camera frame (it reads the viewport below); the mesh-wide filter should not.
+    // The mesh-wide filter is computed once per data change, not per camera frame.
     // `nowSeconds` is deliberately not a key: a packet arriving already changes the node list.
     val visibleNodes =
         remember(nodes, filterState, myNodeInfo, ourNode) {
@@ -196,7 +195,12 @@ fun rememberMeshMapState(
             val zoomLevel by remember(state) { derivedStateOf { state.cameraPosition.zoom.toInt() } }
             // The viewport local, rather than the state's own property: it is what the library scopes viewport
             // recomposition to, and these reads are the whole reason this block runs per frame.
-            val viewportBounds = LocalViewport.current?.visibleBounds?.toBoundingBox()
+            // Held still while the camera stays inside it: reading the live viewport here made this whole block (every
+            // layer) recompose on each frame of a pan, which is what cost the iPhone its smoothness.
+            val viewportBounds by remember(state) {
+                val held = StickyBounds()
+                derivedStateOf { held.update(state.viewport?.visibleBounds?.toBoundingBox()) }
+            }
 
             if (basemap is Basemap.Raster) {
                 RasterBasemapLayer(basemap)
@@ -371,6 +375,21 @@ fun MeshMap(
 /** Remembers the last padded box between recompositions; see [rememberStickyBounds]. */
 private class StickyBounds {
     var box: BoundingBox? = null
+
+    /** The held box, replaced by a padded copy of [viewport] only once the viewport leaves it or gets far smaller. */
+    fun update(viewport: BoundingBox?): BoundingBox? {
+        if (viewport == null) return box
+        val current = box
+        val inside =
+            current != null &&
+                viewport.west >= current.west &&
+                viewport.east <= current.east &&
+                viewport.south >= current.south &&
+                viewport.north <= current.north &&
+                (viewport.east - viewport.west) * STICKY_MAX_RATIO >= (current.east - current.west)
+        if (!inside) box = viewport.padded(CHIP_VIEW_PADDING)
+        return box
+    }
 }
 
 /**
@@ -381,20 +400,7 @@ private class StickyBounds {
  * viewport leaves it (or zooming in leaves it far too large), so a drag costs nothing until it has actually travelled.
  */
 @Composable
-private fun rememberStickyBounds(viewport: BoundingBox?): BoundingBox? {
-    val holder = remember { StickyBounds() }
-    if (viewport == null) return holder.box
-    val current = holder.box
-    val inside =
-        current != null &&
-            viewport.west >= current.west &&
-            viewport.east <= current.east &&
-            viewport.south >= current.south &&
-            viewport.north <= current.north &&
-            (viewport.east - viewport.west) * STICKY_MAX_RATIO >= (current.east - current.west)
-    if (!inside) holder.box = viewport.padded(CHIP_VIEW_PADDING)
-    return holder.box
-}
+private fun rememberStickyBounds(viewport: BoundingBox?): BoundingBox? = remember { StickyBounds() }.update(viewport)
 
 /** How many times larger than the viewport the held box may get before zooming in rebuilds it. */
 private const val STICKY_MAX_RATIO = 4
