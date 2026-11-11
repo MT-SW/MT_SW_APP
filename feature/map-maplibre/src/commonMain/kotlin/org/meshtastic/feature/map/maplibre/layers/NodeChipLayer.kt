@@ -84,7 +84,10 @@ import org.meshtastic.feature.map.maplibre.geojson.lenientBoolean
 import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.sqrt
 
 /**
@@ -443,15 +446,19 @@ internal suspend fun nodeTapAt(
     onStack: (List<ClusterMember>) -> Unit,
 ): Boolean {
     val at = state.screenLocationFromPosition(tap) ?: return false
-    val candidates = chipCandidates(state, at)
+    val scale = screenScale(state, tap, at)
+    val search = chipCandidates(state, at, scale)
+    val candidates = search.candidates
     // The closest bubble wins; rank (favourites on top) only decides between bubbles that are about as close.
     val closest = candidates.minOfOrNull { it.third }
     val pool = candidates.filter { closest != null && it.third <= closest + RANK_TIE_DP }
     val best = pool.maxByOrNull { it.second * RANK_WEIGHT - it.third }
     Logger.i {
-        "Dotyk w węzeł: kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(
-            NodeFeatureKeys.NODE_NUM,
-        )}"
+        "Dotyk w węzeł: ekran ${at.x.value.roundTo1()}, ${at.y.value.roundTo1()}, skala ekranu ${scale.roundTo2()}, " +
+            "zoom ${state.cameraPosition.zoom.toFloat().roundTo1()}, kropek na ekranie ${search.rendered}, " +
+            "najbliższa kropka: ${search.nearest}, kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(
+                NodeFeatureKeys.NODE_NUM,
+            )}"
     }
     val near = best?.let { top -> candidates.filter { it.third <= top.third + STACK_TOLERANCE_DP }.map { it.first } }
     val stack = if (best != null && near != null) stackedMembers(near, best.first) else emptyList()
@@ -473,26 +480,88 @@ internal suspend fun nodeTapAt(
     }
 }
 
+/** What [chipCandidates] found: the dots inside the tap box, and a short account of the geometry for the log. */
+private class ChipSearch(
+    val candidates: List<Triple<Feature<*, JsonObject?>, Int, Float>>,
+    val rendered: Int,
+    val nearest: String,
+)
+
+/**
+ * How many units the map's screen positions are per real dp, found by asking it where two spots a known distance apart
+ * land. It should be 1; the iPhone has been seen answering in a different unit, which put every tap box off by that
+ * factor (the box then only reached a dot's own spot and never the bubble above it). Distances measured on screen are
+ * divided by it. Answers close to 1 are taken as 1, and nonsense is ignored.
+ */
+private suspend fun screenScale(state: MapState, tap: Position, at: DpOffset): Float {
+    val metersPerDp = state.viewport?.metersPerDpAtCenter ?: return 1f
+    if (metersPerDp <= 0.0) return 1f
+    val centreLat = state.cameraPosition.center.latitude
+    val toRad = PI / HALF_TURN_DEG
+    // The map's metres per dp is for the centre of the view; a spot further north or south has shorter degrees.
+    val localMetersPerDp = metersPerDp * cos(tap.latitude * toRad) / cos(centreLat * toRad)
+    // Probe a stretch that is about SCALE_PROBE_DP wide whatever the zoom, so rounding never decides the answer.
+    val probeDeg = SCALE_PROBE_DP * localMetersPerDp / (EARTH_RADIUS_M * toRad * cos(tap.latitude * toRad))
+    val east = state.screenLocationFromPosition(Position(tap.longitude + probeDeg, tap.latitude)) ?: return 1f
+    val measured = hypot((east.x - at.x).value, (east.y - at.y).value).toDouble()
+    val expected = SCALE_PROBE_DP
+    if (measured <= 0.0) return 1f
+    val scale = (measured / expected).toFloat()
+    return when {
+        scale in SCALE_TRUSTED_MIN..SCALE_TRUSTED_MAX -> 1f
+        scale in SCALE_LIMIT_MIN..SCALE_LIMIT_MAX -> scale
+        else -> 1f
+    }
+}
+
+private fun Float.roundTo1(): Float = (this * 10f).toInt() / 10f
+
+private fun Float.roundTo2(): Float = (this * 100f).toInt() / 100f
+
 /**
  * The dots just below the tap, each with its rank (favourites on top) and its distance from the bubble's centre.
  *
  * The map is asked about the whole screen and the box is applied here, on the same screen positions the tap itself came
  * from: a box handed to the map can be read in a slightly different scale (seen on the iPhone), which put some
- * bubbles' taps off their targets while others, near the corner the scale starts from, were right.
+ * bubbles' taps off their targets while others, near the corner the scale starts from, were right. [scale] corrects
+ * the same kind of difference in the screen positions themselves.
  */
-private suspend fun chipCandidates(state: MapState, at: DpOffset): List<Triple<Feature<*, JsonObject?>, Int, Float>> {
+private suspend fun chipCandidates(state: MapState, at: DpOffset, scale: Float): ChipSearch {
     val whole = DpRect(left = 0.dp, top = 0.dp, right = WHOLE_SCREEN_DP.dp, bottom = WHOLE_SCREEN_DP.dp)
-    return state.queryRenderedFeatures(whole, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
-        val spot = (feature.geometry as? Point)?.coordinates
-        val dot = spot?.let { state.screenLocationFromPosition(it) }
-        val dx = (dot?.x?.value ?: Float.NaN) - at.x.value
-        val below = (dot?.y?.value ?: Float.NaN) - at.y.value
-        // NaN (no position) fails every comparison below, so such a dot is left out.
-        val inside = abs(dx) <= TAP_HALF_WIDTH_DP && below >= -TAP_TOP_MARGIN_DP && below <= TAP_HEIGHT_DP
-        val dy = below - CHIP_CENTRE_DP
-        if (inside) Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy)) else null
-    }
+    val dots = state.queryRenderedFeatures(whole, layerIds = setOf(NODE_DOT_LAYER_ID))
+    var nearest = "brak"
+    var nearestDistance = Float.MAX_VALUE
+    val found =
+        dots.mapNotNull { feature ->
+            val spot = (feature.geometry as? Point)?.coordinates
+            val dot = spot?.let { state.screenLocationFromPosition(it) }
+            val dx = ((dot?.x?.value ?: Float.NaN) - at.x.value) / scale
+            val below = ((dot?.y?.value ?: Float.NaN) - at.y.value) / scale
+            val dy = below - CHIP_CENTRE_DP
+            val distance = sqrt(dx * dx + dy * dy)
+            if (distance < nearestDistance) {
+                nearestDistance = distance
+                nearest = "w bok ${dx.roundTo1()}, w dół ${below.roundTo1()}"
+            }
+            // NaN (no position) fails every comparison below, so such a dot is left out.
+            val inside = abs(dx) <= TAP_HALF_WIDTH_DP && below >= -TAP_TOP_MARGIN_DP && below <= TAP_HEIGHT_DP
+            if (inside) Triple(feature, feature.properties.chipRank(), distance) else null
+        }
+    return ChipSearch(found, dots.size, nearest)
 }
 
 /** Larger than any screen, so a query with it covers every dot the map draws. */
 private const val WHOLE_SCREEN_DP = 4000
+
+/** How far east of the tap the screen scale is probed, in dp. */
+private const val SCALE_PROBE_DP = 100.0
+private const val HALF_TURN_DEG = 180.0
+private const val EARTH_RADIUS_M = 6_371_008.8
+
+/** A measured scale this close to 1 is just rounding and a tilted view; it is left alone. */
+private const val SCALE_TRUSTED_MIN = 0.8f
+private const val SCALE_TRUSTED_MAX = 1.25f
+
+/** Beyond these the measurement is taken as wrong, not as a unit difference. */
+private const val SCALE_LIMIT_MIN = 0.2f
+private const val SCALE_LIMIT_MAX = 6f
