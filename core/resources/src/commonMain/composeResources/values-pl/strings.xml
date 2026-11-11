@@ -3847,7 +3847,9 @@
     <string name="propagation_detail_detailed">dokładny</string>
     <string name="propagation_detail_fine">bardzo dokładny</string>
     <string name="propagation_detail_normal">zwykły</string>
-    <string name="propagation_region_item">Około %1$d × %2$d km, %3$s</string>
+    <string name="propagation_region_item">%1$s: około %2$d × %3$d km, %4$s</string>
+    <string name="propagation_region_default_name">Obszar %1$d</string>
+    <string name="propagation_region_name_hint">Nazwa nowego obszaru (opcjonalnie)</string>
     <string name="propagation_region_remove">Usuń obszar</string>
     <string name="propagation_regions_title">Obszary (mogą się nakładać; dokładniejszy jest na wierzchu)</string>
     <string name="propagation_update_all">Aktualizuj wszystkie obszary</string>

@@ -28,15 +28,22 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.layers.RasterLayer
 import org.maplibre.compose.sources.rememberImageSource
 import org.maplibre.compose.util.PositionQuad
 import org.maplibre.compose.util.PreparedImage
+import org.maplibre.spatialk.geojson.Feature
+import org.maplibre.spatialk.geojson.FeatureCollection
+import org.maplibre.spatialk.geojson.LineString
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.propagation.GeoBounds
 import org.meshtastic.feature.map.propagation.PropagationColors
 import org.meshtastic.feature.map.propagation.PropagationKind
@@ -56,6 +63,7 @@ internal const val PROPAGATION_LAYER_ID = "propagation"
 internal const val PROPAGATION_DEFAULT_OPACITY = 0.6f
 
 private const val BITMAP_SIZE = 160
+private const val OUTLINE_ALPHA = 0.7f
 
 /**
  * The propagation forecast: one picture per region, each over the area it was downloaded for.
@@ -75,6 +83,39 @@ internal fun PropagationLayer(state: PropagationState, opacity: Float) {
             RegionLayer(region, finer, state.hoursAhead, state.kind, opacity)
         }
     }
+    // With several regions their edges are drawn too, so it is clear where each one lies and where they overlap.
+    if (ordered.size > 1) RegionOutlines(ordered)
+}
+
+@Composable
+private fun RegionOutlines(regions: List<PropagationRegion>) {
+    val source =
+        rememberFeatureSource(regions.map { it.grid.bounds }) {
+            FeatureCollection(
+                regions.map { region ->
+                    val b = region.grid.bounds
+                    Feature<LineString, JsonObject?>(
+                        geometry =
+                        LineString(
+                            listOf(
+                                Position(longitude = b.west, latitude = b.south),
+                                Position(longitude = b.east, latitude = b.south),
+                                Position(longitude = b.east, latitude = b.north),
+                                Position(longitude = b.west, latitude = b.north),
+                                Position(longitude = b.west, latitude = b.south),
+                            ),
+                        ),
+                        properties = null,
+                    )
+                },
+            )
+        }
+    LineLayer(
+        id = "$PROPAGATION_LAYER_ID-outline",
+        source = source,
+        color = const(Color.White.copy(alpha = OUTLINE_ALPHA)),
+        width = const(1.dp),
+    )
 }
 
 @Suppress("InjectDispatcher")

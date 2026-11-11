@@ -2776,7 +2776,9 @@
     <string name="propagation_legend">Blue: normal, green: slightly further, yellow to red: much further, purple: signal trapped in a duct</string>
     <string name="propagation_loading">Downloading…</string>
     <string name="propagation_none">No forecast yet</string>
-    <string name="propagation_region_item">About %1$d × %2$d km, %3$s</string>
+    <string name="propagation_region_default_name">Area %1$d</string>
+    <string name="propagation_region_item">%1$s: about %2$d × %3$d km, %4$s</string>
+    <string name="propagation_region_name_hint">Name of the new area (optional)</string>
     <string name="propagation_region_remove">Remove area</string>
     <string name="propagation_regions_title">Areas (they may overlap; the more detailed one is drawn on top)</string>
     <string name="propagation_source">Weather data by Open-Meteo.com (CC BY 4.0)</string>

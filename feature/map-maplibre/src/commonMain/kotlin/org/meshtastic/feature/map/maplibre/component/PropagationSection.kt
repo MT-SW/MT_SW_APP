@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -72,7 +73,9 @@ import org.meshtastic.core.resources.propagation_kind_k
 import org.meshtastic.core.resources.propagation_legend
 import org.meshtastic.core.resources.propagation_loading
 import org.meshtastic.core.resources.propagation_none
+import org.meshtastic.core.resources.propagation_region_default_name
 import org.meshtastic.core.resources.propagation_region_item
+import org.meshtastic.core.resources.propagation_region_name_hint
 import org.meshtastic.core.resources.propagation_region_remove
 import org.meshtastic.core.resources.propagation_regions_title
 import org.meshtastic.core.resources.propagation_source
@@ -102,6 +105,7 @@ internal fun PropagationSection(
     val controller: PropagationController = koinInject()
     val state by controller.state.collectAsStateWithLifecycle()
     var detail by remember { mutableStateOf(PropagationDetail.NORMAL) }
+    var name by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -183,7 +187,7 @@ internal fun PropagationSection(
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
-        state.regions.forEach { region ->
+        state.regions.forEachIndexed { index, region ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -192,6 +196,7 @@ internal fun PropagationSection(
                     text =
                     stringResource(
                         Res.string.propagation_region_item,
+                        region.name.ifBlank { stringResource(Res.string.propagation_region_default_name, index + 1) },
                         region.widthKm,
                         region.heightKm,
                         stringResource(region.detail.label()),
@@ -228,6 +233,14 @@ internal fun PropagationSection(
             }
         }
 
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it.take(PropagationController.MAX_NAME) },
+            singleLine = true,
+            label = { Text(stringResource(Res.string.propagation_region_name_hint)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -235,7 +248,10 @@ internal fun PropagationSection(
         ) {
             OutlinedButton(
                 enabled = !state.loading && state.regions.size < PropagationController.MAX_REGIONS,
-                onClick = { target.bounds()?.let { controller.addRegion(it.toGeo(), detail) } },
+                onClick = {
+                    target.bounds()?.let { controller.addRegion(it.toGeo(), detail, name) }
+                    name = ""
+                },
             ) {
                 Text(stringResource(Res.string.propagation_add_region))
             }

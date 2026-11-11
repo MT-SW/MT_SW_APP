@@ -41,9 +41,9 @@ enum class PropagationDetail(val points: Int) {
 
 /**
  * One downloaded area of the propagation layer. Regions may overlap; where they do, the one with the finer grid is
- * drawn. [id] is the time it was added, and also names its file.
+ * drawn. [id] is the time it was added, and also names its file; [name] is what the user called it (empty: not named).
  */
-data class PropagationRegion(val id: Long, val grid: TropoGrid) {
+data class PropagationRegion(val id: Long, val grid: TropoGrid, val name: String = "") {
     val detail: PropagationDetail
         get() = PropagationDetail.of(grid.rows)
 
@@ -81,8 +81,7 @@ internal class PropagationStore {
                     .list(dir)
                     .mapNotNull { path ->
                         val id = idOf(path) ?: return@mapNotNull null
-                        val grid = TropoGrid.decode(fileSystem.read(path) { readUtf8() }) ?: return@mapNotNull null
-                        PropagationRegion(id, grid)
+                        decode(id, fileSystem.read(path) { readUtf8() })
                     }
                     .sortedBy { it.id }
             }
@@ -94,7 +93,8 @@ internal class PropagationStore {
     fun save(region: PropagationRegion) {
         try {
             fileSystem.createDirectories(dir)
-            fileSystem.write(fileOf(region.id)) { writeUtf8(region.grid.encode()) }
+            val named = if (region.name.isEmpty()) "" else "$NAME_MARK${region.name}\n"
+            fileSystem.write(fileOf(region.id)) { writeUtf8(named + region.grid.encode()) }
         } catch (e: Exception) {
             // Not being able to keep it only costs a download next time.
         }
@@ -120,6 +120,14 @@ internal class PropagationStore {
         }
     }
 
+    /** A region file: an optional line "n <name>", then the grid. The older single forecast has no name line. */
+    private fun decode(id: Long, text: String): PropagationRegion? {
+        val named = text.startsWith(NAME_MARK)
+        val name = if (named) text.lineSequence().first().removePrefix(NAME_MARK) else ""
+        val grid = TropoGrid.decode(if (named) text.substringAfter('\n') else text) ?: return null
+        return PropagationRegion(id, grid, name)
+    }
+
     private fun fileOf(id: Long): Path = dir / "$FILE_PREFIX$id$FILE_SUFFIX"
 
     private fun idOf(path: Path): Long? {
@@ -134,5 +142,6 @@ internal class PropagationStore {
     private companion object {
         const val FILE_PREFIX = "region-"
         const val FILE_SUFFIX = ".txt"
+        const val NAME_MARK = "n "
     }
 }

@@ -107,8 +107,8 @@ class PropagationController(
         it.copy(hoursAhead = hours.coerceIn(0, TropoForecastSource.HOURS - 1))
     }
 
-    /** Adds a region over [bounds] (a little wider than the screen) with the grid of [detail] and downloads it. */
-    fun addRegion(bounds: GeoBounds, detail: PropagationDetail) {
+    /** Adds a region called [name] over [bounds] (a little wider than the screen), with [detail], and downloads it. */
+    fun addRegion(bounds: GeoBounds, detail: PropagationDetail, name: String = "") {
         val s = mutable.value
         if (s.loading || s.regions.size >= MAX_REGIONS) return
         lastTry = nowMillis
@@ -116,7 +116,7 @@ class PropagationController(
         mutable.update { it.copy(loading = true, failed = false) }
         scope.launch {
             val grid = source.fetch(padded(bounds), nowMillis, detail.points, detail.points)
-            val region = grid?.let { PropagationRegion(id, it) }
+            val region = grid?.let { PropagationRegion(id, it, name.replace('\n', ' ').trim().take(MAX_NAME)) }
             if (region != null) store.save(region)
             mutable.update {
                 it.copy(
@@ -170,6 +170,7 @@ class PropagationController(
         const val REFRESH_AFTER_MS = 3 * 3_600_000L
         const val RETRY_AFTER_MS = 2 * 60_000L
         const val MAX_REGIONS = 8
+        const val MAX_NAME = 40
     }
 }
 
