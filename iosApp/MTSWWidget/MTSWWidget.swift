@@ -339,6 +339,55 @@ private func withOwn(cards: [NodeCard], label: String, entry: StatsEntry, data: 
     }
 }
 
+/// Czy to rozmiar 4x6 na iPhonie (iOS 27); ten rozmiar istnieje tylko w nowym SDK, więc jest za sprawdzeniem wersji.
+private func isExtraLargePortrait(_ family: WidgetFamily) -> Bool {
+    #if compiler(>=6.4)
+    if #available(iOS 27.0, *) { return family == .systemExtraLargePortrait }
+    #endif
+    return false
+}
+
+/// Rozmiary, które widżet oferuje; 4x6 na iPhonie dochodzi od iOS 27.
+private var widgetFamilies: [WidgetFamily] {
+    var families: [WidgetFamily] = [.systemMedium, .systemLarge, .systemExtraLarge]
+    #if compiler(>=6.4)
+    if #available(iOS 27.0, *) { families.append(.systemExtraLargePortrait) }
+    #endif
+    return families
+}
+
+/// Największy widżet: nasz węzeł, ulubione i reszta sieci (pionowo, gdy jest wyższy niż szerszy; inaczej w dwóch kolumnach).
+struct ExtraLargeView: View {
+    let data: StatsData
+    let favorite: NodeCardView
+    let other: NodeCardView
+
+    var body: some View {
+        GeometryReader { geo in
+            if geo.size.height > geo.size.width {
+                VStack(alignment: .leading, spacing: 6) {
+                    OwnStatsView(data: data).frame(maxHeight: .infinity)
+                    Divider()
+                    favorite.frame(maxHeight: .infinity)
+                    Divider()
+                    other.frame(maxHeight: .infinity)
+                }
+            } else {
+                HStack(alignment: .top, spacing: 14) {
+                    OwnStatsView(data: data).frame(maxWidth: .infinity)
+                    Divider()
+                    VStack(alignment: .leading, spacing: 6) {
+                        favorite.frame(maxHeight: .infinity)
+                        Divider()
+                        other.frame(maxHeight: .infinity)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+    }
+}
+
 struct StatsView: View {
     let entry: StatsEntry
     @Environment(\.widgetFamily) private var family
@@ -364,34 +413,18 @@ struct StatsView: View {
                     (entry.config.second == .favorites ? favorite : network).frame(maxHeight: .infinity)
                 }
             case .systemExtraLarge:
-                // Największy (4x6 na iPhonie, szeroki na iPadzie): nasz węzeł, ulubione i reszta sieci (bez ulubionych i bez nas).
-                GeometryReader { geo in
-                    if geo.size.height > geo.size.width {
-                        VStack(alignment: .leading, spacing: 6) {
-                            OwnStatsView(data: data).frame(maxHeight: .infinity)
-                            Divider()
-                            favorite.frame(maxHeight: .infinity)
-                            Divider()
-                            other.frame(maxHeight: .infinity)
-                        }
-                    } else {
-                        HStack(alignment: .top, spacing: 14) {
-                            OwnStatsView(data: data).frame(maxWidth: .infinity)
-                            Divider()
-                            VStack(alignment: .leading, spacing: 6) {
-                                favorite.frame(maxHeight: .infinity)
-                                Divider()
-                                other.frame(maxHeight: .infinity)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                    }
-                }
+                // Szeroki (iPad): nasz węzeł, ulubione i reszta sieci (bez ulubionych i bez nas).
+                ExtraLargeView(data: data, favorite: favorite, other: other)
             default:
+                if isExtraLargePortrait(family) {
+                    // 4x6 na iPhonie (iOS 27): to osobny rozmiar systemExtraLargePortrait.
+                    ExtraLargeView(data: data, favorite: favorite, other: other)
+                } else {
                 switch entry.config.small {
                 case .own: OwnStatsView(data: data)
                 case .favorites: withOwn(cards: data.favorites, label: isPolish ? "Ulubiony węzeł" : "Favorite node", entry: entry, data: data)
                 case .network: withOwn(cards: data.network, label: isPolish ? "Węzeł sieci" : "Network node", entry: entry, data: data)
+                }
                 }
             }
         } else {
@@ -410,7 +443,7 @@ struct MTSWStatsWidget: Widget {
         .description(isPolish
             ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Przytrzymaj widżet i wybierz „Edytuj widżet”."
             : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. Touch and hold the widget and choose \"Edit widget\".")
-        .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
+        .supportedFamilies(widgetFamilies)
     }
 }
 
