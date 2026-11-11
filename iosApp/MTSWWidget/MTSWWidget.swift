@@ -99,8 +99,8 @@ struct MTSWConfigIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource { text("Statystyki MT_SW", "MT_SW statistics") }
     static var description: IntentDescription {
         IntentDescription(text(
-            "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (iPad): nasz węzeł, ulubione i cała sieć.",
-            "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (iPad): our node, favorites and the whole network."))
+            "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć.",
+            "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (4x6): our node, favorites and the whole network."))
     }
 
     @Parameter(title: "Średni widżet / Medium", default: .own)
@@ -331,16 +331,28 @@ struct StatsView: View {
                     (entry.config.second == .favorites ? favorite : other).frame(maxHeight: .infinity)
                 }
             case .systemExtraLarge:
-                // Największy (iPad): nasz węzeł, pod nim ulubione, pod nimi reszta sieci (bez ulubionych i bez nas).
-                HStack(alignment: .top, spacing: 14) {
-                    OwnStatsView(data: data).frame(maxWidth: .infinity)
-                    Divider()
-                    VStack(alignment: .leading, spacing: 6) {
-                        favorite.frame(maxHeight: .infinity)
-                        Divider()
-                        other.frame(maxHeight: .infinity)
+                // Największy (4x6 na iPhonie, szeroki na iPadzie): nasz węzeł, ulubione i reszta sieci (bez ulubionych i bez nas).
+                GeometryReader { geo in
+                    if geo.size.height > geo.size.width {
+                        VStack(alignment: .leading, spacing: 6) {
+                            OwnStatsView(data: data).frame(maxHeight: .infinity)
+                            Divider()
+                            favorite.frame(maxHeight: .infinity)
+                            Divider()
+                            other.frame(maxHeight: .infinity)
+                        }
+                    } else {
+                        HStack(alignment: .top, spacing: 14) {
+                            OwnStatsView(data: data).frame(maxWidth: .infinity)
+                            Divider()
+                            VStack(alignment: .leading, spacing: 6) {
+                                favorite.frame(maxHeight: .infinity)
+                                Divider()
+                                other.frame(maxHeight: .infinity)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
                     }
-                    .frame(maxWidth: .infinity)
                 }
             default:
                 switch entry.config.small {
@@ -363,8 +375,8 @@ struct MTSWStatsWidget: Widget {
         }
         .configurationDisplayName(isPolish ? "Statystyki MT_SW" : "MT_SW statistics")
         .description(isPolish
-            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (iPad): nasz węzeł, ulubione i cała sieć. Przytrzymaj widżet i wybierz „Edytuj widżet”."
-            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (iPad): our node, favorites and the whole network. Touch and hold the widget and choose \"Edit widget\".")
+            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Przytrzymaj widżet i wybierz „Edytuj widżet”."
+            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. Touch and hold the widget and choose \"Edit widget\".")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }
