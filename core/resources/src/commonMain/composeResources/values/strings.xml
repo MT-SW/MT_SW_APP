@@ -3276,6 +3276,7 @@
     <string name="terrain_horizon_buildings_update">Update buildings (up to %1$d km)</string>
     <string name="terrain_horizon_camera">Camera</string>
     <string name="terrain_horizon_compass">Compass</string>
+    <string name="terrain_horizon_crest">Ridge: %1$s km away, %2$d m above sea level, %3$s° above the horizon</string>
     <string name="terrain_horizon_favorites">Only favourites</string>
     <string name="terrain_horizon_fov">Field of view</string>
     <string name="terrain_horizon_from">From</string>

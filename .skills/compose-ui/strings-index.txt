@@ -3201,6 +3201,7 @@ terrain_horizon_buildings_saving
 terrain_horizon_buildings_update
 terrain_horizon_camera
 terrain_horizon_compass
+terrain_horizon_crest
 terrain_horizon_favorites
 terrain_horizon_fov
 terrain_horizon_from

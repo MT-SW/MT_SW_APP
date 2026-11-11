@@ -84,6 +84,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
@@ -134,6 +135,7 @@ import org.meshtastic.core.resources.terrain_horizon_in_sight
 import org.meshtastic.core.resources.terrain_horizon_info_body
 import org.meshtastic.core.resources.terrain_horizon_info_title
 import org.meshtastic.core.resources.terrain_horizon_labels
+import org.meshtastic.core.resources.terrain_horizon_crest
 import org.meshtastic.core.resources.terrain_horizon_loading
 import org.meshtastic.core.resources.terrain_horizon_move
 import org.meshtastic.core.resources.terrain_horizon_move_back
@@ -170,6 +172,7 @@ import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
+import org.meshtastic.feature.map.planner.Geodesy
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -179,6 +182,8 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.math.tan
+import kotlin.time.Clock
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -190,6 +195,10 @@ private const val WALL_DARKEN = 0.3f
 private const val EDGE_DARKEN = 0.5f
 private const val ROOF_STRIP_PX = 3f
 private const val EDGE_WIDTH_PX = 1.5f
+private const val CREST_TAP_DEG = 2.5
+private const val NIGHT_SHADE = 0.4
+private const val SUN_FULL_DEG = 30.0
+private val HazeShares = listOf(0.0f, 0.1f, 0.25f, 0.45f)
 private const val RELIEF_LIGHT = 0.12f
 private const val RELIEF_DARK = 0.28f
 private const val RIDGE_LIGHT = 0.3f
@@ -649,6 +658,12 @@ private fun Panorama(
     val bands = remember(sky, primary) { BandShares.map { lerp(sky, primary, it) } }
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
     val buildingBands = remember(sky) { BandShares.map { lerp(sky, BuildingColor, it + BUILDING_BAND_BOOST) } }
+    // Light comes from where the sun is now at the station (the real position, a minute-old at most), and the far bands
+    // are veiled by haze.
+    val sun = remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
+    val light = remember(sky, sun) { ReliefLight(sky, HazeShares, sun) }
+    var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
+    val currentProfile by rememberUpdatedState(profile)
     val measurer = rememberTextMeasurer()
     val cardinals =
         listOf(
@@ -660,6 +675,7 @@ private fun Panorama(
     val currentCentre by rememberUpdatedState(centre)
     val currentTargets by rememberUpdatedState(targets)
     val currentFov by rememberUpdatedState(fieldOfView)
+    Box(Modifier.fillMaxSize()) {
     Canvas(
         modifier =
         Modifier.fillMaxSize()
@@ -684,14 +700,51 @@ private fun Panorama(
                         .minByOrNull { (_, at) -> (at - tap).getDistance() }
                         ?.takeIf { (_, at) -> (at - tap).getDistance() <= TAP_RADIUS_PX }
                         ?.let { (target, _) -> onOpenNode(target.nodeNum) }
+                        ?: run { crest = crestAt(currentProfile, tap, size.width.toFloat(), size.height.toFloat(), currentCentre, perDeg, range) }
                 }
             },
     ) {
         val perDeg = size.width / fieldOfView
-        drawBands(profile, groundProfile, shapes, bands, buildingBands, centre, perDeg, range)
+        drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, range)
         drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
         drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
     }
+    crest?.let {
+        Text(
+            stringResource(Res.string.terrain_horizon_crest, it.distanceKm, it.altitudeM, it.angleDeg),
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
+        )
+    }
+    }
+}
+
+/** A ridge the finger touched: its distance (km, one decimal), height above sea level (m) and angle above the horizon. */
+private class CrestInfo(val distanceKm: String, val altitudeM: Int, val angleDeg: String)
+
+/** The ridge of the skyline nearest to a tap, or null when none is within a couple of degrees of it. */
+private fun crestAt(
+    profile: HorizonProfile,
+    tap: Offset,
+    width: Float,
+    height: Float,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+): CrestInfo? {
+    val bearing = centre + (tap.x - width / 2) / perDeg
+    val tapped = range.start + (1.0 - tap.y / height) * (range.endInclusive - range.start)
+    val point = profile.at(bearing.toDouble())
+    val best = (point.crests + HorizonCrest(point.angleDeg, point.distanceM)).minByOrNull { abs(it.angleDeg - tapped) }
+    if (best == null || abs(best.angleDeg - tapped) > CREST_TAP_DEG) return null
+    val d = best.distanceM
+    val effective = Geodesy.EARTH_RADIUS_M * HorizonPanorama.DEFAULT_K
+    val z = profile.observerM + d * tan(best.angleDeg * PI / 180.0) + d * d / (2 * effective)
+    return CrestInfo(
+        ((d / 100.0).roundToInt() / 10.0).toString(),
+        z.roundToInt(),
+        ((best.angleDeg * 10).roundToInt() / 10.0).toString(),
+    )
 }
 
 /**
@@ -727,6 +780,7 @@ private fun DrawScope.drawBands(
     profile: HorizonProfile,
     ground: HorizonProfile?,
     shapes: List<HorizonBuilding>,
+    light: ReliefLight,
     bands: List<Color>,
     buildingBands: List<Color>,
     centre: Float,
@@ -736,14 +790,14 @@ private fun DrawScope.drawBands(
     for (band in bands.indices) {
         val index = bands.lastIndex - band
         if (ground != null) {
-            drawRelief(ground, index, bands[index], centre, perDeg, range)
+            drawRelief(ground, index, bands[index], light, centre, perDeg, range)
             if (shapes.isEmpty()) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
                 drawBuildingShapes(shapes, profile.radiusM, index, buildingBands[index], centre, perDeg, range)
             }
         } else {
-            drawRelief(profile, index, bands[index], centre, perDeg, range)
+            drawRelief(profile, index, bands[index], light, centre, perDeg, range)
         }
     }
 }
@@ -758,6 +812,7 @@ private fun DrawScope.drawRelief(
     profile: HorizonProfile,
     band: Int,
     colour: Color,
+    light: ReliefLight,
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
@@ -781,7 +836,8 @@ private fun DrawScope.drawRelief(
     var previous: Float? = null
     var x = 0f
     while (x <= w + COLUMN_STEP_PX) {
-        val angle = bandAngle(profile, band, (centre + (x - w / 2) / perDeg).toDouble())
+        val bearing = (centre + (x - w / 2) / perDeg).toDouble()
+        val angle = bandAngle(profile, band, bearing)
         if (angle == null) {
             previous = null
             started = false
@@ -792,11 +848,14 @@ private fun DrawScope.drawRelief(
             val before = previous
             if (before != null) {
                 val rise = before - y
-                val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
+                // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
+                val facing = if (rise > 0f) bearing - 90.0 else bearing + 90.0
+                val sunny = light.sunFacing(facing)
+                val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX) * abs(sunny).toFloat()
                 if (strength > 0.02f && y < h) {
                     translate(left = x, top = y) {
                         drawRect(
-                            if (rise > 0f) lit else shade,
+                            if (sunny > 0.0) lit else shade,
                             size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
                             alpha = strength,
                         )
@@ -808,6 +867,31 @@ private fun DrawScope.drawRelief(
         x += COLUMN_STEP_PX
     }
     drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
+    // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
+    val haze = light.haze[band.coerceIn(0, light.haze.lastIndex)]
+    if (haze > 0f) {
+        val zero = yOf(0.0, range, h)
+        clipPath(path) {
+            drawRect(
+                Brush.verticalGradient(
+                    listOf(light.sky.copy(alpha = 0f), light.sky.copy(alpha = haze)),
+                    startY = top,
+                    endY = max(top + 1f, zero),
+                ),
+            )
+        }
+    }
+}
+
+/** How the terrain is lit and veiled: the colour of the sky, the haze of every band, and where the sun is. */
+private class ReliefLight(val sky: Color, val haze: List<Float>, val sun: SunPosition?) {
+    /** How much a slope facing [azimuthDeg] is lit: 1 straight at the sun, -1 away; at night everything is dim. */
+    fun sunFacing(azimuthDeg: Double): Double {
+        val s = sun ?: return if (azimuthDeg % FULL_TURN < FULL_TURN / 2) 1.0 else -1.0
+        if (s.elevationDeg <= 0.0) return -NIGHT_SHADE
+        val up = (s.elevationDeg / SUN_FULL_DEG).coerceIn(0.3, 1.0)
+        return cos((azimuthDeg - s.azimuthDeg) * PI / 180.0) * up
+    }
 }
 
 /**
