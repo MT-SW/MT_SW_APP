@@ -25,12 +25,13 @@ import platform.UIKit.UIApplication
 actual fun applyAppIcon(style: String) {
     // "" is the main icon, which the system shows in the style (default, dark, tinted) chosen in iOS.
     val name =
-        when (style) {
-            "standard" -> "AppIcon-Standard"
-            "dark" -> "AppIcon-Dark"
+        when (AppIconStyle.base(style)) {
+            "standard" -> if (AppIconStyle.isFlat(style)) "AppIcon-StandardFlat" else "AppIcon-Standard"
+            "dark" -> if (AppIconStyle.isFlat(style)) "AppIcon-DarkFlat" else "AppIcon-Dark"
             "clear" -> "AppIcon-Clear"
             "tinted" -> "AppIcon-Tinted"
-            else -> null
+            // A flat icon needs a named set: "automatic" has none, so it becomes the standard one.
+            else -> if (AppIconStyle.isFlat(style)) "AppIcon-StandardFlat" else null
         }
     // Kotlin/Native does not expose the alternate-icon calls of UIApplication, so they go through the selector.
     val application = UIApplication.sharedApplication

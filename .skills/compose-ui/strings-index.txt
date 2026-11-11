@@ -493,6 +493,7 @@ app_functions_write_section
 app_icon_auto
 app_icon_clear
 app_icon_dark
+app_icon_flat
 app_icon_hint
 app_icon_standard
 app_icon_tinted

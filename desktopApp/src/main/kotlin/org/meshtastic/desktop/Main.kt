@@ -284,9 +284,9 @@ private fun ApplicationScope.DeepLinkHandler(
 }
 
 /** Resource file of the icon for a saved style; null (automatic) keeps the usual window icon. */
-private fun appIconFile(style: String): String? = when (style) {
-    "standard" -> "icon.png"
-    "dark" -> "icon_dark.png"
+private fun appIconFile(style: String): String? = when (style.removePrefix("flat-")) {
+    "standard" -> if (style.startsWith("flat-")) "icon_flat.png" else "icon.png"
+    "dark" -> if (style.startsWith("flat-")) "icon_dark_flat.png" else "icon_dark.png"
     "clear" -> "icon_clear.png"
     "tinted" -> "icon_tinted.png"
     else -> null

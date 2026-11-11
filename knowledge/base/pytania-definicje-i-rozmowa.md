@@ -41,7 +41,7 @@ Słowa: grzeje się, gorący, ładowanie, akumulator, Li-ion, puchnięcie, nagrz
 Źródło: Baza wiedzy: akumulatory Li-ion (wiedza ogólna, opracowanie własne, 2026-10)
 
 ### Jak zmienić ikonę aplikacji?
-W Ustawienia → Funkcje MT_SW jest wpis „Ikona aplikacji”. Do wyboru: Automatycznie (domyślnie), Standardowa (żółta), Ciemna (czarne tło, żółty obrys i napis), Przezroczysta i Jednokolorowa (zabarwiana). Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie; na Androidzie zmienia się ikona na ekranie głównym, a na komputerze ikona okna i Docka lub paska zadań. Przy zmianie ikony iPhone może pokazać komunikat systemu.
+W Ustawienia → Funkcje MT_SW jest wpis „Ikona aplikacji”. Do wyboru: Automatycznie (domyślnie), Standardowa (żółta), Ciemna (czarne tło, żółty obrys i napis), Przezroczysta i Jednokolorowa (zabarwiana). Dodatkowa opcja „Płaska ikona (bez 3D)” działa dla każdego stylu. Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie; na Androidzie zmienia się ikona na ekranie głównym, a na komputerze ikona okna i Docka lub paska zadań. Przy zmianie ikony iPhone może pokazać komunikat systemu.
 Słowa: ikona aplikacji, zmienić ikonę, ciemna ikona, czarna ikona, przezroczysta ikona, styl ikony, ikona na ekranie głównym
 Źródło: Dokumentacja aplikacji: ikona aplikacji (sprawdzono 2026-11)
 

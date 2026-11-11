@@ -3721,6 +3721,7 @@
     <string name="app_icon_dark">Ciemna</string>
     <string name="app_icon_clear">Przezroczysta</string>
     <string name="app_icon_tinted">Jednokolorowa (zabarwiana)</string>
+    <string name="app_icon_flat">Płaska ikona (bez 3D)</string>
     <string name="app_icon_hint">Na iPhonie „Automatycznie” podąża za stylem ikon ustawionym w systemie. Przy zmianie ikony system może pokazać komunikat.</string>
     <string name="widget_stats_title">Widżet statystyk</string>
     <string name="widget_stats_summary">Statystyki radia i sieci mesh na ekranie głównym</string>

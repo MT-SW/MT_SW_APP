@@ -33,6 +33,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_icon_auto
 import org.meshtastic.core.resources.app_icon_clear
 import org.meshtastic.core.resources.app_icon_dark
+import org.meshtastic.core.resources.app_icon_flat
 import org.meshtastic.core.resources.app_icon_hint
 import org.meshtastic.core.resources.app_icon_standard
 import org.meshtastic.core.resources.app_icon_tinted
@@ -41,6 +42,7 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.feature.settings.AppIconStyle
 
 /** Icon styles; the key is what is saved ("" is automatic). The same on every platform. */
 private val ICON_STYLES: List<Pair<String, StringResource>> =
@@ -54,7 +56,8 @@ private val ICON_STYLES: List<Pair<String, StringResource>> =
 
 @Composable
 private fun appIconLabel(key: String): String =
-    stringResource((ICON_STYLES.firstOrNull { it.first == key } ?: ICON_STYLES.first()).second)
+    stringResource((ICON_STYLES.firstOrNull { it.first == AppIconStyle.base(key) } ?: ICON_STYLES.first()).second) +
+        if (AppIconStyle.isFlat(key)) " · " + stringResource(Res.string.app_icon_flat) else ""
 
 /** One row "Ikona aplikacji" with a picker of the icon styles (also found by the settings search). */
 @Composable
@@ -66,14 +69,22 @@ fun AppIconSettingsItem(current: String, onPick: (String) -> Unit, modifier: Mod
             onDismiss = { open = false },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
+                    val flat = AppIconStyle.isFlat(current)
                     ICON_STYLES.forEach { (key, label) ->
                         ListItem(
-                            text = stringResource(label) + if (key == current) "  ✓" else "",
+                            text = stringResource(label) + if (key == AppIconStyle.base(current)) "  ✓" else "",
                             trailingIcon = null,
                         ) {
-                            onPick(key)
+                            onPick(AppIconStyle.withFlat(key, flat))
                             open = false
                         }
+                    }
+                    // Applies to every style above: the same icon without the 3D shading.
+                    ListItem(
+                        text = stringResource(Res.string.app_icon_flat) + if (flat) "  ✓" else "",
+                        trailingIcon = null,
+                    ) {
+                        onPick(AppIconStyle.withFlat(current, !flat))
                     }
                     Text(
                         text = stringResource(Res.string.app_icon_hint),

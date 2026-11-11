@@ -381,6 +381,20 @@
 
         <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
         <activity-alias
+            android:name="org.meshtastic.app.IconStandardFlat"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:icon="@mipmap/ic_launcher_flat"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- App icon styles (Funkcje MT_SW → Ikona aplikacji): exactly one alias is enabled and shows on the home screen. -->
+        <activity-alias
             android:name="org.meshtastic.app.IconDark"
             android:targetActivity="org.meshtastic.app.MainActivity"
             android:icon="@mipmap/ic_launcher_dark"

@@ -21,17 +21,18 @@ import android.content.pm.PackageManager
 import org.meshtastic.core.common.ContextServices
 
 private const val ALIAS_PREFIX = "org.meshtastic.app.Icon"
-private val ALIASES = listOf("Standard", "Dark", "Clear", "Tinted")
+private val ALIASES = listOf("Standard", "StandardFlat", "Dark", "Clear", "Tinted")
 
 actual fun applyAppIcon(style: String) {
     val context = ContextServices.app
     val packageManager = context.packageManager
+    // Only the standard icon has a flat variant on Android: the others are flat already.
     val chosen =
-        when (style) {
+        when (AppIconStyle.base(style)) {
             "dark" -> "Dark"
             "clear" -> "Clear"
             "tinted" -> "Tinted"
-            else -> "Standard"
+            else -> if (AppIconStyle.isFlat(style)) "StandardFlat" else "Standard"
         }
     // The new icon is switched on first, so the app never has no icon on the home screen.
     ALIASES.sortedBy { it != chosen }

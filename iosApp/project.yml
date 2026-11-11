@@ -96,7 +96,7 @@ targets:
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-Standard AppIcon-Dark AppIcon-Clear AppIcon-Tinted"
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-Standard AppIcon-StandardFlat AppIcon-Dark AppIcon-DarkFlat AppIcon-Clear AppIcon-Tinted"
         PRODUCT_BUNDLE_IDENTIFIER: pl.sw.mt
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
