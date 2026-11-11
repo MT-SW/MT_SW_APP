@@ -44,8 +44,8 @@ import kotlin.math.roundToLong
 
 /**
  * [PlannerClutterSource] that asks an Overpass API server (default: the public OpenStreetMap France instance, with
- * overpass-api.de and mirrors as backups) for the buildings and forests of OpenStreetMap. Data © OpenStreetMap contributors, ODbL
- * (https://www.openstreetmap.org/copyright).
+ * overpass-api.de and mirrors as backups) for the buildings and forests of OpenStreetMap. Data © OpenStreetMap
+ * contributors, ODbL (https://www.openstreetmap.org/copyright).
  *
  * Answers are kept in memory for [CACHE_MS], so changing power, height or any other parameter of the same link does not
  * download the same data again. One request at a time: the public server limits parallel use.
