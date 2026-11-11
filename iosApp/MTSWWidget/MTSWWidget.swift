@@ -171,19 +171,24 @@ struct StatsProvider: AppIntentTimelineProvider {
 /// Złoty kolor motywu MT_SW (nagłówki sekcji).
 private let gold = Color(red: 0.96, green: 0.78, blue: 0.22)
 
-/// Gdzie przeciąć listę sekcji, żeby kolumny były jak najbardziej wyrównane (nagłówek liczy się jak wiersz).
-private func splitIndex(_ groups: [StatsGroup]) -> Int {
-    let weights = groups.map { $0.lines.count + 1 }
-    let total = weights.reduce(0, +)
-    var best = 0
-    var bestDiff = Int.max
-    var left = 0
-    for index in 0...groups.count {
-        let diff = abs(total - 2 * left)
-        if diff < bestDiff { bestDiff = diff; best = index }
-        if index < groups.count { left += weights[index] }
+/// Dzieli sekcje po kolei na [parts] kolumn o podobnej liczbie wierszy (nagłówek liczy się jak wiersz).
+private func splitGroups(_ groups: [StatsGroup], into parts: Int) -> [[StatsGroup]] {
+    guard parts > 1, groups.count > 1 else { return [groups] }
+    let weights = groups.map { Double($0.lines.count + 1) }
+    let target = weights.reduce(0, +) / Double(parts)
+    var result: [[StatsGroup]] = [[]]
+    var used = 0.0
+    for (index, group) in groups.enumerated() {
+        let leftParts = parts - result.count
+        let leftGroups = groups.count - index
+        if !result[result.count - 1].isEmpty, leftParts > 0, leftGroups >= leftParts,
+           used + weights[index] / 2 > target * Double(result.count) {
+            result.append([])
+        }
+        result[result.count - 1].append(group)
+        used += weights[index]
     }
-    return best
+    return result
 }
 
 private func longest(_ groups: [StatsGroup]) -> Int {
@@ -214,29 +219,42 @@ struct GroupColumn: View {
     }
 }
 
-/// Sekcje w dwóch kolumnach. Wszystkie wiersze mają ten sam rozmiar pisma, dobrany do miejsca (szerokości i wysokości);
-/// kolumna z dłuższymi wierszami dostaje więcej miejsca, więc nic nie jest zmniejszane tylko po jednej stronie.
+/// Gotowy układ sekcji: kolumny, ich szerokości i wspólny rozmiar pisma.
+private struct GroupsLayout {
+    let columns: [[StatsGroup]]
+    let widths: [CGFloat]
+    let size: CGFloat
+}
+
+private func groupsLayout(_ groups: [StatsGroup], parts: Int, area: CGSize, gap: CGFloat, maxSize: CGFloat) -> GroupsLayout {
+    let columns = splitGroups(groups, into: parts)
+    let total = max(area.width - gap * CGFloat(columns.count - 1), 50)
+    let chars = columns.map { CGFloat(max(longest($0), 6)) }
+    let byWidth = total / (chars.reduce(0, +) * 0.52)
+    let tall = CGFloat(max(columns.map { rows($0) }.max() ?? 1, 1))
+    let byHeight = area.height / (tall * 1.3 + 0.8)
+    let size = min(maxSize, max(7.5, min(byWidth, byHeight)))
+    let sum = chars.reduce(0, +)
+    return GroupsLayout(columns: columns, widths: chars.map { total * $0 / sum }, size: size)
+}
+
+/// Sekcje w jednej, dwóch albo trzech kolumnach. Wybierany jest układ, w którym pismo wychodzi największe; wszystkie
+/// wiersze mają ten sam rozmiar, a kolumna z dłuższymi wierszami dostaje więcej miejsca.
 struct GroupsView: View {
     let groups: [StatsGroup]
     let maxSize: CGFloat
 
     var body: some View {
-        let split = splitIndex(groups)
-        let left = Array(groups[..<split])
-        let right = Array(groups[split...])
         GeometryReader { geo in
-            let gap: CGFloat = 12
-            let total = max(geo.size.width - gap, 50)
-            let leftChars = CGFloat(max(longest(left), 6))
-            let rightChars = CGFloat(max(longest(right), 6))
-            let byWidth = total / ((leftChars + rightChars) * 0.52)
-            let tall = CGFloat(max(rows(left), rows(right), 1))
-            let byHeight = geo.size.height / (tall * 1.3 + 0.8)
-            let size = min(maxSize, max(7.5, min(byWidth, byHeight)))
-            let leftWidth = total * leftChars / (leftChars + rightChars)
+            let gap: CGFloat = 10
+            let options = (1...max(1, min(3, groups.count))).map {
+                groupsLayout(groups, parts: $0, area: geo.size, gap: gap, maxSize: maxSize)
+            }
+            let best = options.dropFirst().reduce(options[0]) { $1.size > $0.size + 0.25 ? $1 : $0 }
             HStack(alignment: .top, spacing: gap) {
-                GroupColumn(groups: left, size: size).frame(width: leftWidth, alignment: .topLeading)
-                GroupColumn(groups: right, size: size).frame(width: total - leftWidth, alignment: .topLeading)
+                ForEach(Array(best.columns.enumerated()), id: \.offset) { index, column in
+                    GroupColumn(groups: column, size: best.size).frame(width: best.widths[index], alignment: .topLeading)
+                }
             }
         }
     }
@@ -264,7 +282,7 @@ struct OwnStatsView: View {
                 }
                 Spacer(minLength: 0)
             } else {
-                GroupsView(groups: data.groups, maxSize: 12)
+                GroupsView(groups: data.groups, maxSize: 15)
             }
             // The app writes this text in its own language; the phone's language is only the fallback.
             Text(data.updatedText ?? ((isPolish ? "Zaktualizowano " : "Updated ") + data.updated.formatted(date: .omitted, time: .shortened)))
@@ -282,13 +300,13 @@ struct NodeCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(label.uppercased()).font(.system(size: 9, weight: .bold)).foregroundStyle(gold)
+            Text(label.uppercased()).font(.system(size: 10, weight: .bold)).foregroundStyle(gold)
             if cards.isEmpty {
                 Text(empty).font(.system(size: 12)).foregroundStyle(.secondary)
             } else {
                 let card = cards[step % cards.count]
                 HStack {
-                    Text(card.title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                    Text(card.title).font(.system(size: 15, weight: .semibold)).lineLimit(1)
                     Spacer()
                     if cards.count > 1 {
                         Text("\(step % cards.count + 1)/\(cards.count)")
@@ -298,7 +316,7 @@ struct NodeCardView: View {
                 let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
                     ForEach(Array(card.lines.enumerated()), id: \.offset) { _, line in
-                        Text(line).font(.system(size: 11)).lineLimit(1).minimumScaleFactor(0.7)
+                        Text(line).font(.system(size: 13)).lineLimit(1).minimumScaleFactor(0.7)
                     }
                 }
             }
