@@ -50,6 +50,7 @@ import org.meshtastic.core.resources.planner_clutter_title
 import org.meshtastic.core.resources.planner_ducting_warning
 import org.meshtastic.core.resources.planner_extra_loss
 import org.meshtastic.core.resources.planner_frequency
+import org.meshtastic.core.resources.planner_buildings_on_map
 import org.meshtastic.core.resources.planner_clutter_reflections
 import org.meshtastic.core.resources.planner_frequency_title
 import org.meshtastic.core.resources.planner_ground_reflection
@@ -274,6 +275,17 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
             Checkbox(checked = state.clutterReflections, onCheckedChange = null)
             Text(
                 text = stringResource(Res.string.planner_clutter_reflections),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable { vm.setBuildingsOnMap(!state.buildingsOnMap) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = state.buildingsOnMap, onCheckedChange = null)
+            Text(
+                text = stringResource(Res.string.planner_buildings_on_map),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(start = 8.dp).weight(1f),
             )

@@ -45,6 +45,7 @@ import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.feature.map.planner.BuildingsLayer
 import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.data.ClutterHeights
@@ -78,7 +79,7 @@ class PlannerViewModel(
     elevation: PlannerElevationSource,
     weather: PlannerWeatherSource,
     nodeSource: PlannerNodeSource,
-    clutter: PlannerClutterSource,
+    private val clutter: PlannerClutterSource,
 ) : ViewModel() {
 
     /** Replaceable in tests (e.g. to change the compute dispatcher). */
@@ -232,6 +233,8 @@ class PlannerViewModel(
 
     fun setAzimuth(side: PlannerSide, deg: Double) =
         editEnd(side, deg) { e, v -> e.copy(azimuthDeg = ((v % 360.0) + 360.0) % 360.0) }
+
+    fun setBuildingsOnMap(on: Boolean) = mutate { st -> st.copy(buildingsOnMap = on) }
 
     fun setClutterReflections(on: Boolean) = mutate { st -> st.copy(clutterReflections = on, coverage = null) }
 
@@ -592,6 +595,54 @@ class PlannerViewModel(
         return withContext(Dispatchers.Default) { CoverageLayer.render(coverage, name, uiState.value.coverageOpacity) }
     }
 
+    /**
+     * Map-layer GeoJSON of the plan's buildings, when the option is on: for a link the buildings along the route (those
+     * that reach into the line of sight apart), for a coverage the buildings within its range (only the tall ones from
+     * 15 km). The flag tells a link layer (true) from a coverage layer (false).
+     */
+    @Suppress("TooGenericExceptionCaught")
+    suspend fun buildingsLayers(): List<Pair<Boolean, String>> {
+        val st = uiState.value
+        if (!st.buildingsOnMap) return emptyList()
+        val out = ArrayList<Pair<Boolean, String>>()
+        val link = st.link
+        val a = st.a.point
+        val b = st.b.point
+        if (link != null && a != null && b != null) {
+            try {
+                val polygons = clutter.forLink(a, b).polygons
+                val zA = (st.a.groundAltM ?: link.profile.groundM.first()) + st.a.antennaHeightM
+                val zB = (st.b.groundAltM ?: link.profile.groundM.last()) + st.b.antennaHeightM
+                val json =
+                    withContext(Dispatchers.Default) {
+                        val found = BuildingsLayer.classify(polygons, a, b, zA, zB, link.profile, st.clutterHeights)
+                        if (found.isEmpty()) null else BuildingsLayer.renderLink(found)
+                    }
+                if (json != null) out += true to json
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // No buildings for the route: the plan itself is still shown.
+            }
+        }
+        val coverage = st.coverage
+        if (coverage != null) {
+            try {
+                val radiusKm = (coverage.ringsM.lastOrNull() ?: 0.0) / METERS_PER_KM
+                val polygons =
+                    clutter.buildingsForArea(coverage.center, radiusKm, tallOnly = radiusKm > TALL_ONLY_KM).polygons
+                if (polygons.isNotEmpty()) {
+                    out += false to withContext(Dispatchers.Default) { BuildingsLayer.renderBackdrop(polygons) }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Same: without buildings the coverage is still shown.
+            }
+        }
+        return out
+    }
+
     /** PNG of the terrain profile chart, or null when no profile has been calculated. */
     suspend fun exportPng(strings: PlannerReportStrings): ByteArray? {
         val report = buildReport(strings)
@@ -684,6 +735,11 @@ class PlannerViewModel(
     }
 
     companion object {
+        private const val METERS_PER_KM = 1000.0
+
+        /** From this range of a coverage only the tall buildings are drawn as its backdrop. */
+        private const val TALL_ONLY_KM = 15.0
+
         const val DEBOUNCE_MS = 300L
 
         /** Derived fields: feeder loss at the current frequency, per side hints. */

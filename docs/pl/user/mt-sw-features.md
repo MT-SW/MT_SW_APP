@@ -82,6 +82,7 @@ Planer symuluje zasięg łącza radiowego między dwoma punktami **A** i **B**, 
 - **Dokładny teren** — opcjonalnie pobiera z OpenStreetMap prawdziwe budynki i lasy i uwzględnia ich wysokość.
 - **Pogoda na żądanie** — opcjonalnie uwzględnia warunki propagacji z bieżącej pogody (Open-Meteo).
 - **Rodzaj anteny i charakterystyka** — dla każdej strony wybierasz rodzaj anteny (dookólna, Yagi z wybraną liczbą elementów, Moxon, panelowa, biquad, helisa, czasza, sektorowa); planer uwzględnia jej kierunkowość (zysk, szerokość wiązki, tłumienie do tyłu) i kierunek ustawienia, także w zasięgu dookoła. Ten sam wykres charakterystyki jest w kalkulatorze anten.
+- **Budynki na mapie** — „Pokaż na mapie” dodaje też budynki jako osobne warstwy (do ukrycia w warstwach mapy): dla trasy budynki wzdłuż niej, a te, które sięgają w linię widoczności, na czerwono; dla zasięgu budynki w zasięgu jako tło (od 15 km tylko wysokie). Przełącznik w ustawieniach radia plannera, domyślnie włączony.
 - **Odbicia** — osobne opcje: odbicie od ziemi oraz odbicia od budynków i drzew (zapas na wielodrogowość); wynik trasy pokazuje zysk z odbicia i stratę kierunkowości.
 - **Zasięg dookoła** — rysuje zasięg jako kolorowy raster na mapie, z suwakiem krycia.
 - **Porównanie z pomiarem** — wynik można porównać z ostatnim zmierzonym SNR i RSSI.

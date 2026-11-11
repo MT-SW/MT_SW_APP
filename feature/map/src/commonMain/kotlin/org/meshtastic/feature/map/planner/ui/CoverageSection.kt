@@ -65,6 +65,8 @@ import org.meshtastic.core.resources.planner_coverage_range
 import org.meshtastic.core.resources.planner_coverage_rx_gain
 import org.meshtastic.core.resources.planner_coverage_rx_height
 import org.meshtastic.core.resources.planner_coverage_side
+import org.meshtastic.core.resources.planner_layer_buildings_area
+import org.meshtastic.core.resources.planner_layer_buildings_link
 import org.meshtastic.core.resources.planner_layer_name
 import org.meshtastic.core.resources.planner_legend_excellent
 import org.meshtastic.core.resources.planner_legend_good
@@ -247,11 +249,19 @@ internal fun ShowOnMapButton(vm: PlannerViewModel, bridge: PlannerMapBridge, onS
     val strings = rememberPlannerReportStrings()
     val prefix = plannerGeneratedPrefix()
     val layerName = stringResource(Res.string.planner_layer_name)
+    val linkBuildingsName = stringResource(Res.string.planner_layer_buildings_link)
+    val areaBuildingsName = stringResource(Res.string.planner_layer_buildings_area)
     val scope = rememberCoroutineScope()
     Button(
         onClick = {
             scope.launch {
-                showOnMap(vm, strings.copy(generatedAt = plannerGeneratedAt(prefix)), bridge, layerName)
+                showOnMap(
+                    vm,
+                    strings.copy(generatedAt = plannerGeneratedAt(prefix)),
+                    bridge,
+                    layerName,
+                    linkBuildingsName to areaBuildingsName,
+                )
                 onShownOnMap()
             }
         },
@@ -266,9 +276,14 @@ internal suspend fun showOnMap(
     strings: org.meshtastic.feature.map.planner.state.PlannerReportStrings,
     bridge: PlannerMapBridge,
     layerName: String,
+    buildingsNames: Pair<String, String>,
 ) {
     val json = vm.coverageLayerGeoJson(layerName) ?: vm.exportGeoJson(strings)
     bridge.addGeoJsonLayer(layerName, json)
+    // The buildings go in as layers of their own, so they can be hidden without losing the plan.
+    vm.buildingsLayers().forEach { (isLink, buildings) ->
+        bridge.addGeoJsonLayer(if (isLink) buildingsNames.first else buildingsNames.second, buildings)
+    }
     val st = vm.uiState.value
     val target = st.coverage?.center ?: st.a.point ?: st.b.point
     if (target != null) bridge.moveTo(target.lat, target.lon)

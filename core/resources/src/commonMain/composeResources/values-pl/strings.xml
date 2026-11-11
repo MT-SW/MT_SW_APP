@@ -3843,4 +3843,7 @@
     <string name="propagation_age">Prognoza sprzed %1$d min</string>
     <string name="propagation_legend">Niebieski: normalnie, zielony: trochę dalej, żółty do czerwonego: dużo dalej, fioletowy: sygnał uwięziony w kanale</string>
     <string name="propagation_source">Dane pogodowe: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="planner_buildings_on_map">Pokaż budynki na mapie (trasa: zasłaniające widoczność na czerwono; zasięg: tło)</string>
+    <string name="planner_layer_buildings_link">Planer: budynki na trasie</string>
+    <string name="planner_layer_buildings_area">Planer: budynki w zasięgu</string>
 </resources>

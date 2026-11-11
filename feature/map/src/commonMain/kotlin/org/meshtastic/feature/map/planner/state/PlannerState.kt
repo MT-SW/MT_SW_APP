@@ -273,6 +273,8 @@ data class PlannerUiState(
     val groundReflection: Boolean = false,
     /** Adds a rough allowance for the reflections and scattering of buildings and trees (needs the map data). */
     val clutterReflections: Boolean = false,
+    /** Whether "show on map" also adds the buildings of the plan as map layers. */
+    val buildingsOnMap: Boolean = true,
     /** How far (km) around the coverage centre obstacle data is loaded; the rest keeps the preset loss. */
     val clutterRadiusKm: Double = PlannerClutter.DEFAULT_AREA_RADIUS_KM,
     val forestHeightM: Double = ClutterHeights.DEFAULT_FOREST_M,
