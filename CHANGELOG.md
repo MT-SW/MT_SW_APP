@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Widżet statystyk (Android): wygląd jak na iPhonie — nagłówki grup i sekcji w złotym kolorze MT_SW, wielkimi literami; odstępy między grupami i wierszami; cienka linia między sekcjami (nasz węzeł, ulubiony, inny); wolne miejsce rozkłada się równo między sekcje zamiast zostawać pustym pasem na dole.
 * Mapa (iPhone): przy dotknięciu dymka węzła aplikacja sprawdza, w jakiej skali mapa podaje pozycje na ekranie, i poprawia obszar dotyku; w logu jest geometria dotyku (pozycja, skala, najbliższa kropka).
 * Aktualizacja oprogramowania przez Bluetooth (iPhone/iPad): urządzenie w trybie aktualizacji (nRF52 DFU, ESP32 OTA) jest wyszukiwane bez adresu MAC, bo iOS podaje tylko własny identyfikator urządzenia.
 * Widżet (wszystkie platformy): temperatura i wilgotność węzła w jednej linii, obok siebie (jak napięcie i prąd), zamiast w osobnych wierszach.
@@ -685,6 +686,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Statistics widget (Android): looks like the iPhone one — group and section headings in the MT_SW gold, in capitals; spacing between groups and lines; a thin line between the sections (our node, favorite, other); spare room is shared evenly between the sections instead of an empty strip at the bottom.
 * Map (iPhone): when a node bubble is tapped, the app checks the scale in which the map reports screen positions and corrects the tap area; the log now carries the tap geometry (position, scale, nearest dot).
 * Firmware update over Bluetooth (iPhone/iPad): the device in update mode (nRF52 DFU, ESP32 OTA) is found without a MAC address, because iOS only gives a device its own identifier.
 * Widget (all platforms): a node's temperature and humidity on one line, side by side (like voltage and current), instead of separate rows.
