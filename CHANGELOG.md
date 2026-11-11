@@ -130,7 +130,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
-* Mapa: po zbliżeniu do grupy lub węzła dotknięcie pustego miejsca mapy wraca do widoku sprzed zbliżenia (jak świeżo po wejściu w mapę).
+* Mapa: po zbliżeniu do grupy lub węzła ponowne dotknięcie ikony mapy na dolnym pasku wraca do widoku sprzed zbliżenia (jak świeżo po wejściu w mapę).
+* Mapa propagacji: pasek z godziną i legendą jest długi i niski (sięga prawie do przycisków przybliżania), suwak jest dłuższy, więc dokładniej ustawia godzinę, a mapa jest mniej zasłonięta.
 * Widżet: nowe ustawienie „Inne węzły w widżecie”: wszystkie (domyślnie), ostatnie 10/20/50/100 albo węzły wybrane ręcznie z listy (z polem wyszukiwania).
 * Zgoda na warunki: dopisano, że jedyne dane, jakie mogą trafić do deweloperów, to logi z aplikacji, z różnego rodzaju naszego innego oprogramowania i ze sprzętu, udostępnione przez Ciebie dobrowolnie w celu diagnozy. „Nie zgadzam się” zawsze otwiera osobne ostrzeżenie z odliczaniem 10 s; można tylko wrócić do zgody albo wyczyścić wszystkie dane i zamknąć aplikację (bez zgody nie da się zamknąć aplikacji bez czyszczenia).
 * Mapa: dotknięcie dymka z nazwą węzła działa na całym dymku, przy każdym przybliżeniu i obrocie mapy, tak samo na Androidzie, iPhonie i komputerze (trafienie liczone na ekranie, bez niewidocznych kółek na mapie).

@@ -18,6 +18,7 @@ package org.meshtastic.feature.map.maplibre
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -87,6 +88,7 @@ import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
+import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
@@ -300,6 +302,10 @@ fun MeshMap(
 
     val scope = rememberCoroutineScope()
     DisposableEffect(mapState) { onDispose { ReturnView.forget(mapState) } }
+    // Pressing the Map tab while the map is open goes back to the view the map had on entering.
+    LaunchedEffect(mapState) {
+        MapViewReset.events.collect { ReturnView.take(mapState)?.let { mapState.animateCamera(it.toCameraUpdate()) } }
+    }
     PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
@@ -338,14 +344,6 @@ fun MeshMap(
                             if (onNode) {
                                 ClickResult.Consume
                             } else {
-                                // A tap on empty map after flying in on a node or cluster goes back to the first view.
-                                val back =
-                                    if (tap != null && projection != null && !onCluster(projection, tap)) {
-                                        ReturnView.take(mapState)
-                                    } else {
-                                        null
-                                    }
-                                if (back != null) scope.launch { mapState.animateCamera(back.toCameraUpdate()) }
                                 tap?.let(onMapClick)
                                 ClickResult.Pass
                             }
@@ -355,7 +353,12 @@ fun MeshMap(
             },
             overlay = { include(ornaments) },
         )
-        PropagationOverlay(Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 56.dp))
+        // As wide as the room left of the zoom buttons, with a small gap to them, and low so it covers little map.
+        PropagationOverlay(
+            Modifier.align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = 56.dp),
+        )
     }
 }
 
@@ -583,7 +586,6 @@ private const val CHIP_VIEW_PADDING = 0.5
 
 private const val PROPAGATION_SETTLE_MS = 1500L
 
-/** True when the tap landed on a cluster bubble, which zooms in further instead of going back. */
-private fun onCluster(projection: org.maplibre.compose.camera.CameraProjection, tap: Position): Boolean =
-    projection.queryRenderedFeatures(projection.screenLocationFromPosition(tap), layerIds = setOf("node-clusters"))
-        .isNotEmpty()
+
+/** Room kept free on the right for the zoom buttons (their width and margin) plus a small gap. */
+private const val PROPAGATION_END_CLEARANCE_DP = 88

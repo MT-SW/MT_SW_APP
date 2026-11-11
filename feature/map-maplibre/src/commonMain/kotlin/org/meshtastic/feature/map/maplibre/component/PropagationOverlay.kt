@@ -18,6 +18,9 @@ package org.meshtastic.feature.map.maplibre.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,7 +42,8 @@ import org.meshtastic.core.resources.propagation_hour_now
 import org.meshtastic.feature.map.propagation.PropagationController
 
 private const val OVERLAY_BACKGROUND_ALPHA = 0.85f
-private const val OVERLAY_WIDTH_DP = 200
+private const val HOUR_LABEL_WIDTH_DP = 64
+private const val SLIDER_HEIGHT_DP = 32
 
 /**
  * The legend of the propagation layer and the hour of the forecast, small, right on the map, so the hour can be changed
@@ -54,28 +58,33 @@ internal fun PropagationOverlay(modifier: Modifier = Modifier) {
     Column(
         modifier =
         modifier
-            .width(OVERLAY_WIDTH_DP.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface.copy(alpha = OVERLAY_BACKGROUND_ALPHA))
-            .padding(8.dp),
+            .padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         val ahead = state.hoursAhead
-        Text(
-            text =
-            if (ahead == 0) {
-                stringResource(Res.string.propagation_hour_now)
-            } else {
-                stringResource(Res.string.propagation_hour_ahead, ahead)
-            },
-            style = MaterialTheme.typography.labelMedium,
-        )
         val last = (grid.hours - 1 - grid.hourAt(nowMillis)).coerceAtLeast(1)
-        Slider(
-            value = ahead.toFloat(),
-            onValueChange = { controller.setHoursAhead(it.toInt()) },
-            valueRange = 0f..last.toFloat(),
-            steps = (last - 1).coerceAtLeast(0),
-        )
-        Legend()
+        // One long, low bar: the hour on the left and a slider as wide as the bar, so it can be set precisely.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text =
+                if (ahead == 0) {
+                    stringResource(Res.string.propagation_hour_now)
+                } else {
+                    stringResource(Res.string.propagation_hour_ahead, ahead)
+                },
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.width(HOUR_LABEL_WIDTH_DP.dp),
+            )
+            Slider(
+                value = ahead.toFloat(),
+                onValueChange = { controller.setHoursAhead(it.toInt()) },
+                valueRange = 0f..last.toFloat(),
+                steps = (last - 1).coerceAtLeast(0),
+                modifier = Modifier.weight(1f).height(SLIDER_HEIGHT_DP.dp),
+            )
+        }
+        LegendLine()
     }
+}
 }

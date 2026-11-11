@@ -218,6 +218,22 @@ internal fun Legend() {
     }
 }
 
+/** The legend on one low line: the colour dots, then the text next to them (used on the map itself). */
+@Composable
+internal fun LegendLine() {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        listOf(0xFF3080E0, 0xFF40C040, 0xFFF0D020, 0xFFF08020, 0xFFE02020, 0xFFB000B0).forEach {
+            Box(Modifier.size(10.dp).clip(CircleShape).background(Color(it)))
+        }
+        Text(
+            text = stringResource(Res.string.propagation_legend),
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 2,
+            modifier = Modifier.padding(start = 4.dp),
+        )
+    }
+}
+
 private val PROPAGATION_KIND_LABELS: Map<PropagationKind, StringResource> =
     mapOf(
         PropagationKind.GRADIENT to Res.string.propagation_kind_gradient,

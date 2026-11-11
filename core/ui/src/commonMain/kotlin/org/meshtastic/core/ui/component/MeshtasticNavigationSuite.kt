@@ -84,6 +84,7 @@ import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.reconnecting
 import org.meshtastic.core.ui.navigation.icon
 import org.meshtastic.core.ui.theme.monochromeLayer
+import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 
@@ -273,6 +274,7 @@ private fun handleNavigation(
             TopLevelDestination.Messages -> ScrollToTopEvent.ConversationsTabPressed
             else -> null
         }
+    if (destination == TopLevelDestination.Map) MapViewReset.events.tryEmit(Unit)
     if (event != null) {
         // On the list itself the screen is already there; after going back to it, it has to be built first.
         if (wasOnRoot) uiViewModel.emitScrollToTopEvent(event) else uiViewModel.emitScrollToTopEventDelayed(event)
