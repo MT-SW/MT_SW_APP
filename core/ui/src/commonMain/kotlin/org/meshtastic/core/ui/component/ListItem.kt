@@ -96,11 +96,13 @@ fun SwitchListItem(
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
     leadingIconTint: Color = Color.Unspecified,
+    supportingText: String? = null,
 ) {
     BasicListItem(
         text = text,
         modifier = modifier,
         textColor = textColor,
+        supportingText = supportingText,
         enabled = enabled,
         leadingIcon = leadingIcon,
         leadingIconTint = leadingIconTint,

@@ -32,6 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.db_sync_auto
+import org.meshtastic.core.resources.db_sync_auto_summary
 import org.meshtastic.core.resources.db_sync_done
 import org.meshtastic.core.resources.db_sync_failed
 import org.meshtastic.core.resources.db_sync_info
@@ -95,6 +96,7 @@ fun DatabaseSyncSettingItems(
     SwitchListItem(
         modifier = modifier,
         text = stringResource(Res.string.db_sync_auto),
+        supportingText = stringResource(Res.string.db_sync_auto_summary),
         leadingIcon = MeshtasticIcons.Refresh,
         checked = autoEnabled,
         onClick = { onAutoChange(!autoEnabled) },

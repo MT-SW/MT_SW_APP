@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: przełącznik „Synchronizuj statystyki automatycznie” ma teraz własny opis (co robi i kiedy).
 * Wszystkie wersje: statystyki w widżecie są ułożone w grupy: sieć (węzły, nieprzeczytane), węzeł (zasilanie, czas pracy), radio (eter, ruch, diagnostyka), zasoby (procesor, RAM, flash, PSRAM) i łączność (Wi-Fi, Bluetooth). Na iPhonie i iPadzie widżet pokazuje je w sekcjach ze złotymi nagłówkami, w dwóch wyrównanych kolumnach.
 * Wszystkie wersje: nowy przełącznik w Funkcjach MT_SW „Pomijaj w wykresach odczyty ze złym czasem” (domyślnie wyłączony; włączony pomija w wykresach odczyty z błędnym zegarem węzła, ikona zegara).
 * Wszystkie wersje: widżet pokazuje szum z korektą wzmacniacza (LNA), tak jak aplikacja i powiadomienie.
@@ -610,6 +611,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: the "Synchronize statistics automatically" switch now has its own description (what it does and when).
 * All versions: the widget statistics are arranged in groups: network (nodes, unread), the node (power, uptime), radio (airtime, traffic, diagnostics), resources (CPU, RAM, flash, PSRAM) and connections (Wi-Fi, Bluetooth). On iPhone and iPad the widget shows them in sections with gold headings, in two balanced columns.
 * All versions: new switch in MT_SW features "Skip readings with a wrong time in charts" (off by default; on leaves out readings from a node with a wrong clock, clock icon).
 * All versions: the widget shows the noise floor with the amplifier (LNA) correction, like the app and the notification.

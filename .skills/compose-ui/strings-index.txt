@@ -849,6 +849,7 @@ date_separator_today
 date_separator_yesterday
 ### DB ###
 db_sync_auto
+db_sync_auto_summary
 db_sync_done
 db_sync_failed
 db_sync_info

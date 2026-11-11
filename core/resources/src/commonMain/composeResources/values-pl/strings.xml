@@ -3721,6 +3721,7 @@
     <string name="db_sync_title">Synchronizacja statystyk urządzeń</string>
     <string name="db_sync_summary">Statystyki węzłów wspólnych dla baz Twoich radii</string>
     <string name="db_sync_auto">Synchronizuj statystyki automatycznie</string>
+    <string name="db_sync_auto_summary">Po zmianie radia aplikacja sama połączy statystyki węzłów, które znają obie bazy (bez dubli, niczego nie usuwa)</string>
     <string name="db_sync_now">Synchronizuj teraz</string>
     <string name="db_sync_working">Synchronizacja…</string>
     <string name="db_sync_done">Gotowe: zsynchronizowano wpisów: %1$d.</string>
