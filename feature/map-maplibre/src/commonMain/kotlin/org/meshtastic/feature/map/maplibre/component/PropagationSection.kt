@@ -228,7 +228,7 @@ internal fun LegendLine() {
         Text(
             text = stringResource(Res.string.propagation_legend),
             style = MaterialTheme.typography.labelSmall,
-            maxLines = 2,
+            maxLines = 4,
             modifier = Modifier.padding(start = 4.dp),
         )
     }

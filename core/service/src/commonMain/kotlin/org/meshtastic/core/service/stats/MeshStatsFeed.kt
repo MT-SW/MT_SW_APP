@@ -42,6 +42,11 @@ import org.meshtastic.core.resources.widget_card_heard
 import org.meshtastic.core.resources.widget_card_hops
 import org.meshtastic.core.resources.widget_card_model
 import org.meshtastic.core.resources.widget_card_voltage
+import org.meshtastic.core.resources.widget_card_voltage_current
+import org.meshtastic.core.resources.widget_card_current
+import org.meshtastic.core.resources.widget_card_temperature
+import org.meshtastic.core.resources.widget_card_humidity
+import org.meshtastic.core.resources.widget_card_pressure
 import org.meshtastic.proto.LocalStats
 import kotlin.time.Clock
 
@@ -247,13 +252,24 @@ class MeshStatsFeed(
 private suspend fun MutableList<String>.addSensorLines(node: Node) {
     val env = node.environmentMetrics
     val power = node.powerMetrics
-    env.temperature?.takeIf { !it.isNaN() }?.let { add(MetricFormatter.temperature(it, false)) }
-    env.relative_humidity?.takeIf { it != 0f }?.let { add(MetricFormatter.humidity(it)) }
-    env.barometric_pressure?.takeIf { it != 0f }?.let { add(MetricFormatter.pressure(it)) }
-    val volts = power.ch1_voltage ?: env.voltage
-    val milliAmps = power.ch1_current ?: env.current
-    volts?.let { add(getStringSuspend(Res.string.widget_card_voltage, NumberFormatter.format(it.toDouble(), 2))) }
-    milliAmps?.let { add(MetricFormatter.current(it)) }
+    val volts = (power.ch1_voltage ?: env.voltage)?.let { NumberFormatter.format(it.toDouble(), 2) }
+    val milliAmps = (power.ch1_current ?: env.current)?.let { NumberFormatter.format(it.toDouble(), 1) }
+    // Voltage and current share one line, so the current is never left alone and unlabelled.
+    when {
+        volts != null && milliAmps != null ->
+            add(getStringSuspend(Res.string.widget_card_voltage_current, volts, milliAmps))
+        volts != null -> add(getStringSuspend(Res.string.widget_card_voltage, volts))
+        milliAmps != null -> add(getStringSuspend(Res.string.widget_card_current, milliAmps))
+    }
+    env.temperature?.takeIf { !it.isNaN() }?.let {
+        add(getStringSuspend(Res.string.widget_card_temperature, MetricFormatter.temperature(it, false)))
+    }
+    env.relative_humidity?.takeIf { it != 0f }?.let {
+        add(getStringSuspend(Res.string.widget_card_humidity, MetricFormatter.humidity(it)))
+    }
+    env.barometric_pressure?.takeIf { it != 0f }?.let {
+        add(getStringSuspend(Res.string.widget_card_pressure, MetricFormatter.pressure(it)))
+    }
 }
 
 /** How many nodes of one kind the bigger widgets rotate through (all of them, within reason). */

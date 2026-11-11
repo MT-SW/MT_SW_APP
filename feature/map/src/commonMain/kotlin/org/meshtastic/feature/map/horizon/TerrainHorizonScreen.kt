@@ -192,14 +192,14 @@ private val BuildingColor = Color(0xFF9AA5B1)
 private const val BUILDING_BAND_BOOST = 0.2f
 
 /** The vertical scale may be at most this many times the horizontal one, so mountains look like mountains. */
-private const val MAX_VERTICAL_STRETCH = 3.0
+private const val MAX_VERTICAL_STRETCH = 4.5
 private const val BUILDING_SHADE_STEP = 0.05f
 private const val BUILDING_SHADE_VARIANTS = 5
 private const val BUILDING_SHADE_PRIME = 7
 private const val ROOF_LIGHTEN = 0.28f
 private const val WALL_DARKEN = 0.3f
+private const val MIN_BUILDING_WIDTH_PX = 1.5f
 private const val EDGE_DARKEN = 0.5f
-private const val EDGE_ALPHA = 0.45f
 private const val ROOF_DARKEN = 0.18f
 private const val ROOF_STRIP_PX = 3f
 private const val EDGE_WIDTH_PX = 1.5f
@@ -666,6 +666,17 @@ private fun Panorama(
     val primary = MaterialTheme.colorScheme.primary
     val bands = remember(sky, primary) { BandShares.map { lerp(sky, primary, it) } }
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
+    // The buildings sorted into their distance bands once, far to near, not on every frame.
+    val shapesByBand =
+        remember(shapes, profile.radiusM) {
+            List(BandEdges.size - 1) { band ->
+                val from = BandEdges[band] * profile.radiusM
+                val to = BandEdges[band + 1] * profile.radiusM
+                shapes
+                    .filter { it.distanceM >= from && it.distanceM < to }
+                    .sortedByDescending { it.distanceM }
+            }
+        }
     val buildingBands = remember(sky) { BandShares.map { lerp(sky, BuildingColor, it + BUILDING_BAND_BOOST) } }
     // Light comes from where the sun is now at the station (the real position, a minute-old at most), and the far bands
     // are veiled by haze.
@@ -731,7 +742,7 @@ private fun Panorama(
         ) {
             val perDeg = size.width / fieldOfView
             val shown = fitRange(range, size.height, perDeg)
-            drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, shown)
+            drawBands(profile, groundProfile, shapesByBand, light, bands, buildingBands, centre, perDeg, shown)
             drawGuides(measurer, centre, perDeg, fieldOfView, shown, cardinals)
             drawTargets(measurer, targets, markers, precisions, centre, perDeg, shown, focusNodeNum, names)
         }
@@ -823,7 +834,7 @@ private fun xOf(bearingDeg: Double, centre: Float, perDeg: Float, width: Float):
 private fun DrawScope.drawBands(
     profile: HorizonProfile,
     ground: HorizonProfile?,
-    shapes: List<HorizonBuilding>,
+    shapesByBand: List<List<HorizonBuilding>>,
     light: ReliefLight,
     bands: List<Color>,
     buildingBands: List<Color>,
@@ -835,10 +846,10 @@ private fun DrawScope.drawBands(
         val index = bands.lastIndex - band
         if (ground != null) {
             drawRelief(ground, index, bands[index], light, centre, perDeg, range)
-            if (shapes.isEmpty()) {
+            if (shapesByBand.all { it.isEmpty() }) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
-                drawBuildingShapes(shapes, profile.radiusM, index, buildingBands[index], centre, perDeg, range)
+                drawBuildingShapes(shapesByBand[index], buildingBands[index], centre, perDeg, range)
             }
         } else {
             drawRelief(profile, index, bands[index], light, centre, perDeg, range)
@@ -994,11 +1005,9 @@ private fun DrawScope.drawBuildingSolids(
  * light), then the roof is drawn over them and the outline with a thin dark line. Far buildings are drawn first, so
  * near ones cover them. [radiusM] is the radius of the picture, to place a building in its band.
  */
-@Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements", "NestedBlockDepth")
+@Suppress("LoopWithTooManyJumpStatements")
 private fun DrawScope.drawBuildingShapes(
     shapes: List<HorizonBuilding>,
-    radiusM: Double,
-    band: Int,
     colour: Color,
     centre: Float,
     perDeg: Float,
@@ -1006,56 +1015,43 @@ private fun DrawScope.drawBuildingShapes(
 ) {
     val w = size.width
     val h = size.height
-    val from = BandEdges[band] * radiusM
-    val to = BandEdges[band + 1] * radiusM
-    for (i in shapes.indices.reversed()) {
+    val path = Path()
+    // [shapes] is this band's, far to near: only the buildings of one band are walked, not all of them.
+    for (i in shapes.indices) {
         val b = shapes[i]
-        if (b.distanceM < from || b.distanceM >= to) continue
         // Every building a little lighter or darker than its neighbours, so a town is not one flat colour.
         val step = (i * BUILDING_SHADE_PRIME) % BUILDING_SHADE_VARIANTS - BUILDING_SHADE_VARIANTS / 2
         val shade = step * BUILDING_SHADE_STEP
         val base = if (shade >= 0f) lerp(colour, Color.White, shade) else lerp(colour, Color.Black, -shade)
-        val roofColour = lerp(base, Color.Black, ROOF_DARKEN)
-        val darkWall = lerp(base, Color.Black, WALL_DARKEN)
-        val edge = lerp(base, Color.Black, EDGE_DARKEN).copy(alpha = EDGE_ALPHA)
         val n = b.bearingsDeg.size
-        val xs = FloatArray(n) { xOf(b.bearingsDeg[it], centre, perDeg, w) }
-        if (xs.all { it < -w } || xs.all { it > 2 * w }) continue
-        if (xs.max() - xs.min() > w) continue
-        val yRoof = FloatArray(n) { yOf(b.roofDeg[it], range, h) }
-        val yFoot = FloatArray(n) { yOf(b.footDeg[it], range, h) }
-        // Plan view from the viewer: x east, y north.
-        val px = DoubleArray(n) { b.cornerM[it] * sin(b.bearingsDeg[it] * PI / 180.0) }
-        val py = DoubleArray(n) { b.cornerM[it] * cos(b.bearingsDeg[it] * PI / 180.0) }
-        var area = 0.0
+        var minX = Float.MAX_VALUE
+        var maxX = -Float.MAX_VALUE
+        val xs = FloatArray(n)
         for (k in 0 until n) {
-            val m = (k + 1) % n
-            area += px[k] * py[m] - px[m] * py[k]
+            xs[k] = xOf(b.bearingsDeg[k], centre, perDeg, w)
+            if (xs[k] < minX) minX = xs[k]
+            if (xs[k] > maxX) maxX = xs[k]
         }
-        val sign = if (area >= 0) 1.0 else -1.0
+        // Off the picture, spread over more than the picture (a wrapped outline), or too thin to be seen: skipped.
+        if (maxX < 0f || minX > w || maxX - minX > w || maxX - minX < MIN_BUILDING_WIDTH_PX) continue
+        val darkWall = lerp(base, Color.Black, WALL_DARKEN)
         for (k in 0 until n) {
+            val facing = b.facing[k]
+            if (facing <= 0f) continue
             val m = (k + 1) % n
-            val ex = px[m] - px[k]
-            val ey = py[m] - py[k]
-            // Outward normal of the edge; the wall faces the viewer when the viewer (the origin) is on its outer side.
-            val nx = ey * sign
-            val ny = -ex * sign
-            val facing = -(px[k] * nx + py[k] * ny) / (sqrt(nx * nx + ny * ny) * b.cornerM[k] + 1e-9)
-            if (facing <= 0.0) continue
-            val wall = Path()
-            wall.moveTo(xs[k], yFoot[k])
-            wall.lineTo(xs[m], yFoot[m])
-            wall.lineTo(xs[m], yRoof[m])
-            wall.lineTo(xs[k], yRoof[k])
-            wall.close()
-            drawPath(wall, lerp(darkWall, base, facing.toFloat().coerceIn(0f, 1f)))
+            path.reset()
+            path.moveTo(xs[k], yOf(b.footDeg[k], range, h))
+            path.lineTo(xs[m], yOf(b.footDeg[m], range, h))
+            path.lineTo(xs[m], yOf(b.roofDeg[m], range, h))
+            path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
+            path.close()
+            drawPath(path, lerp(darkWall, base, facing))
         }
-        val roof = Path()
-        roof.moveTo(xs[0], yRoof[0])
-        for (k in 1 until n) roof.lineTo(xs[k], yRoof[k])
-        roof.close()
-        drawPath(roof, roofColour)
-        drawPath(roof, edge, style = Stroke(width = EDGE_WIDTH_PX))
+        path.reset()
+        path.moveTo(xs[0], yOf(b.roofDeg[0], range, h))
+        for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
+        path.close()
+        drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
     }
 }
 

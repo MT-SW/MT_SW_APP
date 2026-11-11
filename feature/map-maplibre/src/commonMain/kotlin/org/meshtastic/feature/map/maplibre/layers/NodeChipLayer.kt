@@ -415,7 +415,9 @@ private const val TAIL_ROUNDING_DP = 2
 private const val MAX_CHIP_IMAGES = 250
 
 /** Half the width and the height of the area a chip covers above its node, used to find the chip a tap landed on. */
-private const val TAP_HALF_WIDTH_DP = 40f
+private const val TAP_HALF_WIDTH_DP = 44f
+private const val RANK_TIE_DP = 10f
+private const val TAP_TOP_MARGIN_DP = 8f
 private const val TAP_HEIGHT_DP = 32f
 private const val STACK_TOLERANCE_DP = 2f
 
@@ -438,7 +440,11 @@ internal suspend fun nodeTapAt(
 ): Boolean {
     val at = state.screenLocationFromPosition(tap) ?: return false
     val candidates = chipCandidates(state, at)
-    val best = candidates.maxByOrNull { it.second * RANK_WEIGHT - it.third }
+    // The closest bubble wins; rank (favourites on top) only decides between bubbles that are about as close.
+    val closest = candidates.minOfOrNull { it.third }
+    val pool = candidates.filter { closest != null && it.third <= closest + RANK_TIE_DP }
+    val best = pool.maxByOrNull { it.second * RANK_WEIGHT - it.third }
+    Logger.i { "Dotyk w węzeł: kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM)}" }
     val near = best?.let { top -> candidates.filter { it.third <= top.third + STACK_TOLERANCE_DP }.map { it.first } }
     val stack = if (best != null && near != null) stackedMembers(near, best.first) else emptyList()
     val nodeNum = best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt()
@@ -464,7 +470,7 @@ private suspend fun chipCandidates(state: MapState, at: DpOffset): List<Triple<F
     val box =
         DpRect(
             left = at.x - TAP_HALF_WIDTH_DP.dp,
-            top = at.y,
+            top = at.y - TAP_TOP_MARGIN_DP.dp,
             right = at.x + TAP_HALF_WIDTH_DP.dp,
             bottom = at.y + TAP_HEIGHT_DP.dp,
         )

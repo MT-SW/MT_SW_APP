@@ -26,6 +26,8 @@ import org.meshtastic.feature.map.planner.data.ClutterMap
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
@@ -41,11 +43,35 @@ class HorizonBuilding(
     /** Distance of every corner (m), to tell which walls face the viewer. */
     val cornerM: DoubleArray,
     val distanceM: Double,
-)
+) {
+    /**
+     * For every edge (corner k to the next), how squarely it faces the viewer from 0 (not at all: not drawn) to 1.
+     * It depends only on the outline, so it is worked out once and not on every frame.
+     */
+    val facing: FloatArray by lazy {
+        val n = bearingsDeg.size
+        val px = DoubleArray(n) { cornerM[it] * sin(bearingsDeg[it] * PI / 180.0) }
+        val py = DoubleArray(n) { cornerM[it] * cos(bearingsDeg[it] * PI / 180.0) }
+        var area = 0.0
+        for (k in 0 until n) {
+            val m = (k + 1) % n
+            area += px[k] * py[m] - px[m] * py[k]
+        }
+        val sign = if (area >= 0) 1.0 else -1.0
+        FloatArray(n) { k ->
+            val m = (k + 1) % n
+            val nx = (py[m] - py[k]) * sign
+            val ny = -(px[m] - px[k]) * sign
+            val f = -(px[k] * nx + py[k] * ny) / (sqrt(nx * nx + ny * ny) * cornerM[k] + 1e-9)
+            f.coerceIn(0.0, 1.0).toFloat()
+        }
+    }
+}
 
 /** Projects the saved buildings around [centre] into [HorizonBuilding]s (nearest [MAX_BUILDINGS], within [maxM]). */
 object HorizonBuildings {
-    private const val MAX_BUILDINGS = 2500
+    private const val MAX_BUILDINGS = 1500
+    private const val MAX_ROOF_DEG = 2.5
     private const val METRES_PER_DEGREE = 111_320.0
 
     // Closer than this a building would only fill the picture with one huge wall; the own roof and the street are
@@ -89,7 +115,9 @@ object HorizonBuildings {
                 corner[i] = d
                 bearings[i] = (atan2(dx, dy) * 180.0 / PI + 360.0) % 360.0
                 foot[i] = HorizonPanorama.angleDeg(observerM, ground(lat, lon), d, effective)
-                roof[i] = HorizonPanorama.angleDeg(observerM, roofZ, d, effective)
+                // A building is never drawn taller than this above its foot, so near towers do not dwarf the hills.
+                val rawRoof = HorizonPanorama.angleDeg(observerM, roofZ, d, effective)
+                roof[i] = foot[i] + min(rawRoof - foot[i], MAX_ROOF_DEG)
             }
             if (nearest < OWN_BUILDING_M || nearest > maxM) continue
             out += HorizonBuilding(bearings, foot, roof, corner, nearest)

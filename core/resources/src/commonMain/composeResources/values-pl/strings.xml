@@ -3847,6 +3847,11 @@
     <string name="planner_layer_buildings_link">Planer: budynki na trasie (© OpenStreetMap)</string>
     <string name="planner_layer_buildings_area">Planer: budynki w zasięgu (© OpenStreetMap)</string>
     <string name="widget_card_voltage">Napięcie: %1$s V</string>
+    <string name="widget_card_voltage_current">Napięcie: %1$s V · Prąd: %2$s mA</string>
+    <string name="widget_card_current">Prąd: %1$s mA</string>
+    <string name="widget_card_temperature">Temperatura: %1$s</string>
+    <string name="widget_card_humidity">Wilgotność: %1$s</string>
+    <string name="widget_card_pressure">Ciśnienie: %1$s</string>
     <string name="widget_card_heard">Słyszany %1$s temu</string>
     <string name="widget_card_hops">Skoków: %1$d</string>
     <string name="widget_card_model">%1$s · %2$s</string>
