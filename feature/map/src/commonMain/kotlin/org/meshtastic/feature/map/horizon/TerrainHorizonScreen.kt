@@ -239,6 +239,13 @@ private const val GRAIN_CELL_BIG = 32
 private const val GRAIN_CELL_MID = 16
 private const val GRAIN_CELL_SMALL = 8
 private const val SMOOTH_NOISE_COLUMNS = 8
+private const val GRAIN_WEIGHT_BIG = 0.45f
+private const val GRAIN_WEIGHT_MID = 0.3f
+private const val GRAIN_WEIGHT_SMALL = 0.15f
+private const val GRAIN_WEIGHT_SPECKLE = 0.1f
+private const val LATTICE_ROW_PRIME = 977
+private const val SMOOTH_A = 3f
+private const val SMOOTH_B = 2f
 private const val GRAIN_ALPHA = 0.10f
 private const val GRAIN_FADE = 0.22f
 private const val GOOD_QUALITY_BUILDINGS = 800
@@ -1127,10 +1134,10 @@ private fun rockGrain(): Brush {
             // Three scales of soft, wrapping noise plus a fine speckle: blotches like rock, scree and moss, with no
             // direction to them, so nothing reads as stripes.
             val tone =
-                0.45f * tileNoise(x, y, GRAIN_CELL_BIG) +
-                    0.30f * tileNoise(x, y, GRAIN_CELL_MID) +
-                    0.15f * tileNoise(x, y, GRAIN_CELL_SMALL) +
-                    0.10f * columnNoise(x * GRAIN_TILE_H + y, 2)
+                GRAIN_WEIGHT_BIG * tileNoise(x, y, GRAIN_CELL_BIG) +
+                    GRAIN_WEIGHT_MID * tileNoise(x, y, GRAIN_CELL_MID) +
+                    GRAIN_WEIGHT_SMALL * tileNoise(x, y, GRAIN_CELL_SMALL) +
+                    GRAIN_WEIGHT_SPECKLE * columnNoise(x * GRAIN_TILE_H + y, 2)
             val strength = abs(tone - 0.5f) * 2f
             paint.color = (if (tone < 0.5f) Color.Black else Color.White).copy(alpha = strength)
             canvas.drawRect(x.toFloat(), y.toFloat(), x + 1f, y + 1f, paint)
@@ -1149,13 +1156,13 @@ private fun tileNoise(x: Int, y: Int, cell: Int): Float {
     val y0 = fy.toInt()
     val tx = smoothStep(fx - x0)
     val ty = smoothStep(fy - y0)
-    fun at(cx: Int, cy: Int) = columnNoise((cx % cols) * 977 + (cy % rows), cell)
+    fun at(cx: Int, cy: Int) = columnNoise((cx % cols) * LATTICE_ROW_PRIME + (cy % rows), cell)
     val top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * tx
     val bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * tx
     return top + (bottom - top) * ty
 }
 
-private fun smoothStep(t: Float): Float = t * t * (3f - 2f * t)
+private fun smoothStep(t: Float): Float = t * t * (SMOOTH_A - SMOOTH_B * t)
 
 /** Noise along the columns of a band that changes gently from one column to the next, so it never shows as bars. */
 private fun smoothNoise(column: Int, band: Int): Float {
