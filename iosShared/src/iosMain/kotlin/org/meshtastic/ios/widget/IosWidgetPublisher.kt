@@ -17,6 +17,7 @@
 package org.meshtastic.ios.widget
 
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.conflate
@@ -105,7 +106,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
         append('"')
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun write(json: String) {
         val folder = NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(WIDGET_APP_GROUP)
         if (folder == null) {

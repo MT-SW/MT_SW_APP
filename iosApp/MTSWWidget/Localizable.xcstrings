@@ -1,150 +1,169 @@
 {
-  "sourceLanguage": "pl",
-  "version": "1.0",
-  "strings": {
-    "Zawartość": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zawartość"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Content"
+  "sourceLanguage" : "pl",
+  "strings" : {
+    "%@/%@" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@"
           }
         }
       }
     },
-    "Nasz węzeł": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nasz węzeł"
+    "Cała sieć na zmianę" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole network in turn"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Our node"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cała sieć na zmianę"
           }
         }
       }
     },
-    "Ulubione na zmianę": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ulubione na zmianę"
+    "Drugie pole" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second area"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Favorites in turn"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugie pole"
           }
         }
       }
     },
-    "Cała sieć na zmianę": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cała sieć na zmianę"
+    "Drugie pole dużego widżetu" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large widget second area"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Whole network in turn"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugie pole dużego widżetu"
           }
         }
       }
     },
-    "Drugie pole": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drugie pole"
+    "Nasz węzeł" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Our node"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Second area"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasz węzeł"
           }
         }
       }
     },
-    "Statystyki MT_SW": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statystyki MT_SW"
+    "Średni widżet" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium widget"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MT_SW statistics"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Średni widżet"
           }
         }
       }
     },
-    "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć.": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć."
+    "Statystyki MT_SW" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MT_SW statistics"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (4x6): our node, favorites and the whole network."
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statystyki MT_SW"
           }
         }
       }
     },
-    "Średni widżet": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Średni widżet"
+    "Ulubione na zmianę" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites in turn"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Medium widget"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulubione na zmianę"
           }
         }
       }
     },
-    "Drugie pole dużego widżetu": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drugie pole dużego widżetu"
+    "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (4x6): our node, favorites and the whole network."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Large widget second area"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć."
+          }
+        }
+      }
+    },
+    "Zawartość" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zawartość"
           }
         }
       }
     }
-  }
+  },
+  "version" : "1.0"
 }
