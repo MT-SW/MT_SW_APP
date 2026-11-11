@@ -21,6 +21,8 @@ import WidgetKit
 
 @main
 struct MTSWApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
     init() {
         // Kotlin zapisuje nowe statystyki i daje znać tym powiadomieniem: widżet odświeża się od razu.
         NotificationCenter.default.addObserver(forName: Notification.Name("MTSWWidgetRefresh"), object: nil, queue: .main) { _ in
@@ -35,6 +37,28 @@ struct MTSWApp: App {
                 .onOpenURL { url in
                     MainViewControllerKt.handleIosDeepLink(url: url.absoluteString)
                 }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { saveWidgetSizes() }
+                }
         }
+    }
+}
+
+/// Zapisuje, w jakich rozmiarach widżet stoi na ekranie głównym; ustawienia aplikacji pokazują opcje tych rozmiarów.
+private func saveWidgetSizes() {
+    WidgetCenter.shared.getCurrentConfigurations { result in
+        guard case .success(let infos) = result,
+              let folder = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.pl.sw.mt")
+        else { return }
+        let names = infos.filter { $0.kind == "MTSWStatsWidget" }.map { info -> String in
+            switch info.family {
+            case .systemMedium: return "medium"
+            case .systemLarge: return "large"
+            case .systemExtraLarge: return "extra"
+            default: return String(describing: info.family) == "systemExtraLargePortrait" ? "extra" : "other"
+            }
+        }
+        try? (["ok"] + names).joined(separator: ",")
+            .write(to: folder.appendingPathComponent("widget-sizes.txt"), atomically: true, encoding: .utf8)
     }
 }

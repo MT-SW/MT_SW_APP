@@ -3496,6 +3496,7 @@
     <string name="widget_content_favorites">Favorites in turn</string>
     <string name="widget_content_network">Whole network in turn</string>
     <string name="widget_content_info">The widget has three sizes (drag its corner to change it).\n\nSmall (4x2): your choice. Our node, or favorites in turn, or the whole network in turn (the whole network is all nodes except ours, favorites included). With favorites or the network, the full statistics of our node come first, then the nodes one after another every 5 minutes.\n\nMedium (4x4): our node on top; below, your choice of favorites or the whole network, in turn.\n\nLarge (4x6): our node on top, favorites below it, and under them the rest of the network (without favorites and without our node), in turn.</string>
+    <string name="widget_content_expand_info">The widget can be made bigger: add it from the widget gallery in a larger size or resize it on the home screen. The smallest shows our node, favorites in turn or the whole network in turn. A bigger one adds a second area to choose (favorites or the whole network). The biggest shows our node, favorites and the rest of the network at once. Below are the options only for the sizes you have on the screen.</string>
     <string name="widget_label_favorite">Favorite node</string>
     <string name="widget_label_network">Network node</string>
     <string name="widget_label_other">Other node</string>

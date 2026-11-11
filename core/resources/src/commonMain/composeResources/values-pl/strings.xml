@@ -3723,6 +3723,7 @@
     <string name="widget_content_favorites">Ulubione na zmianę</string>
     <string name="widget_content_network">Cała sieć na zmianę</string>
     <string name="widget_content_info">Widżet ma trzy rozmiary (zmieniasz je, przeciągając róg widżetu).\n\nMały (4x2): do wyboru nasz węzeł, ulubione na zmianę albo cała sieć na zmianę (cała sieć to wszystkie węzły bez naszego, razem z ulubionymi). Przy ulubionych i sieci najpierw są pełne statystyki naszego węzła, potem kolejne węzły, zmieniane co 5 minut.\n\nŚredni (4x4): u góry nasz węzeł, niżej do wyboru ulubione albo cała sieć, na zmianę.\n\nDuży (4x6): u góry nasz węzeł, pod nim ulubione, a pod nimi reszta sieci (bez ulubionych i bez naszego węzła), na zmianę.</string>
+    <string name="widget_content_expand_info">Widżet można powiększyć: dodaj go z galerii widżetów w większym rozmiarze albo zmień rozmiar na ekranie głównym. Najmniejszy pokazuje nasz węzeł, ulubione na zmianę albo całą sieć na zmianę. Większy dodaje drugie pole do wyboru (ulubione albo cała sieć). Największy pokazuje naraz nasz węzeł, ulubione i resztę sieci. Poniżej są opcje tylko dla rozmiarów, które masz na ekranie.</string>
     <string name="widget_label_favorite">Ulubiony węzeł</string>
     <string name="widget_label_network">Węzeł sieci</string>
     <string name="widget_label_other">Inny węzeł sieci</string>

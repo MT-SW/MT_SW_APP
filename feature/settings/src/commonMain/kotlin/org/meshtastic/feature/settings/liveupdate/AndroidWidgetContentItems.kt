@@ -16,17 +16,22 @@
  */
 package org.meshtastic.feature.settings.liveupdate
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.widget_content_expand_info
 import org.meshtastic.core.resources.widget_content_favorites
 import org.meshtastic.core.resources.widget_content_info
 import org.meshtastic.core.resources.widget_content_network
@@ -39,6 +44,7 @@ import org.meshtastic.core.ui.component.icon
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notifications
+import org.meshtastic.core.ui.util.rememberWidgetSizes
 
 /**
  * MT_SW: what the Android widget shows in its sizes, like the iPhone widget: the smallest one (our node, favorites or
@@ -56,7 +62,17 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
     val network = stringResource(Res.string.widget_content_network)
     val smallNames = listOf(own, favorites, network)
     val secondNames = listOf(favorites, network)
-    BasicListItem(
+    // Only the options of the sizes the widget really has on the home screen; with nothing placed yet, the basic one.
+    val sizes = rememberWidgetSizes()
+    val showSmall = !sizes.known || sizes.medium || !(sizes.large || sizes.extraLarge)
+    val showSecond = !sizes.known || sizes.large
+    Text(
+        text = stringResource(Res.string.widget_content_expand_info),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+    if (showSmall) BasicListItem(
         text = stringResource(Res.string.widget_content_small_title),
         supportingText = smallNames[small.coerceIn(0, 2)],
         leadingIcon = MeshtasticIcons.Notifications,
@@ -64,7 +80,7 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
         onClick = { chooser = 1 },
         modifier = modifier,
     )
-    BasicListItem(
+    if (showSecond) BasicListItem(
         text = stringResource(Res.string.widget_content_second_title),
         supportingText = secondNames[second.coerceIn(0, 1)],
         leadingIcon = MeshtasticIcons.Notifications,
