@@ -72,11 +72,15 @@ import org.maplibre.compose.overlay.MapOverlay as MaplibreOverlay
  * The raster underlay is composed **before** [content] and must stay that way: layers stack in composition order, so a
  * basemap added afterwards paints over the mesh data instead of sitting under it.
  */
+// Spotless and detekt format the marked function type below differently; spotless wins, so detekt is told to leave it.
+@Suppress("FunctionTypeModifierSpacing")
 @Composable
 internal fun rememberSecondaryMapState(
     basemaps: BasemapSelection,
     initialCameraPosition: CameraPosition = CameraPosition(),
-    content: @Composable @MaplibreComposable () -> Unit,
+    content:
+    @Composable @MaplibreComposable
+    () -> Unit,
 ): MapState {
     InstallRadarSmoothing()
     return rememberMapState(baseStyle = basemaps.current.toBaseStyle(), initialCameraPosition = initialCameraPosition) {

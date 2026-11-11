@@ -107,7 +107,8 @@ class BuildingStore(
         val parts = key.split('_')
         val edges = parts.take(PIECE_EDGES).mapNotNull { it.toLongOrNull()?.div(DEGREE_SCALE) }
         if (parts.size != PIECE_PARTS || parts.last() != kind || edges.size != PIECE_EDGES) return false
-        val nearest = GeoPoint(at.lat.coerceIn(edges[0], edges[2]), at.lon.coerceIn(edges[1], edges[3]))
+        val (south, west, north) = edges
+        val nearest = GeoPoint(at.lat.coerceIn(south, north), at.lon.coerceIn(west, edges.last()))
         return Geodesy.distanceM(nearest, at) <= radiusKm * METRES_PER_KM
     }
 
