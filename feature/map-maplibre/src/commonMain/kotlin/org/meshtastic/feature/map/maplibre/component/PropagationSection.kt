@@ -170,9 +170,8 @@ internal fun PropagationSection(
                 enabled = !state.loading,
                 onClick = { target.bounds()?.let { controller.download(it.toGeo()) } },
             ) {
-                Text(
-                    stringResource(if (grid == null) Res.string.propagation_download else Res.string.propagation_update)
-                )
+                val label = if (grid == null) Res.string.propagation_download else Res.string.propagation_update
+                Text(stringResource(label))
             }
             if (state.loading) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
