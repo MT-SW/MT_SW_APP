@@ -219,12 +219,13 @@ internal fun Legend() {
     }
 }
 
-private fun PropagationKind.label(): StringResource {
-    return when (this) {
-        PropagationKind.GRADIENT -> Res.string.propagation_kind_gradient
-        PropagationKind.ENHANCED -> Res.string.propagation_kind_enhanced
-        PropagationKind.K_FACTOR -> Res.string.propagation_kind_k
-    }
-}
+private val PROPAGATION_KIND_LABELS: Map<PropagationKind, StringResource> =
+    mapOf(
+        PropagationKind.GRADIENT to Res.string.propagation_kind_gradient,
+        PropagationKind.ENHANCED to Res.string.propagation_kind_enhanced,
+        PropagationKind.K_FACTOR to Res.string.propagation_kind_k,
+    )
+
+private fun PropagationKind.label(): StringResource = PROPAGATION_KIND_LABELS.getValue(this)
 
 private fun BoundingBox.toGeo(): GeoBounds = GeoBounds(south = south, west = west, north = north, east = east)
