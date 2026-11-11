@@ -30,9 +30,18 @@ internal object ReturnView {
         if (state !in saved) saved[state] = state.cameraPosition
     }
 
-    fun take(state: MapState): CameraPosition? = saved.remove(state)
+    /** The view the map settled on when it opened: where the Map tab goes back to after zooming out or panning. */
+    private val home = mutableMapOf<MapState, CameraPosition>()
+
+    fun setHome(state: MapState) {
+        if (state !in home) home[state] = state.cameraPosition
+    }
+
+    /** The view before the last fly-in, or else the opening view; the opening view stays for the next press. */
+    fun take(state: MapState): CameraPosition? = saved.remove(state) ?: home[state]
 
     fun forget(state: MapState) {
         saved.remove(state)
+        home.remove(state)
     }
 }

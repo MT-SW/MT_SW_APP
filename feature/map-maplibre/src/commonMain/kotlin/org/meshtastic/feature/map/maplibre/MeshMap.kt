@@ -302,6 +302,7 @@ fun MeshMap(
         // Idle can arrive before the first render session; only an idle after a drawn frame means tiles are on screen.
         mapState.events.dropWhile { it !is MapEvent.FrameRendered }.filterIsInstance<MapEvent.Idle>().first()
         Logger.withTag("MapDrawn").d { "tiles drawn" }
+        ReturnView.setHome(mapState)
     }
 
     val scope = rememberCoroutineScope()
