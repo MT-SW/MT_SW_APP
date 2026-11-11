@@ -177,7 +177,7 @@ interface UiPrefs {
 
     /**
      * MT_SW: node charts leave out readings with a wrong time (a node with a wrong clock): more than 30 days in the
-     * future, more than a year older than the newest one, and repeats of the same moment. On by default.
+     * future, more than a year older than the newest one, and repeats of the same moment. Off by default.
      */
     val skipBadTimeChartPoints: StateFlow<Boolean>
 

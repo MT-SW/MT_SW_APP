@@ -396,7 +396,7 @@ class FakeUiPrefs : UiPrefs {
         importMenuInTopBar.value = value
     }
 
-    override val skipBadTimeChartPoints = MutableStateFlow(true)
+    override val skipBadTimeChartPoints = MutableStateFlow(false)
 
     override fun setSkipBadTimeChartPoints(value: Boolean) {
         skipBadTimeChartPoints.value = value

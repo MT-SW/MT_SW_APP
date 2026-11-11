@@ -155,7 +155,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val skipBadTimeChartPoints: StateFlow<Boolean> =
-        dataStore.data.map { it[KEY_SKIP_BAD_TIME_CHART_POINTS] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+        dataStore.data.map { it[KEY_SKIP_BAD_TIME_CHART_POINTS] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
     override fun setSkipBadTimeChartPoints(value: Boolean) {
         scope.launch { dataStore.edit { it[KEY_SKIP_BAD_TIME_CHART_POINTS] = value } }

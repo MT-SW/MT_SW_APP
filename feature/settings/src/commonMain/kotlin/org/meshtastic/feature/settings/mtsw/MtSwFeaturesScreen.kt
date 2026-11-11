@@ -112,6 +112,7 @@ import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
+import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
@@ -196,7 +197,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 )
                 SwitchListItem(
                     text = stringResource(Res.string.skip_bad_time_chart_points),
-                    leadingIcon = MeshtasticIcons.LinkIcon,
+                    leadingIcon = MeshtasticIcons.History,
                     checked = skipBadTimes,
                     onClick = { settingsViewModel.setSkipBadTimeChartPoints(!skipBadTimes) },
                 )
