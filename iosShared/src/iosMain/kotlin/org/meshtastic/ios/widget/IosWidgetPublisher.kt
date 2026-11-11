@@ -24,7 +24,8 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.widget_updated
 import org.meshtastic.core.service.stats.MeshStatsFeed
-import org.meshtastic.core.service.stats.MeshStatsLines
+import org.meshtastic.core.service.stats.MeshStatsNodeCard
+import org.meshtastic.core.service.stats.MeshStatsSnapshot
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSFileManager
@@ -56,11 +57,11 @@ private val MIN_PUBLISH_INTERVAL = 30.seconds
 class IosWidgetPublisher(private val feed: MeshStatsFeed) {
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
-        feed.snapshots().conflate().collect { snapshot ->
+        feed.snapshots(withNodes = true).conflate().collect { snapshot ->
             runCatching {
                 // The words on the widget follow the language of the app, not of the phone: the app writes them.
                 val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                write(json(snapshot.title, snapshot.chip, snapshot.groups, snapshot.connected, updated))
+                write(json(snapshot, updated))
             }
                 .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
             delay(MIN_PUBLISH_INTERVAL)
@@ -69,17 +70,18 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
 
     private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
 
-    private fun json(
-        title: String,
-        chip: String,
-        groups: List<MeshStatsLines.Group>,
-        connected: Boolean,
-        updatedText: String,
-    ): String = "{\"title\":${quote(title)},\"chip\":${quote(chip)},\"connected\":$connected," +
-        "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
-        "\"groups\":[${groups.joinToString(",") { group ->
-            "{\"title\":${quote(group.title)},\"lines\":[${group.lines.joinToString(",") { quote(it) }}]}"
-        }}]}"
+    private fun json(snapshot: MeshStatsSnapshot, updatedText: String): String =
+        "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)},\"connected\":${snapshot.connected}," +
+            "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
+            "\"groups\":[${snapshot.groups.joinToString(",") { group ->
+                "{\"title\":${quote(group.title)},\"lines\":${lines(group.lines)}}"
+            }}]," +
+            "\"favorites\":${cards(snapshot.favorites)},\"others\":${cards(snapshot.others)}}"
+
+    private fun lines(lines: List<String>): String = "[${lines.joinToString(",") { quote(it) }}]"
+
+    private fun cards(cards: List<MeshStatsNodeCard>): String =
+        "[${cards.joinToString(",") { "{\"title\":${quote(it.title)},\"lines\":${lines(it.lines)}}" }}]"
 
     private fun quote(text: String): String = buildString {
         append('"')

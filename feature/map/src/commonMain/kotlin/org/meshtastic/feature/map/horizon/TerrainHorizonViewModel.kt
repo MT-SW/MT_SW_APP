@@ -57,6 +57,7 @@ import org.meshtastic.feature.map.planner.data.BuildingStore
 import org.meshtastic.feature.map.planner.data.ClutterHeights
 import org.meshtastic.feature.map.planner.data.ClutterKind
 import org.meshtastic.feature.map.planner.data.ClutterMap
+import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.PlannerClutterException
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
@@ -151,6 +152,8 @@ data class TerrainHorizonState(
     /** How far the buildings are downloaded (km). */
     val buildingsRadiusKm: Int = DEFAULT_BUILDINGS_RADIUS_KM,
     val buildingsSaving: Boolean = false,
+    /** How many pieces of the area are done, while the buildings are being downloaded. */
+    val buildingsProgress: ClutterProgress? = null,
     /** How the last download ended: true saved, false failed, null none yet. */
     val buildingsOk: Boolean? = null,
 )
@@ -285,7 +288,9 @@ class TerrainHorizonViewModel(
                 ?: return
         if (here.buildingsSaving) return
         viewModelScope.launch {
-            _state.update { it.copy(buildingsSaving = true, buildingsOk = null) }
+            _state.update { it.copy(buildingsSaving = true, buildingsOk = null, buildingsProgress = null) }
+            val watcher =
+                launch { clutter.progress.collect { p -> _state.update { it.copy(buildingsProgress = p) } } }
             val ok =
                 try {
                     val map =
@@ -305,7 +310,10 @@ class TerrainHorizonViewModel(
                     false
                 }
             val bytes = withContext(dispatchers.io) { buildingStore.sizeBytes() }
-            _state.update { it.copy(buildingsSaving = false, buildingsOk = ok, buildingsBytes = bytes) }
+            watcher.cancel()
+            _state.update {
+                it.copy(buildingsSaving = false, buildingsOk = ok, buildingsBytes = bytes, buildingsProgress = null)
+            }
             if (ok && _state.value.buildings) reload()
         }
     }

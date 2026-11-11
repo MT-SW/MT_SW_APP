@@ -48,7 +48,14 @@ data class MeshStatsSnapshot(
     val lines: List<String>,
     /** The same readings in titled sections (network, node, radio, resources, connections) for the iPhone widget. */
     val groups: List<MeshStatsLines.Group> = emptyList(),
+    /** Readings of our favorite nodes, one card each (only when asked for: the bigger iPhone widgets rotate them). */
+    val favorites: List<MeshStatsNodeCard> = emptyList(),
+    /** Readings of the other nodes of the mesh (heard most recently first), one card each. */
+    val others: List<MeshStatsNodeCard> = emptyList(),
 )
+
+/** The readings of one node: its name and the lines (battery, signal, uptime, channel use). */
+data class MeshStatsNodeCard(val title: String, val lines: List<String>)
 
 /**
  * The statistics of the permanent notification on Android (mesh status, or one tracked node when chosen in the adaptive
@@ -68,7 +75,7 @@ class MeshStatsFeed(
      * [ownChoice]: follow the widget's own choice (Android Settings) instead of the adaptive notification's mode, which
      * the iPhone widget still uses.
      */
-    fun snapshots(ownChoice: Boolean = false): Flow<MeshStatsSnapshot> {
+    fun snapshots(ownChoice: Boolean = false, withNodes: Boolean = false): Flow<MeshStatsSnapshot> {
         val modeFlow: Flow<LiveUpdateMode> =
             if (ownChoice) {
                 uiPrefs.androidWidgetNode.map {
@@ -98,7 +105,7 @@ class MeshStatsFeed(
             ->
             Triple(b, s, mode)
         }
-            .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode) }
+            .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode, withNodes) }
     }
 
     @Suppress("LongParameterList")
@@ -108,6 +115,7 @@ class MeshStatsFeed(
         extended: LocalStatsExtended,
         our: Node?,
         mode: LiveUpdateMode,
+        withNodes: Boolean = false,
     ): MeshStatsSnapshot {
         // Same display-only correction as in the app: the noise floor minus the gain of our own radio.
         val lnaGain = our?.num?.let { uiPrefs.lnaGains.value[it] } ?: 0
@@ -133,8 +141,23 @@ class MeshStatsFeed(
                 )
             lines = groups.flatMap { it.lines }
         }
-        return MeshStatsSnapshot(title, if (b.connected) "${b.online}/${b.total}" else "", b.connected, lines, groups)
+        val chip = if (b.connected) "${b.online}/${b.total}" else ""
+        if (!withNodes) return MeshStatsSnapshot(title, chip, b.connected, lines, groups)
+        val others = nodes.nodeDBbyNum.value.values.filter { it.num != our?.num }
+        val favorites = others.filter { it.isFavorite }.sortedBy { it.effectiveLongName }.take(CARD_LIMIT)
+        val rest = others.filter { !it.isFavorite && it.lastHeard > 0 }.sortedByDescending { it.lastHeard }
+        return MeshStatsSnapshot(
+            title,
+            chip,
+            b.connected,
+            lines,
+            groups,
+            favorites = favorites.map { card(it) },
+            others = rest.take(CARD_LIMIT).map { card(it) },
+        )
     }
+
+    private suspend fun card(node: Node) = MeshStatsNodeCard(node.effectiveLongName, trackedLines(node))
 
     private suspend fun trackedLines(node: Node): List<String> = buildList {
         node.deviceMetrics.battery_level?.let { add(MeshStatsLines.batteryText(it)) }
@@ -158,3 +181,6 @@ class MeshStatsFeed(
         }
     }
 }
+
+/** How many nodes of one kind the bigger widgets rotate through. */
+private const val CARD_LIMIT = 12

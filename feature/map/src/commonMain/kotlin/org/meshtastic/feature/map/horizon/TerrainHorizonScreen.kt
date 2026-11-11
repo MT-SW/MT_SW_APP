@@ -60,6 +60,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -1125,12 +1126,23 @@ private fun OfflineBuildings(
             }
         }
         when {
-            state.buildingsSaving ->
+            state.buildingsSaving -> {
+                val progress = state.buildingsProgress
                 Text(
-                    stringResource(Res.string.terrain_horizon_buildings_saving),
+                    stringResource(Res.string.terrain_horizon_buildings_saving) +
+                        (progress?.let { " ${it.done} / ${it.total}" } ?: ""),
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 12.sp,
                 )
+                if (progress != null && progress.total > 0) {
+                    LinearProgressIndicator(
+                        progress = { progress.done.toFloat() / progress.total },
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    )
+                } else {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+                }
+            }
 
             state.buildingsOk == false ->
                 Text(
