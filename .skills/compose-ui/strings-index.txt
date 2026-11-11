@@ -2545,6 +2545,7 @@ planner_clutter_reflections
 planner_ground_reflection
 planner_layer_buildings_area
 planner_layer_buildings_link
+planner_layer_reflection
 planner_pattern_aim_other
 planner_pattern_azimuth
 planner_pattern_beamwidth

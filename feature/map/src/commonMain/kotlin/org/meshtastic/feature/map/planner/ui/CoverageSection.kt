@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.planner_coverage_rx_height
 import org.meshtastic.core.resources.planner_coverage_side
 import org.meshtastic.core.resources.planner_layer_buildings_area
 import org.meshtastic.core.resources.planner_layer_buildings_link
+import org.meshtastic.core.resources.planner_layer_reflection
 import org.meshtastic.core.resources.planner_layer_name
 import org.meshtastic.core.resources.planner_legend_excellent
 import org.meshtastic.core.resources.planner_legend_good
@@ -251,6 +252,7 @@ internal fun ShowOnMapButton(vm: PlannerViewModel, bridge: PlannerMapBridge, onS
     val layerName = stringResource(Res.string.planner_layer_name)
     val linkBuildingsName = stringResource(Res.string.planner_layer_buildings_link)
     val areaBuildingsName = stringResource(Res.string.planner_layer_buildings_area)
+    val reflectionName = stringResource(Res.string.planner_layer_reflection)
     val scope = rememberCoroutineScope()
     Button(
         onClick = {
@@ -261,6 +263,7 @@ internal fun ShowOnMapButton(vm: PlannerViewModel, bridge: PlannerMapBridge, onS
                     bridge,
                     layerName,
                     linkBuildingsName to areaBuildingsName,
+                    reflectionName,
                 )
                 onShownOnMap()
             }
@@ -277,6 +280,7 @@ internal suspend fun showOnMap(
     bridge: PlannerMapBridge,
     layerName: String,
     buildingsNames: Pair<String, String>,
+    reflectionName: String,
 ) {
     val json = vm.coverageLayerGeoJson(layerName) ?: vm.exportGeoJson(strings)
     bridge.addGeoJsonLayer(layerName, json)
@@ -284,6 +288,7 @@ internal suspend fun showOnMap(
     vm.buildingsLayers().forEach { (isLink, buildings) ->
         bridge.addGeoJsonLayer(if (isLink) buildingsNames.first else buildingsNames.second, buildings)
     }
+    vm.reflectionLayer()?.let { bridge.addGeoJsonLayer(reflectionName, it) }
     val st = vm.uiState.value
     val target = st.coverage?.center ?: st.a.point ?: st.b.point
     if (target != null) bridge.moveTo(target.lat, target.lon)

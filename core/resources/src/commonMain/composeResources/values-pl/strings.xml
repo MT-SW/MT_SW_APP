@@ -3850,4 +3850,5 @@
     <string name="widget_card_heard">Słyszany %1$s temu</string>
     <string name="widget_card_hops">Skoków: %1$d</string>
     <string name="widget_card_model">%1$s · %2$s</string>
+    <string name="planner_layer_reflection">Planer: odbicie od ziemi</string>
 </resources>

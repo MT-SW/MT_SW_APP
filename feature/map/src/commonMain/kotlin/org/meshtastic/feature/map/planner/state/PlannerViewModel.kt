@@ -25,6 +25,8 @@
 
 package org.meshtastic.feature.map.planner.state
 
+import kotlin.math.roundToInt
+import kotlin.math.max
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.core.model.antenna.PatternKind
 import androidx.lifecycle.ViewModel
@@ -643,6 +645,35 @@ class PlannerViewModel(
         return out
     }
 
+    /**
+     * The ground reflection as a map layer: the two legs of the reflected ray (A to the reflection point, and on to B)
+     * and the point itself, placed by the flat-ground two-ray geometry (closer to the lower antenna). Null when the
+     * reflection is off or there is no link yet.
+     */
+    fun reflectionLayer(): String? {
+        val st = uiState.value
+        val link = st.link ?: return null
+        val a = st.a.point ?: return null
+        val b = st.b.point ?: return null
+        if (!st.groundReflection) return null
+        val hA = max(st.a.antennaHeightM, MIN_ANTENNA_M)
+        val hB = max(st.b.antennaHeightM, MIN_ANTENNA_M)
+        val t = hA / (hA + hB)
+        val lat = a.lat + (b.lat - a.lat) * t
+        val lon = a.lon + (b.lon - a.lon) * t
+        val gain = link.groundReflectionDb
+        val label = "${(gain * TENTH).roundToInt() / TENTH} dB"
+        fun line(lat1: Double, lon1: Double, lat2: Double, lon2: Double) =
+            "{\"type\":\"Feature\",\"properties\":{\"stroke\":\"#8e24aa\",\"stroke-width\":2," +
+                "\"stroke-opacity\":0.9},\"geometry\":{\"type\":\"LineString\",\"coordinates\":" +
+                "[[$lon1,$lat1],[$lon2,$lat2]]}}"
+        val point =
+            "{\"type\":\"Feature\",\"properties\":{\"marker-color\":\"#8e24aa\",\"title\":\"$label\"}," +
+                "\"geometry\":{\"type\":\"Point\",\"coordinates\":[$lon,$lat]}}"
+        return "{\"type\":\"FeatureCollection\",\"features\":[${line(a.lat, a.lon, lat, lon)}," +
+            "${line(lat, lon, b.lat, b.lon)},$point]}"
+    }
+
     /** PNG of the terrain profile chart, or null when no profile has been calculated. */
     suspend fun exportPng(strings: PlannerReportStrings): ByteArray? {
         val report = buildReport(strings)
@@ -736,6 +767,8 @@ class PlannerViewModel(
 
     companion object {
         private const val METERS_PER_KM = 1000.0
+        private const val MIN_ANTENNA_M = 0.5
+        private const val TENTH = 10.0
 
         /** From this range of a coverage only the tall buildings are drawn as its backdrop. */
         private const val TALL_ONLY_KM = 15.0

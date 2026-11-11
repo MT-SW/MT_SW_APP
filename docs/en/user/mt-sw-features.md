@@ -80,6 +80,7 @@ The planner simulates the range of a radio link between two points, **A** and **
 - It supports amateur bands from 169 MHz to 2.4 GHz and any frequency from 20 MHz to 20 GHz.
 - It computes the ITM (Longley-Rice) model, Earth curvature and the first Fresnel zone, draws a terrain profile and gives the link budget plus antenna bearings and angles.
 - **Exact terrain** — optionally downloads real buildings and forests from OpenStreetMap and takes their height into account.
+- **Ground reflection on the map:** "Show on map" creates a separate layer with the two legs of the reflected ray, the reflection point and the gain in dB (only when reflections are on).
 - **Live weather** — optionally includes propagation conditions from the current weather (Open-Meteo).
 - **Antenna kind and pattern** — for each end you choose the antenna kind (omni, Yagi with a chosen number of elements, Moxon, panel, biquad, helix, dish, sector); the planner takes its directivity (gain, beamwidth, front-to-back) and aiming into account, also in the range all around. The same pattern plot is in the antenna calculator.
 - **Buildings on the map** — "Show on map" also adds the buildings as layers of their own (hideable in the map layers): for a route the buildings along it, with those that reach into the line of sight in red; for a coverage the buildings in range as a backdrop (only tall ones from 15 km). The switch is in the planner's radio settings, on by default.
