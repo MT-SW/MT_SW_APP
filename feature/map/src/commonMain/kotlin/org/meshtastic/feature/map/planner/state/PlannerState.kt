@@ -208,8 +208,6 @@ data class PlannerEnd(
 
     companion object {
         const val DEFAULT_HEIGHT_M = 2.0
-        const val MAX_MULTIPATH_DB = 6.0
-        const val MULTIPATH_DB_PER_OCTAVE = 1.5
         const val DEFAULT_TX_DBM = 20.0
         const val DEFAULT_GAIN_DBI = 2.15
         val DEFAULT_FEEDER: FeederConfig = FeederBuilder.presets.first { it.id == "direct" }.config
@@ -344,6 +342,8 @@ data class PlannerUiState(
         get() = -174.0 + 10.0 * log10(bandwidthKhz * 1000.0) + noiseFigureDb
 
     companion object {
+        const val MAX_MULTIPATH_DB = 6.0
+        const val MULTIPATH_DB_PER_OCTAVE = 1.5
         const val DEFAULT_K = 4.0 / 3.0
         const val DEFAULT_N0 = 301.0
     }
