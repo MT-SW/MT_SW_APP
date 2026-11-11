@@ -875,7 +875,8 @@ private fun DrawScope.drawBands(
             if (shapesByBand.all { it.isEmpty() }) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
-                drawBuildingShapes(shapesByBand[index], buildingBands[index], light.grain, centre, perDeg, range)
+                val grain = light.grain.takeIf { index < 2 }
+                drawBuildingShapes(shapesByBand[index], buildingBands[index], grain, centre, perDeg, range)
             }
         } else {
             drawRelief(profile, index, bands[index], light, centre, perDeg, range)
@@ -1138,6 +1139,8 @@ private fun DrawScope.drawBuildingShapes(
         }
         // Off the picture, spread over more than the picture (a wrapped outline), or too thin to be seen: skipped.
         if (maxX < 0f || minX > w || maxX - minX > w || maxX - minX < MIN_BUILDING_WIDTH_PX) continue
+        // Texture only on buildings wide enough to show it, so a town in the distance costs nothing extra.
+        val texture = grain?.takeIf { maxX - minX > BUILDING_GRAIN_MIN_PX }
         val darkWall = lerp(base, Color.Black, WALL_DARKEN)
         for (k in 0 until n) {
             val facing = b.facing[k]
@@ -1150,14 +1153,14 @@ private fun DrawScope.drawBuildingShapes(
             path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
             path.close()
             drawPath(path, lerp(darkWall, base, facing))
-            if (grain != null && maxX - minX > BUILDING_GRAIN_MIN_PX) drawPath(path, grain, alpha = BUILDING_GRAIN_ALPHA)
+            texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
         }
         path.reset()
         path.moveTo(xs[0], yOf(b.roofDeg[0], range, h))
         for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
         path.close()
         drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
-        if (grain != null && maxX - minX > BUILDING_GRAIN_MIN_PX) drawPath(path, grain, alpha = BUILDING_GRAIN_ALPHA)
+        texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
     }
 }
 
