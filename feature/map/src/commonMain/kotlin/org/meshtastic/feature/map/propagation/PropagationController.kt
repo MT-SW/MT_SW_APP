@@ -139,7 +139,12 @@ class PropagationController(
         if ((stale || uncovered) && retryOk) {
             val kept = area
             // Refreshes the whole remembered area; only a view outside it widens it.
-            area = if (kept == null) padded(bounds) else if (kept.contains(bounds)) kept else union(kept, padded(bounds))
+            area =
+                when {
+                    kept == null -> padded(bounds)
+                    kept.contains(bounds) -> kept
+                    else -> union(kept, padded(bounds))
+                }
             fetchArea()
         }
     }
