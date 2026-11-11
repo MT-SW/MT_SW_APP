@@ -19,7 +19,6 @@ package org.meshtastic.core.database
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.execSQL
-import androidx.sqlite.use
 
 /**
  * Wraps a [SQLiteDriver] so every connection it opens waits up to [busyTimeoutMs] for a competing connection's lock
