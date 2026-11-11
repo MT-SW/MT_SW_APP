@@ -3867,7 +3867,6 @@
     <string name="data_wipe_body">Zostaną trwale usunięte wszystkie dane aplikacji: ustawienia, zapisane węzły i wiadomości, logi, pobrane modele i pliki oraz zapisana zgoda. Tej operacji nie można cofnąć. Po jej zakończeniu aplikacja się zamknie, a po ponownym uruchomieniu będzie wyglądać jak świeżo zainstalowana.</string>
     <string name="data_wipe_confirm">Wyczyść wszystko</string>
     <string name="data_wipe_confirm_wait">Wyczyść wszystko (%1$d)</string>
-    <string name="data_wipe_close_only">Tylko zamknij</string>
     <string name="data_wipe_cancel">Anuluj</string>
     <string name="data_notice_settings_title">Warunki i zgoda na dane</string>
     <string name="data_notice_accepted_on">Zaakceptowano: %1$s</string>
@@ -3887,4 +3886,5 @@
     <string name="widget_others_pick_title">Wybierz węzły do widżetu</string>
     <string name="widget_others_clear">Wyczyść wybór</string>
     <string name="data_wipe_back">Wróć do zgody</string>
+    <string name="widget_others_search">Szukaj</string>
 </resources>

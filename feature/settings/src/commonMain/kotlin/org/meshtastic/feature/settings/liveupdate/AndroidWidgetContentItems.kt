@@ -24,6 +24,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.mutableStateOf
+import org.meshtastic.core.resources.widget_others_search
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -189,25 +193,40 @@ private fun WidgetOthersPicker(picked: Set<Int>, onDone: () -> Unit) {
     val uiPrefs: UiPrefs = koinInject()
     val nodes: NodeRepository = koinInject()
     val all by nodes.nodeDBbyNum.collectAsStateWithLifecycle()
-    val list = remember(all) { all.values.filter { !it.isFavorite }.sortedBy { it.effectiveLongName.lowercase() } }
+    var query by rememberSaveable { mutableStateOf("") }
+    val list =
+        remember(all, query) {
+            all.values
+                .filter { !it.isFavorite && it.effectiveLongName.contains(query.trim(), ignoreCase = true) }
+                .sortedBy { it.effectiveLongName.lowercase() }
+        }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(stringResource(Res.string.widget_others_pick_title)) },
         text = {
-            LazyColumn {
-                items(list, key = { it.num }) { node ->
-                    val on = node.num in picked
-                    Row(
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .clickable {
-                                uiPrefs.setWidgetOthersPicked(if (on) picked - node.num else picked + node.num)
-                            }
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(checked = on, onCheckedChange = null)
-                        Text(node.effectiveLongName, modifier = Modifier.padding(start = 12.dp), maxLines = 1)
+            Column {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    singleLine = true,
+                    label = { Text(stringResource(Res.string.widget_others_search)) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                LazyColumn {
+                    items(list, key = { it.num }) { node ->
+                        val on = node.num in picked
+                        Row(
+                            modifier =
+                            Modifier.fillMaxWidth()
+                                .clickable {
+                                    uiPrefs.setWidgetOthersPicked(if (on) picked - node.num else picked + node.num)
+                                }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Checkbox(checked = on, onCheckedChange = null)
+                            Text(node.effectiveLongName, modifier = Modifier.padding(start = 12.dp), maxLines = 1)
+                        }
                     }
                 }
             }

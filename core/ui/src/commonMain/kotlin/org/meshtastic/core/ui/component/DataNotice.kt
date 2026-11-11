@@ -65,11 +65,9 @@ import org.meshtastic.core.resources.data_notice_title
 import org.meshtastic.core.resources.data_notice_wait
 import org.meshtastic.core.resources.data_wipe_back
 import org.meshtastic.core.resources.data_wipe_body
-import org.meshtastic.core.resources.data_wipe_close_only
 import org.meshtastic.core.resources.data_wipe_confirm
 import org.meshtastic.core.resources.data_wipe_confirm_wait
 import org.meshtastic.core.resources.data_wipe_title
-import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.util.createClipEntry
 
@@ -81,7 +79,7 @@ private const val MAX_TEXT_WIDTH_DP = 640
 /**
  * Terms of use and data notice shown before anything else. The accept button stays locked until the whole text was
  * scrolled to the end and a 10-second countdown has run out. Declining opens a warning with its own 10-second
- * countdown before everything can be erased; from there the user can also go back to the terms or just close the app.
+ * countdown before everything can be erased; from there the user can also go back to the terms; the app cannot be closed without either.
  */
 @Composable
 @Suppress("LongMethod")
@@ -90,7 +88,6 @@ fun DataNoticeScreen(onAccept: () -> Unit, modifier: Modifier = Modifier) {
     var reachedEnd by remember { mutableStateOf(false) }
     var secondsLeft by remember { mutableIntStateOf(COUNTDOWN_SECONDS) }
     var showDeclineChoice by remember { mutableStateOf(false) }
-    val terminate = LocalTerminateApplication.current
 
     LaunchedEffect(Unit) {
         // Give the layout a moment to settle; a text that fits without scrolling counts as already read.
@@ -159,9 +156,8 @@ fun DataNoticeScreen(onAccept: () -> Unit, modifier: Modifier = Modifier) {
 
     if (showDeclineChoice) {
         DataWipeDialog(
-            secondaryLabel = Res.string.data_wipe_close_only,
-            onSecondary = { terminate?.invoke() },
-            onBack = { showDeclineChoice = false },
+            secondaryLabel = Res.string.data_wipe_back,
+            onSecondary = { showDeclineChoice = false },
         )
     }
 }
@@ -171,7 +167,7 @@ fun DataNoticeScreen(onAccept: () -> Unit, modifier: Modifier = Modifier) {
  * just close the app after declining the terms).
  */
 @Composable
-fun DataWipeDialog(secondaryLabel: StringResource, onSecondary: () -> Unit, onBack: (() -> Unit)? = null) {
+fun DataWipeDialog(secondaryLabel: StringResource, onSecondary: () -> Unit) {
     var secondsLeft by remember { mutableIntStateOf(COUNTDOWN_SECONDS) }
     val wipe = LocalWipeApplicationData.current
     LaunchedEffect(Unit) {
@@ -200,13 +196,7 @@ fun DataWipeDialog(secondaryLabel: StringResource, onSecondary: () -> Unit, onBa
                 )
             }
         },
-        dismissButton = {
-            Row {
-                // Way back for someone who declined and then thought better of it: nothing is erased.
-                onBack?.let { TextButton(onClick = it) { Text(stringResource(Res.string.data_wipe_back)) } }
-                TextButton(onClick = onSecondary) { Text(stringResource(secondaryLabel)) }
-            }
-        },
+        dismissButton = { TextButton(onClick = onSecondary) { Text(stringResource(secondaryLabel)) } },
     )
 }
 

@@ -898,7 +898,6 @@
     <string name="data_wipe_back">Back to the terms</string>
     <string name="data_wipe_body">All app data will be permanently deleted: settings, saved nodes and messages, logs, downloaded models and files, and the stored consent. This cannot be undone. When it is done the app closes and looks freshly installed the next time you open it.</string>
     <string name="data_wipe_cancel">Cancel</string>
-    <string name="data_wipe_close_only">Just close</string>
     <string name="data_wipe_confirm">Erase everything</string>
     <string name="data_wipe_confirm_wait">Erase everything (%1$d)</string>
     <string name="data_wipe_settings_summary">Deletes everything and withdraws consent. The app will close.</string>
@@ -3596,6 +3595,7 @@
     <string name="widget_others_pick">Pick nodes…</string>
     <string name="widget_others_pick_title">Pick nodes for the widget</string>
     <string name="widget_others_picked_summary">Picked nodes: %1$d</string>
+    <string name="widget_others_search">Search</string>
     <string name="widget_others_title">Other nodes in the widget</string>
     <string name="widget_packets_bad">Bad</string>
     <string name="widget_packets_dropped">Dropped</string>

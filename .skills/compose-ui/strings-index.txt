@@ -862,7 +862,6 @@ data_notice_wait
 data_wipe_back
 data_wipe_body
 data_wipe_cancel
-data_wipe_close_only
 data_wipe_confirm
 data_wipe_confirm_wait
 data_wipe_settings_summary
@@ -3518,6 +3517,7 @@ widget_others_latest
 widget_others_pick
 widget_others_pick_title
 widget_others_picked_summary
+widget_others_search
 widget_others_title
 widget_packets_bad
 widget_packets_dropped

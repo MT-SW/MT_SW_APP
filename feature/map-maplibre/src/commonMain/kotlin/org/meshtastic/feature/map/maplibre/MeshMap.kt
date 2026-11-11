@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -297,6 +298,8 @@ fun MeshMap(
         Logger.withTag("MapDrawn").d { "tiles drawn" }
     }
 
+    val scope = rememberCoroutineScope()
+    DisposableEffect(mapState) { onDispose { ReturnView.forget(mapState) } }
     PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
@@ -335,6 +338,14 @@ fun MeshMap(
                             if (onNode) {
                                 ClickResult.Consume
                             } else {
+                                // A tap on empty map after flying in on a node or cluster goes back to the first view.
+                                val back =
+                                    if (tap != null && projection != null && !onCluster(projection, tap)) {
+                                        ReturnView.take(mapState)
+                                    } else {
+                                        null
+                                    }
+                                if (back != null) scope.launch { mapState.animateCamera(back.toCameraUpdate()) }
                                 tap?.let(onMapClick)
                                 ClickResult.Pass
                             }
@@ -411,6 +422,7 @@ private fun MeshMapNodeLayers(
                 val current = mapState.cameraPosition
                 // A cluster that cannot report an expansion zoom answers with a sentinel (0 on
                 // Android and desktop, -1 on iOS), so clamp — never zoom out on a tap.
+                ReturnView.remember(mapState)
                 mapState.animateCamera(
                     CameraUpdate(center = centre, zoom = maxOf(expansionZoom, current.zoom)),
                     CameraAnimation.Ease.Standard,
@@ -467,6 +479,7 @@ private fun FlyToFocusedNode(focusNodeNum: Int?, focusedNode: Node?, mapState: M
     LaunchedEffect(focusNodeNum, hasViewport) {
         if (!hasViewport) return@LaunchedEffect
         val node = snapshotFlow { currentNode }.filterNotNull().first()
+        ReturnView.remember(mapState)
         mapState.animateCamera(
             CameraUpdate(center = Position(longitude = node.longitude, latitude = node.latitude), zoom = FOCUS_ZOOM),
             CameraAnimation.Ease.Standard,
@@ -569,3 +582,8 @@ private fun BoxCornerMarker(corner: Position?) {
 private const val CHIP_VIEW_PADDING = 0.5
 
 private const val PROPAGATION_SETTLE_MS = 1500L
+
+/** True when the tap landed on a cluster bubble, which zooms in further instead of going back. */
+private fun onCluster(projection: org.maplibre.compose.camera.CameraProjection, tap: Position): Boolean =
+    projection.queryRenderedFeatures(projection.screenLocationFromPosition(tap), layerIds = setOf("node-clusters"))
+        .isNotEmpty()
