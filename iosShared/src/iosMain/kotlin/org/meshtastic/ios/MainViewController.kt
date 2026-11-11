@@ -55,6 +55,7 @@ import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
+import org.meshtastic.core.ui.theme.LocalSystemDensity
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalTerminateApplication
@@ -187,8 +188,11 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         runCatching { koin.get<MeshServiceOrchestrator>(MeshServiceOrchestrator::class).stop() }
         exit(0)
     }
+    // The map is a native view drawn in real screen points; it needs the density from before the in-app scale.
+    val systemDensity = LocalDensity.current
     CompositionLocalProvider(
         LocalDensity provides rememberScaledDensity(percent = uiScale),
+        LocalSystemDensity provides systemDensity,
         LocalTerminateApplication provides terminate,
         LocalWipeApplicationData provides { wipeIosData() },
     ) {

@@ -17,7 +17,9 @@
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 
@@ -45,3 +47,21 @@ fun rememberScaledDensity(percent: Int, baseDensity: Float? = null): Density {
 }
 
 private const val PERCENT = 100f
+
+/**
+ * The density the screen really has, before the in-app scale was applied; null where the app does not apply one
+ * around a native view (everywhere but the iPhone/iPad so far). A native view such as the map is laid out and drawn in
+ * real screen points, so inside it the scaled density would disagree with what is drawn.
+ */
+val LocalSystemDensity = staticCompositionLocalOf<Density?> { null }
+
+/** Runs [content] with the screen's real density when [LocalSystemDensity] is set, otherwise unchanged. */
+@Composable
+fun WithSystemDensity(content: @Composable () -> Unit) {
+    val system = LocalSystemDensity.current
+    if (system == null) {
+        content()
+    } else {
+        CompositionLocalProvider(LocalDensity provides system, content = content)
+    }
+}

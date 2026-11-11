@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.overlay.include
 import org.maplibre.spatialk.geojson.BoundingBox
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
+import org.meshtastic.core.ui.theme.WithSystemDensity
 import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.CollapsedAttributionOrnaments
@@ -109,20 +111,25 @@ internal fun SecondaryMapSurface(
 
     PauseGrayscaleLayer()
     val zoomRange = basemaps.current.zoomRange()
-    MaplibreMap(
-        modifier = modifier,
-        state = mapState,
-        // Honour what the source can actually serve, as the OSMdroid map did.
-        cameraConstraints =
-        CameraConstraints {
-            minZoom = zoomRange.start.toDouble()
-            maxZoom = zoomRange.endInclusive.toDouble()
-        },
-        interactions = interactions,
-        uiOptions = uiOptions,
-        // The library's default, spelled out so the collapsed branch stays a narrowing of it.
-        overlay = { include(if (showAttribution) MaplibreOverlay.Default else CollapsedAttributionOrnaments) },
-    )
+    // The caller's modifier sizes the box in the app's dp; the map inside fills it in the screen's own density.
+    Box(modifier) {
+        WithSystemDensity {
+            MaplibreMap(
+                modifier = Modifier.fillMaxSize(),
+                state = mapState,
+                // Honour what the source can actually serve, as the OSMdroid map did.
+                cameraConstraints =
+                CameraConstraints {
+                    minZoom = zoomRange.start.toDouble()
+                    maxZoom = zoomRange.endInclusive.toDouble()
+                },
+                interactions = interactions,
+                uiOptions = uiOptions,
+                // The library's default, spelled out so the collapsed branch stays a narrowing of it.
+                overlay = { include(if (showAttribution) MaplibreOverlay.Default else CollapsedAttributionOrnaments) },
+            )
+        }
+    }
 }
 
 /**

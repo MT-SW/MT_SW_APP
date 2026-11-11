@@ -82,6 +82,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
+import org.meshtastic.core.ui.theme.WithSystemDensity
 import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapLink
@@ -320,58 +321,62 @@ fun MeshMap(
     val credits = extraCredits.distinct()
     val ornaments = remember(credits) { meshMapOrnaments(credits) }
     // The size the map really takes on screen, which is what the finger is measured against. The map reports its own
-    // size separately; on the iPhone the picture is drawn larger than that, so taps are scaled back by the ratio.
-    val density = LocalDensity.current
+    // size separately; if the two ever differ, taps are scaled back by the ratio.
     var shown by remember { mutableStateOf(DpSize.Zero) }
     Box(modifier) {
-        MaplibreMap(
-            modifier =
-            Modifier.fillMaxSize().onSizeChanged {
-                shown = with(density) { DpSize(it.width.toDp(), it.height.toDp()) }
-            },
-            state = mapState,
-            // Honour what the source can actually serve, as the OSMdroid map did.
-            cameraConstraints =
-            CameraConstraints {
-                minZoom = zoomRange.start.toDouble()
-                maxZoom = zoomRange.endInclusive.toDouble()
-            },
-            interactions =
-            MapInteractions {
-                callbacks {
-                    longClick {
-                        onEvent { event ->
-                            event.correctedPosition(mapState, shown)?.let(onMapLongClick)
-                            ClickResult.Consume
+        WithSystemDensity {
+            // Measured in the map's own dp, which is the unit its taps and projection use.
+            val mapDensity = LocalDensity.current
+            MaplibreMap(
+                modifier =
+                Modifier.fillMaxSize().onSizeChanged {
+                    shown = with(mapDensity) { DpSize(it.width.toDp(), it.height.toDp()) }
+                },
+                state = mapState,
+                // Honour what the source can actually serve, as the OSMdroid map did.
+                cameraConstraints =
+                CameraConstraints {
+                    minZoom = zoomRange.start.toDouble()
+                    maxZoom = zoomRange.endInclusive.toDouble()
+                },
+                interactions =
+                MapInteractions {
+                    callbacks {
+                        longClick {
+                            onEvent { event ->
+                                event.correctedPosition(mapState, shown)?.let(onMapLongClick)
+                                ClickResult.Consume
+                            }
+                        }
+                        // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
+                        click {
+                            onEvent { event ->
+                                val scale = mapState.displayScale(shown)
+                                val finger = event.screenOffset.dividedBy(scale)
+                                val tap = event.correctedPosition(mapState, shown)
+                                Logger.i {
+                                    "Mapa: dotknięcie ekranu w ${event.position}, po korekcie $tap, " +
+                                        "widok ${shown.text()}, mapa ${mapState.viewport?.size?.text()}, " +
+                                        "skala wyświetlania ${scale.toFloat()}"
+                                }
+                                // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation; the
+                                // check needs the map's answer, so it runs beside the event and the rest of the tap
+                                // (waypoints, planner) is only given the taps that hit no node.
+                                scope.launch {
+                                    val onNode =
+                                        tap != null &&
+                                            onNodeClick != null &&
+                                            nodeTapAt(mapState, tap, finger, onNodeClick, onNodeStack ?: {})
+                                    if (!onNode) tap?.let(onMapClick)
+                                }
+                                ClickResult.Pass
+                            }
                         }
                     }
-                    // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
-                    click {
-                        onEvent { event ->
-                            val scale = mapState.displayScale(shown)
-                            val finger = event.screenOffset.dividedBy(scale)
-                            val tap = event.correctedPosition(mapState, shown)
-                            Logger.i {
-                                "Mapa: dotknięcie ekranu w ${event.position}, po korekcie $tap, widok ${shown.text()}, " +
-                                    "mapa ${mapState.viewport?.size?.text()}, skala wyświetlania ${scale.toFloat()}"
-                            }
-                            // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation; the
-                            // check needs the map's answer, so it runs beside the event and the rest of the tap
-                            // (waypoints, planner) is only given the taps that hit no node.
-                            scope.launch {
-                                val onNode =
-                                    tap != null &&
-                                        onNodeClick != null &&
-                                        nodeTapAt(mapState, tap, finger, onNodeClick, onNodeStack ?: {})
-                                if (!onNode) tap?.let(onMapClick)
-                            }
-                            ClickResult.Pass
-                        }
-                    }
-                }
-            },
-            overlay = { include(ornaments) },
-        )
+                },
+                overlay = { include(ornaments) },
+            )
+        }
         // As wide as the room left of the zoom buttons, with a small gap to them, and low so it covers little map.
         PropagationOverlay(
             Modifier.align(Alignment.BottomStart)
