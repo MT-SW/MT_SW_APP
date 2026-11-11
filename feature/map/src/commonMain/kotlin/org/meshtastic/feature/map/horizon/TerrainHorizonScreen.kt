@@ -225,6 +225,14 @@ private const val GRAIN_TILE_H = 64
 private const val GRAIN_STREAK_SHARE = 0.6f
 private const val GRAIN_ALPHA = 0.16f
 private const val GRAIN_FADE = 0.22f
+private const val FOREST_BANDS = 2
+private const val FOREST_TOP_PX = 26f
+private const val FOREST_GREEN = 0xFF2E4A32
+private const val FOREST_TINT = 0.55f
+private const val FOREST_ALPHA = 0.5f
+private const val FOREST_GRAIN_ALPHA = 0.22f
+private const val BUILDING_GRAIN_ALPHA = 0.14f
+private const val BUILDING_GRAIN_MIN_PX = 8f
 private const val GRAIN = 0.35f
 private const val LOW_SUN_DEG = 15.0
 private const val LOW_SUN_CONTRAST = 0.5f
@@ -867,7 +875,7 @@ private fun DrawScope.drawBands(
             if (shapesByBand.all { it.isEmpty() }) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
-                drawBuildingShapes(shapesByBand[index], buildingBands[index], centre, perDeg, range)
+                drawBuildingShapes(shapesByBand[index], buildingBands[index], light.grain, centre, perDeg, range)
             }
         } else {
             drawRelief(profile, index, bands[index], light, centre, perDeg, range)
@@ -945,6 +953,23 @@ private fun DrawScope.drawRelief(
     // The rock itself: a fine grain with vertical streaks (gullies), strongest on near ridges, fading with distance.
     light.grain?.let { texture ->
         clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
+    }
+    // Forest on the lower slopes of the near ridges: dark speckled ground that starts a little below the crest.
+    if (band < FOREST_BANDS) {
+        val forest = Path()
+        forest.moveTo(0f, h)
+        for (i in outline.indices) {
+            val top = outline[i]
+            val drop = FOREST_TOP_PX * (0.5f + columnNoise(i / 4, band + 7))
+            val start = if (top.isNaN()) h else (top + drop).coerceAtMost(h)
+            forest.lineTo((i * COLUMN_STEP_PX).toFloat(), start)
+        }
+        forest.lineTo((outline.size * COLUMN_STEP_PX).toFloat(), h)
+        forest.close()
+        clipPath(path) {
+            drawPath(forest, lerp(colour, Color(FOREST_GREEN), FOREST_TINT), alpha = FOREST_ALPHA * (1f - band * 0.4f))
+            light.grain?.let { drawPath(forest, it, alpha = FOREST_GRAIN_ALPHA) }
+        }
     }
     drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
@@ -1087,6 +1112,7 @@ private fun DrawScope.drawBuildingSolids(
 private fun DrawScope.drawBuildingShapes(
     shapes: List<HorizonBuilding>,
     colour: Color,
+    grain: Brush?,
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
@@ -1124,12 +1150,14 @@ private fun DrawScope.drawBuildingShapes(
             path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
             path.close()
             drawPath(path, lerp(darkWall, base, facing))
+            if (grain != null && maxX - minX > BUILDING_GRAIN_MIN_PX) drawPath(path, grain, alpha = BUILDING_GRAIN_ALPHA)
         }
         path.reset()
         path.moveTo(xs[0], yOf(b.roofDeg[0], range, h))
         for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofDeg[k], range, h))
         path.close()
         drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
+        if (grain != null && maxX - minX > BUILDING_GRAIN_MIN_PX) drawPath(path, grain, alpha = BUILDING_GRAIN_ALPHA)
     }
 }
 
