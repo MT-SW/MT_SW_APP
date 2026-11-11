@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Panorama: pobieranie budynków trwa dalej po wyjściu z ekranu lub z aplikacji (wcześniej było po cichu przerywane, więc budynki się nie zapisywały); przerwanie i błędy trafiają tylko do logu, bez komunikatu błędu w oknie.
 * Widżet statystyk (Android): jednolite tło z zaokrąglonymi rogami, żeby tekst był czytelny na każdej tapecie; wyższe wiersze (pasują do większej czcionki systemowej), a nagłówek grupy nie wisi już sam na dole kolumny.
 * Mapa: przycisk mapy na pasku zawsze wraca do widoku, w którym mapa się otworzyła (także po oddaleniu lub przesunięciu, nie tylko po przybliżeniu na węzeł).
 * Propagacja: zapamiętywany jest największy pobrany obszar (np. po oddaleniu do maksimum i „Pobierz dla widoku”); odświeżanie pobiera cały ten obszar, a nie tylko to, co jest na ekranie. Obszar rośnie tylko wtedy, gdy widok z niego wyjdzie.
@@ -671,6 +672,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Panorama: the buildings download carries on after leaving the screen or the app (it used to be cancelled silently, so buildings were never saved); cancellation and errors go to the log only, with no error message in the window.
 * Stats widget (Android): a solid rounded background so the text is readable on any wallpaper; taller rows (fit a larger system font) and a group heading no longer hangs alone at the bottom of a column.
 * Map: the map button on the bar always returns to the view the map opened with (after zooming out or panning too, not only after flying in on a node).
 * Propagation: the widest downloaded area is remembered (e.g. zoom out fully and press "download for this view"); refreshes fetch that whole area, not just the screen. It only grows when the view leaves it.

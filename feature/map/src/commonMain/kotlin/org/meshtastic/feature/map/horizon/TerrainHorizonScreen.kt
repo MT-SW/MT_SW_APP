@@ -129,7 +129,6 @@ import org.meshtastic.core.resources.terrain_horizon_buildings
 import org.meshtastic.core.resources.terrain_horizon_buildings_age
 import org.meshtastic.core.resources.terrain_horizon_buildings_age_days
 import org.meshtastic.core.resources.terrain_horizon_buildings_clear
-import org.meshtastic.core.resources.terrain_horizon_buildings_failed
 import org.meshtastic.core.resources.terrain_horizon_buildings_hint
 import org.meshtastic.core.resources.terrain_horizon_buildings_none_here
 import org.meshtastic.core.resources.terrain_horizon_buildings_range
@@ -1854,13 +1853,6 @@ private fun OfflineBuildings(
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
                 }
             }
-
-            state.buildingsOk == false ->
-                Text(
-                    stringResource(Res.string.terrain_horizon_buildings_failed),
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 12.sp,
-                )
 
             state.buildings && !state.buildingsHere ->
                 Text(

@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.di.ApplicationCoroutineScope
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.Node
@@ -220,6 +221,7 @@ class TerrainHorizonViewModel(
     private val magneticFieldProvider: MagneticFieldProvider,
     private val mapPrefs: MapPrefs,
     private val dispatchers: CoroutineDispatchers,
+    private val applicationScope: ApplicationCoroutineScope,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TerrainHorizonState())
     val state: StateFlow<TerrainHorizonState> = _state.asStateFlow()
@@ -314,7 +316,9 @@ class TerrainHorizonViewModel(
                 ?: here.observerLat?.let { lat -> here.observerLon?.let { lon -> GeoPoint(lat, lon) } }
                 ?: return
         if (here.buildingsSaving) return
-        viewModelScope.launch {
+        // In the application's scope, not the screen's: leaving the panorama or the app for a minute used to cancel a
+        // download that takes that long, with nothing in the log.
+        applicationScope.launch {
             _state.update { it.copy(buildingsSaving = true, buildingsOk = null, buildingsProgress = null) }
             buildingStore.maxAgeDays = here.buildingsMaxAgeDays
             Logger.i { "Budynki: pobieranie na ${here.buildingsRadiusKm} km" }
@@ -330,6 +334,7 @@ class TerrainHorizonViewModel(
                     val buildings = map.polygons.filter { it.kind == ClutterKind.BUILDING }
                     withContext(dispatchers.io) { buildingStore.write(centre, here.buildingsRadiusKm, buildings) }
                 } catch (e: CancellationException) {
+                    Logger.w { "Budynki: pobieranie przerwane" }
                     throw e
                 } catch (e: PlannerClutterException) {
                     Logger.w(e) { "Budynki: serwer nie dał danych" }
