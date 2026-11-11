@@ -64,6 +64,11 @@ import org.maplibre.compose.layers.FeaturesClickHandler
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.sources.VectorSource
 import org.maplibre.spatialk.geojson.Feature
+import org.maplibre.spatialk.geojson.Position
+import org.maplibre.spatialk.geojson.Point
+import org.maplibre.compose.map.MapState
+import kotlin.math.sqrt
+import androidx.compose.ui.unit.DpRect
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
@@ -412,6 +417,10 @@ private const val MAX_CHIP_IMAGES = 250
 /** Half the width and the height of the area a chip covers above its node, used to find the chip a tap landed on. */
 private const val TAP_HALF_WIDTH_DP = 40f
 private const val TAP_HEIGHT_DP = 32f
+private const val STACK_TOLERANCE_DP = 2f
+
+/** Larger than any distance on screen, so the rank decides first and the distance only between equal ranks. */
+private const val RANK_WEIGHT = 100_000f
 
 /**
  * Finds the node whose chip (the name bubble above the node's spot) was tapped, in screen coordinates.
@@ -419,47 +428,38 @@ private const val TAP_HEIGHT_DP = 32f
  * Done on the screen, not with an invisible shape on the map, so it behaves the same on every platform and keeps
  * working when the map is turned or tilted. The bubble stands above its node, so the node's dot lies just below the
  * tap: every dot in that box is a candidate and the one whose bubble centre is closest to the tap wins (favourites and
- * our own node first, as they are drawn on top).
+ * our own node first, as they are drawn on top). Returns whether a node (or a stack of them) was opened.
  */
-internal fun nodeTapAt(
-    projection: org.maplibre.compose.camera.CameraProjection,
-    tap: org.maplibre.spatialk.geojson.Position,
+internal suspend fun nodeTapAt(
+    state: MapState,
+    tap: Position,
     click: (Int) -> Unit,
     onStack: (List<ClusterMember>) -> Unit,
 ): Boolean {
-    val at = projection.screenLocationFromPosition(tap)
+    val at = state.screenLocationFromPosition(tap) ?: return false
     val box =
-        androidx.compose.ui.unit.DpRect(
+        DpRect(
             left = at.x - TAP_HALF_WIDTH_DP.dp,
             top = at.y,
             right = at.x + TAP_HALF_WIDTH_DP.dp,
             bottom = at.y + TAP_HEIGHT_DP.dp,
         )
-    val dots = projection.queryRenderedFeatures(box, layerIds = setOf(NODE_DOT_LAYER_ID))
-    if (dots.isEmpty()) return false
-    val best =
-        dots.maxWithOrNull(
-            compareBy<Feature<*, JsonObject?>> { it.properties.chipRank() }.thenBy { -distanceDp(projection, it, at) },
-        ) ?: return false
-    val near = dots.filter { distanceDp(projection, it, at) <= distanceDp(projection, best, at) + STACK_TOLERANCE_DP }
-    val stack = stackedMembers(near, best)
+    val candidates =
+        state.queryRenderedFeatures(box, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
+            val spot = (feature.geometry as? Point)?.coordinates ?: return@mapNotNull null
+            val dot = state.screenLocationFromPosition(spot) ?: return@mapNotNull null
+            val dx = dot.x.value - at.x.value
+            val dy = dot.y.value - TAP_HEIGHT_DP / 2f - at.y.value
+            Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy))
+        }
+    val best = candidates.maxByOrNull { it.second * RANK_WEIGHT - it.third } ?: return false
+    val near = candidates.filter { it.third <= best.third + STACK_TOLERANCE_DP }.map { it.first }
+    val stack = stackedMembers(near, best.first)
     if (stack.isNotEmpty()) {
         onStack(stack)
         return true
     }
-    return best.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt()?.let { click(it); true } ?: false
-}
-
-private const val STACK_TOLERANCE_DP = 2f
-
-private fun distanceDp(
-    projection: org.maplibre.compose.camera.CameraProjection,
-    feature: Feature<*, JsonObject?>,
-    tap: androidx.compose.ui.unit.DpOffset,
-): Float {
-    val p = (feature.geometry as? org.maplibre.spatialk.geojson.Point)?.coordinates ?: return Float.MAX_VALUE
-    val dot = projection.screenLocationFromPosition(p)
-    val dx = dot.x.value - tap.x.value
-    val dy = dot.y.value - TAP_HEIGHT_DP / 2f - tap.y.value
-    return kotlin.math.sqrt(dx * dx + dy * dy)
+    val nodeNum = best.first.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt() ?: return false
+    click(nodeNum)
+    return true
 }

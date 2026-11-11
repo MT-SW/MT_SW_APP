@@ -241,7 +241,6 @@ fun NodeLayers(
         id = "node-chip",
         source = nodeSource,
         nodes = chipNodes,
-        onNodeClick = onNodeClick,
         chipFilter = !feature.has("point_count"),
     )
 
