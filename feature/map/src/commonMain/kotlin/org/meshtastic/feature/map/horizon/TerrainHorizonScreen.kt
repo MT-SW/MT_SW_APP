@@ -1134,7 +1134,7 @@ private fun OfflineBuildings(
                 val progress = state.buildingsProgress
                 Text(
                     stringResource(Res.string.terrain_horizon_buildings_saving) +
-                        (progress?.let { " ${it.done} / ${it.total}" } ?: ""),
+                        progress?.let { " ${it.done} / ${it.total}" }.orEmpty(),
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 12.sp,
                 )
