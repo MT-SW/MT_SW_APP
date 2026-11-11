@@ -1523,7 +1523,6 @@
     <!-- IAQ -->
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">(Indoor Air Quality) relative scale IAQ value as measured by Bosch BME680. Value Range 0–500.</string>
-    <string name="iaq_level_dangerously_polluted">Dangerously Polluted</string>
     <string name="iaq_level_excellent">Excellent</string>
     <string name="iaq_level_extremely_polluted">Extremely Polluted</string>
     <string name="iaq_level_good">Good</string>
@@ -2816,8 +2815,8 @@
     <string name="remote_shell_modifier_locked">Locked</string>
     <string name="remote_shell_modifier_once">Applies to the next key</string>
     <string name="remote_shell_more_options">More options</string>
-    <string name="remote_shell_no_reply">No reply from the node. It must list your radio's public key as an admin key, and be in range.</string>
-    <string name="remote_shell_no_reply_reason">Could not open the session (%1$s). The node must list your radio's public key as an admin key, and be in range.</string>
+    <string name="remote_shell_no_reply">No reply from the node. It must have DMShell turned on in its config.yaml, list your radio's public key as an admin key, and be in range.</string>
+    <string name="remote_shell_no_reply_reason">Could not open the session (%1$s). The node must have DMShell turned on in its config.yaml, list your radio's public key as an admin key, and be in range.</string>
     <string name="remote_shell_open">Open terminal</string>
     <string name="remote_shell_open_description">Opens a shell on this node, starting a remote admin session first if needed</string>
     <string name="remote_shell_reconnect">Reconnect</string>
@@ -3570,8 +3569,10 @@
     <!-- XR -->
     <string name="xr_full_space">Full Space</string>
     <string name="xr_home_space">Home Space</string>
+    <string name="xr_terrain_buildings">Buildings</string>
     <string name="xr_terrain_empty">No nodes with a position yet, so there is no area to show.</string>
     <string name="xr_terrain_flat">No terrain data for this area, so the ground is flat.</string>
+    <string name="xr_terrain_layer_elevation">Elevation</string>
     <string name="xr_terrain_loading">Building the terrain…</string>
     <string name="xr_terrain_map">3D map</string>
     <string name="xr_terrain_unavailable">The terrain could not be loaded. Check the connection and try again.</string>

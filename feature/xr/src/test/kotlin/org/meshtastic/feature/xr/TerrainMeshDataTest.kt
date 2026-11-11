@@ -63,10 +63,52 @@ class TerrainMeshDataTest {
     }
 
     @Test
+    fun `a chip's name is black on a light node color and white on a dark one`() {
+        assertTrue(ChipImage.isLight(Rgb(0.9f, 0.9f, 0.2f)))
+        assertTrue(!ChipImage.isLight(Rgb(0.2f, 0.1f, 0.6f)))
+    }
+
+    @Test
+    fun `a cut-out model masks the clear parts of its image`() {
+        val mesh =
+            TerrainMeshData(
+                floatArrayOf(0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f),
+                FloatArray(9),
+                FloatArray(12),
+                intArrayOf(0, 1, 2),
+            )
+
+        val cut = String(terrainGlb(mesh, ByteArray(4), "image/png", cutout = true), Charsets.ISO_8859_1)
+
+        assertTrue("\"alphaMode\":\"MASK\"" in cut)
+        assertTrue("alphaMode" !in String(terrainGlb(mesh, ByteArray(4), "image/png"), Charsets.ISO_8859_1))
+    }
+
+    @Test
     fun `a connected radio stays the anchor`() {
         val radio = SpatialNodeSnapshot(1, LatLon(47.6, -122.3), isConnectedRadio = true)
         val other = SpatialNodeSnapshot(2, LatLon(47.7, -122.4))
 
         assertEquals(listOf(radio, other), withLocalAnchor(listOf(radio, other)))
+    }
+
+    @Test
+    fun `relief is stretched toward an eighth of the width and capped`() {
+        // 1500 m of relief across 100 km would be 1.5% of the width; 0.12 needs 8x, which the cap holds to 6.
+        assertEquals(6.0, reliefExaggeration(1_500.0, 100_000.0), 1e-9)
+        // 2000 m across 50 km: 0.12 * 50 000 / 2000 = 3.
+        assertEquals(3.0, reliefExaggeration(2_000.0, 50_000.0), 1e-9)
+        // Steep ground close in keeps the floor, and flat ground has nothing to stretch.
+        assertEquals(1.5, reliefExaggeration(1_000.0, 4_000.0), 1e-9)
+        assertEquals(1.5, reliefExaggeration(0.0, 4_000.0), 1e-9)
+    }
+
+    @Test
+    fun `a disk is closed and every index is in range`() {
+        val disk = MeshAccumulator().apply { disk(0.5f, -0.01f, 0f, Rgb(0.1f, 0.1f, 0.1f), segments = 8) }.build()
+
+        // Per segment: a top and a bottom triangle and a side quad.
+        assertEquals(8 * 12, disk.indices.size)
+        assertTrue(disk.indices.all { it in 0 until disk.vertexCount })
     }
 }

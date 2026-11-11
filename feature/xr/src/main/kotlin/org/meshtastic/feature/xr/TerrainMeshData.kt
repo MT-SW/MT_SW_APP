@@ -37,6 +37,7 @@ internal class TerrainMeshData(
     val normals: FloatArray,
     val colors: FloatArray,
     val indices: IntArray,
+    val uvs: FloatArray = FloatArray(positions.size / 3 * 2),
 ) {
     val vertexCount: Int
         get() = positions.size / 3
@@ -87,6 +88,13 @@ internal class MeshAccumulator {
         indices.addAll(listOf(base, base + 1, base + 2, base, base + 2, base + 3))
     }
 
+    /** A flat face: [corners] as xyz, filled by [triangles] of corner indices, all facing [nx], [ny], [nz]. */
+    fun face(corners: List<FloatArray>, triangles: IntArray, nx: Float, ny: Float, nz: Float, color: Rgb) {
+        val base = count
+        corners.forEach { vertex(it[0], it[1], it[2], nx, ny, nz, color) }
+        triangles.forEach { indices.add(base + it) }
+    }
+
     fun box(cx: Float, cy: Float, cz: Float, hx: Float, hy: Float, hz: Float, color: Rgb) {
         fun p(sx: Int, sy: Int, sz: Int) = floatArrayOf(cx + sx * hx, cy + sy * hy, cz + sz * hz)
         quad(listOf(p(-1, 1, 1), p(1, 1, 1), p(1, 1, -1), p(-1, 1, -1)), 0f, 1f, 0f, color)
@@ -95,6 +103,28 @@ internal class MeshAccumulator {
         quad(listOf(p(1, -1, -1), p(-1, -1, -1), p(-1, 1, -1), p(1, 1, -1)), 0f, 0f, -1f, color)
         quad(listOf(p(1, -1, 1), p(1, -1, -1), p(1, 1, -1), p(1, 1, 1)), 1f, 0f, 0f, color)
         quad(listOf(p(-1, -1, -1), p(-1, -1, 1), p(-1, 1, 1), p(-1, 1, -1)), -1f, 0f, 0f, color)
+    }
+
+    /** A flat round slab about the y axis, from [bottom] to [top]. */
+    fun disk(radius: Float, bottom: Float, top: Float, color: Rgb, segments: Int = 64) {
+        fun at(i: Int, y: Float): FloatArray {
+            val theta = 2 * PI.toFloat() * i / segments
+            return floatArrayOf(radius * cos(theta), y, radius * sin(theta))
+        }
+        for (i in 0 until segments) {
+            val a = at(i, top)
+            val b = at(i + 1, top)
+            val base = count
+            vertex(0f, top, 0f, 0f, 1f, 0f, color)
+            vertex(b[0], b[1], b[2], 0f, 1f, 0f, color)
+            vertex(a[0], a[1], a[2], 0f, 1f, 0f, color)
+            vertex(0f, bottom, 0f, 0f, -1f, 0f, color)
+            vertex(a[0], bottom, a[2], 0f, -1f, 0f, color)
+            vertex(b[0], bottom, b[2], 0f, -1f, 0f, color)
+            indices.addAll(listOf(base, base + 1, base + 2, base + 3, base + 4, base + 5))
+            val mid = 2 * PI.toFloat() * (i + 0.5f) / segments
+            quad(listOf(at(i + 1, bottom), at(i, bottom), a, b), cos(mid), 0f, sin(mid), color)
+        }
     }
 
     fun sphere(cx: Float, cy: Float, cz: Float, radius: Float, color: Rgb, rings: Int = 6, segments: Int = 10) {
@@ -200,7 +230,12 @@ internal data class Rgb(val r: Float, val g: Float, val b: Float) {
 }
 
 /** The terrain surface and skirt as colored vertices, the light and the elevation ramp baked in. */
-internal fun terrainMeshData(geometry: SpatialTerrainGeometry, lowest: Double, highest: Double): TerrainMeshData {
+internal fun terrainMeshData(
+    geometry: SpatialTerrainGeometry,
+    lowest: Double,
+    highest: Double,
+    textured: Boolean = false,
+): TerrainMeshData {
     val count = geometry.positions.size / 3
     val surface = geometry.columns * geometry.rows
     val colors = FloatArray(count * 4)
@@ -211,24 +246,68 @@ internal fun terrainMeshData(geometry: SpatialTerrainGeometry, lowest: Double, h
                 SKIRT
             } else {
                 val altitude = geometry.transform.altitude(geometry.positions[i * 3 + 1])
-                val ground = if (altitude <= WATER_LEVEL_METERS) WATER else ramp(((altitude - lowest) / span).toFloat())
+                val ground =
+                    // With an image draped on, it carries the color and the vertex keeps only the light.
+                    when {
+                        textured -> WHITE
+                        altitude <= WATER_LEVEL_METERS -> WATER
+                        else -> ramp(((altitude - lowest) / span).toFloat())
+                    }
                 val nx = geometry.normals[i * 3]
                 val ny = geometry.normals[i * 3 + 1]
                 val nz = geometry.normals[i * 3 + 2]
-                ground.scaled(AMBIENT + (1 - AMBIENT) * max(0f, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]))
+                ground.scaled(bakedLight(nx, ny, nz))
             }
         colors[i * 4] = color.r
         colors[i * 4 + 1] = color.g
         colors[i * 4 + 2] = color.b
         colors[i * 4 + 3] = 1f
     }
-    return TerrainMeshData(geometry.positions, geometry.normals, colors, geometry.indices)
+    // The geometry puts north at v = 1; an image's first row is north, and glTF's v = 0 is that row.
+    val source = geometry.textureCoordinates
+    val uvs = FloatArray(count * 2) { if (it % 2 == 0) source[it] else 1f - source[it] }
+    if (!textured) return TerrainMeshData(geometry.positions, geometry.normals, colors, geometry.indices, uvs)
+    // The top alone: the skirt shares the edge's texture coordinates, so an image would run down it in streaks.
+    return TerrainMeshData(
+        geometry.positions.copyOf(surface * 3),
+        geometry.normals.copyOf(surface * 3),
+        colors.copyOf(surface * 4),
+        geometry.indices.copyOf(geometry.surfaceTriangleCount * 3),
+        uvs.copyOf(surface * 2),
+    )
 }
 
-/** The bezel ring, its compass letters and the eight handles, all in model units. */
-internal fun bezelMeshData(diskRadius: Float, rimTop: Float): TerrainMeshData {
+/** The table's side in one color, for a terrain whose top is drawn apart with an image on it. */
+internal fun skirtMeshData(geometry: SpatialTerrainGeometry): TerrainMeshData? {
+    val surface = geometry.columns * geometry.rows
+    val count = geometry.positions.size / 3 - surface
+    if (count == 0) return null
+    val colors = FloatArray(count * 4)
+    for (i in 0 until count) {
+        val at = (surface + i) * 3
+        val color = SKIRT.scaled(bakedLight(geometry.normals[at], geometry.normals[at + 1], geometry.normals[at + 2]))
+        colors[i * 4] = color.r
+        colors[i * 4 + 1] = color.g
+        colors[i * 4 + 2] = color.b
+        colors[i * 4 + 3] = 1f
+    }
+    val first = geometry.surfaceTriangleCount * 3
+    return TerrainMeshData(
+        geometry.positions.copyOfRange(surface * 3, geometry.positions.size),
+        geometry.normals.copyOfRange(surface * 3, geometry.normals.size),
+        colors,
+        IntArray(geometry.indices.size - first) { geometry.indices[first + it] - surface },
+    )
+}
+
+/**
+ * The bezel ring, its compass letters and the eight handles, all in model units. Its top is level with the map's lowest
+ * ground, so the terrain stands on the table and no wall hides low ground at the edge.
+ */
+internal fun bezelMeshData(diskRadius: Float): TerrainMeshData {
     val acc = MeshAccumulator()
-    val top = min(rimTop + SpatialWheelLayout.BEZEL_LIFT, SpatialWheelLayout.MAXIMUM_TOP).coerceAtLeast(MIN_BEZEL_TOP)
+    val top = BEZEL_TOP
+    val middle = (top - TERRAIN_SKIRT) / 2
     acc.append(
         SpatialBezelMesh(
             innerRadius = diskRadius + SpatialWheelLayout.GAP,
@@ -262,12 +341,25 @@ internal fun bezelMeshData(diskRadius: Float, rimTop: Float): TerrainMeshData {
         for (step in 0..SPOKE_STEPS) {
             val along = spokeStart + (knobDistance - spokeStart) * step / SPOKE_STEPS
             val at = SpatialWheelLayout.point(along, angle)
-            acc.sphere(at.x, top / 2, at.y, SpatialWheelLayout.SPOKE_RADIUS, BEZEL, rings = 4, segments = 6)
+            acc.sphere(at.x, middle, at.y, SpatialWheelLayout.SPOKE_RADIUS, BEZEL, rings = 4, segments = 6)
         }
-        acc.sphere(knob.x, top / 2, knob.y, SpatialWheelLayout.KNOB_RADIUS, KNOB)
+        acc.sphere(knob.x, middle, knob.y, SpatialWheelLayout.KNOB_RADIUS, KNOB)
     }
     return acc.build()
 }
+
+/**
+ * How far to stretch heights so the relief stands [TARGET_RELIEF] of the map's width tall. A mesh tens of kilometers
+ * wide is otherwise a sheet of paper; the cap keeps plains from turning into spikes.
+ */
+internal fun reliefExaggeration(reliefMeters: Double, spanMeters: Double): Double {
+    if (reliefMeters <= 0 || spanMeters <= 0) return MIN_EXAGGERATION
+    return (TARGET_RELIEF * spanMeters / reliefMeters).coerceIn(MIN_EXAGGERATION, MAX_EXAGGERATION)
+}
+
+/** How bright a face with this normal is under the map's fixed light, which the unlit material cannot work out. */
+internal fun bakedLight(nx: Float, ny: Float, nz: Float): Float =
+    AMBIENT + (1 - AMBIENT) * max(0f, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2])
 
 private fun ramp(t: Float): Rgb = when {
     t < 0.35f -> LOWLAND.mix(MIDLAND, t / 0.35f)
@@ -277,14 +369,18 @@ private fun ramp(t: Float): Rgb = when {
 
 private const val WATER_LEVEL_METERS = 0.5
 private const val AMBIENT = 0.45f
-private const val MIN_BEZEL_TOP = 0.012f
+private const val BEZEL_TOP = 0f
 private const val TERRAIN_SKIRT = 0.02f
 private const val SPOKE_STEPS = 6
 private const val LETTER_LIFT = 0.0006f
 private const val LETTER_SCALE = 0.7f
+private const val TARGET_RELIEF = 0.12
+private const val MIN_EXAGGERATION = 1.5
+private const val MAX_EXAGGERATION = 6.0
 
 /** From the north-west and above, the way a printed relief map is lit, normalized. */
 private val LIGHT = floatArrayOf(-0.5f, 0.75f, -0.43f)
+private val WHITE = Rgb(1f, 1f, 1f)
 private val WATER = Rgb(0.2f, 0.42f, 0.62f)
 private val LOWLAND = Rgb(0.36f, 0.56f, 0.34f)
 private val MIDLAND = Rgb(0.62f, 0.55f, 0.36f)

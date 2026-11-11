@@ -1481,7 +1481,6 @@ i_know_what_i_m_doing
 ### IAQ ###
 iaq
 iaq_definition
-iaq_level_dangerously_polluted
 iaq_level_excellent
 iaq_level_extremely_polluted
 iaq_level_good
@@ -3492,8 +3491,10 @@ write_nfc_text
 ### XR ###
 xr_full_space
 xr_home_space
+xr_terrain_buildings
 xr_terrain_empty
 xr_terrain_flat
+xr_terrain_layer_elevation
 xr_terrain_loading
 xr_terrain_map
 xr_terrain_unavailable

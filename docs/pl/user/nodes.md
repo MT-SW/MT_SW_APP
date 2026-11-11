@@ -286,7 +286,7 @@ Niektóre z tych linków są linkami afiliacyjnymi. Oba miejsca informują o tym
 
 ### Zdalny terminal
 
-**Otwórz terminal**, w karcie **Zarządzanie** węzła, otwiera powłokę na węźle z Linuksem uruchamiającym `meshtasticd` 2.8.2 lub nowszy, przesyłaną przez sieć mesh. Węzeł akceptuje ją tylko od węzła, którego klucz publiczny jest na jego liście **Bezpieczeństwo → Klucz administratora**, tej samej, której używa zdalne zarządzanie. Aplikacja najpierw rozpoczyna tę sesję administracyjną, jeśli jej nie ma, a tytuł karty pokazuje, czy jest aktywna. Wiersz może się pojawić na każdym węźle `meshtasticd`, zanim aplikacja pozna jego wersję firmware; starszy węzeł odrzuca powłokę przy otwieraniu. Terminal zajmuje całe okno. Jeśli węzeł nigdy nie odpowie, ekran informuje o tym po minucie.
+**Otwórz terminal**, w karcie **Zarządzanie** węzła, otwiera powłokę na węźle z Linuksem uruchamiającym `meshtasticd` 2.8.2 lub nowszy, przesyłaną przez sieć mesh. Węzeł akceptuje ją tylko od węzła, którego klucz publiczny jest na jego liście **Bezpieczeństwo → Klucz administratora**, tej samej, której używa zdalne zarządzanie. Aplikacja najpierw rozpoczyna tę sesję administracyjną, jeśli jej nie ma, a tytuł karty pokazuje, czy jest aktywna. Wiersz może się pojawić na każdym węźle `meshtasticd`, zanim aplikacja pozna jego wersję firmware; starszy węzeł odrzuca powłokę przy otwieraniu. Terminal zajmuje całe okno. Powłoka jest wyłączona, dopóki operator węzła jej nie włączy: `DMShell: true` w sekcji `Security` pliku `config.yaml`. Jeśli węzeł nigdy nie odpowie, ekran informuje o tym po minucie; węzeł z wyłączoną powłoką nie odpowiada wcale.
 
 Sieć mesh przenosi kilkaset bajtów na sekundę i terminal jest zbudowany z myślą o tym:
 

@@ -1152,7 +1152,6 @@
     <string name="i2s_word_select">I2S wybór słowa</string>
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">Jakość powietrza w pomieszczeniach (Indoor Air Quality) - wartość względna w skali IAQ mierzona czujnikiem BME680. Zakres wartości: 0–500.</string>
-    <string name="iaq_level_dangerously_polluted">Niebezpiecznie zanieczyszczone</string>
     <string name="iaq_level_excellent">Doskonałe</string>
     <string name="iaq_level_extremely_polluted">Ekstremalnie zanieczyszczone</string>
     <string name="iaq_level_good">Dobre</string>
@@ -2154,8 +2153,8 @@
     <string name="remote_shell_modifier_locked">Zablokowany</string>
     <string name="remote_shell_modifier_once">Dotyczy następnego klawisza</string>
     <string name="remote_shell_more_options">Więcej opcji</string>
-    <string name="remote_shell_no_reply">Brak odpowiedzi z węzła. Musi on mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
-    <string name="remote_shell_no_reply_reason">Nie udało się otworzyć sesji (%1$s). Węzeł musi mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
+    <string name="remote_shell_no_reply">Brak odpowiedzi z węzła. Musi on mieć włączone DMShell w pliku config.yaml, mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
+    <string name="remote_shell_no_reply_reason">Nie udało się otworzyć sesji (%1$s). Węzeł musi mieć włączone DMShell w pliku config.yaml, mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
     <string name="remote_shell_open">Otwórz terminal</string>
     <string name="remote_shell_open_description">Otwiera powłokę na tym węźle, w razie potrzeby najpierw rozpoczynając sesję zdalnej administracji</string>
     <string name="remote_shell_reconnect">Połącz ponownie</string>
@@ -3777,8 +3776,10 @@
     <string name="traceroute_waiting">Czekam na odpowiedź</string>
     <string name="xr_full_space">Pełna przestrzeń</string>
     <string name="xr_home_space">Przestrzeń domowa</string>
+    <string name="xr_terrain_buildings">Budynki</string>
     <string name="xr_terrain_empty">Nie ma jeszcze węzłów z pozycją, więc nie ma obszaru do pokazania.</string>
     <string name="xr_terrain_flat">Brak danych terenu dla tego obszaru, więc ziemia jest płaska.</string>
+    <string name="xr_terrain_layer_elevation">Wysokość terenu</string>
     <string name="xr_terrain_loading">Budowanie terenu…</string>
     <string name="xr_terrain_map">Mapa 3D</string>
     <string name="xr_terrain_unavailable">Nie udało się wczytać terenu. Sprawdź połączenie i spróbuj ponownie.</string>
