@@ -26,6 +26,7 @@
 
 package org.meshtastic.feature.map.planner.state
 
+import kotlin.math.atan2
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -190,8 +191,8 @@ class PlannerComputer(
 
         val input =
             LinkInput(
-                a = linkEnd(state.a, pa, ground[0], pb),
-                b = linkEnd(state.b, pb, ground[n], pa),
+                a = linkEnd(state.a, pa, ground[0], pb, elevationDeg(state.a, ground[0], state.b, ground[n], pa, pb)),
+                b = linkEnd(state.b, pb, ground[n], pa, elevationDeg(state.b, ground[n], state.a, ground[0], pb, pa)),
                 frequencyMHz = state.frequencyMHz,
                 bandwidthKhz = state.bandwidthKhz,
                 spreadingFactor = state.spreadingFactor,
@@ -276,6 +277,7 @@ class PlannerComputer(
                 azimuthDeg = coverageAzimuth,
                 beamwidthDeg = end.beamwidthDeg,
                 frontToBackDb = end.frontToBackDb,
+                tiltDeg = end.tiltDeg,
                 rxAntennaHeightM = state.coverageRxHeightM,
                 rxGainDbi = state.coverageRxGainDbi,
                 frequencyMHz = state.frequencyMHz,
@@ -340,14 +342,34 @@ class PlannerComputer(
         PlannerElevationFailure.DECODE -> PlannerError.ELEVATION_DECODE
     }
 
-    private fun linkEnd(end: PlannerEnd, point: GeoPoint, groundM: Double, other: GeoPoint): LinkEnd = LinkEnd(
+    /** The angle (degrees, up is positive) at which [other]'s antenna is seen from [end]'s antenna. */
+    private fun elevationDeg(
+        end: PlannerEnd,
+        groundM: Double,
+        other: PlannerEnd,
+        otherGroundM: Double,
+        from: GeoPoint,
+        to: GeoPoint,
+    ): Double {
+        val distance = Geodesy.distanceM(from, to).coerceAtLeast(1.0)
+        val rise = (otherGroundM + other.antennaHeightM) - (groundM + end.antennaHeightM)
+        return atan2(rise, distance) * RAD_TO_DEG
+    }
+
+    private fun linkEnd(
+        end: PlannerEnd,
+        point: GeoPoint,
+        groundM: Double,
+        other: GeoPoint,
+        elevationDeg: Double,
+    ): LinkEnd = LinkEnd(
         point = point,
         groundAltM = groundM,
         antennaHeightM = end.antennaHeightM,
         txPowerDbm = end.txPowerDbm,
         antennaGainDbi = end.antennaGainDbi,
         feederLossDb = end.feederLossDb,
-        patternLossDb = end.patternLossDb(point, other, other),
+        patternLossDb = end.patternLossDb(point, other, other, elevationDeg),
     )
 
     private suspend fun fetchWeather(p: GeoPoint): PlannerWeatherResult {
@@ -432,3 +454,5 @@ class PlannerComputer(
         private const val STD_RH_PCT = 60.0
     }
 }
+
+private const val RAD_TO_DEG = 57.29577951308232

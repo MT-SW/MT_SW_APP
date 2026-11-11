@@ -2624,7 +2624,7 @@
     <string name="planner_layer_buildings_link">Planner: buildings along the route (© OpenStreetMap)</string>
     <string name="planner_layer_reflection">Planner: ground reflection</string>
     <string name="planner_pattern_aim_other">Point at the other end</string>
-    <string name="planner_pattern_azimuth">Antenna direction (azimuth)</string>
+    <string name="planner_pattern_azimuth">Antenna direction (azimuth, compass degrees)</string>
     <string name="planner_pattern_beamwidth">Beamwidth (−3 dB)</string>
     <string name="planner_pattern_elements">Number of elements</string>
     <string name="planner_pattern_front_to_back">Front-to-back ratio</string>
@@ -2637,6 +2637,7 @@
     <string name="planner_pattern_kind_sector">Sector</string>
     <string name="planner_pattern_kind_yagi">Yagi</string>
     <string name="planner_pattern_reset">Typical values for this kind</string>
+    <string name="planner_pattern_tilt">Antenna tilt (up +, down −)</string>
     <string name="planner_pattern_title">Antenna pattern</string>
     <string name="planner_result_ground_reflection">Ground reflection gain</string>
     <string name="planner_result_pattern_loss">Antenna directivity loss (A / B)</string>
@@ -3565,15 +3566,9 @@
     <string name="widget_adaptive_title">Adaptive widget</string>
     <string name="widget_adaptive_track_in">Track on the widget</string>
     <string name="widget_adaptive_tracking_shown">Tracking %1$s on the home-screen widget</string>
-    <string name="widget_card_current">Current: %1$s mA</string>
     <string name="widget_card_heard">Heard %1$s ago</string>
     <string name="widget_card_hops">Hops: %1$d</string>
-    <string name="widget_card_humidity">Humidity: %1$s</string>
     <string name="widget_card_model">%1$s · %2$s</string>
-    <string name="widget_card_pressure">Pressure: %1$s</string>
-    <string name="widget_card_temperature">Temperature: %1$s</string>
-    <string name="widget_card_voltage">Voltage: %1$s V</string>
-    <string name="widget_card_voltage_current">Voltage: %1$s V · Current: %2$s mA</string>
     <string name="widget_content_expand_info">The widget can be made bigger: add it from the widget gallery in a larger size or resize it on the home screen. The smallest shows our node, favorites in turn or the whole network in turn. A bigger one adds a second area to choose (favorites or the whole network). The biggest shows our node, favorites and the rest of the network at once. Below are the options only for the sizes you have on the screen.</string>
     <string name="widget_content_favorites">Favorites in turn</string>
     <string name="widget_content_info">The widget has three sizes (drag its corner to change it).\n\nSmall (4x2): your choice. Our node, or favorites in turn, or the whole network in turn (the whole network is all nodes except ours, favorites included). With favorites or the network, the full statistics of our node come first, then the nodes one after another every 5 minutes.\n\nMedium (4x4): our node on top; below, your choice of favorites or the whole network, in turn.\n\nLarge (4x6): our node on top, favorites below it, and under them the rest of the network (without favorites and without our node), in turn.</string>

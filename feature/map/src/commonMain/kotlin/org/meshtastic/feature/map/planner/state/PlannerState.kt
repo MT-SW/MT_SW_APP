@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.planner.state
 
+import kotlin.math.abs
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
@@ -153,6 +154,8 @@ data class PlannerEnd(
     val patternElements: Int = AntennaPatterns.DEFAULT_ELEMENTS,
     /** Compass bearing the directional antenna points at, used while [aimAtOther] is false. */
     val azimuthDeg: Double = 0.0,
+    /** How far the directional antenna is tipped up (+) or down (-) from level, in degrees. */
+    val tiltDeg: Double = 0.0,
     /** A link end points at the other end; the coverage of one station uses [azimuthDeg]. */
     val aimAtOther: Boolean = true,
     /** Beamwidth typed by the user; null takes the typical value of the kind. */
@@ -184,11 +187,13 @@ data class PlannerEnd(
      * How many dB less than the full gain this antenna radiates towards [target] from [from], given that it is turned
      * towards [aimAt] (the other end of a link, or the typed bearing when null).
      */
-    fun patternLossDb(from: GeoPoint, target: GeoPoint, aimAt: GeoPoint?): Double {
+    fun patternLossDb(from: GeoPoint, target: GeoPoint, aimAt: GeoPoint?, elevationDeg: Double = 0.0): Double {
         if (!patternKind.directional) return 0.0
         val axis = if (aimAtOther && aimAt != null) Geodesy.bearingDeg(from, aimAt) else azimuthDeg
         val off = AntennaPatterns.angleBetweenDeg(Geodesy.bearingDeg(from, target), axis)
-        return AntennaPatterns.lossDb(off, beamwidthDeg, frontToBackDb)
+        // Up and down the antenna has the same beamwidth as sideways (a simple approximation).
+        val vertical = AntennaPatterns.lossDb(abs(elevationDeg - tiltDeg), beamwidthDeg, frontToBackDb)
+        return AntennaPatterns.lossDb(off, beamwidthDeg, frontToBackDb) + vertical
     }
 
     val point: GeoPoint?

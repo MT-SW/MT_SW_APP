@@ -3819,7 +3819,8 @@
     <string name="planner_pattern_kind_sector">Sektorowa</string>
     <string name="planner_pattern_elements">Liczba elementów</string>
     <string name="planner_pattern_aim_other">Kieruj na drugi koniec</string>
-    <string name="planner_pattern_azimuth">Kierunek anteny (azymut)</string>
+    <string name="planner_pattern_azimuth">Kierunek anteny (azymut, stopnie geograficzne)</string>
+    <string name="planner_pattern_tilt">Pochylenie anteny (góra +, dół −)</string>
     <string name="planner_pattern_beamwidth">Szerokość wiązki (−3 dB)</string>
     <string name="planner_pattern_front_to_back">Tłumienie z tyłu</string>
     <string name="planner_pattern_reset">Wartości typowe dla tego rodzaju</string>
@@ -3846,12 +3847,6 @@
     <string name="planner_buildings_on_map">Pokaż budynki na mapie (trasa: zasłaniające widoczność na czerwono; zasięg: tło)</string>
     <string name="planner_layer_buildings_link">Planer: budynki na trasie (© OpenStreetMap)</string>
     <string name="planner_layer_buildings_area">Planer: budynki w zasięgu (© OpenStreetMap)</string>
-    <string name="widget_card_voltage">Napięcie: %1$s V</string>
-    <string name="widget_card_voltage_current">Napięcie: %1$s V · Prąd: %2$s mA</string>
-    <string name="widget_card_current">Prąd: %1$s mA</string>
-    <string name="widget_card_temperature">Temperatura: %1$s</string>
-    <string name="widget_card_humidity">Wilgotność: %1$s</string>
-    <string name="widget_card_pressure">Ciśnienie: %1$s</string>
     <string name="widget_card_heard">Słyszany %1$s temu</string>
     <string name="widget_card_hops">Skoków: %1$d</string>
     <string name="widget_card_model">%1$s · %2$s</string>

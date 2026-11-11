@@ -239,14 +239,18 @@ class PlannerViewModel(
         )
     }
 
+    /** Typing a direction turns off "point at the other end", so the typed value is the one that counts. */
     fun setAzimuth(side: PlannerSide, deg: Double) =
-        editEnd(side, deg) { e, v -> e.copy(azimuthDeg = ((v % 360.0) + 360.0) % 360.0) }
+        editEnd(side, deg) { e, v -> e.copy(azimuthDeg = ((v % 360.0) + 360.0) % 360.0, aimAtOther = false) }
 
     fun setBuildingsOnMap(on: Boolean) = mutate { st -> st.copy(buildingsOnMap = on) }
 
     fun setClutterReflections(on: Boolean) = mutate { st -> st.copy(clutterReflections = on, coverage = null) }
 
     fun setGroundReflection(on: Boolean) = mutate { st -> st.copy(groundReflection = on, coverage = null) }
+
+    fun setTilt(side: PlannerSide, deg: Double) =
+        editEnd(side, deg) { e, v -> e.copy(tiltDeg = v.coerceIn(-MAX_TILT_DEG, MAX_TILT_DEG)) }
 
     fun setAimAtOther(side: PlannerSide, on: Boolean) = mutate { st ->
         st.withEnd(side, st.end(side).copy(aimAtOther = on))
@@ -260,7 +264,7 @@ class PlannerViewModel(
 
     /** Back to the typical beamwidth and back suppression of the kind. */
     fun resetPattern(side: PlannerSide) = mutate { st ->
-        st.withEnd(side, st.end(side).copy(beamwidthManualDeg = null, frontToBackManualDb = null))
+        st.withEnd(side, st.end(side).copy(beamwidthManualDeg = null, frontToBackManualDb = null, tiltDeg = 0.0))
     }
 
     /** Simple feeder loss in dB. Does not change [PlannerEnd.feederPrecise]; the value is kept when switching modes. */
@@ -325,6 +329,7 @@ class PlannerViewModel(
                 patternKind = a.patternKind,
                 patternElements = a.patternElements,
                 azimuthDeg = a.azimuthDeg,
+                tiltDeg = a.tiltDeg,
                 aimAtOther = a.aimAtOther,
                 beamwidthManualDeg = a.beamwidthManualDeg,
                 frontToBackManualDb = a.frontToBackManualDb,
@@ -830,3 +835,5 @@ class PlannerViewModel(
         }
     }
 }
+
+private const val MAX_TILT_DEG = 60.0

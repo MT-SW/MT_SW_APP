@@ -40,13 +40,12 @@ import org.meshtastic.core.resources.local_stats_uptime
 import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.core.resources.widget_card_heard
 import org.meshtastic.core.resources.widget_card_hops
+import org.meshtastic.core.resources.pressure
+import org.meshtastic.core.resources.humidity
+import org.meshtastic.core.resources.temperature
+import org.meshtastic.core.resources.current
+import org.meshtastic.core.resources.voltage
 import org.meshtastic.core.resources.widget_card_model
-import org.meshtastic.core.resources.widget_card_voltage
-import org.meshtastic.core.resources.widget_card_voltage_current
-import org.meshtastic.core.resources.widget_card_current
-import org.meshtastic.core.resources.widget_card_temperature
-import org.meshtastic.core.resources.widget_card_humidity
-import org.meshtastic.core.resources.widget_card_pressure
 import org.meshtastic.proto.LocalStats
 import kotlin.time.Clock
 
@@ -252,23 +251,22 @@ class MeshStatsFeed(
 private suspend fun MutableList<String>.addSensorLines(node: Node) {
     val env = node.environmentMetrics
     val power = node.powerMetrics
-    val volts = (power.ch1_voltage ?: env.voltage)?.let { NumberFormatter.format(it.toDouble(), 2) }
-    val milliAmps = (power.ch1_current ?: env.current)?.let { NumberFormatter.format(it.toDouble(), 1) }
-    // Voltage and current share one line, so the current is never left alone and unlabelled.
-    when {
-        volts != null && milliAmps != null ->
-            add(getStringSuspend(Res.string.widget_card_voltage_current, volts, milliAmps))
-        volts != null -> add(getStringSuspend(Res.string.widget_card_voltage, volts))
-        milliAmps != null -> add(getStringSuspend(Res.string.widget_card_current, milliAmps))
-    }
+    val volts = (power.ch1_voltage ?: env.voltage)?.takeUnless { it.isNaN() }
+    val milliAmps = (power.ch1_current ?: env.current)?.takeUnless { it.isNaN() }
+    // The same short labels and values as the node's detail list; voltage and current side by side on one line.
+    val power1 = listOfNotNull(
+        volts?.let { "${getStringSuspend(Res.string.voltage)} ${MetricFormatter.voltage(it)}" },
+        milliAmps?.let { "${getStringSuspend(Res.string.current)} ${MetricFormatter.current(it, decimalPlaces = 1)}" },
+    )
+    if (power1.isNotEmpty()) add(power1.joinToString("   "))
     env.temperature?.takeIf { !it.isNaN() }?.let {
-        add(getStringSuspend(Res.string.widget_card_temperature, MetricFormatter.temperature(it, false)))
+        add("${getStringSuspend(Res.string.temperature)} ${MetricFormatter.temperature(it, false)}")
     }
     env.relative_humidity?.takeIf { it != 0f }?.let {
-        add(getStringSuspend(Res.string.widget_card_humidity, MetricFormatter.humidity(it)))
+        add("${getStringSuspend(Res.string.humidity)} ${MetricFormatter.humidity(it)}")
     }
     env.barometric_pressure?.takeIf { it != 0f }?.let {
-        add(getStringSuspend(Res.string.widget_card_pressure, MetricFormatter.pressure(it)))
+        add("${getStringSuspend(Res.string.pressure)} ${MetricFormatter.pressure(it)}")
     }
 }
 

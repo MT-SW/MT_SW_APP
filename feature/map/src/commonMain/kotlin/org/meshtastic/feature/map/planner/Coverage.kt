@@ -18,6 +18,9 @@
 
 package org.meshtastic.feature.map.planner
 
+import kotlin.math.atan2
+import kotlin.math.abs
+import kotlin.math.PI
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.feature.map.planner.data.PlannerClutter
 import kotlin.math.ceil
@@ -38,6 +41,8 @@ data class CoverageInput(
     val azimuthDeg: Double = 0.0,
     val beamwidthDeg: Double = 360.0,
     val frontToBackDb: Double = 0.0,
+    /** How far the directional antenna is tipped up (+) or down (-), in degrees. */
+    val tiltDeg: Double = 0.0,
     val rxAntennaHeightM: Double = 2.0,
     val rxGainDbi: Double = 0.0,
     val frequencyMHz: Double,
@@ -147,7 +152,7 @@ object Coverage {
                     )
                 val m =
                     if (res.returnCode <= 1 && !res.lossDb.isNaN()) {
-                        (eirpMinusLosses - patternLoss - res.lossDb + reflectionAt(input, ringsM[j]) - sens).toFloat()
+                        (eirpMinusLosses - patternLoss - tiltLossDb(input, ground, idx, ringsM[j]) - res.lossDb + reflectionAt(input, ringsM[j]) - sens).toFloat()
                     } else {
                         ERROR_MARGIN_DB
                     }
@@ -183,4 +188,12 @@ fun CoverageResult.marginAt(lat: Double, lon: Double): Float? {
     val jj1 = if (d < ringsM[0]) 0 else j1
     fun at(r: Int) = marginDb[r][jj0] * (1 - td) + marginDb[r][jj1] * td
     return at(ra) * (1 - tr) + at(rb) * tr
+}
+
+/** Extra loss of a tipped directional antenna towards a receiver [distanceM] away at ring sample [idx]. */
+private fun tiltLossDb(input: CoverageInput, ground: DoubleArray, idx: Int, distanceM: Double): Double {
+    if (!input.directional) return 0.0
+    val rise = ground[idx] + input.rxAntennaHeightM - (ground[0] + input.antennaHeightM)
+    val elevation = atan2(rise, max(1.0, distanceM)) * (180.0 / PI)
+    return AntennaPatterns.lossDb(abs(elevation - input.tiltDeg), input.beamwidthDeg, input.frontToBackDb)
 }

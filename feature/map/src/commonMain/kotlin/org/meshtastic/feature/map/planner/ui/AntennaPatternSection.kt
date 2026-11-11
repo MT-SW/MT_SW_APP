@@ -52,6 +52,7 @@ import org.meshtastic.core.resources.planner_pattern_kind_panel
 import org.meshtastic.core.resources.planner_pattern_kind_sector
 import org.meshtastic.core.resources.planner_pattern_kind_yagi
 import org.meshtastic.core.resources.planner_pattern_reset
+import org.meshtastic.core.resources.planner_pattern_tilt
 import org.meshtastic.core.resources.planner_pattern_title
 import org.meshtastic.core.ui.component.AntennaPatternPlot
 import org.meshtastic.feature.map.planner.state.PlannerEnd
@@ -105,17 +106,24 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
             Switch(checked = end.aimAtOther, onCheckedChange = { vm.setAimAtOther(side, it) })
             Text(stringResource(Res.string.planner_pattern_aim_other), style = MaterialTheme.typography.bodyMedium)
         }
-        if (!end.aimAtOther) {
-            PlannerNumberField(
-                label = stringResource(Res.string.planner_pattern_azimuth),
-                value = end.azimuthDeg,
-                onValue = { vm.setAzimuth(side, it) },
-                decimals = 0,
-                suffix = "°",
-                min = 0.0,
-                max = 359.0,
-            )
-        }
+        PlannerNumberField(
+            label = stringResource(Res.string.planner_pattern_azimuth),
+            value = end.azimuthDeg,
+            onValue = { vm.setAzimuth(side, it) },
+            decimals = 0,
+            suffix = "°",
+            min = 0.0,
+            max = 359.0,
+        )
+        PlannerNumberField(
+            label = stringResource(Res.string.planner_pattern_tilt),
+            value = end.tiltDeg,
+            onValue = { vm.setTilt(side, it) },
+            decimals = 1,
+            suffix = "°",
+            min = -60.0,
+            max = 60.0,
+        )
         PlannerNumberField(
             label = stringResource(Res.string.planner_pattern_beamwidth),
             value = end.beamwidthDeg,
