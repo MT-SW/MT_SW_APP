@@ -18,7 +18,7 @@ package org.meshtastic.feature.settings.liveupdate
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -50,7 +50,7 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
     val uiPrefs: UiPrefs = koinInject()
     val small by uiPrefs.androidWidgetSmall.collectAsStateWithLifecycle()
     val second by uiPrefs.androidWidgetSecond.collectAsStateWithLifecycle()
-    var chooser by rememberSaveable { mutableStateOf(0) }
+    var chooser by rememberSaveable { mutableIntStateOf(0) }
     val own = stringResource(Res.string.widget_content_own)
     val favorites = stringResource(Res.string.widget_content_favorites)
     val network = stringResource(Res.string.widget_content_network)
@@ -70,19 +70,25 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
         leadingIcon = MeshtasticIcons.Notifications,
         trailingContent = MeshtasticIcons.ChevronRight.icon(),
         onClick = { chooser = 2 },
-        modifier = modifier,
     )
     if (chooser != 0) {
         val isSmall = chooser == 1
         MeshtasticDialog(
-            title = stringResource(if (isSmall) Res.string.widget_content_small_title else Res.string.widget_content_second_title),
+            title =
+            stringResource(
+                if (isSmall) Res.string.widget_content_small_title else Res.string.widget_content_second_title,
+            ),
             message = stringResource(Res.string.widget_content_info),
             choices =
             (if (isSmall) smallNames else secondNames)
                 .mapIndexed { index, name ->
                     name to
                         {
-                            if (isSmall) uiPrefs.setAndroidWidgetSmall(index) else uiPrefs.setAndroidWidgetSecond(index)
+                            if (isSmall) {
+                                uiPrefs.setAndroidWidgetSmall(index)
+                            } else {
+                                uiPrefs.setAndroidWidgetSecond(index)
+                            }
                         }
                 }
                 .toMap(),

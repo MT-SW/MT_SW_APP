@@ -73,8 +73,8 @@ private const val NODE_SHARE_OF_TWO = 0.45f
 /**
  * Widget "Statystyki MT_SW": the same lines as the permanent notification in one or two columns. Three sizes, like on
  * iPhone: 4x2 shows what is chosen in the settings (our node, or favorites, or the whole network in turn, our node
- * first); 4x4 has our node on top and below it favorites or the whole network in turn; 4x6 has our node, favorites
- * and, under them, the rest of the network (without favorites and without our node).
+ * first); 4x4 has our node on top and below it favorites or the whole network in turn; 4x6 has our node, favorites and,
+ * under them, the rest of the network (without favorites and without our node).
  */
 class MeshStatusWidget :
     GlanceAppWidget(),
@@ -112,17 +112,41 @@ class MeshStatusWidget :
                         height >= THIRD_AREA_FROM_DP ->
                             Column(modifier = GlanceModifier.fillMaxSize()) {
                                 OwnSection(snapshot, width, height * OWN_SHARE_OF_THREE)
-                                NodeSection(NodeKind.Favorite, snapshot?.favorites.orEmpty(), step, width, height * NODE_SHARE_OF_THREE)
-                                NodeSection(NodeKind.Other, snapshot?.others.orEmpty(), step, width, height * NODE_SHARE_OF_THREE)
+                                NodeSection(
+                                    NodeKind.Favorite,
+                                    snapshot?.favorites.orEmpty(),
+                                    step,
+                                    width,
+                                    height * NODE_SHARE_OF_THREE,
+                                )
+                                NodeSection(
+                                    NodeKind.Other,
+                                    snapshot?.others.orEmpty(),
+                                    step,
+                                    width,
+                                    height * NODE_SHARE_OF_THREE,
+                                )
                             }
 
                         height >= SECOND_AREA_FROM_DP ->
                             Column(modifier = GlanceModifier.fillMaxSize()) {
                                 OwnSection(snapshot, width, height * OWN_SHARE_OF_TWO)
                                 if (second == 0) {
-                                    NodeSection(NodeKind.Favorite, snapshot?.favorites.orEmpty(), step, width, height * NODE_SHARE_OF_TWO)
+                                    NodeSection(
+                                        NodeKind.Favorite,
+                                        snapshot?.favorites.orEmpty(),
+                                        step,
+                                        width,
+                                        height * NODE_SHARE_OF_TWO,
+                                    )
                                 } else {
-                                    NodeSection(NodeKind.Network, snapshot?.network.orEmpty(), step, width, height * NODE_SHARE_OF_TWO)
+                                    NodeSection(
+                                        NodeKind.Network,
+                                        snapshot?.network.orEmpty(),
+                                        step,
+                                        width,
+                                        height * NODE_SHARE_OF_TWO,
+                                    )
                                 }
                             }
 
@@ -151,7 +175,11 @@ private fun SmallContent(snapshot: MeshStatsSnapshot?, small: Int, step: Int, wi
     }
 }
 
-private enum class NodeKind { Favorite, Network, Other }
+private enum class NodeKind {
+    Favorite,
+    Network,
+    Other,
+}
 
 /** Our node: the mark, the name, the chip and the statistics in columns. */
 @Composable
@@ -163,8 +191,7 @@ private fun OwnSection(snapshot: MeshStatsSnapshot?, widthDp: Float, heightDp: F
             Text(
                 text = snapshot?.title ?: "MT_SW",
                 maxLines = 1,
-                style =
-                TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )
             if (!snapshot?.chip.isNullOrEmpty()) {

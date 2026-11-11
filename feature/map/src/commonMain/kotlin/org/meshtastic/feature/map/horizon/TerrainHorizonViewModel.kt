@@ -289,8 +289,7 @@ class TerrainHorizonViewModel(
         if (here.buildingsSaving) return
         viewModelScope.launch {
             _state.update { it.copy(buildingsSaving = true, buildingsOk = null, buildingsProgress = null) }
-            val watcher =
-                launch { clutter.progress.collect { p -> _state.update { it.copy(buildingsProgress = p) } } }
+            val watcher = launch { clutter.progress.collect { p -> _state.update { it.copy(buildingsProgress = p) } } }
             val ok =
                 try {
                     val map =

@@ -57,10 +57,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -332,56 +332,60 @@ fun TerrainHorizonScreen(
             }
         }
         if (moreOptions) {
-          Column(Modifier.heightIn(max = OPTIONS_MAX_HEIGHT_DP.dp).verticalScroll(rememberScrollState())) {
-            ChipRow(stringResource(Res.string.terrain_horizon_target_antenna)) {
-                HORIZON_ANTENNAS_M.forEach { m ->
-                    BrandChip(
-                        selected = state.targetAntennaM == m,
-                        onClick = { viewModel.setTargetAntenna(m) },
-                        label = { Text("$m m") },
-                    )
+            Column(Modifier.heightIn(max = OPTIONS_MAX_HEIGHT_DP.dp).verticalScroll(rememberScrollState())) {
+                ChipRow(stringResource(Res.string.terrain_horizon_target_antenna)) {
+                    HORIZON_ANTENNAS_M.forEach { m ->
+                        BrandChip(
+                            selected = state.targetAntennaM == m,
+                            onClick = { viewModel.setTargetAntenna(m) },
+                            label = { Text("$m m") },
+                        )
+                    }
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_refraction)) {
+                    HORIZON_REFRACTIONS.forEach { k ->
+                        BrandChip(
+                            selected = state.refraction == k,
+                            onClick = { viewModel.setRefraction(k) },
+                            label = { Text(if (k == HorizonPanorama.DEFAULT_K) "4/3" else "1") },
+                        )
+                    }
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_fov)) {
+                    FIELDS_OF_VIEW.forEach { deg ->
+                        BrandChip(
+                            selected = fieldOfView == deg,
+                            onClick = { fieldOfView = deg },
+                            label = { Text("$deg°") },
+                        )
+                    }
+                }
+                OfflineTerrain(
+                    state = state,
+                    onRadius = viewModel::setSaveRadius,
+                    onSave = viewModel::saveTerrain,
+                    onClear = viewModel::clearSavedTerrain,
+                )
+                OfflineBuildings(
+                    state = state,
+                    onToggle = viewModel::setBuildings,
+                    onRadius = viewModel::setBuildingsRadius,
+                    onSave = viewModel::saveBuildings,
+                    onClear = viewModel::clearSavedBuildings,
+                )
+                ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) {
+                    Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it })
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_favorites)) {
+                    Switch(checked = state.onlyFavorites, onCheckedChange = viewModel::setOnlyFavorites)
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_precision)) {
+                    Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles)
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_labels)) {
+                    Switch(checked = names, onCheckedChange = { names = it })
                 }
             }
-            ChipRow(stringResource(Res.string.terrain_horizon_refraction)) {
-                HORIZON_REFRACTIONS.forEach { k ->
-                    BrandChip(
-                        selected = state.refraction == k,
-                        onClick = { viewModel.setRefraction(k) },
-                        label = { Text(if (k == HorizonPanorama.DEFAULT_K) "4/3" else "1") },
-                    )
-                }
-            }
-            ChipRow(stringResource(Res.string.terrain_horizon_fov)) {
-                FIELDS_OF_VIEW.forEach { deg ->
-                    BrandChip(selected = fieldOfView == deg, onClick = { fieldOfView = deg }, label = { Text("$deg°") })
-                }
-            }
-            OfflineTerrain(
-                state = state,
-                onRadius = viewModel::setSaveRadius,
-                onSave = viewModel::saveTerrain,
-                onClear = viewModel::clearSavedTerrain,
-            )
-            OfflineBuildings(
-                state = state,
-                onToggle = viewModel::setBuildings,
-                onRadius = viewModel::setBuildingsRadius,
-                onSave = viewModel::saveBuildings,
-                onClear = viewModel::clearSavedBuildings,
-            )
-            ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) {
-                Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it })
-            }
-            ChipRow(stringResource(Res.string.terrain_horizon_favorites)) {
-                Switch(checked = state.onlyFavorites, onCheckedChange = viewModel::setOnlyFavorites)
-            }
-            ChipRow(stringResource(Res.string.terrain_horizon_precision)) {
-                Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles)
-            }
-            ChipRow(stringResource(Res.string.terrain_horizon_labels)) {
-                Switch(checked = names, onCheckedChange = { names = it })
-            }
-          }
         }
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             val profile = state.profile

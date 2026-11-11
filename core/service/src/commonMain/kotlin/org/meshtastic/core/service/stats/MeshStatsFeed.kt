@@ -157,7 +157,11 @@ class MeshStatsFeed(
             favorites = favorites.map { card(it) },
             others = rest.take(CARD_LIMIT).map { card(it) },
             network =
-            others.filter { it.lastHeard > 0 }.sortedByDescending { it.lastHeard }.take(CARD_LIMIT).map { card(it) },
+            others
+                .filter { it.lastHeard > 0 }
+                .sortedByDescending { it.lastHeard }
+                .take(CARD_LIMIT)
+                .map { card(it) },
         )
     }
 

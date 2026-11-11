@@ -61,15 +61,7 @@ object OsmClutterParser {
         for (e in elements) {
             val o = e as? JsonObject ?: continue
             val type = (o["type"] as? JsonPrimitive)?.content
-            if (seen != null && (type == "way" || type == "relation" || type == "node")) {
-                val id = (o["id"] as? JsonPrimitive)?.content?.toLongOrNull()
-                if (id != null) {
-                    // Nodes get negative keys, so they never meet the keys of ways and relations.
-                    val key = if (type == "node") -id - 1 else id * 2 + (if (type == "relation") 1L else 0L)
-                    if (key in seen) continue
-                    fresh?.add(key)
-                }
-            }
+            if (alreadySeen(o, type, seen, fresh)) continue
             when (type) {
                 "way" -> wayPolygon(o, thinM)?.let { if (!isNegligible(it, thinM)) out.add(it) }
                 "relation" -> relationPolygons(o, thinM).forEach { if (!isNegligible(it, thinM)) out.add(it) }
@@ -78,6 +70,17 @@ object OsmClutterParser {
         }
         if (seen != null && fresh != null) seen.addAll(fresh)
         return ClutterMap(out)
+    }
+
+    /** True when this element came with an earlier piece of the area; otherwise its key is noted in [fresh]. */
+    private fun alreadySeen(o: JsonObject, type: String?, seen: MutableSet<Long>?, fresh: MutableList<Long>?): Boolean {
+        if (seen == null || (type != "way" && type != "relation" && type != "node")) return false
+        val id = (o["id"] as? JsonPrimitive)?.content?.toLongOrNull() ?: return false
+        // Nodes get negative keys, so they never meet the keys of ways and relations.
+        val key = if (type == "node") -id - 1 else id * 2 + (if (type == "relation") 1L else 0L)
+        if (key in seen) return true
+        fresh?.add(key)
+        return false
     }
 
     private fun looksLikeFailure(remark: String): Boolean {
@@ -167,8 +170,16 @@ object OsmClutterParser {
         val dLon = dLat / cos(lat * PI / 180.0).coerceAtLeast(0.01)
         val ring =
             doubleArrayOf(
-                lat - dLat, lon - dLon, lat - dLat, lon + dLon, lat + dLat, lon + dLon,
-                lat + dLat, lon - dLon, lat - dLat, lon - dLon,
+                lat - dLat,
+                lon - dLon,
+                lat - dLat,
+                lon + dLon,
+                lat + dLat,
+                lon + dLon,
+                lat + dLat,
+                lon - dLon,
+                lat - dLat,
+                lon - dLon,
             )
         return ClutterPolygon(ClutterKind.BUILDING, buildingHeight(tags) ?: DEFAULT_TOWER_M, ring)
     }

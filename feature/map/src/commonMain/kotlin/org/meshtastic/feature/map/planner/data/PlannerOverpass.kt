@@ -217,9 +217,7 @@ class PlannerOverpass(
                         (
                             e.failure == PlannerClutterFailure.TOO_LARGE ||
                                 e.failure == PlannerClutterFailure.SERVER_LIMIT
-                            ) &&
-                            !busy &&
-                            work.box.maxSideKm > minTileKm
+                            ) && !busy && work.box.maxSideKm > minTileKm
                     when {
                         busy && work.tries < BUSY_RETRIES -> {
                             delay(BUSY_WAIT_MS)
