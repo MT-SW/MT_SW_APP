@@ -237,7 +237,7 @@ class MeshStatsFeed(
     }
 }
 
-/** Readings of the node sensors: temperature, humidity, pressure, and voltage/current from the sensor, not the system. */
+/** Sensor readings of a node: climate, plus voltage and current taken from the sensor, not from the system. */
 private suspend fun MutableList<String>.addSensorLines(node: Node) {
     val env = node.environmentMetrics
     val power = node.powerMetrics
