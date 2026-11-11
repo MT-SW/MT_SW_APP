@@ -2701,6 +2701,7 @@ propagation_download
 propagation_failed
 propagation_hour_ahead
 propagation_hour_now
+propagation_keep_area
 propagation_kind_enhanced
 propagation_kind_gradient
 propagation_kind_k

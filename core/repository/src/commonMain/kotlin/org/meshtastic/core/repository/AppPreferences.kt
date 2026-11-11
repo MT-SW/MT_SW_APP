@@ -754,7 +754,12 @@ interface MapPrefs {
 }
 
 /** What the propagation map layer remembers: on/off, the kind of picture and how often it refreshes on its own. */
-data class PropagationPrefs(val enabled: Boolean = false, val kind: Int = 0, val autoRefresh: Boolean = true)
+data class PropagationPrefs(
+    val enabled: Boolean = false,
+    val kind: Int = 0,
+    val autoRefresh: Boolean = true,
+    val keepArea: Boolean = true,
+)
 
 /** What the terrain panorama remembers between visits: the range, the antenna heights and the radio-horizon factor. */
 data class HorizonPrefs(

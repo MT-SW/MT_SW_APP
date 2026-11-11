@@ -58,6 +58,7 @@ import org.meshtastic.core.resources.propagation_download
 import org.meshtastic.core.resources.propagation_failed
 import org.meshtastic.core.resources.propagation_hour_ahead
 import org.meshtastic.core.resources.propagation_hour_now
+import org.meshtastic.core.resources.propagation_keep_area
 import org.meshtastic.core.resources.propagation_kind_enhanced
 import org.meshtastic.core.resources.propagation_kind_gradient
 import org.meshtastic.core.resources.propagation_kind_k
@@ -159,6 +160,14 @@ internal fun PropagationSection(
         ) {
             Checkbox(checked = state.autoRefresh, onCheckedChange = controller::setAutoRefresh)
             Text(stringResource(Res.string.propagation_auto), style = MaterialTheme.typography.bodyMedium)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = state.keepArea, onCheckedChange = controller::setKeepArea)
+            Text(stringResource(Res.string.propagation_keep_area), style = MaterialTheme.typography.bodyMedium)
         }
 
         Row(

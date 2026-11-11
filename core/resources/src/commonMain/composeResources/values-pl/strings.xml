@@ -3843,6 +3843,7 @@
     <string name="propagation_hour_now">Teraz</string>
     <string name="propagation_hour_ahead">Za %1$d godz.</string>
     <string name="propagation_auto">Odświeżaj automatycznie</string>
+    <string name="propagation_keep_area">Zachowaj największy obszar (przybliżenie go nie zmniejsza)</string>
     <string name="propagation_download">Pobierz dla tego widoku</string>
     <string name="propagation_update">Aktualizuj dla tego widoku</string>
     <string name="propagation_loading">Pobieranie…</string>

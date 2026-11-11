@@ -2767,6 +2767,7 @@
     <string name="propagation_failed">Could not download the forecast</string>
     <string name="propagation_hour_ahead">In %1$d h</string>
     <string name="propagation_hour_now">Now</string>
+    <string name="propagation_keep_area">Keep the largest area (zooming in does not shrink it)</string>
     <string name="propagation_kind_enhanced">Only extended range</string>
     <string name="propagation_kind_gradient">Full scale</string>
     <string name="propagation_kind_k">Earth radius factor k</string>

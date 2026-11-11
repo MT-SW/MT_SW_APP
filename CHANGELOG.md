@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Propagacja: opcja „Zachowaj największy obszar” (domyślnie włączona) — obszar prognozy tylko rośnie i nie zmniejsza się po przybliżeniu mapy, także przy ręcznym pobraniu; zapamiętywany po restarcie.
+* Mapa (iPhone): dymki węzłów dopasowywane do dotyku na ekranie, a nie w pudełku zleconym mapie (część dymków miała przesunięty obszar dotyku).
 * Ikona aplikacji: nowa opcja „Płaska ikona (bez 3D)” dla wszystkich stylów (Android, iPhone/iPad, komputer); starsza, płaska ikona wraca jako zaznaczenie obok stylu.
 * Ikona aplikacji na Androidzie: usunięty rozmyty cień wokół napisu i konturu (przez niego ikona wyglądała na nieostrą); gradient i połysk tła zostają.
 * Mapa (iPhone, Android, komputer): warstwy mapy nie przebudowują się już przy każdej klatce przesuwania i przybliżania — widoczny obszar jest trzymany w miejscu, dopóki kamera nie wyjdzie poza niego. To główna przyczyna zacięć mapy na iPhonie.
@@ -675,6 +677,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Propagation: the "Keep the largest area" option (on by default) — the forecast area only grows and does not shrink on zooming in, also on a manual download; kept across restarts.
+* Map (iPhone): node bubbles are matched to the tap on the screen instead of in a box handed to the map (some bubbles had a shifted tap area).
 * App icon: new option "Flat icon (no 3D)" for all styles (Android, iPhone/iPad, desktop); the earlier flat icon is back as a tick beside the style.
 * App icon on Android: removed the blurry shadow around the lettering and outline (it made the icon look soft); the background gradient and gloss stay.
 * Map (iPhone, Android, desktop): the map layers no longer rebuild on every frame of a pan or zoom — the visible area is held still until the camera leaves it. This was the main cause of the map stutter on the iPhone.

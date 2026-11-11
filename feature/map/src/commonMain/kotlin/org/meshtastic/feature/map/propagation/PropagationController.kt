@@ -40,6 +40,8 @@ data class PropagationState(
     val enabled: Boolean = false,
     val kind: PropagationKind = PropagationKind.GRADIENT,
     val autoRefresh: Boolean = true,
+    /** The downloaded area only grows (zooming in never shrinks it); off, it follows the view. */
+    val keepArea: Boolean = true,
     /** How many hours ahead of now the picture is for (0 = now). */
     val hoursAhead: Int = 0,
     val loading: Boolean = false,
@@ -84,6 +86,7 @@ class PropagationController(
                     enabled = prefs.enabled,
                     kind = PropagationKind.of(prefs.kind),
                     autoRefresh = prefs.autoRefresh,
+                    keepArea = prefs.keepArea,
                     grid = it.grid ?: saved,
                 )
             }
@@ -106,6 +109,11 @@ class PropagationController(
         mapPrefs.updatePropagationPrefs { it.copy(autoRefresh = on) }
     }
 
+    fun setKeepArea(on: Boolean) {
+        mutable.update { it.copy(keepArea = on) }
+        mapPrefs.updatePropagationPrefs { it.copy(keepArea = on) }
+    }
+
     fun setHoursAhead(hours: Int) = mutable.update {
         it.copy(hoursAhead = hours.coerceIn(0, TropoForecastSource.HOURS - 1))
     }
@@ -113,7 +121,7 @@ class PropagationController(
     /** Downloads the forecast for [bounds] now (the "download for this view" button). */
     fun download(bounds: GeoBounds) {
         if (mutable.value.loading) return
-        area = padded(bounds)
+        area = widened(padded(bounds))
         fetchArea()
     }
 
@@ -141,7 +149,7 @@ class PropagationController(
             // Refreshes the whole remembered area; only a view outside it widens it.
             area =
                 when {
-                    kept == null -> padded(bounds)
+                    kept == null || !s.keepArea -> padded(bounds)
                     kept.contains(bounds) -> kept
                     else -> union(kept, padded(bounds))
                 }
@@ -149,6 +157,12 @@ class PropagationController(
         }
     }
 
+
+    /** With "keep the area" on, a new view only widens the remembered area; it never shrinks it. */
+    private fun widened(wanted: GeoBounds): GeoBounds {
+        val kept = area
+        return if (mutable.value.keepArea && kept != null) union(kept, wanted) else wanted
+    }
 
     /** A little wider than the screen, so a small pan does not leave the layer's edge showing. */
     private fun padded(b: GeoBounds): GeoBounds {
