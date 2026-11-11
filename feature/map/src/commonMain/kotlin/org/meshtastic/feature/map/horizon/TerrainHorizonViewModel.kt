@@ -350,7 +350,8 @@ class TerrainHorizonViewModel(
             _state.update {
                 it.copy(buildingsSaving = false, buildingsOk = ok, buildingsBytes = bytes, buildingsProgress = null)
             }
-            if (ok && _state.value.buildings) reload()
+            // Also after a download that did not finish: the pieces that arrived are already used.
+            if (_state.value.buildings) reload()
         }
     }
 
@@ -483,7 +484,9 @@ class TerrainHorizonViewModel(
                         ?.takeIf { it in MIN_AUTO_HEIGHT_M..MAX_AUTO_HEIGHT_M }
                 val height = if (settings.antennaAuto && auto != null) auto else settings.antennaM.toDouble()
                 // Buildings come from the device, never from the internet while the panorama opens.
-                val savedBuildings = withContext(dispatchers.io) { buildingStore.load(spot.at) }
+                // What an interrupted download has already brought is shown too.
+                val tallOnly = _state.value.buildingsRadiusKm > ALL_BUILDINGS_MAX_KM
+                val savedBuildings = withContext(dispatchers.io) { buildingStore.load(spot.at, radiusKm, tallOnly) }
                 val skyline = if (settings.buildings) withBuildings(ground, savedBuildings, spot.at) else ground
                 val (profile, targets) =
                     withContext(dispatchers.default) {

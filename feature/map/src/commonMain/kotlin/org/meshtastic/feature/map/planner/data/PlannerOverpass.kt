@@ -113,6 +113,9 @@ class PlannerOverpass(
     override suspend fun buildingsForArea(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): ClutterMap {
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
         val key = "B" + (if (tallOnly) "T" else "A") + ":" + pointKey(center) + ":" + Num.fmt(r, 1)
+        // Buildings saved on the device by the panorama (an area that holds this whole circle) are used as they are.
+        pieces?.refreshAge()
+        pieces?.savedBuildingsIn(center, r, tallOnly)?.let { return ClutterMap(it) }
         val whole = ClutterBox.around(center.lat, center.lon, r)
         // Always in pieces: a town of a few kilometres is already a heavy answer for one request, and a piece the
         // server finds too heavy is cut smaller (down to a kilometre) and asked again.
@@ -127,6 +130,7 @@ class PlannerOverpass(
                 // Every house of a town in one 30 km piece is more than the public server computes in time, and each
                 // such piece cost a minute before it was cut smaller; houses start in small pieces.
                 tileStartKm = if (tallOnly) TILE_START_KM else BUILDINGS_TILE_START_KM,
+                patient = true,
             )
         }
     }
@@ -153,18 +157,29 @@ class PlannerOverpass(
      * too big, or a refusal because of the query itself ("out of memory", "timed out"), stops at once: another server
      * would say the same, and the caller can split the area instead.
      */
-    private suspend fun fetch(query: String, seen: MutableSet<Long>? = null, thinM: Double = 0.0): ClutterMap {
+    private suspend fun fetch(
+        query: String,
+        seen: MutableSet<Long>? = null,
+        thinM: Double = 0.0,
+        mirrorOnTimeout: Boolean = false,
+    ): ClutterMap {
         val urls = (listOf(baseUrl) + fallbackUrls).distinct()
         return requestLock.withLock {
             val ordered = lastGoodUrl?.let { good -> listOf(good) + urls.filter { it != good } } ?: urls
             var last: PlannerClutterException? = null
+            var timeouts = 0
             for (url in ordered) {
                 try {
                     val map = fetchFrom(url, query, seen, thinM)
                     lastGoodUrl = url
                     return@withLock map
                 } catch (e: PlannerClutterException) {
-                    if (!worthAskingAnotherServer(e)) throw e
+                    // A server that did not answer in time is often just busy: another one is asked before the area
+                    // is cut into smaller pieces (each of which costs a full wait), but only once.
+                    val timedOut =
+                        mirrorOnTimeout && e.failure == PlannerClutterFailure.SERVER_LIMIT && e.detail == "timeout"
+                    if (timedOut) timeouts++
+                    if (!worthAskingAnotherServer(e) && !(timedOut && timeouts < MAX_TIMEOUT_SERVERS)) throw e
                     last = e
                 }
             }
@@ -198,8 +213,9 @@ class PlannerOverpass(
         minTileKm: Double = MIN_TILE_KM,
         pieceKind: String? = null,
         tileStartKm: Double = TILE_START_KM,
+        patient: Boolean = false,
     ): ClutterMap = try {
-        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind, tileStartKm)
+        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind, tileStartKm, patient)
     } finally {
         _progress.value = null
     }
@@ -211,8 +227,14 @@ class PlannerOverpass(
         minTileKm: Double,
         pieceKind: String?,
         tileStartKm: Double,
+        patient: Boolean,
     ): ClutterMap {
-        val deadline = clockMs() + TILED_BUDGET_MS
+        // A patient download (the buildings of the panorama) goes on as long as pieces keep arriving and is given up
+        // only when nothing has arrived for a while; the others have one fixed budget for the whole.
+        val begun = clockMs()
+        var lastGain = begun
+        val stallMs = if (patient) TILED_STALL_MS else TILED_BUDGET_MS
+        val capMs = if (patient) TILED_PATIENT_MAX_MS else TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
         ClutterTiles.grid(whole, tileStartKm).forEach { pending.addLast(TileWork(it)) }
         var done = 0
@@ -225,7 +247,8 @@ class PlannerOverpass(
         // is.
         val thinM = thinOverride ?: max(THIN_M, whole.maxSideKm / 2.0 * THIN_M_PER_KM)
         while (pending.isNotEmpty()) {
-            if (clockMs() > deadline) {
+            val now = clockMs()
+            if (now - lastGain > stallMs || now - begun > capMs) {
                 throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
             }
             val work = pending.removeFirst()
@@ -234,7 +257,7 @@ class PlannerOverpass(
             val part =
                 saved
                     ?: try {
-                        fetch(query(work.box), seen, thinM).also {
+                        fetch(query(work.box), seen, thinM, mirrorOnTimeout = true).also {
                             Logger.i {
                                 "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km pobrany w " +
                                     "${clockMs() - started} ms, obiektów ${it.polygons.size}"
@@ -280,6 +303,7 @@ class PlannerOverpass(
                         continue
                     }
             done++
+            if (patient) lastGain = clockMs()
             _progress.value = ClutterProgress(done, done + pending.size)
             if (saved == null) savePiece(work.box, pieceKind, part)
             for (polygon in part.polygons) {
@@ -435,6 +459,13 @@ class PlannerOverpass(
 
         /** The whole of a large area has to arrive within this time. */
         private const val TILED_BUDGET_MS = 12 * 60 * 1000L
+
+        /** A patient download is given up after this long without a new piece, and in any case after the longer one. */
+        private const val TILED_STALL_MS = 15 * 60 * 1000L
+        private const val TILED_PATIENT_MAX_MS = 3 * 60 * 60 * 1000L
+
+        /** Servers asked for one piece when they do not answer in time (the first one and one more). */
+        private const val MAX_TIMEOUT_SERVERS = 2
         private const val PAUSE_BETWEEN_TILES_MS = 250L
         private const val BUSY_WAIT_MS = 5_000L
         private const val BUSY_RETRIES = 4

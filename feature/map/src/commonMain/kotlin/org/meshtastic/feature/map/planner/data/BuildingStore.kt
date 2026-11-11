@@ -24,6 +24,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.planner.GeoPoint
+import org.meshtastic.feature.map.horizon.ALL_BUILDINGS_MAX_KM
 import org.meshtastic.feature.map.planner.Geodesy
 import kotlin.math.roundToInt
 
@@ -68,17 +69,47 @@ class BuildingStore(
     /** Whether a downloaded area covers [at]. */
     fun covers(at: GeoPoint): Boolean = areas().any { covers(it, at) }
 
-    /** The buildings of every downloaded area that covers [at]; empty when there is none. */
-    fun load(at: GeoPoint): ClutterMap {
+    /**
+     * The buildings of every downloaded area that covers [at]. When no finished area does, and [radiusKm] is given,
+     * the finished pieces of an interrupted download within that range are used, so what has arrived is shown at once
+     * (with only the tall buildings when [tallOnly], the way such a wide area is downloaded). Empty when there is none.
+     */
+    fun load(at: GeoPoint, radiusKm: Int = 0, tallOnly: Boolean = false): ClutterMap {
         val polygons = ArrayList<ClutterPolygon>()
-        for (area in areas().filter { covers(it, at) }) {
+        val covering = areas().filter { covers(it, at) }
+        for (area in covering) {
             try {
                 polygons += decode(fileSystem.read(area.path) { readByteArray() })
             } catch (_: Exception) {
                 // A damaged file is skipped; the rest still counts.
             }
         }
+        if (covering.isEmpty() && radiusKm > 0) polygons += loadPieces(at, radiusKm, tallOnly)
         return ClutterMap(polygons)
+    }
+
+    private fun loadPieces(at: GeoPoint, radiusKm: Int, tallOnly: Boolean): List<ClutterPolygon> = try {
+        if (!fileSystem.exists(piecesDirectory)) {
+            emptyList()
+        } else {
+            val kind = if (tallOnly) KIND_TALL else KIND_ALL
+            fileSystem.list(piecesDirectory).flatMap { path ->
+                val key = path.name.removeSuffix(PIECE_EXTENSION)
+                if (pieceNear(key, kind, at, radiusKm)) readPiece(key).orEmpty() else emptyList()
+            }
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+
+    /** Whether the piece saved under [key] is of [kind] and reaches into the circle of [radiusKm] around [at]. */
+    private fun pieceNear(key: String, kind: String, at: GeoPoint, radiusKm: Int): Boolean {
+        val parts = key.split('_')
+        val edges = parts.take(PIECE_EDGES).mapNotNull { it.toLongOrNull()?.div(DEGREE_SCALE) }
+        if (parts.size != PIECE_PARTS || parts.last() != kind || edges.size != PIECE_EDGES) return false
+        val (south, west, north, east) = edges
+        val nearest = GeoPoint(at.lat.coerceIn(south, north), at.lon.coerceIn(west, east))
+        return Geodesy.distanceM(nearest, at) <= radiusKm * METRES_PER_KM
     }
 
     /** Saves the buildings of the area around [centre]; false when the disk refused. */
@@ -96,11 +127,22 @@ class BuildingStore(
         maxAgeDays = ageDays()
     }
 
-    override fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? {
+    override fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? =
+        readFresh { area -> covers(area, a) && covers(area, b) }
+
+    override fun savedBuildingsIn(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): List<ClutterPolygon>? =
+        readFresh { area ->
+            val reach = Geodesy.distanceM(GeoPoint(area.lat, area.lon), center) + radiusKm * METRES_PER_KM
+            // Every house is only in an area small enough to have been downloaded with all of them.
+            reach <= area.radiusKm * METRES_PER_KM && (tallOnly || area.radiusKm <= ALL_BUILDINGS_MAX_KM)
+        }
+
+    /** The buildings of the saved areas that [suits] and are not older than the chosen age; null when none is. */
+    private fun readFresh(suits: (Area) -> Boolean): List<ClutterPolygon>? {
         val fresh =
             areas().filter { area ->
                 val savedAt = fileSystem.metadataOrNull(area.path)?.lastModifiedAtMillis
-                covers(area, a) && covers(area, b) && savedAt != null && nowMillis - savedAt < maxAgeDays * MS_PER_DAY
+                suits(area) && savedAt != null && nowMillis - savedAt < maxAgeDays * MS_PER_DAY
             }
         if (fresh.isEmpty()) return null
         return try {
@@ -190,6 +232,10 @@ class BuildingStore(
         const val DEFAULT_MAX_AGE_DAYS = 30
         const val MS_PER_DAY = 24L * 60 * 60 * 1000
         const val NAME_PARTS = 3
+        const val PIECE_EDGES = 4
+        const val PIECE_PARTS = 5
+        const val KIND_ALL = "A"
+        const val KIND_TALL = "T"
         const val DEGREE_SCALE = 100_000.0
         const val METRES_PER_KM = 1_000.0
     }
