@@ -103,6 +103,8 @@ data class TerrainHorizonState(
     val loading: Boolean = true,
     val failure: TerrainHorizonFailure? = null,
     val profile: HorizonProfile? = null,
+    /** The skyline of the bare ground, kept next to [profile] while buildings are on, so they can be told apart. */
+    val groundProfile: HorizonProfile? = null,
     val targets: List<HorizonTarget> = emptyList(),
     val radiusKm: Int = DEFAULT_RADIUS_KM,
     /** How far the nodes are drawn (km), independent of how far the terrain is loaded. */
@@ -416,6 +418,7 @@ class TerrainHorizonViewModel(
                         loading = false,
                         failure = TerrainHorizonFailure.NO_POSITION,
                         profile = null,
+                        groundProfile = null,
                         targets = emptyList(),
                         observerName = "",
                     )
@@ -463,10 +466,25 @@ class TerrainHorizonViewModel(
                                 maxOf(settings.nodeRangeKm, radiusKm) * METRES_PER_KM,
                             )
                     }
+                val groundOnly =
+                    if (settings.buildings) {
+                        withContext(dispatchers.default) {
+                            HorizonPanorama.build(
+                                ground,
+                                spot.at,
+                                height,
+                                radiusKm * METRES_PER_KM,
+                                k = settings.refraction,
+                            )
+                        }
+                    } else {
+                        null
+                    }
                 _state.update {
                     it.copy(
                         loading = false,
                         profile = profile,
+                        groundProfile = groundOnly,
                         targets = targets,
                         radiusKm = radiusKm,
                         observerName = spot.name,

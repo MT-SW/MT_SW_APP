@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: w panoramie terenu budynki mają teraz własny, pomarańczowy kolor i widać je jako coś, co sterczy nad terenem, zamiast zlewać się z nim.
 * Wszystkie wersje: logi zapisują się w wybranym folderze jako dwa osobne pliki: „mt_sw_logi_24h.zip” (ostatnie 24 godziny) i „mt_sw_logi_pelne.zip” (pełny log). Na komputerze pliki odświeżają się w folderze logów co kilka minut.
 * Wszystkie wersje: przełącznik „Synchronizuj statystyki automatycznie” ma teraz własny opis (co robi i kiedy).
 * Wszystkie wersje: panorama terenu ma opcję „Budynki” (domyślnie wyłączona): linia horyzontu podnosi się o budynki z OpenStreetMap. Budynki pobierasz raz, wokół podłączonego węzła (do 15 km wszystkie, do 100 km tylko wysokie) i są zapisane na urządzeniu jak teren, więc otwieranie panoramy się nie wydłuża; można je usunąć jednym przyciskiem.
@@ -619,6 +620,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: in the terrain panorama the buildings now have their own orange colour and show as something standing above the ground, instead of blending into it.
 * All versions: logs are saved in the chosen folder as two separate files: "mt_sw_logi_24h.zip" (last 24 hours) and "mt_sw_logi_pelne.zip" (full log). On desktop the files are refreshed in the logs folder every few minutes.
 * All versions: the "Synchronize statistics automatically" switch now has its own description (what it does and when).
 * All versions: the terrain panorama has a "Buildings" option (off by default): the skyline is raised by the buildings of OpenStreetMap. You download them once, around the connected radio (every building up to 15 km, only the tall ones up to 100 km) and they are kept on the device like the terrain, so opening the panorama stays quick; one button deletes them.

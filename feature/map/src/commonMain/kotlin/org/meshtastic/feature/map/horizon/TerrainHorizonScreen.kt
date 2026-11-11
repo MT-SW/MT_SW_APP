@@ -173,6 +173,8 @@ import kotlin.math.roundToInt
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
 private val BandShares = listOf(0.5f, 0.38f, 0.26f, 0.15f)
+private val BuildingColor = Color(0xFFE08A2E)
+private const val BUILDING_BAND_BOOST = 0.3f
 private val BandEdges = listOf(0.0, 0.2, 0.45, 0.75, 1.0001)
 private val FIELDS_OF_VIEW = listOf(60, 120, 240, 360)
 
@@ -423,6 +425,7 @@ fun TerrainHorizonScreen(
                 profile != null ->
                     Panorama(
                         profile = profile,
+                        groundProfile = state.groundProfile,
                         targets = if (onlyVisible) state.targets.filter { it.visible } else state.targets,
                         focusNodeNum = state.focusNodeNum,
                         fieldOfView = fieldOfView.toFloat(),
@@ -590,6 +593,7 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
 @Composable
 private fun Panorama(
     profile: HorizonProfile,
+    groundProfile: HorizonProfile?,
     targets: List<HorizonTarget>,
     focusNodeNum: Int?,
     fieldOfView: Float,
@@ -615,6 +619,8 @@ private fun Panorama(
     val sky = MaterialTheme.colorScheme.background
     val primary = MaterialTheme.colorScheme.primary
     val bands = remember(sky, primary) { BandShares.map { lerp(sky, primary, it) } }
+    // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
+    val buildingBands = remember(sky) { BandShares.map { lerp(sky, BuildingColor, it + BUILDING_BAND_BOOST) } }
     val measurer = rememberTextMeasurer()
     val cardinals =
         listOf(
@@ -654,7 +660,7 @@ private fun Panorama(
             },
     ) {
         val perDeg = size.width / fieldOfView
-        drawBands(profile, bands, centre, perDeg, range)
+        drawBands(profile, groundProfile, bands, buildingBands, centre, perDeg, range)
         drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
         drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
     }
@@ -684,37 +690,58 @@ private fun xOf(bearingDeg: Double, centre: Float, perDeg: Float, width: Float):
     return width / 2 + delta.toFloat() * perDeg
 }
 
-/** The ridges, far ones light and near ones dark, each drawn over the one behind it. */
+/**
+ * The ridges, far ones light and near ones dark, each drawn over the one behind it. With [ground] given, [profile] is
+ * the skyline with buildings and [ground] the bare earth: in every distance band the buildings are drawn first in
+ * [buildingBands] and the ground over them, so what sticks out above the ground is the buildings, in their own colour.
+ */
 private fun DrawScope.drawBands(
     profile: HorizonProfile,
+    ground: HorizonProfile?,
     bands: List<Color>,
+    buildingBands: List<Color>,
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
 ) {
+    for (band in bands.indices) {
+        val index = bands.lastIndex - band
+        if (ground != null) {
+            drawPath(bandPath(profile, index, centre, perDeg, range), buildingBands[index])
+            drawPath(bandPath(ground, index, centre, perDeg, range), bands[index])
+        } else {
+            drawPath(bandPath(profile, index, centre, perDeg, range), bands[index])
+        }
+    }
+}
+
+/** The outline of one distance band (0 is the nearest) of [profile], closed along the bottom of the picture. */
+private fun DrawScope.bandPath(
+    profile: HorizonProfile,
+    band: Int,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+): Path {
     val w = size.width
     val h = size.height
-    for (band in bands.indices) {
-        val from = BandEdges[bands.lastIndex - band] * profile.radiusM
-        val to = BandEdges[bands.lastIndex - band + 1] * profile.radiusM
-        val path = Path()
-        path.moveTo(0f, h)
-        var x = 0f
-        while (x <= w + COLUMN_STEP_PX) {
-            val bearing = centre + (x - w / 2) / perDeg
-            val angle =
-                profile
-                    .at(bearing.toDouble())
-                    .crests
-                    .filter { it.distanceM >= from && it.distanceM < to }
-                    .maxOfOrNull { it.angleDeg }
-            path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
-            x += COLUMN_STEP_PX
-        }
-        path.lineTo(w + COLUMN_STEP_PX, h)
-        path.close()
-        drawPath(path, bands[bands.lastIndex - band])
+    val from = BandEdges[band] * profile.radiusM
+    val to = BandEdges[band + 1] * profile.radiusM
+    val path = Path()
+    path.moveTo(0f, h)
+    var x = 0f
+    while (x <= w + COLUMN_STEP_PX) {
+        val bearing = centre + (x - w / 2) / perDeg
+        val angle =
+            profile.at(bearing.toDouble()).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull {
+                it.angleDeg
+            }
+        path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
+        x += COLUMN_STEP_PX
     }
+    path.lineTo(w + COLUMN_STEP_PX, h)
+    path.close()
+    return path
 }
 
 /** The horizontal and the bearings across the top: the compass letters and a mark every 15°. */
