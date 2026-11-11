@@ -99,12 +99,13 @@ class PlannerOverpass(
     override suspend fun forArea(center: GeoPoint, radiusKm: Double): ClutterMap {
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
         val key = "A:" + pointKey(center) + ":" + Num.fmt(r, 1)
-        // A small area is one request. A large one (50 or 100 km is a box of 100 to 200 km on a side) would be one
-        // answer of tens of megabytes: it is fetched piece by piece instead.
-        return if (r <= SINGLE_REQUEST_KM) {
-            cached(key) { fetch(OsmQueries.area(center, r)) }
-        } else {
-            cached(key) { fetchTiled(ClutterBox.around(center.lat, center.lon, r)) }
+        // Always in pieces, small areas too: every piece is saved on the device, so the woods and built-up land of a
+        // coverage already calculated are there again without a network (a large area is also kept from being one
+        // answer of tens of megabytes).
+        // The piece kind carries the thinning, so a piece saved for a small area is not reused for a wide one.
+        val thin = max(THIN_M, r * THIN_M_PER_KM)
+        return cached(key) {
+            fetchTiled(ClutterBox.around(center.lat, center.lon, r), thinM = thin, pieceKind = "F${thin.toInt()}")
         }
     }
 
@@ -404,8 +405,6 @@ class PlannerOverpass(
         private const val NETWORK_RETRY_WAIT_MS = 2_000L
 
         /** Up to this radius an area is a single request. */
-        private const val SINGLE_REQUEST_KM = 10.0
-
         /** Size of the first tiles of a large area, and the smallest tile a heavy one is cut down to (km on a side). */
         private const val TILE_START_KM = 30.0
         private const val MIN_TILE_KM = 4.0
