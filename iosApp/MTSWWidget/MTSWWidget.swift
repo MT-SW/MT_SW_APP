@@ -312,6 +312,13 @@ struct NodeCardView: View {
     }
 }
 
+/// Średni widżet: nasz węzeł jest pierwszą kartą, po niej kolejno wybrane węzły (ulubione albo cała sieć).
+private func withOwn(favorite: [NodeCard], label: String, entry: StatsEntry, data: StatsData) -> NodeCardView {
+    let own = NodeCard(title: data.title, lines: Array(data.lines.prefix(8)))
+    return NodeCardView(label: label, cards: [own] + favorite, step: entry.step,
+                        empty: isPolish ? "Brak węzłów." : "No nodes.")
+}
+
 struct StatsView: View {
     let entry: StatsEntry
     @Environment(\.widgetFamily) private var family
@@ -363,8 +370,8 @@ struct StatsView: View {
             default:
                 switch entry.config.small {
                 case .own: OwnStatsView(data: data)
-                case .favorites: favorite
-                case .network: network
+                case .favorites: withOwn(favorite: data.favorites, label: favorite.label, entry: entry, data: data)
+                case .network: withOwn(favorite: data.network, label: network.label, entry: entry, data: data)
                 }
             }
         } else {
