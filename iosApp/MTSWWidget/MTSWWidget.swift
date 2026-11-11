@@ -60,23 +60,19 @@ struct StatsEntry: TimelineEntry {
     let config: MTSWConfigIntent
 }
 
-private func text(_ pl: String, _ en: String) -> LocalizedStringResource {
-    LocalizedStringResource(stringLiteral: isPolish ? pl : en)
-}
-
 /// Co pokazuje średni widżet (najmniejszy dostępny).
 enum SmallContent: String, AppEnum {
     case own, favorites, network
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        TypeDisplayRepresentation(name: text("Zawartość", "Content"))
+        TypeDisplayRepresentation(name: "Zawartość")
     }
 
     static var caseDisplayRepresentations: [SmallContent: DisplayRepresentation] {
         [
-            .own: DisplayRepresentation(title: text("Nasz węzeł", "Our node")),
-            .favorites: DisplayRepresentation(title: text("Ulubione na zmianę", "Favorites in turn")),
-            .network: DisplayRepresentation(title: text("Cała sieć na zmianę", "Whole network in turn")),
+            .own: DisplayRepresentation(title: "Nasz węzeł"),
+            .favorites: DisplayRepresentation(title: "Ulubione na zmianę"),
+            .network: DisplayRepresentation(title: "Cała sieć na zmianę"),
         ]
     }
 }
@@ -86,30 +82,28 @@ enum SecondContent: String, AppEnum {
     case favorites, network
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        TypeDisplayRepresentation(name: text("Drugie pole", "Second area"))
+        TypeDisplayRepresentation(name: "Drugie pole")
     }
 
     static var caseDisplayRepresentations: [SecondContent: DisplayRepresentation] {
         [
-            .favorites: DisplayRepresentation(title: text("Ulubione na zmianę", "Favorites in turn")),
-            .network: DisplayRepresentation(title: text("Cała sieć na zmianę", "Whole network in turn")),
+            .favorites: DisplayRepresentation(title: "Ulubione na zmianę"),
+            .network: DisplayRepresentation(title: "Cała sieć na zmianę"),
         ]
     }
 }
 
 /// Ustawienia widżetu (przytrzymaj widżet, potem „Edytuj widżet”).
 struct MTSWConfigIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource { text("Statystyki MT_SW", "MT_SW statistics") }
+    static var title: LocalizedStringResource { "Statystyki MT_SW" }
     static var description: IntentDescription {
-        IntentDescription(text(
-            "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć.",
-            "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (4x6): our node, favorites and the whole network."))
+        IntentDescription("Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć.")
     }
 
-    @Parameter(title: "Średni widżet / Medium", default: .own)
+    @Parameter(title: "Średni widżet", default: .own)
     var small: SmallContent
 
-    @Parameter(title: "Drugie pole dużego / Large second area", default: .favorites)
+    @Parameter(title: "Drugie pole dużego widżetu", default: .favorites)
     var second: SecondContent
 
     init() {}
