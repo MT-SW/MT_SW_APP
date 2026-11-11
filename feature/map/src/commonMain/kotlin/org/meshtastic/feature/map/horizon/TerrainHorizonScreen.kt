@@ -626,6 +626,7 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
     )
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun Panorama(
     profile: HorizonProfile,

@@ -60,6 +60,7 @@ private const val BITMAP_SIZE = 160
  * The picture is drawn off the main thread and only again when the forecast, the hour or the kind changes, never per
  * map frame.
  */
+@Suppress("InjectDispatcher")
 @Composable
 internal fun PropagationLayer(state: PropagationState, opacity: Float) {
     val grid = state.grid
