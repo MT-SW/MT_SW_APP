@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Mapa (iPhone): przy dotknięciu dymka węzła aplikacja sprawdza, w jakiej skali mapa podaje pozycje na ekranie, i poprawia obszar dotyku; w logu jest geometria dotyku (pozycja, skala, najbliższa kropka).
+* Aktualizacja oprogramowania przez Bluetooth (iPhone/iPad): urządzenie w trybie aktualizacji (nRF52 DFU, ESP32 OTA) jest wyszukiwane bez adresu MAC, bo iOS podaje tylko własny identyfikator urządzenia.
 * Widżet (wszystkie platformy): temperatura i wilgotność węzła w jednej linii, obok siebie (jak napięcie i prąd), zamiast w osobnych wierszach.
 * Propagacja: opcja „Zachowaj największy obszar” (domyślnie włączona) — obszar prognozy tylko rośnie i nie zmniejsza się po przybliżeniu mapy, także przy ręcznym pobraniu; zapamiętywany po restarcie.
 * Propagacja: kilka obszarów zamiast jednego (zastępują opcję „Zachowaj największy obszar”): „Dodaj obszar z tego widoku” z wyborem dokładności (zwykły, dokładny, bardzo dokładny), do 8 obszarów, które mogą się nakładać (na wierzchu jest ten z gęstszą siatką, bez podwójnego zaciemnienia), każdy usuwany osobno, „Aktualizuj wszystkie obszary” i automatyczne odświeżanie pobierają wszystkie naraz, każdy w swoich granicach; obszary są zapisywane na urządzeniu (stara pojedyncza prognoza zostaje pierwszym obszarem) (Android, iPhone/iPad, komputer).
@@ -683,6 +685,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Map (iPhone): when a node bubble is tapped, the app checks the scale in which the map reports screen positions and corrects the tap area; the log now carries the tap geometry (position, scale, nearest dot).
+* Firmware update over Bluetooth (iPhone/iPad): the device in update mode (nRF52 DFU, ESP32 OTA) is found without a MAC address, because iOS only gives a device its own identifier.
 * Widget (all platforms): a node's temperature and humidity on one line, side by side (like voltage and current), instead of separate rows.
 * Propagation: the "Keep the largest area" option (on by default) — the forecast area only grows and does not shrink on zooming in, also on a manual download; kept across restarts.
 * Propagation: several areas instead of one (replacing the "Keep the largest area" option): "Add area for this view" with a choice of detail (normal, detailed, very detailed), up to 8 areas that may overlap (the one with the finer grid is drawn on top, without double darkening), each removed separately, "Update all areas" and automatic refresh download all of them at once, each within its own bounds; areas are saved on the device (the old single forecast becomes the first area) (Android, iPhone/iPad, desktop).
