@@ -214,6 +214,11 @@ private const val RIDGE_WIDTH_PX = 1.5f
 private const val SHADE_DEPTH_PX = 64f
 private const val SHADE_MAX = 0.5f
 private const val SMOOTH_PASSES = 2
+private const val GRAIN = 0.35f
+private const val LOW_SUN_DEG = 15.0
+private const val LOW_SUN_CONTRAST = 0.5f
+private const val VALLEY_FOG_SHARE = 0.7f
+private val WarmLight = Color(0xFFFFB86B)
 private const val SHADE_SLOPE_PX = 10f
 private const val EDGE_STEP_PX = 4f
 private const val MIN_BUILDING_DEG = 0.02
@@ -886,7 +891,8 @@ private fun DrawScope.drawRelief(
             endY = h,
         ),
     )
-    val lit = Brush.verticalGradient(listOf(Color.White, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
+    val litColour = light.litColour()
+    val lit = Brush.verticalGradient(listOf(litColour, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
     val shade = Brush.verticalGradient(listOf(Color.Black, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
     val ridge = Path()
     var started = false
@@ -908,7 +914,10 @@ private fun DrawScope.drawRelief(
             // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
             val facing = if (rise > 0f) bearing - 90.0 else bearing + 90.0
             val sunny = light.sunFacing(facing)
-            val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX) * abs(sunny).toFloat()
+            // Every column a little different, so slopes show gullies and ribs and not a smooth wash.
+            val grain = 1f - GRAIN + 2f * GRAIN * columnNoise(i, band)
+            val slope = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
+            val strength = slope * abs(sunny).toFloat() * grain * light.contrast()
             if (strength > 0.02f && y < h) {
                 translate(left = x, top = y) {
                     drawRect(
@@ -936,10 +945,42 @@ private fun DrawScope.drawRelief(
             )
         }
     }
+    // Mist lying low in the valleys of the farther bands: the foot of the band dissolves into the colour of the sky.
+    if (band > 0 && haze > 0f) {
+        clipPath(path) {
+            drawRect(
+                Brush.verticalGradient(
+                    listOf(light.sky.copy(alpha = 0f), light.sky.copy(alpha = haze * VALLEY_FOG_SHARE)),
+                    startY = h * 0.5f,
+                    endY = h,
+                ),
+            )
+        }
+    }
+}
+
+/** A repeatable pseudo-random value from 0 to 1 for a column of a band (the same every frame: no flicker). */
+private fun columnNoise(column: Int, band: Int): Float {
+    var h = column * 73856093 xor band * 19349663
+    h = h xor (h ushr 13)
+    h *= 1274126177
+    return ((h ushr 8) and 0xFFFF) / 65535f
 }
 
 /** How the terrain is lit and veiled: the colour of the sky, the haze of every band, and where the sun is. */
 private class ReliefLight(val sky: Color, val haze: List<Float>, val sun: SunPosition?) {
+    /** How low the sun is, from 0 (high or unknown) to 1 (on the horizon): sunrise and sunset light. */
+    private fun lowSun(): Float {
+        val e = sun?.elevationDeg ?: return 0f
+        return if (e <= 0.0 || e >= LOW_SUN_DEG) 0f else (1.0 - e / LOW_SUN_DEG).toFloat()
+    }
+
+    /** The colour of lit slopes: white, turning warm when the sun is low. */
+    fun litColour(): Color = lerp(Color.White, WarmLight, lowSun())
+
+    /** A low sun throws stronger light and shadow on the slopes. */
+    fun contrast(): Float = 1f + LOW_SUN_CONTRAST * lowSun()
+
     /** How much a slope facing [azimuthDeg] is lit: 1 straight at the sun, -1 away; at night everything is dim. */
     fun sunFacing(azimuthDeg: Double): Double {
         val s = sun ?: return if (azimuthDeg % FULL_TURN < FULL_TURN / 2) 1.0 else -1.0
