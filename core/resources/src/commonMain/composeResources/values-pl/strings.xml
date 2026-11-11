@@ -3843,9 +3843,14 @@
     <string name="propagation_hour_now">Teraz</string>
     <string name="propagation_hour_ahead">Za %1$d godz.</string>
     <string name="propagation_auto">Odświeżaj automatycznie</string>
-    <string name="propagation_keep_area">Zachowaj największy obszar (przybliżenie go nie zmniejsza)</string>
-    <string name="propagation_download">Pobierz dla tego widoku</string>
-    <string name="propagation_update">Aktualizuj dla tego widoku</string>
+    <string name="propagation_add_region">Dodaj obszar z tego widoku</string>
+    <string name="propagation_detail_detailed">dokładny</string>
+    <string name="propagation_detail_fine">bardzo dokładny</string>
+    <string name="propagation_detail_normal">zwykły</string>
+    <string name="propagation_region_item">Około %1$d × %2$d km, %3$s</string>
+    <string name="propagation_region_remove">Usuń obszar</string>
+    <string name="propagation_regions_title">Obszary (mogą się nakładać; dokładniejszy jest na wierzchu)</string>
+    <string name="propagation_update_all">Aktualizuj wszystkie obszary</string>
     <string name="propagation_loading">Pobieranie…</string>
     <string name="propagation_failed">Nie udało się pobrać prognozy</string>
     <string name="propagation_none">Brak prognozy</string>

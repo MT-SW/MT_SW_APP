@@ -33,6 +33,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
@@ -40,6 +42,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,27 +57,35 @@ import org.koin.compose.koinInject
 import org.maplibre.spatialk.geojson.BoundingBox
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.propagation_add_region
 import org.meshtastic.core.resources.propagation_age
 import org.meshtastic.core.resources.propagation_auto
-import org.meshtastic.core.resources.propagation_download
+import org.meshtastic.core.resources.propagation_detail_detailed
+import org.meshtastic.core.resources.propagation_detail_fine
+import org.meshtastic.core.resources.propagation_detail_normal
 import org.meshtastic.core.resources.propagation_failed
 import org.meshtastic.core.resources.propagation_hour_ahead
 import org.meshtastic.core.resources.propagation_hour_now
-import org.meshtastic.core.resources.propagation_keep_area
 import org.meshtastic.core.resources.propagation_kind_enhanced
 import org.meshtastic.core.resources.propagation_kind_gradient
 import org.meshtastic.core.resources.propagation_kind_k
 import org.meshtastic.core.resources.propagation_legend
 import org.meshtastic.core.resources.propagation_loading
 import org.meshtastic.core.resources.propagation_none
+import org.meshtastic.core.resources.propagation_region_item
+import org.meshtastic.core.resources.propagation_region_remove
+import org.meshtastic.core.resources.propagation_regions_title
 import org.meshtastic.core.resources.propagation_source
 import org.meshtastic.core.resources.propagation_title
-import org.meshtastic.core.resources.propagation_update
+import org.meshtastic.core.resources.propagation_update_all
+import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.component.LayerOpacitySlider
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
 import org.meshtastic.feature.map.propagation.GeoBounds
 import org.meshtastic.feature.map.propagation.PropagationController
+import org.meshtastic.feature.map.propagation.PropagationDetail
 import org.meshtastic.feature.map.propagation.PropagationKind
 
 /**
@@ -88,6 +101,7 @@ internal fun PropagationSection(
 ) {
     val controller: PropagationController = koinInject()
     val state by controller.state.collectAsStateWithLifecycle()
+    var detail by remember { mutableStateOf(PropagationDetail.NORMAL) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -104,7 +118,9 @@ internal fun PropagationSection(
                 checked = state.enabled,
                 onCheckedChange = { on ->
                     controller.setEnabled(on)
-                    if (on && state.grid == null) target.bounds()?.let { controller.download(it.toGeo()) }
+                    if (on && state.regions.isEmpty()) {
+                        target.bounds()?.let { controller.addRegion(it.toGeo(), PropagationDetail.NORMAL) }
+                    }
                 },
             )
         }
@@ -142,7 +158,7 @@ internal fun PropagationSection(
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            val last = (grid.hours - 1 - grid.hourAt(nowMillis)).coerceAtLeast(1)
+            val last = state.hoursLeft.coerceAtLeast(1)
             Slider(
                 value = ahead.toFloat(),
                 onValueChange = { controller.setHoursAhead(it.toInt()) },
@@ -162,12 +178,54 @@ internal fun PropagationSection(
             Text(stringResource(Res.string.propagation_auto), style = MaterialTheme.typography.bodyMedium)
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Text(
+            text = stringResource(Res.string.propagation_regions_title),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        state.regions.forEach { region ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text =
+                    stringResource(
+                        Res.string.propagation_region_item,
+                        region.widthKm,
+                        region.heightKm,
+                        stringResource(region.detail.label()),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = { controller.removeRegion(region.id) }) {
+                    Icon(
+                        imageVector = MeshtasticIcons.Delete,
+                        contentDescription = stringResource(Res.string.propagation_region_remove),
+                    )
+                }
+            }
+        }
+        if (state.regions.isEmpty()) {
+            Text(
+                text = stringResource(Res.string.propagation_none),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+
+        FlowRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Checkbox(checked = state.keepArea, onCheckedChange = controller::setKeepArea)
-            Text(stringResource(Res.string.propagation_keep_area), style = MaterialTheme.typography.bodyMedium)
+            PropagationDetail.entries.forEach { option ->
+                FilterChip(
+                    selected = detail == option,
+                    onClick = { detail = option },
+                    label = { Text(stringResource(option.label())) },
+                )
+            }
         }
 
         Row(
@@ -176,32 +234,40 @@ internal fun PropagationSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedButton(
-                enabled = !state.loading,
-                onClick = { target.bounds()?.let { controller.download(it.toGeo()) } },
+                enabled = !state.loading && state.regions.size < PropagationController.MAX_REGIONS,
+                onClick = { target.bounds()?.let { controller.addRegion(it.toGeo(), detail) } },
             ) {
-                val label = if (grid == null) Res.string.propagation_download else Res.string.propagation_update
-                Text(stringResource(label))
+                Text(stringResource(Res.string.propagation_add_region))
             }
-            if (state.loading) {
+            OutlinedButton(enabled = !state.loading && state.regions.isNotEmpty(), onClick = controller::refreshAll) {
+                Text(stringResource(Res.string.propagation_update_all))
+            }
+        }
+        if (state.loading) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 Text(stringResource(Res.string.propagation_loading), style = MaterialTheme.typography.bodySmall)
             }
         }
 
-        val status =
-            when {
-                state.failed -> stringResource(Res.string.propagation_failed)
-
-                grid == null -> stringResource(Res.string.propagation_none)
-
-                else ->
-                    stringResource(Res.string.propagation_age, ((nowMillis - grid.fetchedAtMillis) / 60_000L).toInt())
-            }
-        Text(
-            text = status,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 16.dp),
-        )
+        val oldest = state.regions.minOfOrNull { it.grid.fetchedAtMillis }
+        if (state.failed) {
+            Text(
+                text = stringResource(Res.string.propagation_failed),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        } else if (oldest != null) {
+            Text(
+                text = stringResource(Res.string.propagation_age, ((nowMillis - oldest) / 60_000L).toInt()),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
         Text(
             text = stringResource(Res.string.propagation_source),
             style = MaterialTheme.typography.bodySmall,
@@ -242,6 +308,15 @@ internal fun LegendLine() {
         )
     }
 }
+
+private val PROPAGATION_DETAIL_LABELS: Map<PropagationDetail, StringResource> =
+    mapOf(
+        PropagationDetail.NORMAL to Res.string.propagation_detail_normal,
+        PropagationDetail.DETAILED to Res.string.propagation_detail_detailed,
+        PropagationDetail.FINE to Res.string.propagation_detail_fine,
+    )
+
+private fun PropagationDetail.label(): StringResource = PROPAGATION_DETAIL_LABELS.getValue(this)
 
 private val PROPAGATION_KIND_LABELS: Map<PropagationKind, StringResource> =
     mapOf(

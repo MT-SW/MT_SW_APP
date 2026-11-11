@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.planner.data
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.retry
 import io.ktor.client.plugins.timeout
@@ -123,6 +124,9 @@ class PlannerOverpass(
                 thinM = 0.0,
                 minTileKm = BUILDINGS_MIN_TILE_KM,
                 pieceKind = if (tallOnly) "T" else "A",
+                // Every house of a town in one 30 km piece is more than the public server computes in time, and each
+                // such piece cost a minute before it was cut smaller; houses start in small pieces.
+                tileStartKm = if (tallOnly) TILE_START_KM else BUILDINGS_TILE_START_KM,
             )
         }
     }
@@ -193,8 +197,9 @@ class PlannerOverpass(
         thinM: Double? = null,
         minTileKm: Double = MIN_TILE_KM,
         pieceKind: String? = null,
+        tileStartKm: Double = TILE_START_KM,
     ): ClutterMap = try {
-        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind)
+        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind, tileStartKm)
     } finally {
         _progress.value = null
     }
@@ -205,10 +210,11 @@ class PlannerOverpass(
         thinOverride: Double?,
         minTileKm: Double,
         pieceKind: String?,
+        tileStartKm: Double,
     ): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
-        ClutterTiles.grid(whole, TILE_START_KM).forEach { pending.addLast(TileWork(it)) }
+        ClutterTiles.grid(whole, tileStartKm).forEach { pending.addLast(TileWork(it)) }
         var done = 0
         _progress.value = ClutterProgress(0, pending.size)
         val seen = HashSet<Long>()
@@ -224,11 +230,21 @@ class PlannerOverpass(
             }
             val work = pending.removeFirst()
             val saved = loadPiece(work.box, pieceKind)
+            val started = clockMs()
             val part =
                 saved
                     ?: try {
-                        fetch(query(work.box), seen, thinM)
+                        fetch(query(work.box), seen, thinM).also {
+                            Logger.i {
+                                "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km pobrany w " +
+                                    "${clockMs() - started} ms, obiektów ${it.polygons.size}"
+                            }
+                        }
                     } catch (e: PlannerClutterException) {
+                        Logger.w {
+                            "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km nie udał się po " +
+                                "${clockMs() - started} ms: ${e.failure} ${e.detail.orEmpty()} (próba ${work.tries})"
+                        }
                         val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
                         val flaky = e.failure == PlannerClutterFailure.NETWORK
                         val splittable =
@@ -408,6 +424,7 @@ class PlannerOverpass(
         private const val TILE_START_KM = 30.0
         private const val MIN_TILE_KM = 4.0
         private const val BUILDINGS_MIN_TILE_KM = 1.0
+        private const val BUILDINGS_TILE_START_KM = 5.0
 
         /** Outline points closer than this (m) are dropped in tiled areas, and more so for a larger radius. */
         private const val THIN_M = 25.0

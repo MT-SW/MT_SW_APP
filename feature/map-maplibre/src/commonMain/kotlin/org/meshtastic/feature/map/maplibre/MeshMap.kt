@@ -40,9 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
@@ -108,7 +106,6 @@ import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle
 import org.meshtastic.feature.map.maplibre.style.zoomRange
 import org.meshtastic.feature.map.maplibre.tiles.InstallRadarSmoothing
-import org.meshtastic.feature.map.propagation.GeoBounds
 import org.meshtastic.feature.map.propagation.PropagationController
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
@@ -243,18 +240,13 @@ fun rememberMeshMapState(
     // content in a subcomposition keyed on the loaded style and disposes it on every base-style switch, so a
     // `remember` in there is lost whenever the user changes basemap — which would reset FrameOnce's latch and
     // re-frame the mesh over wherever they had panned to.
-    // The propagation forecast follows the map: downloaded again when it is old or the view leaves it.
-    LaunchedEffect(mapState, propagation.enabled, propagation.autoRefresh) {
+    // The propagation regions are downloaded again together once the oldest forecast is old.
+    LaunchedEffect(propagation.enabled, propagation.autoRefresh) {
         if (propagation.enabled && propagation.autoRefresh) {
-            @OptIn(FlowPreview::class)
-            snapshotFlow { mapState.viewport?.visibleBounds?.toBoundingBox() }
-                .filterNotNull()
-                .debounce(PROPAGATION_SETTLE_MS)
-                .collect { box ->
-                    propagationController.ensureFor(
-                        GeoBounds(south = box.south, west = box.west, north = box.north, east = box.east),
-                    )
-                }
+            while (true) {
+                propagationController.ensureFor()
+                delay(PROPAGATION_CHECK_MS)
+            }
         }
     }
     FrameOnce(enabled = frameOnNodes, nodes = visibleNodes, mapState = mapState)
@@ -597,7 +589,7 @@ private fun BoxCornerMarker(corner: Position?) {
  */
 private const val CHIP_VIEW_PADDING = 0.5
 
-private const val PROPAGATION_SETTLE_MS = 1500L
+private const val PROPAGATION_CHECK_MS = 60_000L
 
 /** Room kept free on the right for the zoom buttons (their width and margin) plus a small gap. */
 private const val PROPAGATION_END_CLEARANCE_DP = 88

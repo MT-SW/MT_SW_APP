@@ -758,7 +758,6 @@ data class PropagationPrefs(
     val enabled: Boolean = false,
     val kind: Int = 0,
     val autoRefresh: Boolean = true,
-    val keepArea: Boolean = true,
 )
 
 /** What the terrain panorama remembers between visits: the range, the antenna heights and the radio-horizon factor. */

@@ -207,7 +207,6 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
                 it[KEY_PROPAGATION_ENABLED] = next.enabled
                 it[KEY_PROPAGATION_KIND] = next.kind
                 it[KEY_PROPAGATION_AUTO_REFRESH] = next.autoRefresh
-                it[KEY_PROPAGATION_KEEP_AREA] = next.keepArea
             }
         }
     }
@@ -218,7 +217,6 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
             enabled = this[KEY_PROPAGATION_ENABLED] ?: defaults.enabled,
             kind = this[KEY_PROPAGATION_KIND] ?: defaults.kind,
             autoRefresh = this[KEY_PROPAGATION_AUTO_REFRESH] ?: defaults.autoRefresh,
-            keepArea = this[KEY_PROPAGATION_KEEP_AREA] ?: defaults.keepArea,
         )
     }
 
@@ -277,7 +275,6 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_PROPAGATION_ENABLED = booleanPreferencesKey("propagation_enabled")
         val KEY_PROPAGATION_KIND = intPreferencesKey("propagation_kind")
         val KEY_PROPAGATION_AUTO_REFRESH = booleanPreferencesKey("propagation_auto_refresh")
-        val KEY_PROPAGATION_KEEP_AREA = booleanPreferencesKey("propagation_keep_area")
         val KEY_CAMERA_LATITUDE = doublePreferencesKey("camera_latitude")
         val KEY_CAMERA_LONGITUDE = doublePreferencesKey("camera_longitude")
         val KEY_CAMERA_ZOOM = doublePreferencesKey("camera_zoom")

@@ -63,7 +63,7 @@ internal fun PropagationOverlay(modifier: Modifier = Modifier) {
             .padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         val ahead = state.hoursAhead
-        val last = (grid.hours - 1 - grid.hourAt(nowMillis)).coerceAtLeast(1)
+        val last = state.hoursLeft.coerceAtLeast(1)
         // One long, low bar: the hour on the left and a slider as wide as the bar, so it can be set precisely.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(

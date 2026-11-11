@@ -59,25 +59,31 @@ import org.meshtastic.core.resources.widget_no_nodes
 import org.meshtastic.core.service.stats.MeshStatsNodeCard
 import org.meshtastic.core.service.stats.MeshStatsSnapshot
 
-private const val LINE_HEIGHT_DP = 17
 private const val WIDGET_CORNER_DP = 16
-private const val HEADER_DP = 30
+private const val PADDING_DP = 8
 private const val TWO_COLUMNS_FROM_DP = 220
 
 /** How long one node is shown before the next one (favorites and the network are shown in turn). */
 private const val ROTATION_MS = 60_000L
-private const val SECOND_AREA_FROM_DP = 200
-private const val THIRD_AREA_FROM_DP = 330
-private const val OWN_SHARE_OF_THREE = 0.4f
-private const val NODE_SHARE_OF_THREE = 0.3f
-private const val OWN_SHARE_OF_TWO = 0.55f
-private const val NODE_SHARE_OF_TWO = 0.45f
+
+private const val TEXT_SP = 11f
+
+/** A line of text is about this many times its size high (the system adds spacing above and below the letters). */
+private const val LINE_FACTOR = 1.4f
+
+/** An average letter is about this part of its size wide (digits and capitals are wider, small letters narrower). */
+private const val CHAR_FACTOR = 0.58f
+private const val OWN_HEADER_DP = 28f
+private const val NODE_HEADER_DP = 35f
+private const val COLUMN_GAP_DP = 4f
+private const val MIN_NODE_LINES = 2
 
 /**
- * Widget "Statystyki MT_SW": the same lines as the permanent notification in one or two columns. Three sizes, like on
- * iPhone: 4x2 shows what is chosen in the settings (our node, or favorites, or the whole network in turn, our node
- * first); 4x4 has our node on top and below it favorites or the whole network in turn; 4x6 has our node, favorites and,
- * under them, the rest of the network (without favorites and without our node).
+ * Widget "Statystyki MT_SW": the same lines as the permanent notification in one or two columns. What is shown follows
+ * the room there is: our node first, then (when the lines of all of them fit) the favorites and the rest of the
+ * network, or else the second area chosen in the settings; the smallest size shows what is chosen in the settings
+ * (our node, or favorites, or the whole network in turn, our node first). A line too long for a column is cut into
+ * several rows, so nothing ends in "…".
  */
 class MeshStatusWidget :
     GlanceAppWidget(),
@@ -113,55 +119,44 @@ class MeshStatusWidget :
                         // A plain surface behind the text: on a busy wallpaper it was unreadable.
                         .background(GlanceTheme.colors.widgetBackground)
                         .cornerRadius(WIDGET_CORNER_DP.dp)
-                        .padding(8.dp)
+                        .padding(PADDING_DP.dp)
                         .clickable(actionStartActivity(open)),
                 ) {
                     val step = (System.currentTimeMillis() / ROTATION_MS).toInt()
-                    val width = size.width.value
-                    val height = size.height.value
+                    val metrics = Metrics(context.resources.configuration.fontScale, size.width.value)
+                    val room = size.height.value - 2 * PADDING_DP
+                    val own = ownNeedDp(snapshot, metrics)
+                    val favorites = snapshot?.favorites.orEmpty()
+                    val others = snapshot?.others.orEmpty()
+                    val favoritesNeed = nodeNeedDp(favorites, step, metrics)
+                    val othersNeed = nodeNeedDp(others, step, metrics)
+                    val smallest = NODE_HEADER_DP * metrics.fontScale + MIN_NODE_LINES * metrics.lineDp
                     when {
-                        height >= THIRD_AREA_FROM_DP ->
+                        room >= own + favoritesNeed + othersNeed ->
                             Column(modifier = GlanceModifier.fillMaxSize()) {
-                                OwnSection(snapshot, width, height * OWN_SHARE_OF_THREE)
-                                NodeSection(
-                                    NodeKind.Favorite,
-                                    snapshot?.favorites.orEmpty(),
-                                    step,
-                                    width,
-                                    height * NODE_SHARE_OF_THREE,
-                                )
-                                NodeSection(
-                                    NodeKind.Other,
-                                    snapshot?.others.orEmpty(),
-                                    step,
-                                    width,
-                                    height * NODE_SHARE_OF_THREE,
-                                )
+                                OwnSection(snapshot, metrics, own)
+                                NodeSection(NodeKind.Favorite, favorites, step, metrics, favoritesNeed)
+                                NodeSection(NodeKind.Other, others, step, metrics, othersNeed)
                             }
 
-                        height >= SECOND_AREA_FROM_DP ->
+                        room >= own + smallest ->
                             Column(modifier = GlanceModifier.fillMaxSize()) {
-                                OwnSection(snapshot, width, height * OWN_SHARE_OF_TWO)
+                                val ownHeight = minOf(own, room - smallest)
+                                OwnSection(snapshot, metrics, ownHeight)
                                 if (second == 0) {
-                                    NodeSection(
-                                        NodeKind.Favorite,
-                                        snapshot?.favorites.orEmpty(),
-                                        step,
-                                        width,
-                                        height * NODE_SHARE_OF_TWO,
-                                    )
+                                    NodeSection(NodeKind.Favorite, favorites, step, metrics, room - ownHeight)
                                 } else {
                                     NodeSection(
                                         NodeKind.Network,
                                         snapshot?.network.orEmpty(),
                                         step,
-                                        width,
-                                        height * NODE_SHARE_OF_TWO,
+                                        metrics,
+                                        room - ownHeight,
                                     )
                                 }
                             }
 
-                        else -> SmallContent(snapshot, small, step, width, height)
+                        else -> SmallContent(snapshot, small, step, metrics, room)
                     }
                 }
             }
@@ -169,9 +164,21 @@ class MeshStatusWidget :
     }
 }
 
+/** The sizes the layout is worked out from: the width of the widget and how big the user's text is. */
+private class Metrics(val fontScale: Float, widthDp: Float) {
+    val lineDp: Float = TEXT_SP * LINE_FACTOR * fontScale
+    val columns: Int = if (widthDp >= TWO_COLUMNS_FROM_DP) 2 else 1
+
+    /** How many letters of the readings fit in one column. */
+    val charsPerLine: Int =
+        (((widthDp - 2 * PADDING_DP) / columns - COLUMN_GAP_DP) / (TEXT_SP * CHAR_FACTOR * fontScale))
+            .toInt()
+            .coerceAtLeast(1)
+}
+
 /** The 4x2 widget: our node, or our node followed by the favorites / the whole network, one after another. */
 @Composable
-private fun SmallContent(snapshot: MeshStatsSnapshot?, small: Int, step: Int, widthDp: Float, heightDp: Float) {
+private fun SmallContent(snapshot: MeshStatsSnapshot?, small: Int, step: Int, metrics: Metrics, heightDp: Float) {
     val cards =
         when (small) {
             1 -> snapshot?.favorites.orEmpty()
@@ -180,9 +187,9 @@ private fun SmallContent(snapshot: MeshStatsSnapshot?, small: Int, step: Int, wi
         }
     val position = step % (cards.size + 1)
     if (position == 0) {
-        OwnSection(snapshot, widthDp, heightDp)
+        OwnSection(snapshot, metrics, heightDp)
     } else {
-        NodeSection(if (small == 1) NodeKind.Favorite else NodeKind.Network, cards, position - 1, widthDp, heightDp)
+        NodeSection(if (small == 1) NodeKind.Favorite else NodeKind.Network, cards, position - 1, metrics, heightDp)
     }
 }
 
@@ -192,9 +199,35 @@ private enum class NodeKind {
     Other,
 }
 
+/** The readings of our node in columns, or null while there is nothing to show. */
+private fun ownParts(snapshot: MeshStatsSnapshot?, metrics: Metrics): List<List<WidgetEntry>>? =
+    if (snapshot == null || !snapshot.connected || snapshot.lines.isEmpty()) {
+        null
+    } else {
+        layoutColumns(snapshot.entries(), metrics)
+    }
+
+/** The height all the readings of our node need. */
+private fun ownNeedDp(snapshot: MeshStatsSnapshot?, metrics: Metrics): Float {
+    val rows = ownParts(snapshot, metrics)?.maxOfOrNull { column -> column.sumOf { it.rows } } ?: 1
+    return OWN_HEADER_DP * metrics.fontScale + rows * metrics.lineDp
+}
+
+/** The height all the readings of the node shown now (one of [cards], by [step]) need. */
+private fun nodeNeedDp(cards: List<MeshStatsNodeCard>, step: Int, metrics: Metrics): Float {
+    val rows =
+        if (cards.isEmpty()) {
+            1
+        } else {
+            val lines = cards[step % cards.size].lines.map { WidgetEntry(it, header = false) }
+            layoutColumns(lines, metrics).maxOfOrNull { column -> column.sumOf { it.rows } } ?: 1
+        }
+    return NODE_HEADER_DP * metrics.fontScale + rows * metrics.lineDp
+}
+
 /** Our node: the mark, the name, the chip and the statistics in columns. */
 @Composable
-private fun OwnSection(snapshot: MeshStatsSnapshot?, widthDp: Float, heightDp: Float) {
+private fun OwnSection(snapshot: MeshStatsSnapshot?, metrics: Metrics, heightDp: Float) {
     Column(modifier = GlanceModifier.fillMaxWidth()) {
         Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             WidgetMark(16.dp)
@@ -208,20 +241,21 @@ private fun OwnSection(snapshot: MeshStatsSnapshot?, widthDp: Float, heightDp: F
             if (snapshot != null) NodeChip(snapshot.shortName, snapshot.color, snapshot.textColor)
         }
         Spacer(GlanceModifier.width(2.dp))
-        if (snapshot == null || !snapshot.connected || snapshot.lines.isEmpty()) {
+        val parts = ownParts(snapshot, metrics)
+        if (parts == null) {
             Text(
                 text = stringResource(Res.string.disconnected),
                 style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
             )
         } else {
-            StatsColumns(snapshot.entries(), widthDp, heightDp)
+            StatsColumns(parts, rowsIn(heightDp - OWN_HEADER_DP * metrics.fontScale, metrics))
         }
     }
 }
 
 /** One node of a list (a favorite, or any node of the network) shown for a while, the next one after it. */
 @Composable
-private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: Int, widthDp: Float, heightDp: Float) {
+private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: Int, metrics: Metrics, heightDp: Float) {
     val label =
         stringResource(
             when (kind) {
@@ -261,32 +295,29 @@ private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: In
                     )
                 }
             }
-            StatsColumns(card.lines.map { WidgetEntry(it, header = false) }, widthDp, heightDp - NODE_HEADER_DP)
+            val parts = layoutColumns(card.lines.map { WidgetEntry(it, header = false) }, metrics)
+            StatsColumns(parts, rowsIn(heightDp - NODE_HEADER_DP * metrics.fontScale, metrics))
         }
     }
 }
 
-private const val NODE_HEADER_DP = 18
+/** How many rows of readings fit in [heightDp] (a hair of room is added, so an exact fit is not lost to rounding). */
+private fun rowsIn(heightDp: Float, metrics: Metrics): Int =
+    (heightDp / metrics.lineDp + ROUNDING_ROOM).toInt().coerceAtLeast(1)
 
-/** The readings of the widget in one or two columns, as many as fit in [widthDp] x [heightDp]. */
+private const val ROUNDING_ROOM = 0.05f
+
+/** The readings of the widget in its columns, as many rows as fit. */
 @Composable
-private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float) {
-    val columns = if (widthDp >= TWO_COLUMNS_FROM_DP) 2 else 1
-    val rows = ((heightDp - HEADER_DP) / LINE_HEIGHT_DP).toInt().coerceAtLeast(1)
-    // Our node's sections have their column fixed (network and radio left, the rest right); other lists split evenly.
-    val parts =
-        if (columns == 2 && all.any { it.column == 1 }) {
-            listOf(0, 1).map { column -> all.filter { it.column == column }.take(rows).withoutLoneHeader() }
-        } else {
-            all.take(rows * columns).splitColumns(columns)
-        }
+private fun StatsColumns(parts: List<List<WidgetEntry>>, maxRows: Int) {
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         parts.forEachIndexed { index, part ->
-            Column(modifier = GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp)) {
-                part.forEach { entry ->
+            val gap = if (index == 0) COLUMN_GAP_DP.dp else 0.dp
+            Column(modifier = GlanceModifier.defaultWeight().padding(end = gap)) {
+                part.fitting(maxRows).forEach { entry ->
                     Text(
                         text = entry.text,
-                        maxLines = 1,
+                        maxLines = entry.rows,
                         style =
                         TextStyle(
                             color =
@@ -295,7 +326,7 @@ private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float
                             } else {
                                 GlanceTheme.colors.onSurface
                             },
-                            fontSize = 11.sp,
+                            fontSize = TEXT_SP.sp,
                             fontWeight = if (entry.header) FontWeight.Bold else FontWeight.Normal,
                         ),
                     )
@@ -305,8 +336,11 @@ private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float
     }
 }
 
-/** One row of the widget: a group heading or a reading. */
-private data class WidgetEntry(val text: String, val header: Boolean, val column: Int = 0)
+/**
+ * One row of the widget: a group heading or a reading. [rows] is how many text lines it takes (a reading still too long
+ * for the column after being cut is allowed two).
+ */
+private data class WidgetEntry(val text: String, val header: Boolean, val column: Int = 0, val rows: Int = 1)
 
 /** Headings (when the snapshot has titled groups) followed by their readings, else just the flat lines. */
 private fun MeshStatsSnapshot.entries(): List<WidgetEntry> = if (groups.any { it.title.isNotEmpty() }) {
@@ -320,14 +354,66 @@ private fun MeshStatsSnapshot.entries(): List<WidgetEntry> = if (groups.any { it
     lines.map { WidgetEntry(it, header = false) }
 }
 
-/** A heading cut off from its readings at the bottom of a column is dropped instead of hanging there alone. */
-private fun List<WidgetEntry>.withoutLoneHeader(): List<WidgetEntry> =
-    if (lastOrNull()?.header == true) dropLast(1) else this
+/**
+ * A reading longer than a column is cut at its separators (" | ", and before a bracket) into several rows, which are
+ * joined again as far as they fit: "Ruch: TX 118 / RX 24908 (D: 170)" becomes two rows instead of ending in "…".
+ */
+private fun WidgetEntry.fitTo(chars: Int): List<WidgetEntry> {
+    if (header || text.length <= chars) return listOf(this)
+    val pieces =
+        text.split(" | ").flatMap { piece ->
+            if (piece.length <= chars) {
+                listOf(piece)
+            } else {
+                piece.split(" (").mapIndexed { i, part -> if (i == 0) part else "($part" }
+            }
+        }
+    val joined = ArrayList<String>()
+    for (piece in pieces) {
+        val last = joined.lastOrNull()
+        if (last != null && !piece.startsWith("(") && last.length + SEPARATOR.length + piece.length <= chars) {
+            joined[joined.lastIndex] = last + SEPARATOR + piece
+        } else {
+            joined.add(piece)
+        }
+    }
+    return joined.map { copy(text = it, rows = if (it.length > chars) 2 else 1) }
+}
 
-/** Splits into [columns] even columns; a heading never stays alone at the bottom of a column. */
+private const val SEPARATOR = " | "
+
+/** The entries in their columns, every one cut to fit the width. */
+private fun layoutColumns(all: List<WidgetEntry>, metrics: Metrics): List<List<WidgetEntry>> {
+    val fitted = all.flatMap { it.fitTo(metrics.charsPerLine) }
+    // Our node's sections have their column fixed (network and radio left, the rest right); other lists split evenly.
+    return if (metrics.columns == 2 && fitted.any { it.column == 1 }) {
+        listOf(0, 1).map { column -> fitted.filter { it.column == column } }
+    } else {
+        fitted.splitColumns(metrics.columns)
+    }
+}
+
+/** The first entries of a column that fit in [maxRows] text lines; a heading is never left alone at the bottom. */
+private fun List<WidgetEntry>.fitting(maxRows: Int): List<WidgetEntry> {
+    var used = 0
+    val taken = takeWhile { entry ->
+        used += entry.rows
+        used <= maxRows
+    }
+    return if (taken.lastOrNull()?.header == true) taken.dropLast(1) else taken
+}
+
+/** Splits into [columns] even columns (by text lines); a heading never stays alone at the bottom of a column. */
 private fun List<WidgetEntry>.splitColumns(columns: Int): List<List<WidgetEntry>> {
     if (columns <= 1 || size < 2) return listOf(this)
-    var cut = (size + columns - 1) / columns
+    val total = sumOf { it.rows }
+    val half = (total + columns - 1) / columns
+    var used = 0
+    var cut = indexOfFirst { entry ->
+        used += entry.rows
+        used > half
+    }
+    if (cut < 0) cut = size
     if (cut > 1 && this[cut - 1].header) cut -= 1
     return listOf(take(cut), drop(cut))
 }

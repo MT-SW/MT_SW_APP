@@ -2761,22 +2761,27 @@
     <string name="privacy_url" translatable="false">https://meshtastic.org/docs/legal/privacy/</string>
     <string name="project_information">Project information</string>
     <!-- PROPAGATION -->
+    <string name="propagation_add_region">Add area for this view</string>
     <string name="propagation_age">Forecast from %1$d min ago</string>
     <string name="propagation_auto">Refresh automatically</string>
-    <string name="propagation_download">Download for this view</string>
+    <string name="propagation_detail_detailed">Detailed</string>
+    <string name="propagation_detail_fine">Very detailed</string>
+    <string name="propagation_detail_normal">Normal</string>
     <string name="propagation_failed">Could not download the forecast</string>
     <string name="propagation_hour_ahead">In %1$d h</string>
     <string name="propagation_hour_now">Now</string>
-    <string name="propagation_keep_area">Keep the largest area (zooming in does not shrink it)</string>
     <string name="propagation_kind_enhanced">Only extended range</string>
     <string name="propagation_kind_gradient">Full scale</string>
     <string name="propagation_kind_k">Earth radius factor k</string>
     <string name="propagation_legend">Blue: normal, green: slightly further, yellow to red: much further, purple: signal trapped in a duct</string>
     <string name="propagation_loading">Downloading…</string>
     <string name="propagation_none">No forecast yet</string>
+    <string name="propagation_region_item">About %1$d × %2$d km, %3$s</string>
+    <string name="propagation_region_remove">Remove area</string>
+    <string name="propagation_regions_title">Areas (they may overlap; the more detailed one is drawn on top)</string>
     <string name="propagation_source">Weather data by Open-Meteo.com (CC BY 4.0)</string>
     <string name="propagation_title">Propagation (weather forecast)</string>
-    <string name="propagation_update">Update for this view</string>
+    <string name="propagation_update_all">Update all areas</string>
     <string name="provide_location_to_mesh">Provide phone location to mesh</string>
     <string name="provider_name_exists">Provider name exists.</string>
     <string name="psk">PSK</string>

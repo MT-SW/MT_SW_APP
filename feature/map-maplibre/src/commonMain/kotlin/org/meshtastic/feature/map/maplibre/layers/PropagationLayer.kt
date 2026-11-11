@@ -20,6 +20,7 @@ package org.meshtastic.feature.map.maplibre.layers
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Rect
@@ -36,8 +37,10 @@ import org.maplibre.compose.util.PositionQuad
 import org.maplibre.compose.util.PreparedImage
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.feature.map.propagation.GeoBounds
 import org.meshtastic.feature.map.propagation.PropagationColors
 import org.meshtastic.feature.map.propagation.PropagationKind
+import org.meshtastic.feature.map.propagation.PropagationRegion
 import org.meshtastic.feature.map.propagation.PropagationState
 import org.meshtastic.feature.map.propagation.TropoGrid
 import kotlin.math.PI
@@ -55,21 +58,42 @@ internal const val PROPAGATION_DEFAULT_OPACITY = 0.6f
 private const val BITMAP_SIZE = 160
 
 /**
- * The propagation forecast, painted as one picture over the area it was downloaded for.
+ * The propagation forecast: one picture per region, each over the area it was downloaded for.
  *
- * The picture is drawn off the main thread and only again when the forecast, the hour or the kind changes, never per
- * map frame.
+ * Regions may overlap. The one with the finer grid is drawn on top, and the coarser pictures are left empty where a
+ * finer one covers them, so the opacity is not added up twice. The pictures are drawn off the main thread and only
+ * again when a forecast, the hour or the kind changes, never per map frame.
  */
-@Suppress("InjectDispatcher")
 @Composable
 internal fun PropagationLayer(state: PropagationState, opacity: Float) {
-    val grid = state.grid
-    if (!state.enabled || grid == null) return
-    val hour = (grid.hourAt(nowMillis) + state.hoursAhead).coerceAtMost(grid.hours - 1)
+    if (!state.enabled) return
+    // Coarsest first, finest last: later layers are drawn above earlier ones.
+    val ordered = state.regions.sortedByDescending { it.cellArea }
+    ordered.forEachIndexed { index, region ->
+        key(region.id) {
+            val finer = ordered.subList(index + 1, ordered.size).map { it.grid.bounds }
+            RegionLayer(region, finer, state.hoursAhead, state.kind, opacity)
+        }
+    }
+}
+
+@Suppress("InjectDispatcher")
+@Composable
+private fun RegionLayer(
+    region: PropagationRegion,
+    finer: List<GeoBounds>,
+    hoursAhead: Int,
+    kind: PropagationKind,
+    opacity: Float,
+) {
+    val grid = region.grid
+    val hour = (grid.hourAt(nowMillis) + hoursAhead).coerceAtMost(grid.hours - 1)
     val image by
-        produceState<PreparedImage?>(initialValue = null, grid, hour, state.kind) {
+        produceState<PreparedImage?>(initialValue = null, grid, hour, kind, finer) {
             value =
-                withContext(Dispatchers.Default) { PreparedImage.fromBitmap(renderPropagation(grid, hour, state.kind)) }
+                withContext(Dispatchers.Default) {
+                    PreparedImage.fromBitmap(renderPropagation(grid, hour, kind, finer))
+                }
         }
     val prepared = image ?: return
     val quad =
@@ -83,15 +107,23 @@ internal fun PropagationLayer(state: PropagationState, opacity: Float) {
             )
         }
     val source = rememberImageSource(quad, prepared)
-    RasterLayer(id = PROPAGATION_LAYER_ID, source = source, opacity = const(opacity))
+    RasterLayer(id = "$PROPAGATION_LAYER_ID-${region.id}", source = source, opacity = const(opacity))
 }
 
 private fun mercatorY(latDeg: Double): Double = ln(tan(PI / 4 + latDeg * PI / 360))
 
 private fun latFromMercator(y: Double): Double = (2 * atan(exp(y)) - PI / 2) * 180 / PI
 
-/** Paints [grid] for [hour]: rows follow the map's own projection, so the picture lines up with the tiles. */
-private fun renderPropagation(grid: TropoGrid, hour: Int, kind: PropagationKind): ImageBitmap {
+/**
+ * Paints [grid] for [hour]: rows follow the map's own projection, so the picture lines up with the tiles. Places inside
+ * one of the [finer] areas are left empty, because a finer picture is drawn there.
+ */
+private fun renderPropagation(
+    grid: TropoGrid,
+    hour: Int,
+    kind: PropagationKind,
+    finer: List<GeoBounds>,
+): ImageBitmap {
     val bitmap = ImageBitmap(BITMAP_SIZE, BITMAP_SIZE)
     val canvas = Canvas(bitmap)
     val paint = Paint()
@@ -102,6 +134,7 @@ private fun renderPropagation(grid: TropoGrid, hour: Int, kind: PropagationKind)
         val lat = latFromMercator(yTop + (yBottom - yTop) * (py + 0.5) / BITMAP_SIZE)
         for (px in 0 until BITMAP_SIZE) {
             val lon = b.west + b.lonSpan * (px + 0.5) / BITMAP_SIZE
+            if (finer.any { lat in it.south..it.north && lon in it.west..it.east }) continue
             val argb = PropagationColors.argb(kind, grid.sample(hour, lat, lon).toDouble())
             if (argb ushr 24 == 0) continue
             paint.color = Color(argb)
