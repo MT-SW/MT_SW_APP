@@ -34,7 +34,9 @@ import kotlin.math.roundToInt
 class BuildingStore(
     private val fileSystem: FileSystem = mapLayerFileSystem(),
     private val directory: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "buildings",
-) {
+) : ClutterPieceCache {
+    private val piecesDirectory: Path = directory / "pieces"
+
     private class Area(val lat: Double, val lon: Double, val radiusKm: Int, val path: Path)
 
     private fun areas(): List<Area> = try {
@@ -79,9 +81,35 @@ class BuildingStore(
         val name =
             "${(centre.lat * DEGREE_SCALE).roundToInt()}_${(centre.lon * DEGREE_SCALE).roundToInt()}_$radiusKm$EXTENSION"
         fileSystem.write(directory / name.toPath()) { write(encode(buildings)) }
+        // The pieces were only there to go on after an interruption; the finished area replaces them.
+        clearPieces()
         true
     } catch (_: Exception) {
         false
+    }
+
+    override fun readPiece(key: String): List<ClutterPolygon>? = try {
+        val path = piecesDirectory / "$key$PIECE_EXTENSION".toPath()
+        if (fileSystem.exists(path)) decode(fileSystem.read(path) { readByteArray() }) else null
+    } catch (_: Exception) {
+        null
+    }
+
+    override fun writePiece(key: String, polygons: List<ClutterPolygon>) {
+        try {
+            fileSystem.createDirectories(piecesDirectory)
+            fileSystem.write(piecesDirectory / "$key$PIECE_EXTENSION".toPath()) { write(encode(polygons)) }
+        } catch (_: Exception) {
+            // A piece not saved is only downloaded again next time.
+        }
+    }
+
+    private fun clearPieces() {
+        try {
+            if (fileSystem.exists(piecesDirectory)) fileSystem.deleteRecursively(piecesDirectory)
+        } catch (_: Exception) {
+            // best effort
+        }
     }
 
     /** The space the saved buildings take, in bytes. */
@@ -135,6 +163,7 @@ class BuildingStore(
 
     private companion object {
         const val EXTENSION = ".bld"
+        const val PIECE_EXTENSION = ".piece"
         const val NAME_PARTS = 3
         const val DEGREE_SCALE = 100_000.0
         const val METRES_PER_KM = 1_000.0

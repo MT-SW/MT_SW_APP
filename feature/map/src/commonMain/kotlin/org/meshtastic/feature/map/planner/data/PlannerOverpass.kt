@@ -39,6 +39,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.export.Num
 import kotlin.math.max
+import kotlin.math.roundToLong
 
 /**
  * [PlannerClutterSource] that asks an Overpass API server (default: the public overpass-api.de instance) for the
@@ -55,6 +56,7 @@ class PlannerOverpass(
     private val timeoutMs: Long = TIMEOUT_MS,
     private val clockMs: () -> Long = { nowMillis },
     private val fallbackUrls: List<String> = FALLBACK_URLS,
+    private val pieces: ClutterPieceCache? = null,
 ) : PlannerClutterSource {
 
     /** Guards the answers kept in memory; held only for a moment. */
@@ -109,7 +111,13 @@ class PlannerOverpass(
         // server finds too heavy is cut smaller (down to a kilometre) and asked again.
         // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not needed.
         return cached(key) {
-            fetchTiled(whole, { OsmQueries.buildings(it, tallOnly) }, thinM = 0.0, minTileKm = BUILDINGS_MIN_TILE_KM)
+            fetchTiled(
+                whole,
+                { OsmQueries.buildings(it, tallOnly) },
+                thinM = 0.0,
+                minTileKm = BUILDINGS_MIN_TILE_KM,
+                pieceKind = if (tallOnly) "T" else "A",
+            )
         }
     }
 
@@ -178,8 +186,9 @@ class PlannerOverpass(
         query: (ClutterBox) -> String = OsmQueries::box,
         thinM: Double? = null,
         minTileKm: Double = MIN_TILE_KM,
+        pieceKind: String? = null,
     ): ClutterMap = try {
-        fetchTiledPieces(whole, query, thinM, minTileKm)
+        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind)
     } finally {
         _progress.value = null
     }
@@ -189,6 +198,7 @@ class PlannerOverpass(
         query: (ClutterBox) -> String,
         thinOverride: Double?,
         minTileKm: Double,
+        pieceKind: String?,
     ): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
@@ -207,8 +217,9 @@ class PlannerOverpass(
                 throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
             }
             val work = pending.removeFirst()
+            val saved = loadPiece(work.box, pieceKind)
             val part =
-                try {
+                saved ?: try {
                     fetch(query(work.box), seen, thinM)
                 } catch (e: PlannerClutterException) {
                     val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
@@ -244,6 +255,7 @@ class PlannerOverpass(
                 }
             done++
             _progress.value = ClutterProgress(done, done + pending.size)
+            if (saved == null) savePiece(work.box, pieceKind, part)
             for (polygon in part.polygons) {
                 polygons.add(polygon)
                 points += polygon.outer.size / 2
@@ -255,6 +267,20 @@ class PlannerOverpass(
             delay(PAUSE_BETWEEN_TILES_MS)
         }
         return ClutterMap(polygons)
+    }
+
+    private fun pieceKey(box: ClutterBox, kind: String): String =
+        listOf(box.south, box.west, box.north, box.east).joinToString("_") { (it * PIECE_SCALE).roundToLong().toString() } +
+            "_" + kind
+
+    /** A piece of this area that an earlier, interrupted download already finished. */
+    private fun loadPiece(box: ClutterBox, kind: String?): ClutterMap? {
+        if (kind == null) return null
+        return pieces?.readPiece(pieceKey(box, kind))?.let { ClutterMap(it) }
+    }
+
+    private fun savePiece(box: ClutterBox, kind: String?, part: ClutterMap) {
+        if (kind != null) pieces?.writePiece(pieceKey(box, kind), part.polygons)
     }
 
     @Suppress("TooGenericExceptionCaught")
@@ -350,6 +376,8 @@ class PlannerOverpass(
     suspend fun invalidate() = cacheLock.withLock { cache.clear() }
 
     companion object {
+        private const val PIECE_SCALE = 100_000.0
+
         const val BASE_URL = "https://overpass-api.de/api/interpreter"
         const val TIMEOUT_MS = 60_000L
         const val CACHE_MS = 30 * 60 * 1000L

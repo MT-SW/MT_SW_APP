@@ -263,6 +263,15 @@ interface PlannerClutterSource {
     suspend fun buildingsForArea(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): ClutterMap = ClutterMap.EMPTY
 }
 
+/** Where the pieces of a big download are kept as they arrive, so an interrupted download goes on where it stopped. */
+interface ClutterPieceCache {
+    /** The polygons of the piece saved under [key], or null when there is none. */
+    fun readPiece(key: String): List<ClutterPolygon>?
+
+    /** Saves the polygons of one finished piece; best effort. */
+    fun writePiece(key: String, polygons: List<ClutterPolygon>)
+}
+
 /** A source that knows no obstacles; the default where none is wired in (and in tests). */
 object NoClutterSource : PlannerClutterSource {
     override suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap = ClutterMap.EMPTY

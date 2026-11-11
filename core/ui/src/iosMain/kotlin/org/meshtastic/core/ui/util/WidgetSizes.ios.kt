@@ -51,9 +51,10 @@ actual fun rememberWidgetSizes(): WidgetSizesInUse {
 private fun readSizes(): WidgetSizesInUse {
     val folder = NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(WIDGET_APP_GROUP)
     val url = folder?.URLByAppendingPathComponent(SIZES_FILE)
-    val names = url?.let { NSString.stringWithContentsOfURL(it, encoding = NSUTF8StringEncoding, error = null) }
-        ?.split(",")
-        .orEmpty()
+    val names =
+        url?.let { NSString.stringWithContentsOfURL(it, encoding = NSUTF8StringEncoding, error = null) }
+            ?.split(",")
+            .orEmpty()
     return if (names.firstOrNull() == "ok") {
         WidgetSizesInUse(
             known = true,
