@@ -16,6 +16,11 @@
  */
 package org.meshtastic.feature.map.maplibre
 
+import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -291,8 +296,9 @@ fun MeshMap(
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
     val ornaments = remember(credits) { meshMapOrnaments(credits) }
+    Box(modifier) {
     MaplibreMap(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         state = mapState,
         // Honour what the source can actually serve, as the OSMdroid map did.
         cameraConstraints =
@@ -321,6 +327,8 @@ fun MeshMap(
         },
         overlay = { include(ornaments) },
     )
+    PropagationOverlay(Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 56.dp))
+    }
 }
 
 /** Remembers the last padded box between recompositions; see [rememberStickyBounds]. */

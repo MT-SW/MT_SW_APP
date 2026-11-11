@@ -199,7 +199,7 @@ internal fun PropagationSection(
 }
 
 @Composable
-private fun Legend() {
+internal fun Legend() {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
         Text(stringResource(Res.string.propagation_legend), style = MaterialTheme.typography.bodySmall)
         Row(
