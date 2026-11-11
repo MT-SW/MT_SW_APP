@@ -268,8 +268,8 @@ class TerrainHorizonViewModel(
     fun setBuildingsRadius(km: Int) = _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
 
     /**
-     * Downloads the buildings around the connected radio, up to the chosen range, and keeps them on the device, so
-     * the panorama reads them from there from now on.
+     * Downloads the buildings around the connected radio, up to the chosen range, and keeps them on the device, so the
+     * panorama reads them from there from now on.
      */
     fun saveBuildings() {
         val here = _state.value
@@ -569,4 +569,3 @@ private fun withBuildings(
         ground(lat, lon) + if (own) 0.0 else buildings.heightAt(lat, lon, heights)
     }
 }
-

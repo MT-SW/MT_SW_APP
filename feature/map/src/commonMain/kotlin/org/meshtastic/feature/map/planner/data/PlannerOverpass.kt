@@ -48,6 +48,7 @@ import kotlin.math.max
  * Answers are kept in memory for [CACHE_MS], so changing power, height or any other parameter of the same link does not
  * download the same data again. One request at a time: the public server limits parallel use.
  */
+@Suppress("TooManyFunctions")
 class PlannerOverpass(
     private val httpClient: HttpClient,
     private val baseUrl: String = BASE_URL,
@@ -107,7 +108,8 @@ class PlannerOverpass(
         return if (r <= SINGLE_REQUEST_KM) {
             cached(key) { fetch(OsmQueries.buildings(whole, tallOnly)) }
         } else {
-            // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not needed.
+            // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not
+            // needed.
             cached(key) { fetchTiled(whole, { OsmQueries.buildings(it, tallOnly) }, thinM = 0.0) }
         }
     }

@@ -31,7 +31,9 @@ internal fun JsonElement?.lenientInt(): Int? {
     return primitive.intOrNull ?: primitive.doubleOrNull?.toLong()?.toInt()
 }
 
-/** Reads a map feature property as a flag; a number counts as one too (non-zero is true), as MapLibre on iPhone sends. */
+/**
+ * Reads a map feature property as a flag; a number counts as one too (non-zero is true), as MapLibre on iPhone sends.
+ */
 internal fun JsonElement?.lenientBoolean(): Boolean? {
     val primitive = this as? JsonPrimitive ?: return null
     return primitive.booleanOrNull ?: primitive.doubleOrNull?.let { it != 0.0 }

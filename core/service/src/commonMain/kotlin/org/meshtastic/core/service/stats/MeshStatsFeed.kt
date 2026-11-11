@@ -71,7 +71,9 @@ class MeshStatsFeed(
     fun snapshots(ownChoice: Boolean = false): Flow<MeshStatsSnapshot> {
         val modeFlow: Flow<LiveUpdateMode> =
             if (ownChoice) {
-                uiPrefs.androidWidgetNode.map { if (it == 0) LiveUpdateMode.MeshStatus else LiveUpdateMode.TrackNode(it) }
+                uiPrefs.androidWidgetNode.map {
+                    if (it == 0) LiveUpdateMode.MeshStatus else LiveUpdateMode.TrackNode(it)
+                }
             } else {
                 prefs.mode
             }

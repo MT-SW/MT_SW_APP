@@ -114,36 +114,43 @@ class MeshStatusWidget :
                             style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
                         )
                     } else {
-                        val columns = if (size.width.value >= TWO_COLUMNS_FROM_DP) 2 else 1
-                        val rows = ((size.height.value - HEADER_DP) / LINE_HEIGHT_DP).toInt().coerceAtLeast(1)
-                        val entries = snapshot.entries().take(rows * columns)
-                        Row(modifier = GlanceModifier.fillMaxWidth()) {
-                            entries.splitColumns(columns).forEachIndexed { index, part ->
-                                Column(
-                                    modifier =
-                                    GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp),
-                                ) {
-                                    part.forEach { entry ->
-                                        Text(
-                                            text = entry.text,
-                                            maxLines = 1,
-                                            style =
-                                            TextStyle(
-                                                color =
-                                                if (entry.header) {
-                                                    GlanceTheme.colors.primary
-                                                } else {
-                                                    GlanceTheme.colors.onSurface
-                                                },
-                                                fontSize = 11.sp,
-                                                fontWeight = if (entry.header) FontWeight.Bold else FontWeight.Normal,
-                                            ),
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        StatsColumns(snapshot, size.width.value, size.height.value)
                     }
+                }
+            }
+        }
+    }
+}
+
+/** The readings of the widget in one or two columns, as many as fit in [widthDp] x [heightDp]. */
+@Composable
+private fun StatsColumns(snapshot: MeshStatsSnapshot, widthDp: Float, heightDp: Float) {
+    val columns = if (widthDp >= TWO_COLUMNS_FROM_DP) 2 else 1
+    val rows = ((heightDp - HEADER_DP) / LINE_HEIGHT_DP).toInt().coerceAtLeast(1)
+    val entries = snapshot.entries().take(rows * columns)
+    Row(modifier = GlanceModifier.fillMaxWidth()) {
+        entries.splitColumns(columns).forEachIndexed { index, part ->
+            Column(
+                modifier =
+                GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp),
+            ) {
+                part.forEach { entry ->
+                    Text(
+                        text = entry.text,
+                        maxLines = 1,
+                        style =
+                        TextStyle(
+                            color =
+                            if (entry.header) {
+                                GlanceTheme.colors.primary
+                            } else {
+                                GlanceTheme.colors.onSurface
+                            },
+                            fontSize = 11.sp,
+                            fontWeight =
+                            if (entry.header) FontWeight.Bold else FontWeight.Normal,
+                        ),
+                    )
                 }
             }
         }

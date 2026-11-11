@@ -130,7 +130,8 @@ class BuildingStore(
         }
     }
 
-    private fun readRing(input: Buffer): DoubleArray = DoubleArray(input.readInt()) { Double.fromBits(input.readLong()) }
+    private fun readRing(input: Buffer): DoubleArray =
+        DoubleArray(input.readInt()) { Double.fromBits(input.readLong()) }
 
     private companion object {
         const val EXTENSION = ".bld"

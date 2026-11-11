@@ -107,6 +107,9 @@ import org.meshtastic.core.resources.mesh_hud_cardinal_south
 import org.meshtastic.core.resources.mesh_hud_cardinal_west
 import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.resources.retry
+import org.meshtastic.core.resources.terrain_horizon_antenna
+import org.meshtastic.core.resources.terrain_horizon_antenna_auto
+import org.meshtastic.core.resources.terrain_horizon_apply
 import org.meshtastic.core.resources.terrain_horizon_buildings
 import org.meshtastic.core.resources.terrain_horizon_buildings_clear
 import org.meshtastic.core.resources.terrain_horizon_buildings_failed
@@ -116,9 +119,6 @@ import org.meshtastic.core.resources.terrain_horizon_buildings_range
 import org.meshtastic.core.resources.terrain_horizon_buildings_save
 import org.meshtastic.core.resources.terrain_horizon_buildings_saved
 import org.meshtastic.core.resources.terrain_horizon_buildings_saving
-import org.meshtastic.core.resources.terrain_horizon_antenna
-import org.meshtastic.core.resources.terrain_horizon_antenna_auto
-import org.meshtastic.core.resources.terrain_horizon_apply
 import org.meshtastic.core.resources.terrain_horizon_camera
 import org.meshtastic.core.resources.terrain_horizon_compass
 import org.meshtastic.core.resources.terrain_horizon_favorites

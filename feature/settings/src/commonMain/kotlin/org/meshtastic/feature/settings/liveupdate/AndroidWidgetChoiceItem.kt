@@ -57,8 +57,7 @@ fun AndroidWidgetChoiceItem(modifier: Modifier = Modifier) {
             stringResource(Res.string.widget_adaptive_mesh_status_shown)
         } else {
             val name =
-                candidates.firstOrNull { it.num == nodeNum }?.effectiveLongName
-                    ?: NodeAddress.numToDefaultId(nodeNum)
+                candidates.firstOrNull { it.num == nodeNum }?.effectiveLongName ?: NodeAddress.numToDefaultId(nodeNum)
             stringResource(Res.string.widget_adaptive_tracking_shown, name)
         }
     BasicListItem(
