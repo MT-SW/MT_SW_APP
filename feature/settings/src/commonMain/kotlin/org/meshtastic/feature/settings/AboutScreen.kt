@@ -272,9 +272,11 @@ private fun DataNoticeSection(acceptedAt: Long?, modifier: Modifier = Modifier) 
         ListItem(
             text = stringResource(Res.string.data_notice_read_again),
             supportingText =
-            acceptedAt?.takeIf { it > 0L }?.let {
-                stringResource(Res.string.data_notice_accepted_on, DateFormatter.formatDateTime(it))
-            } ?: stringResource(Res.string.data_notice_not_accepted),
+            acceptedAt
+                ?.takeIf { it > 0L }
+                ?.let {
+                    stringResource(Res.string.data_notice_accepted_on, DateFormatter.formatDateTime(it))
+                } ?: stringResource(Res.string.data_notice_not_accepted),
             leadingIcon = MeshtasticIcons.Info,
         ) {
             showTerms = true

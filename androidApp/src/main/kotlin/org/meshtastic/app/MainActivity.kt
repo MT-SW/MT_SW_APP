@@ -117,9 +117,9 @@ import org.meshtastic.core.ui.util.LocalNfcWriterProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTerminateApplication
-import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
+import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.util.accentColorOrNull
 import org.meshtastic.core.ui.util.brandHighlightOrNull
 import org.meshtastic.core.ui.util.brandPalette
@@ -145,6 +145,7 @@ class MainActivity : AppCompatActivity() {
     private val isSupportedDevice: Boolean
         get() = (application as? MeshUtilApplication)?.isSupportedDevice != false
 
+    @Suppress("LongMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 

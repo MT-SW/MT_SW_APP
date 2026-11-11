@@ -99,10 +99,10 @@ data class AutoCleanNodesPolicy(val enabled: Boolean, val inactivityDays: Int, v
     }
 }
 
-/** Reactive interface for general UI preferences. */
 /** Version of the terms-of-use text. Raise it whenever the text changes so everybody is asked to accept it again. */
 const val DATA_NOTICE_VERSION = 1
 
+/** Reactive interface for general UI preferences. */
 @Suppress("TooManyFunctions")
 interface UiPrefs {
     val appIntroCompleted: StateFlow<Boolean>

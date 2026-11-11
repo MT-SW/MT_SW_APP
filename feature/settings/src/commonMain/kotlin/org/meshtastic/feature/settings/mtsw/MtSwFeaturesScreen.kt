@@ -52,6 +52,8 @@ import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
+import org.meshtastic.core.resources.data_notice_settings_title
+import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.intro_mtsw_planner_title
@@ -62,9 +64,6 @@ import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
-import org.meshtastic.core.resources.data_notice_settings_title
-import org.meshtastic.core.resources.data_notice_settings_title
-import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title

@@ -39,8 +39,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -83,7 +83,8 @@ private const val MAX_TEXT_WIDTH_DP = 640
  * already has data from an earlier version) it first offers to erase everything.
  */
 @Composable
-fun DataNoticeScreen(offerWipe: Boolean, onAccept: () -> Unit) {
+@Suppress("LongMethod")
+fun DataNoticeScreen(offerWipe: Boolean, onAccept: () -> Unit, modifier: Modifier = Modifier) {
     val scroll = rememberScrollState()
     var reachedEnd by remember { mutableStateOf(false) }
     var secondsLeft by remember { mutableIntStateOf(COUNTDOWN_SECONDS) }
@@ -105,7 +106,7 @@ fun DataNoticeScreen(offerWipe: Boolean, onAccept: () -> Unit) {
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,7 +144,11 @@ fun DataNoticeScreen(offerWipe: Boolean, onAccept: () -> Unit) {
                     ) {
                         Text(stringResource(Res.string.data_notice_decline))
                     }
-                    Button(onClick = onAccept, enabled = reachedEnd && secondsLeft == 0, modifier = Modifier.weight(1f)) {
+                    Button(
+                        onClick = onAccept,
+                        enabled = reachedEnd && secondsLeft == 0,
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Text(stringResource(Res.string.data_notice_accept))
                     }
                 }
