@@ -62,7 +62,7 @@ private const val HEADER_DP = 30
 private const val TWO_COLUMNS_FROM_DP = 220
 
 /** How long one node is shown before the next one (favorites and the network are shown in turn). */
-private const val ROTATION_MS = 300_000L
+private const val ROTATION_MS = 60_000L
 private const val SECOND_AREA_FROM_DP = 200
 private const val THIRD_AREA_FROM_DP = 330
 private const val OWN_SHARE_OF_THREE = 0.4f

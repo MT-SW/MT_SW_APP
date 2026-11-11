@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -39,6 +40,7 @@ import org.meshtastic.core.repository.AppWidgetUpdater
 
 private const val WIDGET_UPDATE_DEBOUNCE_MS = 500L
 private const val TRACKER_UPDATE_SAMPLE_MS = 1_000L
+private const val MESH_STATUS_ROTATION_MS = 60_000L
 
 @Single
 class AndroidAppWidgetUpdater(
@@ -64,6 +66,14 @@ class AndroidAppWidgetUpdater(
 
         scope.launch {
             meshStatusProvider.state.collect {
+                if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
+            }
+        }
+
+        // The status widget shows one node at a time and switches every minute, so it is redrawn on that beat too.
+        scope.launch {
+            while (true) {
+                delay(MESH_STATUS_ROTATION_MS - System.currentTimeMillis() % MESH_STATUS_ROTATION_MS)
                 if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
             }
         }
