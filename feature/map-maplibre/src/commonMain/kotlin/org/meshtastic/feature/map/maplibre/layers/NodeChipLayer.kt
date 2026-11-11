@@ -46,9 +46,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import org.maplibre.compose.expressions.ast.Expression
 import org.maplibre.compose.expressions.dsl.asBoolean
 import org.maplibre.compose.expressions.dsl.asString
@@ -76,6 +73,8 @@ import org.meshtastic.feature.map.maplibre.geojson.MapChipGlyph
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
+import org.meshtastic.feature.map.maplibre.geojson.lenientBoolean
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
 
@@ -125,7 +124,7 @@ internal fun NodeChipLayer(
                 ClickResult.Consume
             } else {
                 top?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
-                    click(nodeNum.jsonPrimitive.int)
+                    nodeNum.lenientInt()?.let(click)
                     ClickResult.Consume
                 } ?: ClickResult.Pass
             }
@@ -139,8 +138,8 @@ internal fun NodeChipLayer(
  */
 internal fun JsonObject?.chipRank(): Int = when {
     this == null -> MapNodePolicy.PRIORITY_ORDINARY
-    this[NodeFeatureKeys.IS_SELF]?.jsonPrimitive?.booleanOrNull == true -> MapNodePolicy.PRIORITY_PROMINENT
-    this[NodeFeatureKeys.IS_FAVORITE]?.jsonPrimitive?.booleanOrNull == true -> MapNodePolicy.PRIORITY_PROMINENT
+    this[NodeFeatureKeys.IS_SELF].lenientBoolean() == true -> MapNodePolicy.PRIORITY_PROMINENT
+    this[NodeFeatureKeys.IS_FAVORITE].lenientBoolean() == true -> MapNodePolicy.PRIORITY_PROMINENT
     else -> MapNodePolicy.PRIORITY_ORDINARY
 }
 

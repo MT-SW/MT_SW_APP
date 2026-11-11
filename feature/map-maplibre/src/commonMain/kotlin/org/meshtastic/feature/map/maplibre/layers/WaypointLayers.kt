@@ -30,8 +30,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.eq
@@ -46,6 +44,7 @@ import org.meshtastic.core.model.DataPacket
 import org.meshtastic.feature.map.maplibre.geojson.WaypointFeatureKeys
 import org.meshtastic.feature.map.maplibre.geojson.geofencesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.iconGlyph
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.geojson.waypointsToFeatureCollection
 import org.meshtastic.feature.map.maplibre.style.MapColors
@@ -86,7 +85,7 @@ internal fun WaypointLayers(waypoints: Collection<DataPacket>, onWaypointClick: 
             iconAllowOverlap = const(true),
             onClick = { features ->
                 features.firstOrNull()?.properties?.get(WaypointFeatureKeys.WAYPOINT_ID)?.let { id ->
-                    onWaypointClick(id.jsonPrimitive.int)
+                    id.lenientInt()?.let(onWaypointClick)
                     ClickResult.Consume
                 } ?: ClickResult.Pass
             },

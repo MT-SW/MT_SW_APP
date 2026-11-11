@@ -22,8 +22,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import org.maplibre.compose.expressions.dsl.asNumber
 import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.const
@@ -43,6 +41,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.precisionCirclesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -238,7 +237,7 @@ fun NodeLayers(
         strokeWidth = const(2.dp),
         onClick = { features ->
             features.firstOrNull()?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
-                onNodeClick(nodeNum.jsonPrimitive.int)
+                nodeNum.lenientInt()?.let(onNodeClick)
                 ClickResult.Consume
             } ?: ClickResult.Pass
         },

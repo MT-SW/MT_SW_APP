@@ -36,8 +36,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.stringResource
 import org.maplibre.compose.camera.CameraAnimation
@@ -74,6 +72,7 @@ import org.meshtastic.feature.map.maplibre.geojson.MapChipGlyph
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.layers.MapChipLayer
@@ -360,7 +359,7 @@ private fun DiscoveredNodeLayers(nodes: List<DiscoveryMapNode>, onNodeClick: (In
         chips = chips,
         onClick = { features ->
             features.firstOrNull()?.properties?.get(DISCOVERY_INDEX_KEY)?.let { index ->
-                onNodeClick(index.jsonPrimitive.int)
+                index.lenientInt()?.let(onNodeClick)
                 ClickResult.Consume
             } ?: ClickResult.Pass
         },

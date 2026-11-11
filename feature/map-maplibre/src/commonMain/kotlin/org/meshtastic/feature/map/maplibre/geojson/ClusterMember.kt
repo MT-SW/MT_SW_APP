@@ -19,7 +19,6 @@ package org.meshtastic.feature.map.maplibre.geojson
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
@@ -76,6 +75,6 @@ private fun JsonObject.toClusterMember(): ClusterMember? {
     )
 }
 
-private fun JsonElement?.asInt(): Int? = this?.jsonPrimitive?.intOrNull
+private fun JsonElement?.asInt(): Int? = this.lenientInt()
 
 private fun JsonElement?.asText(): String = this?.jsonPrimitive?.contentOrNull.orEmpty()

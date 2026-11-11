@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.compose.viewmodel.koinViewModel
 import org.maplibre.compose.expressions.dsl.asNumber
@@ -60,6 +58,7 @@ import org.meshtastic.feature.map.maplibre.component.customRasterBasemaps
 import org.meshtastic.feature.map.maplibre.component.rememberBasemapSelection
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
 import org.meshtastic.feature.map.maplibre.layers.NodeChipLayer
@@ -293,7 +292,7 @@ private fun TrackPointLayer(points: List<TrackPoint>, color: Color, onPositionSe
         // the same reason the node chips resolve a stacked tap by rank instead of by query order.
         onClick = { features ->
             features
-                .mapNotNull { it.properties?.get(TRACK_POINT_KEY)?.jsonPrimitive?.int }
+                .mapNotNull { it.properties?.get(TRACK_POINT_KEY).lenientInt() }
                 .maxOrNull()
                 ?.let { time ->
                     onPositionSelect?.invoke(time)
