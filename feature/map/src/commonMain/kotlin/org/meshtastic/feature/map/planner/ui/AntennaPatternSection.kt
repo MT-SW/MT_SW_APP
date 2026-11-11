@@ -106,24 +106,7 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
             Switch(checked = end.aimAtOther, onCheckedChange = { vm.setAimAtOther(side, it) })
             Text(stringResource(Res.string.planner_pattern_aim_other), style = MaterialTheme.typography.bodyMedium)
         }
-        PlannerNumberField(
-            label = stringResource(Res.string.planner_pattern_azimuth),
-            value = end.azimuthDeg,
-            onValue = { vm.setAzimuth(side, it) },
-            decimals = 0,
-            suffix = "°",
-            min = 0.0,
-            max = 359.0,
-        )
-        PlannerNumberField(
-            label = stringResource(Res.string.planner_pattern_tilt),
-            value = end.tiltDeg,
-            onValue = { vm.setTilt(side, it) },
-            decimals = 1,
-            suffix = "°",
-            min = -60.0,
-            max = 60.0,
-        )
+        AimFields(side, end, vm)
         PlannerNumberField(
             label = stringResource(Res.string.planner_pattern_beamwidth),
             value = end.beamwidthDeg,
@@ -148,6 +131,30 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
         beamwidthDeg = end.beamwidthDeg,
         frontToBackDb = end.frontToBackDb,
         modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(PLOT_WIDTH_SHARE),
+    )
+}
+
+/** The direction (azimuth) and the tilt of a directional antenna. */
+@Composable
+@Suppress("MultipleEmitters")
+private fun AimFields(side: PlannerSide, end: PlannerEnd, vm: PlannerViewModel) {
+    PlannerNumberField(
+        label = stringResource(Res.string.planner_pattern_azimuth),
+        value = end.azimuthDeg,
+        onValue = { vm.setAzimuth(side, it) },
+        decimals = 0,
+        suffix = "°",
+        min = 0.0,
+        max = 359.0,
+    )
+    PlannerNumberField(
+        label = stringResource(Res.string.planner_pattern_tilt),
+        value = end.tiltDeg,
+        onValue = { vm.setTilt(side, it) },
+        decimals = 1,
+        suffix = "°",
+        min = -60.0,
+        max = 60.0,
     )
 }
 

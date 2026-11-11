@@ -342,20 +342,6 @@ class PlannerComputer(
         PlannerElevationFailure.DECODE -> PlannerError.ELEVATION_DECODE
     }
 
-    /** The angle (degrees, up is positive) at which [other]'s antenna is seen from [end]'s antenna. */
-    private fun elevationDeg(
-        end: PlannerEnd,
-        groundM: Double,
-        other: PlannerEnd,
-        otherGroundM: Double,
-        from: GeoPoint,
-        to: GeoPoint,
-    ): Double {
-        val distance = Geodesy.distanceM(from, to).coerceAtLeast(1.0)
-        val rise = (otherGroundM + other.antennaHeightM) - (groundM + end.antennaHeightM)
-        return atan2(rise, distance) * RAD_TO_DEG
-    }
-
     private fun linkEnd(
         end: PlannerEnd,
         point: GeoPoint,
@@ -456,3 +442,17 @@ class PlannerComputer(
 }
 
 private const val RAD_TO_DEG = 57.29577951308232
+
+/** The angle (degrees, up is positive) at which [other]'s antenna is seen from [end]'s antenna. */
+private fun elevationDeg(
+    end: PlannerEnd,
+    groundM: Double,
+    other: PlannerEnd,
+    otherGroundM: Double,
+    from: GeoPoint,
+    to: GeoPoint,
+): Double {
+    val distance = Geodesy.distanceM(from, to).coerceAtLeast(1.0)
+    val rise = (otherGroundM + other.antennaHeightM) - (groundM + end.antennaHeightM)
+    return atan2(rise, distance) * RAD_TO_DEG
+}
