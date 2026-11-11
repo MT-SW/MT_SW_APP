@@ -494,24 +494,20 @@ private class ChipSearch(
  * divided by it. Answers close to 1 are taken as 1, and nonsense is ignored.
  */
 private suspend fun screenScale(state: MapState, tap: Position, at: DpOffset): Float {
-    val metersPerDp = state.viewport?.metersPerDpAtCenter ?: return 1f
-    if (metersPerDp <= 0.0) return 1f
-    val centreLat = state.cameraPosition.center.latitude
+    val metersPerDp = state.viewport?.metersPerDpAtCenter ?: 0.0
+    val probe = if (metersPerDp > 0.0) probeSpotEast(state, tap, metersPerDp) else null
+    val east = probe?.let { state.screenLocationFromPosition(it) }
+    val scale = east?.let { (hypot((it.x - at.x).value, (it.y - at.y).value) / SCALE_PROBE_DP).toFloat() } ?: 1f
+    return if (scale in SCALE_LIMIT_MIN..SCALE_LIMIT_MAX && scale !in SCALE_TRUSTED_MIN..SCALE_TRUSTED_MAX) scale else 1f
+}
+
+/** The spot [SCALE_PROBE_DP] dp east of [tap], worked out from the map's own metres per dp (given for its centre). */
+private fun probeSpotEast(state: MapState, tap: Position, metersPerDp: Double): Position {
     val toRad = PI / HALF_TURN_DEG
-    // The map's metres per dp is for the centre of the view; a spot further north or south has shorter degrees.
-    val localMetersPerDp = metersPerDp * cos(tap.latitude * toRad) / cos(centreLat * toRad)
-    // Probe a stretch that is about SCALE_PROBE_DP wide whatever the zoom, so rounding never decides the answer.
-    val probeDeg = SCALE_PROBE_DP * localMetersPerDp / (EARTH_RADIUS_M * toRad * cos(tap.latitude * toRad))
-    val east = state.screenLocationFromPosition(Position(tap.longitude + probeDeg, tap.latitude)) ?: return 1f
-    val measured = hypot((east.x - at.x).value, (east.y - at.y).value).toDouble()
-    val expected = SCALE_PROBE_DP
-    if (measured <= 0.0) return 1f
-    val scale = (measured / expected).toFloat()
-    return when {
-        scale in SCALE_TRUSTED_MIN..SCALE_TRUSTED_MAX -> 1f
-        scale in SCALE_LIMIT_MIN..SCALE_LIMIT_MAX -> scale
-        else -> 1f
-    }
+    // A spot further north or south than the centre has shorter degrees, so fewer metres per dp.
+    val localMetersPerDp = metersPerDp * cos(tap.latitude * toRad) / cos(state.cameraPosition.center.latitude * toRad)
+    val degrees = SCALE_PROBE_DP * localMetersPerDp / (EARTH_RADIUS_M * toRad * cos(tap.latitude * toRad))
+    return Position(tap.longitude + degrees, tap.latitude)
 }
 
 private fun Float.roundTo1(): Float = (this * 10f).toInt() / 10f
