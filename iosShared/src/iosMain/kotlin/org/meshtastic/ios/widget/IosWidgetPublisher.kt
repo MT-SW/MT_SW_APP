@@ -89,7 +89,9 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
     private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
 
     private fun json(snapshot: MeshStatsSnapshot, updatedText: String, small: Int, second: Int): String =
-        "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)},\"connected\":${snapshot.connected}," +
+        "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)}," +
+            "${chipJson(snapshot.shortName, snapshot.color, snapshot.textColor)}," +
+            "\"connected\":${snapshot.connected}," +
             "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
             "\"groups\":[${snapshot.groups.joinToString(",") { group ->
                 "{\"title\":${quote(group.title)},\"column\":${group.column},\"lines\":${lines(group.lines)}}"
@@ -98,10 +100,17 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
                 snapshot.favorites,
             )},\"others\":${cards(snapshot.others)},\"network\":${cards(snapshot.network)}}"
 
+    /** The short name and the colours of a node's chip, as JSON members (colours as unsigned ARGB). */
+    private fun chipJson(short: String, color: Int, textColor: Int): String =
+        "\"short\":${quote(short)},\"color\":${color.toUInt()},\"textColor\":${textColor.toUInt()}"
+
     private fun lines(lines: List<String>): String = "[${lines.joinToString(",") { quote(it) }}]"
 
     private fun cards(cards: List<MeshStatsNodeCard>): String =
-        "[${cards.joinToString(",") { "{\"title\":${quote(it.title)},\"lines\":${lines(it.lines)}}" }}]"
+        "[${cards.joinToString(",") { card ->
+            "{\"title\":${quote(card.title)},${chipJson(card.shortName, card.color, card.textColor)}," +
+                "\"lines\":${lines(card.lines)}}"
+        }}]"
 
     private fun quote(text: String): String = buildString {
         append('"')

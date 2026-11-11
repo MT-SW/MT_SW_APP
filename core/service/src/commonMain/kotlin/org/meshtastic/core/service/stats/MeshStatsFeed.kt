@@ -54,10 +54,21 @@ data class MeshStatsSnapshot(
     val others: List<MeshStatsNodeCard> = emptyList(),
     /** The whole mesh without our node, favorites included (what the smaller widgets show for "the whole network"). */
     val network: List<MeshStatsNodeCard> = emptyList(),
+    /** Our node's short name and colours (ARGB), for the chip the widgets draw instead of the online count. */
+    val shortName: String = "",
+    val color: Int = 0,
+    val textColor: Int = 0,
 )
 
 /** The readings of one node: its name and the lines (battery, signal, uptime, channel use). */
-data class MeshStatsNodeCard(val title: String, val lines: List<String>)
+data class MeshStatsNodeCard(
+    val title: String,
+    val lines: List<String>,
+    /** The node's short name and colours (ARGB) as drawn on its chip. */
+    val shortName: String = "",
+    val color: Int = 0,
+    val textColor: Int = 0,
+)
 
 /**
  * The statistics of the permanent notification on Android (mesh status, or one tracked node when chosen in the adaptive
@@ -144,7 +155,20 @@ class MeshStatsFeed(
             lines = groups.flatMap { it.lines }
         }
         val chip = if (b.connected) "${b.online}/${b.total}" else ""
-        if (!withNodes) return MeshStatsSnapshot(title, chip, b.connected, lines, groups)
+        val ownShort = our?.user?.short_name.orEmpty()
+        val ownColors = our?.colors
+        if (!withNodes) {
+            return MeshStatsSnapshot(
+                title,
+                chip,
+                b.connected,
+                lines,
+                groups,
+                shortName = ownShort,
+                color = ownColors?.second ?: 0,
+                textColor = ownColors?.first ?: 0,
+            )
+        }
         val others = nodes.nodeDBbyNum.value.values.filter { it.num != our?.num }
         val favorites = others.filter { it.isFavorite }.sortedBy { it.effectiveLongName }.take(CARD_LIMIT)
         val rest = others.filter { !it.isFavorite && it.lastHeard > 0 }.sortedByDescending { it.lastHeard }
@@ -162,10 +186,19 @@ class MeshStatsFeed(
                 .sortedByDescending { it.lastHeard }
                 .take(CARD_LIMIT)
                 .map { card(it) },
+            shortName = ownShort,
+            color = ownColors?.second ?: 0,
+            textColor = ownColors?.first ?: 0,
         )
     }
 
-    private suspend fun card(node: Node) = MeshStatsNodeCard(node.effectiveLongName, trackedLines(node))
+    private suspend fun card(node: Node) = MeshStatsNodeCard(
+        title = node.effectiveLongName,
+        lines = trackedLines(node),
+        shortName = node.user.short_name,
+        color = node.colors.second,
+        textColor = node.colors.first,
+    )
 
     private suspend fun trackedLines(node: Node): List<String> = buildList {
         node.deviceMetrics.battery_level?.let { add(MeshStatsLines.batteryText(it)) }

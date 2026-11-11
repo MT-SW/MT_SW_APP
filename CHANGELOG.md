@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Android i iPhone/iPad: w widżecie statystyk zamiast liczby aktywnych węzłów w rogu jest plakietka naszego węzła (jego kolor i krótka nazwa, jak na mapie); w większych widżetach karty innych węzłów mają pełną nazwę po jednej stronie, a plakietkę z krótką nazwą po drugiej.
 * Wszystkie wersje: nowa warstwa mapy „Propagacja (prognoza pogody)” w ustawieniach warstw: kolorowa prognoza na 24 godziny pokazuje, gdzie pogoda wydłuża zasięg radia (z temperatury, wilgotności i ciśnienia, Open-Meteo, CC BY 4.0). Wybór rodzaju, przezroczystość, godzina, „Pobierz/Aktualizuj dla tego widoku”, zapis na urządzeniu i automatyczne odświeżanie.
 * Wszystkie wersje: planer i kalkulator anten — rodzaje anten (dookólna, Yagi z liczbą elementów, Moxon, panelowa, biquad, helisa, czasza, sektorowa) z charakterystyką promieniowania; planer liczy kierunkowość i ustawienie anten także w zasięgu dookoła, ma osobne opcje odbicia od ziemi oraz od budynków i drzew, a wynik trasy pokazuje zysk z odbicia i stratę kierunkowości.
 * Wszystkie wersje: zdalna administracja węzłem — pytanie o wersję MT_SW_FIRMWARE i o konfigurację statystyk lokalnych wychodzi teraz także do zdalnego węzła (wcześniej nie wychodziło wcale, przez co karta była oznaczona jako nieobsługiwana).
@@ -630,6 +631,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Android and iPhone/iPad: in the statistics widget the corner shows our node's chip (its colour and short name, as on the map) instead of the online count; in the bigger widgets the other nodes' cards have the full name on one side and the chip with the short name on the other.
 * All versions: a new map layer "Propagation (weather forecast)" in the layers settings: a coloured 24-hour forecast shows where the weather extends the radio range (from temperature, humidity and pressure, Open-Meteo, CC BY 4.0). Choice of kind, transparency, hour, "Download/Update for this view", saved on the device and automatic refresh.
 * All versions: planner and antenna calculator — antenna kinds (omni, Yagi with a number of elements, Moxon, panel, biquad, helix, dish, sector) with a radiation pattern; the planner takes antenna directivity and aiming into account also in the range all around, has separate ground reflection and building and tree reflection options, and the link result shows the reflection gain and the directivity loss.
 * All versions: remote administration — the request for the MT_SW_FIRMWARE version and for the local statistics configuration now also goes out to the remote node (before it never went out, so the card was shown as unsupported).

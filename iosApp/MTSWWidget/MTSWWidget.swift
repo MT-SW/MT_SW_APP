@@ -39,11 +39,46 @@ struct StatsGroup {
 struct NodeCard {
     var title: String
     var lines: [String]
+    /// Krótka nazwa i kolory (ARGB) plakietki węzła, jak na mapie.
+    var short: String = ""
+    var color: UInt32 = 0
+    var textColor: UInt32 = 0
+}
+
+/// Kolor z liczby ARGB zapisanej przez aplikację.
+private func argb(_ value: UInt32) -> Color {
+    Color(.sRGB,
+          red: Double((value >> 16) & 0xFF) / 255,
+          green: Double((value >> 8) & 0xFF) / 255,
+          blue: Double(value & 0xFF) / 255,
+          opacity: 1)
+}
+
+/// Plakietka węzła: kolor węzła i jego krótka nazwa (tak jak na mapie).
+struct NodeChip: View {
+    let short: String
+    let color: UInt32
+    let textColor: UInt32
+
+    var body: some View {
+        if !short.isEmpty {
+            Text(short)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(argb(textColor))
+                .lineLimit(1)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(argb(color), in: Capsule())
+        }
+    }
 }
 
 struct StatsData {
     var title: String
     var chip: String
+    var short: String = ""
+    var color: UInt32 = 0
+    var textColor: UInt32 = 0
     var connected: Bool
     var updated: Date
     var updatedText: String?
@@ -77,7 +112,10 @@ struct MTSWConfigIntent: WidgetConfigurationIntent {
 
 private func readCards(_ raw: Any?) -> [NodeCard] {
     (raw as? [[String: Any]] ?? []).map {
-        NodeCard(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [])
+        NodeCard(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [],
+                 short: $0["short"] as? String ?? "",
+                 color: (($0["color"] as? NSNumber)?.uint32Value) ?? 0,
+                 textColor: (($0["textColor"] as? NSNumber)?.uint32Value) ?? 0)
     }
 }
 
@@ -88,6 +126,9 @@ private func readStats() -> StatsData? {
     return StatsData(
         title: json["title"] as? String ?? "MT_SW",
         chip: json["chip"] as? String ?? "",
+        short: json["short"] as? String ?? "",
+        color: (json["color"] as? NSNumber)?.uint32Value ?? 0,
+        textColor: (json["textColor"] as? NSNumber)?.uint32Value ?? 0,
         connected: json["connected"] as? Bool ?? false,
         updated: Date(timeIntervalSince1970: json["updated"] as? Double ?? 0),
         updatedText: json["updatedText"] as? String,
@@ -242,9 +283,7 @@ struct OwnStatsView: View {
             HStack {
                 Text(data.title).font(.system(size: 14, weight: .semibold)).lineLimit(1)
                 Spacer()
-                if !data.chip.isEmpty {
-                    Text(data.chip).font(.system(size: 13, weight: .medium)).foregroundStyle(.secondary)
-                }
+                NodeChip(short: data.short, color: data.color, textColor: data.textColor)
             }
             if data.groups.isEmpty {
                 let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
@@ -281,6 +320,7 @@ struct NodeCardView: View {
                 HStack {
                     Text(card.title).font(.system(size: 15, weight: .semibold)).lineLimit(1)
                     Spacer()
+                    NodeChip(short: card.short, color: card.color, textColor: card.textColor)
                     if cards.count > 1 {
                         Text("\(step % cards.count + 1)/\(cards.count)")
                             .font(.system(size: 10)).foregroundStyle(.secondary)

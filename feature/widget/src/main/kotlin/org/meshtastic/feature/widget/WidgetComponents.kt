@@ -17,8 +17,10 @@
 package org.meshtastic.feature.widget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
@@ -26,6 +28,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -42,6 +45,24 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
+
+/** A node's chip as on the map: its colour with its short name on it. Nothing is drawn without a short name. */
+@Composable
+internal fun NodeChip(shortName: String, color: Int, textColor: Int) {
+    if (shortName.isEmpty()) return
+    Text(
+        text = shortName,
+        maxLines = 1,
+        style = TextStyle(color = ColorProvider(Color(textColor)), fontSize = 12.sp, fontWeight = FontWeight.Bold),
+        modifier =
+        GlanceModifier.background(ColorProvider(Color(color)))
+            .cornerRadius(CHIP_RADIUS)
+            .padding(horizontal = 6.dp, vertical = 1.dp),
+    )
+}
+
+private val CHIP_RADIUS = 8.dp
 
 /** The MT_SW mark, in its own colours (the fork's logo is not a single-colour shape, so it is not tinted). */
 @Composable

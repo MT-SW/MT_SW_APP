@@ -194,13 +194,7 @@ private fun OwnSection(snapshot: MeshStatsSnapshot?, widthDp: Float, heightDp: F
                 style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )
-            if (!snapshot?.chip.isNullOrEmpty()) {
-                Text(
-                    text = snapshot.chip,
-                    maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
-                )
-            }
+            if (snapshot != null) NodeChip(snapshot.shortName, snapshot.color, snapshot.textColor)
         }
         Spacer(GlanceModifier.width(2.dp))
         if (snapshot == null || !snapshot.connected || snapshot.lines.isEmpty()) {
@@ -247,9 +241,10 @@ private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: In
                     TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 12.sp, fontWeight = FontWeight.Bold),
                     modifier = GlanceModifier.defaultWeight(),
                 )
+                NodeChip(card.shortName, card.color, card.textColor)
                 if (cards.size > 1) {
                     Text(
-                        text = "${index + 1}/${cards.size}",
+                        text = " ${index + 1}/${cards.size}",
                         maxLines = 1,
                         style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 10.sp),
                     )
