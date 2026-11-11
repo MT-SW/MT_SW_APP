@@ -338,6 +338,7 @@ fun MeshMap(
                         onEvent { event ->
                             Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
                             val tap = event.position
+                            val finger = event.screenOffset
                             // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation; the
                             // check needs the map's answer, so it runs beside the event and the rest of the tap
                             // (waypoints, planner) is only given the taps that hit no node.
@@ -345,7 +346,7 @@ fun MeshMap(
                                 val onNode =
                                     tap != null &&
                                         onNodeClick != null &&
-                                        nodeTapAt(mapState, tap, onNodeClick, onNodeStack ?: {})
+                                        nodeTapAt(mapState, tap, finger, onNodeClick, onNodeStack ?: {})
                                 if (!onNode) tap?.let(onMapClick)
                             }
                             ClickResult.Pass

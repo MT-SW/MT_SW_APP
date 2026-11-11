@@ -442,10 +442,14 @@ private const val RANK_WEIGHT = 100_000f
 internal suspend fun nodeTapAt(
     state: MapState,
     tap: Position,
+    finger: DpOffset,
     click: (Int) -> Unit,
     onStack: (List<ClusterMember>) -> Unit,
 ): Boolean {
-    val at = state.screenLocationFromPosition(tap) ?: return false
+    // The finger's own place on the map view, as the map reports it with the click: nothing is converted back from the
+    // geographic position, so no scale or offset of the map's projection can move it.
+    val at = finger
+    val projected = state.screenLocationFromPosition(tap)
     val scale = screenScale(state, tap, at)
     val search = chipCandidates(state, at, scale)
     val candidates = search.candidates
@@ -453,12 +457,13 @@ internal suspend fun nodeTapAt(
     val closest = candidates.minOfOrNull { it.third }
     val pool = candidates.filter { closest != null && it.third <= closest + RANK_TIE_DP }
     val best = pool.maxByOrNull { it.second * RANK_WEIGHT - it.third }
+    val chosen = best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM)
+    val finger = "${at.x.value.roundTo1()}, ${at.y.value.roundTo1()}"
+    val fromPosition = "${projected?.x?.value?.roundTo1()}, ${projected?.y?.value?.roundTo1()}"
     Logger.i {
-        "Dotyk w węzeł: ekran ${at.x.value.roundTo1()}, ${at.y.value.roundTo1()}, skala ekranu ${scale.roundTo2()}, " +
+        "Dotyk w węzeł: palec $finger, z pozycji $fromPosition, skala ekranu ${scale.roundTo2()}, " +
             "zoom ${state.cameraPosition.zoom.toFloat().roundTo1()}, kropek na ekranie ${search.rendered}, " +
-            "najbliższa kropka: ${search.nearest}, kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(
-                NodeFeatureKeys.NODE_NUM,
-            )}"
+            "najbliższa kropka: ${search.nearest}, kandydatów ${candidates.size}, wybrany $chosen"
     }
     val near = best?.let { top -> candidates.filter { it.third <= top.third + STACK_TOLERANCE_DP }.map { it.first } }
     val stack = if (best != null && near != null) stackedMembers(near, best.first) else emptyList()
@@ -498,7 +503,8 @@ private suspend fun screenScale(state: MapState, tap: Position, at: DpOffset): F
     val probe = if (metersPerDp > 0.0) probeSpotEast(state, tap, metersPerDp) else null
     val east = probe?.let { state.screenLocationFromPosition(it) }
     val scale = east?.let { (hypot((it.x - at.x).value, (it.y - at.y).value) / SCALE_PROBE_DP).toFloat() } ?: 1f
-    return if (scale in SCALE_LIMIT_MIN..SCALE_LIMIT_MAX && scale !in SCALE_TRUSTED_MIN..SCALE_TRUSTED_MAX) scale else 1f
+    val usable = scale in SCALE_LIMIT_MIN..SCALE_LIMIT_MAX && scale !in SCALE_TRUSTED_MIN..SCALE_TRUSTED_MAX
+    return if (usable) scale else 1f
 }
 
 /** The spot [SCALE_PROBE_DP] dp east of [tap], worked out from the map's own metres per dp (given for its centre). */
