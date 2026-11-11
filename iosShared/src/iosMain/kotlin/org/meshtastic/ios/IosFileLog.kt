@@ -22,6 +22,7 @@ import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -76,6 +77,17 @@ internal object IosFileLog : LogWriter() {
     private var session = ""
     private var startedAt = 0L
 
+    /** The part being written stays open: opening and closing the file for every line made each log call slow. */
+    private var sink: BufferedSink? = null
+
+    /** One formatter for every line: making a new one for each line was the slowest part of a log call. */
+    private val stampFormatter by lazy {
+        NSDateFormatter().apply {
+            locale = NSLocale(localeIdentifier = "en_US_POSIX")
+            dateFormat = "MM-dd HH:mm:ss.SSS"
+        }
+    }
+
     private val levelFlow = MutableStateFlow(AppLogLevel.OFF)
     val level: StateFlow<AppLogLevel>
         get() = levelFlow
@@ -100,7 +112,7 @@ internal object IosFileLog : LogWriter() {
     private fun threadName(): String =
         if (NSThread.isMainThread) "main" else NSThread.currentThread.name?.takeIf { it.isNotBlank() } ?: "worker"
 
-    fun stamp(): String = format("MM-dd HH:mm:ss.SSS")
+    fun stamp(): String = stampFormatter.stringFromDate(NSDate())
 
     /** Repeated at the top of every part and of the report. */
     fun header(): String =
@@ -199,16 +211,14 @@ internal object IosFileLog : LogWriter() {
                     } else {
                         ""
                     }
-                val sink = FileSystem.SYSTEM.appendingSink(dir / currentName).buffer()
-                try {
-                    sink.writeUtf8(head + line)
-                } finally {
-                    sink.close()
-                }
+                val out = sink ?: FileSystem.SYSTEM.appendingSink(dir / currentName).buffer().also { sink = it }
+                out.writeUtf8(head + line)
+                // Every line goes to the file at once, so nothing is lost when the app is killed.
+                out.flush()
                 partBytes += head.length + line.length
                 if (head.isNotEmpty()) pruneOld()
-                if (partBytes >= PART_BYTES) open = false
-            }
+                if (partBytes >= PART_BYTES) closeSink()
+            }.onFailure { closeSink() }
         } finally {
             lock.unlock()
         }
@@ -216,8 +226,15 @@ internal object IosFileLog : LogWriter() {
 
     private fun closeCurrent() {
         lock.lock()
-        open = false
+        closeSink()
         lock.unlock()
+    }
+
+    /** Closes the part being written; the next line opens a new one. Called with the lock held. */
+    private fun closeSink() {
+        open = false
+        runCatching { sink?.close() }
+        sink = null
     }
 
     private fun partName(number: Int) = "mt_sw_log_${session}_${number.toString().padStart(PART_NUMBER_WIDTH, '0')}.txt"

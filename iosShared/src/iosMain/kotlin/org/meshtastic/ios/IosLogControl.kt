@@ -41,6 +41,7 @@ import org.meshtastic.core.common.util.Crc32
 import org.meshtastic.core.database.iosDataDir
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
+import platform.Foundation.NSLock
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSProcessInfo
@@ -91,6 +92,7 @@ internal object IosLogControl : AppLogControl {
     private const val MILLIS_PER_SECOND = 1000L
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val exportLock = NSLock()
     private val folderName = MutableStateFlow<String?>(null)
 
     // The picker only keeps a weak reference to its delegate.
@@ -141,7 +143,8 @@ internal object IosLogControl : AppLogControl {
         observe(UIApplicationDidEnterBackgroundNotification) {
             markState("background")
             Logger.i(tag = LIFECYCLE) { "App process: ON_STOP (entered the background)" }
-            exportNow()
+            // Zipping the logs takes a while: off the main thread, which the system watches while the app goes away.
+            scope.launch { exportNow() }
         }
         observe(UIApplicationWillEnterForegroundNotification) {
             markState("foreground")
@@ -255,11 +258,17 @@ internal object IosLogControl : AppLogControl {
      * log) and, apart from it, the full log (only while it is on).
      */
     fun exportNow() {
-        val crash = IosFileLog.crashFiles().isNotEmpty()
-        if (IosFileLog.recent.value || IosFileLog.level.value != AppLogLevel.OFF || crash) {
-            exportOne(NAME_24H, "last_export_24h.txt", allTime = false)
+        // One saving at a time: the one every few minutes and the one at going to the background must not overlap.
+        exportLock.lock()
+        try {
+            val crash = IosFileLog.crashFiles().isNotEmpty()
+            if (IosFileLog.recent.value || IosFileLog.level.value != AppLogLevel.OFF || crash) {
+                exportOne(NAME_24H, "last_export_24h.txt", allTime = false)
+            }
+            if (IosFileLog.level.value != AppLogLevel.OFF) exportOne(NAME_FULL, "last_export_full.txt", allTime = true)
+        } finally {
+            exportLock.unlock()
         }
-        if (IosFileLog.level.value != AppLogLevel.OFF) exportOne(NAME_FULL, "last_export_full.txt", allTime = true)
     }
 
     @Suppress("ReturnCount")
