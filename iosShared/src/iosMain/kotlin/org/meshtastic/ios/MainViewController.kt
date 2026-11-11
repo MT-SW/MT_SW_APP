@@ -138,7 +138,7 @@ private fun BackgroundCleanup() {
 @Composable
 private fun WidgetPublishing() {
     val publisher = remember {
-        IosWidgetPublisher(koin.get<MeshStatsFeed>(MeshStatsFeed::class))
+        IosWidgetPublisher(koin.get<MeshStatsFeed>(MeshStatsFeed::class), koin.get<UiPrefs>(UiPrefs::class))
     }
     LaunchedEffect(Unit) { withContext(Dispatchers.Default) { publisher.run() } }
 }

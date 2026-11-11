@@ -62,6 +62,7 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
         val support = rememberLiveUpdateSupport()
         if (support.widget) {
             LiveUpdateSection(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+            AndroidWidgetContentItems()
         } else if (support.available) {
             // Android: the widget has its own choice, apart from the adaptive notification.
             AndroidWidgetChoiceItem()

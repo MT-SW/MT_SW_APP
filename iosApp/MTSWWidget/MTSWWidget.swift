@@ -50,6 +50,9 @@ struct StatsData {
     var favorites: [NodeCard]
     var others: [NodeCard]
     var network: [NodeCard]
+    /// Wybór z ustawień aplikacji: co pokazuje mały widżet (0 nasz węzeł, 1 ulubione, 2 sieć) i drugie pole dużego (0 ulubione, 1 sieć).
+    var small: Int = 0
+    var second: Int = 0
 }
 
 struct StatsEntry: TimelineEntry {
@@ -60,51 +63,12 @@ struct StatsEntry: TimelineEntry {
     let config: MTSWConfigIntent
 }
 
-/// Co pokazuje średni widżet (najmniejszy dostępny).
-enum SmallContent: String, AppEnum {
-    case own, favorites, network
-
-    static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        TypeDisplayRepresentation(name: "Zawartość")
-    }
-
-    static var caseDisplayRepresentations: [SmallContent: DisplayRepresentation] {
-        [
-            .own: DisplayRepresentation(title: "Nasz węzeł"),
-            .favorites: DisplayRepresentation(title: "Ulubione na zmianę"),
-            .network: DisplayRepresentation(title: "Cała sieć na zmianę"),
-        ]
-    }
-}
-
-/// Co pokazuje drugie pole dużego widżetu (pod naszym węzłem).
-enum SecondContent: String, AppEnum {
-    case favorites, network
-
-    static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        TypeDisplayRepresentation(name: "Drugie pole")
-    }
-
-    static var caseDisplayRepresentations: [SecondContent: DisplayRepresentation] {
-        [
-            .favorites: DisplayRepresentation(title: "Ulubione na zmianę"),
-            .network: DisplayRepresentation(title: "Cała sieć na zmianę"),
-        ]
-    }
-}
-
-/// Ustawienia widżetu (przytrzymaj widżet, potem „Edytuj widżet”).
+/// Ustawienia widżetu: wybór (co pokazuje) jest w aplikacji i przychodzi razem ze statystykami.
 struct MTSWConfigIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource { "Statystyki MT_SW" }
     static var description: IntentDescription {
         IntentDescription("Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (4x6): nasz węzeł, ulubione i cała sieć.")
     }
-
-    @Parameter(title: "Średni widżet", default: .own)
-    var small: SmallContent
-
-    @Parameter(title: "Drugie pole dużego widżetu", default: .favorites)
-    var second: SecondContent
 
     init() {}
 }
@@ -131,7 +95,9 @@ private func readStats() -> StatsData? {
         },
         favorites: readCards(json["favorites"]),
         others: readCards(json["others"]),
-        network: readCards(json["network"])
+        network: readCards(json["network"]),
+        small: json["small"] as? Int ?? 0,
+        second: json["second"] as? Int ?? 0
     )
 }
 
@@ -313,14 +279,8 @@ struct NodeCardView: View {
                             .font(.system(size: 10)).foregroundStyle(.secondary)
                     }
                 }
-                let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
-                    ForEach(Array(card.lines.enumerated()), id: \.offset) { _, line in
-                        Text(line).font(.system(size: 13)).lineLimit(1).minimumScaleFactor(0.7)
-                    }
-                }
+                GroupsView(groups: [StatsGroup(title: "", lines: card.lines)], maxSize: 17)
             }
-            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
@@ -410,7 +370,7 @@ struct StatsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     OwnStatsView(data: data).frame(maxHeight: .infinity)
                     Divider()
-                    (entry.config.second == .favorites ? favorite : network).frame(maxHeight: .infinity)
+                    (data.second == 0 ? favorite : network).frame(maxHeight: .infinity)
                 }
             case .systemExtraLarge:
                 // Szeroki (iPad): nasz węzeł, ulubione i reszta sieci (bez ulubionych i bez nas).
@@ -420,10 +380,10 @@ struct StatsView: View {
                     // 4x6 na iPhonie (iOS 27): to osobny rozmiar systemExtraLargePortrait.
                     ExtraLargeView(data: data, favorite: favorite, other: other)
                 } else {
-                switch entry.config.small {
-                case .own: OwnStatsView(data: data)
-                case .favorites: withOwn(cards: data.favorites, label: isPolish ? "Ulubiony węzeł" : "Favorite node", entry: entry, data: data)
-                case .network: withOwn(cards: data.network, label: isPolish ? "Węzeł sieci" : "Network node", entry: entry, data: data)
+                switch data.small {
+                case 1: withOwn(cards: data.favorites, label: isPolish ? "Ulubiony węzeł" : "Favorite node", entry: entry, data: data)
+                case 2: withOwn(cards: data.network, label: isPolish ? "Węzeł sieci" : "Network node", entry: entry, data: data)
+                default: OwnStatsView(data: data)
                 }
                 }
             }
@@ -441,8 +401,8 @@ struct MTSWStatsWidget: Widget {
         }
         .configurationDisplayName(isPolish ? "Statystyki MT_SW" : "MT_SW statistics")
         .description(isPolish
-            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Przytrzymaj widżet i wybierz „Edytuj widżet”."
-            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. Touch and hold the widget and choose \"Edit widget\".")
+            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Co pokazuje, wybierasz w aplikacji (Ustawienia → Widżet statystyk)."
+            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. What it shows is chosen in the app (Settings → Statistics widget).")
         .supportedFamilies(widgetFamilies)
     }
 }

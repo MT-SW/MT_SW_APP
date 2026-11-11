@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone i iPad: wybór, co pokazuje widżet w swoich rozmiarach (nasz węzeł, ulubione albo cała sieć), jest teraz w ustawieniach aplikacji („Widżet statystyk”), tak samo jak na Androidzie. Karty węzłów wypełniają całe pole większym pismem.
 * Wszystkie wersje: w panoramie terenu budynki mają teraz własny, pomarańczowy kolor i widać je jako coś, co sterczy nad terenem, zamiast zlewać się z nim.
 * Wszystkie wersje: logi zapisują się w wybranym folderze jako dwa osobne pliki: „mt_sw_logi_24h.zip” (ostatnie 24 godziny) i „mt_sw_logi_pelne.zip” (pełny log). Na komputerze pliki odświeżają się w folderze logów co kilka minut.
 * Wszystkie wersje: przełącznik „Synchronizuj statystyki automatycznie” ma teraz własny opis (co robi i kiedy).
@@ -620,6 +621,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* iPhone and iPad: the choice of what the widget shows in its sizes (our node, favorites or the whole network) is now in the app settings ("Statistics widget"), the same as on Android. Node cards fill the whole area with bigger text.
 * All versions: in the terrain panorama the buildings now have their own orange colour and show as something standing above the ground, instead of blending into it.
 * All versions: logs are saved in the chosen folder as two separate files: "mt_sw_logi_24h.zip" (last 24 hours) and "mt_sw_logi_pelne.zip" (full log). On desktop the files are refreshed in the logs folder every few minutes.
 * All versions: the "Synchronize statistics automatically" switch now has its own description (what it does and when).

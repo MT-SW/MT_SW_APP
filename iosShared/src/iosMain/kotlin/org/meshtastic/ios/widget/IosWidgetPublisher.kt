@@ -20,10 +20,12 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.widget_updated
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.core.service.stats.MeshStatsNodeCard
 import org.meshtastic.core.service.stats.MeshStatsSnapshot
@@ -59,16 +61,25 @@ private val MIN_RELOAD_INTERVAL = 5.minutes
  * shared [MeshStatsFeed]). Without the App Group (for example a build signed without it) nothing is written and the
  * widget shows a hint to open the app.
  */
-class IosWidgetPublisher(private val feed: MeshStatsFeed) {
+class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: UiPrefs) {
     private var lastReload = Clock.System.now() - MIN_RELOAD_INTERVAL
 
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
-        feed.snapshots(withNodes = true).conflate().collect { snapshot ->
+        // What the widget shows in its sizes is chosen in the app settings and travels with the statistics.
+        combine(feed.snapshots(withNodes = true), uiPrefs.androidWidgetSmall, uiPrefs.androidWidgetSecond) {
+            snapshot,
+            small,
+            second,
+            ->
+            Triple(snapshot, small, second)
+        }
+            .conflate()
+            .collect { (snapshot, small, second) ->
             runCatching {
                 // The words on the widget follow the language of the app, not of the phone: the app writes them.
                 val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                write(json(snapshot, updated))
+                write(json(snapshot, updated, small, second))
             }
                 .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
             delay(MIN_PUBLISH_INTERVAL)
@@ -77,13 +88,13 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
 
     private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
 
-    private fun json(snapshot: MeshStatsSnapshot, updatedText: String): String =
+    private fun json(snapshot: MeshStatsSnapshot, updatedText: String, small: Int, second: Int): String =
         "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)},\"connected\":${snapshot.connected}," +
             "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
             "\"groups\":[${snapshot.groups.joinToString(",") { group ->
                 "{\"title\":${quote(group.title)},\"lines\":${lines(group.lines)}}"
             }}]," +
-            "\"favorites\":${cards(
+            "\"small\":$small,\"second\":$second,\"favorites\":${cards(
                 snapshot.favorites,
             )},\"others\":${cards(snapshot.others)},\"network\":${cards(snapshot.network)}}"
 
