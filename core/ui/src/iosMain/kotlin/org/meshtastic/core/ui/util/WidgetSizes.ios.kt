@@ -49,18 +49,19 @@ actual fun rememberWidgetSizes(): WidgetSizesInUse {
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private fun readSizes(): WidgetSizesInUse {
-    val folder =
-        NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(WIDGET_APP_GROUP)
-            ?: return WidgetSizesInUse()
-    val url = folder.URLByAppendingPathComponent(SIZES_FILE) ?: return WidgetSizesInUse()
-    val text = NSString.stringWithContentsOfURL(url, encoding = NSUTF8StringEncoding, error = null)
-        ?: return WidgetSizesInUse()
-    val names = text.split(",")
-    if (names.firstOrNull() != "ok") return WidgetSizesInUse()
-    return WidgetSizesInUse(
-        known = true,
-        medium = "medium" in names,
-        large = "large" in names,
-        extraLarge = "extra" in names,
-    )
+    val folder = NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(WIDGET_APP_GROUP)
+    val url = folder?.URLByAppendingPathComponent(SIZES_FILE)
+    val names = url?.let { NSString.stringWithContentsOfURL(it, encoding = NSUTF8StringEncoding, error = null) }
+        ?.split(",")
+        .orEmpty()
+    return if (names.firstOrNull() == "ok") {
+        WidgetSizesInUse(
+            known = true,
+            medium = "medium" in names,
+            large = "large" in names,
+            extraLarge = "extra" in names,
+        )
+    } else {
+        WidgetSizesInUse()
+    }
 }

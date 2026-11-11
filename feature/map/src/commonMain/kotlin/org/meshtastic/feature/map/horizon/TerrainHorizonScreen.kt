@@ -733,9 +733,13 @@ private fun DrawScope.bandPath(
     while (x <= w + COLUMN_STEP_PX) {
         val bearing = centre + (x - w / 2) / perDeg
         val angle =
-            profile.at(bearing.toDouble()).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull {
-                it.angleDeg
-            }
+            profile
+                .at(bearing.toDouble())
+                .crests
+                .filter { it.distanceM >= from && it.distanceM < to }
+                .maxOfOrNull {
+                    it.angleDeg
+                }
         path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
         x += COLUMN_STEP_PX
     }

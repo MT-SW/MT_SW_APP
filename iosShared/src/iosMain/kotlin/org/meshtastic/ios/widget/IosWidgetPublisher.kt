@@ -22,10 +22,10 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.widget_updated
-import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.core.service.stats.MeshStatsNodeCard
 import org.meshtastic.core.service.stats.MeshStatsSnapshot
@@ -68,22 +68,22 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
     suspend fun run() {
         // What the widget shows in its sizes is chosen in the app settings and travels with the statistics.
         combine(feed.snapshots(withNodes = true), uiPrefs.androidWidgetSmall, uiPrefs.androidWidgetSecond) {
-            snapshot,
-            small,
-            second,
+                snapshot,
+                small,
+                second,
             ->
             Triple(snapshot, small, second)
         }
             .conflate()
             .collect { (snapshot, small, second) ->
-            runCatching {
-                // The words on the widget follow the language of the app, not of the phone: the app writes them.
-                val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                write(json(snapshot, updated, small, second))
+                runCatching {
+                    // The words on the widget follow the language of the app, not of the phone: the app writes them.
+                    val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
+                    write(json(snapshot, updated, small, second))
+                }
+                    .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
+                delay(MIN_PUBLISH_INTERVAL)
             }
-                .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
-            delay(MIN_PUBLISH_INTERVAL)
-        }
     }
 
     private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())

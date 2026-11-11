@@ -72,21 +72,25 @@ fun AndroidWidgetContentItems(modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
-    if (showSmall) BasicListItem(
-        text = stringResource(Res.string.widget_content_small_title),
-        supportingText = smallNames[small.coerceIn(0, 2)],
-        leadingIcon = MeshtasticIcons.Notifications,
-        trailingContent = MeshtasticIcons.ChevronRight.icon(),
-        onClick = { chooser = 1 },
-        modifier = modifier,
-    )
-    if (showSecond) BasicListItem(
-        text = stringResource(Res.string.widget_content_second_title),
-        supportingText = secondNames[second.coerceIn(0, 1)],
-        leadingIcon = MeshtasticIcons.Notifications,
-        trailingContent = MeshtasticIcons.ChevronRight.icon(),
-        onClick = { chooser = 2 },
-    )
+    if (showSmall) {
+        BasicListItem(
+            text = stringResource(Res.string.widget_content_small_title),
+            supportingText = smallNames[small.coerceIn(0, 2)],
+            leadingIcon = MeshtasticIcons.Notifications,
+            trailingContent = MeshtasticIcons.ChevronRight.icon(),
+            onClick = { chooser = 1 },
+            modifier = modifier,
+        )
+    }
+    if (showSecond) {
+        BasicListItem(
+            text = stringResource(Res.string.widget_content_second_title),
+            supportingText = secondNames[second.coerceIn(0, 1)],
+            leadingIcon = MeshtasticIcons.Notifications,
+            trailingContent = MeshtasticIcons.ChevronRight.icon(),
+            onClick = { chooser = 2 },
+        )
+    }
     if (chooser != 0) {
         val isSmall = chooser == 1
         MeshtasticDialog(

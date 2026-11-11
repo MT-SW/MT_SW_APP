@@ -61,8 +61,8 @@ object MeshStatsLines {
     private const val RIGHT_COLUMN = 1
 
     /**
-     * One titled block of statistics, for the widgets that show them in sections. [column] says which of two columns
-     * it belongs to when the widget is wide enough for two: 0 the left one, 1 the right one.
+     * One titled block of statistics, for the widgets that show them in sections. [column] says which of two columns it
+     * belongs to when the widget is wide enough for two: 0 the left one, 1 the right one.
      */
     data class Group(val title: String, val lines: List<String>, val column: Int = 0)
 
