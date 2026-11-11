@@ -820,12 +820,12 @@ open class RadioConfigViewModel(
     /**
      * Runs [send] and retries with capped exponential backoff ([snifferRequestRetryDelay]) if the outbound packet queue
      * rejects it, instead of dying on the first attempt -- see the constants above this class for why this exists.
-     * Bails out early once [localNum] is no longer the connected local node, so a retry loop left over from a dropped
-     * connection can't keep firing into a new one.
+     * Bails out early once [targetNum] is neither the connected local node nor the node being administered remotely,
+     * so a retry loop left over from a dropped connection (or from another node) can't keep firing.
      */
-    private suspend fun requestWithQueueRetry(label: String, localNum: Int, send: suspend () -> Unit) {
+    private suspend fun requestWithQueueRetry(label: String, targetNum: Int, send: suspend () -> Unit) {
         var attempt = 0
-        while (myNodeNum == localNum) {
+        while (myNodeNum == targetNum || destNum == targetNum) {
             try {
                 send()
                 return
