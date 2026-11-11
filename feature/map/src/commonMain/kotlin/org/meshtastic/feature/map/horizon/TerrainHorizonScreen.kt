@@ -188,11 +188,19 @@ import kotlin.time.Clock
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
 private val BandShares = listOf(0.5f, 0.38f, 0.26f, 0.15f)
-private val BuildingColor = Color(0xFFE08A2E)
-private const val BUILDING_BAND_BOOST = 0.3f
+private val BuildingColor = Color(0xFF9AA5B1)
+private const val BUILDING_BAND_BOOST = 0.2f
+
+/** The vertical scale may be at most this many times the horizontal one, so mountains look like mountains. */
+private const val MAX_VERTICAL_STRETCH = 3.0
+private const val BUILDING_SHADE_STEP = 0.05f
+private const val BUILDING_SHADE_VARIANTS = 5
+private const val BUILDING_SHADE_PRIME = 7
 private const val ROOF_LIGHTEN = 0.28f
 private const val WALL_DARKEN = 0.3f
 private const val EDGE_DARKEN = 0.5f
+private const val EDGE_ALPHA = 0.45f
+private const val ROOF_DARKEN = 0.18f
 private const val ROOF_STRIP_PX = 3f
 private const val EDGE_WIDTH_PX = 1.5f
 private const val CREST_TAP_DEG = 2.5
@@ -696,7 +704,11 @@ private fun Panorama(
                                 it to
                                     Offset(
                                         xOf(it.bearingDeg, currentCentre, perDeg, size.width.toFloat()),
-                                        yOf(it.angleDeg, range, size.height.toFloat()),
+                                        yOf(
+                                            it.angleDeg,
+                                            fitRange(range, size.height.toFloat(), perDeg),
+                                            size.height.toFloat(),
+                                        ),
                                     )
                             }
                             .minByOrNull { (_, at) -> (at - tap).getDistance() }
@@ -711,16 +723,17 @@ private fun Panorama(
                                         size.height.toFloat(),
                                         currentCentre,
                                         perDeg,
-                                        range,
+                                        fitRange(range, size.height.toFloat(), perDeg),
                                     )
                             }
                     }
                 },
         ) {
             val perDeg = size.width / fieldOfView
-            drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, range)
-            drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
-            drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
+            val shown = fitRange(range, size.height, perDeg)
+            drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, shown)
+            drawGuides(measurer, centre, perDeg, fieldOfView, shown, cardinals)
+            drawTargets(measurer, targets, markers, precisions, centre, perDeg, shown, focusNodeNum, names)
         }
         crest?.let {
             Text(
@@ -772,6 +785,22 @@ private fun angleRange(profile: HorizonProfile, targets: List<HorizonTarget>): C
     var high = max(4.0, (skyline.maxOrNull() ?: 0.0) + 2.0)
     targets.forEach { high = max(high, it.angleDeg + 1.0) }
     return low..min(MAX_ANGLE_CEIL, high)
+}
+
+/**
+ * The vertical range actually drawn: [range] widened (around the horizon line) when it would stretch the picture
+ * more than [MAX_VERTICAL_STRETCH] times its horizontal scale, which is what turned hills into needles.
+ */
+private fun fitRange(
+    range: ClosedFloatingPointRange<Double>,
+    height: Float,
+    perDeg: Float,
+): ClosedFloatingPointRange<Double> {
+    val span = range.endInclusive - range.start
+    val wanted = height / (perDeg * MAX_VERTICAL_STRETCH)
+    if (wanted <= span) return range
+    val zeroShare = -range.start / span
+    return (-zeroShare * wanted)..((1.0 - zeroShare) * wanted)
 }
 
 private fun yOf(angleDeg: Double, range: ClosedFloatingPointRange<Double>, height: Float): Float {
@@ -979,12 +1008,16 @@ private fun DrawScope.drawBuildingShapes(
     val h = size.height
     val from = BandEdges[band] * radiusM
     val to = BandEdges[band + 1] * radiusM
-    val roofColour = lerp(colour, Color.White, ROOF_LIGHTEN)
-    val darkWall = lerp(colour, Color.Black, WALL_DARKEN)
-    val edge = lerp(colour, Color.Black, EDGE_DARKEN)
     for (i in shapes.indices.reversed()) {
         val b = shapes[i]
         if (b.distanceM < from || b.distanceM >= to) continue
+        // Every building a little lighter or darker than its neighbours, so a town is not one flat colour.
+        val step = (i * BUILDING_SHADE_PRIME) % BUILDING_SHADE_VARIANTS - BUILDING_SHADE_VARIANTS / 2
+        val shade = step * BUILDING_SHADE_STEP
+        val base = if (shade >= 0f) lerp(colour, Color.White, shade) else lerp(colour, Color.Black, -shade)
+        val roofColour = lerp(base, Color.Black, ROOF_DARKEN)
+        val darkWall = lerp(base, Color.Black, WALL_DARKEN)
+        val edge = lerp(base, Color.Black, EDGE_DARKEN).copy(alpha = EDGE_ALPHA)
         val n = b.bearingsDeg.size
         val xs = FloatArray(n) { xOf(b.bearingsDeg[it], centre, perDeg, w) }
         if (xs.all { it < -w } || xs.all { it > 2 * w }) continue
@@ -1015,7 +1048,7 @@ private fun DrawScope.drawBuildingShapes(
             wall.lineTo(xs[m], yRoof[m])
             wall.lineTo(xs[k], yRoof[k])
             wall.close()
-            drawPath(wall, lerp(darkWall, colour, facing.toFloat().coerceIn(0f, 1f)))
+            drawPath(wall, lerp(darkWall, base, facing.toFloat().coerceIn(0f, 1f)))
         }
         val roof = Path()
         roof.moveTo(xs[0], yRoof[0])
