@@ -1112,7 +1112,7 @@ private fun OfflineBuildings(
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = onSave, enabled = !state.buildingsSaving && state.observerLat != null) {
+            Button(onClick = onSave, enabled = !state.buildingsSaving) {
                 Text(stringResource(Res.string.terrain_horizon_buildings_save, state.buildingsRadiusKm))
             }
             if (state.buildingsBytes > 0L && !state.buildingsSaving) {

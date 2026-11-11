@@ -116,6 +116,26 @@ object OsmQueries {
         return sb.append(");out tags geom;").toString()
     }
 
+    /**
+     * The buildings inside [box]. With [tallOnly] only the tall ones (eight floors or more, or 20 m and up), the only
+     * ones that still matter in a skyline far away, so a wide area stays a light request.
+     */
+    fun buildings(box: ClutterBox, tallOnly: Boolean): String {
+        val b = box.asQueryBox()
+        val sb = StringBuilder(header()).append('(')
+        if (tallOnly) {
+            for (kind in listOf("way", "relation")) {
+                val type = if (kind == "relation") "[\"type\"=\"multipolygon\"]" else ""
+                sb.append("$kind[\"building\"]$type[\"building:levels\"~\"^([89]|[1-9][0-9]+)$\"]($b);")
+                sb.append("$kind[\"building\"]$type[\"height\"~\"^([2-9][0-9]|[1-9][0-9]{2,})\"]($b);")
+            }
+        } else {
+            sb.append("way[\"building\"]($b);")
+            sb.append("relation[\"building\"][\"type\"=\"multipolygon\"]($b);")
+        }
+        return sb.append(");out tags geom;").toString()
+    }
+
     /** `lat,lon,lat,lon,...` of points along the path between fractions [f0] and [f1] (both ends included). */
     internal fun polyline(a: GeoPoint, b: GeoPoint, f0: Double, f1: Double): String {
         val lengthM = Geodesy.distanceM(a, b) * (f1 - f0)

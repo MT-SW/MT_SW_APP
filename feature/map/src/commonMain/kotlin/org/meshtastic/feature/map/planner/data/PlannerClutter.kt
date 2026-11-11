@@ -255,6 +255,12 @@ interface PlannerClutterSource {
 
     /** Obstacles (forests and built-up areas) within [radiusKm] of [center]. */
     suspend fun forArea(center: GeoPoint, radiusKm: Double): ClutterMap
+
+    /**
+     * The buildings within [radiusKm] of [center]; with [tallOnly] only the tall ones. A source that knows none keeps
+     * the default.
+     */
+    suspend fun buildingsForArea(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): ClutterMap = ClutterMap.EMPTY
 }
 
 /** A source that knows no obstacles; the default where none is wired in (and in tests). */

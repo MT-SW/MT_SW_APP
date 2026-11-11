@@ -100,6 +100,18 @@ class PlannerOverpass(
         }
     }
 
+    override suspend fun buildingsForArea(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): ClutterMap {
+        val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
+        val key = "B" + (if (tallOnly) "T" else "A") + ":" + pointKey(center) + ":" + Num.fmt(r, 1)
+        val whole = ClutterBox.around(center.lat, center.lon, r)
+        return if (r <= SINGLE_REQUEST_KM) {
+            cached(key) { fetch(OsmQueries.buildings(whole, tallOnly)) }
+        } else {
+            // Houses are kept whole (no thinning); the tall buildings of a wide area are few, so thinning is not needed.
+            cached(key) { fetchTiled(whole, { OsmQueries.buildings(it, tallOnly) }, thinM = 0.0) }
+        }
+    }
+
     private suspend fun cached(key: String, load: suspend () -> ClutterMap): ClutterMap {
         cacheLock.withLock {
             val hit = cache[key]
@@ -160,13 +172,21 @@ class PlannerOverpass(
      * on the border of two tiles is kept once, outlines are thinned to fit in memory, and a server that says "too many
      * requests" is waited for. Everything or an error: half a map would look like open ground where it is not.
      */
-    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap = try {
-        fetchTiledPieces(whole)
+    private suspend fun fetchTiled(
+        whole: ClutterBox,
+        query: (ClutterBox) -> String = OsmQueries::box,
+        thinM: Double? = null,
+    ): ClutterMap = try {
+        fetchTiledPieces(whole, query, thinM)
     } finally {
         _progress.value = null
     }
 
-    private suspend fun fetchTiledPieces(whole: ClutterBox): ClutterMap {
+    private suspend fun fetchTiledPieces(
+        whole: ClutterBox,
+        query: (ClutterBox) -> String,
+        thinOverride: Double?,
+    ): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
         ClutterTiles.grid(whole, TILE_START_KM).forEach { pending.addLast(TileWork(it)) }
@@ -178,7 +198,7 @@ class PlannerOverpass(
         // The farther the area reaches, the coarser the picture needs to be: the coverage raster of 100 km has cells of
         // hundreds of metres, so outlines are thinned (and woods smaller than that dropped) more the bigger the area
         // is.
-        val thinM = max(THIN_M, whole.maxSideKm / 2.0 * THIN_M_PER_KM)
+        val thinM = thinOverride ?: max(THIN_M, whole.maxSideKm / 2.0 * THIN_M_PER_KM)
         while (pending.isNotEmpty()) {
             if (clockMs() > deadline) {
                 throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
@@ -186,7 +206,7 @@ class PlannerOverpass(
             val work = pending.removeFirst()
             val part =
                 try {
-                    fetch(OsmQueries.box(work.box), seen, thinM)
+                    fetch(query(work.box), seen, thinM)
                 } catch (e: PlannerClutterException) {
                     val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
                     val flaky = e.failure == PlannerClutterFailure.NETWORK

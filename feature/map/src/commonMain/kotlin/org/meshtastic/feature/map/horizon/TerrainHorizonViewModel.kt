@@ -161,7 +161,10 @@ val HORIZON_NODE_RANGES_KM = listOf(25, 50, 100, 200, 500, 1000)
 const val DEFAULT_ANTENNA_M = 2
 
 /** The ranges the buildings can be downloaded for: dense places are heavy, so far fewer than the terrain's. */
-val HORIZON_BUILDING_RADII_KM = listOf(1, 2, 5, 10, 15)
+val HORIZON_BUILDING_RADII_KM = listOf(1, 2, 5, 10, 15, 25, 50, 100)
+
+/** Up to this range every building is downloaded, beyond it only the tall ones (the rest are specks that far). */
+const val ALL_BUILDINGS_MAX_KM = 15
 const val DEFAULT_BUILDINGS_RADIUS_KM = 5
 val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80, 100)
 
@@ -265,20 +268,27 @@ class TerrainHorizonViewModel(
     fun setBuildingsRadius(km: Int) = _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
 
     /**
-     * Downloads the buildings around the place looked from, up to the chosen range, and keeps them on the device, so
+     * Downloads the buildings around the connected radio, up to the chosen range, and keeps them on the device, so
      * the panorama reads them from there from now on.
      */
     fun saveBuildings() {
         val here = _state.value
-        val lat = here.observerLat ?: return
-        val lon = here.observerLon ?: return
+        // From the connected radio, whichever place the panorama is looked from; the place looked from is the fallback.
+        val centre =
+            nodeSpot(nodeRepository.ourNodeInfo.value)?.at
+                ?: here.observerLat?.let { lat -> here.observerLon?.let { lon -> GeoPoint(lat, lon) } }
+                ?: return
         if (here.buildingsSaving) return
         viewModelScope.launch {
             _state.update { it.copy(buildingsSaving = true, buildingsOk = null) }
-            val centre = GeoPoint(lat, lon)
             val ok =
                 try {
-                    val map = clutter.forArea(centre, here.buildingsRadiusKm.toDouble())
+                    val map =
+                        clutter.buildingsForArea(
+                            centre,
+                            here.buildingsRadiusKm.toDouble(),
+                            tallOnly = here.buildingsRadiusKm > ALL_BUILDINGS_MAX_KM,
+                        )
                     val buildings = map.polygons.filter { it.kind == ClutterKind.BUILDING }
                     withContext(dispatchers.io) { buildingStore.write(centre, here.buildingsRadiusKm, buildings) }
                 } catch (e: CancellationException) {
