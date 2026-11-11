@@ -170,6 +170,7 @@ import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import kotlin.math.abs
+import androidx.compose.ui.graphics.Brush
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -179,6 +180,13 @@ private val Hidden = Color(0xFFEF5350)
 private val BandShares = listOf(0.5f, 0.38f, 0.26f, 0.15f)
 private val BuildingColor = Color(0xFFE08A2E)
 private const val BUILDING_BAND_BOOST = 0.3f
+private const val ROOF_LIGHTEN = 0.28f
+private const val WALL_DARKEN = 0.3f
+private const val EDGE_DARKEN = 0.5f
+private const val ROOF_STRIP_PX = 3f
+private const val EDGE_WIDTH_PX = 1.5f
+private const val EDGE_STEP_PX = 4f
+private const val MIN_BUILDING_DEG = 0.02
 private val BandEdges = listOf(0.0, 0.2, 0.45, 0.75, 1.0001)
 private val FIELDS_OF_VIEW = listOf(60, 120, 240, 360)
 
@@ -713,12 +721,73 @@ private fun DrawScope.drawBands(
     for (band in bands.indices) {
         val index = bands.lastIndex - band
         if (ground != null) {
-            drawPath(bandPath(profile, index, centre, perDeg, range), buildingBands[index])
             drawPath(bandPath(ground, index, centre, perDeg, range), bands[index])
+            drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
         } else {
             drawPath(bandPath(profile, index, centre, perDeg, range), bands[index])
         }
     }
+}
+
+/**
+ * The buildings of one distance band as solid blocks: where they stand above the ground, each column is a wall in the
+ * band's building colour, shaded darker toward the foot, with a lighter strip for the roof along the top and a dark
+ * edge where the height steps, so a building reads as a body with sides and a roof and not as a flat band. The farther
+ * the band, the more the colour has faded toward the sky, which is the distance fade.
+ */
+private fun DrawScope.drawBuildingSolids(
+    profile: HorizonProfile,
+    ground: HorizonProfile,
+    band: Int,
+    colour: Color,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+) {
+    val w = size.width
+    val h = size.height
+    val roof = lerp(colour, Color.White, ROOF_LIGHTEN)
+    val foot = lerp(colour, Color.Black, WALL_DARKEN)
+    val edge = lerp(colour, Color.Black, EDGE_DARKEN)
+    var previousTop: Float? = null
+    var x = 0f
+    while (x <= w + COLUMN_STEP_PX) {
+        val bearing = (centre + (x - w / 2) / perDeg).toDouble()
+        val building = bandAngle(profile, band, bearing)
+        val bare = bandAngle(ground, band, bearing)
+        val top = building?.takeIf { bare == null || it > bare + MIN_BUILDING_DEG }?.let { yOf(it, range, h) }
+        if (top != null) {
+            val bottom = if (bare == null) h else yOf(bare, range, h)
+            val height = bottom - top
+            if (height > 0f) {
+                drawRect(
+                    brush = Brush.verticalGradient(listOf(colour, foot), startY = top, endY = bottom),
+                    topLeft = Offset(x, top),
+                    size = Size(COLUMN_STEP_PX.toFloat(), height),
+                )
+                drawRect(roof, Offset(x, top), Size(COLUMN_STEP_PX.toFloat(), min(ROOF_STRIP_PX, height)))
+            }
+            val before = previousTop
+            if (before == null || abs(before - top) > EDGE_STEP_PX) {
+                drawRect(edge, Offset(x, top), Size(EDGE_WIDTH_PX, max(1f, bottom - top)))
+            }
+        } else if (previousTop != null) {
+            drawRect(edge, Offset(x - EDGE_WIDTH_PX, previousTop), Size(EDGE_WIDTH_PX, h - previousTop))
+        }
+        previousTop = top
+        x += COLUMN_STEP_PX
+    }
+}
+
+/** The highest crest of [profile] in distance band [band] (0 is the nearest) at [bearing], or null when it has none. */
+private fun bandAngle(profile: HorizonProfile, band: Int, bearing: Double): Double? {
+    val from = BandEdges[band] * profile.radiusM
+    val to = BandEdges[band + 1] * profile.radiusM
+    return profile
+        .at(bearing)
+        .crests
+        .filter { it.distanceM >= from && it.distanceM < to }
+        .maxOfOrNull { it.angleDeg }
 }
 
 /** The outline of one distance band (0 is the nearest) of [profile], closed along the bottom of the picture. */
@@ -731,21 +800,12 @@ private fun DrawScope.bandPath(
 ): Path {
     val w = size.width
     val h = size.height
-    val from = BandEdges[band] * profile.radiusM
-    val to = BandEdges[band + 1] * profile.radiusM
     val path = Path()
     path.moveTo(0f, h)
     var x = 0f
     while (x <= w + COLUMN_STEP_PX) {
         val bearing = centre + (x - w / 2) / perDeg
-        val angle =
-            profile
-                .at(bearing.toDouble())
-                .crests
-                .filter { it.distanceM >= from && it.distanceM < to }
-                .maxOfOrNull {
-                    it.angleDeg
-                }
+        val angle = bandAngle(profile, band, bearing.toDouble())
         path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
         x += COLUMN_STEP_PX
     }
