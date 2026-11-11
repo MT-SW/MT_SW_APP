@@ -82,8 +82,8 @@ private const val COLUMN_GAP_DP = 4f
 private const val MIN_NODE_LINES = 2
 
 /** Room between two lines of one group, and before the next group — the iPhone widget's spacing. */
-private const val LINE_GAP_DP = 1f
-private const val GROUP_GAP_DP = 5f
+private const val LINE_GAP_DP = 2f
+private const val GROUP_GAP_DP = 7f
 
 /** Room above and below the line between two sections of the widget. */
 private const val SECTION_GAP_DP = 6f
@@ -253,7 +253,7 @@ private fun OwnSection(snapshot: MeshStatsSnapshot?, metrics: Metrics, heightDp:
             Text(
                 text = snapshot?.title ?: "MT_SW",
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )
             if (snapshot != null) NodeChip(snapshot.shortName, snapshot.color, snapshot.textColor)
@@ -301,7 +301,7 @@ private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: In
                     text = card.title,
                     maxLines = 1,
                     style =
-                    TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                    TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold),
                     modifier = GlanceModifier.defaultWeight(),
                 )
                 NodeChip(card.shortName, card.color, card.textColor)
