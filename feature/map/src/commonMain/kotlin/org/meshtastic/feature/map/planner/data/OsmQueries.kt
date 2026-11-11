@@ -133,6 +133,9 @@ object OsmQueries {
             sb.append("way[\"building\"]($b);")
             sb.append("relation[\"building\"][\"type\"=\"multipolygon\"]($b);")
         }
+        // Masts, towers and chimneys: points or small outlines, few, and the first things seen far away.
+        sb.append("node[\"man_made\"~\"^(tower|mast|chimney|communications_tower|water_tower)$\"]($b);")
+        sb.append("way[\"man_made\"~\"^(tower|mast|chimney|communications_tower|water_tower)$\"]($b);")
         return sb.append(");out tags geom;").toString()
     }
 

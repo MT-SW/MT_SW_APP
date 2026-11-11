@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -53,6 +54,62 @@ struct StatsEntry: TimelineEntry {
     let data: StatsData?
     /// Numer kolejnego okresu zmiany węzła; liczony z czasu, żeby odświeżenie danych nie wracało do pierwszego węzła.
     let step: Int
+    let config: MTSWConfigIntent
+}
+
+private func text(_ pl: String, _ en: String) -> LocalizedStringResource {
+    LocalizedStringResource(stringLiteral: isPolish ? pl : en)
+}
+
+/// Co pokazuje średni widżet (najmniejszy dostępny).
+enum SmallContent: String, AppEnum {
+    case own, favorites, network
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation {
+        TypeDisplayRepresentation(name: text("Zawartość", "Content"))
+    }
+
+    static var caseDisplayRepresentations: [SmallContent: DisplayRepresentation] {
+        [
+            .own: DisplayRepresentation(title: text("Nasz węzeł", "Our node")),
+            .favorites: DisplayRepresentation(title: text("Ulubione na zmianę", "Favorites in turn")),
+            .network: DisplayRepresentation(title: text("Cała sieć na zmianę", "Whole network in turn")),
+        ]
+    }
+}
+
+/// Co pokazuje drugie pole dużego widżetu (pod naszym węzłem).
+enum SecondContent: String, AppEnum {
+    case favorites, network
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation {
+        TypeDisplayRepresentation(name: text("Drugie pole", "Second area"))
+    }
+
+    static var caseDisplayRepresentations: [SecondContent: DisplayRepresentation] {
+        [
+            .favorites: DisplayRepresentation(title: text("Ulubione na zmianę", "Favorites in turn")),
+            .network: DisplayRepresentation(title: text("Cała sieć na zmianę", "Whole network in turn")),
+        ]
+    }
+}
+
+/// Ustawienia widżetu (przytrzymaj widżet, potem „Edytuj widżet”).
+struct MTSWConfigIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource { text("Statystyki MT_SW", "MT_SW statistics") }
+    static var description: IntentDescription {
+        IntentDescription(text(
+            "Wybierz, co pokazuje widżet. Średni: nasz węzeł albo ulubione albo cała sieć na zmianę. Duży: u góry nasz węzeł, niżej do wyboru ulubione lub cała sieć. Największy (iPad): nasz węzeł, ulubione i cała sieć.",
+            "Choose what the widget shows. Medium: our node, or favorites, or the whole network in turn. Large: our node on top, below your choice of favorites or the whole network. Extra large (iPad): our node, favorites and the whole network."))
+    }
+
+    @Parameter(title: "Średni widżet / Medium", default: .own)
+    var small: SmallContent
+
+    @Parameter(title: "Drugie pole dużego / Large second area", default: .favorites)
+    var second: SecondContent
+
+    init() {}
 }
 
 private func readCards(_ raw: Any?) -> [NodeCard] {
@@ -84,7 +141,7 @@ private var isPolish: Bool { Locale.current.language.languageCode?.identifier ==
 
 private func stepOf(_ date: Date) -> Int { Int(date.timeIntervalSince1970 / rotationSeconds) }
 
-struct StatsProvider: TimelineProvider {
+struct StatsProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> StatsEntry {
         let card = NodeCard(title: "MT_SW", lines: ["85%", "Czas pracy: 3d"])
         return StatsEntry(
@@ -94,22 +151,22 @@ struct StatsProvider: TimelineProvider {
                             groups: [StatsGroup(title: isPolish ? "Sieć" : "Network",
                                                 lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"])],
                             favorites: [card], others: [card]),
-            step: 0)
+            step: 0, config: MTSWConfigIntent())
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (StatsEntry) -> Void) {
-        completion(StatsEntry(date: Date(), data: readStats() ?? placeholder(in: context).data, step: stepOf(Date())))
+    func snapshot(for configuration: MTSWConfigIntent, in context: Context) async -> StatsEntry {
+        StatsEntry(date: Date(), data: readStats() ?? placeholder(in: context).data, step: stepOf(Date()), config: configuration)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<StatsEntry>) -> Void) {
+    func timeline(for configuration: MTSWConfigIntent, in context: Context) async -> Timeline<StatsEntry> {
         let data = readStats()
         let now = Date()
         // Wpisy co kilka minut z góry: widżet sam zmienia węzeł na zmianę, bez budzenia aplikacji.
         let entries = (0..<12).map { index -> StatsEntry in
             let date = now.addingTimeInterval(Double(index) * rotationSeconds)
-            return StatsEntry(date: date, data: data, step: stepOf(date))
+            return StatsEntry(date: date, data: data, step: stepOf(date), config: configuration)
         }
-        completion(Timeline(entries: entries, policy: .after(now.addingTimeInterval(rotationSeconds * 12))))
+        return Timeline(entries: entries, policy: .after(now.addingTimeInterval(rotationSeconds * 12)))
     }
 }
 
@@ -267,14 +324,14 @@ struct StatsView: View {
                 empty: isPolish ? "Brak innych węzłów." : "No other nodes.")
             switch family {
             case .systemLarge:
-                // Pierwsza połowa: nasz węzeł. Druga: ulubione na zmianę.
+                // Góra: zawsze nasz węzeł. Dół: ulubione albo cała sieć na zmianę (do wyboru w ustawieniach widżetu).
                 VStack(alignment: .leading, spacing: 6) {
                     OwnStatsView(data: data).frame(maxHeight: .infinity)
                     Divider()
-                    favorite.frame(maxHeight: .infinity)
+                    (entry.config.second == .favorites ? favorite : other).frame(maxHeight: .infinity)
                 }
             case .systemExtraLarge:
-                // Największy (iPad): nasz węzeł, ulubione i pozostałe węzły sieci na zmianę.
+                // Największy (iPad): nasz węzeł, pod nim ulubione, pod nimi reszta sieci (bez ulubionych i bez nas).
                 HStack(alignment: .top, spacing: 14) {
                     OwnStatsView(data: data).frame(maxWidth: .infinity)
                     Divider()
@@ -286,7 +343,11 @@ struct StatsView: View {
                     .frame(maxWidth: .infinity)
                 }
             default:
-                OwnStatsView(data: data)
+                switch entry.config.small {
+                case .own: OwnStatsView(data: data)
+                case .favorites: favorite
+                case .network: other
+                }
             }
         } else {
             Text(isPolish ? "Otwórz aplikację MT_SW, aby zobaczyć statystyki." : "Open the MT_SW app to see the statistics.")
@@ -297,17 +358,13 @@ struct StatsView: View {
 
 struct MTSWStatsWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "MTSWStatsWidget", provider: StatsProvider()) { entry in
-            if #available(iOS 17.0, *) {
-                StatsView(entry: entry).containerBackground(.fill.tertiary, for: .widget)
-            } else {
-                StatsView(entry: entry).padding()
-            }
+        AppIntentConfiguration(kind: "MTSWStatsWidget", intent: MTSWConfigIntent.self, provider: StatsProvider()) { entry in
+            StatsView(entry: entry).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName(isPolish ? "Statystyki MT_SW" : "MT_SW statistics")
         .description(isPolish
-            ? "Statystyki radia i sieci mesh. Większe rozmiary pokazują też na zmianę ulubione i pozostałe węzły."
-            : "Radio and mesh statistics. Bigger sizes also show favorite and other nodes in turn.")
+            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (iPad): nasz węzeł, ulubione i cała sieć. Przytrzymaj widżet i wybierz „Edytuj widżet”."
+            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (iPad): our node, favorites and the whole network. Touch and hold the widget and choose \"Edit widget\".")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }

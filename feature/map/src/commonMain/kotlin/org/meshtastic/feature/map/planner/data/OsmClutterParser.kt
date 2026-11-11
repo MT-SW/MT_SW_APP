@@ -35,6 +35,9 @@ import kotlin.math.cos
  * several ways, which are joined here). Data © OpenStreetMap contributors, ODbL.
  */
 object OsmClutterParser {
+    private val TOWER_TYPES = setOf("tower", "mast", "chimney", "communications_tower", "water_tower")
+    private const val TOWER_HALF_SIDE_M = 3.0
+    private const val DEFAULT_TOWER_M = 30.0
     private val json = Json { ignoreUnknownKeys = true }
 
     /**
@@ -58,10 +61,11 @@ object OsmClutterParser {
         for (e in elements) {
             val o = e as? JsonObject ?: continue
             val type = (o["type"] as? JsonPrimitive)?.content
-            if (seen != null && (type == "way" || type == "relation")) {
+            if (seen != null && (type == "way" || type == "relation" || type == "node")) {
                 val id = (o["id"] as? JsonPrimitive)?.content?.toLongOrNull()
                 if (id != null) {
-                    val key = id * 2 + (if (type == "relation") 1L else 0L)
+                    // Nodes get negative keys, so they never meet the keys of ways and relations.
+                    val key = if (type == "node") -id - 1 else id * 2 + (if (type == "relation") 1L else 0L)
                     if (key in seen) continue
                     fresh?.add(key)
                 }
@@ -69,6 +73,7 @@ object OsmClutterParser {
             when (type) {
                 "way" -> wayPolygon(o, thinM)?.let { if (!isNegligible(it, thinM)) out.add(it) }
                 "relation" -> relationPolygons(o, thinM).forEach { if (!isNegligible(it, thinM)) out.add(it) }
+                "node" -> nodePolygon(o)?.let { out.add(it) }
             }
         }
         if (seen != null && fresh != null) seen.addAll(fresh)
@@ -85,6 +90,8 @@ object OsmClutterParser {
     internal fun classify(tags: Map<String, String>): ClutterKind? {
         val building = tags["building"]
         if (building != null && building != "no") return ClutterKind.BUILDING
+        // Masts, towers and chimneys stand in a skyline like tall buildings do.
+        if (tags["man_made"] in TOWER_TYPES) return ClutterKind.BUILDING
         if (tags["natural"] == "wood" || tags["landuse"] == "forest") return ClutterKind.FOREST
         return when (tags["landuse"]) {
             "residential" -> ClutterKind.RESIDENTIAL
@@ -148,6 +155,22 @@ object OsmClutterParser {
         if (!isClosed(ring)) return null
         val explicit = if (kind == ClutterKind.BUILDING) buildingHeight(tags) else null
         return ClutterPolygon(kind, explicit, thinRing(ring, thinM))
+    }
+
+    /** A mast or tower drawn as a small square (6 m) around its point; without a height tag it counts as 30 m. */
+    private fun nodePolygon(o: JsonObject): ClutterPolygon? {
+        val tags = tagsOf(o)
+        if (tags["man_made"] !in TOWER_TYPES) return null
+        val lat = (o["lat"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        val lon = (o["lon"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        val dLat = TOWER_HALF_SIDE_M / METERS_PER_DEG
+        val dLon = dLat / cos(lat * PI / 180.0).coerceAtLeast(0.01)
+        val ring =
+            doubleArrayOf(
+                lat - dLat, lon - dLon, lat - dLat, lon + dLon, lat + dLat, lon + dLon,
+                lat + dLat, lon - dLon, lat - dLat, lon - dLon,
+            )
+        return ClutterPolygon(ClutterKind.BUILDING, buildingHeight(tags) ?: DEFAULT_TOWER_M, ring)
     }
 
     private fun relationPolygons(o: JsonObject, thinM: Double): List<ClutterPolygon> {

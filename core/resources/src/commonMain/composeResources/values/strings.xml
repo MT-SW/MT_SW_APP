@@ -3224,7 +3224,7 @@
     <string name="terrain_horizon_buildings">Buildings</string>
     <string name="terrain_horizon_buildings_clear">Delete saved buildings</string>
     <string name="terrain_horizon_buildings_failed">Could not download the buildings (no internet, the server is busy or there are too many).</string>
-    <string name="terrain_horizon_buildings_hint">Raises the skyline by the buildings of OpenStreetMap, so a node behind a block of flats is shown as hidden. They are read from the device, so download them first: around your connected radio, every building up to 15 km, farther only the tall ones (eight floors or 20 m and up), up to 100 km. Data © OpenStreetMap contributors.</string>
+    <string name="terrain_horizon_buildings_hint">Raises the skyline by the buildings, masts and towers of OpenStreetMap, so a node behind a block of flats is shown as hidden. They are read from the device, so download them first: around your connected radio, every building up to 15 km, farther only the tall ones (eight floors or 20 m and up) and masts or towers, up to 100 km. Data © OpenStreetMap contributors.</string>
     <string name="terrain_horizon_buildings_none_here">No downloaded buildings cover this place.</string>
     <string name="terrain_horizon_buildings_range">How far to download buildings</string>
     <string name="terrain_horizon_buildings_save">Download buildings (up to %1$d km)</string>
