@@ -64,7 +64,7 @@ import org.meshtastic.core.resources.discovery_interrupted_scan_restored
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.service.worker.MeshLogCleanupWorker
 import org.meshtastic.feature.discovery.DiscoveryScanEngine
-import org.meshtastic.feature.widget.LocalStatsWidgetReceiver
+import org.meshtastic.feature.widget.MeshStatusWidgetReceiver
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -168,7 +168,7 @@ open class MeshUtilApplication :
                         val result =
                             GlanceAppWidgetManager(this@MeshUtilApplication)
                                 .setWidgetPreviews(
-                                    LocalStatsWidgetReceiver::class,
+                                    MeshStatusWidgetReceiver::class,
                                     intSetOf(AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN),
                                 )
                         Logger.i { "setWidgetPreviews result: $result" }

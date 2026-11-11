@@ -454,16 +454,6 @@
             android:name="org.meshtastic.core.service.LiveUpdateStopReceiver"
             android:exported="false" />
 
-        <receiver
-            android:name="org.meshtastic.feature.widget.LocalStatsWidgetReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_local_stats_info" />
-        </receiver>
 
         <receiver
             android:name="org.meshtastic.feature.widget.MeshStatusWidgetReceiver"
@@ -476,28 +466,7 @@
                 android:resource="@xml/widget_mesh_status_info" />
         </receiver>
 
-        <receiver
-            android:name="org.meshtastic.feature.widget.NodeTrackerWidgetReceiver"
-            android:exported="false"
-            android:label="@string/widget_node_tracker_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_node_tracker_info" />
-        </receiver>
 
-        <!-- Exported for the launcher's APPWIDGET_CONFIGURE; it honors only widget ids bound to the tracker. -->
-        <activity
-            android:name="org.meshtastic.feature.widget.NodeTrackerConfigActivity"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
 
         <!--
             glance-appwidget declares ActionTrampolineActivity, but nothing in Glance ever targets it. Its onCreate
