@@ -26,8 +26,6 @@ import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
-import kotlin.math.max
-import kotlin.math.roundToLong
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -40,6 +38,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.export.Num
+import kotlin.math.max
+import kotlin.math.roundToLong
 
 /**
  * [PlannerClutterSource] that asks an Overpass API server (default: the public overpass-api.de instance) for the
@@ -168,15 +168,15 @@ class PlannerOverpass(
         }
     }
 
-    private fun worthAskingAnotherServer(e: PlannerClutterException): Boolean =
-        when (e.failure) {
-            PlannerClutterFailure.NETWORK,
-            PlannerClutterFailure.BAD_RESPONSE -> true
+    private fun worthAskingAnotherServer(e: PlannerClutterException): Boolean = when (e.failure) {
+        PlannerClutterFailure.NETWORK,
+        PlannerClutterFailure.BAD_RESPONSE,
+        -> true
 
-            PlannerClutterFailure.SERVER_LIMIT -> e.detail?.startsWith("HTTP") == true
+        PlannerClutterFailure.SERVER_LIMIT -> e.detail?.startsWith("HTTP") == true
 
-            PlannerClutterFailure.TOO_LARGE -> false
-        }
+        PlannerClutterFailure.TOO_LARGE -> false
+    }
 
     private class TileWork(val box: ClutterBox, val tries: Int = 0)
 
@@ -193,12 +193,11 @@ class PlannerOverpass(
         thinM: Double? = null,
         minTileKm: Double = MIN_TILE_KM,
         pieceKind: String? = null,
-    ): ClutterMap =
-        try {
-            fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind)
-        } finally {
-            _progress.value = null
-        }
+    ): ClutterMap = try {
+        fetchTiledPieces(whole, query, thinM, minTileKm, pieceKind)
+    } finally {
+        _progress.value = null
+    }
 
     private suspend fun fetchTiledPieces(
         whole: ClutterBox,
@@ -233,8 +232,10 @@ class PlannerOverpass(
                         val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
                         val flaky = e.failure == PlannerClutterFailure.NETWORK
                         val splittable =
-                            (e.failure == PlannerClutterFailure.TOO_LARGE ||
-                                e.failure == PlannerClutterFailure.SERVER_LIMIT) &&
+                            (
+                                e.failure == PlannerClutterFailure.TOO_LARGE ||
+                                    e.failure == PlannerClutterFailure.SERVER_LIMIT
+                                ) &&
                                 !busy &&
                                 work.box.maxSideKm > minTileKm
                         when {
@@ -321,10 +322,12 @@ class PlannerOverpass(
             val msg = e.message.orEmpty().lowercase()
             val serverRefused =
                 msg.startsWith("overpass:") &&
-                    (msg.contains("memory") ||
-                        msg.contains("maxsize") ||
-                        msg.contains("timed out") ||
-                        msg.contains("rate"))
+                    (
+                        msg.contains("memory") ||
+                            msg.contains("maxsize") ||
+                            msg.contains("timed out") ||
+                            msg.contains("rate")
+                        )
             throw PlannerClutterException(
                 if (serverRefused) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.BAD_RESPONSE,
                 e,
@@ -340,46 +343,45 @@ class PlannerOverpass(
      * of megabytes, which a phone with a small heap cannot hold (and the parsed tree is several times larger). A status
      * other than success is reported with its code: 429/502/503/504 mean the server is busy or gave up.
      */
-    private suspend fun download(url: String, query: String): String? =
-        httpClient
-            .prepareGet(url) {
-                parameter("data", query)
-                // The shared client waits 30 s for data and repeats a failed request up to three times. Overpass sends
-                // nothing until the whole answer is computed, so a heavy tile would be cut off and asked again and
-                // again.
-                timeout {
-                    connectTimeoutMillis = CONNECT_TIMEOUT_MS
-                    socketTimeoutMillis = READ_TIMEOUT_MS
-                    requestTimeoutMillis = READ_TIMEOUT_MS + 5_000L
-                }
-                retry {
-                    retryOnServerErrors(maxRetries = 0)
-                    retryOnException(maxRetries = 0, retryOnTimeout = true)
-                }
+    private suspend fun download(url: String, query: String): String? = httpClient
+        .prepareGet(url) {
+            parameter("data", query)
+            // The shared client waits 30 s for data and repeats a failed request up to three times. Overpass sends
+            // nothing until the whole answer is computed, so a heavy tile would be cut off and asked again and
+            // again.
+            timeout {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MS
+                socketTimeoutMillis = READ_TIMEOUT_MS
+                requestTimeoutMillis = READ_TIMEOUT_MS + 5_000L
             }
-            .execute { response ->
-                if (!response.status.isSuccess()) {
-                    val code = response.status.value
-                    val busy = code == 429 || code == 502 || code == 503 || code == 504
-                    throw PlannerClutterException(
-                        if (busy) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.NETWORK,
-                        detail = "HTTP $code",
-                    )
-                }
-                val channel = response.bodyAsChannel()
-                val chunk = ByteArray(CHUNK_BYTES)
-                var buffer = ByteArray(INITIAL_BYTES)
-                var size = 0
-                while (true) {
-                    val n = channel.readAvailable(chunk, 0, chunk.size)
-                    if (n < 0) break
-                    if (size + n > MAX_BODY_BYTES) throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE)
-                    if (size + n > buffer.size) buffer = buffer.copyOf(maxOf(buffer.size * 2, size + n))
-                    chunk.copyInto(buffer, size, 0, n)
-                    size += n
-                }
-                buffer.decodeToString(0, size)
+            retry {
+                retryOnServerErrors(maxRetries = 0)
+                retryOnException(maxRetries = 0, retryOnTimeout = true)
             }
+        }
+        .execute { response ->
+            if (!response.status.isSuccess()) {
+                val code = response.status.value
+                val busy = code == 429 || code == 502 || code == 503 || code == 504
+                throw PlannerClutterException(
+                    if (busy) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.NETWORK,
+                    detail = "HTTP $code",
+                )
+            }
+            val channel = response.bodyAsChannel()
+            val chunk = ByteArray(CHUNK_BYTES)
+            var buffer = ByteArray(INITIAL_BYTES)
+            var size = 0
+            while (true) {
+                val n = channel.readAvailable(chunk, 0, chunk.size)
+                if (n < 0) break
+                if (size + n > MAX_BODY_BYTES) throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE)
+                if (size + n > buffer.size) buffer = buffer.copyOf(maxOf(buffer.size * 2, size + n))
+                chunk.copyInto(buffer, size, 0, n)
+                size += n
+            }
+            buffer.decodeToString(0, size)
+        }
 
     /** Clears the in-memory answers (used by "refresh"). */
     suspend fun invalidate() = cacheLock.withLock { cache.clear() }
