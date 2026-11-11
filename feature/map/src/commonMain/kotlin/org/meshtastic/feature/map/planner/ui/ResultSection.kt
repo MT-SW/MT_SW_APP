@@ -76,6 +76,8 @@ import org.meshtastic.core.resources.planner_rx_power
 import org.meshtastic.core.resources.planner_section_measured
 import org.meshtastic.core.resources.planner_section_result
 import org.meshtastic.core.resources.planner_sensitivity
+import org.meshtastic.core.resources.planner_result_ground_reflection
+import org.meshtastic.core.resources.planner_result_pattern_loss
 import org.meshtastic.core.resources.planner_total_loss
 import org.meshtastic.core.resources.planner_unit_db
 import org.meshtastic.core.resources.planner_unit_dbm
@@ -147,6 +149,18 @@ private fun LinkDetails(state: PlannerUiState, link: LinkResult) {
             stringResource(Res.string.planner_extra_loss_result),
             fmt(link.totalPathLossDb - link.itmLossDb, 1) + " " + unitDb,
         )
+        if (link.groundReflectionDb != 0.0) {
+            PlannerValueRow(
+                stringResource(Res.string.planner_result_ground_reflection),
+                fmt(link.groundReflectionDb, 1) + " " + unitDb,
+            )
+        }
+        if (link.patternLossADb != 0.0 || link.patternLossBDb != 0.0) {
+            PlannerValueRow(
+                stringResource(Res.string.planner_result_pattern_loss),
+                fmt(link.patternLossADb, 1) + " / " + fmt(link.patternLossBDb, 1) + " " + unitDb,
+            )
+        }
         PlannerValueRow(
             stringResource(Res.string.planner_total_loss),
             fmt(link.totalPathLossDb, 1) + " " + unitDb,

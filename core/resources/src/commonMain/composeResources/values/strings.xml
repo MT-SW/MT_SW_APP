@@ -2611,6 +2611,8 @@
     <string name="planner_pattern_kind_yagi">Yagi</string>
     <string name="planner_pattern_reset">Typical values for this kind</string>
     <string name="planner_pattern_title">Antenna pattern</string>
+    <string name="planner_result_ground_reflection">Ground reflection gain</string>
+    <string name="planner_result_pattern_loss">Antenna directivity loss (A / B)</string>
     <string name="play">Play</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d hour</item>

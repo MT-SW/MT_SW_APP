@@ -95,6 +95,11 @@ data class LinkResult(
     /** clearance / first Fresnel radius at the worst point; < 0 means blocked. */
     val worstFresnelRatio: Double,
     val profile: PathProfile,
+    /** Gain from the ground reflection (dB, 0 when off). */
+    val groundReflectionDb: Double = 0.0,
+    /** Loss from antenna directivity at end A / B (dB, 0 for omni or aimed). */
+    val patternLossADb: Double = 0.0,
+    val patternLossBDb: Double = 0.0,
 )
 
 /** Chart data: ground with earth bulge (relative to the ground chord), LOS line and first Fresnel zone. */
@@ -206,6 +211,9 @@ object LinkBudget {
             worstFresnelClearanceM = worstClear,
             worstFresnelRatio = worstRatio,
             profile = profile,
+            groundReflectionDb = reflection,
+            patternLossADb = a.patternLossDb,
+            patternLossBDb = b.patternLossDb,
         )
     }
 

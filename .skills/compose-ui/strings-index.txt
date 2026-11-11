@@ -2557,6 +2557,8 @@ planner_pattern_kind_sector
 planner_pattern_kind_yagi
 planner_pattern_reset
 planner_pattern_title
+planner_result_ground_reflection
+planner_result_pattern_loss
 play
 plurals_hours
 plurals_milliseconds

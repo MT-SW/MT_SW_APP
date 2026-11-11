@@ -3826,4 +3826,6 @@
     <string name="planner_ground_reflection">Uwzględnij odbicia od ziemi (wzmacniają lub osłabiają sygnał)</string>
     <string name="planner_clutter_reflections">Uwzględnij odbicia od budynków i drzew (przybliżony zapas, wymaga dokładnego terenu)</string>
     <string name="antenna_pattern_title">Charakterystyka promieniowania (widok z góry)</string>
+    <string name="planner_result_ground_reflection">Zysk z odbicia od ziemi</string>
+    <string name="planner_result_pattern_loss">Strata kierunkowości anten (A / B)</string>
 </resources>
