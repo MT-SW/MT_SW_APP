@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.maplibre.compose.expressions.dsl.asNumber
@@ -252,6 +253,19 @@ fun NodeLayers(
         onStack = onClusterMembers,
     )
 
+    // The tappable area of a chip. A symbol layer with generated images is not reliably hit by a tap on iPhone, and
+    // the dot under the chip is only 4 dp wide, so an invisible circle covers the chip's body (it stands above the
+    // node's spot) and a tap anywhere on the name opens the node.
+    CircleLayer(
+        id = "node-hit",
+        source = nodeSource,
+        filter = !feature.has("point_count"),
+        color = const(Color.Transparent),
+        radius = const(NODE_HIT_RADIUS.dp),
+        translate = const(DpOffset(0.dp, (-NODE_HIT_LIFT).dp)),
+        onClick = { features -> nodeTap(features, onNodeClick, onClusterMembers) },
+    )
+
     focusedNode?.let { FocusedNodeLayer(node = it, myNodeNum = myNodeNum, onNodeClick = onNodeClick) }
 }
 
@@ -321,6 +335,8 @@ private fun rememberDrawnNodes(nodes: List<Node>): List<Node> {
 
 /** Small enough that a chip drawn over it hides it completely. */
 private const val NODE_DOT_RADIUS = 4
+private const val NODE_HIT_RADIUS = 22
+private const val NODE_HIT_LIFT = 16
 
 private const val PRECISION_FILL_OPACITY = 0.15f
 private const val CLUSTER_OPACITY = 0.9f

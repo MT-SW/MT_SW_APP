@@ -63,6 +63,7 @@ import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.layers.FeaturesClickHandler
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.sources.VectorSource
+import org.maplibre.spatialk.geojson.Feature
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
@@ -114,28 +115,36 @@ internal fun NodeChipLayer(
     filter = chipFilter,
     onClick =
     onNodeClick?.let { click ->
-        { features ->
-            // The chip the user sees on top is the one they meant. Query order is not that order, so pick
-            // by the rank [chipSortKey] draws by — on the Google map the highest zIndex marker takes the tap.
-            val top = features.maxByOrNull { it.properties.chipRank() }
-            Logger.i {
-                "Węzeł na mapie: dotknięto, elementów: ${features.size}, właściwości: " +
-                    "${top?.properties?.keys}, numer: ${top?.properties?.get(NodeFeatureKeys.NODE_NUM)}"
-            }
-            val stack = if (onStack != null && top != null) stackedMembers(features, top) else emptyList()
-            if (stack.isNotEmpty()) {
-                // Several nodes on one spot: the chips overlap, so let the user choose rather than guess.
-                onStack?.invoke(stack)
-                ClickResult.Consume
-            } else {
-                top?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
-                    nodeNum.lenientInt()?.let(click)
-                    ClickResult.Consume
-                } ?: ClickResult.Pass
-            }
-        }
+        { features -> nodeTap(features, click, onStack) }
     },
 )
+
+/**
+ * A tap on a node: the chip drawn on top is the one the user meant. Query order is not that order, so pick by the rank
+ * [chipSortKey] draws by — on the Google map the highest zIndex marker takes the tap. Several nodes on one spot are
+ * listed for a choice.
+ */
+internal fun nodeTap(
+    features: List<Feature<*, *>>,
+    click: (Int) -> Unit,
+    onStack: ((List<ClusterMember>) -> Unit)?,
+): ClickResult {
+    val top = features.maxByOrNull { it.properties.chipRank() }
+    Logger.i {
+        "Węzeł na mapie: dotknięto, elementów: ${features.size}, właściwości: " +
+            "${top?.properties?.keys}, numer: ${top?.properties?.get(NodeFeatureKeys.NODE_NUM)}"
+    }
+    val stack = if (onStack != null && top != null) stackedMembers(features, top) else emptyList()
+    return if (stack.isNotEmpty()) {
+        onStack?.invoke(stack)
+        ClickResult.Consume
+    } else {
+        top?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
+            nodeNum.lenientInt()?.let(click)
+            ClickResult.Consume
+        } ?: ClickResult.Pass
+    }
+}
 
 /**
  * How far up the stack a node's chip is drawn, mirroring the Google flavor's `NodeClusterItem.zIndex`: this node and

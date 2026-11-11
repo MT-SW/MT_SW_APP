@@ -287,7 +287,10 @@ internal object AndroidLogging {
 
         /** Refreshes the zip in Downloads when there is something new to put in it. */
         suspend fun autoExport() {
-            val wanted = MtSwLogging.level.value != AppLogLevel.OFF || MtSwLogging.crashFiles().isNotEmpty()
+            val wanted =
+                MtSwLogging.level.value != AppLogLevel.OFF ||
+                    MtSwLogging.recent.value ||
+                    MtSwLogging.crashFiles().isNotEmpty()
             if (!wanted) return
             val files = MtSwLogging.parts() + MtSwLogging.crashFiles()
             val fingerprint =

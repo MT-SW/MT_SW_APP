@@ -252,7 +252,11 @@ internal object IosLogControl : AppLogControl {
     fun exportNow() {
         runCatching {
             // As on Android: only while the full log is on or a crash was recorded, and only when something is new.
-            val wanted = IosFileLog.level.value != AppLogLevel.OFF || IosFileLog.crashFiles().isNotEmpty()
+            // The log of the last 24 hours is on by default, so it counts too, not only the full log.
+            val wanted =
+                IosFileLog.level.value != AppLogLevel.OFF ||
+                    IosFileLog.recent.value ||
+                    IosFileLog.crashFiles().isNotEmpty()
             if (!wanted) return
             val files = IosFileLog.parts() + IosFileLog.crashFiles()
             val fingerprint =
