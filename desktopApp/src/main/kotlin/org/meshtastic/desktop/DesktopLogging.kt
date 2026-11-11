@@ -21,7 +21,11 @@ package org.meshtastic.desktop
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.AppDataRoot
@@ -57,7 +61,16 @@ internal fun installDesktopLogging(isDebug: Boolean) {
     MtSwLogging.init(logDir, headerText = ::desktopHeader) { level ->
         Logger.setMinSeverity(MtSwLogging.minSeverityFor(Severity.Info, level))
     }
-    AppLogControls.current = DesktopLogControl(logDir)
+    val control = DesktopLogControl(logDir)
+    AppLogControls.current = control
+    // Like the Downloads folder of a phone: two zips kept fresh in the logs folder, the log of the last 24 hours and,
+    // apart from it, the full log (only while it is on).
+    CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+        while (true) {
+            control.autoExport()
+            delay(AUTO_EXPORT_EVERY_MS)
+        }
+    }
     installMapLibreLogging()
     Logger.i { "Log folder: ${logDir.absolutePath}; level ${MtSwLogging.level.value.key}; ${desktopHeader()}" }
 }
@@ -72,6 +85,9 @@ private fun desktopHeader(): String {
 }
 
 private const val MB = 1024 * 1024
+private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
+private const val NAME_24H = "mt_sw_logi_24h.zip"
+private const val NAME_FULL = "mt_sw_logi_pelne.zip"
 
 /** The desktop side of the log switch: same files as on a phone, kept in the logs folder of the data folder. */
 private class DesktopLogControl(private val dir: File) : AppLogControl {
@@ -91,6 +107,28 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
     override fun setRecent(on: Boolean) = MtSwLogging.setRecent(on)
 
     override val canMakeReport: Boolean = true
+
+    /** Refreshes the two zips in the logs folder when there is something new to put in them. */
+    fun autoExport() {
+        val crash = MtSwLogging.crashFiles().isNotEmpty()
+        if (MtSwLogging.recent.value || MtSwLogging.level.value != AppLogLevel.OFF || crash) {
+            exportIfNew(NAME_24H, "last_export_24h.txt", System.currentTimeMillis() - MtSwLogging.RECENT_WINDOW_MS)
+        }
+        if (MtSwLogging.level.value != AppLogLevel.OFF) exportIfNew(NAME_FULL, "last_export_full.txt", 0L)
+    }
+
+    private fun exportIfNew(name: String, markerName: String, since: Long) {
+        runCatching {
+            val files = (MtSwLogging.parts() + MtSwLogging.crashFiles()).filter { it.lastModified() >= since }
+            val fingerprint =
+                "${files.size}:${files.maxOfOrNull { it.lastModified() } ?: 0L}:${files.sumOf { it.length() }}"
+            val marker = File(dir, markerName)
+            if (runCatching { marker.readText() }.getOrNull() == fingerprint) return
+            File(dir, name).outputStream().use { MtSwLogging.writeReportZip(it, since) }
+            marker.writeText(fingerprint)
+        }
+            .onFailure { Logger.w(it) { "Saving the log zip failed" } }
+    }
 
     override suspend fun buildReport(
         note: String,
