@@ -106,6 +106,8 @@ data class TerrainHorizonState(
     val profile: HorizonProfile? = null,
     /** The skyline of the bare ground, kept next to [profile] while buildings are on, so they can be told apart. */
     val groundProfile: HorizonProfile? = null,
+    /** The saved buildings projected as outlines (walls and roofs), drawn over the ground bands; empty when off. */
+    val buildingShapes: List<HorizonBuilding> = emptyList(),
     val targets: List<HorizonTarget> = emptyList(),
     val radiusKm: Int = DEFAULT_RADIUS_KM,
     /** How far the nodes are drawn (km), independent of how far the terrain is loaded. */
@@ -450,6 +452,7 @@ class TerrainHorizonViewModel(
                         failure = TerrainHorizonFailure.NO_POSITION,
                         profile = null,
                         groundProfile = null,
+                        buildingShapes = emptyList(),
                         targets = emptyList(),
                         observerName = "",
                     )
@@ -511,11 +514,27 @@ class TerrainHorizonViewModel(
                     } else {
                         null
                     }
+                val shapes =
+                    if (settings.buildings && !savedBuildings.isEmpty()) {
+                        withContext(dispatchers.default) {
+                            HorizonBuildings.project(
+                                savedBuildings,
+                                spot.at,
+                                profile.observerM,
+                                radiusKm * METRES_PER_KM,
+                                settings.refraction,
+                                ground,
+                            )
+                        }
+                    } else {
+                        emptyList()
+                    }
                 _state.update {
                     it.copy(
                         loading = false,
                         profile = profile,
                         groundProfile = groundOnly,
+                        buildingShapes = shapes,
                         targets = targets,
                         radiusKm = radiusKm,
                         observerName = spot.name,

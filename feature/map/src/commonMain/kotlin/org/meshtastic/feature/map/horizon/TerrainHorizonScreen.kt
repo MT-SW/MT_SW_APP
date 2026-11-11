@@ -169,11 +169,15 @@ import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
 import androidx.compose.ui.graphics.Brush
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -440,6 +444,7 @@ fun TerrainHorizonScreen(
                     Panorama(
                         profile = profile,
                         groundProfile = state.groundProfile,
+                        shapes = state.buildingShapes,
                         targets = if (onlyVisible) state.targets.filter { it.visible } else state.targets,
                         focusNodeNum = state.focusNodeNum,
                         fieldOfView = fieldOfView.toFloat(),
@@ -608,6 +613,7 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
 private fun Panorama(
     profile: HorizonProfile,
     groundProfile: HorizonProfile?,
+    shapes: List<HorizonBuilding>,
     targets: List<HorizonTarget>,
     focusNodeNum: Int?,
     fieldOfView: Float,
@@ -674,7 +680,7 @@ private fun Panorama(
             },
     ) {
         val perDeg = size.width / fieldOfView
-        drawBands(profile, groundProfile, bands, buildingBands, centre, perDeg, range)
+        drawBands(profile, groundProfile, shapes, bands, buildingBands, centre, perDeg, range)
         drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
         drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
     }
@@ -712,6 +718,7 @@ private fun xOf(bearingDeg: Double, centre: Float, perDeg: Float, width: Float):
 private fun DrawScope.drawBands(
     profile: HorizonProfile,
     ground: HorizonProfile?,
+    shapes: List<HorizonBuilding>,
     bands: List<Color>,
     buildingBands: List<Color>,
     centre: Float,
@@ -722,7 +729,11 @@ private fun DrawScope.drawBands(
         val index = bands.lastIndex - band
         if (ground != null) {
             drawPath(bandPath(ground, index, centre, perDeg, range), bands[index])
-            drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
+            if (shapes.isEmpty()) {
+                drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
+            } else {
+                drawBuildingShapes(shapes, profile.radiusM, index, buildingBands[index], centre, perDeg, range)
+            }
         } else {
             drawPath(bandPath(profile, index, centre, perDeg, range), bands[index])
         }
@@ -776,6 +787,73 @@ private fun DrawScope.drawBuildingSolids(
         }
         previousTop = top
         x += COLUMN_STEP_PX
+    }
+}
+
+/**
+ * The buildings of one distance band as real bodies: every wall that faces the viewer is a quadrilateral from the foot
+ * to the roof line of its two corners (so a wall seen at an angle is narrower and darker, one seen face-on is wide and
+ * light), then the roof is drawn over them and the outline with a thin dark line. Far buildings are drawn first, so near
+ * ones cover them. [radiusM] is the radius of the picture, to place a building in its band.
+ */
+@Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements", "NestedBlockDepth")
+private fun DrawScope.drawBuildingShapes(
+    shapes: List<HorizonBuilding>,
+    radiusM: Double,
+    band: Int,
+    colour: Color,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+) {
+    val w = size.width
+    val h = size.height
+    val from = BandEdges[band] * radiusM
+    val to = BandEdges[band + 1] * radiusM
+    val roofColour = lerp(colour, Color.White, ROOF_LIGHTEN)
+    val darkWall = lerp(colour, Color.Black, WALL_DARKEN)
+    val edge = lerp(colour, Color.Black, EDGE_DARKEN)
+    for (i in shapes.indices.reversed()) {
+        val b = shapes[i]
+        if (b.distanceM < from || b.distanceM >= to) continue
+        val n = b.bearingsDeg.size
+        val xs = FloatArray(n) { xOf(b.bearingsDeg[it], centre, perDeg, w) }
+        if (xs.all { it < -w } || xs.all { it > 2 * w }) continue
+        if (xs.max() - xs.min() > w) continue
+        val yRoof = FloatArray(n) { yOf(b.roofDeg[it], range, h) }
+        val yFoot = FloatArray(n) { yOf(b.footDeg[it], range, h) }
+        // Plan view from the viewer: x east, y north.
+        val px = DoubleArray(n) { b.cornerM[it] * sin(b.bearingsDeg[it] * PI / 180.0) }
+        val py = DoubleArray(n) { b.cornerM[it] * cos(b.bearingsDeg[it] * PI / 180.0) }
+        var area = 0.0
+        for (k in 0 until n) {
+            val m = (k + 1) % n
+            area += px[k] * py[m] - px[m] * py[k]
+        }
+        val sign = if (area >= 0) 1.0 else -1.0
+        for (k in 0 until n) {
+            val m = (k + 1) % n
+            val ex = px[m] - px[k]
+            val ey = py[m] - py[k]
+            // Outward normal of the edge; the wall faces the viewer when the viewer (the origin) is on its outer side.
+            val nx = ey * sign
+            val ny = -ex * sign
+            val facing = -(px[k] * nx + py[k] * ny) / (sqrt(nx * nx + ny * ny) * b.cornerM[k] + 1e-9)
+            if (facing <= 0.0) continue
+            val wall = Path()
+            wall.moveTo(xs[k], yFoot[k])
+            wall.lineTo(xs[m], yFoot[m])
+            wall.lineTo(xs[m], yRoof[m])
+            wall.lineTo(xs[k], yRoof[k])
+            wall.close()
+            drawPath(wall, lerp(darkWall, colour, facing.toFloat().coerceIn(0f, 1f)))
+        }
+        val roof = Path()
+        roof.moveTo(xs[0], yRoof[0])
+        for (k in 1 until n) roof.lineTo(xs[k], yRoof[k])
+        roof.close()
+        drawPath(roof, roofColour)
+        drawPath(roof, edge, style = Stroke(width = EDGE_WIDTH_PX))
     }
 }
 
