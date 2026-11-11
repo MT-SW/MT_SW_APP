@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongParameterList")
+@file:Suppress("LongParameterList", "TooManyFunctions")
 
 package org.meshtastic.feature.map.maplibre.layers
 
@@ -458,10 +458,10 @@ internal suspend fun nodeTapAt(
     val pool = candidates.filter { closest != null && it.third <= closest + RANK_TIE_DP }
     val best = pool.maxByOrNull { it.second * RANK_WEIGHT - it.third }
     val chosen = best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM)
-    val finger = "${at.x.value.roundTo1()}, ${at.y.value.roundTo1()}"
+    val fingerText = "${at.x.value.roundTo1()}, ${at.y.value.roundTo1()}"
     val fromPosition = "${projected?.x?.value?.roundTo1()}, ${projected?.y?.value?.roundTo1()}"
     Logger.i {
-        "Dotyk w węzeł: palec $finger, z pozycji $fromPosition, skala ekranu ${scale.roundTo2()}, " +
+        "Dotyk w węzeł: palec $fingerText, z pozycji $fromPosition, skala ekranu ${scale.roundTo2()}, " +
             "zoom ${state.cameraPosition.zoom.toFloat().roundTo1()}, kropek na ekranie ${search.rendered}, " +
             "najbliższa kropka: ${search.nearest}, kandydatów ${candidates.size}, wybrany $chosen"
     }
@@ -498,7 +498,7 @@ private class ChipSearch(
  * factor (the box then only reached a dot's own spot and never the bubble above it). Distances measured on screen are
  * divided by it. Answers close to 1 are taken as 1, and nonsense is ignored.
  */
-private suspend fun screenScale(state: MapState, tap: Position, at: DpOffset): Float {
+private fun screenScale(state: MapState, tap: Position, at: DpOffset): Float {
     val metersPerDp = state.viewport?.metersPerDpAtCenter ?: 0.0
     val probe = if (metersPerDp > 0.0) probeSpotEast(state, tap, metersPerDp) else null
     val east = probe?.let { state.screenLocationFromPosition(it) }
@@ -516,39 +516,41 @@ private fun probeSpotEast(state: MapState, tap: Position, metersPerDp: Double): 
     return Position(tap.longitude + degrees, tap.latitude)
 }
 
-private fun Float.roundTo1(): Float = (this * 10f).toInt() / 10f
+private const val ONE_DECIMAL = 10f
+private const val TWO_DECIMALS = 100f
 
-private fun Float.roundTo2(): Float = (this * 100f).toInt() / 100f
+private fun Float.roundTo1(): Float = (this * ONE_DECIMAL).toInt() / ONE_DECIMAL
+
+private fun Float.roundTo2(): Float = (this * TWO_DECIMALS).toInt() / TWO_DECIMALS
 
 /**
  * The dots just below the tap, each with its rank (favourites on top) and its distance from the bubble's centre.
  *
  * The map is asked about the whole screen and the box is applied here, on the same screen positions the tap itself came
- * from: a box handed to the map can be read in a slightly different scale (seen on the iPhone), which put some
- * bubbles' taps off their targets while others, near the corner the scale starts from, were right. [scale] corrects
- * the same kind of difference in the screen positions themselves.
+ * from: a box handed to the map can be read in a slightly different scale (seen on the iPhone), which put some bubbles'
+ * taps off their targets while others, near the corner the scale starts from, were right. [scale] corrects the same
+ * kind of difference in the screen positions themselves.
  */
 private suspend fun chipCandidates(state: MapState, at: DpOffset, scale: Float): ChipSearch {
     val whole = DpRect(left = 0.dp, top = 0.dp, right = WHOLE_SCREEN_DP.dp, bottom = WHOLE_SCREEN_DP.dp)
     val dots = state.queryRenderedFeatures(whole, layerIds = setOf(NODE_DOT_LAYER_ID))
     var nearest = "brak"
     var nearestDistance = Float.MAX_VALUE
-    val found =
-        dots.mapNotNull { feature ->
-            val spot = (feature.geometry as? Point)?.coordinates
-            val dot = spot?.let { state.screenLocationFromPosition(it) }
-            val dx = ((dot?.x?.value ?: Float.NaN) - at.x.value) / scale
-            val below = ((dot?.y?.value ?: Float.NaN) - at.y.value) / scale
-            val dy = below - CHIP_CENTRE_DP
-            val distance = sqrt(dx * dx + dy * dy)
-            if (distance < nearestDistance) {
-                nearestDistance = distance
-                nearest = "w bok ${dx.roundTo1()}, w dół ${below.roundTo1()}"
-            }
-            // NaN (no position) fails every comparison below, so such a dot is left out.
-            val inside = abs(dx) <= TAP_HALF_WIDTH_DP && below >= -TAP_TOP_MARGIN_DP && below <= TAP_HEIGHT_DP
-            if (inside) Triple(feature, feature.properties.chipRank(), distance) else null
+    val found = dots.mapNotNull { feature ->
+        val spot = (feature.geometry as? Point)?.coordinates
+        val dot = spot?.let { state.screenLocationFromPosition(it) }
+        val dx = ((dot?.x?.value ?: Float.NaN) - at.x.value) / scale
+        val below = ((dot?.y?.value ?: Float.NaN) - at.y.value) / scale
+        val dy = below - CHIP_CENTRE_DP
+        val distance = sqrt(dx * dx + dy * dy)
+        if (distance < nearestDistance) {
+            nearestDistance = distance
+            nearest = "w bok ${dx.roundTo1()}, w dół ${below.roundTo1()}"
         }
+        // NaN (no position) fails every comparison below, so such a dot is left out.
+        val inside = abs(dx) <= TAP_HALF_WIDTH_DP && below >= -TAP_TOP_MARGIN_DP && below <= TAP_HEIGHT_DP
+        if (inside) Triple(feature, feature.properties.chipRank(), distance) else null
+    }
     return ChipSearch(found, dots.size, nearest)
 }
 

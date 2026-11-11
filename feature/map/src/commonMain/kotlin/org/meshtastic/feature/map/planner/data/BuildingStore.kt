@@ -21,10 +21,10 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.feature.map.horizon.ALL_BUILDINGS_MAX_KM
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.planner.GeoPoint
-import org.meshtastic.feature.map.horizon.ALL_BUILDINGS_MAX_KM
 import org.meshtastic.feature.map.planner.Geodesy
 import kotlin.math.roundToInt
 
@@ -70,9 +70,9 @@ class BuildingStore(
     fun covers(at: GeoPoint): Boolean = areas().any { covers(it, at) }
 
     /**
-     * The buildings of every downloaded area that covers [at]. When no finished area does, and [radiusKm] is given,
-     * the finished pieces of an interrupted download within that range are used, so what has arrived is shown at once
-     * (with only the tall buildings when [tallOnly], the way such a wide area is downloaded). Empty when there is none.
+     * The buildings of every downloaded area that covers [at]. When no finished area does, and [radiusKm] is given, the
+     * finished pieces of an interrupted download within that range are used, so what has arrived is shown at once (with
+     * only the tall buildings when [tallOnly], the way such a wide area is downloaded). Empty when there is none.
      */
     fun load(at: GeoPoint, radiusKm: Int = 0, tallOnly: Boolean = false): ClutterMap {
         val polygons = ArrayList<ClutterPolygon>()
@@ -107,8 +107,7 @@ class BuildingStore(
         val parts = key.split('_')
         val edges = parts.take(PIECE_EDGES).mapNotNull { it.toLongOrNull()?.div(DEGREE_SCALE) }
         if (parts.size != PIECE_PARTS || parts.last() != kind || edges.size != PIECE_EDGES) return false
-        val (south, west, north, east) = edges
-        val nearest = GeoPoint(at.lat.coerceIn(south, north), at.lon.coerceIn(west, east))
+        val nearest = GeoPoint(at.lat.coerceIn(edges[0], edges[2]), at.lon.coerceIn(edges[1], edges[3]))
         return Geodesy.distanceM(nearest, at) <= radiusKm * METRES_PER_KM
     }
 
@@ -127,8 +126,9 @@ class BuildingStore(
         maxAgeDays = ageDays()
     }
 
-    override fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? =
-        readFresh { area -> covers(area, a) && covers(area, b) }
+    override fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? = readFresh { area ->
+        covers(area, a) && covers(area, b)
+    }
 
     override fun savedBuildingsIn(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): List<ClutterPolygon>? =
         readFresh { area ->

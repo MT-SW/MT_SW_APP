@@ -181,7 +181,6 @@ private fun rememberMenuOpener(open: () -> Unit): () -> Unit {
             delay(KEYBOARD_CLOSE_DELAY_MS)
             latestOpen()
         }
-        Unit
     }
 }
 

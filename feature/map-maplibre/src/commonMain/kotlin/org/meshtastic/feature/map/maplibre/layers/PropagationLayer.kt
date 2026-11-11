@@ -159,12 +159,7 @@ private fun latFromMercator(y: Double): Double = (2 * atan(exp(y)) - PI / 2) * 1
  * Paints [grid] for [hour]: rows follow the map's own projection, so the picture lines up with the tiles. Places inside
  * one of the [finer] areas are left empty, because a finer picture is drawn there.
  */
-private fun renderPropagation(
-    grid: TropoGrid,
-    hour: Int,
-    kind: PropagationKind,
-    finer: List<GeoBounds>,
-): ImageBitmap {
+private fun renderPropagation(grid: TropoGrid, hour: Int, kind: PropagationKind, finer: List<GeoBounds>): ImageBitmap {
     val bitmap = ImageBitmap(BITMAP_SIZE, BITMAP_SIZE)
     val canvas = Canvas(bitmap)
     val paint = Paint()
@@ -175,11 +170,12 @@ private fun renderPropagation(
         val lat = latFromMercator(yTop + (yBottom - yTop) * (py + 0.5) / BITMAP_SIZE)
         for (px in 0 until BITMAP_SIZE) {
             val lon = b.west + b.lonSpan * (px + 0.5) / BITMAP_SIZE
-            if (finer.any { lat in it.south..it.north && lon in it.west..it.east }) continue
-            val argb = PropagationColors.argb(kind, grid.sample(hour, lat, lon).toDouble())
-            if (argb ushr 24 == 0) continue
-            paint.color = Color(argb)
-            canvas.drawRect(Rect(px.toFloat(), py.toFloat(), px + 1f, py + 1f), paint)
+            val covered = finer.any { lat in it.south..it.north && lon in it.west..it.east }
+            val argb = if (covered) 0 else PropagationColors.argb(kind, grid.sample(hour, lat, lon).toDouble())
+            if (argb ushr 24 != 0) {
+                paint.color = Color(argb)
+                canvas.drawRect(Rect(px.toFloat(), py.toFloat(), px + 1f, py + 1f), paint)
+            }
         }
     }
     return bitmap

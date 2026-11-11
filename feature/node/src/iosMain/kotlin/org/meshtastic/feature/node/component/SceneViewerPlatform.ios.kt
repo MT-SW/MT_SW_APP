@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.meshtastic.core.repository.MirrorFrame
 import org.meshtastic.feature.node.model.GlbBounds
@@ -47,7 +48,7 @@ private class ViewerPage(val dir: String, val html: String)
  * Writes the page for the 3D view into a temporary folder: the bundled `model-viewer` library (Google, Apache-2.0) and
  * the model, which the page reads from its own text so no network and no file access from the page is needed.
  */
-@OptIn(ExperimentalEncodingApi::class, ExperimentalForeignApi::class)
+@OptIn(ExperimentalEncodingApi::class, ExperimentalForeignApi::class, BetaInteropApi::class)
 private fun prepareViewerPage(glb: ByteArray): ViewerPage? {
     val library = NSBundle.mainBundle.pathForResource("model-viewer.min", ofType = "js") ?: return null
     val fm = NSFileManager.defaultManager

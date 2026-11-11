@@ -18,6 +18,7 @@ package org.meshtastic.ios
 
 import androidx.compose.runtime.Composable
 import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
@@ -34,6 +35,7 @@ private const val MEMORY_CACHE_MAX_BYTES = 64L * 1024L * 1024L
 private const val DISK_CACHE_MAX_BYTES = 32L * 1024L * 1024L
 
 /** Image loading (maps of hardware pictures, avatars, links) with a memory and a disk cache. */
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun IosCoilSetup() {
     val httpClient = koinInject<HttpClient>()

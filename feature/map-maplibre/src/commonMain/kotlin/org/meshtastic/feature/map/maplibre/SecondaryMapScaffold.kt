@@ -37,6 +37,7 @@ import org.maplibre.compose.map.MapUiOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.overlay.include
+import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.BoundingBox
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.core.ui.theme.WithSystemDensity
@@ -64,9 +65,9 @@ import org.maplibre.compose.overlay.MapOverlay as MaplibreOverlay
  * `MaplibreMap` — the state owns the base style and the sources and layers over it, and the composable only presents
  * it. The state is returned so the caller can drive the camera and hang its chrome off the same one.
  *
- * [content] is a plain `@Composable`, matching the layer composables it will hold — `NodeLayers` and
- * `RasterBasemapLayer` are declared that way and compose inside the style block without the applier annotation.
- * Spelling `@MaplibreComposable` here is what spotless and detekt disagree about formatting.
+ * [content] is marked `@MaplibreComposable` on purpose: it is composed inside the style block of the map, and saying so
+ * outright keeps the compiler from guessing the target from the callers (on iPhone/iPad it guessed the screen's own
+ * target for the callers that also draw buttons beside the map).
  *
  * The raster underlay is composed **before** [content] and must stay that way: layers stack in composition order, so a
  * basemap added afterwards paints over the mesh data instead of sitting under it.
@@ -75,7 +76,7 @@ import org.maplibre.compose.overlay.MapOverlay as MaplibreOverlay
 internal fun rememberSecondaryMapState(
     basemaps: BasemapSelection,
     initialCameraPosition: CameraPosition = CameraPosition(),
-    content: @Composable () -> Unit,
+    content: @Composable @MaplibreComposable () -> Unit,
 ): MapState {
     InstallRadarSmoothing()
     return rememberMapState(baseStyle = basemaps.current.toBaseStyle(), initialCameraPosition = initialCameraPosition) {

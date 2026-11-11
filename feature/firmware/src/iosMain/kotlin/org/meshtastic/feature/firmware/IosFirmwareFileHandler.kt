@@ -28,6 +28,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -289,6 +290,6 @@ private fun NSData.toByteArray(): ByteArray {
     return out
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private fun ByteArray.toNSData(): NSData =
     if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.toULong()) }

@@ -49,13 +49,13 @@ import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.LocalSystemDensity
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
-import org.meshtastic.core.ui.theme.LocalSystemDensity
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalTerminateApplication

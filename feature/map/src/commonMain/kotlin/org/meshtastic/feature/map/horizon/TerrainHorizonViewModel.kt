@@ -307,7 +307,8 @@ class TerrainHorizonViewModel(
      * Downloads the buildings around the connected radio, up to the chosen range, and keeps them on the device, so the
      * panorama reads them from there from now on.
      */
-    @Suppress("TooGenericExceptionCaught")
+    // The cancellation is logged and then rethrown.
+    @Suppress("TooGenericExceptionCaught", "SuspendFunSwallowedCancellation")
     fun saveBuildings() {
         val here = _state.value
         // From the connected radio, whichever place the panorama is looked from; the place looked from is the fallback.

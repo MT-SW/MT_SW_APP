@@ -27,9 +27,13 @@ actual fun applyAppIcon(style: String) {
     val name =
         when (AppIconStyle.base(style)) {
             "standard" -> if (AppIconStyle.isFlat(style)) "AppIcon-StandardFlat" else "AppIcon-Standard"
+
             "dark" -> if (AppIconStyle.isFlat(style)) "AppIcon-DarkFlat" else "AppIcon-Dark"
+
             "clear" -> "AppIcon-Clear"
+
             "tinted" -> "AppIcon-Tinted"
+
             // A flat icon needs a named set: "automatic" has none, so it becomes the standard one.
             else -> if (AppIconStyle.isFlat(style)) "AppIcon-StandardFlat" else null
         }

@@ -26,11 +26,15 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
 
+private const val NORMAL_POINTS = 6
+private const val DETAILED_POINTS = 9
+private const val FINE_POINTS = 12
+
 /** How many points per side the forecast grid of a region has: more points, finer picture, bigger download. */
 enum class PropagationDetail(val points: Int) {
-    NORMAL(6),
-    DETAILED(9),
-    FINE(12),
+    NORMAL(NORMAL_POINTS),
+    DETAILED(DETAILED_POINTS),
+    FINE(FINE_POINTS),
     ;
 
     companion object {
@@ -49,8 +53,9 @@ data class PropagationRegion(val id: Long, val grid: TropoGrid, val name: String
 
     /** The width of the area in kilometres, measured at its middle. */
     val widthKm: Int
-        get() = (grid.bounds.lonSpan * KM_PER_DEGREE * cos((grid.bounds.south + grid.bounds.north) / 2 * PI / 180))
-            .roundToInt()
+        get() =
+            (grid.bounds.lonSpan * KM_PER_DEGREE * cos((grid.bounds.south + grid.bounds.north) / 2 * PI / 180))
+                .roundToInt()
 
     val heightKm: Int
         get() = (grid.bounds.latSpan * KM_PER_DEGREE).roundToInt()

@@ -271,12 +271,16 @@ private suspend fun MutableList<String>.addSensorLines(node: Node) {
     // Temperature and humidity side by side on one line, as voltage and current are.
     val climate =
         listOfNotNull(
-            env.temperature?.takeIf { !it.isNaN() }?.let {
-                "${getStringSuspend(Res.string.temperature)} ${MetricFormatter.temperature(it, false)}"
-            },
-            env.relative_humidity?.takeIf { it != 0f }?.let {
-                "${getStringSuspend(Res.string.humidity)} ${MetricFormatter.humidity(it)}"
-            },
+            env.temperature
+                ?.takeIf { !it.isNaN() }
+                ?.let {
+                    "${getStringSuspend(Res.string.temperature)} ${MetricFormatter.temperature(it, false)}"
+                },
+            env.relative_humidity
+                ?.takeIf { it != 0f }
+                ?.let {
+                    "${getStringSuspend(Res.string.humidity)} ${MetricFormatter.humidity(it)}"
+                },
         )
     if (climate.isNotEmpty()) add(climate.joinToString("   "))
     env.barometric_pressure

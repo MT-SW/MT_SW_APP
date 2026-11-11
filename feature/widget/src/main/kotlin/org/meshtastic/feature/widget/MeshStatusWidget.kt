@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.widget
 
 import android.content.Context
@@ -96,9 +98,9 @@ private val GOLD = Color(0xFFF5C738)
 /**
  * Widget "Statystyki MT_SW": the same lines as the permanent notification in one or two columns. What is shown follows
  * the room there is: our node first, then (when the lines of all of them fit) the favorites and the rest of the
- * network, or else the second area chosen in the settings; the smallest size shows what is chosen in the settings
- * (our node, or favorites, or the whole network in turn, our node first). A line too long for a column is cut into
- * several rows, so nothing ends in "…".
+ * network, or else the second area chosen in the settings; the smallest size shows what is chosen in the settings (our
+ * node, or favorites, or the whole network in turn, our node first). A line too long for a column is cut into several
+ * rows, so nothing ends in "…".
  */
 class MeshStatusWidget :
     GlanceAppWidget(),
@@ -151,7 +153,7 @@ class MeshStatusWidget :
                         room >= three -> {
                             // What is left over is shared evenly, so the sections and the lines between them
                             // are spread over the whole widget instead of leaving an empty strip at the bottom.
-                            val extra = (room - three) / 3
+                            val extra = (room - three) / SECTION_COUNT
                             Column(modifier = GlanceModifier.fillMaxSize()) {
                                 OwnSection(snapshot, metrics, own + extra)
                                 SectionDivider()
@@ -322,10 +324,15 @@ private fun NodeSection(kind: NodeKind, cards: List<MeshStatsNodeCard>, step: In
 /** The line between two sections of the widget, with room above and below it. */
 @Composable
 private fun SectionDivider() {
-    Spacer(GlanceModifier.height(SECTION_GAP_DP.dp))
-    Spacer(GlanceModifier.fillMaxWidth().height(DIVIDER_DP.dp).background(GlanceTheme.colors.outline))
-    Spacer(GlanceModifier.height(SECTION_GAP_DP.dp))
+    Column {
+        Spacer(GlanceModifier.height(SECTION_GAP_DP.dp))
+        Spacer(GlanceModifier.fillMaxWidth().height(DIVIDER_DP.dp).background(GlanceTheme.colors.outline))
+        Spacer(GlanceModifier.height(SECTION_GAP_DP.dp))
+    }
 }
+
+/** The sections (own node, favourites, the others) that share what is left over in the largest widget. */
+private const val SECTION_COUNT = 3
 
 /** A hair of room is allowed, so an exact fit is not lost to rounding. */
 private const val ROUNDING_DP = 1f

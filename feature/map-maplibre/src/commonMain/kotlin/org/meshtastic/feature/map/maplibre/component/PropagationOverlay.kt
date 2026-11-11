@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.propagation_hour_ahead
 import org.meshtastic.core.resources.propagation_hour_now

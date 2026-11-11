@@ -59,12 +59,16 @@ class BusyTimeoutSQLiteDriver(
     /**
      * In WAL mode SQLite is safe from corruption with `synchronous = NORMAL`, and then does not wait for the disk after
      * every single write (Room leaves the slower FULL, which made each one-row write on a phone take long). Only a
-     * crash of the whole phone can cost the last few writes, never a closed app. Set only when the file really is in
-     * WAL mode (Room asks for it for every database file), so other modes keep their full protection.
+     * crash of the whole phone can cost the last few writes, never a closed app. The mode is only read, never changed
+     * here (changing it needs a lock other connections may hold), and the relaxed setting is used only when the file is
+     * already in WAL mode (Room puts every database file there, and the mode stays in the file), so a file in another
+     * mode keeps its full protection. Failing to read or set it never stops the connection from opening.
      */
     private fun relaxSyncInWal(connection: SQLiteConnection) {
-        val mode = connection.prepare("PRAGMA journal_mode = WAL").use { if (it.step()) it.getText(0) else "" }
-        if (mode.equals("wal", ignoreCase = true)) connection.execSQL("PRAGMA synchronous = NORMAL")
+        runCatching {
+            val mode = connection.prepare("PRAGMA journal_mode").use { if (it.step()) it.getText(0) else "" }
+            if (mode.equals("wal", ignoreCase = true)) connection.execSQL("PRAGMA synchronous = NORMAL")
+        }
     }
 
     companion object {

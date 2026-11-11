@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.map.maplibre
 
 import androidx.compose.foundation.layout.Box
@@ -200,10 +202,11 @@ fun rememberMeshMapState(
             // recomposition to, and these reads are the whole reason this block runs per frame.
             // Held still while the camera stays inside it: reading the live viewport here made this whole block (every
             // layer) recompose on each frame of a pan, which is what cost the iPhone its smoothness.
-            val viewportBounds by remember(state) {
-                val held = StickyBounds()
-                derivedStateOf { held.update(state.viewport?.visibleBounds?.toBoundingBox()) }
-            }
+            val viewportBounds by
+                remember(state) {
+                    val held = StickyBounds()
+                    derivedStateOf { held.update(state.viewport?.visibleBounds?.toBoundingBox()) }
+                }
 
             if (basemap is Basemap.Raster) {
                 RasterBasemapLayer(basemap)
@@ -270,6 +273,25 @@ fun rememberMeshMapState(
     return mapState
 }
 
+/** Tells the store-screenshot capture (it waits for this tag instead of a fixed delay) that the tiles are on screen. */
+@Composable
+private fun ReportMapDrawn(mapState: MapState) {
+    LaunchedEffect(mapState) {
+        // Idle can arrive before the first render session; only an idle after a drawn frame means tiles are on screen.
+        mapState.events.dropWhile { it !is MapEvent.FrameRendered }.filterIsInstance<MapEvent.Idle>().first()
+        Logger.withTag("MapDrawn").d { "tiles drawn" }
+        ReturnView.setHome(mapState)
+    }
+}
+
+/** One line in the log for every tap on the map: where the finger was, where it landed after the correction. */
+private fun logTap(event: ClickEvent, tap: Position?, shown: DpSize, mapState: MapState, scale: Float) {
+    Logger.i {
+        "Mapa: dotknięcie ekranu w ${event.position}, po korekcie $tap, " +
+            "widok ${shown.text()}, mapa ${mapState.viewport?.size?.text()}, skala wyświetlania $scale"
+    }
+}
+
 /**
  * The mesh map, rendered by MapLibre.
  *
@@ -299,13 +321,7 @@ fun MeshMap(
     // thrown by the time this is reached.
     if (!LocalMapLibreRuntimeProbe.current()) return MapEngineUnavailable(modifier)
 
-    // The store-screenshot capture waits for this tag instead of a fixed delay.
-    LaunchedEffect(mapState) {
-        // Idle can arrive before the first render session; only an idle after a drawn frame means tiles are on screen.
-        mapState.events.dropWhile { it !is MapEvent.FrameRendered }.filterIsInstance<MapEvent.Idle>().first()
-        Logger.withTag("MapDrawn").d { "tiles drawn" }
-        ReturnView.setHome(mapState)
-    }
+    ReportMapDrawn(mapState)
 
     val scope = rememberCoroutineScope()
     DisposableEffect(mapState) { onDispose { ReturnView.forget(mapState) } }
@@ -348,18 +364,16 @@ fun MeshMap(
                                 ClickResult.Consume
                             }
                         }
-                        // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
+                        // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is
+                        // selectable.
                         click {
                             onEvent { event ->
                                 val scale = mapState.displayScale(shown)
                                 val finger = event.screenOffset.dividedBy(scale)
                                 val tap = event.correctedPosition(mapState, shown)
-                                Logger.i {
-                                    "Mapa: dotknięcie ekranu w ${event.position}, po korekcie $tap, " +
-                                        "widok ${shown.text()}, mapa ${mapState.viewport?.size?.text()}, " +
-                                        "skala wyświetlania ${scale.toFloat()}"
-                                }
-                                // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation; the
+                                logTap(event, tap, shown, mapState, scale)
+                                // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation;
+                                // the
                                 // check needs the map's answer, so it runs beside the event and the rest of the tap
                                 // (waypoints, planner) is only given the taps that hit no node.
                                 scope.launch {
@@ -395,8 +409,8 @@ private const val DISPLAY_SCALE_TOLERANCE = 0.03f
 
 /**
  * How much larger the map is drawn on screen than the size it was rendered and projected at: [shown] (the room the map
- * takes) over the map's own reported size. 1 whenever the two agree, which is every platform but the iPhone so far,
- * and also when either is not known yet or the ratio is implausible.
+ * takes) over the map's own reported size. 1 whenever the two agree, which is every platform but the iPhone so far, and
+ * also when either is not known yet or the ratio is implausible.
  */
 internal fun MapState.displayScale(shown: DpSize): Float {
     val rendered = viewport?.size

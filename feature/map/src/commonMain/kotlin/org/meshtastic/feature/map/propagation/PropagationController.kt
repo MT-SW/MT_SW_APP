@@ -57,8 +57,8 @@ data class PropagationState(
  *
  * Each region is an area (smaller, larger, finer or coarser) with its forecast for the next 24 hours, kept on the
  * device, so the layer still draws (for the hours that are left) without the internet. Regions are added and removed
- * one by one by the user and all downloaded again together: by hand, or, while the layer is on and automatic refresh
- * is allowed, once the oldest is older than [REFRESH_AFTER_MS].
+ * one by one by the user and all downloaded again together: by hand, or, while the layer is on and automatic refresh is
+ * allowed, once the oldest is older than [REFRESH_AFTER_MS].
  */
 @Single
 class PropagationController(
@@ -145,15 +145,15 @@ class PropagationController(
             var failed = false
             for (region in s.regions) {
                 val grid = source.fetch(region.grid.bounds, nowMillis, region.grid.rows, region.grid.cols)
-                if (grid == null) {
-                    failed = true
-                    continue
-                }
+                if (grid == null) failed = true
                 // A region removed while this ran must not come back.
-                if (mutable.value.regions.none { it.id == region.id }) continue
-                val fresh = region.copy(grid = grid)
-                store.save(fresh)
-                mutable.update { cur -> cur.copy(regions = cur.regions.map { if (it.id == region.id) fresh else it }) }
+                if (grid != null && mutable.value.regions.any { it.id == region.id }) {
+                    val fresh = region.copy(grid = grid)
+                    store.save(fresh)
+                    mutable.update { cur ->
+                        cur.copy(regions = cur.regions.map { if (it.id == region.id) fresh else it })
+                    }
+                }
             }
             mutable.update { it.copy(loading = false, failed = failed, hoursAhead = 0) }
         }

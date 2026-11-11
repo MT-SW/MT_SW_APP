@@ -218,7 +218,8 @@ internal object IosFileLog : LogWriter() {
                 partBytes += head.length + line.length
                 if (head.isNotEmpty()) pruneOld()
                 if (partBytes >= PART_BYTES) closeSink()
-            }.onFailure { closeSink() }
+            }
+                .onFailure { closeSink() }
         } finally {
             lock.unlock()
         }

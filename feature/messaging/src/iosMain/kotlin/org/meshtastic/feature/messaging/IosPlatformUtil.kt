@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.messaging
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -35,7 +36,7 @@ internal fun NSData.toByteArray(): ByteArray {
     return out
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 internal fun ByteArray.toNSData(): NSData =
     if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.toULong()) }
 

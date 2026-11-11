@@ -49,17 +49,24 @@ class BusyTimeoutSQLiteDriverTest {
     }
 
     @Test
-    fun relaxesSyncOnlyWhenTheFileIsInWalMode() {
-        val driver = BusyTimeoutSQLiteDriver(BundledSQLiteDriver())
-        driver.open(dbFile.absolutePath).use { connection ->
-            connection.prepare("PRAGMA journal_mode").use {
-                it.step()
-                assertEquals("wal", it.getText(0).lowercase())
-            }
+    fun relaxesSyncWhenTheFileIsAlreadyInWalMode() {
+        BundledSQLiteDriver().open(dbFile.absolutePath).use { it.execSQL("PRAGMA journal_mode = WAL") }
+        BusyTimeoutSQLiteDriver(BundledSQLiteDriver()).open(dbFile.absolutePath).use { connection ->
             connection.prepare("PRAGMA synchronous").use {
                 it.step()
                 // 1 is NORMAL.
                 assertEquals(1L, it.getLong(0))
+            }
+        }
+    }
+
+    @Test
+    fun keepsFullSyncWhenTheFileIsNotInWalMode() {
+        BusyTimeoutSQLiteDriver(BundledSQLiteDriver()).open(dbFile.absolutePath).use { connection ->
+            connection.prepare("PRAGMA synchronous").use {
+                it.step()
+                // 2 is FULL, SQLite's default.
+                assertEquals(2L, it.getLong(0))
             }
         }
     }

@@ -20,6 +20,7 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import org.jetbrains.compose.resources.StringResource
@@ -163,7 +164,7 @@ private fun showToastNow(text: String) {
 @Composable
 actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { res -> showToastNow(getString(res)) }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Composable
 actual fun rememberSaveFileLauncher(
     onUriReceived: (CommonUri) -> Unit,

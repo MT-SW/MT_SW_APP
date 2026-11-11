@@ -275,8 +275,8 @@ interface ClutterPieceCache {
     fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? = null
 
     /**
-     * The saved buildings of a fresh area that holds the whole circle of [radiusKm] around [center] (with every
-     * house when [tallOnly] is false), or null when there is none.
+     * The saved buildings of a fresh area that holds the whole circle of [radiusKm] around [center] (with every house
+     * when [tallOnly] is false), or null when there is none.
      */
     fun savedBuildingsIn(center: GeoPoint, radiusKm: Double, tallOnly: Boolean): List<ClutterPolygon>? = null
 

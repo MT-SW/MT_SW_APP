@@ -196,7 +196,9 @@ internal fun PropagationSection(
                     text =
                     stringResource(
                         Res.string.propagation_region_item,
-                        region.name.ifBlank { stringResource(Res.string.propagation_region_default_name, index + 1) },
+                        region.name.ifBlank {
+                            stringResource(Res.string.propagation_region_default_name, index + 1)
+                        },
                         region.widthKm,
                         region.heightKm,
                         stringResource(region.detail.label()),

@@ -49,10 +49,11 @@ fun rememberScaledDensity(percent: Int, baseDensity: Float? = null): Density {
 private const val PERCENT = 100f
 
 /**
- * The density the screen really has, before the in-app scale was applied; null where the app does not apply one
- * around a native view (everywhere but the iPhone/iPad so far). A native view such as the map is laid out and drawn in
- * real screen points, so inside it the scaled density would disagree with what is drawn.
+ * The density the screen really has, before the in-app scale was applied; null where the app does not apply one around
+ * a native view (everywhere but the iPhone/iPad so far). A native view such as the map is laid out and drawn in real
+ * screen points, so inside it the scaled density would disagree with what is drawn.
  */
+@Suppress("CompositionLocalAllowlist") // set once at the root of the iPhone/iPad app, read only by native views
 val LocalSystemDensity = staticCompositionLocalOf<Density?> { null }
 
 /** Runs [content] with the screen's real density when [LocalSystemDensity] is set, otherwise unchanged. */

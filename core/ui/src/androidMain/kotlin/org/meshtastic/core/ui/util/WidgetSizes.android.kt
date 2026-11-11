@@ -38,6 +38,7 @@ private const val SECOND_AREA_FROM_DP = 200
 private const val THIRD_AREA_FROM_DP = 330
 
 /** Reads the size of every statistics widget placed on the home screen, and keeps it current while the screen shows. */
+@Suppress("InjectDispatcher") // reads the sizes off the main thread; there is nothing to inject in a screen
 @Composable
 actual fun rememberWidgetSizes(): WidgetSizesInUse {
     val context = LocalContext.current

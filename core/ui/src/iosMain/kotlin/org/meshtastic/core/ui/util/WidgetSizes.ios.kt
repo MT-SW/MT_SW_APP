@@ -37,6 +37,7 @@ private const val SIZES_FILE = "widget-sizes.txt"
 private const val REREAD_MS = 2_000L
 
 /** The app writes the sizes in use into the shared folder every time it comes to the front; this reads them. */
+@Suppress("InjectDispatcher") // reads the sizes off the main thread; there is nothing to inject in a screen
 @Composable
 actual fun rememberWidgetSizes(): WidgetSizesInUse {
     var sizes by remember { mutableStateOf(readSizes()) }

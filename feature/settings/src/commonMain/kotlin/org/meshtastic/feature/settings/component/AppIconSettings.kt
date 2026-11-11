@@ -68,7 +68,10 @@ private fun appIconLabel(key: String): String =
     stringResource((ICON_STYLES.firstOrNull { it.first == AppIconStyle.base(key) } ?: ICON_STYLES.first()).second) +
         if (AppIconStyle.isFlat(key)) " · " + stringResource(Res.string.app_icon_flat) else ""
 
-/** One row "Ikona aplikacji" with a picker of the icon styles and one flat-icon tick for all of them (also found by the settings search). */
+/**
+ * One row "Ikona aplikacji" with a picker of the icon styles and one flat-icon tick for all of them (also found by the
+ * settings search).
+ */
 @Composable
 fun AppIconSettingsItem(current: String, onPick: (String) -> Unit, modifier: Modifier = Modifier) {
     var open by remember { mutableStateOf(false) }

@@ -115,7 +115,9 @@ class PlannerOverpass(
         val key = "B" + (if (tallOnly) "T" else "A") + ":" + pointKey(center) + ":" + Num.fmt(r, 1)
         // Buildings saved on the device by the panorama (an area that holds this whole circle) are used as they are.
         pieces?.refreshAge()
-        pieces?.savedBuildingsIn(center, r, tallOnly)?.let { return ClutterMap(it) }
+        pieces?.savedBuildingsIn(center, r, tallOnly)?.let {
+            return ClutterMap(it)
+        }
         val whole = ClutterBox.around(center.lat, center.lon, r)
         // Always in pieces: a town of a few kilometres is already a heavy answer for one request, and a piece the
         // server finds too heavy is cut smaller (down to a kilometre) and asked again.
@@ -220,6 +222,47 @@ class PlannerOverpass(
         _progress.value = null
     }
 
+    /** What a failed piece asks for: another try after a wait, four smaller pieces, or the end of the download. */
+    private suspend fun handleTileFailure(
+        e: PlannerClutterException,
+        work: TileWork,
+        pending: ArrayDeque<TileWork>,
+        minTileKm: Double,
+        tookMs: Long,
+    ) {
+        Logger.w {
+            "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km nie udał się po " +
+                "$tookMs ms: ${e.failure} ${e.detail.orEmpty()} (próba ${work.tries})"
+        }
+        val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
+        val flaky = e.failure == PlannerClutterFailure.NETWORK
+        val splittable =
+            (e.failure == PlannerClutterFailure.TOO_LARGE || e.failure == PlannerClutterFailure.SERVER_LIMIT) &&
+                !busy &&
+                work.box.maxSideKm > minTileKm
+        when {
+            busy && work.tries < BUSY_RETRIES -> {
+                delay(BUSY_WAIT_MS)
+                pending.addFirst(TileWork(work.box, work.tries + 1))
+            }
+
+            flaky && work.tries < NETWORK_RETRIES -> {
+                delay(NETWORK_RETRY_WAIT_MS)
+                pending.addFirst(TileWork(work.box, work.tries + 1))
+            }
+
+            splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
+
+            // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait and ask again.
+            e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
+                delay(OVERLOAD_WAIT_MS)
+                pending.addFirst(TileWork(work.box, work.tries + 1))
+            }
+
+            else -> throw e
+        }
+    }
+
     private suspend fun fetchTiledPieces(
         whole: ClutterBox,
         query: (ClutterBox) -> String,
@@ -265,42 +308,7 @@ class PlannerOverpass(
                             }
                         }
                     } catch (e: PlannerClutterException) {
-                        Logger.w {
-                            "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km nie udał się po " +
-                                "${clockMs() - started} ms: ${e.failure} ${e.detail.orEmpty()} (próba ${work.tries})"
-                        }
-                        val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
-                        val flaky = e.failure == PlannerClutterFailure.NETWORK
-                        val splittable =
-                            (
-                                e.failure == PlannerClutterFailure.TOO_LARGE ||
-                                    e.failure == PlannerClutterFailure.SERVER_LIMIT
-                                ) &&
-                                !busy &&
-                                work.box.maxSideKm > minTileKm
-                        when {
-                            busy && work.tries < BUSY_RETRIES -> {
-                                delay(BUSY_WAIT_MS)
-                                pending.addFirst(TileWork(work.box, work.tries + 1))
-                            }
-
-                            flaky && work.tries < NETWORK_RETRIES -> {
-                                delay(NETWORK_RETRY_WAIT_MS)
-                                pending.addFirst(TileWork(work.box, work.tries + 1))
-                            }
-
-                            splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
-
-                            // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait
-                            // and
-                            // ask again.
-                            e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
-                                delay(OVERLOAD_WAIT_MS)
-                                pending.addFirst(TileWork(work.box, work.tries + 1))
-                            }
-
-                            else -> throw e
-                        }
+                        handleTileFailure(e, work, pending, minTileKm, clockMs() - started)
                         continue
                     }
             done++

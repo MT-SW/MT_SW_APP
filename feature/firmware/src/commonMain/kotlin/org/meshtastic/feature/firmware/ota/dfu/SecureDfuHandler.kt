@@ -63,9 +63,9 @@ import org.meshtastic.feature.firmware.FirmwareUpdateHandler
 import org.meshtastic.feature.firmware.FirmwareUpdateState
 import org.meshtastic.feature.firmware.ProgressState
 import org.meshtastic.feature.firmware.ota.ThroughputTracker
-import org.meshtastic.feature.firmware.ota.isUpdateTarget
 import org.meshtastic.feature.firmware.ota.downloadWithProgress
 import org.meshtastic.feature.firmware.ota.formatTransferProgress
+import org.meshtastic.feature.firmware.ota.isUpdateTarget
 import org.meshtastic.feature.firmware.ota.retryWithDelay
 import org.meshtastic.feature.firmware.ota.scanForBleDevice
 import org.meshtastic.feature.firmware.wireValue
