@@ -26,6 +26,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -190,6 +191,8 @@ fun rememberMeshMapState(
     val mapState =
         rememberMapState(baseStyle = basemap.toBaseStyle(), initialCameraPosition = initialCameraPosition) {
             val state = checkNotNull(LocalMapState.current)
+            // Whole zoom levels only: the contour tiles follow the level, so a pinch does not hand them a new value per frame.
+            val zoomLevel by remember(state) { derivedStateOf { state.cameraPosition.zoom.toInt() } }
             // The viewport local, rather than the state's own property: it is what the library scopes viewport
             // recomposition to, and these reads are the whole reason this block runs per frame.
             val viewportBounds = LocalViewport.current?.visibleBounds?.toBoundingBox()
@@ -201,7 +204,7 @@ fun rememberMeshMapState(
             PropagationLayer(propagation, layerOpacity[PROPAGATION_LAYER_ID] ?: PROPAGATION_DEFAULT_OPACITY)
             TerrainLayers(
                 viewportBounds = viewportBounds,
-                zoom = state.cameraPosition.zoom,
+                zoom = zoomLevel.toDouble(),
                 displayUnits = displayUnits,
             )
             CustomLayers(customLayers, layerOpacity)
@@ -407,6 +410,7 @@ private fun MeshMapNodeLayers(
     onClusterMembers: (List<ClusterMember>) -> Unit,
     scope: CoroutineScope,
 ) {
+    val zoomLevel by remember(mapState) { derivedStateOf { floor(mapState.cameraPosition.zoom).toInt() } }
     NodeLayers(
         nodes = visibleNodes,
         focusedNode = focusedNode,
@@ -415,7 +419,7 @@ private fun MeshMapNodeLayers(
         visibleBounds = rememberStickyBounds(viewportBounds),
         // Floored: clustering indexes per whole zoom level, so the set only changes when the level does — and a
         // pinch does not recompute it for every fractional step in between.
-        zoom = floor(mapState.cameraPosition.zoom).toInt(),
+        zoom = zoomLevel,
         myNodeNum = myNodeNum,
         showPrecisionCircles = filterState.showPrecisionCircle,
         onNodeClick = navigateToNodeDetails,
