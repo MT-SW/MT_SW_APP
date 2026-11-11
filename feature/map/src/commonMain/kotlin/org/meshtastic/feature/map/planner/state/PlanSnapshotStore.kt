@@ -25,8 +25,13 @@ import org.meshtastic.feature.map.layers.mapLayersDirectory
 
 /** Keeps the remembered link results ([PlanSnapshot]) in a small text file next to the other map data. */
 internal class PlanSnapshotStore {
-    private val fileSystem: FileSystem = mapLayerFileSystem()
-    private val file: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "planner" / "snapshots.txt"
+    // Resolved on first use, inside the try blocks below: where the platform has no storage folder yet (unit tests),
+    // the list simply stays empty instead of failing the whole planner.
+    private val fileSystem: FileSystem by lazy { mapLayerFileSystem() }
+    private val file: Path by lazy {
+        val layers = mapLayersDirectory()
+        (layers.parent ?: layers) / "planner" / "snapshots.txt"
+    }
 
     fun read(): List<PlanSnapshot> = try {
         if (!fileSystem.exists(file)) {

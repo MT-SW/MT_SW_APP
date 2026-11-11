@@ -133,11 +133,11 @@ internal fun PropagationSection(
             val ahead = state.hoursAhead
             Text(
                 text =
-                    if (ahead == 0) {
-                        stringResource(Res.string.propagation_hour_now)
-                    } else {
-                        stringResource(Res.string.propagation_hour_ahead, ahead)
-                    },
+                if (ahead == 0) {
+                    stringResource(Res.string.propagation_hour_now)
+                } else {
+                    stringResource(Res.string.propagation_hour_ahead, ahead)
+                },
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
