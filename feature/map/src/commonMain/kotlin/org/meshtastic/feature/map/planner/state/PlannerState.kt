@@ -288,6 +288,8 @@ data class PlannerUiState(
     val link: LinkResult? = null,
     val series: ProfileSeries? = null,
     val comparison: MeasuredComparison? = null,
+    /** Results the user chose to keep for comparison (kept while the app runs). */
+    val snapshots: List<PlanSnapshot> = emptyList(),
     val error: PlannerError? = null,
     val hintsBySide: Map<PlannerSide, List<PlannerHint>> = emptyMap(),
     // ---- coverage ----
@@ -364,3 +366,15 @@ data class PlannerNodeOption(
     val displayName: String
         get() = longName.ifBlank { shortName.ifBlank { "!" + num.toUInt().toString(16) } }
 }
+
+/** One remembered result of the link, for comparing plans. */
+data class PlanSnapshot(
+    val label: String,
+    val distanceM: Double,
+    val marginAToBDb: Double,
+    val marginBToADb: Double,
+    val spreadingFactor: Int,
+    val frequencyMHz: Double,
+    val heightAM: Double,
+    val heightBM: Double,
+)

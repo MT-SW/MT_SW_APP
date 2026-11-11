@@ -3852,4 +3852,8 @@
     <string name="widget_card_model">%1$s · %2$s</string>
     <string name="planner_layer_reflection">Planer: odbicie od ziemi</string>
     <string name="terrain_horizon_crest">Grzbiet: %1$s km stąd, %2$d m n.p.m., %3$s° nad horyzontem</string>
+    <string name="planner_snapshot_title">Porównanie wyników</string>
+    <string name="planner_snapshot_save">Zapamiętaj ten wynik</string>
+    <string name="planner_snapshot_clear">Wyczyść listę</string>
+    <string name="planner_snapshot_row">%1$s: %2$s km · zapas %3$s / %4$s dB · SF%5$d · %6$s MHz · anteny %7$s / %8$s m</string>
 </resources>

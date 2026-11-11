@@ -645,6 +645,29 @@ class PlannerViewModel(
         return out
     }
 
+    /** Remembers the current link result next to the earlier ones (the last [MAX_SNAPSHOTS] are kept). */
+    fun saveSnapshot() {
+        val st = _uiState.value
+        val link = st.link ?: return
+        val number = (st.snapshots.maxOfOrNull { it.label.removePrefix(SNAPSHOT_PREFIX).toIntOrNull() ?: 0 } ?: 0) + 1
+        val shot =
+            PlanSnapshot(
+                label = SNAPSHOT_PREFIX + number,
+                distanceM = link.distanceM,
+                marginAToBDb = link.aToB.marginDb,
+                marginBToADb = link.bToA.marginDb,
+                spreadingFactor = st.spreadingFactor,
+                frequencyMHz = st.frequencyMHz,
+                heightAM = st.a.antennaHeightM,
+                heightBM = st.b.antennaHeightM,
+            )
+        _uiState.update { it.copy(snapshots = (it.snapshots + shot).takeLast(MAX_SNAPSHOTS)) }
+    }
+
+    fun clearSnapshots() {
+        _uiState.update { it.copy(snapshots = emptyList()) }
+    }
+
     /**
      * The ground reflection as a map layer: the two legs of the reflected ray (A to the reflection point, and on to B)
      * and the point itself, placed by the flat-ground two-ray geometry (closer to the lower antenna). Null when the
@@ -767,6 +790,8 @@ class PlannerViewModel(
 
     companion object {
         private const val METERS_PER_KM = 1000.0
+        private const val MAX_SNAPSHOTS = 6
+        private const val SNAPSHOT_PREFIX = "#"
         private const val MIN_ANTENNA_M = 0.5
         private const val TENTH = 10.0
 

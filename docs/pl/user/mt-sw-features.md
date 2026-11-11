@@ -81,6 +81,7 @@ Planer symuluje zasięg łącza radiowego między dwoma punktami **A** i **B**, 
 - Liczy model ITM (Longley-Rice), krzywiznę Ziemi i pierwszą strefę Fresnela, rysuje przekrój terenu i podaje bilans łącza oraz kąty i namiary anten.
 - **Dokładny teren** — opcjonalnie pobiera z OpenStreetMap prawdziwe budynki i lasy i uwzględnia ich wysokość.
 - **Odbicie od ziemi na mapie:** po „Pokaż na mapie” powstaje osobna warstwa z dwoma odcinkami odbitego promienia, punktem odbicia i zyskiem w dB (tylko gdy odbicia są włączone).
+- **Porównanie wyników:** w planerze „Zapamiętaj ten wynik” zapisuje wynik łącza (odległość, zapas w obu kierunkach, SF, częstotliwość, wysokości anten). Lista do 6 pozycji, do zamknięcia aplikacji; „Wyczyść listę” ją czyści.
 - **Pogoda na żądanie** — opcjonalnie uwzględnia warunki propagacji z bieżącej pogody (Open-Meteo).
 - **Rodzaj anteny i charakterystyka** — dla każdej strony wybierasz rodzaj anteny (dookólna, Yagi z wybraną liczbą elementów, Moxon, panelowa, biquad, helisa, czasza, sektorowa); planer uwzględnia jej kierunkowość (zysk, szerokość wiązki, tłumienie do tyłu) i kierunek ustawienia, także w zasięgu dookoła. Ten sam wykres charakterystyki jest w kalkulatorze anten.
 - **Budynki na mapie** — „Pokaż na mapie” dodaje też budynki jako osobne warstwy (do ukrycia w warstwach mapy): dla trasy budynki wzdłuż niej, a te, które sięgają w linię widoczności, na czerwono; dla zasięgu budynki w zasięgu jako tło (od 15 km tylko wysokie). Przełącznik w ustawieniach radia plannera, domyślnie włączony.

@@ -2617,6 +2617,10 @@
     <string name="planner_pattern_title">Antenna pattern</string>
     <string name="planner_result_ground_reflection">Ground reflection gain</string>
     <string name="planner_result_pattern_loss">Antenna directivity loss (A / B)</string>
+    <string name="planner_snapshot_clear">Clear the list</string>
+    <string name="planner_snapshot_row">%1$s: %2$s km · margin %3$s / %4$s dB · SF%5$d · %6$s MHz · antennas %7$s / %8$s m</string>
+    <string name="planner_snapshot_save">Remember this result</string>
+    <string name="planner_snapshot_title">Compare results</string>
     <string name="play">Play</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d hour</item>

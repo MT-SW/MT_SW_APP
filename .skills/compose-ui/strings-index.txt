@@ -2563,6 +2563,10 @@ planner_pattern_reset
 planner_pattern_title
 planner_result_ground_reflection
 planner_result_pattern_loss
+planner_snapshot_clear
+planner_snapshot_row
+planner_snapshot_save
+planner_snapshot_title
 play
 plurals_hours
 plurals_milliseconds

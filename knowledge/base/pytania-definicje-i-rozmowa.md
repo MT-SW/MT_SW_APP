@@ -181,6 +181,11 @@ Po dotknięciu „Pokaż na mapie” planer dodaje osobne warstwy, które można
 Słowa: planer, pokaż na mapie, budynki na mapie, odbicie od ziemi, warstwa odbicia, zasłaniające budynki, OpenStreetMap, zasięg offline, lasy
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
 
+### Jak porównać wyniki łącza w planerze?
+W planerze pod wynikiem jest karta „Porównanie wyników”. „Zapamiętaj ten wynik” zapisuje odległość, zapas w obu kierunkach, SF, częstotliwość i wysokości anten. Zmieniasz antenę, wysokość albo radio, zapamiętujesz kolejny wynik i widzisz je obok siebie. Lista ma do 6 pozycji i trwa do zamknięcia aplikacji, „Wyczyść listę” ją czyści.
+Słowa: planer, porównanie wyników, zapamiętaj wynik, porównać anteny, porównać wysokości, zapas łącza
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
+
 ### Co pokazują karty węzłów w widżecie?
 Widżet pokazuje w rogu plakietkę naszego węzła (kolor i krótka nazwa). Karty ulubionych i pozostałych węzłów przełączają się co minutę i mają po jednej stronie pełną nazwę, a po drugiej plakietkę węzła, a pod spodem baterię, sygnał, czas działania, użycie kanału, napięcie, czas od ostatniej aktywności, liczbę skoków oraz rolę i model urządzenia.
 Słowa: widżet, karty węzłów, ulubione, plakietka, napięcie, skoki, ostatnia aktywność, rola, model, przełączanie

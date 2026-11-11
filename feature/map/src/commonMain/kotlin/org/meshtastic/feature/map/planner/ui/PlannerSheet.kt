@@ -234,6 +234,7 @@ private fun PlannerSheetContent(
                 StationSection(state = state, vm = vm)
                 RadioSection(state = state, vm = vm)
                 ResultSection(state = state)
+                SnapshotSection(state = state, vm = vm)
                 ProfileChartSection(state = state)
                 CoverageSection(state = state, vm = vm, bridge = bridge, onShownOnMap = onDismiss)
                 ExportSection(state = state, vm = vm, bridge = bridge, onShownOnMap = onDismiss)
