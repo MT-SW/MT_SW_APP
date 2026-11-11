@@ -3221,6 +3221,15 @@
     <string name="terrain_horizon_antenna">My antenna</string>
     <string name="terrain_horizon_antenna_auto">From node</string>
     <string name="terrain_horizon_apply">Show</string>
+    <string name="terrain_horizon_buildings">Buildings</string>
+    <string name="terrain_horizon_buildings_clear">Delete saved buildings</string>
+    <string name="terrain_horizon_buildings_failed">Could not download the buildings (no internet, the server is busy or there are too many).</string>
+    <string name="terrain_horizon_buildings_hint">Raises the skyline by the buildings of OpenStreetMap, so a node behind a block of flats is shown as hidden. They are read from the device, so download them first (up to about 15 km). Data © OpenStreetMap contributors.</string>
+    <string name="terrain_horizon_buildings_none_here">No downloaded buildings cover this place.</string>
+    <string name="terrain_horizon_buildings_range">How far to download buildings</string>
+    <string name="terrain_horizon_buildings_save">Download buildings (up to %1$d km)</string>
+    <string name="terrain_horizon_buildings_saved">Buildings on the device: %1$s MB</string>
+    <string name="terrain_horizon_buildings_saving">Downloading buildings…</string>
     <string name="terrain_horizon_camera">Camera</string>
     <string name="terrain_horizon_compass">Compass</string>
     <string name="terrain_horizon_favorites">Only favourites</string>

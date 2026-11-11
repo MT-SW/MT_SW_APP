@@ -107,6 +107,15 @@ import org.meshtastic.core.resources.mesh_hud_cardinal_south
 import org.meshtastic.core.resources.mesh_hud_cardinal_west
 import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.resources.retry
+import org.meshtastic.core.resources.terrain_horizon_buildings
+import org.meshtastic.core.resources.terrain_horizon_buildings_clear
+import org.meshtastic.core.resources.terrain_horizon_buildings_failed
+import org.meshtastic.core.resources.terrain_horizon_buildings_hint
+import org.meshtastic.core.resources.terrain_horizon_buildings_none_here
+import org.meshtastic.core.resources.terrain_horizon_buildings_range
+import org.meshtastic.core.resources.terrain_horizon_buildings_save
+import org.meshtastic.core.resources.terrain_horizon_buildings_saved
+import org.meshtastic.core.resources.terrain_horizon_buildings_saving
 import org.meshtastic.core.resources.terrain_horizon_antenna
 import org.meshtastic.core.resources.terrain_horizon_antenna_auto
 import org.meshtastic.core.resources.terrain_horizon_apply
@@ -347,6 +356,13 @@ fun TerrainHorizonScreen(
                 onRadius = viewModel::setSaveRadius,
                 onSave = viewModel::saveTerrain,
                 onClear = viewModel::clearSavedTerrain,
+            )
+            OfflineBuildings(
+                state = state,
+                onToggle = viewModel::setBuildings,
+                onRadius = viewModel::setBuildingsRadius,
+                onSave = viewModel::saveBuildings,
+                onClear = viewModel::clearSavedBuildings,
             )
             ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) {
                 Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it })
@@ -1061,6 +1077,73 @@ private fun OfflineTerrain(
             state.savedBytes > 0L ->
                 Text(
                     stringResource(Res.string.terrain_horizon_saved, megabytes(state.savedBytes)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                )
+        }
+    }
+}
+
+/** The buildings of OpenStreetMap, downloaded once and read from the device, so opening the panorama stays quick. */
+@Composable
+private fun OfflineBuildings(
+    state: TerrainHorizonState,
+    onToggle: (Boolean) -> Unit,
+    onRadius: (Int) -> Unit,
+    onSave: () -> Unit,
+    onClear: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+        ChipRow(stringResource(Res.string.terrain_horizon_buildings)) {
+            Switch(checked = state.buildings, onCheckedChange = onToggle)
+        }
+        Text(
+            stringResource(Res.string.terrain_horizon_buildings_hint),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 11.sp,
+        )
+        ChipRow(stringResource(Res.string.terrain_horizon_buildings_range)) {
+            HORIZON_BUILDING_RADII_KM.forEach { km ->
+                BrandChip(
+                    selected = state.buildingsRadiusKm == km,
+                    onClick = { onRadius(km) },
+                    label = { Text("$km km") },
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = onSave, enabled = !state.buildingsSaving && state.observerLat != null) {
+                Text(stringResource(Res.string.terrain_horizon_buildings_save, state.buildingsRadiusKm))
+            }
+            if (state.buildingsBytes > 0L && !state.buildingsSaving) {
+                TextButton(onClick = onClear) { Text(stringResource(Res.string.terrain_horizon_buildings_clear)) }
+            }
+        }
+        when {
+            state.buildingsSaving ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_buildings_saving),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 12.sp,
+                )
+
+            state.buildingsOk == false ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_buildings_failed),
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 12.sp,
+                )
+
+            state.buildings && !state.buildingsHere ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_buildings_none_here),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                )
+
+            state.buildingsBytes > 0L ->
+                Text(
+                    stringResource(Res.string.terrain_horizon_buildings_saved, megabytes(state.buildingsBytes)),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                 )

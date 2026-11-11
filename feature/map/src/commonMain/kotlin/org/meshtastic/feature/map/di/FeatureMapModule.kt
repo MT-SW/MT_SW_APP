@@ -31,6 +31,7 @@ import org.meshtastic.feature.map.planner.data.PlannerElevationSource
 import org.meshtastic.feature.map.planner.data.PlannerOverpass
 import org.meshtastic.feature.map.planner.data.PlannerWeather
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
+import org.meshtastic.feature.map.planner.data.BuildingStore
 import org.meshtastic.feature.map.planner.data.TerrainStore
 import org.meshtastic.feature.map.planner.state.PlannerNodeSource
 import org.meshtastic.feature.map.planner.state.RepositoryPlannerNodeSource
@@ -52,6 +53,8 @@ class FeatureMapModule {
 
     /** Terrain for the native planner: one instance so the decoded-tile LRU is shared across planner sessions. */
     @Single fun provideTerrainStore(): TerrainStore = TerrainStore()
+
+    @Single fun provideBuildingStore(): BuildingStore = BuildingStore()
 
     @Single
     fun providePlannerElevationSource(store: TerrainStore): PlannerElevationSource = PlannerElevation(store = store)

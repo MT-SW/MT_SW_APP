@@ -53,6 +53,12 @@ import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.feature.map.hud.CameraPoseProvider
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
+import org.meshtastic.feature.map.planner.data.BuildingStore
+import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.ClutterKind
+import org.meshtastic.feature.map.planner.data.ClutterMap
+import org.meshtastic.feature.map.planner.data.PlannerClutterException
+import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
 import org.meshtastic.feature.map.planner.data.TerrainStore
@@ -136,12 +142,27 @@ data class TerrainHorizonState(
     val saveTotal: Int = 0,
     /** How the last save ended: true saved, false failed (no internet, disk), null none yet. */
     val saveOk: Boolean? = null,
+    /** True: the skyline is raised by the saved buildings (off by default; they are read from the device). */
+    val buildings: Boolean = false,
+    /** The space the saved buildings take, in bytes. */
+    val buildingsBytes: Long = 0L,
+    /** True when a saved area of buildings covers the place looked from. */
+    val buildingsHere: Boolean = false,
+    /** How far the buildings are downloaded (km). */
+    val buildingsRadiusKm: Int = DEFAULT_BUILDINGS_RADIUS_KM,
+    val buildingsSaving: Boolean = false,
+    /** How the last download ended: true saved, false failed, null none yet. */
+    val buildingsOk: Boolean? = null,
 )
 
 const val DEFAULT_RADIUS_KM = 15
 const val DEFAULT_NODE_RANGE_KM = 100
 val HORIZON_NODE_RANGES_KM = listOf(25, 50, 100, 200, 500, 1000)
 const val DEFAULT_ANTENNA_M = 2
+
+/** The ranges the buildings can be downloaded for: dense places are heavy, so far fewer than the terrain's. */
+val HORIZON_BUILDING_RADII_KM = listOf(1, 2, 5, 10, 15)
+const val DEFAULT_BUILDINGS_RADIUS_KM = 5
 val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80, 100)
 
 /** The farthest range the terrain can be saved for. */
@@ -154,6 +175,11 @@ private const val LOCATION_WAIT_MS = 1_500L
 private const val METRES_PER_KM = 1_000.0
 private const val MIN_AUTO_HEIGHT_M = 0.5
 private const val MAX_AUTO_HEIGHT_M = 100.0
+private const val METRES_PER_DEGREE = 111_320.0
+private const val HALF_TURN_DEG = 180.0
+
+/** Buildings this close to the place looked from are not counted: it stands on or beside them, not behind them. */
+private const val OWN_BUILDING_M = 25.0
 
 /** A place to look from: its position, the name of its node (or ""), and its altitude above sea level when known. */
 private data class Spot(val at: GeoPoint, val name: String, val altitudeM: Double?, val nodeNum: Int? = null)
@@ -168,6 +194,8 @@ class TerrainHorizonViewModel(
     private val nodeRepository: NodeRepository,
     private val phoneLocationProvider: PhoneLocationProvider,
     private val terrainStore: TerrainStore,
+    private val buildingStore: BuildingStore,
+    private val clutter: PlannerClutterSource,
     private val poseProvider: CameraPoseProvider,
     private val magneticFieldProvider: MagneticFieldProvider,
     private val mapPrefs: MapPrefs,
@@ -186,6 +214,9 @@ class TerrainHorizonViewModel(
         _state.update { it.copy(focusNodeNum = focusNodeNum) }
         viewModelScope.launch {
             _state.update { it.copy(savedBytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }) }
+        }
+        viewModelScope.launch {
+            _state.update { it.copy(buildingsBytes = withContext(dispatchers.io) { buildingStore.sizeBytes() }) }
         }
         // The range, antenna heights and radio-horizon factor picked last time come back before the first drawing.
         viewModelScope.launch {
@@ -228,6 +259,47 @@ class TerrainHorizonViewModel(
     fun setTargetAntenna(metres: Int) = change { it.copy(targetAntennaM = metres) }
 
     fun setRefraction(k: Double) = change { it.copy(refraction = k) }
+
+    fun setBuildings(on: Boolean) = change { it.copy(buildings = on) }
+
+    fun setBuildingsRadius(km: Int) = _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
+
+    /**
+     * Downloads the buildings around the place looked from, up to the chosen range, and keeps them on the device, so
+     * the panorama reads them from there from now on.
+     */
+    fun saveBuildings() {
+        val here = _state.value
+        val lat = here.observerLat ?: return
+        val lon = here.observerLon ?: return
+        if (here.buildingsSaving) return
+        viewModelScope.launch {
+            _state.update { it.copy(buildingsSaving = true, buildingsOk = null) }
+            val centre = GeoPoint(lat, lon)
+            val ok =
+                try {
+                    val map = clutter.forArea(centre, here.buildingsRadiusKm.toDouble())
+                    val buildings = map.polygons.filter { it.kind == ClutterKind.BUILDING }
+                    withContext(dispatchers.io) { buildingStore.write(centre, here.buildingsRadiusKm, buildings) }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: PlannerClutterException) {
+                    false
+                }
+            val bytes = withContext(dispatchers.io) { buildingStore.sizeBytes() }
+            _state.update { it.copy(buildingsSaving = false, buildingsOk = ok, buildingsBytes = bytes) }
+            if (ok && _state.value.buildings) reload()
+        }
+    }
+
+    /** Deletes the buildings saved on the device. */
+    fun clearSavedBuildings() {
+        viewModelScope.launch {
+            withContext(dispatchers.io) { buildingStore.clear() }
+            _state.update { it.copy(buildingsBytes = 0L, buildingsHere = false, buildingsOk = null) }
+            if (_state.value.buildings) reload()
+        }
+    }
 
     fun retry() = reload()
 
@@ -341,11 +413,14 @@ class TerrainHorizonViewModel(
                         ?.let { it - ground(spot.at.lat, spot.at.lon) }
                         ?.takeIf { it in MIN_AUTO_HEIGHT_M..MAX_AUTO_HEIGHT_M }
                 val height = if (settings.antennaAuto && auto != null) auto else settings.antennaM.toDouble()
+                // Buildings come from the device, never from the internet while the panorama opens.
+                val savedBuildings = withContext(dispatchers.io) { buildingStore.load(spot.at) }
+                val skyline = if (settings.buildings) withBuildings(ground, savedBuildings, spot.at) else ground
                 val (profile, targets) =
                     withContext(dispatchers.default) {
                         val built =
                             HorizonPanorama.build(
-                                ground,
+                                skyline,
                                 spot.at,
                                 height,
                                 radiusKm * METRES_PER_KM,
@@ -354,7 +429,7 @@ class TerrainHorizonViewModel(
                         built to
                             HorizonPanorama.place(
                                 built,
-                                ground,
+                                skyline,
                                 nodes,
                                 settings.targetAntennaM.toDouble(),
                                 settings.refraction,
@@ -372,6 +447,7 @@ class TerrainHorizonViewModel(
                         observerLon = spot.at.lon,
                         autoAntennaM = auto?.let { a -> kotlin.math.round(a).toInt() },
                         usedAntennaM = kotlin.math.round(height).toInt(),
+                        buildingsHere = !savedBuildings.isEmpty(),
                     )
                 }
             } catch (e: CancellationException) {
@@ -463,3 +539,24 @@ class TerrainHorizonViewModel(
                 )
             }
 }
+
+/**
+ * The ground with the height of the saved buildings added, so they stand in the skyline like hills do. The buildings
+ * right at [at] are left out: the place looked from stands on or beside them, not behind them.
+ */
+private fun withBuildings(
+    ground: (lat: Double, lon: Double) -> Double,
+    buildings: ClutterMap,
+    at: GeoPoint,
+): (Double, Double) -> Double {
+    if (buildings.isEmpty()) return ground
+    val heights = ClutterHeights()
+    val metresPerLon = METRES_PER_DEGREE * kotlin.math.cos(at.lat * kotlin.math.PI / HALF_TURN_DEG)
+    return { lat, lon ->
+        val dy = (lat - at.lat) * METRES_PER_DEGREE
+        val dx = (lon - at.lon) * metresPerLon
+        val own = dx * dx + dy * dy < OWN_BUILDING_M * OWN_BUILDING_M
+        ground(lat, lon) + if (own) 0.0 else buildings.heightAt(lat, lon, heights)
+    }
+}
+

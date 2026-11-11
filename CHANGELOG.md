@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Listopad 2026
 
 * Wszystkie wersje: przełącznik „Synchronizuj statystyki automatycznie” ma teraz własny opis (co robi i kiedy).
+* Wszystkie wersje: panorama terenu ma opcję „Budynki” (domyślnie wyłączona): linia horyzontu podnosi się o budynki z OpenStreetMap. Budynki pobierasz raz (do 1, 2, 5, 10 lub 15 km) i są zapisane na urządzeniu jak teren, więc otwieranie panoramy się nie wydłuża; można je usunąć jednym przyciskiem.
 * iPhone i iPad: kliknięcie w dymek węzła (i w punkt trasy, punkt orientacyjny, węzeł na mapach pomocniczych) znów otwiera ten węzeł; iPhone przekazywał numer jako liczbę dziesiętną, której aplikacja nie przyjmowała.
 * Wszystkie wersje: ikona aplikacji jest bardziej „żywa” i przestrzenna: gradient tła, połysk u góry, cień i wypukłe krawędzie znaku (ikona standardowa i ciemna; przezroczysta i jednokolorowa bez zmian).
 * Android: widżet ma własny wybór w Funkcjach MT_SW („Widżet adaptacyjny”): cała sieć albo jeden węzeł, niezależnie od powiadomienia. Statystyki w widżecie są ułożone w grupy z nagłówkami, tak jak na iPhonie.
@@ -616,6 +617,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### November 2026
 
 * All versions: the "Synchronize statistics automatically" switch now has its own description (what it does and when).
+* All versions: the terrain panorama has a "Buildings" option (off by default): the skyline is raised by the buildings of OpenStreetMap. You download them once (up to 1, 2, 5, 10 or 15 km) and they are kept on the device like the terrain, so opening the panorama stays quick; one button deletes them.
 * iPhone and iPad: tapping a node bubble (and a track point, waypoint, or a node on the secondary maps) opens that node again; iPhone passed the number as a decimal, which the app refused.
 * All versions: the app icon is livelier and has depth: a background gradient, a gloss at the top, a shadow and raised edges on the mark (standard and dark icons; clear and tinted unchanged).
 * Android: the widget has its own choice in MT_SW features ("Adaptive widget"): the whole mesh or one node, apart from the notification. The statistics on the widget are arranged in groups with headings, like on iPhone.

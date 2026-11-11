@@ -3617,6 +3617,15 @@
     <string name="terrain_horizon_move">Przesuń</string>
     <string name="terrain_horizon_move_hint">Przesuń mapę palcem, żeby patrzeć z innego miejsca. Po puszczeniu panorama rysuje się od nowa.</string>
     <string name="terrain_horizon_move_back">Wróć do mojego węzła</string>
+    <string name="terrain_horizon_buildings">Budynki</string>
+    <string name="terrain_horizon_buildings_clear">Usuń pobrane budynki</string>
+    <string name="terrain_horizon_buildings_failed">Nie udało się pobrać budynków (brak internetu, serwer zajęty albo za dużo danych).</string>
+    <string name="terrain_horizon_buildings_hint">Podnosi linię horyzontu o budynki z OpenStreetMap, więc węzeł za blokiem jest pokazany jako zasłonięty. Budynki są czytane z urządzenia, więc najpierw je pobierz (do około 15 km). Dane © współtwórcy OpenStreetMap.</string>
+    <string name="terrain_horizon_buildings_none_here">Pobrane budynki nie obejmują tego miejsca.</string>
+    <string name="terrain_horizon_buildings_range">Jak daleko pobrać budynki</string>
+    <string name="terrain_horizon_buildings_save">Pobierz budynki (do %1$d km)</string>
+    <string name="terrain_horizon_buildings_saved">Budynki na urządzeniu: %1$s MB</string>
+    <string name="terrain_horizon_buildings_saving">Pobieranie budynków…</string>
     <string name="terrain_horizon_offline">Teren offline</string>
     <string name="terrain_horizon_offline_hint">Zapisuje na urządzeniu teren wokół miejsca, z którego patrzysz, dla wszystkich zasięgów aż do wybranego (największy to 100 km). Planer łączy i panorama korzystają z niego bez internetu.</string>
     <string name="terrain_horizon_save">Zapisz teren (do %1$d km)</string>
