@@ -92,7 +92,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
         "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)},\"connected\":${snapshot.connected}," +
             "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
             "\"groups\":[${snapshot.groups.joinToString(",") { group ->
-                "{\"title\":${quote(group.title)},\"lines\":${lines(group.lines)}}"
+                "{\"title\":${quote(group.title)},\"column\":${group.column},\"lines\":${lines(group.lines)}}"
             }}]," +
             "\"small\":$small,\"second\":$second,\"favorites\":${cards(
                 snapshot.favorites,

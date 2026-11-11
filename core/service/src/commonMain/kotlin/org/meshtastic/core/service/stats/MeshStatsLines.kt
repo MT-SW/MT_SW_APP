@@ -58,8 +58,13 @@ private const val BYTES_PER_KB = 1024.0
  * widgets of iPhone/iPad and the computer).
  */
 object MeshStatsLines {
-    /** One titled block of statistics, for the widgets that show them in sections. */
-    data class Group(val title: String, val lines: List<String>)
+    private const val RIGHT_COLUMN = 1
+
+    /**
+     * One titled block of statistics, for the widgets that show them in sections. [column] says which of two columns
+     * it belongs to when the widget is wide enough for two: 0 the left one, 1 the right one.
+     */
+    data class Group(val title: String, val lines: List<String>, val column: Int = 0)
 
     /** The flat lines, in the order of the groups of [meshStatusGroups]. */
     @Suppress("LongParameterList")
@@ -114,10 +119,10 @@ object MeshStatsLines {
         val connections = connectionLines(extended)
         return listOf(
             Group(getStringSuspend(Res.string.widget_group_network), network),
-            Group(getStringSuspend(Res.string.widget_group_node), node),
+            Group(getStringSuspend(Res.string.widget_group_node), node, RIGHT_COLUMN),
             Group(getStringSuspend(Res.string.widget_group_radio), radio),
-            Group(getStringSuspend(Res.string.widget_group_resources), resources),
-            Group(getStringSuspend(Res.string.widget_group_connections), connections),
+            Group(getStringSuspend(Res.string.widget_group_resources), resources, RIGHT_COLUMN),
+            Group(getStringSuspend(Res.string.widget_group_connections), connections, RIGHT_COLUMN),
         )
             .filter { it.lines.isNotEmpty() }
     }

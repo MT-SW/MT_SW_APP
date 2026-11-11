@@ -31,6 +31,8 @@ private let timelineEntries = 15
 struct StatsGroup {
     var title: String
     var lines: [String]
+    /// W której z dwóch kolumn ma stać sekcja (0 lewa, 1 prawa); aplikacja układa: sieć i radio po lewej, reszta po prawej.
+    var column: Int = 0
 }
 
 /// Odczyty jednego węzła (ulubionego albo innego z sieci).
@@ -91,7 +93,8 @@ private func readStats() -> StatsData? {
         updatedText: json["updatedText"] as? String,
         lines: json["lines"] as? [String] ?? [],
         groups: (json["groups"] as? [[String: Any]] ?? []).map {
-            StatsGroup(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [])
+            StatsGroup(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [],
+                       column: $0["column"] as? Int ?? 0)
         },
         favorites: readCards(json["favorites"]),
         others: readCards(json["others"]),
@@ -192,8 +195,7 @@ private struct GroupsLayout {
     let size: CGFloat
 }
 
-private func groupsLayout(_ groups: [StatsGroup], parts: Int, area: CGSize, gap: CGFloat, maxSize: CGFloat) -> GroupsLayout {
-    let columns = splitGroups(groups, into: parts)
+private func groupsLayout(_ columns: [[StatsGroup]], area: CGSize, gap: CGFloat, maxSize: CGFloat) -> GroupsLayout {
     let total = max(area.width - gap * CGFloat(columns.count - 1), 50)
     let chars = columns.map { CGFloat(max(longest($0), 6)) }
     let byWidth = total / (chars.reduce(0, +) * 0.52)
@@ -213,9 +215,14 @@ struct GroupsView: View {
     var body: some View {
         GeometryReader { geo in
             let gap: CGFloat = 10
-            let options = (1...max(1, min(3, groups.count))).map {
-                groupsLayout(groups, parts: $0, area: geo.size, gap: gap, maxSize: maxSize)
-            }
+            // Sekcje z wyznaczoną kolumną (statystyki naszego węzła) idą dokładnie tak; inne układają się same.
+            let fixed = groups.contains { $0.column == 1 }
+            let options: [GroupsLayout] = fixed
+                ? [groupsLayout([groups.filter { $0.column == 0 }, groups.filter { $0.column == 1 }].filter { !$0.isEmpty },
+                                area: geo.size, gap: gap, maxSize: maxSize)]
+                : (1...max(1, min(3, groups.count))).map {
+                    groupsLayout(splitGroups(groups, into: $0), area: geo.size, gap: gap, maxSize: maxSize)
+                }
             let best = options.dropFirst().reduce(options[0]) { $1.size > $0.size + 0.25 ? $1 : $0 }
             HStack(alignment: .top, spacing: gap) {
                 ForEach(Array(best.columns.enumerated()), id: \.offset) { index, column in

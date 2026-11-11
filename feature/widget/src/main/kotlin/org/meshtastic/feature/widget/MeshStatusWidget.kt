@@ -267,9 +267,15 @@ private const val NODE_HEADER_DP = 18
 private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float) {
     val columns = if (widthDp >= TWO_COLUMNS_FROM_DP) 2 else 1
     val rows = ((heightDp - HEADER_DP) / LINE_HEIGHT_DP).toInt().coerceAtLeast(1)
-    val entries = all.take(rows * columns)
+    // Our node's sections have their column fixed (network and radio left, the rest right); other lists split evenly.
+    val parts =
+        if (columns == 2 && all.any { it.column == 1 }) {
+            listOf(all.filter { it.column == 0 }.take(rows), all.filter { it.column == 1 }.take(rows))
+        } else {
+            all.take(rows * columns).splitColumns(columns)
+        }
     Row(modifier = GlanceModifier.fillMaxWidth()) {
-        entries.splitColumns(columns).forEachIndexed { index, part ->
+        parts.forEachIndexed { index, part ->
             Column(modifier = GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp)) {
                 part.forEach { entry ->
                     Text(
@@ -294,14 +300,14 @@ private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float
 }
 
 /** One row of the widget: a group heading or a reading. */
-private data class WidgetEntry(val text: String, val header: Boolean)
+private data class WidgetEntry(val text: String, val header: Boolean, val column: Int = 0)
 
 /** Headings (when the snapshot has titled groups) followed by their readings, else just the flat lines. */
 private fun MeshStatsSnapshot.entries(): List<WidgetEntry> = if (groups.any { it.title.isNotEmpty() }) {
     groups.flatMap { group ->
         buildList {
-            if (group.title.isNotEmpty()) add(WidgetEntry(group.title, header = true))
-            group.lines.forEach { add(WidgetEntry(it, header = false)) }
+            if (group.title.isNotEmpty()) add(WidgetEntry(group.title, header = true, column = group.column))
+            group.lines.forEach { add(WidgetEntry(it, header = false, column = group.column)) }
         }
     }
 } else {
