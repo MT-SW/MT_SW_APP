@@ -125,7 +125,7 @@ internal fun NodeChipLayer(
  * listed for a choice.
  */
 internal fun nodeTap(
-    features: List<Feature<*, *>>,
+    features: List<Feature<*, JsonObject?>>,
     click: (Int) -> Unit,
     onStack: ((List<ClusterMember>) -> Unit)?,
 ): ClickResult {
