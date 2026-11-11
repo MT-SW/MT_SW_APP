@@ -38,6 +38,10 @@ Przy każdym takim połączeniu zewnętrzna usługa widzi twój adres IP:
 - **Zdjęcia w czacie** — jeśli wybierzesz „Wyślij”, zdjęcie jest wysyłane na publiczny serwer zdjęć (catbox.moe, a gdy jest niedostępny: litterbox.catbox.moe lub uguu.se), niezwiązany z MT_SW. Przed wysłaniem pytamy o zgodę i opisujemy, dokąd trafia zdjęcie. Każdy, kto zna link, może je zobaczyć, a aplikacja nie może go usunąć.
 - **MQTT** — jeśli skonfigurujesz własny serwer MQTT, dane idą na ten serwer.
 
+## Zgoda na warunki korzystania
+
+Przy pierwszym uruchomieniu aplikacja pokazuje warunki korzystania i prosi o zgodę. Zapisuje wyłącznie datę zgody, lokalnie w telefonie lub komputerze. Wycofanie zgody: „O aplikacji” → „Wyczyść wszystkie dane aplikacji”.
+
 ## Usuwanie danych
 
 Odinstalowanie aplikacji usuwa jej dane z urządzenia. W ustawieniach można też usunąć wiadomości, węzły, logi i pobrane modele. Dane wysłane do sieci mesh lub na zewnętrzne serwery zdjęć nie podlegają usunięciu przez aplikację.
@@ -89,6 +93,10 @@ With each such connection the outside service sees your IP address:
 - **Firmware update** — from GitHub, only when you start it.
 - **Chat pictures** — if you choose "Send", the picture is uploaded to a public picture host (catbox.moe, or, when unavailable, litterbox.catbox.moe or uguu.se), which is not connected to MT_SW. We ask for your permission first and explain where the picture goes. Anyone with the link can see it, and the app cannot delete it.
 - **MQTT** — if you configure your own MQTT server, data goes to that server.
+
+## Consent to the terms of use
+
+On first start the app shows its terms of use and asks for consent. It stores only the date of consent, locally on your phone or computer. To withdraw consent: “About” → “Erase all app data”.
 
 ## Deleting data
 

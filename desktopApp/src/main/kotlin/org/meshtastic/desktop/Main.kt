@@ -104,6 +104,7 @@ import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
+import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
@@ -125,6 +126,7 @@ import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
+import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.util.TracerouteMapOverlayInsets
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.desktop.data.DesktopPreferencesDataSource
@@ -150,6 +152,7 @@ import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
 import java.awt.Desktop
+import java.io.File
 import java.util.Locale
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.hours
@@ -588,6 +591,11 @@ private fun ApplicationScope.MeshtasticWindow(
             CompositionLocalProvider(
                 LocalEventBranding provides eventEdition,
                 LocalTerminateApplication provides { exitApplication() },
+                LocalWipeApplicationData provides
+                    {
+                        runCatching { File(desktopDataDir()).deleteRecursively() }
+                        exitProcess(0)
+                    },
                 LocalMapViewProvider provides desktopMapViewProvider(),
                 LocalPlannerAvailable provides true,
                 // mapGraph renders the Map tab through this seam, not through LocalMapViewProvider
@@ -637,7 +645,12 @@ private fun ApplicationScope.MeshtasticWindow(
                     AppTheme(darkTheme = isDarkTheme, monochrome = monochrome, saturation = saturation) {
                         // First start: show the welcome screen once, then the app.
                         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
-                        if (introCompleted) {
+                        val dataNoticeAcceptedAt by uiViewModel.dataNoticeAcceptedAt.collectAsState()
+                        if (dataNoticeAcceptedAt == null) {
+                            // Still reading the stored consent: show nothing rather than flash the notice.
+                        } else if (dataNoticeAcceptedAt == 0L) {
+                            DataNoticeScreen(offerWipe = introCompleted, onAccept = { uiViewModel.onDataNoticeAccepted() })
+                        } else if (introCompleted) {
                             DesktopMainScreen(uiViewModel, multiBackstack)
                             AppUpdateDialog()
                             StorageFolderFirstRunDialog()

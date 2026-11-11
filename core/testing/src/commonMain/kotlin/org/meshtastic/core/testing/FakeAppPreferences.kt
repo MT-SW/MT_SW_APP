@@ -93,6 +93,12 @@ class FakeUiPrefs : UiPrefs {
         appIntroCompleted.value = completed
     }
 
+    override val dataNoticeAcceptedAt = MutableStateFlow<Long?>(0L)
+
+    override fun setDataNoticeAcceptedAt(value: Long) {
+        dataNoticeAcceptedAt.value = value
+    }
+
     override val radioSetupOfferedNodes = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun markRadioSetupOffered(nodeNum: Int) {

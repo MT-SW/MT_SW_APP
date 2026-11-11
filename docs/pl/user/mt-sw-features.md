@@ -278,6 +278,10 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 - **Wygląd i marka** — własna nazwa, ikona i kolory (złoto i granat), kolorowa ikona stanu połączenia, instalacja obok oryginalnej aplikacji Meshtastic. Na Windowsie nową wersję instaluje się na starą bez odinstalowywania.
 - **Komputer** — przeciągany pasek przewijania z widocznym torem na długich listach, trzecia kolumna podąża za wybranym węzłem, pozycja „Wprowadzenie” w ustawieniach.
 
+## Warunki korzystania i zgoda na dane
+
+Przy pierwszym uruchomieniu (także po aktualizacji i po wyczyszczeniu danych) pojawia się okno z warunkami korzystania. Opisuje, że dane węzłów, wiadomości, logi i statystyki mogą trafić do Internetu i być publicznie widoczne, że autorzy ich nie zbierają i nie odpowiadają za ich dalsze użycie, oraz że zgoda oznacza zrzeczenie się roszczeń w zakresie dozwolonym prawem. Przycisk „Zgadzam się” odblokowuje się po przewinięciu tekstu do końca i 10-sekundowym odliczaniu. „Nie zgadzam się” zamyka aplikację. Datę zgody zobaczysz w „O aplikacji” → „Warunki i zgoda na dane” (tam możesz też przeczytać warunki ponownie); w Funkcje MT_SW jest tylko skrót. W tej samej sekcji jest „Wyczyść wszystkie dane aplikacji” (po 10 sekundach odliczania): usuwa wszystko, wycofuje zgodę i zamyka aplikację.
+
 ## Pomoc i dokumentacja
 
 Cała pomoc i dokumentacja w aplikacji są po polsku. Wielkość tekstu na stronach pomocy zmienisz przyciskami „A−” i „A+” u góry. Przy pierwszym uruchomieniu, po ekranie powitalnym, jest druga karta z krótkim opisem funkcji MT_SW; można ją zobaczyć ponownie w ustawieniach w pozycji „Wprowadzenie”. Zobacz [Pomoc i dokumentacja](help-and-docs).

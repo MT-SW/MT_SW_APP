@@ -46,6 +46,7 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.service.stats.MeshStatsFeed
+import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
@@ -56,6 +57,7 @@ import org.meshtastic.core.ui.theme.isVividLight
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.theme.saturationFor
 import org.meshtastic.core.ui.util.LocalTerminateApplication
+import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
@@ -63,6 +65,14 @@ import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
+import platform.Foundation.NSApplicationSupportDirectory
+import platform.Foundation.NSBundle
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDefaults
+import platform.Foundation.NSUserDomainMask
 import platform.posix.exit
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -179,6 +189,7 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
     CompositionLocalProvider(
         LocalDensity provides rememberScaledDensity(percent = uiScale),
         LocalTerminateApplication provides terminate,
+        LocalWipeApplicationData provides { wipeIosData() },
     ) {
         AppTheme(
             darkTheme = isDarkTheme,
@@ -187,11 +198,30 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         ) {
             IosCoilSetup()
             val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
-            if (introCompleted) {
+            val dataNoticeAcceptedAt by uiViewModel.dataNoticeAcceptedAt.collectAsState()
+            if (dataNoticeAcceptedAt == null) {
+                // Still reading the stored consent: show nothing rather than flash the notice.
+            } else if (dataNoticeAcceptedAt == 0L) {
+                DataNoticeScreen(offerWipe = introCompleted, onAccept = { uiViewModel.onDataNoticeAccepted() })
+            } else if (introCompleted) {
                 ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
             } else {
                 IosWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
             }
         }
     }
+}
+
+/** Deletes everything the app stored (documents, support files, caches, settings) and ends the process. */
+private fun wipeIosData() {
+    val fileManager = NSFileManager.defaultManager
+    listOf(NSDocumentDirectory, NSApplicationSupportDirectory, NSCachesDirectory).forEach { directory ->
+        NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true).filterIsInstance<String>().forEach { root ->
+            fileManager.contentsOfDirectoryAtPath(root, null)?.filterIsInstance<String>()?.forEach { name ->
+                fileManager.removeItemAtPath("$root/$name", null)
+            }
+        }
+    }
+    NSBundle.mainBundle.bundleIdentifier?.let { NSUserDefaults.standardUserDefaults.removePersistentDomainForName(it) }
+    exit(0)
 }

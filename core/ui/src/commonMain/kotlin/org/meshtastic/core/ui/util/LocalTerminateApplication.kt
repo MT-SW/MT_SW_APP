@@ -26,3 +26,9 @@ import androidx.compose.runtime.compositionLocalOf
  * such action, which hides the button that uses it.
  */
 val LocalTerminateApplication = compositionLocalOf<(() -> Unit)?> { null }
+
+/**
+ * Erases every piece of app data (settings, database, logs, downloaded files) and ends the app, so the next start looks
+ * like a fresh install. Provided by each app entry point; null where the platform offers no such action.
+ */
+val LocalWipeApplicationData = compositionLocalOf<(() -> Unit)?> { null }

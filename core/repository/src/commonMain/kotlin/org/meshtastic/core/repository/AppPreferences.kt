@@ -106,6 +106,11 @@ interface UiPrefs {
 
     fun setAppIntroCompleted(completed: Boolean)
 
+    /** When the user accepted the terms and data notice (epoch millis); 0 = not accepted; null = not read yet. */
+    val dataNoticeAcceptedAt: StateFlow<Long?>
+
+    fun setDataNoticeAcceptedAt(value: Long)
+
     /** Node numbers of the radios the radio setup has already opened for on its own. */
     val radioSetupOfferedNodes: StateFlow<Set<Int>>
 

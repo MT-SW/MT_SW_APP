@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,11 +53,19 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.acknowledgements
 import org.meshtastic.core.resources.apps
 import org.meshtastic.core.resources.copyright_notice
+import org.meshtastic.core.resources.data_notice_accepted_on
+import org.meshtastic.core.resources.data_notice_not_accepted
+import org.meshtastic.core.resources.data_notice_read_again
+import org.meshtastic.core.resources.data_notice_settings_title
+import org.meshtastic.core.resources.data_wipe_cancel
+import org.meshtastic.core.resources.data_wipe_settings_summary
+import org.meshtastic.core.resources.data_wipe_settings_title
 import org.meshtastic.core.resources.documentation
 import org.meshtastic.core.resources.feature_credits_description
 import org.meshtastic.core.resources.feature_credits_title
@@ -70,11 +79,14 @@ import org.meshtastic.core.resources.unofficial_fork_disclaimer
 import org.meshtastic.core.resources.website
 import org.meshtastic.core.resources.what_is_meshtastic
 import org.meshtastic.core.resources.what_is_meshtastic_description
+import org.meshtastic.core.ui.component.DataNoticeReadDialog
+import org.meshtastic.core.ui.component.DataWipeDialog
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Code
+import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
@@ -121,6 +133,7 @@ fun AboutScreen(
     modifier: Modifier = Modifier,
     hiddenFeaturesUnlocked: Boolean = false,
     onUnlockHiddenFeatures: () -> Unit = {},
+    dataNoticeAcceptedAt: Long? = null,
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -159,6 +172,7 @@ fun AboutScreen(
                     onOpenDocs = { uriHandler.openUri(DOCS_URL) },
                     onOpenLicense = { uriHandler.openUri(LICENSE_URL) },
                 )
+                DataNoticeSection(acceptedAt = dataNoticeAcceptedAt)
                 SupportProjectSection()
                 FeatureCreditsSection()
                 CopyrightFooter()
@@ -248,6 +262,33 @@ private fun ProjectInformationSection(
 // (values and values-pl) in the same change, and to Acknowledgements when it has a licence to show.
 // GPL section 5(d): this screen shows the copyright notice, the no-warranty statement and where the
 // license is, so a modified version has to keep showing them too. Keep all three together here.
+@Composable
+private fun DataNoticeSection(acceptedAt: Long?, modifier: Modifier = Modifier) {
+    var showTerms by remember { mutableStateOf(false) }
+    var showWipe by remember { mutableStateOf(false) }
+    if (showTerms) DataNoticeReadDialog(onClose = { showTerms = false })
+    if (showWipe) DataWipeDialog(secondaryLabel = Res.string.data_wipe_cancel, onSecondary = { showWipe = false })
+    ExpressiveSection(title = stringResource(Res.string.data_notice_settings_title), modifier = modifier) {
+        ListItem(
+            text = stringResource(Res.string.data_notice_read_again),
+            supportingText =
+            acceptedAt?.takeIf { it > 0L }?.let {
+                stringResource(Res.string.data_notice_accepted_on, DateFormatter.formatDateTime(it))
+            } ?: stringResource(Res.string.data_notice_not_accepted),
+            leadingIcon = MeshtasticIcons.Info,
+        ) {
+            showTerms = true
+        }
+        ListItem(
+            text = stringResource(Res.string.data_wipe_settings_title),
+            supportingText = stringResource(Res.string.data_wipe_settings_summary),
+            leadingIcon = MeshtasticIcons.Delete,
+        ) {
+            showWipe = true
+        }
+    }
+}
+
 @Composable
 private fun FeatureCreditsSection(modifier: Modifier = Modifier) {
     ExpressiveSection(title = stringResource(Res.string.feature_credits_title), modifier = modifier) {

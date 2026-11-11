@@ -59,6 +59,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_APP_INTRO_COMPLETED] = completed } }
     }
 
+    override val dataNoticeAcceptedAt: StateFlow<Long?> =
+        dataStore.data.map { it[KEY_DATA_NOTICE_ACCEPTED_AT] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, null)
+
+    override fun setDataNoticeAcceptedAt(value: Long) {
+        scope.launch { dataStore.edit { it[KEY_DATA_NOTICE_ACCEPTED_AT] = value } }
+    }
+
     // The default comes from the platform ([UiPrefsDefaults]): the system theme on Android, the saturated theme on
     // iPhone and computer, where the system gives no wallpaper colours.
     override val theme: StateFlow<Int> =
@@ -833,6 +840,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_RADIO_SETUP_OFFERED = stringSetPreferencesKey("radio-setup-offered-nodes")
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
+        val KEY_DATA_NOTICE_ACCEPTED_AT = longPreferencesKey("data_notice_accepted_at")
         val KEY_THEME = intPreferencesKey("theme")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
         val KEY_FONT_FAMILY = stringPreferencesKey("font-family-name")

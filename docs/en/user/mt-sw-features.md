@@ -280,6 +280,10 @@ On weaker devices big models can slow the app down or get it closed, so every mo
 - **Look and brand** — own name, icon and colours (gold and navy), a coloured connection status icon, installation next to the original Meshtastic app. On Windows a new version installs over the old one without uninstalling.
 - **Desktop** — a draggable scroll bar with a visible track on long lists, the third column follows the selected node, and an "Introduction" item in settings.
 
+## Terms of use and data consent
+
+On first start (also after an update and after erasing the data) a window with the terms of use appears. It explains that node data, messages, logs and statistics may reach the Internet and be publicly visible, that the authors do not collect them and are not responsible for their further use, and that consenting means waiving claims to the extent permitted by law. The “I agree” button unlocks after the text is scrolled to the end and a 10-second countdown. “I do not agree” closes the app. You can see the date of consent in “About” → “Terms and data consent” (where you can also read the terms again); MT_SW features has only a shortcut. The same section has “Erase all app data” (after a 10-second countdown): it deletes everything, withdraws the consent and closes the app.
+
 ## Help and documentation
 
 All help and documentation in the app are available in Polish. You can change the text size on help pages with the "A−" and "A+" buttons at the top. On first launch, after the welcome screen, there is a second card with a short description of MT_SW features; you can see it again in settings under "Introduction". See [Help and documentation](help-and-docs).

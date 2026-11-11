@@ -18,6 +18,7 @@
 
 package org.meshtastic.app
 
+import android.app.ActivityManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Intent
@@ -81,6 +82,7 @@ import org.meshtastic.core.resources.map_layer_too_large
 import org.meshtastic.core.service.MeshService
 import org.meshtastic.core.service.ServiceStartTrigger
 import org.meshtastic.core.service.startService
+import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.component.NarrowBandWarningDialog
 import org.meshtastic.core.ui.component.RegionWarningDialog
 import org.meshtastic.core.ui.theme.AppTheme
@@ -115,6 +117,7 @@ import org.meshtastic.core.ui.util.LocalNfcWriterProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTerminateApplication
+import org.meshtastic.core.ui.util.LocalWipeApplicationData
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.accentColorOrNull
@@ -197,12 +200,17 @@ class MainActivity : AppCompatActivity() {
                     saturation = saturationFor(theme),
                 ) {
                     val appIntroCompleted by model.appIntroCompleted.collectAsStateWithLifecycle()
+                    val dataNoticeAcceptedAt by model.dataNoticeAcceptedAt.collectAsStateWithLifecycle()
 
                     // Signal to the system that the initial UI is "fully drawn"
                     // once we've decided whether to show the intro or the main screen.
                     ReportDrawnWhen { true }
 
-                    if (appIntroCompleted || launchOptions.skipOnboarding) {
+                    if (!launchOptions.skipOnboarding && dataNoticeAcceptedAt == null) {
+                        // Still reading the stored consent: show nothing rather than flash the notice.
+                    } else if (!launchOptions.skipOnboarding && dataNoticeAcceptedAt == 0L) {
+                        DataNoticeScreen(offerWipe = appIntroCompleted, onAccept = { model.onDataNoticeAccepted() })
+                    } else if (appIntroCompleted || launchOptions.skipOnboarding) {
                         AppSpatialShell { MainScreen() }
 
                         val showNarrowBandWarning by model.showNarrowBandWarning.collectAsStateWithLifecycle()
@@ -301,6 +309,7 @@ class MainActivity : AppCompatActivity() {
             LocalNfcWriterProvider provides { url, onResult, onDisabled -> NfcWriterEffect(url, onResult, onDisabled) },
             LocalBarcodeScannerSupported provides true,
             LocalTerminateApplication provides ::terminateApplication,
+            LocalWipeApplicationData provides ::wipeApplicationData,
             // Was a constant true, so the NFC affordance appeared on phones with no NFC radio and
             // failed when used. uses-feature declares nfc as not required, so such devices do install.
             LocalNfcScannerSupported provides packageManager.hasSystemFeature(PackageManager.FEATURE_NFC),
@@ -373,6 +382,13 @@ class MainActivity : AppCompatActivity() {
         stopService(MeshService.createIntent(this))
         finishAndRemoveTask()
         Handler(Looper.getMainLooper()).postDelayed({ Process.killProcess(Process.myPid()) }, TERMINATE_DELAY_MS)
+    }
+
+    /** Erases all app data (the system also ends the process); falls back to a plain close if the system refuses. */
+    private fun wipeApplicationData() {
+        stopService(MeshService.createIntent(this))
+        val cleared = (getSystemService(ACTIVITY_SERVICE) as ActivityManager).clearApplicationUserData()
+        if (!cleared) terminateApplication()
     }
 
     private fun handleIntent(intent: Intent) {

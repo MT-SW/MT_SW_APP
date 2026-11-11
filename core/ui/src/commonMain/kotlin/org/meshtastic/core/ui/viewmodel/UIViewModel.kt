@@ -440,6 +440,13 @@ class UIViewModel(
         uiPrefs.setAppIntroCompleted(true)
     }
 
+    /** Null while the stored value is still being read; 0 when the terms were never accepted. */
+    val dataNoticeAcceptedAt: StateFlow<Long?> = uiPrefs.dataNoticeAcceptedAt
+
+    fun onDataNoticeAccepted() {
+        uiPrefs.setDataNoticeAcceptedAt(nowMillis)
+    }
+
     /**
      * Snapshot of the locally-connected radio's config, used to check its LoRa channel bandwidth. Started eagerly (not
      * `stateInWhileSubscribed`) since [checkNarrowBandWarningThrottled] only ever reads [StateFlow.value] directly and

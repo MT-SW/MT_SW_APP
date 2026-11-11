@@ -236,6 +236,8 @@ class SettingsViewModel(
         uiPrefs.setAutoLoadChatImages(value)
     }
 
+    val dataNoticeAcceptedAt: StateFlow<Long?> = uiPrefs.dataNoticeAcceptedAt
+
     fun showAppIntro() {
         uiPrefs.setAppIntroCompleted(false)
     }

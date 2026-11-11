@@ -62,6 +62,9 @@ import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
+import org.meshtastic.core.resources.data_notice_settings_title
+import org.meshtastic.core.resources.data_notice_settings_title
+import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
@@ -357,6 +360,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 ListItem(text = stringResource(Res.string.debug_panel), leadingIcon = MeshtasticIcons.BugReport) {
                     onNavigate(SettingsRoute.DebugPanel)
+                }
+                ListItem(
+                    text = stringResource(Res.string.data_notice_settings_title),
+                    supportingText = stringResource(Res.string.data_notice_shortcut_summary),
+                    leadingIcon = MeshtasticIcons.Info,
+                ) {
+                    onNavigate(SettingsRoute.About)
                 }
             }
 

@@ -200,3 +200,8 @@ Słowa: widżet, karty węzłów, ulubione, plakietka, napięcie, skoki, ostatni
 Zdjęcia w czacie idą na publiczny serwer zdjęć, nie przez LoRa. Błąd „412 uploads paused” znaczy, że główny serwer (catbox.moe) chwilowo nie przyjmuje plików. Aplikacja sama próbuje wtedy kolejnych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin). Jeśli wszystkie serwisy odmówią, pokaże się powód i przycisk „Spróbuj ponownie”.
 Słowa: 412, uploads paused, zdjęcie się nie wysyła, nie wysyła zdjęcia, catbox, litterbox, uguu, serwer zdjęć, błąd wysyłania zdjęcia
 Źródło: Funkcje MT_SW: Zdjęcia przez link
+
+### Co to jest okno „Warunki korzystania i zgoda na dane” i jak wycofać zgodę?
+Przy pierwszym uruchomieniu (po instalacji, po aktualizacji i po wyczyszczeniu danych) aplikacja pokazuje okno z warunkami korzystania. Mówi ono, że dane węzłów, wiadomości, logi i statystyki mogą trafić do Internetu i być publicznie widoczne, że autorzy ich nie zbierają, nie odpowiadają za ich dalsze użycie, a zgoda oznacza zrzeczenie się roszczeń w zakresie dozwolonym prawem. Przycisk „Zgadzam się” odblokowuje się po przewinięciu tekstu do końca i 10-sekundowym odliczaniu; „Nie zgadzam się” zamyka aplikację. Datę zgody widać w „O aplikacji” → „Warunki i zgoda na dane” (tam też można przeczytać warunki ponownie; w Funkcje MT_SW jest skrót). Zgodę wycofujesz przez „Wyczyść wszystkie dane aplikacji” w tej samej sekcji: usuwa to wszystko i zamyka aplikację.
+Słowa: zgoda, warunki korzystania, regulamin, dane publiczne, odmowa zgody, wyczyść dane, reset aplikacji, wycofanie zgody, zrzeczenie roszczeń
+Źródło: Funkcje MT_SW (opracowanie własne, 2026-11)
