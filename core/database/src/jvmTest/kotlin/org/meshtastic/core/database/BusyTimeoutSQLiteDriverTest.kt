@@ -49,6 +49,22 @@ class BusyTimeoutSQLiteDriverTest {
     }
 
     @Test
+    fun relaxesSyncOnlyWhenTheFileIsInWalMode() {
+        val driver = BusyTimeoutSQLiteDriver(BundledSQLiteDriver())
+        driver.open(dbFile.absolutePath).use { connection ->
+            connection.prepare("PRAGMA journal_mode").use {
+                it.step()
+                assertEquals("wal", it.getText(0).lowercase())
+            }
+            connection.prepare("PRAGMA synchronous").use {
+                it.step()
+                // 1 is NORMAL.
+                assertEquals(1L, it.getLong(0))
+            }
+        }
+    }
+
+    @Test
     fun rejectsNonPositiveTimeouts() {
         // SQLite treats zero/negative busy_timeout as "no busy handler", silently defeating the wrapper.
         assertFailsWith<IllegalArgumentException> { BusyTimeoutSQLiteDriver(BundledSQLiteDriver(), 0) }

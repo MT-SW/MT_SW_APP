@@ -24,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -40,7 +42,8 @@ actual fun rememberWidgetSizes(): WidgetSizesInUse {
     var sizes by remember { mutableStateOf(readSizes()) }
     LaunchedEffect(Unit) {
         while (true) {
-            sizes = readSizes()
+            // The file or the system is asked off the main thread; the screen only gets the answer.
+            sizes = withContext(Dispatchers.Default) { readSizes() }
             delay(REREAD_MS)
         }
     }

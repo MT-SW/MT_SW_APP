@@ -19,6 +19,7 @@ package org.meshtastic.core.database
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.execSQL
+import androidx.sqlite.use
 
 /**
  * Wraps a [SQLiteDriver] so every connection it opens waits up to [busyTimeoutMs] for a competing connection's lock
@@ -45,6 +46,7 @@ class BusyTimeoutSQLiteDriver(
         val connection = delegate.open(fileName)
         try {
             connection.execSQL("PRAGMA busy_timeout = $busyTimeoutMs")
+            relaxSyncInWal(connection)
         } catch (@Suppress("TooGenericExceptionCaught") setupFailure: Throwable) {
             // The platforms throw different exception types here (android.database.SQLException on
             // Android, androidx.sqlite.SQLiteException elsewhere); close the live native connection
@@ -53,6 +55,17 @@ class BusyTimeoutSQLiteDriver(
             throw setupFailure
         }
         return connection
+    }
+
+    /**
+     * In WAL mode SQLite is safe from corruption with `synchronous = NORMAL`, and then does not wait for the disk after
+     * every single write (Room leaves the slower FULL, which made each one-row write on a phone take long). Only a
+     * crash of the whole phone can cost the last few writes, never a closed app. Set only when the file really is in
+     * WAL mode (Room asks for it for every database file), so other modes keep their full protection.
+     */
+    private fun relaxSyncInWal(connection: SQLiteConnection) {
+        val mode = connection.prepare("PRAGMA journal_mode = WAL").use { if (it.step()) it.getText(0) else "" }
+        if (mode.equals("wal", ignoreCase = true)) connection.execSQL("PRAGMA synchronous = NORMAL")
     }
 
     companion object {

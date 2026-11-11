@@ -26,7 +26,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 private const val WIDGET_RECEIVER = "org.meshtastic.feature.widget.MeshStatusWidgetReceiver"
 private const val REREAD_MS = 2_000L
@@ -42,7 +44,8 @@ actual fun rememberWidgetSizes(): WidgetSizesInUse {
     var sizes by remember { mutableStateOf(readSizes(context)) }
     LaunchedEffect(context) {
         while (true) {
-            sizes = readSizes(context)
+            // The file or the system is asked off the main thread; the screen only gets the answer.
+            sizes = withContext(Dispatchers.Default) { readSizes(context) }
             delay(REREAD_MS)
         }
     }
