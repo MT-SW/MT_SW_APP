@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Widżet (wszystkie platformy): temperatura i wilgotność węzła w jednej linii, obok siebie (jak napięcie i prąd), zamiast w osobnych wierszach.
 * Propagacja: opcja „Zachowaj największy obszar” (domyślnie włączona) — obszar prognozy tylko rośnie i nie zmniejsza się po przybliżeniu mapy, także przy ręcznym pobraniu; zapamiętywany po restarcie.
 * Mapa (iPhone): dymki węzłów dopasowywane do dotyku na ekranie, a nie w pudełku zleconym mapie (część dymków miała przesunięty obszar dotyku).
 * Ikona aplikacji: nowa opcja „Płaska ikona (bez 3D)” dla wszystkich stylów (Android, iPhone/iPad, komputer); starsza, płaska ikona wraca jako zaznaczenie obok stylu.
@@ -677,6 +678,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Widget (all platforms): a node's temperature and humidity on one line, side by side (like voltage and current), instead of separate rows.
 * Propagation: the "Keep the largest area" option (on by default) — the forecast area only grows and does not shrink on zooming in, also on a manual download; kept across restarts.
 * Map (iPhone): node bubbles are matched to the tap on the screen instead of in a box handed to the map (some bubbles had a shifted tap area).
 * App icon: new option "Flat icon (no 3D)" for all styles (Android, iPhone/iPad, desktop); the earlier flat icon is back as a tick beside the style.
