@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.uikit.OnFocusBehavior
 import androidx.compose.ui.window.ComposeUIViewController
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -213,10 +214,12 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
 }
 
 /** Deletes everything the app stored (documents, support files, caches, settings) and ends the process. */
+@OptIn(ExperimentalForeignApi::class)
 private fun wipeIosData() {
     val fileManager = NSFileManager.defaultManager
     listOf(NSDocumentDirectory, NSApplicationSupportDirectory, NSCachesDirectory).forEach { directory ->
-        NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true).filterIsInstance<String>().forEach { root ->
+        val roots = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
+        roots.filterIsInstance<String>().forEach { root ->
             fileManager.contentsOfDirectoryAtPath(root, null)?.filterIsInstance<String>()?.forEach { name ->
                 fileManager.removeItemAtPath("$root/$name", null)
             }
