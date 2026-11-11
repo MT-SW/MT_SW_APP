@@ -84,6 +84,7 @@ import org.meshtastic.feature.map.maplibre.geojson.lenientBoolean
 import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.stackedMembers
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 /**
@@ -472,22 +473,26 @@ internal suspend fun nodeTapAt(
     }
 }
 
-/** The dots just below the tap, each with its rank (favourites on top) and its distance from the bubble's centre. */
+/**
+ * The dots just below the tap, each with its rank (favourites on top) and its distance from the bubble's centre.
+ *
+ * The map is asked about the whole screen and the box is applied here, on the same screen positions the tap itself came
+ * from: a box handed to the map can be read in a slightly different scale (seen on the iPhone), which put some
+ * bubbles' taps off their targets while others, near the corner the scale starts from, were right.
+ */
 private suspend fun chipCandidates(state: MapState, at: DpOffset): List<Triple<Feature<*, JsonObject?>, Int, Float>> {
-    val box =
-        DpRect(
-            left = at.x - TAP_HALF_WIDTH_DP.dp,
-            top = at.y - TAP_TOP_MARGIN_DP.dp,
-            right = at.x + TAP_HALF_WIDTH_DP.dp,
-            bottom = at.y + TAP_HEIGHT_DP.dp,
-        )
-    return state.queryRenderedFeatures(box, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
+    val whole = DpRect(left = 0.dp, top = 0.dp, right = WHOLE_SCREEN_DP.dp, bottom = WHOLE_SCREEN_DP.dp)
+    return state.queryRenderedFeatures(whole, layerIds = setOf(NODE_DOT_LAYER_ID)).mapNotNull { feature ->
         val spot = (feature.geometry as? Point)?.coordinates
         val dot = spot?.let { state.screenLocationFromPosition(it) }
-        dot?.let {
-            val dx = it.x.value - at.x.value
-            val dy = it.y.value - CHIP_CENTRE_DP - at.y.value
-            Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy))
-        }
+        val dx = (dot?.x?.value ?: Float.NaN) - at.x.value
+        val below = (dot?.y?.value ?: Float.NaN) - at.y.value
+        // NaN (no position) fails every comparison below, so such a dot is left out.
+        val inside = abs(dx) <= TAP_HALF_WIDTH_DP && below >= -TAP_TOP_MARGIN_DP && below <= TAP_HEIGHT_DP
+        val dy = below - CHIP_CENTRE_DP
+        if (inside) Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy)) else null
     }
 }
+
+/** Larger than any screen, so a query with it covers every dot the map draws. */
+private const val WHOLE_SCREEN_DP = 4000
