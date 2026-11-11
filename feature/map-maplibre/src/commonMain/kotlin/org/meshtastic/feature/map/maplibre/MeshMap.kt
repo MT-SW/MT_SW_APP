@@ -35,7 +35,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
@@ -52,6 +56,7 @@ import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.interaction.ClickEvent
 import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.interaction.MapInteractions
 import org.maplibre.compose.layers.CircleLayer
@@ -314,9 +319,16 @@ fun MeshMap(
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
     val ornaments = remember(credits) { meshMapOrnaments(credits) }
+    // The size the map really takes on screen, which is what the finger is measured against. The map reports its own
+    // size separately; on the iPhone the picture is drawn larger than that, so taps are scaled back by the ratio.
+    val density = LocalDensity.current
+    var shown by remember { mutableStateOf(DpSize.Zero) }
     Box(modifier) {
         MaplibreMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier =
+            Modifier.fillMaxSize().onSizeChanged {
+                shown = with(density) { DpSize(it.width.toDp(), it.height.toDp()) }
+            },
             state = mapState,
             // Honour what the source can actually serve, as the OSMdroid map did.
             cameraConstraints =
@@ -329,16 +341,20 @@ fun MeshMap(
                 callbacks {
                     longClick {
                         onEvent { event ->
-                            event.position?.let(onMapLongClick)
+                            event.correctedPosition(mapState, shown)?.let(onMapLongClick)
                             ClickResult.Consume
                         }
                     }
                     // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
                     click {
                         onEvent { event ->
-                            Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
-                            val tap = event.position
-                            val finger = event.screenOffset
+                            val scale = mapState.displayScale(shown)
+                            val finger = event.screenOffset.dividedBy(scale)
+                            val tap = event.correctedPosition(mapState, shown)
+                            Logger.i {
+                                "Mapa: dotknięcie ekranu w ${event.position}, po korekcie $tap, widok ${shown.text()}, " +
+                                    "mapa ${mapState.viewport?.size?.text()}, skala wyświetlania ${scale.toFloat()}"
+                            }
                             // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation; the
                             // check needs the map's answer, so it runs beside the event and the rest of the tap
                             // (waypoints, planner) is only given the taps that hit no node.
@@ -363,6 +379,33 @@ fun MeshMap(
                 .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = 56.dp),
         )
     }
+}
+
+/** A size as "width x height" in whole dp, for the log. */
+private fun DpSize.text() = "${width.value.toInt()}x${height.value.toInt()}"
+
+private const val DISPLAY_SCALE_MIN = 0.5f
+private const val DISPLAY_SCALE_MAX = 2f
+private const val DISPLAY_SCALE_TOLERANCE = 0.03f
+
+/**
+ * How much larger the map is drawn on screen than the size it was rendered and projected at: [shown] (the room the map
+ * takes) over the map's own reported size. 1 whenever the two agree, which is every platform but the iPhone so far,
+ * and also when either is not known yet or the ratio is implausible.
+ */
+internal fun MapState.displayScale(shown: DpSize): Float {
+    val rendered = viewport?.size
+    val ratio = if (rendered != null && rendered.width.value > 0f) shown.width.value / rendered.width.value else 1f
+    val usable = ratio in DISPLAY_SCALE_MIN..DISPLAY_SCALE_MAX && kotlin.math.abs(ratio - 1f) > DISPLAY_SCALE_TOLERANCE
+    return if (usable) ratio else 1f
+}
+
+private fun DpOffset.dividedBy(scale: Float) = DpOffset(x / scale, y / scale)
+
+/** The tapped position with the map's drawn-larger-than-projected scale taken out of the finger's place. */
+private fun ClickEvent.correctedPosition(state: MapState, shown: DpSize): Position? {
+    val scale = state.displayScale(shown)
+    return if (scale == 1f) position else state.positionFromScreenLocation(screenOffset.dividedBy(scale))
 }
 
 /** Remembers the last padded box between recompositions; see [rememberStickyBounds]. */
