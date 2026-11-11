@@ -3256,6 +3256,9 @@ terrain_horizon_offline_hint
 terrain_horizon_only_visible
 terrain_horizon_options
 terrain_horizon_precision
+terrain_horizon_quality
+terrain_horizon_quality_good
+terrain_horizon_quality_very_good
 terrain_horizon_range
 terrain_horizon_refraction
 terrain_horizon_save

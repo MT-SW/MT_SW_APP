@@ -3331,6 +3331,9 @@
     <string name="terrain_horizon_only_visible">Only nodes in sight</string>
     <string name="terrain_horizon_options">Options</string>
     <string name="terrain_horizon_precision">Accuracy circles</string>
+    <string name="terrain_horizon_quality">Panorama quality</string>
+    <string name="terrain_horizon_quality_good">Good</string>
+    <string name="terrain_horizon_quality_very_good">Very good</string>
     <string name="terrain_horizon_range">Range</string>
     <string name="terrain_horizon_refraction">Radio horizon (earth factor)</string>
     <string name="terrain_horizon_save">Save terrain (up to %1$d km)</string>

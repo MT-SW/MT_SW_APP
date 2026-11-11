@@ -214,6 +214,11 @@ interface UiPrefs {
 
     fun setWidgetOthersLimit(limit: Int)
 
+    /** MT_SW: quality of the terrain panorama: 0 is very good (the default, with textures and forests), 1 is good. */
+    val panoramaQuality: StateFlow<Int>
+
+    fun setPanoramaQuality(quality: Int)
+
     /** MT_SW: when not empty, the widgets show only these other nodes (chosen by hand) and ignore the limit. */
     val widgetOthersPicked: StateFlow<Set<Int>>
 

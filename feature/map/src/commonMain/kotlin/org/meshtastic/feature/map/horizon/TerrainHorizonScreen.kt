@@ -105,7 +105,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.resources.terrain_horizon_quality
+import org.meshtastic.core.resources.terrain_horizon_quality_good
+import org.meshtastic.core.resources.terrain_horizon_quality_very_good
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -225,6 +230,7 @@ private const val GRAIN_TILE_H = 64
 private const val GRAIN_STREAK_SHARE = 0.6f
 private const val GRAIN_ALPHA = 0.16f
 private const val GRAIN_FADE = 0.22f
+private const val GOOD_QUALITY_BUILDINGS = 800
 private const val FOREST_BANDS = 2
 private const val FOREST_TOP_PX = 26f
 private const val FOREST_GREEN = 0xFF2E4A32
@@ -273,6 +279,8 @@ fun TerrainHorizonScreen(
 ) {
     LaunchedEffect(focusNodeNum) { viewModel.open(focusNodeNum) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiPrefs: UiPrefs = koinInject()
+    val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
     var fieldOfView by rememberSaveable { mutableStateOf(DEFAULT_FIELD_OF_VIEW) }
     var onlyVisible by rememberSaveable { mutableStateOf(false) }
     var names by rememberSaveable { mutableStateOf(true) }
@@ -427,6 +435,18 @@ fun TerrainHorizonScreen(
                             label = { Text("$deg°") },
                         )
                     }
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_quality)) {
+                    BrandChip(
+                        selected = quality == 0,
+                        onClick = { uiPrefs.setPanoramaQuality(0) },
+                        label = { Text(stringResource(Res.string.terrain_horizon_quality_very_good)) },
+                    )
+                    BrandChip(
+                        selected = quality != 0,
+                        onClick = { uiPrefs.setPanoramaQuality(1) },
+                        label = { Text(stringResource(Res.string.terrain_horizon_quality_good)) },
+                    )
                 }
                 OfflineTerrain(
                     state = state,
@@ -693,11 +713,12 @@ private fun Panorama(
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
     // The buildings sorted into their distance bands once, far to near, not on every frame.
     val shapesByBand =
-        remember(shapes, profile.radiusM) {
+        remember(shapes, profile.radiusM, quality) {
+            val usable = if (quality == 0) shapes else shapes.take(GOOD_QUALITY_BUILDINGS)
             List(BandEdges.size - 1) { band ->
                 val from = BandEdges[band] * profile.radiusM
                 val to = BandEdges[band + 1] * profile.radiusM
-                shapes
+                usable
                     .filter { it.distanceM >= from && it.distanceM < to }
                     .sortedByDescending { it.distanceM }
             }
@@ -707,7 +728,10 @@ private fun Panorama(
     // are veiled by haze.
     val sun =
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
-    val grain = remember { rockGrain() }
+    val uiPrefs: UiPrefs = koinInject()
+    val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
+    // Very good (0) has the rock texture and forests; good keeps the shapes and the light but not the textures.
+    val grain = remember(quality) { if (quality == 0) rockGrain() else null }
     val light = remember(sky, sun, grain) { ReliefLight(sky, HazeShares, sun, grain) }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
@@ -956,7 +980,7 @@ private fun DrawScope.drawRelief(
         clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
     }
     // Forest on the lower slopes of the near ridges: dark speckled ground that starts a little below the crest.
-    if (band < FOREST_BANDS) {
+    if (band < FOREST_BANDS && light.grain != null) {
         val forest = Path()
         forest.moveTo(0f, h)
         for (i in outline.indices) {

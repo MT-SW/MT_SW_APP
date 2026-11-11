@@ -3624,6 +3624,9 @@
     <string name="terrain_horizon_buildings_none_here">Pobrane budynki nie obejmują tego miejsca.</string>
     <string name="terrain_horizon_buildings_range">Jak daleko pobrać budynki</string>
     <string name="terrain_horizon_buildings_save">Pobierz budynki (do %1$d km)</string>
+    <string name="terrain_horizon_quality">Jakość panoramy</string>
+    <string name="terrain_horizon_quality_very_good">Bardzo dobra</string>
+    <string name="terrain_horizon_quality_good">Dobra</string>
     <string name="terrain_horizon_buildings_age">Odświeżaj kawałki starsze niż</string>
     <string name="terrain_horizon_buildings_age_days">%1$d dni</string>
     <string name="terrain_horizon_buildings_update">Aktualizuj budynki (do %1$d km)</string>

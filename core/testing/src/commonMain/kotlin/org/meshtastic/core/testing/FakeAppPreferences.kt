@@ -426,6 +426,12 @@ class FakeUiPrefs : UiPrefs {
         widgetOthersLimit.value = limit
     }
 
+    override val panoramaQuality = MutableStateFlow(0)
+
+    override fun setPanoramaQuality(quality: Int) {
+        panoramaQuality.value = quality
+    }
+
     override val widgetOthersPicked = MutableStateFlow(emptySet<Int>())
 
     override fun setWidgetOthersPicked(nodeNums: Set<Int>) {
