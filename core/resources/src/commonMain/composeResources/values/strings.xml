@@ -2597,8 +2597,8 @@
     <string name="planner_buildings_on_map">Show buildings on the map (route: those blocking the line of sight in red; range: backdrop)</string>
     <string name="planner_clutter_reflections">Include reflections off buildings and trees (rough allowance, needs the precise terrain)</string>
     <string name="planner_ground_reflection">Include ground reflections (they strengthen or weaken the signal)</string>
-    <string name="planner_layer_buildings_area">Planner: buildings in range</string>
-    <string name="planner_layer_buildings_link">Planner: buildings along the route</string>
+    <string name="planner_layer_buildings_area">Planner: buildings in range (© OpenStreetMap)</string>
+    <string name="planner_layer_buildings_link">Planner: buildings along the route (© OpenStreetMap)</string>
     <string name="planner_pattern_aim_other">Point at the other end</string>
     <string name="planner_pattern_azimuth">Antenna direction (azimuth)</string>
     <string name="planner_pattern_beamwidth">Beamwidth (−3 dB)</string>

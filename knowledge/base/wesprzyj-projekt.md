@@ -5,4 +5,4 @@ Pozycja „Wesprzyj projekt” jest w Ustawienia → Funkcje MT_SW oraz w ekrani
 Słowa: wesprzeć, wsparcie, wpłata, datek, kawa, postaw kawę, Ko-fi, kofi, darowizna, pieniądze, dotacja, utrzymanie, rozwój, czy aplikacja jest darmowa
 Źródło: Funkcje MT_SW: Wesprzyj projekt
 
-W wersji aplikacji na iPhone/iPad przygotowanej do App Store ta sekcja jest ukryta, bo Apple nie zezwala na link do zbiórki wewnątrz aplikacji. Na Androidzie, komputerze oraz w zwykłym pliku .ipa (AltStore/Sideloadly) jest dostępna.
+W wersji aplikacji na iPhone/iPad przygotowanej do App Store ta sekcja jest ukryta, bo Apple nie zezwala na link do zbiórki wewnątrz aplikacji. Podobnie jest w wersji na Google Play (zasady płatności Google nie pozwalają na taki link). Na Androidzie w wersji F-Droid i z GitHub, na komputerze oraz w zwykłym pliku .ipa (AltStore/Sideloadly) jest dostępna.

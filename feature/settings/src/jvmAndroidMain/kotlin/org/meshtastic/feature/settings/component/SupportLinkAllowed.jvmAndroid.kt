@@ -16,4 +16,18 @@
  */
 package org.meshtastic.feature.settings.component
 
-actual fun isSupportLinkAllowed(): Boolean = true
+import org.koin.core.qualifier.named
+import org.koin.mp.KoinPlatform
+import org.meshtastic.core.common.di.GOOGLE_SERVICES_AVAILABLE
+
+/**
+ * False in the Google flavor (the Google Play build): Google Play's payments policy does not allow a link to a
+ * donation page that is not a tax-exempt organization's, so the row is not offered there. The F-Droid flavor, the
+ * desktop app and the plain files from GitHub keep it. Where the flavor flag is not bound (desktop) the row is shown.
+ */
+@Suppress("TooGenericExceptionCaught", "SwallowedException")
+actual fun isSupportLinkAllowed(): Boolean = try {
+    KoinPlatform.getKoin().getOrNull<Boolean>(named(GOOGLE_SERVICES_AVAILABLE)) != true
+} catch (e: Exception) {
+    true
+}
