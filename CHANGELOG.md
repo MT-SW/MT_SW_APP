@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Ikona aplikacji na Androidzie: usunięty rozmyty cień wokół napisu i konturu (przez niego ikona wyglądała na nieostrą); gradient i połysk tła zostają.
 * Mapa (iPhone, Android, komputer): warstwy mapy nie przebudowują się już przy każdej klatce przesuwania i przybliżania — widoczny obszar jest trzymany w miejscu, dopóki kamera nie wyjdzie poza niego. To główna przyczyna zacięć mapy na iPhonie.
 * Panorama: pobieranie budynków trwa dalej po wyjściu z ekranu lub z aplikacji (wcześniej było po cichu przerywane, więc budynki się nie zapisywały); przerwanie i błędy trafiają tylko do logu, bez komunikatu błędu w oknie.
 * Widżet statystyk (Android): jednolite tło z zaokrąglonymi rogami, żeby tekst był czytelny na każdej tapecie; wyższe wiersze (pasują do większej czcionki systemowej), a nagłówek grupy nie wisi już sam na dole kolumny.
@@ -673,6 +674,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* App icon on Android: removed the blurry shadow around the lettering and outline (it made the icon look soft); the background gradient and gloss stay.
 * Map (iPhone, Android, desktop): the map layers no longer rebuild on every frame of a pan or zoom — the visible area is held still until the camera leaves it. This was the main cause of the map stutter on the iPhone.
 * Panorama: the buildings download carries on after leaving the screen or the app (it used to be cancelled silently, so buildings were never saved); cancellation and errors go to the log only, with no error message in the window.
 * Stats widget (Android): a solid rounded background so the text is readable on any wallpaper; taller rows (fit a larger system font) and a group heading no longer hangs alone at the bottom of a column.
