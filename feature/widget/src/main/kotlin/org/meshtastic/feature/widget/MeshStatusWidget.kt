@@ -130,10 +130,7 @@ private fun StatsColumns(snapshot: MeshStatsSnapshot, widthDp: Float, heightDp: 
     val entries = snapshot.entries().take(rows * columns)
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         entries.splitColumns(columns).forEachIndexed { index, part ->
-            Column(
-                modifier =
-                GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp),
-            ) {
+            Column(modifier = GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp)) {
                 part.forEach { entry ->
                     Text(
                         text = entry.text,
@@ -147,8 +144,7 @@ private fun StatsColumns(snapshot: MeshStatsSnapshot, widthDp: Float, heightDp: 
                                 GlanceTheme.colors.onSurface
                             },
                             fontSize = 11.sp,
-                            fontWeight =
-                            if (entry.header) FontWeight.Bold else FontWeight.Normal,
+                            fontWeight = if (entry.header) FontWeight.Bold else FontWeight.Normal,
                         ),
                     )
                 }

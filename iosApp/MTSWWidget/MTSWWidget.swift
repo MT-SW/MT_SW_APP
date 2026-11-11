@@ -132,7 +132,7 @@ struct StatsView: View {
                         Text(data.chip).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
                     }
                 }
-                if data.groups.isEmpty() {
+                if data.groups.isEmpty {
                     let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
                         ForEach(Array(data.lines.prefix(14).enumerated()), id: \.offset) { _, line in
