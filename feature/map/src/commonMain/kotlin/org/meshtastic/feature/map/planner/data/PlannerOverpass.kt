@@ -43,8 +43,8 @@ import kotlin.math.max
 import kotlin.math.roundToLong
 
 /**
- * [PlannerClutterSource] that asks an Overpass API server (default: the public overpass-api.de instance) for the
- * buildings and forests of OpenStreetMap. Data © OpenStreetMap contributors, ODbL
+ * [PlannerClutterSource] that asks an Overpass API server (default: the public OpenStreetMap France instance, with
+ * overpass-api.de and mirrors as backups) for the buildings and forests of OpenStreetMap. Data © OpenStreetMap contributors, ODbL
  * (https://www.openstreetmap.org/copyright).
  *
  * Answers are kept in memory for [CACHE_MS], so changing power, height or any other parameter of the same link does not
@@ -53,7 +53,7 @@ import kotlin.math.roundToLong
 @Suppress("TooManyFunctions")
 class PlannerOverpass(
     private val httpClient: HttpClient,
-    private val baseUrl: String = BASE_URL,
+    private val baseUrl: String = FAST_URL,
     private val timeoutMs: Long = TIMEOUT_MS,
     private val clockMs: () -> Long = { nowMillis },
     private val fallbackUrls: List<String> = FALLBACK_URLS,
@@ -260,7 +260,8 @@ class PlannerOverpass(
                         fetch(query(work.box), seen, thinM, mirrorOnTimeout = true).also {
                             Logger.i {
                                 "Overpass: kawałek ${Num.fmt(work.box.maxSideKm, 1)} km pobrany w " +
-                                    "${clockMs() - started} ms, obiektów ${it.polygons.size}"
+                                    "${clockMs() - started} ms, obiektów ${it.polygons.size}, " +
+                                    "serwer ${lastGoodUrl?.substringAfter("://")?.substringBefore('/')}"
                             }
                         }
                     } catch (e: PlannerClutterException) {
@@ -429,7 +430,11 @@ class PlannerOverpass(
     companion object {
         private const val PIECE_SCALE = 100_000.0
 
+        /** The main public server; it answered after 30-40 s even to an empty query, so it is now the first backup. */
         const val BASE_URL = "https://overpass-api.de/api/interpreter"
+
+        /** The instance of OpenStreetMap France: the same data, and it answered the same pieces in 4-5 s. */
+        const val FAST_URL = "https://overpass.openstreetmap.fr/api/interpreter"
         const val TIMEOUT_MS = 60_000L
         const val CACHE_MS = 30 * 60 * 1000L
         private const val MAX_BODY_BYTES = 12_000_000
@@ -474,6 +479,7 @@ class PlannerOverpass(
         /** Public mirrors tried when the main server refuses, is busy or does not answer. */
         val FALLBACK_URLS =
             listOf(
+                BASE_URL,
                 "https://overpass.kumi.systems/api/interpreter",
                 "https://overpass.private.coffee/api/interpreter",
             )

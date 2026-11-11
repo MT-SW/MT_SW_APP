@@ -32,7 +32,7 @@ Przy każdym takim połączeniu zewnętrzna usługa widzi twój adres IP:
 - **Mapy** — kafelki i style mapy z serwisu OpenFreeMap / OpenStreetMap (tiles.openfreemap.org).
 - **Pobieranie modeli AI** — z serwisu Hugging Face (huggingface.co), tylko gdy sam pobierzesz model.
 - **Pogoda i propagacja (planer, warstwa propagacji na mapie)** — dane pogodowe z serwisu Open-Meteo (api.open-meteo.com), tylko gdy włączysz pogodę w planerze albo warstwę propagacji. Serwis dostaje współrzędne punktu albo siatki punktów nad widocznym fragmentem mapy; nie wysyłamy nic poza nimi.
-- **Teren i budynki (planer, panorama terenu)** — wysokości terenu z serwisu Mapterhorn oraz budynki i lasy z OpenStreetMap przez Overpass API, tylko gdy z nich korzystasz (dokładny teren, panorama, budynki). Serwisy dostają obszar, którego dotyczy pobranie.
+- **Teren i budynki (planer, panorama terenu)** — wysokości terenu z serwisu Mapterhorn oraz budynki i lasy z OpenStreetMap przez publiczne serwery Overpass API (m.in. OpenStreetMap France), tylko gdy z nich korzystasz (dokładny teren, panorama, budynki). Serwisy dostają obszar, którego dotyczy pobranie.
 - **Wesprzyj projekt** — wiersz otwiera w przeglądarce stronę Ko-fi dopiero po dotknięciu; aplikacja nic tam nie wysyła. W wersji na Google Play i w wersji na App Store wiersz jest ukryty.
 - **Aktualizacja firmware** — z serwisu GitHub, tylko gdy ją uruchomisz.
 - **Zdjęcia w czacie** — jeśli wybierzesz „Wyślij”, zdjęcie jest wysyłane na publiczny serwer zdjęć (catbox.moe, a gdy jest niedostępny: litterbox.catbox.moe lub uguu.se), niezwiązany z MT_SW. Przed wysłaniem pytamy o zgodę i opisujemy, dokąd trafia zdjęcie. Każdy, kto zna link, może je zobaczyć, a aplikacja nie może go usunąć.
@@ -88,7 +88,7 @@ With each such connection the outside service sees your IP address:
 - **Maps** — map tiles and styles from OpenFreeMap / OpenStreetMap (tiles.openfreemap.org).
 - **AI model downloads** — from Hugging Face (huggingface.co), only when you download a model yourself.
 - **Weather and propagation (planner, propagation map layer)** — weather data from Open-Meteo (api.open-meteo.com), only when you turn on weather in the planner or the propagation layer. The service receives the coordinates of a point, or of a grid of points over the visible part of the map; nothing else is sent.
-- **Terrain and buildings (planner, terrain panorama)** — terrain heights from Mapterhorn and buildings and forests from OpenStreetMap through the Overpass API, only when you use them (exact terrain, panorama, buildings). The services receive the area the download is for.
+- **Terrain and buildings (planner, terrain panorama)** — terrain heights from Mapterhorn and buildings and forests from OpenStreetMap through public Overpass API servers (among them OpenStreetMap France), only when you use them (exact terrain, panorama, buildings). The services receive the area the download is for.
 - **Support the project** — the row opens the Ko-fi page in the browser only after you tap it; the app sends nothing there. In the Google Play and App Store builds the row is hidden.
 - **Firmware update** — from GitHub, only when you start it.
 - **Chat pictures** — if you choose "Send", the picture is uploaded to a public picture host (catbox.moe, or, when unavailable, litterbox.catbox.moe or uguu.se), which is not connected to MT_SW. We ask for your permission first and explain where the picture goes. Anyone with the link can see it, and the app cannot delete it.
