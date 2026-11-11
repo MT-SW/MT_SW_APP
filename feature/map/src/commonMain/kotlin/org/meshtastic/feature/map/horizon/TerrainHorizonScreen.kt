@@ -82,6 +82,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -214,6 +220,11 @@ private const val RIDGE_WIDTH_PX = 1.5f
 private const val SHADE_DEPTH_PX = 64f
 private const val SHADE_MAX = 0.5f
 private const val SMOOTH_PASSES = 2
+private const val GRAIN_TILE_W = 128
+private const val GRAIN_TILE_H = 64
+private const val GRAIN_STREAK_SHARE = 0.6f
+private const val GRAIN_ALPHA = 0.16f
+private const val GRAIN_FADE = 0.22f
 private const val GRAIN = 0.35f
 private const val LOW_SUN_DEG = 15.0
 private const val LOW_SUN_CONTRAST = 0.5f
@@ -688,7 +699,8 @@ private fun Panorama(
     // are veiled by haze.
     val sun =
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
-    val light = remember(sky, sun) { ReliefLight(sky, HazeShares, sun) }
+    val grain = remember { rockGrain() }
+    val light = remember(sky, sun, grain) { ReliefLight(sky, HazeShares, sun, grain) }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
     val measurer = rememberTextMeasurer()
@@ -930,6 +942,10 @@ private fun DrawScope.drawRelief(
         }
         previous = y
     }
+    // The rock itself: a fine grain with vertical streaks (gullies), strongest on near ridges, fading with distance.
+    light.grain?.let { texture ->
+        clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
+    }
     drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
     val haze = light.haze[band.coerceIn(0, light.haze.lastIndex)]
@@ -959,6 +975,27 @@ private fun DrawScope.drawRelief(
     }
 }
 
+/**
+ * A small tile of light and dark specks, repeated over the terrain as its texture. Whole columns are lighter or darker
+ * than their neighbours, which reads as gullies and ribs running down a slope, with a finer grain on top. It is drawn
+ * once and then only repeated, so it costs nothing per frame.
+ */
+private fun rockGrain(): Brush {
+    val image = ImageBitmap(GRAIN_TILE_W, GRAIN_TILE_H)
+    val canvas = GraphicsCanvas(image)
+    val paint = Paint()
+    for (x in 0 until GRAIN_TILE_W) {
+        val streak = columnNoise(x, 1)
+        for (y in 0 until GRAIN_TILE_H) {
+            val tone = GRAIN_STREAK_SHARE * streak + (1f - GRAIN_STREAK_SHARE) * columnNoise(x * GRAIN_TILE_H + y, 2)
+            val strength = abs(tone - 0.5f) * 2f
+            paint.color = (if (tone < 0.5f) Color.Black else Color.White).copy(alpha = strength)
+            canvas.drawRect(x.toFloat(), y.toFloat(), x + 1f, y + 1f, paint)
+        }
+    }
+    return ShaderBrush(ImageShader(image, TileMode.Repeated, TileMode.Repeated))
+}
+
 /** A repeatable pseudo-random value from 0 to 1 for a column of a band (the same every frame: no flicker). */
 private fun columnNoise(column: Int, band: Int): Float {
     var h = column * 73856093 xor band * 19349663
@@ -968,7 +1005,7 @@ private fun columnNoise(column: Int, band: Int): Float {
 }
 
 /** How the terrain is lit and veiled: the colour of the sky, the haze of every band, and where the sun is. */
-private class ReliefLight(val sky: Color, val haze: List<Float>, val sun: SunPosition?) {
+private class ReliefLight(val sky: Color, val haze: List<Float>, val sun: SunPosition?, val grain: Brush? = null) {
     /** How low the sun is, from 0 (high or unknown) to 1 (on the horizon): sunrise and sunset light. */
     private fun lowSun(): Float {
         val e = sun?.elevationDeg ?: return 0f
