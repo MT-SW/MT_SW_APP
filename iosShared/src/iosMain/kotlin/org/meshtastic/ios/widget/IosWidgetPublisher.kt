@@ -36,6 +36,7 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.writeToURL
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /** The shared folder of the app and its widget (App Group). */
@@ -49,12 +50,17 @@ private const val WIDGET_REFRESH = "MTSWWidgetRefresh"
 
 private val MIN_PUBLISH_INTERVAL = 30.seconds
 
+/** The widget is asked to reload at most this often: iOS limits the reloads and ignores them once they run out. */
+private val MIN_RELOAD_INTERVAL = 5.minutes
+
 /**
  * Publishes the statistics for the widget of iPhone/iPad: the same lines as the permanent notification on Android (the
  * shared [MeshStatsFeed]). Without the App Group (for example a build signed without it) nothing is written and the
  * widget shows a hint to open the app.
  */
 class IosWidgetPublisher(private val feed: MeshStatsFeed) {
+    private var lastReload = Clock.System.now() - MIN_RELOAD_INTERVAL
+
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
         feed.snapshots(withNodes = true).conflate().collect { snapshot ->
@@ -108,7 +114,11 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
         }
         val url: NSURL = folder.URLByAppendingPathComponent(WIDGET_FILE) ?: return
         NSString.create(string = json).writeToURL(url, atomically = true, encoding = NSUTF8StringEncoding, error = null)
-        NSNotificationCenter.defaultCenter.postNotificationName(WIDGET_REFRESH, null)
+        val now = Clock.System.now()
+        if (now - lastReload >= MIN_RELOAD_INTERVAL) {
+            lastReload = now
+            NSNotificationCenter.defaultCenter.postNotificationName(WIDGET_REFRESH, null)
+        }
     }
 }
 

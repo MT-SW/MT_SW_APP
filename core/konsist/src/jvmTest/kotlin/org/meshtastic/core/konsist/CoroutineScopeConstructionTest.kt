@@ -70,6 +70,7 @@ class CoroutineScopeConstructionTest {
             "core/service/commonMain/SharedRadioInterfaceService.kt",
             "core/service/commonMain/SharedRadioInterfaceService.kt",
             "core/takserver/jvmAndroidMain/TAKClientConnection.kt",
+            "desktopApp/main/DesktopLogging.kt",
             "desktopApp/main/DesktopMessageQueue.kt",
             "desktopApp/main/DesktopPreferencesDataSource.kt",
             "desktopApp/main/NoopStubs.kt",

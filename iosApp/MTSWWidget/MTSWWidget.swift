@@ -23,7 +23,9 @@ import WidgetKit
 private let appGroup = "group.pl.sw.mt"
 
 /// Co ile sekund widżet zmienia pokazywany węzeł (ulubione i pozostałe pokazują się na zmianę).
-private let rotationSeconds: Double = 300
+private let rotationSeconds: Double = 60
+/// Ile wpisów (minut) widżet ma z góry; po tym czasie sam ponownie czyta dane z pliku.
+private let timelineEntries = 15
 
 /// Jedna sekcja statystyk (Sieć, Węzeł, Radio, Zasoby, Łączność) z nagłówkiem.
 struct StatsGroup {
@@ -163,12 +165,12 @@ struct StatsProvider: AppIntentTimelineProvider {
     func timeline(for configuration: MTSWConfigIntent, in context: Context) async -> Timeline<StatsEntry> {
         let data = readStats()
         let now = Date()
-        // Wpisy co kilka minut z góry: widżet sam zmienia węzeł na zmianę, bez budzenia aplikacji.
-        let entries = (0..<12).map { index -> StatsEntry in
+        // Wpisy co minutę z góry: widżet sam zmienia węzeł na zmianę, bez budzenia aplikacji.
+        let entries = (0..<timelineEntries).map { index -> StatsEntry in
             let date = now.addingTimeInterval(Double(index) * rotationSeconds)
             return StatsEntry(date: date, data: data, step: stepOf(date), config: configuration)
         }
-        return Timeline(entries: entries, policy: .after(now.addingTimeInterval(rotationSeconds * 12)))
+        return Timeline(entries: entries, policy: .after(now.addingTimeInterval(rotationSeconds * Double(timelineEntries))))
     }
 }
 
