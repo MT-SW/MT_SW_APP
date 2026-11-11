@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: karty ulubionych i pozostałych węzłów w widżecie pokazują też napięcie, czas od ostatniej aktywności, liczbę skoków oraz rolę i model urządzenia. Android: widżet przełącza węzły co minutę, tak jak na iPhonie.
 * Wszystkie wersje: planer — „Pokaż na mapie” dodaje budynki jako osobne warstwy: dla trasy budynki wzdłuż niej (zasłaniające widoczność na czerwono), dla zasięgu budynki w zasięgu jako tło (od 15 km tylko wysokie); przełącznik w ustawieniach radia, domyślnie włączony.
 * Wszystkie wersje: w panoramie terenu budynki są rysowane jak bryły: ściana ciemniejsza ku dołowi, jaśniejszy dach na górze, ciemna krawędź tam, gdzie wysokość się zmienia, a dalsze zlewają się z niebem.
 * Android i iPhone/iPad: w widżecie statystyk zamiast liczby aktywnych węzłów w rogu jest plakietka naszego węzła (jego kolor i krótka nazwa, jak na mapie); w większych widżetach karty innych węzłów mają pełną nazwę po jednej stronie, a plakietkę z krótką nazwą po drugiej.
@@ -633,6 +634,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: the favorite and other node cards in the widget also show the voltage, the time since the last activity, the number of hops, and the device role and model. Android: the widget switches nodes every minute, as on the iPhone.
 * All versions: planner — "Show on map" adds the buildings as layers of their own: for a route the buildings along it (those blocking the line of sight in red), for a coverage the buildings in range as a backdrop (only tall ones from 15 km); a switch in the radio settings, on by default.
 * All versions: in the terrain panorama buildings are drawn as solids: the wall darkens toward the foot, a lighter roof on top, a dark edge where the height steps, and farther ones fade toward the sky.
 * Android and iPhone/iPad: in the statistics widget the corner shows our node's chip (its colour and short name, as on the map) instead of the online count; in the bigger widgets the other nodes' cards have the full name on one side and the chip with the short name on the other.

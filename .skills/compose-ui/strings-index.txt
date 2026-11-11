@@ -3458,6 +3458,10 @@ widget_adaptive_off_summary
 widget_adaptive_title
 widget_adaptive_track_in
 widget_adaptive_tracking_shown
+widget_card_heard
+widget_card_hops
+widget_card_model
+widget_card_voltage
 widget_content_expand_info
 widget_content_favorites
 widget_content_info

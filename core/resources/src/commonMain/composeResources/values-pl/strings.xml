@@ -3846,4 +3846,8 @@
     <string name="planner_buildings_on_map">Pokaż budynki na mapie (trasa: zasłaniające widoczność na czerwono; zasięg: tło)</string>
     <string name="planner_layer_buildings_link">Planer: budynki na trasie (© OpenStreetMap)</string>
     <string name="planner_layer_buildings_area">Planer: budynki w zasięgu (© OpenStreetMap)</string>
+    <string name="widget_card_voltage">Napięcie: %1$s V</string>
+    <string name="widget_card_heard">Słyszany %1$s temu</string>
+    <string name="widget_card_hops">Skoków: %1$d</string>
+    <string name="widget_card_model">%1$s · %2$s</string>
 </resources>

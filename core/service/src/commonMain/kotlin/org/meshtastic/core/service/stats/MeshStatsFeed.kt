@@ -19,6 +19,7 @@ package org.meshtastic.core.service.stats
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -36,6 +37,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.live_update_signal
+import org.meshtastic.core.resources.widget_card_heard
+import org.meshtastic.core.resources.widget_card_hops
+import org.meshtastic.core.resources.widget_card_model
+import org.meshtastic.core.resources.widget_card_voltage
 import org.meshtastic.core.resources.local_stats_uptime
 import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.proto.LocalStats
@@ -220,6 +225,17 @@ class MeshStatsFeed(
                 ),
             )
         }
+        metrics.voltage?.let {
+            add(getStringSuspend(Res.string.widget_card_voltage, NumberFormatter.format(it.toDouble(), 2)))
+        }
+        if (node.lastHeard != 0) {
+            val ago = (Clock.System.now().epochSeconds - node.lastHeard).coerceAtLeast(0)
+            add(getStringSuspend(Res.string.widget_card_heard, formatDurationSuspend(ago)))
+        }
+        if (node.hopsAway >= 0) add(getStringSuspend(Res.string.widget_card_hops, node.hopsAway))
+        val role = node.user.role.name
+        val model = node.user.hw_model.name
+        add(getStringSuspend(Res.string.widget_card_model, role, model))
     }
 }
 
