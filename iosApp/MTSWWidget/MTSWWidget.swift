@@ -47,6 +47,7 @@ struct StatsData {
     var groups: [StatsGroup]
     var favorites: [NodeCard]
     var others: [NodeCard]
+    var network: [NodeCard]
 }
 
 struct StatsEntry: TimelineEntry {
@@ -133,7 +134,8 @@ private func readStats() -> StatsData? {
             StatsGroup(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [])
         },
         favorites: readCards(json["favorites"]),
-        others: readCards(json["others"])
+        others: readCards(json["others"]),
+        network: readCards(json["network"])
     )
 }
 
@@ -150,7 +152,7 @@ struct StatsProvider: AppIntentTimelineProvider {
                             lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"],
                             groups: [StatsGroup(title: isPolish ? "Sieć" : "Network",
                                                 lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"])],
-                            favorites: [card], others: [card]),
+                            favorites: [card], others: [card], network: [card]),
             step: 0, config: MTSWConfigIntent())
     }
 
@@ -322,13 +324,17 @@ struct StatsView: View {
             let other = NodeCardView(
                 label: isPolish ? "Inny węzeł sieci" : "Other node", cards: data.others, step: entry.step,
                 empty: isPolish ? "Brak innych węzłów." : "No other nodes.")
+            // Mniejsze widżety: cała sieć bez naszego węzła, razem z ulubionymi.
+            let network = NodeCardView(
+                label: isPolish ? "Węzeł sieci" : "Network node", cards: data.network, step: entry.step,
+                empty: isPolish ? "Brak innych węzłów." : "No other nodes.")
             switch family {
             case .systemLarge:
                 // Góra: zawsze nasz węzeł. Dół: ulubione albo cała sieć na zmianę (do wyboru w ustawieniach widżetu).
                 VStack(alignment: .leading, spacing: 6) {
                     OwnStatsView(data: data).frame(maxHeight: .infinity)
                     Divider()
-                    (entry.config.second == .favorites ? favorite : other).frame(maxHeight: .infinity)
+                    (entry.config.second == .favorites ? favorite : network).frame(maxHeight: .infinity)
                 }
             case .systemExtraLarge:
                 // Największy (4x6 na iPhonie, szeroki na iPadzie): nasz węzeł, ulubione i reszta sieci (bez ulubionych i bez nas).
@@ -358,7 +364,7 @@ struct StatsView: View {
                 switch entry.config.small {
                 case .own: OwnStatsView(data: data)
                 case .favorites: favorite
-                case .network: other
+                case .network: network
                 }
             }
         } else {

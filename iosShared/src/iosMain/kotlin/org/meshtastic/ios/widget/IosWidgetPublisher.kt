@@ -76,7 +76,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
             "\"groups\":[${snapshot.groups.joinToString(",") { group ->
                 "{\"title\":${quote(group.title)},\"lines\":${lines(group.lines)}}"
             }}]," +
-            "\"favorites\":${cards(snapshot.favorites)},\"others\":${cards(snapshot.others)}}"
+            "\"favorites\":${cards(snapshot.favorites)},\"others\":${cards(snapshot.others)},\"network\":${cards(snapshot.network)}}"
 
     private fun lines(lines: List<String>): String = "[${lines.joinToString(",") { quote(it) }}]"
 

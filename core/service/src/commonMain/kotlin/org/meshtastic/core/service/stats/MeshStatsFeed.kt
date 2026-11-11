@@ -52,6 +52,8 @@ data class MeshStatsSnapshot(
     val favorites: List<MeshStatsNodeCard> = emptyList(),
     /** Readings of the other nodes of the mesh (heard most recently first), one card each. */
     val others: List<MeshStatsNodeCard> = emptyList(),
+    /** The whole mesh without our node, favorites included (what the smaller widgets show for "the whole network"). */
+    val network: List<MeshStatsNodeCard> = emptyList(),
 )
 
 /** The readings of one node: its name and the lines (battery, signal, uptime, channel use). */
@@ -154,6 +156,8 @@ class MeshStatsFeed(
             groups,
             favorites = favorites.map { card(it) },
             others = rest.take(CARD_LIMIT).map { card(it) },
+            network =
+            others.filter { it.lastHeard > 0 }.sortedByDescending { it.lastHeard }.take(CARD_LIMIT).map { card(it) },
         )
     }
 
