@@ -42,7 +42,6 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
-import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.precisionCirclesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -229,19 +228,13 @@ fun NodeLayers(
     // the node whose chip image did not fit under NodeChipLayer's ceiling — without it such a node resolves to a
     // transparent sprite and is both unseeable and untappable, which is worse than the plain dot chips replaced.
     CircleLayer(
-        id = "node-dot",
+        id = NODE_DOT_LAYER_ID,
         source = nodeSource,
         filter = !feature.has("point_count"),
         color = feature[NodeFeatureKeys.BACKGROUND].convertToColor(const(Color.Gray)),
         radius = const(NODE_DOT_RADIUS.dp),
         strokeColor = const(Color.White),
         strokeWidth = const(2.dp),
-        onClick = { features ->
-            features.firstOrNull()?.properties?.get(NodeFeatureKeys.NODE_NUM)?.let { nodeNum ->
-                nodeNum.lenientInt()?.let(onNodeClick)
-                ClickResult.Consume
-            } ?: ClickResult.Pass
-        },
     )
 
     NodeChipLayer(
@@ -250,20 +243,6 @@ fun NodeLayers(
         nodes = chipNodes,
         onNodeClick = onNodeClick,
         chipFilter = !feature.has("point_count"),
-        onStack = onClusterMembers,
-    )
-
-    // The tappable area of a chip. A symbol layer with generated images is not reliably hit by a tap on iPhone, and
-    // the dot under the chip is only 4 dp wide, so an invisible circle covers the chip's body (it stands above the
-    // node's spot) and a tap anywhere on the name opens the node.
-    CircleLayer(
-        id = "node-hit",
-        source = nodeSource,
-        filter = !feature.has("point_count"),
-        color = const(Color.Transparent),
-        radius = const(NODE_HIT_RADIUS.dp),
-        translate = const(DpOffset(0.dp, (-NODE_HIT_LIFT).dp)),
-        onClick = { features -> nodeTap(features, onNodeClick, onClusterMembers) },
     )
 
     focusedNode?.let { FocusedNodeLayer(node = it, myNodeNum = myNodeNum, onNodeClick = onNodeClick) }
@@ -289,6 +268,9 @@ private fun FocusedNodeLayer(node: Node, myNodeNum: Int?, onNodeClick: (Int) -> 
     )
     NodeChipLayer(id = "node-focus-chip", source = source, nodes = listOf(node), onNodeClick = onNodeClick)
 }
+
+/** The layer at every unclustered node's exact spot; the tap hit-test looks for it (see [nodeTapAt]). */
+internal const val NODE_DOT_LAYER_ID = "node-dot"
 
 private const val FOCUS_RING_RADIUS = 16
 private const val FOCUS_RING_STROKE = 3
@@ -335,8 +317,6 @@ private fun rememberDrawnNodes(nodes: List<Node>): List<Node> {
 
 /** Small enough that a chip drawn over it hides it completely. */
 private const val NODE_DOT_RADIUS = 4
-private const val NODE_HIT_RADIUS = 34
-private const val NODE_HIT_LIFT = 22
 
 private const val PRECISION_FILL_OPACITY = 0.15f
 private const val CLUSTER_OPACITY = 0.9f

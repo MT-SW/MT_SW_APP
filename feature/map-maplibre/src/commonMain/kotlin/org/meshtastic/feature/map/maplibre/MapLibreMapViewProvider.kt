@@ -184,6 +184,8 @@ class MapLibreMapViewProvider(
                 modifier = Modifier.fillMaxSize(),
                 basemap = basemaps.current,
                 onMapLongClick = waypoints.onLongPress,
+                onNodeClick = navigateToNodeDetails,
+                onNodeStack = { screen.clusterMembers = it },
                 onMapClick = { position ->
                     // While the Planner is waiting for a point, the tap belongs to it rather than to the waypoint
                     // tools.

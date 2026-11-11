@@ -90,6 +90,7 @@ import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeLayers
+import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
 import org.meshtastic.feature.map.maplibre.layers.NodeLinkLayers
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
@@ -279,6 +280,10 @@ fun MeshMap(
     onMapLongClick: (Position) -> Unit = {},
     /** Called with the tapped position. Used to collect the two corners of a waypoint's geofence bounding box. */
     onMapClick: (Position) -> Unit = {},
+    /** Called with a node whose name bubble was tapped. */
+    onNodeClick: ((Int) -> Unit)? = null,
+    /** Called with the nodes standing on one spot when a tap lands on that stack. */
+    onNodeStack: ((List<ClusterMember>) -> Unit)? = null,
 ) {
     // No engine on this device means presenting a map is the UnsatisfiedLinkError crash in #7001. Covers the view
     // only: `rememberMapState` builds the native runtime itself, so a runtime that cannot come up at all has already
@@ -319,8 +324,20 @@ fun MeshMap(
                     click {
                         onEvent { event ->
                             Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
-                            event.position?.let(onMapClick)
-                            ClickResult.Pass
+                            val tap = event.position
+                            val projection = mapState.projection
+                            // A tap on a node's name bubble belongs to the node, whatever the zoom or rotation.
+                            val onNode =
+                                tap != null &&
+                                    projection != null &&
+                                    onNodeClick != null &&
+                                    nodeTapAt(projection, tap, onNodeClick, onNodeStack ?: {})
+                            if (onNode) {
+                                ClickResult.Consume
+                            } else {
+                                tap?.let(onMapClick)
+                                ClickResult.Pass
+                            }
                         }
                     }
                 }
