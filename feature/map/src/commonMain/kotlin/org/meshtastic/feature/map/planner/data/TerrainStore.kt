@@ -38,7 +38,7 @@ class TerrainStore(
     fun has(tile: TileIndex): Boolean = fileSystem.exists(pathOf(tile))
 
     /** Saved tiles older than this many days are fetched again. */
-    @Volatile var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
+    var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
 
     /** Reads the chosen age again (the choice is made in the panorama and kept in the settings). */
     suspend fun refreshAge() {

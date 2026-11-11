@@ -41,7 +41,7 @@ class BuildingStore(
     private val piecesDirectory: Path = directory / "pieces"
 
     /** Saved pieces older than this many days are downloaded again. */
-    @Volatile var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
+    var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
 
     private class Area(val lat: Double, val lon: Double, val radiusKm: Int, val path: Path)
 
