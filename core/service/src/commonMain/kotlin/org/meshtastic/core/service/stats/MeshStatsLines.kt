@@ -43,6 +43,11 @@ import org.meshtastic.core.resources.local_stats_traffic
 import org.meshtastic.core.resources.local_stats_uptime
 import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.core.resources.powered
+import org.meshtastic.core.resources.widget_group_connections
+import org.meshtastic.core.resources.widget_group_network
+import org.meshtastic.core.resources.widget_group_node
+import org.meshtastic.core.resources.widget_group_radio
+import org.meshtastic.core.resources.widget_group_resources
 import org.meshtastic.proto.LocalStats
 
 private const val MAX_BATTERY_LEVEL = 100
@@ -53,7 +58,10 @@ private const val BYTES_PER_KB = 1024.0
  * widgets of iPhone/iPad and the computer).
  */
 object MeshStatsLines {
-    /** [lnaGain] is the display-only correction of the noise floor (the same as in the app). */
+    /** One titled block of statistics, for the widgets that show them in sections. */
+    data class Group(val title: String, val lines: List<String>)
+
+    /** The flat lines, in the order of the groups of [meshStatusGroups]. */
     @Suppress("LongParameterList")
     suspend fun meshStatus(
         nodesOnline: Int,
@@ -63,18 +71,55 @@ object MeshStatsLines {
         localStats: LocalStats?,
         extended: LocalStatsExtended?,
         lnaGain: Int = 0,
-    ): List<String> = buildList {
-        add(getStringSuspend(Res.string.live_update_nodes_online, nodesOnline, nodesTotal))
-        add(getStringSuspend(Res.string.live_update_unread, unread))
-        // Grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime, traffic,
-        // diagnostics), the resources (CPU, RAM, flash, PSRAM) and the connections (Wi-Fi, Bluetooth).
-        if (localStats != null) {
-            addAll(localStatsLines(localStats, radioBattery, lnaGain))
-        } else {
+    ): List<String> = meshStatusGroups(
+        nodesOnline,
+        nodesTotal,
+        unread,
+        radioBattery,
+        localStats,
+        extended,
+        lnaGain,
+    )
+        .flatMap { it.lines }
+
+    /**
+     * The statistics grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime,
+     * traffic, diagnostics), the resources (CPU, RAM, flash, PSRAM) and the connections (Wi-Fi, Bluetooth). Empty
+     * groups are left out. [lnaGain] is the display-only correction of the noise floor (the same as in the app).
+     */
+    @Suppress("LongParameterList")
+    suspend fun meshStatusGroups(
+        nodesOnline: Int,
+        nodesTotal: Int,
+        unread: Int,
+        radioBattery: Int?,
+        localStats: LocalStats?,
+        extended: LocalStatsExtended?,
+        lnaGain: Int = 0,
+    ): List<Group> {
+        val network =
+            listOf(
+                getStringSuspend(Res.string.live_update_nodes_online, nodesOnline, nodesTotal),
+                getStringSuspend(Res.string.live_update_unread, unread),
+            )
+        val node = buildList {
             radioBattery?.let { add(batteryText(it)) }
+            localStats?.let {
+                add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.uptime_seconds.toLong())))
+            }
         }
+        val radio = localStats?.let { radioLines(it, lnaGain) }.orEmpty()
         val heapLine = localStats?.let { heapLine(it) }
-        addAll(extendedLines(extended, ramAlreadyShown = heapLine != null, ramLine = heapLine))
+        val resources = resourceLines(extended, ramAlreadyShown = heapLine != null, ramLine = heapLine)
+        val connections = connectionLines(extended)
+        return listOf(
+            Group(getStringSuspend(Res.string.widget_group_network), network),
+            Group(getStringSuspend(Res.string.widget_group_node), node),
+            Group(getStringSuspend(Res.string.widget_group_radio), radio),
+            Group(getStringSuspend(Res.string.widget_group_resources), resources),
+            Group(getStringSuspend(Res.string.widget_group_connections), connections),
+        )
+            .filter { it.lines.isNotEmpty() }
     }
 
     suspend fun batteryText(level: Int): String = if (level > MAX_BATTERY_LEVEL) {
@@ -84,9 +129,7 @@ object MeshStatsLines {
     }
 
     @Suppress("LongMethod", "CyclomaticComplexMethod")
-    private suspend fun localStatsLines(stats: LocalStats, batteryLevel: Int?, lnaGain: Int): List<String> = buildList {
-        batteryLevel?.let { add(batteryText(it)) }
-        add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(stats.uptime_seconds.toLong())))
+    private suspend fun radioLines(stats: LocalStats, lnaGain: Int): List<String> = buildList {
         add(
             getStringSuspend(
                 Res.string.local_stats_utilization,
@@ -137,7 +180,7 @@ object MeshStatsLines {
     }
 
     @Suppress("CyclomaticComplexMethod")
-    suspend fun extendedLines(
+    private suspend fun resourceLines(
         ext: LocalStatsExtended?,
         ramAlreadyShown: Boolean,
         ramLine: String? = null,
@@ -179,6 +222,12 @@ object MeshStatsLines {
                     ),
                 )
             }
+        }
+    }
+
+    private suspend fun connectionLines(ext: LocalStatsExtended?): List<String> {
+        if (ext == null) return emptyList()
+        return buildList {
             if (ext.wifiRssi != 0) add(getStringSuspend(Res.string.live_update_wifi, ext.wifiRssi))
             if (ext.bleRssi != 0) add(getStringSuspend(Res.string.live_update_ble, ext.bleRssi))
         }

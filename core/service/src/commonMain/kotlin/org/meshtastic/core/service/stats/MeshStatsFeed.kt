@@ -41,7 +41,14 @@ import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.proto.LocalStats
 
 /** What a widget shows: a title, a short chip (nodes online/all), whether the radio is connected, and the lines. */
-data class MeshStatsSnapshot(val title: String, val chip: String, val connected: Boolean, val lines: List<String>)
+data class MeshStatsSnapshot(
+    val title: String,
+    val chip: String,
+    val connected: Boolean,
+    val lines: List<String>,
+    /** The same readings in titled sections (network, node, radio, resources, connections) for the iPhone widget. */
+    val groups: List<MeshStatsLines.Group> = emptyList(),
+)
 
 /**
  * The statistics of the permanent notification on Android (mesh status, or one tracked node when chosen in the adaptive
@@ -95,13 +102,15 @@ class MeshStatsFeed(
         val tracked = (mode as? LiveUpdateMode.TrackNode)?.let { nodes.nodeDBbyNum.value[it.nodeNum] }
         val title: String
         val lines: List<String>
+        val groups: List<MeshStatsLines.Group>
         if (tracked != null) {
             title = tracked.effectiveLongName
             lines = trackedLines(tracked)
+            groups = listOf(MeshStatsLines.Group("", lines))
         } else {
             title = our?.effectiveLongName?.takeIf { it.isNotBlank() } ?: "MT_SW"
-            lines =
-                MeshStatsLines.meshStatus(
+            groups =
+                MeshStatsLines.meshStatusGroups(
                     nodesOnline = b.online,
                     nodesTotal = b.total,
                     unread = b.unread,
@@ -110,8 +119,9 @@ class MeshStatsFeed(
                     extended = extended.takeIf { it != LocalStatsExtended() },
                     lnaGain = lnaGain,
                 )
+            lines = groups.flatMap { it.lines }
         }
-        return MeshStatsSnapshot(title, if (b.connected) "${b.online}/${b.total}" else "", b.connected, lines)
+        return MeshStatsSnapshot(title, if (b.connected) "${b.online}/${b.total}" else "", b.connected, lines, groups)
     }
 
     private suspend fun trackedLines(node: Node): List<String> = buildList {

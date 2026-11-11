@@ -24,6 +24,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.widget_updated
 import org.meshtastic.core.service.stats.MeshStatsFeed
+import org.meshtastic.core.service.stats.MeshStatsLines
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSFileManager
@@ -59,7 +60,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
             runCatching {
                 // The words on the widget follow the language of the app, not of the phone: the app writes them.
                 val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                write(json(snapshot.title, snapshot.chip, snapshot.lines, snapshot.connected, updated))
+                write(json(snapshot.title, snapshot.chip, snapshot.groups, snapshot.connected, updated))
             }
                 .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
             delay(MIN_PUBLISH_INTERVAL)
@@ -71,12 +72,14 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
     private fun json(
         title: String,
         chip: String,
-        lines: List<String>,
+        groups: List<MeshStatsLines.Group>,
         connected: Boolean,
         updatedText: String,
     ): String = "{\"title\":${quote(title)},\"chip\":${quote(chip)},\"connected\":$connected," +
         "\"updated\":${Clock.System.now().epochSeconds},\"updatedText\":${quote(updatedText)}," +
-        "\"lines\":[${lines.joinToString(",") { quote(it) }}]}"
+        "\"groups\":[${groups.joinToString(",") { group ->
+            "{\"title\":${quote(group.title)},\"lines\":[${group.lines.joinToString(",") { quote(it) }}]}"
+        }}]}"
 
     private fun quote(text: String): String = buildString {
         append('"')

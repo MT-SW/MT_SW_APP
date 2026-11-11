@@ -3405,6 +3405,11 @@ widget_adaptive_off_summary
 widget_adaptive_title
 widget_adaptive_track_in
 widget_adaptive_tracking_shown
+widget_group_connections
+widget_group_network
+widget_group_node
+widget_group_radio
+widget_group_resources
 widget_node_tracker_choose
 widget_node_tracker_not_found
 widget_node_tracker_title

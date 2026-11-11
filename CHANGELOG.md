@@ -18,7 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
-* Wszystkie wersje: statystyki w widżecie są ułożone w grupy: sieć (węzły, nieprzeczytane), węzeł (zasilanie, czas pracy), radio (eter, ruch, diagnostyka), zasoby (procesor, RAM, flash, PSRAM) i łączność (Wi-Fi, Bluetooth).
+* Wszystkie wersje: statystyki w widżecie są ułożone w grupy: sieć (węzły, nieprzeczytane), węzeł (zasilanie, czas pracy), radio (eter, ruch, diagnostyka), zasoby (procesor, RAM, flash, PSRAM) i łączność (Wi-Fi, Bluetooth). Na iPhonie i iPadzie widżet pokazuje je w sekcjach ze złotymi nagłówkami, w dwóch wyrównanych kolumnach.
 * Wszystkie wersje: nowy przełącznik w Funkcjach MT_SW „Pomijaj w wykresach odczyty ze złym czasem” (domyślnie włączony; wyłączony pokazuje w wykresach wszystkie odczyty).
 * Wszystkie wersje: widżet pokazuje szum z korektą wzmacniacza (LNA), tak jak aplikacja i powiadomienie.
 * Wszystkie wersje: w menu wyboru motywu nazwy kategorii są złote i większe niż pozycje.
@@ -610,7 +610,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
-* All versions: the widget statistics are arranged in groups: network (nodes, unread), the node (power, uptime), radio (airtime, traffic, diagnostics), resources (CPU, RAM, flash, PSRAM) and connections (Wi-Fi, Bluetooth).
+* All versions: the widget statistics are arranged in groups: network (nodes, unread), the node (power, uptime), radio (airtime, traffic, diagnostics), resources (CPU, RAM, flash, PSRAM) and connections (Wi-Fi, Bluetooth). On iPhone and iPad the widget shows them in sections with gold headings, in two balanced columns.
 * All versions: new switch in MT_SW features "Skip readings with a wrong time in charts" (on by default; off shows every reading in the charts).
 * All versions: the widget shows the noise floor with the amplifier (LNA) correction, like the app and the notification.
 * All versions: in the theme picker the category names are gold and larger than the options.

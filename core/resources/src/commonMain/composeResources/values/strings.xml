@@ -3483,6 +3483,11 @@
     <string name="widget_adaptive_title">Adaptive widget</string>
     <string name="widget_adaptive_track_in">Track on the widget</string>
     <string name="widget_adaptive_tracking_shown">Tracking %1$s on the home-screen widget</string>
+    <string name="widget_group_connections">Connections</string>
+    <string name="widget_group_network">Network</string>
+    <string name="widget_group_node">Node</string>
+    <string name="widget_group_radio">Radio</string>
+    <string name="widget_group_resources">Resources</string>
     <string name="widget_node_tracker_choose">Choose a node to track</string>
     <string name="widget_node_tracker_not_found">Node not found. Tap to choose a node.</string>
     <string name="widget_node_tracker_title">Node Tracker</string>

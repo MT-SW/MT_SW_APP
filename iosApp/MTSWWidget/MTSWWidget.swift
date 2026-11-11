@@ -21,6 +21,12 @@ import WidgetKit
 /// Wspólny folder aplikacji i widżetu (App Group). Z niego widżet czyta statystyki zapisane przez aplikację.
 private let appGroup = "group.pl.sw.mt"
 
+/// Jedna sekcja statystyk (Sieć, Węzeł, Radio, Zasoby, Łączność) z nagłówkiem.
+struct StatsGroup {
+    var title: String
+    var lines: [String]
+}
+
 struct StatsData {
     var title: String
     var chip: String
@@ -28,6 +34,7 @@ struct StatsData {
     var updated: Date
     var updatedText: String?
     var lines: [String]
+    var groups: [StatsGroup]
 }
 
 struct StatsEntry: TimelineEntry {
@@ -45,7 +52,10 @@ private func readStats() -> StatsData? {
         connected: json["connected"] as? Bool ?? false,
         updated: Date(timeIntervalSince1970: json["updated"] as? Double ?? 0),
         updatedText: json["updatedText"] as? String,
-        lines: json["lines"] as? [String] ?? []
+        lines: json["lines"] as? [String] ?? [],
+        groups: (json["groups"] as? [[String: Any]] ?? []).map {
+            StatsGroup(title: $0["title"] as? String ?? "", lines: $0["lines"] as? [String] ?? [])
+        }
     )
 }
 
@@ -54,7 +64,9 @@ private var isPolish: Bool { Locale.current.language.languageCode?.identifier ==
 struct StatsProvider: TimelineProvider {
     func placeholder(in context: Context) -> StatsEntry {
         StatsEntry(date: Date(), data: StatsData(title: "MT_SW", chip: "3/9", connected: true, updated: Date(), updatedText: nil,
-                                                 lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"]))
+                                                 lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"],
+                                                 groups: [StatsGroup(title: isPolish ? "Sieć" : "Network",
+                                                                     lines: ["3 z 9 węzłów online", "0 nieprzeczytanych"])]))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (StatsEntry) -> Void) {
@@ -64,6 +76,46 @@ struct StatsProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<StatsEntry>) -> Void) {
         let entry = StatsEntry(date: Date(), data: readStats())
         completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(15 * 60))))
+    }
+}
+
+/// Złoty kolor motywu MT_SW (nagłówki sekcji).
+private let gold = Color(red: 0.96, green: 0.78, blue: 0.22)
+
+/// Gdzie przeciąć listę sekcji, żeby kolumny były jak najbardziej wyrównane (nagłówek liczy się jak wiersz).
+private func splitIndex(_ groups: [StatsGroup]) -> Int {
+    let weights = groups.map { $0.lines.count + 1 }
+    let total = weights.reduce(0, +)
+    var best = 0
+    var bestDiff = Int.max
+    var left = 0
+    for index in 0...groups.count {
+        let diff = abs(total - 2 * left)
+        if diff < bestDiff { bestDiff = diff; best = index }
+        if index < groups.count { left += weights[index] }
+    }
+    return best
+}
+
+struct GroupColumn: View {
+    let groups: [StatsGroup]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
+                VStack(alignment: .leading, spacing: 1) {
+                    if !group.title.isEmpty {
+                        Text(group.title.uppercased())
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(gold)
+                    }
+                    ForEach(Array(group.lines.enumerated()), id: \.offset) { _, line in
+                        Text(line).font(.system(size: 10)).lineLimit(1).minimumScaleFactor(0.65)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 }
 
@@ -80,10 +132,20 @@ struct StatsView: View {
                         Text(data.chip).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
                     }
                 }
-                let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
-                    ForEach(Array(data.lines.prefix(14).enumerated()), id: \.offset) { _, line in
-                        Text(line).font(.system(size: 10)).lineLimit(2).minimumScaleFactor(0.8)
+                if data.groups.isEmpty() {
+                    let columns = [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 2) {
+                        ForEach(Array(data.lines.prefix(14).enumerated()), id: \.offset) { _, line in
+                            Text(line).font(.system(size: 10)).lineLimit(2).minimumScaleFactor(0.8)
+                        }
+                    }
+                } else {
+                    // Sekcje w dwóch kolumnach: kolejność zostaje logiczna (sieć, węzeł, radio | zasoby, łączność),
+                    // a miejsce dzielimy tak, żeby obie kolumny były podobnej wysokości.
+                    let split = splitIndex(data.groups)
+                    HStack(alignment: .top, spacing: 12) {
+                        GroupColumn(groups: Array(data.groups[..<split]))
+                        GroupColumn(groups: Array(data.groups[split...]))
                     }
                 }
                 Spacer(minLength: 0)
