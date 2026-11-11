@@ -80,7 +80,8 @@ internal object IosLogControl : AppLogControl {
     private const val REPORT_DIR = "reports"
     private const val KB = 1024
     private const val VIEW_SIZE = 1.0
-    private const val AUTO_NAME = "mt_sw_logi_najnowsze.zip"
+    private const val NAME_24H = "mt_sw_logi_24h.zip"
+    private const val NAME_FULL = "mt_sw_logi_pelne.zip"
     private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
     private const val BOOKMARK_FILE = "folder.bookmark"
     private const val NAME_FILE = "folder.name"
@@ -243,35 +244,41 @@ internal object IosLogControl : AppLogControl {
         } finally {
             if (opened) url.stopAccessingSecurityScopedResource()
         }
-        runCatching { FileSystem.SYSTEM.delete((iosDataDir() + "/logs/last_export.txt").toPath()) }
+        for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) {
+            runCatching { FileSystem.SYSTEM.delete((iosDataDir() + "/logs/" + marker).toPath()) }
+        }
         exportNow()
     }
 
-    /** Writes a fresh zip of the logs of the last 24 hours into the chosen folder; does nothing without one. */
-    @Suppress("ReturnCount")
+    /**
+     * Writes fresh zips into the chosen folder; does nothing without one: the logs of the last 24 hours (the automatic
+     * log) and, apart from it, the full log (only while it is on).
+     */
     fun exportNow() {
+        val crash = IosFileLog.crashFiles().isNotEmpty()
+        if (IosFileLog.recent.value || IosFileLog.level.value != AppLogLevel.OFF || crash) {
+            exportOne(NAME_24H, "last_export_24h.txt", allTime = false)
+        }
+        if (IosFileLog.level.value != AppLogLevel.OFF) exportOne(NAME_FULL, "last_export_full.txt", allTime = true)
+    }
+
+    @Suppress("ReturnCount")
+    private fun exportOne(name: String, markerName: String, allTime: Boolean) {
         runCatching {
-            // As on Android: only while the full log is on or a crash was recorded, and only when something is new.
-            // The log of the last 24 hours is on by default, so it counts too, not only the full log.
-            val wanted =
-                IosFileLog.level.value != AppLogLevel.OFF ||
-                    IosFileLog.recent.value ||
-                    IosFileLog.crashFiles().isNotEmpty()
-            if (!wanted) return
-            val files = IosFileLog.parts() + IosFileLog.crashFiles()
+            val since = if (allTime) 0L else IosFileLog.nowMillis() - IosFileLog.RECENT_WINDOW_MS
+            val files = (IosFileLog.parts() + IosFileLog.crashFiles()).filter { IosFileLog.modified(it) >= since }
             val fingerprint =
                 "${files.size}:${files.maxOfOrNull { IosFileLog.modified(it) } ?: 0L}:" +
                     "${files.sumOf { IosFileLog.size(it) }}"
-            val marker = (iosDataDir() + "/logs/last_export.txt").toPath()
+            val marker = (iosDataDir() + "/logs/" + markerName).toPath()
             if (runCatching { FileSystem.SYSTEM.read(marker) { readUtf8() } }.getOrNull() == fingerprint) return
             val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return
             val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
             val opened = url.startAccessingSecurityScopedResource()
             try {
                 val folder = url.path ?: return
-                val target = folder.toPath() / AUTO_NAME
-                val bytes = zip(reportEntries("", true, emptyList()))
-                FileSystem.SYSTEM.write(target) { write(bytes) }
+                val bytes = zip(reportEntries("", true, emptyList(), allTime))
+                FileSystem.SYSTEM.write(folder.toPath() / name) { write(bytes) }
                 FileSystem.SYSTEM.write(marker) { writeUtf8(fingerprint) }
             } finally {
                 if (opened) url.stopAccessingSecurityScopedResource()
@@ -284,12 +291,18 @@ internal object IosLogControl : AppLogControl {
         note: String,
         withLogs: Boolean,
         extras: List<Pair<String, ByteArray>>,
+        allTime: Boolean = false,
     ): List<Pair<String, ByteArray>> {
         val now = IosFileLog.nowMillis()
-        val since = if (withLogs) now - IosFileLog.RECENT_WINDOW_MS else Long.MAX_VALUE
+        val since =
+            when {
+                !withLogs -> Long.MAX_VALUE
+                allTime -> 0L
+                else -> now - IosFileLog.RECENT_WINDOW_MS
+            }
         val files = (IosFileLog.parts() + IosFileLog.crashFiles()).filter { IosFileLog.modified(it) >= since }
         val toc = StringBuilder("MT_SW log package, made ${IosFileLog.stamp()}\n${IosFileLog.header()}\n")
-        if (withLogs) toc.append("Only what was written in the last 24 hours\n")
+        if (withLogs && !allTime) toc.append("Only what was written in the last 24 hours\n")
         val all = listOf("opis_zgloszenia.txt" to note.encodeToByteArray()) + extras
         for ((name, bytes) in all) toc.append("$name: ${bytes.size / KB} KB\n")
         val logs = files.map { f -> (if (f.parent?.name == "crash") "crash/" else "") + f.name to read(f) }

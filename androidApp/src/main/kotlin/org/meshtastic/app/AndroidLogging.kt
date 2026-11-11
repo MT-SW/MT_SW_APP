@@ -64,10 +64,12 @@ import java.util.Date
  */
 internal object AndroidLogging {
     private const val TAG = "AppLifecycle"
-    private const val AUTO_NAME = "mt_sw_logi_najnowsze.zip"
+    private const val NAME_24H = "mt_sw_logi_24h.zip"
+    private const val NAME_FULL = "mt_sw_logi_pelne.zip"
     private const val FOLDER = "MT_SW_logi"
     private const val EXIT_REASONS_SHOWN = 6
-    private const val FINGERPRINT_NAME = "last_export.txt"
+    private const val FINGERPRINT_24H = "last_export_24h.txt"
+    private const val FINGERPRINT_FULL = "last_export_full.txt"
     private const val MB = 1024 * 1024
     private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
 
@@ -285,34 +287,42 @@ internal object AndroidLogging {
         }
             .getOrNull()
 
-        /** Refreshes the zip in Downloads when there is something new to put in it. */
+        /**
+         * Refreshes the zips in Downloads when there is something new to put in them: the log of the last 24 hours (the
+         * automatic one) and, apart from it, the full log (only while it is on).
+         */
         suspend fun autoExport() {
-            val wanted =
-                MtSwLogging.level.value != AppLogLevel.OFF ||
-                    MtSwLogging.recent.value ||
-                    MtSwLogging.crashFiles().isNotEmpty()
-            if (!wanted) return
-            val files = MtSwLogging.parts() + MtSwLogging.crashFiles()
+            val crash = MtSwLogging.crashFiles().isNotEmpty()
+            if (MtSwLogging.recent.value || MtSwLogging.level.value != AppLogLevel.OFF || crash) {
+                val since = System.currentTimeMillis() - MtSwLogging.RECENT_WINDOW_MS
+                exportIfNew(NAME_24H, FINGERPRINT_24H, since)
+            }
+            if (MtSwLogging.level.value != AppLogLevel.OFF) exportIfNew(NAME_FULL, FINGERPRINT_FULL, 0L)
+        }
+
+        private suspend fun exportIfNew(name: String, markerName: String, since: Long) {
+            val files = (MtSwLogging.parts() + MtSwLogging.crashFiles()).filter { it.lastModified() >= since }
             val fingerprint =
                 "${files.size}:${files.maxOfOrNull { it.lastModified() } ?: 0L}:${files.sumOf { it.length() }}"
-            val marker = File(dir, FINGERPRINT_NAME)
+            val marker = File(dir, markerName)
             if (runCatching { marker.readText() }.getOrNull() == fingerprint) return
-            if (export(AUTO_NAME, overwrite = true) != null) runCatching { marker.writeText(fingerprint) }
+            if (export(name, overwrite = true, since = since) != null) runCatching { marker.writeText(fingerprint) }
         }
 
-        private suspend fun export(name: String, overwrite: Boolean): String? = withContext(Dispatchers.IO) {
-            runCatching {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    exportToDownloads(name, overwrite)
-                } else {
-                    exportLegacy(name)
+        private suspend fun export(name: String, overwrite: Boolean, since: Long): String? =
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        exportToDownloads(name, overwrite, since)
+                    } else {
+                        exportLegacy(name, since)
+                    }
                 }
+                    .onFailure { Logger.w(it, tag = TAG) { "Log export failed" } }
+                    .getOrNull()
             }
-                .onFailure { Logger.w(it, tag = TAG) { "Log export failed" } }
-                .getOrNull()
-        }
 
-        private fun exportToDownloads(name: String, overwrite: Boolean): String? {
+        private fun exportToDownloads(name: String, overwrite: Boolean, since: Long): String? {
             val resolver = app.contentResolver
             val relative = "${Environment.DIRECTORY_DOWNLOADS}/$FOLDER/"
             val collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
@@ -343,7 +353,7 @@ internal object AndroidLogging {
                         },
                     )
                     ?: return null
-            resolver.openOutputStream(uri, "wt")?.use { MtSwLogging.writeZip(it) } ?: return null
+            resolver.openOutputStream(uri, "wt")?.use { MtSwLogging.writeReportZip(it, since) } ?: return null
             return "Pobrane/$FOLDER/$name"
         }
 
@@ -352,14 +362,14 @@ internal object AndroidLogging {
          * folder.
          */
         @Suppress("DEPRECATION")
-        private fun exportLegacy(name: String): String? {
+        private fun exportLegacy(name: String, since: Long): String? {
             val publicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), FOLDER)
             val target = runCatching {
                 publicDir.mkdirs()
                 File(publicDir, name).also { it.outputStream().close() }
             }
                 .getOrElse { File(app.getExternalFilesDir(null) ?: dir, name) }
-            target.outputStream().use { MtSwLogging.writeZip(it) }
+            target.outputStream().use { MtSwLogging.writeReportZip(it, since) }
             return target.absolutePath
         }
     }
