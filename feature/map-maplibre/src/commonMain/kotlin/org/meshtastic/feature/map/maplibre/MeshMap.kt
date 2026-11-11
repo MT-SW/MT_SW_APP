@@ -191,7 +191,7 @@ fun rememberMeshMapState(
     val mapState =
         rememberMapState(baseStyle = basemap.toBaseStyle(), initialCameraPosition = initialCameraPosition) {
             val state = checkNotNull(LocalMapState.current)
-            // Whole zoom levels only: the contour tiles follow the level, so a pinch does not hand them a new value per frame.
+            // Whole zoom levels only: the contour tiles follow the level, not every frame of a pinch.
             val zoomLevel by remember(state) { derivedStateOf { state.cameraPosition.zoom.toInt() } }
             // The viewport local, rather than the state's own property: it is what the library scopes viewport
             // recomposition to, and these reads are the whole reason this block runs per frame.
