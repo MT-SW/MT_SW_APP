@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Listopad 2026
 
 * Wszystkie wersje: przełącznik „Synchronizuj statystyki automatycznie” ma teraz własny opis (co robi i kiedy).
+* Wszystkie wersje: ikona aplikacji jest bardziej „żywa” i przestrzenna: gradient tła, połysk u góry, cień i wypukłe krawędzie znaku (ikona standardowa i ciemna; przezroczysta i jednokolorowa bez zmian).
 * Android: widżet ma własny wybór w Funkcjach MT_SW („Widżet adaptacyjny”): cała sieć albo jeden węzeł, niezależnie od powiadomienia. Statystyki w widżecie są ułożone w grupy z nagłówkami, tak jak na iPhonie.
 * Android: usunięte widżety niedodane przez nas („Statystyki lokalne” i „Śledzenie węzła”). Został tylko widżet MT_SW.
 * Wszystkie wersje: statystyki w widżecie są ułożone w grupy: sieć (węzły, nieprzeczytane), węzeł (zasilanie, czas pracy), radio (eter, ruch, diagnostyka), zasoby (procesor, RAM, flash, PSRAM) i łączność (Wi-Fi, Bluetooth). Na iPhonie i iPadzie widżet pokazuje je w sekcjach ze złotymi nagłówkami, w dwóch wyrównanych kolumnach.
@@ -614,6 +615,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### November 2026
 
 * All versions: the "Synchronize statistics automatically" switch now has its own description (what it does and when).
+* All versions: the app icon is livelier and has depth: a background gradient, a gloss at the top, a shadow and raised edges on the mark (standard and dark icons; clear and tinted unchanged).
 * Android: the widget has its own choice in MT_SW features ("Adaptive widget"): the whole mesh or one node, apart from the notification. The statistics on the widget are arranged in groups with headings, like on iPhone.
 * Android: removed the widgets we did not add ("Local stats" and "Node tracker"). Only the MT_SW widget remains.
 * All versions: the widget statistics are arranged in groups: network (nodes, unread), the node (power, uptime), radio (airtime, traffic, diagnostics), resources (CPU, RAM, flash, PSRAM) and connections (Wi-Fi, Bluetooth). On iPhone and iPad the widget shows them in sections with gold headings, in two balanced columns.
