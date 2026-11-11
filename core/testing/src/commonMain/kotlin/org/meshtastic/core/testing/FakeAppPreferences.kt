@@ -402,6 +402,12 @@ class FakeUiPrefs : UiPrefs {
         skipBadTimeChartPoints.value = value
     }
 
+    override val androidWidgetNode = MutableStateFlow(0)
+
+    override fun setAndroidWidgetNode(nodeNum: Int) {
+        androidWidgetNode.value = nodeNum
+    }
+
     override val autoLoadChatImages = MutableStateFlow(false)
 
     override fun setAutoLoadChatImages(value: Boolean) {

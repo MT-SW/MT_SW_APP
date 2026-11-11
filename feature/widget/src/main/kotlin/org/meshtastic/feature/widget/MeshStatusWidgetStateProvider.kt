@@ -38,5 +38,5 @@ class MeshStatusWidgetStateProvider(feed: MeshStatsFeed) {
 
     @OptIn(FlowPreview::class)
     val state: StateFlow<MeshStatsSnapshot?> =
-        feed.snapshots().sample(MESH_STATUS_SAMPLE_MS).stateIn(scope, SharingStarted.Eagerly, null)
+        feed.snapshots(ownChoice = true).sample(MESH_STATUS_SAMPLE_MS).stateIn(scope, SharingStarted.Eagerly, null)
 }

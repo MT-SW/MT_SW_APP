@@ -183,6 +183,14 @@ interface UiPrefs {
 
     fun setSkipBadTimeChartPoints(value: Boolean)
 
+    /**
+     * MT_SW: what the Android widget shows, chosen apart from the notification: 0 is the whole mesh, any other number is
+     * the node to track.
+     */
+    val androidWidgetNode: StateFlow<Int>
+
+    fun setAndroidWidgetNode(nodeNum: Int)
+
     /** MT_SW: the import / share / add-contact button sits in the top bar instead of floating over the list. */
     val importMenuInTopBar: StateFlow<Boolean>
 

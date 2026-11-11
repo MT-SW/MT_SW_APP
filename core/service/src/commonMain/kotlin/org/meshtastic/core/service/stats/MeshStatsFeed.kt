@@ -64,7 +64,17 @@ class MeshStatsFeed(
 ) {
     private data class Basics(val online: Int, val total: Int, val unread: Int, val connected: Boolean)
 
-    fun snapshots(): Flow<MeshStatsSnapshot> {
+    /**
+     * [ownChoice]: follow the widget's own choice (Android Settings) instead of the adaptive notification's mode, which
+     * the iPhone widget still uses.
+     */
+    fun snapshots(ownChoice: Boolean = false): Flow<MeshStatsSnapshot> {
+        val modeFlow: Flow<LiveUpdateMode> =
+            if (ownChoice) {
+                uiPrefs.androidWidgetNode.map { if (it == 0) LiveUpdateMode.MeshStatus else LiveUpdateMode.TrackNode(it) }
+            } else {
+                prefs.mode
+            }
         val basics: Flow<Basics> =
             combine(
                 nodes.onlineNodeCount,
@@ -77,7 +87,7 @@ class MeshStatsFeed(
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
         // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
-        return combine(basics, stats, prefs.mode, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) {
+        return combine(basics, stats, modeFlow, nodes.nodeDBbyNum.map { it.size }, uiPrefs.lnaGains) {
                 b,
                 s,
                 mode,

@@ -38,6 +38,7 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
+import org.meshtastic.feature.settings.liveupdate.AndroidWidgetChoiceItem
 import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 
 /** The row "Widżet statystyk": a scrollable information window about the widget and how to add it. */
@@ -57,8 +58,12 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
             )
         }
         // Where the adaptive display is a widget (iPhone, iPad) its choice (whole mesh or one node) is made right here.
-        if (rememberLiveUpdateSupport().widget) {
+        val support = rememberLiveUpdateSupport()
+        if (support.widget) {
             LiveUpdateSection(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+        } else if (support.available) {
+            // Android: the widget has its own choice, apart from the adaptive notification.
+            AndroidWidgetChoiceItem()
         }
         ListItem(
             text = stringResource(Res.string.widget_stats_title),

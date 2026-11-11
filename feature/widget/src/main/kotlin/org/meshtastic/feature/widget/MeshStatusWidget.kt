@@ -116,19 +116,28 @@ class MeshStatusWidget :
                     } else {
                         val columns = if (size.width.value >= TWO_COLUMNS_FROM_DP) 2 else 1
                         val rows = ((size.height.value - HEADER_DP) / LINE_HEIGHT_DP).toInt().coerceAtLeast(1)
-                        val shown = snapshot.lines.take(rows * columns)
-                        val perColumn = (shown.size + columns - 1) / columns
+                        val entries = snapshot.entries().take(rows * columns)
                         Row(modifier = GlanceModifier.fillMaxWidth()) {
-                            shown.chunked(perColumn).forEachIndexed { index, part ->
+                            entries.splitColumns(columns).forEachIndexed { index, part ->
                                 Column(
                                     modifier =
                                     GlanceModifier.defaultWeight().padding(end = if (index == 0) 4.dp else 0.dp),
                                 ) {
-                                    part.forEach { line ->
+                                    part.forEach { entry ->
                                         Text(
-                                            text = line,
+                                            text = entry.text,
                                             maxLines = 1,
-                                            style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 11.sp),
+                                            style =
+                                            TextStyle(
+                                                color =
+                                                if (entry.header) {
+                                                    GlanceTheme.colors.primary
+                                                } else {
+                                                    GlanceTheme.colors.onSurface
+                                                },
+                                                fontSize = 11.sp,
+                                                fontWeight = if (entry.header) FontWeight.Bold else FontWeight.Normal,
+                                            ),
                                         )
                                     }
                                 }
@@ -139,4 +148,27 @@ class MeshStatusWidget :
             }
         }
     }
+}
+
+/** One row of the widget: a group heading or a reading. */
+private data class WidgetEntry(val text: String, val header: Boolean)
+
+/** Headings (when the snapshot has titled groups) followed by their readings, else just the flat lines. */
+private fun MeshStatsSnapshot.entries(): List<WidgetEntry> = if (groups.any { it.title.isNotEmpty() }) {
+    groups.flatMap { group ->
+        buildList {
+            if (group.title.isNotEmpty()) add(WidgetEntry(group.title, header = true))
+            group.lines.forEach { add(WidgetEntry(it, header = false)) }
+        }
+    }
+} else {
+    lines.map { WidgetEntry(it, header = false) }
+}
+
+/** Splits into [columns] even columns; a heading never stays alone at the bottom of a column. */
+private fun List<WidgetEntry>.splitColumns(columns: Int): List<List<WidgetEntry>> {
+    if (columns <= 1 || size < 2) return listOf(this)
+    var cut = (size + columns - 1) / columns
+    if (cut > 1 && this[cut - 1].header) cut -= 1
+    return listOf(take(cut), drop(cut))
 }
