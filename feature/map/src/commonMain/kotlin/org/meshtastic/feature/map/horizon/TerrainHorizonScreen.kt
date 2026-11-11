@@ -26,7 +26,6 @@
 
 package org.meshtastic.feature.map.horizon
 
-import co.touchlab.kermit.Logger
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -72,10 +71,10 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -83,15 +82,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -106,18 +104,13 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.emptyFlow
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.resources.terrain_horizon_quality
-import org.meshtastic.core.resources.terrain_horizon_quality_auto
-import org.meshtastic.core.resources.terrain_horizon_quality_best
-import org.meshtastic.core.resources.terrain_horizon_quality_good
-import org.meshtastic.core.resources.terrain_horizon_quality_lowered
-import org.meshtastic.core.resources.terrain_horizon_quality_very_good
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -173,6 +166,12 @@ import org.meshtastic.core.resources.terrain_horizon_offline_hint
 import org.meshtastic.core.resources.terrain_horizon_only_visible
 import org.meshtastic.core.resources.terrain_horizon_options
 import org.meshtastic.core.resources.terrain_horizon_precision
+import org.meshtastic.core.resources.terrain_horizon_quality
+import org.meshtastic.core.resources.terrain_horizon_quality_auto
+import org.meshtastic.core.resources.terrain_horizon_quality_best
+import org.meshtastic.core.resources.terrain_horizon_quality_good
+import org.meshtastic.core.resources.terrain_horizon_quality_lowered
+import org.meshtastic.core.resources.terrain_horizon_quality_very_good
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
 import org.meshtastic.core.resources.terrain_horizon_save
@@ -198,11 +197,10 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.sin
-import kotlin.math.sqrt
 import kotlin.math.tan
 import kotlin.time.Clock
 import kotlin.time.TimeSource
+import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -731,15 +729,8 @@ private fun Panorama(
     val uiPrefs: UiPrefs = koinInject()
     val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
     // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
-    var autoLevel by remember { mutableIntStateOf(LEVEL_BEST) }
-    var lowered by remember { mutableStateOf(false) }
-    LaunchedEffect(lowered) {
-        if (lowered) {
-            delay(NOTICE_MS)
-            lowered = false
-        }
-    }
-    val level = if (quality < 0) autoLevel else quality
+    val auto = rememberAutoLevel(quality) { centre }
+    val level = if (quality < 0) auto.level else quality
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
     // The buildings sorted into their distance bands once, far to near, not on every frame.
     val shapesByBand =
@@ -748,9 +739,7 @@ private fun Panorama(
             List(BandEdges.size - 1) { band ->
                 val from = BandEdges[band] * profile.radiusM
                 val to = BandEdges[band + 1] * profile.radiusM
-                usable
-                    .filter { it.distanceM >= from && it.distanceM < to }
-                    .sortedByDescending { it.distanceM }
+                usable.filter { it.distanceM >= from && it.distanceM < to }.sortedByDescending { it.distanceM }
             }
         }
     val buildingBands = remember(sky) { BandShares.map { lerp(sky, BuildingColor, it + BUILDING_BAND_BOOST) } }
@@ -758,31 +747,6 @@ private fun Panorama(
     // are veiled by haze.
     val sun =
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
-    LaunchedEffect(quality) {
-        if (quality >= 0) return@LaunchedEffect
-        // Time between two successive pictures while the view is being turned (pauses are not counted).
-        var mark = TimeSource.Monotonic.markNow()
-        var frames = 0
-        var slow = 0
-        snapshotFlow { centre }
-            .collect {
-                val gap = mark.elapsedNow().inWholeMilliseconds
-                mark = TimeSource.Monotonic.markNow()
-                if (gap < AUTO_IDLE_GAP_MS) {
-                    frames++
-                    if (gap > AUTO_SLOW_FRAME_MS) slow++
-                    if (frames >= AUTO_WINDOW_FRAMES) {
-                        Logger.i { "Panorama: klatek $frames, wolnych $slow, poziom $autoLevel" }
-                        if (slow * 2 > frames && autoLevel < LEVEL_GOOD) {
-                            autoLevel++
-                            lowered = true
-                        }
-                        frames = 0
-                        slow = 0
-                    }
-                }
-            }
-    }
     // Very good (0) has the rock texture and forests; good keeps the shapes and the light but not the textures.
     val grain = remember(level) { if (level < LEVEL_GOOD) rockGrain() else null }
     val light = remember(sky, sun, grain, level) { ReliefLight(sky, HazeShares, sun, grain, level == LEVEL_BEST) }
@@ -800,7 +764,7 @@ private fun Panorama(
     val currentTargets by rememberUpdatedState(targets)
     val currentFov by rememberUpdatedState(fieldOfView)
     Box(Modifier.fillMaxSize()) {
-        if (lowered) {
+        if (auto.lowered) {
             Text(
                 text = stringResource(Res.string.terrain_horizon_quality_lowered),
                 style = MaterialTheme.typography.labelMedium,
@@ -987,7 +951,6 @@ private fun DrawScope.drawRelief(
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
 ) {
-    val w = size.width
     val h = size.height
     val outline = bandOutline(profile, band, centre, perDeg, range)
     val path = bandPath(outline)
@@ -1000,66 +963,12 @@ private fun DrawScope.drawRelief(
             endY = h,
         ),
     )
-    val litColour = light.litColour()
-    val lit = Brush.verticalGradient(listOf(litColour, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
-    val shade = Brush.verticalGradient(listOf(Color.Black, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
-    val ridge = Path()
-    var started = false
-    var previous: Float? = null
-    for (i in outline.indices) {
-        val x = (i * COLUMN_STEP_PX).toFloat()
-        val y = outline[i]
-        if (y.isNaN()) {
-            previous = null
-            started = false
-            continue
-        }
-        val bearing = (centre + (x - w / 2) / perDeg).toDouble()
-        if (started) ridge.lineTo(x, y) else ridge.moveTo(x, y)
-        started = true
-        val before = previous
-        if (before != null) {
-            val rise = before - y
-            // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
-            val facing = if (rise > 0f) bearing - 90.0 else bearing + 90.0
-            val sunny = light.sunFacing(facing)
-            // Every column a little different, so slopes show gullies and ribs and not a smooth wash.
-            val grain = 1f - GRAIN + 2f * GRAIN * columnNoise(i, band)
-            val slope = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
-            val strength = slope * abs(sunny).toFloat() * grain * light.contrast()
-            if (strength > 0.02f && y < h) {
-                translate(left = x, top = y) {
-                    drawRect(
-                        if (sunny > 0.0) lit else shade,
-                        size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
-                        alpha = strength,
-                    )
-                }
-            }
-        }
-        previous = y
-    }
+    val ridge = drawSlopeShading(outline, band, light, centre, perDeg)
     // The rock itself: a fine grain with vertical streaks (gullies), strongest on near ridges, fading with distance.
     light.grain?.let { texture ->
         clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
     }
-    // Forest on the lower slopes of the near ridges: dark speckled ground that starts a little below the crest.
-    if (band < FOREST_BANDS && light.extras && light.grain != null) {
-        val forest = Path()
-        forest.moveTo(0f, h)
-        for (i in outline.indices) {
-            val top = outline[i]
-            val drop = FOREST_TOP_PX * (0.5f + columnNoise(i / 4, band + 7))
-            val start = if (top.isNaN()) h else (top + drop).coerceAtMost(h)
-            forest.lineTo((i * COLUMN_STEP_PX).toFloat(), start)
-        }
-        forest.lineTo((outline.size * COLUMN_STEP_PX).toFloat(), h)
-        forest.close()
-        clipPath(path) {
-            drawPath(forest, lerp(colour, Color(FOREST_GREEN), FOREST_TINT), alpha = FOREST_ALPHA * (1f - band * 0.4f))
-            light.grain?.let { drawPath(forest, it, alpha = FOREST_GRAIN_ALPHA) }
-        }
-    }
+    if (band < FOREST_BANDS && light.extras) drawForest(path, outline, band, colour, light.grain)
     drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
     val haze = light.haze[band.coerceIn(0, light.haze.lastIndex)]
@@ -1086,6 +995,116 @@ private fun DrawScope.drawRelief(
                 ),
             )
         }
+    }
+}
+
+/** The automatic quality level of the panorama: it starts at the best and only steps down, never up. */
+private class AutoLevel {
+    var level by mutableIntStateOf(LEVEL_BEST)
+    var lowered by mutableStateOf(false)
+    private var frames = 0
+    private var slow = 0
+
+    /** Takes the time (ms) between two pictures and, after a window of them, steps down when most were slow. */
+    fun record(gapMs: Long) {
+        frames++
+        if (gapMs > AUTO_SLOW_FRAME_MS) slow++
+        if (frames < AUTO_WINDOW_FRAMES) return
+        Logger.i { "Panorama: klatek $frames, wolnych $slow, poziom $level" }
+        if (slow * 2 > frames && level < LEVEL_GOOD) {
+            level++
+            lowered = true
+        }
+        frames = 0
+        slow = 0
+    }
+}
+
+@Composable
+private fun rememberAutoLevel(quality: Int, centre: () -> Float): AutoLevel {
+    val auto = remember { AutoLevel() }
+    val currentCentre by rememberUpdatedState(centre)
+    LaunchedEffect(auto.lowered) {
+        if (auto.lowered) {
+            delay(NOTICE_MS)
+            auto.lowered = false
+        }
+    }
+    LaunchedEffect(quality) {
+        if (quality >= 0) return@LaunchedEffect
+        // Time between two successive pictures while the view is being turned (pauses are not counted).
+        var mark = TimeSource.Monotonic.markNow()
+        snapshotFlow { currentCentre() }
+            .collect {
+                val gap = mark.elapsedNow().inWholeMilliseconds
+                mark = TimeSource.Monotonic.markNow()
+                if (gap < AUTO_IDLE_GAP_MS) auto.record(gap)
+            }
+    }
+    return auto
+}
+
+/**
+ * Shades every slope of one band by which way it faces the sun, with a grain that varies column by column (gullies and
+ * ribs), and returns the line of the crest.
+ */
+private fun DrawScope.drawSlopeShading(
+    outline: FloatArray,
+    band: Int,
+    light: ReliefLight,
+    centre: Float,
+    perDeg: Float,
+): Path {
+    val w = size.width
+    val h = size.height
+    val lit = Brush.verticalGradient(listOf(light.litColour(), Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
+    val shade = Brush.verticalGradient(listOf(Color.Black, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
+    val ridge = Path()
+    var previous = Float.NaN
+    for (i in outline.indices) {
+        val x = (i * COLUMN_STEP_PX).toFloat()
+        val y = outline[i]
+        if (!y.isNaN()) {
+            if (previous.isNaN()) ridge.moveTo(x, y) else ridge.lineTo(x, y)
+            if (!previous.isNaN()) {
+                val bearing = (centre + (x - w / 2) / perDeg).toDouble()
+                val rise = previous - y
+                // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
+                val sunny = light.sunFacing(if (rise > 0f) bearing - 90.0 else bearing + 90.0)
+                val grain = 1f - GRAIN + 2f * GRAIN * columnNoise(i, band)
+                val slope = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
+                val strength = slope * abs(sunny).toFloat() * grain * light.contrast()
+                if (strength > 0.02f && y < h) {
+                    translate(left = x, top = y) {
+                        drawRect(
+                            if (sunny > 0.0) lit else shade,
+                            size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
+                            alpha = strength,
+                        )
+                    }
+                }
+            }
+        }
+        previous = y
+    }
+    return ridge
+}
+
+/** Forest on the lower slopes of a near band: dark speckled ground that starts a little below the crest. */
+private fun DrawScope.drawForest(path: Path, outline: FloatArray, band: Int, colour: Color, grain: Brush?) {
+    val h = size.height
+    val forest = Path()
+    forest.moveTo(0f, h)
+    for (i in outline.indices) {
+        val crest = outline[i]
+        val drop = FOREST_TOP_PX * (0.5f + columnNoise(i / 4, band + 7))
+        forest.lineTo((i * COLUMN_STEP_PX).toFloat(), if (crest.isNaN()) h else (crest + drop).coerceAtMost(h))
+    }
+    forest.lineTo((outline.size * COLUMN_STEP_PX).toFloat(), h)
+    forest.close()
+    clipPath(path) {
+        drawPath(forest, lerp(colour, Color(FOREST_GREEN), FOREST_TINT), alpha = FOREST_ALPHA * (1f - band * 0.4f))
+        grain?.let { drawPath(forest, it, alpha = FOREST_GRAIN_ALPHA) }
     }
 }
 

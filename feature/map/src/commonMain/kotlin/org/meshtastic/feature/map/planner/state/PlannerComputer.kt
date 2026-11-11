@@ -26,7 +26,6 @@
 
 package org.meshtastic.feature.map.planner.state
 
-import kotlin.math.atan2
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +57,7 @@ import org.meshtastic.feature.map.planner.data.PlannerElevationSource
 import org.meshtastic.feature.map.planner.data.PlannerWeatherResult
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
 import org.meshtastic.feature.map.planner.data.PropagationConditions
+import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
 

@@ -18,11 +18,11 @@
 
 package org.meshtastic.feature.map.planner
 
-import kotlin.math.atan2
-import kotlin.math.abs
-import kotlin.math.PI
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.feature.map.planner.data.PlannerClutter
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max

@@ -45,8 +45,8 @@ class HorizonBuilding(
     val distanceM: Double,
 ) {
     /**
-     * For every edge (corner k to the next), how squarely it faces the viewer from 0 (not at all: not drawn) to 1.
-     * It depends only on the outline, so it is worked out once and not on every frame.
+     * For every edge (corner k to the next), how squarely it faces the viewer from 0 (not at all: not drawn) to 1. It
+     * depends only on the outline, so it is worked out once and not on every frame.
      */
     val facing: FloatArray by lazy {
         val n = bearingsDeg.size

@@ -16,12 +16,12 @@
  */
 package org.meshtastic.core.service.stats
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -36,18 +36,18 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.current
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.humidity
 import org.meshtastic.core.resources.live_update_signal
 import org.meshtastic.core.resources.local_stats_uptime
 import org.meshtastic.core.resources.local_stats_utilization
+import org.meshtastic.core.resources.pressure
+import org.meshtastic.core.resources.temperature
+import org.meshtastic.core.resources.voltage
 import org.meshtastic.core.resources.widget_card_heard
 import org.meshtastic.core.resources.widget_card_hops
-import org.meshtastic.core.resources.pressure
-import org.meshtastic.core.resources.humidity
-import org.meshtastic.core.resources.temperature
-import org.meshtastic.core.resources.current
-import org.meshtastic.core.resources.voltage
 import org.meshtastic.core.resources.widget_card_model
 import org.meshtastic.proto.LocalStats
 import kotlin.time.Clock
@@ -122,13 +122,13 @@ class MeshStatsFeed(
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
         // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
-        return combine(basics, stats, modeFlow, nodes.nodeDBbyNum.map { it.size }.distinctUntilChanged(), uiPrefs.lnaGains) {
-                b,
-                s,
-                mode,
-                _,
-                _,
-            ->
+        return combine(
+            basics,
+            stats,
+            modeFlow,
+            nodes.nodeDBbyNum.map { it.size }.distinctUntilChanged(),
+            uiPrefs.lnaGains,
+        ) { b, s, mode, _, _ ->
             Triple(b, s, mode)
         }
             // Every packet touches the node list; the widget is rebuilt at most every few seconds, not on each one.
@@ -260,20 +260,29 @@ private suspend fun MutableList<String>.addSensorLines(node: Node) {
     val volts = (power.ch1_voltage ?: env.voltage)?.takeUnless { it.isNaN() }
     val milliAmps = (power.ch1_current ?: env.current)?.takeUnless { it.isNaN() }
     // The same short labels and values as the node's detail list; voltage and current side by side on one line.
-    val power1 = listOfNotNull(
-        volts?.let { "${getStringSuspend(Res.string.voltage)} ${MetricFormatter.voltage(it)}" },
-        milliAmps?.let { "${getStringSuspend(Res.string.current)} ${MetricFormatter.current(it, decimalPlaces = 1)}" },
-    )
+    val power1 =
+        listOfNotNull(
+            volts?.let { "${getStringSuspend(Res.string.voltage)} ${MetricFormatter.voltage(it)}" },
+            milliAmps?.let {
+                "${getStringSuspend(Res.string.current)} ${MetricFormatter.current(it, decimalPlaces = 1)}"
+            },
+        )
     if (power1.isNotEmpty()) add(power1.joinToString("   "))
-    env.temperature?.takeIf { !it.isNaN() }?.let {
-        add("${getStringSuspend(Res.string.temperature)} ${MetricFormatter.temperature(it, false)}")
-    }
-    env.relative_humidity?.takeIf { it != 0f }?.let {
-        add("${getStringSuspend(Res.string.humidity)} ${MetricFormatter.humidity(it)}")
-    }
-    env.barometric_pressure?.takeIf { it != 0f }?.let {
-        add("${getStringSuspend(Res.string.pressure)} ${MetricFormatter.pressure(it)}")
-    }
+    env.temperature
+        ?.takeIf { !it.isNaN() }
+        ?.let {
+            add("${getStringSuspend(Res.string.temperature)} ${MetricFormatter.temperature(it, false)}")
+        }
+    env.relative_humidity
+        ?.takeIf { it != 0f }
+        ?.let {
+            add("${getStringSuspend(Res.string.humidity)} ${MetricFormatter.humidity(it)}")
+        }
+    env.barometric_pressure
+        ?.takeIf { it != 0f }
+        ?.let {
+            add("${getStringSuspend(Res.string.pressure)} ${MetricFormatter.pressure(it)}")
+        }
 }
 
 /** How many nodes of one kind the bigger widgets rotate through (all of them, within reason). */

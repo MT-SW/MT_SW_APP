@@ -444,7 +444,11 @@ internal suspend fun nodeTapAt(
     val closest = candidates.minOfOrNull { it.third }
     val pool = candidates.filter { closest != null && it.third <= closest + RANK_TIE_DP }
     val best = pool.maxByOrNull { it.second * RANK_WEIGHT - it.third }
-    Logger.i { "Dotyk w węzeł: kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM)}" }
+    Logger.i {
+        "Dotyk w węzeł: kandydatów ${candidates.size}, wybrany ${best?.first?.properties?.get(
+            NodeFeatureKeys.NODE_NUM,
+        )}"
+    }
     val near = best?.let { top -> candidates.filter { it.third <= top.third + STACK_TOLERANCE_DP }.map { it.first } }
     val stack = if (best != null && near != null) stackedMembers(near, best.first) else emptyList()
     val nodeNum = best?.first?.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt()

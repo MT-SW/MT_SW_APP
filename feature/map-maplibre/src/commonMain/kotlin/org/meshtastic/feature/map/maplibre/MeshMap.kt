@@ -24,9 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -312,29 +312,7 @@ fun MeshMap(
             ReturnView.take(mapState)?.let { first -> mapState.animateCamera(first.toCameraUpdate()) }
         }
     }
-    // Diagnostics for the logs: how smooth the map is while it moves (only a window with slow frames is written).
-    LaunchedEffect(mapState) {
-        var mark = TimeSource.Monotonic.markNow()
-        var frames = 0
-        var slow = 0
-        var longest = 0L
-        snapshotFlow { mapState.cameraPosition }
-            .collect {
-                val gap = mark.elapsedNow().inWholeMilliseconds
-                mark = TimeSource.Monotonic.markNow()
-                if (gap < FRAME_IDLE_GAP_MS) {
-                    frames++
-                    if (gap > SLOW_FRAME_MS) slow++
-                    longest = maxOf(longest, gap)
-                    if (frames >= FRAME_WINDOW) {
-                        if (slow > 0) Logger.i { "Mapa: klatek $frames, wolnych $slow, najdłuższa przerwa $longest ms" }
-                        frames = 0
-                        slow = 0
-                        longest = 0L
-                    }
-                }
-            }
-    }
+    MapFrameStats(mapState)
     PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
@@ -616,6 +594,33 @@ private const val PROPAGATION_SETTLE_MS = 1500L
 
 /** Room kept free on the right for the zoom buttons (their width and margin) plus a small gap. */
 private const val PROPAGATION_END_CLEARANCE_DP = 88
+
+/** Diagnostics for the logs: how smooth the map is while it moves (only a window with slow frames is written). */
+@Composable
+private fun MapFrameStats(mapState: MapState) {
+    LaunchedEffect(mapState) {
+        var mark = TimeSource.Monotonic.markNow()
+        var frames = 0
+        var slow = 0
+        var longest = 0L
+        snapshotFlow { mapState.cameraPosition }
+            .collect {
+                val gap = mark.elapsedNow().inWholeMilliseconds
+                mark = TimeSource.Monotonic.markNow()
+                if (gap < FRAME_IDLE_GAP_MS) {
+                    frames++
+                    if (gap > SLOW_FRAME_MS) slow++
+                    longest = maxOf(longest, gap)
+                    if (frames >= FRAME_WINDOW) {
+                        if (slow > 0) Logger.i { "Mapa: klatek $frames, wolnych $slow, najdłuższa przerwa $longest ms" }
+                        frames = 0
+                        slow = 0
+                        longest = 0L
+                    }
+                }
+            }
+    }
+}
 
 private const val FRAME_WINDOW = 60
 private const val SLOW_FRAME_MS = 32

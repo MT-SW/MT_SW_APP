@@ -18,7 +18,6 @@
 
 package org.meshtastic.feature.map.planner.state
 
-import kotlin.math.abs
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
@@ -38,6 +37,7 @@ import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PlannerWeatherError
 import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
+import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.log2
 import kotlin.math.min
