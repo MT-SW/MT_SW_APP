@@ -211,8 +211,9 @@ private const val RELIEF_LIGHT = 0.12f
 private const val RELIEF_DARK = 0.28f
 private const val RIDGE_LIGHT = 0.3f
 private const val RIDGE_WIDTH_PX = 1.5f
-private const val SHADE_DEPTH_PX = 44f
-private const val SHADE_MAX = 0.4f
+private const val SHADE_DEPTH_PX = 64f
+private const val SHADE_MAX = 0.5f
+private const val SMOOTH_PASSES = 2
 private const val SHADE_SLOPE_PX = 10f
 private const val EDGE_STEP_PX = 4f
 private const val MIN_BUILDING_DEG = 0.02
@@ -874,7 +875,8 @@ private fun DrawScope.drawRelief(
 ) {
     val w = size.width
     val h = size.height
-    val path = bandPath(profile, band, centre, perDeg, range)
+    val outline = bandOutline(profile, band, centre, perDeg, range)
+    val path = bandPath(outline)
     val top = path.getBounds().top.coerceIn(0f, h)
     drawPath(
         path,
@@ -889,37 +891,35 @@ private fun DrawScope.drawRelief(
     val ridge = Path()
     var started = false
     var previous: Float? = null
-    var x = 0f
-    while (x <= w + COLUMN_STEP_PX) {
-        val bearing = (centre + (x - w / 2) / perDeg).toDouble()
-        val angle = bandAngle(profile, band, bearing)
-        if (angle == null) {
+    for (i in outline.indices) {
+        val x = (i * COLUMN_STEP_PX).toFloat()
+        val y = outline[i]
+        if (y.isNaN()) {
             previous = null
             started = false
-        } else {
-            val y = yOf(angle, range, h)
-            if (started) ridge.lineTo(x, y) else ridge.moveTo(x, y)
-            started = true
-            val before = previous
-            if (before != null) {
-                val rise = before - y
-                // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
-                val facing = if (rise > 0f) bearing - 90.0 else bearing + 90.0
-                val sunny = light.sunFacing(facing)
-                val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX) * abs(sunny).toFloat()
-                if (strength > 0.02f && y < h) {
-                    translate(left = x, top = y) {
-                        drawRect(
-                            if (sunny > 0.0) lit else shade,
-                            size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
-                            alpha = strength,
-                        )
-                    }
+            continue
+        }
+        val bearing = (centre + (x - w / 2) / perDeg).toDouble()
+        if (started) ridge.lineTo(x, y) else ridge.moveTo(x, y)
+        started = true
+        val before = previous
+        if (before != null) {
+            val rise = before - y
+            // A slope rising to the right faces left, one falling faces right; the sun lights what faces it.
+            val facing = if (rise > 0f) bearing - 90.0 else bearing + 90.0
+            val sunny = light.sunFacing(facing)
+            val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX) * abs(sunny).toFloat()
+            if (strength > 0.02f && y < h) {
+                translate(left = x, top = y) {
+                    drawRect(
+                        if (sunny > 0.0) lit else shade,
+                        size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
+                        alpha = strength,
+                    )
                 }
             }
-            previous = y
         }
-        x += COLUMN_STEP_PX
+        previous = y
     }
     drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
@@ -1062,26 +1062,50 @@ private fun bandAngle(profile: HorizonProfile, band: Int, bearing: Double): Doub
     return profile.at(bearing).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull { it.angleDeg }
 }
 
-/** The outline of one distance band (0 is the nearest) of [profile], closed along the bottom of the picture. */
-private fun DrawScope.bandPath(
+/**
+ * The crest of one distance band as a height (pixels from the top) for every picture column, or NaN where the band has
+ * no terrain. It is worked out once per band and lightly smoothed, so a ridge flows like a real one and not like the
+ * steps of the elevation data.
+ */
+private fun DrawScope.bandOutline(
     profile: HorizonProfile,
     band: Int,
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
-): Path {
+): FloatArray {
     val w = size.width
+    val h = size.height
+    val count = (w / COLUMN_STEP_PX).toInt() + 2
+    val raw =
+        FloatArray(count) { i ->
+            val bearing = centre + (i * COLUMN_STEP_PX - w / 2) / perDeg
+            bandAngle(profile, band, bearing.toDouble())?.let { yOf(it, range, h) } ?: Float.NaN
+        }
+    var current = raw
+    repeat(SMOOTH_PASSES) {
+        val source = current
+        current =
+            FloatArray(count) { i ->
+                val here = source[i]
+                val before = source.getOrElse(i - 1) { Float.NaN }
+                val after = source.getOrElse(i + 1) { Float.NaN }
+                // Only between two neighbours that exist: the edge of a band is left as it is.
+                if (here.isNaN() || before.isNaN() || after.isNaN()) here else (before + 2f * here + after) / 4f
+            }
+    }
+    return current
+}
+
+/** The outline of one distance band (0 is the nearest), closed along the bottom of the picture. */
+private fun DrawScope.bandPath(outline: FloatArray): Path {
     val h = size.height
     val path = Path()
     path.moveTo(0f, h)
-    var x = 0f
-    while (x <= w + COLUMN_STEP_PX) {
-        val bearing = centre + (x - w / 2) / perDeg
-        val angle = bandAngle(profile, band, bearing.toDouble())
-        path.lineTo(x, if (angle == null) h else yOf(angle, range, h))
-        x += COLUMN_STEP_PX
+    for (i in outline.indices) {
+        path.lineTo((i * COLUMN_STEP_PX).toFloat(), if (outline[i].isNaN()) h else outline[i])
     }
-    path.lineTo(w + COLUMN_STEP_PX, h)
+    path.lineTo(((outline.size) * COLUMN_STEP_PX).toFloat(), h)
     path.close()
     return path
 }
