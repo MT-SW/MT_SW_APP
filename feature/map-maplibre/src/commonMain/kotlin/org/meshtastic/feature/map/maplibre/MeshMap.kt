@@ -286,6 +286,7 @@ fun MeshMap(
                 // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
                 click {
                     onEvent { event ->
+                        Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
                         event.position?.let(onMapClick)
                         ClickResult.Pass
                     }

@@ -27,6 +27,7 @@ package org.meshtastic.feature.map.horizon
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -291,6 +292,7 @@ class TerrainHorizonViewModel(
         if (here.buildingsSaving) return
         viewModelScope.launch {
             _state.update { it.copy(buildingsSaving = true, buildingsOk = null, buildingsProgress = null) }
+            Logger.i { "Budynki: pobieranie na ${here.buildingsRadiusKm} km" }
             val watcher = launch { clutter.progress.collect { p -> _state.update { it.copy(buildingsProgress = p) } } }
             val ok =
                 try {
@@ -304,13 +306,16 @@ class TerrainHorizonViewModel(
                     withContext(dispatchers.io) { buildingStore.write(centre, here.buildingsRadiusKm, buildings) }
                 } catch (e: CancellationException) {
                     throw e
-                } catch (_: PlannerClutterException) {
+                } catch (e: PlannerClutterException) {
+                    Logger.w(e) { "Budynki: serwer nie dał danych" }
                     false
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    Logger.w(e) { "Budynki: pobieranie nie udało się" }
                     // Whatever else goes wrong (a dropped connection, a full disk), the button must not stay "saving".
                     false
                 }
             val bytes = withContext(dispatchers.io) { buildingStore.sizeBytes() }
+            Logger.i { "Budynki: koniec pobierania, udane: $ok, zajmują $bytes B" }
             watcher.cancel()
             _state.update {
                 it.copy(buildingsSaving = false, buildingsOk = ok, buildingsBytes = bytes, buildingsProgress = null)

@@ -118,6 +118,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed) {
         val now = Clock.System.now()
         if (now - lastReload >= MIN_RELOAD_INTERVAL) {
             lastReload = now
+            Logger.i { "Widżet: zapisano statystyki i poproszono system o odświeżenie" }
             NSNotificationCenter.defaultCenter.postNotificationName(WIDGET_REFRESH, null)
         }
     }
