@@ -176,6 +176,16 @@ W ustawieniach warstw mapy (przycisk warstw) jest sekcja „Propagacja (prognoza
 Słowa: propagacja, warstwa propagacji, kanał troposferyczny, ducting, prognoza zasięgu, pogoda, refrakcja, współczynnik k, warstwy mapy
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Propagacja na mapie (sprawdzono 2026-11)
 
+### Co planer pokazuje na mapie (budynki, odbicia od ziemi)?
+Po dotknięciu „Pokaż na mapie” planer dodaje osobne warstwy, które można ukryć bez utraty planu: budynki wzdłuż trasy (szare, a te, które zasłaniają widok, na czerwono), budynki w zasięgu dla zasięgu wokół punktu (przy dużym promieniu tylko wysokie) oraz, gdy włączone są odbicia od ziemi, warstwę „Planer: odbicie od ziemi” z dwoma odcinkami odbitego promienia, punktem odbicia i zyskiem w dB. Budynki pochodzą z OpenStreetMap (© OpenStreetMap), a przełącznik „Budynki na mapie” jest w ustawieniach radia planera. Lasy i tereny zabudowane dla zasięgu zapisują się na urządzeniu, więc policzony raz zasięg działa potem bez internetu.
+Słowa: planer, pokaż na mapie, budynki na mapie, odbicie od ziemi, warstwa odbicia, zasłaniające budynki, OpenStreetMap, zasięg offline, lasy
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
+
+### Co pokazują karty węzłów w widżecie?
+Widżet pokazuje w rogu plakietkę naszego węzła (kolor i krótka nazwa). Karty ulubionych i pozostałych węzłów przełączają się co minutę i mają po jednej stronie pełną nazwę, a po drugiej plakietkę węzła, a pod spodem baterię, sygnał, czas działania, użycie kanału, napięcie, czas od ostatniej aktywności, liczbę skoków oraz rolę i model urządzenia.
+Słowa: widżet, karty węzłów, ulubione, plakietka, napięcie, skoki, ostatnia aktywność, rola, model, przełączanie
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Widżet statystyk (sprawdzono 2026-11)
+
 ### Dlaczego nie wysyła się zdjęcie w czacie (błąd 412 „uploads paused”)?
 Zdjęcia w czacie idą na publiczny serwer zdjęć, nie przez LoRa. Błąd „412 uploads paused” znaczy, że główny serwer (catbox.moe) chwilowo nie przyjmuje plików. Aplikacja sama próbuje wtedy kolejnych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin). Jeśli wszystkie serwisy odmówią, pokaże się powód i przycisk „Spróbuj ponownie”.
 Słowa: 412, uploads paused, zdjęcie się nie wysyła, nie wysyła zdjęcia, catbox, litterbox, uguu, serwer zdjęć, błąd wysyłania zdjęcia
