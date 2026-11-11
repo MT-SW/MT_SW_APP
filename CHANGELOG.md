@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Mapa: przycisk mapy na pasku zawsze wraca do widoku, w którym mapa się otworzyła (także po oddaleniu lub przesunięciu, nie tylko po przybliżeniu na węzeł).
+* Propagacja: zapamiętywany jest największy pobrany obszar (np. po oddaleniu do maksimum i „Pobierz dla widoku”); odświeżanie pobiera cały ten obszar, a nie tylko to, co jest na ekranie. Obszar rośnie tylko wtedy, gdy widok z niego wyjdzie.
 * Mapa: dotyk w dymek trafia teraz dokładnie w narysowany dymek (obszar dotyku i środek dymka wyliczone z jego rzeczywistego położenia nad węzłem).
 * Panorama: jakość automatyczna schodzi niżej dopiero przy naprawdę długim zacinaniu (dłuższe okno pomiaru, wyższy próg).
 * Panorama: nowa tekstura gór i lasów — miękkie, bezkierunkowe plamy zamiast pionowych kresek, gładkie cieniowanie zboczy.
@@ -668,6 +670,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Map: the map button on the bar always returns to the view the map opened with (after zooming out or panning too, not only after flying in on a node).
+* Propagation: the widest downloaded area is remembered (e.g. zoom out fully and press "download for this view"); refreshes fetch that whole area, not just the screen. It only grows when the view leaves it.
 * Map: a tap on a bubble now lands exactly on the drawn bubble (tap area and bubble centre computed from its real position above the node).
 * Panorama: the automatic quality steps down only after really long stutter (longer measuring window, higher threshold).
 * Panorama: new texture for mountains and forests — soft, directionless blotches instead of vertical streaks, smooth slope shading.

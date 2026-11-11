@@ -68,6 +68,13 @@ class PropagationController(
     val state: StateFlow<PropagationState> = mutable.asStateFlow()
     private var lastTry = 0L
 
+    /**
+     * The widest area the forecast was asked for (already padded): the user zooms out, downloads, then zooms in again,
+     * and a later refresh must keep fetching this whole area instead of shrinking to the screen. Only the "download
+     * for this view" button sets it afresh, and it grows when the view leaves it.
+     */
+    private var area: GeoBounds? = null
+
     init {
         scope.launch {
             val prefs = mapPrefs.awaitPropagationPrefs()
@@ -80,6 +87,7 @@ class PropagationController(
                     grid = it.grid ?: saved,
                 )
             }
+            if (area == null) area = saved?.bounds
         }
     }
 
@@ -105,10 +113,16 @@ class PropagationController(
     /** Downloads the forecast for [bounds] now (the "download for this view" button). */
     fun download(bounds: GeoBounds) {
         if (mutable.value.loading) return
+        area = padded(bounds)
+        fetchArea()
+    }
+
+    private fun fetchArea() {
+        val wanted = area ?: return
         lastTry = nowMillis
         mutable.update { it.copy(loading = true, failed = false) }
         scope.launch {
-            val grid = source.fetch(padded(bounds), nowMillis)
+            val grid = source.fetch(wanted, nowMillis)
             if (grid != null) save(grid)
             mutable.update { it.copy(loading = false, failed = grid == null, grid = grid ?: it.grid, hoursAhead = 0) }
         }
@@ -122,8 +136,14 @@ class PropagationController(
         val stale = grid == null || nowMillis - grid.fetchedAtMillis > REFRESH_AFTER_MS
         val uncovered = grid != null && !grid.bounds.contains(bounds)
         val retryOk = nowMillis - lastTry > RETRY_AFTER_MS
-        if ((stale || uncovered) && retryOk) download(bounds)
+        if ((stale || uncovered) && retryOk) {
+            val kept = area
+            // Refreshes the whole remembered area; only a view outside it widens it.
+            area = if (kept == null) padded(bounds) else if (kept.contains(bounds)) kept else union(kept, padded(bounds))
+            fetchArea()
+        }
     }
+
 
     /** A little wider than the screen, so a small pan does not leave the layer's edge showing. */
     private fun padded(b: GeoBounds): GeoBounds {
@@ -159,3 +179,11 @@ class PropagationController(
         private const val MAX_LAT = 80.0
     }
 }
+
+/** The smallest area holding both [a] and [b]. */
+private fun union(a: GeoBounds, b: GeoBounds) = GeoBounds(
+    south = minOf(a.south, b.south),
+    west = minOf(a.west, b.west),
+    north = maxOf(a.north, b.north),
+    east = maxOf(a.east, b.east),
+)
