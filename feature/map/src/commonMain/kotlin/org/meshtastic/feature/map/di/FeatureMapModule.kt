@@ -61,7 +61,8 @@ class FeatureMapModule {
 
     @Single fun providePlannerWeatherSource(httpClient: HttpClient): PlannerWeatherSource = PlannerWeather(httpClient)
 
-    @Single fun providePlannerClutterSource(httpClient: HttpClient, buildings: BuildingStore): PlannerClutterSource =
+    @Single
+    fun providePlannerClutterSource(httpClient: HttpClient, buildings: BuildingStore): PlannerClutterSource =
         PlannerOverpass(httpClient, pieces = buildings)
 
     @Single

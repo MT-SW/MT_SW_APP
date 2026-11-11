@@ -3624,11 +3624,13 @@
     <string name="terrain_horizon_buildings_none_here">Pobrane budynki nie obejmują tego miejsca.</string>
     <string name="terrain_horizon_buildings_range">Jak daleko pobrać budynki</string>
     <string name="terrain_horizon_buildings_save">Pobierz budynki (do %1$d km)</string>
+    <string name="terrain_horizon_buildings_update">Aktualizuj budynki (do %1$d km)</string>
     <string name="terrain_horizon_buildings_saved">Budynki na urządzeniu: %1$s MB</string>
     <string name="terrain_horizon_buildings_saving">Pobieranie budynków…</string>
     <string name="terrain_horizon_offline">Teren offline</string>
     <string name="terrain_horizon_offline_hint">Zapisuje na urządzeniu teren wokół miejsca, z którego patrzysz, dla wszystkich zasięgów aż do wybranego (największy to 100 km). Planer łączy i panorama korzystają z niego bez internetu.</string>
     <string name="terrain_horizon_save">Zapisz teren (do %1$d km)</string>
+    <string name="terrain_horizon_update">Aktualizuj teren (do %1$d km)</string>
     <string name="terrain_horizon_save_clear">Usuń zapisany teren</string>
     <string name="terrain_horizon_saving">Zapisywanie… %1$d z %2$d</string>
     <string name="terrain_horizon_save_failed">Nie udało się zapisać terenu (brak internetu albo miejsca na dysku).</string>

@@ -3155,6 +3155,7 @@ terrain_horizon_buildings_range
 terrain_horizon_buildings_save
 terrain_horizon_buildings_saved
 terrain_horizon_buildings_saving
+terrain_horizon_buildings_update
 terrain_horizon_camera
 terrain_horizon_compass
 terrain_horizon_favorites
@@ -3193,6 +3194,7 @@ terrain_horizon_saved
 terrain_horizon_saving
 terrain_horizon_target_antenna
 terrain_horizon_title
+terrain_horizon_update
 ### THEME ###
 theme
 theme_dark
@@ -3414,11 +3416,22 @@ widget_adaptive_off_summary
 widget_adaptive_title
 widget_adaptive_track_in
 widget_adaptive_tracking_shown
+widget_content_expand_info
+widget_content_favorites
+widget_content_info
+widget_content_network
+widget_content_own
+widget_content_second_title
+widget_content_small_title
 widget_group_connections
 widget_group_network
 widget_group_node
 widget_group_radio
 widget_group_resources
+widget_label_favorite
+widget_label_network
+widget_label_other
+widget_no_nodes
 widget_node_tracker_choose
 widget_node_tracker_not_found
 widget_node_tracker_title

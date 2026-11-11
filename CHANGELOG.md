@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: po pobraniu terenu i budynków przycisk zmienia się na „Aktualizuj”; budynki odświeżają tylko kawałki starsze niż 30 dni, a teren dobiera brakujące kafelki.
 * Wszystkie wersje: pobieranie budynków (panorama terenu) zapisuje każdy skończony kawałek od razu na urządzeniu, więc po przerwaniu kolejne „Pobierz” bierze tylko brakujące kawałki zamiast zaczynać od początku.
 * Wszystkie wersje: w widżecie statystyki naszego węzła mają stały układ: sieć i radio w lewej kolumnie, węzeł, zasoby i łączność w prawej. Dzięki temu pismo jest większe.
 * Wszystkie wersje: w ustawieniach „Widżet statystyk” jest opis, że widżet da się powiększyć, a opcje zawartości pokazują się tylko dla rozmiarów, które widżet naprawdę ma na ekranie (najmniejszy: jedna opcja, większy: dodatkowa). Aplikacja sama wykrywa rozmiary widżetu na iPhonie, iPadzie i Androidzie.
@@ -624,6 +625,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: once terrain and buildings are downloaded the button becomes "Update"; buildings refresh only pieces older than 30 days, and terrain fetches only the missing tiles.
 * All versions: the buildings download (terrain panorama) saves every finished piece on the device at once, so after an interruption the next download fetches only the missing pieces instead of starting over.
 * All versions: in the widget the statistics of our node have a fixed layout: network and radio in the left column, node, resources and connections in the right one. This allows bigger text.
 * All versions: the "Statistics widget" settings have a description that the widget can be made bigger, and the content options show only for the sizes the widget really has on the screen (smallest: one option, bigger: an extra one). The app detects the widget sizes itself on iPhone, iPad and Android.

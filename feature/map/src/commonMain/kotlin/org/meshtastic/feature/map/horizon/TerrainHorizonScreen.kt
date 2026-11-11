@@ -119,6 +119,7 @@ import org.meshtastic.core.resources.terrain_horizon_buildings_none_here
 import org.meshtastic.core.resources.terrain_horizon_buildings_range
 import org.meshtastic.core.resources.terrain_horizon_buildings_save
 import org.meshtastic.core.resources.terrain_horizon_buildings_saved
+import org.meshtastic.core.resources.terrain_horizon_buildings_update
 import org.meshtastic.core.resources.terrain_horizon_buildings_saving
 import org.meshtastic.core.resources.terrain_horizon_camera
 import org.meshtastic.core.resources.terrain_horizon_compass
@@ -155,6 +156,7 @@ import org.meshtastic.core.resources.terrain_horizon_save_clear
 import org.meshtastic.core.resources.terrain_horizon_save_failed
 import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
+import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.resources.terrain_horizon_saving
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
@@ -1094,7 +1096,12 @@ private fun OfflineTerrain(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = onSave, enabled = !state.saving && state.observerLat != null) {
-                Text(stringResource(Res.string.terrain_horizon_save, state.saveRadiusKm))
+                Text(
+                    stringResource(
+                        if (state.savedBytes > 0L) Res.string.terrain_horizon_update else Res.string.terrain_horizon_save,
+                        state.saveRadiusKm,
+                    ),
+                )
             }
             if (state.savedBytes > 0L && !state.saving) {
                 TextButton(onClick = onClear) { Text(stringResource(Res.string.terrain_horizon_save_clear)) }
@@ -1154,7 +1161,16 @@ private fun OfflineBuildings(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = onSave, enabled = !state.buildingsSaving) {
-                Text(stringResource(Res.string.terrain_horizon_buildings_save, state.buildingsRadiusKm))
+                Text(
+                    stringResource(
+                        if (state.buildingsBytes > 0L) {
+                            Res.string.terrain_horizon_buildings_update
+                        } else {
+                            Res.string.terrain_horizon_buildings_save
+                        },
+                        state.buildingsRadiusKm,
+                    ),
+                )
             }
             if (state.buildingsBytes > 0L && !state.buildingsSaving) {
                 TextButton(onClick = onClear) { Text(stringResource(Res.string.terrain_horizon_buildings_clear)) }

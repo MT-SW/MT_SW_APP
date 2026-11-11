@@ -20,6 +20,7 @@ import okio.Buffer
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.planner.GeoPoint
@@ -31,6 +32,7 @@ import kotlin.math.roundToInt
  * terrain panorama raises its skyline by them without asking the internet each time it opens. One file per downloaded
  * area, named after its centre and range; [load] merges every area that covers the place looked from.
  */
+@Suppress("TooManyFunctions")
 class BuildingStore(
     private val fileSystem: FileSystem = mapLayerFileSystem(),
     private val directory: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "buildings",
@@ -81,8 +83,6 @@ class BuildingStore(
         val name =
             "${(centre.lat * DEGREE_SCALE).roundToInt()}_${(centre.lon * DEGREE_SCALE).roundToInt()}_$radiusKm$EXTENSION"
         fileSystem.write(directory / name.toPath()) { write(encode(buildings)) }
-        // The pieces were only there to go on after an interruption; the finished area replaces them.
-        clearPieces()
         true
     } catch (_: Exception) {
         false
@@ -90,7 +90,13 @@ class BuildingStore(
 
     override fun readPiece(key: String): List<ClutterPolygon>? = try {
         val path = piecesDirectory / "$key$PIECE_EXTENSION".toPath()
-        if (fileSystem.exists(path)) decode(fileSystem.read(path) { readByteArray() }) else null
+        val savedAt = fileSystem.metadataOrNull(path)?.lastModifiedAtMillis
+        // A piece older than a month is asked for again: that is the update of an area that is already saved.
+        if (savedAt != null && nowMillis - savedAt < PIECE_MAX_AGE_MS) {
+            decode(fileSystem.read(path) { readByteArray() })
+        } else {
+            null
+        }
     } catch (_: Exception) {
         null
     }
@@ -104,17 +110,12 @@ class BuildingStore(
         }
     }
 
-    private fun clearPieces() {
-        try {
-            if (fileSystem.exists(piecesDirectory)) fileSystem.deleteRecursively(piecesDirectory)
-        } catch (_: Exception) {
-            // best effort
-        }
-    }
-
     /** The space the saved buildings take, in bytes. */
     fun sizeBytes(): Long = try {
-        areas().sumOf { fileSystem.metadataOrNull(it.path)?.size ?: 0L }
+        areas().sumOf { fileSystem.metadataOrNull(it.path)?.size ?: 0L } +
+            (if (fileSystem.exists(piecesDirectory)) fileSystem.list(piecesDirectory) else emptyList()).sumOf {
+                fileSystem.metadataOrNull(it)?.size ?: 0L
+            }
     } catch (_: Exception) {
         0L
     }
@@ -164,6 +165,7 @@ class BuildingStore(
     private companion object {
         const val EXTENSION = ".bld"
         const val PIECE_EXTENSION = ".piece"
+        const val PIECE_MAX_AGE_MS = 30L * 24 * 60 * 60 * 1000
         const val NAME_PARTS = 3
         const val DEGREE_SCALE = 100_000.0
         const val METRES_PER_KM = 1_000.0

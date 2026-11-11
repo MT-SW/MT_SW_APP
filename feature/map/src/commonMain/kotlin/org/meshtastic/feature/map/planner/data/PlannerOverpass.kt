@@ -219,40 +219,44 @@ class PlannerOverpass(
             val work = pending.removeFirst()
             val saved = loadPiece(work.box, pieceKind)
             val part =
-                saved ?: try {
-                    fetch(query(work.box), seen, thinM)
-                } catch (e: PlannerClutterException) {
-                    val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
-                    val flaky = e.failure == PlannerClutterFailure.NETWORK
-                    val splittable =
-                        (
-                            e.failure == PlannerClutterFailure.TOO_LARGE ||
-                                e.failure == PlannerClutterFailure.SERVER_LIMIT
-                            ) && !busy && work.box.maxSideKm > minTileKm
-                    when {
-                        busy && work.tries < BUSY_RETRIES -> {
-                            delay(BUSY_WAIT_MS)
-                            pending.addFirst(TileWork(work.box, work.tries + 1))
+                saved
+                    ?: try {
+                        fetch(query(work.box), seen, thinM)
+                    } catch (e: PlannerClutterException) {
+                        val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
+                        val flaky = e.failure == PlannerClutterFailure.NETWORK
+                        val splittable =
+                            (
+                                e.failure == PlannerClutterFailure.TOO_LARGE ||
+                                    e.failure == PlannerClutterFailure.SERVER_LIMIT
+                                ) &&
+                                !busy &&
+                                work.box.maxSideKm > minTileKm
+                        when {
+                            busy && work.tries < BUSY_RETRIES -> {
+                                delay(BUSY_WAIT_MS)
+                                pending.addFirst(TileWork(work.box, work.tries + 1))
+                            }
+
+                            flaky && work.tries < NETWORK_RETRIES -> {
+                                delay(NETWORK_RETRY_WAIT_MS)
+                                pending.addFirst(TileWork(work.box, work.tries + 1))
+                            }
+
+                            splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
+
+                            // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait
+                            // and
+                            // ask again.
+                            e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
+                                delay(OVERLOAD_WAIT_MS)
+                                pending.addFirst(TileWork(work.box, work.tries + 1))
+                            }
+
+                            else -> throw e
                         }
-
-                        flaky && work.tries < NETWORK_RETRIES -> {
-                            delay(NETWORK_RETRY_WAIT_MS)
-                            pending.addFirst(TileWork(work.box, work.tries + 1))
-                        }
-
-                        splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
-
-                        // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait and
-                        // ask again.
-                        e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
-                            delay(OVERLOAD_WAIT_MS)
-                            pending.addFirst(TileWork(work.box, work.tries + 1))
-                        }
-
-                        else -> throw e
+                        continue
                     }
-                    continue
-                }
             done++
             _progress.value = ClutterProgress(done, done + pending.size)
             if (saved == null) savePiece(work.box, pieceKind, part)
@@ -270,8 +274,9 @@ class PlannerOverpass(
     }
 
     private fun pieceKey(box: ClutterBox, kind: String): String =
-        listOf(box.south, box.west, box.north, box.east).joinToString("_") { (it * PIECE_SCALE).roundToLong().toString() } +
-            "_" + kind
+        listOf(box.south, box.west, box.north, box.east).joinToString("_") {
+            (it * PIECE_SCALE).roundToLong().toString()
+        } + "_" + kind
 
     /** A piece of this area that an earlier, interrupted download already finished. */
     private fun loadPiece(box: ClutterBox, kind: String?): ClutterMap? {
