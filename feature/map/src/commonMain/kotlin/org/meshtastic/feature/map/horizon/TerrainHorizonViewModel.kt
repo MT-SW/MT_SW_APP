@@ -154,6 +154,8 @@ data class TerrainHorizonState(
     val buildingsHere: Boolean = false,
     /** How far the buildings are downloaded (km). */
     val buildingsRadiusKm: Int = DEFAULT_BUILDINGS_RADIUS_KM,
+    /** Saved pieces of buildings older than this many days are downloaded again by "Update". */
+    val buildingsMaxAgeDays: Int = DEFAULT_BUILDINGS_MAX_AGE_DAYS,
     val buildingsSaving: Boolean = false,
     /** How many pieces of the area are done, while the buildings are being downloaded. */
     val buildingsProgress: ClutterProgress? = null,
@@ -172,6 +174,11 @@ val HORIZON_BUILDING_RADII_KM = listOf(1, 2, 5, 10, 15, 25, 50, 100)
 /** Up to this range every building is downloaded, beyond it only the tall ones (the rest are specks that far). */
 const val ALL_BUILDINGS_MAX_KM = 15
 const val DEFAULT_BUILDINGS_RADIUS_KM = 5
+
+/** The ages (days) after which saved buildings are asked for again. */
+val HORIZON_BUILDING_AGES_DAYS = listOf(7, 14, 30, 60, 90)
+
+const val DEFAULT_BUILDINGS_MAX_AGE_DAYS = 30
 val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80, 100)
 
 /** The farthest range the terrain can be saved for. */
@@ -242,6 +249,7 @@ class TerrainHorizonViewModel(
                     refraction = saved.refraction,
                     buildings = saved.buildings,
                     buildingsRadiusKm = saved.buildingsRadiusKm,
+                    buildingsMaxAgeDays = saved.buildingsMaxAgeDays,
                 )
             }
             reload()
@@ -273,6 +281,11 @@ class TerrainHorizonViewModel(
 
     fun setBuildings(on: Boolean) = change { it.copy(buildings = on) }
 
+    fun setBuildingsMaxAge(days: Int) {
+        _state.update { it.copy(buildingsMaxAgeDays = days) }
+        mapPrefs.updateHorizonPrefs { it.copy(buildingsMaxAgeDays = days) }
+    }
+
     fun setBuildingsRadius(km: Int) {
         _state.update { it.copy(buildingsRadiusKm = km, buildingsOk = null) }
         mapPrefs.updateHorizonPrefs { it.copy(buildingsRadiusKm = km) }
@@ -293,6 +306,7 @@ class TerrainHorizonViewModel(
         if (here.buildingsSaving) return
         viewModelScope.launch {
             _state.update { it.copy(buildingsSaving = true, buildingsOk = null, buildingsProgress = null) }
+            buildingStore.maxAgeDays = here.buildingsMaxAgeDays
             Logger.i { "Budynki: pobieranie na ${here.buildingsRadiusKm} km" }
             val watcher = launch { clutter.progress.collect { p -> _state.update { it.copy(buildingsProgress = p) } } }
             val ok =
@@ -406,6 +420,7 @@ class TerrainHorizonViewModel(
                 refraction = after.refraction,
                 buildings = after.buildings,
                 buildingsRadiusKm = after.buildingsRadiusKm,
+                buildingsMaxAgeDays = after.buildingsMaxAgeDays,
             )
         }
         reload()

@@ -116,6 +116,8 @@ import org.meshtastic.core.resources.terrain_horizon_buildings_clear
 import org.meshtastic.core.resources.terrain_horizon_buildings_failed
 import org.meshtastic.core.resources.terrain_horizon_buildings_hint
 import org.meshtastic.core.resources.terrain_horizon_buildings_none_here
+import org.meshtastic.core.resources.terrain_horizon_buildings_age
+import org.meshtastic.core.resources.terrain_horizon_buildings_age_days
 import org.meshtastic.core.resources.terrain_horizon_buildings_range
 import org.meshtastic.core.resources.terrain_horizon_buildings_save
 import org.meshtastic.core.resources.terrain_horizon_buildings_saved
@@ -374,6 +376,7 @@ fun TerrainHorizonScreen(
                     state = state,
                     onToggle = viewModel::setBuildings,
                     onRadius = viewModel::setBuildingsRadius,
+                    onAge = viewModel::setBuildingsMaxAge,
                     onSave = viewModel::saveBuildings,
                     onClear = viewModel::clearSavedBuildings,
                 )
@@ -1138,6 +1141,7 @@ private fun OfflineBuildings(
     state: TerrainHorizonState,
     onToggle: (Boolean) -> Unit,
     onRadius: (Int) -> Unit,
+    onAge: (Int) -> Unit,
     onSave: () -> Unit,
     onClear: () -> Unit,
 ) {
@@ -1156,6 +1160,15 @@ private fun OfflineBuildings(
                     selected = state.buildingsRadiusKm == km,
                     onClick = { onRadius(km) },
                     label = { Text("$km km") },
+                )
+            }
+        }
+        ChipRow(stringResource(Res.string.terrain_horizon_buildings_age)) {
+            HORIZON_BUILDING_AGES_DAYS.forEach { days ->
+                BrandChip(
+                    selected = state.buildingsMaxAgeDays == days,
+                    onClick = { onAge(days) },
+                    label = { Text(stringResource(Res.string.terrain_horizon_buildings_age_days, days)) },
                 )
             }
         }

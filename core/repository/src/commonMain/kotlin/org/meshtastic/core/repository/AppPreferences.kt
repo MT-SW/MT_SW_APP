@@ -733,6 +733,7 @@ data class HorizonPrefs(
     val refraction: Double = 4.0 / 3.0,
     val buildings: Boolean = false,
     val buildingsRadiusKm: Int = 5,
+    val buildingsMaxAgeDays: Int = 30,
 )
 
 data class MapCameraPosition(val latitude: Double, val longitude: Double, val zoom: Double)

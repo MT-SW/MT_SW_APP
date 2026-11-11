@@ -39,6 +39,9 @@ class BuildingStore(
 ) : ClutterPieceCache {
     private val piecesDirectory: Path = directory / "pieces"
 
+    /** Saved pieces older than this many days are downloaded again. */
+    @Volatile var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
+
     private class Area(val lat: Double, val lon: Double, val radiusKm: Int, val path: Path)
 
     private fun areas(): List<Area> = try {
@@ -92,7 +95,7 @@ class BuildingStore(
         val path = piecesDirectory / "$key$PIECE_EXTENSION".toPath()
         val savedAt = fileSystem.metadataOrNull(path)?.lastModifiedAtMillis
         // A piece older than a month is asked for again: that is the update of an area that is already saved.
-        if (savedAt != null && nowMillis - savedAt < PIECE_MAX_AGE_MS) {
+        if (savedAt != null && nowMillis - savedAt < maxAgeDays * MS_PER_DAY) {
             decode(fileSystem.read(path) { readByteArray() })
         } else {
             null
@@ -165,7 +168,8 @@ class BuildingStore(
     private companion object {
         const val EXTENSION = ".bld"
         const val PIECE_EXTENSION = ".piece"
-        const val PIECE_MAX_AGE_MS = 30L * 24 * 60 * 60 * 1000
+        const val DEFAULT_MAX_AGE_DAYS = 30
+        const val MS_PER_DAY = 24L * 60 * 60 * 1000
         const val NAME_PARTS = 3
         const val DEGREE_SCALE = 100_000.0
         const val METRES_PER_KM = 1_000.0
