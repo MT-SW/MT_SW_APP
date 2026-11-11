@@ -32,7 +32,9 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
+import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -57,7 +59,8 @@ import org.meshtastic.core.resources.widget_no_nodes
 import org.meshtastic.core.service.stats.MeshStatsNodeCard
 import org.meshtastic.core.service.stats.MeshStatsSnapshot
 
-private const val LINE_HEIGHT_DP = 15
+private const val LINE_HEIGHT_DP = 17
+private const val WIDGET_CORNER_DP = 16
 private const val HEADER_DP = 30
 private const val TWO_COLUMNS_FROM_DP = 220
 
@@ -104,7 +107,15 @@ class MeshStatusWidget :
                         context.packageManager.getLaunchIntentForPackage(context.packageName)
                             ?: Intent().setClassName(context.packageName, "org.meshtastic.app.MainActivity"),
                     )
-                Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp).clickable(actionStartActivity(open))) {
+                Column(
+                    modifier =
+                    GlanceModifier.fillMaxSize()
+                        // A plain surface behind the text: on a busy wallpaper it was unreadable.
+                        .background(GlanceTheme.colors.widgetBackground)
+                        .cornerRadius(WIDGET_CORNER_DP.dp)
+                        .padding(8.dp)
+                        .clickable(actionStartActivity(open)),
+                ) {
                     val step = (System.currentTimeMillis() / ROTATION_MS).toInt()
                     val width = size.width.value
                     val height = size.height.value
@@ -265,7 +276,7 @@ private fun StatsColumns(all: List<WidgetEntry>, widthDp: Float, heightDp: Float
     // Our node's sections have their column fixed (network and radio left, the rest right); other lists split evenly.
     val parts =
         if (columns == 2 && all.any { it.column == 1 }) {
-            listOf(all.filter { it.column == 0 }.take(rows), all.filter { it.column == 1 }.take(rows))
+            listOf(0, 1).map { column -> all.filter { it.column == column }.take(rows).withoutLoneHeader() }
         } else {
             all.take(rows * columns).splitColumns(columns)
         }
@@ -308,6 +319,10 @@ private fun MeshStatsSnapshot.entries(): List<WidgetEntry> = if (groups.any { it
 } else {
     lines.map { WidgetEntry(it, header = false) }
 }
+
+/** A heading cut off from its readings at the bottom of a column is dropped instead of hanging there alone. */
+private fun List<WidgetEntry>.withoutLoneHeader(): List<WidgetEntry> =
+    if (lastOrNull()?.header == true) dropLast(1) else this
 
 /** Splits into [columns] even columns; a heading never stays alone at the bottom of a column. */
 private fun List<WidgetEntry>.splitColumns(columns: Int): List<List<WidgetEntry>> {
