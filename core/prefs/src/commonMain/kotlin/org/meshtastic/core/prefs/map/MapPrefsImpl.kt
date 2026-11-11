@@ -191,6 +191,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
                 it[KEY_HORIZON_BUILDINGS] = next.buildings
                 it[KEY_HORIZON_BUILDINGS_RADIUS_KM] = next.buildingsRadiusKm
                 it[KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS] = next.buildingsMaxAgeDays
+                it[KEY_HORIZON_TERRAIN_MAX_AGE_DAYS] = next.terrainMaxAgeDays
             }
         }
     }
@@ -209,6 +210,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
             buildings = this[KEY_HORIZON_BUILDINGS] ?: defaults.buildings,
             buildingsRadiusKm = this[KEY_HORIZON_BUILDINGS_RADIUS_KM] ?: defaults.buildingsRadiusKm,
             buildingsMaxAgeDays = this[KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS] ?: defaults.buildingsMaxAgeDays,
+            terrainMaxAgeDays = this[KEY_HORIZON_TERRAIN_MAX_AGE_DAYS] ?: defaults.terrainMaxAgeDays,
         )
     }
 
@@ -245,6 +247,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_HORIZON_BUILDINGS = booleanPreferencesKey("horizon_buildings")
         val KEY_HORIZON_BUILDINGS_RADIUS_KM = intPreferencesKey("horizon_buildings_radius_km")
         val KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS = intPreferencesKey("horizon_buildings_max_age_days")
+        val KEY_HORIZON_TERRAIN_MAX_AGE_DAYS = intPreferencesKey("horizon_terrain_max_age_days")
         val KEY_CAMERA_LATITUDE = doublePreferencesKey("camera_latitude")
         val KEY_CAMERA_LONGITUDE = doublePreferencesKey("camera_longitude")
         val KEY_CAMERA_ZOOM = doublePreferencesKey("camera_zoom")

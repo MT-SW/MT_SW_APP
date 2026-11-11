@@ -76,7 +76,12 @@ class PlannerOverpass(
     private suspend fun fetchLink(a: GeoPoint, b: GeoPoint): ClutterMap {
         val seen = HashSet<Long>()
         val polygons = ArrayList<ClutterPolygon>()
-        for (query in OsmQueries.linkParts(a, b)) {
+        // Buildings saved on the device (and not older than the chosen age) are used; only the woods are asked for.
+        pieces?.refreshAge()
+        val saved = pieces?.savedBuildings(a, b)
+        if (saved != null) polygons.addAll(saved)
+        val queries = OsmQueries.linkParts(a, b).let { if (saved != null) it.take(1) else it }
+        for (query in queries) {
             try {
                 polygons.addAll(fetch(query, seen).polygons)
             } catch (e: PlannerClutterException) {

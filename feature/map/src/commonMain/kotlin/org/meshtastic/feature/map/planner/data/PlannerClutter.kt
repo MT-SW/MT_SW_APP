@@ -268,6 +268,12 @@ interface ClutterPieceCache {
     /** The polygons of the piece saved under [key], or null when there is none. */
     fun readPiece(key: String): List<ClutterPolygon>?
 
+    /** Reads the chosen age of saved data again before it is used. */
+    suspend fun refreshAge() {}
+
+    /** The saved buildings of a fresh area that covers both [a] and [b], or null when there is none. */
+    fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? = null
+
     /** Saves the polygons of one finished piece; best effort. */
     fun writePiece(key: String, polygons: List<ClutterPolygon>)
 }

@@ -19,6 +19,7 @@ package org.meshtastic.feature.map.planner.data
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.terrain.TileIndex
@@ -30,10 +31,25 @@ import org.meshtastic.feature.map.terrain.TileIndex
 class TerrainStore(
     private val fileSystem: FileSystem = mapLayerFileSystem(),
     private val directory: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "terrain",
+    private val ageDays: suspend () -> Int = { DEFAULT_MAX_AGE_DAYS },
 ) {
     private fun pathOf(tile: TileIndex): Path = directory / "${tile.zoom}-${tile.x}-${tile.y}.tile".toPath()
 
     fun has(tile: TileIndex): Boolean = fileSystem.exists(pathOf(tile))
+
+    /** Saved tiles older than this many days are fetched again. */
+    @Volatile var maxAgeDays: Int = DEFAULT_MAX_AGE_DAYS
+
+    /** Reads the chosen age again (the choice is made in the panorama and kept in the settings). */
+    suspend fun refreshAge() {
+        maxAgeDays = ageDays()
+    }
+
+    /** Whether the tile is saved and younger than [maxAgeDays]. */
+    fun isFresh(tile: TileIndex): Boolean {
+        val savedAt = fileSystem.metadataOrNull(pathOf(tile))?.lastModifiedAtMillis
+        return savedAt != null && nowMillis - savedAt < maxAgeDays * MS_PER_DAY
+    }
 
     /** The saved bytes (empty: no tile there), or null when this tile was never saved. */
     fun read(tile: TileIndex): ByteArray? {
@@ -72,5 +88,10 @@ class TerrainStore(
         } catch (_: Exception) {
             // best effort
         }
+    }
+
+    private companion object {
+        const val DEFAULT_MAX_AGE_DAYS = 30
+        const val MS_PER_DAY = 24L * 60 * 60 * 1000
     }
 }

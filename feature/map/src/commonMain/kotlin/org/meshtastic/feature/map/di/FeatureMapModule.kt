@@ -52,9 +52,13 @@ class FeatureMapModule {
     ): MapLayersManager = MapLayersManager(dispatchers, httpClient, mapPrefs)
 
     /** Terrain for the native planner: one instance so the decoded-tile LRU is shared across planner sessions. */
-    @Single fun provideTerrainStore(): TerrainStore = TerrainStore()
+    @Single
+    fun provideTerrainStore(mapPrefs: MapPrefs): TerrainStore =
+        TerrainStore(ageDays = { mapPrefs.awaitHorizonPrefs().terrainMaxAgeDays })
 
-    @Single fun provideBuildingStore(): BuildingStore = BuildingStore()
+    @Single
+    fun provideBuildingStore(mapPrefs: MapPrefs): BuildingStore =
+        BuildingStore(ageDays = { mapPrefs.awaitHorizonPrefs().buildingsMaxAgeDays })
 
     @Single
     fun providePlannerElevationSource(store: TerrainStore): PlannerElevationSource = PlannerElevation(store = store)

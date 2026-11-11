@@ -36,6 +36,7 @@ import kotlin.math.roundToInt
 class BuildingStore(
     private val fileSystem: FileSystem = mapLayerFileSystem(),
     private val directory: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "buildings",
+    private val ageDays: suspend () -> Int = { DEFAULT_MAX_AGE_DAYS },
 ) : ClutterPieceCache {
     private val piecesDirectory: Path = directory / "pieces"
 
@@ -89,6 +90,24 @@ class BuildingStore(
         true
     } catch (_: Exception) {
         false
+    }
+
+    override suspend fun refreshAge() {
+        maxAgeDays = ageDays()
+    }
+
+    override fun savedBuildings(a: GeoPoint, b: GeoPoint): List<ClutterPolygon>? {
+        val fresh =
+            areas().filter { area ->
+                val savedAt = fileSystem.metadataOrNull(area.path)?.lastModifiedAtMillis
+                covers(area, a) && covers(area, b) && savedAt != null && nowMillis - savedAt < maxAgeDays * MS_PER_DAY
+            }
+        if (fresh.isEmpty()) return null
+        return try {
+            fresh.flatMap { decode(fileSystem.read(it.path) { readByteArray() }) }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     override fun readPiece(key: String): List<ClutterPolygon>? = try {

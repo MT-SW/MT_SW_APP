@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: planer używa zapisanych na urządzeniu budynków i terenu bez pytania internetu; dane starsze niż wybrana liczba dni (domyślnie 30, wybór także dla terenu) są odświeżane same, a gdy brak internetu zostają stare.
 * Wszystkie wersje: po pobraniu terenu i budynków przycisk zmienia się na „Aktualizuj”; budynki odświeżają tylko kawałki starsze niż wybrana liczba dni (7, 14, 30, 60 lub 90; domyślnie 30), a teren dobiera brakujące kafelki.
 * Wszystkie wersje: pobieranie budynków (panorama terenu) zapisuje każdy skończony kawałek od razu na urządzeniu, więc po przerwaniu kolejne „Pobierz” bierze tylko brakujące kawałki zamiast zaczynać od początku.
 * Wszystkie wersje: w widżecie statystyki naszego węzła mają stały układ: sieć i radio w lewej kolumnie, węzeł, zasoby i łączność w prawej. Dzięki temu pismo jest większe.
@@ -625,6 +626,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: the planner uses the buildings and terrain saved on the device without asking the internet; data older than the chosen number of days (30 by default, the choice now also for terrain) is refreshed by itself, and kept as it is when there is no internet.
 * All versions: once terrain and buildings are downloaded the button becomes "Update"; buildings refresh only pieces older than the chosen number of days (7, 14, 30, 60 or 90; 30 by default), and terrain fetches only the missing tiles.
 * All versions: the buildings download (terrain panorama) saves every finished piece on the device at once, so after an interruption the next download fetches only the missing pieces instead of starting over.
 * All versions: in the widget the statistics of our node have a fixed layout: network and radio in the left column, node, resources and connections in the right one. This allows bigger text.

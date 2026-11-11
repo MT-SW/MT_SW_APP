@@ -216,12 +216,13 @@ class PlannerElevation(
         zoom: Int,
         persist: Boolean = false,
     ): Map<TileIndex, ElevationTile?> {
+        store?.refreshAge()
         val result = HashMap<TileIndex, ElevationTile?>()
         val missing = ArrayList<TileIndex>()
         lock.withLock {
             for (t in needed) {
                 // Saving needs the tile on the disk too, so one only in memory still counts as missing.
-                if (cache.containsKey(t) && !(persist && store?.has(t) == false)) {
+                if (cache.containsKey(t) && !(persist && store?.isFresh(t) == false)) {
                     val v = cache.remove(t)
                     cache[t] = v
                     result[t] = v
@@ -237,6 +238,8 @@ class PlannerElevation(
                 withContext(ioContext) {
                     val out = ArrayList<Pair<TileIndex, ElevationTile?>>()
                     for (t in missing) {
+                        // Saving asks for a fresh tile: an old one is fetched again (and kept if that fails).
+                        if (persist && !fromDisk.isFresh(t)) continue
                         val bytes = fromDisk.read(t) ?: continue
                         val tile =
                             if (bytes.isEmpty()) {
@@ -264,14 +267,11 @@ class PlannerElevation(
                 }
                 missing.removeAll { it in result }
             }
+            // Used as they are; the ones past their age are refreshed in the background of this call, once.
+            if (!persist) refreshStale(fromDisk, saved.map { it.first }.filter { !fromDisk.isFresh(it) }, bounds, zoom)
         }
         if (missing.isEmpty()) return result
-        val url =
-            if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
-                MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
-            } else {
-                MapterhornEndpoints.GLOBAL_PMTILES_URL
-            }
+        val url = archiveUrl(bounds, zoom)
         val fetched =
             withContext(ioContext) {
                 fetcherLock.withLock {
@@ -333,6 +333,37 @@ class PlannerElevation(
             }
         fetchers[url] = created
         return created
+    }
+
+    private fun archiveUrl(bounds: GeoBounds, zoom: Int): String =
+        if (zoom > MapterhornEndpoints.GLOBAL_MAX_ZOOM) {
+            MapterhornEndpoints.regionalUrlFor(bounds) ?: MapterhornEndpoints.GLOBAL_PMTILES_URL
+        } else {
+            MapterhornEndpoints.GLOBAL_PMTILES_URL
+        }
+
+    /** Tiles already tried for a refresh in this run: a device without the internet is not asked again and again. */
+    private val refreshTried = HashSet<TileIndex>()
+
+    /** Fetches the saved tiles that are past their age again; best effort, the old tile stays when that fails. */
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun refreshStale(disk: TerrainStore, stale: List<TileIndex>, bounds: GeoBounds, zoom: Int) {
+        if (stale.isEmpty()) return
+        val url = archiveUrl(bounds, zoom)
+        withContext(ioContext) {
+            fetcherLock.withLock {
+                val todo = stale.filter { refreshTried.add(it) }
+                if (todo.isEmpty()) return@withLock
+                try {
+                    val fetcher = fetcherFor(url)
+                    for (t in todo) disk.write(t, fetcher.fetchTile(t.zoom, t.x, t.y))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    dropFetcher(url)
+                }
+            }
+        }
     }
 
     private fun dropFetcher(url: String) {

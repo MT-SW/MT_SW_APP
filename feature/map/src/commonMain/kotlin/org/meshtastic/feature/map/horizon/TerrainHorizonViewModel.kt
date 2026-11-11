@@ -156,6 +156,8 @@ data class TerrainHorizonState(
     val buildingsRadiusKm: Int = DEFAULT_BUILDINGS_RADIUS_KM,
     /** Saved pieces of buildings older than this many days are downloaded again by "Update". */
     val buildingsMaxAgeDays: Int = DEFAULT_BUILDINGS_MAX_AGE_DAYS,
+    /** Saved terrain tiles older than this many days are fetched again by "Update". */
+    val terrainMaxAgeDays: Int = DEFAULT_BUILDINGS_MAX_AGE_DAYS,
     val buildingsSaving: Boolean = false,
     /** How many pieces of the area are done, while the buildings are being downloaded. */
     val buildingsProgress: ClutterProgress? = null,
@@ -250,6 +252,7 @@ class TerrainHorizonViewModel(
                     buildings = saved.buildings,
                     buildingsRadiusKm = saved.buildingsRadiusKm,
                     buildingsMaxAgeDays = saved.buildingsMaxAgeDays,
+                    terrainMaxAgeDays = saved.terrainMaxAgeDays,
                 )
             }
             reload()
@@ -280,6 +283,11 @@ class TerrainHorizonViewModel(
     fun setRefraction(k: Double) = change { it.copy(refraction = k) }
 
     fun setBuildings(on: Boolean) = change { it.copy(buildings = on) }
+
+    fun setTerrainMaxAge(days: Int) {
+        _state.update { it.copy(terrainMaxAgeDays = days) }
+        mapPrefs.updateHorizonPrefs { it.copy(terrainMaxAgeDays = days) }
+    }
 
     fun setBuildingsMaxAge(days: Int) {
         _state.update { it.copy(buildingsMaxAgeDays = days) }
@@ -362,6 +370,7 @@ class TerrainHorizonViewModel(
         val lon = here.observerLon ?: return
         if (here.saving) return
         viewModelScope.launch {
+            terrainStore.maxAgeDays = here.terrainMaxAgeDays
             _state.update { it.copy(saving = true, saveDone = 0, saveTotal = 0, saveOk = null) }
             val ok =
                 try {
@@ -421,6 +430,7 @@ class TerrainHorizonViewModel(
                 buildings = after.buildings,
                 buildingsRadiusKm = after.buildingsRadiusKm,
                 buildingsMaxAgeDays = after.buildingsMaxAgeDays,
+                terrainMaxAgeDays = after.terrainMaxAgeDays,
             )
         }
         reload()

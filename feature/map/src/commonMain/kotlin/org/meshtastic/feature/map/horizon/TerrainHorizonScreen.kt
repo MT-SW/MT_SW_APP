@@ -369,6 +369,7 @@ fun TerrainHorizonScreen(
                 OfflineTerrain(
                     state = state,
                     onRadius = viewModel::setSaveRadius,
+                    onAge = viewModel::setTerrainMaxAge,
                     onSave = viewModel::saveTerrain,
                     onClear = viewModel::clearSavedTerrain,
                 )
@@ -1078,6 +1079,7 @@ private const val MAP_METRES_PER_KM = 1_000.0
 private fun OfflineTerrain(
     state: TerrainHorizonState,
     onRadius: (Int) -> Unit,
+    onAge: (Int) -> Unit,
     onSave: () -> Unit,
     onClear: () -> Unit,
 ) {
@@ -1095,6 +1097,15 @@ private fun OfflineTerrain(
         ChipRow(stringResource(Res.string.terrain_horizon_save_range)) {
             HORIZON_RADII_KM.forEach { km ->
                 BrandChip(selected = state.saveRadiusKm == km, onClick = { onRadius(km) }, label = { Text("$km km") })
+            }
+        }
+        ChipRow(stringResource(Res.string.terrain_horizon_buildings_age)) {
+            HORIZON_BUILDING_AGES_DAYS.forEach { days ->
+                BrandChip(
+                    selected = state.terrainMaxAgeDays == days,
+                    onClick = { onAge(days) },
+                    label = { Text(stringResource(Res.string.terrain_horizon_buildings_age_days, days)) },
+                )
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
