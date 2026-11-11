@@ -89,7 +89,6 @@ import org.meshtastic.core.model.antenna.AntennaDesign
 import org.meshtastic.core.model.antenna.AntennaInput
 import org.meshtastic.core.model.antenna.AntennaMath
 import org.meshtastic.core.model.antenna.AntennaPatterns
-import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.core.model.antenna.AntennaPrefill
 import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.AntennaSetups
@@ -102,6 +101,7 @@ import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.Insulation
 import org.meshtastic.core.model.antenna.Note
+import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.model.antenna.Polarization
 import org.meshtastic.core.repository.FileService
@@ -159,7 +159,6 @@ import org.meshtastic.core.resources.antenna_feed_title
 import org.meshtastic.core.resources.antenna_freq_ours
 import org.meshtastic.core.resources.antenna_frequency
 import org.meshtastic.core.resources.antenna_gain
-import org.meshtastic.core.resources.antenna_pattern_title
 import org.meshtastic.core.resources.antenna_gain_override
 import org.meshtastic.core.resources.antenna_hint_cable
 import org.meshtastic.core.resources.antenna_hint_worst
@@ -184,6 +183,7 @@ import org.meshtastic.core.resources.antenna_note_radials
 import org.meshtastic.core.resources.antenna_note_tune_swr
 import org.meshtastic.core.resources.antenna_note_yagi_boom
 import org.meshtastic.core.resources.antenna_note_yagi_driven
+import org.meshtastic.core.resources.antenna_pattern_title
 import org.meshtastic.core.resources.antenna_planner_name
 import org.meshtastic.core.resources.antenna_pol_circular
 import org.meshtastic.core.resources.antenna_pol_either

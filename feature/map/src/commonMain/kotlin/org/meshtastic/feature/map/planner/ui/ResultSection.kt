@@ -71,13 +71,13 @@ import org.meshtastic.core.resources.planner_measured_note
 import org.meshtastic.core.resources.planner_measured_pred_rssi
 import org.meshtastic.core.resources.planner_measured_pred_snr
 import org.meshtastic.core.resources.planner_no
+import org.meshtastic.core.resources.planner_result_ground_reflection
 import org.meshtastic.core.resources.planner_result_need_points
+import org.meshtastic.core.resources.planner_result_pattern_loss
 import org.meshtastic.core.resources.planner_rx_power
 import org.meshtastic.core.resources.planner_section_measured
 import org.meshtastic.core.resources.planner_section_result
 import org.meshtastic.core.resources.planner_sensitivity
-import org.meshtastic.core.resources.planner_result_ground_reflection
-import org.meshtastic.core.resources.planner_result_pattern_loss
 import org.meshtastic.core.resources.planner_total_loss
 import org.meshtastic.core.resources.planner_unit_db
 import org.meshtastic.core.resources.planner_unit_dbm

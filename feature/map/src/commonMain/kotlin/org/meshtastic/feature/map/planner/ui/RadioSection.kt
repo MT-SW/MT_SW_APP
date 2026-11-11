@@ -45,13 +45,13 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_atmospheric_loss
 import org.meshtastic.core.resources.planner_band_free
 import org.meshtastic.core.resources.planner_bandwidth
+import org.meshtastic.core.resources.planner_buildings_on_map
 import org.meshtastic.core.resources.planner_clutter
+import org.meshtastic.core.resources.planner_clutter_reflections
 import org.meshtastic.core.resources.planner_clutter_title
 import org.meshtastic.core.resources.planner_ducting_warning
 import org.meshtastic.core.resources.planner_extra_loss
 import org.meshtastic.core.resources.planner_frequency
-import org.meshtastic.core.resources.planner_buildings_on_map
-import org.meshtastic.core.resources.planner_clutter_reflections
 import org.meshtastic.core.resources.planner_frequency_title
 import org.meshtastic.core.resources.planner_ground_reflection
 import org.meshtastic.core.resources.planner_k_factor

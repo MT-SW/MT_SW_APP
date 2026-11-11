@@ -30,6 +30,7 @@ enum class PropagationKind {
 
     /** The effective earth radius factor k. */
     K_FACTOR,
+
     ;
 
     companion object {
@@ -72,6 +73,7 @@ object PropagationColors {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun interpolate(stops: List<Stop>, x: Double): Int {
         if (x <= stops.first().at) return stops.first().argb
         if (x >= stops.last().at) return stops.last().argb

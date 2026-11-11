@@ -67,8 +67,8 @@ import org.meshtastic.core.resources.planner_coverage_rx_height
 import org.meshtastic.core.resources.planner_coverage_side
 import org.meshtastic.core.resources.planner_layer_buildings_area
 import org.meshtastic.core.resources.planner_layer_buildings_link
-import org.meshtastic.core.resources.planner_layer_reflection
 import org.meshtastic.core.resources.planner_layer_name
+import org.meshtastic.core.resources.planner_layer_reflection
 import org.meshtastic.core.resources.planner_legend_excellent
 import org.meshtastic.core.resources.planner_legend_good
 import org.meshtastic.core.resources.planner_legend_marginal

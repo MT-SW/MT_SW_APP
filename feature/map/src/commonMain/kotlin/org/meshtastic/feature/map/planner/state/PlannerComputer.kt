@@ -285,11 +285,11 @@ class PlannerComputer(
                 kFactor = state.kFactor,
                 surfaceRefractivity = state.surfaceRefractivity,
                 extraLossDb =
-                    if (clutterMap != null) {
-                        state.effectiveExtraLossDb + state.multipathDb(clutterMap.stats)
-                    } else {
-                        state.extraLossDb
-                    },
+                if (clutterMap != null) {
+                    state.effectiveExtraLossDb + state.multipathDb(clutterMap.stats)
+                } else {
+                    state.extraLossDb
+                },
                 groundReflection = state.groundReflection,
                 maxRangeKm = state.coverageMaxRangeKm,
                 radials = state.coverageRadials,

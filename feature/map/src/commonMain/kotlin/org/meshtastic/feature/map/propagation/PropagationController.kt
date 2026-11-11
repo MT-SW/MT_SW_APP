@@ -98,7 +98,9 @@ class PropagationController(
         mapPrefs.updatePropagationPrefs { it.copy(autoRefresh = on) }
     }
 
-    fun setHoursAhead(hours: Int) = mutable.update { it.copy(hoursAhead = hours.coerceIn(0, TropoForecastSource.HOURS - 1)) }
+    fun setHoursAhead(hours: Int) = mutable.update {
+        it.copy(hoursAhead = hours.coerceIn(0, TropoForecastSource.HOURS - 1))
+    }
 
     /** Downloads the forecast for [bounds] now (the "download for this view" button). */
     fun download(bounds: GeoBounds) {

@@ -44,6 +44,7 @@ fun AntennaPatternPlot(beamwidthDeg: Double, frontToBackDb: Double, modifier: Mo
     Canvas(modifier.fillMaxWidth().aspectRatio(1f)) {
         val c = Offset(size.width / 2f, size.height / 2f)
         val r = size.minDimension / 2f * 0.92f
+
         // Radius of a level: the main direction is the outer ring, 30 dB down is the centre.
         fun radius(db: Double): Float = (r * (1.0 - db / 30.0).coerceIn(0.0, 1.0)).toFloat()
         for (db in listOf(0.0, 3.0, 10.0, 20.0)) {

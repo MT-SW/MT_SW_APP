@@ -46,9 +46,10 @@ object BuildingsLayer {
     internal class Classified(val polygon: ClutterPolygon, val blocking: Boolean)
 
     /**
-     * The buildings within [NEAR_M] of the straight line A to B, each marked blocking when its roof is above the line of
-     * sight. [zA] and [zB] are the antenna altitudes (m above sea level); ground comes from [profile].
+     * The buildings within [NEAR_M] of the straight line A to B, each marked blocking when its roof is above the line
+     * of sight. [zA] and [zB] are the antenna altitudes (m above sea level); ground comes from [profile].
      */
+    @Suppress("LoopWithTooManyJumpStatements")
     internal fun classify(
         polygons: List<ClutterPolygon>,
         a: GeoPoint,
@@ -92,7 +93,9 @@ object BuildingsLayer {
 
     /** GeoJSON of a link's buildings (see [classify]). */
     internal fun renderLink(buildings: List<Classified>): String = collection(
-        buildings.take(MAX_FEATURES).map { feature(it.polygon, if (it.blocking) BLOCKING_COLOR else ROUTE_COLOR, 0.65) },
+        buildings.take(MAX_FEATURES).map {
+            feature(it.polygon, if (it.blocking) BLOCKING_COLOR else ROUTE_COLOR, 0.65)
+        },
     )
 
     /** GeoJSON of the buildings around a coverage centre, as a backdrop. */
@@ -114,7 +117,8 @@ object BuildingsLayer {
         for (i in 0..n) {
             val k = i % n
             if (i > 0) ring.append(',')
-            ring.append('[')
+            ring
+                .append('[')
                 .append(Num.fmt(p.outer[2 * k + 1], 6))
                 .append(',')
                 .append(Num.fmt(p.outer[2 * k], 6))

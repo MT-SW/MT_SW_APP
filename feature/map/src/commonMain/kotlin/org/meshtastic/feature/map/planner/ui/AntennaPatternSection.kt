@@ -74,6 +74,7 @@ private fun kindName(kind: PatternKind): StringResource = when (kind) {
  * a typed bearing), and the link and the coverage area follow from it.
  */
 @Composable
+@Suppress("MultipleEmitters")
 internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: PlannerViewModel) {
     PlannerSubheading(text = stringResource(Res.string.planner_pattern_title))
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -138,6 +139,8 @@ internal fun AntennaPatternSection(side: PlannerSide, end: PlannerEnd, vm: Plann
     AntennaPatternPlot(
         beamwidthDeg = end.beamwidthDeg,
         frontToBackDb = end.frontToBackDb,
-        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(0.6f),
+        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(PLOT_WIDTH_SHARE),
     )
 }
+
+private const val PLOT_WIDTH_SHARE = 0.6f

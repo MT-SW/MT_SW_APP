@@ -57,8 +57,8 @@ enum class PatternKind(val directional: Boolean) {
  * Typical numbers for the horizontal pattern of each [PatternKind], and the loss off the main direction.
  *
  * These are textbook approximations (a parabolic main lobe that is 3 dB down at half the beamwidth and flattens out at
- * the front-to-back ratio), good for planning how much a link or a coverage area changes when an antenna is turned,
- * not a replacement for a measured pattern.
+ * the front-to-back ratio), good for planning how much a link or a coverage area changes when an antenna is turned, not
+ * a replacement for a measured pattern.
  */
 object AntennaPatterns {
     const val MIN_ELEMENTS = 2

@@ -19,7 +19,6 @@ package org.meshtastic.core.service.stats
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlin.time.Clock
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -37,13 +36,14 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.live_update_signal
+import org.meshtastic.core.resources.local_stats_uptime
+import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.core.resources.widget_card_heard
 import org.meshtastic.core.resources.widget_card_hops
 import org.meshtastic.core.resources.widget_card_model
 import org.meshtastic.core.resources.widget_card_voltage
-import org.meshtastic.core.resources.local_stats_uptime
-import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.proto.LocalStats
+import kotlin.time.Clock
 
 /** What a widget shows: a title, a short chip (nodes online/all), whether the radio is connected, and the lines. */
 data class MeshStatsSnapshot(

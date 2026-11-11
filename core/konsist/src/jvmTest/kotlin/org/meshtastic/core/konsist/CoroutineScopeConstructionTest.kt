@@ -83,6 +83,7 @@ class CoroutineScopeConstructionTest {
             "feature/map/commonMain/CustomTileProviderRepository.kt",
             "feature/map/commonMain/LayerOpacityStore.kt",
             "feature/map/commonMain/MapLayersManager.kt",
+            "feature/map/commonMain/PropagationController.kt",
             "feature/messaging/commonMain/ChatImageUploader.kt",
             "feature/messaging/iosMain/IosDictationService.kt",
             "feature/messaging/iosMain/IosTranslationRouter.kt",

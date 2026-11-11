@@ -50,6 +50,7 @@ object HorizonBuildings {
     private const val OWN_BUILDING_M = 25.0
     private const val MIN_HEIGHT_M = 2.0
 
+    @Suppress("LoopWithTooManyJumpStatements")
     fun project(
         buildings: ClutterMap,
         centre: GeoPoint,

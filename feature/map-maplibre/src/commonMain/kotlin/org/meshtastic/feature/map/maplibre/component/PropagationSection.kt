@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.maplibre.spatialk.geojson.BoundingBox
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.propagation_age
@@ -72,13 +73,13 @@ import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
 import org.meshtastic.feature.map.propagation.GeoBounds
 import org.meshtastic.feature.map.propagation.PropagationController
 import org.meshtastic.feature.map.propagation.PropagationKind
-import org.maplibre.spatialk.geojson.BoundingBox
 
 /**
- * The propagation layer, as a section of the layers sheet: on/off, the kind of picture, transparency, which hour of
- * the 24-hour forecast, and the download for what is on screen.
+ * The propagation layer, as a section of the layers sheet: on/off, the kind of picture, transparency, which hour of the
+ * 24-hour forecast, and the download for what is on screen.
  */
 @Composable
+@Suppress("LongMethod")
 internal fun PropagationSection(
     target: OfflineMapTarget,
     opacity: Map<String, Float>,
@@ -98,10 +99,13 @@ internal fun PropagationSection(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f),
             )
-            Switch(checked = state.enabled, onCheckedChange = { on ->
-                controller.setEnabled(on)
-                if (on && state.grid == null) target.bounds()?.let { controller.download(it.toGeo()) }
-            })
+            Switch(
+                checked = state.enabled,
+                onCheckedChange = { on ->
+                    controller.setEnabled(on)
+                    if (on && state.grid == null) target.bounds()?.let { controller.download(it.toGeo()) }
+                },
+            )
         }
         if (!state.enabled) return@Column
 
@@ -129,11 +133,11 @@ internal fun PropagationSection(
             val ahead = state.hoursAhead
             Text(
                 text =
-                if (ahead == 0) {
-                    stringResource(Res.string.propagation_hour_now)
-                } else {
-                    stringResource(Res.string.propagation_hour_ahead, ahead)
-                },
+                    if (ahead == 0) {
+                        stringResource(Res.string.propagation_hour_now)
+                    } else {
+                        stringResource(Res.string.propagation_hour_ahead, ahead)
+                    },
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
@@ -167,9 +171,7 @@ internal fun PropagationSection(
                 onClick = { target.bounds()?.let { controller.download(it.toGeo()) } },
             ) {
                 Text(
-                    stringResource(
-                        if (grid == null) Res.string.propagation_download else Res.string.propagation_update,
-                    ),
+                    stringResource(if (grid == null) Res.string.propagation_download else Res.string.propagation_update)
                 )
             }
             if (state.loading) {
@@ -181,8 +183,11 @@ internal fun PropagationSection(
         val status =
             when {
                 state.failed -> stringResource(Res.string.propagation_failed)
+
                 grid == null -> stringResource(Res.string.propagation_none)
-                else -> stringResource(Res.string.propagation_age, ((nowMillis - grid.fetchedAtMillis) / 60_000L).toInt())
+
+                else ->
+                    stringResource(Res.string.propagation_age, ((nowMillis - grid.fetchedAtMillis) / 60_000L).toInt())
             }
         Text(
             text = status,
@@ -214,10 +219,11 @@ internal fun Legend() {
     }
 }
 
-private fun PropagationKind.label(): StringResource = when (this) {
-    PropagationKind.GRADIENT -> Res.string.propagation_kind_gradient
-    PropagationKind.ENHANCED -> Res.string.propagation_kind_enhanced
-    PropagationKind.K_FACTOR -> Res.string.propagation_kind_k
-}
+private fun PropagationKind.label(): StringResource =
+    when (this) {
+        PropagationKind.GRADIENT -> Res.string.propagation_kind_gradient
+        PropagationKind.ENHANCED -> Res.string.propagation_kind_enhanced
+        PropagationKind.K_FACTOR -> Res.string.propagation_kind_k
+    }
 
 private fun BoundingBox.toGeo(): GeoBounds = GeoBounds(south = south, west = west, north = north, east = east)

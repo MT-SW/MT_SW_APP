@@ -16,11 +16,9 @@
  */
 package org.meshtastic.feature.map.maplibre
 
-import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,14 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import org.meshtastic.feature.map.propagation.PropagationController
-import org.meshtastic.feature.map.propagation.GeoBounds
-import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
-import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
-import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
-import org.koin.compose.koinInject
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.FlowPreview
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -46,13 +37,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import org.koin.compose.koinInject
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
@@ -88,6 +82,7 @@ import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
+import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -96,6 +91,9 @@ import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeLinkLayers
+import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
+import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
+import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
@@ -106,6 +104,8 @@ import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle
 import org.meshtastic.feature.map.maplibre.style.zoomRange
 import org.meshtastic.feature.map.maplibre.tiles.InstallRadarSmoothing
+import org.meshtastic.feature.map.propagation.GeoBounds
+import org.meshtastic.feature.map.propagation.PropagationController
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 import org.maplibre.compose.layers.LocationIndicatorDefaults as CoreLocationIndicatorDefaults
@@ -126,7 +126,7 @@ import org.maplibre.compose.layers.LocationIndicatorDefaults as CoreLocationIndi
  * drawn.
  */
 @Composable
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "LongMethod")
 fun rememberMeshMapState(
     viewModel: BaseMapViewModel,
     navigateToNodeDetails: (Int) -> Unit,
@@ -297,37 +297,37 @@ fun MeshMap(
     val credits = extraCredits.distinct()
     val ornaments = remember(credits) { meshMapOrnaments(credits) }
     Box(modifier) {
-    MaplibreMap(
-        modifier = Modifier.fillMaxSize(),
-        state = mapState,
-        // Honour what the source can actually serve, as the OSMdroid map did.
-        cameraConstraints =
-        CameraConstraints {
-            minZoom = zoomRange.start.toDouble()
-            maxZoom = zoomRange.endInclusive.toDouble()
-        },
-        interactions =
-        MapInteractions {
-            callbacks {
-                longClick {
-                    onEvent { event ->
-                        event.position?.let(onMapLongClick)
-                        ClickResult.Consume
+        MaplibreMap(
+            modifier = Modifier.fillMaxSize(),
+            state = mapState,
+            // Honour what the source can actually serve, as the OSMdroid map did.
+            cameraConstraints =
+            CameraConstraints {
+                minZoom = zoomRange.start.toDouble()
+                maxZoom = zoomRange.endInclusive.toDouble()
+            },
+            interactions =
+            MapInteractions {
+                callbacks {
+                    longClick {
+                        onEvent { event ->
+                            event.position?.let(onMapLongClick)
+                            ClickResult.Consume
+                        }
+                    }
+                    // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
+                    click {
+                        onEvent { event ->
+                            Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
+                            event.position?.let(onMapClick)
+                            ClickResult.Pass
+                        }
                     }
                 }
-                // Pass, not Consume: a tap has to keep reaching the layers underneath or nothing is selectable.
-                click {
-                    onEvent { event ->
-                        Logger.i { "Mapa: dotknięcie ekranu w ${event.position}" }
-                        event.position?.let(onMapClick)
-                        ClickResult.Pass
-                    }
-                }
-            }
-        },
-        overlay = { include(ornaments) },
-    )
-    PropagationOverlay(Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 56.dp))
+            },
+            overlay = { include(ornaments) },
+        )
+        PropagationOverlay(Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 56.dp))
     }
 }
 

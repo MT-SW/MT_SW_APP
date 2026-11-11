@@ -19,10 +19,10 @@
 package org.meshtastic.feature.map.planner.state
 
 import org.meshtastic.core.model.antenna.AntennaPatterns
-import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.FeederResult
+import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
@@ -38,9 +38,9 @@ import org.meshtastic.feature.map.planner.data.PlannerWeatherError
 import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.math.log10
-import kotlin.math.pow
 import kotlin.math.log2
 import kotlin.math.min
+import kotlin.math.pow
 
 /** The two link ends. */
 enum class PlannerSide {
@@ -321,12 +321,11 @@ data class PlannerUiState(
         }
 
     /** The allowance (dB) for reflections off buildings and trees, for what [stats] found: more of them, more of it. */
-    fun multipathDb(stats: ClutterStats): Double =
-        if (clutterReflections) {
-            min(MAX_MULTIPATH_DB, MULTIPATH_DB_PER_OCTAVE * log2(1.0 + stats.buildings / 20.0 + stats.forests / 5.0))
-        } else {
-            0.0
-        }
+    fun multipathDb(stats: ClutterStats): Double = if (clutterReflections) {
+        min(MAX_MULTIPATH_DB, MULTIPATH_DB_PER_OCTAVE * log2(1.0 + stats.buildings / 20.0 + stats.forests / 5.0))
+    } else {
+        0.0
+    }
 
     fun end(side: PlannerSide): PlannerEnd = if (side == PlannerSide.A) a else b
 

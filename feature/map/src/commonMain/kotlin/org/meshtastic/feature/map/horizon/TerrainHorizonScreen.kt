@@ -78,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -127,6 +128,7 @@ import org.meshtastic.core.resources.terrain_horizon_buildings_saving
 import org.meshtastic.core.resources.terrain_horizon_buildings_update
 import org.meshtastic.core.resources.terrain_horizon_camera
 import org.meshtastic.core.resources.terrain_horizon_compass
+import org.meshtastic.core.resources.terrain_horizon_crest
 import org.meshtastic.core.resources.terrain_horizon_favorites
 import org.meshtastic.core.resources.terrain_horizon_fov
 import org.meshtastic.core.resources.terrain_horizon_from
@@ -135,7 +137,6 @@ import org.meshtastic.core.resources.terrain_horizon_in_sight
 import org.meshtastic.core.resources.terrain_horizon_info_body
 import org.meshtastic.core.resources.terrain_horizon_info_title
 import org.meshtastic.core.resources.terrain_horizon_labels
-import org.meshtastic.core.resources.terrain_horizon_crest
 import org.meshtastic.core.resources.terrain_horizon_loading
 import org.meshtastic.core.resources.terrain_horizon_move
 import org.meshtastic.core.resources.terrain_horizon_move_back
@@ -176,7 +177,6 @@ import org.meshtastic.feature.map.planner.Geodesy
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
-import androidx.compose.ui.graphics.Brush
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -660,7 +660,8 @@ private fun Panorama(
     val buildingBands = remember(sky) { BandShares.map { lerp(sky, BuildingColor, it + BUILDING_BAND_BOOST) } }
     // Light comes from where the sun is now at the station (the real position, a minute-old at most), and the far bands
     // are veiled by haze.
-    val sun = remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
+    val sun =
+        remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
     val light = remember(sky, sun) { ReliefLight(sky, HazeShares, sun) }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
@@ -676,50 +677,63 @@ private fun Panorama(
     val currentTargets by rememberUpdatedState(targets)
     val currentFov by rememberUpdatedState(fieldOfView)
     Box(Modifier.fillMaxSize()) {
-    Canvas(
-        modifier =
-        Modifier.fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures { _, dx ->
-                    onManualTurn()
-                    val perDeg = size.width / currentFov
-                    centre = ((currentCentre - dx / perDeg) % FULL_TURN + FULL_TURN) % FULL_TURN
+        Canvas(
+            modifier =
+            Modifier.fillMaxSize()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { _, dx ->
+                        onManualTurn()
+                        val perDeg = size.width / currentFov
+                        centre = ((currentCentre - dx / perDeg) % FULL_TURN + FULL_TURN) % FULL_TURN
+                    }
                 }
-            }
-            .pointerInput(Unit) {
-                detectTapGestures { tap ->
-                    val perDeg = size.width / currentFov
-                    currentTargets
-                        .map {
-                            it to
-                                Offset(
-                                    xOf(it.bearingDeg, currentCentre, perDeg, size.width.toFloat()),
-                                    yOf(it.angleDeg, range, size.height.toFloat()),
-                                )
-                        }
-                        .minByOrNull { (_, at) -> (at - tap).getDistance() }
-                        ?.takeIf { (_, at) -> (at - tap).getDistance() <= TAP_RADIUS_PX }
-                        ?.let { (target, _) -> onOpenNode(target.nodeNum) }
-                        ?: run { crest = crestAt(currentProfile, tap, size.width.toFloat(), size.height.toFloat(), currentCentre, perDeg, range) }
-                }
-            },
-    ) {
-        val perDeg = size.width / fieldOfView
-        drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, range)
-        drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
-        drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
-    }
-    crest?.let {
-        Text(
-            stringResource(Res.string.terrain_horizon_crest, it.distanceKm, it.altitudeM, it.angleDeg),
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
-        )
-    }
+                .pointerInput(Unit) {
+                    detectTapGestures { tap ->
+                        val perDeg = size.width / currentFov
+                        currentTargets
+                            .map {
+                                it to
+                                    Offset(
+                                        xOf(it.bearingDeg, currentCentre, perDeg, size.width.toFloat()),
+                                        yOf(it.angleDeg, range, size.height.toFloat()),
+                                    )
+                            }
+                            .minByOrNull { (_, at) -> (at - tap).getDistance() }
+                            ?.takeIf { (_, at) -> (at - tap).getDistance() <= TAP_RADIUS_PX }
+                            ?.let { (target, _) -> onOpenNode(target.nodeNum) }
+                            ?: run {
+                                crest =
+                                    crestAt(
+                                        currentProfile,
+                                        tap,
+                                        size.width.toFloat(),
+                                        size.height.toFloat(),
+                                        currentCentre,
+                                        perDeg,
+                                        range,
+                                    )
+                            }
+                    }
+                },
+        ) {
+            val perDeg = size.width / fieldOfView
+            drawBands(profile, groundProfile, shapes, light, bands, buildingBands, centre, perDeg, range)
+            drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
+            drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
+        }
+        crest?.let {
+            Text(
+                stringResource(Res.string.terrain_horizon_crest, it.distanceKm, it.altitudeM, it.angleDeg),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
+            )
+        }
     }
 }
 
-/** A ridge the finger touched: its distance (km, one decimal), height above sea level (m) and angle above the horizon. */
+/**
+ * A ridge the finger touched: its distance (km, one decimal), height above sea level (m) and angle above the horizon.
+ */
 private class CrestInfo(val distanceKm: String, val altitudeM: Int, val angleDeg: String)
 
 /** The ridge of the skyline nearest to a tap, or null when none is within a couple of degrees of it. */
@@ -804,9 +818,9 @@ private fun DrawScope.drawBands(
 
 /**
  * One distance band of the terrain with depth: a gradient from a lit ridge down to a darker foot, every slope shaded by
- * which way it faces (light comes from the left, so a slope rising to the right is lit and one falling is in shadow, the
- * steeper the stronger) with the shade fading out below the ridge, and a light line along the crest. Together they make
- * the ridges read as hills with a lit and a dark side and not as flat cut-outs.
+ * which way it faces (light comes from the left, so a slope rising to the right is lit and one falling is in shadow,
+ * the steeper the stronger) with the shade fading out below the ridge, and a light line along the crest. Together they
+ * make the ridges read as hills with a lit and a dark side and not as flat cut-outs.
  */
 private fun DrawScope.drawRelief(
     profile: HorizonProfile,
@@ -947,8 +961,8 @@ private fun DrawScope.drawBuildingSolids(
 /**
  * The buildings of one distance band as real bodies: every wall that faces the viewer is a quadrilateral from the foot
  * to the roof line of its two corners (so a wall seen at an angle is narrower and darker, one seen face-on is wide and
- * light), then the roof is drawn over them and the outline with a thin dark line. Far buildings are drawn first, so near
- * ones cover them. [radiusM] is the radius of the picture, to place a building in its band.
+ * light), then the roof is drawn over them and the outline with a thin dark line. Far buildings are drawn first, so
+ * near ones cover them. [radiusM] is the radius of the picture, to place a building in its band.
  */
 @Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements", "NestedBlockDepth")
 private fun DrawScope.drawBuildingShapes(
@@ -1015,11 +1029,7 @@ private fun DrawScope.drawBuildingShapes(
 private fun bandAngle(profile: HorizonProfile, band: Int, bearing: Double): Double? {
     val from = BandEdges[band] * profile.radiusM
     val to = BandEdges[band + 1] * profile.radiusM
-    return profile
-        .at(bearing)
-        .crests
-        .filter { it.distanceM >= from && it.distanceM < to }
-        .maxOfOrNull { it.angleDeg }
+    return profile.at(bearing).crests.filter { it.distanceM >= from && it.distanceM < to }.maxOfOrNull { it.angleDeg }
 }
 
 /** The outline of one distance band (0 is the nearest) of [profile], closed along the bottom of the picture. */

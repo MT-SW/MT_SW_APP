@@ -35,10 +35,11 @@ import org.meshtastic.feature.map.planner.state.PlannerUiState
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
 
 private const val KM = 1000.0
+private const val FREQUENCY_DECIMALS = 3
 
 /**
- * Keeps results of the link next to each other: "remember" stores the current result (distance, margins both ways, loss,
- * radio and antenna heights), and every remembered one is listed, so a change of antenna, height or radio can be
+ * Keeps results of the link next to each other: "remember" stores the current result (distance, margins both ways,
+ * loss, radio and antenna heights), and every remembered one is listed, so a change of antenna, height or radio can be
  * compared with what it was before. The list is kept on the device.
  */
 @Composable
@@ -63,7 +64,7 @@ internal fun SnapshotSection(state: PlannerUiState, vm: PlannerViewModel) {
                         fmt(s.marginAToBDb, 1),
                         fmt(s.marginBToADb, 1),
                         s.spreadingFactor,
-                        fmt(s.frequencyMHz, 3),
+                        fmt(s.frequencyMHz, FREQUENCY_DECIMALS),
                         fmt(s.heightAM, 0),
                         fmt(s.heightBM, 0),
                     ),

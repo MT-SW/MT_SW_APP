@@ -32,20 +32,23 @@ internal class PlanSnapshotStore {
         if (!fileSystem.exists(file)) {
             emptyList()
         } else {
-            fileSystem.read(file) { readUtf8() }.lines().mapNotNull { line ->
-                val p = line.split('\t')
-                if (p.size != FIELDS) return@mapNotNull null
-                PlanSnapshot(
-                    label = p[0],
-                    distanceM = p[1].toDouble(),
-                    marginAToBDb = p[2].toDouble(),
-                    marginBToADb = p[3].toDouble(),
-                    spreadingFactor = p[4].toInt(),
-                    frequencyMHz = p[5].toDouble(),
-                    heightAM = p[6].toDouble(),
-                    heightBM = p[7].toDouble(),
-                )
-            }
+            fileSystem
+                .read(file) { readUtf8() }
+                .lines()
+                .mapNotNull { line ->
+                    val p = line.split('\t')
+                    if (p.size != FIELDS) return@mapNotNull null
+                    PlanSnapshot(
+                        label = p[0],
+                        distanceM = p[1].toDouble(),
+                        marginAToBDb = p[2].toDouble(),
+                        marginBToADb = p[3].toDouble(),
+                        spreadingFactor = p[4].toInt(),
+                        frequencyMHz = p[5].toDouble(),
+                        heightAM = p[6].toDouble(),
+                        heightBM = p[7].toDouble(),
+                    )
+                }
         }
     } catch (e: Exception) {
         emptyList()

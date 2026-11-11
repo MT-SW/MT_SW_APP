@@ -186,6 +186,11 @@ W planerze pod wynikiem jest karta „Porównanie wyników”. „Zapamiętaj te
 Słowa: planer, porównanie wyników, zapamiętaj wynik, porównać anteny, porównać wysokości, zapas łącza
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, Planer (sprawdzono 2026-11)
 
+### Co nowego pokazuje panorama terenu (budynki, mgła, słońce)?
+Panorama rysuje budynki z OpenStreetMap jako prawdziwe bryły: ściany widoczne pod kątem (węższe i ciemniejsze, gdy stoją bokiem), jasny dach i cienki obrys; dalsze budynki bledną jak teren. Teren ma gradient od jasnego grzbietu do ciemnej podstawy, cieniowane stoki, jasną linię grzbietu i mgłę dalszych pasm. Światło pada według prawdziwego położenia słońca w miejscu stacji (w nocy jest przygaszone). Dotknięcie grzbietu pokazuje jego odległość, wysokość n.p.m. i kąt nad horyzontem. Budynki trzeba wcześniej pobrać (opcja „Budynki” w panoramie); bez nich panorama rysuje słupki.
+Słowa: panorama terenu, budynki w panoramie, bryły, mgła, słońce, grzbiet, wysokość grzbietu, cieniowanie, 3D
+Źródło: Dokumentacja aplikacji: Mapa i punkty trasy, panorama terenu (sprawdzono 2026-11)
+
 ### Co pokazują karty węzłów w widżecie?
 Widżet pokazuje w rogu plakietkę naszego węzła (kolor i krótka nazwa). Karty ulubionych i pozostałych węzłów przełączają się co minutę i mają po jednej stronie pełną nazwę, a po drugiej plakietkę węzła, a pod spodem baterię, sygnał, czas działania, użycie kanału, napięcie, czas od ostatniej aktywności, liczbę skoków oraz rolę i model urządzenia.
 Słowa: widżet, karty węzłów, ulubione, plakietka, napięcie, skoki, ostatnia aktywność, rola, model, przełączanie

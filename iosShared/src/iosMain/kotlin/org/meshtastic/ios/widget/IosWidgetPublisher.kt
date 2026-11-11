@@ -106,11 +106,10 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
 
     private fun lines(lines: List<String>): String = "[${lines.joinToString(",") { quote(it) }}]"
 
-    private fun cards(cards: List<MeshStatsNodeCard>): String =
-        "[${cards.joinToString(",") { card ->
-            "{\"title\":${quote(card.title)},${chipJson(card.shortName, card.color, card.textColor)}," +
-                "\"lines\":${lines(card.lines)}}"
-        }}]"
+    private fun cards(cards: List<MeshStatsNodeCard>): String = "[${cards.joinToString(",") { card ->
+        "{\"title\":${quote(card.title)},${chipJson(card.shortName, card.color, card.textColor)}," +
+            "\"lines\":${lines(card.lines)}}"
+    }}]"
 
     private fun quote(text: String): String = buildString {
         append('"')

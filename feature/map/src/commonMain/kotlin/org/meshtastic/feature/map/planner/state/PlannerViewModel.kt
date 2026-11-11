@@ -25,10 +25,6 @@
 
 package org.meshtastic.feature.map.planner.state
 
-import kotlin.math.roundToInt
-import kotlin.math.max
-import org.meshtastic.core.model.antenna.AntennaPatterns
-import org.meshtastic.core.model.antenna.PatternKind
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
@@ -44,9 +40,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.model.antenna.AntennaPatterns
 import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.PatternKind
 import org.meshtastic.feature.map.planner.BuildingsLayer
 import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.feature.map.planner.PlannerBands
@@ -66,6 +64,8 @@ import org.meshtastic.feature.map.planner.export.PlannerProfileImage
 import org.meshtastic.feature.map.planner.export.PlannerReport
 import org.meshtastic.feature.map.planner.plannerRadioFromPreset
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * State holder of the native MT_SW Planner. Register scope: the host screen (Koin viewModel), so the state survives the
@@ -248,7 +248,9 @@ class PlannerViewModel(
 
     fun setGroundReflection(on: Boolean) = mutate { st -> st.copy(groundReflection = on, coverage = null) }
 
-    fun setAimAtOther(side: PlannerSide, on: Boolean) = mutate { st -> st.withEnd(side, st.end(side).copy(aimAtOther = on)) }
+    fun setAimAtOther(side: PlannerSide, on: Boolean) = mutate { st ->
+        st.withEnd(side, st.end(side).copy(aimAtOther = on))
+    }
 
     fun setBeamwidth(side: PlannerSide, deg: Double) =
         editEnd(side, deg) { e, v -> e.copy(beamwidthManualDeg = v.coerceIn(5.0, 360.0)) }
@@ -302,7 +304,8 @@ class PlannerViewModel(
                     txPowerDbm = setup.txDbm.coerceIn(-10.0, 50.0),
                     antennaGainDbi = setup.gainDbi.coerceIn(-10.0, 60.0),
                     patternKind = PatternKind.of(setup.input.type),
-                    patternElements = setup.input.elements.coerceIn(AntennaPatterns.MIN_ELEMENTS, AntennaPatterns.MAX_ELEMENTS),
+                    patternElements =
+                    setup.input.elements.coerceIn(AntennaPatterns.MIN_ELEMENTS, AntennaPatterns.MAX_ELEMENTS),
                     beamwidthManualDeg = null,
                     frontToBackManualDb = null,
                     feederConfig = setup.feeder,

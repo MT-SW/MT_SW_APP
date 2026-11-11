@@ -125,6 +125,7 @@ object LinkBudget {
      * Analyse a link over [profile]. Antenna heights are taken above the profile's terrain at each end (the profile is
      * authoritative for ground elevation; [LinkEnd.groundAltM] is informational). ITM loss is reciprocal.
      */
+    @Suppress("LongMethod")
     fun analyze(input: LinkInput, profile: PathProfile): LinkResult {
         val a = input.a
         val b = input.b
@@ -162,8 +163,9 @@ object LinkBudget {
 
         fun dir(tx: LinkEnd, rx: LinkEnd): DirectionResult {
             val rxP =
-                tx.txPowerDbm + tx.antennaGainDbi - tx.patternLossDb - tx.feederLossDb - total +
-                    rx.antennaGainDbi - rx.patternLossDb - rx.feederLossDb
+                tx.txPowerDbm + tx.antennaGainDbi - tx.patternLossDb - tx.feederLossDb - total + rx.antennaGainDbi -
+                    rx.patternLossDb -
+                    rx.feederLossDb
             val margin = rxP - sens - input.fadeMarginDb
             return DirectionResult(rxP, margin, if (itmOk) LinkVerdict.fromMargin(margin) else LinkVerdict.NO_LINK)
         }

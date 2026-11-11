@@ -25,10 +25,10 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 /**
- * The reflection from the ground under a link: the wave that reaches the receiver straight and the one that bounces
- * off the ground arrive almost together and add up or cancel each other, depending on the heights, the distance and
- * the wavelength (the "two-ray" model). Over open flat ground it can add a few dB or take away much more; the
- * terrain model of the planner only partly covers this, so it is an option.
+ * The reflection from the ground under a link: the wave that reaches the receiver straight and the one that bounces off
+ * the ground arrive almost together and add up or cancel each other, depending on the heights, the distance and the
+ * wavelength (the "two-ray" model). Over open flat ground it can add a few dB or take away much more; the terrain model
+ * of the planner only partly covers this, so it is an option.
  */
 object GroundReflection {
     /** Typical strength of the ground reflection at a flat grazing angle. */

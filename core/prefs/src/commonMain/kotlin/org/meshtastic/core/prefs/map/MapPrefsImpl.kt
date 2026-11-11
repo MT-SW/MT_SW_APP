@@ -36,10 +36,10 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.MapDataStore
 import org.meshtastic.core.repository.HorizonPrefs
-import org.meshtastic.core.repository.PropagationPrefs
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapFilterPrefs
 import org.meshtastic.core.repository.MapPrefs
+import org.meshtastic.core.repository.PropagationPrefs
 
 @Single
 @Suppress("TooManyFunctions")
@@ -197,7 +197,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         }
     }
 
-    override suspend fun awaitPropagationPrefs(): PropagationPrefs = dataStore.data.map { it.toPropagationPrefs() }.first()
+    override suspend fun awaitPropagationPrefs(): PropagationPrefs =
+        dataStore.data.map { it.toPropagationPrefs() }.first()
 
     override fun updatePropagationPrefs(transform: (PropagationPrefs) -> PropagationPrefs) {
         scope.launch {
