@@ -418,7 +418,10 @@ private const val MAX_CHIP_IMAGES = 250
 private const val TAP_HALF_WIDTH_DP = 44f
 private const val RANK_TIE_DP = 10f
 private const val TAP_TOP_MARGIN_DP = 8f
-private const val TAP_HEIGHT_DP = 32f
+private const val TAP_HEIGHT_DP = 38f
+
+/** How far above the node's spot the middle of the bubble sits: gap + tail + half the body (8 + 6 + 20/2). */
+private const val CHIP_CENTRE_DP = (GAP_DP + TAIL_HEIGHT_DP + HEIGHT_DP / 2).toFloat()
 private const val STACK_TOLERANCE_DP = 2f
 
 /** Larger than any distance on screen, so the rank decides first and the distance only between equal ranks. */
@@ -483,7 +486,7 @@ private suspend fun chipCandidates(state: MapState, at: DpOffset): List<Triple<F
         val dot = spot?.let { state.screenLocationFromPosition(it) }
         dot?.let {
             val dx = it.x.value - at.x.value
-            val dy = it.y.value - TAP_HEIGHT_DP / 2f - at.y.value
+            val dy = it.y.value - CHIP_CENTRE_DP - at.y.value
             Triple(feature, feature.properties.chipRank(), sqrt(dx * dx + dy * dy))
         }
     }
