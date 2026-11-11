@@ -48,6 +48,19 @@ internal val DEFAULT_SCAN_TIMEOUT: Duration = 10.seconds
  */
 internal fun calculateMacPlusOne(macAddress: String): String = NordicDfu.bootloaderAddress(macAddress)
 
+private val MAC_ADDRESS = Regex("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
+
+/**
+ * Whether this scan result is the device being updated, now in its update mode.
+ *
+ * Where addresses are real MACs (Android, desktop) the update mode shows up at the same address or at MAC+1. An iPhone
+ * is never given an address, only an identifier the system made up per device, and the device in update mode gets a new
+ * one — so it cannot be told apart by address at all. The scan is already limited to the update service, which only a
+ * device in update mode advertises, so every result is accepted there.
+ */
+internal fun BleDevice.isUpdateTarget(target: String): Boolean =
+    !MAC_ADDRESS.matches(target) || address == target || address == calculateMacPlusOne(target)
+
 /**
  * Scan for a BLE device matching [predicate] with retry logic.
  *

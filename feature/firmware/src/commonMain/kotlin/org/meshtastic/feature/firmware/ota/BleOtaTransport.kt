@@ -80,12 +80,10 @@ class BleOtaTransport(
 
     /** Scan for the device by MAC address (or MAC+1 for OTA mode) with retries. */
     private suspend fun scanForOtaDevice(): BleDevice? {
-        val otaAddress = calculateMacPlusOne(address)
-        val targetAddresses = setOf(address, otaAddress)
         Logger.i { "BLE OTA: Will match target OTA device addresses" }
 
         return scanForBleDevice(scanner = scanner, tag = "BLE OTA", serviceUuid = OTA_SERVICE_UUID) {
-            it.address in targetAddresses
+            it.isUpdateTarget(address)
         }
     }
 

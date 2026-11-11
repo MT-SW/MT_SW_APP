@@ -63,7 +63,7 @@ import org.meshtastic.feature.firmware.FirmwareUpdateHandler
 import org.meshtastic.feature.firmware.FirmwareUpdateState
 import org.meshtastic.feature.firmware.ProgressState
 import org.meshtastic.feature.firmware.ota.ThroughputTracker
-import org.meshtastic.feature.firmware.ota.calculateMacPlusOne
+import org.meshtastic.feature.firmware.ota.isUpdateTarget
 import org.meshtastic.feature.firmware.ota.downloadWithProgress
 import org.meshtastic.feature.firmware.ota.formatTransferProgress
 import org.meshtastic.feature.firmware.ota.retryWithDelay
@@ -778,7 +778,6 @@ class SecureDfuHandler(
      * SoftDevice and bootloader. It copies both images into place before it advertises again, which takes minutes.
      */
     private suspend fun awaitBootloaderAfterSwap(target: String): Boolean {
-        val targetAddresses = setOf(target, calculateMacPlusOne(target))
         val deadline = TimeSource.Monotonic.markNow() + BOOTLOADER_SWAP_TIMEOUT
         delay(BOOTLOADER_SWAP_FIRST_SCAN_DELAY)
         while (deadline.hasNotPassedNow()) {
@@ -786,7 +785,7 @@ class SecureDfuHandler(
                 scanForBleDeviceTolerant(
                     tag = "Bootloader DFU swap",
                     serviceUuid = LegacyDfuUuids.SERVICE,
-                    predicate = { it.address in targetAddresses },
+                    predicate = { it.isUpdateTarget(target) },
                 )
             if (hit != null) return true
         }
@@ -813,16 +812,14 @@ class SecureDfuHandler(
         updateState(
             FirmwareUpdateState.Processing(ProgressState(UiText.Resource(Res.string.firmware_update_waiting_reboot))),
         )
-        val macPlusOne = calculateMacPlusOne(target)
-        val targetAddresses = setOf(target, macPlusOne)
-        Logger.i { "DFU: detect — predicate matches original MAC and MAC+1" }
+        Logger.i { "DFU: detect — predicate matches original MAC and MAC+1 (on iPhone: any device in update mode)" }
 
         Logger.i { "DFU: detect — scanning for Legacy DFU service (${LegacyDfuUuids.SERVICE})" }
         val legacyHit =
             scanForBleDeviceTolerant(
                 tag = "DFU detect (legacy)",
                 serviceUuid = LegacyDfuUuids.SERVICE,
-                predicate = { it.address in targetAddresses },
+                predicate = { it.isUpdateTarget(target) },
             )
 
         if (legacyHit != null) {
@@ -837,7 +834,7 @@ class SecureDfuHandler(
             scanForBleDeviceTolerant(
                 tag = "DFU detect (secure)",
                 serviceUuid = SecureDfuUuids.SERVICE,
-                predicate = { it.address in targetAddresses },
+                predicate = { it.isUpdateTarget(target) },
             )
 
         val detection = if (secureHit != null) BootloaderDetection.SecureObserved else BootloaderDetection.Unknown

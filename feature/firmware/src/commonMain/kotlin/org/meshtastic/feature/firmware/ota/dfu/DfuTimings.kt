@@ -29,6 +29,7 @@ import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.ble.BleService
 import org.meshtastic.core.model.util.anonymize
 import org.meshtastic.feature.firmware.ota.calculateMacPlusOne
+import org.meshtastic.feature.firmware.ota.isUpdateTarget
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -69,7 +70,7 @@ internal suspend fun BleConnection.connectToDfuControlPoint(
     val shown = targetAddresses.map { it.anonymize() }
     Logger.i { "$tag: Scanning for DFU mode device at $shown..." }
     val device =
-        scan { it.address in targetAddresses }
+        scan { it.isUpdateTarget(address) }
             ?: throw DfuException.ConnectionFailed("DFU mode device not found (tried $shown).$notFoundHint")
 
     Logger.i { "$tag: Found DFU mode device at ${device.address.anonymize()}, connecting..." }
