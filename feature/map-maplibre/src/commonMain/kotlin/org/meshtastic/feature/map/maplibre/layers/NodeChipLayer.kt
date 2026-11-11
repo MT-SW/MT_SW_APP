@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.json.JsonObject
 import org.maplibre.compose.expressions.ast.Expression
 import org.maplibre.compose.expressions.dsl.asBoolean
@@ -117,6 +118,10 @@ internal fun NodeChipLayer(
             // The chip the user sees on top is the one they meant. Query order is not that order, so pick
             // by the rank [chipSortKey] draws by — on the Google map the highest zIndex marker takes the tap.
             val top = features.maxByOrNull { it.properties.chipRank() }
+            Logger.i {
+                "Węzeł na mapie: dotknięto, elementów: ${features.size}, właściwości: " +
+                    "${top?.properties?.keys}, numer: ${top?.properties?.get(NodeFeatureKeys.NODE_NUM)}"
+            }
             val stack = if (onStack != null && top != null) stackedMembers(features, top) else emptyList()
             if (stack.isNotEmpty()) {
                 // Several nodes on one spot: the chips overlap, so let the user choose rather than guess.
