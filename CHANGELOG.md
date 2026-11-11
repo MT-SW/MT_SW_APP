@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Wszystkie wersje: panorama terenu ma więcej głębi: pasma terenu mają gradient od jasnego grzbietu do ciemnej podstawy, stoki są cieniowane zależnie od tego, w którą stronę są zwrócone (światło z lewej), a grzbiet ma jasną linię. Dzięki temu wzgórza wyglądają jak bryły, a nie płaskie wycięcia.
 * Wszystkie wersje: panorama terenu rysuje budynki jako prawdziwe bryły z obrysu z OpenStreetMap: ściany widoczne pod kątem (węższe i ciemniejsze, gdy stoją bokiem), jasny dach i cienki obrys, a dalsze budynki bledną tak jak teren. Bez zapisanych budynków panorama rysuje jak dotąd słupki.
 * Wszystkie wersje: planer — lasy i tereny zabudowane z OpenStreetMap dla zasięgu są teraz zapisywane na urządzeniu także przy małych obszarach (do tej pory tylko przy dużych), więc raz policzony zasięg działa potem bez internetu.
 * Wszystkie wersje: planer — przy włączonych odbiciach od ziemi „Pokaż na mapie” dodaje osobną warstwę „Planer: odbicie od ziemi”: dwa odcinki odbitego promienia, punkt odbicia i zysk w dB. Warstwę można ukryć bez utraty planu.
@@ -637,6 +638,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* All versions: the terrain panorama has more depth: the terrain bands have a gradient from a light ridge to a dark foot, slopes are shaded by which way they face (light from the left) and the ridge has a light line, so hills read as bodies and not as flat cut-outs.
 * All versions: the terrain panorama draws buildings as real bodies from the OpenStreetMap outline: walls seen at an angle (narrower and darker when they stand sideways), a light roof and a thin outline, and farther buildings fade like the terrain. Without saved buildings the panorama draws columns as before.
 * All versions: planner — the woods and built-up land from OpenStreetMap for the coverage are now saved on the device for small areas too (before, only for large ones), so a coverage calculated once works later without the internet.
 * All versions: planner — with ground reflections on, "Show on map" adds a separate "Planner: ground reflection" layer: the two legs of the reflected ray, the reflection point and the gain in dB. The layer can be hidden without losing the plan.

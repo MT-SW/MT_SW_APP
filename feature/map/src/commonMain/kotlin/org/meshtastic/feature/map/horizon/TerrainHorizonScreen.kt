@@ -84,6 +84,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextMeasurer
@@ -189,6 +190,13 @@ private const val WALL_DARKEN = 0.3f
 private const val EDGE_DARKEN = 0.5f
 private const val ROOF_STRIP_PX = 3f
 private const val EDGE_WIDTH_PX = 1.5f
+private const val RELIEF_LIGHT = 0.12f
+private const val RELIEF_DARK = 0.28f
+private const val RIDGE_LIGHT = 0.3f
+private const val RIDGE_WIDTH_PX = 1.5f
+private const val SHADE_DEPTH_PX = 44f
+private const val SHADE_MAX = 0.4f
+private const val SHADE_SLOPE_PX = 10f
 private const val EDGE_STEP_PX = 4f
 private const val MIN_BUILDING_DEG = 0.02
 private val BandEdges = listOf(0.0, 0.2, 0.45, 0.75, 1.0001)
@@ -728,16 +736,78 @@ private fun DrawScope.drawBands(
     for (band in bands.indices) {
         val index = bands.lastIndex - band
         if (ground != null) {
-            drawPath(bandPath(ground, index, centre, perDeg, range), bands[index])
+            drawRelief(ground, index, bands[index], centre, perDeg, range)
             if (shapes.isEmpty()) {
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
                 drawBuildingShapes(shapes, profile.radiusM, index, buildingBands[index], centre, perDeg, range)
             }
         } else {
-            drawPath(bandPath(profile, index, centre, perDeg, range), bands[index])
+            drawRelief(profile, index, bands[index], centre, perDeg, range)
         }
     }
+}
+
+/**
+ * One distance band of the terrain with depth: a gradient from a lit ridge down to a darker foot, every slope shaded by
+ * which way it faces (light comes from the left, so a slope rising to the right is lit and one falling is in shadow, the
+ * steeper the stronger) with the shade fading out below the ridge, and a light line along the crest. Together they make
+ * the ridges read as hills with a lit and a dark side and not as flat cut-outs.
+ */
+private fun DrawScope.drawRelief(
+    profile: HorizonProfile,
+    band: Int,
+    colour: Color,
+    centre: Float,
+    perDeg: Float,
+    range: ClosedFloatingPointRange<Double>,
+) {
+    val w = size.width
+    val h = size.height
+    val path = bandPath(profile, band, centre, perDeg, range)
+    val top = path.getBounds().top.coerceIn(0f, h)
+    drawPath(
+        path,
+        Brush.verticalGradient(
+            listOf(lerp(colour, Color.White, RELIEF_LIGHT), colour, lerp(colour, Color.Black, RELIEF_DARK)),
+            startY = top,
+            endY = h,
+        ),
+    )
+    val lit = Brush.verticalGradient(listOf(Color.White, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
+    val shade = Brush.verticalGradient(listOf(Color.Black, Color.Transparent), startY = 0f, endY = SHADE_DEPTH_PX)
+    val ridge = Path()
+    var started = false
+    var previous: Float? = null
+    var x = 0f
+    while (x <= w + COLUMN_STEP_PX) {
+        val angle = bandAngle(profile, band, (centre + (x - w / 2) / perDeg).toDouble())
+        if (angle == null) {
+            previous = null
+            started = false
+        } else {
+            val y = yOf(angle, range, h)
+            if (started) ridge.lineTo(x, y) else ridge.moveTo(x, y)
+            started = true
+            val before = previous
+            if (before != null) {
+                val rise = before - y
+                val strength = min(SHADE_MAX, abs(rise) / SHADE_SLOPE_PX)
+                if (strength > 0.02f && y < h) {
+                    translate(left = x, top = y) {
+                        drawRect(
+                            if (rise > 0f) lit else shade,
+                            size = Size(COLUMN_STEP_PX.toFloat(), min(SHADE_DEPTH_PX, h - y)),
+                            alpha = strength,
+                        )
+                    }
+                }
+            }
+            previous = y
+        }
+        x += COLUMN_STEP_PX
+    }
+    drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
 }
 
 /**
