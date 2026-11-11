@@ -152,7 +152,9 @@ object Coverage {
                     )
                 val m =
                     if (res.returnCode <= 1 && !res.lossDb.isNaN()) {
-                        (eirpMinusLosses - patternLoss - tiltLossDb(input, ground, idx, ringsM[j]) - res.lossDb + reflectionAt(input, ringsM[j]) - sens).toFloat()
+                        val tilt = tiltLossDb(input, ground, idx, ringsM[j])
+                        (eirpMinusLosses - patternLoss - tilt - res.lossDb + reflectionAt(input, ringsM[j]) - sens)
+                            .toFloat()
                     } else {
                         ERROR_MARGIN_DB
                     }

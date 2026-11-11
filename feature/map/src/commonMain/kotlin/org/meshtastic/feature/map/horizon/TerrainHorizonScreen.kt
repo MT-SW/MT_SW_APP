@@ -728,6 +728,18 @@ private fun Panorama(
     val sky = MaterialTheme.colorScheme.background
     val primary = MaterialTheme.colorScheme.primary
     val bands = remember(sky, primary) { BandShares.map { lerp(sky, primary, it) } }
+    val uiPrefs: UiPrefs = koinInject()
+    val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
+    // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
+    var autoLevel by remember { mutableIntStateOf(LEVEL_BEST) }
+    var lowered by remember { mutableStateOf(false) }
+    LaunchedEffect(lowered) {
+        if (lowered) {
+            delay(NOTICE_MS)
+            lowered = false
+        }
+    }
+    val level = if (quality < 0) autoLevel else quality
     // Buildings in their own colour, so they read as something standing on the ground and not as more ground.
     // The buildings sorted into their distance bands once, far to near, not on every frame.
     val shapesByBand =
@@ -746,18 +758,6 @@ private fun Panorama(
     // are veiled by haze.
     val sun =
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
-    val uiPrefs: UiPrefs = koinInject()
-    val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
-    // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
-    var autoLevel by remember { mutableIntStateOf(LEVEL_BEST) }
-    var lowered by remember { mutableStateOf(false) }
-    LaunchedEffect(lowered) {
-        if (lowered) {
-            delay(NOTICE_MS)
-            lowered = false
-        }
-    }
-    val level = if (quality < 0) autoLevel else quality
     LaunchedEffect(quality) {
         if (quality >= 0) return@LaunchedEffect
         // Time between two successive pictures while the view is being turned (pauses are not counted).
