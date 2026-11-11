@@ -225,9 +225,7 @@ class MeshStatsFeed(
                 ),
             )
         }
-        metrics.voltage?.let {
-            add(getStringSuspend(Res.string.widget_card_voltage, NumberFormatter.format(it.toDouble(), 2)))
-        }
+        addSensorLines(node)
         if (node.lastHeard != 0) {
             val ago = (Clock.System.now().epochSeconds - node.lastHeard).coerceAtLeast(0)
             add(getStringSuspend(Res.string.widget_card_heard, formatDurationSuspend(ago)))
@@ -239,5 +237,18 @@ class MeshStatsFeed(
     }
 }
 
-/** How many nodes of one kind the bigger widgets rotate through. */
-private const val CARD_LIMIT = 12
+/** Readings of the node sensors: temperature, humidity, pressure, and voltage/current from the sensor, not the system. */
+private suspend fun MutableList<String>.addSensorLines(node: Node) {
+    val env = node.environmentMetrics
+    val power = node.powerMetrics
+    env.temperature?.takeIf { !it.isNaN() }?.let { add(MetricFormatter.temperature(it, false)) }
+    env.relative_humidity?.takeIf { it != 0f }?.let { add(MetricFormatter.humidity(it)) }
+    env.barometric_pressure?.takeIf { it != 0f }?.let { add(MetricFormatter.pressure(it)) }
+    val volts = power.ch1_voltage ?: env.voltage
+    val milliAmps = power.ch1_current ?: env.current
+    volts?.let { add(getStringSuspend(Res.string.widget_card_voltage, NumberFormatter.format(it.toDouble(), 2))) }
+    milliAmps?.let { add(MetricFormatter.current(it)) }
+}
+
+/** How many nodes of one kind the bigger widgets rotate through (all of them, within reason). */
+private const val CARD_LIMIT = 500

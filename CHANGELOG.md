@@ -130,6 +130,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
+* Widget: listy „Inny węzeł sieci” i całej sieci pokazują wszystkie węzły (wcześniej tylko 12). Karty węzłów mają odczyty czujników: temperaturę, wilgotność, ciśnienie oraz napięcie i natężenie z czujnika (nie systemowe).
+* Panorama terenu: naturalna skala pionowa (budynki i góry proporcjonalne do terenu), delikatniejsze kolory budynków.
 * Panorama terenu: w „Opcjach” przełącznik „Tylko ulubione” pokazuje w panoramie i na mapie przesuwania tylko ulubione węzły (zapamiętywany).
 * Panorama terenu: okręgi dokładności węzłów, które nie podają dokładnej pozycji. Na małej mapie przesuwania są okręgami na ziemi, jak na głównej mapie, a w samej panoramie owalem o rozmiarze niepewności widzianej z miejsca obserwacji. Wyłączasz je w „Opcjach” (przełącznik „Okręgi dokładności”, zapamiętywany).
 * Panorama terenu: zasięg, wysokości anten i współczynnik horyzontu są zapamiętywane (już nie wraca do 15 km). Nowa opcja „Węzły do” (25–1000 km, domyślnie 100 km) działa osobno od zasięgu terenu: węzły dalsze niż załadowany teren też są rysowane.
