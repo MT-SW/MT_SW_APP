@@ -304,7 +304,9 @@ fun MeshMap(
     DisposableEffect(mapState) { onDispose { ReturnView.forget(mapState) } }
     // Pressing the Map tab while the map is open goes back to the view the map had on entering.
     LaunchedEffect(mapState) {
-        MapViewReset.events.collect { ReturnView.take(mapState)?.let { mapState.animateCamera(it.toCameraUpdate()) } }
+        MapViewReset.events.collect { _ ->
+            ReturnView.take(mapState)?.let { first -> mapState.animateCamera(first.toCameraUpdate()) }
+        }
     }
     PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
