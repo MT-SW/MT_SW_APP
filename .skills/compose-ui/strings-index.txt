@@ -2738,6 +2738,7 @@ quick_chat_show
 quick_cmd_hello_desc
 quick_cmd_ping_desc
 quick_cmd_test_desc
+quick_command_sent
 quick_commands_hint
 quick_commands_need_keys
 quick_commands_title

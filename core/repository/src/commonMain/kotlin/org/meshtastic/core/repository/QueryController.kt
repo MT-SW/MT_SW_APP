@@ -57,8 +57,10 @@ interface QueryController {
     /**
      * Sets the GPIO pins selected in [gpioMask] on [destNum] to the corresponding bits in [gpioValue], via the Remote
      * Hardware module. See https://meshtastic.org/docs/configuration/module/remote-hardware/.
+     *
+     * @return true when the target confirmed delivery, false on NAK, timeout or local rejection.
      */
-    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long)
+    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long): Boolean
 
     /**
      * Reads the GPIO pins selected in [gpioMask] on [destNum] via the Remote Hardware module.

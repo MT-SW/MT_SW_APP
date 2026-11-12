@@ -2804,6 +2804,7 @@
     <string name="quick_cmd_hello_desc">Say hello to the node</string>
     <string name="quick_cmd_ping_desc">Check that the node answers</string>
     <string name="quick_cmd_test_desc">Send a test message</string>
+    <string name="quick_command_sent">Command sent</string>
     <string name="quick_commands_hint">Short test messages sent privately to this node, even when its role hides manual messages. Handy for checking the link and new firmware builds. Works only with firmware 2.8.0 or newer.</string>
     <string name="quick_commands_need_keys">Needs an exchange of keys with this node (encrypted private message).</string>
     <string name="quick_commands_title">Quick commands</string>

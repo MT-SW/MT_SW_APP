@@ -2953,6 +2953,7 @@
     <string name="quick_commands_hint">Krótkie wiadomości testowe wysyłane prywatnie do tego węzła, także gdy jego rola ukrywa ręczne wiadomości. Przydatne do sprawdzania łączności i nowych wersji firmware. Działa dopiero od wersji firmware 2.8.0.</string>
     <string name="quick_commands_need_keys">Wymaga wymiany kluczy z tym węzłem (szyfrowana wiadomość prywatna).</string>
     <string name="quick_cmd_ping_desc">Sprawdź, czy węzeł odpowiada</string>
+    <string name="quick_command_sent">Komenda wysłana</string>
     <string name="quick_cmd_hello_desc">Przywitaj się z węzłem</string>
     <string name="quick_cmd_test_desc">Wyślij wiadomość testową</string>
     <string name="remote_manage_title">Listy i kontakty na zdalnym urządzeniu</string>

@@ -72,6 +72,7 @@ import org.meshtastic.core.resources.delivery_confirmed
 import org.meshtastic.core.resources.gpio_off
 import org.meshtastic.core.resources.gpio_on
 import org.meshtastic.core.resources.gpio_read_result
+import org.meshtastic.core.resources.quick_command_sent
 import org.meshtastic.core.resources.remote_admin_unreachable
 import org.meshtastic.core.resources.remote_command_no_response
 import org.meshtastic.core.resources.request_metadata
@@ -264,10 +265,20 @@ class NodeDetailViewModel(
         }
     }
 
-    /** Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue] via the Remote Hardware module. */
-    fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
-        viewModelScope.launch { radioController.writeGpio(destNum, gpioMask, gpioValue) }
-    }
+    /**
+     * Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue] via the Remote Hardware module and shows whether the
+     * target confirmed delivery.
+     */
+    fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) =
+        safeLaunch(tag = "writeGpio") {
+            try {
+                showRemoteCommandResult(queryController.writeGpio(destNum, gpioMask, gpioValue))
+            } catch (e: PacketQueueRejectedException) {
+                showNodeRequestFailure(e, QUEUE_REJECTION_LOG_MESSAGE, snackbarManager, resolveUiText)
+            } catch (e: LocalNodeUnavailableException) {
+                showNodeRequestFailure(e, LOCAL_NODE_UNAVAILABLE_LOG_MESSAGE, snackbarManager, resolveUiText)
+            }
+        }
 
     /** Reads the GPIO pins in [gpioMask] on [destNum] via the Remote Hardware module and shows the result. */
     fun readGpio(destNum: Int, gpioMask: Long) {
@@ -288,12 +299,18 @@ class NodeDetailViewModel(
      * when we've exchanged a valid public key with [node] ([Node.hasPKC] && ![Node.mismatchKey]); otherwise falls back
      * to [node]'s regular channel.
      */
-    fun sendQuickMessage(node: Node, text: String) {
-        viewModelScope.launch {
+    fun sendQuickMessage(node: Node, text: String) =
+        safeLaunch(tag = "sendQuickMessage") {
             val channel = if (node.hasPKC && !node.mismatchKey) NodeAddress.PKC_CHANNEL_INDEX else node.channel
-            radioController.sendMessage(DataPacket(to = node.user.id, channel = channel, text = text))
+            try {
+                radioController.sendMessage(DataPacket(to = node.user.id, channel = channel, text = text))
+                snackbarManager.showSnackbar(getString(Res.string.quick_command_sent))
+            } catch (e: PacketQueueRejectedException) {
+                showNodeRequestFailure(e, QUEUE_REJECTION_LOG_MESSAGE, snackbarManager, resolveUiText)
+            } catch (e: LocalNodeUnavailableException) {
+                showNodeRequestFailure(e, LOCAL_NODE_UNAVAILABLE_LOG_MESSAGE, snackbarManager, resolveUiText)
+            }
         }
-    }
 
     /** Sends an OnDemand diagnostics query (e.g. node stats) to [destNum]. */
     fun requestOnDemand(destNum: Int, longName: String, requestType: OnDemandType) =

@@ -461,7 +461,7 @@ class CommandSenderImpl(
         tracerouteHandler.recordStartTime(effectiveRequestId, destNum)
     }
 
-    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long): Boolean {
         val hw =
             HardwareMessage.Builder()
                 .also { wb ->
@@ -470,7 +470,7 @@ class CommandSenderImpl(
                     wb.gpio_value = gpioValue
                 }
                 .build()
-        packetHandler.sendToRadio(
+        return packetHandler.sendToRadioAndAwaitRoutingAck(
             buildMeshPacket(
                 to = destNum,
                 wantAck = true,

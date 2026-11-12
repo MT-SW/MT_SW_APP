@@ -200,8 +200,11 @@ interface CommandSender {
      * corresponding bits in [gpioValue]. Requires the target to have the Remote Hardware module enabled and share the
      * channel this is sent on (see the app's node-channel resolution) — see
      * https://meshtastic.org/docs/configuration/module/remote-hardware/.
+     *
+     * @return true when the target confirmed delivery with a mesh routing ACK; false on NAK, timeout or when the local
+     *   radio did not accept the packet.
      */
-    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long)
+    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long): Boolean
 
     /**
      * Sends a Remote Hardware READ_GPIOS command to [destNum] and awaits its READ_GPIOS_REPLY.

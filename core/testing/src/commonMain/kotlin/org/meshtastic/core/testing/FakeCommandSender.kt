@@ -182,8 +182,9 @@ class FakeCommandSender :
         failCommandIfConfigured()
     }
 
-    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long): Boolean {
         failCommandIfConfigured()
+        return true
     }
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? {

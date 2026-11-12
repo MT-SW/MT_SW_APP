@@ -281,7 +281,7 @@ class FakeRadioController :
 
     override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {}
 
-    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {}
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long): Boolean = true
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? = null
 
