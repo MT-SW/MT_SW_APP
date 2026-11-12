@@ -87,6 +87,21 @@ class NotificationPrefsTest {
     }
 
     @Test
+    fun `alerts radio notices and updates default to true and can be turned off`() = testScope.runTest {
+        assertTrue(notificationPrefs.alertsEnabled.value)
+        assertTrue(notificationPrefs.radioNoticesEnabled.value)
+        assertTrue(notificationPrefs.updatesEnabled.value)
+
+        notificationPrefs.setAlertsEnabled(false)
+        notificationPrefs.setRadioNoticesEnabled(false)
+        notificationPrefs.setUpdatesEnabled(false)
+
+        assertFalse(notificationPrefs.alertsEnabled.value)
+        assertFalse(notificationPrefs.radioNoticesEnabled.value)
+        assertFalse(notificationPrefs.updatesEnabled.value)
+    }
+
+    @Test
     fun `setting reactionsEnabled updates preference`() = testScope.runTest {
         notificationPrefs.setReactionsEnabled(false)
         assertFalse(notificationPrefs.reactionsEnabled.value)

@@ -117,6 +117,24 @@ class DesktopNotificationManagerTest {
     }
 
     @Test
+    fun `alert radio notice and update notifications follow their switches`() = runTest {
+        val sender = FakeNativeSender()
+        val prefs = FakeNotificationPrefs()
+        val manager = DesktopNotificationManager(prefs, sender)
+        val categories =
+            listOf(Notification.Category.Alert, Notification.Category.Client, Notification.Category.Service)
+
+        for (category in categories) assertTrue(manager.dispatch(Notification("A", "x", category = category)))
+
+        prefs.setAlertsEnabled(false)
+        prefs.setRadioNoticesEnabled(false)
+        prefs.setUpdatesEnabled(false)
+
+        for (category in categories) assertFalse(manager.dispatch(Notification("B", "y", category = category)))
+        assertEquals(categories.size, sender.sent.size)
+    }
+
+    @Test
     fun `reaction and waypoint notifications dispatch by default`() = runTest {
         val sender = FakeNativeSender()
         val manager = DesktopNotificationManager(FakeNotificationPrefs(), sender)

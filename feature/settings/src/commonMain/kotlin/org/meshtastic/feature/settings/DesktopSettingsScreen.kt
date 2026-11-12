@@ -406,6 +406,13 @@ fun DesktopSettingsScreen(
                             onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
                             newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
                             onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
+                            alertsEnabled = settingsViewModel.alertsEnabled.collectAsStateWithLifecycle().value,
+                            onToggleAlerts = { settingsViewModel.setAlertsEnabled(it) },
+                            radioNoticesEnabled =
+                            settingsViewModel.radioNoticesEnabled.collectAsStateWithLifecycle().value,
+                            onToggleRadioNotices = { settingsViewModel.setRadioNoticesEnabled(it) },
+                            updatesEnabled = settingsViewModel.updatesEnabled.collectAsStateWithLifecycle().value,
+                            onToggleUpdates = { settingsViewModel.setUpdatesEnabled(it) },
                             showSoundWhileOpen = showNotificationSound,
                             soundWhileOpen =
                             settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,

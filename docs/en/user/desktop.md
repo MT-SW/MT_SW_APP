@@ -107,7 +107,7 @@ Shortcuts use **⌘** (Command) on macOS and **Ctrl** on Windows and Linux. (The
 
 ### Notification Preferences
 
-The desktop app provides in-app toggles for controlling which notifications are shown. Find them in the **App Notifications** section of the Settings screen: **Direct message notifications**, **New node notifications**, **Low battery notifications**, **Reaction notifications**, and **Waypoint notifications**.
+The desktop app provides in-app toggles for controlling which notifications are shown. Find them in the **App Notifications** section of the Settings screen: **Direct message notifications**, **New node notifications**, **Low battery notifications**, **Reaction notifications**, **Waypoint notifications**, **Alarm notifications** (messages with the bell), **Notices from the radio** and **Update notifications**.
 
 ## Built-in Documentation Browser
 

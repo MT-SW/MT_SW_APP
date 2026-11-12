@@ -26,14 +26,20 @@ import org.meshtastic.core.resources.meshtastic_new_nodes_notifications
 import org.meshtastic.core.resources.meshtastic_reactions_notifications
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications
 import org.meshtastic.core.resources.notification_sound_while_open
+import org.meshtastic.core.resources.notifications_alerts
+import org.meshtastic.core.resources.notifications_radio_notices
+import org.meshtastic.core.resources.notifications_updates
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.AddReaction
 import org.meshtastic.core.ui.icon.BatteryAlert
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PinDrop
+import org.meshtastic.core.ui.icon.SystemUpdate
 import org.meshtastic.core.ui.icon.VolumeUp
+import org.meshtastic.core.ui.icon.Warning
 
 /**
  * Notification settings section with in-app toggles. Primarily used on platforms without system notification channels.
@@ -50,6 +56,12 @@ fun NotificationSection(
     onToggleReactions: (Boolean) -> Unit,
     newWaypointsEnabled: Boolean,
     onToggleNewWaypoints: (Boolean) -> Unit,
+    alertsEnabled: Boolean = true,
+    onToggleAlerts: (Boolean) -> Unit = {},
+    radioNoticesEnabled: Boolean = true,
+    onToggleRadioNotices: (Boolean) -> Unit = {},
+    updatesEnabled: Boolean = true,
+    onToggleUpdates: (Boolean) -> Unit = {},
     showSoundWhileOpen: Boolean = false,
     soundWhileOpen: Boolean = false,
     onToggleSoundWhileOpen: (Boolean) -> Unit = {},
@@ -84,6 +96,24 @@ fun NotificationSection(
             leadingIcon = MeshtasticIcons.PinDrop,
             checked = newWaypointsEnabled,
             onClick = { onToggleNewWaypoints(!newWaypointsEnabled) },
+        )
+        SwitchListItem(
+            text = stringResource(Res.string.notifications_alerts),
+            leadingIcon = MeshtasticIcons.Warning,
+            checked = alertsEnabled,
+            onClick = { onToggleAlerts(!alertsEnabled) },
+        )
+        SwitchListItem(
+            text = stringResource(Res.string.notifications_radio_notices),
+            leadingIcon = MeshtasticIcons.Info,
+            checked = radioNoticesEnabled,
+            onClick = { onToggleRadioNotices(!radioNoticesEnabled) },
+        )
+        SwitchListItem(
+            text = stringResource(Res.string.notifications_updates),
+            leadingIcon = MeshtasticIcons.SystemUpdate,
+            checked = updatesEnabled,
+            onClick = { onToggleUpdates(!updatesEnabled) },
         )
         if (showSoundWhileOpen) {
             SwitchListItem(

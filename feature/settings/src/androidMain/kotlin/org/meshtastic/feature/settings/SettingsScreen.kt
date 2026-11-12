@@ -76,6 +76,7 @@ import org.meshtastic.core.ui.util.isBluetoothSupported
 import org.meshtastic.feature.settings.component.AppInfoSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.NotificationLinkSection
 import org.meshtastic.feature.settings.component.PermissionsSettingsContent
 import org.meshtastic.feature.settings.component.PersistenceSettingsContent
 import org.meshtastic.feature.settings.component.PrivacySettingsContent
@@ -345,6 +346,8 @@ fun SettingsScreen(
                         }
                     }
                 }
+
+                NotificationLinkSection()
 
                 LiveUpdateSection()
 

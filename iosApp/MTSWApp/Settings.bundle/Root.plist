@@ -68,6 +68,36 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>Alarm notifications</string>
+			<key>Key</key>
+			<string>mtsw_notify_alerts</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Notices from the radio</string>
+			<key>Key</key>
+			<string>mtsw_notify_radio_notices</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Update notifications</string>
+			<key>Key</key>
+			<string>mtsw_notify_updates</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>Notification sound while the app is open</string>
 			<key>Key</key>
 			<string>mtsw_notify_sound_while_open</string>

@@ -132,9 +132,9 @@ class IosNotificationManager(
                 Notification.Category.NodeEvent -> prefs.nodeEventsEnabled.value
                 Notification.Category.MeshBeacon -> prefs.nodeEventsEnabled.value
                 Notification.Category.Battery -> prefs.lowBatteryEnabled.value
-                Notification.Category.Alert -> true
-                Notification.Category.Client -> true
-                Notification.Category.Service -> true
+                Notification.Category.Alert -> prefs.alertsEnabled.value
+                Notification.Category.Client -> prefs.radioNoticesEnabled.value
+                Notification.Category.Service -> prefs.updatesEnabled.value
             }
         if (!enabled) return false
         val content =

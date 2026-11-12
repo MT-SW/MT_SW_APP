@@ -2467,14 +2467,19 @@ notification_permission_denied_notice
 notification_permission_rationale
 notification_permissions_description
 notification_reaction_to
+notification_settings_android
+notification_settings_android_hint
 notification_settings_in_system
 notification_sound_while_open
 ### NOTIFICATIONS ###
+notifications_alerts
 notifications_for_channel_and_direct_messages
 notifications_for_low_battery_alerts
 notifications_for_newly_discovered_nodes
 notifications_on_alert_bell_receipt
 notifications_on_message_receipt
+notifications_radio_notices
+notifications_updates
 now
 ### OFFLINE ###
 offline_maps

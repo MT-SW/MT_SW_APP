@@ -140,9 +140,18 @@ class SettingsViewModel(
     val lowBatteryEnabled = notificationPrefs.lowBatteryEnabled
     val reactionsEnabled = notificationPrefs.reactionsEnabled
     val newWaypointsEnabled = notificationPrefs.newWaypointsEnabled
+    val alertsEnabled = notificationPrefs.alertsEnabled
+    val radioNoticesEnabled = notificationPrefs.radioNoticesEnabled
+    val updatesEnabled = notificationPrefs.updatesEnabled
     val notificationSoundWhileOpen = notificationPrefs.soundWhileOpen
 
     fun setMessagesEnabled(enabled: Boolean) = notificationPrefs.setMessagesEnabled(enabled)
+
+    fun setAlertsEnabled(enabled: Boolean) = notificationPrefs.setAlertsEnabled(enabled)
+
+    fun setRadioNoticesEnabled(enabled: Boolean) = notificationPrefs.setRadioNoticesEnabled(enabled)
+
+    fun setUpdatesEnabled(enabled: Boolean) = notificationPrefs.setUpdatesEnabled(enabled)
 
     fun setNotificationSoundWhileOpen(enabled: Boolean) = notificationPrefs.setSoundWhileOpen(enabled)
 

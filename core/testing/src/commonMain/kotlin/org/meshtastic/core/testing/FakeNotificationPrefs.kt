@@ -80,6 +80,24 @@ class FakeNotificationPrefs : NotificationPrefs {
 
     override suspend fun loadNewWaypointsEnabled(): Boolean = newWaypointsEnabled.value
 
+    override val alertsEnabled = MutableStateFlow(true)
+
+    override fun setAlertsEnabled(enabled: Boolean) {
+        alertsEnabled.value = enabled
+    }
+
+    override val radioNoticesEnabled = MutableStateFlow(true)
+
+    override fun setRadioNoticesEnabled(enabled: Boolean) {
+        radioNoticesEnabled.value = enabled
+    }
+
+    override val updatesEnabled = MutableStateFlow(true)
+
+    override fun setUpdatesEnabled(enabled: Boolean) {
+        updatesEnabled.value = enabled
+    }
+
     override val geofenceAlertOptIns = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setGeofenceAlertOptIn(waypointId: Int, enabled: Boolean) {

@@ -666,6 +666,24 @@ interface NotificationPrefs {
     suspend fun loadNewWaypointsEnabled(): Boolean
 
     /**
+     * Desktop and iPhone/iPad opt-out for alarm notifications (messages with the alert bell, such as an SOS from a
+     * neighbour); Android uses the system channel setting instead. On by default.
+     */
+    val alertsEnabled: StateFlow<Boolean>
+
+    fun setAlertsEnabled(enabled: Boolean)
+
+    /** Desktop and iPhone/iPad opt-out for notices sent by the radio itself; Android uses the system channel. */
+    val radioNoticesEnabled: StateFlow<Boolean>
+
+    fun setRadioNoticesEnabled(enabled: Boolean)
+
+    /** Desktop and iPhone/iPad opt-out for update notices (the app and the radio software); on by default. */
+    val updatesEnabled: StateFlow<Boolean>
+
+    fun setUpdatesEnabled(enabled: Boolean)
+
+    /**
      * Waypoint ids of foreign (not locally-created) geofences the user has opted in to receiving crossing alerts for.
      * Geofences are mesh-broadcast, so by default only the creator is alerted; this is the per-geofence opt-in.
      */

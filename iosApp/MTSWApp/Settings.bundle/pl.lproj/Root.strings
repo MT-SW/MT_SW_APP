@@ -6,4 +6,7 @@
 "Low battery notifications" = "Powiadomienia o niskim poziomie baterii";
 "Reaction notifications" = "Powiadomienia o reakcjach";
 "Waypoint notifications" = "Powiadomienia punktów orientacyjnych";
+"Alarm notifications" = "Powiadomienia o alarmach";
+"Notices from the radio" = "Komunikaty z radia";
+"Update notifications" = "Powiadomienia o aktualizacjach";
 "Notification sound while the app is open" = "Dźwięk powiadomień, gdy aplikacja jest otwarta";

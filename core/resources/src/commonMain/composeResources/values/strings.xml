@@ -2518,14 +2518,19 @@
     <string name="notification_permission_rationale">Notifications are how MT_SW_APP reaches you when the app is not open: new messages, newly discovered nodes, and a radio running low on battery. Nothing else changes if you decline.</string>
     <string name="notification_permissions_description">MT_SW_APP uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
     <string name="notification_reaction_to">%1$s to “%2$s”</string>
+    <string name="notification_settings_android">Notifications (in system settings)</string>
+    <string name="notification_settings_android_hint">Sound, vibration, importance and lock screen for each kind of notification.</string>
     <string name="notification_settings_in_system">Notifications (in iPhone settings)</string>
     <string name="notification_sound_while_open">Notification sound while the app is open</string>
     <!-- NOTIFICATIONS -->
+    <string name="notifications_alerts">Alarm notifications</string>
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>
     <string name="notifications_for_low_battery_alerts">Notifications for low battery alerts for the connected device.</string>
     <string name="notifications_for_newly_discovered_nodes">Notifications for newly discovered nodes.</string>
     <string name="notifications_on_alert_bell_receipt">Notifications on alert/bell receipt</string>
     <string name="notifications_on_message_receipt">Notifications on message receipt</string>
+    <string name="notifications_radio_notices">Notices from the radio</string>
+    <string name="notifications_updates">Update notifications</string>
     <string name="now">Now</string>
     <!-- OFFLINE -->
     <string name="offline_maps">Offline maps</string>
