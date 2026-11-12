@@ -160,7 +160,7 @@ class CoverageController(
                         latitude = latI * GeoConstants.DEG_D,
                         longitude = lonI * GeoConstants.DEG_D,
                         snr = snr,
-                        time = position.time.takeIf { it != 0 } ?: packet.rx_time,
+                        time = position.time.takeIf { it != 0 } ?: packet.rx_time ?: 0,
                         nodeNum = node.num,
                     )
                 names[node.num] = node.effectiveLongName
