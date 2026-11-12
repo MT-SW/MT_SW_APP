@@ -48,8 +48,6 @@ actual val bleScanRequiresLocationServices: Boolean = false
 
 @Composable actual fun rememberBluetoothPermissionState(): PermissionUiState = grantedPermissionUiState()
 
-@Composable actual fun rememberNotificationPermissionState(): PermissionUiState = grantedPermissionUiState()
-
 @Composable actual fun rememberLocalNetworkPermissionState(): PermissionUiState = grantedPermissionUiState()
 
 @Composable actual fun rememberCameraPermissionState(): PermissionUiState = grantedPermissionUiState()

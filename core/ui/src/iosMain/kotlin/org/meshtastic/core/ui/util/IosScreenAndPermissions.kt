@@ -36,8 +36,16 @@ import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.UIKit.UIApplication
+import platform.UserNotifications.UNAuthorizationOptionAlert
+import platform.UserNotifications.UNAuthorizationOptionBadge
+import platform.UserNotifications.UNAuthorizationOptionSound
+import platform.UserNotifications.UNAuthorizationStatusDenied
+import platform.UserNotifications.UNAuthorizationStatusNotDetermined
+import platform.UserNotifications.UNUserNotificationCenter
 import platform.UIKit.UIScreen
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 /** Keeps the screen on while [enabled] (firmware update, scanning, HUD), like the window flag on Android. */
 @Composable
@@ -109,4 +117,36 @@ actual fun isBluetoothDisabled(): Boolean {
         }
     }
     return off
+}
+
+/** The real notification permission of iOS, read from the system and refreshed every time the app comes back. */
+@Composable
+actual fun rememberNotificationPermissionState(): PermissionUiState {
+    val center = remember { UNUserNotificationCenter.currentNotificationCenter() }
+    var status by remember { mutableStateOf(PermissionStatus.NOT_REQUESTED) }
+
+    fun refresh() {
+        center.getNotificationSettingsWithCompletionHandler { settings ->
+            val newStatus =
+                when (settings?.authorizationStatus) {
+                    UNAuthorizationStatusNotDetermined -> PermissionStatus.NOT_REQUESTED
+                    UNAuthorizationStatusDenied -> PermissionStatus.PERMANENTLY_DENIED
+                    // Allowed, provisional or temporary: notifications can be shown.
+                    else -> PermissionStatus.GRANTED
+                }
+            dispatch_async(dispatch_get_main_queue()) { status = newStatus }
+        }
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refresh() }
+    return PermissionUiState(
+        status = status,
+        request = {
+            center.requestAuthorizationWithOptions(
+                UNAuthorizationOptionAlert or UNAuthorizationOptionBadge or UNAuthorizationOptionSound,
+            ) { _, _ ->
+                refresh()
+            }
+        },
+        openAppSettings = { openAppSettings() },
+    )
 }
