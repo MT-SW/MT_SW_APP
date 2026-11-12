@@ -17,6 +17,7 @@
 package org.meshtastic.core.data.manager
 
 import co.touchlab.kermit.Logger
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -105,8 +106,11 @@ class MessageArchiverImpl(
         mutableState.update { it.copy(running = true) }
         var ok = true
         var files = 0
+        val start = TimeSource.Monotonic.markNow()
         try {
-            for ((plainName, content) in buildFiles(config)) {
+            val built = buildFiles(config)
+            Logger.i { "Message archive: ${built.size} files built in ${start.elapsedNow().inWholeMilliseconds} ms" }
+            for ((plainName, content) in built) {
                 // The hash covers the password too, so a new password rewrites the files.
                 val hash = (content + config.password).hashCode()
                 val name = if (config.encrypted) "$plainName.$ENCRYPTED_EXTENSION" else plainName
@@ -130,6 +134,9 @@ class MessageArchiverImpl(
             Logger.e(e) { "Message archive failed" }
             ok = false
         } finally {
+            Logger.i {
+                "Message archive: done in ${start.elapsedNow().inWholeMilliseconds} ms, $files files written, ok=$ok"
+            }
             mutableState.value =
                 MessageArchiveState(running = false, lastRunMillis = nowMillis, lastFileCount = files, lastFailed = !ok)
         }

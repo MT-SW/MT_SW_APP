@@ -20,6 +20,8 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import co.touchlab.kermit.Logger
+import kotlin.time.TimeSource
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -146,11 +148,14 @@ private class FolderPickerDelegate(var onUri: (CommonUri?) -> Unit) :
             onUri(null)
             return
         }
+        val start = TimeSource.Monotonic.markNow()
         val opened = url.startAccessingSecurityScopedResource()
         val bookmark = url.bookmarkDataWithOptions(0uL, null, null, null)
         if (opened) url.stopAccessingSecurityScopedResource()
         val bytes = bookmark?.toByteArray()
+        Logger.i { "Folder picker: the bookmark was made in ${start.elapsedNow().inWholeMilliseconds} ms" }
         onUri(bytes?.let { CommonUri.parse("bookmark:" + it.joinToString("") { b -> hexByte(b) }) })
+        Logger.i { "Folder picker: the choice was handled after ${start.elapsedNow().inWholeMilliseconds} ms" }
     }
 
     override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {

@@ -27,6 +27,7 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
+import kotlin.time.TimeSource
 import okio.BufferedSink
 import okio.ByteString.Companion.decodeHex
 import okio.FileSystem
@@ -50,6 +51,7 @@ class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
         withContext(dispatchers.io) {
             var folderUrl: NSURL? = null
             var opened = false
+            val start = TimeSource.Monotonic.markNow()
             try {
                 val bytes = folder.removePrefix(BOOKMARK_PREFIX).decodeHex().toByteArray()
                 val data = bytes.toNSData()
@@ -59,6 +61,7 @@ class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
                         NSURL.URLByResolvingBookmarkData(data, 0uL, null, stale.ptr, null)
                     }
                 val url = folderUrl ?: return@withContext false
+                Logger.i { "Folder: the bookmark was resolved in ${start.elapsedNow().inWholeMilliseconds} ms" }
                 opened = url.startAccessingSecurityScopedResource()
                 val directory = (url.path ?: return@withContext false).toPath()
                 val sink = FileSystem.SYSTEM.sink(directory / name).buffer()
@@ -67,6 +70,7 @@ class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
                 } finally {
                     sink.close()
                 }
+                Logger.i { "Folder: $name was written after ${start.elapsedNow().inWholeMilliseconds} ms" }
                 true
             } catch (e: CancellationException) {
                 throw e

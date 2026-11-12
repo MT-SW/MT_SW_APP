@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* iPhone/iPad, archiwum wiadomości: wybór folderu i zapis zostawiają w dzienniku czas trwania poszczególnych kroków (zamiana wyboru na zakładkę, odczyt zakładki, zapis pliku), żeby dało się ustalić, co zacina aplikację przy wyborze folderu.
 * Powiadomienia, więcej kategorii (komputer, iPhone/iPad): trzy nowe przełączniki — „Powiadomienia o alarmach” (wiadomości z dzwonkiem, np. SOS od sąsiada), „Komunikaty z radia” i „Powiadomienia o aktualizacjach” (aplikacja i oprogramowanie radia). Na iPhonie są też w Ustawienia → MT_SW i są zsynchronizowane z aplikacją. Domyślnie włączone.
 * Android, powiadomienia: w ustawieniach jest osobna sekcja „Powiadomienia” z wierszem „Powiadomienia (w ustawieniach systemu)”, który otwiera systemową stronę powiadomień aplikacji (dźwięk, wibracja, ważność i ekran blokady osobno dla każdego rodzaju).
 * Archiwum wiadomości, przywracanie (wszystkie wersje): przycisk „Przywróć z archiwum” wczytuje wiadomości z plików CSV (także zaszyfrowanych tym samym hasłem) z powrotem do historii. Archiwum zapisuje nazwę kanału, więc wiadomość trafia do kanału o tej samej nazwie nawet po zamianie kanałów miejscami; wiadomości prywatne wracają do swojej rozmowy, a te, które już są w aplikacji, nie są dublowane. Działa tylko z formatu CSV.
@@ -721,6 +722,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* iPhone/iPad, message archive: choosing the folder and writing leave the time of each step in the log (making the bookmark of the choice, resolving it, writing the file), so that what makes the app stall when the folder is chosen can be found.
 * Notifications, more categories (desktop, iPhone/iPad): three new switches — "Alarm notifications" (messages with the bell, e.g. an SOS from a neighbour), "Notices from the radio" and "Update notifications" (the app and the radio software). On iPhone they are also in Settings → MT_SW and are kept in step with the app. On by default.
 * Android, notifications: the settings have a separate "Notifications" section with the row "Notifications (in system settings)", which opens the system notification page of the app (sound, vibration, importance and lock screen for each kind).
 * Message archive, restoring (all versions): the "Restore from archive" button reads the messages from CSV files (also ones encrypted with the same password) back into the history. The archive saves the channel name, so a message goes to the channel with the same name even after the channels were swapped around; private messages return to their own conversation, and messages already in the app are not duplicated. Works from the CSV format only.
