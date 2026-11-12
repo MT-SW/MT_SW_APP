@@ -43,7 +43,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberShowToast
-import platform.AVFoundation.AVAudioPlayer
+import platform.AVFAudio.AVAudioPlayer
 import platform.Foundation.NSData
 import platform.Foundation.create
 

@@ -40,7 +40,6 @@ import platform.AVFoundation.AVCaptureVideoOrientationPortrait
 import platform.AVFoundation.AVCaptureVideoOrientationPortraitUpsideDown
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.fileDataRepresentation
-import platform.AVFoundation.videoOrientation
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSData

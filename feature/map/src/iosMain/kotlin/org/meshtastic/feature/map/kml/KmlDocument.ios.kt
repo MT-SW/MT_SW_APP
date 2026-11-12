@@ -76,7 +76,8 @@ private fun <T> withZip(bytes: ByteArray, block: (FileSystem) -> T): T? {
 /** This entry inflated, or null once it would take the archive past [remaining] bytes (the header size is not trusted). */
 private fun FileSystem.readWithin(path: Path, remaining: Long): ByteArray? {
     val out = Buffer()
-    source(path).buffer().use { source ->
+    val source = source(path).buffer()
+    try {
         while (true) {
             val read = source.read(out, READ_CHUNK)
             if (read == -1L) break
@@ -85,6 +86,8 @@ private fun FileSystem.readWithin(path: Path, remaining: Long): ByteArray? {
                 return null
             }
         }
+    } finally {
+        source.close()
     }
     return out.readByteArray()
 }
