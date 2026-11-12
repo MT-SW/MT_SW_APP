@@ -356,7 +356,11 @@ private func isExtraLargePortrait(_ family: WidgetFamily) -> Bool {
 
 /// Rozmiary, które widżet oferuje; 4x6 na iPhonie dochodzi od iOS 27.
 private var widgetFamilies: [WidgetFamily] {
-    var families: [WidgetFamily] = [.systemMedium, .systemLarge, .systemExtraLarge]
+    // Trzy małe rozmiary dochodzą na ekran blokady (iPhone): okrągły, prostokątny i w jednej linii.
+    var families: [WidgetFamily] = [
+        .systemMedium, .systemLarge, .systemExtraLarge,
+        .accessoryCircular, .accessoryRectangular, .accessoryInline,
+    ]
     #if compiler(>=6.4)
     if #available(iOS 27.0, *) { families.append(.systemExtraLargePortrait) }
     #endif
@@ -412,6 +416,25 @@ struct StatsView: View {
                 label: isPolish ? "Węzeł sieci" : "Network node", cards: data.network, step: entry.step,
                 empty: isPolish ? "Brak innych węzłów." : "No other nodes.")
             switch family {
+            case .accessoryInline:
+                // Ekran blokady, jedna linia: nazwa naszego węzła i ile węzłów jest online.
+                Text("\(data.title) \(data.chip)")
+            case .accessoryCircular:
+                ZStack {
+                    AccessoryWidgetBackground()
+                    Text(data.chip).font(.system(size: 15, weight: .bold)).minimumScaleFactor(0.5).lineLimit(1)
+                }
+            case .accessoryRectangular:
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack {
+                        Text(data.title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                        Spacer(minLength: 2)
+                        Text(data.chip).font(.system(size: 13, weight: .bold))
+                    }
+                    ForEach(Array(data.lines.prefix(2).enumerated()), id: \.offset) { _, line in
+                        Text(line).font(.system(size: 11)).lineLimit(1).minimumScaleFactor(0.7)
+                    }
+                }
             case .systemLarge:
                 // Góra: zawsze nasz węzeł. Dół: ulubione albo cała sieć na zmianę (do wyboru w ustawieniach widżetu).
                 VStack(alignment: .leading, spacing: 6) {
@@ -448,8 +471,8 @@ struct MTSWStatsWidget: Widget {
         }
         .configurationDisplayName(isPolish ? "Statystyki MT_SW" : "MT_SW statistics")
         .description(isPolish
-            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Co pokazuje, wybierasz w aplikacji (Ustawienia → Widżet statystyk)."
-            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. What it shows is chosen in the app (Settings → Statistics widget).")
+            ? "Średni: nasz węzeł (albo ulubione, albo cała sieć na zmianę). Duży: nasz węzeł u góry, niżej ulubione lub cała sieć na zmianę. Największy (4x6): nasz węzeł, ulubione i cała sieć. Na ekranie blokady (iPhone) są też trzy małe widżety: okrągły, prostokątny i w jednej linii — nazwa naszego węzła i ile węzłów jest online. Co pokazuje, wybierasz w aplikacji (Ustawienia → Widżet statystyk)."
+            : "Medium: our node (or favorites, or the whole network in turn). Large: our node on top, below favorites or the whole network in turn. Extra large (4x6): our node, favorites and the whole network. The lock screen (iPhone) also has three small widgets: round, rectangular and one line — our node name and how many nodes are online. What it shows is chosen in the app (Settings → Statistics widget).")
         .supportedFamilies(widgetFamilies)
     }
 }
