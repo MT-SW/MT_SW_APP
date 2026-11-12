@@ -690,6 +690,14 @@ interface NotificationPrefs {
 
     /** Turns the counting of packets relayed by [nodeNum] on or off for its silence alert. */
     fun setNodeSilenceCountRelayed(nodeNum: Int, enabled: Boolean)
+
+    /**
+     * Quiet hours of all silence alerts, or null when there are none. An alert that comes due inside them is held back
+     * and raised when they end, if the node is still silent.
+     */
+    val nodeSilenceQuietHours: StateFlow<QuietHours?>
+
+    fun setNodeSilenceQuietHours(hours: QuietHours?)
 }
 
 /** Reactive interface for general map preferences. */
@@ -965,4 +973,17 @@ interface MeshBeaconPrefs {
     val storedBeacons: StateFlow<List<String>>
 
     fun setStoredBeacons(records: List<String>)
+}
+
+/**
+ * A daily span of whole hours, [startHour] inclusive to [endHour] exclusive, both 0..23. It may cross midnight (22 to 7).
+ * Equal hours mean the whole day.
+ */
+data class QuietHours(val startHour: Int, val endHour: Int) {
+    /** Whether [hour] (0..23) falls inside. */
+    fun contains(hour: Int): Boolean = when {
+        startHour == endHour -> true
+        startHour < endHour -> hour in startHour until endHour
+        else -> hour >= startHour || hour < endHour
+    }
 }

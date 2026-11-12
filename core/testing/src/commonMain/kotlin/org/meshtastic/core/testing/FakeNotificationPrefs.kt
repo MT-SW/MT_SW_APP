@@ -96,6 +96,12 @@ class FakeNotificationPrefs : NotificationPrefs {
             }
     }
 
+    override val nodeSilenceQuietHours = MutableStateFlow<org.meshtastic.core.repository.QuietHours?>(null)
+
+    override fun setNodeSilenceQuietHours(hours: org.meshtastic.core.repository.QuietHours?) {
+        nodeSilenceQuietHours.value = hours
+    }
+
     override val nodeSilenceCountRelayed = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setNodeSilenceCountRelayed(nodeNum: Int, enabled: Boolean) {

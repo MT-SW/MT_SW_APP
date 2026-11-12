@@ -31,6 +31,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.QuietHours
 
 @Single
 class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : NotificationPrefs {
@@ -167,6 +168,20 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         }
     }
 
+    // Stored as "start-end" hours, or empty for none.
+    override val nodeSilenceQuietHours: StateFlow<QuietHours?> =
+        dataStore.data
+            .map { prefs -> parseQuietHours(prefs[KEY_NODE_SILENCE_QUIET]) }
+            .stateIn(scope, SharingStarted.Eagerly, null)
+
+    override fun setNodeSilenceQuietHours(hours: QuietHours?) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                prefs[KEY_NODE_SILENCE_QUIET] = hours?.let { "${it.startHour}-${it.endHour}" }.orEmpty()
+            }
+        }
+    }
+
     companion object {
         /** Cap on remembered foreign-geofence opt-ins; far above realistic manual use, oldest evicted past it. */
         const val MAX_GEOFENCE_OPT_INS = 100
@@ -184,6 +199,14 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
             }
             ?.toMap() ?: emptyMap()
 
+        private fun parseQuietHours(text: String?): QuietHours? {
+            val (start, end) = text?.split('-')?.takeIf { it.size == 2 } ?: return null
+            val startHour = start.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
+            val endHour = end.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
+            return QuietHours(startHour, endHour)
+        }
+
+        private val KEY_NODE_SILENCE_QUIET = stringPreferencesKey("notif_node_silence_quiet")
         private val KEY_NODE_SILENCE_ALERTS = stringPreferencesKey("notif_node_silence_alerts")
         private val KEY_NODE_SILENCE_RELAYED = stringPreferencesKey("notif_node_silence_relayed")
         private val KEY_MESSAGES_ENABLED = booleanPreferencesKey("notif_messages_enabled")

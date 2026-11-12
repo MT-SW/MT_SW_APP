@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.MeshNotificationManager
@@ -34,8 +35,12 @@ import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.node_silence_alert_group
 import org.meshtastic.core.resources.node_silence_alert_notification
 import org.meshtastic.core.resources.unknown_username
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 import kotlin.time.DurationUnit
 
 /**
@@ -91,6 +96,13 @@ class NodeSilenceMonitorImpl(
             }
         }
         val countRelayed = notificationPrefs.nodeSilenceCountRelayed.value
+        val quiet =
+            notificationPrefs.nodeSilenceQuietHours.value?.contains(
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour,
+            ) == true
+        // Nodes that went silent in this round: several at once (a power cut, a bad hour on the band) are reported
+        // with one notification instead of a burst.
+        val newlySilent = mutableListOf<Pair<Node, Long>>()
         for ((nodeNum, minutes) in alerts) {
             val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: continue
             var lastHeard = node.lastHeard
@@ -99,25 +111,43 @@ class NodeSilenceMonitorImpl(
             if (lastHeard == 0) continue
             val silentSeconds = now - lastHeard
             if (silentSeconds >= minutes * SECONDS_PER_MINUTE) {
-                if (alerted[nodeNum] != lastHeard) {
+                // In quiet hours the alert is held back and not remembered, so it is raised once they end.
+                if (alerted[nodeNum] != lastHeard && !quiet) {
                     alerted[nodeNum] = lastHeard
-                    val name =
-                        node.effectiveLongName.takeIf { it.isNotBlank() } ?: getStringSuspend(Res.string.unknown_username)
-                    val title =
-                        getStringSuspend(
-                            Res.string.node_silence_alert_notification,
-                            name,
-                            formatDurationSuspend(silentSeconds, DurationUnit.MINUTES),
-                        )
-                    Logger.i { "Node $nodeNum silent for $silentSeconds s; raising the silence alert" }
-                    notifications.showNewNodeSeenNotification(node, title)
+                    newlySilent += node to silentSeconds
                 }
             } else if (alerted.remove(nodeNum) != null) {
                 // Heard again: the old alert is out of date.
                 notifications.cancelNewNodeNotification(nodeNum)
             }
         }
+        raise(newlySilent)
     }
+
+    private suspend fun raise(newlySilent: List<Pair<Node, Long>>) {
+        if (newlySilent.isEmpty()) return
+        Logger.i { "${newlySilent.size} node(s) silent; raising the silence alert" }
+        if (newlySilent.size >= GROUP_FROM) {
+            val names = newlySilent.map { (node, _) -> displayName(node) }
+            val more = if (names.size > GROUP_NAMES_SHOWN) ", …" else ""
+            val shown = names.take(GROUP_NAMES_SHOWN).joinToString(", ") + more
+            val title = getStringSuspend(Res.string.node_silence_alert_group, newlySilent.size, shown)
+            notifications.showNewNodeSeenNotification(newlySilent.first().first, title)
+            return
+        }
+        for ((node, silentSeconds) in newlySilent) {
+            val title =
+                getStringSuspend(
+                    Res.string.node_silence_alert_notification,
+                    displayName(node),
+                    formatDurationSuspend(silentSeconds, DurationUnit.MINUTES),
+                )
+            notifications.showNewNodeSeenNotification(node, title)
+        }
+    }
+
+    private suspend fun displayName(node: Node): String =
+        node.effectiveLongName.takeIf { it.isNotBlank() } ?: getStringSuspend(Res.string.unknown_username)
 
     /**
      * When a packet last came through [nodeNum], or 0. The packet names its relay by one byte only, so it is counted
@@ -134,5 +164,9 @@ class NodeSilenceMonitorImpl(
         const val CHECK_INTERVAL_MS = 60_000L
         const val SETTLE_SECONDS = 120L
         const val SECONDS_PER_MINUTE = 60
+
+        /** From this many nodes silent in one round, one notification names them all. */
+        const val GROUP_FROM = 3
+        const val GROUP_NAMES_SHOWN = 3
     }
 }

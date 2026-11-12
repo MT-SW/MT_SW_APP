@@ -3990,4 +3990,9 @@
     <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy.</string>
     <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
     <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
+    <string name="node_silence_alert_group">Cisza węzłów: %1$d (%2$s)</string>
+    <string name="node_silence_quiet_title">Godziny ciszy (wszystkie węzły)</string>
+    <string name="node_silence_quiet_hint">W tych godzinach strażnik nie powiadamia. Jeśli węzeł nadal milczy, powiadomienie przyjdzie po ich zakończeniu. Gdy kilka węzłów zamilknie naraz, przychodzi jedno wspólne powiadomienie.</string>
+    <string name="node_silence_quiet_from">Od</string>
+    <string name="node_silence_quiet_to">Do</string>
 </resources>

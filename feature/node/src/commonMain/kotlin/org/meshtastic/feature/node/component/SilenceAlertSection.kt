@@ -54,16 +54,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.QuietHours
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.node_silence_alert_custom
 import org.meshtastic.core.resources.node_silence_count_relayed
 import org.meshtastic.core.resources.node_silence_count_relayed_hint
+import org.meshtastic.core.resources.node_silence_quiet_from
+import org.meshtastic.core.resources.node_silence_quiet_hint
+import org.meshtastic.core.resources.node_silence_quiet_title
+import org.meshtastic.core.resources.node_silence_quiet_to
 import org.meshtastic.core.resources.node_silence_alert_hint
 import org.meshtastic.core.resources.node_silence_alert_off
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Remove
 import org.meshtastic.core.ui.icon.Save
 import kotlin.time.DurationUnit
 
@@ -85,6 +92,7 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val alerts by prefs.nodeSilenceAlerts.collectAsStateWithLifecycle()
     val current = alerts[nodeNum]
     val relayed by prefs.nodeSilenceCountRelayed.collectAsStateWithLifecycle()
+    val quiet by prefs.nodeSilenceQuietHours.collectAsStateWithLifecycle()
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -162,6 +170,61 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                     onCheckedChange = { prefs.setNodeSilenceCountRelayed(nodeNum, it) },
                 )
             }
+
+            // Quiet hours are one setting for every node's watchdog, kept here beside them.
+            Spacer(Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(Res.string.node_silence_quiet_title),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Text(
+                        text = stringResource(Res.string.node_silence_quiet_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = quiet != null,
+                    onCheckedChange = { prefs.setNodeSilenceQuietHours(if (it) QuietHours(DEFAULT_QUIET_FROM, DEFAULT_QUIET_TO) else null) },
+                )
+            }
+            quiet?.let { hours ->
+                HourStepper(
+                    label = stringResource(Res.string.node_silence_quiet_from),
+                    hour = hours.startHour,
+                    onChange = { prefs.setNodeSilenceQuietHours(hours.copy(startHour = it)) },
+                )
+                HourStepper(
+                    label = stringResource(Res.string.node_silence_quiet_to),
+                    hour = hours.endHour,
+                    onChange = { prefs.setNodeSilenceQuietHours(hours.copy(endHour = it)) },
+                )
+            }
+        }
+    }
+}
+
+private const val DEFAULT_QUIET_FROM = 22
+private const val DEFAULT_QUIET_TO = 7
+private const val HOURS_PER_DAY = 24
+
+/** One whole hour of the day with a button each side to move it, wrapping round midnight. */
+@Composable
+private fun HourStepper(label: String, hour: Int, onChange: (Int) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(text = label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+        IconButton(onClick = { onChange((hour + HOURS_PER_DAY - 1) % HOURS_PER_DAY) }) {
+            Icon(imageVector = MeshtasticIcons.Remove, contentDescription = null)
+        }
+        Text(text = hour.toString().padStart(2, '0') + ":00", style = MaterialTheme.typography.bodyLarge)
+        IconButton(onClick = { onChange((hour + 1) % HOURS_PER_DAY) }) {
+            Icon(imageVector = MeshtasticIcons.Add, contentDescription = null)
         }
     }
 }

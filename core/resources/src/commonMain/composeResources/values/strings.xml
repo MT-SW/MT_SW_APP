@@ -2455,11 +2455,16 @@
     <string name="node_show_on_map">Show on map</string>
     <string name="node_silence_alert">Node watchdog</string>
     <string name="node_silence_alert_custom">Own time (hours)</string>
+    <string name="node_silence_alert_group">Silent nodes: %1$d (%2$s)</string>
     <string name="node_silence_alert_hint">A notification when the radio has not heard this node for the chosen time. It works while the app is connected to the radio.</string>
     <string name="node_silence_alert_notification">%1$s: silent for %2$s</string>
     <string name="node_silence_alert_off">Off</string>
     <string name="node_silence_count_relayed">Also count packets passing through the node</string>
     <string name="node_silence_count_relayed_hint">Besides its own packets, a packet that reached the radio through this node (it passed it on) also shows the node is alive. Matched by the last byte of the node ID, so it is skipped when two known nodes end alike.</string>
+    <string name="node_silence_quiet_from">From</string>
+    <string name="node_silence_quiet_hint">The watchdog does not notify during these hours. If the node is still silent, the notification comes when they end. When several nodes go silent at once, one shared notification comes.</string>
+    <string name="node_silence_quiet_title">Quiet hours (all nodes)</string>
+    <string name="node_silence_quiet_to">To</string>
     <string name="node_sort_alpha">A-Z</string>
     <string name="node_sort_button">Node sorting options</string>
     <string name="node_sort_channel">Channel</string>
