@@ -16,9 +16,40 @@
  */
 package org.meshtastic.core.common.util
 
-/**
- * Fixed separators, matching the rest of the iOS stubs in this module. `NSNumberFormatter` belongs here once the iOS
- * client reads real locale data.
- */
+import platform.Foundation.NSLocale
+import platform.Foundation.NSLock
+import platform.Foundation.NSNumber
+import platform.Foundation.NSNumberFormatter
+import platform.Foundation.NSNumberFormatterDecimalStyle
+import platform.Foundation.NSNumberFormatterRoundHalfUp
+import platform.Foundation.currentLocale
+import platform.Foundation.localeIdentifier
+
+private val formatterLock = NSLock()
+private val formatters = HashMap<String, NSNumberFormatter>()
+
+/** One formatter per language and number of digits: building one for every number would slow long lists down. */
+private fun formatterFor(fractionDigits: Int): NSNumberFormatter {
+    val locale = NSLocale.currentLocale
+    val key = "${locale.localeIdentifier}|$fractionDigits"
+    formatterLock.lock()
+    try {
+        return formatters.getOrPut(key) {
+            NSNumberFormatter().apply {
+                this.locale = locale
+                numberStyle = NSNumberFormatterDecimalStyle
+                minimumFractionDigits = fractionDigits.toULong()
+                maximumFractionDigits = fractionDigits.toULong()
+                // Half-up like the Android and desktop versions, so only the separators differ from the plain format.
+                roundingMode = NSNumberFormatterRoundHalfUp
+            }
+        }
+    } finally {
+        formatterLock.unlock()
+    }
+}
+
+/** Numbers on the iPhone use the decimal and grouping separators of the language set in the phone. */
 actual fun formatDecimalLocalized(value: Double, fractionDigits: Int): String =
-    NumberFormatter.formatInvariant(value, fractionDigits)
+    formatterFor(fractionDigits).stringFromNumber(NSNumber(double = value))
+        ?: NumberFormatter.formatInvariant(value, fractionDigits)

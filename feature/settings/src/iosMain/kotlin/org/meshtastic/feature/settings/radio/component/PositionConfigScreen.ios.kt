@@ -14,10 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package org.meshtastic.feature.settings.radio.component
 
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Position
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.position_config_set_fixed_from_phone
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 
 @Composable
@@ -26,5 +34,25 @@ actual fun DeviceLocationButton(
     enabled: Boolean,
     onLocationReceived: (Position) -> Unit,
 ) {
-    // No-op for iOS for now
+    val coroutineScope = rememberCoroutineScope()
+
+    TextButton(
+        enabled = enabled,
+        onClick = {
+            coroutineScope.launch {
+                val phoneLoc = viewModel.getCurrentLocation()
+                if (phoneLoc != null) {
+                    val locationInput =
+                        Position(
+                            latitude = phoneLoc.latitude,
+                            longitude = phoneLoc.longitude,
+                            altitude = (phoneLoc.mslAltitudeMeters ?: phoneLoc.altitudeMeters ?: 0.0).toInt(),
+                        )
+                    onLocationReceived(locationInput)
+                }
+            }
+        },
+    ) {
+        Text(text = stringResource(Res.string.position_config_set_fixed_from_phone))
+    }
 }
