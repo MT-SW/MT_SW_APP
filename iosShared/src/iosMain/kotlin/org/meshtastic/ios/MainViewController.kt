@@ -178,9 +178,8 @@ private fun WidgetPublishing() {
 }
 
 /** Applies the theme chosen in the settings and shows the app. */
-@Suppress("ViewModelForwarding")
+@Suppress("ViewModelForwarding", "LongMethod")
 @Composable
-@Suppress("LongMethod")
 private fun ThemedApp(uiViewModel: UIViewModel) {
     val uiPrefs = remember { koin.get<UiPrefs>(UiPrefs::class) }
     val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
