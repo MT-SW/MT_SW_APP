@@ -225,7 +225,8 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
                 val value = minutes.toIntOrNull()?.takeIf { it > 0 } ?: return@mapNotNull null
                 nodeNum to value
             }
-            ?.toMap() ?: emptyMap()
+            ?.toMap()
+            .orEmpty()
 
         @Suppress("ReturnCount")
         private fun parseQuietHours(text: String?): QuietHours? {

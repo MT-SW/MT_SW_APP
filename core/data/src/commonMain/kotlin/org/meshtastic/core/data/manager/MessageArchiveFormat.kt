@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooManyFunctions", "MagicNumber", "DestructuringDeclarationWithTooManyEntries")
+@file:Suppress(
+    "TooManyFunctions",
+    "MagicNumber",
+    "DestructuringDeclarationWithTooManyEntries",
+    "SpreadOperator",
+    "DoubleMutabilityForCollection",
+)
 
 package org.meshtastic.core.data.manager
 

@@ -170,7 +170,7 @@ class MessageArchiverImpl(
                         contact = contact,
                         limit = MESSAGES_PER_CONVERSATION,
                         includeFiltered = false,
-                        getNode = { userId -> nodes.getNode(userId ?: "") },
+                        getNode = { userId -> nodes.getNode(userId.orEmpty()) },
                     )
                     .first()
             for (message in messages) {
@@ -341,7 +341,7 @@ class MessageArchiverImpl(
             val seen =
                 context.seen.getOrPut(contact) {
                     packets
-                        .getMessagesFrom(contact, null, true) { userId -> nodes.getNode(userId ?: "") }
+                        .getMessagesFrom(contact, null, true) { userId -> nodes.getNode(userId.orEmpty()) }
                         .first()
                         .mapTo(mutableSetOf()) { lineKeyOf(it.displayTime / MILLIS_PER_SECOND, it.text) }
                 }
