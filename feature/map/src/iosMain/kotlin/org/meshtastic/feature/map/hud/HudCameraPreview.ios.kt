@@ -34,6 +34,7 @@ import platform.AVFoundation.AVAuthorizationStatusNotDetermined
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureDevicePositionBack
+import platform.AVFoundation.AVCapturePhotoOutput
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPresetPhoto
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
@@ -86,9 +87,9 @@ actual fun HudCameraPreview(
     val currentOnAvailable by rememberUpdatedState(onAvailable)
     val currentOnStill by rememberUpdatedState(onStill)
     val session = remember { AVCaptureSession() }
+    val photoOutput = remember { AVCapturePhotoOutput() }
 
     DisposableEffect(session) {
-        // There is no still of the camera on iPhone; the overlay is shown without the picture capture.
         currentOnStill(null)
         fun start() {
             val device =
@@ -105,6 +106,11 @@ actual fun HudCameraPreview(
                 session.sessionPreset = AVCaptureSessionPresetPhoto
             }
             session.addInput(input)
+            // The photo output is what the "save picture with the overlay" button takes the still from.
+            if (session.canAddOutput(photoOutput)) {
+                session.addOutput(photoOutput)
+                currentOnStill(IosHudStill(photoOutput))
+            }
             session.commitConfiguration()
             val format = device.activeFormat
             val fovRad = format.videoFieldOfView.toDouble() * kotlin.math.PI / 180.0
@@ -137,6 +143,7 @@ actual fun HudCameraPreview(
         }
         onDispose {
             if (session.running) session.stopRunning()
+            currentOnStill(null)
             currentOnIntrinsics(null)
         }
     }

@@ -74,6 +74,7 @@ targets:
         NSLocationWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie, w kompasie i może ją wysłać do sieci mesh."
         NSMotionUsageDescription: "MT_SW odczytuje ciśnienie powietrza (barometr) i położenie telefonu w widoku terenu."
         NSCameraUsageDescription: "MT_SW używa aparatu do skanowania kodów QR (kanały, kontakty, kod połączenia) oraz do widoku terenu (panoramy) z nałożonymi węzłami mesh."
+        NSPhotoLibraryAddUsageDescription: "MT_SW zapisuje w Zdjęciach obraz z aparatu z nałożonymi węzłami mesh (widok terenu)."
         CFBundleURLTypes:
           - CFBundleURLName: "MT_SW link"
             CFBundleURLSchemes:
