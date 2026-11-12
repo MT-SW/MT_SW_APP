@@ -43,7 +43,7 @@ internal const val COVERAGE_DEFAULT_OPACITY = 0.8f
 private const val SNR_FLOOR = -20f
 private const val SNR_CEILING = 5f
 private const val OPAQUE = 0xFF000000.toInt()
-private const val DOT_RADIUS_DP = 5
+private const val DOT_RADIUS_DP = 12
 private const val DOT_STROKE_ALPHA = 0.6f
 
 /**

@@ -112,7 +112,12 @@ class CoverageController(
                 state.copy(sources = measured.second, readMillis = nowMillis, nodeFilter = node)
             }
             applyFilter()
-            Logger.i { "Coverage: ${mutable.value.points.size} of ${all.size} points are shown on the map" }
+            val places =
+                mutable.value.points.map { (it.latitude * PLACE_GRID).toLong() to (it.longitude * PLACE_GRID).toLong() }
+            Logger.i {
+                "Coverage: ${mutable.value.points.size} of ${all.size} points are shown on the map, " +
+                    "in ${places.distinct().size} different places"
+            }
         } finally {
             mutable.update { it.copy(loading = false) }
         }
@@ -181,6 +186,7 @@ class CoverageController(
 
     private companion object {
         const val MAX_POINTS = 20_000
+        const val PLACE_GRID = 1_000 // about 100 m
         const val MILLIS_PER_SECOND = 1_000L
         const val SECONDS_PER_DAY = 86_400L
     }
