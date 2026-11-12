@@ -24,7 +24,8 @@ import okio.BufferedSink
  * The settings of the automatic message archive. [folder] is the address of the chosen folder as the platform gave it
  * (empty = none chosen). [intervalMinutes] is how often the archive is brought up to date. [format] is one of
  * [FORMAT_TEXT], [FORMAT_CSV], [FORMAT_MARKDOWN]. With [perConversation] every conversation gets its own file for a
- * day, otherwise there is one file for all of them.
+ * day, otherwise there is one file for all of them. A non-empty [password] makes every file encrypted (see
+ * `ArchiveCrypto`); it stays on the device and is never written into the archive folder.
  */
 data class MessageArchiveConfig(
     val enabled: Boolean = false,
@@ -32,15 +33,22 @@ data class MessageArchiveConfig(
     val intervalMinutes: Int = DEFAULT_INTERVAL_MINUTES,
     val format: Int = FORMAT_TEXT,
     val perConversation: Boolean = false,
+    val password: String = "",
 ) {
-    /** Written as `enabled|intervalMinutes|format|perConversation|folder`. */
-    fun encode(): String = listOf(
-        if (enabled) 1 else 0,
-        intervalMinutes,
-        format,
-        if (perConversation) 1 else 0,
-    )
-        .joinToString("|") + "|" + folder
+    /** True when the files are written encrypted. */
+    val encrypted: Boolean
+        get() = password.isNotEmpty()
+
+    /**
+     * Written as `enabled|intervalMinutes|format|perConversation|folder`; with a password the same text follows the
+     * prefix `e|<password as hex>|`, so settings saved before the password existed still read correctly.
+     */
+    fun encode(): String {
+        val base =
+            listOf(if (enabled) 1 else 0, intervalMinutes, format, if (perConversation) 1 else 0)
+                .joinToString("|") + "|" + folder
+        return if (encrypted) "$ENCRYPTED_PREFIX${hex(password)}|$base" else base
+    }
 
     companion object {
         const val FORMAT_TEXT = 0
@@ -48,9 +56,32 @@ data class MessageArchiveConfig(
         const val FORMAT_MARKDOWN = 2
         const val DEFAULT_INTERVAL_MINUTES = 15
         private const val FIELDS = 5
+        private const val ENCRYPTED_PREFIX = "e|"
+        private const val HEX_RADIX = 16
+        private const val HEX_DIGITS_PER_BYTE = 2
+
+        private fun hex(text: String): String = text.encodeToByteArray().joinToString("") {
+            (it.toInt() and 0xFF).toString(HEX_RADIX).padStart(HEX_DIGITS_PER_BYTE, '0')
+        }
+
+        private fun unhex(text: String): String? {
+            if (text.length % HEX_DIGITS_PER_BYTE != 0) return null
+            val bytes =
+                text.chunked(HEX_DIGITS_PER_BYTE).map { it.toIntOrNull(HEX_RADIX)?.toByte() ?: return null }
+            return bytes.toByteArray().decodeToString()
+        }
 
         /** Reads what [encode] wrote; anything unreadable gives the defaults. */
         fun decode(text: String?): MessageArchiveConfig {
+            if (text != null && text.startsWith(ENCRYPTED_PREFIX)) {
+                val parts = text.split('|', limit = 3)
+                val password = parts.getOrNull(1)?.let(::unhex) ?: return MessageArchiveConfig()
+                return decodePlain(parts.getOrNull(2)).copy(password = password)
+            }
+            return decodePlain(text)
+        }
+
+        private fun decodePlain(text: String?): MessageArchiveConfig {
             val parts = text?.split('|', limit = FIELDS) ?: return MessageArchiveConfig()
             if (parts.size < FIELDS) return MessageArchiveConfig()
             val numbers = parts.take(FIELDS - 1).map { it.toIntOrNull() ?: return MessageArchiveConfig() }

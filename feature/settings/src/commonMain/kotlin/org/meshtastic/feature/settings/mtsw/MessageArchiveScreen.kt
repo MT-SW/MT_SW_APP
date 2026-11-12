@@ -29,10 +29,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -46,6 +51,13 @@ import org.meshtastic.core.repository.MessageArchivePrefs
 import org.meshtastic.core.repository.MessageArchiver
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archive_choose_folder
+import org.meshtastic.core.resources.archive_encrypt
+import org.meshtastic.core.resources.archive_encrypt_hint
+import org.meshtastic.core.resources.archive_encrypt_info
+import org.meshtastic.core.resources.archive_encrypt_on
+import org.meshtastic.core.resources.archive_encrypt_remove
+import org.meshtastic.core.resources.archive_encrypt_save
+import org.meshtastic.core.resources.archive_password
 import org.meshtastic.core.resources.archive_enabled
 import org.meshtastic.core.resources.archive_folder
 import org.meshtastic.core.resources.archive_folder_chosen
@@ -66,8 +78,9 @@ import org.meshtastic.core.resources.archive_never
 import org.meshtastic.core.resources.archive_now
 import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.mt_sw_other_archive_body
-import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.EditPasswordPreference
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -76,6 +89,7 @@ import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
 import org.meshtastic.feature.settings.component.ExpressiveSection
 
 private val INTERVALS = listOf(5, 15, 30, 60, 180)
+private const val MAX_PASSWORD_LENGTH = 128
 
 /** The automatic message archive: where to, in which format, how often, plus a button to write it right now. */
 @Composable
@@ -85,6 +99,7 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
     val config by prefs.config.collectAsStateWithLifecycle()
     val state by archiver.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    var password by rememberSaveable { mutableStateOf("") }
     val pickFolder =
         rememberOpenDocumentTreeLauncher { uri ->
             if (uri != null) prefs.setConfig(config.copy(folder = uri.toString(), enabled = true))
@@ -98,7 +113,13 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,
-                actions = { InfoButton(Res.string.archive_title, Res.string.mt_sw_other_archive_body) },
+                actions = {
+                    InfoButton(
+                        Res.string.archive_title,
+                        Res.string.mt_sw_other_archive_body,
+                        Res.string.archive_encrypt_info,
+                    )
+                },
                 onClickChip = {},
             )
         },
@@ -160,6 +181,45 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                             onClick = { prefs.setConfig(config.copy(intervalMinutes = minutes)) },
                             label = { Text(stringResource(Res.string.archive_interval_minutes, minutes)) },
                         )
+                    }
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.archive_encrypt)) {
+                Text(
+                    text =
+                    stringResource(
+                        if (config.encrypted) Res.string.archive_encrypt_on else Res.string.archive_encrypt_hint,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                EditPasswordPreference(
+                    title = stringResource(Res.string.archive_password),
+                    value = password,
+                    maxSize = MAX_PASSWORD_LENGTH,
+                    enabled = true,
+                    keyboardActions = KeyboardActions {},
+                    onValueChanged = { password = it },
+                )
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        onClick = {
+                            prefs.setConfig(config.copy(password = password))
+                            password = ""
+                        },
+                        enabled = password.isNotEmpty(),
+                    ) {
+                        Text(stringResource(Res.string.archive_encrypt_save))
+                    }
+                    if (config.encrypted) {
+                        OutlinedButton(onClick = { prefs.setConfig(config.copy(password = "")) }) {
+                            Text(stringResource(Res.string.archive_encrypt_remove))
+                        }
                     }
                 }
             }

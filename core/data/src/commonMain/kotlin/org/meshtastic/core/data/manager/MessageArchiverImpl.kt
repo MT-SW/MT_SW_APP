@@ -34,6 +34,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.crypto.ArchiveCrypto
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.NodeAddress
@@ -97,10 +98,18 @@ class MessageArchiverImpl(
         var ok = true
         var files = 0
         try {
-            for ((name, content) in buildFiles(config)) {
-                val hash = content.hashCode()
+            for ((plainName, content) in buildFiles(config)) {
+                // The hash covers the password too, so a new password rewrites the files.
+                val hash = (content + config.password).hashCode()
+                val name = if (config.encrypted) "$plainName.$ENCRYPTED_EXTENSION" else plainName
                 if (written[name] == hash) continue
-                if (folders.writeFile(config.folder, name) { sink -> sink.writeUtf8(content) }) {
+                val bytes =
+                    if (config.encrypted) ArchiveCrypto.encrypt(config.password, content.encodeToByteArray()) else null
+                val done =
+                    folders.writeFile(config.folder, name) { sink ->
+                        if (bytes != null) sink.write(bytes) else sink.writeUtf8(content)
+                    }
+                if (done) {
                     written[name] = hash
                     files++
                 } else {
@@ -173,6 +182,7 @@ class MessageArchiverImpl(
     private companion object {
         const val MILLIS_PER_MINUTE = 60_000L
         const val CHECK_INTERVAL_MS = 60_000L
+        const val ENCRYPTED_EXTENSION = "enc"
         const val MESSAGES_PER_CONVERSATION = 500
     }
 }

@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Archiwum wiadomości, ochrona hasłem (wszystkie wersje): pliki archiwum można zaszyfrować hasłem (AES-256, klucz z hasła przez PBKDF2-SHA256, 100 000 powtórzeń) — dostają końcówkę .enc, a plik da się otworzyć też poleceniem `openssl enc -d -aes-256-ctr -pbkdf2 -md sha256 -iter 100000`. Nowa sekcja „Ochrona hasłem” w ekranie archiwum (ustaw i usuń hasło), opis w oknie „i”, Funkcje MT_SW, dokumentacja i wiedza asystenta zaktualizowane.
 * Mapa zasięgu z pomiarów (wszystkie wersje): w dzienniku pozycji węzła przycisk SNR koloruje trasę na mapie według mocy sygnału, z jaką radio odebrało każdą pozycję (tylko pakiety odebrane bezpośrednio), ze skalą kolorów; przycisk warstw zapisuje trasę jako plik KML z kolorami do wczytania jako warstwa mapy.
 * Porównanie dwóch tras (wszystkie wersje): w dzienniku pozycji węzła przycisk trasy wybiera drugi węzeł i rysuje jego trasę obok pierwszej, w innym kolorze; okno pokazuje długość i liczbę pozycji obu tras.
 * Strażnik węzła: godziny ciszy (jedne dla wszystkich węzłów, powiadomienie czeka do ich końca) i jedno wspólne powiadomienie, gdy kilka węzłów (od trzech) zamilknie naraz.
@@ -717,6 +718,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Message archive, password protection (all versions): the archive files can be encrypted with a password (AES-256, key from the password via PBKDF2-SHA256, 100,000 rounds) — they get the ending .enc, and a file also opens with `openssl enc -d -aes-256-ctr -pbkdf2 -md sha256 -iter 100000`. New "Password protection" section on the archive screen (set and remove the password), description in the "i" window, MT_SW features, documentation and assistant knowledge updated.
 * Coverage map from measurements (all versions): in a node's position log the SNR button colours the track on the map by the signal strength the radio received each position with (direct packets only), with a colour scale; the layers button saves the track as a coloured KML file to load as a map layer.
 * Comparing two tracks (all versions): in a node's position log the route button picks a second node and draws its track beside the first, in another colour; the dialog shows the length and number of positions of both tracks.
 * Node watchdog: quiet hours (one setting for all nodes, the notification waits until they end) and one shared notification when several nodes (three or more) go silent at once.

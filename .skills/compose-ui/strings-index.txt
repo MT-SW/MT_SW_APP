@@ -538,6 +538,12 @@ aqi_very_unhealthy
 archive_channel_n
 archive_choose_folder
 archive_enabled
+archive_encrypt
+archive_encrypt_hint
+archive_encrypt_info
+archive_encrypt_on
+archive_encrypt_remove
+archive_encrypt_save
 archive_folder
 archive_folder_chosen
 archive_folder_none
@@ -555,6 +561,7 @@ archive_last_failed
 archive_last_ok
 archive_never
 archive_now
+archive_password
 archive_summary
 archive_title
 archived_channel

@@ -68,4 +68,14 @@ class MessageArchiveFormatTest {
         assertEquals(config, MessageArchiveConfig.decode(config.encode()))
         assertEquals(MessageArchiveConfig(), MessageArchiveConfig.decode("zle"))
     }
+
+    @Test
+    fun configWithPasswordReadsBackTheSame() {
+        val config = MessageArchiveConfig(true, "content://x/tree/a|b", 60, 1, true, "hasło|z \"ąę\"")
+        assertEquals(config, MessageArchiveConfig.decode(config.encode()))
+        // Settings saved before the password existed have no prefix and give no password.
+        val old = MessageArchiveConfig(true, "folder", 15, 0, false)
+        assertEquals("", MessageArchiveConfig.decode(old.encode()).password)
+        assertEquals(MessageArchiveConfig(), MessageArchiveConfig.decode("e|zz|1|15|0|0|x"))
+    }
 }
