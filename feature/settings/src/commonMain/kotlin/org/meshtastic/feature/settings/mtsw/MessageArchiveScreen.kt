@@ -65,7 +65,9 @@ import org.meshtastic.core.resources.archive_last_ok
 import org.meshtastic.core.resources.archive_never
 import org.meshtastic.core.resources.archive_now
 import org.meshtastic.core.resources.archive_title
+import org.meshtastic.core.resources.mt_sw_other_archive_body
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -96,7 +98,7 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,
-                actions = {},
+                actions = { InfoButton(Res.string.archive_title, Res.string.mt_sw_other_archive_body) },
                 onClickChip = {},
             )
         },

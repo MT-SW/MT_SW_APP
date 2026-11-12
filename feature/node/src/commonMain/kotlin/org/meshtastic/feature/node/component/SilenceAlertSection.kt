@@ -57,6 +57,7 @@ import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.QuietHours
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.resources.mt_sw_other_silence_body
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.node_silence_alert_custom
 import org.meshtastic.core.resources.node_silence_count_relayed
@@ -68,6 +69,7 @@ import org.meshtastic.core.resources.node_silence_quiet_to
 import org.meshtastic.core.resources.node_silence_alert_hint
 import org.meshtastic.core.resources.node_silence_alert_off
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
@@ -99,12 +101,16 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = stringResource(Res.string.node_silence_alert),
-                style = MaterialTheme.typography.titleMediumEmphasized,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(Res.string.node_silence_alert),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+                InfoButton(Res.string.node_silence_alert, Res.string.mt_sw_other_silence_body)
+            }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(Res.string.node_silence_alert_hint),

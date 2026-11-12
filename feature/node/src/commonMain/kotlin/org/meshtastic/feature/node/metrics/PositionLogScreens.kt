@@ -54,6 +54,8 @@ import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.export_gpx
 import org.meshtastic.core.resources.mesh_hud_open
+import org.meshtastic.core.resources.mt_sw_other_compare_body
+import org.meshtastic.core.resources.mt_sw_other_coverage_body
 import org.meshtastic.core.resources.position_log
 import org.meshtastic.core.resources.track_compare
 import org.meshtastic.core.resources.track_compare_empty
@@ -61,7 +63,9 @@ import org.meshtastic.core.resources.track_compare_off
 import org.meshtastic.core.resources.track_compare_summary
 import org.meshtastic.core.resources.track_compare_title
 import org.meshtastic.core.resources.track_export_kml
+import org.meshtastic.core.resources.track_info_title
 import org.meshtastic.core.resources.track_snr_colors
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Delete
@@ -128,6 +132,13 @@ fun PositionLogScreen(
                         contentDescription = stringResource(Res.string.mesh_hud_open),
                     )
                 }
+            }
+            if (hasTrackPoint) {
+                InfoButton(
+                    Res.string.track_info_title,
+                    Res.string.mt_sw_other_coverage_body,
+                    Res.string.mt_sw_other_compare_body,
+                )
             }
             if (snrByTime.isNotEmpty()) {
                 IconButton(onClick = { colorBySnr = !colorBySnr }) {

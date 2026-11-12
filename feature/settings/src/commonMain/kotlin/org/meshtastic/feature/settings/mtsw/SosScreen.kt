@@ -92,8 +92,10 @@ import org.meshtastic.core.resources.sos_status_enroute
 import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
+import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_title
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -127,7 +129,7 @@ fun SosScreen(onBack: () -> Unit) {
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,
-                actions = {},
+                actions = { InfoButton(Res.string.sos_title, Res.string.mt_sw_other_sos_body) },
                 onClickChip = {},
             )
         },

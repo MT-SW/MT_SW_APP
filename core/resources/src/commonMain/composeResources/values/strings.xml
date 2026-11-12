@@ -2300,7 +2300,7 @@
     <string name="mt_sw_other_polarity_title">Inverted power and current</string>
     <string name="mt_sw_other_remote_lists_body">In the node details (Administration → Lists and contacts on the remote device) you enter a node ID and add it to the favorites or ignored list on the remote device over the mesh. The app waits for a confirmation from the network, so you know the change arrived.</string>
     <string name="mt_sw_other_remote_lists_title">Remote favorites and ignored</string>
-    <string name="mt_sw_other_silence_body">In the node details (below the notes) you can turn on the watchdog for that one node: set it from 1 hour up to 30 days, or type your own time in hours (up to 90 days). When the node has been silent for that long, you get a notification; it disappears when the node is heard again. Optionally it also counts packets that only passed through the node. It works while the app is connected to the radio.</string>
+    <string name="mt_sw_other_silence_body">In the node details (below the notes) you can turn on the watchdog for that one node: set it from 1 hour up to 30 days, or type your own time in hours (up to 90 days). When the node has been silent for that long, you get a notification; it disappears when the node is heard again. Optionally it also counts packets that only passed through the node. At the bottom of the card are quiet hours for all nodes: during them the watchdog does not notify, and if the node is still silent the notification comes when they end. When several nodes (three or more) go silent at once, one shared notification comes. It works while the app is connected to the radio.</string>
     <string name="mt_sw_other_silence_title">Node watchdog</string>
     <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channel, with your position, and shows whether the send was confirmed. You can set the channel, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer\'s tray menu. The shortcuts only open the screen; the alarm is sent by holding the button.</string>
     <string name="mt_sw_other_sos_title">SOS</string>
@@ -3509,6 +3509,7 @@
     <string name="track_compare_summary">%1$s: %2$d positions, %3$s</string>
     <string name="track_compare_title">Compare with a node\'s track</string>
     <string name="track_export_kml">Save coverage (KML)</string>
+    <string name="track_info_title">Coverage and track comparison</string>
     <string name="track_point">track point</string>
     <string name="track_snr_colors">Colour track by SNR</string>
     <!-- TRAFFIC -->

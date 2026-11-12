@@ -46,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.ui.component.InfoButton
+import androidx.compose.ui.Alignment
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
@@ -56,6 +58,7 @@ import org.meshtastic.core.resources.availability_longest_silence
 import org.meshtastic.core.resources.availability_now
 import org.meshtastic.core.resources.availability_summary
 import org.meshtastic.core.resources.availability_title
+import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.resources.formatDuration
 import kotlin.time.DurationUnit
 
@@ -86,12 +89,16 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = stringResource(Res.string.availability_title),
-                style = MaterialTheme.typography.titleMediumEmphasized,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(Res.string.availability_title),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+                InfoButton(Res.string.availability_title, Res.string.mt_sw_other_availability_body)
+            }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(Res.string.availability_hint),

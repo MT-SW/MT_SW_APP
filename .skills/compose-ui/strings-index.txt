@@ -3431,6 +3431,7 @@ track_compare_off
 track_compare_summary
 track_compare_title
 track_export_kml
+track_info_title
 track_point
 track_snr_colors
 ### TRAFFIC ###
