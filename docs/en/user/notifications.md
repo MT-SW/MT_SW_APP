@@ -19,6 +19,8 @@ Meshtastic posts a notification when something on the mesh needs you while the a
 
 To see the categories, tap **App Notifications** in the **Information** section of **Settings**. It opens Android's notification settings for Meshtastic, where the categories sit in three groups.
 
+On iPhone/iPad this row is called **Notifications (in iPhone settings)** and opens the app page in the iPhone Settings. It has the system notification settings (sound, banners, badge, lock screen) and the switches for which events show a notification: direct message, new nodes, low battery, reactions, waypoints and the sound while the app is open. A change in the iPhone settings works at once, and changes made by the app itself (for example the automatic switch-off of new node notifications at an event) show up there.
+
 | Group | Category | Posted for | Tapping it opens |
 |---|---|---|---|
 | Messages | Direct message notifications | A message sent directly to you | The conversation |

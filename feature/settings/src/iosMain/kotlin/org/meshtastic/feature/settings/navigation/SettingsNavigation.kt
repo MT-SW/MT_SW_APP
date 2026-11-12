@@ -18,6 +18,7 @@ package org.meshtastic.feature.settings.navigation
 
 import androidx.compose.runtime.Composable
 import org.meshtastic.core.navigation.Route
+import org.meshtastic.core.ui.util.rememberOpenAppSettings
 import org.meshtastic.feature.settings.DesktopSettingsScreen
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
@@ -37,5 +38,6 @@ actual fun SettingsMainScreen(
         onBack = onBack,
         showProvideLocation = true,
         showNotificationSound = true,
+        onOpenSystemNotificationSettings = rememberOpenAppSettings(),
     )
 }

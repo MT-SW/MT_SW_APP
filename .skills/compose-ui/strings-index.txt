@@ -2399,6 +2399,7 @@ notification_permission_denied_notice
 notification_permission_rationale
 notification_permissions_description
 notification_reaction_to
+notification_settings_in_system
 notification_sound_while_open
 ### NOTIFICATIONS ###
 notifications_for_channel_and_direct_messages

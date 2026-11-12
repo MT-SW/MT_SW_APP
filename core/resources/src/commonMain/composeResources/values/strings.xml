@@ -2450,6 +2450,7 @@
     <string name="notification_permission_rationale">Notifications are how MT_SW_APP reaches you when the app is not open: new messages, newly discovered nodes, and a radio running low on battery. Nothing else changes if you decline.</string>
     <string name="notification_permissions_description">MT_SW_APP uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
     <string name="notification_reaction_to">%1$s to “%2$s”</string>
+    <string name="notification_settings_in_system">Notifications (in iPhone settings)</string>
     <string name="notification_sound_while_open">Notification sound while the app is open</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>

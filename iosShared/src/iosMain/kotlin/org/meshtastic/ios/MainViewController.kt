@@ -43,6 +43,7 @@ import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.prefs.ui.UiPrefsDefaults
+import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
@@ -76,6 +77,7 @@ import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
+import org.meshtastic.ios.notification.IosNotificationSettingsSync
 import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.Foundation.NSApplicationSupportDirectory
@@ -124,6 +126,7 @@ fun MainViewController() = ComposeUIViewController(
         MeshServiceLifecycle()
         BackgroundCleanup()
         WidgetPublishing()
+        NotificationSettingsSync()
         AppUpdateLifecycle()
         ThemedApp(uiViewModel)
     }
@@ -155,6 +158,13 @@ private fun BackgroundCleanup() {
             delay(NODE_CLEANUP_CHECK_INTERVAL)
         }
     }
+}
+
+/** Keeps the notification switches of the iPhone settings (Settings → MT_SW) and of the app the same. */
+@Composable
+private fun NotificationSettingsSync() {
+    val sync = remember { IosNotificationSettingsSync(koin.get<NotificationPrefs>(NotificationPrefs::class)) }
+    LaunchedEffect(Unit) { sync.run() }
 }
 
 /** Keeps the statistics for the widget up to date while the app runs (the widget reads them from the App Group). */

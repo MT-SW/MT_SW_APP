@@ -50,6 +50,8 @@ import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.WifiProvisionRoute
+import org.meshtastic.core.resources.app_notifications
+import org.meshtastic.core.resources.notification_settings_in_system
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.app_settings
@@ -85,6 +87,7 @@ import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LocationOn
+import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.WavingHand
@@ -131,6 +134,11 @@ fun DesktopSettingsScreen(
     /** True on iPhone/iPad, where the phone's own position can be sent to the radio (as on Android). */
     showProvideLocation: Boolean = false,
     showNotificationSound: Boolean = false,
+    /**
+     * Set on iPhone/iPad: the notification switches live in the phone's own settings (Settings → MT_SW), like the
+     * notification settings of Android, so a single row opens them instead of the in-app switches.
+     */
+    onOpenSystemNotificationSettings: (() -> Unit)? = null,
 ) {
     val provideLocation by settingsViewModel.provideLocation.collectAsStateWithLifecycle()
     val state by radioConfigViewModel.radioConfigState.collectAsStateWithLifecycle()
@@ -377,22 +385,33 @@ fun DesktopSettingsScreen(
                         }
                     }
 
-                    NotificationSection(
-                        messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
-                        onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
-                        nodeEventsEnabled = settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
-                        onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
-                        lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
-                        onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
-                        reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
-                        onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
-                        newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
-                        onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
-                        showSoundWhileOpen = showNotificationSound,
-                        soundWhileOpen =
-                        settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,
-                        onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
-                    )
+                    if (onOpenSystemNotificationSettings != null) {
+                        ExpressiveSection(title = stringResource(Res.string.app_notifications)) {
+                            ListItem(
+                                text = stringResource(Res.string.notification_settings_in_system),
+                                leadingIcon = MeshtasticIcons.Notifications,
+                            ) {
+                                onOpenSystemNotificationSettings()
+                            }
+                        }
+                    } else {
+                        NotificationSection(
+                            messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
+                            onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
+                            nodeEventsEnabled = settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
+                            onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
+                            lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
+                            onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
+                            reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
+                            onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
+                            newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
+                            onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
+                            showSoundWhileOpen = showNotificationSound,
+                            soundWhileOpen =
+                            settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,
+                            onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
+                        )
+                    }
 
                     ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
                         ListItem(

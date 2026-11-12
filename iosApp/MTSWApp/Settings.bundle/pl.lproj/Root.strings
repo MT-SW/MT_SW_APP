@@ -1,0 +1,9 @@
+/* MT_SW: ustawienia powiadomień w ustawieniach systemu */
+"App Notifications" = "Powiadomienia aplikacji";
+"Which events show a notification. The system settings of notifications (sound, banners, badge, lock screen) are on the Notifications line above." = "Które zdarzenia pokazują powiadomienie. Systemowe ustawienia powiadomień (dźwięk, banery, plakietka, ekran blokady) są w wierszu „Powiadomienia” wyżej.";
+"Direct message notifications" = "Powiadomienia o bezpośredniej wiadomości";
+"New node notifications" = "Powiadomienia o nowych węzłach";
+"Low battery notifications" = "Powiadomienia o niskim poziomie baterii";
+"Reaction notifications" = "Powiadomienia o reakcjach";
+"Waypoint notifications" = "Powiadomienia punktów orientacyjnych";
+"Notification sound while the app is open" = "Dźwięk powiadomień, gdy aplikacja jest otwarta";

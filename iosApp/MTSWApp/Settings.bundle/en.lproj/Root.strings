@@ -1,0 +1,9 @@
+/* MT_SW: ustawienia powiadomień w ustawieniach systemu */
+"App Notifications" = "App Notifications";
+"Which events show a notification. The system settings of notifications (sound, banners, badge, lock screen) are on the Notifications line above." = "Which events show a notification. The system settings of notifications (sound, banners, badge, lock screen) are on the Notifications line above.";
+"Direct message notifications" = "Direct message notifications";
+"New node notifications" = "New node notifications";
+"Low battery notifications" = "Low battery notifications";
+"Reaction notifications" = "Reaction notifications";
+"Waypoint notifications" = "Waypoint notifications";
+"Notification sound while the app is open" = "Notification sound while the app is open";

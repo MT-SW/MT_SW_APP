@@ -3904,4 +3904,5 @@
     <string name="widget_others_clear">Wyczyść wybór</string>
     <string name="data_wipe_back">Wróć do zgody</string>
     <string name="widget_others_search">Szukaj</string>
+    <string name="notification_settings_in_system">Powiadomienia (w ustawieniach iPhone’a)</string>
 </resources>

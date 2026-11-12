@@ -19,6 +19,8 @@ MT_SW wysyła powiadomienie, gdy coś w sieci mesh Cię potrzebuje, a aplikacja 
 
 Aby zobaczyć kategorie, dotknij **Powiadomienia aplikacji** w sekcji **Informacje** w **Ustawieniach**. Otwiera to ustawienia powiadomień Androida dla aplikacji, gdzie kategorie są w trzech grupach.
 
+Na iPhonie/iPadzie ten wiersz nazywa się **Powiadomienia (w ustawieniach iPhone’a)** i otwiera stronę aplikacji w Ustawieniach iPhone’a. Są tam systemowe ustawienia powiadomień (dźwięk, banery, plakietka, ekran blokady) oraz przełączniki, które zdarzenia pokazują powiadomienie: bezpośrednia wiadomość, nowe węzły, niski poziom baterii, reakcje, punkty orientacyjne i dźwięk przy otwartej aplikacji. Zmiana w ustawieniach iPhone’a działa od razu, a zmiany zrobione przez samą aplikację (np. automatyczne wyłączenie powiadomień o nowych węzłach na wydarzeniu) są tam widoczne.
+
 | Grupa | Kategoria | Publikowane dla | Dotknięcie otwiera |
 |---|---|---|---|
 | Wiadomości | Powiadomienia o bezpośredniej wiadomości | Wiadomość wysłana bezpośrednio do Ciebie | Rozmowę |
