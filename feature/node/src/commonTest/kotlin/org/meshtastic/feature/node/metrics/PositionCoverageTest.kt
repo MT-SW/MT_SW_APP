@@ -91,4 +91,20 @@ class PositionCoverageTest {
         assertEquals(forward, trackLengthMeters(track.reversed()))
         assertEquals(0.0, trackLengthMeters(track.take(1)))
     }
+
+    @Test
+    fun `network kml has a folder per node with only measured dots`() {
+        val kml =
+            buildNetworkCoverageKml(
+                listOf(
+                    CoverageTrack("A", track, mapOf(100 to -10f, 300 to 3f)),
+                    CoverageTrack("B", track, emptyMap()),
+                ),
+                "SNR",
+            )
+        assertEquals(1, Regex("<Folder>").findAll(kml).count())
+        assertEquals(2, Regex("<Point>").findAll(kml).count())
+        assertTrue(kml.contains("<name>A</name>"))
+        assertTrue(!kml.contains("snr_none"))
+    }
 }

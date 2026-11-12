@@ -899,6 +899,7 @@
     <string name="conversations">Conversations</string>
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
+    <string name="coverage_export_all">Save coverage of all nodes (KML)</string>
     <string name="cpu_usage">CPU Usage</string>
     <string name="cpu_usage_description">Processor utilization percentage</string>
     <string name="create_your_own_networks">Create Your Own Networks</string>
@@ -2288,7 +2289,7 @@
     <string name="mt_sw_other_compare_title">Compare two tracks</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
     <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
-    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer.</string>
+    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak.</string>
     <string name="mt_sw_other_coverage_title">Coverage map from measurements</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>

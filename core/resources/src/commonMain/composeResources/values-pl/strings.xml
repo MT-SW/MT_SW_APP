@@ -3987,7 +3987,7 @@
     <string name="track_compare_empty">Brak innych węzłów z pozycją.</string>
     <string name="track_compare_summary">%1$s: %2$d pozycji, %3$s</string>
     <string name="mt_sw_other_coverage_title">Mapa zasięgu z pomiarów</string>
-    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy.</string>
+    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo.</string>
     <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
     <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
     <string name="node_silence_alert_group">Cisza węzłów: %1$d (%2$s)</string>
@@ -3996,4 +3996,5 @@
     <string name="node_silence_quiet_from">Od</string>
     <string name="node_silence_quiet_to">Do</string>
     <string name="track_info_title">Zasięg i porównanie tras</string>
+    <string name="coverage_export_all">Zapisz zasięg wszystkich węzłów (KML)</string>
 </resources>

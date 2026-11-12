@@ -24,7 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
@@ -32,7 +34,11 @@ import org.meshtastic.core.model.swapBatteryPolarity
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.node.domain.usecase.positionSnrByTime
+import org.meshtastic.feature.node.metrics.CoverageTrack
+import org.meshtastic.feature.node.metrics.buildNetworkCoverageKml
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
 
@@ -123,6 +129,30 @@ class NetworkSummaryViewModel(
     private val meshLogRepository: MeshLogRepository,
     private val uiPrefs: UiPrefs,
 ) : ViewModel() {
+
+    /**
+     * The measured signal of every node's positions as KML (see buildNetworkCoverageKml), or null when nothing was
+     * measured. Reads each node's stored position packets, so it is done on request, not with the summary.
+     */
+    suspend fun coverageKml(): ByteArray? = withContext(Dispatchers.Default) {
+        val tracks =
+            nodeRepository
+                .nodeDBbyNum
+                .value
+                .values
+                .filter { it.lastHeard != 0 }
+                .mapNotNull { node ->
+                    val packets = meshLogRepository.getMeshPacketsFrom(node.num, PortNum.POSITION_APP.value).first()
+                    val snr = positionSnrByTime(packets)
+                    if (snr.isEmpty()) return@mapNotNull null
+                    CoverageTrack(
+                        name = node.user.long_name.ifBlank { node.user.short_name },
+                        positions = packets.mapNotNull { it.toPosition() },
+                        snrByTime = snr,
+                    )
+                }
+        if (tracks.isEmpty()) null else buildNetworkCoverageKml(tracks, "SNR").encodeToByteArray()
+    }
 
     val uiState: StateFlow<NetworkSummaryUiState> =
         combine(

@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.coverage_export_all
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.ui.component.FullScreenLoading
@@ -113,6 +116,7 @@ private const val MIME_HTML = "text/html"
 private const val MIME_MARKDOWN = "text/markdown"
 private const val MIME_TEXT = "text/plain"
 private const val MIME_CSV = "text/csv"
+private const val MIME_KML = "application/vnd.google-earth.kml+xml"
 
 @OptIn(ExperimentalLayoutApi::class)
 @Suppress("LongMethod")
@@ -129,6 +133,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
     val exportText =
         rememberFileExporter(content = { uiState.toReport(generatedStamp()).toPlainText().encodeToByteArray() })
     val exportCsv = rememberFileExporter(content = { uiState.toReport(generatedStamp()).toCsv().encodeToByteArray() })
+    val exportCoverage = rememberFileExporter(content = { viewModel.coverageKml() })
 
     val gold = MaterialTheme.colorScheme.StatusOnline
     val purple = HealthLevel.BAD.color()
@@ -199,6 +204,13 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                             onClick = {
                                 menuOpen = false
                                 exportCsv("podsumowanie_sieci.csv", MIME_CSV)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.coverage_export_all)) },
+                            onClick = {
+                                menuOpen = false
+                                exportCoverage("zasieg_sieci.kml", MIME_KML)
                             },
                         )
                     }

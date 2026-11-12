@@ -79,6 +79,52 @@ internal fun buildCoverageKml(positions: List<Position>, snrByTime: Map<Int, Flo
     }
 }
 
+/** One node's measured positions for [buildNetworkCoverageKml]. */
+internal class CoverageTrack(val name: String, val positions: List<Position>, val snrByTime: Map<Int, Float>)
+
+/**
+ * A KML file with the measurements of every node together: one folder per node, one dot per position the radio heard
+ * directly, coloured by SNR. Loaded as a map layer it shows where the network is heard well and where it is not.
+ * Positions without a measurement are left out, since a grey dot says nothing about coverage.
+ */
+internal fun buildNetworkCoverageKml(tracks: List<CoverageTrack>, name: String): String {
+    val perNode =
+        tracks.map { track ->
+            track.name to
+                track.positions
+                    .sortedBy { it.time }
+                    .mapNotNull { pos ->
+                        val snr = track.snrByTime[pos.time] ?: return@mapNotNull null
+                        val (latI, lonI) = pos.fixOrNull() ?: return@mapNotNull null
+                        KmlPoint(lat = latI * GeoConstants.DEG_D, lon = lonI * GeoConstants.DEG_D, time = pos.time, snr = snr)
+                    }
+        }
+    val buckets = perNode.flatMap { (_, points) -> points.map { snrBucket(it.snr) } }.distinct()
+    return buildString {
+        append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        append("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n")
+        append("  <name>${name.xmlEscaped()}</name>\n")
+        for (bucket in buckets) {
+            val color = kmlColor(snrRgb(bucket?.toFloat()))
+            append("  <Style id=\"${styleId(bucket)}\"><IconStyle><color>$color</color><scale>0.6</scale>")
+            append("<Icon><href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle></Style>\n")
+        }
+        for ((nodeName, points) in perNode) {
+            if (points.isEmpty()) continue
+            append("  <Folder><name>${nodeName.xmlEscaped()}</name>\n")
+            for (p in points) {
+                val label = p.snr?.let { "${NumberFormatter.formatInvariant(it, 1)} dB" } ?: "-"
+                append("    <Placemark><name>$label</name>")
+                if (p.time > 0) append("<TimeStamp><when>${Instant.fromEpochSeconds(p.time.toLong())}</when></TimeStamp>")
+                append("<styleUrl>#${styleId(snrBucket(p.snr))}</styleUrl>")
+                append("<Point><coordinates>${p.coordinates()}</coordinates></Point></Placemark>\n")
+            }
+            append("  </Folder>\n")
+        }
+        append("</Document>\n</kml>\n")
+    }
+}
+
 private class KmlPoint(val lat: Double, val lon: Double, val time: Int, val snr: Float?) {
     fun coordinates(): String {
         val x = NumberFormatter.formatInvariant(lon, COORDINATE_DECIMALS)
