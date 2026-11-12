@@ -38,11 +38,6 @@ actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): A
 
 actual val isDesktopPlatform: Boolean = false
 
-@Composable
-actual fun KeepScreenOn(enabled: Boolean) {
-    // No-op iOS stub.
-}
-
 actual val bleScanRequiresLocationServices: Boolean = false
 
 @Composable actual fun isGpsDisabled(): Boolean = false
@@ -52,15 +47,6 @@ actual val bleScanRequiresLocationServices: Boolean = false
 @Composable actual fun isBluetoothSupported(): Boolean = true
 
 @Composable actual fun isWifiUnavailable(): Boolean = false
-
-@Composable
-actual fun SetScreenBrightness(brightness: Float) {
-    // No-op iOS stub.
-}
-
-@Composable actual fun rememberLocationPermissionState(): PermissionUiState = grantedPermissionUiState()
-
-@Composable actual fun rememberPreciseLocationPermissionState(): PermissionUiState = grantedPermissionUiState()
 
 @Composable actual fun rememberBluetoothPermissionState(): PermissionUiState = grantedPermissionUiState()
 
