@@ -48,6 +48,8 @@ data class MetricsState(
     val neighborInfoRequests: List<MeshLog> = emptyList(),
     val neighborInfoResults: List<MeshLog> = emptyList(),
     val positionLogs: List<Position> = emptyList(),
+    /** `Position.time` to the SNR (dB) of the direct packet that carried it; only positions heard without a relay. */
+    val positionSnr: Map<Int, Float> = emptyMap(),
     val deviceHardware: DeviceHardware? = null,
     /** msh.to vendor/marketplace links for this device's hardware, region-filtered and sorted (vendor first). */
     val deviceLinks: List<DeviceLink> = emptyList(),

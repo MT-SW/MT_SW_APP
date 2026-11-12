@@ -68,6 +68,9 @@ import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
+import org.meshtastic.core.resources.track_compare
+import org.meshtastic.core.resources.track_export_kml
+import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
@@ -200,6 +203,9 @@ object SettingsSearchCatalog {
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.archive_title to SettingsRoute.MessageArchive,
             Res.string.availability_title to SettingsRoute.MtSwOtherFeatures,
+            Res.string.track_compare to SettingsRoute.MtSwOtherFeatures,
+            Res.string.track_export_kml to SettingsRoute.MtSwOtherFeatures,
+            Res.string.track_snr_colors to SettingsRoute.MtSwOtherFeatures,
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
             Res.string.skip_bad_time_chart_points to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,

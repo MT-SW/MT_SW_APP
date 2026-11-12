@@ -16,37 +16,67 @@
  */
 package org.meshtastic.feature.node.metrics
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.hasFix
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.clear_position_track_message
 import org.meshtastic.core.resources.clear_position_track_title
+import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.export_gpx
 import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.position_log
+import org.meshtastic.core.resources.track_compare
+import org.meshtastic.core.resources.track_compare_empty
+import org.meshtastic.core.resources.track_compare_off
+import org.meshtastic.core.resources.track_compare_summary
+import org.meshtastic.core.resources.track_compare_title
+import org.meshtastic.core.resources.track_export_kml
+import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FileDownload
+import org.meshtastic.core.ui.icon.Layers
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
+import org.meshtastic.core.ui.icon.Route
+import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
+import org.meshtastic.core.ui.util.LocalTrackOverlay
+import org.meshtastic.core.ui.util.TrackCompare
+import org.meshtastic.core.ui.util.TrackOverlay
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.proto.Position
 
 @Composable
 fun PositionLogScreen(
@@ -65,10 +95,23 @@ fun PositionLogScreen(
     val exportGpxLauncher = rememberSaveFileLauncher { uri -> viewModel.savePositionGpx(uri, positions, gpxTrackName) }
     val hasTrackPoint = remember(positions) { positions.any { it.hasFix() } }
 
+    // Coverage view: the track coloured by the SNR it was heard with, saved as KML, and a second track beside it.
+    val snrByTime = state.positionSnr
+    var colorBySnr by rememberSaveable { mutableStateOf(false) }
+    val exportKmlLauncher =
+        rememberSaveFileLauncher { uri -> viewModel.savePositionKml(uri, positions, snrByTime, gpxTrackName) }
+    val compare by viewModel.trackCompare.collectAsStateWithLifecycle()
+    val compareCandidates by viewModel.compareCandidates.collectAsStateWithLifecycle()
+    var showCompareDialog by rememberSaveable { mutableStateOf(false) }
+
     val trackMap = LocalNodeTrackMapProvider.current
     val destNum = state.node?.num ?: 0
 
-    BaseMetricScreen(
+    CompositionLocalProvider(
+        LocalTrackOverlay provides
+            TrackOverlay(colorBySnr = colorBySnr && snrByTime.isNotEmpty(), snrByTime = snrByTime, compare = compare),
+    ) {
+        BaseMetricScreen(
         isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = null,
@@ -83,6 +126,30 @@ fun PositionLogScreen(
                     Icon(
                         imageVector = MeshtasticIcons.CenterFocusStrong,
                         contentDescription = stringResource(Res.string.mesh_hud_open),
+                    )
+                }
+            }
+            if (snrByTime.isNotEmpty()) {
+                IconButton(onClick = { colorBySnr = !colorBySnr }) {
+                    Icon(
+                        imageVector = MeshtasticIcons.Snr,
+                        contentDescription = stringResource(Res.string.track_snr_colors),
+                        tint = if (colorBySnr) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                    )
+                }
+                IconButton(onClick = { exportKmlLauncher("coverage.kml", "application/vnd.google-earth.kml+xml") }) {
+                    Icon(
+                        imageVector = MeshtasticIcons.Layers,
+                        contentDescription = stringResource(Res.string.track_export_kml),
+                    )
+                }
+            }
+            if (hasTrackPoint) {
+                IconButton(onClick = { showCompareDialog = true }) {
+                    Icon(
+                        imageVector = MeshtasticIcons.Route,
+                        contentDescription = stringResource(Res.string.track_compare),
+                        tint = if (compare != null) MaterialTheme.colorScheme.primary else LocalContentColor.current,
                     )
                 }
             }
@@ -125,8 +192,78 @@ fun PositionLogScreen(
                 }
             }
         },
+        )
+    }
+
+    if (showCompareDialog) {
+        TrackCompareDialog(
+            candidates = compareCandidates,
+            ownName = nodeName,
+            ownPositions = positions,
+            compare = compare,
+            onSelect = {
+                viewModel.setCompareNode(it)
+                showCompareDialog = false
+            },
+            onDismiss = { showCompareDialog = false },
+        )
+    }
+}
+
+/**
+ * Picks the node whose track is drawn beside this one. While a comparison is on it also gives the two tracks' length
+ * and number of fixes, so the routes can be told apart by more than colour.
+ */
+@Composable
+private fun TrackCompareDialog(
+    candidates: List<Node>,
+    ownName: String,
+    ownPositions: List<Position>,
+    compare: TrackCompare?,
+    onSelect: (Int?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.track_compare_title)) },
+        text = {
+            Column {
+                if (compare != null) {
+                    Text(trackSummary(ownName, ownPositions))
+                    Text(trackSummary(compare.label, compare.positions))
+                }
+                if (candidates.isEmpty()) {
+                    Text(stringResource(Res.string.track_compare_empty))
+                } else {
+                    LazyColumn(modifier = Modifier.heightIn(max = COMPARE_LIST_MAX_HEIGHT.dp)) {
+                        items(candidates, key = { it.num }) { node ->
+                            ListItem(
+                                headlineContent = { Text(node.effectiveLongName) },
+                                modifier = Modifier.clickable { onSelect(node.num) },
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } },
+        dismissButton =
+        if (compare != null) {
+            { TextButton(onClick = { onSelect(null) }) { Text(stringResource(Res.string.track_compare_off)) } }
+        } else {
+            null
+        },
     )
 }
+
+@Composable
+private fun trackSummary(name: String, positions: List<Position>): String {
+    val km = NumberFormatter.format(trackLengthMeters(positions) / METERS_PER_KM, 2)
+    return stringResource(Res.string.track_compare_summary, name, positions.count { it.hasFix() }, "$km km")
+}
+
+private const val COMPARE_LIST_MAX_HEIGHT = 320
+private const val METERS_PER_KM = 1000.0
 
 /** Trash-can action that asks for confirmation before invoking [onConfirm] to delete the position track. */
 @Composable

@@ -49,10 +49,15 @@ import org.meshtastic.core.common.util.latLongToMeter
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.theme.monoSafe
+import org.meshtastic.core.ui.util.LocalTrackOverlay
+import org.meshtastic.core.ui.util.SNR_LEGEND
+import org.meshtastic.core.ui.util.SNR_UNKNOWN_RGB
+import org.meshtastic.core.ui.util.snrRgb
 import org.meshtastic.feature.map.LastHeardFilter
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.component.NodeTrackFilterMenu
 import org.meshtastic.feature.map.includes
+import org.meshtastic.feature.map.maplibre.component.TrackLegend
 import org.meshtastic.feature.map.maplibre.component.TrackPointCard
 import org.meshtastic.feature.map.maplibre.component.customRasterBasemaps
 import org.meshtastic.feature.map.maplibre.component.rememberBasemapSelection
@@ -73,6 +78,13 @@ private const val TRACK_POINT_KEY = "positionTime"
 
 /** A point's opacity along the track's time fade, from the shared [trackFadeAlpha]. */
 private const val TRACK_ALPHA_KEY = "alpha"
+
+/** A point's received SNR in dB, for the coverage colouring. [NO_SNR] stands in where nothing was measured. */
+private const val TRACK_SNR_KEY = "snr"
+private const val NO_SNR = -99f
+
+/** Below any real SNR, so the grey stops of an unmeasured point never blend into the weakest colour. */
+private const val UNMEASURED_EDGE = -30.0
 
 /** A timestamped point on a node's position track. */
 private typealias TrackPoint = Pair<GeoPosition, Int>
@@ -117,18 +129,37 @@ fun MapLibreNodeTrackMap(
     val trackFilter = filterState.lastHeardTrackFilter
     val points = remember(allPoints, trackFilter) { allPoints.olderThanCutoffRemoved(trackFilter) }
 
+    // What the position-log screen asked to add: the SNR colouring and the second track to compare against.
+    val overlay = LocalTrackOverlay.current
+    val snrByTime = overlay.snrByTime.takeIf { overlay.colorBySnr && it.isNotEmpty() }
+    val compare = overlay.compare
+    val compareAll =
+        remember(compare) { compare?.positions?.mapNotNull { it.toTrackPoint() }?.sortedBy { it.second }.orEmpty() }
+    val comparePoints = remember(compareAll, trackFilter) { compareAll.olderThanCutoffRemoved(trackFilter) }
+    val compareNode = remember(nodes, compare) { compare?.let { c -> nodes.firstOrNull { it.num == c.nodeNum } } }
+
     if (allPoints.isEmpty()) return
 
     // The colour the rest of the app draws this node in. The track used to be a flat blue, which said nothing about
     // whose track it was — the Google flavor fades the node's own colour along it, and so does this now.
     val trackColor = node?.let { Color(it.colors.second).monoSafe() } ?: MapColors.Slate
 
+    // A compared track must be told apart from this one: the other node's own colour, unless it matches.
+    val compareColor =
+        compareNode?.let { Color(it.colors.second).monoSafe() }?.takeIf { it != trackColor } ?: MapColors.Highlight
+
     val mapState =
         rememberSecondaryMapState(basemaps) {
             // A LineString needs two coordinates; a filter tight enough to leave one point would otherwise throw.
-            if (points.size > 1) TrackLineLayer(points = points, color = trackColor)
+            if (points.size > 1) TrackLineLayer(points = points, color = trackColor, snrByTime = snrByTime)
+            if (comparePoints.size > 1) CompareTrackLayer(points = comparePoints, color = compareColor)
             if (points.isNotEmpty()) {
-                TrackPointLayer(points = points, color = trackColor, onPositionSelect = onPositionSelect)
+                TrackPointLayer(
+                    points = points,
+                    color = trackColor,
+                    snrByTime = snrByTime,
+                    onPositionSelect = onPositionSelect,
+                )
                 selectedPositionTime?.let { selected ->
                     SelectedTrackPointLayer(points = points, selectedTime = selected)
                 }
@@ -136,11 +167,17 @@ fun MapLibreNodeTrackMap(
                 // where the node is now, and that is the one point worth naming.
                 if (node != null) NewestPositionChip(node = node, newest = points.last())
             }
+            if (compareNode != null && comparePoints.isNotEmpty()) {
+                NewestPositionChip(node = compareNode, newest = comparePoints.last(), id = "compare-head")
+            }
         }
 
     // Frame the whole track, not just its midpoint: a fixed zoom on the centre cropped long tracks at both ends. Keyed
     // on the *unfiltered* track, so tightening the age filter does not yank the camera around under the user.
-    FitBoundsOnceVisible(mapState = mapState, key = allPoints) { positionsBoundingBox(allPoints.map { it.first }) }
+    // A compared track is framed with it, so choosing one brings both routes into view.
+    FitBoundsOnceVisible(mapState = mapState, key = allPoints to compareAll) {
+        positionsBoundingBox((allPoints + compareAll).map { it.first })
+    }
 
     // The map and its toolbar stay up even when the filter empties the track — otherwise the control that emptied it
     // disappears along with the points, leaving no way back.
@@ -158,6 +195,17 @@ fun MapLibreNodeTrackMap(
                 )
             },
         )
+
+        if (snrByTime != null || compare != null) {
+            TrackLegend(
+                showSnr = snrByTime != null,
+                mainName = node?.user?.long_name.orEmpty(),
+                mainColor = trackColor,
+                compareName = compare?.label,
+                compareColor = compareColor,
+                modifier = Modifier.align(Alignment.TopStart).padding(CARD_INSET.dp),
+            )
+        }
 
         // What the Google flavor puts in a marker info window. MapLibre draws markers as layer features, which have no
         // info window, so the detail for the selected point goes at the foot of the map instead.
@@ -206,7 +254,10 @@ private fun List<TrackPoint>.olderThanCutoffRemoved(filter: LastHeardFilter): Li
 
 private fun List<TrackPoint>.recency(): List<Float> = trackRecency(map { it.second.toLong() })
 
-private fun pointFeatures(points: List<TrackPoint>): FeatureCollection<Point, JsonObject?> {
+private fun pointFeatures(
+    points: List<TrackPoint>,
+    snrByTime: Map<Int, Float>? = null,
+): FeatureCollection<Point, JsonObject?> {
     val recency = points.recency()
     return FeatureCollection(
         points.mapIndexed { index, (position, time) ->
@@ -216,6 +267,7 @@ private fun pointFeatures(points: List<TrackPoint>): FeatureCollection<Point, Js
                 buildJsonObject {
                     put(TRACK_POINT_KEY, time)
                     put(TRACK_ALPHA_KEY, trackFadeAlpha(recency[index]))
+                    if (snrByTime != null) put(TRACK_SNR_KEY, snrByTime[time] ?: NO_SNR)
                 },
             )
         },
@@ -244,6 +296,29 @@ internal fun trackLineStops(points: List<GeoPosition>, recency: List<Float>): Li
 }
 
 /**
+ * The coverage line's colour stops: each vertex at its share of the track's length, in the colour of the SNR it was
+ * heard with (grey where none was measured). Same rules as [trackLineStops] — strictly ascending progress, the newer
+ * vertex winning when one adds no length.
+ */
+internal fun trackSignalStops(points: List<GeoPosition>, snr: List<Float?>): List<Pair<Double, Int>> {
+    val along = DoubleArray(points.size)
+    for (i in 1 until points.size) {
+        val (a, b) = points[i - 1] to points[i]
+        along[i] = along[i - 1] + latLongToMeter(a.latitude, a.longitude, b.latitude, b.longitude)
+    }
+    val total = along.lastOrNull() ?: 0.0
+    val stops = mutableListOf<Pair<Double, Int>>()
+    points.indices.forEach { i ->
+        val progress = if (total > 0) along[i] / total else 0.0
+        val stop = progress to snrRgb(snr[i])
+        if (stops.isNotEmpty() && progress <= stops.last().first) stops[stops.lastIndex] = stop else stops += stop
+    }
+    return stops
+}
+
+private const val OPAQUE = 0xFF000000.toInt()
+
+/**
  * The track itself, fading from faint at the oldest end to solid at the newest.
  *
  * `line-gradient` needs the source to compute line-distance metrics, which is what `lineMetrics` turns on; without it
@@ -251,7 +326,7 @@ internal fun trackLineStops(points: List<GeoPosition>, recency: List<Float>): Li
  */
 @Suppress("SpreadOperator") // interpolate() only takes its stops as varargs
 @Composable
-private fun TrackLineLayer(points: List<TrackPoint>, color: Color) {
+private fun TrackLineLayer(points: List<TrackPoint>, color: Color, snrByTime: Map<Int, Float>?) {
     val source =
         rememberFeatureSource(points, options = GeoJsonOptions { lineMetrics = true }) {
             FeatureCollection(
@@ -260,7 +335,18 @@ private fun TrackLineLayer(points: List<TrackPoint>, color: Color) {
                 ),
             )
         }
-    val stops = remember(points) { trackLineStops(points.map { it.first }, points.recency()) }
+    val stops =
+        remember(points, snrByTime) {
+            if (snrByTime == null) {
+                trackLineStops(points.map { it.first }, points.recency()).map { (progress, alpha) ->
+                    progress to color.copy(alpha = alpha)
+                }
+            } else {
+                trackSignalStops(points.map { it.first }, points.map { snrByTime[it.second] }).map { (progress, rgb) ->
+                    progress to Color(OPAQUE or rgb)
+                }
+            }
+        }
     LineLayer(
         id = "track-line",
         source = source,
@@ -271,23 +357,33 @@ private fun TrackLineLayer(points: List<TrackPoint>, color: Color) {
         interpolate(
             linear(),
             feature.lineProgress(),
-            *stops.map { (progress, alpha) -> progress to const(color.copy(alpha = alpha)) }.toTypedArray(),
+            *stops.map { (progress, stopColor) -> progress to const(stopColor) }.toTypedArray(),
         ),
     )
 }
 
 /** Every recorded position, oldest faintest. Tapping one reports it so the caller's list can follow along. */
 @Composable
-private fun TrackPointLayer(points: List<TrackPoint>, color: Color, onPositionSelect: ((Int) -> Unit)?) {
-    val source = rememberFeatureSource(points) { pointFeatures(points) }
+private fun TrackPointLayer(
+    points: List<TrackPoint>,
+    color: Color,
+    snrByTime: Map<Int, Float>?,
+    onPositionSelect: ((Int) -> Unit)?,
+) {
+    val source = rememberFeatureSource(points, snrByTime) { pointFeatures(points, snrByTime) }
     CircleLayer(
         id = "track-points",
         source = source,
-        color = const(color),
+        color =
+        if (snrByTime == null) {
+            const(color)
+        } else {
+            interpolate(linear(), feature[TRACK_SNR_KEY].asNumber(), *snrColorStops())
+        },
         radius = const(5.dp),
         strokeColor = const(Color.White),
         strokeWidth = const(2.dp),
-        opacity = feature[TRACK_ALPHA_KEY].asNumber(),
+        opacity = if (snrByTime == null) feature[TRACK_ALPHA_KEY].asNumber() else const(1f),
         // Where points overlap the newest one wins, rather than whichever the query happened to return first —
         // the same reason the node chips resolve a stacked tap by rank instead of by query order.
         onClick = { features ->
@@ -299,6 +395,45 @@ private fun TrackPointLayer(points: List<TrackPoint>, color: Color, onPositionSe
                     ClickResult.Consume
                 } ?: ClickResult.Pass
         },
+    )
+}
+
+/** The colour ramp of a point by its SNR: the legend's steps, with a grey tail for points nobody measured. */
+private fun snrColorStops() =
+    (
+        listOf(NO_SNR.toDouble() to SNR_UNKNOWN_RGB, UNMEASURED_EDGE to SNR_UNKNOWN_RGB) +
+            SNR_LEGEND.map { (snr, rgb) -> snr.toDouble() to rgb }
+        )
+        .map { (snr, rgb) -> snr to const(Color(OPAQUE or rgb)) }
+        .toTypedArray()
+
+/** The second track: a plain line in the other node's colour, with a dot at every fix. */
+@Composable
+private fun CompareTrackLayer(points: List<TrackPoint>, color: Color) {
+    val lineSource =
+        rememberFeatureSource(points) {
+            FeatureCollection(
+                listOf(
+                    Feature<LineString, JsonObject?>(geometry = LineString(points.map { it.first }), properties = null),
+                ),
+            )
+        }
+    LineLayer(
+        id = "compare-line",
+        source = lineSource,
+        cap = const(LineCap.Round),
+        join = const(LineJoin.Round),
+        color = const(color),
+        width = const(3.dp),
+    )
+    val pointSource = rememberFeatureSource(points, "compare") { pointFeatures(points) }
+    CircleLayer(
+        id = "compare-points",
+        source = pointSource,
+        color = const(color),
+        radius = const(4.dp),
+        strokeColor = const(Color.White),
+        strokeWidth = const(1.dp),
     )
 }
 
@@ -318,7 +453,7 @@ private fun SelectedTrackPointLayer(points: List<TrackPoint>, selectedTime: Int)
 
 /** The node's own chip, at the head of the track. */
 @Composable
-private fun NewestPositionChip(node: Node, newest: TrackPoint) {
+private fun NewestPositionChip(node: Node, newest: TrackPoint, id: String = "track-head") {
     val source =
         rememberFeatureSource(node, newest) {
             FeatureCollection(
@@ -334,5 +469,5 @@ private fun NewestPositionChip(node: Node, newest: TrackPoint) {
                 ),
             )
         }
-    NodeChipLayer(id = "track-head", source = source, nodes = listOf(node))
+    NodeChipLayer(id = id, source = source, nodes = listOf(node))
 }

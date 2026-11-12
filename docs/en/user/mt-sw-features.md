@@ -141,6 +141,14 @@ The node details (below the notes) have a "Node watchdog" card. You turn it on s
 
 The node details, below the node watchdog, have a "Node availability" card with a bar chart: when the radio recorded packets from that node. You pick the range with buttons: a day, 3, 7, 14 or 30 days. A taller bar means more packets in that time slot, and a gap means silence. Under the chart you see in how many slots the node was heard (and the percentage), and its longest silence. The chart is built from the recorded packets, so it reaches back only as far as the log retention (MT_SW features → Logs) allows. It works the same on Android, desktop and iPhone/iPad.
 
+## Coverage map from measurements
+
+The node's position log (the track map at the top) has an SNR button. It colours the track by the signal strength the radio received each position with: red is weak, green strong, grey not measured. A colour scale sits on the map. Only positions received directly, without a relay, count, because a relayed position carries the SNR of the last hop, not of the distance to the node. The SNR button shows only when such measurements exist. The layers button saves the track as a coloured KML file (lines and points with the SNR value) that you can load as a map layer. The measurements come from the stored logs, so they reach back as far as the log retention allows.
+
+## Comparing two tracks
+
+In the node's position log the route button opens a list of other nodes with a position. Pick one and its track is drawn on the map beside the first, in that node's colour (orange if the colours match), with its name at the end of the track. The map fits both tracks at once. The dialog shows the length and number of positions of both tracks. "Turn comparison off" removes the second track.
+
 ## Sniffer
 
 The **Sniffer** screen (Settings → Advanced) shows network traffic live, including packets the phone cannot decrypt.

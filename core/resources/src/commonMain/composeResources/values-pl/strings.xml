@@ -3979,4 +3979,15 @@
     <string name="archive_channel_n">Kanał %1$d</string>
     <string name="mt_sw_other_archive_title">Archiwum wiadomości</string>
     <string name="mt_sw_other_archive_body">W „Funkcjach MT_SW” archiwum wiadomości trzyma kopię Twoich wiadomości tekstowych w wybranym folderze: jeden plik na dobę albo na rozmowę i dobę, jako tekst, CSV lub Markdown, uzupełniany co 5 minut do 3 godzin, gdy aplikacja działa. „Zapisz teraz” zapisuje od razu. Działa na Androidzie, komputerze i iPhonie/iPadzie.</string>
+    <string name="track_snr_colors">Koloruj trasę według SNR</string>
+    <string name="track_export_kml">Zapisz zasięg (KML)</string>
+    <string name="track_compare">Porównaj trasy</string>
+    <string name="track_compare_title">Porównaj z trasą węzła</string>
+    <string name="track_compare_off">Wyłącz porównanie</string>
+    <string name="track_compare_empty">Brak innych węzłów z pozycją.</string>
+    <string name="track_compare_summary">%1$s: %2$d pozycji, %3$s</string>
+    <string name="mt_sw_other_coverage_title">Mapa zasięgu z pomiarów</string>
+    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy.</string>
+    <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
+    <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
 </resources>

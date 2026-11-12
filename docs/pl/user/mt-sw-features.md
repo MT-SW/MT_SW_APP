@@ -141,6 +141,14 @@ W szczegółach węzła (pod notatkami) jest karta „Strażnik węzła”. Wł�
 
 W szczegółach węzła, pod strażnikiem węzła, jest karta „Dostępność węzła” z wykresem słupkowym: kiedy radio zapisało pakiety od tego węzła. Zakres wybierasz przyciskami: doba, 3, 7, 14 albo 30 dni. Wyższy słupek oznacza więcej pakietów w danym przedziale czasu, a puste miejsce — ciszę. Pod wykresem widać, w ilu przedziałach węzeł był słyszany (i jaki to procent), oraz jego najdłuższą ciszę. Wykres powstaje z zapisanych pakietów, więc sięga tylko tak daleko, jak pozwala czas przechowywania logów (Funkcje MT_SW → Logi). Działa tak samo na Androidzie, komputerze i iPhonie/iPadzie.
 
+## Mapa zasięgu z pomiarów
+
+W dzienniku pozycji węzła (mapa trasy u góry) jest przycisk SNR. Koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję: czerwony to słaby sygnał, zielony mocny, szary brak pomiaru. Pod mapą jest skala kolorów. Liczą się tylko pozycje odebrane bezpośrednio, bez przekaźnika, bo przekazana pozycja niesie SNR ostatniego skoku, a nie odległości do węzła. Przycisk SNR pojawia się tylko wtedy, gdy są takie pomiary. Przycisk warstw zapisuje trasę jako plik KML z kolorami (linie i punkty z wartością SNR), który wczytasz jako warstwę mapy. Pomiary pochodzą z zapisanych logów, więc sięgają tak daleko, jak czas ich przechowywania.
+
+## Porównanie dwóch tras
+
+W dzienniku pozycji węzła przycisk trasy otwiera listę innych węzłów z pozycją. Po wybraniu jednego jego trasa rysuje się na mapie obok pierwszej, w kolorze tego węzła (a gdy kolory są takie same, w pomarańczowym), z jego nazwą na końcu trasy. Mapa mieści obie trasy naraz. W oknie widać długość i liczbę pozycji obu tras. „Wyłącz porównanie” usuwa drugą trasę.
+
 ## Sniffer
 
 Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, także pakiety, których telefon nie potrafi rozszyfrować.

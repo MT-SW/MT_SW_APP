@@ -2233,8 +2233,12 @@ mt_sw_other_availability_body
 mt_sw_other_availability_title
 mt_sw_other_calls_body
 mt_sw_other_calls_title
+mt_sw_other_compare_body
+mt_sw_other_compare_title
 mt_sw_other_contacts_body
 mt_sw_other_contacts_title
+mt_sw_other_coverage_body
+mt_sw_other_coverage_title
 mt_sw_other_full_doc
 mt_sw_other_gpio_body
 mt_sw_other_gpio_title
@@ -3414,8 +3418,16 @@ traceroute_time_label
 traceroute_traced_by
 traceroute_unknown_hop
 traceroute_waiting
+### TRACK ###
 track_and_share_locations
+track_compare
+track_compare_empty
+track_compare_off
+track_compare_summary
+track_compare_title
+track_export_kml
 track_point
+track_snr_colors
 ### TRAFFIC ###
 traffic_management
 traffic_management_config

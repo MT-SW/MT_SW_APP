@@ -316,6 +316,7 @@ constructor(
                     },
                     signalMetrics = logs.packets.filter { it.isDirectSignal() },
                     positionLogs = logs.posPackets.mapNotNull { it.toPosition() },
+                    positionSnr = positionSnrByTime(logs.posPackets),
                     paxMetrics = logs.pax,
                     tracerouteRequests = trReqs,
                     tracerouteResults = logs.trRes,
@@ -415,5 +416,19 @@ constructor(
         const val HARDWARE_INDEX = 5
         const val NODES_INDEX = 6
         const val LOCALE_UNITS_INDEX = 7
+    }
+}
+
+/**
+ * The SNR each logged position was heard with. Only direct packets count: a relayed one carries the SNR of the last hop,
+ * which says nothing about the distance to the node. A position with no usable time is skipped, since the time is the
+ * key the track map uses to find it again.
+ */
+internal fun positionSnrByTime(packets: List<MeshPacket>): Map<Int, Float> = buildMap {
+    for (packet in packets) {
+        if (!packet.isDirectSignal()) continue
+        val snr = packet.rx_snr.takeUnless { it.isNaN() } ?: continue
+        val time = packet.toPosition()?.time ?: continue
+        if (time > 0) put(time, snr)
     }
 }

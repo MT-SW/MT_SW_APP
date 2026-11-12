@@ -81,6 +81,8 @@ import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
 import org.meshtastic.core.ui.util.AlertManager
+import org.meshtastic.core.ui.util.TrackCompare
+import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.core.ui.util.toMessageRes
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
@@ -447,6 +449,51 @@ open class MetricsViewModel(
         }
     }
 
+    /** Track coloured by received SNR, as KML: the file the user loads as a map layer to see the coverage. */
+    fun savePositionKml(
+        uri: CommonUri,
+        data: List<org.meshtastic.proto.Position>,
+        snrByTime: Map<Int, Float>,
+        trackName: String,
+    ) {
+        safeLaunch(context = dispatchers.io, tag = "exportKml") {
+            fileService.write(uri) { sink -> sink.writeUtf8(buildCoverageKml(data, snrByTime, trackName)) }
+        }
+    }
+
+    private val compareNodeNum = MutableStateFlow<Int?>(null)
+
+    /** Nodes whose track can be set beside this one: they have a position and are not this node. */
+    val compareCandidates: StateFlow<List<Node>> =
+        nodeRepository.nodeDBbyNum
+            .map { db ->
+                db.values.filter { it.num != destNum && it.validPosition != null }.sortedBy { it.effectiveLongName }
+            }
+            .stateInWhileSubscribed(initialValue = emptyList())
+
+    /** The second track, drawn beside this node's own on the position map, or null while nothing is compared. */
+    val trackCompare: StateFlow<TrackCompare?> =
+        compareNodeNum
+            .flatMapLatest { num ->
+                if (num == null) {
+                    flowOf(null)
+                } else {
+                    combine(
+                        meshLogRepository.getMeshPacketsFrom(num, PortNum.POSITION_APP.value),
+                        nodeRepository.nodeDBbyNum,
+                    ) { packets, db ->
+                        val id = "!" + num.toUInt().toString(HEX_RADIX).padStart(HEX_ID_LENGTH, '0')
+                        val label = db[num]?.effectiveLongName ?: id
+                        TrackCompare(num, label, packets.mapNotNull { it.toPosition() })
+                    }
+                }
+            }
+            .stateInWhileSubscribed(initialValue = null)
+
+    fun setCompareNode(nodeNum: Int?) {
+        compareNodeNum.value = nodeNum
+    }
+
     fun saveLocalStatsCSV(uri: CommonUri, data: List<Telemetry>) {
         exportCsv(
             uri = uri,
@@ -693,3 +740,6 @@ $trkpts    </trkseg>
 private const val COORDINATE_DECIMALS = 7
 
 private const val HEADING_DECIMALS = 2
+
+private const val HEX_RADIX = 16
+private const val HEX_ID_LENGTH = 8

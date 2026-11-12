@@ -2284,8 +2284,12 @@
     <string name="mt_sw_other_availability_title">Node availability</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>
+    <string name="mt_sw_other_compare_body">In a node\'s position log the route button lets you pick a second node and draws its track beside the first, in another colour. The dialog shows the length and number of positions of both tracks. The map fits both at once.</string>
+    <string name="mt_sw_other_compare_title">Compare two tracks</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
     <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
+    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer.</string>
+    <string name="mt_sw_other_coverage_title">Coverage map from measurements</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
     <string name="mt_sw_other_gpio_title">Remote GPIO</string>
@@ -3492,8 +3496,16 @@
     <string name="traceroute_traced_by">Traced by %1$s</string>
     <string name="traceroute_unknown_hop">Unknown hop</string>
     <string name="traceroute_waiting">Waiting for response</string>
+    <!-- TRACK -->
     <string name="track_and_share_locations">Track and Share Locations</string>
+    <string name="track_compare">Compare tracks</string>
+    <string name="track_compare_empty">No other nodes with a position.</string>
+    <string name="track_compare_off">Turn comparison off</string>
+    <string name="track_compare_summary">%1$s: %2$d positions, %3$s</string>
+    <string name="track_compare_title">Compare with a node\'s track</string>
+    <string name="track_export_kml">Save coverage (KML)</string>
     <string name="track_point">track point</string>
+    <string name="track_snr_colors">Colour track by SNR</string>
     <!-- TRAFFIC -->
     <string name="traffic_management">Traffic Management</string>
     <string name="traffic_management_config">Traffic Management Configuration</string>

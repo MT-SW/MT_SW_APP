@@ -73,6 +73,10 @@ import org.meshtastic.core.resources.mt_sw_map_title
 import org.meshtastic.core.resources.archive_summary
 import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.mt_sw_other_archive_body
+import org.meshtastic.core.resources.mt_sw_other_compare_body
+import org.meshtastic.core.resources.mt_sw_other_compare_title
+import org.meshtastic.core.resources.mt_sw_other_coverage_body
+import org.meshtastic.core.resources.mt_sw_other_coverage_title
 import org.meshtastic.core.resources.mt_sw_other_archive_title
 import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.resources.mt_sw_other_availability_title
@@ -489,6 +493,8 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_sos_title, Res.string.mt_sw_other_sos_body)
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
             OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)
+            OtherFeature(Res.string.mt_sw_other_coverage_title, Res.string.mt_sw_other_coverage_body)
+            OtherFeature(Res.string.mt_sw_other_compare_title, Res.string.mt_sw_other_compare_body)
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_full_doc)) {
                 ListItem(text = stringResource(Res.string.mt_sw_other_full_doc), leadingIcon = MeshtasticIcons.Info) {
                     onNavigate(SettingsRoute.HelpDocPage("mt-sw-features"))
