@@ -2211,6 +2211,8 @@ mt_sw_other_polarity_body
 mt_sw_other_polarity_title
 mt_sw_other_remote_lists_body
 mt_sw_other_remote_lists_title
+mt_sw_other_silence_body
+mt_sw_other_silence_title
 mt_sw_other_summary
 mt_sw_other_title
 mt_sw_planner_open_summary
@@ -2360,6 +2362,13 @@ node_number
 node_request_send_failed
 node_restarting
 node_show_on_map
+node_silence_alert
+node_silence_alert_custom
+node_silence_alert_hint
+node_silence_alert_notification
+node_silence_alert_off
+node_silence_count_relayed
+node_silence_count_relayed_hint
 node_sort_alpha
 node_sort_button
 node_sort_channel

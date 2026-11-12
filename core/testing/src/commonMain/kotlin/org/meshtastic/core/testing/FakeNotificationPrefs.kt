@@ -86,4 +86,20 @@ class FakeNotificationPrefs : NotificationPrefs {
         geofenceAlertOptIns.value =
             geofenceAlertOptIns.value.toMutableSet().apply { if (enabled) add(waypointId) else remove(waypointId) }
     }
+
+    override val nodeSilenceAlerts = MutableStateFlow<Map<Int, Int>>(emptyMap())
+
+    override fun setNodeSilenceAlert(nodeNum: Int, minutes: Int?) {
+        nodeSilenceAlerts.value =
+            nodeSilenceAlerts.value.toMutableMap().apply {
+                if (minutes == null || minutes <= 0) remove(nodeNum) else put(nodeNum, minutes)
+            }
+    }
+
+    override val nodeSilenceCountRelayed = MutableStateFlow<Set<Int>>(emptySet())
+
+    override fun setNodeSilenceCountRelayed(nodeNum: Int, enabled: Boolean) {
+        nodeSilenceCountRelayed.value =
+            nodeSilenceCountRelayed.value.toMutableSet().apply { if (enabled) add(nodeNum) else remove(nodeNum) }
+    }
 }

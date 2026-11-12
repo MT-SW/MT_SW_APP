@@ -40,6 +40,7 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeManager
+import org.meshtastic.core.repository.NodeSilenceMonitor
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.TakPrefs
@@ -79,6 +80,7 @@ class MeshServiceOrchestrator(
     private val dispatchers: CoroutineDispatchers,
     private val localNetworkAccess: LocalNetworkAccess,
     private val lastBleNodeRecorder: LastBleNodeRecorder,
+    private val nodeSilenceMonitor: NodeSilenceMonitor,
 ) {
     // Per-start coroutine scope. A fresh scope is created on each start() and cancelled on stop(), so all collectors
     // launched from start() are torn down cleanly and do not accumulate across start/stop/start cycles.
@@ -218,6 +220,9 @@ class MeshServiceOrchestrator(
         radioInterfaceService.connectionError
             .onEach { errorMessage -> serviceStateWriter.setErrorMessage(errorMessage, Severity.Warn) }
             .launchIn(newScope)
+
+        // The silence alerts set per node in the node details.
+        nodeSilenceMonitor.start(newScope)
     }
 
     /**

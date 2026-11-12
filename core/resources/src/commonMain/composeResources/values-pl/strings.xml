@@ -3905,4 +3905,13 @@
     <string name="data_wipe_back">Wróć do zgody</string>
     <string name="widget_others_search">Szukaj</string>
     <string name="notification_settings_in_system">Powiadomienia (w ustawieniach iPhone’a)</string>
+    <string name="node_silence_alert">Strażnik węzła</string>
+    <string name="node_silence_alert_custom">Własny czas (godziny)</string>
+    <string name="node_silence_alert_hint">Powiadomienie, gdy radio nie słyszy tego węzła przez wybrany czas. Działa, gdy aplikacja jest połączona z radiem.</string>
+    <string name="node_silence_alert_notification">%1$s: nie odzywa się od %2$s</string>
+    <string name="node_silence_alert_off">Wyłączony</string>
+    <string name="mt_sw_other_silence_title">Strażnik węzła</string>
+    <string name="mt_sw_other_silence_body">W szczegółach węzła (pod notatkami) możesz włączyć strażnika dla tego jednego węzła: ustawiasz od 1 godziny do 30 dni albo wpisujesz własny czas w godzinach (do 90 dni). Gdy węzeł milczy tak długo, dostajesz powiadomienie, które znika, gdy węzeł znów się odezwie. Opcjonalnie liczy też pakiety, które tylko przeszły przez węzeł. Działa, gdy aplikacja jest połączona z radiem.</string>
+    <string name="node_silence_count_relayed">Licz też pakiety przechodzące przez węzeł</string>
+    <string name="node_silence_count_relayed_hint">Oprócz własnych pakietów węzła o jego życiu świadczy też pakiet, który dotarł do radia przez ten węzeł (przekazał go dalej). Dopasowanie po ostatnim bajcie identyfikatora, więc gdy dwa znane węzły kończą się tak samo, jest pomijane.</string>
 </resources>

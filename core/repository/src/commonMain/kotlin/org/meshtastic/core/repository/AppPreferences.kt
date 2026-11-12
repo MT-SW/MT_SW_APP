@@ -672,6 +672,24 @@ interface NotificationPrefs {
     val geofenceAlertOptIns: StateFlow<Set<Int>>
 
     fun setGeofenceAlertOptIn(waypointId: Int, enabled: Boolean)
+
+    /**
+     * The "node silence alert" of every node that has one: node number → minutes without a signal after which the app
+     * raises a notification. A node that is not in the map has no alert. Set per node in the node details.
+     */
+    val nodeSilenceAlerts: StateFlow<Map<Int, Int>>
+
+    /** Sets the silence alert of [nodeNum] to [minutes] without a signal, or removes it when [minutes] is null. */
+    fun setNodeSilenceAlert(nodeNum: Int, minutes: Int?)
+
+    /**
+     * Nodes whose silence alert also counts a packet that merely passed through them (they relayed it) as a sign of
+     * life, not only the packets they sent themselves. A node that is not in the set counts only its own packets.
+     */
+    val nodeSilenceCountRelayed: StateFlow<Set<Int>>
+
+    /** Turns the counting of packets relayed by [nodeNum] on or off for its silence alert. */
+    fun setNodeSilenceCountRelayed(nodeNum: Int, enabled: Boolean)
 }
 
 /** Reactive interface for general map preferences. */

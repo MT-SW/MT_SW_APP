@@ -290,6 +290,12 @@ class MeshMessageProcessorImpl(
             )
         val logJob = insertMeshLog(log, session)
 
+        // A packet that really came over our radio through a relay shows that relay is alive, even if it is not the
+        // sender (used by the optional "count relayed packets" part of the node silence alert). Encrypted packets count.
+        if (packet.relay_node != 0 && packet.rx_rssi != null && packet.via_mqtt != true && packet.from != myNodeNum) {
+            RelayActivityTracker.record(packet.relay_node, nowSeconds.toInt())
+        }
+
         // A packet the firmware could not decrypt (no matching channel key) still arrives via the same
         // sendPacketToPhoneRaw() path, with `decoded` null and only `encrypted` populated — see
         // SnifferLogViewModel's doc comment, which already handles this case on the read side. It's logged above

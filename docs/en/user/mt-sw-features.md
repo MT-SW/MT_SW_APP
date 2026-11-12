@@ -125,6 +125,10 @@ The feed line is worked out just like in the Mesh Link Planner: any number of co
 
 In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity the MT_SW firmware version and, from MT_SW_FIRMWARE v3, the LAN statistics (the node's IP address on Wi-Fi or Ethernet, UDP on the local network, MQTT and the broker connection). The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.
 
+## Node watchdog
+
+The node details (below the notes) have a "Node watchdog" card. You turn it on separately for each node and choose after how long without a signal you get a notification: from 1 hour up to 30 days (ready buttons) or your own time in hours, up to 90 days. The notification disappears by itself when the node is heard again, and comes back only after the next silence. The extra option "Also count packets passing through the node" (off by default) also takes a packet that reached the radio through this node, although somebody else sent it, as a sign of life. The node is recognised by the last byte of its ID, so when two known nodes end alike, this option is skipped. The watchdog works while the app is connected to the radio (Android, desktop and iPhone/iPad) and waits briefly after connecting for the radio's node list.
+
 ## Sniffer
 
 The **Sniffer** screen (Settings → Advanced) shows network traffic live, including packets the phone cannot decrypt.

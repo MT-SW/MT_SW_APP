@@ -125,6 +125,10 @@ Tor antenowy liczy się tak samo jak w Mesh Link Planerze: dowolna liczba złąc
 
 W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru, wersja firmware MT_SW oraz (od MT_SW_FIRMWARE v3) statystyki sieci LAN: adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.
 
+## Strażnik węzła
+
+W szczegółach węzła (pod notatkami) jest karta „Strażnik węzła”. Włączasz ją osobno dla każdego węzła i wybierasz, po jakim czasie bez sygnału ma przyjść powiadomienie: od 1 godziny do 30 dni (gotowe przyciski) albo własny czas w godzinach, do 90 dni. Powiadomienie znika samo, gdy węzeł znów się odezwie, i przychodzi ponownie dopiero po kolejnym zamilknięciu. Dodatkowa opcja „Licz też pakiety przechodzące przez węzeł” (domyślnie wyłączona) uznaje za znak życia także pakiet, który dotarł do radia przez ten węzeł, choć nadał go ktoś inny. Węzeł jest rozpoznawany po ostatnim bajcie identyfikatora, więc gdy dwa znane węzły kończą się tak samo, ta opcja jest pomijana. Strażnik działa, gdy aplikacja jest połączona z radiem (Android, komputer i iPhone/iPad), a krótko po połączeniu czeka na listę węzłów z radia.
+
 ## Sniffer
 
 Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, także pakiety, których telefon nie potrafi rozszyfrować.

@@ -100,6 +100,7 @@ class QuickSettingsTileControllerTest {
             dispatchers = dispatchers,
             localNetworkAccess = LocalNetworkAccess { true },
             lastBleNodeRecorder = {},
+            nodeSilenceMonitor = {},
         )
     }
 }

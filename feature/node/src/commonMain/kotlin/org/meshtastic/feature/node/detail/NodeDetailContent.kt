@@ -46,6 +46,7 @@ import org.meshtastic.feature.node.component.DisplayNameSection
 import org.meshtastic.feature.node.component.NodeDetailsSection
 import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.component.NotesSection
+import org.meshtastic.feature.node.component.SilenceAlertSection
 import org.meshtastic.feature.node.model.NodeDetailAction
 
 /**
@@ -147,6 +148,10 @@ fun NodeDetailList(
             }
             item { DisplayNameSection(node = node, onSaveDisplayName = onSaveDisplayName) }
             item { NotesSection(node = node, onSaveNotes = onSaveNotes) }
+            // Our own node is always "heard", so the alert makes sense only for the other nodes.
+            if (!uiState.metricsState.isLocal) {
+                item { SilenceAlertSection(nodeNum = node.num) }
+            }
             if (!uiState.metricsState.isManaged) {
                 item {
                     AdministrationSection(

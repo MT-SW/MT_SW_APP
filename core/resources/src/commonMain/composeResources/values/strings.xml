@@ -2262,6 +2262,8 @@
     <string name="mt_sw_other_polarity_title">Inverted power and current</string>
     <string name="mt_sw_other_remote_lists_body">In the node details (Administration → Lists and contacts on the remote device) you enter a node ID and add it to the favorites or ignored list on the remote device over the mesh. The app waits for a confirmation from the network, so you know the change arrived.</string>
     <string name="mt_sw_other_remote_lists_title">Remote favorites and ignored</string>
+    <string name="mt_sw_other_silence_body">In the node details (below the notes) you can turn on the watchdog for that one node: set it from 1 hour up to 30 days, or type your own time in hours (up to 90 days). When the node has been silent for that long, you get a notification; it disappears when the node is heard again. Optionally it also counts packets that only passed through the node. It works while the app is connected to the radio.</string>
+    <string name="mt_sw_other_silence_title">Node watchdog</string>
     <string name="mt_sw_other_summary">Where to find features that live next to a node</string>
     <string name="mt_sw_other_title">Other features</string>
     <string name="mt_sw_planner_open_summary">Simulates the radio link between two points with terrain and link budget. Also under the map's buttons and on a node's page</string>
@@ -2411,6 +2413,13 @@
     <string name="node_request_send_failed">Couldn't send request. Try again.</string>
     <string name="node_restarting">Restarting…</string>
     <string name="node_show_on_map">Show on map</string>
+    <string name="node_silence_alert">Node watchdog</string>
+    <string name="node_silence_alert_custom">Own time (hours)</string>
+    <string name="node_silence_alert_hint">A notification when the radio has not heard this node for the chosen time. It works while the app is connected to the radio.</string>
+    <string name="node_silence_alert_notification">%1$s: silent for %2$s</string>
+    <string name="node_silence_alert_off">Off</string>
+    <string name="node_silence_count_relayed">Also count packets passing through the node</string>
+    <string name="node_silence_count_relayed_hint">Besides its own packets, a packet that reached the radio through this node (it passed it on) also shows the node is alive. Matched by the last byte of the node ID, so it is skipped when two known nodes end alike.</string>
     <string name="node_sort_alpha">A-Z</string>
     <string name="node_sort_button">Node sorting options</string>
     <string name="node_sort_channel">Channel</string>

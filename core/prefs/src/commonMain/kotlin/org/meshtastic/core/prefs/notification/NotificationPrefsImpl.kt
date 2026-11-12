@@ -135,6 +135,38 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         }
     }
 
+    // Stored as "node:minutes" pairs separated by commas.
+    override val nodeSilenceAlerts: StateFlow<Map<Int, Int>> =
+        dataStore.data
+            .map { prefs -> parseSilenceAlerts(prefs[KEY_NODE_SILENCE_ALERTS]) }
+            .stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
+    override fun setNodeSilenceAlert(nodeNum: Int, minutes: Int?) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                val alerts = parseSilenceAlerts(prefs[KEY_NODE_SILENCE_ALERTS]).toMutableMap()
+                if (minutes == null || minutes <= 0) alerts.remove(nodeNum) else alerts[nodeNum] = minutes
+                prefs[KEY_NODE_SILENCE_ALERTS] = alerts.entries.joinToString(",") { "${it.key}:${it.value}" }
+            }
+        }
+    }
+
+    // Stored as node numbers separated by commas.
+    override val nodeSilenceCountRelayed: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs -> parseOptInIds(prefs[KEY_NODE_SILENCE_RELAYED]).toSet() }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setNodeSilenceCountRelayed(nodeNum: Int, enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                val nodes = parseOptInIds(prefs[KEY_NODE_SILENCE_RELAYED]).toMutableSet()
+                if (enabled) nodes.add(nodeNum) else nodes.remove(nodeNum)
+                prefs[KEY_NODE_SILENCE_RELAYED] = nodes.joinToString(",")
+            }
+        }
+    }
+
     companion object {
         /** Cap on remembered foreign-geofence opt-ins; far above realistic manual use, oldest evicted past it. */
         const val MAX_GEOFENCE_OPT_INS = 100
@@ -142,6 +174,18 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private fun parseOptInIds(csv: String?): List<Int> =
             csv?.split(',')?.mapNotNull { it.toIntOrNull() }?.distinct() ?: emptyList()
 
+        private fun parseSilenceAlerts(csv: String?): Map<Int, Int> = csv
+            ?.split(',')
+            ?.mapNotNull { pair ->
+                val (node, minutes) = pair.split(':').takeIf { it.size == 2 } ?: return@mapNotNull null
+                val nodeNum = node.toIntOrNull() ?: return@mapNotNull null
+                val value = minutes.toIntOrNull()?.takeIf { it > 0 } ?: return@mapNotNull null
+                nodeNum to value
+            }
+            ?.toMap() ?: emptyMap()
+
+        private val KEY_NODE_SILENCE_ALERTS = stringPreferencesKey("notif_node_silence_alerts")
+        private val KEY_NODE_SILENCE_RELAYED = stringPreferencesKey("notif_node_silence_relayed")
         private val KEY_MESSAGES_ENABLED = booleanPreferencesKey("notif_messages_enabled")
         private val KEY_NODE_EVENTS_ENABLED = booleanPreferencesKey("notif_node_events_enabled")
         private val KEY_NODE_EVENTS_AUTO_DISABLED = booleanPreferencesKey("notif_node_events_auto_disabled_event")
