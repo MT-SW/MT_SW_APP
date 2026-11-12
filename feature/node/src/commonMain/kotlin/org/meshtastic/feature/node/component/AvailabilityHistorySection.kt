@@ -97,7 +97,9 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                 )
-                InfoButton(Res.string.availability_title, Res.string.mt_sw_other_availability_body)
+                InfoButton(Res.string.availability_title, Res.string.mt_sw_other_availability_body,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
             }
             Spacer(Modifier.height(4.dp))
             Text(

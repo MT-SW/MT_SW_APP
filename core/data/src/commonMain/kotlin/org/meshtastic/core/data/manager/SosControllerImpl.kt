@@ -132,10 +132,17 @@ class SosControllerImpl(
 
     private suspend fun textFor(config: SosConfig, position: Pair<Double, Double>?): String {
         val message = config.message.ifBlank { getStringSuspend(Res.string.sos_default_message) }
-        if (position == null) return message
-        val lat = rounded(position.first)
-        val lon = rounded(position.second)
-        return "$message $lat,$lon https://maps.google.com/?q=$lat,$lon"
+        val body =
+            if (position == null) {
+                message
+            } else {
+                val lat = rounded(position.first)
+                val lon = rounded(position.second)
+                "$message $lat,$lon https://maps.google.com/?q=$lat,$lon"
+            }
+        // The alarm bell, written like the bell button of the chat does: a radio with the external notification module
+        // sounds its alert on the bell character, and other apps show the bell.
+        return "$ALERT_BELL $body $ALERT_BELL_CHAR"
     }
 
     private fun rounded(value: Double): Double = (value * COORDINATE_SCALE).roundToLong() / COORDINATE_SCALE
@@ -146,5 +153,7 @@ class SosControllerImpl(
         const val DELIVERY_WAIT_MS = 90_000L
         const val LOCATION_WAIT_MS = 4_000L
         const val COORDINATE_SCALE = 100_000.0
+        const val ALERT_BELL = "🔔"
+        const val ALERT_BELL_CHAR = '\u0007'
     }
 }

@@ -109,7 +109,9 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                 )
-                InfoButton(Res.string.node_silence_alert, Res.string.mt_sw_other_silence_body)
+                InfoButton(Res.string.node_silence_alert, Res.string.mt_sw_other_silence_body,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
             }
             Spacer(Modifier.height(4.dp))
             Text(

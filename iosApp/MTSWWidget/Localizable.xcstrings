@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "pl",
   "strings" : {
+    "%@ %@" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%@/%@" : {
       "localizations" : {
         "pl" : {

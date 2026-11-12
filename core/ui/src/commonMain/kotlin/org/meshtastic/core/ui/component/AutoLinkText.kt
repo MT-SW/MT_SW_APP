@@ -48,7 +48,9 @@ private fun defaultTextLinkStyles(): TextLinkStyles {
 private val WEB_URL_REGEX =
     Regex(
         """(?:(?:https?|ftp)://|www\.)[-a-zA-Z0-9@:%._\+~#=]{1,256}""" +
-            """\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)""",
+            // A comma belongs to the link only when a letter or digit follows it (map links carry "lat,lon"), so a
+            // comma that ends a sentence stays outside the link.
+            """\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]|,(?=[a-zA-Z0-9-]))*""",
         RegexOption.IGNORE_CASE,
     )
 

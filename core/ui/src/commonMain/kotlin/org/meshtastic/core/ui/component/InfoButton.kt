@@ -19,12 +19,12 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -44,16 +45,23 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /**
  * The "i" button of the MT_SW features: opens a window that explains, in plain words, what the function is for and how
- * to use it. One paragraph per entry of [bodies]. The window scrolls, so a long text is never cut off.
+ * to use it. One paragraph per entry of [bodies]. The window scrolls, so a long text is never cut off. The icon has the
+ * normal size of an icon button and takes the colour of its surroundings (grey in a bar); [tint] is passed where the
+ * screen colours its icons, like the section cards of the node details (primary).
  */
 @Composable
-fun InfoButton(title: StringResource, vararg bodies: StringResource, modifier: Modifier = Modifier) {
+fun InfoButton(
+    title: StringResource,
+    vararg bodies: StringResource,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
+) {
     var open by rememberSaveable { mutableStateOf(false) }
     IconButton(onClick = { open = true }, modifier = modifier) {
         Icon(
             imageVector = MeshtasticIcons.Info,
             contentDescription = stringResource(title),
-            modifier = Modifier.size(ICON_SIZE.dp),
+            tint = tint,
         )
     }
     if (open) {
@@ -75,5 +83,4 @@ fun InfoButton(title: StringResource, vararg bodies: StringResource, modifier: M
     }
 }
 
-private const val ICON_SIZE = 22
 private const val MAX_HEIGHT = 420

@@ -143,4 +143,12 @@ class AutoLinkTextRenderTest {
         assertEquals("hi @!abcd1234", result.text)
         assertNull(result.clickableTags().singleOrNull())
     }
+
+    @Test // map links carry "lat,lon": the comma stays inside the link, a comma after the link stays outside
+    fun map_link_with_coordinates_is_one_link() {
+        val text = "SOS 52.12345,19.54321 https://maps.google.com/?q=52.12345,19.54321, pomocy"
+        val link = build(text).urlLinks().single { it.first.startsWith("https://") }
+        assertEquals("https://maps.google.com/?q=52.12345,19.54321", link.first)
+        assertEquals(link.first, text.substring(link.second, link.third))
+    }
 }
