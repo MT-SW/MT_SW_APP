@@ -88,7 +88,7 @@ class NodeSilenceMonitorImpl(
                 displayName(node),
                 formatDurationSuspend(minutes * SECONDS_PER_MINUTE, DurationUnit.MINUTES),
             )
-        notifications.showNewNodeSeenNotification(node, title)
+        notifications.showNodeSilenceNotification(node, title)
     }
 
     private suspend fun check() {
@@ -105,7 +105,7 @@ class NodeSilenceMonitorImpl(
         for (nodeNum in alerted.keys.toList()) {
             if (nodeNum !in alerts) {
                 alerted.remove(nodeNum)
-                notifications.cancelNewNodeNotification(nodeNum)
+                notifications.cancelNodeSilenceNotification(nodeNum)
             }
         }
         val countRelayed = notificationPrefs.nodeSilenceCountRelayed.value
@@ -131,7 +131,7 @@ class NodeSilenceMonitorImpl(
                 }
             } else if (alerted.remove(nodeNum) != null) {
                 // Heard again: the old alert is out of date.
-                notifications.cancelNewNodeNotification(nodeNum)
+                notifications.cancelNodeSilenceNotification(nodeNum)
             }
         }
         raise(newlySilent)
@@ -145,7 +145,7 @@ class NodeSilenceMonitorImpl(
             val more = if (names.size > GROUP_NAMES_SHOWN) ", …" else ""
             val shown = names.take(GROUP_NAMES_SHOWN).joinToString(", ") + more
             val title = getStringSuspend(Res.string.node_silence_alert_group, newlySilent.size, shown)
-            notifications.showNewNodeSeenNotification(newlySilent.first().first, title)
+            notifications.showNodeSilenceNotification(newlySilent.first().first, title)
             return
         }
         for ((node, silentSeconds) in newlySilent) {
@@ -155,7 +155,7 @@ class NodeSilenceMonitorImpl(
                     displayName(node),
                     formatDurationSuspend(silentSeconds, DurationUnit.MINUTES),
                 )
-            notifications.showNewNodeSeenNotification(node, title)
+            notifications.showNodeSilenceNotification(node, title)
         }
     }
 

@@ -74,6 +74,11 @@ interface MeshNotificationManager {
 
     fun cancelNewNodeNotification(nodeNum: Int)
 
+    /** The node watchdog alert: [node] has been silent. It has its own category, so it does not follow new nodes. */
+    suspend fun showNodeSilenceNotification(node: Node, title: String)
+
+    fun cancelNodeSilenceNotification(nodeNum: Int)
+
     /**
      * Warns that [node]'s battery is low. The first reading of an episode posts and alerts; later ones only refresh a
      * warning still showing, so a dismissed one stays dismissed until [cancelLowBatteryNotification] or

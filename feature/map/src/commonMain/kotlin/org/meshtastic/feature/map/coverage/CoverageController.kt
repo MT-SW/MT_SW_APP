@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.coverage
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +28,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.fixOrNull
 import org.meshtastic.core.model.util.GeoConstants
-import org.meshtastic.core.model.util.isDirectSignal
+import org.meshtastic.core.model.util.isMeasuredDirect
 import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -97,12 +98,16 @@ class CoverageController(
     private suspend fun measure(): Pair<List<CoveragePoint>, Int> {
         val points = mutableListOf<CoveragePoint>()
         var nodes = 0
+        var seen = 0
+        var direct = 0
         for (node in nodeRepository.nodeDBbyNum.value.values) {
             if (node.lastHeard == 0) continue
             val packets = meshLogRepository.getMeshPacketsFrom(node.num, PortNum.POSITION_APP.value).first()
             var measured = false
             for (packet in packets) {
-                if (!packet.isDirectSignal()) continue
+                seen++
+                if (!packet.isMeasuredDirect()) continue
+                direct++
                 val snr = packet.rx_snr.takeUnless { it.isNaN() } ?: continue
                 val position = packet.toPosition() ?: continue
                 val (latI, lonI) = position.fixOrNull() ?: continue
@@ -117,6 +122,7 @@ class CoverageController(
             }
             if (measured) nodes++
         }
+        Logger.i { "Coverage: $seen position packets read, $direct heard directly, ${points.size} with a fix and SNR" }
         return points.sortedByDescending { it.time }.take(MAX_POINTS) to nodes
     }
 

@@ -98,6 +98,12 @@ class FakeNotificationPrefs : NotificationPrefs {
         updatesEnabled.value = enabled
     }
 
+    override val nodeSilenceEnabled = MutableStateFlow(true)
+
+    override fun setNodeSilenceEnabled(enabled: Boolean) {
+        nodeSilenceEnabled.value = enabled
+    }
+
     override val geofenceAlertOptIns = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setGeofenceAlertOptIn(waypointId: Int, enabled: Boolean) {

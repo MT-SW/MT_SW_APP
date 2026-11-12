@@ -107,7 +107,7 @@ Skróty używają **⌘** (Command) w macOS oraz **Ctrl** w Windows i Linuxie. (
 
 ### Preferencje powiadomień
 
-Aplikacja na komputer ma przełączniki, którymi wybierasz, jakie powiadomienia mają być pokazywane. Znajdziesz je w sekcji **Powiadomienia aplikacji** na ekranie Ustawienia: **Powiadomienia o bezpośredniej wiadomości**, **Powiadomienia o nowych węzłach**, **Powiadomienia o niskim poziomie baterii**, **Powiadomienia o reakcjach**, **Powiadomienia o punktach trasy**, **Powiadomienia o alarmach** (wiadomości z dzwonkiem), **Komunikaty z radia** i **Powiadomienia o aktualizacjach**.
+Aplikacja na komputer ma przełączniki, którymi wybierasz, jakie powiadomienia mają być pokazywane. Znajdziesz je w sekcji **Powiadomienia aplikacji** na ekranie Ustawienia: **Powiadomienia o bezpośredniej wiadomości**, **Powiadomienia o nowych węzłach**, **Powiadomienia o niskim poziomie baterii**, **Powiadomienia o reakcjach**, **Powiadomienia o punktach trasy**, **Strażnik węzła (węzeł milczy)**, **Powiadomienia o alarmach** (wiadomości z dzwonkiem), **Komunikaty z radia** i **Powiadomienia o aktualizacjach**.
 
 ## Wbudowana przeglądarka dokumentacji
 

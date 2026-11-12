@@ -43,6 +43,9 @@ data class Notification(
         /** Waypoints received from the mesh. */
         Waypoint,
         NodeEvent,
+
+        /** The node watchdog: a node has been silent for the time set for it. */
+        Silence,
         Battery,
         Alert,
         Service,

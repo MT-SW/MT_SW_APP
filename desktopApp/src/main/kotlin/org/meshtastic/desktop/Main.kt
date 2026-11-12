@@ -85,6 +85,7 @@ import org.maplibre.compose.desktop.ProvideMapPresentationHost
 import org.maplibre.compose.desktop.rememberAwtComposeMapPresentationHost
 import org.meshtastic.core.common.BuildConfigProvider
 import org.meshtastic.core.common.background.AutostartControls
+import org.meshtastic.core.common.background.SingleInstanceControls
 import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
@@ -191,6 +192,9 @@ private fun svgPainterResource(path: String, density: Density): Painter = rememb
 
 @OptIn(ExperimentalCoilApi::class)
 fun main(args: Array<String>) {
+    // A second copy asks the first one to show its window and ends here, unless the person allowed several copies.
+    if (!SingleInstance.claim()) exitProcess(0)
+    SingleInstanceControls.current = DesktopSingleInstanceControl
     // Before anything is opened: a requested move of the data folder is made now (with a progress window).
     prepareDataFolder()
     installQuitHandler()
@@ -397,6 +401,13 @@ private fun ApplicationScope.MeshtasticDesktopApp(
 ) {
     var isAppVisible by remember { mutableStateOf(true) }
     var isWindowReady by remember { mutableStateOf(false) }
+    // A second start of the program shows this window again instead of opening a new copy.
+    LaunchedEffect(Unit) {
+        SingleInstance.showRequests.collect {
+            isAppVisible = true
+            bringWindowToFront()
+        }
+    }
     val trayState = rememberTrayState()
     val density = LocalDensity.current
     // The window icon follows the style picked in Funkcje MT_SW → Ikona aplikacji; automatic keeps the usual one.

@@ -102,6 +102,17 @@ class NotificationPrefsTest {
     }
 
     @Test
+    fun `node watchdog alerts default to true and do not follow new node notifications`() = testScope.runTest {
+        assertTrue(notificationPrefs.nodeSilenceEnabled.value)
+
+        notificationPrefs.setNodeEventsEnabled(false)
+        assertTrue(notificationPrefs.nodeSilenceEnabled.value)
+
+        notificationPrefs.setNodeSilenceEnabled(false)
+        assertFalse(notificationPrefs.nodeSilenceEnabled.value)
+    }
+
+    @Test
     fun `setting reactionsEnabled updates preference`() = testScope.runTest {
         notificationPrefs.setReactionsEnabled(false)
         assertFalse(notificationPrefs.reactionsEnabled.value)

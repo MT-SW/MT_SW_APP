@@ -300,6 +300,8 @@ class LinuxNotificationSender(
 
                 Notification.Category.NodeEvent -> "network"
 
+                Notification.Category.Silence -> "network"
+
                 Notification.Category.MeshBeacon -> "network"
 
                 Notification.Category.Service -> "device"

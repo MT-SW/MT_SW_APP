@@ -40,6 +40,11 @@ object AppDataRoot {
     private const val OLD_FOLDERS = "old-data-folders.txt"
     private const val ERROR = "data-move-error.txt"
     private const val ASKED = "data-folder-asked"
+    private const val SEVERAL = "allow-several-instances"
+
+    /** Files of the one-copy-only check; they live in the settings folder and are never moved with the data. */
+    const val INSTANCE_LOCK = "instance.lock"
+    const val INSTANCE_PORT = "instance.port"
 
     /**
      * The folder created inside a place a person picks, so that picking a disk or a home folder never scatters files.
@@ -50,7 +55,8 @@ object AppDataRoot {
     private const val SPARE_MB = 100L
 
     /** Files that describe where the data is; they always stay in [defaultDir] and are never copied or removed. */
-    private val SETTINGS_FILES = setOf(POINTER, PENDING, OLD_FOLDERS, ERROR, ASKED)
+    private val SETTINGS_FILES =
+        setOf(POINTER, PENDING, OLD_FOLDERS, ERROR, ASKED, SEVERAL, INSTANCE_LOCK, INSTANCE_PORT)
 
     private val overridden: Boolean = !System.getenv("MESHTASTIC_DATA_DIR").isNullOrBlank()
 
@@ -72,6 +78,22 @@ object AppDataRoot {
             prepare()
             return current ?: defaultDir
         }
+
+    /** True when the person allowed a second copy of the program to run (off by default: one copy only). */
+    fun allowsSeveralInstances(): Boolean = File(defaultDir, SEVERAL).isFile
+
+    /** Allows or forbids a second copy of the program; read at the next start. */
+    fun setAllowSeveralInstances(on: Boolean) {
+        runCatching {
+            val file = File(defaultDir, SEVERAL)
+            if (on) {
+                defaultDir.mkdirs()
+                file.writeText("yes")
+            } else {
+                file.delete()
+            }
+        }
+    }
 
     /** True when a move was requested and will be done by [prepare]. */
     fun hasPendingMove(): Boolean = pendingFile().isFile

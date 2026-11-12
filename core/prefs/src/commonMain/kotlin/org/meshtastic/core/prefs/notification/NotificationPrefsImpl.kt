@@ -135,6 +135,13 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         scope.launch { dataStore.edit { it[KEY_UPDATES_ENABLED] = enabled } }
     }
 
+    override val nodeSilenceEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_NODE_SILENCE_ENABLED] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setNodeSilenceEnabled(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_NODE_SILENCE_ENABLED] = enabled } }
+    }
+
     // Stored as an insertion-ordered CSV of ints (DataStore has no int-set key, and a plain set can't express age).
     // Ordering lets us evict the oldest opt-in once capped; non-numeric leftovers are ignored on read.
     override val geofenceAlertOptIns: StateFlow<Set<Int>> =
@@ -239,6 +246,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private val KEY_ALERTS_ENABLED = booleanPreferencesKey("notif_alerts_enabled")
         private val KEY_RADIO_NOTICES_ENABLED = booleanPreferencesKey("notif_radio_notices_enabled")
         private val KEY_UPDATES_ENABLED = booleanPreferencesKey("notif_updates_enabled")
+        private val KEY_NODE_SILENCE_ENABLED = booleanPreferencesKey("notif_node_silence_enabled")
         private val KEY_SOUND_WHILE_OPEN = booleanPreferencesKey("notif_sound_while_open")
         private val KEY_GEOFENCE_ALERT_OPT_INS = stringPreferencesKey("notif_geofence_alert_opt_ins")
     }

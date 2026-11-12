@@ -46,6 +46,7 @@ class IosNotificationSettingsSync(private val prefs: NotificationPrefs) {
             Item(KEY_ALERTS, prefs.alertsEnabled, prefs::setAlertsEnabled),
             Item(KEY_RADIO_NOTICES, prefs.radioNoticesEnabled, prefs::setRadioNoticesEnabled),
             Item(KEY_UPDATES, prefs.updatesEnabled, prefs::setUpdatesEnabled),
+            Item(KEY_NODE_SILENCE, prefs.nodeSilenceEnabled, prefs::setNodeSilenceEnabled),
             Item(KEY_SOUND_WHILE_OPEN, prefs.soundWhileOpen, prefs::setSoundWhileOpen),
         )
 
@@ -103,6 +104,7 @@ class IosNotificationSettingsSync(private val prefs: NotificationPrefs) {
         const val KEY_ALERTS = "mtsw_notify_alerts"
         const val KEY_RADIO_NOTICES = "mtsw_notify_radio_notices"
         const val KEY_UPDATES = "mtsw_notify_updates"
+        const val KEY_NODE_SILENCE = "mtsw_notify_node_silence"
         const val KEY_SOUND_WHILE_OPEN = "mtsw_notify_sound_while_open"
     }
 }

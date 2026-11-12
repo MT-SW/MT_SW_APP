@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Strażnik węzła: alarm ma teraz własny przełącznik „Strażnik węzła (węzeł milczy)” na komputerze i iPhonie/iPadzie (Ustawienia → MT_SW) oraz własną kategorię „Strażnik węzła” w ustawieniach powiadomień Androida. Nie zależy już od powiadomień o nowych węzłach, więc także testowe powiadomienie dociera, gdy nowe węzły są wyłączone.
+* Zasięgi (mapa główna i trasa w szczegółach węzła): pozycje usłyszane bezpośrednio są teraz rozpoznawane także wtedy, gdy radio nie podaje rodzaju transportu ani czasu odbioru, przez co wcześniej nie pokazywały się żadne kropki ani kolory SNR. Przy odczycie zasięgów do logu trafia liczba przeczytanych i bezpośrednich pozycji.
+* Komputer: domyślnie działa jedna kopia programu (drugie uruchomienie pokazuje okno pierwszej, także schowanej przy zegarze); w Funkcje MT_SW przełącznik „Pozwól na drugą kopię obok” pozwala uruchamiać kilka kopii.
 * Strażnik węzła: w szczegółach węzła przycisk „Wyślij testowe powiadomienie” pokazuje od razu, jak wygląda alarm o milczeniu (z Twoim czasem milczenia), więc możesz sprawdzić, czy powiadomienia docierają.
 * Mapa zasięgu: przełącznik warstwy „Zasięgi sieci” jest zapamiętywany (wszystkie wersje), więc po ponownym uruchomieniu aplikacji warstwa zostaje włączona.
 * Archiwum wiadomości: „Przywróć z archiwum” czyta teraz także pliki tekstowe i Markdown (też zaszyfrowane): kanał po nazwie albo numerze, rozmowę prywatną po nazwie węzła, duplikaty po tekście i sekundzie. Poprawka: kanał bez nazwy (domyślny) nie był przywracany z tabeli CSV. Tytuły rozmów w plikach tekstowych i Markdown mają teraz nazwę kanału.
@@ -729,6 +732,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Node watchdog: the alert now has its own switch "Node watchdog (a node is silent)" on desktop and iPhone/iPad (Settings → MT_SW) and its own "Node watchdog" category in the Android notification settings. It no longer depends on the new node notifications, so the test notification also arrives when new nodes are switched off.
+* Coverage (main map and the track in the node details): positions heard directly are now recognised also when the radio reports no transport and no arrival time, which before left the map without dots and the track without SNR colours. When the coverage is read, the log gets the number of positions read and heard directly.
+* Desktop: the program runs in one copy by default (a second start shows the window of the first one, also when it is hidden in the tray); in MT_SW features the "Allow a second copy next to it" switch lets you run several copies.
 * Node watchdog: in the node details a "Send test notification" button shows at once what the silence alert looks like (with your silence time), so you can check that notifications arrive.
 * Coverage map: the "Network coverage" layer switch is remembered (all versions), so the layer stays on after the app is restarted.
 * Message archive: "Restore from archive" now also reads text and Markdown files (also encrypted ones): a channel by name or number, a private chat by node name, duplicates by text and second. Fix: a channel without a name (the default one) was not restored from the CSV table. The conversation titles in text and Markdown files now carry the channel name.

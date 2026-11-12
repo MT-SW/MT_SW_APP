@@ -168,6 +168,9 @@ class MeshNotificationManagerImplTest {
                     NotificationChannelSpec.NewNodes ->
                         NotificationManager.IMPORTANCE_DEFAULT to NotificationChannelGroupSpec.Mesh
 
+                    NotificationChannelSpec.NodeSilence ->
+                        NotificationManager.IMPORTANCE_HIGH to NotificationChannelGroupSpec.Mesh
+
                     NotificationChannelSpec.MeshBeacon ->
                         NotificationManager.IMPORTANCE_LOW to NotificationChannelGroupSpec.Mesh
 

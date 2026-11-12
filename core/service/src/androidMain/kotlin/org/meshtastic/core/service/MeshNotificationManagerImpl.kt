@@ -220,6 +220,7 @@ class MeshNotificationManagerImpl(
         private const val TAG_REACTION = "reaction"
         private const val TAG_ALERT = "alert"
         private const val TAG_NEW_NODE = "new_node"
+        private const val TAG_NODE_SILENCE = "node_silence"
         private const val TAG_LOW_BATTERY = "low_battery"
         private const val TAG_CLIENT = "client"
         private const val TAG_MESH_BEACON = "mesh_beacon"
@@ -806,6 +807,17 @@ class MeshNotificationManagerImpl(
     }
 
     override fun cancelNewNodeNotification(nodeNum: Int) = notificationManager.cancel(TAG_NEW_NODE, nodeNum)
+
+    override suspend fun showNodeSilenceNotification(node: Node, title: String) {
+        ensureChannels()
+        notificationManager.notify(
+            TAG_NODE_SILENCE,
+            node.num,
+            createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeSilence),
+        )
+    }
+
+    override fun cancelNodeSilenceNotification(nodeNum: Int) = notificationManager.cancel(TAG_NODE_SILENCE, nodeNum)
 
     /**
      * Recovery and device switches end an episode from separate work, so a post that was still resolving its text when
@@ -1439,9 +1451,13 @@ class MeshNotificationManagerImpl(
             .setStyle(NotificationCompat.BigTextStyle().bigText(alert))
             .build()
 
-    private fun createNewNodeSeenNotification(title: String, node: Node): Notification {
+    private fun createNewNodeSeenNotification(
+        title: String,
+        node: Node,
+        channel: NotificationChannelSpec = NotificationChannelSpec.NewNodes,
+    ): Notification {
         val message = node.effectiveLongName
-        return commonBuilder(NotificationChannelSpec.NewNodes, createOpenNodeDetailIntent(node.num))
+        return commonBuilder(channel, createOpenNodeDetailIntent(node.num))
             .setCategory(Notification.CATEGORY_STATUS)
             .setAutoCancel(true)
             .setContentTitle(title)

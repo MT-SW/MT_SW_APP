@@ -29,6 +29,7 @@ On iPhone/iPad this row is called **Notifications (in iPhone settings)** and ope
 | Messages | Waypoint notifications | A waypoint shared on the mesh, or a geofence crossing | The waypoint on the map |
 | Messages | Alert notifications | A critical alert from a node | The conversation |
 | Mesh | New node notifications | A node heard for the first time | The node's details |
+| Mesh | Node watchdog | A node silent for longer than set for it in the watchdog | The node's details |
 | Mesh | Mesh invitation notifications | An invitation to join a nearby mesh | Local Mesh Discovery |
 | Mesh | Low battery notifications (favorite nodes) | A favorite node's battery running low | The node's details |
 | Device | Service notifications | The connection to your node while the app runs in the background | The app |

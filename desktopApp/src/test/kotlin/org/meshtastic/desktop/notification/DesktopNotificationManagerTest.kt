@@ -135,6 +135,20 @@ class DesktopNotificationManagerTest {
     }
 
     @Test
+    fun `node watchdog notifications follow their own switch and not the new node one`() = runTest {
+        val sender = FakeNativeSender()
+        val prefs = FakeNotificationPrefs().apply { setNodeEventsEnabled(false) }
+        val manager = DesktopNotificationManager(prefs, sender)
+
+        assertTrue(manager.dispatch(Notification("A", "x", category = Notification.Category.Silence)))
+
+        prefs.setNodeSilenceEnabled(false)
+
+        assertFalse(manager.dispatch(Notification("B", "y", category = Notification.Category.Silence)))
+        assertEquals(1, sender.sent.size)
+    }
+
+    @Test
     fun `reaction and waypoint notifications dispatch by default`() = runTest {
         val sender = FakeNativeSender()
         val manager = DesktopNotificationManager(FakeNotificationPrefs(), sender)

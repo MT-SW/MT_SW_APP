@@ -55,4 +55,27 @@ class RxTimeExtensionsTest {
         assertFalse(loraPacket(null).isDirectSignal())
         assertFalse(loraPacket(0).isDirectSignal())
     }
+
+    private fun packet(hopStart: Int, hopLimit: Int, transport: MeshPacket.TransportMechanism?) = MeshPacket.Builder()
+        .also { wb ->
+            wb.hop_start = hopStart
+            wb.hop_limit = hopLimit
+            if (transport != null) wb.transport_mechanism = transport
+        }
+        .build()
+
+    @Test
+    fun `isMeasuredDirect accepts a packet without a transport or an arrival time`() {
+        assertTrue(packet(3, 3, null).isMeasuredDirect())
+        assertTrue(packet(3, 3, MeshPacket.TransportMechanism.TRANSPORT_LORA).isMeasuredDirect())
+        assertFalse(packet(3, 3, null).isDirectSignal())
+    }
+
+    @Test
+    fun `isMeasuredDirect leaves out relayed packets and other transports`() {
+        assertFalse(packet(3, 2, null).isMeasuredDirect())
+        assertFalse(packet(0, 0, null).isMeasuredDirect())
+        assertFalse(packet(3, 3, MeshPacket.TransportMechanism.TRANSPORT_MQTT).isMeasuredDirect())
+        assertFalse(packet(3, 3, MeshPacket.TransportMechanism.TRANSPORT_API).isMeasuredDirect())
+    }
 }

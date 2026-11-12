@@ -9,4 +9,5 @@
 "Alarm notifications" = "Powiadomienia o alarmach";
 "Notices from the radio" = "Komunikaty z radia";
 "Update notifications" = "Powiadomienia o aktualizacjach";
+"Node watchdog (a node is silent)" = "Strażnik węzła (węzeł milczy)";
 "Notification sound while the app is open" = "Dźwięk powiadomień, gdy aplikacja jest otwarta";

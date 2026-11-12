@@ -44,6 +44,7 @@ import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.hasValidEnvironmentMetrics
 import org.meshtastic.core.model.util.isDirectSignal
+import org.meshtastic.core.model.util.isMeasuredDirect
 import org.meshtastic.core.repository.DeviceHardwareRepository
 import org.meshtastic.core.repository.DeviceLinkRepository
 import org.meshtastic.core.repository.DeviceModelRepository
@@ -426,7 +427,7 @@ constructor(
  */
 internal fun positionSnrByTime(packets: List<MeshPacket>): Map<Int, Float> = buildMap {
     for (packet in packets) {
-        if (!packet.isDirectSignal()) continue
+        if (!packet.isMeasuredDirect()) continue
         val snr = packet.rx_snr.takeUnless { it.isNaN() } ?: continue
         val time = packet.toPosition()?.time ?: continue
         if (time > 0) put(time, snr)

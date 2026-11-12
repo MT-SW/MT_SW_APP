@@ -29,6 +29,7 @@ Na iPhonie/iPadzie ten wiersz nazywa się **Powiadomienia (w ustawieniach iPhone
 | Wiadomości | Powiadomienia punktów orientacyjnych | Punkt trasy udostępniony w sieci mesh lub przekroczenie geofence | Punkt trasy na mapie |
 | Wiadomości | Powiadomienia alertowe | Krytyczny alert z węzła | Rozmowę |
 | Mesh | Powiadomienia o nowych węzłach | Węzeł usłyszany po raz pierwszy | Szczegóły węzła |
+| Mesh | Strażnik węzła | Węzeł milczy dłużej, niż ustawiono dla niego w strażniku | Szczegóły węzła |
 | Mesh | Powiadomienia o zaproszeniach do sieci mesh | Zaproszenie do dołączenia do pobliskiej sieci mesh | Odkrywanie lokalnej sieci mesh |
 | Mesh | Powiadomienia o niskim poziomie baterii (ulubione węzły) | Kończąca się bateria ulubionego węzła | Szczegóły węzła |
 | Urządzenie | Powiadomienia o usługach | Połączenie z Twoim węzłem, gdy aplikacja działa w tle | Aplikację |

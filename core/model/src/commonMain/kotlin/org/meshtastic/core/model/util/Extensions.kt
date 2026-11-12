@@ -105,6 +105,21 @@ fun MeshPacket.isDirectSignal(): Boolean =
     rxTimeOrNull() != null && hop_start == hop_limit && via_mqtt != true && isLora()
 
 /**
+ * Returns true if this packet was heard by the radio directly (no relay) and can be used to measure coverage.
+ *
+ * Looser than [isDirectSignal] on purpose: that one needs the radio to report a LoRa transport and an arrival time, and
+ * firmware that sets neither (older or custom builds) would leave the coverage map and the SNR colouring of a track
+ * empty. Here a missing transport counts as radio; only a packet known to come from MQTT, the local network or the
+ * phone API is left out. The hop counts must be known (`hop_start` above zero) and equal, as in [isDirectSignal].
+ */
+fun MeshPacket.isMeasuredDirect(): Boolean = hop_start > 0 &&
+    hop_start == hop_limit &&
+    via_mqtt != true &&
+    transport_mechanism != MeshPacket.TransportMechanism.TRANSPORT_MQTT &&
+    transport_mechanism != MeshPacket.TransportMechanism.TRANSPORT_MULTICAST_UDP &&
+    transport_mechanism != MeshPacket.TransportMechanism.TRANSPORT_API
+
+/**
  * Returns true if this telemetry packet carries environment metrics worth listing: a temperature and humidity pair, or
  * a lightning reading, or a voltage/current reading. An AS3935 on its own reports only lightning, and an INA sensor
  * only voltage and current, so both are admitted without the climate pair.

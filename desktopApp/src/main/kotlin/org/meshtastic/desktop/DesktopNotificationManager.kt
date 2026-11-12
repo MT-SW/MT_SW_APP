@@ -67,6 +67,7 @@ class DesktopNotificationManager(
                 Notification.Category.Reaction -> prefs.loadReactionsEnabled()
                 Notification.Category.Waypoint -> prefs.loadNewWaypointsEnabled()
                 Notification.Category.NodeEvent -> prefs.nodeEventsEnabled.value
+                Notification.Category.Silence -> prefs.nodeSilenceEnabled.value
                 Notification.Category.MeshBeacon -> prefs.nodeEventsEnabled.value
                 Notification.Category.Battery -> prefs.lowBatteryEnabled.value
                 Notification.Category.Alert -> prefs.alertsEnabled.value

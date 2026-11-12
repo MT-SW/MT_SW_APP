@@ -36,6 +36,8 @@ class FakeMeshNotificationManager : MeshNotificationManager {
     val meshBeacons = mutableListOf<MeshBeaconOffer>()
     val newNodes = mutableListOf<Node>()
     val cancelledNewNodes = mutableListOf<Int>()
+    val silenceNotified = mutableListOf<Node>()
+    val cancelledSilence = mutableListOf<Int>()
     val lowBatteryNotified = mutableListOf<Node>()
     val lowBatteryCancelled = mutableListOf<Int>()
     val clientPosts = mutableListOf<ClientPost>()
@@ -91,6 +93,14 @@ class FakeMeshNotificationManager : MeshNotificationManager {
 
     override fun cancelNewNodeNotification(nodeNum: Int) {
         cancelledNewNodes += nodeNum
+    }
+
+    override suspend fun showNodeSilenceNotification(node: Node, title: String) {
+        silenceNotified += node
+    }
+
+    override fun cancelNodeSilenceNotification(nodeNum: Int) {
+        cancelledSilence += nodeNum
     }
 
     override suspend fun notifyLowBattery(node: Node, isRemote: Boolean) {

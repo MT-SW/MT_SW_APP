@@ -52,6 +52,8 @@ import org.meshtastic.core.resources.meshtastic_service_notifications_descriptio
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications_description
 import org.meshtastic.core.resources.messages
+import org.meshtastic.core.resources.node_silence_notifications
+import org.meshtastic.core.resources.node_silence_notifications_description
 import org.meshtastic.core.resources.notification_group_mesh
 
 /** Meshtastic brand accent (Green 500, see .skills/design-standards): the small-icon tint and the LED colour. */
@@ -118,6 +120,13 @@ internal enum class NotificationChannelSpec(
         Res.string.meshtastic_new_nodes_notifications_description,
         NotificationChannelGroupSpec.Mesh,
         NotificationManager.IMPORTANCE_DEFAULT,
+    ),
+    NodeSilence(
+        NotificationChannels.NODE_SILENCE,
+        Res.string.node_silence_notifications,
+        Res.string.node_silence_notifications_description,
+        NotificationChannelGroupSpec.Mesh,
+        NotificationManager.IMPORTANCE_HIGH,
     ),
     MeshBeacon(
         NotificationChannels.MESH_BEACON,
@@ -186,6 +195,7 @@ internal enum class NotificationChannelSpec(
                 Waypoints,
                 Reactions,
                 NewNodes,
+                NodeSilence,
                 LowBattery,
                 DeviceStatus,
                 -> channel.setSound(defaultSound, soundAttributes(AudioAttributes.USAGE_NOTIFICATION))

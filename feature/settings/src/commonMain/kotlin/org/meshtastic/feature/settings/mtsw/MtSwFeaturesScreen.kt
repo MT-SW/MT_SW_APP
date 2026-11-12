@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.background.AutostartControls
+import org.meshtastic.core.common.background.SingleInstanceControls
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
@@ -50,6 +51,7 @@ import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.autostart_title
+import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.data_notice_settings_title
@@ -96,6 +98,8 @@ import org.meshtastic.core.resources.mt_sw_other_silence_body
 import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.mt_sw_other_sos_title
 import org.meshtastic.core.resources.mt_sw_other_silence_title
+import org.meshtastic.core.resources.mt_sw_other_single_instance_body
+import org.meshtastic.core.resources.mt_sw_other_single_instance_title
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_body
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_title
 import org.meshtastic.core.resources.mt_sw_other_summary
@@ -147,6 +151,7 @@ import org.meshtastic.feature.settings.component.AppIconSettingsItem
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
+import org.meshtastic.feature.settings.component.SingleInstanceSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
@@ -295,6 +300,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             // Only on the computer app (installed from its own launcher); hidden elsewhere.
             if (AutostartControls.current != null) {
                 ExpressiveSection(title = stringResource(Res.string.autostart_title)) { AutostartSettings() }
+            }
+
+            // Only on the computer app: one copy of the program by default, a second one only when allowed.
+            if (SingleInstanceControls.current != null) {
+                ExpressiveSection(title = stringResource(Res.string.single_instance_title)) { SingleInstanceSettings() }
             }
 
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
@@ -492,6 +502,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_archive_title, Res.string.mt_sw_other_archive_body)
             OtherFeature(Res.string.mt_sw_other_sos_title, Res.string.mt_sw_other_sos_body)
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
+            OtherFeature(Res.string.mt_sw_other_single_instance_title, Res.string.mt_sw_other_single_instance_body)
             OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)
             OtherFeature(Res.string.mt_sw_other_coverage_title, Res.string.mt_sw_other_coverage_body)
             OtherFeature(Res.string.mt_sw_other_compare_title, Res.string.mt_sw_other_compare_body)

@@ -55,6 +55,7 @@ private val STACKING_CATEGORIES =
         Notification.Category.Reaction,
         Notification.Category.Waypoint,
         Notification.Category.NodeEvent,
+        Notification.Category.Silence,
         Notification.Category.MeshBeacon,
         Notification.Category.Alert,
         Notification.Category.Battery,
@@ -130,6 +131,7 @@ class IosNotificationManager(
                 Notification.Category.Reaction -> prefs.loadReactionsEnabled()
                 Notification.Category.Waypoint -> prefs.loadNewWaypointsEnabled()
                 Notification.Category.NodeEvent -> prefs.nodeEventsEnabled.value
+                Notification.Category.Silence -> prefs.nodeSilenceEnabled.value
                 Notification.Category.MeshBeacon -> prefs.nodeEventsEnabled.value
                 Notification.Category.Battery -> prefs.lowBatteryEnabled.value
                 Notification.Category.Alert -> prefs.alertsEnabled.value

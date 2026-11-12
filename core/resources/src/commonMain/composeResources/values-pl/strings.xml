@@ -2980,6 +2980,9 @@
     <string name="on_demand_hero_progress">Sprawdzono %1$d z %2$d</string>
     <string name="wifi_rssi_signal">WiFi RSSI</string>
     <string name="notifications_alerts">Powiadomienia o alarmach</string>
+    <string name="notifications_node_silence">Strażnik węzła (węzeł milczy)</string>
+    <string name="node_silence_notifications">Strażnik węzła</string>
+    <string name="node_silence_notifications_description">Węzeł milczy dłużej, niż ustawiono dla niego w strażniku.</string>
     <string name="notifications_radio_notices">Komunikaty z radia</string>
     <string name="notifications_updates">Powiadomienia o aktualizacjach</string>
     <string name="notification_settings_android">Powiadomienia (w ustawieniach systemu)</string>
@@ -3488,6 +3491,9 @@
     <string name="background_keepalive_summary">Domyślnie wyłączone. iPhone i iPad usypiają aplikację, której nie ma na ekranie, co zrywa połączenie z radiem przez Wi-Fi/TCP (także przez Tailscale) i przerywa zbieranie danych. Po włączeniu aplikacja działa dalej w tle dzięki lokalizacji w tle, tak samo jak oryginalna aplikacja Meshtastic na urządzenia Apple. Pozycja jest odczytywana rzadko i tylko po to, żeby aplikacja nie została uśpiona; nigdzie nie jest wysyłana. Wymaga zgody na lokalizację „Zawsze”. Zużywa więcej baterii, a system pokazuje strzałkę lokalizacji.</string>
     <string name="background_keepalive_title">Działaj w tle</string>
     <string name="autostart_title">Uruchamiaj z komputerem</string>
+    <string name="single_instance_title">Jedna kopia programu</string>
+    <string name="single_instance_switch">Pozwól na drugą kopię obok</string>
+    <string name="single_instance_summary">Domyślnie program działa tylko w jednej kopii: gdy uruchomisz go drugi raz, pokaże się okno pierwszej, więc dwie kopie nie biją się o dostęp do węzła. Włącz, jeśli chcesz uruchamiać kilka kopii naraz (na przykład dla kilku radii). Zmiana działa od następnego uruchomienia programu.</string>
     <string name="autostart_summary">Uruchamia aplikację po zalogowaniu do komputera, dzięki czemu dane z radia są dalej zbierane. Domyślnie wyłączone. Działa w zainstalowanej aplikacji.</string>
     <string name="background_section_title">Praca w tle</string>
     <string name="app_log_level">Zbieranie logów</string>
@@ -3919,6 +3925,8 @@
     <string name="node_silence_test_notification">Test strażnika: %1$s nie odzywa się od %2$s</string>
     <string name="node_silence_alert_off">Wyłączony</string>
     <string name="mt_sw_other_silence_title">Strażnik węzła</string>
+    <string name="mt_sw_other_single_instance_title">Jedna kopia programu</string>
+    <string name="mt_sw_other_single_instance_body">Na komputerze program domyślnie działa w jednej kopii: gdy uruchomisz go drugi raz, wyskoczy okno już działającej kopii (także schowanej przy zegarze), więc dwie kopie nie biją się o dostęp do węzła. Przełącznik „Pozwól na drugą kopię obok” w Funkcjach MT_SW pozwala uruchamiać kilka kopii naraz; zmiana działa od następnego uruchomienia.</string>
     <string name="mt_sw_other_silence_body">W szczegółach węzła (pod notatkami) możesz włączyć strażnika dla tego jednego węzła: ustawiasz od 1 godziny do 30 dni albo wpisujesz własny czas w godzinach (do 90 dni). Gdy węzeł milczy tak długo, dostajesz powiadomienie, które znika, gdy węzeł znów się odezwie. Opcjonalnie liczy też pakiety, które tylko przeszły przez węzeł. Na dole karty są godziny ciszy dla wszystkich węzłów: w tym czasie strażnik nie powiadamia, a jeśli węzeł nadal milczy, powiadomienie przychodzi po ich końcu. Gdy kilka węzłów (od trzech) zamilknie naraz, przychodzi jedno wspólne powiadomienie. Przycisk „Wyślij testowe powiadomienie” pokazuje od razu takie samo powiadomienie, żebyś sprawdził, że dochodzi. Działa, gdy aplikacja jest połączona z radiem.</string>
     <string name="node_silence_count_relayed">Licz też pakiety przechodzące przez węzeł</string>
     <string name="node_silence_count_relayed_hint">Oprócz własnych pakietów węzła o jego życiu świadczy też pakiet, który dotarł do radia przez ten węzeł (przekazał go dalej). Dopasowanie po ostatnim bajcie identyfikatora, więc gdy dwa znane węzły kończą się tak samo, jest pomijane.</string>

@@ -413,6 +413,9 @@ fun DesktopSettingsScreen(
                             onToggleRadioNotices = { settingsViewModel.setRadioNoticesEnabled(it) },
                             updatesEnabled = settingsViewModel.updatesEnabled.collectAsStateWithLifecycle().value,
                             onToggleUpdates = { settingsViewModel.setUpdatesEnabled(it) },
+                            nodeSilenceEnabled =
+                            settingsViewModel.nodeSilenceEnabled.collectAsStateWithLifecycle().value,
+                            onToggleNodeSilence = { settingsViewModel.setNodeSilenceEnabled(it) },
                             showSoundWhileOpen = showNotificationSound,
                             soundWhileOpen =
                             settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,

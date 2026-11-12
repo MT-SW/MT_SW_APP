@@ -59,6 +59,9 @@ Słowa: dołącz dane, kopia zapasowa, przenieść dane, nowy telefon, scalić b
 
 W Ustawienia → Funkcje MT_SW (aplikacja na komputer) jest „Uruchamiaj z komputerem” — start aplikacji po zalogowaniu. Android startuje sam po restarcie telefonu; iPhone i iPad nie mogą.
 Słowa: autostart, uruchamiaj z komputerem, start po zalogowaniu, rozruch, po restarcie
+
+Aplikacja na komputer domyślnie działa w jednej kopii: drugie uruchomienie pokazuje okno pierwszej, więc dwie kopie nie biją się o dostęp do węzła. W Ustawienia → Funkcje MT_SW jest przełącznik „Pozwól na drugą kopię obok”, który pozwala uruchamiać kilka kopii naraz; zmiana działa od następnego uruchomienia.
+Słowa: jedna kopia, druga kopia, dwie kopie, kilka kopii, drugie okno, ikona znika, bije się o węzeł, wiele instancji
 Źródło: Dokumentacja aplikacji: synchronizacja statystyk urządzeń (sprawdzono 2026-11)
 
 ### Jak powiększyć interfejs aplikacji?

@@ -684,6 +684,14 @@ interface NotificationPrefs {
     fun setUpdatesEnabled(enabled: Boolean)
 
     /**
+     * Desktop and iPhone/iPad opt-out for the node watchdog alerts (a node has been silent); Android uses the system
+     * channel. Independent of [nodeEventsEnabled], so the alerts do not vanish with the new-node ones. On by default.
+     */
+    val nodeSilenceEnabled: StateFlow<Boolean>
+
+    fun setNodeSilenceEnabled(enabled: Boolean)
+
+    /**
      * Waypoint ids of foreign (not locally-created) geofences the user has opted in to receiving crossing alerts for.
      * Geofences are mesh-broadcast, so by default only the creator is alerted; this is the per-geofence opt-in.
      */
