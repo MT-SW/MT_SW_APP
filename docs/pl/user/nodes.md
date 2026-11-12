@@ -2,7 +2,7 @@
 title: Węzły
 parent: Przewodnik użytkownika
 nav_order: 4
-last_updated: 2026-10-26
+last_updated: 2026-11-12
 description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
@@ -161,10 +161,11 @@ Niezgodność nigdy nie zastępuje klucza, który już masz. Aplikacja zachowuje
 Z listy węzłów możesz:
 - **Dotknąć** węzła, aby zobaczyć jego stronę szczegółów
 - **Dotknąć i przytrzymać**, aby wywołać szybkie akcje:
+  - **Ustaw nazwę własną**, aby nadać węzłowi [nazwę lokalną](#nazwy-własne-węzłów)
   - **Dodaj do ulubionych** lub **Usuń z ulubionych**
-  - **Wycisz powiadomienia** lub **Włącz powiadomienia**, pokazywane dopiero wtedy, gdy ten węzeł zgłosi firmware 2.7.18 lub nowsze
+  - **Wycisz powiadomienia** lub **Włącz powiadomienia**, pokazywane dopiero wtedy, gdy Twój własny węzeł zgłosi firmware 2.7.18 lub nowsze
   - **Wiadomość**, aby otworzyć wiadomość bezpośrednią
-  - **Śledzenie trasy**, wyłączone na 10 sekund po każdym żądaniu traceroute
+  - **Śledzenie trasy**, które pokazuje **Trasa za** *N* **s** i jest wyłączone na 10 sekund po każdym żądaniu traceroute
   - **Otwórz kompas** (dla węzła z pozycją)
   - **Otwórz widok sieci** (dla węzła z pozycją, na telefonie, który go obsługuje) — zobacz [widok AR sieci](map-and-waypoints#widok-ar-sieci)
   - **Ignoruj** lub **Usuń z ignorowanych**
@@ -275,6 +276,8 @@ Etykieta zawsze towarzyszy oznaczeniu, więc status nigdy nie jest przekazywany 
 ### Model 3D urządzenia
 
 Gdy internetowy flasher Meshtastic ma model 3D sprzętu węzła, obrazek urządzenia na ekranie szczegółów ma plakietkę 3D. Dotknij jej, aby otworzyć model na pełnym ekranie, gdzie przeciągnięcie go obraca. W wersjach Google Play **Zobacz w swojej przestrzeni** stawia model na prawdziwej powierzchni w prawdziwym rozmiarze przez ARCore, a na Androidzie 10 i nowszym przycisk migawki zapisuje widok w Pictures/Meshtastic. Wersje F-Droid i na komputer pokazują model bez widoku AR.
+
+Przycisk banana (**Banan dla porównania skali**) stawia obok urządzenia banana w prawdziwym rozmiarze, w przeglądarce modelu i w widoku AR. Banan ma 185 mm (7,3 cala) wysokości, więc pokazuje, jak duże jest urządzenie. Przy każdym otwarciu modelu jest wyłączony.
 
 ### Linki do urządzeń („Chcę taki”)
 

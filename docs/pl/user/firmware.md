@@ -2,7 +2,7 @@
 title: Aktualizacje firmware
 parent: Przewodnik użytkownika
 nav_order: 13
-last_updated: 2026-10-30
+last_updated: 2026-11-12
 description: Aktualizuj firmware radia przez Bluetooth, Wi-Fi lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
@@ -96,6 +96,24 @@ Bootloader nRF od producenta dostarczany jako `.zip` (np. RAK WisBlock RAK4631) 
 
 Przy połączeniu **USB/szeregowym** urządzenia nRF52 i RP2040 można wykasować w ramach aktualizacji — to zgoda **Wykasuj urządzenie podczas aktualizacji** opisana wcześniej na tej stronie. Urządzenia nRF52 dodatkowo oferują **Zaktualizuj bootloader**, gdy dla danej płyty opublikowano zaktualizowany bootloader; urządzenia RP2040 nie mają bootloadera Adafruit, więc nigdy go nie widzą. Aktualizacja instaluje wydanie [Meshtastic nRF52 Bootloader](https://github.com/meshtastic/nRF52_Bootloader) wskazane na karcie.
 
+### Wersja bootloadera i aktualizacja przez Bluetooth
+
+Węzeł nRF52 z firmware nowszym niż 2.8.2 zgłasza wersję swojego bootloadera podczas pracy. Karta urządzenia na ekranie firmware pokazuje wtedy wiersz **Bootloader** z najnowszym wydaniem obok, przy dowolnym połączeniu. Każdy bootloader sprzed 2.6.0 zgłasza tę samą wartość, więc takie węzły pokazują **Bootloader: starszy niż 2.6.0**. Węzeł, który nie zgłasza wersji, nie ma tego wiersza. Węzeł, który zgłasza najnowsze wydanie, nie dostaje propozycji aktualizacji.
+
+Ekran oferuje **Zaktualizuj bootloader** przez Bluetooth, gdy spełnione jest wszystko naraz:
+
+- węzeł jest połączony przez Bluetooth
+- zgłasza bootloader starszy niż najnowsze wydanie
+- wybrana jest wersja firmware
+
+Przed startem odłącz kabel USB. Przy podłączonym kablu nowy bootloader uruchamia się jako dysk aktualizacji, a nie przez Bluetooth, i aplikacja nie może wysłać firmware.
+
+Aplikacja wysyła nowy bootloader przez Bluetooth, a potem instaluje ponownie wybrane firmware, bo zapis bootloadera je kasuje. Cała aktualizacja trwa około 10 minut. Potem wiersz **Bootloader** pokazuje najnowsze wydanie.
+
+Przed zapisem aplikacja sprawdza pobrany pakiet i odczytuje z bootloadera nazwę płyty. Jeśli pakiet nie przejdzie weryfikacji, nic nie jest zapisywane. Jeśli bootloader podaje inną płytę albo żadnej, nic nie jest zapisywane, a węzeł uruchamia się ponownie w swoim firmware.
+
+Węzeł, który po zapisie bootloadera nie wraca przez Bluetooth, można dokończyć na dwa sposoby: zainstalować firmware z jego dysku aktualizacji przez USB albo odłączyć go, zresetować i użyć **Wznów aktualizację firmware** w zakładce **Połącz**.
+
 ### Co robi bootloader nRF52
 
 Wersja 2.6.0 i nowsze Meshtastic nRF52 Bootloader robi poniższe, gdy dysk aktualizacji jest widoczny.
@@ -121,7 +139,7 @@ Zarówno kasowanie przez USB, jak i aktualizacja bootloadera zapisują po kolei 
 
 Aplikacja odczytuje `INFO_UF2.TXT` z wybranego dysku, aby potwierdzić, że to naprawdę dysk aktualizacji urządzenia, i rozpoznać płytę przed zapisaniem czegokolwiek.
 
-Przy aktualizacji bootloadera aplikacja odczytuje też zainstalowaną wersję bootloadera z `INFO_UF2.TXT` i pokazuje ją obok najnowszego wydania przed zapisaniem czegokolwiek. Działające firmware nie zgłasza swojego bootloadera, więc zainstalowana wersja pojawia się dopiero po restarcie urządzenia w tryb aktualizacji, nigdy na ekranie firmware podczas połączenia. Jeśli obie wersje są takie same, bootloader zostaje bez zmian, a aplikacja przechodzi od razu do ponownej instalacji firmware. W przeciwnym razie wybierz **Zaktualizuj bootloader**, aby go zapisać, lub **Pomiń**, aby ponownie zainstalować firmware bez zmiany bootloadera.
+Przy aktualizacji bootloadera aplikacja odczytuje też zainstalowaną wersję bootloadera z `INFO_UF2.TXT` i pokazuje ją obok najnowszego wydania przed zapisaniem czegokolwiek. Na firmware 2.8.2 i starszym działające firmware nie zgłasza swojego bootloadera, więc zainstalowana wersja pojawia się dopiero po restarcie urządzenia w tryb aktualizacji. Jeśli obie wersje są takie same, bootloader zostaje bez zmian, a aplikacja przechodzi od razu do ponownej instalacji firmware. W przeciwnym razie wybierz **Zaktualizuj bootloader**, aby go zapisać, lub **Pomiń**, aby ponownie zainstalować firmware bez zmiany bootloadera.
 
 W nRF52 aplikacja musi już znać stos Bluetooth używany przez Twoje urządzenie, zanim zacznie, ponieważ nie może odczytać bootloadera, dopóki urządzenie się nie zrestartuje. Jeśli nie może potwierdzić stosu, odmawia kasowania i kieruje Cię do [Web Flashera](https://flasher.meshtastic.org). W Web Flasherze wybranie złego stosu Bluetooth może sprawić, że radio da się odzyskać tylko programatorem sprzętowym.
 

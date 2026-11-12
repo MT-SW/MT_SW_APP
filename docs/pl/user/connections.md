@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-11-10
+last_updated: 2026-11-12
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -144,9 +144,16 @@ Jeśli skanowanie zgłosi **Nie znaleziono sieci** lub całkowicie się nie powi
 
 Bycie połączonym nie oznacza możliwości nadawania.
 
-Radio opuszcza fabrykę bez ustawionego regionu LoRa i nie nadaje, dopóki go nie ustawisz. Gdy połączysz takie radio, zakładka **Połącz** pokazuje kartę **Wybierz swój region**; dotknij jej, aby otworzyć ekran LoRa i wybrać region, w którym się znajdujesz.
+Radio opuszcza fabrykę bez ustawionego regionu LoRa i nie nadaje, dopóki go nie ustawisz. Przy pierwszym połączeniu takiego radia aplikacja otwiera prowadzoną konfigurację, a zakładka **Połącz** pokazuje kartę **Wybierz swój region**, która otwiera ją ponownie. Konfiguracja prowadzi przez cztery wybory i kończy się podsumowaniem:
 
-Po ustawieniu regionu zakładka ostrzega, jeśli radio jest tylko do odbioru: karta **Nadawanie jest wyłączone** z treścią „To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.” Dotknij jej, aby otworzyć ten sam ekran i ponownie włączyć **Nadawanie włączone** (Transmit Enabled). Naraz pojawia się tylko jedna z tych dwóch kart — nieustawiony region sam w sobie zatrzymuje nadawanie radia, więc aplikacja wskazuje najpierw to i wstrzymuje kartę nadawania, dopóki nie ustawisz regionu.
+1. **Region.** Wyszukaj na liście region, w którym jesteś. Aplikacja podpowiada ten, który pasuje do ustawienia regionu w telefonie; potwierdź go albo wybierz inny.
+2. **Preset.** Preset modemu ustala zasięg i szybkość sieci mesh, a wszyscy w jednej sieci używają tego samego. Na firmware starszym niż 2.8 radio po zapisaniu restartuje się, a konfiguracja trwa dalej po ponownym połączeniu.
+3. **Nazwa.** Wpisz nazwy, które inni widzą na swoich listach węzłów i mapach. Licencjonowani operatorzy pomijają tę stronę.
+4. **Pobliskie sieci.** Na węźle z modułem [Meshbeacon](discovery#mesh-beacon) włącz nasłuchiwanie zaproszeń od pobliskich sieci i dołącz do jednej z tych, które usłyszałeś.
+
+Jeśli zamkniesz konfigurację, aplikacja nie otworzy jej sama ponownie dla tego węzła. Po ustawieniu regionu karta nazywa się **Konfiguracja radia**, a ekran **Ustawienia** ma wiersz **Konfiguracja radia** dla własnego węzła.
+
+Po ustawieniu regionu zakładka ostrzega też, jeśli radio jest tylko do odbioru: karta **Nadawanie jest wyłączone** z treścią „To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.” Dotknij jej, aby otworzyć ekran LoRa i ponownie włączyć **Nadawanie włączone** (Transmit Enabled). Naraz pojawia się tylko jedna z tych dwóch kart — nieustawiony region sam w sobie zatrzymuje nadawanie radia, więc aplikacja wskazuje najpierw to i wstrzymuje kartę nadawania, dopóki nie ustawisz regionu.
 
 Więcej informacji znajdziesz w [Ustawienia — Radio i użytkownik](settings-radio-user#lora-config).
 

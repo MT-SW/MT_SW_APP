@@ -2,7 +2,7 @@
 title: Odkrywanie lokalnej sieci mesh
 parent: Przewodnik użytkownika
 nav_order: 12
-last_updated: 2026-10-21
+last_updated: 2026-11-12
 description: Poznaj swoją sieć mesh — skaner Odkrywania lokalnej sieci mesh, trasy traceroute, mapy sąsiadów i narzędzia do odkrywania węzłów.
 aliases:
   - discovery
@@ -158,6 +158,7 @@ Uruchom traceroute kilka razy w ciągu kilku minut, czekając 10 sekund przerwy 
 #### Rozwiązywanie problemów za pomocą traceroute
 
 - **Brak odpowiedzi** — Traceroute nic nie odebrał. Węzeł docelowy może być offline, poza zasięgiem lub na innym kanale. Sprawdź, czy oba węzły mają co najmniej jeden wspólny kanał z tym samym kluczem szyfrowania.
+- **Przekroczono limit wysyłania** — Twój węzeł odrzucił żądanie, bo wysyła jeden traceroute na 10 sekund. Pierścień na przycisku traceroute odlicza czas do następnego dozwolonego.
 - **Traceroute przekracza limit czasu** — Ścieżka może być zbyt długa (przekracza limit skoków) albo węzeł przekaźnikowy jest zatłoczony. Spróbuj zwiększyć limit skoków w **Ustawienia → LoRa**.
 - **Nie można wyświetlić trasy na mapie, ponieważ węzeł początkowy lub końcowy nie posiada aktualnej lokalizacji** — Ścieżka została prześledzona, ale jeden z końców nigdy nie udostępnił pozycji.
 - **Ścieżki asymetryczne** — Traceroute z A→B może iść inną ścieżką niż B→A. To normalne — propagacja fal radiowych nie zawsze jest symetryczna.

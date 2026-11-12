@@ -2,7 +2,7 @@
 title: Metryki węzła
 parent: Przewodnik użytkownika
 nav_order: 5
-last_updated: 2026-10-21
+last_updated: 2026-11-12
 description: Panele telemetrii każdego węzła sieci mesh — stan urządzenia, czujniki środowiskowe, jakość powietrza, jakość sygnału, zasilanie, traceroute i historia pozycji.
 aliases:
   - metrics
@@ -58,11 +58,21 @@ Dane z czujników środowiskowych (wymagają zgodnego sprzętu):
 | Rezystancja gazu | BME680 |
 | IAQ (jakość powietrza) | BME680 |
 
-Metryki środowiskowe są wykreślane w czasie — temperatura, wilgotność i ciśnienie mają każde własny wykres liniowy z jednostką miary na osi Y.
+Metryki środowiskowe są wykreślane w czasie, jeden wykres na jednostkę, jeden pod drugim: temperatura, wilgotność, ciśnienie i każdy inny odczyt, który zgłasza węzeł, mają własny wykres z jednostką na osi Y. Wilgotność i wilgotność gleby biegną od 0 do 100%. Jednostka bez danych nie dostaje wykresu.
 
-Indeks **IAQ (Indoor Air Quality — jakość powietrza w pomieszczeniach)** z BME680 to pojedyncza wartość 0–500+ wyliczana z rezystancji gazu, pokazana na kolorowej skali od *Doskonałe* (Excellent) do *Niebezpiecznie zanieczyszczone* (Dangerously Polluted):
+Indeks **IAQ (Indoor Air Quality — jakość powietrza w pomieszczeniach)** z BME680 to pojedyncza wartość 0–500+ wyliczana z rezystancji gazu, pokazana na siedmiostopniowej skali. Każdy stopień ma kolor i etykietę:
 
-![Skala indeksu IAQ od Doskonałego do Niebezpiecznie zanieczyszczonego](../../assets/screenshots/node-metrics_iaq_scale.png)
+| IAQ | Etykieta |
+|-----|----------|
+| 0–50 | Doskonałe |
+| 51–100 | Dobre |
+| 101–150 | Lekko zanieczyszczone |
+| 151–200 | Umiarkowanie zanieczyszczone |
+| 201–250 | Mocno zanieczyszczone |
+| 251–350 | Poważnie zanieczyszczone |
+| 351 i więcej | Ekstremalnie zanieczyszczone |
+
+![Legenda IAQ z siedmioma stopniami i ich kolorami](../../assets/screenshots/node-metrics_iaq_scale.png)
 
 > 💡 **Wskazówka:** Metryki środowiskowe wymagają czujnika podłączonego do zdalnego węzła. Nie wszystkie węzły zgłaszają dane środowiskowe. Pełną listę obsługiwanych czujników znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
 
@@ -139,28 +149,32 @@ Telemetria zarządzania zasilaniem (wymaga czujnika INA lub zgodnego sprzętu):
 | Napięcie | Odczyt napięcia dla każdego kanału |
 | Prąd | Pobór dla każdego kanału, w miliamperach |
 
-Ekran szczegółów węzła pokazuje karty dla kanałów od 1 do 3. Użyj przycisku wykresu w wierszu **Metryki zasilania**, aby otworzyć ekran wykresu, który wypisuje chip dla każdego kanału, który zgłosił dane — do ośmiu — i wykreśla ten, który wybierzesz. Użyj pola etykiety pod chipami, aby nadać kanałowi własną nazwę, na przykład Solar lub Akumulator. Aplikacja nie wylicza mocy w watach z napięcia i prądu.
+Ekran szczegółów węzła pokazuje kartę dla każdego kanału, który zgłosił dane, do ośmiu, pod nazwą, którą kanałowi nadałeś, albo **Kanał** *N*. Kanał, który zgłosił tylko napięcie albo tylko prąd, pokazuje tylko ten odczyt. Przycisk wykresu w wierszu **Metryki zasilania** otwiera ekran wykresu. Wypisuje on chip dla każdego kanału, który zgłosił dane, do ośmiu, i wykreśla ten, który wybierzesz. Użyj pola etykiety pod chipami, aby nadać kanałowi własną nazwę, na przykład Solar lub Akumulator. Aplikacja nie wylicza mocy w watach z napięcia i prądu.
 
 ## Traceroute
 
 Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 
 1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, Aplikacja wysyła najwyżej jeden traceroute na 10 sekund, do dowolnego węzła, a **Śledzenie trasy** w menu po dotknięciu i przytrzymaniu na liście węzłów dzieli tę samą blokadę.
-2. Aplikacja wysyła żądanie traceroute do docelowego węzła.
+2. Aplikacja wysyła żądanie traceroute do docelowego węzła. W historii żądanie pokazuje **Czekam na odpowiedź**, dopóki się nie rozstrzygnie.
 3. Wyniki pokazują każdy skok wraz z jego SNR.
+
+Pierścień na przycisku traceroute odlicza sekundy do chwili, gdy można wysłać następne żądanie.
 
 ### Odczytywanie wyników traceroute
 
 Traceroute to podróż w obie strony, więc każdy zapisany wynik zawiera liczbę skoków w każdym kierunku, **Skoki w przód** i **Skoki powrotne**, oraz czas **Trasa w obie strony** w sekundach. Wynik oznaczony **Bezpośrednio** dotarł do celu bez żadnego przekaźnika po drodze. Dotknij wyniku, aby zobaczyć trasę wyznaczoną do celu i trasę wyznaczoną z powrotem do Ciebie, wraz z SNR każdego skoku. Ten widok oferuje **Pokaż na mapie**, który rysuje tę samą ścieżkę, o ile węzeł początkowy i docelowy udostępniły pozycję.
 
-Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**, a przekaźnik, którego Twój węzeł nie zna, jako jego identyfikator węzła, na przykład `!a1b2c3d4`.
+Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**, a przekaźnik, którego Twój węzeł nie zna, jako jego identyfikator węzła, na przykład `!a1b2c3d4`. Skok, którego węzeł ostatnio usłyszano przez MQTT, jest oznaczony `(MQTT)`.
 
 Historia zawiera też traceroute, których ta aplikacja nie zlecała:
 
 - **Zaobserwowany** oznacza odpowiedź tego węzła na żądanie wysłane gdzie indziej, na przykład z ekranu Twojego węzła. Ma liczby skoków, ale nie ma czasu podróży w obie strony, a jego punkty na wykresie są pustymi kółkami.
 - **Śledzone przez** *węzeł* oznacza traceroute, który ten węzeł wykonał do Twojego. Pokazuje trasę przychodzącą z SNR każdego skoku, ale bez trasy powrotnej, bez czasu podróży w obie strony i bez mapy, i nie pojawia się na wykresie.
 
-Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nigdy nie odpowiedział. Może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 10-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
+Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nie odpowiedział w ciągu dwóch minut albo że sieć mesh zgłosiła, iż żądania nie dało się dostarczyć. Cel może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 10-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
+
+Wynik oznaczony **Przekroczono limit wysyłania** oznacza, że Twój węzeł odrzucił żądanie, bo wysyła jeden traceroute na 10 sekund. Poczekaj na koniec blokady i spróbuj ponownie.
 
 ## Dziennik pozycji
 

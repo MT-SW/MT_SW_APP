@@ -252,7 +252,6 @@ compose.desktop {
             )
 
             // Default JVM arguments for the packaged application
-            // Increase max heap size to prevent OOM issues on complex maps/data
             jvmArgs(*desktopJvmArgs.toTypedArray())
 
             // App Icon & OS Specific Configurations

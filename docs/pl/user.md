@@ -17,6 +17,14 @@ Dokumentacja korzystania z aplikacji MT_SW_APP na Androida i komputery stacjonar
 Keep the last 5–8 entries and archive older ones by removing them.
 -->
 
+**Listopad 2026** — [Połączenia](user/connections) — Węzeł bez regionu otwiera prowadzoną konfigurację regionu, presetu, nazwy i pobliskich sieci.
+
+**Listopad 2026** — [Aktualizacje firmware](user/firmware) — Ekran firmware pokazuje wersję bootloadera nRF52 zgłaszaną przez węzeł, a przestarzały bootloader można zaktualizować przez Bluetooth.
+
+**Listopad 2026** — [Wiadomości i kanały](user/messages-and-channels) — **Udostępnij kanały** oferuje Zastąp albo Dodaj na samym kodzie, a import Dodaj pokazuje, ile miejsc na kanały jest zajętych.
+
+**Listopad 2026** — [Metryki węzła](user/node-metrics) — Żądanie traceroute pokazuje **Czekam na odpowiedź**, **Brak odpowiedzi** albo **Przekroczono limit wysyłania**, skoki przez MQTT są oznaczone, a odczyty środowiskowe mają jeden wykres na jednostkę.
+
 **Październik 2026** — [Funkcje MT_SW](user/mt-sw-features) — Nowa strona opisuje, co MT_SW_APP dodaje do oryginalnej aplikacji, np. Zdrowie sieci, połączenia na mapie, Mesh Link Planer, diagnostykę, Sniffer i skalowanie aplikacji, oraz gdzie każdą z tych funkcji znaleźć.
 
 **Październik 2026** — [Ustawienia — radio i użytkownik](user/settings-radio-user) — Każdy ekran konfiguracji ma własną sekcję, ustawienia używają dokładnych nazw z aplikacji, a każda tabela podaje wartość domyślną.

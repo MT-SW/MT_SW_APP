@@ -2,7 +2,7 @@
 title: Map & Waypoints
 parent: User Guide
 nav_order: 6
-last_updated: 2026-11-07
+last_updated: 2026-11-12
 description: View node positions on the map, create and share waypoints, manage map layers and Site Planner, and control position sharing and privacy.
 aliases:
   - map

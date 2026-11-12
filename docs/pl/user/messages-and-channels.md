@@ -2,7 +2,7 @@
 title: Wiadomości i kanały
 parent: Przewodnik użytkownika
 nav_order: 3
-last_updated: 2026-10-21
+last_updated: 2026-11-12
 description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
@@ -46,9 +46,18 @@ Sama długość klucza nie zmienia ikony: klucz 128-bitowy i 256-bitowy pokazuj�
 4. Ustaw nazwę kanału i **PSK** oraz wybierz, czy kanał ma używać wysyłania i pobierania przez MQTT. Nadanie nazwy nowemu kanałowi automatycznie generuje nowy 256-bitowy klucz; ikona odświeżania obok **PSK** generuje kolejny.
 5. Dotknij **Zapisz**, aby zamknąć edytor. Zmiana jest na razie tylko w Twoim telefonie.
 6. Dotknij **Wyślij** na dole listy kanałów, aby zapisać zmiany w węźle. **Anuluj** albo opuszczenie ekranu bez dotknięcia **Wyślij** odrzuca zmiany.
-7. Opcjonalnie: udostępnij adres URL kanału lub kod QR osobom, które potrzebują dostępu.
+7. Opcjonalnie: udostępnij kanały osobom, które potrzebują dostępu — zobacz [Udostępnianie i importowanie kanałów](#udostępnianie-i-importowanie-kanałów).
 
 Dotknięcie istniejącego kanału otwiera ten sam edytor, w którym możesz zmienić nazwę, PSK, wysyłanie i pobieranie przez MQTT oraz dokładność pozycji. Każda zmiana na tym ekranie — dodanie, edycja, usunięcie lub przeciągnięcie kanału w nowe miejsce — czeka na **Wyślij** w ten sam sposób.
+
+### Udostępnianie i importowanie kanałów
+
+Na ekranie **Kanały** dotknij **Udostępnij kanały**, aby zobaczyć kod QR i link do kanałów Twojego węzła. Zanim go komuś przekażesz, wybierz, co kod zrobi na węźle drugiej osoby:
+
+- **Zastąp** nadpisuje wszystkie kanały na jej węźle Twoimi i stosuje Twoje ustawienia LoRa.
+- **Dodaj** zachowuje jej kanały i ustawienia LoRa, a Twoje dopisuje na końcu.
+
+Aby przyjąć czyjeś kanały, użyj przycisku importu na tym samym ekranie: **Skanuj kod QR udostępnionych kanałów**, **Wpisz URL udostępnionych kanałów** albo, na telefonie z NFC, **Skanuj udostępnione kanały (NFC)**. Przy kodzie „Dodaj” aplikacja wypisuje przychodzące kanały, żebyś zaznaczył te, które chcesz, i pokazuje, ile miejsc na kanały w Twoim węźle jest zajętych. Jeśli wybór się nie mieści, wiersz podpowiada, ile kanałów odznaczyć. Odznaczenie kanału, który już jest na Twoim węźle, usuwa go.
 
 ### Zarchiwizowane kanały
 

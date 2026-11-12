@@ -2,7 +2,7 @@
 title: Aplikacja na komputer
 parent: Przewodnik użytkownika
 nav_order: 14
-last_updated: 2026-10-21
+last_updated: 2026-11-12
 description: Instalacja i obsługa aplikacji MT_SW_APP na komputerze z Linuxem, macOS i Windows — połączenia, zgodność funkcji i skróty klawiszowe.
 aliases:
   - desktop
@@ -145,7 +145,7 @@ Wymagania:
 - Tryb serwisowy USB — kasowanie fabryczne nRF52/RP2040 i aktualizacja bootloadera — jest tylko na Androidzie, a
   aplikacja na komputer go nie oferuje. Użyj zamiast tego [Web Flasher](https://flasher.meshtastic.org)
 - Niektóre funkcje specyficzne dla Androida (widżety, określone kanały powiadomień) są niedostępne
-- Wydajność może być słabsza na komputerach o niskiej specyfikacji z Compose Desktop
+- Wydajność może być słabsza na komputerach o niskiej specyfikacji z Compose Desktop. Aplikacja może zająć na stertę do 90% pamięci RAM komputera (model asystenta i mapy potrzebują miejsca); maszyna wirtualna Javy bierze tylko tyle, ile naprawdę używa
 - Parowanie z zapamiętaniem (bonding) BLE nie jest obsługiwane na komputerze (parowanie działa bez bondingu)
 
 ## Powiązane tematy

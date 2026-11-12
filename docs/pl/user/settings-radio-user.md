@@ -2,7 +2,7 @@
 title: Ustawienia — Radio i użytkownik
 parent: Przewodnik użytkownika
 nav_order: 7
-last_updated: 2026-10-26
+last_updated: 2026-11-12
 description: Konfiguracja sprzętu węzła, presetów LoRa, profilu użytkownika, udostępniania pozycji, zarządzania energią i bezpieczeństwa.
 aliases:
   - settings
@@ -232,7 +232,7 @@ W **Ustawienia → Bezpieczeństwo**. Ekran jest podzielony na karty: **Autentyc
 | Kopia kluczy | Zapisuje zaszyfrowaną kopię zapasową kluczy węzła na tym telefonie. Tylko dla własnego węzła i nie w aplikacji na komputer | — |
 | API dziennika debugowania włączone | Wysyła na żywo logi debugowania przez port szeregowy oraz pozwala przeglądać i eksportować logi węzła z zaciemnioną pozycją przez Bluetooth | Wyłączone |
 | Usuń kopię zapasową kluczy | Usuwa zapisaną kopię zapasową kluczy z tego telefonu | — |
-| Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero po ustawieniu **Klucza administratora** | Wyłączone |
+| Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero po ustawieniu **Klucza administratora**, a zapis bez żadnego klucza administratora wyłącza go. Jeśli wszystkie klucze administratora zostaną utracone, jedynym ratunkiem jest wykasowanie węzła przez [Web Flasher](https://flasher.meshtastic.org) | Wyłączone |
 | Klucz prywatny | Klucz prywatny Twojego węzła (obchodź się z nim bezpiecznie). Pokazany jako zaciemniony, gdy oglądasz inny węzeł przez zdalne zarządzanie — firmware go nie wysyła | Tworzy go węzeł |
 | Poziom ochrony | Jak traktowane są pakiety niepodpisane: **Ścisły — Wymagaj uwierzytelnienia**, **Zrównoważony — Preferuj uwierzytelnione** lub **Kompatybilny — Akceptuj niepodpisane**. Wymaga firmware obsługującego podpisywanie pakietów; **Ścisły** prosi o potwierdzenie | Kompatybilny |
 | Klucz publiczny | Klucz publiczny Twojego węzła (tylko do odczytu) | Wyliczany z klucza prywatnego |
