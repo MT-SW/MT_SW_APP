@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,6 +49,7 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.repository.MessageArchiveConfig
 import org.meshtastic.core.repository.MessageArchivePrefs
+import org.meshtastic.core.repository.MessageArchiveRestoreResult
 import org.meshtastic.core.repository.MessageArchiver
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archive_choose_folder
@@ -58,6 +60,12 @@ import org.meshtastic.core.resources.archive_encrypt_on
 import org.meshtastic.core.resources.archive_encrypt_remove
 import org.meshtastic.core.resources.archive_encrypt_save
 import org.meshtastic.core.resources.archive_password
+import org.meshtastic.core.resources.archive_restore
+import org.meshtastic.core.resources.archive_restore_button
+import org.meshtastic.core.resources.archive_restore_csv_only
+import org.meshtastic.core.resources.archive_restore_hint
+import org.meshtastic.core.resources.archive_restore_info
+import org.meshtastic.core.resources.archive_restore_result
 import org.meshtastic.core.resources.archive_enabled
 import org.meshtastic.core.resources.archive_folder
 import org.meshtastic.core.resources.archive_folder_chosen
@@ -100,6 +108,8 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
     val state by archiver.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     var password by rememberSaveable { mutableStateOf("") }
+    var restoring by rememberSaveable { mutableStateOf(false) }
+    var restoreResult by remember { mutableStateOf<MessageArchiveRestoreResult?>(null) }
     val pickFolder =
         rememberOpenDocumentTreeLauncher { uri ->
             if (uri != null) prefs.setConfig(config.copy(folder = uri.toString(), enabled = true))
@@ -118,6 +128,7 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                         Res.string.archive_title,
                         Res.string.mt_sw_other_archive_body,
                         Res.string.archive_encrypt_info,
+                        Res.string.archive_restore_info,
                     )
                 },
                 onClickChip = {},
@@ -221,6 +232,50 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                             Text(stringResource(Res.string.archive_encrypt_remove))
                         }
                     }
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.archive_restore)) {
+                Text(
+                    text = stringResource(Res.string.archive_restore_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                if (config.format != MessageArchiveConfig.FORMAT_CSV) {
+                    Text(
+                        text = stringResource(Res.string.archive_restore_csv_only),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+                Button(
+                    onClick = {
+                        restoring = true
+                        scope.launch {
+                            restoreResult = archiver.restore()
+                            restoring = false
+                        }
+                    },
+                    enabled = config.folder.isNotBlank() && !restoring,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    Text(stringResource(Res.string.archive_restore_button))
+                }
+                restoreResult?.let { result ->
+                    Text(
+                        text =
+                        stringResource(
+                            Res.string.archive_restore_result,
+                            result.restored,
+                            result.alreadyThere,
+                            result.noChannel,
+                            result.unreadable,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
                 }
             }
 

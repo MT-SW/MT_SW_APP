@@ -45,4 +45,20 @@ class JvmFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
                 false
             }
         }
+
+    override suspend fun readFiles(folder: String, suffixes: List<String>): List<Pair<String, ByteArray>> =
+        withContext(dispatchers.io) {
+            try {
+                val directory = if (folder.startsWith("file:")) File(URI(folder)) else File(folder)
+                directory
+                    .listFiles { file -> file.isFile && suffixes.any { file.name.endsWith(it) } }
+                    .orEmpty()
+                    .map { it.name to it.readBytes() }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(e) { "Failed to read the files of the folder" }
+                emptyList()
+            }
+        }
 }

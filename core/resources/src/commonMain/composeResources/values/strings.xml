@@ -583,6 +583,12 @@
     <string name="archive_never">Not saved yet</string>
     <string name="archive_now">Save now</string>
     <string name="archive_password">Password</string>
+    <string name="archive_restore">Restore messages</string>
+    <string name="archive_restore_button">Restore from the archive</string>
+    <string name="archive_restore_csv_only">Restoring reads the table files (.csv), because only they carry the channel names and message numbers. Choose the "Table (.csv)" format above if you want to be able to restore the messages later. Files saved earlier as text or Markdown cannot be restored.</string>
+    <string name="archive_restore_hint">Puts the messages from the table files (.csv, also the encrypted .csv.enc) of the archive folder back into the message history. Each message goes to the channel of the same name, even if the channels sit in other places now.</string>
+    <string name="archive_restore_info">Restoring: press "Restore from the archive" and the app reads every table file (.csv or the encrypted .csv.enc) in the archive folder and adds the messages that are missing from the history, for example after a reinstall, on a new phone or after the history was deleted. A message is put into the channel with the same NAME as when it was saved, so it lands in the right place even if someone has swapped the channels or moved them to other slots; a message whose channel is not set up now is skipped, and the result says how many. Private messages go back to the same person. A message that is already in the history is not added again, so the restore can be repeated safely. For encrypted files the same password must be set above. Only the table format (.csv) can be restored, because only it keeps the channel names and message numbers; set it in "File format". Messages saved before this existed (without those data) are skipped.</string>
+    <string name="archive_restore_result">Put back: %1$d, already there: %2$d, no such channel now: %3$d, unreadable files: %4$d</string>
     <string name="archive_summary">Automatically saves your messages to a folder you choose.</string>
     <string name="archive_title">Message archive</string>
     <string name="archived_channel">Archived channel</string>

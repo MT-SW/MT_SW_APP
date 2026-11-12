@@ -40,8 +40,69 @@ class MessageArchiveFormatTest {
     @Test
     fun csvQuotesEveryCell() {
         val csv = formatArchive(entries, MessageArchiveConfig.FORMAT_CSV).lines()
-        assertEquals("\"data\",\"godzina\",\"rozmowa\",\"nadawca\",\"tekst\"", csv[0])
-        assertEquals("\"2026-11-12\",\"16:05:10\",\"Kanał 0\",\"Jan\",\"Cześć \"\"wszystkim\"\"\"", csv[1])
+        assertEquals(
+            "\"data\",\"godzina\",\"rozmowa\",\"nadawca\",\"tekst\",\"czas_ms\",\"kanal\"," +
+                "\"indeks_kanalu\",\"adres\",\"id_nadawcy\",\"moja\",\"id_wiadomosci\"",
+            csv[0],
+        )
+        assertEquals(
+            "\"2026-11-12\",\"16:05:10\",\"Kanał 0\",\"Jan\",\"Cześć \"\"wszystkim\"\"\"," +
+                "\"0\",\"\",\"0\",\"\",\"\",\"0\",\"0\"",
+            csv[1],
+        )
+    }
+
+    @Test
+    fun csvReadsBackWithTheChannelNameAndMultilineText() {
+        val written =
+            listOf(
+                ArchiveEntry(
+                    date = "2026-11-12",
+                    time = "16:05:10",
+                    conversation = "Główny",
+                    sender = "Jan",
+                    text = "Cześć \"wszystkim\", ok",
+                    millis = 1_762_960_000_000L,
+                    channelName = "Główny",
+                    channelIndex = 0,
+                    address = "^all",
+                    senderId = "!aabbccdd",
+                    fromLocal = false,
+                    packetId = 77,
+                ),
+                ArchiveEntry(
+                    date = "2026-11-12",
+                    time = "16:06:00",
+                    conversation = "Anna",
+                    sender = "Ja",
+                    text = "linia 1\nlinia 2",
+                    millis = 1_762_960_060_000L,
+                    channelName = "",
+                    channelIndex = 8,
+                    address = "!11223344",
+                    senderId = "!99887766",
+                    fromLocal = true,
+                    packetId = 78,
+                ),
+            )
+        val read = parseArchiveCsv(formatArchive(written, MessageArchiveConfig.FORMAT_CSV))
+        assertEquals(2, read.size)
+        assertEquals(
+            ArchiveRecord(1_762_960_000_000L, "Cześć \"wszystkim\", ok", "Główny", 0, "^all", "!aabbccdd", false, 77),
+            read[0],
+        )
+        assertEquals(
+            ArchiveRecord(1_762_960_060_000L, "linia 1\nlinia 2", "", 8, "!11223344", "!99887766", true, 78),
+            read[1],
+        )
+    }
+
+    @Test
+    fun csvFromBeforeRestoringGivesNothing() {
+        val old =
+            "\"data\",\"godzina\",\"rozmowa\",\"nadawca\",\"tekst\"\n" +
+                "\"2026-11-12\",\"16:05:10\",\"Kanał 0\",\"Jan\",\"x\"\n"
+        assertEquals(emptyList(), parseArchiveCsv(old))
     }
 
     @Test

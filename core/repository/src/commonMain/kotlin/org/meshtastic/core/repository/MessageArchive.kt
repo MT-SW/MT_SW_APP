@@ -117,7 +117,26 @@ interface MessageArchiver {
 
     /** Brings the archive up to date now; true when every file was written. */
     suspend fun archiveNow(): Boolean
+
+    /**
+     * Puts the messages of the CSV files in the archive folder back into the message history, each into the channel
+     * of the same name (the channels may have moved to other slots since). Messages already there are not added again.
+     */
+    suspend fun restore(): MessageArchiveRestoreResult
 }
+
+/**
+ * What a restore did: [files] CSV files read, [restored] messages put back, [alreadyThere] left alone because they are
+ * in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could not
+ * be read (a wrong or missing password gives these).
+ */
+data class MessageArchiveRestoreResult(
+    val files: Int = 0,
+    val restored: Int = 0,
+    val alreadyThere: Int = 0,
+    val noChannel: Int = 0,
+    val unreadable: Int = 0,
+)
 
 /** Starts the periodic archiving when the mesh service starts. */
 fun interface MessageArchiveMonitor {
@@ -128,4 +147,7 @@ fun interface MessageArchiveMonitor {
 interface FolderService {
     /** Writes the file [name] in [folder] (created when missing, otherwise replaced). True when it worked. */
     suspend fun writeFile(folder: String, name: String, block: suspend (BufferedSink) -> Unit): Boolean
+
+    /** The files directly in [folder] whose names end with one of [suffixes], as name and content; empty on failure. */
+    suspend fun readFiles(folder: String, suffixes: List<String>): List<Pair<String, ByteArray>>
 }

@@ -34,23 +34,30 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
+import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.crypto.ArchiveCrypto
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ContactKey
+import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.FolderService
 import org.meshtastic.core.repository.MessageArchiveConfig
 import org.meshtastic.core.repository.MessageArchiveMonitor
+import org.meshtastic.core.repository.MessageArchiveRestoreResult
 import org.meshtastic.core.repository.MessageArchivePrefs
 import org.meshtastic.core.repository.MessageArchiveState
 import org.meshtastic.core.repository.MessageArchiver
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archive_channel_n
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.unknown_username
+import org.meshtastic.proto.PortNum
 import kotlin.time.Instant
 
 /**
@@ -65,6 +72,7 @@ class MessageArchiverImpl(
     private val nodes: NodeRepository,
     private val folders: FolderService,
     private val prefs: MessageArchivePrefs,
+    private val radioConfig: RadioConfigRepository,
 ) : MessageArchiver,
     MessageArchiveMonitor {
     private val mutableState = MutableStateFlow(MessageArchiveState())
@@ -134,9 +142,12 @@ class MessageArchiverImpl(
         val today = Instant.fromEpochMilliseconds(nowMillis).toLocalDateTime(zone).date
         val days = setOf(today.toString(), today.minus(1, DateTimeUnit.DAY).toString())
         val unknown = getStringSuspend(Res.string.unknown_username)
+        val channelNames = channelNamesBySlot()
         val entries = mutableListOf<Pair<Long, ArchiveEntry>>()
         for (contact in packets.getContacts().first().keys) {
             val title = conversationTitle(contact)
+            val key = ContactKey(contact)
+            val channelName = channelNames[key.channel].orEmpty()
             val messages =
                 packets
                     .getMessagesFrom(
@@ -152,7 +163,22 @@ class MessageArchiverImpl(
                 if (date !in days) continue
                 val sender = message.node.effectiveLongName.takeIf { it.isNotBlank() } ?: unknown
                 val time = local.time.toString().substringBefore('.')
-                entries += message.displayTime to ArchiveEntry(date, time, title, sender, message.text)
+                entries +=
+                    message.displayTime to
+                    ArchiveEntry(
+                        date = date,
+                        time = time,
+                        conversation = title,
+                        sender = sender,
+                        text = message.text,
+                        millis = message.displayTime,
+                        channelName = channelName,
+                        channelIndex = key.channel,
+                        address = key.addressString,
+                        senderId = message.node.user.id,
+                        fromLocal = message.fromLocal,
+                        packetId = message.packetId,
+                    )
             }
         }
         val extension = archiveExtension(config.format)
@@ -167,6 +193,94 @@ class MessageArchiverImpl(
                 }
             }
             .mapValues { (_, list) -> formatArchive(list, config.format) }
+    }
+
+    /** Slot number → the name of the channel in it as it is now (a blank name is the one of the modem preset). */
+    private suspend fun channelNamesBySlot(): Map<Int, String> {
+        val set = radioConfig.channelSetFlow.first()
+        return set.settings.indices.mapNotNull { slot -> set.getChannel(slot)?.name?.let { slot to it } }.toMap()
+    }
+
+    override suspend fun restore(): MessageArchiveRestoreResult = mutex.withLock {
+        val config = prefs.config.value
+        if (config.folder.isBlank()) return@withLock MessageArchiveRestoreResult()
+        val myNodeNum = nodes.myNodeInfo.value?.myNodeNum ?: return@withLock MessageArchiveRestoreResult()
+        val slotByName = channelNamesBySlot().entries.groupBy({ it.value }, { it.key }).mapValues { it.value.min() }
+        val files = folders.readFiles(config.folder, listOf(".csv", ".csv.$ENCRYPTED_EXTENSION"))
+        var read = 0
+        var restored = 0
+        var already = 0
+        var noChannel = 0
+        var unreadable = 0
+        for ((name, bytes) in files) {
+            val text = readableText(name, bytes, config.password)
+            if (text == null) {
+                unreadable++
+                continue
+            }
+            val records = parseArchiveCsv(text)
+            if (records.isEmpty()) {
+                // A file that is not one of ours, or the wrong password: nothing in it looks like messages.
+                if (name.endsWith(".$ENCRYPTED_EXTENSION")) unreadable++
+                continue
+            }
+            read++
+            for (record in records) {
+                val slot = slotFor(record, slotByName)
+                when {
+                    slot == null -> noChannel++
+                    record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> already++
+                    else -> {
+                        saveRecord(myNodeNum, record, slot)
+                        restored++
+                    }
+                }
+            }
+        }
+        MessageArchiveRestoreResult(read, restored, already, noChannel, unreadable)
+    }
+
+    /** The text of an archive file, decrypted when it is a `.enc` file; null when it cannot be read. */
+    private fun readableText(name: String, bytes: ByteArray, password: String): String? {
+        if (!name.endsWith(".$ENCRYPTED_EXTENSION")) return bytes.decodeToString()
+        if (password.isEmpty()) return null
+        return ArchiveCrypto.decrypt(password, bytes)?.decodeToString()
+    }
+
+    /** The slot the channel of [record] has now, found by its name; the private-message slot is kept as it was. */
+    private fun slotFor(record: ArchiveRecord, slotByName: Map<String, Int>): Int? = when {
+        record.channelName.isNotEmpty() -> slotByName[record.channelName]
+        record.channelIndex == NodeAddress.PKC_CHANNEL_INDEX -> NodeAddress.PKC_CHANNEL_INDEX
+        else -> null
+    }
+
+    private suspend fun saveRecord(myNodeNum: Int, record: ArchiveRecord, slot: Int) {
+        val broadcast = record.address == NodeAddress.ID_BROADCAST
+        val to =
+            when {
+                broadcast -> NodeAddress.ID_BROADCAST
+                record.fromLocal -> record.address
+                else -> NodeAddress.ID_LOCAL
+            }
+        val packet =
+            DataPacket(
+                to = to,
+                bytes = record.text.encodeToByteArray().toByteString(),
+                dataType = PortNum.TEXT_MESSAGE_APP.value,
+                from = if (record.fromLocal) NodeAddress.ID_LOCAL else record.senderId.ifEmpty { record.address },
+                time = record.millis,
+                id = record.packetId,
+                status = if (record.fromLocal) MessageStatus.DELIVERED else MessageStatus.UNKNOWN,
+                channel = slot,
+                wantAck = false,
+            )
+        packets.savePacket(
+            myNodeNum = myNodeNum,
+            contactKey = "$slot${record.address}",
+            packet = packet,
+            receivedTime = record.millis,
+            read = true,
+        )
     }
 
     private suspend fun conversationTitle(contact: String): String {

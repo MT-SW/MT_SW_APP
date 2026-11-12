@@ -65,6 +65,38 @@ class AndroidFolderService(private val context: Application, private val dispatc
             }
         }
 
+    override suspend fun readFiles(folder: String, suffixes: List<String>): List<Pair<String, ByteArray>> =
+        withContext(dispatchers.io) {
+            try {
+                val resolver = context.contentResolver
+                val tree = Uri.parse(folder)
+                val treeId = DocumentsContract.getTreeDocumentId(tree)
+                val children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, treeId)
+                val columns =
+                    arrayOf(
+                        DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                        DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    )
+                val found = mutableListOf<Pair<String, Uri>>()
+                resolver.query(children, columns, null, null, null)?.use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val name = cursor.getString(1) ?: continue
+                        if (suffixes.any { name.endsWith(it) }) {
+                            found += name to DocumentsContract.buildDocumentUriUsingTree(tree, cursor.getString(0))
+                        }
+                    }
+                }
+                found.mapNotNull { (name, uri) ->
+                    resolver.openInputStream(uri)?.use { input -> name to input.readBytes() }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(e) { "Failed to read the files of the chosen folder" }
+                emptyList()
+            }
+        }
+
     /** The document inside the tree whose display name is [name], or null when there is none. */
     private fun findChild(tree: Uri, treeId: String, name: String): Uri? {
         val children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, treeId)

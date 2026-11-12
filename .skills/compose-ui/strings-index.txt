@@ -562,6 +562,12 @@ archive_last_ok
 archive_never
 archive_now
 archive_password
+archive_restore
+archive_restore_button
+archive_restore_csv_only
+archive_restore_hint
+archive_restore_info
+archive_restore_result
 archive_summary
 archive_title
 archived_channel
