@@ -16,15 +16,27 @@
  */
 package org.meshtastic.core.common.util
 
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.annotation.Single
+import platform.Foundation.NSCurrentLocaleDidChangeNotification
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
 
-/**
- * Stubbed alongside the module's other iOS locale stubs. `NSCurrentLocaleDidChangeNotification` is where this belongs
- * once the iOS client reads real locale data.
- */
+/** Reports every change of the system locale (language or region), so formatted values can be redrawn. */
 @Single
 class IosLocaleChangeNotifier : LocaleChangeNotifier {
-    override val localeChanges: Flow<Unit> = emptyFlow()
+    override val localeChanges: Flow<Unit> = callbackFlow {
+        val center = NSNotificationCenter.defaultCenter
+        val observer =
+            center.addObserverForName(
+                name = NSCurrentLocaleDidChangeNotification,
+                `object` = null,
+                queue = NSOperationQueue.mainQueue,
+            ) { _ ->
+                trySend(Unit)
+            }
+        awaitClose { center.removeObserver(observer) }
+    }
 }
