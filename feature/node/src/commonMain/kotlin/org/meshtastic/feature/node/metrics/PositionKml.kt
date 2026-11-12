@@ -57,7 +57,7 @@ internal fun buildCoverageKml(positions: List<Position>, snrByTime: Map<Int, Flo
             append("  <Style id=\"${styleId(bucket)}\">")
             append("<LineStyle><color>$color</color><width>4</width></LineStyle>")
             append("<IconStyle><color>$color</color><scale>0.6</scale>")
-            append("<Icon><href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle>")
+            append("<Icon><href>$DOT_ICON</href></Icon></IconStyle>")
             append("</Style>\n")
         }
         append("  <Folder><name>SNR dB</name>\n")
@@ -96,7 +96,12 @@ internal fun buildNetworkCoverageKml(tracks: List<CoverageTrack>, name: String):
                     .mapNotNull { pos ->
                         val snr = track.snrByTime[pos.time] ?: return@mapNotNull null
                         val (latI, lonI) = pos.fixOrNull() ?: return@mapNotNull null
-                        KmlPoint(lat = latI * GeoConstants.DEG_D, lon = lonI * GeoConstants.DEG_D, time = pos.time, snr = snr)
+                        KmlPoint(
+                            lat = latI * GeoConstants.DEG_D,
+                            lon = lonI * GeoConstants.DEG_D,
+                            time = pos.time,
+                            snr = snr,
+                        )
                     }
         }
     val buckets = perNode.flatMap { (_, points) -> points.map { snrBucket(it.snr) } }.distinct()
@@ -107,7 +112,7 @@ internal fun buildNetworkCoverageKml(tracks: List<CoverageTrack>, name: String):
         for (bucket in buckets) {
             val color = kmlColor(snrRgb(bucket?.toFloat()))
             append("  <Style id=\"${styleId(bucket)}\"><IconStyle><color>$color</color><scale>0.6</scale>")
-            append("<Icon><href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle></Style>\n")
+            append("<Icon><href>$DOT_ICON</href></Icon></IconStyle></Style>\n")
         }
         for ((nodeName, points) in perNode) {
             if (points.isEmpty()) continue
@@ -115,7 +120,9 @@ internal fun buildNetworkCoverageKml(tracks: List<CoverageTrack>, name: String):
             for (p in points) {
                 val label = p.snr?.let { "${NumberFormatter.formatInvariant(it, 1)} dB" } ?: "-"
                 append("    <Placemark><name>$label</name>")
-                if (p.time > 0) append("<TimeStamp><when>${Instant.fromEpochSeconds(p.time.toLong())}</when></TimeStamp>")
+                if (p.time > 0) {
+                    append("<TimeStamp><when>${Instant.fromEpochSeconds(p.time.toLong())}</when></TimeStamp>")
+                }
                 append("<styleUrl>#${styleId(snrBucket(p.snr))}</styleUrl>")
                 append("<Point><coordinates>${p.coordinates()}</coordinates></Point></Placemark>\n")
             }
@@ -155,6 +162,7 @@ private fun hex2(value: Int): String = value.toString(HEX_RADIX).padStart(2, '0'
 private fun String.xmlEscaped(): String = replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 private const val COORDINATE_DECIMALS = 7
+private const val DOT_ICON = "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png"
 private const val CHANNEL_MASK = 0xFF
 private const val RED_SHIFT = 16
 private const val GREEN_SHIFT = 8
