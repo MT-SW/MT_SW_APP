@@ -168,8 +168,18 @@ actual fun rememberSaveFileLauncher(
 
 @Composable
 actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit {
+    val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+            // Keep the access after a restart, so a folder chosen once (for the message archive) stays usable.
+            if (uri != null) {
+                runCatching {
+                    context.contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                    )
+                }
+            }
             onTreeUriSelect(uri?.toKmpUri())
         }
     return remember(launcher) { { launcher.launch(null) } }

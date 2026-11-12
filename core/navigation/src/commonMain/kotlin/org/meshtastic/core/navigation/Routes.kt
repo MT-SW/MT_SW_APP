@@ -241,6 +241,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object Sos : SettingsRoute
 
+    @Serializable data object MessageArchive : SettingsRoute
+
     // endregion
 
     // region help & documentation routes

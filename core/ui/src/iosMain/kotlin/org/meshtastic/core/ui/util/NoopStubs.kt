@@ -34,8 +34,6 @@ actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): A
 
 @Composable actual fun rememberOpenNfcSettings(): () -> Unit = {}
 
-@Composable actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit = {}
-
 actual val isDesktopPlatform: Boolean = false
 
 actual val bleScanRequiresLocationServices: Boolean = false

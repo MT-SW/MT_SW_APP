@@ -22,12 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.useContents
+import kotlinx.cinterop.usePinned
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import org.meshtastic.core.common.util.CommonUri
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSData
 import platform.Foundation.NSString
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
@@ -48,8 +51,10 @@ import platform.UIKit.UIView
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
+import platform.UniformTypeIdentifiers.UTTypeFolder
 import platform.UniformTypeIdentifiers.UTTypeItem
 import platform.darwin.NSObject
+import platform.posix.memcpy
 
 internal fun topViewController(): UIViewController? {
     val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
@@ -122,6 +127,54 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
     return { _ ->
         // The chosen file is copied into the app's own folder, so it can be read without extra permission.
         val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeItem), asCopy = true)
+        picker.delegate = delegate
+        topViewController()?.presentViewController(picker, animated = true, completion = null)
+    }
+}
+
+/**
+ * Hands back the folder the user picked as `bookmark:` and the bookmark's bytes in hex: iOS lets an app come back to a
+ * picked folder only through such a bookmark.
+ */
+private class FolderPickerDelegate(var onUri: (CommonUri?) -> Unit) :
+    NSObject(),
+    UIDocumentPickerDelegateProtocol {
+    @OptIn(ExperimentalForeignApi::class)
+    override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentsAtURLs: List<*>) {
+        val url = didPickDocumentsAtURLs.firstOrNull() as? NSURL
+        if (url == null) {
+            onUri(null)
+            return
+        }
+        val opened = url.startAccessingSecurityScopedResource()
+        val bookmark = url.bookmarkDataWithOptions(0uL, null, null, null)
+        if (opened) url.stopAccessingSecurityScopedResource()
+        val bytes = bookmark?.toByteArray()
+        onUri(bytes?.let { CommonUri.parse("bookmark:" + it.joinToString("") { b -> hexByte(b) }) })
+    }
+
+    override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+        onUri(null)
+    }
+}
+
+private fun hexByte(byte: Byte): String = (byte.toInt() and 0xFF).toString(16).padStart(2, '0')
+
+@OptIn(ExperimentalForeignApi::class)
+private fun NSData.toByteArray(): ByteArray {
+    val n = length.toInt()
+    val out = ByteArray(n)
+    if (n > 0) out.usePinned { memcpy(it.addressOf(0), bytes, length) }
+    return out
+}
+
+@Composable
+actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit {
+    // The delegate is held here because the picker only keeps a weak reference to it.
+    val delegate = remember { FolderPickerDelegate(onTreeUriSelect) }
+    delegate.onUri = onTreeUriSelect
+    return {
+        val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder), asCopy = false)
         picker.delegate = delegate
         topViewController()?.presentViewController(picker, animated = true, completion = null)
     }

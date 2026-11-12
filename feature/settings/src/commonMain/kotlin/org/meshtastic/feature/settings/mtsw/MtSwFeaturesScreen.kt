@@ -70,6 +70,10 @@ import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
 import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title
+import org.meshtastic.core.resources.archive_summary
+import org.meshtastic.core.resources.archive_title
+import org.meshtastic.core.resources.mt_sw_other_archive_body
+import org.meshtastic.core.resources.mt_sw_other_archive_title
 import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.resources.mt_sw_other_availability_title
 import org.meshtastic.core.resources.mt_sw_other_calls_body
@@ -128,6 +132,7 @@ import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
@@ -378,6 +383,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.archive_title)) {
+                ListItem(
+                    text = stringResource(Res.string.archive_title),
+                    supportingText = stringResource(Res.string.archive_summary),
+                    leadingIcon = MeshtasticIcons.Save,
+                ) {
+                    onNavigate(SettingsRoute.MessageArchive)
+                }
+            }
+
             ExpressiveSection(title = stringResource(Res.string.sos_title)) {
                 ListItem(
                     text = stringResource(Res.string.sos_title),
@@ -470,6 +485,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_remote_lists_title, Res.string.mt_sw_other_remote_lists_body)
             OtherFeature(Res.string.mt_sw_other_contacts_title, Res.string.mt_sw_other_contacts_body)
             OtherFeature(Res.string.mt_sw_other_calls_title, Res.string.mt_sw_other_calls_body)
+            OtherFeature(Res.string.mt_sw_other_archive_title, Res.string.mt_sw_other_archive_body)
             OtherFeature(Res.string.mt_sw_other_sos_title, Res.string.mt_sw_other_sos_body)
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
             OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)

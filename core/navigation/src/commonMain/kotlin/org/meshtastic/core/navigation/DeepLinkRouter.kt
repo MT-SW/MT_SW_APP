@@ -273,6 +273,7 @@ object DeepLinkRouter {
             "mt-sw-other-features" to SettingsRoute.MtSwOtherFeatures,
             "antenna-calculator" to SettingsRoute.AntennaCalculator,
             "sos" to SettingsRoute.Sos,
+            "message-archive" to SettingsRoute.MessageArchive,
             "knowledge-base" to SettingsRoute.KnowledgeBase,
             "helpdocs" to SettingsRoute.HelpDocs,
             "help-docs" to SettingsRoute.HelpDocs,

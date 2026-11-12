@@ -101,6 +101,7 @@ class QuickSettingsTileControllerTest {
             localNetworkAccess = LocalNetworkAccess { true },
             lastBleNodeRecorder = {},
             nodeSilenceMonitor = {},
+            messageArchiveMonitor = {},
         )
     }
 }

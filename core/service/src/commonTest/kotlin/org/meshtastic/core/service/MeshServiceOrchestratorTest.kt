@@ -170,6 +170,7 @@ class MeshServiceOrchestratorTest {
             localNetworkAccess = localNetworkAccess,
             lastBleNodeRecorder = {},
             nodeSilenceMonitor = {},
+            messageArchiveMonitor = {},
         )
     }
 
