@@ -129,6 +129,10 @@ W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) może
 
 W szczegółach węzła (pod notatkami) jest karta „Strażnik węzła”. Włączasz ją osobno dla każdego węzła i wybierasz, po jakim czasie bez sygnału ma przyjść powiadomienie: od 1 godziny do 30 dni (gotowe przyciski) albo własny czas w godzinach, do 90 dni. Powiadomienie znika samo, gdy węzeł znów się odezwie, i przychodzi ponownie dopiero po kolejnym zamilknięciu. Dodatkowa opcja „Licz też pakiety przechodzące przez węzeł” (domyślnie wyłączona) uznaje za znak życia także pakiet, który dotarł do radia przez ten węzeł, choć nadał go ktoś inny. Węzeł jest rozpoznawany po ostatnim bajcie identyfikatora, więc gdy dwa znane węzły kończą się tak samo, ta opcja jest pomijana. Strażnik działa, gdy aplikacja jest połączona z radiem (Android, komputer i iPhone/iPad), a krótko po połączeniu czeka na listę węzłów z radia.
 
+## Dostępność węzła
+
+W szczegółach węzła, pod strażnikiem węzła, jest karta „Dostępność węzła” z wykresem słupkowym: kiedy radio zapisało pakiety od tego węzła. Zakres wybierasz przyciskami: doba, 3, 7, 14 albo 30 dni. Wyższy słupek oznacza więcej pakietów w danym przedziale czasu, a puste miejsce — ciszę. Pod wykresem widać, w ilu przedziałach węzeł był słyszany (i jaki to procent), oraz jego najdłuższą ciszę. Wykres powstaje z zapisanych pakietów, więc sięga tylko tak daleko, jak pozwala czas przechowywania logów (Funkcje MT_SW → Logi). Działa tak samo na Androidzie, komputerze i iPhonie/iPadzie.
+
 ## Sniffer
 
 Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, także pakiety, których telefon nie potrafi rozszyfrować.

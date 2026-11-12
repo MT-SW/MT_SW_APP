@@ -614,6 +614,13 @@
     <string name="auto_load_chat_images">Automatically load images from links in chat</string>
     <string name="autostart_summary">Starts the app when you log in to the computer, so the radio data keeps being collected. Off by default. Works in the installed app.</string>
     <string name="autostart_title">Start with the computer</string>
+    <!-- AVAILABILITY -->
+    <string name="availability_empty">No recorded packets from this node in this period.</string>
+    <string name="availability_hint">When the radio recorded packets from this node. Taller bars mean more packets. It reaches back only as far as the log retention allows.</string>
+    <string name="availability_longest_silence">Longest silence: %1$s</string>
+    <string name="availability_now">now</string>
+    <string name="availability_summary">Heard in %1$d of %2$d time slots (%3$d%%)</string>
+    <string name="availability_title">Node availability</string>
     <string name="available_pins">Available pins</string>
     <string name="back">Back</string>
     <string name="background_keepalive_permission">The "Always" location permission is missing. Allow it in the system settings of this app (Location → Always).</string>
@@ -2248,6 +2255,8 @@
     <string name="mt_sw_map_filter_summary">Limit the map to nodes within a number of hops and a distance from your node. Opens the map; the limits are in its filters.</string>
     <string name="mt_sw_map_filter_title">Map filter: hops and distance</string>
     <string name="mt_sw_map_title">Network planning</string>
+    <string name="mt_sw_other_availability_body">In the node details (below the node watchdog) a bar chart shows when the radio recorded packets from that node: for the last day, 3, 7, 14 or 30 days. A taller bar means more packets in that time slot; below it you see in how many slots the node was heard and its longest silence. The chart is built from the recorded packets, so it reaches back only as far as the log retention (MT_SW features → Logs) allows.</string>
+    <string name="mt_sw_other_availability_title">Node availability</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>

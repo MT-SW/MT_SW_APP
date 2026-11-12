@@ -108,6 +108,13 @@ interface MeshLogDao {
     )
     fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
 
+    /** Only the receive times (epoch ms) of the packets from [nodeNum] since [sinceTimestamp], oldest first. */
+    @Query(
+        "SELECT received_date FROM log WHERE from_num = :nodeNum AND received_date >= :sinceTimestamp " +
+            "ORDER BY received_date ASC",
+    )
+    fun getReceivedTimesFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<Long>>
+
     /**
      * All logs across every sender and every port since [sinceTimestamp] — used to derive SNR/RSSI history, since that
      * data lives in every packet's header, not just telemetry packets.

@@ -57,6 +57,7 @@ import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.node_silence_alert
+import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_section_title
@@ -194,6 +195,7 @@ object SettingsSearchCatalog {
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.node_silence_alert to SettingsRoute.MtSwOtherFeatures,
+            Res.string.availability_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
             Res.string.skip_bad_time_chart_points to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,

@@ -130,6 +130,11 @@ open class MeshLogRepositoryImpl(
         .map { list -> list.map { it.asExternalModel() } }
         .flowOn(dispatchers.io)
 
+    override fun getReceivedTimesFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<Long>> =
+        dbManager.currentDb
+            .flatMapLatest { it.meshLogDao().getReceivedTimesFromNodeSince(nodeNum, sinceTimestamp) }
+            .flowOn(dispatchers.io)
+
     /** The newest [MeshLog] of [portNum] from every sender. */
     override fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>> = dbManager.currentDb
         .flatMapLatest { it.meshLogDao().getLatestLogsByPortNumPerSender(portNum) }

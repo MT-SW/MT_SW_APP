@@ -593,6 +593,13 @@ auto_clean_nodes_title
 auto_load_chat_images
 autostart_summary
 autostart_title
+### AVAILABILITY ###
+availability_empty
+availability_hint
+availability_longest_silence
+availability_now
+availability_summary
+availability_title
 available_pins
 back
 background_keepalive_permission
@@ -2197,6 +2204,8 @@ mt_sw_features_title
 mt_sw_map_filter_summary
 mt_sw_map_filter_title
 mt_sw_map_title
+mt_sw_other_availability_body
+mt_sw_other_availability_title
 mt_sw_other_calls_body
 mt_sw_other_calls_title
 mt_sw_other_contacts_body

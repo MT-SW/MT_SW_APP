@@ -129,6 +129,10 @@ In the node details (Administration → "On-demand diagnostics") you can ask any
 
 The node details (below the notes) have a "Node watchdog" card. You turn it on separately for each node and choose after how long without a signal you get a notification: from 1 hour up to 30 days (ready buttons) or your own time in hours, up to 90 days. The notification disappears by itself when the node is heard again, and comes back only after the next silence. The extra option "Also count packets passing through the node" (off by default) also takes a packet that reached the radio through this node, although somebody else sent it, as a sign of life. The node is recognised by the last byte of its ID, so when two known nodes end alike, this option is skipped. The watchdog works while the app is connected to the radio (Android, desktop and iPhone/iPad) and waits briefly after connecting for the radio's node list.
 
+## Node availability
+
+The node details, below the node watchdog, have a "Node availability" card with a bar chart: when the radio recorded packets from that node. You pick the range with buttons: a day, 3, 7, 14 or 30 days. A taller bar means more packets in that time slot, and a gap means silence. Under the chart you see in how many slots the node was heard (and the percentage), and its longest silence. The chart is built from the recorded packets, so it reaches back only as far as the log retention (MT_SW features → Logs) allows. It works the same on Android, desktop and iPhone/iPad.
+
 ## Sniffer
 
 The **Sniffer** screen (Settings → Advanced) shows network traffic live, including packets the phone cannot decrypt.

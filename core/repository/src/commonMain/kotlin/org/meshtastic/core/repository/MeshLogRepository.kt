@@ -17,6 +17,7 @@
 package org.meshtastic.core.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.MyNodeInfo
@@ -70,6 +71,10 @@ interface MeshLogRepository {
     /** Like [getLogsFromNodeSince], but entries carry no text copy of the packet (`raw_message` is empty). */
     fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> =
         getLogsFromNodeSince(nodeNum, sinceTimestamp)
+
+    /** Only the receive times (epoch ms) of the packets from [nodeNum] since [sinceTimestamp], oldest first. */
+    fun getReceivedTimesFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<Long>> =
+        getLogsFromNodeSinceSlim(nodeNum, sinceTimestamp).map { logs -> logs.map { it.received_date } }
 
     /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
     fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>

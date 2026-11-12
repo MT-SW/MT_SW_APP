@@ -3914,4 +3914,12 @@
     <string name="mt_sw_other_silence_body">W szczegółach węzła (pod notatkami) możesz włączyć strażnika dla tego jednego węzła: ustawiasz od 1 godziny do 30 dni albo wpisujesz własny czas w godzinach (do 90 dni). Gdy węzeł milczy tak długo, dostajesz powiadomienie, które znika, gdy węzeł znów się odezwie. Opcjonalnie liczy też pakiety, które tylko przeszły przez węzeł. Działa, gdy aplikacja jest połączona z radiem.</string>
     <string name="node_silence_count_relayed">Licz też pakiety przechodzące przez węzeł</string>
     <string name="node_silence_count_relayed_hint">Oprócz własnych pakietów węzła o jego życiu świadczy też pakiet, który dotarł do radia przez ten węzeł (przekazał go dalej). Dopasowanie po ostatnim bajcie identyfikatora, więc gdy dwa znane węzły kończą się tak samo, jest pomijane.</string>
+    <string name="availability_title">Dostępność węzła</string>
+    <string name="availability_hint">Kiedy radio zapisało pakiety od tego węzła. Wyższy słupek to więcej pakietów. Sięga tylko tak daleko, jak pozwala czas przechowywania logów.</string>
+    <string name="availability_empty">Brak zapisanych pakietów od tego węzła w tym okresie.</string>
+    <string name="availability_now">teraz</string>
+    <string name="availability_summary">Słyszany w %1$d z %2$d przedziałów czasu (%3$d%%)</string>
+    <string name="availability_longest_silence">Najdłuższa cisza: %1$s</string>
+    <string name="mt_sw_other_availability_title">Dostępność węzła</string>
+    <string name="mt_sw_other_availability_body">W szczegółach węzła (pod strażnikiem węzła) wykres słupkowy pokazuje, kiedy radio zapisało pakiety od tego węzła: z ostatniej doby, 3, 7, 14 albo 30 dni. Wyższy słupek to więcej pakietów w danym przedziale czasu; pod wykresem widzisz, w ilu przedziałach węzeł był słyszany, i jego najdłuższą ciszę. Wykres powstaje z zapisanych pakietów, więc sięga tylko tak daleko, jak pozwala czas przechowywania logów (Funkcje MT_SW → Logi).</string>
 </resources>

@@ -70,6 +70,8 @@ import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
 import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title
+import org.meshtastic.core.resources.mt_sw_other_availability_body
+import org.meshtastic.core.resources.mt_sw_other_availability_title
 import org.meshtastic.core.resources.mt_sw_other_calls_body
 import org.meshtastic.core.resources.mt_sw_other_calls_title
 import org.meshtastic.core.resources.mt_sw_other_contacts_body
@@ -454,6 +456,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_contacts_title, Res.string.mt_sw_other_contacts_body)
             OtherFeature(Res.string.mt_sw_other_calls_title, Res.string.mt_sw_other_calls_body)
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
+            OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_full_doc)) {
                 ListItem(text = stringResource(Res.string.mt_sw_other_full_doc), leadingIcon = MeshtasticIcons.Info) {
                     onNavigate(SettingsRoute.HelpDocPage("mt-sw-features"))
