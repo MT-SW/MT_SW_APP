@@ -71,7 +71,7 @@ A Wear OS watch paired with your phone shows every Meshtastic notification excep
 
 ## Test notifications
 
-In Settings (desktop and phone) there are two test buttons: "Test SOS alarm notification" and "Test radio notice notification". They show at once what these notifications look like and whether they arrive at all, without waiting for a real event. The node watchdog test is in the node details.
+In Settings (desktop and phone) there are three test buttons: "Test alarm (SOS)", "Test notice from the radio" and "Test new node notification". They show at once what these notifications look like and whether they arrive at all, without waiting for a real event. A kind that is switched off in the settings does not arrive as a test either. The node watchdog test is in the node details.
 
 ## Related Topics
 

@@ -71,7 +71,7 @@ Zegarek Wear OS sparowany z telefonem pokazuje każde powiadomienie MT_SW z wyj�
 
 ## Testowe powiadomienia
 
-W Ustawieniach (komputer i telefon) są dwa przyciski testowe: „Testowe powiadomienie o alarmie SOS” i „Testowe powiadomienie z radia”. Pokazują od razu, jak wyglądają te powiadomienia i czy w ogóle docierają, bez czekania na prawdziwe zdarzenie. Test strażnika węzła jest w szczegółach węzła.
+W Ustawieniach (komputer i telefon) są trzy przyciski testowe: „Testowy alarm (SOS)”, „Testowy komunikat z radia” i „Testowe powiadomienie o nowym węźle”. Pokazują od razu, jak wyglądają te powiadomienia i czy w ogóle docierają, bez czekania na prawdziwe zdarzenie. Rodzaj wyłączony w ustawieniach nie przyjdzie też jako test. Test strażnika węzła jest w szczegółach węzła.
 
 ## Zobacz także
 

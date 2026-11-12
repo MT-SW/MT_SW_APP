@@ -809,6 +809,15 @@ interface MapPrefs {
 
     /** Remembers whether the coverage layer of the main map is on. */
     fun setCoverageEnabled(on: Boolean) {}
+
+    /** The saved period of the coverage filter in days (0: all). */
+    suspend fun awaitCoverageDays(): Int = 0
+
+    /** The saved node of the coverage filter, null when all nodes are shown. */
+    suspend fun awaitCoverageNode(): Int? = null
+
+    /** Remembers the coverage filter: the period in [days] (0: all) and the [nodeNum] (null: all nodes). */
+    fun setCoverageFilter(days: Int, nodeNum: Int?) {}
 }
 
 /** What the propagation map layer remembers: on/off, the kind of picture and how often it refreshes on its own. */

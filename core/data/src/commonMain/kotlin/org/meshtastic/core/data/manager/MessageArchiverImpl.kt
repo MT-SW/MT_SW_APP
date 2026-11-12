@@ -252,6 +252,7 @@ class MessageArchiverImpl(
             noChannel = counts.noChannel,
             unreadable = counts.unreadable,
             preview = preview,
+            missingChannels = counts.missing.take(MAX_MISSING_NAMES),
         )
     }
 
@@ -265,6 +266,7 @@ class MessageArchiverImpl(
     private class RestoreCounts(val preview: Boolean) {
         val wouldHave = mutableSetOf<Int>()
         val wouldHaveLines = mutableSetOf<String>()
+        val missing = linkedSetOf<String>()
         var files = 0
         var restored = 0
         var already = 0
@@ -294,7 +296,10 @@ class MessageArchiverImpl(
         for (record in records) {
             val slot = slotFor(record, slotByName)
             when {
-                slot == null -> counts.noChannel++
+                slot == null -> {
+                    counts.noChannel++
+                    if (record.channelName.isNotBlank()) counts.missing += record.channelName
+                }
                 record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> counts.already++
                 counts.preview && record.packetId != 0 && !counts.wouldHave.add(record.packetId) -> counts.already++
                 else -> {
@@ -323,6 +328,7 @@ class MessageArchiverImpl(
             val target = textTarget(line.conversation, context)
             if (millis == null || target == null) {
                 counts.noChannel++
+                if (target == null && line.conversation.isNotBlank()) counts.missing += line.conversation
                 continue
             }
             val (slot, address) = target
@@ -436,6 +442,7 @@ class MessageArchiverImpl(
         const val ENCRYPTED_EXTENSION = "enc"
         const val MESSAGES_PER_CONVERSATION = 500
         const val MILLIS_PER_SECOND = 1_000L
+        const val MAX_MISSING_NAMES = 10
         val RESTORE_EXTENSIONS = listOf("csv", "txt", "md")
     }
 }

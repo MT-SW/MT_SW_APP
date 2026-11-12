@@ -65,6 +65,7 @@ import org.meshtastic.core.resources.archive_restore_button
 import org.meshtastic.core.resources.archive_restore_csv_only
 import org.meshtastic.core.resources.archive_restore_hint
 import org.meshtastic.core.resources.archive_restore_info
+import org.meshtastic.core.resources.archive_restore_missing_channels
 import org.meshtastic.core.resources.archive_restore_preview_button
 import org.meshtastic.core.resources.archive_restore_preview_result
 import org.meshtastic.core.resources.archive_restore_result
@@ -297,6 +298,18 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
+                    if (result.missingChannels.isNotEmpty()) {
+                        Text(
+                            text =
+                            stringResource(
+                                Res.string.archive_restore_missing_channels,
+                                result.missingChannels.joinToString(", "),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                    }
                 }
             }
 

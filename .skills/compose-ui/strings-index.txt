@@ -568,6 +568,7 @@ archive_restore_button
 archive_restore_csv_only
 archive_restore_hint
 archive_restore_info
+archive_restore_missing_channels
 archive_restore_preview_button
 archive_restore_preview_result
 archive_restore_result
@@ -2498,6 +2499,7 @@ notification_sound_while_open
 notification_test_alert_button
 notification_test_alert_text
 notification_test_hint
+notification_test_new_node_button
 notification_test_radio_button
 notification_test_radio_text
 notification_test_sender

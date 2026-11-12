@@ -99,7 +99,9 @@ class CoverageController(
         if (restored) return
         restored = true
         val saved = mapPrefs.awaitCoverageEnabled()
-        mutable.update { it.copy(enabled = saved) }
+        val days = mapPrefs.awaitCoverageDays()
+        val node = mapPrefs.awaitCoverageNode()
+        mutable.update { it.copy(enabled = saved, days = days, nodeFilter = node) }
     }
 
     /** Reads the measurements again. A read that is already going on is not started a second time. */
@@ -109,7 +111,11 @@ class CoverageController(
         try {
             val measured = withContext(dispatchers.default) { measure() }
             all = measured.first
-            mutable.update { it.copy(sources = measured.second, readMillis = nowMillis) }
+            mutable.update { state ->
+                // A saved node that has no measurements any more must not leave the map empty.
+                val node = state.nodeFilter?.takeIf { saved -> measured.second.any { it.nodeNum == saved } }
+                state.copy(sources = measured.second, readMillis = nowMillis, nodeFilter = node)
+            }
             applyFilter()
         } finally {
             mutable.update { it.copy(loading = false) }
@@ -120,12 +126,14 @@ class CoverageController(
     fun setDays(days: Int) {
         mutable.update { it.copy(days = days) }
         applyFilter()
+        mapPrefs.setCoverageFilter(days, mutable.value.nodeFilter)
     }
 
     /** Shows only the measurements of [nodeNum] (null: all nodes). */
     fun setNode(nodeNum: Int?) {
         mutable.update { it.copy(nodeFilter = nodeNum) }
         applyFilter()
+        mapPrefs.setCoverageFilter(mutable.value.days, nodeNum)
     }
 
     private fun applyFilter() {

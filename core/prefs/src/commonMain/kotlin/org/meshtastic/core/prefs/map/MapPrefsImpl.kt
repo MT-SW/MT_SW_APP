@@ -217,6 +217,19 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         scope.launch { dataStore.edit { it[KEY_COVERAGE_ENABLED] = on } }
     }
 
+    override suspend fun awaitCoverageDays(): Int = dataStore.data.first()[KEY_COVERAGE_DAYS] ?: 0
+
+    override suspend fun awaitCoverageNode(): Int? = dataStore.data.first()[KEY_COVERAGE_NODE]
+
+    override fun setCoverageFilter(days: Int, nodeNum: Int?) {
+        scope.launch {
+            dataStore.edit {
+                it[KEY_COVERAGE_DAYS] = days
+                if (nodeNum == null) it.remove(KEY_COVERAGE_NODE) else it[KEY_COVERAGE_NODE] = nodeNum
+            }
+        }
+    }
+
     private fun Preferences.toPropagationPrefs(): PropagationPrefs {
         val defaults = PropagationPrefs()
         return PropagationPrefs(
@@ -279,6 +292,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS = intPreferencesKey("horizon_buildings_max_age_days")
         val KEY_HORIZON_TERRAIN_MAX_AGE_DAYS = intPreferencesKey("horizon_terrain_max_age_days")
         val KEY_COVERAGE_ENABLED = booleanPreferencesKey("coverage_enabled")
+        val KEY_COVERAGE_DAYS = intPreferencesKey("coverage_days")
+        val KEY_COVERAGE_NODE = intPreferencesKey("coverage_node")
         val KEY_PROPAGATION_ENABLED = booleanPreferencesKey("propagation_enabled")
         val KEY_PROPAGATION_KIND = intPreferencesKey("propagation_kind")
         val KEY_PROPAGATION_AUTO_REFRESH = booleanPreferencesKey("propagation_auto_refresh")

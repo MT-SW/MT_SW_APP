@@ -31,12 +31,18 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.repository.MeshNotificationManager
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.new_node_seen
 import org.meshtastic.core.resources.notification_test_alert_button
 import org.meshtastic.core.resources.notification_test_alert_text
 import org.meshtastic.core.resources.notification_test_hint
+import org.meshtastic.core.resources.notification_test_new_node_button
 import org.meshtastic.core.resources.notification_test_radio_button
 import org.meshtastic.core.resources.notification_test_radio_text
 import org.meshtastic.core.resources.notification_test_sender
@@ -55,6 +61,7 @@ private const val TEST_CONTACT_KEY = "0^all"
 @Composable
 fun NotificationTestSection() {
     val manager = koinInject<MeshNotificationManager>()
+    val nodeRepository = koinInject<NodeRepository>()
     val scope = rememberCoroutineScope()
     val sender = stringResource(Res.string.notification_test_sender)
     val alertText = stringResource(Res.string.notification_test_alert_text)
@@ -88,6 +95,18 @@ fun NotificationTestSection() {
                     },
                 ) {
                     Text(stringResource(Res.string.notification_test_radio_button))
+                }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            // Your own node stands for the new one; without a radio a bare node is enough for a test.
+                            val node = nodeRepository.ourNodeInfo.value ?: Node(num = 1)
+                            val name = node.effectiveLongName.ifBlank { sender }
+                            manager.showNewNodeSeenNotification(node, getStringSuspend(Res.string.new_node_seen, name))
+                        }
+                    },
+                ) {
+                    Text(stringResource(Res.string.notification_test_new_node_button))
                 }
             }
         }

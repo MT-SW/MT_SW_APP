@@ -130,7 +130,8 @@ interface MessageArchiver {
  * What a restore did: [files] archive files read, [restored] messages put back, [alreadyThere] left alone because they
  * are in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could
  * not be read (a wrong or missing password gives these). With [preview] nothing was written: [restored] is how many
- * messages a restore would put back.
+ * messages a restore would put back. [missingChannels] are the names (at most ten) of the chats that have no
+ * channel now.
  */
 data class MessageArchiveRestoreResult(
     val files: Int = 0,
@@ -139,6 +140,7 @@ data class MessageArchiveRestoreResult(
     val noChannel: Int = 0,
     val unreadable: Int = 0,
     val preview: Boolean = false,
+    val missingChannels: List<String> = emptyList(),
 )
 
 /** Starts the periodic archiving when the mesh service starts. */
