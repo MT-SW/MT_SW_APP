@@ -879,7 +879,14 @@ contrast_standard
 conversations
 copy
 copyright_notice
+### COVERAGE ###
 coverage_export_all
+coverage_info_body
+coverage_loading
+coverage_none
+coverage_refresh
+coverage_summary
+coverage_title
 cpu_usage
 cpu_usage_description
 create_your_own_networks
@@ -3451,6 +3458,14 @@ track_compare_summary
 track_compare_title
 track_export_kml
 track_info_title
+track_legend_compare
+track_legend_gpx
+track_legend_hide
+track_legend_hud
+track_legend_kml
+track_legend_show
+track_legend_snr
+track_legend_title
 track_point
 track_snr_colors
 ### TRAFFIC ###

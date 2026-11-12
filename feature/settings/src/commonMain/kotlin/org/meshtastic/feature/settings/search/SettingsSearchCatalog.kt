@@ -57,6 +57,7 @@ import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.archive_title
+import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.availability_title
@@ -203,6 +204,7 @@ object SettingsSearchCatalog {
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.archive_title to SettingsRoute.MessageArchive,
             Res.string.availability_title to SettingsRoute.MtSwOtherFeatures,
+            Res.string.coverage_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.track_compare to SettingsRoute.MtSwOtherFeatures,
             Res.string.track_export_kml to SettingsRoute.MtSwOtherFeatures,
             Res.string.track_snr_colors to SettingsRoute.MtSwOtherFeatures,

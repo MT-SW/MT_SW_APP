@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Mapa zasięgu na głównej mapie (wszystkie wersje): w ustawieniach warstw mapy sekcja „Zasięgi sieci (pokrycie)” — kolorowe kropki (SNR: czerwony słaby, zielony mocny) dla pozycji wszystkich węzłów usłyszanych bezpośrednio, z suwakiem przezroczystości, skalą kolorów, liczbą pomiarów, przyciskiem „Wczytaj ponownie” i przyciskiem „i” z opisem.
+* Dziennik pozycji: karta „Co robią ikony na górze” opisuje prostymi słowami ikony widoku sieci, SNR, warstw, trasy i pobierania (można ją ukryć).
 * iPhone/iPad, archiwum wiadomości: wybór folderu i zapis zostawiają w dzienniku czas trwania poszczególnych kroków (zamiana wyboru na zakładkę, odczyt zakładki, zapis pliku), żeby dało się ustalić, co zacina aplikację przy wyborze folderu.
 * Powiadomienia, więcej kategorii (komputer, iPhone/iPad): trzy nowe przełączniki — „Powiadomienia o alarmach” (wiadomości z dzwonkiem, np. SOS od sąsiada), „Komunikaty z radia” i „Powiadomienia o aktualizacjach” (aplikacja i oprogramowanie radia). Na iPhonie są też w Ustawienia → MT_SW i są zsynchronizowane z aplikacją. Domyślnie włączone.
 * Android, powiadomienia: w ustawieniach jest osobna sekcja „Powiadomienia” z wierszem „Powiadomienia (w ustawieniach systemu)”, który otwiera systemową stronę powiadomień aplikacji (dźwięk, wibracja, ważność i ekran blokady osobno dla każdego rodzaju).
@@ -722,6 +724,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Coverage on the main map (all versions): in the map layer settings a "Network coverage" section — coloured dots (SNR: red weak, green strong) for the positions of all nodes heard directly, with a transparency slider, a colour key, the number of measurements, a "Read again" button and an "i" button with a description.
+* Position log: a "What the icons at the top do" card describes the mesh view, SNR, layers, route and download icons in plain words (it can be hidden).
 * iPhone/iPad, message archive: choosing the folder and writing leave the time of each step in the log (making the bookmark of the choice, resolving it, writing the file), so that what makes the app stall when the folder is chosen can be found.
 * Notifications, more categories (desktop, iPhone/iPad): three new switches — "Alarm notifications" (messages with the bell, e.g. an SOS from a neighbour), "Notices from the radio" and "Update notifications" (the app and the radio software). On iPhone they are also in Settings → MT_SW and are kept in step with the app. On by default.
 * Android, notifications: the settings have a separate "Notifications" section with the row "Notifications (in system settings)", which opens the system notification page of the app (sound, vibration, importance and lock screen for each kind).

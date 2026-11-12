@@ -4005,7 +4005,7 @@
     <string name="track_compare_empty">Brak innych węzłów z pozycją.</string>
     <string name="track_compare_summary">%1$s: %2$d pozycji, %3$s</string>
     <string name="mt_sw_other_coverage_title">Mapa zasięgu z pomiarów</string>
-    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo.</string>
+    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo. To samo, bez zapisywania pliku, pokazuje warstwa „Zasięgi sieci (pokrycie)” na głównej mapie (przycisk warstw): kolorowe kropki ze wszystkich węzłów, z suwakiem przezroczystości, skalą kolorów i przyciskiem „Wczytaj ponownie”.</string>
     <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
     <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
     <string name="node_silence_alert_group">Cisza węzłów: %1$d (%2$s)</string>
@@ -4013,6 +4013,20 @@
     <string name="node_silence_quiet_hint">W tych godzinach strażnik nie powiadamia. Jeśli węzeł nadal milczy, powiadomienie przyjdzie po ich zakończeniu. Gdy kilka węzłów zamilknie naraz, przychodzi jedno wspólne powiadomienie.</string>
     <string name="node_silence_quiet_from">Od</string>
     <string name="node_silence_quiet_to">Do</string>
+    <string name="track_legend_title">Co robią ikony na górze</string>
+    <string name="track_legend_hide">Ukryj</string>
+    <string name="track_legend_show">Pokaż</string>
+    <string name="track_legend_hud">Widok sieci: pokazuje węzły na obrazie z aparatu (albo jako kompas), żeby wiedzieć, w którą stronę patrzeć, szukając węzła.</string>
+    <string name="track_legend_snr">SNR: koloruje trasę według siły sygnału, z jaką odebrano każdą pozycję — czerwony słaby, zielony mocny. Widać, gdzie sieć ma dobry zasięg.</string>
+    <string name="track_legend_kml">Warstwy: zapisuje te kolory jako plik KML, który wczytasz jako warstwę mapy (mapa zasięgu).</string>
+    <string name="track_legend_compare">Trasa: rysuje obok trasę drugiego węzła, w innym kolorze, żeby porównać obie drogi.</string>
+    <string name="track_legend_gpx">Pobieranie: zapisuje trasę jako plik GPX do aplikacji nawigacyjnej lub map.</string>
+    <string name="coverage_title">Zasięgi sieci (pokrycie)</string>
+    <string name="coverage_info_body">Ta warstwa pokazuje na mapie, gdzie Twoje radio słyszało inne węzły bezpośrednio i jak mocno. Każda kropka to jedna pozycja węzła, która dotarła do radia bez przekaźnika: zielona oznacza mocny sygnał (SNR), czerwona słaby. Dzięki temu widać, gdzie sieć ma dobry zasięg, a gdzie są dziury. Pozycja przekazana przez inny węzeł się nie liczy, bo mówi o sygnale ostatniego skoku, a nie o odległości do węzła. Pomiary pochodzą z logów zapisanych w aplikacji, więc sięgają tak daleko wstecz, jak długo logi są trzymane. Przycisk „Wczytaj ponownie” czyta je jeszcze raz.</string>
+    <string name="coverage_loading">Wczytywanie pomiarów…</string>
+    <string name="coverage_none">Brak pomiarów. Pojawią się, gdy radio usłyszy pozycje węzłów bezpośrednio.</string>
+    <string name="coverage_summary">%1$d pomiarów z %2$d węzłów</string>
+    <string name="coverage_refresh">Wczytaj ponownie</string>
     <string name="track_info_title">Zasięg i porównanie tras</string>
     <string name="coverage_export_all">Zapisz zasięg wszystkich węzłów (KML)</string>
 </resources>

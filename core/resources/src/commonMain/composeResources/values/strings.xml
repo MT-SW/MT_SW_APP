@@ -912,7 +912,14 @@
     <string name="conversations">Conversations</string>
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
+    <!-- COVERAGE -->
     <string name="coverage_export_all">Save coverage of all nodes (KML)</string>
+    <string name="coverage_info_body">This layer shows on the map where your radio heard other nodes directly, and how strongly. Every dot is one position of a node that reached the radio without a relay: green means a strong signal (SNR), red a weak one. So you can see where the network reaches well and where there are gaps. A relayed position is not counted, because it tells the signal of the last hop, not the distance to the node. The measurements come from the logs stored in the app, so they reach as far back as the logs are kept. The "Read again" button reads them again.</string>
+    <string name="coverage_loading">Reading the measurements…</string>
+    <string name="coverage_none">No measurements yet. They appear when the radio hears the positions of nodes directly.</string>
+    <string name="coverage_refresh">Read again</string>
+    <string name="coverage_summary">%1$d measurements from %2$d nodes</string>
+    <string name="coverage_title">Network coverage</string>
     <string name="cpu_usage">CPU Usage</string>
     <string name="cpu_usage_description">Processor utilization percentage</string>
     <string name="create_your_own_networks">Create Your Own Networks</string>
@@ -2302,7 +2309,7 @@
     <string name="mt_sw_other_compare_title">Compare two tracks</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
     <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
-    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak.</string>
+    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak. The same, without saving a file, is shown by the "Network coverage" layer on the main map (the layers button): coloured dots from all nodes, with a transparency slider, a colour key and a "Read again" button.</string>
     <string name="mt_sw_other_coverage_title">Coverage map from measurements</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
@@ -3529,6 +3536,14 @@
     <string name="track_compare_title">Compare with a node\'s track</string>
     <string name="track_export_kml">Save coverage (KML)</string>
     <string name="track_info_title">Coverage and track comparison</string>
+    <string name="track_legend_compare">Route: draws the track of a second node beside this one, in another colour, to compare the two routes.</string>
+    <string name="track_legend_gpx">Download: saves the track as a GPX file for a navigation or maps app.</string>
+    <string name="track_legend_hide">Hide</string>
+    <string name="track_legend_hud">Mesh view: shows the nodes on the camera image (or as a compass), so you know which way to look for one.</string>
+    <string name="track_legend_kml">Layers: saves those colours as a KML file that you can load as a map layer (a coverage map).</string>
+    <string name="track_legend_show">Show</string>
+    <string name="track_legend_snr">SNR: colours the track by the signal strength each position was heard with — red weak, green strong. It shows where the network reaches well.</string>
+    <string name="track_legend_title">What the icons at the top do</string>
     <string name="track_point">track point</string>
     <string name="track_snr_colors">Colour track by SNR</string>
     <!-- TRAFFIC -->

@@ -91,10 +91,14 @@ import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
+import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
+import org.meshtastic.feature.map.maplibre.layers.COVERAGE_DEFAULT_OPACITY
+import org.meshtastic.feature.map.maplibre.layers.COVERAGE_LAYER_ID
+import org.meshtastic.feature.map.maplibre.layers.CoverageLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
@@ -182,6 +186,8 @@ fun rememberMeshMapState(
 
     val propagationController: PropagationController = koinInject()
     val propagation by propagationController.state.collectAsStateWithLifecycle()
+    val coverageController: CoverageController = koinInject()
+    val coverage by coverageController.state.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     val focusedNode = remember(nodes, focusNodeNum) { focusNodeNum?.let { num -> nodes.firstOrNull { it.num == num } } }
@@ -219,6 +225,7 @@ fun rememberMeshMapState(
                 displayUnits = displayUnits,
             )
             CustomLayers(customLayers, layerOpacity)
+            CoverageLayer(coverage, layerOpacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY)
 
             if (filterState.showWaypoints) {
                 WaypointLayers(waypoints = waypoints.values, onWaypointClick = onWaypointClick)
@@ -258,6 +265,8 @@ fun rememberMeshMapState(
             }
         }
     }
+    // The coverage measurements are read when the layer is switched on; the sheet has a button to read them again.
+    LaunchedEffect(coverage.enabled) { if (coverage.enabled) coverageController.refresh() }
     FrameOnce(enabled = frameOnNodes, nodes = visibleNodes, mapState = mapState)
     FlyToFocusedNode(focusNodeNum = focusNodeNum, focusedNode = focusedNode, mapState = mapState)
 

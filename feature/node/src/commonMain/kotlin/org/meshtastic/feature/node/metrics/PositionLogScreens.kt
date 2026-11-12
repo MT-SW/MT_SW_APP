@@ -18,12 +18,19 @@ package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -38,9 +45,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.Node
@@ -64,6 +74,14 @@ import org.meshtastic.core.resources.track_compare_summary
 import org.meshtastic.core.resources.track_compare_title
 import org.meshtastic.core.resources.track_export_kml
 import org.meshtastic.core.resources.track_info_title
+import org.meshtastic.core.resources.track_legend_compare
+import org.meshtastic.core.resources.track_legend_gpx
+import org.meshtastic.core.resources.track_legend_hide
+import org.meshtastic.core.resources.track_legend_hud
+import org.meshtastic.core.resources.track_legend_kml
+import org.meshtastic.core.resources.track_legend_show
+import org.meshtastic.core.resources.track_legend_snr
+import org.meshtastic.core.resources.track_legend_title
 import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
@@ -189,6 +207,14 @@ fun PositionLogScreen(
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
             LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
+                if (hasTrackPoint) {
+                    item(key = "icon_legend", contentType = "icon_legend") {
+                        TrackIconLegend(
+                            showHud = onOpenMeshHud != null,
+                            showSnr = snrByTime.isNotEmpty(),
+                        )
+                    }
+                }
                 itemsIndexed(
                     positions,
                     key = { index, position -> "${position.time}_$index" },
@@ -218,6 +244,49 @@ fun PositionLogScreen(
             },
             onDismiss = { showCompareDialog = false },
         )
+    }
+}
+
+/**
+ * A plain description of the icons above the track: what each one does and what it is for. The icons only have a
+ * contentDescription, which nobody sees, so this card says it in words; it can be folded away.
+ */
+@Composable
+private fun TrackIconLegend(showHud: Boolean, showSnr: Boolean) {
+    var expanded by rememberSaveable { mutableStateOf(true) }
+    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(Res.string.track_legend_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(
+                        stringResource(if (expanded) Res.string.track_legend_hide else Res.string.track_legend_show),
+                    )
+                }
+            }
+            if (expanded) {
+                if (showHud) LegendRow(MeshtasticIcons.CenterFocusStrong, Res.string.track_legend_hud)
+                if (showSnr) {
+                    LegendRow(MeshtasticIcons.Snr, Res.string.track_legend_snr)
+                    LegendRow(MeshtasticIcons.Layers, Res.string.track_legend_kml)
+                }
+                LegendRow(MeshtasticIcons.Route, Res.string.track_legend_compare)
+                LegendRow(MeshtasticIcons.FileDownload, Res.string.track_legend_gpx)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendRow(icon: ImageVector, text: StringResource) {
+    Row(modifier = Modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(text = stringResource(text), style = MaterialTheme.typography.bodySmall)
     }
 }
 

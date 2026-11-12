@@ -148,6 +148,10 @@ private fun MapLayersSheet(
 
         PropagationSection(target = offlineTarget, opacity = opacity, onOpacityChange = onOpacityChange)
 
+        HorizontalDivider()
+
+        CoverageSection(opacity = opacity, onOpacityChange = onOpacityChange)
+
         if (offlineMapsSupported) {
             HorizontalDivider()
 
