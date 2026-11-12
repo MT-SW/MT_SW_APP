@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Listopad 2026
 
 * Powiadomienia: w Ustawieniach trzy przyciski („Testowy alarm (SOS)”, „Testowy komunikat z radia”, „Testowe powiadomienie o nowym węźle”; komputer, Android, iPhone/iPad) pokazują od razu, jak wyglądają te powiadomienia.
+* Zasięgi (mapa główna): kropki są teraz rysowane osobno dla każdego koloru SNR (stały kolor warstwy zamiast koloru liczonego przez mapę, który na telefonie nic nie pokazywał), a pozycje bez czasu we wpisie dostają czas odbioru pakietu, więc filtr okresu ich nie gubi. Do logu trafia liczba pozycji pokazanych na mapie.
 * Zasięgi na mapie: filtr po okresie (wszystko, 1, 7, 30 dni) i po węźle, z liczbą pokazanych pozycji; wybór jest zapamiętany.
 * Archiwum wiadomości: przycisk „Sprawdź, ile wiadomości wróci” pokazuje na próbę, ile wiadomości by wróciło, ile już jest i ilu brakuje kanału (z nazwami tych kanałów), niczego nie zmieniając.
 * Strażnik węzła: alarm ma teraz własny przełącznik „Strażnik węzła (węzeł milczy)” na komputerze i iPhonie/iPadzie (Ustawienia → MT_SW) oraz własną kategorię „Strażnik węzła” w ustawieniach powiadomień Androida. Nie zależy już od powiadomień o nowych węzłach, więc także testowe powiadomienie dociera, gdy nowe węzły są wyłączone.
@@ -736,6 +737,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### November 2026
 
 * Notifications: three buttons ("Test alarm (SOS)", "Test notice from the radio", "Test new node notification"; desktop, Android, iPhone/iPad) show at once what these notifications look like.
+* Coverage (main map): the dots are now drawn per SNR colour (a fixed layer colour instead of a colour worked out by the map, which showed nothing on the phone), and positions without a time in the entry get the packet's arrival time, so the period filter no longer drops them. The log gets the number of positions shown on the map.
 * Coverage on the map: a filter by period (all, 1, 7, 30 days) and by node, with the number of positions shown; the choice is remembered.
 * Message archive: the "Check how many messages would come back" button shows as a trial run how many messages would come back, how many are already there and for how many there is no channel (with the names of those channels), changing nothing.
 * Node watchdog: the alert now has its own switch "Node watchdog (a node is silent)" on desktop and iPhone/iPad (Settings → MT_SW) and its own "Node watchdog" category in the Android notification settings. It no longer depends on the new node notifications, so the test notification also arrives when new nodes are switched off.

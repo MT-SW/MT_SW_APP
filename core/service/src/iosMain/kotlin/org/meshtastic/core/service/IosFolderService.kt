@@ -27,7 +27,6 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
-import kotlin.time.TimeSource
 import okio.BufferedSink
 import okio.ByteString.Companion.decodeHex
 import okio.FileSystem
@@ -39,6 +38,7 @@ import org.meshtastic.core.repository.FolderService
 import platform.Foundation.NSData
 import platform.Foundation.NSURL
 import platform.Foundation.create
+import kotlin.time.TimeSource
 
 /**
  * The chosen folder is kept as a bookmark (`bookmark:` and its bytes as hex), because iOS lets an app reach a folder
@@ -55,11 +55,10 @@ class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
             try {
                 val bytes = folder.removePrefix(BOOKMARK_PREFIX).decodeHex().toByteArray()
                 val data = bytes.toNSData()
-                folderUrl =
-                    memScoped {
-                        val stale = alloc<BooleanVar>()
-                        NSURL.URLByResolvingBookmarkData(data, 0uL, null, stale.ptr, null)
-                    }
+                folderUrl = memScoped {
+                    val stale = alloc<BooleanVar>()
+                    NSURL.URLByResolvingBookmarkData(data, 0uL, null, stale.ptr, null)
+                }
                 val url = folderUrl ?: return@withContext false
                 Logger.i { "Folder: the bookmark was resolved in ${start.elapsedNow().inWholeMilliseconds} ms" }
                 opened = url.startAccessingSecurityScopedResource()
@@ -89,16 +88,14 @@ class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
             var opened = false
             try {
                 val data = folder.removePrefix(BOOKMARK_PREFIX).decodeHex().toByteArray().toNSData()
-                folderUrl =
-                    memScoped {
-                        val stale = alloc<BooleanVar>()
-                        NSURL.URLByResolvingBookmarkData(data, 0uL, null, stale.ptr, null)
-                    }
+                folderUrl = memScoped {
+                    val stale = alloc<BooleanVar>()
+                    NSURL.URLByResolvingBookmarkData(data, 0uL, null, stale.ptr, null)
+                }
                 val url = folderUrl ?: return@withContext emptyList()
                 opened = url.startAccessingSecurityScopedResource()
                 val directory = (url.path ?: return@withContext emptyList()).toPath()
-                FileSystem.SYSTEM
-                    .list(directory)
+                FileSystem.SYSTEM.list(directory)
                     .filter { path -> suffixes.any { path.name.endsWith(it) } }
                     .map { path -> path.name to FileSystem.SYSTEM.read(path) { readByteArray() } }
             } catch (e: CancellationException) {

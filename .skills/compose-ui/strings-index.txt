@@ -2277,6 +2277,8 @@ mt_sw_other_gpio_title
 mt_sw_other_intro
 mt_sw_other_lna_body
 mt_sw_other_lna_title
+mt_sw_other_notification_test_body
+mt_sw_other_notification_test_title
 mt_sw_other_polarity_body
 mt_sw_other_polarity_title
 mt_sw_other_remote_lists_body
@@ -2503,6 +2505,7 @@ notification_test_new_node_button
 notification_test_radio_button
 notification_test_radio_text
 notification_test_sender
+notification_test_summary
 notification_test_title
 ### NOTIFICATIONS ###
 notifications_alerts

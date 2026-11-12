@@ -35,8 +35,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,6 +71,7 @@ import org.meshtastic.feature.map.maplibre.layers.COVERAGE_LAYER_ID
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+@Suppress("LongMethod")
 internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (String, Float) -> Unit) {
     val controller: CoverageController = koinInject()
     val state by controller.state.collectAsStateWithLifecycle()
@@ -149,6 +150,7 @@ internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (Stri
             text =
             when {
                 state.loading -> stringResource(Res.string.coverage_loading)
+
                 state.total == 0 -> stringResource(Res.string.coverage_none)
 
                 state.points.isEmpty() -> stringResource(Res.string.coverage_none_filtered)
@@ -157,7 +159,12 @@ internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (Stri
                     stringResource(Res.string.coverage_summary, state.points.size, state.nodes)
 
                 else ->
-                    stringResource(Res.string.coverage_summary_filtered, state.points.size, state.total, state.nodes)
+                    stringResource(
+                        Res.string.coverage_summary_filtered,
+                        state.points.size,
+                        state.total,
+                        state.nodes,
+                    )
             },
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),

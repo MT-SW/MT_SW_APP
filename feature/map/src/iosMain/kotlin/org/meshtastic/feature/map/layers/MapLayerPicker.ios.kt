@@ -41,20 +41,19 @@ import platform.posix.memcpy
 @Composable
 actual fun rememberMapLayerPicker(onPick: (PickedMapFile) -> Unit): MapLayerPickerLauncher {
     val scope = rememberCoroutineScope()
-    val openFile =
-        rememberOpenFileLauncher { uri ->
-            val url = uri?.toString()?.let { NSURL.URLWithString(it) } ?: return@rememberOpenFileLauncher
-            val name = url.lastPathComponent?.takeIf { it.isNotBlank() } ?: "layer_$nowMillis"
-            scope.launch {
-                onPick(
-                    PickedMapFile(
-                        displayName = name,
-                        extensionOrMime = name.substringAfterLast('.', "").ifBlank { null },
-                        read = { withContext(ioDispatcher) { url.readBytesOrNull() } },
-                    ),
-                )
-            }
+    val openFile = rememberOpenFileLauncher { uri ->
+        val url = uri?.toString()?.let { NSURL.URLWithString(it) } ?: return@rememberOpenFileLauncher
+        val name = url.lastPathComponent?.takeIf { it.isNotBlank() } ?: "layer_$nowMillis"
+        scope.launch {
+            onPick(
+                PickedMapFile(
+                    displayName = name,
+                    extensionOrMime = name.substringAfterLast('.', "").ifBlank { null },
+                    read = { withContext(ioDispatcher) { url.readBytesOrNull() } },
+                ),
+            )
         }
+    }
     return MapLayerPickerLauncher { openFile("*/*") }
 }
 

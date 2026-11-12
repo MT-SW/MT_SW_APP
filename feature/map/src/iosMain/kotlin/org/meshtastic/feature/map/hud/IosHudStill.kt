@@ -25,8 +25,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.jetbrains.skia.Image
 import platform.AVFoundation.AVCaptureConnection
@@ -61,7 +61,11 @@ private val log = Logger.withTag("HudStill")
 private class PhotoDelegate(private val onData: (NSData?) -> Unit) :
     NSObject(),
     AVCapturePhotoCaptureDelegateProtocol {
-    override fun captureOutput(output: AVCapturePhotoOutput, didFinishProcessingPhoto: AVCapturePhoto, error: NSError?) {
+    override fun captureOutput(
+        output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto: AVCapturePhoto,
+        error: NSError?,
+    ) {
         if (error != null) log.w { "The camera could not take the picture: ${error.localizedDescription}" }
         onData(if (error == null) didFinishProcessingPhoto.fileDataRepresentation() else null)
     }
@@ -87,11 +91,10 @@ class IosHudStill(private val photoOutput: AVCapturePhotoOutput) : HudStill {
         if (connection != null && connection.isVideoOrientationSupported()) {
             connection.videoOrientation = currentVideoOrientation()
         }
-        val photoDelegate =
-            PhotoDelegate { data ->
-                delegate = null
-                if (continuation.isActive) continuation.resume(data?.let { UIImage.imageWithData(it) })
-            }
+        val photoDelegate = PhotoDelegate { data ->
+            delegate = null
+            if (continuation.isActive) continuation.resume(data?.let { UIImage.imageWithData(it) })
+        }
         delegate = photoDelegate
         photoOutput.capturePhotoWithSettings(AVCapturePhotoSettings.photoSettings(), delegate = photoDelegate)
     }
@@ -126,7 +129,12 @@ class IosHudStill(private val photoOutput: AVCapturePhotoOutput) : HudStill {
         return renderer.imageWithActions { _ ->
             photo.drawInRect(CGRectMake(0.0, 0.0, photoWidth, photoHeight))
             overlay.drawInRect(
-                CGRectMake((photoWidth - visibleWidth) / 2, (photoHeight - visibleHeight) / 2, visibleWidth, visibleHeight),
+                CGRectMake(
+                    (photoWidth - visibleWidth) / 2,
+                    (photoHeight - visibleHeight) / 2,
+                    visibleWidth,
+                    visibleHeight,
+                ),
             )
         }
     }

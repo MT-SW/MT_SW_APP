@@ -22,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.ConnectionState
@@ -39,8 +41,6 @@ import org.meshtastic.core.resources.node_silence_alert_group
 import org.meshtastic.core.resources.node_silence_alert_notification
 import org.meshtastic.core.resources.node_silence_test_notification
 import org.meshtastic.core.resources.unknown_username
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.DurationUnit
 
@@ -115,6 +115,7 @@ class NodeSilenceMonitorImpl(
             ) == true
         // Nodes that went silent in this round: several at once (a power cut, a bad hour on the band) are reported
         // with one notification instead of a burst.
+        @Suppress("LoopWithTooManyJumpStatements")
         val newlySilent = mutableListOf<Pair<Node, Long>>()
         for ((nodeNum, minutes) in alerts) {
             val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: continue

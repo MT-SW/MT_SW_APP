@@ -36,13 +36,13 @@ import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.UIKit.UIApplication
+import platform.UIKit.UIScreen
 import platform.UserNotifications.UNAuthorizationOptionAlert
 import platform.UserNotifications.UNAuthorizationOptionBadge
 import platform.UserNotifications.UNAuthorizationOptionSound
 import platform.UserNotifications.UNAuthorizationStatusDenied
 import platform.UserNotifications.UNAuthorizationStatusNotDetermined
 import platform.UserNotifications.UNUserNotificationCenter
-import platform.UIKit.UIScreen
 import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
@@ -130,7 +130,9 @@ actual fun rememberNotificationPermissionState(): PermissionUiState {
             val newStatus =
                 when (settings?.authorizationStatus) {
                     UNAuthorizationStatusNotDetermined -> PermissionStatus.NOT_REQUESTED
+
                     UNAuthorizationStatusDenied -> PermissionStatus.PERMANENTLY_DENIED
+
                     // Allowed, provisional or temporary: notifications can be shown.
                     else -> PermissionStatus.GRANTED
                 }

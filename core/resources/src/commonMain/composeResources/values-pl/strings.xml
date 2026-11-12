@@ -3978,6 +3978,9 @@
     <string name="sos_hold_tap">Dotyk</string>
     <string name="sos_hold_seconds">%1$d s</string>
     <string name="mt_sw_other_sos_title">SOS</string>
+    <string name="mt_sw_other_notification_test_title">Testowe powiadomienia</string>
+    <string name="mt_sw_other_notification_test_body">W Ustawieniach sekcja „Wypróbuj powiadomienia” ma trzy przyciski: testowy alarm SOS, testowy komunikat z radia i testowe powiadomienie o nowym węźle. Każdy pokazuje od razu, jak wygląda takie powiadomienie, więc sprawdzisz dźwięk, przełącznik i ustawienie systemu bez czekania na prawdziwe zdarzenie. Rodzaj wyłączony nie przyjdzie też jako test. Strażnik węzła ma własny przycisk testowy w szczegółach węzła. Nic nie jest wysyłane przez radio.</string>
+    <string name="notification_test_summary">Alarm SOS, komunikat z radia, nowy węzeł: zobacz od razu</string>
     <string name="mt_sw_other_sos_body">W „Funkcjach MT_SW” ekran SOS ma duży przycisk. Przytrzymany przez ustawiony czas (albo dotknięty, jeśli tak wybierzesz) wysyła wiadomość alarmową na wybrany kanał, z Twoją pozycją, i pokazuje, czy wysłanie zostało potwierdzone. Ustawiasz kanał, treść, pozycję, powtarzanie (co 1 do 30 minut, do 50 razy, z zatrzymaniem po pierwszym potwierdzeniu) i czas przytrzymania przycisku. Powtarzanie trwa także po zamknięciu ekranu; kończy je tylko „Zatrzymaj”. Ekran otwiera też kafelek „SOS” w szybkich ustawieniach Androida, skrót „SOS MT_SW” na iPhonie i iPadzie (Siri, Skróty, przycisk czynności) oraz pozycja „SOS” w menu ikony przy zegarze na komputerze. Skróty tylko otwierają ekran, alarm wysyła się po przytrzymaniu przycisku.</string>
     <string name="archive_title">Archiwum wiadomości</string>
     <string name="archive_restore">Przywracanie wiadomości</string>
@@ -4019,7 +4022,7 @@
     <string name="archive_channel_named">Kanał %1$d (%2$s)</string>
     <string name="archive_channel_n">Kanał %1$d</string>
     <string name="mt_sw_other_archive_title">Archiwum wiadomości</string>
-    <string name="mt_sw_other_archive_body">W „Funkcjach MT_SW” archiwum wiadomości trzyma kopię Twoich wiadomości tekstowych w wybranym folderze: jeden plik na dobę albo na rozmowę i dobę, jako tekst, CSV lub Markdown, uzupełniany co 5 minut do 3 godzin, gdy aplikacja działa. „Zapisz teraz” zapisuje od razu. Działa na Androidzie, komputerze i iPhonie/iPadzie.</string>
+    <string name="mt_sw_other_archive_body">W „Funkcjach MT_SW” archiwum wiadomości trzyma kopię Twoich wiadomości tekstowych w wybranym folderze: jeden plik na dobę albo na rozmowę i dobę, jako tekst, CSV lub Markdown, uzupełniany co 5 minut do 3 godzin, gdy aplikacja działa. „Zapisz teraz” zapisuje od razu. „Sprawdź, ile wiadomości wróci” pokazuje na próbę, co by wróciło z archiwum, niczego nie zmieniając. Działa na Androidzie, komputerze i iPhonie/iPadzie.</string>
     <string name="track_snr_colors">Koloruj trasę według SNR</string>
     <string name="track_export_kml">Zapisz zasięg (KML)</string>
     <string name="track_compare">Porównaj trasy</string>

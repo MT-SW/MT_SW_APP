@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.util.SNR_LEGEND
 
 /**
- * Key to the track map: the SNR colour ramp when the track is coloured by signal, and which colour is which node when
- * a second track is compared. Small and translucent, so the map under it stays readable.
+ * Key to the track map: the SNR colour ramp when the track is coloured by signal, and which colour is which node when a
+ * second track is compared. Small and translucent, so the map under it stays readable.
  */
 @Composable
 internal fun TrackLegend(

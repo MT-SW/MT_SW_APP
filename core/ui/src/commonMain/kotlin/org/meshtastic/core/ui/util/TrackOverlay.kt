@@ -36,11 +36,11 @@ data class TrackOverlay(
     val compare: TrackCompare? = null,
 )
 
+@Suppress("CompositionLocalAllowlist")
 val LocalTrackOverlay = compositionLocalOf { TrackOverlay() }
 
 /** Colour steps of the coverage track, weakest first: SNR in dB to 0xRRGGBB. */
-private val SNR_STEPS =
-    listOf(-20f to 0xD32F2F, -12f to 0xF57C00, -6f to 0xFBC02D, 0f to 0x9CCC65, 5f to 0x2E7D32)
+private val SNR_STEPS = listOf(-20f to 0xD32F2F, -12f to 0xF57C00, -6f to 0xFBC02D, 0f to 0x9CCC65, 5f to 0x2E7D32)
 
 /** A point with no measured SNR. */
 const val SNR_UNKNOWN_RGB: Int = 0x9E9E9E
@@ -52,6 +52,7 @@ val SNR_LEGEND: List<Pair<Float, Int>> = SNR_STEPS
  * Colour for a received [snr], as 0xRRGGBB. Blends linearly between the steps and clamps at both ends; null (no direct
  * measurement) is grey.
  */
+@Suppress("ReturnCount")
 fun snrRgb(snr: Float?): Int {
     if (snr == null || snr.isNaN()) return SNR_UNKNOWN_RGB
     if (snr <= SNR_STEPS.first().first) return SNR_STEPS.first().second

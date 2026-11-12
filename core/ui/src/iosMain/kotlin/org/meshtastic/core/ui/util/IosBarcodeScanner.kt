@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 @file:OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @file:Suppress("MagicNumber")
 
@@ -151,7 +150,9 @@ private fun presentScanner(cancelTitle: String, onResult: (String?) -> Unit) {
     fun finish(result: String?) {
         if (finished) return
         finished = true
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) { session.stopRunning() }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
+            session.stopRunning()
+        }
         controller.dismissViewControllerAnimated(true) {
             activeScan = null
             onResult(result)
@@ -166,7 +167,9 @@ private fun presentScanner(cancelTitle: String, onResult: (String?) -> Unit) {
     scannerView.cancelButton.addTarget(target, NSSelectorFromString("cancel"), UIControlEventTouchUpInside)
 
     host.presentViewController(controller, animated = true) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) { session.startRunning() }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
+            session.startRunning()
+        }
     }
 }
 

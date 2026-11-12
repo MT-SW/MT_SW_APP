@@ -34,6 +34,7 @@ class JvmFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
     override suspend fun writeFile(folder: String, name: String, block: suspend (BufferedSink) -> Unit): Boolean =
         withContext(dispatchers.io) {
             try {
+                @Suppress("TooGenericExceptionCaught")
                 val directory = if (folder.startsWith("file:")) File(URI(folder)) else File(folder)
                 directory.mkdirs()
                 File(directory, name).sink().buffer().use { sink -> block(sink) }
@@ -49,6 +50,7 @@ class JvmFolderService(private val dispatchers: CoroutineDispatchers) : FolderSe
     override suspend fun readFiles(folder: String, suffixes: List<String>): List<Pair<String, ByteArray>> =
         withContext(dispatchers.io) {
             try {
+                @Suppress("TooGenericExceptionCaught")
                 val directory = if (folder.startsWith("file:")) File(URI(folder)) else File(folder)
                 directory
                     .listFiles { file -> file.isFile && suffixes.any { file.name.endsWith(it) } }

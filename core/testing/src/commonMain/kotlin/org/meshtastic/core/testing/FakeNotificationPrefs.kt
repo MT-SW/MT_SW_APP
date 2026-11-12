@@ -19,6 +19,7 @@ package org.meshtastic.core.testing
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.meshtastic.core.repository.NotificationPrefs
 
+@Suppress("TooManyFunctions")
 class FakeNotificationPrefs : NotificationPrefs {
     override val messagesEnabled = MutableStateFlow(true)
 

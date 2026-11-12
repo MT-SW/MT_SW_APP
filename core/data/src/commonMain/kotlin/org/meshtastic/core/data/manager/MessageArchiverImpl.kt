@@ -17,7 +17,6 @@
 package org.meshtastic.core.data.manager
 
 import co.touchlab.kermit.Logger
-import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -34,8 +33,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
-import org.koin.core.annotation.Single
 import okio.ByteString.Companion.toByteString
+import org.koin.core.annotation.Single
 import org.meshtastic.core.common.crypto.ArchiveCrypto
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ContactKey
@@ -47,8 +46,8 @@ import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.FolderService
 import org.meshtastic.core.repository.MessageArchiveConfig
 import org.meshtastic.core.repository.MessageArchiveMonitor
-import org.meshtastic.core.repository.MessageArchiveRestoreResult
 import org.meshtastic.core.repository.MessageArchivePrefs
+import org.meshtastic.core.repository.MessageArchiveRestoreResult
 import org.meshtastic.core.repository.MessageArchiveState
 import org.meshtastic.core.repository.MessageArchiver
 import org.meshtastic.core.repository.NodeRepository
@@ -61,14 +60,16 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.proto.PortNum
 import kotlin.time.Instant
+import kotlin.time.TimeSource
 
 /**
  * Keeps a copy of the text messages in a folder the user chose: one file per day (or per conversation and day), in the
  * format they picked. Every run rewrites the files of today and yesterday from the message history, so nothing is
- * missed when the app was closed for a while, and a file is written only when its content changed. It does not need
- * the radio: it reads the message history stored on the device.
+ * missed when the app was closed for a while, and a file is written only when its content changed. It does not need the
+ * radio: it reads the message history stored on the device.
  */
 @Single
+@Suppress("TooManyFunctions")
 class MessageArchiverImpl(
     private val packets: PacketRepository,
     private val nodes: NodeRepository,
@@ -300,8 +301,11 @@ class MessageArchiverImpl(
                     counts.noChannel++
                     if (record.channelName.isNotBlank()) counts.missing += record.channelName
                 }
+
                 record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> counts.already++
+
                 counts.preview && record.packetId != 0 && !counts.wouldHave.add(record.packetId) -> counts.already++
+
                 else -> {
                     if (counts.preview) {
                         val key = lineKeyOf(record.millis / MILLIS_PER_SECOND, record.text)
@@ -322,6 +326,7 @@ class MessageArchiverImpl(
      * channel by its name (or its number, when the file does not have the name), a private chat by the name of the
      * node.
      */
+    @Suppress("LoopWithTooManyJumpStatements")
     private suspend fun restoreLines(lines: List<ArchiveLine>, context: TextRestore, counts: RestoreCounts): Boolean {
         for (line in lines) {
             val millis = line.millis(context.zone)
@@ -365,6 +370,7 @@ class MessageArchiverImpl(
     }
 
     /** The slot and the address of the chat a text line belongs to now, or null when there is no such chat. */
+    @Suppress("ReturnCount")
     private fun textTarget(title: String, context: TextRestore): Pair<Int, String>? {
         parseChannelTitle(title)?.let { channel ->
             val slot =
@@ -376,12 +382,12 @@ class MessageArchiverImpl(
             return slot?.let { it to NodeAddress.ID_BROADCAST }
         }
         val node = context.knownNodes.singleOrNull { it.effectiveLongName == title } ?: return null
-        val slot =
-            if (context.myNode?.hasPKC == true && node.hasPKC) NodeAddress.PKC_CHANNEL_INDEX else node.channel
+        val slot = if (context.myNode?.hasPKC == true && node.hasPKC) NodeAddress.PKC_CHANNEL_INDEX else node.channel
         return slot to node.user.id
     }
 
     /** The text of an archive file, decrypted when it is a `.enc` file; null when it cannot be read. */
+    @Suppress("ReturnCount")
     private fun readableText(name: String, bytes: ByteArray, password: String): String? {
         if (!name.endsWith(".$ENCRYPTED_EXTENSION")) return bytes.decodeToString()
         if (password.isEmpty()) return null

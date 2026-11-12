@@ -99,17 +99,16 @@ internal object SingleInstance {
         repeat(CONNECT_TRIES) {
             val port = runCatching { portFile.readText().trim().toInt() }.getOrNull()
             if (port != null) {
-                val sent =
-                    runCatching {
-                        Socket(InetAddress.getLoopbackAddress(), port).use { socket ->
-                            socket.soTimeout = TIMEOUT_MS
-                            socket.getOutputStream().apply {
-                                write("$SHOW\n".toByteArray())
-                                flush()
-                            }
+                val sent = runCatching {
+                    Socket(InetAddress.getLoopbackAddress(), port).use { socket ->
+                        socket.soTimeout = TIMEOUT_MS
+                        socket.getOutputStream().apply {
+                            write("$SHOW\n".toByteArray())
+                            flush()
                         }
                     }
-                        .isSuccess
+                }
+                    .isSuccess
                 if (sent) return true
             }
             Thread.sleep(CONNECT_WAIT_MS)

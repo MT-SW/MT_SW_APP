@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.core.data.manager
 
 import kotlinx.datetime.LocalDate
@@ -84,10 +86,12 @@ internal fun formatArchive(entries: List<ArchiveEntry>, format: Int): String = w
                 }
             )
             .joinToString("\n", postfix = "\n")
+
     MessageArchiveConfig.FORMAT_MARKDOWN ->
         entries.joinToString("\n", postfix = "\n") {
             "- **${it.time}** · ${it.conversation} · **${it.sender}**: ${it.text.oneLine()}"
         }
+
     else ->
         entries.joinToString("\n", postfix = "\n") {
             "[${it.date} ${it.time}] ${it.conversation} | ${it.sender}: ${it.text.oneLine()}"
@@ -132,7 +136,9 @@ internal data class ArchiveRecord(
  */
 internal fun parseArchiveCsv(csv: String): List<ArchiveRecord> = csvRows(csv).mapNotNull { row ->
     if (row.size < CSV_RESTORE_COLUMNS) return@mapNotNull null
+    @Suppress("MagicNumber")
     val millis = row[5].toLongOrNull() ?: return@mapNotNull null
+    @Suppress("MagicNumber")
     val address = row[8]
     if (millis <= 0L || address.isEmpty()) return@mapNotNull null
     ArchiveRecord(
@@ -160,11 +166,14 @@ private fun csvRows(csv: String): List<List<String>> {
                 cell.append('"')
                 i++
             }
+
             c == '"' -> quoted = !quoted
+
             !quoted && c == ',' -> {
                 row.add(cell.toString())
                 cell.clear()
             }
+
             !quoted && (c == '\n' || c == '\r') -> {
                 if (c == '\r' && i + 1 < csv.length && csv[i + 1] == '\n') i++
                 if (cell.isNotEmpty() || row.isNotEmpty()) {
@@ -174,6 +183,7 @@ private fun csvRows(csv: String): List<List<String>> {
                 row = mutableListOf()
                 cell.clear()
             }
+
             else -> cell.append(c)
         }
         i++
@@ -203,30 +213,39 @@ private val CHANNEL_TITLE = Regex("""^(?:Kanał|Channel) (\d+)(?: \((.*)\))?$"""
 private const val LINE_BREAK_MARK = " ⏎ "
 
 /** The messages of a text archive file (`[date time] conversation | sender: text`); other lines are skipped. */
-internal fun parseArchiveText(content: String): List<ArchiveLine> = content.lineSequence().mapNotNull { line ->
-    val match = TEXT_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
-    val (date, time, conversation, rest) = match.destructured
-    val cut = rest.indexOf(": ")
-    if (cut < 0) return@mapNotNull null
-    val text = rest.substring(cut + 2).replace(LINE_BREAK_MARK, "\n")
-    ArchiveLine(date, time, conversation, rest.substring(0, cut), text)
-}.toList()
+internal fun parseArchiveText(content: String): List<ArchiveLine> = content
+    .lineSequence()
+    .mapNotNull { line ->
+        val match = TEXT_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
+        @Suppress("DestructuringDeclarationWithTooManyEntries")
+        val (date, time, conversation, rest) = match.destructured
+        val cut = rest.indexOf(": ")
+        if (cut < 0) return@mapNotNull null
+        val text = rest.substring(cut + 2).replace(LINE_BREAK_MARK, "\n")
+        ArchiveLine(date, time, conversation, rest.substring(0, cut), text)
+    }
+    .toList()
 
 /** The messages of a Markdown archive file; the day comes from the file name, which holds it (`…_2026-11-12…`). */
 internal fun parseArchiveMarkdown(content: String, fileName: String): List<ArchiveLine> {
     val date = DATE_IN_NAME.find(fileName)?.value ?: return emptyList()
-    return content.lineSequence().mapNotNull { line ->
-        val match = MARKDOWN_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
-        val (time, conversation, sender, text) = match.destructured
-        ArchiveLine(date, time, conversation, sender, text.replace(LINE_BREAK_MARK, "\n"))
-    }.toList()
+    return content
+        .lineSequence()
+        .mapNotNull { line ->
+            val match = MARKDOWN_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
+            @Suppress("DestructuringDeclarationWithTooManyEntries")
+            val (time, conversation, sender, text) = match.destructured
+            ArchiveLine(date, time, conversation, sender, text.replace(LINE_BREAK_MARK, "\n"))
+        }
+        .toList()
 }
 
 /** The exact time of a line, read in [zone]; null when the date or the time is not valid. */
 internal fun ArchiveLine.millis(zone: TimeZone): Long? = runCatching {
     val clock = if (time.length == "00:00".length) "$time:00" else time
     LocalDateTime(LocalDate.parse(date), LocalTime.parse(clock)).toInstant(zone).toEpochMilliseconds()
-}.getOrNull()
+}
+    .getOrNull()
 
 /** A channel conversation title: its slot number and, when the file has it, the channel name. */
 internal class ChannelTitle(val index: Int, val name: String?)

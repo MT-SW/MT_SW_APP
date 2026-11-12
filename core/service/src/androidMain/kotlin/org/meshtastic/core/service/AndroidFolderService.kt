@@ -52,6 +52,7 @@ class AndroidFolderService(private val context: Application, private val dispatc
                     Logger.e { "Could not create $name in the chosen folder" }
                     return@withContext false
                 }
+                @Suppress("TooGenericExceptionCaught")
                 val pfd = resolver.openFileDescriptor(target, "wt") ?: return@withContext false
                 pfd.use { descriptor ->
                     FileOutputStream(descriptor.fileDescriptor).sink().buffer().use { sink -> block(sink) }
@@ -80,6 +81,7 @@ class AndroidFolderService(private val context: Application, private val dispatc
                 val found = mutableListOf<Pair<String, Uri>>()
                 resolver.query(children, columns, null, null, null)?.use { cursor ->
                     while (cursor.moveToNext()) {
+                        @Suppress("TooGenericExceptionCaught")
                         val name = cursor.getString(1) ?: continue
                         if (suffixes.any { name.endsWith(it) }) {
                             found += name to DocumentsContract.buildDocumentUriUsingTree(tree, cursor.getString(0))

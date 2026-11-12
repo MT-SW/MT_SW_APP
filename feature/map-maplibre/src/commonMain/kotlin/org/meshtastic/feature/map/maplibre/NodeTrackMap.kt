@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.map.maplibre
 
 import androidx.compose.foundation.layout.Box
@@ -399,13 +401,12 @@ private fun TrackPointLayer(
 }
 
 /** The colour ramp of a point by its SNR: the legend's steps, with a grey tail for points nobody measured. */
-private fun snrColorStops() =
-    (
-        listOf(NO_SNR.toDouble() to SNR_UNKNOWN_RGB, UNMEASURED_EDGE to SNR_UNKNOWN_RGB) +
-            SNR_LEGEND.map { (snr, rgb) -> snr.toDouble() to rgb }
-        )
-        .map { (snr, rgb) -> snr to const(Color(OPAQUE or rgb)) }
-        .toTypedArray()
+private fun snrColorStops() = (
+    listOf(NO_SNR.toDouble() to SNR_UNKNOWN_RGB, UNMEASURED_EDGE to SNR_UNKNOWN_RGB) +
+        SNR_LEGEND.map { (snr, rgb) -> snr.toDouble() to rgb }
+    )
+    .map { (snr, rgb) -> snr to const(Color(OPAQUE or rgb)) }
+    .toTypedArray()
 
 /** The second track: a plain line in the other node's colour, with a dot at every fix. */
 @Composable

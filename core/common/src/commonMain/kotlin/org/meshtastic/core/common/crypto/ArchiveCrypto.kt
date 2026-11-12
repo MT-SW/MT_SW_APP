@@ -23,8 +23,8 @@ package org.meshtastic.core.common.crypto
  * bytes `Salted__`, an 8-byte salt, then the data encrypted with AES-256 in counter mode. Key and counter come from one
  * PBKDF2-HMAC-SHA256 run over the password and the salt ([ITERATIONS] rounds, 32 bytes of key then 16 of counter).
  *
- * Keeping to that format means a file can be opened on any computer with a standard tool, without this app:
- * `openssl enc -d -aes-256-ctr -pbkdf2 -md sha256 -iter 100000 -in file.enc -out file.txt`.
+ * Keeping to that format means a file can be opened on any computer with a standard tool, without this app: `openssl
+ * enc -d -aes-256-ctr -pbkdf2 -md sha256 -iter 100000 -in file.enc -out file.txt`.
  *
  * Counter mode hides the content but does not detect a wrong password or a changed file: a wrong password gives
  * unreadable bytes.

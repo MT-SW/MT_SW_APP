@@ -38,13 +38,7 @@ import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.proto.PortNum
 
 /** One measurement: where a node was when the radio heard its position directly, and with what SNR (dB). */
-data class CoveragePoint(
-    val latitude: Double,
-    val longitude: Double,
-    val snr: Float,
-    val time: Int,
-    val nodeNum: Int,
-)
+data class CoveragePoint(val latitude: Double, val longitude: Double, val snr: Float, val time: Int, val nodeNum: Int)
 
 /** A node that has measurements, for the node filter: its name and how many measurements it has. */
 data class CoverageSource(val nodeNum: Int, val name: String, val count: Int)
@@ -118,6 +112,7 @@ class CoverageController(
                 state.copy(sources = measured.second, readMillis = nowMillis, nodeFilter = node)
             }
             applyFilter()
+            Logger.i { "Coverage: ${mutable.value.points.size} of ${all.size} points are shown on the map" }
         } finally {
             mutable.update { it.copy(loading = false) }
         }
@@ -165,7 +160,7 @@ class CoverageController(
                         latitude = latI * GeoConstants.DEG_D,
                         longitude = lonI * GeoConstants.DEG_D,
                         snr = snr,
-                        time = position.time,
+                        time = position.time.takeIf { it != 0 } ?: packet.rx_time,
                         nodeNum = node.num,
                     )
                 names[node.num] = node.effectiveLongName

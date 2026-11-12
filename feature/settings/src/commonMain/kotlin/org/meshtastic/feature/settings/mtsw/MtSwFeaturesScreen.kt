@@ -98,12 +98,16 @@ import org.meshtastic.core.resources.mt_sw_other_silence_body
 import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.mt_sw_other_sos_title
 import org.meshtastic.core.resources.mt_sw_other_silence_title
+import org.meshtastic.core.resources.mt_sw_other_notification_test_body
+import org.meshtastic.core.resources.mt_sw_other_notification_test_title
 import org.meshtastic.core.resources.mt_sw_other_single_instance_body
 import org.meshtastic.core.resources.mt_sw_other_single_instance_title
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_body
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
+import org.meshtastic.core.resources.notification_test_summary
+import org.meshtastic.core.resources.notification_test_title
 import org.meshtastic.core.resources.sos_summary
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
@@ -140,6 +144,7 @@ import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.icon.Tune
@@ -417,6 +422,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.notification_test_title)) {
+                ListItem(
+                    text = stringResource(Res.string.notification_test_title),
+                    supportingText = stringResource(Res.string.notification_test_summary),
+                    leadingIcon = MeshtasticIcons.Notifications,
+                ) {
+                    onNavigate(SettingsRoute.Settings())
+                }
+            }
+
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_title)) {
                 ListItem(
                     text = stringResource(Res.string.mt_sw_other_title),
@@ -501,6 +516,10 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_calls_title, Res.string.mt_sw_other_calls_body)
             OtherFeature(Res.string.mt_sw_other_archive_title, Res.string.mt_sw_other_archive_body)
             OtherFeature(Res.string.mt_sw_other_sos_title, Res.string.mt_sw_other_sos_body)
+            OtherFeature(
+                Res.string.mt_sw_other_notification_test_title,
+                Res.string.mt_sw_other_notification_test_body,
+            )
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
             OtherFeature(Res.string.mt_sw_other_single_instance_title, Res.string.mt_sw_other_single_instance_body)
             OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)

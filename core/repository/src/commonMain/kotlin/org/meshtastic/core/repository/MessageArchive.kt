@@ -45,8 +45,9 @@ data class MessageArchiveConfig(
      */
     fun encode(): String {
         val base =
-            listOf(if (enabled) 1 else 0, intervalMinutes, format, if (perConversation) 1 else 0)
-                .joinToString("|") + "|" + folder
+            listOf(if (enabled) 1 else 0, intervalMinutes, format, if (perConversation) 1 else 0).joinToString("|") +
+                "|" +
+                folder
         return if (encrypted) "$ENCRYPTED_PREFIX${hex(password)}|$base" else base
     }
 
@@ -60,18 +61,20 @@ data class MessageArchiveConfig(
         private const val HEX_RADIX = 16
         private const val HEX_DIGITS_PER_BYTE = 2
 
+        @Suppress("MagicNumber")
         private fun hex(text: String): String = text.encodeToByteArray().joinToString("") {
             (it.toInt() and 0xFF).toString(HEX_RADIX).padStart(HEX_DIGITS_PER_BYTE, '0')
         }
 
+        @Suppress("ReturnCount")
         private fun unhex(text: String): String? {
             if (text.length % HEX_DIGITS_PER_BYTE != 0) return null
-            val bytes =
-                text.chunked(HEX_DIGITS_PER_BYTE).map { it.toIntOrNull(HEX_RADIX)?.toByte() ?: return null }
+            val bytes = text.chunked(HEX_DIGITS_PER_BYTE).map { it.toIntOrNull(HEX_RADIX)?.toByte() ?: return null }
             return bytes.toByteArray().decodeToString()
         }
 
         /** Reads what [encode] wrote; anything unreadable gives the defaults. */
+        @Suppress("ReturnCount")
         fun decode(text: String?): MessageArchiveConfig {
             if (text != null && text.startsWith(ENCRYPTED_PREFIX)) {
                 val parts = text.split('|', limit = 3)
@@ -81,6 +84,7 @@ data class MessageArchiveConfig(
             return decodePlain(text)
         }
 
+        @Suppress("ReturnCount")
         private fun decodePlain(text: String?): MessageArchiveConfig {
             val parts = text?.split('|', limit = FIELDS) ?: return MessageArchiveConfig()
             if (parts.size < FIELDS) return MessageArchiveConfig()
@@ -119,9 +123,9 @@ interface MessageArchiver {
     suspend fun archiveNow(): Boolean
 
     /**
-     * Puts the messages of the archive files (CSV, text, Markdown) in the archive folder back into the message
-     * history, each into the channel of the same name (the channels may have moved to other slots since). Messages
-     * already there are not added again.
+     * Puts the messages of the archive files (CSV, text, Markdown) in the archive folder back into the message history,
+     * each into the channel of the same name (the channels may have moved to other slots since). Messages already there
+     * are not added again.
      */
     suspend fun restore(preview: Boolean = false): MessageArchiveRestoreResult
 }
@@ -130,8 +134,8 @@ interface MessageArchiver {
  * What a restore did: [files] archive files read, [restored] messages put back, [alreadyThere] left alone because they
  * are in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could
  * not be read (a wrong or missing password gives these). With [preview] nothing was written: [restored] is how many
- * messages a restore would put back. [missingChannels] are the names (at most ten) of the chats that have no
- * channel now.
+ * messages a restore would put back. [missingChannels] are the names (at most ten) of the chats that have no channel
+ * now.
  */
 data class MessageArchiveRestoreResult(
     val files: Int = 0,

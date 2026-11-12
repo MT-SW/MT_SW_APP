@@ -22,8 +22,8 @@ import org.meshtastic.core.model.MessageStatus
 /**
  * The settings of the SOS mode. [message] empty means the default text; [repeatMinutes] 0 means send once, otherwise
  * the message is sent again every [repeatMinutes] minutes, up to [repeatCount] times in all, and (when
- * [stopWhenDelivered]) not any more once a send was confirmed. [holdSeconds] is how long the button has to be held
- * (0 = a single tap sends).
+ * [stopWhenDelivered]) not any more once a send was confirmed. [holdSeconds] is how long the button has to be held (0 =
+ * a single tap sends).
  */
 data class SosConfig(
     val channel: Int = 0,
@@ -51,6 +51,7 @@ data class SosConfig(
         private const val FIELDS = 7
 
         /** Reads what [encode] wrote; anything unreadable gives the defaults. */
+        @Suppress("ReturnCount")
         fun decode(text: String?): SosConfig {
             val parts = text?.split('|', limit = FIELDS) ?: return SosConfig()
             if (parts.size < FIELDS) return SosConfig()

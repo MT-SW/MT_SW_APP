@@ -101,6 +101,7 @@ class SosControllerImpl(
     }
 
     /** True when the radio confirmed the send within the waiting time. */
+    @Suppress("ReturnCount")
     private suspend fun waitForDelivery(packetId: Int): Boolean {
         var waited = 0L
         while (waited < DELIVERY_WAIT_MS) {
@@ -111,7 +112,9 @@ class SosControllerImpl(
                 MessageStatus.SFPP_ROUTING,
                 MessageStatus.SFPP_CONFIRMED,
                 -> return true
+
                 MessageStatus.ERROR -> return false
+
                 else -> Unit
             }
             delay(POLL_MS)
@@ -121,6 +124,7 @@ class SosControllerImpl(
     }
 
     /** The phone's fix when it comes quickly, otherwise the position our own node reports; null when neither. */
+    @Suppress("ReturnCount")
     private suspend fun currentPosition(): Pair<Double, Double>? {
         val fix =
             withTimeoutOrNull(LOCATION_WAIT_MS) { phone.locationUpdates().first { !it.permissionGranted || it.hasFix } }

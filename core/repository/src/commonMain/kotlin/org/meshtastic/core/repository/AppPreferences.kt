@@ -611,6 +611,7 @@ data class AppUpdatePrefs(
 )
 
 /** Reactive interface for notification preferences. */
+@Suppress("TooManyFunctions")
 interface NotificationPrefs {
     val messagesEnabled: StateFlow<Boolean>
 
@@ -1017,8 +1018,8 @@ interface MeshBeaconPrefs {
 }
 
 /**
- * A daily span of whole hours, [startHour] inclusive to [endHour] exclusive, both 0..23. It may cross midnight
- * (22 to 7). Equal hours mean the whole day.
+ * A daily span of whole hours, [startHour] inclusive to [endHour] exclusive, both 0..23. It may cross midnight (22 to
+ * 7). Equal hours mean the whole day.
  */
 data class QuietHours(val startHour: Int, val endHour: Int) {
     /** Whether [hour] (0..23) falls inside. */

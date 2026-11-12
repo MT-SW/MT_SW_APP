@@ -49,7 +49,8 @@ actual fun readKmlArchiveImages(bytes: ByteArray, hrefs: Set<String>): Map<Strin
         for (entry in zip.listRecursively("/".toPath())) {
             val name = entry.toString().trimStart('/')
             if (name !in hrefs || zip.metadata(entry).isDirectory) continue
-            // Budget blown mid-archive: keep the images already taken, the overlays whose files went unread are skipped.
+            // Budget blown mid-archive: keep the images already taken, the overlays whose files went unread are
+            // skipped.
             val data = zip.readWithin(entry, budget) ?: break
             budget -= data.size
             images[name] = data
@@ -73,7 +74,9 @@ private fun <T> withZip(bytes: ByteArray, block: (FileSystem) -> T): T? {
     }
 }
 
-/** This entry inflated, or null once it would take the archive past [remaining] bytes (the header size is not trusted). */
+/**
+ * This entry inflated, or null once it would take the archive past [remaining] bytes (the header size is not trusted).
+ */
 private fun FileSystem.readWithin(path: Path, remaining: Long): ByteArray? {
     val out = Buffer()
     val source = source(path).buffer()

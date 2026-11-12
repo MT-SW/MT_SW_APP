@@ -34,6 +34,7 @@ import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.QuietHours
 
 @Single
+@Suppress("TooManyFunctions")
 class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : NotificationPrefs {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
@@ -217,8 +218,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private fun parseOptInIds(csv: String?): List<Int> =
             csv?.split(',')?.mapNotNull { it.toIntOrNull() }?.distinct() ?: emptyList()
 
-        private fun parseSilenceAlerts(csv: String?): Map<Int, Int> = csv
-            ?.split(',')
+        private fun parseSilenceAlerts(csv: String?): Map<Int, Int> = csv?.split(',')
             ?.mapNotNull { pair ->
                 val (node, minutes) = pair.split(':').takeIf { it.size == 2 } ?: return@mapNotNull null
                 val nodeNum = node.toIntOrNull() ?: return@mapNotNull null
@@ -227,9 +227,12 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
             }
             ?.toMap() ?: emptyMap()
 
+        @Suppress("ReturnCount")
         private fun parseQuietHours(text: String?): QuietHours? {
             val (start, end) = text?.split('-')?.takeIf { it.size == 2 } ?: return null
+            @Suppress("MagicNumber")
             val startHour = start.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
+            @Suppress("MagicNumber")
             val endHour = end.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
             return QuietHours(startHour, endHour)
         }

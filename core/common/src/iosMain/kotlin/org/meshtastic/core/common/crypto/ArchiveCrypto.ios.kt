@@ -17,11 +17,11 @@
 package org.meshtastic.core.common.crypto
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.UByteVar
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.usePinned
-import kotlinx.cinterop.UByteVar
 import platform.CoreCrypto.CCKeyDerivationPBKDF
 import platform.CoreCrypto.kCCPBKDF2
 import platform.CoreCrypto.kCCPRFHmacAlgSHA256
@@ -34,24 +34,23 @@ actual fun pbkdf2Sha256(password: ByteArray, salt: ByteArray, iterations: Int, k
     val out = ByteArray(keyBytes)
     // An empty array has no first element to point at, so a one-byte stand-in is passed with a length of zero.
     val pass = if (password.isEmpty()) ByteArray(1) else password
-    val status =
-        pass.usePinned { p ->
-            salt.usePinned { s ->
-                out.usePinned { o ->
-                    CCKeyDerivationPBKDF(
-                        kCCPBKDF2,
-                        p.addressOf(0),
-                        password.size.convert(),
-                        s.addressOf(0).reinterpret<UByteVar>(),
-                        salt.size.convert(),
-                        kCCPRFHmacAlgSHA256,
-                        iterations.convert(),
-                        o.addressOf(0).reinterpret<UByteVar>(),
-                        keyBytes.convert(),
-                    )
-                }
+    val status = pass.usePinned { p ->
+        salt.usePinned { s ->
+            out.usePinned { o ->
+                CCKeyDerivationPBKDF(
+                    kCCPBKDF2,
+                    p.addressOf(0),
+                    password.size.convert(),
+                    s.addressOf(0).reinterpret<UByteVar>(),
+                    salt.size.convert(),
+                    kCCPRFHmacAlgSHA256,
+                    iterations.convert(),
+                    o.addressOf(0).reinterpret<UByteVar>(),
+                    keyBytes.convert(),
+                )
             }
         }
+    }
     check(status == 0) { "PBKDF2 failed: $status" }
     return out
 }

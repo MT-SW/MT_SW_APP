@@ -2310,7 +2310,7 @@
     <string name="mt_sw_map_filter_summary">Limit the map to nodes within a number of hops and a distance from your node. Opens the map; the limits are in its filters.</string>
     <string name="mt_sw_map_filter_title">Map filter: hops and distance</string>
     <string name="mt_sw_map_title">Network planning</string>
-    <string name="mt_sw_other_archive_body">In "MT_SW features" the message archive keeps a copy of your text messages in a folder you choose: one file per day or per conversation and day, as text, CSV or Markdown, updated every 5 minutes to 3 hours while the app runs. "Save now" writes it at once. Works on Android, desktop and iPhone/iPad.</string>
+    <string name="mt_sw_other_archive_body">In "MT_SW features" the message archive keeps a copy of your text messages in a folder you choose: one file per day or per conversation and day, as text, CSV or Markdown, updated every 5 minutes to 3 hours while the app runs. "Save now" writes it at once. "Check how many messages would come back" shows as a trial what would come back from the archive, changing nothing. Works on Android, desktop and iPhone/iPad.</string>
     <string name="mt_sw_other_archive_title">Message archive</string>
     <string name="mt_sw_other_availability_body">In the node details (below the node watchdog) a bar chart shows when the radio recorded packets from that node: for the last day, 3, 7, 14 or 30 days. A taller bar means more packets in that time slot; below it you see in how many slots the node was heard and its longest silence. The chart is built from the recorded packets, so it reaches back only as far as the log retention (MT_SW features → Logs) allows.</string>
     <string name="mt_sw_other_availability_title">Node availability</string>
@@ -2328,6 +2328,8 @@
     <string name="mt_sw_other_intro">Some MT_SW features are not in Settings, because they belong to a single node. Here is where they are and what they do.</string>
     <string name="mt_sw_other_lna_body">In the details of another node there is a field that corrects only the noise reported by that node. Your own LNA gain is set in Settings → LoRa. The correction is applied when values are shown, so raw readings are never changed.</string>
     <string name="mt_sw_other_lna_title">LNA correction of a node</string>
+    <string name="mt_sw_other_notification_test_body">In Settings the "Try the notifications" section has three buttons: a test SOS alarm, a test notice from the radio and a test new node notification. Each shows at once what that notification looks like, so you can check the sound, the switch and the system setting without waiting for a real event. A kind that is switched off does not arrive as a test either. The node watchdog has its own test button in the node details. Nothing is sent over the radio.</string>
+    <string name="mt_sw_other_notification_test_title">Test notifications</string>
     <string name="mt_sw_other_polarity_body">For a sensor connected the wrong way round. In the node information window (the \"i\" icon) you can swap power with battery percentage and invert the sign of the current, separately for each node. This only changes how values are shown.</string>
     <string name="mt_sw_other_polarity_title">Inverted power and current</string>
     <string name="mt_sw_other_remote_lists_body">In the node details (Administration → Lists and contacts on the remote device) you enter a node ID and add it to the favorites or ignored list on the remote device over the mesh. The app waits for a confirmation from the network, so you know the change arrived.</string>
@@ -2554,6 +2556,7 @@
     <string name="notification_test_radio_button">Test notice from the radio</string>
     <string name="notification_test_radio_text">This is a test notice from the radio. There is nothing to do.</string>
     <string name="notification_test_sender">Notification test</string>
+    <string name="notification_test_summary">SOS alarm, notice from the radio, new node: see them at once</string>
     <string name="notification_test_title">Try the notifications</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_alerts">Alarm notifications</string>

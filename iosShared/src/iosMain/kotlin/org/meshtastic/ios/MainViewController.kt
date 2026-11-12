@@ -76,8 +76,8 @@ import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
-import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.notification.IosNotificationSettingsSync
+import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.widget.IosWidgetPublisher
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.Foundation.NSApplicationSupportDirectory
@@ -170,6 +170,7 @@ private fun NotificationSettingsSync() {
 /** Keeps the statistics for the widget up to date while the app runs (the widget reads them from the App Group). */
 @Composable
 private fun WidgetPublishing() {
+    @Suppress("LongMethod")
     val publisher = remember {
         IosWidgetPublisher(koin.get<MeshStatsFeed>(MeshStatsFeed::class), koin.get<UiPrefs>(UiPrefs::class))
     }
@@ -179,6 +180,7 @@ private fun WidgetPublishing() {
 /** Applies the theme chosen in the settings and shows the app. */
 @Suppress("ViewModelForwarding")
 @Composable
+@Suppress("LongMethod")
 private fun ThemedApp(uiViewModel: UIViewModel) {
     val uiPrefs = remember { koin.get<UiPrefs>(UiPrefs::class) }
     val themePref by uiPrefs.theme.collectAsState(initial = UiPrefsDefaults.theme)
@@ -216,13 +218,15 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
     val eventThemeEnabled by uiViewModel.eventThemeEnabled.collectAsState()
     val eventTheme =
         remember(eventEdition, eventThemeEnabled) {
-            eventEdition?.takeIf { eventThemeEnabled }?.let {
-                EventTheme(
-                    accent = it.accentColorOrNull(),
-                    highlight = it.brandHighlightOrNull(),
-                    palette = it.brandPalette(),
-                )
-            }
+            eventEdition
+                ?.takeIf { eventThemeEnabled }
+                ?.let {
+                    EventTheme(
+                        accent = it.accentColorOrNull(),
+                        highlight = it.brandHighlightOrNull(),
+                        palette = it.brandPalette(),
+                    )
+                }
         }
     CompositionLocalProvider(
         LocalEventBranding provides eventEdition,
