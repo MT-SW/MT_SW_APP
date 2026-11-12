@@ -54,7 +54,7 @@ class MessageArchiveFormatTest {
 
     @Test
     fun fileNamesAreSafe() {
-        assertEquals("Kana__0".trim('_').ifEmpty { "x" }.let { safeFileName("Kanał 0") }, safeFileName("Kanał 0"))
+        assertEquals("Kanał_0", safeFileName("Kanał 0"))
         assertEquals("rozmowa", safeFileName("///"))
         assertEquals("csv", archiveExtension(MessageArchiveConfig.FORMAT_CSV))
         assertEquals("md", archiveExtension(MessageArchiveConfig.FORMAT_MARKDOWN))
