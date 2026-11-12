@@ -123,13 +123,14 @@ interface MessageArchiver {
      * history, each into the channel of the same name (the channels may have moved to other slots since). Messages
      * already there are not added again.
      */
-    suspend fun restore(): MessageArchiveRestoreResult
+    suspend fun restore(preview: Boolean = false): MessageArchiveRestoreResult
 }
 
 /**
  * What a restore did: [files] archive files read, [restored] messages put back, [alreadyThere] left alone because they
  * are in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could
- * not be read (a wrong or missing password gives these).
+ * not be read (a wrong or missing password gives these). With [preview] nothing was written: [restored] is how many
+ * messages a restore would put back.
  */
 data class MessageArchiveRestoreResult(
     val files: Int = 0,
@@ -137,6 +138,7 @@ data class MessageArchiveRestoreResult(
     val alreadyThere: Int = 0,
     val noChannel: Int = 0,
     val unreadable: Int = 0,
+    val preview: Boolean = false,
 )
 
 /** Starts the periodic archiving when the mesh service starts. */

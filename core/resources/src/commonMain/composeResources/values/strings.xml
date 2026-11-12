@@ -589,6 +589,8 @@
     <string name="archive_restore_csv_only">The table format (.csv) restores most exactly, because it keeps the channel names, the message numbers and the exact time. Text and Markdown files can be restored too, but less exactly: a channel is found by its name (in older files by its number), a private chat by the name of the node, and a message counts as already there when it has the same text in the same second.</string>
     <string name="archive_restore_hint">Puts the messages from the archive files (.csv, .txt, .md, also the encrypted ones) of the archive folder back into the message history. Each message goes to the channel of the same name, even if the channels sit in other places now.</string>
     <string name="archive_restore_info">Restoring: press "Restore from the archive" and the app reads every archive file (table .csv, text .txt and Markdown .md, also the encrypted .enc ones) in the archive folder and adds the messages that are missing from the history, for example after a reinstall, on a new phone or after the history was deleted. A message is put into the channel with the same NAME as when it was saved, so it lands in the right place even if someone has swapped the channels or moved them to other slots; a message whose channel is not set up now is skipped, and the result says how many. Private messages go back to the same person. A message that is already in the history is not added again, so the restore can be repeated safely. For encrypted files the same password must be set above. The table format (.csv) works most exactly, because it keeps the channel names, the message numbers and the exact time. In text and Markdown files a channel is found by its name (in files saved before this existed, by its number), a private chat by the name of the node, and a message counts as already there when it has the same text in the same second. Messages saved in a table before this existed (without those data) are skipped.</string>
+    <string name="archive_restore_preview_button">Check how many messages would come back</string>
+    <string name="archive_restore_preview_result">Check only, nothing was changed. Would be put back: %1$d, already there: %2$d, no such channel now: %3$d, unreadable files: %4$d</string>
     <string name="archive_restore_result">Put back: %1$d, already there: %2$d, no such channel now: %3$d, unreadable files: %4$d</string>
     <string name="archive_summary">Automatically saves your messages to a folder you choose.</string>
     <string name="archive_title">Message archive</string>
@@ -914,12 +916,19 @@
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
     <!-- COVERAGE -->
+    <string name="coverage_all_nodes">All nodes</string>
     <string name="coverage_export_all">Save coverage of all nodes (KML)</string>
-    <string name="coverage_info_body">This layer shows on the map where your radio heard other nodes directly, and how strongly. Every dot is one position of a node that reached the radio without a relay: green means a strong signal (SNR), red a weak one. So you can see where the network reaches well and where there are gaps. A relayed position is not counted, because it tells the signal of the last hop, not the distance to the node. The measurements come from the logs stored in the app, so they reach as far back as the logs are kept. The "Read again" button reads them again.</string>
+    <string name="coverage_info_body">This layer shows on the map where your radio heard other nodes directly, and how strongly. Every dot is one position of a node that reached the radio without a relay: green means a strong signal (SNR), red a weak one. So you can see where the network reaches well and where there are gaps. A relayed position is not counted, because it tells the signal of the last hop, not the distance to the node. The measurements come from the logs stored in the app, so they reach as far back as the logs are kept. The "Read again" button reads them again. With the buttons "All time", "Day", "7 days" and "30 days" and the node list you can show only fresh measurements or those of one node (the filter lasts for this session and does not change the saved data).</string>
     <string name="coverage_loading">Reading the measurements…</string>
     <string name="coverage_none">No measurements yet. They appear when the radio hears the positions of nodes directly.</string>
+    <string name="coverage_none_filtered">No measurement matches the chosen period and node.</string>
+    <string name="coverage_period_all">All time</string>
+    <string name="coverage_period_day">Day</string>
+    <string name="coverage_period_month">30 days</string>
+    <string name="coverage_period_week">7 days</string>
     <string name="coverage_refresh">Read again</string>
     <string name="coverage_summary">%1$d measurements from %2$d nodes</string>
+    <string name="coverage_summary_filtered">%1$d of %2$d measurements from %3$d nodes</string>
     <string name="coverage_title">Network coverage</string>
     <string name="cpu_usage">CPU Usage</string>
     <string name="cpu_usage_description">Processor utilization percentage</string>
@@ -2310,7 +2319,7 @@
     <string name="mt_sw_other_compare_title">Compare two tracks</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
     <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
-    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak. The same, without saving a file, is shown by the "Network coverage" layer on the main map (the layers button): coloured dots from all nodes, with a transparency slider, a colour key and a "Read again" button.</string>
+    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak. The same, without saving a file, is shown by the "Network coverage" layer on the main map (the layers button): coloured dots from all nodes, with a transparency slider, a colour key and a "Read again" button. With the buttons "All time", "Day", "7 days" and "30 days" and the node list you can show only fresh measurements or those of one node (the filter lasts for this session and does not change the saved data).</string>
     <string name="mt_sw_other_coverage_title">Coverage map from measurements</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
@@ -2537,6 +2546,13 @@
     <string name="notification_settings_android_hint">Sound, vibration, importance and lock screen for each kind of notification.</string>
     <string name="notification_settings_in_system">Notifications (in iPhone settings)</string>
     <string name="notification_sound_while_open">Notification sound while the app is open</string>
+    <string name="notification_test_alert_button">Test alarm (SOS)</string>
+    <string name="notification_test_alert_text">This is a test alarm. There is nothing to do.</string>
+    <string name="notification_test_hint">Shows a notification of that kind at once, so you can check the sound, the switch and the system settings without waiting for a real event. Nothing is sent over the radio.</string>
+    <string name="notification_test_radio_button">Test notice from the radio</string>
+    <string name="notification_test_radio_text">This is a test notice from the radio. There is nothing to do.</string>
+    <string name="notification_test_sender">Notification test</string>
+    <string name="notification_test_title">Try the notifications</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_alerts">Alarm notifications</string>
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>

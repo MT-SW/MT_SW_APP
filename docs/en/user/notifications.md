@@ -69,6 +69,10 @@ On Android 11 and newer, a message notification can also open as a floating bubb
 
 A Wear OS watch paired with your phone shows every Meshtastic notification except the service notification, which Android keeps on the phone because it never goes away. A message notification keeps its actions on the watch, and **Reply** there can offer suggested replies. The watch's own notification settings decide whether Meshtastic appears on it at all.
 
+## Test notifications
+
+In Settings (desktop and phone) there are two test buttons: "Test SOS alarm notification" and "Test radio notice notification". They show at once what these notifications look like and whether they arrive at all, without waiting for a real event. The node watchdog test is in the node details.
+
 ## Related Topics
 
 - [Messages & Channels](messages-and-channels) — muting conversations and nodes, bubbles, and message states

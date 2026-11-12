@@ -568,6 +568,8 @@ archive_restore_button
 archive_restore_csv_only
 archive_restore_hint
 archive_restore_info
+archive_restore_preview_button
+archive_restore_preview_result
 archive_restore_result
 archive_summary
 archive_title
@@ -881,12 +883,19 @@ conversations
 copy
 copyright_notice
 ### COVERAGE ###
+coverage_all_nodes
 coverage_export_all
 coverage_info_body
 coverage_loading
 coverage_none
+coverage_none_filtered
+coverage_period_all
+coverage_period_day
+coverage_period_month
+coverage_period_week
 coverage_refresh
 coverage_summary
+coverage_summary_filtered
 coverage_title
 cpu_usage
 cpu_usage_description
@@ -2486,6 +2495,13 @@ notification_settings_android
 notification_settings_android_hint
 notification_settings_in_system
 notification_sound_while_open
+notification_test_alert_button
+notification_test_alert_text
+notification_test_hint
+notification_test_radio_button
+notification_test_radio_text
+notification_test_sender
+notification_test_title
 ### NOTIFICATIONS ###
 notifications_alerts
 notifications_for_channel_and_direct_messages

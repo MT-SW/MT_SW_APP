@@ -2980,6 +2980,13 @@
     <string name="on_demand_hero_progress">Sprawdzono %1$d z %2$d</string>
     <string name="wifi_rssi_signal">WiFi RSSI</string>
     <string name="notifications_alerts">Powiadomienia o alarmach</string>
+    <string name="notification_test_title">Wypróbuj powiadomienia</string>
+    <string name="notification_test_hint">Pokazuje od razu powiadomienie danego rodzaju, więc sprawdzisz dźwięk, przełącznik i ustawienia systemu bez czekania na prawdziwe zdarzenie. Nic nie jest wysyłane przez radio.</string>
+    <string name="notification_test_alert_button">Testowy alarm (SOS)</string>
+    <string name="notification_test_radio_button">Testowy komunikat z radia</string>
+    <string name="notification_test_alert_text">To jest testowy alarm. Nic nie trzeba robić.</string>
+    <string name="notification_test_radio_text">To jest testowy komunikat z radia. Nic nie trzeba robić.</string>
+    <string name="notification_test_sender">Test powiadomień</string>
     <string name="notifications_node_silence">Strażnik węzła (węzeł milczy)</string>
     <string name="node_silence_notifications">Strażnik węzła</string>
     <string name="node_silence_notifications_description">Węzeł milczy dłużej, niż ustawiono dla niego w strażniku.</string>
@@ -3977,6 +3984,8 @@
     <string name="archive_restore_csv_only">Najdokładniej przywraca format tabeli (.csv), bo zapisuje nazwy kanałów, numery wiadomości i dokładny czas. Z plików tekstowych i Markdown też się da, ale mniej dokładnie: kanał jest rozpoznawany po nazwie (w starszych plikach po numerze), rozmowa prywatna po nazwie węzła, a wiadomość uznana za już istniejącą, gdy ma ten sam tekst w tej samej sekundzie.</string>
     <string name="archive_restore_hint">Wkłada wiadomości z plików archiwum (.csv, .txt, .md, także zaszyfrowanych) z folderu archiwum z powrotem do historii wiadomości. Każda trafia do kanału o tej samej nazwie, nawet jeśli kanały są teraz w innych miejscach.</string>
     <string name="archive_restore_info">Przywracanie: naciśnij „Przywróć z archiwum”, a aplikacja przeczyta wszystkie pliki archiwum (tabela .csv, tekst .txt i Markdown .md, także zaszyfrowane .enc) z folderu archiwum i doda do historii wiadomości te, których w niej brakuje, na przykład po ponownej instalacji, na nowym telefonie albo po skasowaniu historii. Wiadomość trafia do kanału o tej samej NAZWIE, jaką miał przy zapisie, więc ląduje we właściwym miejscu, nawet gdy ktoś zamienił kanały miejscami albo przesunął je w inne sloty; wiadomość z kanału, którego teraz nie ma w ustawieniach, jest pomijana, a wynik pokazuje ile ich było. Wiadomości prywatne wracają do tej samej osoby. Wiadomość, która już jest w historii, nie jest dodawana drugi raz, więc przywracanie można bezpiecznie powtarzać. Dla plików zaszyfrowanych musi być ustawione wyżej to samo hasło. Najdokładniej działa format tabeli (.csv), bo zapisuje nazwy kanałów, numery wiadomości i dokładny czas. W plikach tekstowych i Markdown kanał jest rozpoznawany po nazwie (w plikach zapisanych przed dodaniem tej funkcji — po numerze), rozmowa prywatna po nazwie węzła, a o tym, że wiadomość już jest, decyduje ten sam tekst w tej samej sekundzie. Wiadomości zapisane w tabeli przed dodaniem tej funkcji (bez tych danych) są pomijane.</string>
+    <string name="archive_restore_preview_button">Sprawdź, ile wiadomości wróci</string>
+    <string name="archive_restore_preview_result">Tylko sprawdzenie, nic nie zmieniono. Wróciłoby: %1$d, już są: %2$d, brak takiego kanału teraz: %3$d, pliki nie do odczytania: %4$d</string>
     <string name="archive_restore_result">Przywrócono: %1$d, już były: %2$d, brak takiego kanału teraz: %3$d, pliki nie do odczytania: %4$d</string>
     <string name="archive_encrypt">Ochrona hasłem</string>
     <string name="archive_encrypt_hint">Bez hasła pliki to zwykły tekst, który przeczyta każdy z dostępem do folderu. Ustaw hasło, aby zapisywać je zaszyfrowane (pliki .enc).</string>
@@ -4017,7 +4026,7 @@
     <string name="track_compare_empty">Brak innych węzłów z pozycją.</string>
     <string name="track_compare_summary">%1$s: %2$d pozycji, %3$s</string>
     <string name="mt_sw_other_coverage_title">Mapa zasięgu z pomiarów</string>
-    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo. To samo, bez zapisywania pliku, pokazuje warstwa „Zasięgi sieci (pokrycie)” na głównej mapie (przycisk warstw): kolorowe kropki ze wszystkich węzłów, z suwakiem przezroczystości, skalą kolorów i przyciskiem „Wczytaj ponownie”.</string>
+    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo. To samo, bez zapisywania pliku, pokazuje warstwa „Zasięgi sieci (pokrycie)” na głównej mapie (przycisk warstw): kolorowe kropki ze wszystkich węzłów, z suwakiem przezroczystości, skalą kolorów i przyciskiem „Wczytaj ponownie”. Przyciskami „Cały okres”, „Doba”, „7 dni” i „30 dni” oraz listą węzłów możesz pokazać tylko świeże pomiary albo pomiary jednego węzła (filtr dotyczy tej sesji i nie zmienia zapisanych danych).</string>
     <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
     <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
     <string name="node_silence_alert_group">Cisza węzłów: %1$d (%2$s)</string>
@@ -4034,11 +4043,18 @@
     <string name="track_legend_compare">Trasa: rysuje obok trasę drugiego węzła, w innym kolorze, żeby porównać obie drogi.</string>
     <string name="track_legend_gpx">Pobieranie: zapisuje trasę jako plik GPX do aplikacji nawigacyjnej lub map.</string>
     <string name="coverage_title">Zasięgi sieci (pokrycie)</string>
-    <string name="coverage_info_body">Ta warstwa pokazuje na mapie, gdzie Twoje radio słyszało inne węzły bezpośrednio i jak mocno. Każda kropka to jedna pozycja węzła, która dotarła do radia bez przekaźnika: zielona oznacza mocny sygnał (SNR), czerwona słaby. Dzięki temu widać, gdzie sieć ma dobry zasięg, a gdzie są dziury. Pozycja przekazana przez inny węzeł się nie liczy, bo mówi o sygnale ostatniego skoku, a nie o odległości do węzła. Pomiary pochodzą z logów zapisanych w aplikacji, więc sięgają tak daleko wstecz, jak długo logi są trzymane. Przycisk „Wczytaj ponownie” czyta je jeszcze raz.</string>
+    <string name="coverage_info_body">Ta warstwa pokazuje na mapie, gdzie Twoje radio słyszało inne węzły bezpośrednio i jak mocno. Każda kropka to jedna pozycja węzła, która dotarła do radia bez przekaźnika: zielona oznacza mocny sygnał (SNR), czerwona słaby. Dzięki temu widać, gdzie sieć ma dobry zasięg, a gdzie są dziury. Pozycja przekazana przez inny węzeł się nie liczy, bo mówi o sygnale ostatniego skoku, a nie o odległości do węzła. Pomiary pochodzą z logów zapisanych w aplikacji, więc sięgają tak daleko wstecz, jak długo logi są trzymane. Przycisk „Wczytaj ponownie” czyta je jeszcze raz. Przyciskami „Cały okres”, „Doba”, „7 dni” i „30 dni” oraz listą węzłów możesz pokazać tylko świeże pomiary albo pomiary jednego węzła (filtr dotyczy tej sesji i nie zmienia zapisanych danych).</string>
     <string name="coverage_loading">Wczytywanie pomiarów…</string>
     <string name="coverage_none">Brak pomiarów. Pojawią się, gdy radio usłyszy pozycje węzłów bezpośrednio.</string>
     <string name="coverage_summary">%1$d pomiarów z %2$d węzłów</string>
     <string name="coverage_refresh">Wczytaj ponownie</string>
+    <string name="coverage_period_all">Cały okres</string>
+    <string name="coverage_period_day">Doba</string>
+    <string name="coverage_period_week">7 dni</string>
+    <string name="coverage_period_month">30 dni</string>
+    <string name="coverage_all_nodes">Wszystkie węzły</string>
+    <string name="coverage_summary_filtered">%1$d z %2$d pomiarów z %3$d węzłów</string>
+    <string name="coverage_none_filtered">Żaden pomiar nie pasuje do wybranego okresu i węzła.</string>
     <string name="track_info_title">Zasięg i porównanie tras</string>
     <string name="coverage_export_all">Zapisz zasięg wszystkich węzłów (KML)</string>
 </resources>

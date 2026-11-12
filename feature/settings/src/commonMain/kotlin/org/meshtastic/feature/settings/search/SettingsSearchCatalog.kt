@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.resources.node_silence_alert
+import org.meshtastic.core.resources.notification_test_title
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.node_color_title
@@ -202,6 +203,7 @@ object SettingsSearchCatalog {
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.node_silence_alert to SettingsRoute.MtSwOtherFeatures,
+            Res.string.notification_test_title to SettingsRoute.Settings(),
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.archive_title to SettingsRoute.MessageArchive,
             Res.string.availability_title to SettingsRoute.MtSwOtherFeatures,

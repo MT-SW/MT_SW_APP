@@ -65,6 +65,8 @@ import org.meshtastic.core.resources.archive_restore_button
 import org.meshtastic.core.resources.archive_restore_csv_only
 import org.meshtastic.core.resources.archive_restore_hint
 import org.meshtastic.core.resources.archive_restore_info
+import org.meshtastic.core.resources.archive_restore_preview_button
+import org.meshtastic.core.resources.archive_restore_preview_result
 import org.meshtastic.core.resources.archive_restore_result
 import org.meshtastic.core.resources.archive_enabled
 import org.meshtastic.core.resources.archive_folder
@@ -250,6 +252,19 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 }
+                OutlinedButton(
+                    onClick = {
+                        restoring = true
+                        scope.launch {
+                            restoreResult = archiver.restore(preview = true)
+                            restoring = false
+                        }
+                    },
+                    enabled = config.folder.isNotBlank() && !restoring,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    Text(stringResource(Res.string.archive_restore_preview_button))
+                }
                 Button(
                     onClick = {
                         restoring = true
@@ -264,10 +279,16 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                     Text(stringResource(Res.string.archive_restore_button))
                 }
                 restoreResult?.let { result ->
+                    val resultText =
+                        if (result.preview) {
+                            Res.string.archive_restore_preview_result
+                        } else {
+                            Res.string.archive_restore_result
+                        }
                     Text(
                         text =
                         stringResource(
-                            Res.string.archive_restore_result,
+                            resultText,
                             result.restored,
                             result.alreadyThere,
                             result.noChannel,

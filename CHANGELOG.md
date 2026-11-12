@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Powiadomienia: w Ustawieniach dwa przyciski „Testowe powiadomienie o alarmie SOS” i „Testowe powiadomienie z radia” (komputer, Android, iPhone/iPad) pokazują od razu, jak wyglądają te powiadomienia.
+* Zasięgi na mapie: filtr po okresie (wszystko, 1, 7, 30 dni) i po węźle, z liczbą pokazanych pozycji.
+* Archiwum wiadomości: przycisk „Sprawdź, ile wiadomości wróci” pokazuje na próbę, ile wiadomości by wróciło, ile już jest i ilu brakuje kanału, niczego nie zmieniając.
 * Strażnik węzła: alarm ma teraz własny przełącznik „Strażnik węzła (węzeł milczy)” na komputerze i iPhonie/iPadzie (Ustawienia → MT_SW) oraz własną kategorię „Strażnik węzła” w ustawieniach powiadomień Androida. Nie zależy już od powiadomień o nowych węzłach, więc także testowe powiadomienie dociera, gdy nowe węzły są wyłączone.
 * Zasięgi (mapa główna i trasa w szczegółach węzła): pozycje usłyszane bezpośrednio są teraz rozpoznawane także wtedy, gdy radio nie podaje rodzaju transportu ani czasu odbioru, przez co wcześniej nie pokazywały się żadne kropki ani kolory SNR. Przy odczycie zasięgów do logu trafia liczba przeczytanych i bezpośrednich pozycji.
 * Komputer: domyślnie działa jedna kopia programu (drugie uruchomienie pokazuje okno pierwszej, także schowanej przy zegarze); w Funkcje MT_SW przełącznik „Pozwól na drugą kopię obok” pozwala uruchamiać kilka kopii.
@@ -732,6 +735,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Notifications: two buttons in Settings, "Test SOS alarm notification" and "Test radio notice notification" (desktop, Android, iPhone/iPad), show at once what these notifications look like.
+* Coverage on the map: a filter by period (all, 1, 7, 30 days) and by node, with the number of positions shown.
+* Message archive: the "Check how many messages would come back" button shows as a trial run how many messages would come back, how many are already there and for how many there is no channel, changing nothing.
 * Node watchdog: the alert now has its own switch "Node watchdog (a node is silent)" on desktop and iPhone/iPad (Settings → MT_SW) and its own "Node watchdog" category in the Android notification settings. It no longer depends on the new node notifications, so the test notification also arrives when new nodes are switched off.
 * Coverage (main map and the track in the node details): positions heard directly are now recognised also when the radio reports no transport and no arrival time, which before left the map without dots and the track without SNR colours. When the coverage is read, the log gets the number of positions read and heard directly.
 * Desktop: the program runs in one copy by default (a second start shows the window of the first one, also when it is hidden in the tray); in MT_SW features the "Allow a second copy next to it" switch lets you run several copies.

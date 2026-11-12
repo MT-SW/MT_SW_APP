@@ -100,6 +100,7 @@ import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
 import org.meshtastic.feature.settings.component.HomoglyphSetting
 import org.meshtastic.feature.settings.component.NotificationSection
+import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
@@ -422,6 +423,8 @@ fun DesktopSettingsScreen(
                             onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
                         )
                     }
+
+                    NotificationTestSection()
 
                     ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
                         ListItem(

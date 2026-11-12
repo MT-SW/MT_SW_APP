@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.fixOrNull
@@ -36,15 +37,32 @@ import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.proto.PortNum
 
 /** One measurement: where a node was when the radio heard its position directly, and with what SNR (dB). */
-data class CoveragePoint(val latitude: Double, val longitude: Double, val snr: Float, val time: Int)
+data class CoveragePoint(
+    val latitude: Double,
+    val longitude: Double,
+    val snr: Float,
+    val time: Int,
+    val nodeNum: Int,
+)
+
+/** A node that has measurements, for the node filter: its name and how many measurements it has. */
+data class CoverageSource(val nodeNum: Int, val name: String, val count: Int)
 
 /** What the coverage layer of the main map shows. */
 data class CoverageState(
     val enabled: Boolean = false,
     val loading: Boolean = false,
     val points: List<CoveragePoint> = emptyList(),
-    /** How many nodes the [points] come from. */
+    /** How many nodes the shown [points] come from. */
     val nodes: Int = 0,
+    /** How many measurements there are before the filter; [points] is the part the filter lets through. */
+    val total: Int = 0,
+    /** The nodes that have measurements, most measurements first. */
+    val sources: List<CoverageSource> = emptyList(),
+    /** The filter on the age of a measurement, in days; 0 shows all of them. */
+    val days: Int = 0,
+    /** The filter on one node; null shows all nodes. */
+    val nodeFilter: Int? = null,
     /** When the measurements were last read, in milliseconds; 0 when they were not read yet. */
     val readMillis: Long = 0L,
 )
@@ -67,6 +85,7 @@ class CoverageController(
     private val mutable = MutableStateFlow(CoverageState())
     val state: StateFlow<CoverageState> = mutable.asStateFlow()
     private var restored = false
+    private var all: List<CoveragePoint> = emptyList()
 
     /** Switches the layer on or off and remembers it, so it is still on after the app is opened again. */
     fun setEnabled(on: Boolean) {
@@ -88,22 +107,43 @@ class CoverageController(
         if (mutable.value.loading) return
         mutable.update { it.copy(loading = true) }
         try {
-            val (points, nodes) = withContext(dispatchers.default) { measure() }
-            mutable.update { it.copy(points = points, nodes = nodes, readMillis = nowMillis) }
+            val measured = withContext(dispatchers.default) { measure() }
+            all = measured.first
+            mutable.update { it.copy(sources = measured.second, readMillis = nowMillis) }
+            applyFilter()
         } finally {
             mutable.update { it.copy(loading = false) }
         }
     }
 
-    private suspend fun measure(): Pair<List<CoveragePoint>, Int> {
+    /** Shows only the measurements of the last [days] days (0: all of them). */
+    fun setDays(days: Int) {
+        mutable.update { it.copy(days = days) }
+        applyFilter()
+    }
+
+    /** Shows only the measurements of [nodeNum] (null: all nodes). */
+    fun setNode(nodeNum: Int?) {
+        mutable.update { it.copy(nodeFilter = nodeNum) }
+        applyFilter()
+    }
+
+    private fun applyFilter() {
+        mutable.update { state ->
+            val since = if (state.days > 0) nowMillis / MILLIS_PER_SECOND - state.days * SECONDS_PER_DAY else 0L
+            val shown = all.filter { (state.nodeFilter == null || it.nodeNum == state.nodeFilter) && it.time >= since }
+            state.copy(points = shown, nodes = shown.map { it.nodeNum }.distinct().size, total = all.size)
+        }
+    }
+
+    private suspend fun measure(): Pair<List<CoveragePoint>, List<CoverageSource>> {
         val points = mutableListOf<CoveragePoint>()
-        var nodes = 0
+        val names = mutableMapOf<Int, String>()
         var seen = 0
         var direct = 0
         for (node in nodeRepository.nodeDBbyNum.value.values) {
             if (node.lastHeard == 0) continue
             val packets = meshLogRepository.getMeshPacketsFrom(node.num, PortNum.POSITION_APP.value).first()
-            var measured = false
             for (packet in packets) {
                 seen++
                 if (!packet.isMeasuredDirect()) continue
@@ -117,16 +157,27 @@ class CoverageController(
                         longitude = lonI * GeoConstants.DEG_D,
                         snr = snr,
                         time = position.time,
+                        nodeNum = node.num,
                     )
-                measured = true
+                names[node.num] = node.effectiveLongName
             }
-            if (measured) nodes++
         }
         Logger.i { "Coverage: $seen position packets read, $direct heard directly, ${points.size} with a fix and SNR" }
-        return points.sortedByDescending { it.time }.take(MAX_POINTS) to nodes
+        val kept = points.sortedByDescending { it.time }.take(MAX_POINTS)
+        val sources =
+            kept
+                .groupingBy { it.nodeNum }
+                .eachCount()
+                .map { (num, count) ->
+                    CoverageSource(num, names[num].orEmpty().ifBlank { formatString("!%08x", num) }, count)
+                }
+                .sortedByDescending { it.count }
+        return kept to sources
     }
 
     private companion object {
         const val MAX_POINTS = 20_000
+        const val MILLIS_PER_SECOND = 1_000L
+        const val SECONDS_PER_DAY = 86_400L
     }
 }

@@ -69,6 +69,10 @@ W Androidzie 11 i nowszym powiadomienie o wiadomości może też otworzyć się 
 
 Zegarek Wear OS sparowany z telefonem pokazuje każde powiadomienie MT_SW z wyjątkiem powiadomienia usługi, które Android zostawia na telefonie, ponieważ nigdy nie znika. Powiadomienie o wiadomości zachowuje swoje akcje na zegarku, a **Odpowiedz** może tam oferować sugerowane odpowiedzi. To ustawienia powiadomień samego zegarka decydują, czy MT_SW w ogóle się na nim pojawia.
 
+## Testowe powiadomienia
+
+W Ustawieniach (komputer i telefon) są dwa przyciski testowe: „Testowe powiadomienie o alarmie SOS” i „Testowe powiadomienie z radia”. Pokazują od razu, jak wyglądają te powiadomienia i czy w ogóle docierają, bez czekania na prawdziwe zdarzenie. Test strażnika węzła jest w szczegółach węzła.
+
 ## Zobacz także
 
 - [Wiadomości i kanały](messages-and-channels) — wyciszanie rozmów i węzłów, dymki oraz stany wiadomości

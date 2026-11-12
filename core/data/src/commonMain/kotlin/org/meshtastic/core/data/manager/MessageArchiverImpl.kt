@@ -217,7 +217,7 @@ class MessageArchiverImpl(
         return set.settings.indices.mapNotNull { slot -> set.getChannel(slot)?.name?.let { slot to it } }.toMap()
     }
 
-    override suspend fun restore(): MessageArchiveRestoreResult = mutex.withLock {
+    override suspend fun restore(preview: Boolean): MessageArchiveRestoreResult = mutex.withLock {
         val config = prefs.config.value
         if (config.folder.isBlank()) return@withLock MessageArchiveRestoreResult()
         val myNodeNum = nodes.myNodeInfo.value?.myNodeNum ?: return@withLock MessageArchiveRestoreResult()
@@ -226,7 +226,7 @@ class MessageArchiverImpl(
         val suffixes = RESTORE_EXTENSIONS.flatMap { listOf(".$it", ".$it.$ENCRYPTED_EXTENSION") }
         // The tables first: they hold the exact times and numbers, so what the text files add is compared with them.
         val files = folders.readFiles(config.folder, suffixes).sortedBy { (name, _) -> if (isCsvFile(name)) 0 else 1 }
-        val counts = RestoreCounts()
+        val counts = RestoreCounts(preview)
         val textRestore = TextRestore(myNodeNum, channels, slotByName)
         for ((name, bytes) in files) {
             val text = readableText(name, bytes, config.password)
@@ -245,12 +245,26 @@ class MessageArchiverImpl(
                 if (found) counts.files++
             }
         }
-        MessageArchiveRestoreResult(counts.files, counts.restored, counts.already, counts.noChannel, counts.unreadable)
+        MessageArchiveRestoreResult(
+            files = counts.files,
+            restored = counts.restored,
+            alreadyThere = counts.already,
+            noChannel = counts.noChannel,
+            unreadable = counts.unreadable,
+            preview = preview,
+        )
     }
 
     private fun isCsvFile(name: String) = name.removeSuffix(".$ENCRYPTED_EXTENSION").endsWith(".csv")
 
-    private class RestoreCounts {
+    /**
+     * The counters of one restore. In a [preview] nothing is written, so what the run would have written is remembered
+     * here ([wouldHave]: message numbers, [wouldHaveLines]: chat and second and text) to count a message that is in two
+     * files only once, just like a real restore does.
+     */
+    private class RestoreCounts(val preview: Boolean) {
+        val wouldHave = mutableSetOf<Int>()
+        val wouldHaveLines = mutableSetOf<String>()
         var files = 0
         var restored = 0
         var already = 0
@@ -282,8 +296,14 @@ class MessageArchiverImpl(
             when {
                 slot == null -> counts.noChannel++
                 record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> counts.already++
+                counts.preview && record.packetId != 0 && !counts.wouldHave.add(record.packetId) -> counts.already++
                 else -> {
-                    saveRecord(myNodeNum, record, slot)
+                    if (counts.preview) {
+                        val key = lineKeyOf(record.millis / MILLIS_PER_SECOND, record.text)
+                        counts.wouldHaveLines += "$slot${record.address}|$key"
+                    } else {
+                        saveRecord(myNodeNum, record, slot)
+                    }
                     counts.restored++
                 }
             }
@@ -315,7 +335,7 @@ class MessageArchiverImpl(
                         .mapTo(mutableSetOf()) { lineKeyOf(it.displayTime / MILLIS_PER_SECOND, it.text) }
                 }
             val key = lineKeyOf(millis / MILLIS_PER_SECOND, line.text)
-            if (!seen.add(key)) {
+            if (!seen.add(key) || (counts.preview && "$contact|$key" in counts.wouldHaveLines)) {
                 counts.already++
                 continue
             }
@@ -332,7 +352,7 @@ class MessageArchiverImpl(
                     fromLocal = fromLocal,
                     packetId = key.hashCode().takeIf { it != 0 } ?: 1,
                 )
-            saveRecord(context.myNodeNum, record, slot)
+            if (!counts.preview) saveRecord(context.myNodeNum, record, slot)
             counts.restored++
         }
         return lines.isNotEmpty()
