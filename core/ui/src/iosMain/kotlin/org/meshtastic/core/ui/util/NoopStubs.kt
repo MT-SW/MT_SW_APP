@@ -42,8 +42,6 @@ actual val bleScanRequiresLocationServices: Boolean = false
 
 @Composable actual fun isGpsDisabled(): Boolean = false
 
-@Composable actual fun isBluetoothDisabled(): Boolean = false
-
 @Composable actual fun isBluetoothSupported(): Boolean = true
 
 @Composable actual fun isWifiUnavailable(): Boolean = false

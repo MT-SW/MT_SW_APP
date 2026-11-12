@@ -27,12 +27,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.CoreBluetooth.CBCentralManager
+import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
+import platform.CoreBluetooth.CBCentralManagerOptionShowPowerAlertKey
+import platform.CoreBluetooth.CBManagerStatePoweredOff
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.UIKit.UIApplication
 import platform.UIKit.UIScreen
+import platform.darwin.NSObject
 
 /** Keeps the screen on while [enabled] (firmware update, scanning, HUD), like the window flag on Android. */
 @Composable
@@ -80,3 +85,28 @@ actual fun rememberLocationPermissionState(): PermissionUiState {
 
 // iOS has no coarse/precise split that an app has to ask for separately, so the same state serves both.
 @Composable actual fun rememberPreciseLocationPermissionState(): PermissionUiState = rememberLocationPermissionState()
+
+private class BluetoothStateDelegate(var onOff: (Boolean) -> Unit) :
+    NSObject(),
+    CBCentralManagerDelegateProtocol {
+    override fun centralManagerDidUpdateState(central: CBCentralManager) {
+        onOff(central.state == CBManagerStatePoweredOff)
+    }
+}
+
+/** True while Bluetooth is switched off in the system, so the connection screen can say it (like on Android). */
+@Composable
+actual fun isBluetoothDisabled(): Boolean {
+    var off by remember { mutableStateOf(false) }
+    DisposableEffect(Unit) {
+        val delegate = BluetoothStateDelegate { off = it }
+        // The system's own "turn Bluetooth on" alert is left out; the app shows its own notice instead.
+        val options = mapOf<Any?, Any?>(CBCentralManagerOptionShowPowerAlertKey to false)
+        val manager = CBCentralManager(delegate = delegate, queue = null, options = options)
+        onDispose {
+            delegate.onOff = {}
+            manager.delegate = null
+        }
+    }
+    return off
+}
