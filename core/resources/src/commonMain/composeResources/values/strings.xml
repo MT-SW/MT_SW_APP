@@ -2273,6 +2273,8 @@
     <string name="mt_sw_other_remote_lists_title">Remote favorites and ignored</string>
     <string name="mt_sw_other_silence_body">In the node details (below the notes) you can turn on the watchdog for that one node: set it from 1 hour up to 30 days, or type your own time in hours (up to 90 days). When the node has been silent for that long, you get a notification; it disappears when the node is heard again. Optionally it also counts packets that only passed through the node. It works while the app is connected to the radio.</string>
     <string name="mt_sw_other_silence_title">Node watchdog</string>
+    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channel, with your position, and shows whether the send was confirmed. You can set the channel, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it.</string>
+    <string name="mt_sw_other_sos_title">SOS</string>
     <string name="mt_sw_other_summary">Where to find features that live next to a node</string>
     <string name="mt_sw_other_title">Other features</string>
     <string name="mt_sw_planner_open_summary">Simulates the radio link between two points with terrain and link budget. Also under the map's buttons and on a node's page</string>
@@ -3241,6 +3243,38 @@
     <string name="soil_temperature">Soil Temp</string>
     <string name="soil_water_metrics">Soil &amp; Water</string>
     <string name="solar_irradiance">Solar Irradiance</string>
+    <!-- SOS -->
+    <string name="sos_button">SOS</string>
+    <string name="sos_button_hold">Hold to send</string>
+    <string name="sos_button_tap">Tap to send</string>
+    <string name="sos_cancel">Stop</string>
+    <string name="sos_channel_n">Channel %1$d</string>
+    <string name="sos_default_message">SOS! I need help.</string>
+    <string name="sos_hold_seconds">%1$d s</string>
+    <string name="sos_hold_tap">Tap</string>
+    <string name="sos_include_position">Add my position</string>
+    <string name="sos_intro">Sends an emergency message to the chosen channel, with your position, and watches whether it was delivered. Hold the button for the set time so it cannot be pressed by accident.</string>
+    <string name="sos_message_label">Text (empty = default)</string>
+    <string name="sos_position_attached">With position</string>
+    <string name="sos_position_missing">Without position (no GPS fix)</string>
+    <string name="sos_repeat_count">Number of sends</string>
+    <string name="sos_repeat_every">Every %1$d min</string>
+    <string name="sos_repeat_once">Once</string>
+    <string name="sos_result_delivered">Finished: the message was confirmed</string>
+    <string name="sos_result_refused">Could not send: the channel is not on the radio</string>
+    <string name="sos_result_unconfirmed">Finished: no confirmation</string>
+    <string name="sos_section_channel">Channel</string>
+    <string name="sos_section_hold">Holding the button</string>
+    <string name="sos_section_message">Message</string>
+    <string name="sos_section_repeat">Repeating</string>
+    <string name="sos_status_delivered">delivered, confirmed</string>
+    <string name="sos_status_enroute">sent to the radio, waiting for confirmation</string>
+    <string name="sos_status_error">delivery failed</string>
+    <string name="sos_status_queued">waiting for the radio</string>
+    <string name="sos_status_sending">Sending %1$d of %2$d</string>
+    <string name="sos_stop_when_delivered">Stop after a confirmation</string>
+    <string name="sos_summary">An emergency button: sends a message with your position to a chosen channel and checks whether it was delivered.</string>
+    <string name="sos_title">SOS</string>
     <string name="speed">Speed</string>
     <string name="speed_kmh">%1$d Km/h</string>
     <string name="speed_mph">%1$d mph</string>

@@ -239,6 +239,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object AntennaCalculator : SettingsRoute
 
+    @Serializable data object Sos : SettingsRoute
+
     // endregion
 
     // region help & documentation routes

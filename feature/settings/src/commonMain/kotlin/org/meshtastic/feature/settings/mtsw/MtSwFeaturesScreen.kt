@@ -85,11 +85,15 @@ import org.meshtastic.core.resources.mt_sw_other_lna_title
 import org.meshtastic.core.resources.mt_sw_other_polarity_body
 import org.meshtastic.core.resources.mt_sw_other_polarity_title
 import org.meshtastic.core.resources.mt_sw_other_silence_body
+import org.meshtastic.core.resources.mt_sw_other_sos_body
+import org.meshtastic.core.resources.mt_sw_other_sos_title
 import org.meshtastic.core.resources.mt_sw_other_silence_title
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_body
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
+import org.meshtastic.core.resources.sos_summary
+import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
 import org.meshtastic.core.resources.mt_sw_terrain_open_summary
 import org.meshtastic.core.resources.node_color_pick
@@ -124,6 +128,7 @@ import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
@@ -373,6 +378,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.sos_title)) {
+                ListItem(
+                    text = stringResource(Res.string.sos_title),
+                    supportingText = stringResource(Res.string.sos_summary),
+                    leadingIcon = MeshtasticIcons.Warning,
+                ) {
+                    onNavigate(SettingsRoute.Sos)
+                }
+            }
+
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_title)) {
                 ListItem(
                     text = stringResource(Res.string.mt_sw_other_title),
@@ -455,6 +470,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_remote_lists_title, Res.string.mt_sw_other_remote_lists_body)
             OtherFeature(Res.string.mt_sw_other_contacts_title, Res.string.mt_sw_other_contacts_body)
             OtherFeature(Res.string.mt_sw_other_calls_title, Res.string.mt_sw_other_calls_body)
+            OtherFeature(Res.string.mt_sw_other_sos_title, Res.string.mt_sw_other_sos_body)
             OtherFeature(Res.string.mt_sw_other_silence_title, Res.string.mt_sw_other_silence_body)
             OtherFeature(Res.string.mt_sw_other_availability_title, Res.string.mt_sw_other_availability_body)
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_full_doc)) {

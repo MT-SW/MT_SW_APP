@@ -3922,4 +3922,37 @@
     <string name="availability_longest_silence">Najdłuższa cisza: %1$s</string>
     <string name="mt_sw_other_availability_title">Dostępność węzła</string>
     <string name="mt_sw_other_availability_body">W szczegółach węzła (pod strażnikiem węzła) wykres słupkowy pokazuje, kiedy radio zapisało pakiety od tego węzła: z ostatniej doby, 3, 7, 14 albo 30 dni. Wyższy słupek to więcej pakietów w danym przedziale czasu; pod wykresem widzisz, w ilu przedziałach węzeł był słyszany, i jego najdłuższą ciszę. Wykres powstaje z zapisanych pakietów, więc sięga tylko tak daleko, jak pozwala czas przechowywania logów (Funkcje MT_SW → Logi).</string>
+    <string name="sos_title">SOS</string>
+    <string name="sos_summary">Przycisk alarmowy: wysyła wiadomość z Twoją pozycją na wybrany kanał i sprawdza, czy została dostarczona.</string>
+    <string name="sos_intro">Wysyła wiadomość alarmową na wybrany kanał, z Twoją pozycją, i sprawdza, czy została dostarczona. Przycisk trzeba przytrzymać przez ustawiony czas, żeby nie dało się go nacisnąć przypadkiem.</string>
+    <string name="sos_button">SOS</string>
+    <string name="sos_button_hold">Przytrzymaj, aby wysłać</string>
+    <string name="sos_button_tap">Dotknij, aby wysłać</string>
+    <string name="sos_cancel">Zatrzymaj</string>
+    <string name="sos_default_message">SOS! Potrzebuję pomocy.</string>
+    <string name="sos_status_sending">Wysyłanie %1$d z %2$d</string>
+    <string name="sos_status_queued">czeka na radio</string>
+    <string name="sos_status_enroute">wysłano do radia, czekam na potwierdzenie</string>
+    <string name="sos_status_delivered">dostarczono, potwierdzone</string>
+    <string name="sos_status_error">błąd dostarczenia</string>
+    <string name="sos_result_delivered">Zakończono: wiadomość potwierdzona</string>
+    <string name="sos_result_unconfirmed">Zakończono: brak potwierdzenia</string>
+    <string name="sos_result_refused">Nie udało się wysłać: tego kanału nie ma w radiu</string>
+    <string name="sos_position_attached">Z pozycją</string>
+    <string name="sos_position_missing">Bez pozycji (brak sygnału GPS)</string>
+    <string name="sos_section_channel">Kanał</string>
+    <string name="sos_channel_n">Kanał %1$d</string>
+    <string name="sos_section_message">Wiadomość</string>
+    <string name="sos_message_label">Treść (puste = domyślna)</string>
+    <string name="sos_include_position">Dołącz moją pozycję</string>
+    <string name="sos_section_repeat">Powtarzanie</string>
+    <string name="sos_repeat_once">Raz</string>
+    <string name="sos_repeat_every">Co %1$d min</string>
+    <string name="sos_repeat_count">Liczba wysłań</string>
+    <string name="sos_stop_when_delivered">Przestań po potwierdzeniu</string>
+    <string name="sos_section_hold">Przytrzymanie przycisku</string>
+    <string name="sos_hold_tap">Dotyk</string>
+    <string name="sos_hold_seconds">%1$d s</string>
+    <string name="mt_sw_other_sos_title">SOS</string>
+    <string name="mt_sw_other_sos_body">W „Funkcjach MT_SW” ekran SOS ma duży przycisk. Przytrzymany przez ustawiony czas (albo dotknięty, jeśli tak wybierzesz) wysyła wiadomość alarmową na wybrany kanał, z Twoją pozycją, i pokazuje, czy wysłanie zostało potwierdzone. Ustawiasz kanał, treść, pozycję, powtarzanie (co 1 do 30 minut, do 50 razy, z zatrzymaniem po pierwszym potwierdzeniu) i czas przytrzymania przycisku. Powtarzanie trwa także po zamknięciu ekranu; kończy je tylko „Zatrzymaj”.</string>
 </resources>
