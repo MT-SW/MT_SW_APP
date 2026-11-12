@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -52,7 +53,7 @@ private const val MAX_RINGTONE_SIZE = 230
 // The player stops when it is released, so the one that is playing is kept here.
 private var currentPlayer: AVAudioPlayer? = null
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private fun playWav(wav: ByteArray) {
     val data = wav.usePinned { NSData.create(bytes = it.addressOf(0), length = wav.size.toULong()) }
     val player = AVAudioPlayer(data = data, error = null)

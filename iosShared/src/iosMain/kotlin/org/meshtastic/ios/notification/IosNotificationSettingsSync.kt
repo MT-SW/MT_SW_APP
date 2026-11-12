@@ -46,7 +46,7 @@ class IosNotificationSettingsSync(private val prefs: NotificationPrefs) {
             Item(KEY_SOUND_WHILE_OPEN, prefs.soundWhileOpen, prefs::setSoundWhileOpen),
         )
 
-    suspend fun run() = coroutineScope {
+    suspend fun run(): Unit = coroutineScope {
         val defaults = NSUserDefaults.standardUserDefaults
         // The saved settings load in a moment; this waits for them so the app's real values are not replaced by the
         // defaults they start with.
