@@ -45,15 +45,15 @@ import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sqrt
 
+/** The radio's own values, used by the calculators when the question does not give them. */
+data class AssistantCalculatorDefaults(val preset: ChannelOption? = null, val txDbm: Int = 0)
+
 /**
  * Radio calculations done by the app, never by the model (a small model guesses numbers). Each one recognises its
  * question by words and by numbers with units, so it works for any wording and any values, not only prepared questions.
  * [answer] gives the written result in Polish or English, or null when the question is not a calculation.
  */
 object AssistantCalculators {
-    /** The radio's own values, used when the question does not give them. */
-    data class Defaults(val preset: ChannelOption? = null, val txDbm: Int = 0)
-
     /** The frequency of our network, used when a question gives none. */
     const val OUR_MHZ = 869.44165
     private const val C = 299_792_458.0
@@ -62,7 +62,11 @@ object AssistantCalculators {
     /** A link margin of this many dB over free space usually survives some obstacles and fading. */
     private const val GOOD_MARGIN_DB = 20.0
 
-    fun answer(question: String, polish: Boolean, defaults: Defaults = Defaults()): String? {
+    fun answer(
+        question: String,
+        polish: Boolean,
+        defaults: AssistantCalculatorDefaults = AssistantCalculatorDefaults(),
+    ): String? {
         lastAntenna = null
         polishLabels = polish
         val q = question.lowercase().replace(' ', ' ')
@@ -678,7 +682,7 @@ object AssistantCalculators {
 
     // ---------------------------------------------------------------- LoRa
 
-    private fun preset(q: String, defaults: Defaults): Pair<ChannelOption, Boolean> {
+    private fun preset(q: String, defaults: AssistantCalculatorDefaults): Pair<ChannelOption, Boolean> {
         val flat = q.replace(Regex("[\\s_-]"), "")
         val named = ChannelOption.entries.firstOrNull { flat.contains(it.name.replace("_", "").lowercase()) }
         return when {
@@ -723,7 +727,7 @@ object AssistantCalculators {
 
     private fun snrLimit(sf: Int) = -7.5 - 2.5 * (sf - 7)
 
-    private fun range(q: String, t: Texts, defaults: Defaults): String? {
+    private fun range(q: String, t: Texts, defaults: AssistantCalculatorDefaults): String? {
         if (
             !has(
                 q,
@@ -979,7 +983,7 @@ object AssistantCalculators {
             )
     }
 
-    private fun presets(q: String, t: Texts, defaults: Defaults): String? {
+    private fun presets(q: String, t: Texts, defaults: AssistantCalculatorDefaults): String? {
         if (!has(q, "preset")) return null
         if (
             !has(
@@ -1148,7 +1152,7 @@ object AssistantCalculators {
         return sb.toString()
     }
 
-    private fun airtime(q: String, t: Texts, defaults: Defaults): String? {
+    private fun airtime(q: String, t: Texts, defaults: AssistantCalculatorDefaults): String? {
         if (
             !has(
                 q,

@@ -2774,10 +2774,10 @@ class AssistantDataProvider(
     }
 
     /** The radio's preset and transmit power, for calculations whose question does not give them. */
-    suspend fun calcDefaults(): AssistantCalculators.Defaults {
-        val lora = radioConfigRepository.localConfigFlow.first().lora ?: return AssistantCalculators.Defaults()
+    suspend fun calcDefaults(): AssistantCalculatorDefaults {
+        val lora = radioConfigRepository.localConfigFlow.first().lora ?: return AssistantCalculatorDefaults()
         val preset = if (lora.use_preset) ChannelOption.from(lora.modem_preset) else null
-        return AssistantCalculators.Defaults(preset, lora.tx_power)
+        return AssistantCalculatorDefaults(preset, lora.tx_power)
     }
 
     /**

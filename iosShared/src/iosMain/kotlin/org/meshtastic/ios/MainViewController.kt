@@ -122,14 +122,12 @@ fun MainViewController() = ComposeUIViewController(
     configure = { onFocusBehavior = OnFocusBehavior.DoNothing },
 ) {
     val uiViewModel = sharedUiViewModel
-    org.koin.compose.KoinContext(koin) {
-        MeshServiceLifecycle()
-        BackgroundCleanup()
-        WidgetPublishing()
-        NotificationSettingsSync()
-        AppUpdateLifecycle()
-        ThemedApp(uiViewModel)
-    }
+    MeshServiceLifecycle()
+    BackgroundCleanup()
+    WidgetPublishing()
+    NotificationSettingsSync()
+    AppUpdateLifecycle()
+    ThemedApp(uiViewModel)
 }
 
 /** Starts the radio service with the screen and stops it with it. */
