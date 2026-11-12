@@ -19,7 +19,12 @@
 package org.meshtastic.feature.node.health
 
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.common.util.nowMillis
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /** One "label: value" line of the exported summary. */
 internal data class ReportLine(val label: String, val value: String)
@@ -27,11 +32,15 @@ internal data class ReportLine(val label: String, val value: String)
 /** One bar of a chart in the exported summary; [value] is only compared with the other bars of the same section. */
 internal data class ReportBar(val label: String, val value: Float, val text: String)
 
+/** One node of a position sketch in the exported summary; [isMe] marks the local node. */
+internal data class ReportPoint(val label: String, val latitude: Double, val longitude: Double, val isMe: Boolean)
+
 /** A titled part of the exported summary. */
 internal data class ReportSection(
     val title: String,
     val lines: List<ReportLine> = emptyList(),
     val bars: List<ReportBar> = emptyList(),
+    val points: List<ReportPoint> = emptyList(),
 )
 
 /** The whole summary as plain data, so it can be written out as PDF, HTML, Markdown, text or CSV. */
@@ -120,6 +129,18 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
                 ),
             ),
         )
+        if (nodeRows.isNotEmpty()) {
+            val nowSeconds = (nowMillis / MILLIS_PER_SECOND).toInt()
+            add(ReportSection("Lista węzłów (od ostatnio słyszanych)", lines = nodeRows.map { it.toLine(nowSeconds) }))
+        }
+        if (mapPoints.isNotEmpty()) {
+            add(
+                ReportSection(
+                    title = "Położenie węzłów (schemat, północ u góry)",
+                    points = mapPoints.map { ReportPoint(it.nodeName, it.latitude, it.longitude, it.isMe) },
+                ),
+            )
+        }
         addRanking(
             "Najdłużej działające węzły",
             uptimeLeaders.map { ReportBar(it.nodeName, it.uptimeSeconds.toFloat(), uptimeText(it.uptimeSeconds)) },
@@ -162,6 +183,72 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
     }
     return NetworkReport(title = "Podsumowanie sieci mesh", generated = generated, sections = sections)
 }
+
+private const val MILLIS_PER_SECOND = 1000L
+private const val SECONDS_PER_MINUTE = 60
+private const val MAINS_LEVEL = 100
+
+private fun NodeRow.toLine(nowSeconds: Int): ReportLine {
+    val parts =
+        listOfNotNull(
+            snr?.let { "sygnał ${MetricFormatter.snr(it)}" },
+            batteryPercent?.let { if (it > MAINS_LEVEL) "zasilanie zewn." else "bateria $it%" },
+            if (lastHeardSeconds == 0) "nie słyszany" else ageText(nowSeconds - lastHeardSeconds),
+            distanceMeters?.let { distanceText(it) },
+        )
+    return ReportLine(nodeName, parts.joinToString(" · "))
+}
+
+private fun ageText(seconds: Int): String {
+    val s = seconds.coerceAtLeast(0)
+    return when {
+        s < SECONDS_PER_HOUR -> "${s / SECONDS_PER_MINUTE} min temu"
+        s < SECONDS_PER_HOUR * HOURS_PER_DAY -> "${s / SECONDS_PER_HOUR} h temu"
+        else -> "${s / (SECONDS_PER_HOUR * HOURS_PER_DAY)} d temu"
+    }
+}
+
+/** A [ReportPoint] placed in a drawing box: [x] and [y] count from the top left corner. */
+internal data class PlacedPoint(val point: ReportPoint, val x: Float, val y: Float)
+
+/**
+ * Places [points] in a box of [width] × [height] with [pad] around it, north up and the true proportions kept (the
+ * east-west distances are shortened by the cosine of the latitude), centred in the box.
+ */
+internal fun placePoints(points: List<ReportPoint>, width: Float, height: Float, pad: Float): List<PlacedPoint> {
+    if (points.isEmpty()) return emptyList()
+    val minLat = points.minOf { it.latitude }
+    val maxLat = points.maxOf { it.latitude }
+    val minLon = points.minOf { it.longitude }
+    val maxLon = points.maxOf { it.longitude }
+    val k = cos((minLat + maxLat) / 2 * PI / 180.0)
+    val spanX = ((maxLon - minLon) * k).toFloat()
+    val spanY = (maxLat - minLat).toFloat()
+    val availW = width - 2 * pad
+    val availH = height - 2 * pad
+    val scaleX = if (spanX > 0f) availW / spanX else Float.MAX_VALUE
+    val scaleY = if (spanY > 0f) availH / spanY else Float.MAX_VALUE
+    val scale = if (spanX <= 0f && spanY <= 0f) 0f else min(scaleX, scaleY)
+    val offsetX = pad + (availW - spanX * scale) / 2
+    val offsetY = pad + (availH - spanY * scale) / 2
+    return points.map {
+        PlacedPoint(
+            point = it,
+            x = offsetX + ((it.longitude - minLon) * k).toFloat() * scale,
+            y = offsetY + (maxLat - it.latitude).toFloat() * scale,
+        )
+    }
+}
+
+/** The coordinates written out for the text formats, e.g. `50.87654, 20.63284`. */
+internal fun ReportPoint.coordinates(): String = "${rounded(latitude)}, ${rounded(longitude)}"
+
+private const val COORDINATE_SCALE = 100_000.0
+
+private fun rounded(value: Double): Double = (value * COORDINATE_SCALE).roundToLong() / COORDINATE_SCALE
+
+/** Names are drawn next to the dots only while there are few enough of them to stay readable. */
+internal const val MAX_LABELLED_POINTS = 30
 
 private const val SNR_OFFSET = 30f
 private const val TENTHS = 10f
@@ -211,6 +298,7 @@ internal fun NetworkReport.toPlainText(): String = buildString {
         section.lines.forEach { appendLine("${it.label}: ${it.value}") }
         val max = section.bars.maxOfOrNull { it.value } ?: 0f
         section.bars.forEach { appendLine("${it.label}: ${it.text} ${textBar(it.value, max)}".trimEnd()) }
+        section.points.forEach { appendLine("${it.label}: ${it.coordinates()}") }
     }
 }
 
@@ -225,6 +313,7 @@ internal fun NetworkReport.toMarkdown(): String = buildString {
         section.lines.forEach { appendLine("- **${it.label}:** ${it.value}") }
         val max = section.bars.maxOfOrNull { it.value } ?: 0f
         section.bars.forEach { appendLine("- ${it.label}: **${it.text}** ${textBar(it.value, max)}".trimEnd()) }
+        section.points.forEach { appendLine("- ${it.label}: ${it.coordinates()}") }
     }
 }
 
@@ -233,10 +322,36 @@ internal fun NetworkReport.toCsv(): String = buildString {
     sections.forEach { section ->
         section.lines.forEach { appendLine(csvRow(section.title, it.label, it.value)) }
         section.bars.forEach { appendLine(csvRow(section.title, it.label, it.text)) }
+        section.points.forEach { appendLine(csvRow(section.title, it.label, it.coordinates())) }
     }
 }
 
 private fun csvRow(vararg cells: String) = cells.joinToString(",") { "\"${it.replace("\"", "\"\"")}\"" }
+
+private const val SVG_WIDTH = 720f
+private const val SVG_HEIGHT = 420f
+private const val SVG_PAD = 28f
+
+/** The position sketch as an inline SVG: a dot per node, the local node larger, names when there are few nodes. */
+private fun List<ReportPoint>.toSvg(): String = buildString {
+    append("<svg viewBox=\"0 0 ${SVG_WIDTH.toInt()} ${SVG_HEIGHT.toInt()}\" style=\"width:100%;height:auto\">")
+    append("<rect width=\"${SVG_WIDTH.toInt()}\" height=\"${SVG_HEIGHT.toInt()}\" fill=\"#f6f6f6\" rx=\"8\"/>")
+    val labelled = size <= MAX_LABELLED_POINTS
+    placePoints(this@toSvg, SVG_WIDTH, SVG_HEIGHT, SVG_PAD).forEach { placed ->
+        val x = placed.x.roundToInt()
+        val y = placed.y.roundToInt()
+        val name = placed.point.label.escapeHtml()
+        if (placed.point.isMe) {
+            append("<circle cx=\"$x\" cy=\"$y\" r=\"7\" fill=\"#222\"><title>$name</title></circle>")
+        } else {
+            append("<circle cx=\"$x\" cy=\"$y\" r=\"4\" fill=\"#d9a400\"><title>$name</title></circle>")
+        }
+        if (labelled || placed.point.isMe) {
+            append("<text x=\"${x + 8}\" y=\"${y + 4}\" font-size=\"11\" fill=\"#444\">$name</text>")
+        }
+    }
+    append("</svg>")
+}
 
 private fun String.escapeHtml() = replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
@@ -271,6 +386,7 @@ internal fun NetworkReport.toHtml(): String = buildString {
                     "<span class=\"v\">${it.text.escapeHtml()}</span></div>",
             )
         }
+        if (section.points.isNotEmpty()) appendLine(section.points.toSvg())
         appendLine("</section>")
     }
     appendLine("</body></html>")

@@ -54,6 +54,18 @@ data class ChannelMessageCount(val channelIndex: Int, val weekCount: Int, val to
 
 data class MessageSender(val nodeName: String, val count: Int)
 
+/** One row of the exported node list: who, how strong, how full the battery, when last heard and how far from us. */
+data class NodeRow(
+    val nodeName: String,
+    val snr: Float?,
+    val batteryPercent: Int?,
+    val lastHeardSeconds: Int,
+    val distanceMeters: Int?,
+)
+
+/** A node with a valid position, for the position sketch in the exported summary. */
+data class MapPoint(val nodeName: String, val latitude: Double, val longitude: Double, val isMe: Boolean)
+
 data class NetworkSummaryUiState(
     val onlineCount: Int = 0,
     val totalCount: Int = 0,
@@ -92,11 +104,18 @@ data class NetworkSummaryUiState(
     val snrDistribution: List<Int> = listOf(0, 0, 0, 0, 0),
     /** Text messages per day over the last 7 days, oldest first; the last one is the last 24 hours. */
     val messagesPerDay: List<Int> = List(DAYS_IN_WEEK) { 0 },
+    /** Nodes for the exported list, the most recently heard first. */
+    val nodeRows: List<NodeRow> = emptyList(),
+    /** Nodes with a valid position, for the exported position sketch. */
+    val mapPoints: List<MapPoint> = emptyList(),
     /** False until the first calculation has finished; the screen shows a loading indicator meanwhile. */
     val isLoaded: Boolean = false,
 )
 
 const val DAYS_IN_WEEK = 7
+
+private const val MAX_REPORT_NODES = 300
+private const val MAX_REPORT_POINTS = 500
 
 @KoinViewModel
 class NetworkSummaryViewModel(
@@ -294,6 +313,25 @@ class NetworkSummaryViewModel(
                     .take(TOP_LIST_COUNT)
                     .map { (num, count) -> MessageSender(nameByNum[num] ?: "?", count) }
 
+            val nodeRows =
+                nodes
+                    .sortedByDescending { it.lastHeard }
+                    .take(MAX_REPORT_NODES)
+                    .map { node ->
+                        NodeRow(
+                            nodeName = nameByNum[node.num] ?: "?",
+                            snr = node.snr.takeIf { it != Float.MAX_VALUE },
+                            batteryPercent = shownBattery(node),
+                            lastHeardSeconds = node.lastHeard,
+                            distanceMeters = myNode?.takeIf { it.num != node.num }?.distance(node),
+                        )
+                    }
+            val mapPoints =
+                nodes
+                    .filter { it.validPosition != null }
+                    .take(MAX_REPORT_POINTS)
+                    .map { MapPoint(nameByNum[it.num] ?: "?", it.latitude, it.longitude, it.num == myNodeNum) }
+
             val attentionItems = buildList {
                 lowBatteryNodes.forEach {
                     add(AttentionItem(nameByNum[it.num] ?: "?", "Bateria ${shownBattery(it)}%"))
@@ -361,6 +399,8 @@ class NetworkSummaryViewModel(
                 topMessageSendersWeek = topMessageSendersWeek,
                 topMessageSendersToday = topMessageSendersToday,
                 attentionItems = attentionItems,
+                nodeRows = nodeRows,
+                mapPoints = mapPoints,
                 batteryDistribution = batteryDistribution,
                 snrDistribution = snrDistribution,
                 messagesPerDay = messagesPerDay,

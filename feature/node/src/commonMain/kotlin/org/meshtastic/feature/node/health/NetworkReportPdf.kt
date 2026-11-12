@@ -101,6 +101,10 @@ private class PdfPages {
         page.append("$gray g BT /${if (bold) "F2" else "F1"} $size Tf $x $y Td (${pdfText(value)}) Tj ET\n")
     }
 
+    fun textAt(x: Int, atY: Int, size: Int, value: String, gray: Float = 0.3f) {
+        page.append("$gray g BT /F1 $size Tf $x $atY Td (${pdfText(value)}) Tj ET\n")
+    }
+
     fun rect(x: Int, bottom: Int, width: Int, height: Int, r: Float, g: Float, b: Float) {
         page.append("$r $g $b rg $x $bottom $width $height re f\n")
     }
@@ -119,6 +123,32 @@ private fun wrapLine(text: String, limit: Int): List<String> {
 }
 
 private const val LINE_CHARS = 95
+private const val MAP_WIDTH = 480
+private const val MAP_HEIGHT = 270
+private const val MAP_PAD = 14f
+private const val DOT_SIZE = 5
+private const val ME_DOT_SIZE = 8
+private const val LABEL_SIZE = 7
+
+/** Draws the position sketch: a light frame, a dot per node (the local node larger) and names when there are few. */
+private fun PdfPages.drawPoints(points: List<ReportPoint>) {
+    ensureSpace(MAP_HEIGHT + LINE_HEIGHT)
+    val bottom = y - MAP_HEIGHT
+    rect(LABEL_X, bottom, MAP_WIDTH, MAP_HEIGHT, 0.95f, 0.95f, 0.95f)
+    val labelled = points.size <= MAX_LABELLED_POINTS
+    placePoints(points, MAP_WIDTH.toFloat(), MAP_HEIGHT.toFloat(), MAP_PAD).forEach { placed ->
+        // The sketch counts y from the top, the PDF from the bottom.
+        val px = LABEL_X + placed.x.roundToInt()
+        val py = bottom + MAP_HEIGHT - placed.y.roundToInt()
+        if (placed.point.isMe) {
+            rect(px - ME_DOT_SIZE / 2, py - ME_DOT_SIZE / 2, ME_DOT_SIZE, ME_DOT_SIZE, 0.1f, 0.1f, 0.1f)
+        } else {
+            rect(px - DOT_SIZE / 2, py - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE, 0.85f, 0.65f, 0f)
+        }
+        if (labelled || placed.point.isMe) textAt(px + 6, py - 2, LABEL_SIZE, placed.point.label.take(MAX_LABEL_CHARS))
+    }
+    y -= MAP_HEIGHT + LINE_HEIGHT
+}
 
 /** Renders the report as a multi-page A4 PDF. */
 internal fun NetworkReport.toPdf(): ByteArray {
@@ -153,6 +183,7 @@ internal fun NetworkReport.toPdf(): ByteArray {
             doc.text(VALUE_X, BODY_SIZE, true, bar.text)
             doc.y -= LINE_HEIGHT
         }
+        if (section.points.isNotEmpty()) doc.drawPoints(section.points)
         doc.y -= LINE_HEIGHT / 2
     }
     return assemblePdf(doc.pages.map { it.toString() })
