@@ -38,7 +38,6 @@ import kotlin.concurrent.thread
  * the program start as usual: a broken check must never stop it from opening.
  */
 internal object SingleInstance {
-    private const val TAG = "SingleInstance"
     private const val SHOW = "show"
     private const val CONNECT_TRIES = 20
     private const val CONNECT_WAIT_MS = 100L

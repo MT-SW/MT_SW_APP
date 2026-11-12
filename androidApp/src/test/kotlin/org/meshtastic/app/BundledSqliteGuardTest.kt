@@ -59,6 +59,7 @@ class BundledSqliteGuardTest {
             add("org.meshtastic.core.service.ConversationActionService")
             add("org.meshtastic.core.service.LiveUpdateStopReceiver")
             add("org.meshtastic.core.service.MeshQuickSettingsTileService")
+            add("org.meshtastic.core.service.SosQuickSettingsTileService")
             add("org.meshtastic.core.nfc.MeshtasticHostApduService")
             add("org.meshtastic.feature.widget.MeshStatusWidgetReceiver")
         }
