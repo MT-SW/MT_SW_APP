@@ -23,8 +23,8 @@ import okio.BufferedSink
 /**
  * The settings of the automatic message archive. [folder] is the address of the chosen folder as the platform gave it
  * (empty = none chosen). [intervalMinutes] is how often the archive is brought up to date. [format] is one of
- * [FORMAT_TEXT], [FORMAT_CSV], [FORMAT_MARKDOWN]. With [perConversation] every conversation gets its own file for a day,
- * otherwise there is one file for all of them.
+ * [FORMAT_TEXT], [FORMAT_CSV], [FORMAT_MARKDOWN]. With [perConversation] every conversation gets its own file for a
+ * day, otherwise there is one file for all of them.
  */
 data class MessageArchiveConfig(
     val enabled: Boolean = false,

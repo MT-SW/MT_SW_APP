@@ -27,8 +27,15 @@ class NetworkReportNodesTest {
         val state =
             NetworkSummaryUiState(
                 isLoaded = true,
-                nodeRows = listOf(NodeRow("Kielce", snr = 6.5f, batteryPercent = 80, lastHeardSeconds = 0, distanceMeters = 2500)),
-                mapPoints = listOf(MapPoint("Kielce", 50.87, 20.63, isMe = true), MapPoint("Busko", 50.47, 20.72, isMe = false)),
+                nodeRows =
+                listOf(
+                    NodeRow("Kielce", snr = 6.5f, batteryPercent = 80, lastHeardSeconds = 0, distanceMeters = 2500),
+                ),
+                mapPoints =
+                listOf(
+                    MapPoint("Kielce", 50.87, 20.63, isMe = true),
+                    MapPoint("Busko", 50.47, 20.72, isMe = false),
+                ),
             )
         val report = state.toReport("teraz")
         val list = report.sections.first { it.title.startsWith("Lista węzłów") }

@@ -40,8 +40,8 @@ import platform.Foundation.NSURL
 import platform.Foundation.create
 
 /**
- * The chosen folder is kept as a bookmark (`bookmark:` and its bytes as hex), because iOS lets an app reach a folder the
- * user picked only through it. The bookmark is opened for the time of the write.
+ * The chosen folder is kept as a bookmark (`bookmark:` and its bytes as hex), because iOS lets an app reach a folder
+ * the user picked only through it. The bookmark is opened for the time of the write.
  */
 @Single
 class IosFolderService(private val dispatchers: CoroutineDispatchers) : FolderService {

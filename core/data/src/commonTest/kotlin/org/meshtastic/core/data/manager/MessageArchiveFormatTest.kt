@@ -47,7 +47,8 @@ class MessageArchiveFormatTest {
     @Test
     fun markdownMakesAList() {
         assertEquals(
-            "- **16:05:10** · Kanał 0 · **Jan**: Cześć \"wszystkim\"\n- **16:06:00** · Anna · **Anna**: linia 1 linia 2\n",
+            "- **16:05:10** · Kanał 0 · **Jan**: Cześć \"wszystkim\"\n" +
+                "- **16:06:00** · Anna · **Anna**: linia 1 linia 2\n",
             formatArchive(entries, MessageArchiveConfig.FORMAT_MARKDOWN),
         )
     }

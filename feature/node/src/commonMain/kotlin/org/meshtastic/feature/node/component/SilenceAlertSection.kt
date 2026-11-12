@@ -135,7 +135,9 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
             }
 
             Spacer(Modifier.height(12.dp))
-            var hours by remember(nodeNum, current) { mutableStateOf(current?.let { (it / MINUTES_PER_HOUR).toString() }.orEmpty()) }
+            var hours by remember(nodeNum, current) {
+                mutableStateOf(current?.let { (it / MINUTES_PER_HOUR).toString() }.orEmpty())
+            }
             val hoursValue = hours.toIntOrNull()?.takeIf { it in 1..MAX_CUSTOM_HOURS }
             val keyboardController = LocalSoftwareKeyboardController.current
             val save = {
@@ -144,7 +146,9 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
             }
             OutlinedTextField(
                 value = hours,
-                onValueChange = { value -> hours = value.filter { it.isDigit() }.take(MAX_CUSTOM_HOURS.toString().length) },
+                onValueChange = { value ->
+                    hours = value.filter { it.isDigit() }.take(MAX_CUSTOM_HOURS.toString().length)
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 label = { Text(stringResource(Res.string.node_silence_alert_custom)) },
@@ -193,7 +197,11 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                 }
                 Switch(
                     checked = quiet != null,
-                    onCheckedChange = { prefs.setNodeSilenceQuietHours(if (it) QuietHours(DEFAULT_QUIET_FROM, DEFAULT_QUIET_TO) else null) },
+                    onCheckedChange = {
+                        prefs.setNodeSilenceQuietHours(
+                            if (it) QuietHours(DEFAULT_QUIET_FROM, DEFAULT_QUIET_TO) else null,
+                        )
+                    },
                 )
             }
             quiet?.let { hours ->

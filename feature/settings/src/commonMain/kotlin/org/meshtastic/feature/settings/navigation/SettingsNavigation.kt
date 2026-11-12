@@ -521,7 +521,9 @@ fun EntryProviderScope<NavKey>.settingsGraph(
     entry<SettingsRoute.AntennaCalculator> {
         AntennaCalculatorScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() })
     }
-    entry<SettingsRoute.MessageArchive> { MessageArchiveScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() }) }
+    entry<SettingsRoute.MessageArchive> {
+        MessageArchiveScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() })
+    }
     entry<SettingsRoute.Sos> { SosScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() }) }
     entry<SettingsRoute.MtSwOtherFeatures> {
         MtSwOtherFeaturesScreen(

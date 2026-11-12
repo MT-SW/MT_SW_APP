@@ -276,7 +276,11 @@ private fun SosButton(holdSeconds: Int, enabled: Boolean, onTrigger: () -> Unit)
         }
     }
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(RING_SIZE.dp)) {
-        CircularProgressIndicator(progress = { progress.value }, modifier = Modifier.size(RING_SIZE.dp), strokeWidth = 8.dp)
+        CircularProgressIndicator(
+            progress = { progress.value },
+            modifier = Modifier.size(RING_SIZE.dp),
+            strokeWidth = 8.dp,
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier =
@@ -341,7 +345,9 @@ private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit) 
         if (config.includePosition && state.attempt > 0) {
             Text(
                 text =
-                stringResource(if (state.withPosition) Res.string.sos_position_attached else Res.string.sos_position_missing),
+                stringResource(
+                    if (state.withPosition) Res.string.sos_position_attached else Res.string.sos_position_missing,
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

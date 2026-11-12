@@ -68,7 +68,8 @@ class AndroidFolderService(private val context: Application, private val dispatc
     /** The document inside the tree whose display name is [name], or null when there is none. */
     private fun findChild(tree: Uri, treeId: String, name: String): Uri? {
         val children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, treeId)
-        val columns = arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+        val columns =
+            arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME)
         context.contentResolver.query(children, columns, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
                 if (cursor.getString(1) == name) {
