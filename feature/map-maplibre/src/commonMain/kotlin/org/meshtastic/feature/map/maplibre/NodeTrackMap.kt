@@ -365,6 +365,7 @@ private fun TrackLineLayer(points: List<TrackPoint>, color: Color, snrByTime: Ma
 }
 
 /** Every recorded position, oldest faintest. Tapping one reports it so the caller's list can follow along. */
+@Suppress("SpreadOperator") // interpolate() only takes its stops as varargs
 @Composable
 private fun TrackPointLayer(
     points: List<TrackPoint>,
