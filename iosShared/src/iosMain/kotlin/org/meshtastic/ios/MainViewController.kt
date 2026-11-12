@@ -49,6 +49,10 @@ import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.service.stats.MeshStatsFeed
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.EventTheme
+import org.meshtastic.core.ui.theme.EventThemeToggle
+import org.meshtastic.core.ui.theme.LocalEventTheme
+import org.meshtastic.core.ui.theme.LocalEventThemeToggle
 import org.meshtastic.core.ui.theme.LocalSystemDensity
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
@@ -58,8 +62,15 @@ import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.theme.saturationFor
+import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
+import org.meshtastic.core.ui.util.LocalBarcodeScannerSupported
+import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalWipeApplicationData
+import org.meshtastic.core.ui.util.accentColorOrNull
+import org.meshtastic.core.ui.util.brandHighlightOrNull
+import org.meshtastic.core.ui.util.brandPalette
+import org.meshtastic.core.ui.util.rememberIosBarcodeScanner
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
@@ -190,11 +201,30 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
     }
     // The map is a native view drawn in real screen points; it needs the density from before the in-app scale.
     val systemDensity = LocalDensity.current
+    // Event firmware (an edition with its own colours) brands the app like on Android; the sheet can opt out.
+    val eventEdition by uiViewModel.eventEdition.collectAsState()
+    val eventThemeEnabled by uiViewModel.eventThemeEnabled.collectAsState()
+    val eventTheme =
+        remember(eventEdition, eventThemeEnabled) {
+            eventEdition?.takeIf { eventThemeEnabled }?.let {
+                EventTheme(
+                    accent = it.accentColorOrNull(),
+                    highlight = it.brandHighlightOrNull(),
+                    palette = it.brandPalette(),
+                )
+            }
+        }
     CompositionLocalProvider(
+        LocalEventBranding provides eventEdition,
+        LocalEventTheme provides eventTheme,
+        LocalEventThemeToggle provides
+            EventThemeToggle(enabled = eventThemeEnabled, onChange = uiViewModel::setEventThemeEnabled),
         LocalDensity provides rememberScaledDensity(percent = uiScale),
         LocalSystemDensity provides systemDensity,
         LocalTerminateApplication provides terminate,
         LocalWipeApplicationData provides { wipeIosData() },
+        LocalBarcodeScannerProvider provides { onResult -> rememberIosBarcodeScanner(onResult) },
+        LocalBarcodeScannerSupported provides true,
     ) {
         AppTheme(
             darkTheme = isDarkTheme,

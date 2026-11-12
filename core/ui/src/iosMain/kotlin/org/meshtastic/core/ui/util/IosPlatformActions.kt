@@ -51,7 +51,7 @@ import platform.UIKit.UIWindowScene
 import platform.UniformTypeIdentifiers.UTTypeItem
 import platform.darwin.NSObject
 
-private fun topViewController(): UIViewController? {
+internal fun topViewController(): UIViewController? {
     val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
     val window: UIWindow? =
         scene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } as? UIWindow
@@ -66,7 +66,7 @@ private fun openUrlString(url: String) {
     UIApplication.sharedApplication.openURL(nsUrl, options = emptyMap<Any?, Any?>(), completionHandler = null)
 }
 
-private fun openAppSettings() = openUrlString(UIApplicationOpenSettingsURLString)
+internal fun openAppSettings() = openUrlString(UIApplicationOpenSettingsURLString)
 
 private fun percentEncode(text: String): String = buildString {
     for (b in text.encodeToByteArray()) {
@@ -128,7 +128,7 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun showToastNow(text: String) {
+internal fun showToastNow(text: String) {
     val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
     val window =
         (scene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } ?: scene?.windows?.firstOrNull())

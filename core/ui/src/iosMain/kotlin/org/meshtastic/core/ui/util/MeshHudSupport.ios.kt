@@ -17,5 +17,13 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.CoreMotion.CMMotionManager
 
-@Composable actual fun rememberMeshHudSupported(): Boolean = false
+/** The HUD needs a camera and the motion sensors; every iPhone has them, an iPad or simulator might not. */
+@Composable
+actual fun rememberMeshHudSupported(): Boolean = remember {
+    AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo) != null && CMMotionManager().deviceMotionAvailable
+}
