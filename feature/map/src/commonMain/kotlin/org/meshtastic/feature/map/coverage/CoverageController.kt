@@ -27,6 +27,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.fixOrNull
 import org.meshtastic.core.model.util.GeoConstants
 import org.meshtastic.core.model.util.isMeasuredDirect

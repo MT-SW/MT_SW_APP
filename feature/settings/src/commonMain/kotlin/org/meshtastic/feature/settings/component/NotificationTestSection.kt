@@ -87,7 +87,7 @@ fun NotificationTestSection() {
                     onClick = {
                         scope.launch {
                             manager.showClientNotification(
-                                ClientNotification(message = radioText),
+                                ClientNotification.Builder().also { builder -> builder.message = radioText }.build(),
                                 sender,
                                 Notification.Type.Info,
                             )
