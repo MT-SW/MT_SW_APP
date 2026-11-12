@@ -119,16 +119,17 @@ interface MessageArchiver {
     suspend fun archiveNow(): Boolean
 
     /**
-     * Puts the messages of the CSV files in the archive folder back into the message history, each into the channel
-     * of the same name (the channels may have moved to other slots since). Messages already there are not added again.
+     * Puts the messages of the archive files (CSV, text, Markdown) in the archive folder back into the message
+     * history, each into the channel of the same name (the channels may have moved to other slots since). Messages
+     * already there are not added again.
      */
     suspend fun restore(): MessageArchiveRestoreResult
 }
 
 /**
- * What a restore did: [files] CSV files read, [restored] messages put back, [alreadyThere] left alone because they are
- * in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could not
- * be read (a wrong or missing password gives these).
+ * What a restore did: [files] archive files read, [restored] messages put back, [alreadyThere] left alone because they
+ * are in the history, [noChannel] skipped because no channel of that name is set up now, [unreadable] files that could
+ * not be read (a wrong or missing password gives these).
  */
 data class MessageArchiveRestoreResult(
     val files: Int = 0,

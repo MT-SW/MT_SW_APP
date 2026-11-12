@@ -266,6 +266,7 @@ fun rememberMeshMapState(
         }
     }
     // The coverage measurements are read when the layer is switched on; the sheet has a button to read them again.
+    LaunchedEffect(Unit) { coverageController.restore() }
     LaunchedEffect(coverage.enabled) { if (coverage.enabled) coverageController.refresh() }
     FrameOnce(enabled = frameOnNodes, nodes = visibleNodes, mapState = mapState)
     FlyToFocusedNode(focusNodeNum = focusNodeNum, focusedNode = focusedNode, mapState = mapState)

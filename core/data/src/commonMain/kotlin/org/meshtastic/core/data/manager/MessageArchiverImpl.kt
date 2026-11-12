@@ -56,6 +56,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archive_channel_n
+import org.meshtastic.core.resources.archive_channel_named
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.proto.PortNum
@@ -152,9 +153,16 @@ class MessageArchiverImpl(
         val channelNames = channelNamesBySlot()
         val entries = mutableListOf<Pair<Long, ArchiveEntry>>()
         for (contact in packets.getContacts().first().keys) {
-            val title = conversationTitle(contact)
             val key = ContactKey(contact)
             val channelName = channelNames[key.channel].orEmpty()
+            val fileTitle = conversationTitle(contact)
+            // In a channel the title also has the channel name, which a restore from a text file goes by.
+            val title =
+                if (key.addressString == NodeAddress.ID_BROADCAST && channelName.isNotEmpty()) {
+                    getStringSuspend(Res.string.archive_channel_named, key.channel, channelName)
+                } else {
+                    fileTitle
+                }
             val messages =
                 packets
                     .getMessagesFrom(
@@ -185,6 +193,7 @@ class MessageArchiverImpl(
                         senderId = message.node.user.id,
                         fromLocal = message.fromLocal,
                         packetId = message.packetId,
+                        fileTitle = fileTitle,
                     )
             }
         }
@@ -194,7 +203,7 @@ class MessageArchiverImpl(
             .map { it.second }
             .groupBy {
                 if (config.perConversation) {
-                    "wiadomosci_${it.date}_${safeFileName(it.conversation)}.$extension"
+                    "wiadomosci_${it.date}_${safeFileName(it.fileTitle)}.$extension"
                 } else {
                     "wiadomosci_${it.date}.$extension"
                 }
@@ -212,39 +221,138 @@ class MessageArchiverImpl(
         val config = prefs.config.value
         if (config.folder.isBlank()) return@withLock MessageArchiveRestoreResult()
         val myNodeNum = nodes.myNodeInfo.value?.myNodeNum ?: return@withLock MessageArchiveRestoreResult()
-        val slotByName = channelNamesBySlot().entries.groupBy({ it.value }, { it.key }).mapValues { it.value.min() }
-        val files = folders.readFiles(config.folder, listOf(".csv", ".csv.$ENCRYPTED_EXTENSION"))
-        var read = 0
+        val channels = channelNamesBySlot()
+        val slotByName = channels.entries.groupBy({ it.value }, { it.key }).mapValues { it.value.min() }
+        val suffixes = RESTORE_EXTENSIONS.flatMap { listOf(".$it", ".$it.$ENCRYPTED_EXTENSION") }
+        // The tables first: they hold the exact times and numbers, so what the text files add is compared with them.
+        val files = folders.readFiles(config.folder, suffixes).sortedBy { (name, _) -> if (isCsvFile(name)) 0 else 1 }
+        val counts = RestoreCounts()
+        val textRestore = TextRestore(myNodeNum, channels, slotByName)
+        for ((name, bytes) in files) {
+            val text = readableText(name, bytes, config.password)
+            if (text == null) {
+                counts.unreadable++
+                continue
+            }
+            val plain = name.removeSuffix(".$ENCRYPTED_EXTENSION")
+            when {
+                isCsvFile(name) -> restoreCsv(parseArchiveCsv(text), myNodeNum, slotByName, counts)
+                plain.endsWith(".md") -> restoreLines(parseArchiveMarkdown(text, name), textRestore, counts)
+                else -> restoreLines(parseArchiveText(text), textRestore, counts)
+            }.also { found ->
+                // A file that is not one of ours, or the wrong password: nothing in it looks like messages.
+                if (!found && name.endsWith(".$ENCRYPTED_EXTENSION")) counts.unreadable++
+                if (found) counts.files++
+            }
+        }
+        MessageArchiveRestoreResult(counts.files, counts.restored, counts.already, counts.noChannel, counts.unreadable)
+    }
+
+    private fun isCsvFile(name: String) = name.removeSuffix(".$ENCRYPTED_EXTENSION").endsWith(".csv")
+
+    private class RestoreCounts {
+        var files = 0
         var restored = 0
         var already = 0
         var noChannel = 0
         var unreadable = 0
-        for ((name, bytes) in files) {
-            val text = readableText(name, bytes, config.password)
-            if (text == null) {
-                unreadable++
-                continue
-            }
-            val records = parseArchiveCsv(text)
-            if (records.isEmpty()) {
-                // A file that is not one of ours, or the wrong password: nothing in it looks like messages.
-                if (name.endsWith(".$ENCRYPTED_EXTENSION")) unreadable++
-                continue
-            }
-            read++
-            for (record in records) {
-                val slot = slotFor(record, slotByName)
-                when {
-                    slot == null -> noChannel++
-                    record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> already++
-                    else -> {
-                        saveRecord(myNodeNum, record, slot)
-                        restored++
-                    }
+    }
+
+    /** What the text and Markdown files need: who is who now, and the messages that are already in each chat. */
+    private inner class TextRestore(
+        val myNodeNum: Int,
+        val channels: Map<Int, String>,
+        val slotByName: Map<String, Int>,
+    ) {
+        val zone: TimeZone = TimeZone.currentSystemDefault()
+        val knownNodes by lazy { nodes.nodeDBbyNum.value.values.toList() }
+        val myNode by lazy { nodes.nodeDBbyNum.value[myNodeNum] }
+        val seen = mutableMapOf<String, MutableSet<String>>()
+    }
+
+    /** Puts the messages of one CSV file back; false when the file holds none. */
+    private suspend fun restoreCsv(
+        records: List<ArchiveRecord>,
+        myNodeNum: Int,
+        slotByName: Map<String, Int>,
+        counts: RestoreCounts,
+    ): Boolean {
+        for (record in records) {
+            val slot = slotFor(record, slotByName)
+            when {
+                slot == null -> counts.noChannel++
+                record.packetId != 0 && packets.findPacketsWithId(record.packetId).isNotEmpty() -> counts.already++
+                else -> {
+                    saveRecord(myNodeNum, record, slot)
+                    counts.restored++
                 }
             }
         }
-        MessageArchiveRestoreResult(read, restored, already, noChannel, unreadable)
+        return records.isNotEmpty()
+    }
+
+    /**
+     * Puts the messages of one text or Markdown file back. These files have no message numbers, so a message counts as
+     * already there when the chat has one with the same text in the same second. The chat is found from the title: a
+     * channel by its name (or its number, when the file does not have the name), a private chat by the name of the
+     * node.
+     */
+    private suspend fun restoreLines(lines: List<ArchiveLine>, context: TextRestore, counts: RestoreCounts): Boolean {
+        for (line in lines) {
+            val millis = line.millis(context.zone)
+            val target = textTarget(line.conversation, context)
+            if (millis == null || target == null) {
+                counts.noChannel++
+                continue
+            }
+            val (slot, address) = target
+            val contact = "$slot$address"
+            val seen =
+                context.seen.getOrPut(contact) {
+                    packets
+                        .getMessagesFrom(contact, null, true) { userId -> nodes.getNode(userId ?: "") }
+                        .first()
+                        .mapTo(mutableSetOf()) { lineKeyOf(it.displayTime / MILLIS_PER_SECOND, it.text) }
+                }
+            val key = lineKeyOf(millis / MILLIS_PER_SECOND, line.text)
+            if (!seen.add(key)) {
+                counts.already++
+                continue
+            }
+            val sender = context.knownNodes.singleOrNull { it.effectiveLongName == line.sender }
+            val fromLocal = line.sender == context.myNode?.effectiveLongName
+            val record =
+                ArchiveRecord(
+                    millis = millis,
+                    text = line.text,
+                    channelName = "",
+                    channelIndex = slot,
+                    address = address,
+                    senderId = sender?.user?.id.orEmpty(),
+                    fromLocal = fromLocal,
+                    packetId = key.hashCode().takeIf { it != 0 } ?: 1,
+                )
+            saveRecord(context.myNodeNum, record, slot)
+            counts.restored++
+        }
+        return lines.isNotEmpty()
+    }
+
+    /** The slot and the address of the chat a text line belongs to now, or null when there is no such chat. */
+    private fun textTarget(title: String, context: TextRestore): Pair<Int, String>? {
+        parseChannelTitle(title)?.let { channel ->
+            val slot =
+                if (channel.name != null) {
+                    context.slotByName[channel.name]
+                } else {
+                    channel.index.takeIf { it in context.channels }
+                }
+            return slot?.let { it to NodeAddress.ID_BROADCAST }
+        }
+        val node = context.knownNodes.singleOrNull { it.effectiveLongName == title } ?: return null
+        val slot =
+            if (context.myNode?.hasPKC == true && node.hasPKC) NodeAddress.PKC_CHANNEL_INDEX else node.channel
+        return slot to node.user.id
     }
 
     /** The text of an archive file, decrypted when it is a `.enc` file; null when it cannot be read. */
@@ -254,11 +362,13 @@ class MessageArchiverImpl(
         return ArchiveCrypto.decrypt(password, bytes)?.decodeToString()
     }
 
-    /** The slot the channel of [record] has now, found by its name; the private-message slot is kept as it was. */
-    private fun slotFor(record: ArchiveRecord, slotByName: Map<String, Int>): Int? = when {
-        record.channelName.isNotEmpty() -> slotByName[record.channelName]
-        record.channelIndex == NodeAddress.PKC_CHANNEL_INDEX -> NodeAddress.PKC_CHANNEL_INDEX
-        else -> null
+    /**
+     * The slot the channel of [record] has now, found by its name (a blank name is a name too: the channel of the modem
+     * preset); the private-message slot is kept as it was.
+     */
+    private fun slotFor(record: ArchiveRecord, slotByName: Map<String, Int>): Int? = when (record.channelIndex) {
+        NodeAddress.PKC_CHANNEL_INDEX -> NodeAddress.PKC_CHANNEL_INDEX
+        else -> slotByName[record.channelName]
     }
 
     private suspend fun saveRecord(myNodeNum: Int, record: ArchiveRecord, slot: Int) {
@@ -305,5 +415,7 @@ class MessageArchiverImpl(
         const val CHECK_INTERVAL_MS = 60_000L
         const val ENCRYPTED_EXTENSION = "enc"
         const val MESSAGES_PER_CONVERSATION = 500
+        const val MILLIS_PER_SECOND = 1_000L
+        val RESTORE_EXTENSIONS = listOf("csv", "txt", "md")
     }
 }

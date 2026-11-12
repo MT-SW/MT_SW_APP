@@ -16,6 +16,11 @@
  */
 package org.meshtastic.core.data.manager
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import org.meshtastic.core.repository.MessageArchiveConfig
 
 /**
@@ -38,6 +43,8 @@ internal data class ArchiveEntry(
     val senderId: String = "",
     val fromLocal: Boolean = false,
     val packetId: Int = 0,
+    /** The conversation as it is in the file name; it stays the same when the shown title gets more words. */
+    val fileTitle: String = conversation,
 )
 
 internal fun archiveExtension(format: Int): String = when (format) {
@@ -179,3 +186,55 @@ private fun csvRows(csv: String): List<List<String>> {
 }
 
 private fun csvRow(vararg cells: String) = cells.joinToString(",") { "\"${it.replace("\"", "\"\"")}\"" }
+
+/** One message line of a text or Markdown archive file; the date of a Markdown line comes from the file name. */
+internal data class ArchiveLine(
+    val date: String,
+    val time: String,
+    val conversation: String,
+    val sender: String,
+    val text: String,
+)
+
+private val TEXT_LINE = Regex("""^\[(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}(?::\d{2})?)] (.*?) \| (.*)$""")
+private val MARKDOWN_LINE = Regex("""^- \*\*(\d{2}:\d{2}(?::\d{2})?)\*\* · (.*?) · \*\*(.*?)\*\*: (.*)$""")
+private val DATE_IN_NAME = Regex("""\d{4}-\d{2}-\d{2}""")
+private val CHANNEL_TITLE = Regex("""^(?:Kanał|Channel) (\d+)(?: \((.*)\))?$""")
+private const val LINE_BREAK_MARK = " ⏎ "
+
+/** The messages of a text archive file (`[date time] conversation | sender: text`); other lines are skipped. */
+internal fun parseArchiveText(content: String): List<ArchiveLine> = content.lineSequence().mapNotNull { line ->
+    val match = TEXT_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
+    val (date, time, conversation, rest) = match.destructured
+    val cut = rest.indexOf(": ")
+    if (cut < 0) return@mapNotNull null
+    val text = rest.substring(cut + 2).replace(LINE_BREAK_MARK, "\n")
+    ArchiveLine(date, time, conversation, rest.substring(0, cut), text)
+}.toList()
+
+/** The messages of a Markdown archive file; the day comes from the file name, which holds it (`…_2026-11-12…`). */
+internal fun parseArchiveMarkdown(content: String, fileName: String): List<ArchiveLine> {
+    val date = DATE_IN_NAME.find(fileName)?.value ?: return emptyList()
+    return content.lineSequence().mapNotNull { line ->
+        val match = MARKDOWN_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
+        val (time, conversation, sender, text) = match.destructured
+        ArchiveLine(date, time, conversation, sender, text.replace(LINE_BREAK_MARK, "\n"))
+    }.toList()
+}
+
+/** The exact time of a line, read in [zone]; null when the date or the time is not valid. */
+internal fun ArchiveLine.millis(zone: TimeZone): Long? = runCatching {
+    val clock = if (time.length == "00:00".length) "$time:00" else time
+    LocalDateTime(LocalDate.parse(date), LocalTime.parse(clock)).toInstant(zone).toEpochMilliseconds()
+}.getOrNull()
+
+/** A channel conversation title: its slot number and, when the file has it, the channel name. */
+internal class ChannelTitle(val index: Int, val name: String?)
+
+internal fun parseChannelTitle(title: String): ChannelTitle? = CHANNEL_TITLE.matchEntire(title)?.let { match ->
+    ChannelTitle(match.groupValues[1].toInt(), match.groups[2]?.value?.takeIf { it.isNotEmpty() })
+}
+
+/** A message's text as one line, the way the text and Markdown files hold it, so two copies can be compared. */
+internal fun lineKeyOf(seconds: Long, text: String): String =
+    "$seconds|" + text.replace("\r\n", " ").replace('\n', ' ').replace('\r', ' ').replace(LINE_BREAK_MARK, " ")

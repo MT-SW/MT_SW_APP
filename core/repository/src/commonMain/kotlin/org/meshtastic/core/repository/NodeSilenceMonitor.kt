@@ -22,7 +22,13 @@ import kotlinx.coroutines.CoroutineScope
  * Watches the nodes that have a "node silence alert" (set in the node details) and raises a notification when the radio
  * has not heard such a node for the chosen time.
  */
-fun interface NodeSilenceMonitor {
+interface NodeSilenceMonitor {
     /** Starts watching in [scope]; the watching ends when the scope is cancelled. */
     fun start(scope: CoroutineScope)
+
+    /**
+     * Raises a test notification, built and shown the same way as the real one, as if [nodeNum] had just gone silent.
+     * Quiet hours and the connection to the radio do not matter for it. Does nothing when the node is not known.
+     */
+    suspend fun sendTest(nodeNum: Int)
 }

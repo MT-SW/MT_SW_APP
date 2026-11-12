@@ -28,6 +28,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.fixOrNull
 import org.meshtastic.core.model.util.GeoConstants
 import org.meshtastic.core.model.util.isDirectSignal
+import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.ui.util.toPosition
@@ -59,12 +60,27 @@ data class CoverageState(
 class CoverageController(
     private val nodeRepository: NodeRepository,
     private val meshLogRepository: MeshLogRepository,
+    private val mapPrefs: MapPrefs,
     private val dispatchers: CoroutineDispatchers,
 ) {
     private val mutable = MutableStateFlow(CoverageState())
     val state: StateFlow<CoverageState> = mutable.asStateFlow()
+    private var restored = false
 
-    fun setEnabled(on: Boolean) = mutable.update { it.copy(enabled = on) }
+    /** Switches the layer on or off and remembers it, so it is still on after the app is opened again. */
+    fun setEnabled(on: Boolean) {
+        restored = true
+        mutable.update { it.copy(enabled = on) }
+        mapPrefs.setCoverageEnabled(on)
+    }
+
+    /** Takes over the saved on/off setting, once, when the map is first shown. */
+    suspend fun restore() {
+        if (restored) return
+        restored = true
+        val saved = mapPrefs.awaitCoverageEnabled()
+        mutable.update { it.copy(enabled = saved) }
+    }
 
     /** Reads the measurements again. A read that is already going on is not started a second time. */
     suspend fun refresh() {

@@ -37,6 +37,7 @@ import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.node_silence_alert_group
 import org.meshtastic.core.resources.node_silence_alert_notification
+import org.meshtastic.core.resources.node_silence_test_notification
 import org.meshtastic.core.resources.unknown_username
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -76,6 +77,18 @@ class NodeSilenceMonitorImpl(
                 delay(CHECK_INTERVAL_MS)
             }
         }
+    }
+
+    override suspend fun sendTest(nodeNum: Int) {
+        val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: return
+        val minutes = notificationPrefs.nodeSilenceAlerts.value[nodeNum] ?: DEFAULT_TEST_MINUTES
+        val title =
+            getStringSuspend(
+                Res.string.node_silence_test_notification,
+                displayName(node),
+                formatDurationSuspend(minutes * SECONDS_PER_MINUTE, DurationUnit.MINUTES),
+            )
+        notifications.showNewNodeSeenNotification(node, title)
     }
 
     private suspend fun check() {
@@ -163,7 +176,8 @@ class NodeSilenceMonitorImpl(
         const val SUFFIX_MASK = 0xFF
         const val CHECK_INTERVAL_MS = 60_000L
         const val SETTLE_SECONDS = 120L
-        const val SECONDS_PER_MINUTE = 60
+        const val SECONDS_PER_MINUTE = 60L
+        const val DEFAULT_TEST_MINUTES = 60
 
         /** From this many nodes silent in one round, one notification names them all. */
         const val GROUP_FROM = 3

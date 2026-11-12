@@ -795,6 +795,12 @@ interface MapPrefs {
 
     /** Applies [transform] to the propagation layer's saved settings. */
     fun updatePropagationPrefs(transform: (PropagationPrefs) -> PropagationPrefs) {}
+
+    /** Whether the coverage layer of the main map was left on. */
+    suspend fun awaitCoverageEnabled(): Boolean = false
+
+    /** Remembers whether the coverage layer of the main map is on. */
+    fun setCoverageEnabled(on: Boolean) {}
 }
 
 /** What the propagation map layer remembers: on/off, the kind of picture and how often it refreshes on its own. */

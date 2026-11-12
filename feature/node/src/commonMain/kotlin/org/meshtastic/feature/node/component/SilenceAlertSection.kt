@@ -35,12 +35,14 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,8 +53,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.repository.NodeSilenceMonitor
 import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.QuietHours
 import org.meshtastic.core.resources.Res
@@ -63,6 +67,8 @@ import org.meshtastic.core.resources.node_silence_alert_custom
 import org.meshtastic.core.resources.node_silence_count_relayed
 import org.meshtastic.core.resources.node_silence_count_relayed_hint
 import org.meshtastic.core.resources.node_silence_quiet_from
+import org.meshtastic.core.resources.node_silence_test_button
+import org.meshtastic.core.resources.node_silence_test_hint
 import org.meshtastic.core.resources.node_silence_quiet_hint
 import org.meshtastic.core.resources.node_silence_quiet_title
 import org.meshtastic.core.resources.node_silence_quiet_to
@@ -91,6 +97,8 @@ private const val MAX_CUSTOM_HOURS = 24 * 90
 @Composable
 fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val prefs = koinInject<NotificationPrefs>()
+    val monitor = koinInject<NodeSilenceMonitor>()
+    val scope = rememberCoroutineScope()
     val alerts by prefs.nodeSilenceAlerts.collectAsStateWithLifecycle()
     val current = alerts[nodeNum]
     val relayed by prefs.nodeSilenceCountRelayed.collectAsStateWithLifecycle()
@@ -162,6 +170,16 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { save() }),
+            )
+
+            Spacer(Modifier.height(12.dp))
+            OutlinedButton(onClick = { scope.launch { monitor.sendTest(nodeNum) } }) {
+                Text(stringResource(Res.string.node_silence_test_button))
+            }
+            Text(
+                text = stringResource(Res.string.node_silence_test_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Spacer(Modifier.height(12.dp))

@@ -19,7 +19,9 @@ package org.meshtastic.core.data.manager
 
 import org.meshtastic.core.repository.MessageArchiveConfig
 import kotlin.test.Test
+import kotlinx.datetime.TimeZone
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class MessageArchiveFormatTest {
     private val entries =
@@ -138,5 +140,72 @@ class MessageArchiveFormatTest {
         val old = MessageArchiveConfig(true, "folder", 15, 0, false)
         assertEquals("", MessageArchiveConfig.decode(old.encode()).password)
         assertEquals(MessageArchiveConfig(), MessageArchiveConfig.decode("e|zz|1|15|0|0|x"))
+    }
+
+    @Test
+    fun textReadsBackWhatItWrote() {
+        val read = parseArchiveText(formatArchive(entries, MessageArchiveConfig.FORMAT_TEXT))
+        assertEquals(
+            listOf(
+                ArchiveLine("2026-11-12", "16:05:10", "Kanał 0", "Jan", "Cześć \"wszystkim\""),
+                ArchiveLine("2026-11-12", "16:06:00", "Anna", "Anna", "linia 1 linia 2"),
+            ),
+            read,
+        )
+    }
+
+    @Test
+    fun textKeepsAColonInsideTheMessage() {
+        val read = parseArchiveText("[2026-11-12 16:05] Kanał 0 (Główny) | Jan: godzina 12: 30\r\nśmieci\n")
+        assertEquals(listOf(ArchiveLine("2026-11-12", "16:05", "Kanał 0 (Główny)", "Jan", "godzina 12: 30")), read)
+    }
+
+    @Test
+    fun textBringsBackTheLineBreakMark() {
+        val read = parseArchiveText("[2026-11-12 16:05:10] Anna | Ja: a ⏎ b\n")
+        assertEquals("a\nb", read.single().text)
+    }
+
+    @Test
+    fun markdownTakesTheDayFromTheFileName() {
+        val read =
+            parseArchiveMarkdown(
+                formatArchive(entries, MessageArchiveConfig.FORMAT_MARKDOWN),
+                "wiadomosci_2026-11-12_Kanał_0.md",
+            )
+        assertEquals(
+            listOf(
+                ArchiveLine("2026-11-12", "16:05:10", "Kanał 0", "Jan", "Cześć \"wszystkim\""),
+                ArchiveLine("2026-11-12", "16:06:00", "Anna", "Anna", "linia 1 linia 2"),
+            ),
+            read,
+        )
+        assertEquals(emptyList(), parseArchiveMarkdown("- **16:05:10** · A · **B**: c", "bez_daty.md"))
+    }
+
+    @Test
+    fun lineTimeIsReadInTheGivenZone() {
+        val line = ArchiveLine("2026-11-12", "16:05:10", "Anna", "Jan", "x")
+        assertEquals(1_794_499_510_000L, line.millis(TimeZone.UTC))
+        assertEquals(1_794_499_500_000L, ArchiveLine("2026-11-12", "16:05", "Anna", "Jan", "x").millis(TimeZone.UTC))
+        assertNull(ArchiveLine("2026-13-40", "16:05:10", "Anna", "Jan", "x").millis(TimeZone.UTC))
+    }
+
+    @Test
+    fun channelTitleGivesTheNumberAndTheName() {
+        val named = parseChannelTitle("Kanał 2 (Główny)")
+        assertEquals(2, named?.index)
+        assertEquals("Główny", named?.name)
+        val plain = parseChannelTitle("Channel 0")
+        assertEquals(0, plain?.index)
+        assertNull(plain?.name)
+        assertNull(parseChannelTitle("Anna"))
+    }
+
+    @Test
+    fun sameMessageGivesTheSameKeyWhateverTheLineBreaks() {
+        assertEquals(lineKeyOf(10, "a b"), lineKeyOf(10, "a\nb"))
+        assertEquals(lineKeyOf(10, "a b"), lineKeyOf(10, "a\r\nb"))
+        assertEquals(lineKeyOf(10, "a b"), lineKeyOf(10, "a ⏎ b"))
     }
 }

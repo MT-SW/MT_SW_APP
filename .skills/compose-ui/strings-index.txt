@@ -536,6 +536,7 @@ aqi_value_with_severity
 aqi_very_unhealthy
 ### ARCHIVE ###
 archive_channel_n
+archive_channel_named
 archive_choose_folder
 archive_enabled
 archive_encrypt
@@ -2435,6 +2436,9 @@ node_silence_quiet_from
 node_silence_quiet_hint
 node_silence_quiet_title
 node_silence_quiet_to
+node_silence_test_button
+node_silence_test_hint
+node_silence_test_notification
 node_sort_alpha
 node_sort_button
 node_sort_channel

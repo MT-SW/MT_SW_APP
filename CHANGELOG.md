@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Strażnik węzła: w szczegółach węzła przycisk „Wyślij testowe powiadomienie” pokazuje od razu, jak wygląda alarm o milczeniu (z Twoim czasem milczenia), więc możesz sprawdzić, czy powiadomienia docierają.
+* Mapa zasięgu: przełącznik warstwy „Zasięgi sieci” jest zapamiętywany (wszystkie wersje), więc po ponownym uruchomieniu aplikacji warstwa zostaje włączona.
+* Archiwum wiadomości: „Przywróć z archiwum” czyta teraz także pliki tekstowe i Markdown (też zaszyfrowane): kanał po nazwie albo numerze, rozmowę prywatną po nazwie węzła, duplikaty po tekście i sekundzie. Poprawka: kanał bez nazwy (domyślny) nie był przywracany z tabeli CSV. Tytuły rozmów w plikach tekstowych i Markdown mają teraz nazwę kanału.
 * SOS: wiadomość ma na początku i na końcu dzwonek alarmowy (🔔), więc u odbiorców przychodzi jako alarm, tak jak wiadomość z przycisku dzwonka w czacie; link z pozycją (z przecinkiem we współrzędnych) jest teraz w całości klikalny we wszystkich wiadomościach, także poza SOS.
 * Przyciski „i” w szczegółach węzła mają kolor i rozmiar jak sąsiednie ikony.
 * Mapa zasięgu na głównej mapie (wszystkie wersje): w ustawieniach warstw mapy sekcja „Zasięgi sieci (pokrycie)” — kolorowe kropki (SNR: czerwony słaby, zielony mocny) dla pozycji wszystkich węzłów usłyszanych bezpośrednio, z suwakiem przezroczystości, skalą kolorów, liczbą pomiarów, przyciskiem „Wczytaj ponownie” i przyciskiem „i” z opisem.
@@ -726,6 +729,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Node watchdog: in the node details a "Send test notification" button shows at once what the silence alert looks like (with your silence time), so you can check that notifications arrive.
+* Coverage map: the "Network coverage" layer switch is remembered (all versions), so the layer stays on after the app is restarted.
+* Message archive: "Restore from archive" now also reads text and Markdown files (also encrypted ones): a channel by name or number, a private chat by node name, duplicates by text and second. Fix: a channel without a name (the default one) was not restored from the CSV table. The conversation titles in text and Markdown files now carry the channel name.
 * SOS: the message has the alarm bell (🔔) at the start and at the end, so it arrives for the receivers as an alarm, like a message from the bell button in the chat; a position link (with a comma in the coordinates) is now clickable as a whole in all messages, not only in SOS.
 * The "i" buttons in the node details have the same colour and size as the icons next to them.
 * Coverage on the main map (all versions): in the map layer settings a "Network coverage" section — coloured dots (SNR: red weak, green strong) for the positions of all nodes heard directly, with a transparency slider, a colour key, the number of measurements, a "Read again" button and an "i" button with a description.
