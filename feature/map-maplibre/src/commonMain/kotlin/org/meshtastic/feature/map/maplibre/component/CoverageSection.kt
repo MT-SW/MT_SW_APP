@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -39,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +51,8 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.coverage_all_nodes
 import org.meshtastic.core.resources.coverage_info_body
+import org.meshtastic.core.resources.coverage_legend_strong
+import org.meshtastic.core.resources.coverage_legend_weak
 import org.meshtastic.core.resources.coverage_loading
 import org.meshtastic.core.resources.coverage_none
 import org.meshtastic.core.resources.coverage_none_filtered
@@ -61,13 +66,16 @@ import org.meshtastic.core.resources.coverage_summary_filtered
 import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.feature.map.component.LayerOpacitySlider
+import org.meshtastic.feature.map.coverage.COVERAGE_LEVELS_DB
 import org.meshtastic.feature.map.coverage.CoverageController
+import org.meshtastic.feature.map.coverage.coverageRgb
 import org.meshtastic.feature.map.maplibre.layers.COVERAGE_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.COVERAGE_LAYER_ID
 
 /**
  * The coverage layer, as a section of the layers sheet: on/off with a plain description behind the "i", transparency,
- * the colour key, a filter by age and by node, how many measurements there are, and a button to read them again.
+ * the colour key, a filter by when a node was heard and by node, how many nodes are shown, and a button to count the
+ * reach again.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -122,7 +130,7 @@ internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (Stri
                     )
                     state.sources.forEach { source ->
                         DropdownMenuItem(
-                            text = { Text("${source.name} (${source.count})") },
+                            text = { Text(source.name) },
                             onClick = {
                                 controller.setNode(source.nodeNum)
                                 menuOpen = false
@@ -138,33 +146,20 @@ internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (Stri
             opacity = opacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY,
             onOpacityChange = onOpacityChange,
         )
-        TrackLegend(
-            showSnr = true,
-            mainName = "",
-            mainColor = Color.Unspecified,
-            compareName = null,
-            compareColor = Color.Unspecified,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
+        CoverageLegend(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
         Text(
             text =
             when {
-                state.loading -> stringResource(Res.string.coverage_loading)
+                state.loading -> stringResource(Res.string.coverage_loading, state.done, state.toDo)
 
                 state.total == 0 -> stringResource(Res.string.coverage_none)
 
-                state.points.isEmpty() -> stringResource(Res.string.coverage_none_filtered)
+                state.areas.isEmpty() -> stringResource(Res.string.coverage_none_filtered)
 
                 state.days == 0 && state.nodeFilter == null ->
-                    stringResource(Res.string.coverage_summary, state.points.size, state.nodes)
+                    stringResource(Res.string.coverage_summary, state.areas.size)
 
-                else ->
-                    stringResource(
-                        Res.string.coverage_summary_filtered,
-                        state.points.size,
-                        state.total,
-                        state.nodes,
-                    )
+                else -> stringResource(Res.string.coverage_summary_filtered, state.areas.size, state.total)
             },
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -190,3 +185,19 @@ private val PERIODS =
         WEEK_DAYS to Res.string.coverage_period_week,
         MONTH_DAYS to Res.string.coverage_period_month,
     )
+
+private const val LEGEND_BAR_DP = 10
+private const val OPAQUE = 0xFF000000.toInt()
+
+/** The colour key: a bar from the weakest to the strongest signal, in the colours of the planner's coverage. */
+@Composable
+private fun CoverageLegend(modifier: Modifier = Modifier) {
+    val colors = COVERAGE_LEVELS_DB.map { Color(OPAQUE or coverageRgb(it)) }
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth().height(LEGEND_BAR_DP.dp).background(Brush.horizontalGradient(colors)))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(stringResource(Res.string.coverage_legend_weak), style = MaterialTheme.typography.labelSmall)
+            Text(stringResource(Res.string.coverage_legend_strong), style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}

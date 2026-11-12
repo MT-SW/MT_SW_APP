@@ -4031,7 +4031,7 @@
     <string name="track_compare_empty">Brak innych węzłów z pozycją.</string>
     <string name="track_compare_summary">%1$s: %2$d pozycji, %3$s</string>
     <string name="mt_sw_other_coverage_title">Mapa zasięgu z pomiarów</string>
-    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo. To samo, bez zapisywania pliku, pokazuje warstwa „Zasięgi sieci (pokrycie)” na głównej mapie (przycisk warstw): kolorowe kropki ze wszystkich węzłów, z suwakiem przezroczystości, skalą kolorów i przyciskiem „Wczytaj ponownie”. Przyciskami „Cały okres”, „Doba”, „7 dni” i „30 dni” oraz listą węzłów możesz pokazać tylko świeże pomiary albo pomiary jednego węzła (filtr dotyczy tej sesji i nie zmienia zapisanych danych).</string>
+    <string name="mt_sw_other_coverage_body">W dzienniku pozycji węzła (mapa trasy) przycisk SNR koloruje trasę według mocy sygnału, z jaką radio odebrało każdą pozycję (czerwony słaby, zielony mocny, szary bez pomiaru). Liczą się tylko pakiety odebrane bezpośrednio, bez przekaźnika. Przycisk warstw zapisuje tę trasę jako plik KML z kolorami, który można wczytać jako warstwę mapy. Pomiary wszystkich węzłów naraz zapiszesz w Zdrowiu sieci: Podsumowanie, przycisk pobierania, „Zapisz zasięg wszystkich węzłów (KML)”. Plik ma po jednym folderze na węzeł, a w nim kolorowe punkty tam, gdzie radio słyszało węzeł bezpośrednio — wczytany jako warstwa mapy pokazuje, gdzie sieć jest słyszana dobrze, a gdzie słabo. Osobno działa warstwa „Zasięgi sieci (pokrycie)” na głównej mapie (przycisk warstw): rysuje przybliżony zasięg każdego węzła z pozycją, liczony jak w Planerze łącza z ukształtowaniem terenu, jako kolorowe obszary (fioletowy słaby, żółty mocny), z suwakiem przezroczystości, skalą kolorów i przyciskiem „Przelicz ponownie”. Węzeł z niedokładną pozycją jest liczony z najwyższego miejsca w jej obrębie. Przyciskami „Cały okres”, „Doba”, „7 dni” i „30 dni” oraz listą węzłów możesz pokazać tylko węzły słyszane w wybranym okresie albo jeden węzeł.</string>
     <string name="mt_sw_other_compare_title">Porównanie dwóch tras</string>
     <string name="mt_sw_other_compare_body">W dzienniku pozycji węzła przycisk trasy pozwala wybrać drugi węzeł i narysować jego trasę obok pierwszej, w innym kolorze. Okno pokazuje długość i liczbę pozycji obu tras. Mapa mieści obie trasy naraz.</string>
     <string name="node_silence_alert_group">Cisza węzłów: %1$d (%2$s)</string>
@@ -4048,18 +4048,20 @@
     <string name="track_legend_compare">Trasa: rysuje obok trasę drugiego węzła, w innym kolorze, żeby porównać obie drogi.</string>
     <string name="track_legend_gpx">Pobieranie: zapisuje trasę jako plik GPX do aplikacji nawigacyjnej lub map.</string>
     <string name="coverage_title">Zasięgi sieci (pokrycie)</string>
-    <string name="coverage_info_body">Ta warstwa pokazuje na mapie, gdzie Twoje radio słyszało inne węzły bezpośrednio i jak mocno. Każda kropka to jedna pozycja węzła, która dotarła do radia bez przekaźnika: zielona oznacza mocny sygnał (SNR), czerwona słaby. Dzięki temu widać, gdzie sieć ma dobry zasięg, a gdzie są dziury. Pozycja przekazana przez inny węzeł się nie liczy, bo mówi o sygnale ostatniego skoku, a nie o odległości do węzła. Pomiary pochodzą z logów zapisanych w aplikacji, więc sięgają tak daleko wstecz, jak długo logi są trzymane. Przycisk „Wczytaj ponownie” czyta je jeszcze raz. Przyciskami „Cały okres”, „Doba”, „7 dni” i „30 dni” oraz listą węzłów możesz pokazać tylko świeże pomiary albo pomiary jednego węzła (filtr dotyczy tej sesji i nie zmienia zapisanych danych).</string>
-    <string name="coverage_loading">Wczytywanie pomiarów…</string>
-    <string name="coverage_none">Brak pomiarów. Pojawią się, gdy radio usłyszy pozycje węzłów bezpośrednio.</string>
-    <string name="coverage_summary">%1$d pomiarów z %2$d węzłów</string>
-    <string name="coverage_refresh">Wczytaj ponownie</string>
+    <string name="coverage_legend_strong">mocny</string>
+    <string name="coverage_legend_weak">słaby</string>
+    <string name="coverage_info_body">Ta warstwa pokazuje na mapie przybliżony zasięg każdego węzła, który ma pozycję. Zasięg jest liczony tak jak w Planerze łącza, z uwzględnieniem ukształtowania terenu (bez budynków i lasów), dla typowego węzła: antena 2 m, moc 20 dBm, ustawienia radia z Planera. Kolor pokazuje siłę sygnału: fioletowy słaby, żółty mocny. Obszary kolejnych węzłów nakładają się, więc tam, gdzie sięga kilka węzłów, kolor jest gęstszy. Węzeł, który podaje zaokrągloną (niedokładną) pozycję, jest liczony z najwyższego miejsca w obrębie tego zaokrąglenia (do 2,5 km), bo najczęściej stoi na szczycie, a nie na zboczu obok. To tylko przybliżenie: prawdziwe węzły mają inne anteny i moc, a dokładne wyliczenia zrobisz w Planerze. Dane o terenie są pobierane z internetu i zapisywane na urządzeniu. Filtry pokazują tylko węzły słyszane w wybranym okresie albo jeden węzeł, a „Przelicz ponownie” liczy zasięg od nowa.</string>
+    <string name="coverage_loading">Liczenie zasięgu: %1$d z %2$d węzłów…</string>
+    <string name="coverage_none">Brak węzłów z pozycją, więc nie ma czego pokazać.</string>
+    <string name="coverage_summary">Zasięg %1$d węzłów</string>
+    <string name="coverage_refresh">Przelicz ponownie</string>
     <string name="coverage_period_all">Cały okres</string>
     <string name="coverage_period_day">Doba</string>
     <string name="coverage_period_week">7 dni</string>
     <string name="coverage_period_month">30 dni</string>
     <string name="coverage_all_nodes">Wszystkie węzły</string>
-    <string name="coverage_summary_filtered">%1$d z %2$d pomiarów z %3$d węzłów</string>
-    <string name="coverage_none_filtered">Żaden pomiar nie pasuje do wybranego okresu i węzła.</string>
+    <string name="coverage_summary_filtered">Zasięg %1$d z %2$d węzłów</string>
+    <string name="coverage_none_filtered">Żaden węzeł nie pasuje do wybranego okresu i węzła.</string>
     <string name="track_info_title">Zasięg i porównanie tras</string>
     <string name="coverage_export_all">Zapisz zasięg wszystkich węzłów (KML)</string>
 </resources>

@@ -887,6 +887,8 @@ copyright_notice
 coverage_all_nodes
 coverage_export_all
 coverage_info_body
+coverage_legend_strong
+coverage_legend_weak
 coverage_loading
 coverage_none
 coverage_none_filtered

@@ -18,21 +18,20 @@ package org.meshtastic.feature.map.maplibre.layers
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.json.JsonObject
 import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.FillLayer
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
-import org.maplibre.spatialk.geojson.Point
-import org.maplibre.spatialk.geojson.Position
-import org.meshtastic.core.ui.util.snrRgb
-import org.meshtastic.feature.map.coverage.CoveragePoint
+import org.maplibre.spatialk.geojson.Polygon
+import org.meshtastic.feature.map.coverage.COVERAGE_LEVELS_DB
+import org.meshtastic.feature.map.coverage.CoverageArea
 import org.meshtastic.feature.map.coverage.CoverageState
+import org.meshtastic.feature.map.coverage.coverageRgb
+import org.meshtastic.feature.map.maplibre.geojson.destination
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
-import kotlin.math.roundToInt
+import kotlin.math.max
 
 /** The layer id, also the key of its opacity setting. */
 internal const val COVERAGE_LAYER_ID = "coverage"
@@ -40,53 +39,56 @@ internal const val COVERAGE_LAYER_ID = "coverage"
 /** How opaque the layer is until the user moves its slider. */
 internal const val COVERAGE_DEFAULT_OPACITY = 0.8f
 
-private const val SNR_FLOOR = -20f
-private const val SNR_CEILING = 5f
+/** The share of the layer's opacity each colour step gets: the steps lie over each other, so the centre is denser. */
+private const val LEVEL_OPACITY_SHARE = 0.5f
 private const val OPAQUE = 0xFF000000.toInt()
-private const val DOT_RADIUS_DP = 12
-private const val DOT_STROKE_ALPHA = 0.6f
+private const val MIN_RADIUS_M = 60.0
+private const val FULL_TURN_DEG = 360.0
 
 /**
- * The measured coverage: one dot for every position the radio heard directly, coloured by the SNR it was heard with
- * (the same colours as the track of a node, red weak to green strong).
+ * The estimated reach of the nodes, as coloured areas: weak signal purple at the edge, strong yellow near the node.
  *
- * The dots are grouped by colour (a step of 1 dB each), and every group is one layer with a plain colour. This is on
- * purpose: a colour worked out by the map from a property of each dot did not draw anything on the phone, a layer with
- * a fixed colour always does.
+ * Every colour step is one layer with a plain colour, drawn from the widest to the narrowest, so the areas of nodes
+ * that reach the same place add up and the well covered places stand out.
  */
 @Composable
 internal fun CoverageLayer(state: CoverageState, opacity: Float) {
-    if (!state.enabled || state.points.isEmpty()) return
-    val groups =
-        remember(state.points) {
-            state.points.groupBy { point -> snrRgb(point.snr.coerceIn(SNR_FLOOR, SNR_CEILING).roundToInt().toFloat()) }
+    if (!state.enabled || state.areas.isEmpty()) return
+    COVERAGE_LEVELS_DB.forEachIndexed { level, marginDb ->
+        key(level) {
+            CoverageLevel(
+                level = level,
+                color = Color(OPAQUE or coverageRgb(marginDb)),
+                areas = state.areas,
+                opacity = opacity * LEVEL_OPACITY_SHARE,
+            )
         }
-    for ((rgb, points) in groups) {
-        key(rgb) { CoverageDots(rgb = rgb, points = points, opacity = opacity) }
     }
 }
 
-/** The dots of one colour. */
+/** The areas of one colour step of every node. */
 @Composable
-private fun CoverageDots(rgb: Int, points: List<CoveragePoint>, opacity: Float) {
+private fun CoverageLevel(level: Int, color: Color, areas: List<CoverageArea>, opacity: Float) {
     val source =
-        rememberFeatureSource(points) {
+        rememberFeatureSource(areas, level) {
             FeatureCollection(
-                points.map { point ->
-                    Feature<Point, JsonObject?>(
-                        geometry = Point(Position(longitude = point.longitude, latitude = point.latitude)),
-                        properties = null,
-                    )
+                areas.mapNotNull { area ->
+                    areaPolygon(area, level)?.let { Feature<Polygon, JsonObject?>(geometry = it, properties = null) }
                 },
             )
         }
-    CircleLayer(
-        id = "$COVERAGE_LAYER_ID-points-$rgb",
-        source = source,
-        color = const(Color(OPAQUE or rgb)),
-        radius = const(DOT_RADIUS_DP.dp),
-        strokeColor = const(Color.White.copy(alpha = DOT_STROKE_ALPHA)),
-        strokeWidth = const(1.dp),
-        opacity = const(opacity),
-    )
+    FillLayer(id = "$COVERAGE_LAYER_ID-level-$level", source = source, color = const(color), opacity = const(opacity))
+}
+
+/** The outline of how far colour step [level] reaches from the node, or null when it reaches nowhere. */
+private fun areaPolygon(area: CoverageArea, level: Int): Polygon? {
+    val reach = area.reachM[level]
+    if (reach.all { it <= 0.0 }) return null
+    val ring =
+        reach.mapIndexed { radial, distance ->
+            destination(area.latitude, area.longitude, max(distance, MIN_RADIUS_M), radial * FULL_TURN_DEG / reach.size)
+        }
+    // Closed by hand: `ring + ring.first()` would pick the Iterable overload of plus, a Position being a collection.
+    val closed = ring.toMutableList().also { it.add(ring.first()) }
+    return Polygon(listOf(closed))
 }
