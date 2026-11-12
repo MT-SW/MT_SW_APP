@@ -232,6 +232,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
             val (start, end) = text?.split('-')?.takeIf { it.size == 2 } ?: return null
             @Suppress("MagicNumber")
             val startHour = start.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
+
             @Suppress("MagicNumber")
             val endHour = end.toIntOrNull()?.takeIf { it in 0..23 } ?: return null
             return QuietHours(startHour, endHour)

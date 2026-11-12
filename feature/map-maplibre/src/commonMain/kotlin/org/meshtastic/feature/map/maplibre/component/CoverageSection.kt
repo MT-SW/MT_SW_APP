@@ -60,6 +60,8 @@ import org.meshtastic.core.resources.coverage_period_all
 import org.meshtastic.core.resources.coverage_period_day
 import org.meshtastic.core.resources.coverage_period_month
 import org.meshtastic.core.resources.coverage_period_week
+import org.meshtastic.core.resources.coverage_range_km
+import org.meshtastic.core.resources.coverage_range_title
 import org.meshtastic.core.resources.coverage_refresh
 import org.meshtastic.core.resources.coverage_summary
 import org.meshtastic.core.resources.coverage_summary_filtered
@@ -67,6 +69,7 @@ import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.feature.map.component.LayerOpacitySlider
 import org.meshtastic.feature.map.coverage.COVERAGE_LEVELS_DB
+import org.meshtastic.feature.map.coverage.COVERAGE_RANGES_KM
 import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.coverage.coverageRgb
 import org.meshtastic.feature.map.maplibre.layers.COVERAGE_DEFAULT_OPACITY
@@ -138,6 +141,28 @@ internal fun CoverageSection(opacity: Map<String, Float>, onOpacityChange: (Stri
                         )
                     }
                 }
+            }
+        }
+
+        Text(
+            text = stringResource(Res.string.coverage_range_title),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
+        )
+        FlowRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            COVERAGE_RANGES_KM.forEach { km ->
+                FilterChip(
+                    selected = state.rangeKm == km,
+                    enabled = !state.loading,
+                    onClick = {
+                        controller.setRangeKm(km)
+                        scope.launch { controller.refresh() }
+                    },
+                    label = { Text(stringResource(Res.string.coverage_range_km, km)) },
+                )
             }
         }
 

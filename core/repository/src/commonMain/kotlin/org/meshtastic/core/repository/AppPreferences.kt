@@ -819,6 +819,12 @@ interface MapPrefs {
 
     /** Remembers the coverage filter: the period in [days] (0: all) and the [nodeNum] (null: all nodes). */
     fun setCoverageFilter(days: Int, nodeNum: Int?) {}
+
+    /** The saved distance of the coverage layer, in kilometres. */
+    suspend fun awaitCoverageRangeKm(): Int = 20
+
+    /** Remembers the distance of the coverage layer, in kilometres. */
+    fun setCoverageRangeKm(km: Int) {}
 }
 
 /** What the propagation map layer remembers: on/off, the kind of picture and how often it refreshes on its own. */

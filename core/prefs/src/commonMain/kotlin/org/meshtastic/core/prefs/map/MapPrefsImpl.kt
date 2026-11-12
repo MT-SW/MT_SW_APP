@@ -221,6 +221,12 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
 
     override suspend fun awaitCoverageNode(): Int? = dataStore.data.first()[KEY_COVERAGE_NODE]
 
+    override suspend fun awaitCoverageRangeKm(): Int = dataStore.data.first()[KEY_COVERAGE_RANGE_KM] ?: 20
+
+    override fun setCoverageRangeKm(km: Int) {
+        scope.launch { dataStore.edit { it[KEY_COVERAGE_RANGE_KM] = km } }
+    }
+
     override fun setCoverageFilter(days: Int, nodeNum: Int?) {
         scope.launch {
             dataStore.edit {
@@ -294,6 +300,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_COVERAGE_ENABLED = booleanPreferencesKey("coverage_enabled")
         val KEY_COVERAGE_DAYS = intPreferencesKey("coverage_days")
         val KEY_COVERAGE_NODE = intPreferencesKey("coverage_node")
+        val KEY_COVERAGE_RANGE_KM = intPreferencesKey("coverage_range_km")
         val KEY_PROPAGATION_ENABLED = booleanPreferencesKey("propagation_enabled")
         val KEY_PROPAGATION_KIND = intPreferencesKey("propagation_kind")
         val KEY_PROPAGATION_AUTO_REFRESH = booleanPreferencesKey("propagation_auto_refresh")

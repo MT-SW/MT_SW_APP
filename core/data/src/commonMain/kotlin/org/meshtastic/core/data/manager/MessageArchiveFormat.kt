@@ -138,6 +138,7 @@ internal fun parseArchiveCsv(csv: String): List<ArchiveRecord> = csvRows(csv).ma
     if (row.size < CSV_RESTORE_COLUMNS) return@mapNotNull null
     @Suppress("MagicNumber")
     val millis = row[5].toLongOrNull() ?: return@mapNotNull null
+
     @Suppress("MagicNumber")
     val address = row[8]
     if (millis <= 0L || address.isEmpty()) return@mapNotNull null
@@ -218,7 +219,7 @@ internal fun parseArchiveText(content: String): List<ArchiveLine> = content
     .mapNotNull { line ->
         val match = TEXT_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
         @Suppress("DestructuringDeclarationWithTooManyEntries")
-        val (date, time, conversation, rest) = match.destructured
+            val (date, time, conversation, rest) = match.destructured
         val cut = rest.indexOf(": ")
         if (cut < 0) return@mapNotNull null
         val text = rest.substring(cut + 2).replace(LINE_BREAK_MARK, "\n")
@@ -234,7 +235,7 @@ internal fun parseArchiveMarkdown(content: String, fileName: String): List<Archi
         .mapNotNull { line ->
             val match = MARKDOWN_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
             @Suppress("DestructuringDeclarationWithTooManyEntries")
-            val (time, conversation, sender, text) = match.destructured
+                val (time, conversation, sender, text) = match.destructured
             ArchiveLine(date, time, conversation, sender, text.replace(LINE_BREAK_MARK, "\n"))
         }
         .toList()

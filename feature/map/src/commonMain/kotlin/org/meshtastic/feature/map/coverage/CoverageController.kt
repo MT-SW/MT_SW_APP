@@ -45,13 +45,19 @@ import org.meshtastic.feature.map.planner.state.PlannerUiState
 /** The signal margins (dB above what the radio can still decode) the layer colours, weakest first. */
 val COVERAGE_LEVELS_DB: List<Float> = listOf(0f, 6f, 12f, 18f, 24f)
 
+/** How far from a node the reach is counted and drawn, in kilometres, shortest first. */
+val COVERAGE_RANGES_KM: List<Int> = listOf(1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 75, 100)
+
+/** The distance used until the user picks another one. */
+const val COVERAGE_DEFAULT_RANGE_KM = 20
+
 /** `0xRRGGBB` of the planner's colour for a signal margin of [marginDb]. */
 fun coverageRgb(marginDb: Float): Int =
     CoverageLayer.colorOf(CoverageLayer.classOf(marginDb)).removePrefix("#").toInt(16)
 
 /**
- * The estimated reach of one node: for every compass direction (radial i points at 360 * i / radials degrees) how far
- * a signal of each of the [COVERAGE_LEVELS_DB] still arrives, in metres. [latitude] and [longitude] are where the reach
+ * The estimated reach of one node: for every compass direction (radial i points at 360 * i / radials degrees) how far a
+ * signal of each of the [COVERAGE_LEVELS_DB] still arrives, in metres. [latitude] and [longitude] are where the reach
  * is counted from, which for a node with a rounded position is the highest ground nearby, not the reported spot.
  */
 data class CoverageArea(
@@ -82,6 +88,8 @@ data class CoverageState(
     val days: Int = 0,
     /** The filter on one node; null shows all nodes. */
     val nodeFilter: Int? = null,
+    /** How far from a node the reach is counted and drawn, in kilometres. */
+    val rangeKm: Int = COVERAGE_DEFAULT_RANGE_KM,
     /** When the reach was last counted, in milliseconds; 0 when it was not yet. */
     val readMillis: Long = 0L,
 )
@@ -123,7 +131,8 @@ class CoverageController(
         val saved = mapPrefs.awaitCoverageEnabled()
         val days = mapPrefs.awaitCoverageDays()
         val node = mapPrefs.awaitCoverageNode()
-        mutable.update { it.copy(enabled = saved, days = days, nodeFilter = node) }
+        val range = mapPrefs.awaitCoverageRangeKm().takeIf { it in COVERAGE_RANGES_KM } ?: COVERAGE_DEFAULT_RANGE_KM
+        mutable.update { it.copy(enabled = saved, days = days, nodeFilter = node, rangeKm = range) }
     }
 
     /** Counts the reach again. A count that is already going on is not started a second time. */
@@ -136,11 +145,12 @@ class CoverageController(
             val chosen = state.nodeFilter?.takeIf { saved -> sources.any { it.nodeNum == saved } }
             state.copy(loading = true, done = 0, toDo = nodes.size, sources = sources, nodeFilter = chosen)
         }
+        val rangeKm = mutable.value.rangeKm
         val shown = ArrayList<CoverageArea>()
         try {
             for ((index, node) in nodes.withIndex()) {
                 try {
-                    shown += areaOf(node)
+                    shown += areaOf(node, rangeKm)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: PlannerElevationException) {
@@ -166,6 +176,12 @@ class CoverageController(
         mapPrefs.setCoverageFilter(days, mutable.value.nodeFilter)
     }
 
+    /** Sets how far from a node the reach is counted, in kilometres; [refresh] counts it again for that distance. */
+    fun setRangeKm(km: Int) {
+        mutable.update { it.copy(rangeKm = km) }
+        mapPrefs.setCoverageRangeKm(km)
+    }
+
     /** Shows only [nodeNum] (null: all nodes). */
     fun setNode(nodeNum: Int?) {
         mutable.update { it.copy(nodeFilter = nodeNum) }
@@ -176,23 +192,25 @@ class CoverageController(
     private fun applyFilter() {
         mutable.update { state ->
             val since = if (state.days > 0) nowMillis / MILLIS_PER_SECOND - state.days * SECONDS_PER_DAY else 0L
-            val shown =
-                all.filter { (state.nodeFilter == null || it.nodeNum == state.nodeFilter) && it.lastHeard >= since }
+            val shown = all.filter {
+                (state.nodeFilter == null || it.nodeNum == state.nodeFilter) && it.lastHeard >= since
+            }
             state.copy(areas = shown, total = all.size)
         }
     }
 
     private fun nameOf(node: Node): String = node.effectiveLongName.ifBlank { formatString("!%08x", node.num) }
 
-    private suspend fun areaOf(node: Node): CoverageArea {
-        val key = "${node.num}:${(node.latitude * PLACE_GRID).toLong()}:${(node.longitude * PLACE_GRID).toLong()}"
+    private suspend fun areaOf(node: Node, rangeKm: Int): CoverageArea {
+        val place = "${(node.latitude * PLACE_GRID).toLong()}:${(node.longitude * PLACE_GRID).toLong()}"
+        val key = "${node.num}:$place:$rangeKm"
         val known = counted[key]
         if (known != null) return known.copy(lastHeard = node.lastHeard)
         val reported = GeoPoint(node.latitude, node.longitude)
-        val ground = elevation.prepareArea(reported, RANGE_KM)
+        val ground = elevation.prepareArea(reported, rangeKm.toDouble())
         val roundedWithin = precisionRadiusMetersOrNull(node.position.precision_bits)
         val center = if (roundedWithin != null) highestPoint(reported, roundedWithin, ground) else reported
-        val result = withContext(dispatchers.default) { Coverage.compute(inputAt(center, ground), ground) }
+        val result = withContext(dispatchers.default) { Coverage.compute(inputAt(center, ground, rangeKm), ground) }
         val area =
             CoverageArea(
                 nodeNum = node.num,
@@ -227,7 +245,7 @@ class CoverageController(
         return best
     }
 
-    private fun inputAt(center: GeoPoint, ground: (Double, Double) -> Double): CoverageInput {
+    private fun inputAt(center: GeoPoint, ground: (Double, Double) -> Double, rangeKm: Int): CoverageInput {
         val end = radio.a
         return CoverageInput(
             center = center,
@@ -245,10 +263,10 @@ class CoverageController(
             kFactor = radio.kFactor,
             surfaceRefractivity = radio.surfaceRefractivity,
             extraLossDb = radio.extraLossDb,
-            maxRangeKm = RANGE_KM,
+            maxRangeKm = rangeKm.toDouble(),
             radials = RADIALS,
-            stepM = STEP_M,
-            rangeSteps = RINGS,
+            stepM = (rangeKm * STEP_M_PER_KM).coerceIn(MIN_STEP_M, MAX_STEP_M),
+            rangeSteps = rangeKm.coerceIn(MIN_RINGS, MAX_RINGS),
         )
     }
 
@@ -262,10 +280,12 @@ class CoverageController(
     }
 
     private companion object {
-        const val RANGE_KM = 20.0
         const val RADIALS = 36
-        const val RINGS = 20
-        const val STEP_M = 300.0
+        const val MIN_RINGS = 10
+        const val MAX_RINGS = 50
+        const val STEP_M_PER_KM = 15.0
+        const val MIN_STEP_M = 100.0
+        const val MAX_STEP_M = 400.0
         const val PLACE_GRID = 1_000 // about 100 m
         const val MAX_SNAP_M = 2_500.0
         const val MIN_SNAP_STEP_M = 40.0

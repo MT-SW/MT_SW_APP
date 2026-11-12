@@ -113,6 +113,7 @@ class NodeSilenceMonitorImpl(
             notificationPrefs.nodeSilenceQuietHours.value?.contains(
                 Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour,
             ) == true
+
         // Nodes that went silent in this round: several at once (a power cut, a bad hour on the band) are reported
         // with one notification instead of a burst.
         @Suppress("LoopWithTooManyJumpStatements")

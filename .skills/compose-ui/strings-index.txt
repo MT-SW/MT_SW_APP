@@ -896,6 +896,8 @@ coverage_period_all
 coverage_period_day
 coverage_period_month
 coverage_period_week
+coverage_range_km
+coverage_range_title
 coverage_refresh
 coverage_summary
 coverage_summary_filtered

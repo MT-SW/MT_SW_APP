@@ -84,10 +84,9 @@ private fun CoverageLevel(level: Int, color: Color, areas: List<CoverageArea>, o
 private fun areaPolygon(area: CoverageArea, level: Int): Polygon? {
     val reach = area.reachM[level]
     if (reach.all { it <= 0.0 }) return null
-    val ring =
-        reach.mapIndexed { radial, distance ->
-            destination(area.latitude, area.longitude, max(distance, MIN_RADIUS_M), radial * FULL_TURN_DEG / reach.size)
-        }
+    val ring = reach.mapIndexed { radial, distance ->
+        destination(area.latitude, area.longitude, max(distance, MIN_RADIUS_M), radial * FULL_TURN_DEG / reach.size)
+    }
     // Closed by hand: `ring + ring.first()` would pick the Iterable overload of plus, a Position being a collection.
     val closed = ring.toMutableList().also { it.add(ring.first()) }
     return Polygon(listOf(closed))
