@@ -58,7 +58,7 @@ class PositionCoverageTest {
 
     @Test
     fun `kml colour is blue green red with an opaque alpha`() {
-        assertEquals("ff2f32d3", kmlColor(0xD32F2F))
+        assertEquals("ff2f2fd3", kmlColor(0xD32F2F))
     }
 
     @Test
