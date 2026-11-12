@@ -18,6 +18,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* SOS: wiadomość ma na początku i na końcu dzwonek alarmowy (🔔), więc u odbiorców przychodzi jako alarm, tak jak wiadomość z przycisku dzwonka w czacie; link z pozycją (z przecinkiem we współrzędnych) jest teraz w całości klikalny we wszystkich wiadomościach, także poza SOS.
+* Przyciski „i” w szczegółach węzła mają kolor i rozmiar jak sąsiednie ikony.
 * Mapa zasięgu na głównej mapie (wszystkie wersje): w ustawieniach warstw mapy sekcja „Zasięgi sieci (pokrycie)” — kolorowe kropki (SNR: czerwony słaby, zielony mocny) dla pozycji wszystkich węzłów usłyszanych bezpośrednio, z suwakiem przezroczystości, skalą kolorów, liczbą pomiarów, przyciskiem „Wczytaj ponownie” i przyciskiem „i” z opisem.
 * Dziennik pozycji: karta „Co robią ikony na górze” opisuje prostymi słowami ikony widoku sieci, SNR, warstw, trasy i pobierania (można ją ukryć).
 * iPhone/iPad, archiwum wiadomości: wybór folderu i zapis zostawiają w dzienniku czas trwania poszczególnych kroków (zamiana wyboru na zakładkę, odczyt zakładki, zapis pliku), żeby dało się ustalić, co zacina aplikację przy wyborze folderu.
@@ -724,6 +726,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* SOS: the message has the alarm bell (🔔) at the start and at the end, so it arrives for the receivers as an alarm, like a message from the bell button in the chat; a position link (with a comma in the coordinates) is now clickable as a whole in all messages, not only in SOS.
+* The "i" buttons in the node details have the same colour and size as the icons next to them.
 * Coverage on the main map (all versions): in the map layer settings a "Network coverage" section — coloured dots (SNR: red weak, green strong) for the positions of all nodes heard directly, with a transparency slider, a colour key, the number of measurements, a "Read again" button and an "i" button with a description.
 * Position log: a "What the icons at the top do" card describes the mesh view, SNR, layers, route and download icons in plain words (it can be hidden).
 * iPhone/iPad, message archive: choosing the folder and writing leave the time of each step in the log (making the bookmark of the choice, resolving it, writing the file), so that what makes the app stall when the folder is chosen can be found.
