@@ -91,6 +91,7 @@ import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.database.desktopDataDir
 import org.meshtastic.core.model.DeviceAddress
+import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
@@ -432,6 +433,15 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     val quitLabel = stringResource(Res.string.desktop_tray_quit)
     val trayMenuItems = buildList {
         add(TrayMenuItem(showLabel) { isAppVisible = true })
+        // Opens the SOS screen; the alarm itself is sent by holding the button there. "SOS" needs no translation.
+        add(
+            TrayMenuItem("SOS") {
+                isAppVisible = true
+                uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos")) {
+                    Logger.e { "The SOS screen link was not accepted" }
+                }
+            },
+        )
         add(TrayMenuItem(quitLabel) { exitApplication() })
     }
 

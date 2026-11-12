@@ -38,10 +38,23 @@ struct MTSWApp: App {
                     MainViewControllerKt.handleIosDeepLink(url: url.absoluteString)
                 }
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { saveWidgetSizes() }
+                    if phase == .active {
+                        saveWidgetSizes()
+                        openPendingLink()
+                    }
                 }
         }
     }
+}
+
+/// Skrót Siri/Skróty zostawia w pliku adres, który ma się otworzyć po uruchomieniu aplikacji (np. ekran SOS).
+private func openPendingLink() {
+    guard let folder = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.pl.sw.mt")
+    else { return }
+    let file = folder.appendingPathComponent("pending-link.txt")
+    guard let link = try? String(contentsOf: file, encoding: .utf8), !link.isEmpty else { return }
+    try? FileManager.default.removeItem(at: file)
+    MainViewControllerKt.handleIosDeepLink(url: link)
 }
 
 /// Zapisuje, w jakich rozmiarach widżet stoi na ekranie głównym; ustawienia aplikacji pokazują opcje tych rozmiarów.

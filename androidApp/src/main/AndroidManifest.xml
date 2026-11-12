@@ -251,6 +251,18 @@
             android:foregroundServiceType="connectedDevice|location"
             android:exported="false" />
 
+        <!-- Quick Settings tile that opens the SOS screen (the alarm itself is sent by holding the button there) -->
+        <service
+            android:name="org.meshtastic.core.service.SosQuickSettingsTileService"
+            android:exported="true"
+            android:icon="@drawable/meshtastic_ic_notification"
+            android:label="SOS"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Quick Settings tile for the radio connection; BIND_QUICK_SETTINGS_TILE limits binding to SystemUI -->
         <service
             android:name="org.meshtastic.core.service.MeshQuickSettingsTileService"

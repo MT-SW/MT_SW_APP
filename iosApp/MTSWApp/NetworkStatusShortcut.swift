@@ -42,8 +42,34 @@ struct NetworkStatusIntent: AppIntent {
     }
 }
 
+/// Skrót „SOS MT_SW” (Siri, Skróty, przycisk czynności): otwiera ekran SOS. Alarm wysyła się dopiero po przytrzymaniu
+/// przycisku na tym ekranie, więc przypadkowe uruchomienie skrótu nie wyśle fałszywego alarmu.
+struct OpenSosIntent: AppIntent {
+    static var title: LocalizedStringResource = "SOS MT_SW"
+    static var description = IntentDescription("Otwiera ekran SOS w aplikacji MT_SW. Alarm wysyłasz, przytrzymując przycisk.")
+    static var openAppWhenRun: Bool = true
+
+    func perform() async throws -> some IntentResult {
+        // Aplikacja po otwarciu czyta ten plik i przechodzi na ekran SOS (zob. MTSWApp.swift).
+        if let folder = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: shortcutAppGroup) {
+            try? "meshtastic://meshtastic/sos".write(
+                to: folder.appendingPathComponent("pending-link.txt"), atomically: true, encoding: .utf8)
+        }
+        return .result()
+    }
+}
+
 struct MTSWShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: OpenSosIntent(),
+            phrases: [
+                "SOS w \(.applicationName)",
+                "SOS in \(.applicationName)",
+            ],
+            shortTitle: "SOS",
+            systemImageName: "exclamationmark.triangle"
+        )
         AppShortcut(
             intent: NetworkStatusIntent(),
             phrases: [
