@@ -28,6 +28,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.position_config_set_fixed_from_phone
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 
+@Suppress("ModifierMissing")
 @Composable
 actual fun DeviceLocationButton(
     viewModel: RadioConfigViewModel,

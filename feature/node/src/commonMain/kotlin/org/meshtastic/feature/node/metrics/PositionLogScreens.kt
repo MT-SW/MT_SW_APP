@@ -100,6 +100,7 @@ import org.meshtastic.core.ui.util.TrackOverlay
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.Position
 
+@Suppress("LongMethod")
 @Composable
 fun PositionLogScreen(
     viewModel: MetricsViewModel,

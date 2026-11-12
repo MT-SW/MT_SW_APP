@@ -324,7 +324,9 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
                 text =
                 when {
                     state.lastRunMillis == 0L -> stringResource(Res.string.archive_never)
+
                     state.lastFailed -> stringResource(Res.string.archive_last_failed)
+
                     else ->
                         stringResource(
                             Res.string.archive_last_ok,
@@ -354,6 +356,7 @@ private fun ChipRow(content: @Composable () -> Unit) {
 }
 
 /** The folder in words: its last name when the address carries one, otherwise just that one is chosen. */
+@Suppress("ReturnCount")
 @Composable
 private fun folderLabel(folder: String): String {
     if (folder.isBlank()) return stringResource(Res.string.archive_folder_none)

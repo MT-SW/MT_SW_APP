@@ -79,6 +79,7 @@ class IosHudStill(private val photoOutput: AVCapturePhotoOutput) : HudStill {
     // The system holds the delegate only weakly, so it is kept here until the photo arrives.
     private var delegate: PhotoDelegate? = null
 
+    @Suppress("ReturnCount")
     override suspend fun take(overlay: ImageBitmap): Boolean {
         val photo = takePhoto() ?: return false
         val overlayImage = overlay.toUiImage() ?: return false
@@ -152,6 +153,7 @@ class IosHudStill(private val photoOutput: AVCapturePhotoOutput) : HudStill {
 }
 
 /** The overlay (a Compose image) as a UIImage, going through PNG. */
+@Suppress("ReturnCount")
 private fun ImageBitmap.toUiImage(): UIImage? {
     val bytes = Image.makeFromBitmap(asSkiaBitmap()).encodeToData()?.bytes ?: return null
     if (bytes.isEmpty()) return null

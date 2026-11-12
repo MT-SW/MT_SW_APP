@@ -52,7 +52,6 @@ class AndroidFolderService(private val context: Application, private val dispatc
                     Logger.e { "Could not create $name in the chosen folder" }
                     return@withContext false
                 }
-                @Suppress("TooGenericExceptionCaught")
                 val pfd = resolver.openFileDescriptor(target, "wt") ?: return@withContext false
                 pfd.use { descriptor ->
                     FileOutputStream(descriptor.fileDescriptor).sink().buffer().use { sink -> block(sink) }
@@ -60,7 +59,7 @@ class AndroidFolderService(private val context: Application, private val dispatc
                 true
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 Logger.e(e) { "Failed to write $name to the chosen folder" }
                 false
             }
@@ -93,7 +92,7 @@ class AndroidFolderService(private val context: Application, private val dispatc
                 }
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 Logger.e(e) { "Failed to read the files of the chosen folder" }
                 emptyList()
             }

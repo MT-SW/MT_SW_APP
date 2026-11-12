@@ -326,6 +326,7 @@ private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit) 
         when {
             state.refused ->
                 Text(stringResource(Res.string.sos_result_refused), color = MaterialTheme.colorScheme.error)
+
             state.running -> {
                 Text(
                     text = stringResource(Res.string.sos_status_sending, state.attempt, state.total),
@@ -333,6 +334,7 @@ private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit) 
                 )
                 Text(text = statusText(state.status), style = MaterialTheme.typography.bodyMedium)
             }
+
             else ->
                 Text(
                     text =
@@ -362,7 +364,10 @@ private fun statusText(status: MessageStatus?): String = when (status) {
     MessageStatus.SFPP_ROUTING,
     MessageStatus.SFPP_CONFIRMED,
     -> stringResource(Res.string.sos_status_delivered)
+
     MessageStatus.ENROUTE -> stringResource(Res.string.sos_status_enroute)
+
     MessageStatus.ERROR -> stringResource(Res.string.sos_status_error)
+
     else -> stringResource(Res.string.sos_status_queued)
 }

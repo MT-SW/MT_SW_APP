@@ -215,6 +215,7 @@ internal data class PlacedPoint(val point: ReportPoint, val x: Float, val y: Flo
  * Places [points] in a box of [width] × [height] with [pad] around it, north up and the true proportions kept (the
  * east-west distances are shortened by the cosine of the latitude), centred in the box.
  */
+@Suppress("MagicNumber")
 internal fun placePoints(points: List<ReportPoint>, width: Float, height: Float, pad: Float): List<PlacedPoint> {
     if (points.isEmpty()) return emptyList()
     val minLat = points.minOf { it.latitude }
@@ -333,6 +334,7 @@ private const val SVG_HEIGHT = 420f
 private const val SVG_PAD = 28f
 
 /** The position sketch as an inline SVG: a dot per node, the local node larger, names when there are few nodes. */
+@Suppress("MagicNumber")
 private fun List<ReportPoint>.toSvg(): String = buildString {
     append("<svg viewBox=\"0 0 ${SVG_WIDTH.toInt()} ${SVG_HEIGHT.toInt()}\" style=\"width:100%;height:auto\">")
     append("<rect width=\"${SVG_WIDTH.toInt()}\" height=\"${SVG_HEIGHT.toInt()}\" fill=\"#f6f6f6\" rx=\"8\"/>")

@@ -94,6 +94,7 @@ private const val MAX_CUSTOM_HOURS = 24 * 90
  * notification. Set per node, from an hour up to 90 days; off by default. Optionally also counts packets that only
  * passed through the node.
  */
+@Suppress("LongMethod", "MagicNumber")
 @Composable
 fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val prefs = koinInject<NotificationPrefs>()
@@ -117,7 +118,9 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                 )
-                InfoButton(Res.string.node_silence_alert, Res.string.mt_sw_other_silence_body,
+                InfoButton(
+                    Res.string.node_silence_alert,
+                    Res.string.mt_sw_other_silence_body,
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }

@@ -425,6 +425,7 @@ constructor(
  * hop, which says nothing about the distance to the node. A position with no usable time is skipped, since the time
  * is the key the track map uses to find it again.
  */
+@Suppress("LoopWithTooManyJumpStatements")
 internal fun positionSnrByTime(packets: List<MeshPacket>): Map<Int, Float> = buildMap {
     for (packet in packets) {
         if (!packet.isMeasuredDirect()) continue

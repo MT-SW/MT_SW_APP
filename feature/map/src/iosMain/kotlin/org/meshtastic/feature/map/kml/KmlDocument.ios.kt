@@ -41,6 +41,7 @@ actual fun readKmlDocument(bytes: ByteArray): String? = if (bytes.isKmzArchive()
 }
 
 /** The images [hrefs] points at, taken out of the KMZ; empty for a bare KML. */
+@Suppress("LoopWithTooManyJumpStatements")
 actual fun readKmlArchiveImages(bytes: ByteArray, hrefs: Set<String>): Map<String, ByteArray> {
     if (hrefs.isEmpty() || !bytes.isKmzArchive()) return emptyMap()
     return withZip(bytes) { zip ->

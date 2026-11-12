@@ -62,7 +62,7 @@ private fun playWav(wav: ByteArray) {
     currentPlayer = player
 }
 
-@Suppress("TooGenericExceptionCaught")
+@Suppress("TooGenericExceptionCaught", "ModifierMissing")
 @Composable
 actual fun RingtoneTrailingIcon(ringtoneInput: String, onRingtoneImported: (String) -> Unit, enabled: Boolean) {
     val fileService = koinInject<FileService>()

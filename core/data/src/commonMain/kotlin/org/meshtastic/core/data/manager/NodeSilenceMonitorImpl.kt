@@ -91,6 +91,7 @@ class NodeSilenceMonitorImpl(
         notifications.showNodeSilenceNotification(node, title)
     }
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private suspend fun check() {
         val now = nowSeconds
         if (connection.connectionState.value !is ConnectionState.Connected) {
@@ -116,7 +117,6 @@ class NodeSilenceMonitorImpl(
 
         // Nodes that went silent in this round: several at once (a power cut, a bad hour on the band) are reported
         // with one notification instead of a burst.
-        @Suppress("LoopWithTooManyJumpStatements")
         val newlySilent = mutableListOf<Pair<Node, Long>>()
         for ((nodeNum, minutes) in alerts) {
             val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: continue

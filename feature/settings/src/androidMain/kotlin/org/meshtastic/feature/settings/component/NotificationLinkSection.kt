@@ -36,6 +36,7 @@ import org.meshtastic.core.ui.icon.Notifications
  * (messages, alarms, new nodes, battery and others), and for each one the sound, vibration, importance and the lock
  * screen can be set.
  */
+@Suppress("ModifierMissing")
 @Composable
 fun NotificationLinkSection() {
     val context = LocalContext.current

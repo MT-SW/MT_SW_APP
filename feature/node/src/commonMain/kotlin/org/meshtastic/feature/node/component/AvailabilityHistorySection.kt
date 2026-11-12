@@ -35,7 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -67,10 +67,11 @@ import kotlin.time.DurationUnit
  * and taller the more packets there were. Built from the recorded packets, so it reaches back only as far as the log
  * retention allows. The range is chosen with chips, from a day to a month.
  */
+@Suppress("LongMethod", "MagicNumber")
 @Composable
 fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
     val repository = koinInject<MeshLogRepository>()
-    var rangeIndex by remember { mutableStateOf(0) }
+    var rangeIndex by remember { mutableIntStateOf(0) }
     val range = AVAILABILITY_RANGES[rangeIndex]
     // The window is fixed when the range is picked, so the chart does not jump on every recomposition.
     val nowMs = remember(nodeNum, rangeIndex) { nowMillis }
@@ -97,7 +98,9 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                 )
-                InfoButton(Res.string.availability_title, Res.string.mt_sw_other_availability_body,
+                InfoButton(
+                    Res.string.availability_title,
+                    Res.string.mt_sw_other_availability_body,
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }

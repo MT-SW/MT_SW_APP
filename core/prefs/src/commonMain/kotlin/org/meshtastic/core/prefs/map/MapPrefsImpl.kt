@@ -221,7 +221,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
 
     override suspend fun awaitCoverageNode(): Int? = dataStore.data.first()[KEY_COVERAGE_NODE]
 
-    override suspend fun awaitCoverageRangeKm(): Int = dataStore.data.first()[KEY_COVERAGE_RANGE_KM] ?: 20
+    override suspend fun awaitCoverageRangeKm(): Int =
+        dataStore.data.first()[KEY_COVERAGE_RANGE_KM] ?: DEFAULT_COVERAGE_RANGE_KM
 
     override fun setCoverageRangeKm(km: Int) {
         scope.launch { dataStore.edit { it[KEY_COVERAGE_RANGE_KM] = km } }
@@ -264,6 +265,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
     }
 
     companion object {
+        private const val DEFAULT_COVERAGE_RANGE_KM = 20
+
         val KEY_MESH_HUD_COACH_SEEN_PREF = booleanPreferencesKey("mesh_hud_coach_seen")
         val KEY_MAP_STYLE_PREF = intPreferencesKey("map_style_id")
         val KEY_SHOW_ONLY_FAVORITES_PREF = booleanPreferencesKey("show_only_favorites")

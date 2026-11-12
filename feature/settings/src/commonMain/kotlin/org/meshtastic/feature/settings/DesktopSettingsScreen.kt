@@ -405,7 +405,8 @@ fun DesktopSettingsScreen(
                             onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
                             reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
                             onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
-                            newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
+                            newWaypointsEnabled =
+                                settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
                             onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
                             alertsEnabled = settingsViewModel.alertsEnabled.collectAsStateWithLifecycle().value,
                             onToggleAlerts = { settingsViewModel.setAlertsEnabled(it) },

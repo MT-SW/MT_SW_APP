@@ -58,6 +58,7 @@ private const val TEST_CONTACT_KEY = "0^all"
  * over the radio.
  */
 @OptIn(ExperimentalLayoutApi::class)
+@Suppress("ModifierMissing")
 @Composable
 fun NotificationTestSection() {
     val manager = koinInject<MeshNotificationManager>()

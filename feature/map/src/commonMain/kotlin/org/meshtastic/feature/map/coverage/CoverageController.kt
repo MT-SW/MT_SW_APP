@@ -46,6 +46,7 @@ import org.meshtastic.feature.map.planner.state.PlannerUiState
 val COVERAGE_LEVELS_DB: List<Float> = listOf(0f, 6f, 12f, 18f, 24f)
 
 /** How far from a node the reach is counted and drawn, in kilometres, shortest first. */
+@Suppress("MagicNumber")
 val COVERAGE_RANGES_KM: List<Int> = listOf(1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 75, 100)
 
 /** The distance used until the user picks another one. */
@@ -103,6 +104,7 @@ data class CoverageState(
  * ground within the rounding (at most [MAX_SNAP_M]), because such a node most likely stands on a peak and not on the
  * slope next to it.
  */
+@Suppress("TooManyFunctions")
 @Single
 class CoverageController(
     private val nodeRepository: NodeRepository,
