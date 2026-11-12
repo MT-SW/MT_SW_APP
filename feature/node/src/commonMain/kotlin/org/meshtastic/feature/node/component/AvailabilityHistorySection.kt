@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -46,8 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.component.InfoButton
-import androidx.compose.ui.Alignment
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
@@ -58,13 +57,14 @@ import org.meshtastic.core.resources.availability_longest_silence
 import org.meshtastic.core.resources.availability_now
 import org.meshtastic.core.resources.availability_summary
 import org.meshtastic.core.resources.availability_title
-import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.resources.mt_sw_other_availability_body
+import org.meshtastic.core.ui.component.InfoButton
 import kotlin.time.DurationUnit
 
 /**
- * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it
- * and taller the more packets there were. Built from the recorded packets, so it reaches back only as far as the log
+ * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it and
+ * taller the more packets there were. Built from the recorded packets, so it reaches back only as far as the log
  * retention allows. The range is chosen with chips, from a day to a month.
  */
 @Suppress("LongMethod", "MagicNumber")

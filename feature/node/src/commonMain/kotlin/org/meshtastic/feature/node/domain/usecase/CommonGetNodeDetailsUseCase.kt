@@ -422,8 +422,8 @@ constructor(
 
 /**
  * The SNR each logged position was heard with. Only direct packets count: a relayed one carries the SNR of the last
- * hop, which says nothing about the distance to the node. A position with no usable time is skipped, since the time
- * is the key the track map uses to find it again.
+ * hop, which says nothing about the distance to the node. A position with no usable time is skipped, since the time is
+ * the key the track map uses to find it again.
  */
 @Suppress("LoopWithTooManyJumpStatements")
 internal fun positionSnrByTime(packets: List<MeshPacket>): Map<Int, Float> = buildMap {

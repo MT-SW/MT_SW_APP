@@ -46,8 +46,7 @@ internal fun buildCoverageKml(positions: List<Position>, snrByTime: Map<Int, Flo
                     snr = snrByTime[pos.time],
                 )
             }
-    val buckets =
-        (points.map { snrBucket(it.snr) } + points.zipWithNext { a, b -> snrBucket(legSnr(a, b)) }).distinct()
+    val buckets = (points.map { snrBucket(it.snr) } + points.zipWithNext { a, b -> snrBucket(legSnr(a, b)) }).distinct()
     return buildString {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         append("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n")
@@ -88,22 +87,21 @@ internal class CoverageTrack(val name: String, val positions: List<Position>, va
  * Positions without a measurement are left out, since a grey dot says nothing about coverage.
  */
 internal fun buildNetworkCoverageKml(tracks: List<CoverageTrack>, name: String): String {
-    val perNode =
-        tracks.map { track ->
-            track.name to
-                track.positions
-                    .sortedBy { it.time }
-                    .mapNotNull { pos ->
-                        val snr = track.snrByTime[pos.time] ?: return@mapNotNull null
-                        val (latI, lonI) = pos.fixOrNull() ?: return@mapNotNull null
-                        KmlPoint(
-                            lat = latI * GeoConstants.DEG_D,
-                            lon = lonI * GeoConstants.DEG_D,
-                            time = pos.time,
-                            snr = snr,
-                        )
-                    }
-        }
+    val perNode = tracks.map { track ->
+        track.name to
+            track.positions
+                .sortedBy { it.time }
+                .mapNotNull { pos ->
+                    val snr = track.snrByTime[pos.time] ?: return@mapNotNull null
+                    val (latI, lonI) = pos.fixOrNull() ?: return@mapNotNull null
+                    KmlPoint(
+                        lat = latI * GeoConstants.DEG_D,
+                        lon = lonI * GeoConstants.DEG_D,
+                        time = pos.time,
+                        snr = snr,
+                    )
+                }
+    }
     val buckets = perNode.flatMap { (_, points) -> points.map { snrBucket(it.snr) } }.distinct()
     return buildString {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")

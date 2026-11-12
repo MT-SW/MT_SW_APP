@@ -50,10 +50,9 @@ import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.WifiProvisionRoute
-import org.meshtastic.core.resources.app_notifications
-import org.meshtastic.core.resources.notification_settings_in_system
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
+import org.meshtastic.core.resources.app_notifications
 import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.device_links
@@ -64,6 +63,7 @@ import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.intro_show
+import org.meshtastic.core.resources.notification_settings_in_system
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.preferences_system_default
 import org.meshtastic.core.resources.provide_location_to_mesh
@@ -87,8 +87,8 @@ import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LocationOn
-import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.icon.Wifi
@@ -406,7 +406,7 @@ fun DesktopSettingsScreen(
                             reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
                             onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
                             newWaypointsEnabled =
-                                settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
+                            settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
                             onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
                             alertsEnabled = settingsViewModel.alertsEnabled.collectAsStateWithLifecycle().value,
                             onToggleAlerts = { settingsViewModel.setAlertsEnabled(it) },

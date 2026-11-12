@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 @file:Suppress("MagicNumber")
 
 package org.meshtastic.feature.settings.radio.component
@@ -25,8 +24,8 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 /**
- * Turns an RTTTL ringtone (`name:d=4,o=5,b=63:8c,8d,...`) into a mono 16-bit WAV, because iOS cannot play RTTTL
- * itself. Pure Kotlin, so it can be checked without a device.
+ * Turns an RTTTL ringtone (`name:d=4,o=5,b=63:8c,8d,...`) into a mono 16-bit WAV, because iOS cannot play RTTTL itself.
+ * Pure Kotlin, so it can be checked without a device.
  */
 internal object RtttlSynth {
     private const val SAMPLE_RATE = 22_050

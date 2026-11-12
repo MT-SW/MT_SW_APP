@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.foundation.layout.Row
@@ -69,30 +68,29 @@ actual fun RingtoneTrailingIcon(ringtoneInput: String, onRingtoneImported: (Stri
     val showToast = rememberShowToast()
     val scope = rememberCoroutineScope()
 
-    val launcher =
-        rememberOpenFileLauncher { uri ->
-            if (uri != null) {
-                scope.launch {
-                    try {
-                        var text = ""
-                        fileService.read(uri) { source ->
-                            val buffer = Buffer()
-                            source.read(buffer, MAX_RINGTONE_SIZE.toLong())
-                            text = buffer.readUtf8()
-                        }
-                        if (text.isNotEmpty()) {
-                            onRingtoneImported(text)
-                            showToast(getString(Res.string.ringtone_imported))
-                        } else {
-                            showToast(getString(Res.string.ringtone_file_empty))
-                        }
-                    } catch (e: Exception) {
-                        Logger.e(e) { "Error importing ringtone" }
-                        showToast(getString(Res.string.ringtone_import_error, e.message ?: e.toString()))
+    val launcher = rememberOpenFileLauncher { uri ->
+        if (uri != null) {
+            scope.launch {
+                try {
+                    var text = ""
+                    fileService.read(uri) { source ->
+                        val buffer = Buffer()
+                        source.read(buffer, MAX_RINGTONE_SIZE.toLong())
+                        text = buffer.readUtf8()
                     }
+                    if (text.isNotEmpty()) {
+                        onRingtoneImported(text)
+                        showToast(getString(Res.string.ringtone_imported))
+                    } else {
+                        showToast(getString(Res.string.ringtone_file_empty))
+                    }
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error importing ringtone" }
+                    showToast(getString(Res.string.ringtone_import_error, e.message ?: e.toString()))
                 }
             }
         }
+    }
 
     Row {
         IconButton(onClick = { launcher("*/*") }, enabled = enabled) {

@@ -33,9 +33,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -100,7 +100,7 @@ import org.meshtastic.core.ui.util.TrackOverlay
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.Position
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "ModifierMissing")
 @Composable
 fun PositionLogScreen(
     viewModel: MetricsViewModel,
@@ -121,8 +121,9 @@ fun PositionLogScreen(
     // Coverage view: the track coloured by the SNR it was heard with, saved as KML, and a second track beside it.
     val snrByTime = state.positionSnr
     var colorBySnr by rememberSaveable { mutableStateOf(false) }
-    val exportKmlLauncher =
-        rememberSaveFileLauncher { uri -> viewModel.savePositionKml(uri, positions, snrByTime, gpxTrackName) }
+    val exportKmlLauncher = rememberSaveFileLauncher { uri ->
+        viewModel.savePositionKml(uri, positions, snrByTime, gpxTrackName)
+    }
     val compare by viewModel.trackCompare.collectAsStateWithLifecycle()
     val compareCandidates by viewModel.compareCandidates.collectAsStateWithLifecycle()
     var showCompareDialog by rememberSaveable { mutableStateOf(false) }
@@ -135,101 +136,112 @@ fun PositionLogScreen(
             TrackOverlay(colorBySnr = colorBySnr && snrByTime.isNotEmpty(), snrByTime = snrByTime, compare = compare),
     ) {
         BaseMetricScreen(
-        isLoading = isLoading,
-        onNavigateUp = onNavigateUp,
-        telemetryType = null,
-        titleRes = Res.string.position_log,
-        nodeName = nodeName,
-        data = positions,
-        timeProvider = { it.time.toDouble() },
-        onExportCsv = { exportPositionLauncher("position.csv", "text/csv") },
-        extraActions = {
-            if (hasTrackPoint && onOpenMeshHud != null) {
-                IconButton(onClick = onOpenMeshHud) {
-                    Icon(
-                        imageVector = MeshtasticIcons.CenterFocusStrong,
-                        contentDescription = stringResource(Res.string.mesh_hud_open),
-                    )
-                }
-            }
-            if (hasTrackPoint) {
-                InfoButton(
-                    Res.string.track_info_title,
-                    Res.string.mt_sw_other_coverage_body,
-                    Res.string.mt_sw_other_compare_body,
-                )
-            }
-            if (snrByTime.isNotEmpty()) {
-                IconButton(onClick = { colorBySnr = !colorBySnr }) {
-                    Icon(
-                        imageVector = MeshtasticIcons.Snr,
-                        contentDescription = stringResource(Res.string.track_snr_colors),
-                        tint = if (colorBySnr) MaterialTheme.colorScheme.primary else LocalContentColor.current,
-                    )
-                }
-                IconButton(onClick = { exportKmlLauncher("coverage.kml", "application/vnd.google-earth.kml+xml") }) {
-                    Icon(
-                        imageVector = MeshtasticIcons.Layers,
-                        contentDescription = stringResource(Res.string.track_export_kml),
-                    )
-                }
-            }
-            if (hasTrackPoint) {
-                IconButton(onClick = { showCompareDialog = true }) {
-                    Icon(
-                        imageVector = MeshtasticIcons.Route,
-                        contentDescription = stringResource(Res.string.track_compare),
-                        tint = if (compare != null) MaterialTheme.colorScheme.primary else LocalContentColor.current,
-                    )
-                }
-            }
-            if (hasTrackPoint) {
-                IconButton(onClick = { exportGpxLauncher("track.gpx", "application/gpx+xml") }) {
-                    Icon(
-                        imageVector = MeshtasticIcons.FileDownload,
-                        contentDescription = stringResource(Res.string.export_gpx),
-                    )
-                }
-            }
-            if (positions.isNotEmpty()) {
-                ClearPositionTrackButton(onConfirm = { viewModel.clearPosition() })
-            }
-            if (!state.isLocal) {
-                IconButton(onClick = { viewModel.requestPosition() }) {
-                    Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = null)
-                }
-            }
-        },
-        chartPart = { modifier, selectedX, _, onPointSelected ->
-            val selectedTime = selectedX?.toInt()
-            // Positional: trackMap is a function type, so it takes no named arguments. Collapsed credit, this being a
-            // strip inside a screen whose own map is a tab away.
-            trackMap(destNum, positions, modifier, selectedTime, { time -> onPointSelected(time.toDouble()) }, false)
-        },
-        listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
-                if (hasTrackPoint) {
-                    item(key = "icon_legend", contentType = "icon_legend") {
-                        TrackIconLegend(
-                            showHud = onOpenMeshHud != null,
-                            showSnr = snrByTime.isNotEmpty(),
+            isLoading = isLoading,
+            onNavigateUp = onNavigateUp,
+            telemetryType = null,
+            titleRes = Res.string.position_log,
+            nodeName = nodeName,
+            data = positions,
+            timeProvider = { it.time.toDouble() },
+            onExportCsv = { exportPositionLauncher("position.csv", "text/csv") },
+            extraActions = {
+                if (hasTrackPoint && onOpenMeshHud != null) {
+                    IconButton(onClick = onOpenMeshHud) {
+                        Icon(
+                            imageVector = MeshtasticIcons.CenterFocusStrong,
+                            contentDescription = stringResource(Res.string.mesh_hud_open),
                         )
                     }
                 }
-                itemsIndexed(
-                    positions,
-                    key = { index, position -> "${position.time}_$index" },
-                    contentType = { _, _ -> "position_log" },
-                ) { _, position ->
-                    PositionCard(
-                        position = position,
-                        displayUnits = state.displayUnits,
-                        isSelected = position.time.toDouble() == selectedX,
-                        onClick = { onCardClick(position.time.toDouble()) },
+                if (hasTrackPoint) {
+                    InfoButton(
+                        Res.string.track_info_title,
+                        Res.string.mt_sw_other_coverage_body,
+                        Res.string.mt_sw_other_compare_body,
                     )
                 }
-            }
-        },
+                if (snrByTime.isNotEmpty()) {
+                    IconButton(onClick = { colorBySnr = !colorBySnr }) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Snr,
+                            contentDescription = stringResource(Res.string.track_snr_colors),
+                            tint = if (colorBySnr) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                        )
+                    }
+                    IconButton(
+                        onClick = { exportKmlLauncher("coverage.kml", "application/vnd.google-earth.kml+xml") },
+                    ) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Layers,
+                            contentDescription = stringResource(Res.string.track_export_kml),
+                        )
+                    }
+                }
+                if (hasTrackPoint) {
+                    IconButton(onClick = { showCompareDialog = true }) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Route,
+                            contentDescription = stringResource(Res.string.track_compare),
+                            tint =
+                            if (compare != null) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                        )
+                    }
+                }
+                if (hasTrackPoint) {
+                    IconButton(onClick = { exportGpxLauncher("track.gpx", "application/gpx+xml") }) {
+                        Icon(
+                            imageVector = MeshtasticIcons.FileDownload,
+                            contentDescription = stringResource(Res.string.export_gpx),
+                        )
+                    }
+                }
+                if (positions.isNotEmpty()) {
+                    ClearPositionTrackButton(onConfirm = { viewModel.clearPosition() })
+                }
+                if (!state.isLocal) {
+                    IconButton(onClick = { viewModel.requestPosition() }) {
+                        Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = null)
+                    }
+                }
+            },
+            chartPart = { modifier, selectedX, _, onPointSelected ->
+                val selectedTime = selectedX?.toInt()
+                // Positional: trackMap is a function type, so it takes no named arguments. Collapsed credit, this being
+                // a
+                // strip inside a screen whose own map is a tab away.
+                trackMap(
+                    destNum,
+                    positions,
+                    modifier,
+                    selectedTime,
+                    { time -> onPointSelected(time.toDouble()) },
+                    false,
+                )
+            },
+            listPart = { modifier, selectedX, lazyListState, onCardClick ->
+                LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
+                    if (hasTrackPoint) {
+                        item(key = "icon_legend", contentType = "icon_legend") {
+                            TrackIconLegend(
+                                showHud = onOpenMeshHud != null,
+                                showSnr = snrByTime.isNotEmpty(),
+                            )
+                        }
+                    }
+                    itemsIndexed(
+                        positions,
+                        key = { index, position -> "${position.time}_$index" },
+                        contentType = { _, _ -> "position_log" },
+                    ) { _, position ->
+                        PositionCard(
+                            position = position,
+                            displayUnits = state.displayUnits,
+                            isSelected = position.time.toDouble() == selectedX,
+                            onClick = { onCardClick(position.time.toDouble()) },
+                        )
+                    }
+                }
+            },
         )
     }
 
@@ -264,9 +276,7 @@ private fun TrackIconLegend(showHud: Boolean, showSnr: Boolean) {
                     modifier = Modifier.weight(1f),
                 )
                 TextButton(onClick = { expanded = !expanded }) {
-                    Text(
-                        stringResource(if (expanded) Res.string.track_legend_hide else Res.string.track_legend_show),
-                    )
+                    Text(stringResource(if (expanded) Res.string.track_legend_hide else Res.string.track_legend_show))
                 }
             }
             if (expanded) {

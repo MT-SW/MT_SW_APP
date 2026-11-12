@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooManyFunctions")
+@file:Suppress("TooManyFunctions", "MagicNumber", "DestructuringDeclarationWithTooManyEntries")
 
 package org.meshtastic.core.data.manager
 
@@ -136,10 +136,7 @@ internal data class ArchiveRecord(
  */
 internal fun parseArchiveCsv(csv: String): List<ArchiveRecord> = csvRows(csv).mapNotNull { row ->
     if (row.size < CSV_RESTORE_COLUMNS) return@mapNotNull null
-    @Suppress("MagicNumber")
     val millis = row[5].toLongOrNull() ?: return@mapNotNull null
-
-    @Suppress("MagicNumber")
     val address = row[8]
     if (millis <= 0L || address.isEmpty()) return@mapNotNull null
     ArchiveRecord(
@@ -218,8 +215,7 @@ internal fun parseArchiveText(content: String): List<ArchiveLine> = content
     .lineSequence()
     .mapNotNull { line ->
         val match = TEXT_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
-        @Suppress("DestructuringDeclarationWithTooManyEntries")
-            val (date, time, conversation, rest) = match.destructured
+        val (date, time, conversation, rest) = match.destructured
         val cut = rest.indexOf(": ")
         if (cut < 0) return@mapNotNull null
         val text = rest.substring(cut + 2).replace(LINE_BREAK_MARK, "\n")
@@ -234,8 +230,7 @@ internal fun parseArchiveMarkdown(content: String, fileName: String): List<Archi
         .lineSequence()
         .mapNotNull { line ->
             val match = MARKDOWN_LINE.matchEntire(line.trimEnd('\r')) ?: return@mapNotNull null
-            @Suppress("DestructuringDeclarationWithTooManyEntries")
-                val (time, conversation, sender, text) = match.destructured
+            val (time, conversation, sender, text) = match.destructured
             ArchiveLine(date, time, conversation, sender, text.replace(LINE_BREAK_MARK, "\n"))
         }
         .toList()

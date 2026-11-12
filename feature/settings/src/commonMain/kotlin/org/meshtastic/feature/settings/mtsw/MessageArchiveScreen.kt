@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
@@ -33,13 +34,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,23 +53,13 @@ import org.meshtastic.core.repository.MessageArchiveRestoreResult
 import org.meshtastic.core.repository.MessageArchiver
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archive_choose_folder
+import org.meshtastic.core.resources.archive_enabled
 import org.meshtastic.core.resources.archive_encrypt
 import org.meshtastic.core.resources.archive_encrypt_hint
 import org.meshtastic.core.resources.archive_encrypt_info
 import org.meshtastic.core.resources.archive_encrypt_on
 import org.meshtastic.core.resources.archive_encrypt_remove
 import org.meshtastic.core.resources.archive_encrypt_save
-import org.meshtastic.core.resources.archive_password
-import org.meshtastic.core.resources.archive_restore
-import org.meshtastic.core.resources.archive_restore_button
-import org.meshtastic.core.resources.archive_restore_csv_only
-import org.meshtastic.core.resources.archive_restore_hint
-import org.meshtastic.core.resources.archive_restore_info
-import org.meshtastic.core.resources.archive_restore_missing_channels
-import org.meshtastic.core.resources.archive_restore_preview_button
-import org.meshtastic.core.resources.archive_restore_preview_result
-import org.meshtastic.core.resources.archive_restore_result
-import org.meshtastic.core.resources.archive_enabled
 import org.meshtastic.core.resources.archive_folder
 import org.meshtastic.core.resources.archive_folder_chosen
 import org.meshtastic.core.resources.archive_folder_none
@@ -87,6 +77,16 @@ import org.meshtastic.core.resources.archive_last_failed
 import org.meshtastic.core.resources.archive_last_ok
 import org.meshtastic.core.resources.archive_never
 import org.meshtastic.core.resources.archive_now
+import org.meshtastic.core.resources.archive_password
+import org.meshtastic.core.resources.archive_restore
+import org.meshtastic.core.resources.archive_restore_button
+import org.meshtastic.core.resources.archive_restore_csv_only
+import org.meshtastic.core.resources.archive_restore_hint
+import org.meshtastic.core.resources.archive_restore_info
+import org.meshtastic.core.resources.archive_restore_missing_channels
+import org.meshtastic.core.resources.archive_restore_preview_button
+import org.meshtastic.core.resources.archive_restore_preview_result
+import org.meshtastic.core.resources.archive_restore_result
 import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.mt_sw_other_archive_body
 import org.meshtastic.core.ui.component.EditPasswordPreference
@@ -113,10 +113,9 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
     var password by rememberSaveable { mutableStateOf("") }
     var restoring by rememberSaveable { mutableStateOf(false) }
     var restoreResult by remember { mutableStateOf<MessageArchiveRestoreResult?>(null) }
-    val pickFolder =
-        rememberOpenDocumentTreeLauncher { uri ->
-            if (uri != null) prefs.setConfig(config.copy(folder = uri.toString(), enabled = true))
-        }
+    val pickFolder = rememberOpenDocumentTreeLauncher { uri ->
+        if (uri != null) prefs.setConfig(config.copy(folder = uri.toString(), enabled = true))
+    }
 
     Scaffold(
         topBar = {

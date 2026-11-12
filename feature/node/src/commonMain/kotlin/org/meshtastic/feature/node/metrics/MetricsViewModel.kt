@@ -82,8 +82,8 @@ import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.TrackCompare
-import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.core.ui.util.toMessageRes
+import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeDetailUiState

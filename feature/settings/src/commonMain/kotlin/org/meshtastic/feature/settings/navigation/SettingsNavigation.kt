@@ -58,11 +58,11 @@ import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
-import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.MessageArchiveScreen
+import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.MtSwOtherFeaturesScreen
-import org.meshtastic.feature.settings.mtsw.SosScreen
 import org.meshtastic.feature.settings.mtsw.SmartFeaturesScreen
+import org.meshtastic.feature.settings.mtsw.SosScreen
 import org.meshtastic.feature.settings.radio.CleanNodeDatabaseScreen
 import org.meshtastic.feature.settings.radio.CleanNodeDatabaseViewModel
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel

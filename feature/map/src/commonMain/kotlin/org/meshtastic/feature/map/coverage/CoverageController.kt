@@ -53,6 +53,7 @@ val COVERAGE_RANGES_KM: List<Int> = listOf(1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50
 const val COVERAGE_DEFAULT_RANGE_KM = 20
 
 /** `0xRRGGBB` of the planner's colour for a signal margin of [marginDb]. */
+@Suppress("MagicNumber")
 fun coverageRgb(marginDb: Float): Int =
     CoverageLayer.colorOf(CoverageLayer.classOf(marginDb)).removePrefix("#").toInt(16)
 

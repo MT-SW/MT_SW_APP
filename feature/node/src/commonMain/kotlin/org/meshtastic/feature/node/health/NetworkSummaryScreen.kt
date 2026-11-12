@@ -55,10 +55,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.coverage_export_all
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.coverage_export_all
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.BatteryEmpty

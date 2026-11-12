@@ -65,6 +65,7 @@ import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.sos_button
 import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
@@ -92,7 +93,6 @@ import org.meshtastic.core.resources.sos_status_enroute
 import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
-import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.ui.component.InfoButton

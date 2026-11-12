@@ -34,8 +34,8 @@ import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.AddReaction
 import org.meshtastic.core.ui.icon.BatteryAlert
 import org.meshtastic.core.ui.icon.History
-import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Info
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PinDrop

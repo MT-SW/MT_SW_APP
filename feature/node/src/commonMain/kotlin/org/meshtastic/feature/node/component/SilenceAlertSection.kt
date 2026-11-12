@@ -20,9 +20,9 @@ package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,8 +42,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,16 +64,16 @@ import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.mt_sw_other_silence_body
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.node_silence_alert_custom
+import org.meshtastic.core.resources.node_silence_alert_hint
+import org.meshtastic.core.resources.node_silence_alert_off
 import org.meshtastic.core.resources.node_silence_count_relayed
 import org.meshtastic.core.resources.node_silence_count_relayed_hint
 import org.meshtastic.core.resources.node_silence_quiet_from
-import org.meshtastic.core.resources.node_silence_test_button
-import org.meshtastic.core.resources.node_silence_test_hint
 import org.meshtastic.core.resources.node_silence_quiet_hint
 import org.meshtastic.core.resources.node_silence_quiet_title
 import org.meshtastic.core.resources.node_silence_quiet_to
-import org.meshtastic.core.resources.node_silence_alert_hint
-import org.meshtastic.core.resources.node_silence_alert_off
+import org.meshtastic.core.resources.node_silence_test_button
+import org.meshtastic.core.resources.node_silence_test_hint
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.icon.Add
@@ -83,8 +83,7 @@ import org.meshtastic.core.ui.icon.Save
 import kotlin.time.DurationUnit
 
 /** Ready choices, in minutes: from an hour up to a month. Any other time can be typed in hours. */
-private val SILENCE_CHOICES_MINUTES =
-    listOf(60, 120, 180, 360, 720, 1_440, 2_880, 4_320, 7_200, 10_080, 20_160, 43_200)
+private val SILENCE_CHOICES_MINUTES = listOf(60, 120, 180, 360, 720, 1_440, 2_880, 4_320, 7_200, 10_080, 20_160, 43_200)
 
 private const val MINUTES_PER_HOUR = 60
 private const val MAX_CUSTOM_HOURS = 24 * 90
@@ -148,9 +147,10 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
             }
 
             Spacer(Modifier.height(12.dp))
-            var hours by remember(nodeNum, current) {
-                mutableStateOf(current?.let { (it / MINUTES_PER_HOUR).toString() }.orEmpty())
-            }
+            var hours by
+                remember(nodeNum, current) {
+                    mutableStateOf(current?.let { (it / MINUTES_PER_HOUR).toString() }.orEmpty())
+                }
             val hoursValue = hours.toIntOrNull()?.takeIf { it in 1..MAX_CUSTOM_HOURS }
             val keyboardController = LocalSoftwareKeyboardController.current
             val save = {

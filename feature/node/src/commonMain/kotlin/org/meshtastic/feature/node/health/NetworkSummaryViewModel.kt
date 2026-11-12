@@ -136,10 +136,7 @@ class NetworkSummaryViewModel(
      */
     suspend fun coverageKml(): ByteArray? = withContext(Dispatchers.Default) {
         val tracks =
-            nodeRepository
-                .nodeDBbyNum
-                .value
-                .values
+            nodeRepository.nodeDBbyNum.value.values
                 .filter { it.lastHeard != 0 }
                 .mapNotNull { node ->
                     val packets = meshLogRepository.getMeshPacketsFrom(node.num, PortNum.POSITION_APP.value).first()
