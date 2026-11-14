@@ -3286,6 +3286,7 @@ sos_ack_help
 sos_ack_seen
 sos_acks_button
 sos_acks_empty
+sos_acks_export
 sos_acks_title
 sos_alarm_bell_notifications
 sos_alarm_bell_notifications_description
@@ -3348,6 +3349,7 @@ sos_nodes_none
 sos_nodes_note
 sos_nodes_pick_title
 sos_nodes_search
+sos_notify_on_answer
 sos_open
 sos_position_attached
 sos_position_missing
@@ -3383,12 +3385,14 @@ sos_section_message
 sos_section_nodes
 sos_section_receive
 sos_section_repeat
+sos_status_answered
 sos_status_delivered
 sos_status_enroute
 sos_status_error
 sos_status_queued
 sos_status_sending
 sos_status_sending_unlimited
+sos_stop_on_answer
 sos_stop_when_delivered
 sos_style_bell
 sos_style_note

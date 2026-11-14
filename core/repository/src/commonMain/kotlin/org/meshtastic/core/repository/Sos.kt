@@ -234,6 +234,16 @@ interface SosPrefs {
     val repeatGateMinutes: StateFlow<Int>
 
     fun setRepeatGateMinutes(minutes: Int)
+
+    /** True (the default) when repeating of our own SOS stops as soon as a recipient answers it. */
+    val stopOnAnswer: StateFlow<Boolean>
+
+    fun setStopOnAnswer(on: Boolean)
+
+    /** True (the default) when a notification tells us that a recipient answered our SOS. */
+    val notifyOnAnswer: StateFlow<Boolean>
+
+    fun setNotifyOnAnswer(on: Boolean)
 }
 
 /** How the alarm of a received SOS sounds. */
@@ -612,6 +622,8 @@ data class SosState(
     val withPosition: Boolean = false,
     /** True when no message could be sent at all (for example every channel is gone from the radio). */
     val refused: Boolean = false,
+    /** True when a recipient answered and the repeating was stopped because of it. */
+    val answered: Boolean = false,
 )
 
 /** Sends the SOS message and follows its delivery; keeps going when the screen is closed. */
@@ -623,6 +635,22 @@ interface SosController {
 
     /** Stops a run in progress. */
     fun cancel()
+}
+
+/** The answers to our SOS as a text a spreadsheet opens: one line per answer, a header first. */
+object SosAckExport {
+    private const val BOM = "\uFEFF"
+    private const val HEADER = "time_utc,name,node,answer"
+
+    fun csv(entries: List<SosAckEntry>): String = BOM + HEADER + "\n" + entries.joinToString("") { e ->
+        listOf(
+            Instant.fromEpochMilliseconds(e.time).toString(),
+            e.name,
+            NodeAddress.numToDefaultId(e.nodeNum),
+            e.ack.name.lowercase(),
+        )
+            .joinToString(",") { "\"" + it.replace("\"", "\"\"") + "\"" } + "\n"
+    }
 }
 
 /** The history as a text a spreadsheet opens: one line per SOS, a header first. */

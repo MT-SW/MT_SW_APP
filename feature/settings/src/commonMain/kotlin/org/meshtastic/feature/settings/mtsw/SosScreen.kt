@@ -79,6 +79,7 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAck
 import org.meshtastic.core.repository.SosAckEntry
+import org.meshtastic.core.repository.SosAckExport
 import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlert
@@ -100,6 +101,7 @@ import org.meshtastic.core.resources.sos_ack_help
 import org.meshtastic.core.resources.sos_ack_seen
 import org.meshtastic.core.resources.sos_acks_button
 import org.meshtastic.core.resources.sos_acks_empty
+import org.meshtastic.core.resources.sos_acks_export
 import org.meshtastic.core.resources.sos_acks_title
 import org.meshtastic.core.resources.sos_alarm_flash_switch
 import org.meshtastic.core.resources.sos_alarm_map
@@ -152,6 +154,7 @@ import org.meshtastic.core.resources.sos_nodes_none
 import org.meshtastic.core.resources.sos_nodes_note
 import org.meshtastic.core.resources.sos_nodes_pick_title
 import org.meshtastic.core.resources.sos_nodes_search
+import org.meshtastic.core.resources.sos_notify_on_answer
 import org.meshtastic.core.resources.sos_position_attached
 import org.meshtastic.core.resources.sos_position_missing
 import org.meshtastic.core.resources.sos_quiet_from
@@ -181,12 +184,14 @@ import org.meshtastic.core.resources.sos_section_message
 import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_receive
 import org.meshtastic.core.resources.sos_section_repeat
+import org.meshtastic.core.resources.sos_status_answered
 import org.meshtastic.core.resources.sos_status_delivered
 import org.meshtastic.core.resources.sos_status_enroute
 import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
 import org.meshtastic.core.resources.sos_status_sending_unlimited
+import org.meshtastic.core.resources.sos_stop_on_answer
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_style_bell
 import org.meshtastic.core.resources.sos_style_note
@@ -487,6 +492,18 @@ fun SosScreen(onBack: () -> Unit) {
                         checked = config.stopWhenDelivered,
                         text = stringResource(Res.string.sos_stop_when_delivered),
                         onClick = { prefs.setConfig(config.copy(stopWhenDelivered = !config.stopWhenDelivered)) },
+                    )
+                    val stopOnAnswer by prefs.stopOnAnswer.collectAsStateWithLifecycle()
+                    SwitchListItem(
+                        checked = stopOnAnswer,
+                        text = stringResource(Res.string.sos_stop_on_answer),
+                        onClick = { prefs.setStopOnAnswer(!stopOnAnswer) },
+                    )
+                    val notifyOnAnswer by prefs.notifyOnAnswer.collectAsStateWithLifecycle()
+                    SwitchListItem(
+                        checked = notifyOnAnswer,
+                        text = stringResource(Res.string.sos_notify_on_answer),
+                        onClick = { prefs.setNotifyOnAnswer(!notifyOnAnswer) },
                     )
                 }
             }
@@ -1033,7 +1050,14 @@ private fun SosStatus(
 ) {
     if (state.attempt == 0 && !state.refused) return
     var showAcks by remember { mutableStateOf(false) }
-    if (showAcks) SosAcksDialog(acks = acks, onDismiss = { showAcks = false })
+    val exportAcks = rememberFileExporter(content = { SosAckExport.csv(acks).encodeToByteArray() })
+    if (showAcks) {
+        SosAcksDialog(
+            acks = acks,
+            onExport = { exportAcks("sos_confirmations.csv", "text/csv") },
+            onDismiss = { showAcks = false },
+        )
+    }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         when {
             state.refused ->
@@ -1061,6 +1085,13 @@ private fun SosStatus(
                     style = MaterialTheme.typography.titleMedium,
                 )
         }
+        if (state.answered) {
+            Text(
+                text = stringResource(Res.string.sos_status_answered),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         if (config.includePosition && state.attempt > 0) {
             Text(
                 text =
@@ -1086,7 +1117,7 @@ private fun SosStatus(
 
 /** Who answered the SOS sent last (newest first): name, what they answered and when. Scrolls when long. */
 @Composable
-private fun SosAcksDialog(acks: List<SosAckEntry>, onDismiss: () -> Unit) {
+private fun SosAcksDialog(acks: List<SosAckEntry>, onExport: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.sos_acks_title)) },
@@ -1111,6 +1142,9 @@ private fun SosAcksDialog(acks: List<SosAckEntry>, onDismiss: () -> Unit) {
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } },
+        dismissButton = {
+            if (acks.isNotEmpty()) TextButton(onClick = onExport) { Text(stringResource(Res.string.sos_acks_export)) }
+        },
     )
 }
 

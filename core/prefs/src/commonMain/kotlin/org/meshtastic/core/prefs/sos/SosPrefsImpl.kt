@@ -154,7 +154,23 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_GATE_MINUTES] = minutes.coerceIn(1, MAX_GATE_MINUTES) } }
     }
 
+    override val stopOnAnswer: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_STOP_ANSWER] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setStopOnAnswer(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_STOP_ANSWER] = on } }
+    }
+
+    override val notifyOnAnswer: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_NOTIFY_ANSWER] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setNotifyOnAnswer(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_NOTIFY_ANSWER] = on } }
+    }
+
     private companion object {
+        val KEY_STOP_ANSWER = booleanPreferencesKey("sos_stop_on_answer")
+        val KEY_NOTIFY_ANSWER = booleanPreferencesKey("sos_notify_on_answer")
         const val DEFAULT_GATE_MINUTES = 10
         const val MAX_GATE_MINUTES = 120
         val KEY_TARGETS = stringPreferencesKey("sos_target_messages")

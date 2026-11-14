@@ -60,6 +60,8 @@ class CoroutineScopeConstructionTest {
             "core/prefs/commonMain/NotificationPrefsImpl.kt",
             "core/prefs/commonMain/RadioPrefsImpl.kt",
             "core/prefs/commonMain/SenderMutePrefsImpl.kt",
+            "core/prefs/commonMain/SosAcksImpl.kt",
+            "core/prefs/commonMain/SosHistoryImpl.kt",
             "core/prefs/commonMain/SosPrefsImpl.kt",
             "core/prefs/commonMain/TakPrefsImpl.kt",
             "core/prefs/commonMain/UiPrefsImpl.kt",

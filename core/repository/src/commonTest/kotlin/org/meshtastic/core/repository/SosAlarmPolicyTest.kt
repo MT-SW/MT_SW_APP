@@ -219,4 +219,13 @@ Pomocy", SosTargets.nodeKey(42) to "Do Oleka")
         assertEquals(emptyMap(), SosTargets.decode(SosTargets.encode(mapOf("c0" to "  "))))
         assertEquals(emptyMap(), SosTargets.decode(null))
     }
+
+    @Test
+    fun acksExportAsCsv() {
+        val csv = SosAckExport.csv(listOf(SosAckEntry(0L, 5, "Ala \"A\"", SosAck.COMING)))
+        val lines = csv.removePrefix("\uFEFF").lines()
+        assertEquals("time_utc,name,node,answer", lines[0])
+        assertTrue(lines[1].contains("\"Ala \"\"A\"\"\""))
+        assertTrue(lines[1].endsWith("\"coming\""))
+    }
 }

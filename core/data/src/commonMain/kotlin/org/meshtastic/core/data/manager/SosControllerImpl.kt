@@ -37,6 +37,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosConfig
+import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.SosState
@@ -62,6 +63,7 @@ class SosControllerImpl(
     private val nodes: NodeRepository,
     private val phone: PhoneLocationProvider,
     private val acks: SosAcks,
+    private val prefs: SosPrefs,
     private val scope: ServiceScope,
 ) : SosController {
     private val mutableState = MutableStateFlow(SosState())
@@ -88,6 +90,7 @@ class SosControllerImpl(
         val total = if (!repeating) 1 else if (unlimited) 0 else config.repeatCount.coerceAtLeast(1)
         mutableState.value = SosState(running = true, total = total)
         var delivered = false
+        var answered = false
         try {
             var attempt = 0
             while (unlimited || attempt < total) {
@@ -107,14 +110,22 @@ class SosControllerImpl(
                 }
                 if (waitForDelivery(queued)) delivered = true
                 if (delivered && config.stopWhenDelivered) break
-                if (unlimited || attempt < total) delay(config.repeatMinutes * MILLIS_PER_MINUTE)
+                if (answeredNow()) {
+                    answered = true
+                    break
+                }
+                if (unlimited || attempt < total) {
+                    answered = waitForAnswer(config.repeatMinutes * MILLIS_PER_MINUTE)
+                    if (answered) break
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Logger.e(e) { "SOS failed" }
         } finally {
-            mutableState.update { it.copy(running = false, delivered = delivered) }
+            // Someone answering counts as the confirmation, so there is no "send again" offered.
+            mutableState.update { it.copy(running = false, delivered = delivered || answered, answered = answered) }
         }
     }
 
@@ -137,6 +148,21 @@ class SosControllerImpl(
                 NodeAddress.ByNum(num).toContactKey(slot).value to config.targetMessages[SosTargets.nodeKey(num)]
             }
         return channelKeys + nodeKeys
+    }
+
+    /** True when the option is on and a recipient has answered the SOS sent last. */
+    private fun answeredNow(): Boolean = prefs.stopOnAnswer.value && acks.entries.value.isNotEmpty()
+
+    /** Waits [millis] before the next send; true when a recipient answered meanwhile (the wait is cut short). */
+    private suspend fun waitForAnswer(millis: Long): Boolean {
+        var waited = 0L
+        while (waited < millis) {
+            if (answeredNow()) return true
+            val step = minOf(POLL_MS, millis - waited)
+            delay(step)
+            waited += step
+        }
+        return answeredNow()
     }
 
     /** True when the radio confirmed every send within the waiting time. */

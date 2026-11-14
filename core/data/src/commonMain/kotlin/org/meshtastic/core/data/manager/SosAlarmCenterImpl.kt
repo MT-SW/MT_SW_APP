@@ -47,6 +47,9 @@ import org.meshtastic.core.repository.SosReply
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.sos_ack_coming
+import org.meshtastic.core.resources.sos_ack_help
+import org.meshtastic.core.resources.sos_ack_seen
 import org.meshtastic.core.resources.sos_reply_calling_help
 import org.meshtastic.core.resources.sos_reply_coming
 import org.meshtastic.core.resources.sos_reply_seen
@@ -130,6 +133,18 @@ class SosAlarmCenterImpl(
     override fun ackReceived(fromNodeNum: Int, senderName: String, ack: SosAck) {
         Logger.i { "SOS alarm: $senderName answered $ack" }
         acks.add(SosAckEntry(time = nowMillis, nodeNum = fromNodeNum, name = senderName, ack = ack))
+        if (!prefs.notifyOnAnswer.value) return
+        scope.launch {
+            val text =
+                getStringSuspend(
+                    when (ack) {
+                        SosAck.SEEN -> Res.string.sos_ack_seen
+                        SosAck.COMING -> Res.string.sos_ack_coming
+                        SosAck.CALLING_HELP -> Res.string.sos_ack_help
+                    },
+                )
+            runCatching { notifications.showAlertNotification(directKey(fromNodeNum), senderName, text) }
+        }
     }
 
     /** Local time of day, in minutes since midnight. */
