@@ -24,11 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.layers.CircleLayer
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.SosAck
 import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.latestByNode
+import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
+import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.style.MapColors
@@ -41,7 +44,7 @@ import org.meshtastic.feature.map.maplibre.style.MapColors
  * Unclustered nodes only, like the pulse: a ring under a cluster bubble would not say which member answered.
  */
 @Composable
-internal fun SosAnswerLayer(unclustered: List<Node>) {
+internal fun SosAnswerLayer(unclustered: List<Node>, onNodeClick: (Int) -> Unit) {
     val answers by koinInject<SosAcks>().entries.collectAsStateWithLifecycle()
     val latest = remember(answers) { answers.latestByNode() }
     for (ack in SosAck.entries) {
@@ -54,6 +57,16 @@ internal fun SosAnswerLayer(unclustered: List<Node>) {
             radius = const(ringRadius(ack).dp),
             strokeColor = const(ringColor(ack)),
             strokeWidth = const(RING_WIDTH_DP.dp),
+            // A tap on the ring opens the node like a tap on its chip does.
+            onClick = { features ->
+                val num = features.firstNotNullOfOrNull { it.properties?.get(NodeFeatureKeys.NODE_NUM).lenientInt() }
+                if (num == null) {
+                    ClickResult.Pass
+                } else {
+                    onNodeClick(num)
+                    ClickResult.Consume
+                }
+            },
         )
     }
 }

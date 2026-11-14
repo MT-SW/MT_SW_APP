@@ -99,8 +99,14 @@ class SosControllerImpl(
                 mutableState.update {
                     it.copy(attempt = attempt, status = MessageStatus.QUEUED, withPosition = position != null)
                 }
+                // A node that already answered gets no more repeats; when only such nodes were chosen, the run is over.
+                val keys = targetKeys(config, acks.entries.value.map { it.nodeNum }.toSet())
+                if (keys.isEmpty()) {
+                    answered = true
+                    break
+                }
                 val queued =
-                    targetKeys(config).mapNotNull { (key, own) ->
+                    keys.mapNotNull { (key, own) ->
                         val text = textFor(own ?: config.message, position)
                         (sendMessage(text, key) as? SendMessageOutcome.Queued)?.packetId
                     }
@@ -134,7 +140,7 @@ class SosControllerImpl(
      * direct message goes on the shared key slot when both radios have a public key, else on the channel the node was
      * heard on, exactly as the chat does.
      */
-    private fun targetKeys(config: SosConfig): List<Pair<String, String?>> {
+    private fun targetKeys(config: SosConfig, answeredNodes: Set<Int>): List<Pair<String, String?>> {
         val db = nodes.nodeDBbyNum.value
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
         // With nothing chosen at all the main channel is used, so the message never goes nowhere.
@@ -142,7 +148,7 @@ class SosControllerImpl(
         val channelKeys =
             channels.map { ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)] }
         val nodeKeys =
-            config.nodes.map { num ->
+            config.nodes.filter { it !in answeredNodes }.map { num ->
                 val node = db[num]
                 val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
                 NodeAddress.ByNum(num).toContactKey(slot).value to config.targetMessages[SosTargets.nodeKey(num)]
