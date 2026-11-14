@@ -27,9 +27,11 @@ import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
-import platform.Foundation.NSData
+import platform.Foundation.NSFileHandle
 import platform.Foundation.NSURL
-import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.closeFile
+import platform.Foundation.fileHandleForReadingFromURL
+import platform.Foundation.readDataOfLength
 import platform.posix.memcpy
 
 /**
@@ -49,7 +51,7 @@ actual fun rememberMapLayerPicker(onPick: (PickedMapFile) -> Unit): MapLayerPick
                 PickedMapFile(
                     displayName = name,
                     extensionOrMime = name.substringAfterLast('.', "").ifBlank { null },
-                    read = { withContext(ioDispatcher) { url.readBytesOrNull() } },
+                    read = { maxBytes -> withContext(ioDispatcher) { url.readBytesOrNull(maxBytes) } },
                 ),
             )
         }
@@ -57,13 +59,16 @@ actual fun rememberMapLayerPicker(onPick: (PickedMapFile) -> Unit): MapLayerPick
     return MapLayerPickerLauncher { openFile("*/*") }
 }
 
+/** The first [maxBytes] of the file (like on Android and desktop), so a huge file is never held whole in memory. */
 @OptIn(ExperimentalForeignApi::class)
-private fun NSURL.readBytesOrNull(): ByteArray? {
-    val data = NSData.dataWithContentsOfURL(this)
-    if (data == null) {
+private fun NSURL.readBytesOrNull(maxBytes: Long): ByteArray? {
+    val handle = NSFileHandle.fileHandleForReadingFromURL(this, null)
+    if (handle == null) {
         Logger.withTag("MapLayer").e { "Failed to read the picked map layer" }
         return null
     }
+    val data = handle.readDataOfLength(maxBytes.toULong())
+    handle.closeFile()
     val bytes = ByteArray(data.length.toInt())
     if (bytes.isNotEmpty()) {
         bytes.usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
