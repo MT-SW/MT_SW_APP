@@ -27,13 +27,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.noiseFloorOrNull
+import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.util.LnaCorrection
@@ -113,6 +116,22 @@ fun MeshtasticAppShell(
             LnaCorrection(myNodeNum, lnaGains, currentInverted, batteryInverted)
         }
 
+    // What every top bar shows: the plate of our node, and the red SOS button (on the cards chosen in the settings; all
+    // by default). Provided once here so that no card has to be wired by hand.
+    val sosPrefs = koinInject<SosPrefs>()
+    val sosScreens by sosPrefs.barScreens.collectAsStateWithLifecycle()
+    val ourNode by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
+    val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
+    val appBarExtras =
+        remember(ourNode, connectionState, sosScreens, uiViewModel) {
+            AppBarExtras(
+                ourNode = ourNode,
+                connected = connectionState is ConnectionState.Connected,
+                sosScreens = sosScreens,
+                onOpenSos = { uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos")) },
+            )
+        }
+
     MeshtasticSnackbarProvider(snackbarManager = uiViewModel.snackbarManager, hostModifier = hostModifier) {
         // Provide the activity FLOW (stable ref) — not a collected value — so it costs no recomposition; only the
         // local-node connection badge collects it, animating in the draw phase. See LocalMeshActivity.
@@ -121,6 +140,7 @@ fun MeshtasticAppShell(
             LocalNoiseFloor provides noiseFloor,
             LocalLnaCorrection provides lnaCorrection,
             LocalMeshActivity provides uiViewModel.meshActivity,
+            LocalAppBarExtras provides appBarExtras,
         ) {
             // Inside the provider: dialogs raised here (e.g. the traceroute result) read LocalModemPreset etc.
             MeshtasticCommonAppSetup(

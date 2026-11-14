@@ -273,6 +273,7 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.AntennaPatternPlot
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -434,6 +435,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.antenna_calc_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,

@@ -51,6 +51,7 @@ import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.traceroute_showing_nodes
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Route
@@ -112,6 +113,7 @@ private fun TracerouteMapScaffold(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = title,
                 ourNode = null,
                 showNodeChip = false,

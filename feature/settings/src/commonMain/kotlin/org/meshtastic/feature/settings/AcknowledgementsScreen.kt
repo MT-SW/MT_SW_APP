@@ -52,6 +52,7 @@ import org.meshtastic.core.resources.planner_credits_line_osm
 import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
 import org.meshtastic.core.resources.planner_credits_line_splat
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 
 /**
  * Shared Acknowledgements screen listing the open-source libraries the app is built on, using the multiplatform
@@ -76,6 +77,7 @@ fun AcknowledgementsScreen(onNavigateUp: () -> Unit, jsonProvider: suspend () ->
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.acknowledgements),
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,

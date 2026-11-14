@@ -41,6 +41,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.share
 import org.meshtastic.core.resources.share_to
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.feature.messaging.ui.contact.ContactItem
@@ -68,6 +69,7 @@ fun ShareScreen(contacts: List<Contact>, onConfirm: (String) -> Unit, onNavigate
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.MESSAGES,
                 title = stringResource(Res.string.share_to),
                 ourNode = null,
                 showNodeChip = false,

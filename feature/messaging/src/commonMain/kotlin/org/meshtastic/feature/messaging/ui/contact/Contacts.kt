@@ -137,6 +137,7 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.ScrollToTopEvent
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.smartScrollToTop
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Delete
@@ -289,6 +290,7 @@ fun ContactsScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.MESSAGES,
                 title = stringResource(Res.string.conversations),
                 ourNode = ourNode,
                 showNodeChip = ourNode != null && connectionState is ConnectionState.Connected,

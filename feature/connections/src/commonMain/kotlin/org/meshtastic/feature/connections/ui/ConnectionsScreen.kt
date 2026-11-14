@@ -126,6 +126,7 @@ import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
@@ -484,6 +485,7 @@ fun ConnectionsScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.CONNECTIONS,
                 title = stringResource(Res.string.connections),
                 ourNode = ourNode,
                 showNodeChip = ourNode != null && connectionState is ConnectionState.Connected,

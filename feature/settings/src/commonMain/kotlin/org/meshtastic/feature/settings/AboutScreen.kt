@@ -84,6 +84,7 @@ import org.meshtastic.core.ui.component.DataWipeDialog
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Code
 import org.meshtastic.core.ui.icon.Delete
@@ -141,6 +142,7 @@ fun AboutScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.about),
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,

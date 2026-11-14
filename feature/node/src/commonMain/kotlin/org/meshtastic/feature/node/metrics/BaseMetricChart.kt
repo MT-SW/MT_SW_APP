@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
@@ -273,6 +274,7 @@ fun <T> BaseMetricScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = nodeName,
                 subtitle = stringResource(titleRes) + " (${data.size} ${stringResource(Res.string.logs)})",
                 ourNode = null,

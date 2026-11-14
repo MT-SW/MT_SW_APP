@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.save_changes
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.settings.radio.RadioConfigState
 import org.meshtastic.feature.settings.radio.RebootBehavior
@@ -112,6 +113,7 @@ fun <T : Message<T, *>> RadioConfigScreenList(
         Scaffold(
             topBar = {
                 MainAppBar(
+                    sosScreen = SosBarScreen.SETTINGS,
                     title = title,
                     canNavigateUp = true,
                     onNavigateUp = onBack,

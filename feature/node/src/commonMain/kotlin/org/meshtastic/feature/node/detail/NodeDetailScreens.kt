@@ -47,6 +47,7 @@ import org.meshtastic.core.resources.details
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.RemoteAdminRegionDialog
 import org.meshtastic.core.ui.component.ShareContactDialog
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.util.ActiveWhileStarted
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.core.ui.util.rememberMeshHudSupported
@@ -148,6 +149,7 @@ private fun NodeDetailScaffold(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = stringResource(Res.string.details),
                 subtitle = uiState.nodeName.asString(),
                 ourNode = uiState.ourNode,

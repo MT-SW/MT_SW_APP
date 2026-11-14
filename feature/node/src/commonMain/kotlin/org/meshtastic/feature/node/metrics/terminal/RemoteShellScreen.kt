@@ -105,6 +105,7 @@ import org.meshtastic.core.resources.remote_shell_status_not_connected
 import org.meshtastic.core.resources.remote_shell_status_opening
 import org.meshtastic.core.resources.remote_shell_subtitle_round_trip
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.More
@@ -191,6 +192,7 @@ fun RemoteShellScreen(viewModel: RemoteShellViewModel, onNavigateUp: () -> Unit,
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = viewModel.nodeLongName,
                 subtitle = subtitle,
                 ourNode = null,

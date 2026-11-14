@@ -68,6 +68,7 @@ import org.meshtastic.core.resources.translator_sessions_empty
 import org.meshtastic.core.resources.translator_sessions_new
 import org.meshtastic.core.resources.translator_sessions_title
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -215,6 +216,7 @@ fun AiHomeScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.AI,
                 title =
                 stringResource(
                     when {

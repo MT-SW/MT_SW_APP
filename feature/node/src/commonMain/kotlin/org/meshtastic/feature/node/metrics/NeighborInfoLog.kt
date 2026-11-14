@@ -47,6 +47,7 @@ import org.meshtastic.core.resources.routing_error_no_response
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
@@ -122,6 +123,7 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
         topBar = {
             val lastRequestNeighborsTime by viewModel.lastRequestNeighborsTime.collectAsStateWithLifecycle()
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = state.node?.effectiveLongName.orEmpty(),
                 subtitle = stringResource(Res.string.neighbor_info),
                 ourNode = null,

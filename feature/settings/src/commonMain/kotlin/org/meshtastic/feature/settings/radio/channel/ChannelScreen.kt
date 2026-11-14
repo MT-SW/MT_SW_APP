@@ -90,6 +90,7 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.PreferenceFooter
 import org.meshtastic.core.ui.component.QrDialog
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Share
@@ -256,6 +257,7 @@ fun ChannelScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = "",
                 ourNode = null,
                 showNodeChip = false,

@@ -61,6 +61,7 @@ import org.meshtastic.core.resources.press_and_drag
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.dragContainer
 import org.meshtastic.core.ui.component.dragDropItemsIndexed
 import org.meshtastic.core.ui.component.rememberDragDropState
@@ -192,6 +193,7 @@ private fun ChannelConfigScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = title,
                 canNavigateUp = true,
                 onNavigateUp = onBack,

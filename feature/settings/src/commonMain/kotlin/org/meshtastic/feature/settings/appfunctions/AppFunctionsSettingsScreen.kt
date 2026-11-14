@@ -49,6 +49,7 @@ import org.meshtastic.core.resources.app_functions_send_message
 import org.meshtastic.core.resources.app_functions_settings
 import org.meshtastic.core.resources.app_functions_write_section
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SettingsRemote
@@ -75,6 +76,7 @@ fun AppFunctionsSettingsScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.app_functions_settings),
                 canNavigateUp = true,
                 onNavigateUp = onBack,

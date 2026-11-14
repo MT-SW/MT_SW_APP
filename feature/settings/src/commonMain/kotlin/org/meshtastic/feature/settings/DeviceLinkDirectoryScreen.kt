@@ -40,6 +40,7 @@ import org.meshtastic.core.resources.device_links_affiliate_disclosure
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.isDesktopPlatform
@@ -58,6 +59,7 @@ fun DeviceLinkDirectoryScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.device_links),
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,

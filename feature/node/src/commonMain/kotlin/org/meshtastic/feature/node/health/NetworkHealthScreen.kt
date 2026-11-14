@@ -61,6 +61,7 @@ import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -153,6 +154,7 @@ fun NetworkHealthScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.HEALTH,
                 title = "Zdrowie sieci",
                 ourNode = null,
                 showNodeChip = false,

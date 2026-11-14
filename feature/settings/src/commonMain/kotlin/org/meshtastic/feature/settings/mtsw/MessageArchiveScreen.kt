@@ -93,6 +93,7 @@ import org.meshtastic.core.ui.component.EditPasswordPreference
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
@@ -120,6 +121,7 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.archive_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,

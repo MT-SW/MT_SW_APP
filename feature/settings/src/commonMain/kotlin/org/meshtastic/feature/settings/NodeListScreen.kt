@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.feature.settings.component.NodeLayoutSettings
 
 /**
@@ -55,6 +56,7 @@ fun NodeListScreen(settingsViewModel: SettingsViewModel, onNavigateUp: () -> Uni
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.node_layout_section_title),
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,

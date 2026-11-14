@@ -28,6 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.util.LocalMapViewProvider
 import org.meshtastic.feature.map.component.LocalOpenMeshHud
 
@@ -51,6 +52,7 @@ fun MapScreen(
         modifier = modifier,
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.MAP,
                 title = stringResource(Res.string.map),
                 ourNode = ourNodeInfo,
                 showNodeChip = ourNodeInfo != null && isConnected,

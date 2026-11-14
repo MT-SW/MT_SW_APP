@@ -87,6 +87,7 @@ import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Info
@@ -177,6 +178,7 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.debug_panel),
                 ourNode = null,
                 showNodeChip = false,

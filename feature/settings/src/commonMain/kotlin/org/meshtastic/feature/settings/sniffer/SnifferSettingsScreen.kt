@@ -77,6 +77,7 @@ import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.feature.settings.export.rememberLogExportSaver
 import org.meshtastic.feature.settings.export.rememberLogImportPicker
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
@@ -252,6 +253,7 @@ fun SnifferSettingsScreen(
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.sniffer_settings_title),
                 subtitle = bufferCountText,
                 ourNode = null,

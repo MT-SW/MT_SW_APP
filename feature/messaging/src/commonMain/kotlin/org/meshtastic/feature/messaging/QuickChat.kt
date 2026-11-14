@@ -72,6 +72,7 @@ import org.meshtastic.core.resources.quick_chat_new
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.dragContainer
 import org.meshtastic.core.ui.component.dragDropItemsIndexed
 import org.meshtastic.core.ui.component.rememberDragDropState
@@ -96,6 +97,7 @@ fun QuickChatScreen(modifier: Modifier = Modifier, viewModel: QuickChatViewModel
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.MESSAGES,
                 title = stringResource(Res.string.quick_chat),
                 ourNode = null,
                 showNodeChip = false,

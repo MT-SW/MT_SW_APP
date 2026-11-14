@@ -57,6 +57,7 @@ import org.meshtastic.core.resources.filter_whole_word
 import org.meshtastic.core.resources.filter_words
 import org.meshtastic.core.resources.filter_words_summary
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -71,6 +72,7 @@ fun FilterSettingsScreen(viewModel: FilterSettingsViewModel, onBack: () -> Unit)
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.filter_settings),
                 canNavigateUp = true,
                 onNavigateUp = onBack,

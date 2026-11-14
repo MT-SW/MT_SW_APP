@@ -129,6 +129,7 @@ import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
@@ -204,6 +205,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.mt_sw_features_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,
@@ -454,6 +456,7 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.smart_features_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,
@@ -493,6 +496,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.mt_sw_other_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,

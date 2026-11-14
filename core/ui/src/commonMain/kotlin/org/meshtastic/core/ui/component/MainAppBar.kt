@@ -63,6 +63,10 @@ fun MainAppBar(
     canNavigateUp: Boolean,
     onNavigateUp: () -> Unit,
     onClickChip: (Node) -> Unit,
+    // The card this bar belongs to, which decides whether the red SOS button is shown (a setting of the person), and
+    // whether this bar may carry it at all (the SOS screen itself does not).
+    sosScreen: SosBarScreen = SosBarScreen.OTHER,
+    showSos: Boolean = true,
     // Trailing slot: a @Composable content lambda, not an event handler (detekt LambdaParameterEventTrailing).
     actions: @Composable () -> Unit,
 ) {
@@ -120,6 +124,7 @@ fun MainAppBar(
                 TopBarActions(
                     ourNode = ourNode,
                     showNodeChip = showNodeChip,
+                    sosScreen = sosScreen.takeIf { showSos },
                     actions = actions,
                     onClickChip = onClickChip,
                 )
@@ -133,11 +138,23 @@ fun MainAppBar(
 private fun TopBarActions(
     ourNode: Node?,
     showNodeChip: Boolean,
+    sosScreen: SosBarScreen?,
     actions: @Composable () -> Unit,
     onClickChip: (Node) -> Unit,
 ) {
-    AnimatedVisibility(visible = showNodeChip, enter = fadeIn(), exit = fadeOut()) {
-        ourNode?.let { node ->
+    // The same two things on every card: the plate of our node while the radio is connected, and the SOS button. A bar
+    // that was given no node of its own takes the one from the app root, so no card is left without them.
+    val extras = LocalAppBarExtras.current
+    val chipNode = ourNode ?: extras.ourNode
+    val chipVisible = chipNode != null && (showNodeChip || extras.connected)
+    val openSos = extras.onOpenSos
+    val sosVisible = sosScreen != null && openSos != null && sosScreen.key in extras.sosScreens
+
+    if (sosVisible && openSos != null) {
+        SosChip(onClick = openSos, modifier = Modifier.padding(start = 8.dp))
+    }
+    AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
+        chipNode?.let { node ->
             NodeChip(modifier = Modifier.padding(horizontal = 16.dp), node = node, onClick = onClickChip)
         }
     }

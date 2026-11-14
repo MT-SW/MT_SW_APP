@@ -187,6 +187,7 @@ import org.meshtastic.core.resources.wifi_drops_label
 import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.AirUtilization
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.Chart
@@ -261,6 +262,7 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.NODES,
                 title = stringResource(Res.string.on_demand_log_title),
                 subtitle = null,
                 ourNode = null,

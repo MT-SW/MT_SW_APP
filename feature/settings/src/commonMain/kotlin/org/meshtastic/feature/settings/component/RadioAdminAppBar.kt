@@ -24,6 +24,7 @@ import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.remotely_administrating
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosBarScreen
 
 /**
  * App bar for a screen that configures either the connected node or a remote one: while [isLocal] the subtitle is
@@ -43,6 +44,7 @@ internal fun RadioAdminAppBar(
     canNavigateUp: Boolean = true,
 ) {
     MainAppBar(
+        sosScreen = SosBarScreen.SETTINGS,
         modifier = modifier,
         title = title,
         subtitle =

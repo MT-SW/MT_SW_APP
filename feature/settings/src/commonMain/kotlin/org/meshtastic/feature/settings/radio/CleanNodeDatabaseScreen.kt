@@ -63,6 +63,7 @@ import org.meshtastic.core.resources.clean_unknown_nodes_any_date
 import org.meshtastic.core.resources.nodes_queued_for_deletion
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.SosBarScreen
 
 /**
  * Composable screen for cleaning the node database. Allows users to specify criteria for deleting nodes. The list of
@@ -85,6 +86,7 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
     Scaffold(
         topBar = {
             MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
                 title = stringResource(Res.string.clean_node_database_title),
                 ourNode = null,
                 showNodeChip = false,
