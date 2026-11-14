@@ -24,8 +24,8 @@ class SosSirenTest {
     @Test
     fun pcmHasWholePairsOfTonesInSixteenBitSamples() {
         val oneSecond = SosSiren.pcm(1.4)
-        // 4 tones x 0.35 s at 44100 Hz, two bytes a sample.
-        assertEquals(2 * 15_435 * 2, oneSecond.size)
+        // 1.4 s is two pairs of tones: 4 tones x 0.35 s at 44100 Hz (whole samples), two bytes a sample.
+        assertEquals(4 * 15_434 * 2, oneSecond.size)
         assertTrue(oneSecond.any { it.toInt() != 0 })
     }
 

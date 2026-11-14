@@ -39,6 +39,7 @@ data class WhatsNewRequest(val full: Boolean, val fromRelease: Int)
 object WhatsNew {
     private const val SEPARATOR = '|'
 
+    @Suppress("DoubleMutabilityForCollection") // the lists are swapped for new ones while the text is read
     fun parse(text: String): List<WhatsNewRelease> {
         val releases = mutableListOf<WhatsNewRelease>()
         var order = -1

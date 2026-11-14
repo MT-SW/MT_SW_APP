@@ -35,8 +35,7 @@ class SosAlarmPolicyTest {
         test: Boolean = false,
     ) = SosAlarmPolicy.rings(test, receive, sender, onlyChosen, chosen, quiet, quietExceptions, minute)
 
-    @Test
-    fun ordinaryAlarmRings() = assertTrue(rings())
+    @Test fun ordinaryAlarmRings() = assertTrue(rings())
 
     @Test
     fun switchedOffNeverRingsExceptATest() {
@@ -91,8 +90,10 @@ class SosAlarmPolicyTest {
     @Test
     fun stylesEncodeAndDecode() {
         val styles = mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT, 4 to SosAlarmStyle.SIREN)
-        assertEquals(mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT),
-            SosAlarmStyle.decodeMap(SosAlarmStyle.encodeMap(styles)))
+        assertEquals(
+            mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT),
+            SosAlarmStyle.decodeMap(SosAlarmStyle.encodeMap(styles)),
+        )
         assertEquals(emptyMap(), SosAlarmStyle.decodeMap(null))
         assertEquals(emptyMap(), SosAlarmStyle.decodeMap("x,1:2:3"))
         assertEquals(mapOf(7 to SosAlarmStyle.SIREN), SosAlarmStyle.decodeMap("7:NIEZNANY"))

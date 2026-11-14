@@ -92,7 +92,8 @@ private const val PULSE_MIN = 0.7f
  * the person confirms it. When it appears the conversation it came in is opened underneath, so that is where the person
  * lands after confirming. The sound is the platform's (see [org.meshtastic.core.repository.SosAlarmSound]).
  */
-@Suppress("LongMethod", "ModifierMissing") // a full-screen overlay: it has no place to be given by a parent
+// A full-screen overlay: no place to be given by a parent; the effect runs once per alert, not on every redraw.
+@Suppress("LongMethod", "ModifierMissing", "UnnecessaryLaunchedEffect")
 @Composable
 fun SosAlarmOverlay(uiViewModel: UIViewModel) {
     val center = koinInject<SosAlarmCenter>()

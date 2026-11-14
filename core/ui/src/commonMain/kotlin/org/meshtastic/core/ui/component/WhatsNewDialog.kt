@@ -53,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -173,6 +174,8 @@ fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
                 try {
                     val language = getString(Res.string.whats_new_language)
                     WhatsNew.parse(Res.readBytes("files/whats_new_$language.md").decodeToString())
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                     // Only in the log: the window then simply says there is nothing to show.
                     Logger.withTag("WhatsNew").e(e) { "The list of changes could not be read" }

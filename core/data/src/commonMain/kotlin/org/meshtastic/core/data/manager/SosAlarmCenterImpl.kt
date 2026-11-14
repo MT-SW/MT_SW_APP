@@ -17,6 +17,7 @@
 package org.meshtastic.core.data.manager
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -149,12 +150,16 @@ class SosAlarmCenterImpl(
                     },
                 )
             // Someone calling for help gets the bell sound of the alarm; the other answers a quiet alert.
-            runCatching {
+            try {
                 if (ack == SosAck.CALLING_HELP) {
                     notifications.showSosAlarmNotification(directKey(fromNodeNum), senderName, text, SosAlarmStyle.BELL)
                 } else {
                     notifications.showAlertNotification(directKey(fromNodeNum), senderName, text)
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.w(e) { "SOS alarm: the notification of the answer could not be shown" }
             }
         }
     }
@@ -218,8 +223,13 @@ class SosAlarmCenterImpl(
         val num = ringing.fromNodeNum ?: return
         if (ringing.test) return
         scope.launch {
-            runCatching { sendMessage(SosAckMarker.tag(ack) + text(), directKey(num)) }
-                .onFailure { Logger.w(it) { "SOS alarm: the answer to the sender could not be sent" } }
+            try {
+                sendMessage(SosAckMarker.tag(ack) + text(), directKey(num))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.w(e) { "SOS alarm: the answer to the sender could not be sent" }
+            }
         }
     }
 
