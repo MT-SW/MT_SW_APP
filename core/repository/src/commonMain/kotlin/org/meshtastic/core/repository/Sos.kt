@@ -632,7 +632,7 @@ object SosNotificationActions {
 /** The last answer of each node in [this] (the list is newest first), for marking them on the map. */
 fun List<SosAckEntry>.latestByNode(): Map<Int, SosAck> {
     val latest = LinkedHashMap<Int, SosAck>()
-    for (entry in this) latest.putIfAbsent(entry.nodeNum, entry.ack)
+    for (entry in this) if (entry.nodeNum !in latest) latest[entry.nodeNum] = entry.ack
     return latest
 }
 
