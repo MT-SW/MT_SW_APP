@@ -4092,4 +4092,7 @@
     <string name="sos_bar_ai">Asystent i tłumacz</string>
     <string name="sos_bar_health">Zdrowie sieci</string>
     <string name="sos_bar_other">Pozostałe ekrany</string>
+    <string name="map_layer_not_map_data">%1$s nie jest mapą KML ani GeoJSON i nie można go narysować.</string>
+    <string name="map_layer_stored_too_large">%1$s ma ponad %2$d MB i nie można go narysować.</string>
+    <string name="map_layer_too_detailed">%1$s ma zbyt dużo szczegółów, żeby narysować go na mapie.</string>
 </resources>

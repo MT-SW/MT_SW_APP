@@ -90,7 +90,7 @@ coil = "3.6.3"
 datadog-gradle = "1.32.0"
 detekt = "2.0.0-alpha.6"
 dokka = "2.3.0"
-devtools-ksp = "2.3.13"
+devtools-ksp = "2.3.14"
 firebase-crashlytics-gradle = "3.0.8"
 google-services-gradle = "4.6.0"
 markdown = "0.7.18"
@@ -99,7 +99,7 @@ okio = "3.18.2"
 bouncycastle = "1.87"
 uri-kmp = "0.0.21"
 spotless = "8.11.0"
-sceneview = "4.68.0"
+sceneview = "4.69.5"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
@@ -113,7 +113,7 @@ dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.10.0"
 wire = "6.4.7"
-meshtastic-protobufs = "2.8.2.11-g4c80682-SNAPSHOT"
+meshtastic-protobufs = "2.8.2.13-g0adaccd-SNAPSHOT"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -273,7 +273,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
-robolectric = { module = "org.robolectric:robolectric", version = "4.17" }
+robolectric = { module = "org.robolectric:robolectric", version = "4.18" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 # Other
