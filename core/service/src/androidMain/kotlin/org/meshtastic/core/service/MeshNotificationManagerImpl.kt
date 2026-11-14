@@ -146,6 +146,7 @@ import org.meshtastic.core.resources.no_local_stats
 import org.meshtastic.core.resources.notification_reaction_to
 import org.meshtastic.core.resources.powered
 import org.meshtastic.core.resources.reply
+import org.meshtastic.core.resources.sos_alarm_notification_title
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.you
 import org.meshtastic.core.service.stats.MeshStatsLines
@@ -219,6 +220,8 @@ class MeshNotificationManagerImpl(
         private const val TAG_WAYPOINT = "waypoint"
         private const val TAG_REACTION = "reaction"
         private const val TAG_ALERT = "alert"
+        private const val TAG_SOS_ALARM = "sos_alarm"
+        private const val SOS_ALARM_ID = 3
         private const val TAG_NEW_NODE = "new_node"
         private const val TAG_NODE_SILENCE = "node_silence"
         private const val TAG_LOW_BATTERY = "low_battery"
@@ -785,6 +788,30 @@ class MeshNotificationManagerImpl(
         ensureChannels()
         notificationManager.notify(TAG_ALERT, contactKey.hashCode(), createAlertNotification(contactKey, name, alert))
     }
+
+    /**
+     * The alarm of a received SOS: the alarm channel, rings again and again until it is cancelled (the insistent flag),
+     * opens over the lock screen (full-screen intent) and leads to the conversation it came in.
+     */
+    override suspend fun showSosAlarmNotification(contactKey: String, name: String, text: String) {
+        ensureChannels()
+        val title = getStringSuspend(Res.string.sos_alarm_notification_title, name)
+        val open = createOpenMessageIntent(contactKey)
+        val notification =
+            commonBuilder(NotificationChannelSpec.SosAlarm, open)
+                .setCategory(Notification.CATEGORY_ALARM)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setAutoCancel(false)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setFullScreenIntent(open, true)
+                .build()
+        notification.flags = notification.flags or Notification.FLAG_INSISTENT
+        notificationManager.notify(TAG_SOS_ALARM, SOS_ALARM_ID, notification)
+    }
+
+    override fun cancelSosAlarmNotification() = notificationManager.cancel(TAG_SOS_ALARM, SOS_ALARM_ID)
 
     override suspend fun showMeshBeaconNotification(offer: MeshBeaconOffer) {
         ensureChannels()

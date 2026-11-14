@@ -652,6 +652,8 @@
     <string name="auto_clean_nodes_inactivity_days">Remove nodes inactive for more than %1$d days</string>
     <string name="auto_clean_nodes_title">Automatic Cleanup</string>
     <string name="auto_load_chat_images">Automatically load images from links in chat</string>
+    <string name="autostart_minimized_summary">When the app starts with the computer its window stays closed and the app waits in the tray (the icon by the clock). Opening the app by hand still shows the window.</string>
+    <string name="autostart_minimized_title">Start in the tray</string>
     <string name="autostart_summary">Starts the app when you log in to the computer, so the radio data keeps being collected. Off by default. Works in the installed app.</string>
     <string name="autostart_title">Start with the computer</string>
     <!-- AVAILABILITY -->
@@ -3351,9 +3353,21 @@
     <string name="soil_water_metrics">Soil &amp; Water</string>
     <string name="solar_irradiance">Solar Irradiance</string>
     <!-- SOS -->
+    <string name="sos_alarm_confirm">Confirm, stop the alarm</string>
+    <string name="sos_alarm_from">SOS from %1$s</string>
+    <string name="sos_alarm_notification_title">SOS from %1$s</string>
+    <string name="sos_alarm_notifications">SOS alarm</string>
+    <string name="sos_alarm_notifications_description">The alarm for an SOS that another copy of this app sent. It rings again and again until it is confirmed.</string>
+    <string name="sos_alarm_open">Open the conversation</string>
+    <string name="sos_alarm_test">Test the alarm (only on this device)</string>
+    <string name="sos_alarm_test_note">This is a test of the alarm. Nothing was sent.</string>
+    <string name="sos_alarm_test_sender">Alarm test</string>
+    <string name="sos_alarm_test_text">This is how an SOS from another node will look and sound.</string>
     <string name="sos_bar_ai">Assistant and translator</string>
     <string name="sos_bar_connections">Connections</string>
     <string name="sos_bar_health">Network health</string>
+    <string name="sos_bar_hold_desc">Tap to open SOS. Hold for %1$d s to send the alarm.</string>
+    <string name="sos_bar_hold_note">The SOS button in the top bar always has to be held for at least %1$d s, even when a shorter time is set here, so that it does not fire by accident. A tap opens the SOS screen.</string>
     <string name="sos_bar_map">Map</string>
     <string name="sos_bar_messages">Messages</string>
     <string name="sos_bar_nodes">Nodes</string>
@@ -3375,6 +3389,8 @@
     <string name="sos_nodes_add">Add or remove nodes</string>
     <string name="sos_nodes_done">Done</string>
     <string name="sos_nodes_empty">No nodes to choose from.</string>
+    <string name="sos_nodes_missing">These chosen nodes are no longer on the node list: %1$s. The alarm is sent to them anyway.</string>
+    <string name="sos_nodes_missing_remove">Remove them from the choice</string>
     <string name="sos_nodes_none">No node chosen.</string>
     <string name="sos_nodes_note">Every chosen node gets the alarm as a separate direct message — also one that is marked as not monitored or does not take messages. No exceptions.</string>
     <string name="sos_nodes_pick_title">Choose nodes</string>
@@ -3382,6 +3398,8 @@
     <string name="sos_open">Open SOS</string>
     <string name="sos_position_attached">With position</string>
     <string name="sos_position_missing">Without position (no GPS fix)</string>
+    <string name="sos_receive_note">An SOS sent by another copy of MT_SW_APP (it carries a hidden mark, so an ordinary text with the word SOS does not count) opens the conversation, covers the whole screen with a big SOS and rings until you confirm it. On Android the alarm sounds even when the phone is locked.</string>
+    <string name="sos_receive_switch">Alarm when an SOS is received</string>
     <string name="sos_repeat_count">Number of sends</string>
     <string name="sos_repeat_every">Every %1$d min</string>
     <string name="sos_repeat_once">Once</string>
@@ -3393,6 +3411,7 @@
     <string name="sos_section_hold">Holding the button</string>
     <string name="sos_section_message">Message</string>
     <string name="sos_section_nodes">Nodes (direct message)</string>
+    <string name="sos_section_receive">Receiving an SOS</string>
     <string name="sos_section_repeat">Repeating</string>
     <string name="sos_status_delivered">delivered, confirmed</string>
     <string name="sos_status_enroute">sent to the radio, waiting for confirmation</string>

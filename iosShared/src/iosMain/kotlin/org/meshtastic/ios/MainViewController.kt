@@ -44,6 +44,7 @@ import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.SosAlarmSounds
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
@@ -101,6 +102,7 @@ private val koin: Koin by lazy {
     IosLogControl.start()
     configureIosBleBackground()
     AppBackgroundControls.current = IosBackgroundKeepAlive
+    SosAlarmSounds.current = IosSosAlarmSound
     IosBackgroundKeepAlive.restore()
     startKoin<IosKoinApp> {}.koin
 }

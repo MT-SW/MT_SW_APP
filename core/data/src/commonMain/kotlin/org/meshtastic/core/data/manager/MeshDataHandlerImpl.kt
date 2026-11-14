@@ -66,6 +66,9 @@ import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.RemoteShellHandler
 import org.meshtastic.core.repository.SenderMutePrefs
+import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAlert
+import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.StoreForwardPacketHandler
 import org.meshtastic.core.repository.TelemetryPacketHandler
@@ -120,6 +123,7 @@ class MeshDataHandlerImpl(
     private val radioInterfaceService: RadioInterfaceService,
     private val activeConversationTracker: ActiveConversationTracker,
     private val senderMutePrefs: SenderMutePrefs,
+    private val sosAlarm: SosAlarmCenter,
     private val scope: ServiceScope,
 ) : MeshDataHandler {
 
@@ -529,9 +533,24 @@ class MeshDataHandlerImpl(
 
             insert(dataPacket, myNodeNum, contactKey, nowMillis, read = fromLocal || isFiltered, filtered = isFiltered)
             if (!isFiltered) {
+                raiseSosAlarmIfNeeded(dataPacket, contactKey, fromLocal)
                 handlePacketNotification(dataPacket, contactKey, updateNotification)
             }
         }
+    }
+
+    /**
+     * An SOS written by another copy of this app (it carries [SosMarker]) rings the alarm and opens the conversation.
+     * Old messages that only arrive late (history from a node) and our own messages are left out.
+     */
+    private suspend fun raiseSosAlarmIfNeeded(dataPacket: DataPacket, contactKey: String, fromLocal: Boolean) {
+        if (fromLocal || dataPacket.dataType != PortNum.TEXT_MESSAGE_APP.value) return
+        val text = dataPacket.text ?: return
+        if (!SosMarker.isSos(text)) return
+        if (nowMillis - dataPacket.time > SOS_MAX_AGE_MS) return
+        sosAlarm.raise(
+            SosAlert(id = nowMillis, contactKey = contactKey, senderName = getSenderName(dataPacket), text = text),
+        )
     }
 
     @Suppress("ReturnCount")
@@ -729,5 +748,8 @@ class MeshDataHandlerImpl(
 
     companion object {
         private const val HOPS_AWAY_UNAVAILABLE = -1
+
+        /** An SOS older than this when it arrives is history, not an alarm. */
+        private const val SOS_MAX_AGE_MS = 15 * 60_000L
     }
 }

@@ -183,6 +183,7 @@ class MeshDataHandlerTest {
                 meshBeaconRepository = meshBeaconRepository,
                 radioInterfaceService = radioInterfaceService,
                 activeConversationTracker = activeConversationTracker,
+                sosAlarm = mock(MockMode.autofill),
                 senderMutePrefs = FakeSenderMutePrefs(),
                 scope = testScope.asServiceScope(),
             )

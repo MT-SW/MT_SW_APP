@@ -1,7 +1,8 @@
 # 5 | Version v5 (2.8.5)
 ## new | New features
 - **SOS mode.** An "SOS" screen with a big button: an alarm with your position to the chosen channels (several can be chosen) and as a direct message to chosen nodes, also unmonitored ones. It is sent by holding the button, with repeating and confirmation. The message has the alarm bell, so for the receivers it arrives as an alarm.
-- **SOS at hand.** A red "SOS" button with a yellow border next to the plate of your node in the top bar of every card (turn it off or choose the cards in the SOS screen), a tile in the Android quick settings, a "SOS MT_SW" shortcut (Siri, Shortcuts), an item in the tray icon menu on the computer, and an SOS widget on Android and iPhone/iPad (also the lock screen).
+- **SOS at hand.** A red "SOS" button with a yellow border next to the plate of your node in the top bar of every card (holding it for at least 2 s sends the alarm; turn it off or choose the cards in the SOS screen), a tile in the Android quick settings, a "SOS MT_SW" shortcut (Siri, Shortcuts), an item in the tray icon menu on the computer, and an SOS widget on Android and iPhone/iPad (also the lock screen).
+- **Alarm when an SOS is received.** An SOS from another copy of the app (it has a hidden mark, so an ordinary text with the word SOS starts nothing) opens the conversation, covers the whole screen with a big SOS and rings again and again until you confirm it. On Android also on a locked phone. The "Test the alarm" button in the SOS screen tries it on this device.
 - **Neighbours on a map.** In the neighbours window of a node a new "Show on map" button: only the node and its neighbours with lines and the signal colour (SNR); when some have no position, a note says so.
 - **Network coverage on the map.** The layer draws the approximate range of every node with a position (with the terrain), and a new "Propagation (weather forecast)" layer shows where the weather stretches the range; several areas can be added.
 - **Node watchdog and availability.** A notification when a chosen node goes silent (with quiet hours and one shared notification for many nodes), and a chart of the availability history of a node.
@@ -11,7 +12,7 @@
 - **Link planner.** A comparison of results, antenna direction and tilt, antenna types, buildings and ground reflections on the map.
 - **Statistics widget.** A new widget on Android, and on iPhone/iPad also small widgets for the lock screen; the plate of our node, a choice of which nodes to show.
 - **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
-- **Computer.** The "Start with the computer" option and a single copy of the program by default.
+- **Computer.** The "Start with the computer" option, with a start in the tray (the window does not open), and a single copy of the program by default.
 - **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option.
 - **Data.** "Add data from a backup" and synchronisation of the device statistics.
 - **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.

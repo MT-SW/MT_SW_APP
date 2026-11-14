@@ -1,7 +1,8 @@
 # 5 | Wersja v5 (2.8.5)
 ## new | Nowe funkcje
 - **Tryb SOS.** Ekran „SOS” z dużym przyciskiem: alarm z Twoją pozycją na wybrane kanały (można kilka) i jako wiadomość bezpośrednia do wybranych węzłów, także niemonitorowanych. Wysyła się po przytrzymaniu przycisku, z powtarzaniem i potwierdzeniem. Wiadomość ma dzwonek alarmowy, więc u odbiorców przychodzi jako alarm.
-- **SOS pod ręką.** Czerwony przycisk „SOS” z żółtą obwódką obok plakietki Twojego węzła na górnym pasku każdej karty (wyłączysz go albo wybierzesz karty w ekranie SOS), kafelek w szybkich ustawieniach Androida, skrót „SOS MT_SW” (Siri, Skróty), pozycja w menu ikony przy zegarze na komputerze oraz widżet SOS na Androidzie i iPhonie/iPadzie (też ekran blokady).
+- **SOS pod ręką.** Czerwony przycisk „SOS” z żółtą obwódką obok plakietki Twojego węzła na górnym pasku każdej karty (przytrzymanie co najmniej 2 s wysyła alarm; wyłączysz go albo wybierzesz karty w ekranie SOS), kafelek w szybkich ustawieniach Androida, skrót „SOS MT_SW” (Siri, Skróty), pozycja w menu ikony przy zegarze na komputerze oraz widżet SOS na Androidzie i iPhonie/iPadzie (też ekran blokady).
+- **Alarm po odebraniu SOS.** SOS z innej kopii aplikacji (ma ukryty znacznik, więc zwykły tekst ze słowem SOS nic nie uruchamia) otwiera rozmowę, zakrywa cały ekran wielkim napisem SOS i dzwoni w kółko, dopóki go nie potwierdzisz. Na Androidzie także przy zablokowanym telefonie. Przycisk „Sprawdź alarm” w ekranie SOS próbuje to na tym urządzeniu.
 - **Sąsiedzi na mapie.** W oknie sąsiadów węzła nowy przycisk „Pokaż na mapie”: sam węzeł i jego sąsiedzi z liniami i kolorem sygnału (SNR); gdy część nie ma pozycji, jest o tym informacja.
 - **Zasięgi sieci na mapie.** Warstwa rysuje przybliżony zasięg każdego węzła z pozycją (z ukształtowaniem terenu), a nowa warstwa „Propagacja (prognoza pogody)” pokazuje, gdzie pogoda wydłuża zasięg; można dodać kilka obszarów.
 - **Strażnik węzła i dostępność.** Powiadomienie, gdy wybrany węzeł zamilknie (z godzinami ciszy i wspólnym powiadomieniem dla wielu węzłów), oraz wykres historii dostępności węzła.
@@ -11,7 +12,7 @@
 - **Planer łącza.** Porównanie wyników, kierunek i pochylenie anteny, rodzaje anten, budynki i odbicia od ziemi na mapie.
 - **Widżet statystyk.** Nowy widżet na Androidzie, a na iPhonie/iPadzie także małe widżety na ekran blokady; plakietka naszego węzła, wybór, które węzły pokazywać.
 - **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
-- **Komputer.** Opcja „Uruchamiaj z komputerem” i domyślnie jedna kopia programu.
+- **Komputer.** Opcja „Uruchamiaj z komputerem” z możliwością startu w zasobniku (okno się nie otwiera) i domyślnie jedna kopia programu.
 - **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji.
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.

@@ -60,6 +60,8 @@
 
     <!-- API 33+ Notification runtime permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- The alarm of a received SOS opens over the lock screen. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <!-- API 36.1+ lets a running firmware update show as a Live Update -->
     <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 

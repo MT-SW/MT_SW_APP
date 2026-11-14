@@ -24,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.autostart_minimized_summary
+import org.meshtastic.core.resources.autostart_minimized_title
 import org.meshtastic.core.resources.autostart_summary
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -40,4 +42,14 @@ fun AutostartSettings() {
         enabled = true,
         onCheckedChange = { control.setEnabled(it) },
     )
+    if (enabled) {
+        val minimized by control.startMinimized.collectAsStateWithLifecycle()
+        SwitchPreference(
+            title = stringResource(Res.string.autostart_minimized_title),
+            summary = stringResource(Res.string.autostart_minimized_summary),
+            checked = minimized,
+            enabled = true,
+            onCheckedChange = { control.setStartMinimized(it) },
+        )
+    }
 }

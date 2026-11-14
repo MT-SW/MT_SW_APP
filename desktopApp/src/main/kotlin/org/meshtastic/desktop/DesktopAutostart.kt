@@ -37,6 +37,17 @@ internal class DesktopAutostart private constructor(private val launcher: String
     private val state = MutableStateFlow(isRegistered())
     override val enabled: StateFlow<Boolean> = state
 
+    // The wish is kept in the registration itself (the launch command carries MINIMIZED_ARG), so the app needs no
+    // settings to be read before its window opens.
+    private val minimized = MutableStateFlow(readMinimized())
+    override val startMinimized: StateFlow<Boolean> = minimized
+
+    override fun setStartMinimized(on: Boolean) {
+        minimized.value = on
+        if (state.value) setEnabled(true)
+        Logger.i { "Autostart: startMinimized=$on" }
+    }
+
     init {
         // A registration made by an older install may point at a folder that no longer exists: write it again.
         if (state.value) setEnabled(true)
@@ -48,6 +59,15 @@ internal class DesktopAutostart private constructor(private val launcher: String
         state.value = isRegistered()
         Logger.i { "Autostart: wanted=$on registered=${state.value} launcher=$launcher" }
     }
+
+    private fun readMinimized(): Boolean = runCatching {
+        when {
+            os.contains("win") -> runOutput("reg", "query", RUN_KEY, "/v", NAME).second.contains(MINIMIZED_ARG)
+            os.contains("mac") -> macPlist().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
+            else -> linuxEntry().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
+        }
+    }
+        .getOrDefault(false)
 
     private fun isRegistered(): Boolean = runCatching {
         when {
@@ -61,7 +81,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
     private fun register() {
         when {
             os.contains("win") -> {
-                val code = run("reg", "add", RUN_KEY, "/v", NAME, "/t", "REG_SZ", "/d", "\"$launcher\"", "/f")
+                // The command is written with its own escaped quotes, which Java wraps into one argument.
+                val command = if (minimized.value) "\\\"$launcher\\\" $MINIMIZED_ARG" else "\"$launcher\""
+                val code = run("reg", "add", RUN_KEY, "/v", NAME, "/t", "REG_SZ", "/d", command, "/f")
                 // Windows keeps a separate "disabled in Startup apps" mark per entry. Once the person (or the system)
                 // has turned the app off there, the Run entry is ignored for good, so the mark is removed here.
                 run("reg", "delete", APPROVED_KEY, "/v", NAME, "/f")
@@ -71,13 +93,14 @@ internal class DesktopAutostart private constructor(private val launcher: String
             os.contains("mac") ->
                 macPlist().apply {
                     parentFile?.mkdirs()
+                    val macArguments = if (minimized.value) "<string>$MINIMIZED_ARG</string>" else ""
                     writeText(
                         """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>Label</key><string>$LABEL</string>
-    <key>ProgramArguments</key><array><string>${escapeXml(launcher)}</string></array>
+    <key>ProgramArguments</key><array><string>${escapeXml(launcher)}</string>$macArguments</array>
     <key>RunAtLoad</key><true/>
 </dict>
 </plist>
@@ -88,8 +111,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
             else ->
                 linuxEntry().apply {
                     parentFile?.mkdirs()
+                    val linuxArguments = if (minimized.value) " $MINIMIZED_ARG" else ""
                     writeText(
-                        "[Desktop Entry]\nType=Application\nName=MT_SW\nExec=\"$launcher\"\n" +
+                        "[Desktop Entry]\nType=Application\nName=MT_SW\nExec=\"$launcher\"$linuxArguments\n" +
                             "X-GNOME-Autostart-enabled=true\n",
                     )
                 }
@@ -112,22 +136,26 @@ internal class DesktopAutostart private constructor(private val launcher: String
         return File(base, "autostart/mt_sw.desktop")
     }
 
-    private fun run(vararg command: String): Int {
+    private fun run(vararg command: String): Int = runOutput(*command).first
+
+    private fun runOutput(vararg command: String): Pair<Int, String> {
         val process = ProcessBuilder(*command).redirectErrorStream(true).start()
         val output = process.inputStream.readBytes().decodeToString().trim()
         if (!process.waitFor(WAIT_SECONDS, TimeUnit.SECONDS)) {
             process.destroyForcibly()
             Logger.w { "Autostart: ${command.first()} did not finish in $WAIT_SECONDS s" }
-            return -1
+            return -1 to output
         }
         val code = process.exitValue()
         if (code != 0) Logger.d { "Autostart: ${command.joinToString(" ")} -> $code $output" }
-        return code
+        return code to output
     }
 
     private fun escapeXml(text: String) = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
     companion object {
+        /** Added to the launch command when the start at login should wait in the tray. */
+        const val MINIMIZED_ARG = "--minimized"
         private const val NAME = "MT_SW"
         private const val LABEL = "pl.sw.mt.autostart"
         private const val RUN_KEY = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"

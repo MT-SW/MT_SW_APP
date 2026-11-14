@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.prefs.sos
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +57,15 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_BAR] = screens.joinToString(",") } }
     }
 
+    override val receiveAlarm: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_RECEIVE] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setReceiveAlarm(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_RECEIVE] = on } }
+    }
+
     private companion object {
+        val KEY_RECEIVE = booleanPreferencesKey("sos_receive_alarm")
         val KEY_SOS = stringPreferencesKey("sos_config")
         val KEY_BAR = stringPreferencesKey("sos_bar_screens")
     }

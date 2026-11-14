@@ -14,10 +14,116 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 
 ## Zmiany forka MT_SW
 
-Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
+Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, według wersji (najnowsza pierwsza). Opis funkcji: [README.md](README.md).
 
-### Listopad 2026
+### Skrót według wersji
 
+Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokazuje okno „Nowości w aplikacji”).
+
+#### Wersja v5 (2.8.5)
+
+##### Nowe funkcje
+
+* **Tryb SOS.** Ekran „SOS” z dużym przyciskiem: alarm z Twoją pozycją na wybrane kanały (można kilka) i jako wiadomość bezpośrednia do wybranych węzłów, także niemonitorowanych. Wysyła się po przytrzymaniu przycisku, z powtarzaniem i potwierdzeniem. Wiadomość ma dzwonek alarmowy, więc u odbiorców przychodzi jako alarm.
+* **SOS pod ręką.** Czerwony przycisk „SOS” z żółtą obwódką obok plakietki Twojego węzła na górnym pasku każdej karty (wyłączysz go albo wybierzesz karty w ekranie SOS), kafelek w szybkich ustawieniach Androida, skrót „SOS MT_SW” (Siri, Skróty), pozycja w menu ikony przy zegarze na komputerze oraz widżet SOS na Androidzie i iPhonie/iPadzie (też ekran blokady).
+* **Sąsiedzi na mapie.** W oknie sąsiadów węzła nowy przycisk „Pokaż na mapie”: sam węzeł i jego sąsiedzi z liniami i kolorem sygnału (SNR); gdy część nie ma pozycji, jest o tym informacja.
+* **Zasięgi sieci na mapie.** Warstwa rysuje przybliżony zasięg każdego węzła z pozycją (z ukształtowaniem terenu), a nowa warstwa „Propagacja (prognoza pogody)” pokazuje, gdzie pogoda wydłuża zasięg; można dodać kilka obszarów.
+* **Strażnik węzła i dostępność.** Powiadomienie, gdy wybrany węzeł zamilknie (z godzinami ciszy i wspólnym powiadomieniem dla wielu węzłów), oraz wykres historii dostępności węzła.
+* **Archiwum wiadomości.** Automatyczna kopia wiadomości w wybranym folderze, przywracanie z plików CSV, tekstowych i Markdown, szyfrowanie hasłem.
+* **Zasięg z pomiarów.** Trasa węzła kolorowana siłą sygnału, porównanie dwóch tras i zapis zasięgu całej sieci do KML.
+* **Panorama terenu.** Budynki jako bryły, lasy, mgła, światło według prawdziwego słońca, ustawienie jakości panoramy.
+* **Planer łącza.** Porównanie wyników, kierunek i pochylenie anteny, rodzaje anten, budynki i odbicia od ziemi na mapie.
+* **Widżet statystyk.** Nowy widżet na Androidzie, a na iPhonie/iPadzie także małe widżety na ekran blokady; plakietka naszego węzła, wybór, które węzły pokazywać.
+* **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
+* **Komputer.** Opcja „Uruchamiaj z komputerem” i domyślnie jedna kopia programu.
+* **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji.
+* **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
+* **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
+
+##### Ulepszenia
+
+* Plakietka Twojego węzła jest teraz na górnym pasku wszystkich kart, także w Ustawieniach, Asystencie, Tłumaczu i Zdrowiu sieci.
+* Mapa: filtr „Maks. liczba skoków” i „Maks. odległość od mojego węzła”, lista „wybierz węzeł” dla węzłów w tym samym miejscu, dokładniejsze dotykanie dymków i płynniejsze przesuwanie.
+* Dolne zakładki otwierają stronę tam, gdzie ją zostawiłeś, a kliknięcie powiadomienia otwiera rozmowę, z której przyszło.
+* Wykresy pomijają odczyty z błędnym zegarem węzła, baza zapisuje szybciej, a logi na iPhonie/iPadzie są dużo szybsze.
+* Widżet: temperatura i wilgotność w jednej linii, rzadsze przebudowy danych.
+* Panorama: gładsze grzbiety, nowe tekstury gór i lasów, szybsze rysowanie budynków; budynki pobierają się od małych kawałków i każdy zapisuje się od razu.
+* Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
+
+##### Naprawione błędy
+
+* „Uruchamiaj z komputerem” działa na Windowsie i w AppImage na Linuksie.
+* iPhone/iPad: przesunięte klikanie w dymki na mapie, brak dźwięku powiadomień przy zablokowanym telefonie, błąd kopii zapasowej, gaśnięcie ekranu podczas aktualizacji.
+* Zdalna administracja pyta o wersję MT_SW_FIRMWARE także węzeł zdalny.
+* Zapis GPIO czeka na potwierdzenie z węzła i pokazuje wynik.
+* Bluetooth nie zapisuje już w logach osobnej linii dla każdego pakietu.
+* Zasięgi z trasy rozpoznają pozycje usłyszane bezpośrednio także wtedy, gdy radio nie podaje rodzaju transportu.
+* Okno sąsiadów miało dwa przyciski robiące to samo; teraz jest jeden „Zamknij”.
+* Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
+
+##### Zmiany względem oryginału
+
+* Scalone zmiany oryginału (wersja 2.8.5 i późniejsze): m.in. kreator konfiguracji radia, kody połączenia QR/NFC, aktualizacja bootloadera nRF52 przez Bluetooth i nowsze biblioteki.
+* Usunięte widżety „Statystyki lokalne” i „Śledzenie węzła”: został jeden widżet MT_SW.
+* iPhone/iPad: najstarszy obsługiwany system to iOS 17, a identyfikator aplikacji to pl.sw.mt, jak na Androidzie.
+* Budowanie dostosowane do nowego Gradle.
+
+#### Od początku do wersji v4 (2.8.4)
+
+##### Nowe funkcje
+
+* **Zdrowie sieci.** Zakładki zasilania, sygnału, eteru i środowiska, karta „Kondycja sieci”, podsumowanie z rankingami i eksport do PDF, HTML, Markdown, tekstu i CSV, wykresy w szczegółach węzła.
+* **Asystent AI, tłumacz i dyktowanie offline.** Jeden silnik (llama.cpp) i jeden wybór modeli (Gemma, Qwen, Bielik, DeepSeek), z użyciem NPU i karty graficznej; asystent liczy sam, zna aplikację i sieć, ma pamięć między rozmowami, pokazuje przyciski do ekranów i ustawień; opcjonalny internet; czytanie na głos. Treści AI są oznaczone.
+* **Planer łącza (Mesh Link Planer) i kalkulator anten.** Natywny planer z terenem, przeszkodami, pogodą na żywo i zasięgiem na mapie, kreator kabli i złączy, wymiary 13 typów anten.
+* **Widok sieci (panorama terenu).** Sylwetka terenu dookoła z węzłami, obracana kompasem, teren offline, widok AR z aparatu.
+* **Diagnostyka na żądanie i sniffer.** Zapytania do węzłów (port 354) oraz sniffer radiowy i MQTT na jednym ekranie z zapisem i grupowaniem duplikatów.
+* **Funkcje MT_SW i dokumentacja.** Osobny ekran z funkcjami forka, baza wiedzy, cała dokumentacja w aplikacji po polsku i angielsku, ekran powitalny „Co dodaje MT_SW”.
+* **Powiadomienia adaptacyjne** (Android 16+) i powiadomienia o nowych wersjach aplikacji.
+* **Trasy i sąsiedzi.** Traceroute na mapie z siłą sygnału, linie jakości sygnału między węzłami, ikona sąsiadów na liście węzłów.
+* **Węzły.** Nazwa węzła pośredniczącego (relay), ręczne dodawanie kontaktu, czyszczenie bazy węzłów (także automatyczne i przez Bluetooth), kolor węzła przy generowaniu klucza, dodatkowa telemetria MT_SW_FIRMWARE v3 i siła Wi-Fi.
+* **Czat.** Długie wiadomości dzielone i składane, zdjęcia przez link, podgląd obrazków z linków, tłumaczenie przed wysłaniem, czytanie na głos.
+* **Motywy i wygląd.** Czarno-białe motywy, „Skalowanie aplikacji”, wybór dowolnego koloru węzła, kolory statusów zgodne z aplikacją.
+* **Wersje na komputer i iPhone/iPad.** Aplikacja na macOS, Windows i Linuksa z ekranem powitalnym oraz podstawa aplikacji na iPhone/iPad.
+* **Wsparcie.** „Wesprzyj projekt”, zgłaszanie błędów i pomysłów, zbieranie logów.
+
+##### Ulepszenia
+
+* Płynniejsza aplikacja: lżejsze listy węzłów i rozmów, mapa, szczegóły węzła i Zdrowie sieci przy dużej ilości danych, szybszy start na komputerze.
+* Nazwy presetów modemu po polsku z angielską nazwą w nawiasie, polskie nazwy ról urządzeń, pełne tłumaczenie na polski.
+* Jednolite kolory w całej aplikacji: złoty = dobrze, czerwony = średnio, fioletowy = źle.
+* Szum jest oceniany po korekcie LNA, ocena SNR zależy od presetu.
+* Ustawienia LoRa: przesunięcie częstotliwości, coding rate, domyślnie preset Narrow Fast i 869,44165 MHz.
+* Mapy offline także dla domyślnej mapy OpenStreetMap, domyślna mapa OpenStreetMap i mniejsze plakietki z ogonkiem.
+* Opisy „i” przy funkcjach, spokojniejsze okna informacyjne, pasek przewijania na komputerze.
+
+##### Naprawione błędy
+
+* Ponowne łączenie Bluetooth z już sparowanym urządzeniem (Xiaomi/MIUI).
+* Puste listy rozwijane w spakowanej wersji na komputer.
+* Odzyskiwanie urządzenia zablokowanego w trybie DFU oraz aktualizacja własnym plikiem dla nieznanych urządzeń.
+* Zamykanie się aplikacji przy użyciu tłumacza i przy ogromnej ilości danych w Zdrowiu sieci.
+* Czyszczenie węzłów przez Bluetooth działa do końca; naprawione wysyłanie zdjęć przez link i gubienie zapytań diagnostyki.
+* Komputer: podwójne ekrany w nawigacji i nieprawidłowe kolumny po zapisanej sesji.
+* Poprawne zapisy liczby skoków w historii tras i „Czas trasy” zamiast angielskiego tekstu.
+
+##### Zmiany względem oryginału
+
+* Przemianowanie na MT_SW_APP z własną ikoną i własnym identyfikatorem, dzięki czemu aplikacja instaluje się obok oryginału.
+* Natywny planer łącza zamiast zewnętrznego Site Plannera.
+* Usunięty model tłumacza NLLB-200 (licencja niezgodna z naszą).
+* Ukryte przestarzałe role urządzeń (REPEATER, ROUTER_CLIENT); „Heap” nazywa się teraz RAM.
+* Kolejne scalenia z oryginałem (protobufy, biblioteki, tłumaczenia, nowe funkcje), z pierwszeństwem naszych polskich tłumaczeń.
+
+## Pełny dziennik zmian według wersji
+
+Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
+
+### v5 (2.8.5) — wersje testowe od 5 listopada 2026
+
+* Alarm po odebraniu SOS (wszystkie wersje): SOS wysłany z innej kopii MT_SW_APP ma w treści ukryty, niewidoczny znacznik (zwykły tekst ze słowem SOS go nie ma, więc niczego nie uruchamia). Odebrany otwiera rozmowę, zakrywa cały ekran wielkim napisem SOS z nazwą nadawcy i treścią i dzwoni, dopóki go nie potwierdzisz. Android: powiadomienie alarmowe powtarzane w kółko (dźwięk alarmu, wibracja, otwiera się nad ekranem blokady, prosi o przebicie trybu „Nie przeszkadzać”); komputer: okno wraca z zasobnika, a syrena gra w pętli; iPhone/iPad: dźwięk alarmu i wibracja w pętli, gdy aplikacja jest otwarta. W ekranie SOS: przełącznik „Alarm po odebraniu SOS” i przycisk „Sprawdź alarm (tylko na tym urządzeniu)”. Znacznik chroni przed przypadkiem, nie jest zabezpieczeniem: kod aplikacji jest otwarty.
+* SOS na górnym pasku: przycisk trzeba przytrzymać co najmniej 2 s (żółte wypełnienie rośnie podczas trzymania), więc nie włączy się przypadkiem; krótkie dotknięcie otwiera ekran SOS. Krótszy czas z ekranu SOS dotyczy tylko dużego przycisku w ekranie, na pasku jest zawsze co najmniej 2 s (jest o tym informacja w ustawieniach).
+* SOS: gdy wybrany węzeł zniknął z listy węzłów, ekran SOS ostrzega o tym (alarm i tak do niego idzie) i ma przycisk „Usuń je z wyboru”.
+* Komputer: nowa opcja „Start w zasobniku” (pod „Uruchamiaj z komputerem”): przy starcie razem z komputerem okno się nie otwiera, aplikacja czeka przy zegarze; gdy zasobnika nie ma, okno otwiera się po 10 s.
 * Nowości w aplikacji (wszystkie wersje): po aktualizacji aplikacja pokazuje listę zmian od ostatniej stabilnej wersji, a nowej instalacji — całą listę od początku (nowe funkcje, ulepszenia, naprawione błędy, zmiany względem oryginału). Nowa instalacja dostaje ją dopiero po zatwierdzeniu zgody, zamknięciu ekranów powitalnych i skonfigurowaniu radia (bez radia po kilku minutach). W oknie można przełączać „Od ostatniej stabilnej” i „Wszystko od początku”, a w Funkcjach MT_SW jest pozycja „Nowości w aplikacji”, która otwiera tę listę w dowolnej chwili.
 * Widżet „SOS” (Android i iPhone/iPad): czerwona płytka z żółtą obwódką i napisem SOS, w kilku rozmiarach (iPhone także na ekran blokady). Dotknięcie otwiera ekran SOS; alarm wysyła się dopiero po przytrzymaniu przycisku, więc dotknięcie w kieszeni nie wyśle fałszywego alarmu. Na komputerze odpowiada mu pozycja „SOS” w menu ikony przy zegarze.
 * SOS: oprócz kanałów (można wybrać kilka) alarm można wysłać jako wiadomość bezpośrednią do wybranych węzłów sieci, także takich, które nie przyjmują wiadomości (niemonitorowanych), bez wyjątków; wybór węzłów z wyszukiwarką; potwierdzenie liczy się, gdy dotarły wszystkie wysłania (wszystkie wersje).
@@ -108,7 +214,6 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Dokumentacja i wiedza asystenta uzupełnione o jakość panoramy, kierunek i pochylenie anteny oraz nowe linie widżetu.
 * Panorama: krótki komunikat „Jakość panoramy obniżona automatycznie”, gdy automat zejdzie na niższy poziom. Panorama i mapa zapisują w logach statystyki klatek (tylko okna z wolnymi klatkami na mapie), co pomoże znaleźć miejsca zacinania.
 * Planer: kierunek anteny (azymut w stopniach geograficznych) można wpisać zawsze, a nowe pole „Pochylenie anteny” (góra/dół) wpływa na łącze i zasięg.
-
 * Wszystkie wersje: przy pierwszym uruchomieniu (po instalacji, po aktualizacji do tej wersji i po wyczyszczeniu danych) przed kreatorem pojawia się okno „Warunki korzystania i zgoda na dane”: długi tekst o tym, że dane węzłów, wiadomości, logi i statystyki mogą trafić do Internetu i być publicznie widoczne, o braku zbierania ich przez autorów, braku odpowiedzialności i zrzeczeniu się roszczeń w zakresie dozwolonym prawem (w każdym kraju). Przycisk „Zgadzam się” odblokowuje się dopiero po przewinięciu tekstu do końca i 10-sekundowym odliczaniu. „Nie zgadzam się” zamyka aplikację (u osoby z danymi z wcześniejszej wersji najpierw pojawia się pytanie, czy wyczyścić wszystkie dane). Data zgody jest zapisywana i widoczna w „O aplikacji” → „Warunki i zgoda na dane” (tam można też przeczytać warunki ponownie); w Funkcje MT_SW jest tylko skrót do tego miejsca. Tekst warunków można skopiować, a po jego zmianie (zmiana wersji tekstu) okno pokaże się wszystkim ponownie; razem z datą zapisywana jest wersja tekstu. W tej samej sekcji jest „Wyczyść wszystkie dane aplikacji” (osobne ostrzeżenie z 10-sekundowym odliczaniem), które przywraca aplikację do stanu po świeżej instalacji i wycofuje zgodę.
 * Wszystkie wersje: planer ma kartę „Porównanie wyników”: „Zapamiętaj ten wynik” zapisuje odległość, zapas w obu kierunkach, SF, częstotliwość i wysokości anten, a lista (do 12 pozycji, zapisana na urządzeniu) pozwala porównać zmianę anteny, wysokości albo radia z tym, co było wcześniej.
 * Wszystkie wersje: panorama terenu ma mgłę dalszych pasm, światło według prawdziwego położenia słońca (w nocy przygaszone), a dotknięcie grzbietu pokazuje jego odległość, wysokość n.p.m. i kąt nad horyzontem. Mapa: przy włączonej warstwie propagacji w rogu jest mała legenda i suwak godzin prognozy.
@@ -201,17 +306,31 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Tablet i komputer: w widoku czatów lista rozmów jest węższa, a kanał z wiadomościami szerszy (około 36% do 64%). Węzły i dokumentacja zachowują dotychczasowy podział. Wybranie innej rozmowy zastępuje otwartą, zamiast nakładać się na nią, więc można swobodnie przełączać kanały. Szerokość nadal można zmieniać przeciągnięciem.
 * iPhone i iPad: połączenie z radiem po przerwie (np. po nocy) wraca samo. Gdy radia nie widać w skanie, aplikacja zostawia u systemu długie żądanie połączenia (do 30 minut, ponawiane), które system dokończy także w tle, gdy tylko radio znów będzie w zasięgu, zamiast skanować co kilkanaście sekund.
 * Historia tras (traceroute): każdy wpis ma opis, czy trasa została zlecona ręcznie, czy odebrana automatycznie. W trybie sniffer odpowiedzi adresowane do innych węzłów też zapisują się jako zaobserwowane (bez alarmu); alarm powstaje tylko dla naszych własnych zleceń.
-* Tablet i komputer: boczny pasek z przyciskami (Wiadomości, Węzły, Ustawienia, Połącz i inne) ma przyciski na dole ekranu, a nowa funkcja dochodzi nad nimi. Na iPadzie pasek nie zachodzi już na zegar i baterię u góry.
-* Wysyłanie zdjęć w czacie: gdy główny serwer (catbox.moe) odmawia przyjęcia plików (błąd „412 uploads paused”), aplikacja sama próbuje zapasowych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin).
-* Nowa pozycja „Wesprzyj projekt” w „Funkcje MT_SW” i w „O aplikacji”: otwiera w przeglądarce stronę dewelopera (Ko-fi) z dobrowolnym wsparciem utrzymania i rozwoju aplikacji. Jest też w wyszukiwarce ustawień i w wiedzy asystenta.
-* Ekrany metryk (urządzenie, sygnał, środowisko, zasilanie, pozycje i inne): wykres jest zawsze u góry, a lista pod nim, także na tablecie i desktopie, dzięki czemu wykres nie jest ściśnięty w wąskiej kolumnie.
-* iPhone i iPad: podstawa aplikacji na iPhone'a w tym samym repozytorium: zakładki węzłów, wiadomości, połączeń i ustawień, Bluetooth i Wi-Fi do radia (z automatycznym wyszukiwaniem w sieci). Mapa, powiadomienia, wybór i zapis zdjęć, mikrofon, GPS, kompas i barometr działają; asystent, tłumacz i dyktowanie AI (llama.cpp), otwieranie linków, map i udostępnianie tekstu, wybór pliku firmware, zapamiętywanie rozmów i notatek asystenta na iPhonie, aktualizacja firmware radia z iPhone'a (pobranie i rozpakowanie), skala interfejsu, otwieranie linków (kanały, kontakty), ekran powitalny i ładowanie obrazków; funkcje AI dojdą później. Dodatkowo na iPhonie: ikony urządzeń z poprawnymi kolorami, widok 3D urządzeń, widok panoramy terenu, przycisk „Wymuś zatrzymanie aplikacji”.
 * Treści tworzone przez AI są oznaczone: odpowiedzi asystenta mają etykietę „Odpowiedź AI, może zawierać błędy”, a tłumaczenia (w czacie i w tłumaczu) dopisek „(AI)”. Dotyczy wszystkich wersji.
 * Zdjęcia w czacie: okno zgody przed wysłaniem opisuje, dokąd trafia zdjęcie (serwisy osób trzecich, czas przechowywania, adres IP, kto je zobaczy); teksty są w zasobach PL i EN. Dodana polityka prywatności (PRIVACY.md) i plik NOTICE.
 * Wersja sklepowa Androida (budowana jako „google”, dla Google Play) nie ma już żadnych usług Google: używa tego samego kodu i tej samej mapy (MapLibre) co F-Droid, bez Map Google, Firebase (awarie i statystyki), Datadog, ML Kit, Gemini Nano, ARCore i czcionek od Google. Skaner kodów QR to ZXing w obu wersjach. Nazwy zadań w Gradle bez zmian.
 * Usunięty model tłumacza NLLB-200 (licencja CC BY-NC, tylko użytek niekomercyjny, niezgodna z GPL-3.0): tłumaczą teraz modele z wolną licencją (Gemma, Qwen, Bielik); pliki NLLB pobrane wcześniej są usuwane przy starcie. Razem z modelem usunięty jego osobny silnik (ONNX Runtime) i cały kod tłumacza NLLB: aplikacja jest mniejsza. Z tego samego powodu (licencje Llamy i Gemma Terms of Use) usunięte modele TranslateGemma 4B i 12B, DeepSeek na Llamie (8B i 70B) oraz Llama 3.2 1B; ich pliki też są usuwane przy starcie.
 * Android: instalator i ustawienia systemu pokazują teraz naszą nazwę wydania (np. `v4(2.8.4).test.1`), tak jak ekran „O aplikacji”, bez numeru budowy i nazwy sklepu (fdroid, google).
 * Modele AI: „Pozostałe” są zawsze ostatnie, za wszystkimi rodzinami. Na początku jest Gemma.
+* Mapa: po zbliżeniu do grupy lub węzła ponowne dotknięcie ikony mapy na dolnym pasku wraca do widoku sprzed zbliżenia (jak świeżo po wejściu w mapę).
+* Mapa propagacji: pasek z godziną i legendą jest długi i niski (sięga prawie do przycisków przybliżania), suwak jest dłuższy, więc dokładniej ustawia godzinę, a mapa jest mniej zasłonięta.
+* Widżet: nowe ustawienie „Inne węzły w widżecie”: wszystkie (domyślnie), ostatnie 10/20/50/100 albo węzły wybrane ręcznie z listy (z polem wyszukiwania).
+* Zgoda na warunki: dopisano, że jedyne dane, jakie mogą trafić do deweloperów, to logi z aplikacji, z różnego rodzaju naszego innego oprogramowania i ze sprzętu, udostępnione przez Ciebie dobrowolnie w celu diagnozy. „Nie zgadzam się” zawsze otwiera osobne ostrzeżenie z odliczaniem 10 s; można tylko wrócić do zgody albo wyczyścić wszystkie dane i zamknąć aplikację (bez zgody nie da się zamknąć aplikacji bez czyszczenia).
+* Mapa: dotknięcie dymka z nazwą węzła działa na całym dymku, przy każdym przybliżeniu i obrocie mapy, tak samo na Androidzie, iPhonie i komputerze (trafienie liczone na ekranie, bez niewidocznych kółek na mapie).
+* Mapa: lista „Węzły w tej lokalizacji” jest zwarta (jeden wiersz na węzeł, bez powtarzania skróconej nazwy, cienkie separatory), a obszar dotyku węzła jest większy, więc łatwiej w niego trafić.
+* Widget: listy „Inny węzeł sieci” i całej sieci pokazują wszystkie węzły (wcześniej tylko 12). Karty węzłów mają odczyty czujników: temperaturę, wilgotność, ciśnienie oraz napięcie i natężenie z czujnika (nie systemowe).
+* Panorama terenu: naturalna skala pionowa (budynki i góry proporcjonalne do terenu), delikatniejsze kolory budynków.
+* Tłumacz: ma jedną komendę (`/tłumacz`, test tłumaczeń, z polskimi literami lub bez; pozostałe komendy są tylko w asystencie), ikonę „i” z opisem komendy oraz historię sesji pod ikoną zegara. Każda sesja (tłumaczenia razem z wynikami komend) zapisuje się na urządzeniu, można ją otworzyć, usunąć albo zacząć nową.
+
+### v4 (2.8.4) i wcześniej
+
+#### Listopad 2026 (do 4 listopada)
+
+* Tablet i komputer: boczny pasek z przyciskami (Wiadomości, Węzły, Ustawienia, Połącz i inne) ma przyciski na dole ekranu, a nowa funkcja dochodzi nad nimi. Na iPadzie pasek nie zachodzi już na zegar i baterię u góry.
+* Wysyłanie zdjęć w czacie: gdy główny serwer (catbox.moe) odmawia przyjęcia plików (błąd „412 uploads paused”), aplikacja sama próbuje zapasowych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin).
+* Nowa pozycja „Wesprzyj projekt” w „Funkcje MT_SW” i w „O aplikacji”: otwiera w przeglądarce stronę dewelopera (Ko-fi) z dobrowolnym wsparciem utrzymania i rozwoju aplikacji. Jest też w wyszukiwarce ustawień i w wiedzy asystenta.
+* Ekrany metryk (urządzenie, sygnał, środowisko, zasilanie, pozycje i inne): wykres jest zawsze u góry, a lista pod nim, także na tablecie i desktopie, dzięki czemu wykres nie jest ściśnięty w wąskiej kolumnie.
+* iPhone i iPad: podstawa aplikacji na iPhone'a w tym samym repozytorium: zakładki węzłów, wiadomości, połączeń i ustawień, Bluetooth i Wi-Fi do radia (z automatycznym wyszukiwaniem w sieci). Mapa, powiadomienia, wybór i zapis zdjęć, mikrofon, GPS, kompas i barometr działają; asystent, tłumacz i dyktowanie AI (llama.cpp), otwieranie linków, map i udostępnianie tekstu, wybór pliku firmware, zapamiętywanie rozmów i notatek asystenta na iPhonie, aktualizacja firmware radia z iPhone'a (pobranie i rozpakowanie), skala interfejsu, otwieranie linków (kanały, kontakty), ekran powitalny i ładowanie obrazków; funkcje AI dojdą później. Dodatkowo na iPhonie: ikony urządzeń z poprawnymi kolorami, widok 3D urządzeń, widok panoramy terenu, przycisk „Wymuś zatrzymanie aplikacji”.
 * Modele DeepSeek (1.5B, 7B, Llama 8B, 14B) używają teraz plików Q4_0 jak reszta modeli, bo pliki Q4_K_M dawały bełkot na NPU i karcie graficznej telefonów Snapdragon (model uruchamiał się, ale test nie dawał sensownej odpowiedzi). Kto pobrał stary plik, powinien go usunąć i pobrać model jeszcze raz.
 * DeepSeek R1 Distill Qwen 1.5B używa dokładniejszego pliku Q8_0 (około 1,8 GB), bo najmniejszy model źle znosi mocne ściskanie. Kto pobrał stary plik, powinien go usunąć i pobrać model jeszcze raz.
 * DeepSeek R1 Distill Qwen 1.5B: zalecane minimum to 6 GB RAM.
@@ -221,14 +340,6 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
-* Mapa: po zbliżeniu do grupy lub węzła ponowne dotknięcie ikony mapy na dolnym pasku wraca do widoku sprzed zbliżenia (jak świeżo po wejściu w mapę).
-* Mapa propagacji: pasek z godziną i legendą jest długi i niski (sięga prawie do przycisków przybliżania), suwak jest dłuższy, więc dokładniej ustawia godzinę, a mapa jest mniej zasłonięta.
-* Widżet: nowe ustawienie „Inne węzły w widżecie”: wszystkie (domyślnie), ostatnie 10/20/50/100 albo węzły wybrane ręcznie z listy (z polem wyszukiwania).
-* Zgoda na warunki: dopisano, że jedyne dane, jakie mogą trafić do deweloperów, to logi z aplikacji, z różnego rodzaju naszego innego oprogramowania i ze sprzętu, udostępnione przez Ciebie dobrowolnie w celu diagnozy. „Nie zgadzam się” zawsze otwiera osobne ostrzeżenie z odliczaniem 10 s; można tylko wrócić do zgody albo wyczyścić wszystkie dane i zamknąć aplikację (bez zgody nie da się zamknąć aplikacji bez czyszczenia).
-* Mapa: dotknięcie dymka z nazwą węzła działa na całym dymku, przy każdym przybliżeniu i obrocie mapy, tak samo na Androidzie, iPhonie i komputerze (trafienie liczone na ekranie, bez niewidocznych kółek na mapie).
-* Mapa: lista „Węzły w tej lokalizacji” jest zwarta (jeden wiersz na węzeł, bez powtarzania skróconej nazwy, cienkie separatory), a obszar dotyku węzła jest większy, więc łatwiej w niego trafić.
-* Widget: listy „Inny węzeł sieci” i całej sieci pokazują wszystkie węzły (wcześniej tylko 12). Karty węzłów mają odczyty czujników: temperaturę, wilgotność, ciśnienie oraz napięcie i natężenie z czujnika (nie systemowe).
-* Panorama terenu: naturalna skala pionowa (budynki i góry proporcjonalne do terenu), delikatniejsze kolory budynków.
 * Panorama terenu: w „Opcjach” przełącznik „Tylko ulubione” pokazuje w panoramie i na mapie przesuwania tylko ulubione węzły (zapamiętywany).
 * Panorama terenu: okręgi dokładności węzłów, które nie podają dokładnej pozycji. Na małej mapie przesuwania są okręgami na ziemi, jak na głównej mapie, a w samej panoramie owalem o rozmiarze niepewności widzianej z miejsca obserwacji. Wyłączasz je w „Opcjach” (przełącznik „Okręgi dokładności”, zapamiętywany).
 * Panorama terenu: zasięg, wysokości anten i współczynnik horyzontu są zapamiętywane (już nie wraca do 15 km). Nowa opcja „Węzły do” (25–1000 km, domyślnie 100 km) działa osobno od zasięgu terenu: węzły dalsze niż załadowany teren też są rysowane.
@@ -260,11 +371,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Zgłaszanie błędów i pomysłów: przeniesione do funkcji MT_SW. Aplikacja sama trzyma logi z ostatnich 24 godzin; okno zgłoszenia pozwala wybrać Discord, WhatsApp albo Signal i „Wyślij” składa paczkę z logami (telefon: udostępnienie wybranej aplikacji z plikiem i linkiem do grupy; komputer: zapis zip, otwarcie folderu i grupy).
 * Asystent: po pierwszym pobraniu modelu pyta o zgodę na test zgodności (krótkie pytanie, raport `/sprzęt`, sprawdzenie dyktowania z najmniejszym modelem); wynik trafia do jednej paczki w oknie zgłoszenia, nic nie jest wysyłane samo. Test można powtórzyć z okna „i”.
 * Asystent: nagłówek rozmowy (ostrzeżenie i przyciski kopiowania/zapisu) zwija się przy przewijaniu rozmowy palcem i wraca po przesunięciu w dół, więc przy mocno powiększonym ekranie nie zasłania rozmowy; przełącznik jest w oknie informacji.
-* Tłumacz: ma jedną komendę (`/tłumacz`, test tłumaczeń, z polskimi literami lub bez; pozostałe komendy są tylko w asystencie), ikonę „i” z opisem komendy oraz historię sesji pod ikoną zegara. Każda sesja (tłumaczenia razem z wynikami komend) zapisuje się na urządzeniu, można ją otworzyć, usunąć albo zacząć nową.
 * Prąd z czujnika odwrócony przełącznikiem polaryzacji jest teraz pokazywany z właściwym znakiem także na liście węzłów (linia dodatkowa), w szczegółach węzła (czujniki środowiska i kanały zasilania) i w odpowiedziach asystenta. Po migracji pokazywał się tam znak z czujnika.
 * Wersja firmware jest pokazywana krótko (np. 2.8.2), bez numeru kompilacji i dopisków, w szczegółach węzła (zainstalowana, najnowsza stabilna i alfa), na karcie połączenia i w statystykach OnDemand.
 
-### Październik 2026
+#### Październik 2026
 * Ustawienia AI: przełącznik „Pomijaj NPU” i przycisk czyszczenia nieudanych prób są widoczne od razu tylko na komputerach z NPU obsługiwanym przez silnik (Intel Core Ultra); na telefonach i pozostałych komputerach są ukryte.
 * NPU Intela: Wszystkie modele próbują NPU Intela (sprawdzona jest tam Gemma E4B), a model, któremu się nie uda, wraca do próby po tygodniu zamiast po 3 dniach (na komputerze po aktualizacji sterownika NPU od razu). To samo dotyczy NPU w telefonie. Start na NPU może trwać do 20 minut, bo model jest kompilowany za każdym razem (zapis skompilowanego modelu na dysku powoduje na tym NPU błąd, więc go nie używamy). Raport `/sprzet` pokazuje, ile trwał start, a przy błędzie ostatnie linie logu programu.
 * Asystent AI: silnik zapisuje w logu więcej o układach (nazwy kart graficznych i ich pamięć, podział modelu, warstwy), więc `/sprzet` pokazuje, na której karcie model naprawdę pracuje. Przy braku mikrofonu na komputerze log wypisuje, jakie urządzenia dźwiękowe widzi system.
@@ -675,7 +785,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Dokumentacja**
 * README i CHANGELOG uzupełnione o całą historię forka.
 
-### Wrzesień 2026
+#### Wrzesień 2026
 
 **Jakość sygnału, LNA, logi (29–30.09, 1.10)**
 * Korekta wzmocnienia LNA dla szumu i RSSI (pole w LoRa pod mocą radia i w oknie „Jakość sygnału”, osobne pole dla obcych węzłów w szczegółach węzła, wykresy, Zdrowie sieci, średni szum w podsumowaniu).
@@ -710,7 +820,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Utrzymanie**
 * Synchronizacje z upstreamem (1.09, 13.09, 20.09) wraz z aktualizacją protobufów (2.8.0.x); uzupełnione brakujące tłumaczenia PL (w tym 320 wpisów schematu); poprawki formatowania i statycznej analizy.
 
-### Sierpień 2026
+#### Sierpień 2026
 
 * **Zdrowie sieci** (1–2.08): nowa zakładka z metrykami zasilania, sygnału, eteru, środowiska, ruchu i sąsiadów; podsumowanie z rankingami; dane dekodowane na żywo z logu mesh. W sierpniu doszła zakładka **Zasoby** (CPU/pamięć/flash/PSRAM) i widżet „Local Stats”.
 * **Nazwa węzła pośredniczącego (relay)** na liście węzłów i w szczegółach oraz pełna lista relayów w statusie doręczenia (do 10.08, 15.08).
@@ -720,7 +830,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * **Rebranding (27–29.08):** MT_SW_APP, autorska ikona (kontur województwa i „MT_SW”), paleta złoto/granat, ekran „O aplikacji” z zastrzeżeniem o nieoficjalnym forku, nazwa wersji desktopowej, ikona w zasobniku.
 * Synchronizacje z upstreamem (5.08, 10.08, 15.08, 16.08, 29.08); przejście na wspólny silnik mapy MapLibre (Android i desktop), domyślnie włączone nakładki cieniowania terenu i radaru pogody.
 
-### Lipiec 2026 — start forka
+#### Lipiec 2026 — start forka
 
 * Przywrócony ekran Traffic Management (27.07).
 * Zawsze widoczna lista sparowanych urządzeń Bluetooth; widoczność Remote Hardware; zdalne ulubione/ignorowanie przez sieć LoRa z potwierdzeniem routing ACK (27.07).
@@ -736,10 +846,116 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 
 ## MT_SW fork changes
 
-The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
+The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, by version (newest first). Feature details: [README.md](README.md).
 
-### November 2026
+### Summary by version
 
+The main things of every version, split by kind of change (the "What's new in the app" window shows the same).
+
+#### Version v5 (2.8.5)
+
+##### New features
+
+* **SOS mode.** An "SOS" screen with a big button: an alarm with your position to the chosen channels (several can be chosen) and as a direct message to chosen nodes, also unmonitored ones. It is sent by holding the button, with repeating and confirmation. The message has the alarm bell, so for the receivers it arrives as an alarm.
+* **SOS at hand.** A red "SOS" button with a yellow border next to the plate of your node in the top bar of every card (turn it off or choose the cards in the SOS screen), a tile in the Android quick settings, a "SOS MT_SW" shortcut (Siri, Shortcuts), an item in the tray icon menu on the computer, and an SOS widget on Android and iPhone/iPad (also the lock screen).
+* **Neighbours on a map.** In the neighbours window of a node a new "Show on map" button: only the node and its neighbours with lines and the signal colour (SNR); when some have no position, a note says so.
+* **Network coverage on the map.** The layer draws the approximate range of every node with a position (with the terrain), and a new "Propagation (weather forecast)" layer shows where the weather stretches the range; several areas can be added.
+* **Node watchdog and availability.** A notification when a chosen node goes silent (with quiet hours and one shared notification for many nodes), and a chart of the availability history of a node.
+* **Message archive.** An automatic copy of messages in a chosen folder, restoring from CSV, text and Markdown files, password encryption.
+* **Range from measurements.** The route of a node coloured by signal strength, a comparison of two routes and a save of the range of the whole network to KML.
+* **Terrain panorama.** Buildings as solids, forests, fog, light by the real sun, a panorama quality setting.
+* **Link planner.** A comparison of results, antenna direction and tilt, antenna types, buildings and ground reflections on the map.
+* **Statistics widget.** A new widget on Android, and on iPhone/iPad also small widgets for the lock screen; the plate of our node, a choice of which nodes to show.
+* **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
+* **Computer.** The "Start with the computer" option and a single copy of the program by default.
+* **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option.
+* **Data.** "Add data from a backup" and synchronisation of the device statistics.
+* **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
+
+##### Improvements
+
+* The plate of your node is now in the top bar of all cards, also in Settings, the Assistant, the Translator and Network health.
+* Map: the filters "Max. number of hops" and "Max. distance from my node", a "choose node" list for nodes in the same place, more exact touching of the bubbles and smoother panning.
+* The bottom tabs open the page where you left it, and a tap on a notification opens the conversation it came from.
+* Charts skip readings with a wrong node clock, the database writes faster, and the logs on iPhone/iPad are much faster.
+* Widget: temperature and humidity in one line, rarer rebuilds of the data.
+* Panorama: smoother ridges, new textures of mountains and forests, faster drawing of buildings; the buildings download in small pieces and each is saved at once.
+* Firmware update over Bluetooth on iPhone/iPad finds the device in update mode without a MAC address.
+
+##### Fixed bugs
+
+* "Start with the computer" works on Windows and in the AppImage on Linux.
+* iPhone/iPad: shifted taps on the map bubbles, no notification sound on a locked phone, an error of the backup, the screen going off during an update.
+* Remote administration asks for the MT_SW_FIRMWARE version of the remote node too.
+* A GPIO write waits for the confirmation of the node and shows the result.
+* Bluetooth no longer writes a separate log line for every packet.
+* Ranges from a route recognise positions heard directly also when the radio gives no kind of transport.
+* The neighbours window had two buttons that did the same; now there is one "Close".
+* The download of buildings goes on after leaving the screen instead of being cut off silently.
+
+##### Changes against the original
+
+* Merged changes of the original (version 2.8.5 and later): among others the radio setup wizard, QR/NFC connection codes, an nRF52 bootloader update over Bluetooth and newer libraries.
+* The "Local statistics" and "Node tracker" widgets were removed: one MT_SW widget is left.
+* iPhone/iPad: the oldest supported system is iOS 17, and the app identifier is pl.sw.mt, like on Android.
+* The build was adapted to the new Gradle.
+
+#### From the start to version v4 (2.8.4)
+
+##### New features
+
+* **Network health.** Tabs for power, signal, airtime and environment, a "Network condition" card, a summary with rankings and export to PDF, HTML, Markdown, text and CSV, charts in the node details.
+* **AI assistant, translator and dictation offline.** One engine (llama.cpp) and one choice of models (Gemma, Qwen, Bielik, DeepSeek), using the NPU and the graphics card; the assistant calculates by itself, knows the app and the network, remembers between conversations, shows buttons to screens and settings; optional internet; reading aloud. AI content is marked.
+* **Link planner (Mesh Link Planer) and antenna calculator.** A native planner with terrain, obstacles, live weather and the range on the map, a cable and connector wizard, the dimensions of 13 antenna types.
+* **Network view (terrain panorama).** The silhouette of the terrain all around with the nodes, turned by the compass, offline terrain, an AR view from the camera.
+* **On-demand diagnostics and sniffer.** Queries to nodes (port 354) and a radio and MQTT sniffer on one screen with saving and grouping of duplicates.
+* **MT_SW features and documentation.** A separate screen with the features of the fork, a knowledge base, all the documentation in the app in Polish and English, the welcome screen "What MT_SW adds".
+* **Adaptive notifications** (Android 16+) and notifications about new versions of the app.
+* **Routes and neighbours.** Traceroute on the map with signal strength, signal quality lines between nodes, a neighbours icon in the node list.
+* **Nodes.** The name of the relay node, adding a contact by hand, cleaning of the node database (also automatic and over Bluetooth), the node colour when generating a key, extra telemetry of MT_SW_FIRMWARE v3 and Wi-Fi strength.
+* **Chat.** Long messages split and put together, photos by link, a preview of images from links, translation before sending, reading aloud.
+* **Themes and look.** Black-and-white themes, "App scaling", any node colour, status colours matching the app.
+* **Computer and iPhone/iPad versions.** The app for macOS, Windows and Linux with a welcome screen and the base of the iPhone/iPad app.
+* **Support.** "Support the project", reporting bugs and ideas, collecting logs.
+
+##### Improvements
+
+* A smoother app: lighter node and conversation lists, the map, node details and Network health with a lot of data, a faster start on the computer.
+* Modem preset names in Polish with the English name in brackets, Polish names of device roles, a full Polish translation.
+* The same colours across the app: gold = good, red = medium, purple = bad.
+* Noise is rated after the LNA correction, the SNR rating depends on the preset.
+* LoRa settings: frequency offset, coding rate, Narrow Fast preset and 869.44165 MHz by default.
+* Offline maps also for the default OpenStreetMap map, the default OpenStreetMap map and smaller plates with a tail.
+* "i" descriptions for features, calmer information windows, a scroll bar on the computer.
+
+##### Fixed bugs
+
+* Reconnecting Bluetooth to an already paired device (Xiaomi/MIUI).
+* Empty drop-down lists in the packaged computer version.
+* Recovering a device stuck in DFU mode and updating with an own file for unknown devices.
+* The app closing when using the translator and with a huge amount of data in Network health.
+* Cleaning nodes over Bluetooth works to the end; fixed sending photos by link and lost diagnostic queries.
+* Computer: doubled screens in the navigation and wrong columns after a saved session.
+* The right count of hops in the route history and "Route time" instead of an English text.
+
+##### Changes against the original
+
+* Renamed to MT_SW_APP with its own icon and its own identifier, so it installs next to the original.
+* A native link planner instead of the external Site Planner.
+* The NLLB-200 translator model was removed (its licence does not match ours).
+* Outdated device roles hidden (REPEATER, ROUTER_CLIENT); "Heap" is now called RAM.
+* Further merges with the original (protobufs, libraries, translations, new features), with our Polish translations first.
+
+## Full change log by version
+
+Every new change goes under the heading of the current version.
+
+### v5 (2.8.5) — test versions from 5 November 2026
+
+* Alarm when an SOS is received (all versions): an SOS sent by another copy of MT_SW_APP carries a hidden, invisible mark in its text (an ordinary text with the word SOS has none, so it starts nothing). A received one opens the conversation, covers the whole screen with a big SOS with the sender's name and the text, and rings until you confirm it. Android: an alarm notification that rings again and again (alarm sound, vibration, opens over the lock screen, asks to break through Do Not Disturb); computer: the window comes back from the tray and a siren plays in a loop; iPhone/iPad: the alarm sound and vibration in a loop while the app is open. In the SOS screen: the "Alarm when an SOS is received" switch and the "Test the alarm (only on this device)" button. The mark protects against accidents, it is not a lock: the app's code is open.
+* SOS in the top bar: the button has to be held for at least 2 s (a gold fill grows while it is held), so it does not fire by accident; a short tap opens the SOS screen. A shorter time set in the SOS screen applies only to the big button in the screen, the bar always needs at least 2 s (the settings say so).
+* SOS: when a chosen node is gone from the node list, the SOS screen warns about it (the alarm is still sent to it) and has a "Remove them from the choice" button.
+* Computer: a new option "Start in the tray" (under "Start with the computer"): when the app starts with the computer its window stays closed and the app waits by the clock; where there is no tray the window opens after 10 s.
 * What's new in the app (all versions): after an update the app shows the list of changes since the last stable version, and a new installation gets the whole list from the start (new features, improvements, fixed bugs, changes against the original). A new installation gets it only after the terms are accepted, the welcome screens are closed and the radio is configured (without a radio, after a few minutes). The window can switch between "Since the last stable" and "Everything from the start", and in MT_SW features the "What's new in the app" item opens this list at any time.
 * "SOS" widget (Android and iPhone/iPad): a red plate with a yellow border and the letters SOS, in several sizes (iPhone also for the lock screen). A tap opens the SOS screen; the alarm is sent only by holding the button, so a touch in a pocket cannot send a false alarm. On the computer the "SOS" item in the tray icon menu takes its place.
 * SOS: besides channels (several can be chosen) the alarm can be sent as a direct message to chosen network nodes, also ones that do not accept messages (unmonitored), with no exceptions; the nodes are chosen with a search; the confirmation counts when all the sends arrived (all versions).
@@ -830,7 +1046,6 @@ The entries below describe only what this fork adds on top of the original, from
 * Documentation and the assistant's knowledge updated with the panorama quality, the antenna direction and tilt, and the new widget lines.
 * Panorama: a short notice "Panorama quality lowered automatically" when the automatic mode steps down. The panorama and the map write frame statistics to the logs (only windows with slow frames on the map), which helps to find where it stutters.
 * Planner: the antenna direction (azimuth in compass degrees) can always be typed, and a new "Antenna tilt" field (up/down) affects the link and the coverage.
-
 * All versions: on first start (after installing, after updating to this version and after erasing the data) a “Terms of use and data consent” window appears before the setup wizard: a long text saying that node data, messages, logs and statistics may reach the Internet and be publicly visible, that the authors do not collect them, that they are not liable, and that claims are waived to the extent permitted by law (in any country). The “I agree” button unlocks only after the text is scrolled to the end and a 10-second countdown. “I do not agree” closes the app (for someone with data from an earlier version it first asks whether to erase all data). The date of consent is stored and shown in “About” → “Terms and data consent” (where the terms can also be read again); MT_SW features has only a shortcut to that place. The text of the terms can be copied, and when it changes (a new text version) the window appears again for everyone; the text version is stored together with the date. The same section has “Erase all app data” (a separate warning with a 10-second countdown), which returns the app to its fresh-install state and withdraws the consent.
 * All versions: the planner has a "Compare results" card: "Remember this result" stores the distance, the margin both ways, the SF, the frequency and the antenna heights, and the list (up to 12, kept on the device) lets you compare a change of antenna, height or radio with what it was before.
 * All versions: the terrain panorama has haze on the farther bands, light from the real position of the sun (dimmed at night), and a tap on a ridge shows its distance, height above sea level and angle above the horizon. Map: with the propagation layer on, a small legend and the forecast hour slider sit in the corner.
@@ -917,17 +1132,23 @@ The entries below describe only what this fork adds on top of the original, from
 * Tablet and desktop: in the chats view the conversation list is narrower and the message channel wider (about 36% to 64%). Nodes and the documentation keep their usual split. Choosing another conversation replaces the open one instead of stacking on it, so channels can be switched freely. The width can still be changed by dragging.
 * iPhone and iPad: the link to the radio comes back by itself after a break (for example overnight). When the radio is not seen in a scan, the app leaves a long connection request with the system (up to 30 minutes, repeated), which the system finishes in the background as soon as the radio is in range again, instead of scanning every few seconds.
 * Traceroute history: every entry says whether the trace was requested manually or received automatically. In sniffer mode, responses addressed to other nodes are also recorded as observed (with no alert); an alert is raised only for our own requests.
-* Tablet and desktop: the side bar with the buttons (Messages, Nodes, Settings, Connect and others) keeps its buttons at the bottom of the screen, and a new function is added above them. On the iPad the bar no longer overlaps the clock and battery at the top.
-* Sending chat pictures: when the main host (catbox.moe) refuses files (the "412 uploads paused" error), the app tries the backup hosts on its own (litterbox.catbox.moe, then uguu.se). Pictures on the backup hosts stay for a shorter time (72 hours or a few hours).
-* New "Support the project" entry in "MT_SW features" and in "About": opens the developer's page (Ko-fi) in the browser for voluntary support of the maintenance and development of the app. It is also in the settings search and in the assistant's knowledge.
-* Metric screens (device, signal, environment, power, position and others): the chart is always on top and the list below it, also on tablets and desktop, so the chart is no longer squeezed into a narrow column.
-* iPhone and iPad: the base of the app for iPhone in the same repository: nodes, messages, connections and settings tabs, Bluetooth and Wi-Fi to the radio (with automatic search on the network). Map, notifications, picking and saving pictures, the microphone, GPS, compass and barometer work; AI assistant, translator and dictation (llama.cpp), opening links and maps, sharing text, firmware file picker, assistant chats and notes saved on the iPhone, radio firmware update from the iPhone (download and unpack), interface scale, opening links (channels, contacts), the welcome screen and image loading; AI features come later. Also on iPhone: device icons with correct colours, the 3D device view, the terrain panorama view, the "Force stop app" button.
 * AI-made content is marked: assistant answers carry the label "AI answer, it may contain mistakes", and translations (in chat and in the translator) the suffix "(AI)". Applies to every build.
 * Chat pictures: the consent window before sending explains where the picture goes (third-party services, how long it is kept, IP address, who can see it); the texts are in the PL and EN resources. Added a privacy policy (PRIVACY.md) and a NOTICE file.
 * The Android store build (built as "google", for Google Play) no longer has any Google services: it uses the same code and the same map (MapLibre) as F-Droid, without Google Maps, Firebase (crashes and analytics), Datadog, ML Kit, Gemini Nano, ARCore and Google fonts. The QR scanner is ZXing in both builds. The Gradle task names are unchanged.
 * Removed the NLLB-200 translator model (CC BY-NC licence, non-commercial use only, incompatible with GPL-3.0): translation now uses freely licensed models (Gemma, Qwen, Bielik); NLLB files downloaded earlier are deleted at start. Its separate engine (ONNX Runtime) and all NLLB translator code were removed with it: the app is smaller. For the same reason (Llama and Gemma Terms of Use licences) the TranslateGemma 4B and 12B, DeepSeek on Llama (8B and 70B) and Llama 3.2 1B models were removed; their files are deleted at start too.
 * Android: the installer and the system settings now show our release name (for example `v4(2.8.4).test.1`), the same as the About screen, without the build number and the store name (fdroid, google).
 * AI models: "Other" is always last, after all the families. Gemma comes first.
+* Translator: it has one command (`/tłumacz`, the translation test, with or without Polish letters; the other commands are only in the assistant), an "i" icon with the description of the command and a session history under the clock icon. Every session (translations together with the results of the commands) is saved on the device and can be opened, deleted or started anew.
+
+### v4 (2.8.4) and earlier
+
+#### November 2026 (up to 4 November)
+
+* Tablet and desktop: the side bar with the buttons (Messages, Nodes, Settings, Connect and others) keeps its buttons at the bottom of the screen, and a new function is added above them. On the iPad the bar no longer overlaps the clock and battery at the top.
+* Sending chat pictures: when the main host (catbox.moe) refuses files (the "412 uploads paused" error), the app tries the backup hosts on its own (litterbox.catbox.moe, then uguu.se). Pictures on the backup hosts stay for a shorter time (72 hours or a few hours).
+* New "Support the project" entry in "MT_SW features" and in "About": opens the developer's page (Ko-fi) in the browser for voluntary support of the maintenance and development of the app. It is also in the settings search and in the assistant's knowledge.
+* Metric screens (device, signal, environment, power, position and others): the chart is always on top and the list below it, also on tablets and desktop, so the chart is no longer squeezed into a narrow column.
+* iPhone and iPad: the base of the app for iPhone in the same repository: nodes, messages, connections and settings tabs, Bluetooth and Wi-Fi to the radio (with automatic search on the network). Map, notifications, picking and saving pictures, the microphone, GPS, compass and barometer work; AI assistant, translator and dictation (llama.cpp), opening links and maps, sharing text, firmware file picker, assistant chats and notes saved on the iPhone, radio firmware update from the iPhone (download and unpack), interface scale, opening links (channels, contacts), the welcome screen and image loading; AI features come later. Also on iPhone: device icons with correct colours, the 3D device view, the terrain panorama view, the "Force stop app" button.
 * The DeepSeek models (1.5B, 7B, Llama 8B, 14B) now use Q4_0 files like the other models, because the Q4_K_M files gave nonsense on the NPU and graphics card of Snapdragon phones (the model started but the test got no sensible answer). Whoever downloaded the old file should delete it and download the model again.
 * DeepSeek R1 Distill Qwen 1.5B uses the more exact Q8_0 file (about 1.8 GB), because the smallest model copes badly with heavy compression. Whoever downloaded the old file should delete it and download the model again.
 * DeepSeek R1 Distill Qwen 1.5B: recommended minimum is 6 GB of RAM.
@@ -968,11 +1189,10 @@ The entries below describe only what this fork adds on top of the original, from
 * Reporting bugs and ideas: moved to the MT_SW features. The app keeps the logs of the last 24 hours by itself; the report window lets you pick Discord, WhatsApp or Signal and "Send" builds a package with the logs (phone: share to the chosen app with the file and the group link; computer: save the zip, open its folder and the group).
 * Assistant: after the first model download it asks for consent to a compatibility test (a short question, the `/sprzęt` report, a dictation check with the smallest model); the result goes into one package in the report window, nothing is sent by itself. The test can be repeated from the "i" window.
 * Assistant: the header of the chat (the notice and the copy/save buttons) folds away when the chat is scrolled with a finger and comes back on a swipe down, so it does not cover the chat on a strongly enlarged screen; the switch is in the info window.
-* Translator: it has one command (`/tłumacz`, the translation test, with or without Polish letters; the other commands are only in the assistant), an "i" icon with the description of the command and a session history under the clock icon. Every session (translations together with the results of the commands) is saved on the device and can be opened, deleted or started anew.
 * A current inverted with the polarity switch is now shown with the right sign also on the node list (the extra line), in the node details (environment sensors and power channels) and in the assistant's answers. After the migration they showed the sensor's own sign.
 * The firmware version is shown short (for example 2.8.2), without the build number and additions, in the node details (installed, latest stable and alpha), on the connection card and in the OnDemand statistics.
 
-### October 2026
+#### October 2026
 * AI settings: the "Skip NPU" switch and the button that clears failed attempts are shown at once only on computers with an NPU the engine can use (Intel Core Ultra); on phones and on the other computers they are hidden.
 * Intel NPU: Every model tries the Intel NPU (Gemma E4B is the checked one there), and a model that fails is tried again after a week instead of 3 days (on a computer at once after an NPU driver update). The same goes for the NPU of a phone. A start on the NPU can take up to 20 minutes, because the model is compiled every time (saving the compiled model on disk causes an error on this NPU, so it is not used). The `/sprzet` report shows how long the start took and, on an error, the last lines of the program's log.
 * AI assistant: the engine writes more about the chips into the log (graphics card names and their memory, the split of the model, layers), so `/sprzet` shows which card the model really runs on. When a computer has no microphone, the log lists the sound devices the system sees.
@@ -1374,7 +1594,7 @@ The entries below describe only what this fork adds on top of the original, from
 **Documentation**
 * README and CHANGELOG completed with the whole history of the fork.
 
-### September 2026
+#### September 2026
 
 **Signal quality, LNA, logs (29–30 Sep, 1 Oct)**
 * LNA gain correction for noise floor and RSSI (field in LoRa under the radio power and in the "Signal quality" dialog, a separate field for foreign nodes in node details, charts, Network Health, average noise in the summary).
@@ -1409,7 +1629,7 @@ The entries below describe only what this fork adds on top of the original, from
 **Maintenance**
 * Upstream syncs (1 Sep, 13 Sep, 20 Sep) together with protobufs updates (2.8.0.x); missing PL translations completed (including 320 schema entries); formatting and static-analysis fixes.
 
-### August 2026
+#### August 2026
 
 * **Network Health** (1–2 Aug): a new tab with power, signal, airtime, environment, traffic and neighbor metrics; a summary with rankings; data decoded live from the mesh log. A **Resources** tab (CPU/memory/flash/PSRAM) and a "Local Stats" widget followed in August.
 * **Relay node name** in the node list and node details, and the full list of relays in the delivery status (until 10 Aug, 15 Aug).
@@ -1419,7 +1639,7 @@ The entries below describe only what this fork adds on top of the original, from
 * **Rebranding (27–29 Aug):** MT_SW_APP, custom icon (province outline and "MT_SW"), gold/navy palette, an "About" screen with the unofficial-fork disclaimer, desktop app name, tray icon.
 * Upstream syncs (5 Aug, 10 Aug, 15 Aug, 16 Aug, 29 Aug); switch to the shared MapLibre map engine (Android and desktop), hillshade and weather radar overlays on by default.
 
-### July 2026 — start of the fork
+#### July 2026 — start of the fork
 
 * Restored the Traffic Management screen (27 Jul).
 * An always visible list of paired Bluetooth devices; Remote Hardware visibility; remote favorite/ignore over the LoRa mesh with routing-ACK confirmation (27 Jul).

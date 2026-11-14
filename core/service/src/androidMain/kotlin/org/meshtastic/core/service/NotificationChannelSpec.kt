@@ -54,6 +54,8 @@ import org.meshtastic.core.resources.meshtastic_waypoints_notifications_descript
 import org.meshtastic.core.resources.messages
 import org.meshtastic.core.resources.node_silence_notifications
 import org.meshtastic.core.resources.node_silence_notifications_description
+import org.meshtastic.core.resources.sos_alarm_notifications
+import org.meshtastic.core.resources.sos_alarm_notifications_description
 import org.meshtastic.core.resources.notification_group_mesh
 
 /** Meshtastic brand accent (Green 500, see .skills/design-standards): the small-icon tint and the LED colour. */
@@ -111,6 +113,13 @@ internal enum class NotificationChannelSpec(
         NotificationChannels.ALERTS,
         Res.string.meshtastic_alerts_notifications,
         Res.string.meshtastic_alerts_notifications_description,
+        NotificationChannelGroupSpec.Messages,
+        NotificationManager.IMPORTANCE_HIGH,
+    ),
+    SosAlarm(
+        NotificationChannels.SOS_ALARM,
+        Res.string.sos_alarm_notifications,
+        Res.string.sos_alarm_notifications_description,
         NotificationChannelGroupSpec.Messages,
         NotificationManager.IMPORTANCE_HIGH,
     ),
@@ -185,6 +194,16 @@ internal enum class NotificationChannelSpec(
                     channel.setSound(defaultSound, soundAttributes(AudioAttributes.USAGE_NOTIFICATION))
                 }
 
+                // The alarm of a received SOS: the alarm sound (not the notification one), strong vibration, and it
+                // asks to break through Do Not Disturb (it does so once allowed in the system settings).
+                SosAlarm -> {
+                    channel.enableLights(true)
+                    channel.enableVibration(true)
+                    channel.vibrationPattern = SOS_VIBRATION
+                    channel.setBypassDnd(true)
+                    channel.setSound(alarmSound, soundAttributes(AudioAttributes.USAGE_ALARM))
+                }
+
                 LowBatteryRemote -> {
                     channel.enableVibration(true)
                     channel.setSound(defaultSound, soundAttributes(AudioAttributes.USAGE_NOTIFICATION))
@@ -208,6 +227,9 @@ internal enum class NotificationChannelSpec(
 
     private companion object {
         val defaultSound: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val alarmSound: Uri? =
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) ?: defaultSound
+        val SOS_VIBRATION = longArrayOf(0, 800, 300, 800, 300, 800)
 
         fun soundAttributes(usage: Int): AudioAttributes =
             AudioAttributes.Builder().setUsage(usage).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()

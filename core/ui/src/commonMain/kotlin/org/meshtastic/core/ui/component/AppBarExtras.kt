@@ -16,7 +16,11 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.defaultMinSize
@@ -27,18 +31,29 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.SosBarScreens
+import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.sos_bar_hold_desc
 import org.meshtastic.core.resources.sos_button
 import org.meshtastic.core.resources.sos_open
 
@@ -52,6 +67,9 @@ data class AppBarExtras(
     val connected: Boolean = false,
     val sosScreens: Set<String> = emptySet(),
     val onOpenSos: (() -> Unit)? = null,
+    /** Sends the alarm; the SOS button of the bars calls it after being held for [sosHoldSeconds]. Null: no sending. */
+    val onSendSos: (() -> Unit)? = null,
+    val sosHoldSeconds: Int = SosConfig.BAR_MIN_HOLD_SECONDS,
 )
 
 @Suppress("CompositionLocalAllowlist")
@@ -74,13 +92,33 @@ private val SosGold = Color(0xFFF5C839)
 
 /**
  * The SOS button of the top bars, made like the plate of a node (same shape and height) so the two sit together: red
- * inside with a gold border and bold white letters, to be seen at once and read at a glance.
+ * inside with a gold border and bold white letters, to be seen at once and read at a glance. A tap opens the SOS
+ * screen; holding it for [holdSeconds] (a gold fill grows while it is held) sends the alarm, so it never fires by
+ * accident.
  */
 @Composable
-fun SosChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun SosChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    holdSeconds: Int = SosConfig.BAR_MIN_HOLD_SECONDS,
+    onHoldComplete: (() -> Unit)? = null,
+) {
     val label = stringResource(Res.string.sos_open)
+    val holdLabel = stringResource(Res.string.sos_bar_hold_desc, holdSeconds)
+    var pressed by remember { mutableStateOf(false) }
+    val progress = remember { Animatable(0f) }
+    val currentHold by rememberUpdatedState(onHoldComplete)
+    LaunchedEffect(pressed, holdSeconds) {
+        if (pressed && currentHold != null) {
+            progress.snapTo(0f)
+            progress.animateTo(1f, tween(durationMillis = holdSeconds * MILLIS, easing = LinearEasing))
+            currentHold?.invoke()
+            pressed = false
+        } else {
+            progress.snapTo(0f)
+        }
+    }
     Card(
-        onClick = onClick,
         modifier = modifier,
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = SosRed, contentColor = Color.White),
@@ -90,8 +128,30 @@ fun SosChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
             modifier =
             Modifier.width(IntrinsicSize.Min)
                 .defaultMinSize(minWidth = 48.dp, minHeight = 28.dp)
+                .drawBehind {
+                    drawRect(
+                        color = SosGold.copy(alpha = FILL_ALPHA),
+                        size = size.copy(width = size.width * progress.value),
+                    )
+                }
+                .pointerInput(onHoldComplete != null) {
+                    detectTapGestures(
+                        onPress = {
+                            pressed = true
+                            tryAwaitRelease()
+                            pressed = false
+                        },
+                        onTap = { onClick() },
+                    )
+                }
                 .padding(horizontal = 8.dp)
-                .semantics { contentDescription = label },
+                .semantics {
+                    contentDescription = if (onHoldComplete != null) holdLabel else label
+                    this.onClick(label = label) {
+                        onClick()
+                        true
+                    }
+                },
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -103,3 +163,6 @@ fun SosChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
         }
     }
 }
+
+private const val MILLIS = 1000
+private const val FILL_ALPHA = 0.6f

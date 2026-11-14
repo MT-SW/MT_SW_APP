@@ -18,6 +18,8 @@ package org.meshtastic.core.repository
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SosConfigTest {
     @Test
@@ -43,6 +45,26 @@ class SosConfigTest {
         assertEquals(SosConfig(), SosConfig.decode("a|b|c"))
         assertEquals(SosConfig(), SosConfig.decode("x|1|0|3|1|2|tekst"))
         assertEquals(SosConfig(), SosConfig.decode("c0|a|0|3|1|2||tekst"))
+    }
+
+    @Test
+    fun onlyTheMarkedMessageIsAnSos() {
+        val sent = "\uD83D\uDD14 " + SosMarker.TAG + "Pomocy"
+        assertTrue(SosMarker.isSos(sent))
+        assertEquals("\uD83D\uDD14 Pomocy", SosMarker.clean(sent))
+        assertFalse(SosMarker.isSos("SOS pomocy"))
+        assertFalse(SosMarker.isSos("\uD83D\uDD14 SOS"))
+        assertFalse(SosMarker.isSos(null))
+        // The mark far down in a long text (pasted, not sent by the app) does not count.
+        assertFalse(SosMarker.isSos("x".repeat(40) + SosMarker.TAG))
+    }
+
+    @Test
+    fun theBarButtonNeedsAtLeastTwoSeconds() {
+        assertEquals(2, SosConfig(holdSeconds = 0).barHoldSeconds)
+        assertEquals(2, SosConfig(holdSeconds = 1).barHoldSeconds)
+        assertEquals(3, SosConfig(holdSeconds = 3).barHoldSeconds)
+        assertEquals(5, SosConfig(holdSeconds = 5).barHoldSeconds)
     }
 
     @Test

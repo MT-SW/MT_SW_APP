@@ -3499,6 +3499,8 @@
     <string name="background_keepalive_summary">Domyślnie wyłączone. iPhone i iPad usypiają aplikację, której nie ma na ekranie, co zrywa połączenie z radiem przez Wi-Fi/TCP (także przez Tailscale) i przerywa zbieranie danych. Po włączeniu aplikacja działa dalej w tle dzięki lokalizacji w tle, tak samo jak oryginalna aplikacja Meshtastic na urządzenia Apple. Pozycja jest odczytywana rzadko i tylko po to, żeby aplikacja nie została uśpiona; nigdzie nie jest wysyłana. Wymaga zgody na lokalizację „Zawsze”. Zużywa więcej baterii, a system pokazuje strzałkę lokalizacji.</string>
     <string name="background_keepalive_title">Działaj w tle</string>
     <string name="autostart_title">Uruchamiaj z komputerem</string>
+    <string name="autostart_minimized_title">Start w zasobniku</string>
+    <string name="autostart_minimized_summary">Gdy aplikacja uruchamia się razem z komputerem, jej okno się nie otwiera, a aplikacja czeka w zasobniku (ikona przy zegarze). Ręczne otwarcie aplikacji nadal pokazuje okno.</string>
     <string name="single_instance_title">Jedna kopia programu</string>
     <string name="single_instance_switch">Pozwól na drugą kopię obok</string>
     <string name="single_instance_summary">Domyślnie program działa tylko w jednej kopii: gdy uruchomisz go drugi raz, pokaże się okno pierwszej, więc dwie kopie nie biją się o dostęp do węzła. Włącz, jeśli chcesz uruchamiać kilka kopii naraz (na przykład dla kilku radii). Zmiana działa od następnego uruchomienia programu.</string>
@@ -4081,6 +4083,8 @@
     <string name="sos_nodes_done">Gotowe</string>
     <string name="sos_nodes_empty">Brak węzłów do wyboru.</string>
     <string name="sos_open">Otwórz SOS</string>
+    <string name="sos_bar_hold_desc">Dotknij, aby otworzyć SOS. Przytrzymaj %1$d s, aby wysłać alarm.</string>
+    <string name="sos_bar_hold_note">Przycisk SOS na górnym pasku zawsze trzeba przytrzymać co najmniej %1$d s, nawet gdy tu ustawisz krótszy czas, żeby nie włączył się przypadkiem. Dotknięcie otwiera ekran SOS.</string>
     <string name="sos_section_bar">Przycisk SOS na górnym pasku</string>
     <string name="sos_bar_show">Pokazuj przycisk SOS na górnym pasku</string>
     <string name="sos_bar_note">Czerwony przycisk SOS obok plakietki Twojego węzła otwiera ten ekran. Wybierz karty, na których ma być widoczny.</string>
@@ -4104,4 +4108,19 @@
     <string name="whats_new_changelog">Pełna lista zmian</string>
     <string name="whats_new_empty">Brak wpisów do pokazania.</string>
     <string name="whats_new_open_desc">Co się zmieniło od ostatniej stabilnej wersji albo wszystko od początku, w grupach: nowe funkcje, ulepszenia, naprawione błędy, zmiany względem oryginału</string>
+    <string name="sos_alarm_confirm">Potwierdzam, wyłącz alarm</string>
+    <string name="sos_alarm_from">SOS od: %1$s</string>
+    <string name="sos_alarm_notification_title">SOS od: %1$s</string>
+    <string name="sos_alarm_notifications">Alarm SOS</string>
+    <string name="sos_alarm_notifications_description">Alarm po odebraniu SOS wysłanego z innej kopii tej aplikacji. Dzwoni w kółko, dopóki go nie potwierdzisz.</string>
+    <string name="sos_alarm_open">Otwórz rozmowę</string>
+    <string name="sos_alarm_test">Sprawdź alarm (tylko na tym urządzeniu)</string>
+    <string name="sos_alarm_test_note">To jest próba alarmu. Nic nie zostało wysłane.</string>
+    <string name="sos_alarm_test_sender">Próba alarmu</string>
+    <string name="sos_alarm_test_text">Tak będzie wyglądał i brzmiał SOS od innego węzła.</string>
+    <string name="sos_nodes_missing">Tych wybranych węzłów nie ma już na liście węzłów: %1$s. Alarm i tak do nich zostanie wysłany.</string>
+    <string name="sos_nodes_missing_remove">Usuń je z wyboru</string>
+    <string name="sos_receive_note">SOS wysłany z innej kopii MT_SW_APP (ma ukryty znacznik, więc zwykły tekst ze słowem SOS się nie liczy) otwiera rozmowę, zakrywa cały ekran wielkim napisem SOS i dzwoni, dopóki go nie potwierdzisz. Na Androidzie alarm dzwoni także przy zablokowanym telefonie.</string>
+    <string name="sos_receive_switch">Alarm po odebraniu SOS</string>
+    <string name="sos_section_receive">Odbiór SOS</string>
 </resources>

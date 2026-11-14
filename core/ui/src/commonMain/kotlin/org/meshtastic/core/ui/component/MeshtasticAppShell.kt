@@ -16,6 +16,8 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +38,7 @@ import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.assistant.AssistantLinks
@@ -120,15 +123,23 @@ fun MeshtasticAppShell(
     // by default). Provided once here so that no card has to be wired by hand.
     val sosPrefs = koinInject<SosPrefs>()
     val sosScreens by sosPrefs.barScreens.collectAsStateWithLifecycle()
+    val sosConfig by sosPrefs.config.collectAsStateWithLifecycle()
+    val sosController = koinInject<SosController>()
     val ourNode by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
     val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
     val appBarExtras =
-        remember(ourNode, connectionState, sosScreens, uiViewModel) {
+        remember(ourNode, connectionState, sosScreens, sosConfig.barHoldSeconds, uiViewModel) {
             AppBarExtras(
                 ourNode = ourNode,
                 connected = connectionState is ConnectionState.Connected,
                 sosScreens = sosScreens,
                 onOpenSos = { uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos")) },
+                // Held long enough: send now with the settings of the SOS screen and open it to show the progress.
+                onSendSos = {
+                    sosController.start(sosPrefs.config.value)
+                    uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos"))
+                },
+                sosHoldSeconds = sosConfig.barHoldSeconds,
             )
         }
 
@@ -158,7 +169,11 @@ fun MeshtasticAppShell(
             )
             // The list of what is new: after an update, or (once the first setup is done) for a new installation.
             WhatsNewHost(uiViewModel)
-            content()
+            // The alarm of a received SOS covers everything, so it sits over the content in one box.
+            Box(modifier = Modifier.fillMaxSize()) {
+                content()
+                SosAlarmOverlay(uiViewModel)
+            }
         }
     }
 }

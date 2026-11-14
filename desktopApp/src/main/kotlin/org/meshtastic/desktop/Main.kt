@@ -99,6 +99,8 @@ import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.prefs.ui.UiPrefsDefaults
+import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAlarmSounds
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.desktop_tray_quit
@@ -137,6 +139,7 @@ import org.meshtastic.desktop.di.DesktopKoinApp
 import org.meshtastic.desktop.map.DesktopTracerouteMap
 import org.meshtastic.desktop.map.desktopMapViewProvider
 import org.meshtastic.desktop.notification.DesktopOS
+import org.meshtastic.desktop.notification.DesktopSosAlarmSound
 import org.meshtastic.desktop.notification.NativeNotificationSender
 import org.meshtastic.desktop.notification.NotificationClicks
 import org.meshtastic.desktop.tray.SniTrayEffect
@@ -193,7 +196,11 @@ private fun svgPainterResource(path: String, density: Density): Painter = rememb
 }
 
 @OptIn(ExperimentalCoilApi::class)
+/** True when the program was started at login with the wish to wait in the tray (see [DesktopAutostart]). */
+private var startedMinimized = false
+
 fun main(args: Array<String>) {
+    startedMinimized = DesktopAutostart.MINIMIZED_ARG in args
     // A second copy asks the first one to show its window and ends here, unless the person allowed several copies.
     if (!SingleInstance.claim()) exitProcess(0)
     SingleInstanceControls.current = DesktopSingleInstanceControl
@@ -201,6 +208,7 @@ fun main(args: Array<String>) {
     prepareDataFolder()
     installQuitHandler()
     AutostartControls.current = DesktopAutostart.create()
+    SosAlarmSounds.current = DesktopSosAlarmSound()
     // No wallpaper colours on a computer: the saturated theme is the default look.
     UiPrefsDefaults.theme = MODE_VIVID
     // exitProcessOnExit = false is what makes the shutdown block below reachable at all: with the default (true),
@@ -401,13 +409,23 @@ private fun ApplicationScope.MeshtasticDesktopApp(
     monochrome: Boolean,
     saturation: Int,
 ) {
-    var isAppVisible by remember { mutableStateOf(true) }
+    var isAppVisible by remember { mutableStateOf(!startedMinimized) }
     var isWindowReady by remember { mutableStateOf(false) }
     // A second start of the program shows this window again instead of opening a new copy.
     LaunchedEffect(Unit) {
         SingleInstance.showRequests.collect {
             isAppVisible = true
             bringWindowToFront()
+        }
+    }
+    // An SOS that arrives brings the window forward, even from the tray.
+    val sosAlarm = koinInject<SosAlarmCenter>()
+    LaunchedEffect(Unit) {
+        sosAlarm.alert.collect {
+            if (it != null) {
+                isAppVisible = true
+                bringWindowToFront()
+            }
         }
     }
     val trayState = rememberTrayState()
@@ -486,6 +504,16 @@ private fun ApplicationScope.MeshtasticDesktopApp(
         )
     }
 
+    // A start in the tray needs a tray that can bring the window back: when none shows up the window opens after all.
+    LaunchedEffect(Unit) {
+        if (startedMinimized) {
+            delay(TRAY_WAIT_MS)
+            if (!canHideToTray(awtTraySupported = isTraySupported, sniTrayRegistered = isSniTrayRegistered)) {
+                isAppVisible = true
+            }
+        }
+    }
+
     if (isWindowReady) {
         // Hide via `visible` rather than dropping the Window from composition so the UI tree
         // (navigation backstack, scroll positions) survives a hide-to-tray round trip.
@@ -509,6 +537,8 @@ private fun ApplicationScope.MeshtasticDesktopApp(
         }
     }
 }
+
+private const val TRAY_WAIT_MS = 10_000L
 
 // ----- Update discovery -----
 

@@ -36,6 +36,10 @@ data class SosConfig(
     val stopWhenDelivered: Boolean = true,
     val holdSeconds: Int = DEFAULT_HOLD_SECONDS,
 ) {
+    /** How long the SOS button of the top bars has to be held: never less than [BAR_MIN_HOLD_SECONDS]. */
+    val barHoldSeconds: Int
+        get() = holdSeconds.coerceAtLeast(BAR_MIN_HOLD_SECONDS)
+
     /**
      * Written as `c<channels>|position|repeatMinutes|repeatCount|stopWhenDelivered|holdSeconds|<nodes>|message`, the
      * channels and the node numbers each separated by commas. The leading `c` tells it from the older form that held a
@@ -55,6 +59,9 @@ data class SosConfig(
     companion object {
         const val DEFAULT_REPEAT_COUNT = 3
         const val DEFAULT_HOLD_SECONDS = 2
+
+        /** The shortest hold of the bar button, so it never fires by accident; a shorter setting is raised to it. */
+        const val BAR_MIN_HOLD_SECONDS = 2
         private const val FIELDS = 8
         private const val OLD_FIELDS = 7
         private const val CHANNEL_MARK = "c"
@@ -140,6 +147,78 @@ interface SosPrefs {
     val barScreens: StateFlow<Set<String>>
 
     fun setBarScreens(screens: Set<String>)
+
+    /** True (the default) when a received SOS from another copy of this app raises the full-screen alarm. */
+    val receiveAlarm: StateFlow<Boolean>
+
+    fun setReceiveAlarm(on: Boolean)
+}
+
+/**
+ * The hidden mark that an SOS message was sent by this app, so that the alarm on the receiving side is raised only by
+ * these and never by a message that merely says "SOS". It is a run of invisible characters (not shown by the chat)
+ * placed right after the bell. It keeps accidents and ordinary texts away; it is not a lock, because the app is open
+ * source and anyone who is on the channel can write the same characters.
+ */
+object SosMarker {
+    private const val START = '\u2063'
+    private const val END = '\u2064'
+    private const val ZERO = '\u200B'
+    private const val ONE = '\u200C'
+    private const val PATTERN = "10110010"
+    private const val SEARCH_LENGTH = 24
+
+    /** The characters written into the message. */
+    val TAG: String = buildString {
+        append(START)
+        PATTERN.forEach { append(if (it == '1') ONE else ZERO) }
+        append(END)
+    }
+
+    /** True when [text] opens with the mark (a long message split in parts keeps it in the first one). */
+    fun isSos(text: String?): Boolean = text != null && text.take(SEARCH_LENGTH).contains(TAG)
+
+    /** [text] without the mark. */
+    fun clean(text: String): String = text.replace(TAG, "")
+}
+
+/** An SOS that arrived (or a test of the alarm, [test]); [contactKey] is the conversation it came in. */
+data class SosAlert(
+    val id: Long,
+    val contactKey: String,
+    val senderName: String,
+    val text: String,
+    val test: Boolean = false,
+)
+
+/**
+ * The alarm for an SOS that arrived from another copy of this app: it holds the alert that is ringing (shown on the
+ * whole screen) until the person confirms it, and starts and stops the sound.
+ */
+interface SosAlarmCenter {
+    /** The alert that is ringing now, or null. */
+    val alert: StateFlow<SosAlert?>
+
+    /** Starts the alarm (does nothing when the person turned the alarm off in the SOS screen, except for a test). */
+    fun raise(alert: SosAlert)
+
+    /** The person confirmed it: the sound and the notification stop. */
+    fun acknowledge()
+}
+
+/**
+ * The looping sound of the alarm where the app has to make it itself (desktop, iPhone/iPad); Android uses the
+ * notification, which rings again and again by itself.
+ */
+interface SosAlarmSound {
+    fun start()
+
+    fun stop()
+}
+
+/** Holder of the platform's [SosAlarmSound]; null where the platform's notification rings by itself. */
+object SosAlarmSounds {
+    var current: SosAlarmSound? = null
 }
 
 /**

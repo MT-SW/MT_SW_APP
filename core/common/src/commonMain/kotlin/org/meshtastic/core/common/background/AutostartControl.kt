@@ -29,6 +29,12 @@ interface AutostartControl {
 
     /** Registers or removes the start at login. */
     fun setEnabled(on: Boolean)
+
+    /** True when a start at login leaves the window closed and waits in the tray (the icon by the clock). */
+    val startMinimized: StateFlow<Boolean>
+
+    /** Turns the start in the tray on or off; takes effect at the next login. */
+    fun setStartMinimized(on: Boolean)
 }
 
 /** Holder of the platform's [AutostartControl]; null until the platform code installs it. */

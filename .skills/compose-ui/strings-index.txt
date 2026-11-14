@@ -631,6 +631,8 @@ auto_clean_nodes_enabled
 auto_clean_nodes_inactivity_days
 auto_clean_nodes_title
 auto_load_chat_images
+autostart_minimized_summary
+autostart_minimized_title
 autostart_summary
 autostart_title
 ### AVAILABILITY ###
@@ -3279,9 +3281,21 @@ soil_temperature
 soil_water_metrics
 solar_irradiance
 ### SOS ###
+sos_alarm_confirm
+sos_alarm_from
+sos_alarm_notification_title
+sos_alarm_notifications
+sos_alarm_notifications_description
+sos_alarm_open
+sos_alarm_test
+sos_alarm_test_note
+sos_alarm_test_sender
+sos_alarm_test_text
 sos_bar_ai
 sos_bar_connections
 sos_bar_health
+sos_bar_hold_desc
+sos_bar_hold_note
 sos_bar_map
 sos_bar_messages
 sos_bar_nodes
@@ -3303,6 +3317,8 @@ sos_message_label
 sos_nodes_add
 sos_nodes_done
 sos_nodes_empty
+sos_nodes_missing
+sos_nodes_missing_remove
 sos_nodes_none
 sos_nodes_note
 sos_nodes_pick_title
@@ -3310,6 +3326,8 @@ sos_nodes_search
 sos_open
 sos_position_attached
 sos_position_missing
+sos_receive_note
+sos_receive_switch
 sos_repeat_count
 sos_repeat_every
 sos_repeat_once
@@ -3321,6 +3339,7 @@ sos_section_channel
 sos_section_hold
 sos_section_message
 sos_section_nodes
+sos_section_receive
 sos_section_repeat
 sos_status_delivered
 sos_status_enroute

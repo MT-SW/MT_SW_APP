@@ -22,6 +22,7 @@ object NotificationChannels {
     const val BROADCASTS = "my_broadcasts"
     const val WAYPOINTS = "my_waypoints"
     const val ALERTS = "my_alerts"
+    const val SOS_ALARM = "sos_alarm"
     const val REACTIONS = "my_reactions"
     const val NEW_NODES = "new_nodes"
     const val NODE_SILENCE = "node_silence"

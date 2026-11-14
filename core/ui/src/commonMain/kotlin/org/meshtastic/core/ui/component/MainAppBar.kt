@@ -151,7 +151,12 @@ private fun TopBarActions(
     val sosVisible = sosScreen != null && openSos != null && sosScreen.key in extras.sosScreens
 
     if (sosVisible && openSos != null) {
-        SosChip(onClick = openSos, modifier = Modifier.padding(start = 8.dp))
+        SosChip(
+            onClick = openSos,
+            modifier = Modifier.padding(start = 8.dp),
+            holdSeconds = extras.sosHoldSeconds,
+            onHoldComplete = extras.onSendSos,
+        )
     }
     AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
         chipNode?.let { node ->

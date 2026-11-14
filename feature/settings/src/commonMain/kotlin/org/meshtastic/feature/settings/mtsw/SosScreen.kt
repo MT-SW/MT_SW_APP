@@ -66,11 +66,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
@@ -78,6 +82,9 @@ import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mt_sw_other_sos_body
+import org.meshtastic.core.resources.sos_alarm_test
+import org.meshtastic.core.resources.sos_alarm_test_sender
+import org.meshtastic.core.resources.sos_alarm_test_text
 import org.meshtastic.core.resources.sos_bar_ai
 import org.meshtastic.core.resources.sos_bar_connections
 import org.meshtastic.core.resources.sos_bar_health
@@ -89,6 +96,7 @@ import org.meshtastic.core.resources.sos_bar_other
 import org.meshtastic.core.resources.sos_bar_settings
 import org.meshtastic.core.resources.sos_bar_show
 import org.meshtastic.core.resources.sos_button
+import org.meshtastic.core.resources.sos_bar_hold_note
 import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
 import org.meshtastic.core.resources.sos_cancel
@@ -101,12 +109,16 @@ import org.meshtastic.core.resources.sos_message_label
 import org.meshtastic.core.resources.sos_nodes_add
 import org.meshtastic.core.resources.sos_nodes_done
 import org.meshtastic.core.resources.sos_nodes_empty
+import org.meshtastic.core.resources.sos_nodes_missing
+import org.meshtastic.core.resources.sos_nodes_missing_remove
 import org.meshtastic.core.resources.sos_nodes_none
 import org.meshtastic.core.resources.sos_nodes_note
 import org.meshtastic.core.resources.sos_nodes_pick_title
 import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.sos_position_attached
 import org.meshtastic.core.resources.sos_position_missing
+import org.meshtastic.core.resources.sos_receive_note
+import org.meshtastic.core.resources.sos_receive_switch
 import org.meshtastic.core.resources.sos_repeat_count
 import org.meshtastic.core.resources.sos_repeat_every
 import org.meshtastic.core.resources.sos_repeat_once
@@ -118,6 +130,7 @@ import org.meshtastic.core.resources.sos_section_channel
 import org.meshtastic.core.resources.sos_section_hold
 import org.meshtastic.core.resources.sos_section_message
 import org.meshtastic.core.resources.sos_section_nodes
+import org.meshtastic.core.resources.sos_section_receive
 import org.meshtastic.core.resources.sos_section_repeat
 import org.meshtastic.core.resources.sos_status_delivered
 import org.meshtastic.core.resources.sos_status_enroute
@@ -243,6 +256,27 @@ fun SosScreen(onBack: () -> Unit) {
                             )
                         }
                     }
+                    // A chosen node that is gone from the node list (cleaned away, or never heard again): the alarm is
+                    // still sent to it, but the person should know. Only judged once the list has been loaded.
+                    val missing = if (nodeDb.isEmpty()) emptyList() else config.nodes.filter { it !in nodeDb }
+                    if (missing.isNotEmpty()) {
+                        Text(
+                            text =
+                            stringResource(
+                                Res.string.sos_nodes_missing,
+                                missing.joinToString { NodeAddress.numToDefaultId(it) },
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                        TextButton(
+                            onClick = { prefs.setConfig(config.copy(nodes = config.nodes - missing.toSet())) },
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        ) {
+                            Text(stringResource(Res.string.sos_nodes_missing_remove))
+                        }
+                    }
                 }
                 Button(onClick = { pickingNodes = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
                     Text(stringResource(Res.string.sos_nodes_add))
@@ -316,6 +350,39 @@ fun SosScreen(onBack: () -> Unit) {
                 }
             }
 
+            val receiveAlarm by prefs.receiveAlarm.collectAsStateWithLifecycle()
+            val alarmCenter = koinInject<SosAlarmCenter>()
+            val testSender = stringResource(Res.string.sos_alarm_test_sender)
+            val testText = stringResource(Res.string.sos_alarm_test_text)
+            ExpressiveSection(title = stringResource(Res.string.sos_section_receive)) {
+                Text(
+                    text = stringResource(Res.string.sos_receive_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                SwitchListItem(
+                    checked = receiveAlarm,
+                    text = stringResource(Res.string.sos_receive_switch),
+                    onClick = { prefs.setReceiveAlarm(!receiveAlarm) },
+                )
+                Button(
+                    onClick = {
+                        alarmCenter.raise(
+                            SosAlert(
+                                id = nowMillis,
+                                contactKey = ContactKey.broadcast(0).value,
+                                senderName = testSender,
+                                text = testText,
+                                test = true,
+                            ),
+                        )
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    Text(stringResource(Res.string.sos_alarm_test))
+                }
+            }
+
             val barScreens by prefs.barScreens.collectAsStateWithLifecycle()
             ExpressiveSection(title = stringResource(Res.string.sos_section_bar)) {
                 Text(
@@ -371,6 +438,11 @@ fun SosScreen(onBack: () -> Unit) {
                         )
                     }
                 }
+                Text(
+                    text = stringResource(Res.string.sos_bar_hold_note, SosConfig.BAR_MIN_HOLD_SECONDS),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
             }
         }
     }

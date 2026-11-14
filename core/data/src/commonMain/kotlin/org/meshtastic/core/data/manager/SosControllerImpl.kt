@@ -37,6 +37,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
+import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.repository.usecase.SendMessageOutcome
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
@@ -172,8 +173,9 @@ class SosControllerImpl(
                 "$message $lat,$lon https://maps.google.com/?q=$lat,$lon"
             }
         // The alarm bell, written like the bell button of the chat does: a radio with the external notification module
-        // sounds its alert on the bell character, and other apps show the bell.
-        return "$ALERT_BELL $body $ALERT_BELL_CHAR"
+        // sounds its alert on the bell character, and other apps show the bell. The hidden mark after the bell tells
+        // another copy of this app that the message is a real SOS (see SosMarker).
+        return "$ALERT_BELL ${SosMarker.TAG}$body $ALERT_BELL_CHAR"
     }
 
     private fun rounded(value: Double): Double = (value * COORDINATE_SCALE).roundToLong() / COORDINATE_SCALE
