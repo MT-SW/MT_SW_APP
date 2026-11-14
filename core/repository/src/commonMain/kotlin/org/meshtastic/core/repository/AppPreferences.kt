@@ -109,6 +109,21 @@ interface UiPrefs {
 
     fun setAppIntroCompleted(completed: Boolean)
 
+    /** The build (see `WhatsNew.buildKey`) whose "what's new" list was last shown; null while not read yet. */
+    val whatsNewSeenBuild: StateFlow<String?>
+
+    fun setWhatsNewSeenBuild(build: String)
+
+    /** The number of the last stable release whose list was shown; 0 when none. */
+    val whatsNewSeenStable: StateFlow<Int>
+
+    fun setWhatsNewSeenStable(release: Int)
+
+    /** True from the end of the first-run introduction until the full "what's new" list has been shown. */
+    val whatsNewFull: StateFlow<Boolean>
+
+    fun setWhatsNewFull(pending: Boolean)
+
     /** When the user accepted the terms and data notice (epoch millis); 0 = not accepted; null = not read yet. */
     val dataNoticeAcceptedAt: StateFlow<Long?>
 

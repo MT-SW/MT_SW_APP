@@ -437,7 +437,22 @@ class UIViewModel(
     val appIntroCompleted: StateFlow<Boolean> = uiPrefs.appIntroCompleted
 
     fun onAppIntroCompleted() {
+        // A new installation gets the whole list of what the app has over the original, once the person has finished
+        // the first setup (see WhatsNewHost).
+        if (!uiPrefs.appIntroCompleted.value) uiPrefs.setWhatsNewFull(true)
         uiPrefs.setAppIntroCompleted(true)
+    }
+
+    /** Prefs behind the "what's new" list. */
+    val whatsNewSeenBuild: StateFlow<String?> = uiPrefs.whatsNewSeenBuild
+    val whatsNewSeenStable: StateFlow<Int> = uiPrefs.whatsNewSeenStable
+    val whatsNewFull: StateFlow<Boolean> = uiPrefs.whatsNewFull
+
+    /** The list was shown (and closed): the person is not shown it again for this build. */
+    fun onWhatsNewShown(buildKey: String, stableRelease: Int?) {
+        uiPrefs.setWhatsNewSeenBuild(buildKey)
+        if (stableRelease != null) uiPrefs.setWhatsNewSeenStable(stableRelease)
+        uiPrefs.setWhatsNewFull(false)
     }
 
     /** Null while the stored value is still being read; 0 when the terms were never accepted. */

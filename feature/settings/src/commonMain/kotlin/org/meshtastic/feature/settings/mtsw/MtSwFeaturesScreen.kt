@@ -40,6 +40,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.background.SingleInstanceControls
+import org.meshtastic.core.model.MtswRelease
+import org.meshtastic.core.model.WhatsNewRequest
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
@@ -126,11 +128,14 @@ import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.resources.translator_open_summary
 import org.meshtastic.core.resources.ui_scale
+import org.meshtastic.core.resources.whats_new_open_desc
+import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.WhatsNewDialog
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
@@ -414,6 +419,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.whats_new_title)) { WhatsNewEntry() }
+
             ExpressiveSection(title = stringResource(Res.string.sos_title)) {
                 ListItem(
                     text = stringResource(Res.string.sos_title),
@@ -547,5 +554,24 @@ private fun OtherFeature(title: StringResource, body: StringResource) {
             color = MaterialTheme.colorScheme.primary,
         )
         Text(text = stringResource(body), style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/** The row that opens the list of what is new: since the last stable version, or everything from the start. */
+@Composable
+private fun WhatsNewEntry() {
+    var open by remember { mutableStateOf(false) }
+    ListItem(
+        text = stringResource(Res.string.whats_new_title),
+        supportingText = stringResource(Res.string.whats_new_open_desc),
+        leadingIcon = MeshtasticIcons.Info,
+    ) {
+        open = true
+    }
+    if (open) {
+        WhatsNewDialog(
+            initialRequest = WhatsNewRequest(full = false, fromRelease = MtswRelease.RELEASE - 1),
+            onDismiss = { open = false },
+        )
     }
 }

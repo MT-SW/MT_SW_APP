@@ -156,6 +156,8 @@ fun MeshtasticAppShell(
                     )
                 },
             )
+            // The list of what is new: after an update, or (once the first setup is done) for a new installation.
+            WhatsNewHost(uiViewModel)
             content()
         }
     }

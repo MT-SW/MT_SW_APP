@@ -77,6 +77,7 @@ import org.meshtastic.core.resources.track_compare
 import org.meshtastic.core.resources.track_export_kml
 import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.wifi_devices
@@ -206,6 +207,7 @@ object SettingsSearchCatalog {
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.node_silence_alert to SettingsRoute.MtSwOtherFeatures,
             Res.string.notification_test_title to SettingsRoute.Settings(),
+            Res.string.whats_new_title to SettingsRoute.MtSwFeatures,
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.sos_section_nodes to SettingsRoute.Sos,
             Res.string.sos_section_bar to SettingsRoute.Sos,

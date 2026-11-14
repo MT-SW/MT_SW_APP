@@ -93,6 +93,24 @@ class FakeUiPrefs : UiPrefs {
         appIntroCompleted.value = completed
     }
 
+    override val whatsNewSeenBuild = MutableStateFlow<String?>("")
+
+    override fun setWhatsNewSeenBuild(build: String) {
+        whatsNewSeenBuild.value = build
+    }
+
+    override val whatsNewSeenStable = MutableStateFlow(0)
+
+    override fun setWhatsNewSeenStable(release: Int) {
+        whatsNewSeenStable.value = release
+    }
+
+    override val whatsNewFull = MutableStateFlow(false)
+
+    override fun setWhatsNewFull(pending: Boolean) {
+        whatsNewFull.value = pending
+    }
+
     override val dataNoticeAcceptedAt = MutableStateFlow<Long?>(0L)
 
     override fun setDataNoticeAcceptedAt(value: Long) {

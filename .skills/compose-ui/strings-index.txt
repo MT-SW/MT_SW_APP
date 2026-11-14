@@ -3696,6 +3696,16 @@ website
 weight
 what_is_meshtastic
 what_is_meshtastic_description
+### WHATS ###
+whats_new_all
+whats_new_changelog
+whats_new_empty
+whats_new_intro_first
+whats_new_intro_update
+whats_new_language
+whats_new_open_desc
+whats_new_since_stable
+whats_new_title
 ### WIDGET ###
 widget_adaptive_mesh_status_shown
 widget_adaptive_off_summary

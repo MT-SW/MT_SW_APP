@@ -3774,6 +3774,16 @@
     <string name="weight">Weight</string>
     <string name="what_is_meshtastic">What is MT_SW?</string>
     <string name="what_is_meshtastic_description">MT_SW is an app and a community around an open LoRa mesh network that works without the internet or base stations: radios pass messages on from node to node. The app extends the original with a link planner, a terrain panorama, an offline AI assistant and translator, extra statistics, a richer node list and many more settings. We build it together with the local community of the Świętokrzyskie region, and anyone can join.</string>
+    <!-- WHATS -->
+    <string name="whats_new_all">Everything from the start</string>
+    <string name="whats_new_changelog">Full list of changes</string>
+    <string name="whats_new_empty">Nothing to show.</string>
+    <string name="whats_new_intro_first">Welcome! Here is everything this app has over the original, from the start of its making: new features, improvements, fixed bugs and changes against the original.</string>
+    <string name="whats_new_intro_update">The app has been updated. Here is what changed since the last stable version.</string>
+    <string name="whats_new_language">en</string>
+    <string name="whats_new_open_desc">What changed since the last stable version, or everything from the start, in groups: new features, improvements, fixed bugs, changes against the original</string>
+    <string name="whats_new_since_stable">Since the last stable</string>
+    <string name="whats_new_title">What\'s new in the app</string>
     <!-- WIDGET -->
     <string name="widget_adaptive_mesh_status_shown">Mesh status on the home-screen widget</string>
     <string name="widget_adaptive_off_summary">Show the whole mesh or one node on the home-screen widget</string>

@@ -60,6 +60,27 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_APP_INTRO_COMPLETED] = completed } }
     }
 
+    override val whatsNewSeenBuild: StateFlow<String?> =
+        dataStore.data.map { it[KEY_WHATS_NEW_BUILD] ?: "" }.stateIn(scope, SharingStarted.Eagerly, null)
+
+    override fun setWhatsNewSeenBuild(build: String) {
+        scope.launch { dataStore.edit { it[KEY_WHATS_NEW_BUILD] = build } }
+    }
+
+    override val whatsNewSeenStable: StateFlow<Int> =
+        dataStore.data.map { it[KEY_WHATS_NEW_STABLE] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun setWhatsNewSeenStable(release: Int) {
+        scope.launch { dataStore.edit { it[KEY_WHATS_NEW_STABLE] = release } }
+    }
+
+    override val whatsNewFull: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_WHATS_NEW_FULL] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setWhatsNewFull(pending: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_WHATS_NEW_FULL] = pending } }
+    }
+
     override val dataNoticeAcceptedAt: StateFlow<Long?> =
         dataStore.data
             .map { prefs ->
@@ -877,6 +898,9 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_RADIO_SETUP_OFFERED = stringSetPreferencesKey("radio-setup-offered-nodes")
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
+        val KEY_WHATS_NEW_BUILD = stringPreferencesKey("whats_new_seen_build")
+        val KEY_WHATS_NEW_STABLE = intPreferencesKey("whats_new_seen_stable")
+        val KEY_WHATS_NEW_FULL = booleanPreferencesKey("whats_new_full_pending")
         val KEY_DATA_NOTICE_ACCEPTED_AT = longPreferencesKey("data_notice_accepted_at")
         val KEY_DATA_NOTICE_VERSION = intPreferencesKey("data_notice_version")
         val KEY_THEME = intPreferencesKey("theme")
