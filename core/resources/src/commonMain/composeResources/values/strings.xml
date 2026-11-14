@@ -2342,7 +2342,7 @@
     <string name="mt_sw_other_silence_title">Node watchdog</string>
     <string name="mt_sw_other_single_instance_body">On the computer the program runs in one copy by default: when you start it a second time, the window of the copy that is already running comes forward (also when it is hidden in the tray), so two copies do not fight over the same node. The "Allow a second copy next to it" switch in MT_SW features lets you run several copies at once; the change applies from the next start.</string>
     <string name="mt_sw_other_single_instance_title">One copy of the program</string>
-    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channel, with your position, and shows whether the send was confirmed. You can set the channel, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer\'s tray menu. The shortcuts only open the screen; the alarm is sent by holding the button.</string>
+    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channels and as a direct message to the chosen nodes (also ones that do not accept messages), with your position, and shows whether the send was confirmed. You can set the channels, the nodes, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer\'s tray menu. The red "SOS" button in the top bar, next to the plate of your node, also opens this screen; you can turn it off or choose the cards where it is shown. The shortcuts and the button only open the screen; the alarm is sent by holding the button.</string>
     <string name="mt_sw_other_sos_title">SOS</string>
     <string name="mt_sw_other_summary">Where to find features that live next to a node</string>
     <string name="mt_sw_other_title">Other features</string>
@@ -2380,7 +2380,14 @@
     <string name="need_hardware_description">MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation and the project website explain how to choose the hardware and set it up.</string>
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
+    <!-- NEIGHBORS -->
     <string name="neighbors_dialog_empty">No neighbour list saved from this node.</string>
+    <string name="neighbors_map_center_unknown">This node has no known position, so the lines to its neighbours cannot be drawn.</string>
+    <string name="neighbors_map_legend">Each line runs from a neighbour to the node that reported it. The number on it is the SNR that node heard the neighbour with.</string>
+    <string name="neighbors_map_missing">%1$d of %2$d neighbours are not on the map, because their position is not known.</string>
+    <string name="neighbors_map_none">None of the neighbours has a known position, so there is nothing to show on the map.</string>
+    <string name="neighbors_map_title">Neighbours on the map</string>
+    <string name="neighbors_show_on_map">Show on map</string>
     <!-- NETWORK -->
     <string name="network">Network</string>
     <string name="network_health">Network Health</string>
@@ -3341,6 +3348,16 @@
     <string name="soil_water_metrics">Soil &amp; Water</string>
     <string name="solar_irradiance">Solar Irradiance</string>
     <!-- SOS -->
+    <string name="sos_bar_ai">Assistant and translator</string>
+    <string name="sos_bar_connections">Connections</string>
+    <string name="sos_bar_health">Network health</string>
+    <string name="sos_bar_map">Map</string>
+    <string name="sos_bar_messages">Messages</string>
+    <string name="sos_bar_nodes">Nodes</string>
+    <string name="sos_bar_note">The red SOS button next to the plate of your node opens this screen. Choose the cards where it is shown.</string>
+    <string name="sos_bar_other">Other screens</string>
+    <string name="sos_bar_settings">Settings</string>
+    <string name="sos_bar_show">Show the SOS button in the top bar</string>
     <string name="sos_button">SOS</string>
     <string name="sos_button_hold">Hold to send</string>
     <string name="sos_button_tap">Tap to send</string>
@@ -3350,27 +3367,37 @@
     <string name="sos_hold_seconds">%1$d s</string>
     <string name="sos_hold_tap">Tap</string>
     <string name="sos_include_position">Add my position</string>
-    <string name="sos_intro">Sends an emergency message to the chosen channel, with your position, and watches whether it was delivered. Hold the button for the set time so it cannot be pressed by accident.</string>
+    <string name="sos_intro">Sends an emergency message with your position to the chosen channels and as a direct message to the chosen nodes, and watches whether it was delivered. Hold the button for the set time so it cannot be pressed by accident.</string>
     <string name="sos_message_label">Text (empty = default)</string>
+    <string name="sos_nodes_add">Add or remove nodes</string>
+    <string name="sos_nodes_done">Done</string>
+    <string name="sos_nodes_empty">No nodes to choose from.</string>
+    <string name="sos_nodes_none">No node chosen.</string>
+    <string name="sos_nodes_note">Every chosen node gets the alarm as a separate direct message — also one that is marked as not monitored or does not take messages. No exceptions.</string>
+    <string name="sos_nodes_pick_title">Choose nodes</string>
+    <string name="sos_nodes_search">Search for a node</string>
+    <string name="sos_open">Open SOS</string>
     <string name="sos_position_attached">With position</string>
     <string name="sos_position_missing">Without position (no GPS fix)</string>
     <string name="sos_repeat_count">Number of sends</string>
     <string name="sos_repeat_every">Every %1$d min</string>
     <string name="sos_repeat_once">Once</string>
     <string name="sos_result_delivered">Finished: the message was confirmed</string>
-    <string name="sos_result_refused">Could not send: the channel is not on the radio</string>
+    <string name="sos_result_refused">Could not send: the chosen channels are not on the radio</string>
     <string name="sos_result_unconfirmed">Finished: no confirmation</string>
-    <string name="sos_section_channel">Channel</string>
+    <string name="sos_section_bar">SOS button in the top bar</string>
+    <string name="sos_section_channel">Channels</string>
     <string name="sos_section_hold">Holding the button</string>
     <string name="sos_section_message">Message</string>
+    <string name="sos_section_nodes">Nodes (direct message)</string>
     <string name="sos_section_repeat">Repeating</string>
     <string name="sos_status_delivered">delivered, confirmed</string>
     <string name="sos_status_enroute">sent to the radio, waiting for confirmation</string>
     <string name="sos_status_error">delivery failed</string>
     <string name="sos_status_queued">waiting for the radio</string>
     <string name="sos_status_sending">Sending %1$d of %2$d</string>
-    <string name="sos_stop_when_delivered">Stop after a confirmation</string>
-    <string name="sos_summary">An emergency button: sends a message with your position to a chosen channel and checks whether it was delivered.</string>
+    <string name="sos_stop_when_delivered">Stop after every send is confirmed</string>
+    <string name="sos_summary">An emergency button: sends a message with your position to the chosen channels and as a direct message to the chosen nodes, and checks whether it was delivered.</string>
     <string name="sos_title">SOS</string>
     <string name="speed">Speed</string>
     <string name="speed_kmh">%1$d Km/h</string>

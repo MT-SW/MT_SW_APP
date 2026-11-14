@@ -2329,7 +2329,14 @@ need_hardware
 need_hardware_description
 neighbor_info
 neighbor_info_config
+### NEIGHBORS ###
 neighbors_dialog_empty
+neighbors_map_center_unknown
+neighbors_map_legend
+neighbors_map_missing
+neighbors_map_none
+neighbors_map_title
+neighbors_show_on_map
 ### NETWORK ###
 network
 network_health
@@ -3269,6 +3276,16 @@ soil_temperature
 soil_water_metrics
 solar_irradiance
 ### SOS ###
+sos_bar_ai
+sos_bar_connections
+sos_bar_health
+sos_bar_map
+sos_bar_messages
+sos_bar_nodes
+sos_bar_note
+sos_bar_other
+sos_bar_settings
+sos_bar_show
 sos_button
 sos_button_hold
 sos_button_tap
@@ -3280,6 +3297,14 @@ sos_hold_tap
 sos_include_position
 sos_intro
 sos_message_label
+sos_nodes_add
+sos_nodes_done
+sos_nodes_empty
+sos_nodes_none
+sos_nodes_note
+sos_nodes_pick_title
+sos_nodes_search
+sos_open
 sos_position_attached
 sos_position_missing
 sos_repeat_count
@@ -3288,9 +3313,11 @@ sos_repeat_once
 sos_result_delivered
 sos_result_refused
 sos_result_unconfirmed
+sos_section_bar
 sos_section_channel
 sos_section_hold
 sos_section_message
+sos_section_nodes
 sos_section_repeat
 sos_status_delivered
 sos_status_enroute
