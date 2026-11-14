@@ -34,6 +34,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioController
+import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.usecase.SendMessageOutcome
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 
@@ -101,6 +102,9 @@ class ConversationActionService :
 
             ACTION_REACT -> react(intent, contactKey)
 
+            // A button of the SOS alarm notification: confirms the alarm and sends the chosen answer to the sender.
+            ACTION_SOS_REPLY -> SosNotificationActions.reply(intent.getStringExtra(EXTRA_SOS_REPLY).orEmpty())
+
             else -> Logger.w(tag = TAG) { "Unknown conversation action ${intent.action}" }
         }
     }
@@ -156,6 +160,8 @@ class ConversationActionService :
         const val ACTION_REPLY = "org.meshtastic.app.REPLY_ACTION"
         const val ACTION_MARK_AS_READ = "org.meshtastic.app.MARK_AS_READ"
         const val ACTION_REACT = "org.meshtastic.app.REACT_ACTION"
+        const val ACTION_SOS_REPLY = "org.meshtastic.app.SOS_REPLY_ACTION"
+        const val EXTRA_SOS_REPLY = "sos_reply"
         const val EXTRA_CONTACT_KEY = "contact_key"
         const val EXTRA_REPLY_ID = "reply_id"
         const val EXTRA_EMOJI = "emoji"

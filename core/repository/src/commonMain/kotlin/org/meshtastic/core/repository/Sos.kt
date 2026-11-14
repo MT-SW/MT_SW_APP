@@ -603,6 +603,39 @@ interface SosAlarmSound {
     fun stop()
 }
 
+/**
+ * The way a button on a platform's SOS alarm notification reaches the alarm center without a dependency cycle between
+ * the notifications and the center: the center puts itself here when it starts.
+ */
+object SosNotificationActions {
+    /** The identifier of the button "alarm confirmed", and of the answers; see [reply]. */
+    const val SEEN = "seen"
+    const val COMING = "coming"
+    const val CALLING_HELP = "calling_help"
+
+    var current: SosAlarmCenter? = null
+
+    /** True while an alarm of a received SOS is showing, so its notification may carry the answer buttons. */
+    fun alarmShowing(): Boolean = current?.alert?.value != null
+
+    /** Does what the button named [action] stands for: confirms the alarm and sends the answer, if any. */
+    fun reply(action: String) {
+        val center = current ?: return
+        when (action) {
+            COMING -> center.reply(SosReply.COMING)
+            CALLING_HELP -> center.reply(SosReply.CALLING_HELP)
+            else -> center.acknowledge()
+        }
+    }
+}
+
+/** The last answer of each node in [this] (the list is newest first), for marking them on the map. */
+fun List<SosAckEntry>.latestByNode(): Map<Int, SosAck> {
+    val latest = LinkedHashMap<Int, SosAck>()
+    for (entry in this) latest.putIfAbsent(entry.nodeNum, entry.ack)
+    return latest
+}
+
 /** Holder of the platform's [SosAlarmSound]; null where the platform's notification rings by itself. */
 object SosAlarmSounds {
     var current: SosAlarmSound? = null

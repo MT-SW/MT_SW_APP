@@ -223,6 +223,9 @@ fun NodeLayers(
     // Under the chips, so a pulse reads as a halo around the node rather than covering it.
     NodePulseLayer(nodes = nodes, unclustered = unclustered)
 
+    // The rings of the nodes that answered our SOS, also under the chips.
+    SosAnswerLayer(unclustered = unclustered)
+
     // Under the chips, and normally invisible behind them: a chip is 64x28dp and covers this entirely. It exists for
     // the node whose chip image did not fit under NodeChipLayer's ceiling — without it such a node resolves to a
     // transparent sprite and is both unseeable and untappable, which is worse than the plain dot chips replaced.

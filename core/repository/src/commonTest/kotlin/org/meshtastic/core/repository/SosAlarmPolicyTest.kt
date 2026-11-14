@@ -228,4 +228,15 @@ Pomocy", SosTargets.nodeKey(42) to "Do Oleka")
         assertTrue(lines[1].contains("\"Ala \"\"A\"\"\""))
         assertTrue(lines[1].endsWith("\"coming\""))
     }
+
+    @Test
+    fun latestAnswerOfEachNodeWins() {
+        val entries =
+            listOf(
+                SosAckEntry(3L, 5, "Ala", SosAck.CALLING_HELP),
+                SosAckEntry(2L, 6, "Olek", SosAck.SEEN),
+                SosAckEntry(1L, 5, "Ala", SosAck.SEEN),
+            )
+        assertEquals(mapOf(5 to SosAck.CALLING_HELP, 6 to SosAck.SEEN), entries.latestByNode())
+    }
 }

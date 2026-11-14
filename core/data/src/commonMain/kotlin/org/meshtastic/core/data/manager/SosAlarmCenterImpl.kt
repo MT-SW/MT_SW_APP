@@ -38,6 +38,7 @@ import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlarmPolicy
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlarmSounds
+import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosHistory
 import org.meshtastic.core.repository.SosHistoryEntry
@@ -78,6 +79,11 @@ class SosAlarmCenterImpl(
     /** When each node's last SOS came (for the "second SOS" option); kept in memory only. */
     private val lastSeen = mutableMapOf<Int, Long>()
     override val alert: StateFlow<SosAlert?> = mutableAlert.asStateFlow()
+
+    init {
+        // The buttons of the alarm notification (iPhone and iPad) reach this class through here.
+        SosNotificationActions.current = this
+    }
 
     override fun raise(alert: SosAlert) {
         val shown = alert.copy(text = SosMarker.clean(alert.text))
@@ -143,7 +149,14 @@ class SosAlarmCenterImpl(
                         SosAck.CALLING_HELP -> Res.string.sos_ack_help
                     },
                 )
-            runCatching { notifications.showAlertNotification(directKey(fromNodeNum), senderName, text) }
+            // Someone calling for help gets the bell sound of the alarm; the other answers a quiet alert.
+            runCatching {
+                if (ack == SosAck.CALLING_HELP) {
+                    notifications.showSosAlarmNotification(directKey(fromNodeNum), senderName, text, SosAlarmStyle.BELL)
+                } else {
+                    notifications.showAlertNotification(directKey(fromNodeNum), senderName, text)
+                }
+            }
         }
     }
 

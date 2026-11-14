@@ -24,6 +24,12 @@ import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.SosNotificationActions
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.sos_alarm_confirm
+import org.meshtastic.core.resources.sos_reply_button_calling_help
+import org.meshtastic.core.resources.sos_reply_button_coming
 import org.meshtastic.ios.handleIosDeepLink
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
@@ -35,6 +41,10 @@ import platform.UserNotifications.UNAuthorizationOptionBadge
 import platform.UserNotifications.UNAuthorizationOptionSound
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotification
+import platform.UserNotifications.UNNotificationAction
+import platform.UserNotifications.UNNotificationActionOptionNone
+import platform.UserNotifications.UNNotificationCategory
+import platform.UserNotifications.UNNotificationCategoryOptionNone
 import platform.UserNotifications.UNNotificationPresentationOptionBanner
 import platform.UserNotifications.UNNotificationPresentationOptionList
 import platform.UserNotifications.UNNotificationPresentationOptionSound
@@ -49,6 +59,10 @@ import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
 private const val USER_INFO_DEEP_LINK = "deepLink"
+
+/** The category of the SOS alarm: its buttons confirm the alarm and answer the sender without opening the app. */
+private const val SOS_CATEGORY = "mtsw_sos_alarm"
+private const val SOS_ACTION_PREFIX = "mtsw_sos_"
 
 /** The most notifications one alarm posts (the system keeps at most 64 waiting). */
 private const val MAX_REPEATS = 60
@@ -89,6 +103,13 @@ private class ForegroundBanner :
         didReceiveNotificationResponse: UNNotificationResponse,
         withCompletionHandler: () -> Unit,
     ) {
+        val action = didReceiveNotificationResponse.actionIdentifier
+        if (action.startsWith(SOS_ACTION_PREFIX)) {
+            // A button of the SOS alarm: confirm it and send the answer; the app is not opened.
+            SosNotificationActions.reply(action.removePrefix(SOS_ACTION_PREFIX))
+            withCompletionHandler()
+            return
+        }
         val link = didReceiveNotificationResponse.notification.request.content.userInfo[USER_INFO_DEEP_LINK] as? String
         if (link != null) handleIosDeepLink(link)
         withCompletionHandler()
@@ -103,6 +124,7 @@ class IosNotificationManager(
 ) : NotificationManager {
     private val center = UNUserNotificationCenter.currentNotificationCenter()
     private val delegate = ForegroundBanner()
+    private var sosCategoryRegistered = false
 
     init {
         // On iPhone the process lifecycle is always "resumed" (the app keeps its Bluetooth link), so it cannot tell a
@@ -116,6 +138,33 @@ class IosNotificationManager(
         ) { granted, error ->
             Logger.i { "Notification permission: granted=$granted error=${error?.localizedDescription}" }
         }
+    }
+
+    /** The buttons of the SOS alarm (confirm, "I am coming", "calling for help"); registered once, with their texts. */
+    private suspend fun registerSosCategory() {
+        if (sosCategoryRegistered) return
+        sosCategoryRegistered = true
+        val actions =
+            listOf(
+                SosNotificationActions.SEEN to getStringSuspend(Res.string.sos_alarm_confirm),
+                SosNotificationActions.COMING to getStringSuspend(Res.string.sos_reply_button_coming),
+                SosNotificationActions.CALLING_HELP to getStringSuspend(Res.string.sos_reply_button_calling_help),
+            )
+                .map { (id, title) ->
+                    UNNotificationAction.actionWithIdentifier(
+                        identifier = SOS_ACTION_PREFIX + id,
+                        title = title,
+                        options = UNNotificationActionOptionNone,
+                    )
+                }
+        val category =
+            UNNotificationCategory.categoryWithIdentifier(
+                identifier = SOS_CATEGORY,
+                actions = actions,
+                intentIdentifiers = emptyList<String>(),
+                options = UNNotificationCategoryOptionNone,
+            )
+        center.setNotificationCategories(setOf(category))
     }
 
     private fun observe(name: String?, block: () -> Unit) {
@@ -145,11 +194,15 @@ class IosNotificationManager(
         // An alarm (the SOS) is shown whatever the switch of its category says.
         val enabled = notification.alarm || categoryEnabled
         if (!enabled) return false
+        // The buttons answer an SOS we received; the notice that someone called for help has nothing to answer.
+        val sosButtons = notification.alarm && SosNotificationActions.alarmShowing()
+        if (sosButtons) registerSosCategory()
         val content =
             UNMutableNotificationContent().apply {
                 setTitle(notification.title)
                 setBody(notification.message)
                 notification.deepLink?.let { setUserInfo(mapOf<Any?, Any?>(USER_INFO_DEEP_LINK to it)) }
+                if (sosButtons) setCategoryIdentifier(SOS_CATEGORY)
                 // Notifications of one conversation (or kind) are stacked together in the list.
                 notification.id?.let { setThreadIdentifier(it.toString()) }
                 // A quiet notification (app open on another screen) gets a sound only if the user switched that on.

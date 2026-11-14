@@ -88,6 +88,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
 import org.meshtastic.core.repository.SosAlarmStyle
+import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
@@ -147,7 +148,10 @@ import org.meshtastic.core.resources.no_local_stats
 import org.meshtastic.core.resources.notification_reaction_to
 import org.meshtastic.core.resources.powered
 import org.meshtastic.core.resources.reply
+import org.meshtastic.core.resources.sos_alarm_confirm
 import org.meshtastic.core.resources.sos_alarm_notification_title
+import org.meshtastic.core.resources.sos_reply_button_calling_help
+import org.meshtastic.core.resources.sos_reply_button_coming
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.you
 import org.meshtastic.core.service.stats.MeshStatsLines
@@ -223,6 +227,7 @@ class MeshNotificationManagerImpl(
         private const val TAG_ALERT = "alert"
         private const val TAG_SOS_ALARM = "sos_alarm"
         private const val SOS_ALARM_ID = 3
+        private const val SOS_ACTION_CODE_SCALE = 1000
         private const val TAG_NEW_NODE = "new_node"
         private const val TAG_NODE_SILENCE = "node_silence"
         private const val TAG_LOW_BATTERY = "low_battery"
@@ -805,7 +810,7 @@ class MeshNotificationManagerImpl(
         val open = createOpenMessageIntent(contactKey)
         val spec =
             if (style == SosAlarmStyle.BELL) NotificationChannelSpec.SosAlarmBell else NotificationChannelSpec.SosAlarm
-        val notification =
+        val builder =
             commonBuilder(spec, open)
                 .setCategory(Notification.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -814,9 +819,46 @@ class MeshNotificationManagerImpl(
                 .setContentText(text)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setFullScreenIntent(open, true)
-                .build()
+        // The buttons answer an SOS we received; the notice that someone called for help has nothing to answer.
+        if (SosNotificationActions.alarmShowing()) {
+            builder
+                .addAction(sosReplyAction(contactKey, SosNotificationActions.SEEN, Res.string.sos_alarm_confirm))
+                .addAction(
+                    sosReplyAction(contactKey, SosNotificationActions.COMING, Res.string.sos_reply_button_coming),
+                )
+                .addAction(
+                    sosReplyAction(
+                        contactKey,
+                        SosNotificationActions.CALLING_HELP,
+                        Res.string.sos_reply_button_calling_help,
+                    ),
+                )
+        }
+        val notification = builder.build()
         notification.flags = notification.flags or Notification.FLAG_INSISTENT
         notificationManager.notify(TAG_SOS_ALARM, SOS_ALARM_ID, notification)
+    }
+
+    /** A button of the SOS alarm that confirms it (and answers the sender) without opening the app. */
+    private suspend fun sosReplyAction(
+        contactKey: String,
+        reply: String,
+        label: StringResource,
+    ): NotificationCompat.Action {
+        val intent =
+            conversationActionIntent(ConversationActionService.ACTION_SOS_REPLY, contactKey)
+                .putExtra(ConversationActionService.EXTRA_SOS_REPLY, reply)
+        // One request code for each button: the intents differ only in an extra, which does not tell them apart.
+        val pendingIntent =
+            PendingIntent.getService(
+                context,
+                SOS_ALARM_ID * SOS_ACTION_CODE_SCALE + reply.hashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        return NotificationCompat.Action.Builder(0, getStringSuspend(label), pendingIntent)
+            .setShowsUserInterface(false)
+            .build()
     }
 
     override fun cancelSosAlarmNotification() = notificationManager.cancel(TAG_SOS_ALARM, SOS_ALARM_ID)

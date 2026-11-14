@@ -50,6 +50,17 @@ internal object MapColors {
     val DiscoveryMesh: Color
         get() = DiscoveryMeshBase.monoSafe()
 
+    /** The rings of the answers to our SOS: calling for help, coming, only saw it. */
+    private val SosHelpBase = Color(0xFFD32F2F)
+    val SosHelp: Color
+        get() = SosHelpBase.monoSafe()
+    private val SosComingBase = Color(0xFF388E3C)
+    val SosComing: Color
+        get() = SosComingBase.monoSafe()
+    private val SosSeenBase = Color(0xFF757575)
+    val SosSeen: Color
+        get() = SosSeenBase.monoSafe()
+
     /** The scanner itself. */
     private val DiscoveryUserBase = Color(0xFFFF9800)
     val DiscoveryUser: Color
