@@ -25,6 +25,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_update_message
@@ -147,7 +148,12 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
      * sound, so it sounds without a break even when the app is closed. Confirming the alarm (in the app) removes the
      * rest.
      */
-    override suspend fun showSosAlarmNotification(contactKey: String, name: String, text: String) {
+    override suspend fun showSosAlarmNotification(
+        contactKey: String,
+        name: String,
+        text: String,
+        style: SosAlarmStyle,
+    ) {
         notificationManager.dispatch(
             Notification(
                 title = getStringSuspend(Res.string.sos_alarm_notification_title, name),
@@ -156,7 +162,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
                 id = SOS_ALARM_ID,
                 deepLink = openMessageLink(contactKey),
                 alarm = true,
-                soundName = ensureSosSoundFile(),
+                soundName = ensureSosSoundFile(style),
                 repeatTimes = SOS_REPEATS,
                 repeatEverySeconds = SOS_REPEAT_SECONDS,
             ),

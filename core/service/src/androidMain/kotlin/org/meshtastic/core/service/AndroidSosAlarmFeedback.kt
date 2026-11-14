@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.meshtastic.core.repository.SosAlarmSound
+import org.meshtastic.core.repository.SosAlarmStyle
 
 /**
  * What the alarm of a received SOS adds on a phone besides the sound of its notification (which rings again and again
@@ -39,7 +40,7 @@ class AndroidSosAlarmFeedback(context: Context) : SosAlarmSound {
     private var job: Job? = null
 
     @Synchronized
-    override fun start(flash: Boolean) {
+    override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (!flash || job?.isActive == true) return
         val manager = cameras ?: return
         val id =

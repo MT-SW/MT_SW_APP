@@ -32,6 +32,7 @@ import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlarmPolicy
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlarmSounds
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosHistory
@@ -62,6 +63,9 @@ class SosAlarmCenterImpl(
     private val scope: ServiceScope,
 ) : SosAlarmCenter {
     private val mutableAlert = MutableStateFlow<SosAlert?>(null)
+
+    /** The sound that is going now (null when none); a silent alarm leaves it null. */
+    private var sounding: SosAlarmStyle? = null
     override val alert: StateFlow<SosAlert?> = mutableAlert.asStateFlow()
 
     override fun raise(alert: SosAlert) {
@@ -75,6 +79,7 @@ class SosAlarmCenterImpl(
                 onlyChosen = prefs.alarmOnlyChosen.value,
                 chosen = prefs.alarmNodes.value,
                 quiet = prefs.quietHours.value,
+                quietExceptions = prefs.quietExceptions.value,
                 minuteOfDay = minuteOfDay(),
             )
         if (!shown.test) record(shown, rings)
@@ -82,11 +87,21 @@ class SosAlarmCenterImpl(
             Logger.i { "SOS alarm: kept quiet (settings) for ${shown.senderName}" }
             return
         }
-        val wasRinging = mutableAlert.value != null
+        val style =
+            shown.style ?: SosAlarmPolicy.styleFor(shown.fromNodeNum, prefs.alarmNodes.value, prefs.alarmStyles.value)
         mutableAlert.value = shown
-        Logger.i { "SOS alarm: raised from ${shown.senderName} test=${shown.test}" }
-        if (!wasRinging) runCatching { SosAlarmSounds.current?.start(prefs.alarmFlash.value) }
-        scope.launch { notifications.showSosAlarmNotification(shown.contactKey, shown.senderName, shown.text) }
+        Logger.i { "SOS alarm: raised from ${shown.senderName} test=${shown.test} style=$style" }
+        // A silent alarm is only the window; the ordinary message notification stays. A louder sound replaces a
+        // gentler one that is already going (a siren is never replaced by a bell).
+        val louder =
+            style != SosAlarmStyle.SILENT &&
+                (sounding == null || (sounding == SosAlarmStyle.BELL && style == SosAlarmStyle.SIREN))
+        if (!louder) return
+        if (sounding != null) runCatching { SosAlarmSounds.current?.stop() }
+        sounding = style
+        val flash = prefs.alarmFlash.value && style == SosAlarmStyle.SIREN
+        runCatching { SosAlarmSounds.current?.start(flash, style) }
+        scope.launch { notifications.showSosAlarmNotification(shown.contactKey, shown.senderName, shown.text, style) }
     }
 
     /** Local time of day, in minutes since midnight. */
@@ -133,6 +148,7 @@ class SosAlarmCenterImpl(
     private fun stop(): SosAlert? {
         val ringing = mutableAlert.value ?: return null
         mutableAlert.value = null
+        sounding = null
         runCatching { SosAlarmSounds.current?.stop() }
         notifications.cancelSosAlarmNotification()
         Logger.i { "SOS alarm: confirmed" }

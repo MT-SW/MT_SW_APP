@@ -18,13 +18,16 @@ package org.meshtastic.core.repository
 
 import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.NodeAddress
+import kotlin.time.Instant
 
 /**
  * The settings of the SOS mode. The message goes to every channel in [channels] (as a broadcast on it) and as a direct
  * message to every node in [nodes], whether or not that node takes messages: a node that is marked as not monitored is
  * no exception. [message] empty means the default text; [repeatMinutes] 0 means send once, otherwise the message is
- * sent again every [repeatMinutes] minutes, up to [repeatCount] times in all, and (when [stopWhenDelivered]) not any
- * more once every send was confirmed. [holdSeconds] is how long the button has to be held (0 = a single tap sends).
+ * sent again every [repeatMinutes] minutes, up to [repeatCount] times in all ([UNLIMITED_REPEATS] = without a limit,
+ * until a send is confirmed or the person stops it), and (when [stopWhenDelivered]) not any more once every send was
+ * confirmed. [holdSeconds] is how long the button has to be held (0 = a single tap sends).
  */
 data class SosConfig(
     val channels: List<Int> = listOf(0),
@@ -58,6 +61,9 @@ data class SosConfig(
 
     companion object {
         const val DEFAULT_REPEAT_COUNT = 3
+
+        /** The value of [repeatCount] that means: send again and again, with no limit on the number of sends. */
+        const val UNLIMITED_REPEATS = 0
         const val DEFAULT_HOLD_SECONDS = 2
 
         /** The shortest hold of the bar button, so it never fires by accident; a shorter setting is raised to it. */
@@ -87,7 +93,7 @@ data class SosConfig(
                 nodes = nodes,
                 includePosition = numbers[0] != 0,
                 repeatMinutes = numbers[1].coerceAtLeast(0),
-                repeatCount = numbers[2].coerceAtLeast(1),
+                repeatCount = numbers[2].coerceAtLeast(UNLIMITED_REPEATS),
                 stopWhenDelivered = numbers[3] != 0,
                 holdSeconds = numbers[4].coerceIn(0, MAX_HOLD_SECONDS),
                 message = parts[FIELDS - 1],
@@ -173,10 +179,52 @@ interface SosPrefs {
 
     fun setAlarmOnlyChosen(on: Boolean)
 
-    /** The quiet hours: in them only an SOS from [alarmNodes] still rings. */
+    /** The quiet hours: in them only an SOS from [quietExceptions] still rings. */
     val quietHours: StateFlow<SosQuietHours>
 
     fun setQuietHours(hours: SosQuietHours)
+
+    /** The nodes whose SOS rings the full alarm even in the quiet hours; a list of its own. */
+    val quietExceptions: StateFlow<Set<Int>>
+
+    fun setQuietExceptions(nodes: Set<Int>)
+
+    /** The sound of the alarm for the nodes in [alarmNodes] that do not use the siren; nodes not here use the siren. */
+    val alarmStyles: StateFlow<Map<Int, SosAlarmStyle>>
+
+    fun setAlarmStyles(styles: Map<Int, SosAlarmStyle>)
+}
+
+/** How the alarm of a received SOS sounds. */
+enum class SosAlarmStyle {
+    /** The loud siren, the strong vibration and the flashing torch. */
+    SIREN,
+
+    /** A gentler bell in a loop and the vibration, no torch. */
+    BELL,
+
+    /** Only the window on the screen: no sound, no vibration, no torch (the ordinary message notification stays). */
+    SILENT,
+    ;
+
+    companion object {
+        /** Reads a style by its name; anything unknown gives the siren. */
+        fun parse(name: String?): SosAlarmStyle = entries.firstOrNull { it.name == name } ?: SIREN
+
+        /** Writes the styles as `number:STYLE` pairs joined by commas; the siren is the default and is left out. */
+        fun encodeMap(styles: Map<Int, SosAlarmStyle>): String =
+            styles.filterValues { it != SIREN }.entries.joinToString(",") { "${it.key}:${it.value.name}" }
+
+        /** Reads what [encodeMap] wrote; unreadable pairs are skipped. */
+        fun decodeMap(text: String?): Map<Int, SosAlarmStyle> = text.orEmpty()
+            .split(',')
+            .mapNotNull { pair ->
+                val parts = pair.split(':')
+                val num = parts.getOrNull(0)?.trim()?.toIntOrNull()
+                if (parts.size != 2 || num == null) null else num to parse(parts[1].trim())
+            }
+            .toMap()
+    }
 }
 
 /**
@@ -220,8 +268,9 @@ data class SosQuietHours(
 /** Decides whether an SOS that arrived rings the full alarm. Pure, so it is easy to test. */
 object SosAlarmPolicy {
     /**
-     * True when the alarm rings. A test always does; otherwise the main switch [receive] must be on, and (when
-     * [onlyChosen] is on, or the time [minuteOfDay] is in the [quiet] hours) the sender must be one of [chosen].
+     * True when the alarm rings. A test always does; otherwise the main switch [receive] must be on, when [onlyChosen]
+     * is on the sender must be one of [chosen], and in the [quiet] hours (at [minuteOfDay]) the sender must be one of
+     * [quietExceptions].
      */
     @Suppress("LongParameterList")
     fun rings(
@@ -231,15 +280,19 @@ object SosAlarmPolicy {
         onlyChosen: Boolean,
         chosen: Set<Int>,
         quiet: SosQuietHours,
+        quietExceptions: Set<Int>,
         minuteOfDay: Int,
     ): Boolean {
         if (test) return true
         if (!receive) return false
-        val listed = senderNum != null && senderNum in chosen
-        if (onlyChosen && !listed) return false
-        if (quiet.contains(minuteOfDay) && !listed) return false
+        if (onlyChosen && (senderNum == null || senderNum !in chosen)) return false
+        if (quiet.contains(minuteOfDay) && (senderNum == null || senderNum !in quietExceptions)) return false
         return true
     }
+
+    /** The sound for an SOS from [senderNum]: the one set for a node in [chosen], else the siren. */
+    fun styleFor(senderNum: Int?, chosen: Set<Int>, styles: Map<Int, SosAlarmStyle>): SosAlarmStyle =
+        if (senderNum != null && senderNum in chosen) styles[senderNum] ?: SosAlarmStyle.SIREN else SosAlarmStyle.SIREN
 }
 
 /** One SOS that was received: when, from whom, what it said and where the sender last was. */
@@ -348,6 +401,8 @@ data class SosAlert(
     val test: Boolean = false,
     /** The node that sent it, when it is known: replies and the map go there. */
     val fromNodeNum: Int? = null,
+    /** The sound to use; null lets the settings decide by the sender (a test of a sound sets it). */
+    val style: SosAlarmStyle? = null,
 )
 
 /** The ready answers of the alarm window; each is sent to the sender as a direct message. */
@@ -385,8 +440,11 @@ interface SosAlarmCenter {
  * notification, which rings again and again by itself.
  */
 interface SosAlarmSound {
-    /** Starts the alarm; [flash] says whether the torch should flash too (where the device has one). */
-    fun start(flash: Boolean)
+    /**
+     * Starts the alarm in [style]; [flash] says whether the torch should flash too (where the device has one). A
+     * silent alarm is never started here.
+     */
+    fun start(flash: Boolean, style: SosAlarmStyle = SosAlarmStyle.SIREN)
 
     fun stop()
 }
@@ -421,4 +479,25 @@ interface SosController {
 
     /** Stops a run in progress. */
     fun cancel()
+}
+
+/** The history as a text a spreadsheet opens: one line per SOS, a header first. */
+object SosHistoryExport {
+    private const val BOM = "\uFEFF"
+    private const val HEADER = "time_utc,sender,sender_node,text,latitude,longitude,alarm"
+
+    fun csv(entries: List<SosHistoryEntry>): String = BOM + HEADER + "\n" + entries.joinToString("") { e ->
+        listOf(
+            Instant.fromEpochMilliseconds(e.time).toString(),
+            e.senderName,
+            e.senderNum?.let { NodeAddress.numToDefaultId(it) }.orEmpty(),
+            e.text,
+            e.latitude?.toString().orEmpty(),
+            e.longitude?.toString().orEmpty(),
+            if (e.alarmed) "yes" else "no",
+        )
+            .joinToString(",") { quote(it) } + "\n"
+    }
+
+    private fun quote(field: String): String = "\"" + field.replace("\"", "\"\"") + "\""
 }

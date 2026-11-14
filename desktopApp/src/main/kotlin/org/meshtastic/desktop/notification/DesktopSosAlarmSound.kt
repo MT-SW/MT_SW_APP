@@ -18,6 +18,7 @@ package org.meshtastic.desktop.notification
 
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.repository.SosAlarmSound
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosSiren
 import java.io.ByteArrayInputStream
 import javax.sound.sampled.AudioFormat
@@ -26,17 +27,19 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 
 /**
- * The alarm sound of a received SOS on a computer: the shared siren played in a loop until [stop]. The notification of
+ * The alarm sound of a received SOS on a computer: the shared siren (or, for a node set to the bell, the bell) played
+ * in a loop until [stop]. The notification of
  * the system cannot ring again and again, so the app does it. A computer has no torch, so [start] ignores the flash.
  */
 internal class DesktopSosAlarmSound : SosAlarmSound {
     private var clip: Clip? = null
 
     @Synchronized
-    override fun start(flash: Boolean) {
+    override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (clip != null) return
         runCatching {
-            val data = SosSiren.pcm(SIREN_SECONDS)
+            val data =
+                if (style == SosAlarmStyle.BELL) SosSiren.bellPcm(BELL_SECONDS) else SosSiren.pcm(SIREN_SECONDS)
             val format = AudioFormat(SosSiren.SAMPLE_RATE.toFloat(), SAMPLE_BITS, 1, true, false)
             val stream = AudioInputStream(ByteArrayInputStream(data), format, (data.size / BYTES_PER_SAMPLE).toLong())
             val newClip = AudioSystem.getClip()
@@ -60,5 +63,6 @@ internal class DesktopSosAlarmSound : SosAlarmSound {
         const val SAMPLE_BITS = 16
         const val BYTES_PER_SAMPLE = 2
         const val SIREN_SECONDS = 1.4
+        const val BELL_SECONDS = 2.0
     }
 }

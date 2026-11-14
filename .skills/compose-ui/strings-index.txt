@@ -3281,6 +3281,8 @@ soil_temperature
 soil_water_metrics
 solar_irradiance
 ### SOS ###
+sos_alarm_bell_notifications
+sos_alarm_bell_notifications_description
 sos_alarm_confirm
 sos_alarm_flash_switch
 sos_alarm_from
@@ -3317,6 +3319,7 @@ sos_confirm_switch
 sos_default_message
 sos_history_clear
 sos_history_empty
+sos_history_export
 sos_history_no_position
 sos_history_note
 sos_history_quiet
@@ -3339,6 +3342,7 @@ sos_open
 sos_position_attached
 sos_position_missing
 sos_quiet_from
+sos_quiet_nodes_title
 sos_quiet_note
 sos_quiet_switch
 sos_quiet_to
@@ -3347,6 +3351,8 @@ sos_receive_switch
 sos_repeat_count
 sos_repeat_every
 sos_repeat_once
+sos_repeat_unlimited
+sos_repeat_unlimited_note
 sos_reply_button_calling_help
 sos_reply_button_coming
 sos_reply_calling_help
@@ -3369,7 +3375,13 @@ sos_status_enroute
 sos_status_error
 sos_status_queued
 sos_status_sending
+sos_status_sending_unlimited
 sos_stop_when_delivered
+sos_style_bell
+sos_style_note
+sos_style_silent
+sos_style_siren
+sos_style_title
 sos_summary
 sos_title
 speed

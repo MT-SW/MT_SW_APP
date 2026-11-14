@@ -54,6 +54,8 @@ import org.meshtastic.core.resources.meshtastic_waypoints_notifications_descript
 import org.meshtastic.core.resources.messages
 import org.meshtastic.core.resources.node_silence_notifications
 import org.meshtastic.core.resources.node_silence_notifications_description
+import org.meshtastic.core.resources.sos_alarm_bell_notifications
+import org.meshtastic.core.resources.sos_alarm_bell_notifications_description
 import org.meshtastic.core.resources.sos_alarm_notifications
 import org.meshtastic.core.resources.sos_alarm_notifications_description
 import org.meshtastic.core.resources.notification_group_mesh
@@ -120,6 +122,13 @@ internal enum class NotificationChannelSpec(
         NotificationChannels.SOS_ALARM,
         Res.string.sos_alarm_notifications,
         Res.string.sos_alarm_notifications_description,
+        NotificationChannelGroupSpec.Messages,
+        NotificationManager.IMPORTANCE_HIGH,
+    ),
+    SosAlarmBell(
+        NotificationChannels.SOS_ALARM_BELL,
+        Res.string.sos_alarm_bell_notifications,
+        Res.string.sos_alarm_bell_notifications_description,
         NotificationChannelGroupSpec.Messages,
         NotificationManager.IMPORTANCE_HIGH,
     ),
@@ -202,6 +211,15 @@ internal enum class NotificationChannelSpec(
                     channel.vibrationPattern = SOS_VIBRATION
                     channel.setBypassDnd(true)
                     channel.setSound(alarmSound, soundAttributes(AudioAttributes.USAGE_ALARM))
+                }
+
+                // The gentler alarm: the ordinary notification sound (rung again and again by the insistent flag) and
+                // the strong vibration, without breaking through Do Not Disturb.
+                SosAlarmBell -> {
+                    channel.enableLights(true)
+                    channel.enableVibration(true)
+                    channel.vibrationPattern = SOS_VIBRATION
+                    channel.setSound(defaultSound, soundAttributes(AudioAttributes.USAGE_NOTIFICATION))
                 }
 
                 LowBatteryRemote -> {

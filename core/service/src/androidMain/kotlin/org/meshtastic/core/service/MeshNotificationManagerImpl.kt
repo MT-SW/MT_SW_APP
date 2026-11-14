@@ -87,6 +87,7 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
@@ -793,12 +794,19 @@ class MeshNotificationManagerImpl(
      * The alarm of a received SOS: the alarm channel, rings again and again until it is cancelled (the insistent flag),
      * opens over the lock screen (full-screen intent) and leads to the conversation it came in.
      */
-    override suspend fun showSosAlarmNotification(contactKey: String, name: String, text: String) {
+    override suspend fun showSosAlarmNotification(
+        contactKey: String,
+        name: String,
+        text: String,
+        style: SosAlarmStyle,
+    ) {
         ensureChannels()
         val title = getStringSuspend(Res.string.sos_alarm_notification_title, name)
         val open = createOpenMessageIntent(contactKey)
+        val spec =
+            if (style == SosAlarmStyle.BELL) NotificationChannelSpec.SosAlarmBell else NotificationChannelSpec.SosAlarm
         val notification =
-            commonBuilder(NotificationChannelSpec.SosAlarm, open)
+            commonBuilder(spec, open)
                 .setCategory(Notification.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(false)

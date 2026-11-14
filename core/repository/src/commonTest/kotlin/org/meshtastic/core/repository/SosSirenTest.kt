@@ -37,4 +37,14 @@ class SosSirenTest {
         assertEquals("data", wav.copyOfRange(36, 40).decodeToString())
         assertEquals(SosSiren.pcm(1.4).size + 44, wav.size)
     }
+
+    @Test
+    fun bellHasWholeCyclesAndEndsInSilence() {
+        val bell = SosSiren.bellPcm(2.0)
+        assertEquals(88_200 * 2, bell.size)
+        assertTrue(bell.any { it.toInt() != 0 })
+        // The last tenth of a second is a pause, so a loop has no click.
+        assertTrue(bell.copyOfRange(bell.size - 8_820, bell.size).all { it.toInt() == 0 })
+        assertEquals(bell.size + 44, SosSiren.bellWav(2.0).size)
+    }
 }

@@ -77,12 +77,14 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosHistory
 import org.meshtastic.core.repository.SosHistoryEntry
+import org.meshtastic.core.repository.SosHistoryExport
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosQuietHours
 import org.meshtastic.core.repository.SosState
@@ -116,6 +118,7 @@ import org.meshtastic.core.resources.sos_channel_n
 import org.meshtastic.core.resources.sos_confirm_switch
 import org.meshtastic.core.resources.sos_history_clear
 import org.meshtastic.core.resources.sos_history_empty
+import org.meshtastic.core.resources.sos_history_export
 import org.meshtastic.core.resources.sos_history_no_position
 import org.meshtastic.core.resources.sos_history_note
 import org.meshtastic.core.resources.sos_history_quiet
@@ -137,6 +140,7 @@ import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.sos_position_attached
 import org.meshtastic.core.resources.sos_position_missing
 import org.meshtastic.core.resources.sos_quiet_from
+import org.meshtastic.core.resources.sos_quiet_nodes_title
 import org.meshtastic.core.resources.sos_quiet_note
 import org.meshtastic.core.resources.sos_quiet_switch
 import org.meshtastic.core.resources.sos_quiet_to
@@ -145,6 +149,8 @@ import org.meshtastic.core.resources.sos_receive_switch
 import org.meshtastic.core.resources.sos_repeat_count
 import org.meshtastic.core.resources.sos_repeat_every
 import org.meshtastic.core.resources.sos_repeat_once
+import org.meshtastic.core.resources.sos_repeat_unlimited
+import org.meshtastic.core.resources.sos_repeat_unlimited_note
 import org.meshtastic.core.resources.sos_resend
 import org.meshtastic.core.resources.sos_result_delivered
 import org.meshtastic.core.resources.sos_result_refused
@@ -162,12 +168,19 @@ import org.meshtastic.core.resources.sos_status_enroute
 import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
+import org.meshtastic.core.resources.sos_status_sending_unlimited
 import org.meshtastic.core.resources.sos_stop_when_delivered
+import org.meshtastic.core.resources.sos_style_bell
+import org.meshtastic.core.resources.sos_style_note
+import org.meshtastic.core.resources.sos_style_silent
+import org.meshtastic.core.resources.sos_style_siren
+import org.meshtastic.core.resources.sos_style_title
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.util.rememberFileExporter
 import org.meshtastic.feature.settings.component.ExpressiveSection
 
 private val REPEAT_MINUTES = listOf(0, 1, 2, 5, 10, 15, 30)
@@ -197,13 +210,34 @@ fun SosScreen(onBack: () -> Unit) {
     val myInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
     var pickingNodes by remember { mutableStateOf(false) }
     var pickingAlarmNodes by remember { mutableStateOf(false) }
+    var pickingQuietNodes by remember { mutableStateOf(false) }
     val alarmNodes by prefs.alarmNodes.collectAsStateWithLifecycle()
+    val alarmStyles by prefs.alarmStyles.collectAsStateWithLifecycle()
+    val quietExceptions by prefs.quietExceptions.collectAsStateWithLifecycle()
+
+    if (pickingQuietNodes) {
+        SosNodePicker(
+            nodes = nodeDb.values.filter { it.num != myInfo?.myNodeNum },
+            selected = quietExceptions.toList(),
+            onToggle = { num ->
+                prefs.setQuietExceptions(if (num in quietExceptions) quietExceptions - num else quietExceptions + num)
+            },
+            onDismiss = { pickingQuietNodes = false },
+        )
+    }
 
     if (pickingAlarmNodes) {
         SosNodePicker(
             nodes = nodeDb.values.filter { it.num != myInfo?.myNodeNum },
             selected = alarmNodes.toList(),
-            onToggle = { num -> prefs.setAlarmNodes(if (num in alarmNodes) alarmNodes - num else alarmNodes + num) },
+            onToggle = { num ->
+                if (num in alarmNodes) {
+                    prefs.setAlarmNodes(alarmNodes - num)
+                    prefs.setAlarmStyles(alarmStyles - num)
+                } else {
+                    prefs.setAlarmNodes(alarmNodes + num)
+                }
+            },
             onDismiss = { pickingAlarmNodes = false },
         )
     }
@@ -385,6 +419,18 @@ fun SosScreen(onBack: () -> Unit) {
                                 label = { Text("$count") },
                             )
                         }
+                        FilterChip(
+                            selected = config.repeatCount == SosConfig.UNLIMITED_REPEATS,
+                            onClick = { prefs.setConfig(config.copy(repeatCount = SosConfig.UNLIMITED_REPEATS)) },
+                            label = { Text(stringResource(Res.string.sos_repeat_unlimited)) },
+                        )
+                    }
+                    if (config.repeatCount == SosConfig.UNLIMITED_REPEATS) {
+                        Text(
+                            text = stringResource(Res.string.sos_repeat_unlimited_note),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
                     }
                     SwitchListItem(
                         checked = config.stopWhenDelivered,
@@ -444,16 +490,38 @@ fun SosScreen(onBack: () -> Unit) {
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 } else {
-                    FlowRow(
+                    Text(
+                        text = stringResource(Res.string.sos_style_title),
+                        style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    )
+                    Text(
+                        text = stringResource(Res.string.sos_style_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         for (num in alarmNodes) {
                             FilterChip(
                                 selected = true,
-                                onClick = { prefs.setAlarmNodes(alarmNodes - num) },
+                                onClick = {
+                                    prefs.setAlarmNodes(alarmNodes - num)
+                                    prefs.setAlarmStyles(alarmStyles - num)
+                                },
                                 label = { Text(sosNodeName(nodeDb[num], num) + "  ✕") },
                             )
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                for (style in SosAlarmStyle.entries) {
+                                    FilterChip(
+                                        selected = (alarmStyles[num] ?: SosAlarmStyle.SIREN) == style,
+                                        onClick = { prefs.setAlarmStyles(alarmStyles + (num to style)) },
+                                        label = { Text(stringResource(sosStyleLabel(style))) },
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -461,29 +529,53 @@ fun SosScreen(onBack: () -> Unit) {
                     Text(stringResource(Res.string.sos_nodes_add))
                 }
                 val quiet by prefs.quietHours.collectAsStateWithLifecycle()
-                SosQuietHoursEditor(hours = quiet, onChange = { prefs.setQuietHours(it) })
-                Button(
-                    onClick = {
-                        alarmCenter.raise(
-                            SosAlert(
-                                id = nowMillis,
-                                contactKey = ContactKey.broadcast(0).value,
-                                senderName = testSender,
-                                text = testText,
-                                test = true,
-                            ),
-                        )
-                    },
+                SosQuietHoursEditor(
+                    hours = quiet,
+                    onChange = { prefs.setQuietHours(it) },
+                    exceptions = quietExceptions.map { sosNodeName(nodeDb[it], it) to it },
+                    onRemoveException = { prefs.setQuietExceptions(quietExceptions - it) },
+                    onPickExceptions = { pickingQuietNodes = true },
+                )
+                Text(
+                    text = stringResource(Res.string.sos_alarm_test),
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(stringResource(Res.string.sos_alarm_test))
+                    for (style in SosAlarmStyle.entries) {
+                        Button(
+                            onClick = {
+                                alarmCenter.raise(
+                                    SosAlert(
+                                        id = nowMillis,
+                                        contactKey = ContactKey.broadcast(0).value,
+                                        senderName = testSender,
+                                        text = testText,
+                                        test = true,
+                                        style = style,
+                                    ),
+                                )
+                            },
+                        ) {
+                            Text(stringResource(sosStyleLabel(style)))
+                        }
+                    }
                 }
             }
 
             val sosHistory = koinInject<SosHistory>()
             val historyEntries by sosHistory.entries.collectAsStateWithLifecycle()
             ExpressiveSection(title = stringResource(Res.string.sos_section_history)) {
-                SosHistoryList(entries = historyEntries, onClear = { sosHistory.clear() })
+                val exportHistory =
+                    rememberFileExporter(content = { SosHistoryExport.csv(historyEntries).encodeToByteArray() })
+                SosHistoryList(
+                    entries = historyEntries,
+                    onClear = { sosHistory.clear() },
+                    onExport = { exportHistory("sos_history.csv", "text/csv") },
+                )
             }
 
             val barScreens by prefs.barScreens.collectAsStateWithLifecycle()
@@ -553,7 +645,13 @@ fun SosScreen(onBack: () -> Unit) {
 
 /** The quiet hours: a switch and, when it is on, the start and the end, each moved by half an hour with − and +. */
 @Composable
-private fun SosQuietHoursEditor(hours: SosQuietHours, onChange: (SosQuietHours) -> Unit) {
+private fun SosQuietHoursEditor(
+    hours: SosQuietHours,
+    onChange: (SosQuietHours) -> Unit,
+    exceptions: List<Pair<String, Int>>,
+    onRemoveException: (Int) -> Unit,
+    onPickExceptions: () -> Unit,
+) {
     SwitchListItem(
         checked = hours.enabled,
         text = stringResource(Res.string.sos_quiet_switch),
@@ -573,6 +671,27 @@ private fun SosQuietHoursEditor(hours: SosQuietHours, onChange: (SosQuietHours) 
         label = stringResource(Res.string.sos_quiet_to, clockText(hours.toMinutes)),
         onStep = { onChange(hours.copy(toMinutes = stepMinutes(hours.toMinutes, it))) },
     )
+    Text(
+        text = stringResource(Res.string.sos_quiet_nodes_title),
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
+    if (exceptions.isEmpty()) {
+        Text(
+            text = stringResource(Res.string.sos_nodes_none),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+    } else {
+        FlowRow(modifier = Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            for ((name, num) in exceptions) {
+                FilterChip(selected = true, onClick = { onRemoveException(num) }, label = { Text("$name  ✕") })
+            }
+        }
+    }
+    Button(onClick = onPickExceptions, modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(stringResource(Res.string.sos_nodes_add))
+    }
 }
 
 @Composable
@@ -601,7 +720,7 @@ private fun stepMinutes(value: Int, delta: Int): Int =
 
 /** The received SOS, newest first: who, when, what, and shortcuts to the conversation and to the sender on the map. */
 @Composable
-private fun SosHistoryList(entries: List<SosHistoryEntry>, onClear: () -> Unit) {
+private fun SosHistoryList(entries: List<SosHistoryEntry>, onClear: () -> Unit, onExport: () -> Unit) {
     Text(
         text = stringResource(Res.string.sos_history_note),
         style = MaterialTheme.typography.bodySmall,
@@ -657,9 +776,16 @@ private fun SosHistoryList(entries: List<SosHistoryEntry>, onClear: () -> Unit) 
             }
         }
     }
-    TextButton(onClick = onClear, modifier = Modifier.padding(horizontal = 8.dp)) {
-        Text(stringResource(Res.string.sos_history_clear))
+    Row(modifier = Modifier.padding(horizontal = 8.dp)) {
+        TextButton(onClick = onExport) { Text(stringResource(Res.string.sos_history_export)) }
+        TextButton(onClick = onClear) { Text(stringResource(Res.string.sos_history_clear)) }
     }
+}
+
+private fun sosStyleLabel(style: SosAlarmStyle): StringResource = when (style) {
+    SosAlarmStyle.SIREN -> Res.string.sos_style_siren
+    SosAlarmStyle.BELL -> Res.string.sos_style_bell
+    SosAlarmStyle.SILENT -> Res.string.sos_style_silent
 }
 
 private fun sosBarScreenLabel(key: String): StringResource = when (key) {
@@ -804,7 +930,12 @@ private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit, 
 
             state.running -> {
                 Text(
-                    text = stringResource(Res.string.sos_status_sending, state.attempt, state.total),
+                    text =
+                    if (state.total == 0) {
+                        stringResource(Res.string.sos_status_sending_unlimited, state.attempt)
+                    } else {
+                        stringResource(Res.string.sos_status_sending, state.attempt, state.total)
+                    },
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(text = statusText(state.status), style = MaterialTheme.typography.bodyMedium)

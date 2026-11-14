@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
@@ -107,7 +108,29 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_QUIET] = hours.encode() } }
     }
 
+    override val quietExceptions: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs ->
+                prefs[KEY_QUIET_NODES]?.split(',')?.mapNotNull { it.trim().toIntOrNull() }?.toSet().orEmpty()
+            }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setQuietExceptions(nodes: Set<Int>) {
+        scope.launch { dataStore.edit { it[KEY_QUIET_NODES] = nodes.joinToString(",") } }
+    }
+
+    override val alarmStyles: StateFlow<Map<Int, SosAlarmStyle>> =
+        dataStore.data
+            .map { SosAlarmStyle.decodeMap(it[KEY_STYLES]) }
+            .stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
+    override fun setAlarmStyles(styles: Map<Int, SosAlarmStyle>) {
+        scope.launch { dataStore.edit { it[KEY_STYLES] = SosAlarmStyle.encodeMap(styles) } }
+    }
+
     private companion object {
+        val KEY_QUIET_NODES = stringPreferencesKey("sos_quiet_exceptions")
+        val KEY_STYLES = stringPreferencesKey("sos_alarm_styles")
         val KEY_ALARM_NODES = stringPreferencesKey("sos_alarm_nodes")
         val KEY_ONLY_CHOSEN = booleanPreferencesKey("sos_alarm_only_chosen")
         val KEY_QUIET = stringPreferencesKey("sos_quiet_hours")

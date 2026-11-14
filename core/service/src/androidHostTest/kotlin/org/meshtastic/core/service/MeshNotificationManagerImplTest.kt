@@ -168,6 +168,9 @@ class MeshNotificationManagerImplTest {
                     NotificationChannelSpec.SosAlarm ->
                         NotificationManager.IMPORTANCE_HIGH to NotificationChannelGroupSpec.Messages
 
+                    NotificationChannelSpec.SosAlarmBell ->
+                        NotificationManager.IMPORTANCE_HIGH to NotificationChannelGroupSpec.Messages
+
                     NotificationChannelSpec.NewNodes ->
                         NotificationManager.IMPORTANCE_DEFAULT to NotificationChannelGroupSpec.Mesh
 

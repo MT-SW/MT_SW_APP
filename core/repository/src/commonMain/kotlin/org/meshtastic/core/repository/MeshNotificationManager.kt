@@ -70,10 +70,15 @@ interface MeshNotificationManager {
     /**
      * The notification of an SOS from another copy of this app. Android overrides it with an alarm that rings again
      * and again and opens on the lock screen until it is cancelled; elsewhere it is an ordinary alert (the app plays
-     * the looping sound itself, see [SosAlarmSound]).
+     * the looping sound itself, see [SosAlarmSound]). [style] is the sound the person chose for the sender (a silent
+     * alarm never gets here).
      */
-    suspend fun showSosAlarmNotification(contactKey: String, name: String, text: String) =
-        showAlertNotification(contactKey, name, text)
+    suspend fun showSosAlarmNotification(
+        contactKey: String,
+        name: String,
+        text: String,
+        style: SosAlarmStyle = SosAlarmStyle.SIREN,
+    ) = showAlertNotification(contactKey, name, text)
 
     /** Removes the SOS alarm notification, when the person confirmed the alarm. */
     fun cancelSosAlarmNotification() = Unit

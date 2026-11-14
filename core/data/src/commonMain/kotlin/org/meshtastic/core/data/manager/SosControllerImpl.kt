@@ -77,11 +77,16 @@ class SosControllerImpl(
     }
 
     private suspend fun run(config: SosConfig) {
-        val total = if (config.repeatMinutes > 0) config.repeatCount.coerceAtLeast(1) else 1
+        val repeating = config.repeatMinutes > 0
+        val unlimited = repeating && config.repeatCount == SosConfig.UNLIMITED_REPEATS
+        // With no limit the total stays 0 ("sends so far" only); the run ends by a confirmation or by cancel().
+        val total = if (!repeating) 1 else if (unlimited) 0 else config.repeatCount.coerceAtLeast(1)
         mutableState.value = SosState(running = true, total = total)
         var delivered = false
         try {
-            for (attempt in 1..total) {
+            var attempt = 0
+            while (unlimited || attempt < total) {
+                attempt++
                 val position = if (config.includePosition) currentPosition() else null
                 mutableState.update {
                     it.copy(attempt = attempt, status = MessageStatus.QUEUED, withPosition = position != null)
@@ -97,7 +102,7 @@ class SosControllerImpl(
                 }
                 if (waitForDelivery(queued)) delivered = true
                 if (delivered && config.stopWhenDelivered) break
-                if (attempt < total) delay(config.repeatMinutes * MILLIS_PER_MINUTE)
+                if (unlimited || attempt < total) delay(config.repeatMinutes * MILLIS_PER_MINUTE)
             }
         } catch (e: CancellationException) {
             throw e

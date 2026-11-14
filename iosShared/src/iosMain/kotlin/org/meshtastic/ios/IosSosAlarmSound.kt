@@ -29,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.meshtastic.core.repository.SosAlarmSound
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosSiren
 import org.meshtastic.ios.notification.toNSData
 import platform.AVFoundation.AVAudioPlayer
@@ -54,9 +55,9 @@ internal object IosSosAlarmSound : SosAlarmSound {
     private var vibrationJob: Job? = null
     private var torchJob: Job? = null
 
-    override fun start(flash: Boolean) {
+    override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (vibrationJob?.isActive == true) return
-        startSiren()
+        startSiren(style)
         vibrationJob =
             scope.launch {
                 while (isActive) {
@@ -77,12 +78,14 @@ internal object IosSosAlarmSound : SosAlarmSound {
         sirenPlayer = null
     }
 
-    private fun startSiren() {
+    private fun startSiren(style: SosAlarmStyle) {
         runCatching {
             val session = AVAudioSession.sharedInstance()
             session.setCategory(AVAudioSessionCategoryPlayback, error = null)
             session.setActive(true, error = null)
-            val player = AVAudioPlayer(data = SosSiren.wav(SIREN_SECONDS).toNSData(), error = null)
+            val sound =
+                if (style == SosAlarmStyle.BELL) SosSiren.bellWav(BELL_SECONDS) else SosSiren.wav(SIREN_SECONDS)
+            val player = AVAudioPlayer(data = sound.toNSData(), error = null)
             player.numberOfLoops = -1
             player.volume = 1f
             player.prepareToPlay()
@@ -121,4 +124,5 @@ internal object IosSosAlarmSound : SosAlarmSound {
     private const val VIBRATE_MS = 1_500L
     private const val BLINK_MS = 400L
     private const val SIREN_SECONDS = 1.4
+    private const val BELL_SECONDS = 2.0
 }

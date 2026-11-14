@@ -30,9 +30,10 @@ class SosAlarmPolicyTest {
         onlyChosen: Boolean = false,
         chosen: Set<Int> = emptySet(),
         quiet: SosQuietHours = SosQuietHours(),
+        quietExceptions: Set<Int> = emptySet(),
         minute: Int = 12 * 60,
         test: Boolean = false,
-    ) = SosAlarmPolicy.rings(test, receive, sender, onlyChosen, chosen, quiet, minute)
+    ) = SosAlarmPolicy.rings(test, receive, sender, onlyChosen, chosen, quiet, quietExceptions, minute)
 
     @Test
     fun ordinaryAlarmRings() = assertTrue(rings())
@@ -51,11 +52,72 @@ class SosAlarmPolicyTest {
     }
 
     @Test
-    fun quietHoursLetOnlyChosenThrough() {
+    fun quietHoursLetOnlyTheirExceptionsThrough() {
         assertFalse(rings(quiet = night, minute = 23 * 60))
-        assertFalse(rings(quiet = night, minute = 3 * 60, chosen = setOf(2)))
-        assertTrue(rings(sender = 2, quiet = night, minute = 3 * 60, chosen = setOf(2)))
+        assertFalse(rings(sender = 2, quiet = night, minute = 3 * 60, chosen = setOf(2)))
+        assertFalse(rings(sender = null, quiet = night, minute = 3 * 60, quietExceptions = setOf(2)))
+        assertTrue(rings(sender = 2, quiet = night, minute = 3 * 60, quietExceptions = setOf(2)))
         assertTrue(rings(quiet = night, minute = 12 * 60))
+    }
+
+    @Test
+    fun theTwoListsWorkTogether() {
+        // Only chosen is on and the sender is in neither list for the quiet hours: quiet wins.
+        assertFalse(rings(sender = 2, onlyChosen = true, chosen = setOf(2), quiet = night, minute = 3 * 60))
+        assertTrue(
+            rings(
+                sender = 2,
+                onlyChosen = true,
+                chosen = setOf(2),
+                quiet = night,
+                quietExceptions = setOf(2),
+                minute = 3 * 60,
+            ),
+        )
+        // In the quiet exceptions but not in the chosen list while only chosen is on: that rule still holds.
+        assertFalse(rings(sender = 3, onlyChosen = true, chosen = setOf(2), quietExceptions = setOf(3)))
+    }
+
+    @Test
+    fun styleIsTakenFromTheListOnly() {
+        val styles = mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT)
+        assertEquals(SosAlarmStyle.BELL, SosAlarmPolicy.styleFor(2, setOf(2, 3), styles))
+        assertEquals(SosAlarmStyle.SILENT, SosAlarmPolicy.styleFor(3, setOf(2, 3), styles))
+        assertEquals(SosAlarmStyle.SIREN, SosAlarmPolicy.styleFor(4, setOf(2, 3), styles))
+        assertEquals(SosAlarmStyle.SIREN, SosAlarmPolicy.styleFor(3, setOf(2), styles))
+        assertEquals(SosAlarmStyle.SIREN, SosAlarmPolicy.styleFor(null, setOf(2), styles))
+    }
+
+    @Test
+    fun stylesEncodeAndDecode() {
+        val styles = mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT, 4 to SosAlarmStyle.SIREN)
+        assertEquals(mapOf(2 to SosAlarmStyle.BELL, 3 to SosAlarmStyle.SILENT),
+            SosAlarmStyle.decodeMap(SosAlarmStyle.encodeMap(styles)))
+        assertEquals(emptyMap(), SosAlarmStyle.decodeMap(null))
+        assertEquals(emptyMap(), SosAlarmStyle.decodeMap("x,1:2:3"))
+        assertEquals(mapOf(7 to SosAlarmStyle.SIREN), SosAlarmStyle.decodeMap("7:NIEZNANY"))
+    }
+
+    @Test
+    fun unlimitedRepeatsSurviveEncoding() {
+        val config = SosConfig(repeatMinutes = 5, repeatCount = SosConfig.UNLIMITED_REPEATS)
+        assertEquals(SosConfig.UNLIMITED_REPEATS, SosConfig.decode(config.encode()).repeatCount)
+    }
+
+    @Test
+    fun historyExportIsAQuotedCsv() {
+        val csv =
+            SosHistoryExport.csv(
+                listOf(
+                    SosHistoryEntry(0L, 255, "Ala, \"Ola\"", "k", "SOS\npomocy", 50.5, 20.25, alarmed = false),
+                    SosHistoryEntry(1000L, null, "Bez", "k", "t"),
+                ),
+            )
+        val lines = csv.removePrefix("\uFEFF").split('\n')
+        assertEquals("time_utc,sender,sender_node,text,latitude,longitude,alarm", lines[0])
+        assertTrue(lines[1].startsWith("\"1970-01-01T00:00:00Z\",\"Ala, \"\"Ola\"\"\",\"!000000ff\","))
+        assertTrue(csv.contains("\"no\""))
+        assertTrue(csv.contains("\"1970-01-01T00:00:01Z\",\"Bez\",\"\",\"t\",\"\",\"\",\"yes\""))
     }
 
     @Test

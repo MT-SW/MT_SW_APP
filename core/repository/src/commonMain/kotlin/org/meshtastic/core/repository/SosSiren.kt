@@ -17,6 +17,7 @@
 package org.meshtastic.core.repository
 
 import kotlin.math.PI
+import kotlin.math.exp
 import kotlin.math.sin
 
 /**
@@ -32,6 +33,11 @@ object SosSiren {
     private const val AMPLITUDE = 0.9
     private const val WAV_HEADER = 44
     private val TONES = listOf(880.0, 660.0)
+    private const val BELL_HZ = 1318.5
+    private const val BELL_OVERTONE = 2.76
+    private const val BELL_DECAY = 3.5
+    private const val BELL_STRIKE_SECONDS = 0.5
+    private const val BELL_CYCLE_SECONDS = 2.0
 
     /** [seconds] of siren (rounded to whole pairs of tones) as 16-bit little-endian mono samples. */
     fun pcm(seconds: Double): ByteArray {
@@ -54,9 +60,43 @@ object SosSiren {
         return out
     }
 
+    /**
+     * [seconds] of the gentler bell (rounded to whole two-second cycles): two soft strikes that die away, then a
+     * pause, as 16-bit little-endian mono samples. It loops without a click, because the last strike has died away.
+     */
+    fun bellPcm(seconds: Double): ByteArray {
+        val cycles = (seconds / BELL_CYCLE_SECONDS).toInt().coerceAtLeast(1)
+        val samplesPerCycle = (SAMPLE_RATE * BELL_CYCLE_SECONDS).toInt()
+        val strike = (SAMPLE_RATE * BELL_STRIKE_SECONDS).toInt()
+        val out = ByteArray(cycles * samplesPerCycle * BYTES_PER_SAMPLE)
+        var index = 0
+        repeat(cycles) {
+            for (n in 0 until samplesPerCycle) {
+                // The time since the last strike (strikes at 0 and at half a second); silent after the second one.
+                val since = if (n < strike) n else if (n < 2 * strike) n - strike else -1
+                val value =
+                    if (since < 0) {
+                        0
+                    } else {
+                        val t = since.toDouble() / SAMPLE_RATE
+                        val wave = sin(2 * PI * BELL_HZ * t) + 0.4 * sin(2 * PI * BELL_HZ * BELL_OVERTONE * t)
+                        val fade = minOf(1.0, since / (SAMPLE_RATE * FADE_SECONDS))
+                        (wave / 1.4 * exp(-BELL_DECAY * t) * fade * AMPLITUDE * Short.MAX_VALUE).toInt()
+                    }
+                out[index++] = (value and 0xFF).toByte()
+                out[index++] = ((value shr 8) and 0xFF).toByte()
+            }
+        }
+        return out
+    }
+
     /** The same siren as a WAV file (header and samples), for players that read a file. */
-    fun wav(seconds: Double): ByteArray {
-        val data = pcm(seconds)
+    fun wav(seconds: Double): ByteArray = wrapWav(pcm(seconds))
+
+    /** The bell as a WAV file. */
+    fun bellWav(seconds: Double): ByteArray = wrapWav(bellPcm(seconds))
+
+    private fun wrapWav(data: ByteArray): ByteArray {
         val out = ByteArray(WAV_HEADER + data.size)
         fun put(offset: Int, text: String) = text.forEachIndexed { i, c -> out[offset + i] = c.code.toByte() }
         fun putBytes(offset: Int, value: Int, count: Int) =
