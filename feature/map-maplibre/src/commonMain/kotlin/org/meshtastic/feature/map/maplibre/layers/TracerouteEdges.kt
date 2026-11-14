@@ -92,6 +92,26 @@ internal fun tracerouteEdges(route: List<Int>, snr: List<Int>, nodeLookup: Map<I
     return edges
 }
 
+/**
+ * The lines of a neighbour report: one per neighbour, running from the neighbour to the node that reported it (the SNR
+ * is the one that node measured). Neighbours, or the node itself, without a position leave their line out.
+ */
+internal fun neighborEdges(
+    centerNum: Int,
+    neighbors: List<Pair<Int, Float>>,
+    nodeLookup: Map<Int, Node>,
+): List<TracerouteEdge> {
+    val center = nodeLookup[centerNum]?.takeIf { it.validPosition != null } ?: return emptyList()
+    return neighbors.mapNotNull { (num, snr) ->
+        val neighbor = nodeLookup[num]?.takeIf { it.validPosition != null } ?: return@mapNotNull null
+        TracerouteEdge(
+            from = Position(longitude = neighbor.longitude, latitude = neighbor.latitude),
+            to = Position(longitude = center.longitude, latitude = center.latitude),
+            snrDb = snr,
+        )
+    }
+}
+
 internal const val UNKNOWN_SNR = -128
 private const val SNR_UNITS_PER_DB = 4f
 private const val RAD_PER_DEG = kotlin.math.PI / 180.0

@@ -28,6 +28,7 @@ import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.LocalMapViewProvider
+import org.meshtastic.core.ui.util.LocalNeighborMapProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
@@ -38,6 +39,7 @@ import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.maplibre.MapLibreDiscoveryMap
 import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
+import org.meshtastic.feature.map.maplibre.MapLibreNeighborMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 
 /**
@@ -72,6 +74,10 @@ fun ProvideIosMaps(content: @Composable () -> Unit) {
                     onPositionSelect = onPositionSelect,
                     showAttribution = showAttribution,
                 )
+            },
+        LocalNeighborMapProvider provides
+            { centerNum, neighbors, nodeLookup, modifier ->
+                MapLibreNeighborMap(centerNum, neighbors, nodeLookup, modifier)
             },
         LocalHorizonPickMapProvider provides
             { lat, lon, radiusKm, nodes, onCenterChanged, modifier ->

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -46,6 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.animateFloatingActionButton
@@ -67,6 +69,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -80,11 +84,17 @@ import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
 import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.channel_invalid
+import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.hop_histogram_title
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.neighbors_dialog_empty
+import org.meshtastic.core.resources.neighbors_map_center_unknown
+import org.meshtastic.core.resources.neighbors_map_legend
+import org.meshtastic.core.resources.neighbors_map_missing
+import org.meshtastic.core.resources.neighbors_map_none
+import org.meshtastic.core.resources.neighbors_map_title
+import org.meshtastic.core.resources.neighbors_show_on_map
 import org.meshtastic.core.resources.node_list_help_title
 import org.meshtastic.core.resources.nodes
 import org.meshtastic.core.resources.nodes_empty_disconnected_hint
@@ -95,7 +105,6 @@ import org.meshtastic.core.resources.nodes_unheard_banner
 import org.meshtastic.core.resources.nodes_unheard_banner_one
 import org.meshtastic.core.resources.nodes_unheard_keep
 import org.meshtastic.core.resources.nodes_unheard_remove
-import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.set_up_connection
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FastScrollSidebar
@@ -112,6 +121,7 @@ import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.component.ShareContactDialog
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.smartScrollToTop
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
@@ -124,6 +134,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
+import org.meshtastic.core.ui.util.LocalNeighborMapProvider
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
@@ -222,6 +233,7 @@ fun NodeListScreen(
     var neighborsOpenFor by remember { mutableStateOf<Int?>(null) }
     // One lambda for the whole list: a new one on every recomposition made every card redraw each time.
     val onNeighborsClick = remember<(Int) -> Unit> { { num -> neighborsOpenFor = num } }
+    var neighborMapFor by remember { mutableStateOf<Int?>(null) }
     neighborsOpenFor?.let { num ->
         NeighborReportDialog(
             report = neighborReports[num],
@@ -232,6 +244,18 @@ fun NodeListScreen(
                     ?: "!" + nodeNum.toUInt().toString(HEX_RADIX)
             },
             onDismiss = { neighborsOpenFor = null },
+            onShowOnMap = {
+                neighborsOpenFor = null
+                neighborMapFor = num
+            },
+        )
+    }
+    neighborMapFor?.let { num ->
+        NeighborMapDialog(
+            centerNum = num,
+            report = neighborReports[num],
+            nodeLookup = remember(unfilteredNodes) { unfilteredNodes.associateBy { it.num } },
+            onDismiss = { neighborMapFor = null },
         )
     }
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
@@ -334,6 +358,7 @@ fun NodeListScreen(
             modifier = modifier,
             topBar = {
                 MainAppBar(
+                    sosScreen = SosBarScreen.NODES,
                     title = stringResource(Res.string.nodes),
                     // Node counts deliberately live in the list header (NodeCountSummary), not here: the app bar's
                     // title/subtitle slot competes for width with the node chip + action icons and is clipped to a
@@ -675,7 +700,12 @@ private const val HEX_RADIX = 16
  * of each. It never leaves the list.
  */
 @Composable
-private fun NeighborReportDialog(report: NeighborReport?, nameOf: (Int) -> String, onDismiss: () -> Unit) {
+private fun NeighborReportDialog(
+    report: NeighborReport?,
+    nameOf: (Int) -> String,
+    onDismiss: () -> Unit,
+    onShowOnMap: () -> Unit,
+) {
     val header = stringResource(Res.string.neighbor_info)
     val statusGreen = MaterialTheme.colorScheme.StatusOnline
     val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
@@ -706,7 +736,81 @@ private fun NeighborReportDialog(report: NeighborReport?, nameOf: (Int) -> Strin
                 }
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.okay)) } },
+        // The two buttons used to do the same thing (close). Now one closes and the other opens the map.
+        dismissButton =
+        if (message == null) {
+            null
+        } else {
+            { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } }
+        },
+        confirmButton = {
+            if (message == null) {
+                TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
+            } else {
+                TextButton(onClick = onShowOnMap) { Text(stringResource(Res.string.neighbors_show_on_map)) }
+            }
+        },
     )
+}
+
+/**
+ * The map of a neighbour report, full screen: the node that reported it and the neighbours that have a position, with
+ * a line from each to the node in the colour of its SNR. Under the map, a note when some neighbours are missing from it
+ * because their position is not known.
+ */
+@Composable
+private fun NeighborMapDialog(
+    centerNum: Int,
+    report: NeighborReport?,
+    nodeLookup: Map<Int, Node>,
+    onDismiss: () -> Unit,
+) {
+    val neighbors = remember(report) { report?.neighbors.orEmpty().map { it.nodeNum to it.snr } }
+    val centerKnown = nodeLookup[centerNum]?.validPosition != null
+    val located = neighbors.count { nodeLookup[it.first]?.validPosition != null }
+    val missing = neighbors.size - located
+    val emptyText = if (centerKnown) Res.string.neighbors_map_none else Res.string.neighbors_map_center_unknown
+    val neighborMap = LocalNeighborMapProvider.current
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+            Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(Res.string.neighbors_map_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
+                }
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    if (centerKnown && located > 0) {
+                        neighborMap(centerNum, neighbors, nodeLookup, Modifier.fillMaxSize())
+                    } else {
+                        Text(
+                            text = stringResource(emptyText),
+                            modifier = Modifier.align(Alignment.Center).padding(24.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = stringResource(Res.string.neighbors_map_legend),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    if (centerKnown && missing > 0 && located > 0) {
+                        Text(
+                            text = stringResource(Res.string.neighbors_map_missing, missing, neighbors.size),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

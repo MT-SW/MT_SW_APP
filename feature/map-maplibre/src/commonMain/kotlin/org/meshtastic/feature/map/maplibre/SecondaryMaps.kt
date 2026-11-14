@@ -76,6 +76,7 @@ import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.layers.MapChipLayer
+import org.meshtastic.feature.map.maplibre.layers.NeighborLinkLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeChipLayer
 import org.meshtastic.feature.map.maplibre.layers.NodePrecisionLayer
 import org.meshtastic.feature.map.maplibre.layers.TracerouteLayers
@@ -177,6 +178,42 @@ fun MapLibreTracerouteMap(
     // Keyed on the hops: the route is what this map exists to frame, so a different route should re-frame it. The
     // padding is what keeps the outermost hops clear of the toolbar and the legend.
     FitBoundsOnceVisible(mapState = mapState, key = hops) { nodesBoundingBox(hops) }
+
+    Box(modifier = modifier) {
+        SecondaryMapSurface(mapState = mapState, basemaps = basemaps, showAttribution = false)
+        SecondaryMapChrome(mapState = mapState, basemaps = basemaps)
+    }
+}
+
+/**
+ * One node and the neighbours it reported: the node, each neighbour that has a position, and a line from every
+ * neighbour to the node coloured by the SNR it was heard with. Nothing else is drawn, so the map answers one question:
+ * who hears this node, and how well.
+ */
+@Composable
+fun MapLibreNeighborMap(
+    centerNum: Int,
+    neighbors: List<Pair<Int, Float>>,
+    nodeLookup: Map<Int, Node>,
+    modifier: Modifier = Modifier,
+    customBasemaps: @Composable () -> List<Basemap.Raster> = { customRasterBasemaps() },
+) {
+    // Null for the one frame before the basemap preference has loaded from disk; see rememberBasemapSelection.
+    val basemaps = rememberBasemapSelection(customBasemaps()) ?: return
+    val shown =
+        remember(centerNum, neighbors, nodeLookup) {
+            (listOf(centerNum) + neighbors.map { it.first }).distinct().mapNotNull { nodeLookup[it] }.filter {
+                it.validPosition != null
+            }
+        }
+
+    val mapState =
+        rememberSecondaryMapState(basemaps) {
+            NeighborLinkLayers(centerNum = centerNum, neighbors = neighbors, nodeLookup = nodeLookup)
+            TracerouteHopLayers(shown)
+        }
+
+    FitBoundsOnceVisible(mapState = mapState, key = shown) { nodesBoundingBox(shown) }
 
     Box(modifier = modifier) {
         SecondaryMapSurface(mapState = mapState, basemaps = basemaps, showAttribution = false)

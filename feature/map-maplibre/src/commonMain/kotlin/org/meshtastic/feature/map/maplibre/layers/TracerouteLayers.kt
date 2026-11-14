@@ -75,6 +75,18 @@ internal fun TracerouteLayers(
     DirectionLayers(id = "traceroute-return", edges = returnEdges, preset = preset, palette = palette)
 }
 
+/**
+ * A neighbour report: a line from every neighbour to the node that reported it, in the colour of the signal quality
+ * its SNR rates, with an arrowhead at the node and the SNR written along it (the traceroute drawing, as a star).
+ */
+@Composable
+internal fun NeighborLinkLayers(centerNum: Int, neighbors: List<Pair<Int, Float>>, nodeLookup: Map<Int, Node>) {
+    val preset = LocalModemPreset.current
+    val palette = Quality.entries.associateWith { it.color.invoke().toCssHex() }
+    val edges = remember(centerNum, neighbors, nodeLookup) { neighborEdges(centerNum, neighbors, nodeLookup) }
+    DirectionLayers(id = "neighbor-links", edges = edges, preset = preset, palette = palette)
+}
+
 /** One direction's lines, arrowheads and labels. */
 @Composable
 private fun DirectionLayers(
