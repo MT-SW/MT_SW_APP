@@ -68,8 +68,11 @@ import org.meshtastic.core.resources.report_issues_title
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title
+import org.meshtastic.core.resources.sos_quiet_switch
 import org.meshtastic.core.resources.sos_section_bar
+import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_nodes
+import org.meshtastic.core.resources.sos_section_receive
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.terrain_horizon_title
@@ -211,6 +214,9 @@ object SettingsSearchCatalog {
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.sos_section_nodes to SettingsRoute.Sos,
             Res.string.sos_section_bar to SettingsRoute.Sos,
+            Res.string.sos_section_receive to SettingsRoute.Sos,
+            Res.string.sos_section_history to SettingsRoute.Sos,
+            Res.string.sos_quiet_switch to SettingsRoute.Sos,
             Res.string.archive_title to SettingsRoute.MessageArchive,
             Res.string.availability_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.coverage_title to SettingsRoute.MtSwOtherFeatures,

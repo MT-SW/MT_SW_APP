@@ -21,14 +21,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
+import org.meshtastic.core.common.util.nowInstant
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAlarmPolicy
 import org.meshtastic.core.repository.SosAlarmSounds
 import org.meshtastic.core.repository.SosAlert
+import org.meshtastic.core.repository.SosHistory
+import org.meshtastic.core.repository.SosHistoryEntry
 import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosReply
@@ -48,6 +55,7 @@ import org.meshtastic.core.resources.sos_reply_seen
 @Single
 class SosAlarmCenterImpl(
     private val prefs: SosPrefs,
+    private val history: SosHistory,
     private val notifications: MeshNotificationManager,
     private val sendMessage: SendMessageUseCase,
     private val nodes: NodeRepository,
@@ -57,14 +65,51 @@ class SosAlarmCenterImpl(
     override val alert: StateFlow<SosAlert?> = mutableAlert.asStateFlow()
 
     override fun raise(alert: SosAlert) {
-        // A test always rings, so the person can hear what the alarm is like; a real one follows the switch.
-        if (!alert.test && !prefs.receiveAlarm.value) return
         val shown = alert.copy(text = SosMarker.clean(alert.text))
+        // A test always rings, so the person can hear what the alarm is like; a real one follows the settings.
+        val rings =
+            SosAlarmPolicy.rings(
+                test = shown.test,
+                receive = prefs.receiveAlarm.value,
+                senderNum = shown.fromNodeNum,
+                onlyChosen = prefs.alarmOnlyChosen.value,
+                chosen = prefs.alarmNodes.value,
+                quiet = prefs.quietHours.value,
+                minuteOfDay = minuteOfDay(),
+            )
+        if (!shown.test) record(shown, rings)
+        if (!rings) {
+            Logger.i { "SOS alarm: kept quiet (settings) for ${shown.senderName}" }
+            return
+        }
         val wasRinging = mutableAlert.value != null
         mutableAlert.value = shown
         Logger.i { "SOS alarm: raised from ${shown.senderName} test=${shown.test}" }
         if (!wasRinging) runCatching { SosAlarmSounds.current?.start(prefs.alarmFlash.value) }
         scope.launch { notifications.showSosAlarmNotification(shown.contactKey, shown.senderName, shown.text) }
+    }
+
+    /** Local time of day, in minutes since midnight. */
+    private fun minuteOfDay(): Int {
+        val time = nowInstant.toLocalDateTime(systemTimeZone)
+        return time.hour * MINUTES_PER_HOUR + time.minute
+    }
+
+    /** Writes the SOS into the history, with the last known position of the sender. */
+    private fun record(alert: SosAlert, rang: Boolean) {
+        val node = alert.fromNodeNum?.let { nodes.nodeDBbyNum.value[it] }?.takeIf { it.validPosition != null }
+        history.add(
+            SosHistoryEntry(
+                time = nowMillis,
+                senderNum = alert.fromNodeNum,
+                senderName = alert.senderName,
+                contactKey = alert.contactKey,
+                text = alert.text,
+                latitude = node?.latitude,
+                longitude = node?.longitude,
+                alarmed = rang,
+            ),
+        )
     }
 
     override fun acknowledge() {
@@ -109,5 +154,9 @@ class SosAlarmCenterImpl(
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
         val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
         return NodeAddress.ByNum(num).toContactKey(slot).value
+    }
+
+    private companion object {
+        const val MINUTES_PER_HOUR = 60
     }
 }

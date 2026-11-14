@@ -45,6 +45,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,11 +67,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SosAlarmCenter
@@ -78,17 +81,26 @@ import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
+import org.meshtastic.core.repository.SosHistory
+import org.meshtastic.core.repository.SosHistoryEntry
 import org.meshtastic.core.repository.SosPrefs
+import org.meshtastic.core.repository.SosQuietHours
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.sos_alarm_flash_switch
+import org.meshtastic.core.resources.sos_alarm_map
+import org.meshtastic.core.resources.sos_alarm_nodes_title
+import org.meshtastic.core.resources.sos_alarm_only_chosen_note
+import org.meshtastic.core.resources.sos_alarm_only_chosen_switch
+import org.meshtastic.core.resources.sos_alarm_open
 import org.meshtastic.core.resources.sos_alarm_test
 import org.meshtastic.core.resources.sos_alarm_test_sender
 import org.meshtastic.core.resources.sos_alarm_test_text
 import org.meshtastic.core.resources.sos_bar_ai
 import org.meshtastic.core.resources.sos_bar_connections
 import org.meshtastic.core.resources.sos_bar_health
+import org.meshtastic.core.resources.sos_bar_hold_note
 import org.meshtastic.core.resources.sos_bar_map
 import org.meshtastic.core.resources.sos_bar_messages
 import org.meshtastic.core.resources.sos_bar_nodes
@@ -97,12 +109,17 @@ import org.meshtastic.core.resources.sos_bar_other
 import org.meshtastic.core.resources.sos_bar_settings
 import org.meshtastic.core.resources.sos_bar_show
 import org.meshtastic.core.resources.sos_button
-import org.meshtastic.core.resources.sos_bar_hold_note
 import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
 import org.meshtastic.core.resources.sos_cancel
 import org.meshtastic.core.resources.sos_channel_n
 import org.meshtastic.core.resources.sos_confirm_switch
+import org.meshtastic.core.resources.sos_history_clear
+import org.meshtastic.core.resources.sos_history_empty
+import org.meshtastic.core.resources.sos_history_no_position
+import org.meshtastic.core.resources.sos_history_note
+import org.meshtastic.core.resources.sos_history_quiet
+import org.meshtastic.core.resources.sos_history_with_position
 import org.meshtastic.core.resources.sos_hold_seconds
 import org.meshtastic.core.resources.sos_hold_tap
 import org.meshtastic.core.resources.sos_include_position
@@ -119,16 +136,22 @@ import org.meshtastic.core.resources.sos_nodes_pick_title
 import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.sos_position_attached
 import org.meshtastic.core.resources.sos_position_missing
+import org.meshtastic.core.resources.sos_quiet_from
+import org.meshtastic.core.resources.sos_quiet_note
+import org.meshtastic.core.resources.sos_quiet_switch
+import org.meshtastic.core.resources.sos_quiet_to
 import org.meshtastic.core.resources.sos_receive_note
 import org.meshtastic.core.resources.sos_receive_switch
 import org.meshtastic.core.resources.sos_repeat_count
 import org.meshtastic.core.resources.sos_repeat_every
 import org.meshtastic.core.resources.sos_repeat_once
+import org.meshtastic.core.resources.sos_resend
 import org.meshtastic.core.resources.sos_result_delivered
 import org.meshtastic.core.resources.sos_result_refused
 import org.meshtastic.core.resources.sos_result_unconfirmed
 import org.meshtastic.core.resources.sos_section_bar
 import org.meshtastic.core.resources.sos_section_channel
+import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_hold
 import org.meshtastic.core.resources.sos_section_message
 import org.meshtastic.core.resources.sos_section_nodes
@@ -141,6 +164,7 @@ import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_title
+import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
@@ -150,6 +174,8 @@ private val REPEAT_MINUTES = listOf(0, 1, 2, 5, 10, 15, 30)
 private val REPEAT_COUNTS = listOf(2, 3, 5, 10, 20, 50)
 private val HOLD_SECONDS = listOf(0, 1, 2, 3, 5)
 private const val MILLIS = 1000
+private const val QUIET_STEP_MINUTES = 30
+private const val MINUTES_PER_HOUR = 60
 private const val BUTTON_SIZE = 160
 private const val RING_SIZE = 184
 
@@ -170,6 +196,17 @@ fun SosScreen(onBack: () -> Unit) {
     val nodeDb by nodeRepository.nodeDBbyNum.collectAsStateWithLifecycle()
     val myInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
     var pickingNodes by remember { mutableStateOf(false) }
+    var pickingAlarmNodes by remember { mutableStateOf(false) }
+    val alarmNodes by prefs.alarmNodes.collectAsStateWithLifecycle()
+
+    if (pickingAlarmNodes) {
+        SosNodePicker(
+            nodes = nodeDb.values.filter { it.num != myInfo?.myNodeNum },
+            selected = alarmNodes.toList(),
+            onToggle = { num -> prefs.setAlarmNodes(if (num in alarmNodes) alarmNodes - num else alarmNodes + num) },
+            onDismiss = { pickingAlarmNodes = false },
+        )
+    }
 
     if (pickingNodes) {
         SosNodePicker(
@@ -210,7 +247,12 @@ fun SosScreen(onBack: () -> Unit) {
                     onTrigger = { controller.start(config) },
                 )
             }
-            SosStatus(state = state, config = config, onCancel = { controller.cancel() })
+            SosStatus(
+                state = state,
+                config = config,
+                onCancel = { controller.cancel() },
+                onResend = { controller.start(config) },
+            )
 
             ExpressiveSection(title = stringResource(Res.string.sos_section_channel)) {
                 FlowRow(
@@ -379,6 +421,47 @@ fun SosScreen(onBack: () -> Unit) {
                     text = stringResource(Res.string.sos_confirm_switch),
                     onClick = { prefs.setConfirmToSender(!confirmToSender) },
                 )
+                val onlyChosen by prefs.alarmOnlyChosen.collectAsStateWithLifecycle()
+                SwitchListItem(
+                    checked = onlyChosen,
+                    text = stringResource(Res.string.sos_alarm_only_chosen_switch),
+                    onClick = { prefs.setAlarmOnlyChosen(!onlyChosen) },
+                )
+                Text(
+                    text = stringResource(Res.string.sos_alarm_only_chosen_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Text(
+                    text = stringResource(Res.string.sos_alarm_nodes_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                if (alarmNodes.isEmpty()) {
+                    Text(
+                        text = stringResource(Res.string.sos_nodes_none),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                } else {
+                    FlowRow(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (num in alarmNodes) {
+                            FilterChip(
+                                selected = true,
+                                onClick = { prefs.setAlarmNodes(alarmNodes - num) },
+                                label = { Text(sosNodeName(nodeDb[num], num) + "  ✕") },
+                            )
+                        }
+                    }
+                }
+                Button(onClick = { pickingAlarmNodes = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(stringResource(Res.string.sos_nodes_add))
+                }
+                val quiet by prefs.quietHours.collectAsStateWithLifecycle()
+                SosQuietHoursEditor(hours = quiet, onChange = { prefs.setQuietHours(it) })
                 Button(
                     onClick = {
                         alarmCenter.raise(
@@ -395,6 +478,12 @@ fun SosScreen(onBack: () -> Unit) {
                 ) {
                     Text(stringResource(Res.string.sos_alarm_test))
                 }
+            }
+
+            val sosHistory = koinInject<SosHistory>()
+            val historyEntries by sosHistory.entries.collectAsStateWithLifecycle()
+            ExpressiveSection(title = stringResource(Res.string.sos_section_history)) {
+                SosHistoryList(entries = historyEntries, onClear = { sosHistory.clear() })
             }
 
             val barScreens by prefs.barScreens.collectAsStateWithLifecycle()
@@ -459,6 +548,117 @@ fun SosScreen(onBack: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+/** The quiet hours: a switch and, when it is on, the start and the end, each moved by half an hour with − and +. */
+@Composable
+private fun SosQuietHoursEditor(hours: SosQuietHours, onChange: (SosQuietHours) -> Unit) {
+    SwitchListItem(
+        checked = hours.enabled,
+        text = stringResource(Res.string.sos_quiet_switch),
+        onClick = { onChange(hours.copy(enabled = !hours.enabled)) },
+    )
+    if (!hours.enabled) return
+    Text(
+        text = stringResource(Res.string.sos_quiet_note),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
+    QuietTimeRow(
+        label = stringResource(Res.string.sos_quiet_from, clockText(hours.fromMinutes)),
+        onStep = { onChange(hours.copy(fromMinutes = stepMinutes(hours.fromMinutes, it))) },
+    )
+    QuietTimeRow(
+        label = stringResource(Res.string.sos_quiet_to, clockText(hours.toMinutes)),
+        onStep = { onChange(hours.copy(toMinutes = stepMinutes(hours.toMinutes, it))) },
+    )
+}
+
+@Composable
+private fun QuietTimeRow(label: String, onStep: (Int) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        OutlinedButton(onClick = { onStep(-QUIET_STEP_MINUTES) }) { Text("−") }
+        OutlinedButton(onClick = { onStep(QUIET_STEP_MINUTES) }, modifier = Modifier.padding(start = 8.dp)) {
+            Text("+")
+        }
+    }
+}
+
+private fun clockText(minutes: Int): String {
+    val hour = (minutes / MINUTES_PER_HOUR).toString().padStart(2, '0')
+    val minute = (minutes % MINUTES_PER_HOUR).toString().padStart(2, '0')
+    return "$hour:$minute"
+}
+
+/** [value] moved by [delta] minutes round the clock. */
+private fun stepMinutes(value: Int, delta: Int): Int =
+    ((value + delta) % SosQuietHours.DAY_MINUTES + SosQuietHours.DAY_MINUTES) % SosQuietHours.DAY_MINUTES
+
+/** The received SOS, newest first: who, when, what, and shortcuts to the conversation and to the sender on the map. */
+@Composable
+private fun SosHistoryList(entries: List<SosHistoryEntry>, onClear: () -> Unit) {
+    Text(
+        text = stringResource(Res.string.sos_history_note),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
+    if (entries.isEmpty()) {
+        Text(
+            text = stringResource(Res.string.sos_history_empty),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+        return
+    }
+    for (entry in entries) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
+            Text(
+                text = entry.senderName,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = DateFormatter.formatDateTime(entry.time),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (entry.text.isNotBlank()) Text(text = entry.text, style = MaterialTheme.typography.bodyMedium)
+            if (!entry.alarmed) {
+                Text(
+                    text = stringResource(Res.string.sos_history_quiet),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            val hasPosition = entry.latitude != null && entry.longitude != null
+            Text(
+                text =
+                stringResource(
+                    if (hasPosition) Res.string.sos_history_with_position else Res.string.sos_history_no_position,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row {
+                TextButton(onClick = { AssistantLinks.open("$DEEP_LINK_BASE_URI/messages/${entry.contactKey}") }) {
+                    Text(stringResource(Res.string.sos_alarm_open))
+                }
+                val sender = entry.senderNum
+                if (hasPosition && sender != null) {
+                    TextButton(onClick = { AssistantLinks.open("$DEEP_LINK_BASE_URI/map/focus/$sender") }) {
+                        Text(stringResource(Res.string.sos_alarm_map))
+                    }
+                }
+            }
+        }
+    }
+    TextButton(onClick = onClear, modifier = Modifier.padding(horizontal = 8.dp)) {
+        Text(stringResource(Res.string.sos_history_clear))
     }
 }
 
@@ -595,7 +795,7 @@ private fun SosButton(holdSeconds: Int, enabled: Boolean, onTrigger: () -> Unit)
 
 /** What the last run did: progress while sending, then the result. Nothing before the first run. */
 @Composable
-private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit) {
+private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit, onResend: () -> Unit) {
     if (state.attempt == 0 && !state.refused) return
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         when {
@@ -630,6 +830,10 @@ private fun SosStatus(state: SosState, config: SosConfig, onCancel: () -> Unit) 
             )
         }
         if (state.running) Button(onClick = onCancel) { Text(stringResource(Res.string.sos_cancel)) }
+        // Nobody confirmed it (or nothing could be sent): one tap sends the whole alarm once more.
+        if (!state.running && !state.delivered) {
+            Button(onClick = onResend) { Text(stringResource(Res.string.sos_resend)) }
+        }
     }
 }
 

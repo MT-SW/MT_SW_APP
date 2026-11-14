@@ -186,7 +186,7 @@
     <string name="ai_model_translator_title">Model used for translation</string>
     <string name="ai_model_use">Use</string>
     <string name="ai_models_advice_assistant">For the assistant we recommend the Gemma family (E2B, E4B and larger): it answers most accurately and understands Polish best. Models from other families (Qwen, Bielik) stay as an option for weaker phones.</string>
-    <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model\'s answers are right. We advise checking them elsewhere. With the internet switched on, this model only quotes the search results, in no words of its own.</string>
+    <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model's answers are right. We advise checking them elsewhere. With the internet switched on, this model only quotes the search results, in no words of its own.</string>
     <string name="ai_models_advice_dictation">For dictation we recommend the Whisper models: they are accurate, fast and light.</string>
     <string name="ai_models_empty">There are no models for this function on this device.</string>
     <string name="ai_models_hint">Nothing is downloaded by itself. Each model is a separate download; the first one also installs a small engine program. Deleting a model does not remove the others.</string>
@@ -343,7 +343,7 @@
     <string name="analytics_okay">Allow analytics and crash reporting.</string>
     <string name="analytics_platforms">Analytics platforms:</string>
     <!-- ANTENNA -->
-    <string name="antenna_accuracy">Formulas: thickness Stutzman &amp; Thiele, Yagi Rothammel/DL6WU, Moxon L. B. Cebik, helix J. D. Kraus, patch Balanis and Hammerstad, cables from manufacturers\' tables. Results are a very good starting point; every antenna still needs tuning with a meter.</string>
+    <string name="antenna_accuracy">Formulas: thickness Stutzman &amp; Thiele, Yagi Rothammel/DL6WU, Moxon L. B. Cebik, helix J. D. Kraus, patch Balanis and Hammerstad, cables from manufacturers' tables. Results are a very good starting point; every antenna still needs tuning with a meter.</string>
     <string name="antenna_boom">Boom diameter (mm)</string>
     <string name="antenna_cable_for">Coax used for the antenna</string>
     <string name="antenna_calc_open">Open the antenna calculator</string>
@@ -407,14 +407,14 @@
     <string name="antenna_metal_boom">Elements through a metal boom</string>
     <string name="antenna_note_balun">About 300 Ω: feed it through a 4:1 balun (for example the λ/2 coax loop D).</string>
     <string name="antenna_note_choke">Put a choke on the feed cable (a few turns of the cable or ferrite) so the cable does not radiate.</string>
-    <string name="antenna_note_coax_vf">Coax lengths depend on the cable\'s velocity factor: check it in the datasheet or measure the cable.</string>
+    <string name="antenna_note_coax_vf">Coax lengths depend on the cable's velocity factor: check it in the datasheet or measure the cable.</string>
     <string name="antenna_note_coil">A 5/8 radiator needs a matching coil at the base (a few turns, tuned for the lowest SWR).</string>
     <string name="antenna_note_feed_tap">Move the feed point a little up or down for the lowest SWR.</string>
     <string name="antenna_note_gain">The gain is a typical value for this design, not a measurement.</string>
     <string name="antenna_note_half_balun">The λ/2 loop joins the two ends of the dipole; the coax to the radio goes to one of them.</string>
-    <string name="antenna_note_helix_gain">Kraus\'s gain formula is optimistic: in practice expect 2–3 dB less.</string>
+    <string name="antenna_note_helix_gain">Kraus's gain formula is optimistic: in practice expect 2–3 dB less.</string>
     <string name="antenna_note_helix_match">About 140 Ω: bring the first quarter turn close to the ground plane (or use a matching strip) to get 50 Ω.</string>
-    <string name="antenna_note_moxon">Cebik\'s equations hold for a wire 0.00001–0.01 λ thick.</string>
+    <string name="antenna_note_moxon">Cebik's equations hold for a wire 0.00001–0.01 λ thick.</string>
     <string name="antenna_note_patch">FR4 is lossy at these frequencies and its εr varies: the result needs tuning, a low-loss laminate is more exact.</string>
     <string name="antenna_note_radials">Radials flat give about 36 Ω; bent down by about 45° about 50 Ω, which suits the radio.</string>
     <string name="antenna_note_tune_swr">Build a little longer and trim while measuring with an SWR meter or NanoVNA: if the resonance is too low, shorten 1–2 mm at a time.</string>
@@ -622,7 +622,7 @@
     <string name="assistant_header_collapse_hint">The notice and the "Copy whole conversation" and "Save conversation" buttons above the chat fold away when you scroll the chat up with a finger and come back on a swipe down. This helps when the screen is strongly enlarged.</string>
     <string name="assistant_history">Conversation history</string>
     <string name="assistant_history_empty">No saved conversations. Conversations are saved only on this device.</string>
-    <string name="assistant_info_body">The assistant answers about your network, the app settings and radio basics. It runs on your device with the AI model you installed (Settings → MT_SW features → AI models). Numbers come from the app\'s tools, not from the model\'s memory. It never saves settings or sends messages by itself; it only prepares a draft or opens the right screen.\n\nCommands you can type in the chat:\n/test – all tests at once, including the translator (report saved to a file on a computer)\n/szybki – a short test (a tenth of everything, a few minutes)\n/narzedzia – how it uses the app\'s tools\n/rozmowa – free conversation\n/baza – the knowledge base and how-to questions\n/tlumacz – translations (names, numbers and links must stay as they are)\n/sprzet – which model runs, where (graphics card or processor) and its size\n\nThe commands work with or without Polish letters (e.g. /tłumacz and /tlumacz).\n\nAt the bottom of this window is the "Run the compatibility test" button: the assistant asks itself one question, checks the hardware and dictation, and the result goes into one bundle in the report window (nothing is sent by itself).</string>
+    <string name="assistant_info_body">The assistant answers about your network, the app settings and radio basics. It runs on your device with the AI model you installed (Settings → MT_SW features → AI models). Numbers come from the app's tools, not from the model's memory. It never saves settings or sends messages by itself; it only prepares a draft or opens the right screen.\n\nCommands you can type in the chat:\n/test – all tests at once, including the translator (report saved to a file on a computer)\n/szybki – a short test (a tenth of everything, a few minutes)\n/narzedzia – how it uses the app's tools\n/rozmowa – free conversation\n/baza – the knowledge base and how-to questions\n/tlumacz – translations (names, numbers and links must stay as they are)\n/sprzet – which model runs, where (graphics card or processor) and its size\n\nThe commands work with or without Polish letters (e.g. /tłumacz and /tlumacz).\n\nAt the bottom of this window is the "Run the compatibility test" button: the assistant asks itself one question, checks the hardware and dictation, and the result goes into one bundle in the report window (nothing is sent by itself).</string>
     <string name="assistant_info_title">About the assistant</string>
     <string name="assistant_input_hint">Ask a question…</string>
     <string name="assistant_memory_notice">The assistant saves short notes and remembers some information between conversations. You can view, edit and delete them in the assistant settings.</string>
@@ -666,7 +666,7 @@
     <string name="available_pins">Available pins</string>
     <string name="back">Back</string>
     <string name="background_keepalive_permission">The "Always" location permission is missing. Allow it in the system settings of this app (Location → Always).</string>
-    <string name="background_keepalive_summary">Off by default. An iPhone or iPad suspends an app that is not on the screen, which cuts the Wi-Fi/TCP link to the radio (also over Tailscale) and stops collecting data. When on, the app keeps running in the background with the system\'s background location, the same way the original Meshtastic app for Apple does. The position is read rarely and only to keep the app alive; it is not sent anywhere. Needs the "Always" location permission. Uses more battery, and the system shows the location arrow.</string>
+    <string name="background_keepalive_summary">Off by default. An iPhone or iPad suspends an app that is not on the screen, which cuts the Wi-Fi/TCP link to the radio (also over Tailscale) and stops collecting data. When on, the app keeps running in the background with the system's background location, the same way the original Meshtastic app for Apple does. The position is read rarely and only to keep the app alive; it is not sent anywhere. Needs the "Always" location permission. Uses more battery, and the system shows the location arrow.</string>
     <string name="background_keepalive_title">Keep running in the background</string>
     <string name="background_section_title">Work in the background</string>
     <string name="backup_app_database">Back up app data</string>
@@ -921,7 +921,7 @@
     <!-- COVERAGE -->
     <string name="coverage_all_nodes">All nodes</string>
     <string name="coverage_export_all">Save coverage of all nodes (KML)</string>
-    <string name="coverage_info_body">This layer shows on the map the estimated reach of every node that has a position. The reach is counted like in the link planner, with the shape of the terrain (without buildings and forests), for a typical node: 2 m antenna, 20 dBm, the planner\'s radio settings. The colour shows the signal strength: purple weak, yellow strong. The areas of the nodes lie over each other, so where several nodes reach, the colour is denser. A node that reports a rounded (imprecise) position is counted from the highest ground within that rounding (up to 2.5 km), because it most likely stands on a peak and not on the slope next to it. This is only an estimate: real nodes have other antennas and power, and the exact calculations are in the Planner. The terrain data is downloaded from the internet and saved on the device. The filters show only the nodes heard in the chosen period, or one node, and “Count again” counts the reach anew. The distance (1 to 100 km) says how far from a node the reach is counted and drawn; a longer distance takes longer and downloads more terrain data.</string>
+    <string name="coverage_info_body">This layer shows on the map the estimated reach of every node that has a position. The reach is counted like in the link planner, with the shape of the terrain (without buildings and forests), for a typical node: 2 m antenna, 20 dBm, the planner's radio settings. The colour shows the signal strength: purple weak, yellow strong. The areas of the nodes lie over each other, so where several nodes reach, the colour is denser. A node that reports a rounded (imprecise) position is counted from the highest ground within that rounding (up to 2.5 km), because it most likely stands on a peak and not on the slope next to it. This is only an estimate: real nodes have other antennas and power, and the exact calculations are in the Planner. The terrain data is downloaded from the internet and saved on the device. The filters show only the nodes heard in the chosen period, or one node, and “Count again” counts the reach anew. The distance (1 to 100 km) says how far from a node the reach is counted and drawn; a longer distance takes longer and downloads more terrain data.</string>
     <string name="coverage_legend_strong">strong</string>
     <string name="coverage_legend_weak">weak</string>
     <string name="coverage_loading">Counting the reach: %1$d of %2$d nodes…</string>
@@ -2325,11 +2325,11 @@
     <string name="mt_sw_other_availability_title">Node availability</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>
-    <string name="mt_sw_other_compare_body">In a node\'s position log the route button lets you pick a second node and draws its track beside the first, in another colour. The dialog shows the length and number of positions of both tracks. The map fits both at once.</string>
+    <string name="mt_sw_other_compare_body">In a node's position log the route button lets you pick a second node and draws its track beside the first, in another colour. The dialog shows the length and number of positions of both tracks. The map fits both at once.</string>
     <string name="mt_sw_other_compare_title">Compare two tracks</string>
     <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
     <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
-    <string name="mt_sw_other_coverage_body">In a node\'s position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak. Separately, the "Network coverage" layer works on the main map (the layers button): it draws the estimated reach of every node with a position, counted like in the link planner with the shape of the terrain, as coloured areas (purple weak, yellow strong), with a transparency slider, a colour key and a "Count again" button. A node with an imprecise position is counted from the highest ground within it. With the buttons "All time", "Day", "7 days" and "30 days" and the node list you can show only the nodes heard in the chosen period, or one node. The distance (1 to 100 km) sets how far the reach is counted.</string>
+    <string name="mt_sw_other_coverage_body">In a node's position log (track map) the SNR button colours the track by the signal strength the radio received each position with (red weak, green strong, grey not measured). Only packets received directly, without a relay, count. The layers button saves that track as a coloured KML file you can load as a map layer. The measurements of all nodes together are saved in Network health: Summary, the download button, "Save coverage of all nodes (KML)". The file has one folder per node with coloured dots where the radio heard the node directly — loaded as a map layer it shows where the network is heard well and where it is weak. Separately, the "Network coverage" layer works on the main map (the layers button): it draws the estimated reach of every node with a position, counted like in the link planner with the shape of the terrain, as coloured areas (purple weak, yellow strong), with a transparency slider, a colour key and a "Count again" button. A node with an imprecise position is counted from the highest ground within it. With the buttons "All time", "Day", "7 days" and "30 days" and the node list you can show only the nodes heard in the chosen period, or one node. The distance (1 to 100 km) sets how far the reach is counted.</string>
     <string name="mt_sw_other_coverage_title">Coverage map from measurements</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
@@ -2339,7 +2339,7 @@
     <string name="mt_sw_other_lna_title">LNA correction of a node</string>
     <string name="mt_sw_other_notification_test_body">In Settings the "Try the notifications" section has three buttons: a test SOS alarm, a test notice from the radio and a test new node notification. Each shows at once what that notification looks like, so you can check the sound, the switch and the system setting without waiting for a real event. A kind that is switched off does not arrive as a test either. The node watchdog has its own test button in the node details. Nothing is sent over the radio.</string>
     <string name="mt_sw_other_notification_test_title">Test notifications</string>
-    <string name="mt_sw_other_polarity_body">For a sensor connected the wrong way round. In the node information window (the \"i\" icon) you can swap power with battery percentage and invert the sign of the current, separately for each node. This only changes how values are shown.</string>
+    <string name="mt_sw_other_polarity_body">For a sensor connected the wrong way round. In the node information window (the "i" icon) you can swap power with battery percentage and invert the sign of the current, separately for each node. This only changes how values are shown.</string>
     <string name="mt_sw_other_polarity_title">Inverted power and current</string>
     <string name="mt_sw_other_remote_lists_body">In the node details (Administration → Lists and contacts on the remote device) you enter a node ID and add it to the favorites or ignored list on the remote device over the mesh. The app waits for a confirmation from the network, so you know the change arrived.</string>
     <string name="mt_sw_other_remote_lists_title">Remote favorites and ignored</string>
@@ -2347,7 +2347,7 @@
     <string name="mt_sw_other_silence_title">Node watchdog</string>
     <string name="mt_sw_other_single_instance_body">On the computer the program runs in one copy by default: when you start it a second time, the window of the copy that is already running comes forward (also when it is hidden in the tray), so two copies do not fight over the same node. The "Allow a second copy next to it" switch in MT_SW features lets you run several copies at once; the change applies from the next start.</string>
     <string name="mt_sw_other_single_instance_title">One copy of the program</string>
-    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channels and as a direct message to the chosen nodes (also ones that do not accept messages), with your position, and shows whether the send was confirmed. You can set the channels, the nodes, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer\'s tray menu. The red "SOS" button in the top bar, next to the plate of your node, also opens this screen; you can turn it off or choose the cards where it is shown. A "SOS" widget for the home screen (on iPhone and iPad also for the lock screen) opens this screen too. The shortcuts, the button and the widget only open the screen; the alarm is sent by holding the button.</string>
+    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channels and as a direct message to the chosen nodes (also ones that do not accept messages), with your position, and shows whether the send was confirmed. You can set the channels, the nodes, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer's tray menu. The red "SOS" button in the top bar, next to the plate of your node, also opens this screen; you can turn it off or choose the cards where it is shown. A "SOS" widget for the home screen (on iPhone and iPad also for the lock screen) opens this screen too. The shortcuts, the button and the widget only open the screen; the alarm is sent by holding the button. When an SOS arrives from another copy of the app, the full alarm goes off; in the "Receiving an SOS" part you can limit it to chosen nodes and set quiet hours. Received SOS are saved in the history on this screen. When a send is not confirmed, the "Send SOS again" button sends the alarm once more at once.</string>
     <string name="mt_sw_other_sos_title">SOS</string>
     <string name="mt_sw_other_summary">Where to find features that live next to a node</string>
     <string name="mt_sw_other_title">Other features</string>
@@ -3357,9 +3357,12 @@
     <string name="sos_alarm_flash_switch">Flash the torch in the alarm</string>
     <string name="sos_alarm_from">SOS from %1$s</string>
     <string name="sos_alarm_map">Show on the map</string>
+    <string name="sos_alarm_nodes_title">Nodes whose alarm always goes off</string>
     <string name="sos_alarm_notification_title">SOS from %1$s</string>
     <string name="sos_alarm_notifications">SOS alarm</string>
     <string name="sos_alarm_notifications_description">The alarm for an SOS that another copy of this app sent. It rings again and again until it is confirmed.</string>
+    <string name="sos_alarm_only_chosen_note">When on, only an SOS from the nodes in the list below sets off the full alarm. An SOS from others arrives as an ordinary message and is saved in the history. The list also works in the quiet hours.</string>
+    <string name="sos_alarm_only_chosen_switch">Full alarm only from chosen nodes</string>
     <string name="sos_alarm_open">Open the conversation</string>
     <string name="sos_alarm_test">Test the alarm (only on this device)</string>
     <string name="sos_alarm_test_note">This is a test of the alarm. Nothing was sent.</string>
@@ -3384,6 +3387,12 @@
     <string name="sos_channel_n">Channel %1$d</string>
     <string name="sos_confirm_switch">Tell the sender when I confirm</string>
     <string name="sos_default_message">SOS! I need help.</string>
+    <string name="sos_history_clear">Clear the history</string>
+    <string name="sos_history_empty">No SOS has been received yet.</string>
+    <string name="sos_history_no_position">No sender position</string>
+    <string name="sos_history_note">The last 50 received SOS (alarm tests are not saved). The position is the last known position of the sender.</string>
+    <string name="sos_history_quiet">Alarm kept quiet by a setting</string>
+    <string name="sos_history_with_position">Sender position known</string>
     <string name="sos_hold_seconds">%1$d s</string>
     <string name="sos_hold_tap">Tap</string>
     <string name="sos_include_position">Add my position</string>
@@ -3401,6 +3410,10 @@
     <string name="sos_open">Open SOS</string>
     <string name="sos_position_attached">With position</string>
     <string name="sos_position_missing">Without position (no GPS fix)</string>
+    <string name="sos_quiet_from">From %1$s</string>
+    <string name="sos_quiet_note">In the quiet hours the full alarm goes off only for an SOS from the nodes in the list above (with an empty list, from nobody). Other SOS arrive as an ordinary message and are saved in the history.</string>
+    <string name="sos_quiet_switch">Quiet hours</string>
+    <string name="sos_quiet_to">To %1$s</string>
     <string name="sos_receive_note">An SOS sent by another copy of MT_SW_APP (it carries a hidden mark, so an ordinary text with the word SOS does not count) opens the conversation, covers the whole screen with a big SOS and rings until you confirm it. On Android and iPhone/iPad the alarm also sounds when the phone is locked.</string>
     <string name="sos_receive_switch">Alarm when an SOS is received</string>
     <string name="sos_repeat_count">Number of sends</string>
@@ -3411,11 +3424,13 @@
     <string name="sos_reply_calling_help">I am calling for help.</string>
     <string name="sos_reply_coming">I am coming to you.</string>
     <string name="sos_reply_seen">SOS seen, I am reacting.</string>
+    <string name="sos_resend">Send SOS again</string>
     <string name="sos_result_delivered">Finished: the message was confirmed</string>
     <string name="sos_result_refused">Could not send: the chosen channels are not on the radio</string>
     <string name="sos_result_unconfirmed">Finished: no confirmation</string>
     <string name="sos_section_bar">SOS button in the top bar</string>
     <string name="sos_section_channel">Channels</string>
+    <string name="sos_section_history">History of received SOS</string>
     <string name="sos_section_hold">Holding the button</string>
     <string name="sos_section_message">Message</string>
     <string name="sos_section_nodes">Nodes (direct message)</string>
@@ -3528,7 +3543,7 @@
     <string name="terrain_horizon_from">From</string>
     <string name="terrain_horizon_hint">Drag to turn the view. Green outline: the node stands above the ridge in front of it. Red outline: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
     <string name="terrain_horizon_in_sight">Nodes in sight: %1$d of %2$d</string>
-    <string name="terrain_horizon_info_body">The terrain panorama shows the terrain all around as seen from a chosen place, and which nodes of the mesh stand above the ridge in front of them and which a ridge hides.\n\nHow to read the view\n• The skyline is the terrain all round. Horizontally is the compass direction (e.g. S, 225°), vertically the angle above or below eye level.\n• A node is drawn as on the map: a dot in its colour with a badge carrying the short name above it. Green frame on the badge: the node stands above the ridge in front of it. Red frame: a ridge hides it.\n• This is geometry only. A node in sight can still be out of radio range (power, antennas, obstacles and settings decide), and a hidden one may still be heard through reflections. The link planner shows the exact profile.\n\nButtons\n• From: where you look from. Your node (the default), this phone, any node with a position, or a position typed in by hand.\n• Compass: the panorama turns with the phone. Touching the view switches the compass off so you can look around by hand.\n• Move: a map like the main one with a cross in the middle. Move it and let go, and the panorama is redrawn from the point under the cross. "Back to my node" restores the default place.\n• Range: how far the terrain is worked out and nodes are looked for (2 to 100 km).\n• My antenna: the height of the antenna above the ground where you look from. By default from the node\'s altitude, and it can be set by hand.\n• Gear: the height of the antennas of the nodes shown, the radio-horizon factor (4/3 allows for the bending of the waves, 1 is pure geometry), the field of view, showing only the nodes in sight and the names, and saving terrain offline.\n• Camera: the same view over the phone\'s camera image.\n\nOffline terrain\nSaved terrain works without the internet and the link planner uses it too. How much to save is picked in the options (up to 100 km).\n\nSources: terrain from Mapterhorn, method from the Horizon view of MeshRF (GPL-3.0).\n\nNodes without an exact position have accuracy circles (switch them off in "Options").</string>
+    <string name="terrain_horizon_info_body">The terrain panorama shows the terrain all around as seen from a chosen place, and which nodes of the mesh stand above the ridge in front of them and which a ridge hides.\n\nHow to read the view\n• The skyline is the terrain all round. Horizontally is the compass direction (e.g. S, 225°), vertically the angle above or below eye level.\n• A node is drawn as on the map: a dot in its colour with a badge carrying the short name above it. Green frame on the badge: the node stands above the ridge in front of it. Red frame: a ridge hides it.\n• This is geometry only. A node in sight can still be out of radio range (power, antennas, obstacles and settings decide), and a hidden one may still be heard through reflections. The link planner shows the exact profile.\n\nButtons\n• From: where you look from. Your node (the default), this phone, any node with a position, or a position typed in by hand.\n• Compass: the panorama turns with the phone. Touching the view switches the compass off so you can look around by hand.\n• Move: a map like the main one with a cross in the middle. Move it and let go, and the panorama is redrawn from the point under the cross. "Back to my node" restores the default place.\n• Range: how far the terrain is worked out and nodes are looked for (2 to 100 km).\n• My antenna: the height of the antenna above the ground where you look from. By default from the node's altitude, and it can be set by hand.\n• Gear: the height of the antennas of the nodes shown, the radio-horizon factor (4/3 allows for the bending of the waves, 1 is pure geometry), the field of view, showing only the nodes in sight and the names, and saving terrain offline.\n• Camera: the same view over the phone's camera image.\n\nOffline terrain\nSaved terrain works without the internet and the link planner uses it too. How much to save is picked in the options (up to 100 km).\n\nSources: terrain from Mapterhorn, method from the Horizon view of MeshRF (GPL-3.0).\n\nNodes without an exact position have accuracy circles (switch them off in "Options").</string>
     <string name="terrain_horizon_info_title">About the terrain panorama</string>
     <string name="terrain_horizon_labels">Names</string>
     <string name="terrain_horizon_loading">Reading terrain…</string>
@@ -3627,7 +3642,7 @@
     <string name="track_compare_empty">No other nodes with a position.</string>
     <string name="track_compare_off">Turn comparison off</string>
     <string name="track_compare_summary">%1$s: %2$d positions, %3$s</string>
-    <string name="track_compare_title">Compare with a node\'s track</string>
+    <string name="track_compare_title">Compare with a node's track</string>
     <string name="track_export_kml">Save coverage (KML)</string>
     <string name="track_info_title">Coverage and track comparison</string>
     <string name="track_legend_compare">Route: draws the track of a second node beside this one, in another colour, to compare the two routes.</string>
@@ -3676,7 +3691,7 @@
     <string name="translator_downloading">Downloading the model: %1$d%</string>
     <string name="translator_error_failed">Translation failed. The device may be short of memory.</string>
     <string name="translator_error_same">The text is already in that language.</string>
-    <string name="translator_error_unknown">Could not tell the language of the text. Choose it in the \"From\" list.</string>
+    <string name="translator_error_unknown">Could not tell the language of the text. Choose it in the "From" list.</string>
     <string name="translator_export_title">MT_SW – translator conversation</string>
     <string name="translator_failed">The download failed. Tap to try again.</string>
     <string name="translator_from">From</string>
@@ -3810,7 +3825,7 @@
     <string name="whats_new_language">en</string>
     <string name="whats_new_open_desc">What changed since the last stable version, or everything from the start, in groups: new features, improvements, fixed bugs, changes against the original</string>
     <string name="whats_new_since_stable">Since the last stable</string>
-    <string name="whats_new_title">What\'s new in the app</string>
+    <string name="whats_new_title">What's new in the app</string>
     <!-- WIDGET -->
     <string name="widget_adaptive_mesh_status_shown">Mesh status on the home-screen widget</string>
     <string name="widget_adaptive_off_summary">Show the whole mesh or one node on the home-screen widget</string>

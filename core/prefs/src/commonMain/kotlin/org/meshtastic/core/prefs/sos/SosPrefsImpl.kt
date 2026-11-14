@@ -32,6 +32,7 @@ import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
+import org.meshtastic.core.repository.SosQuietHours
 
 @Single
 class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : SosPrefs {
@@ -78,7 +79,38 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_CONFIRM] = on } }
     }
 
+    // Written as the node numbers joined by commas; no value or an empty text means none.
+    override val alarmNodes: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs ->
+                prefs[KEY_ALARM_NODES]?.split(',')?.mapNotNull { it.trim().toIntOrNull() }?.toSet().orEmpty()
+            }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setAlarmNodes(nodes: Set<Int>) {
+        scope.launch { dataStore.edit { it[KEY_ALARM_NODES] = nodes.joinToString(",") } }
+    }
+
+    override val alarmOnlyChosen: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_ONLY_CHOSEN] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setAlarmOnlyChosen(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_ONLY_CHOSEN] = on } }
+    }
+
+    override val quietHours: StateFlow<SosQuietHours> =
+        dataStore.data
+            .map { SosQuietHours.decode(it[KEY_QUIET]) }
+            .stateIn(scope, SharingStarted.Eagerly, SosQuietHours())
+
+    override fun setQuietHours(hours: SosQuietHours) {
+        scope.launch { dataStore.edit { it[KEY_QUIET] = hours.encode() } }
+    }
+
     private companion object {
+        val KEY_ALARM_NODES = stringPreferencesKey("sos_alarm_nodes")
+        val KEY_ONLY_CHOSEN = booleanPreferencesKey("sos_alarm_only_chosen")
+        val KEY_QUIET = stringPreferencesKey("sos_quiet_hours")
         val KEY_FLASH = booleanPreferencesKey("sos_alarm_flash")
         val KEY_CONFIRM = booleanPreferencesKey("sos_confirm_to_sender")
         val KEY_RECEIVE = booleanPreferencesKey("sos_receive_alarm")
