@@ -16,7 +16,9 @@
  */
 package org.meshtastic.core.prefs.sos
 
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -26,27 +28,39 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.SosHistory
 import org.meshtastic.core.repository.SosHistoryCodec
 import org.meshtastic.core.repository.SosHistoryEntry
 
-/** The history of received SOS, kept in the same store as the other SOS settings. */
+/**
+ * The history of received SOS, kept in the same store as the other SOS settings. With [keepDays] set, entries older
+ * than that are left out when read and removed from the store when something is written (and once at start).
+ */
 @Single
 class SosHistoryImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : SosHistory {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
     override val entries: StateFlow<List<SosHistoryEntry>> =
         dataStore.data
-            .map { SosHistoryCodec.decode(it[KEY_HISTORY]) }
+            .map { SosHistoryCodec.prune(SosHistoryCodec.decode(it[KEY_HISTORY]), it[KEY_KEEP] ?: 0, nowMillis) }
             .stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    override val keepDays: StateFlow<Int> =
+        dataStore.data.map { it[KEY_KEEP] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    init {
+        scope.launch { dataStore.edit { writePruned(it) } }
+    }
 
     override fun add(entry: SosHistoryEntry) {
         scope.launch {
             dataStore.edit {
                 val all = listOf(entry) + SosHistoryCodec.decode(it[KEY_HISTORY])
                 it[KEY_HISTORY] = SosHistoryCodec.encode(all.take(SosHistoryCodec.MAX_ENTRIES))
+                writePruned(it)
             }
         }
     }
@@ -55,7 +69,23 @@ class SosHistoryImpl(private val dataStore: UiDataStore, dispatchers: CoroutineD
         scope.launch { dataStore.edit { it[KEY_HISTORY] = "" } }
     }
 
+    override fun setKeepDays(days: Int) {
+        scope.launch {
+            dataStore.edit {
+                it[KEY_KEEP] = days.coerceAtLeast(0)
+                writePruned(it)
+            }
+        }
+    }
+
+    private fun writePruned(prefs: MutablePreferences) {
+        val text = prefs[KEY_HISTORY] ?: return
+        val kept = SosHistoryCodec.prune(SosHistoryCodec.decode(text), prefs[KEY_KEEP] ?: 0, nowMillis)
+        prefs[KEY_HISTORY] = SosHistoryCodec.encode(kept)
+    }
+
     private companion object {
         val KEY_HISTORY = stringPreferencesKey("sos_history")
+        val KEY_KEEP = intPreferencesKey("sos_history_keep_days")
     }
 }

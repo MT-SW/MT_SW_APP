@@ -3281,6 +3281,12 @@ soil_temperature
 soil_water_metrics
 solar_irradiance
 ### SOS ###
+sos_ack_coming
+sos_ack_help
+sos_ack_seen
+sos_acks_button
+sos_acks_empty
+sos_acks_title
 sos_alarm_bell_notifications
 sos_alarm_bell_notifications_description
 sos_alarm_confirm
@@ -3320,6 +3326,9 @@ sos_default_message
 sos_history_clear
 sos_history_empty
 sos_history_export
+sos_history_keep_days
+sos_history_keep_forever
+sos_history_keep_title
 sos_history_no_position
 sos_history_note
 sos_history_quiet
@@ -3328,6 +3337,7 @@ sos_hold_seconds
 sos_hold_tap
 sos_include_position
 sos_intro
+sos_message_for
 sos_message_label
 sos_nodes_add
 sos_nodes_done
@@ -3350,6 +3360,9 @@ sos_receive_note
 sos_receive_switch
 sos_repeat_count
 sos_repeat_every
+sos_repeat_gate_minutes
+sos_repeat_gate_note
+sos_repeat_gate_switch
 sos_repeat_once
 sos_repeat_unlimited
 sos_repeat_unlimited_note
@@ -3383,6 +3396,7 @@ sos_style_silent
 sos_style_siren
 sos_style_title
 sos_summary
+sos_targets_note
 sos_title
 speed
 speed_kmh

@@ -2347,7 +2347,7 @@
     <string name="mt_sw_other_silence_title">Node watchdog</string>
     <string name="mt_sw_other_single_instance_body">On the computer the program runs in one copy by default: when you start it a second time, the window of the copy that is already running comes forward (also when it is hidden in the tray), so two copies do not fight over the same node. The "Allow a second copy next to it" switch in MT_SW features lets you run several copies at once; the change applies from the next start.</string>
     <string name="mt_sw_other_single_instance_title">One copy of the program</string>
-    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channels and as a direct message to the chosen nodes (also ones that do not accept messages), with your position, and shows whether the send was confirmed. You can set the channels, the nodes, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer's tray menu. The red "SOS" button in the top bar, next to the plate of your node, also opens this screen; you can turn it off or choose the cards where it is shown. A "SOS" widget for the home screen (on iPhone and iPad also for the lock screen) opens this screen too. The shortcuts, the button and the widget only open the screen; the alarm is sent by holding the button. When an SOS arrives from another copy of the app, the full alarm goes off; in the "Receiving an SOS" part you can limit it to chosen nodes and set quiet hours. Received SOS are saved in the history on this screen. When a send is not confirmed, the "Send SOS again" button sends the alarm once more at once. You choose the alarm sound (siren, bell, silent) separately for the nodes in the list, the history can be saved to a file, and the number of repeats can be set to "No limit".</string>
+    <string name="mt_sw_other_sos_body">In "MT_SW features" the SOS screen has a big button. Held for the set time (or tapped, if you choose so), it sends an emergency message to the chosen channels and as a direct message to the chosen nodes (also ones that do not accept messages), with your position, and shows whether the send was confirmed. You can set the channels, the nodes, the text, the position, repeating (every 1 to 30 minutes, up to 50 times, with a stop after the first confirmation) and how long the button must be held. It keeps repeating when you close the screen; only "Stop" ends it. The screen also opens from a "SOS" tile in the Android quick settings, a "SOS MT_SW" shortcut on iPhone and iPad (Siri, Shortcuts, the action button) and a "SOS" item in the computer's tray menu. The red "SOS" button in the top bar, next to the plate of your node, also opens this screen; you can turn it off or choose the cards where it is shown. A "SOS" widget for the home screen (on iPhone and iPad also for the lock screen) opens this screen too. The shortcuts, the button and the widget only open the screen; the alarm is sent by holding the button. When an SOS arrives from another copy of the app, the full alarm goes off; in the "Receiving an SOS" part you can limit it to chosen nodes and set quiet hours. Received SOS are saved in the history on this screen. When a send is not confirmed, the "Send SOS again" button sends the alarm once more at once. You choose the alarm sound (siren, bell, silent) separately for the nodes in the list, the history can be saved to a file, and the number of repeats can be set to "No limit". An extra option sets off the alarm only after a second SOS from the same node (the main safeguard is the hold time). The "Who confirmed the SOS" button shows who answered the SOS you sent. A channel or node can have a separate text, and the history can clean itself after the chosen number of days.</string>
     <string name="mt_sw_other_sos_title">SOS</string>
     <string name="mt_sw_other_summary">Where to find features that live next to a node</string>
     <string name="mt_sw_other_title">Other features</string>
@@ -3353,6 +3353,12 @@
     <string name="soil_water_metrics">Soil &amp; Water</string>
     <string name="solar_irradiance">Solar Irradiance</string>
     <!-- SOS -->
+    <string name="sos_ack_coming">Is on the way</string>
+    <string name="sos_ack_help">Is calling for help</string>
+    <string name="sos_ack_seen">Saw the SOS</string>
+    <string name="sos_acks_button">Who confirmed the SOS (%1$d)</string>
+    <string name="sos_acks_empty">Nobody has confirmed this SOS yet. Answers from other copies of this app appear here by themselves.</string>
+    <string name="sos_acks_title">Who confirmed the SOS</string>
     <string name="sos_alarm_bell_notifications">SOS alarm (bell)</string>
     <string name="sos_alarm_bell_notifications_description">The alarm for an SOS from a node that is set to the bell. It rings again and again until you confirm it, but more gently than the siren.</string>
     <string name="sos_alarm_confirm">Confirm, stop the alarm</string>
@@ -3392,6 +3398,9 @@
     <string name="sos_history_clear">Clear the history</string>
     <string name="sos_history_empty">No SOS has been received yet.</string>
     <string name="sos_history_export">Save the history to a file</string>
+    <string name="sos_history_keep_days">After %1$d days</string>
+    <string name="sos_history_keep_forever">Never</string>
+    <string name="sos_history_keep_title">Remove old entries by themselves</string>
     <string name="sos_history_no_position">No sender position</string>
     <string name="sos_history_note">The last 50 received SOS (alarm tests are not saved). The position is the last known position of the sender.</string>
     <string name="sos_history_quiet">Alarm kept quiet by a setting</string>
@@ -3400,6 +3409,7 @@
     <string name="sos_hold_tap">Tap</string>
     <string name="sos_include_position">Add my position</string>
     <string name="sos_intro">Sends an emergency message with your position to the chosen channels and as a direct message to the chosen nodes, and watches whether it was delivered. Hold the button for the set time so it cannot be pressed by accident.</string>
+    <string name="sos_message_for">Text for: %1$s</string>
     <string name="sos_message_label">Text (empty = default)</string>
     <string name="sos_nodes_add">Add or remove nodes</string>
     <string name="sos_nodes_done">Done</string>
@@ -3422,6 +3432,9 @@
     <string name="sos_receive_switch">Alarm when an SOS is received</string>
     <string name="sos_repeat_count">Number of sends</string>
     <string name="sos_repeat_every">Every %1$d min</string>
+    <string name="sos_repeat_gate_minutes">%1$d min</string>
+    <string name="sos_repeat_gate_note">Extra option, off by default. When on, the first SOS from a node only arrives as an ordinary message; the full alarm goes off when the same node sends another one within the chosen time. The main safeguard against an accidental SOS is still the hold time of the button.</string>
+    <string name="sos_repeat_gate_switch">Alarm only after a second SOS</string>
     <string name="sos_repeat_once">Once</string>
     <string name="sos_repeat_unlimited">No limit</string>
     <string name="sos_repeat_unlimited_note">With no limit the SOS is sent every chosen number of minutes until a send is confirmed (when stopping after a confirmation is off, until you tap "Stop").</string>
@@ -3455,6 +3468,7 @@
     <string name="sos_style_siren">Siren</string>
     <string name="sos_style_title">Alarm sound for the nodes in the list</string>
     <string name="sos_summary">An emergency button: sends a message with your position to the chosen channels and as a direct message to the chosen nodes, and checks whether it was delivered.</string>
+    <string name="sos_targets_note">You can set a different text for each chosen channel or node below (empty = the text above).</string>
     <string name="sos_title">SOS</string>
     <string name="speed">Speed</string>
     <string name="speed_kmh">%1$d Km/h</string>

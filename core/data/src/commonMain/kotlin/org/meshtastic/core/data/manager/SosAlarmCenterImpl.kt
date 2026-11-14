@@ -30,6 +30,10 @@ import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.SosAck
+import org.meshtastic.core.repository.SosAckEntry
+import org.meshtastic.core.repository.SosAckMarker
+import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlarmPolicy
 import org.meshtastic.core.repository.SosAlarmStyle
@@ -57,6 +61,7 @@ import org.meshtastic.core.resources.sos_reply_seen
 class SosAlarmCenterImpl(
     private val prefs: SosPrefs,
     private val history: SosHistory,
+    private val acks: SosAcks,
     private val notifications: MeshNotificationManager,
     private val sendMessage: SendMessageUseCase,
     private val nodes: NodeRepository,
@@ -66,12 +71,15 @@ class SosAlarmCenterImpl(
 
     /** The sound that is going now (null when none); a silent alarm leaves it null. */
     private var sounding: SosAlarmStyle? = null
+
+    /** When each node's last SOS came (for the "second SOS" option); kept in memory only. */
+    private val lastSeen = mutableMapOf<Int, Long>()
     override val alert: StateFlow<SosAlert?> = mutableAlert.asStateFlow()
 
     override fun raise(alert: SosAlert) {
         val shown = alert.copy(text = SosMarker.clean(alert.text))
         // A test always rings, so the person can hear what the alarm is like; a real one follows the settings.
-        val rings =
+        val allowed =
             SosAlarmPolicy.rings(
                 test = shown.test,
                 receive = prefs.receiveAlarm.value,
@@ -82,6 +90,9 @@ class SosAlarmCenterImpl(
                 quietExceptions = prefs.quietExceptions.value,
                 minuteOfDay = minuteOfDay(),
             )
+        // Noted for every real SOS, also when it does not ring, so the next one counts as the second.
+        val waits = !shown.test && waitsForSecond(shown)
+        val rings = allowed && !waits
         if (!shown.test) record(shown, rings)
         if (!rings) {
             Logger.i { "SOS alarm: kept quiet (settings) for ${shown.senderName}" }
@@ -102,6 +113,23 @@ class SosAlarmCenterImpl(
         val flash = prefs.alarmFlash.value && style == SosAlarmStyle.SIREN
         runCatching { SosAlarmSounds.current?.start(flash, style) }
         scope.launch { notifications.showSosAlarmNotification(shown.contactKey, shown.senderName, shown.text, style) }
+    }
+
+    /**
+     * True when the option "alarm only after a second SOS" is on and this is the first one from that node in the
+     * chosen time. Every real SOS is noted, so the next one from the same node counts as the second.
+     */
+    private fun waitsForSecond(alert: SosAlert): Boolean {
+        val now = nowMillis
+        val second =
+            SosAlarmPolicy.isSecond(alert.fromNodeNum, lastSeen, now, prefs.repeatGateMinutes.value)
+        alert.fromNodeNum?.let { lastSeen[it] = now }
+        return prefs.repeatGate.value && !second
+    }
+
+    override fun ackReceived(fromNodeNum: Int, senderName: String, ack: SosAck) {
+        Logger.i { "SOS alarm: $senderName answered $ack" }
+        acks.add(SosAckEntry(time = nowMillis, nodeNum = fromNodeNum, name = senderName, ack = ack))
     }
 
     /** Local time of day, in minutes since midnight. */
@@ -129,12 +157,15 @@ class SosAlarmCenterImpl(
 
     override fun acknowledge() {
         val ringing = stop() ?: return
-        if (prefs.confirmToSender.value) sendToSender(ringing) { getStringSuspend(Res.string.sos_reply_seen) }
+        if (prefs.confirmToSender.value) {
+            sendToSender(ringing, SosAck.SEEN) { getStringSuspend(Res.string.sos_reply_seen) }
+        }
     }
 
     override fun reply(reply: SosReply) {
         val ringing = stop() ?: return
-        sendToSender(ringing) {
+        val ack = if (reply == SosReply.COMING) SosAck.COMING else SosAck.CALLING_HELP
+        sendToSender(ringing, ack) {
             getStringSuspend(
                 when (reply) {
                     SosReply.COMING -> Res.string.sos_reply_coming
@@ -155,11 +186,12 @@ class SosAlarmCenterImpl(
         return ringing
     }
 
-    private fun sendToSender(ringing: SosAlert, text: suspend () -> String) {
+    /** Sends [text] to the sender with the hidden mark of [ack], so the sender's copy can list who answered. */
+    private fun sendToSender(ringing: SosAlert, ack: SosAck, text: suspend () -> String) {
         val num = ringing.fromNodeNum ?: return
         if (ringing.test) return
         scope.launch {
-            runCatching { sendMessage(text(), directKey(num)) }
+            runCatching { sendMessage(SosAckMarker.tag(ack) + text(), directKey(num)) }
                 .onFailure { Logger.w(it) { "SOS alarm: the answer to the sender could not be sent" } }
         }
     }

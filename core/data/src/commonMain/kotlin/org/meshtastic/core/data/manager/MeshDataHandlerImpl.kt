@@ -67,6 +67,7 @@ import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.RemoteShellHandler
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosAckMarker
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.ServiceStateWriter
@@ -543,11 +544,19 @@ class MeshDataHandlerImpl(
      * An SOS written by another copy of this app (it carries [SosMarker]) rings the alarm and opens the conversation.
      * Old messages that only arrive late (history from a node) and our own messages are left out.
      */
+    @Suppress("ReturnCount")
     private suspend fun raiseSosAlarmIfNeeded(dataPacket: DataPacket, contactKey: String, fromLocal: Boolean) {
         if (fromLocal || dataPacket.dataType != PortNum.TEXT_MESSAGE_APP.value) return
         val text = dataPacket.text ?: return
-        if (!SosMarker.isSos(text)) return
         if (nowMillis - dataPacket.time > SOS_MAX_AGE_MS) return
+        // An answer of a recipient to an SOS we sent: it goes into the list of who confirmed.
+        SosAckMarker.parse(text)?.let { ack ->
+            nodeManager.getNodeById(dataPacket.from.orEmpty())?.num?.let { num ->
+                sosAlarm.ackReceived(num, getSenderName(dataPacket), ack)
+            }
+            return
+        }
+        if (!SosMarker.isSos(text)) return
         sosAlarm.raise(
             SosAlert(
                 id = nowMillis,

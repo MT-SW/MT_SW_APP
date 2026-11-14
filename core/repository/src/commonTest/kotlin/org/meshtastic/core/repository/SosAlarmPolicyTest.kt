@@ -160,4 +160,63 @@ class SosAlarmPolicyTest {
         val many = (1..SosHistoryCodec.MAX_ENTRIES + 10).map { SosHistoryEntry(it.toLong(), 1, "n", "k", "t") }
         assertEquals(SosHistoryCodec.MAX_ENTRIES, SosHistoryCodec.decode(SosHistoryCodec.encode(many)).size)
     }
+
+    @Test
+    fun secondSosCountsOnlyInsideTheWindow() {
+        val minute = 60_000L
+        val seen = mapOf(7 to 100 * minute)
+        assertFalse(SosAlarmPolicy.isSecond(7, emptyMap(), 100 * minute, 10))
+        assertTrue(SosAlarmPolicy.isSecond(7, seen, 105 * minute, 10))
+        assertTrue(SosAlarmPolicy.isSecond(7, seen, 110 * minute, 10))
+        assertFalse(SosAlarmPolicy.isSecond(7, seen, 111 * minute, 10))
+        assertFalse(SosAlarmPolicy.isSecond(8, seen, 101 * minute, 10))
+        assertTrue(SosAlarmPolicy.isSecond(null, seen, 101 * minute, 10))
+    }
+
+    @Test
+    fun historyPruneRemovesOldEntries() {
+        val day = 86_400_000L
+        val now = 100 * day
+        val entries =
+            listOf(
+                SosHistoryEntry(now - 2 * day, 1, "a", "k", "t"),
+                SosHistoryEntry(now - 40 * day, 1, "b", "k", "t"),
+            )
+        assertEquals(entries, SosHistoryCodec.prune(entries, 0, now))
+        assertEquals(entries.take(1), SosHistoryCodec.prune(entries, 30, now))
+        assertEquals(entries, SosHistoryCodec.prune(entries, 90, now))
+    }
+
+    @Test
+    fun ackMarkerIsFoundAndRemoved() {
+        for (ack in SosAck.entries) {
+            val text = SosAckMarker.tag(ack) + "SOS odebrany"
+            assertEquals(ack, SosAckMarker.parse(text))
+            assertEquals("SOS odebrany", SosAckMarker.clean(text))
+        }
+        assertEquals(null, SosAckMarker.parse("zwykły tekst"))
+        assertEquals(null, SosAckMarker.parse(null))
+        assertFalse(SosMarker.isSos(SosAckMarker.tag(SosAck.SEEN) + "tekst"))
+    }
+
+    @Test
+    fun acksEncodeAndDecode() {
+        val entries =
+            listOf(
+                SosAckEntry(2L, 5, "Ala | ma", SosAck.COMING),
+                SosAckEntry(1L, 6, "Olek", SosAck.SEEN),
+            )
+        assertEquals(entries, SosAckCodec.decode(SosAckCodec.encode(entries)))
+        assertEquals(emptyList(), SosAckCodec.decode(""))
+        assertEquals(emptyList(), SosAckCodec.decode("zepsute"))
+    }
+
+    @Test
+    fun targetMessagesEncodeAndDecode() {
+        val messages = mapOf(SosTargets.channelKey(1) to "Dla rodziny
+Pomocy", SosTargets.nodeKey(42) to "Do Oleka")
+        assertEquals(messages, SosTargets.decode(SosTargets.encode(messages)))
+        assertEquals(emptyMap(), SosTargets.decode(SosTargets.encode(mapOf("c0" to "  "))))
+        assertEquals(emptyMap(), SosTargets.decode(null))
+    }
 }

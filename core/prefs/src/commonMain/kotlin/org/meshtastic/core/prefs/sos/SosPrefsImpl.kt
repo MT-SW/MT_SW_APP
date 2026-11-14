@@ -18,6 +18,7 @@ package org.meshtastic.core.prefs.sos
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -34,16 +35,25 @@ import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosQuietHours
+import org.meshtastic.core.repository.SosTargets
 
 @Single
 class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : SosPrefs {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
+    // The own texts of single recipients are kept under a key of their own and put back into the config here.
     override val config: StateFlow<SosConfig> =
-        dataStore.data.map { SosConfig.decode(it[KEY_SOS]) }.stateIn(scope, SharingStarted.Eagerly, SosConfig())
+        dataStore.data
+            .map { SosConfig.decode(it[KEY_SOS]).copy(targetMessages = SosTargets.decode(it[KEY_TARGETS])) }
+            .stateIn(scope, SharingStarted.Eagerly, SosConfig())
 
     override fun setConfig(config: SosConfig) {
-        scope.launch { dataStore.edit { it[KEY_SOS] = config.encode() } }
+        scope.launch {
+            dataStore.edit {
+                it[KEY_SOS] = config.encode()
+                it[KEY_TARGETS] = SosTargets.encode(config.targetMessages)
+            }
+        }
     }
 
     // Written as the keys joined by commas; an empty text means none (the button is off), no value means all.
@@ -128,7 +138,28 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_STYLES] = SosAlarmStyle.encodeMap(styles) } }
     }
 
+    override val repeatGate: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_GATE] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setRepeatGate(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_GATE] = on } }
+    }
+
+    override val repeatGateMinutes: StateFlow<Int> =
+        dataStore.data
+            .map { it[KEY_GATE_MINUTES] ?: DEFAULT_GATE_MINUTES }
+            .stateIn(scope, SharingStarted.Eagerly, DEFAULT_GATE_MINUTES)
+
+    override fun setRepeatGateMinutes(minutes: Int) {
+        scope.launch { dataStore.edit { it[KEY_GATE_MINUTES] = minutes.coerceIn(1, MAX_GATE_MINUTES) } }
+    }
+
     private companion object {
+        const val DEFAULT_GATE_MINUTES = 10
+        const val MAX_GATE_MINUTES = 120
+        val KEY_TARGETS = stringPreferencesKey("sos_target_messages")
+        val KEY_GATE = booleanPreferencesKey("sos_repeat_gate")
+        val KEY_GATE_MINUTES = intPreferencesKey("sos_repeat_gate_minutes")
         val KEY_QUIET_NODES = stringPreferencesKey("sos_quiet_exceptions")
         val KEY_STYLES = stringPreferencesKey("sos_alarm_styles")
         val KEY_ALARM_NODES = stringPreferencesKey("sos_alarm_nodes")

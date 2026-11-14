@@ -38,6 +38,11 @@ data class SosConfig(
     val repeatCount: Int = DEFAULT_REPEAT_COUNT,
     val stopWhenDelivered: Boolean = true,
     val holdSeconds: Int = DEFAULT_HOLD_SECONDS,
+    /**
+     * Own texts for single recipients, by the keys of [SosTargets] (a channel or a node); a recipient without one gets
+     * [message]. Kept apart from [encode], which does not write them.
+     */
+    val targetMessages: Map<String, String> = emptyMap(),
 ) {
     /** How long the SOS button of the top bars has to be held: never less than [BAR_MIN_HOLD_SECONDS]. */
     val barHoldSeconds: Int
@@ -126,6 +131,32 @@ data class SosConfig(
     }
 }
 
+/** The keys of the recipients that can have a text of their own (see [SosConfig.targetMessages]). */
+object SosTargets {
+    private const val ENTRY_SEPARATOR = '\u001E'
+    private const val FIELD_SEPARATOR = '\u001F'
+
+    fun channelKey(index: Int): String = "c$index"
+
+    fun nodeKey(num: Int): String = "n$num"
+
+    /** Writes the texts; an empty text means none and is left out. */
+    fun encode(messages: Map<String, String>): String = messages.entries
+        .filter { it.value.isNotBlank() }
+        .joinToString("$ENTRY_SEPARATOR") { "${it.key}$FIELD_SEPARATOR${it.value.filterNot(::isSeparator)}" }
+
+    /** Reads what [encode] wrote; unreadable parts are skipped. */
+    fun decode(text: String?): Map<String, String> = text.orEmpty()
+        .split(ENTRY_SEPARATOR)
+        .mapNotNull { entry ->
+            val parts = entry.split(FIELD_SEPARATOR, limit = 2)
+            if (parts.size == 2 && parts[0].isNotEmpty() && parts[1].isNotBlank()) parts[0] to parts[1] else null
+        }
+        .toMap()
+
+    private fun isSeparator(c: Char): Boolean = c == ENTRY_SEPARATOR || c == FIELD_SEPARATOR
+}
+
 /**
  * The cards (screens) whose top bar carries the red SOS button, named by the keys below. All of them by default; none
  * means the button is off everywhere.
@@ -193,6 +224,16 @@ interface SosPrefs {
     val alarmStyles: StateFlow<Map<Int, SosAlarmStyle>>
 
     fun setAlarmStyles(styles: Map<Int, SosAlarmStyle>)
+
+    /** True when the full alarm goes off only for a second SOS from the same node (off by default). */
+    val repeatGate: StateFlow<Boolean>
+
+    fun setRepeatGate(on: Boolean)
+
+    /** The minutes in which the second SOS has to come for [repeatGate]. */
+    val repeatGateMinutes: StateFlow<Int>
+
+    fun setRepeatGateMinutes(minutes: Int)
 }
 
 /** How the alarm of a received SOS sounds. */
@@ -290,6 +331,18 @@ object SosAlarmPolicy {
         return true
     }
 
+    /**
+     * True when this SOS counts as the second one: the same node sent one less than [windowMinutes] minutes ago
+     * ([lastSeen] holds the time of each node's last SOS). A sender that is not known cannot be judged, so it counts.
+     */
+    fun isSecond(senderNum: Int?, lastSeen: Map<Int, Long>, now: Long, windowMinutes: Int): Boolean {
+        if (senderNum == null) return true
+        val last = lastSeen[senderNum] ?: return false
+        return now - last <= windowMinutes * MILLIS_PER_MINUTE
+    }
+
+    private const val MILLIS_PER_MINUTE = 60_000L
+
     /** The sound for an SOS from [senderNum]: the one set for a node in [chosen], else the siren. */
     fun styleFor(senderNum: Int?, chosen: Set<Int>, styles: Map<Int, SosAlarmStyle>): SosAlarmStyle =
         if (senderNum != null && senderNum in chosen) styles[senderNum] ?: SosAlarmStyle.SIREN else SosAlarmStyle.SIREN
@@ -315,6 +368,11 @@ interface SosHistory {
     fun add(entry: SosHistoryEntry)
 
     fun clear()
+
+    /** Entries older than this many days are removed by themselves; 0 (the default) keeps them all. */
+    val keepDays: StateFlow<Int>
+
+    fun setKeepDays(days: Int)
 }
 
 /** Writes and reads the history as one text: entries apart by one separator, the fields of an entry by another. */
@@ -339,6 +397,12 @@ object SosHistoryCodec {
     }
 
     private fun isSeparator(c: Char): Boolean = c == ENTRY_SEPARATOR || c == FIELD_SEPARATOR
+
+    /** [entries] without those older than [keepDays] days at [now]; [keepDays] 0 or less keeps them all. */
+    fun prune(entries: List<SosHistoryEntry>, keepDays: Int, now: Long): List<SosHistoryEntry> =
+        if (keepDays <= 0) entries else entries.filter { now - it.time <= keepDays * MILLIS_PER_DAY }
+
+    private const val MILLIS_PER_DAY = 86_400_000L
 
     /** Entries that cannot be read are skipped; nothing readable gives an empty list. */
     fun decode(text: String?): List<SosHistoryEntry> {
@@ -392,6 +456,83 @@ object SosMarker {
     fun clean(text: String): String = text.replace(TAG, "")
 }
 
+/** What a recipient answered to an SOS: it was seen, they are coming, or they are calling for help. */
+enum class SosAck(internal val bits: String) {
+    SEEN("01001101"),
+    COMING("01001110"),
+    CALLING_HELP("01001011"),
+}
+
+/**
+ * The hidden mark in front of the answers a recipient's copy of this app sends, so the sender's copy can tell who
+ * confirmed (see [SosAck]). Like [SosMarker] it is no lock, only a way to tell these answers from an ordinary text.
+ */
+object SosAckMarker {
+    private const val START = '\u2063'
+    private const val END = '\u2064'
+    private const val ZERO = '\u200B'
+    private const val ONE = '\u200C'
+    private const val SEARCH_LENGTH = 24
+
+    /** The characters written in front of the answer [ack]. */
+    fun tag(ack: SosAck): String = buildString {
+        append(START)
+        ack.bits.forEach { append(if (it == '1') ONE else ZERO) }
+        append(END)
+    }
+
+    /** The answer that [text] opens with, or null when it is an ordinary text. */
+    fun parse(text: String?): SosAck? {
+        val head = text?.take(SEARCH_LENGTH) ?: return null
+        return SosAck.entries.firstOrNull { head.contains(tag(it)) }
+    }
+
+    /** [text] without any mark. */
+    fun clean(text: String): String = SosAck.entries.fold(text) { acc, ack -> acc.replace(tag(ack), "") }
+}
+
+/** One answer of a recipient to our SOS. */
+data class SosAckEntry(val time: Long, val nodeNum: Int, val name: String, val ack: SosAck)
+
+/** The answers to the SOS we sent last (cleared when a new SOS is started), the newest first. */
+interface SosAcks {
+    val entries: StateFlow<List<SosAckEntry>>
+
+    fun add(entry: SosAckEntry)
+
+    fun clear()
+}
+
+/** Writes and reads the answers as one text. */
+object SosAckCodec {
+    const val MAX_ENTRIES = 50
+    private const val ENTRY_SEPARATOR = '\u001E'
+    private const val FIELD_SEPARATOR = '\u001F'
+    private const val FIELDS = 4
+
+    fun encode(entries: List<SosAckEntry>): String = entries.take(MAX_ENTRIES).joinToString("$ENTRY_SEPARATOR") {
+        listOf(it.time.toString(), it.nodeNum.toString(), it.name.filterNot(::isSeparator), it.ack.name)
+            .joinToString("$FIELD_SEPARATOR")
+    }
+
+    fun decode(text: String?): List<SosAckEntry> {
+        if (text.isNullOrEmpty()) return emptyList()
+        return text.split(ENTRY_SEPARATOR).mapNotNull { entry ->
+            val f = entry.split(FIELD_SEPARATOR)
+            val time = f.getOrNull(0)?.toLongOrNull()
+            val num = f.getOrNull(1)?.toIntOrNull()
+            val ack = SosAck.entries.firstOrNull { it.name == f.getOrNull(3) }
+            if (f.size != FIELDS || time == null || num == null || ack == null) {
+                null
+            } else {
+                SosAckEntry(time, num, f[2], ack)
+            }
+        }
+    }
+
+    private fun isSeparator(c: Char): Boolean = c == ENTRY_SEPARATOR || c == FIELD_SEPARATOR
+}
+
 /** An SOS that arrived (or a test of the alarm, [test]); [contactKey] is the conversation it came in. */
 data class SosAlert(
     val id: Long,
@@ -433,6 +574,9 @@ interface SosAlarmCenter {
 
     /** Answers the sender with a ready message and confirms the alarm. Does nothing but confirm for a test. */
     fun reply(reply: SosReply)
+
+    /** A recipient answered an SOS we sent (the answer carries [SosAckMarker]): it goes into the list of [SosAcks]. */
+    fun ackReceived(fromNodeNum: Int, senderName: String, ack: SosAck)
 }
 
 /**

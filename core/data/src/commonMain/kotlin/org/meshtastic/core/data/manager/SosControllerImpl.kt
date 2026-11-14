@@ -35,10 +35,12 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
+import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosMarker
 import org.meshtastic.core.repository.SosState
+import org.meshtastic.core.repository.SosTargets
 import org.meshtastic.core.repository.usecase.SendMessageOutcome
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 import org.meshtastic.core.resources.Res
@@ -59,6 +61,7 @@ class SosControllerImpl(
     private val packets: PacketRepository,
     private val nodes: NodeRepository,
     private val phone: PhoneLocationProvider,
+    private val acks: SosAcks,
     private val scope: ServiceScope,
 ) : SosController {
     private val mutableState = MutableStateFlow(SosState())
@@ -67,6 +70,8 @@ class SosControllerImpl(
 
     override fun start(config: SosConfig) {
         if (job?.isActive == true) return
+        // The answers shown are always those to the SOS sent last.
+        acks.clear()
         job = scope.launch { run(config) }
     }
 
@@ -91,9 +96,9 @@ class SosControllerImpl(
                 mutableState.update {
                     it.copy(attempt = attempt, status = MessageStatus.QUEUED, withPosition = position != null)
                 }
-                val text = textFor(config, position)
                 val queued =
-                    targetKeys(config).mapNotNull { key ->
+                    targetKeys(config).mapNotNull { (key, own) ->
+                        val text = textFor(own ?: config.message, position)
                         (sendMessage(text, key) as? SendMessageOutcome.Queued)?.packetId
                     }
                 if (queued.isEmpty()) {
@@ -118,17 +123,18 @@ class SosControllerImpl(
      * direct message goes on the shared key slot when both radios have a public key, else on the channel the node was
      * heard on, exactly as the chat does.
      */
-    private fun targetKeys(config: SosConfig): List<String> {
+    private fun targetKeys(config: SosConfig): List<Pair<String, String?>> {
         val db = nodes.nodeDBbyNum.value
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
         // With nothing chosen at all the main channel is used, so the message never goes nowhere.
         val channels = if (config.channels.isEmpty() && config.nodes.isEmpty()) listOf(0) else config.channels
-        val channelKeys = channels.map { ContactKey.broadcast(it).value }
+        val channelKeys =
+            channels.map { ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)] }
         val nodeKeys =
             config.nodes.map { num ->
                 val node = db[num]
                 val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
-                NodeAddress.ByNum(num).toContactKey(slot).value
+                NodeAddress.ByNum(num).toContactKey(slot).value to config.targetMessages[SosTargets.nodeKey(num)]
             }
         return channelKeys + nodeKeys
     }
@@ -167,8 +173,9 @@ class SosControllerImpl(
         return if (node.validPosition != null) node.latitude to node.longitude else null
     }
 
-    private suspend fun textFor(config: SosConfig, position: Pair<Double, Double>?): String {
-        val message = config.message.ifBlank { getStringSuspend(Res.string.sos_default_message) }
+    /** The text for one recipient: its own [text] when it has one (or the general one), else the default. */
+    private suspend fun textFor(text: String, position: Pair<Double, Double>?): String {
+        val message = text.ifBlank { getStringSuspend(Res.string.sos_default_message) }
         val body =
             if (position == null) {
                 message
