@@ -32,9 +32,10 @@ import org.meshtastic.core.repository.SosAlarmSound
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosSiren
 import org.meshtastic.ios.notification.toNSData
-import platform.AVFoundation.AVAudioPlayer
-import platform.AVFoundation.AVAudioSession
-import platform.AVFoundation.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioPlayer
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.setActive
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureTorchModeOff
 import platform.AVFoundation.AVCaptureTorchModeOn
