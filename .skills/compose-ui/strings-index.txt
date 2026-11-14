@@ -3285,6 +3285,7 @@ sos_ack_coming
 sos_ack_help
 sos_ack_seen
 sos_acks_button
+sos_acks_button_of
 sos_acks_empty
 sos_acks_export
 sos_acks_title

@@ -4148,6 +4148,7 @@
     <string name="sos_ack_coming">Jest w drodze</string>
     <string name="sos_ack_help">Wzywa pomoc</string>
     <string name="sos_acks_button">Kto potwierdził SOS (%1$d)</string>
+    <string name="sos_acks_button_of">Kto potwierdził SOS (%1$d z %2$d)</string>
     <string name="sos_acks_title">Kto potwierdził SOS</string>
     <string name="sos_acks_empty">Nikt jeszcze nie potwierdził tego SOS. Odpowiedzi z innych kopii aplikacji pojawią się tu same.</string>
     <string name="sos_history_keep_title">Usuwaj stare wpisy automatycznie</string>

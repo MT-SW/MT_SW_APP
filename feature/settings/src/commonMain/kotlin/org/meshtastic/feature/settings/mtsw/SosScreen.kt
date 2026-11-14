@@ -100,6 +100,7 @@ import org.meshtastic.core.resources.sos_ack_coming
 import org.meshtastic.core.resources.sos_ack_help
 import org.meshtastic.core.resources.sos_ack_seen
 import org.meshtastic.core.resources.sos_acks_button
+import org.meshtastic.core.resources.sos_acks_button_of
 import org.meshtastic.core.resources.sos_acks_empty
 import org.meshtastic.core.resources.sos_acks_export
 import org.meshtastic.core.resources.sos_acks_title
@@ -1103,8 +1104,16 @@ private fun SosStatus(
             )
         }
         if (state.attempt > 0) {
+            // With chosen nodes the button counts how many of them answered; otherwise how many answers there are.
+            val answeredChosen = acks.map { it.nodeNum }.distinct().count { it in config.nodes }
             OutlinedButton(onClick = { showAcks = true }) {
-                Text(stringResource(Res.string.sos_acks_button, acks.size))
+                Text(
+                    if (config.nodes.isEmpty()) {
+                        stringResource(Res.string.sos_acks_button, acks.size)
+                    } else {
+                        stringResource(Res.string.sos_acks_button_of, answeredChosen, config.nodes.size)
+                    },
+                )
             }
         }
         if (state.running) Button(onClick = onCancel) { Text(stringResource(Res.string.sos_cancel)) }

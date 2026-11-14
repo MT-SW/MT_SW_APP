@@ -3357,6 +3357,7 @@
     <string name="sos_ack_help">Is calling for help</string>
     <string name="sos_ack_seen">Saw the SOS</string>
     <string name="sos_acks_button">Who confirmed the SOS (%1$d)</string>
+    <string name="sos_acks_button_of">Who confirmed the SOS (%1$d of %2$d)</string>
     <string name="sos_acks_empty">Nobody has confirmed this SOS yet. Answers from other copies of this app appear here by themselves.</string>
     <string name="sos_acks_export">Save the list to a file</string>
     <string name="sos_acks_title">Who confirmed the SOS</string>
