@@ -477,7 +477,81 @@ struct MTSWStatsWidget: Widget {
     }
 }
 
+/// Widżet „SOS”: dotknięcie otwiera ekran SOS w aplikacji (jak skrót „SOS MT_SW”). Alarm wysyła się dopiero po przytrzymaniu
+/// przycisku na tym ekranie, więc dotknięcie widżetu w kieszeni nie wyśle fałszywego alarmu.
+struct SosEntry: TimelineEntry {
+    let date: Date
+}
+
+struct SosProvider: TimelineProvider {
+    func placeholder(in context: Context) -> SosEntry { SosEntry(date: .now) }
+    func getSnapshot(in context: Context, completion: @escaping (SosEntry) -> Void) { completion(SosEntry(date: .now)) }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SosEntry>) -> Void) {
+        completion(Timeline(entries: [SosEntry(date: .now)], policy: .never))
+    }
+}
+
+/// Czerwień i złoto przycisku SOS: te same co na górnym pasku aplikacji.
+private let sosRed = Color(red: 0xD3 / 255, green: 0x2F / 255, blue: 0x2F / 255)
+private let sosGold = Color(red: 0xF5 / 255, green: 0xC8 / 255, blue: 0x39 / 255)
+
+struct SosView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        switch family {
+        case .accessoryInline:
+            Text("SOS").widgetURL(sosURL)
+        case .accessoryCircular:
+            ZStack {
+                AccessoryWidgetBackground()
+                Text("SOS").font(.system(size: 17, weight: .black)).minimumScaleFactor(0.5).lineLimit(1)
+            }
+            .widgetURL(sosURL)
+            .containerBackground(for: .widget) { Color.clear }
+        case .accessoryRectangular:
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                Text("SOS").font(.system(size: 22, weight: .black))
+            }
+            .widgetURL(sosURL)
+            .containerBackground(for: .widget) { Color.clear }
+        default:
+            ZStack {
+                RoundedRectangle(cornerRadius: 22).strokeBorder(sosGold, lineWidth: 6).padding(6)
+                Text("SOS")
+                    .font(.system(size: 54, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .minimumScaleFactor(0.4)
+                    .lineLimit(1)
+                    .padding(.horizontal, 18)
+            }
+            .widgetURL(sosURL)
+            .containerBackground(for: .widget) { sosRed }
+        }
+    }
+
+    private var sosURL: URL { URL(string: "meshtastic://meshtastic/sos")! }
+}
+
+struct MTSWSosWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "MTSWSosWidget", provider: SosProvider()) { _ in
+            SosView()
+        }
+        .configurationDisplayName("SOS")
+        .description(isPolish
+            ? "Otwiera ekran SOS w aplikacji MT_SW. Alarm wysyłasz, przytrzymując przycisk na tym ekranie. Jest też na ekranie blokady (iPhone): okrągły, prostokątny i w jednej linii."
+            : "Opens the SOS screen in the MT_SW app. You send the alarm by holding the button on that screen. It is also on the lock screen (iPhone): round, rectangular and one line.")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+        .contentMarginsDisabled()
+    }
+}
+
 @main
 struct MTSWWidgetBundle: WidgetBundle {
-    var body: some Widget { MTSWStatsWidget() }
+    var body: some Widget {
+        MTSWStatsWidget()
+        MTSWSosWidget()
+    }
 }

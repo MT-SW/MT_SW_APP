@@ -23,4 +23,6 @@
     <string name="widget_node_tracker_description">Battery, signal and last heard for one node you pick</string>
     <string name="widget_mesh_status_label">MT_SW statistics</string>
     <string name="widget_mesh_status_description">The same statistics as the permanent notification: mesh status or one tracked node</string>
+    <string name="widget_sos_label">SOS</string>
+    <string name="widget_sos_description">Opens the SOS screen: the alarm is sent by holding its button</string>
 </resources>

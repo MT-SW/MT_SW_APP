@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Widżet „SOS” (Android i iPhone/iPad): czerwona płytka z żółtą obwódką i napisem SOS, w kilku rozmiarach (iPhone także na ekran blokady). Dotknięcie otwiera ekran SOS; alarm wysyła się dopiero po przytrzymaniu przycisku, więc dotknięcie w kieszeni nie wyśle fałszywego alarmu. Na komputerze odpowiada mu pozycja „SOS” w menu ikony przy zegarze.
 * SOS: oprócz kanałów (można wybrać kilka) alarm można wysłać jako wiadomość bezpośrednią do wybranych węzłów sieci, także takich, które nie przyjmują wiadomości (niemonitorowanych), bez wyjątków; wybór węzłów z wyszukiwarką; potwierdzenie liczy się, gdy dotarły wszystkie wysłania (wszystkie wersje).
 * Pasek górny (wszystkie wersje): na każdej karcie jest teraz plakietka z krótką nazwą i kolorem Twojego węzła (także w Ustawieniach, Asystencie, Tłumaczu i Zdrowiu sieci) oraz czerwony przycisk „SOS” z żółtą obwódką, który otwiera ekran SOS. Domyślnie jest włączony wszędzie; w ekranie SOS można go wyłączyć albo wybrać karty, na których ma być.
 * Sąsiedzi węzła (lista węzłów, ikona sąsiadów): okno ma jeden przycisk „Zamknij” (wcześniej „Anuluj” i „OK” robiły to samo) i nowy „Pokaż na mapie”: mapa z samym węzłem i jego sąsiadami, z liniami do nich i kolorem sygnału (SNR); gdy część sąsiadów nie ma pozycji, pod mapą jest informacja, ilu nie da się pokazać (wszystkie wersje).
@@ -738,6 +739,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* "SOS" widget (Android and iPhone/iPad): a red plate with a yellow border and the letters SOS, in several sizes (iPhone also for the lock screen). A tap opens the SOS screen; the alarm is sent only by holding the button, so a touch in a pocket cannot send a false alarm. On the computer the "SOS" item in the tray icon menu takes its place.
 * SOS: besides channels (several can be chosen) the alarm can be sent as a direct message to chosen network nodes, also ones that do not accept messages (unmonitored), with no exceptions; the nodes are chosen with a search; the confirmation counts when all the sends arrived (all versions).
 * Top bar (all versions): every card now has the plate with the short name and colour of your node (also in Settings, the Assistant, the Translator and Network health) and a red "SOS" button with a yellow border that opens the SOS screen. It is on everywhere by default; in the SOS screen it can be turned off or the cards where it is shown can be chosen.
 * Node neighbours (node list, neighbours icon): the window has one "Close" button (before, "Cancel" and "OK" did the same) and a new "Show on map": a map with only the node and its neighbours, with lines to them and the signal colour (SNR); when some neighbours have no position, a note under the map says how many cannot be shown (all versions).

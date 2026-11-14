@@ -62,6 +62,7 @@ class BundledSqliteGuardTest {
             add("org.meshtastic.core.service.SosQuickSettingsTileService")
             add("org.meshtastic.core.nfc.MeshtasticHostApduService")
             add("org.meshtastic.feature.widget.MeshStatusWidgetReceiver")
+            add("org.meshtastic.feature.widget.SosWidgetReceiver")
         }
 
         val entryPoints = context.appEntryPoints()

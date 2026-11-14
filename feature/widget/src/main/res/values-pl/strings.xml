@@ -22,4 +22,6 @@
     <string name="widget_node_tracker_label">Śledzenie węzła</string>
     <string name="widget_mesh_status_label">Statystyki MT_SW</string>
     <string name="widget_mesh_status_description">Te same statystyki co w stałym powiadomieniu: stan sieci albo jeden śledzony węzeł</string>
+    <string name="widget_sos_label">SOS</string>
+    <string name="widget_sos_description">Otwiera ekran SOS: alarm wysyła się po przytrzymaniu jego przycisku</string>
 </resources>
