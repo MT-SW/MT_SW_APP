@@ -23,25 +23,32 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,16 +63,31 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mt_sw_other_sos_body
+import org.meshtastic.core.resources.sos_bar_ai
+import org.meshtastic.core.resources.sos_bar_connections
+import org.meshtastic.core.resources.sos_bar_health
+import org.meshtastic.core.resources.sos_bar_map
+import org.meshtastic.core.resources.sos_bar_messages
+import org.meshtastic.core.resources.sos_bar_nodes
+import org.meshtastic.core.resources.sos_bar_note
+import org.meshtastic.core.resources.sos_bar_other
+import org.meshtastic.core.resources.sos_bar_settings
+import org.meshtastic.core.resources.sos_bar_show
 import org.meshtastic.core.resources.sos_button
 import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
@@ -76,6 +98,13 @@ import org.meshtastic.core.resources.sos_hold_tap
 import org.meshtastic.core.resources.sos_include_position
 import org.meshtastic.core.resources.sos_intro
 import org.meshtastic.core.resources.sos_message_label
+import org.meshtastic.core.resources.sos_nodes_add
+import org.meshtastic.core.resources.sos_nodes_done
+import org.meshtastic.core.resources.sos_nodes_empty
+import org.meshtastic.core.resources.sos_nodes_none
+import org.meshtastic.core.resources.sos_nodes_note
+import org.meshtastic.core.resources.sos_nodes_pick_title
+import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.sos_position_attached
 import org.meshtastic.core.resources.sos_position_missing
 import org.meshtastic.core.resources.sos_repeat_count
@@ -84,9 +113,11 @@ import org.meshtastic.core.resources.sos_repeat_once
 import org.meshtastic.core.resources.sos_result_delivered
 import org.meshtastic.core.resources.sos_result_refused
 import org.meshtastic.core.resources.sos_result_unconfirmed
+import org.meshtastic.core.resources.sos_section_bar
 import org.meshtastic.core.resources.sos_section_channel
 import org.meshtastic.core.resources.sos_section_hold
 import org.meshtastic.core.resources.sos_section_message
+import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_repeat
 import org.meshtastic.core.resources.sos_status_delivered
 import org.meshtastic.core.resources.sos_status_enroute
@@ -120,10 +151,27 @@ fun SosScreen(onBack: () -> Unit) {
     val state by controller.state.collectAsStateWithLifecycle()
     val channelSet by radioConfig.channelSetFlow.collectAsStateWithLifecycle(null)
     val channelNames = channelSet?.settings?.map { it.name }.orEmpty()
+    val nodeRepository = koinInject<NodeRepository>()
+    val nodeDb by nodeRepository.nodeDBbyNum.collectAsStateWithLifecycle()
+    val myInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
+    var pickingNodes by remember { mutableStateOf(false) }
+
+    if (pickingNodes) {
+        SosNodePicker(
+            nodes = nodeDb.values.filter { it.num != myInfo?.myNodeNum },
+            selected = config.nodes,
+            onToggle = { num ->
+                val chosen = if (num in config.nodes) config.nodes - num else config.nodes + num
+                prefs.setConfig(config.copy(nodes = chosen))
+            },
+            onDismiss = { pickingNodes = false },
+        )
+    }
 
     Scaffold(
         topBar = {
             MainAppBar(
+                showSos = false,
                 title = stringResource(Res.string.sos_title),
                 canNavigateUp = true,
                 onNavigateUp = onBack,
@@ -158,11 +206,46 @@ fun SosScreen(onBack: () -> Unit) {
                     for (index in indices) {
                         val name = channelNames.getOrNull(index).orEmpty()
                         FilterChip(
-                            selected = config.channel == index,
-                            onClick = { prefs.setConfig(config.copy(channel = index)) },
+                            selected = index in config.channels,
+                            onClick = {
+                                val on = index in config.channels
+                                val chosen = if (on) config.channels - index else config.channels + index
+                                prefs.setConfig(config.copy(channels = chosen.sorted()))
+                            },
                             label = { Text(name.ifBlank { stringResource(Res.string.sos_channel_n, index) }) },
                         )
                     }
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.sos_section_nodes)) {
+                Text(
+                    text = stringResource(Res.string.sos_nodes_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                if (config.nodes.isEmpty()) {
+                    Text(
+                        text = stringResource(Res.string.sos_nodes_none),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                } else {
+                    FlowRow(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (num in config.nodes) {
+                            FilterChip(
+                                selected = true,
+                                onClick = { prefs.setConfig(config.copy(nodes = config.nodes - num)) },
+                                label = { Text(sosNodeName(nodeDb[num], num) + "  ✕") },
+                            )
+                        }
+                    }
+                }
+                Button(onClick = { pickingNodes = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(stringResource(Res.string.sos_nodes_add))
                 }
             }
 
@@ -233,6 +316,40 @@ fun SosScreen(onBack: () -> Unit) {
                 }
             }
 
+            val barScreens by prefs.barScreens.collectAsStateWithLifecycle()
+            ExpressiveSection(title = stringResource(Res.string.sos_section_bar)) {
+                Text(
+                    text = stringResource(Res.string.sos_bar_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                SwitchListItem(
+                    checked = barScreens.isNotEmpty(),
+                    text = stringResource(Res.string.sos_bar_show),
+                    onClick = {
+                        prefs.setBarScreens(if (barScreens.isEmpty()) SosBarScreens.ALL.toSet() else emptySet())
+                    },
+                )
+                if (barScreens.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (screen in SosBarScreens.ALL) {
+                            FilterChip(
+                                selected = screen in barScreens,
+                                onClick = {
+                                    // The last card cannot be switched off here; the switch above turns the button off.
+                                    val chosen = if (screen in barScreens) barScreens - screen else barScreens + screen
+                                    if (chosen.isNotEmpty()) prefs.setBarScreens(chosen)
+                                },
+                                label = { Text(stringResource(sosBarScreenLabel(screen))) },
+                            )
+                        }
+                    }
+                }
+            }
+
             ExpressiveSection(title = stringResource(Res.string.sos_section_hold)) {
                 FlowRow(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -257,6 +374,78 @@ fun SosScreen(onBack: () -> Unit) {
             }
         }
     }
+}
+
+private fun sosBarScreenLabel(key: String): StringResource = when (key) {
+    SosBarScreens.CONNECTIONS -> Res.string.sos_bar_connections
+    SosBarScreens.MESSAGES -> Res.string.sos_bar_messages
+    SosBarScreens.NODES -> Res.string.sos_bar_nodes
+    SosBarScreens.MAP -> Res.string.sos_bar_map
+    SosBarScreens.SETTINGS -> Res.string.sos_bar_settings
+    SosBarScreens.AI -> Res.string.sos_bar_ai
+    SosBarScreens.HEALTH -> Res.string.sos_bar_health
+    else -> Res.string.sos_bar_other
+}
+
+/** The name of a node for the list of SOS recipients: its long name, else the short one, else its id. */
+private fun sosNodeName(node: Node?, num: Int): String {
+    val long = node?.user?.long_name.orEmpty()
+    val short = node?.user?.short_name.orEmpty()
+    return when {
+        long.isNotBlank() && short.isNotBlank() -> "$long ($short)"
+        long.isNotBlank() -> long
+        short.isNotBlank() -> short
+        else -> NodeAddress.numToDefaultId(num)
+    }
+}
+
+/**
+ * The window to pick the nodes that get the SOS as a direct message. Every node the app knows is listed, the ones that
+ * are marked as not monitored too: nothing is left out.
+ */
+@Composable
+private fun SosNodePicker(nodes: List<Node>, selected: List<Int>, onToggle: (Int) -> Unit, onDismiss: () -> Unit) {
+    var query by remember { mutableStateOf("") }
+    val shown =
+        remember(nodes, query) {
+            nodes
+                .filter { node -> sosNodeName(node, node.num).contains(query.trim(), ignoreCase = true) }
+                .sortedBy { sosNodeName(it, it.num).lowercase() }
+        }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.sos_nodes_pick_title)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(Res.string.sos_nodes_search)) },
+                    singleLine = true,
+                )
+                if (shown.isEmpty()) {
+                    Text(
+                        text = stringResource(Res.string.sos_nodes_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
+                }
+                LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                    items(shown, key = { it.num }) { node ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
+                        ) {
+                            Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
+                            Text(text = sosNodeName(node, node.num), style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sos_nodes_done)) } },
+    )
 }
 
 /** The round button; with a hold time a ring fills while it is held and the send starts when the ring is full. */

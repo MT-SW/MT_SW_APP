@@ -31,6 +31,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
@@ -45,8 +46,10 @@ import org.meshtastic.core.resources.sos_default_message
 import kotlin.math.roundToLong
 
 /**
- * Sends the SOS message to the chosen channel, with the position when wanted, and watches the delivery status until it
- * is confirmed, refused or too long has passed. With repeating on it sends again at the chosen interval. It runs in the
+ * Sends the SOS message to every chosen channel and as a direct message to every chosen node, with the position when
+ * wanted, and watches the delivery status until every send is confirmed, refused or too long has passed. A chosen node
+ * is written to without any check: one that is marked as not monitored or not messageable is no exception, because an
+ * alarm must not be held back by a setting. With repeating on it sends again at the chosen interval. It runs in the
  * service scope, so closing the SOS screen does not stop it; only [cancel] does.
  */
 @Single
@@ -82,12 +85,16 @@ class SosControllerImpl(
                 mutableState.update {
                     it.copy(attempt = attempt, status = MessageStatus.QUEUED, withPosition = position != null)
                 }
-                val outcome = sendMessage(textFor(config, position), ContactKey.broadcast(config.channel).value)
-                if (outcome !is SendMessageOutcome.Queued) {
+                val text = textFor(config, position)
+                val queued =
+                    targetKeys(config).mapNotNull { key ->
+                        (sendMessage(text, key) as? SendMessageOutcome.Queued)?.packetId
+                    }
+                if (queued.isEmpty()) {
                     mutableState.update { it.copy(running = false, refused = true) }
                     return
                 }
-                if (waitForDelivery(outcome.packetId)) delivered = true
+                if (waitForDelivery(queued)) delivered = true
                 if (delivered && config.stopWhenDelivered) break
                 if (attempt < total) delay(config.repeatMinutes * MILLIS_PER_MINUTE)
             }
@@ -100,28 +107,48 @@ class SosControllerImpl(
         }
     }
 
-    /** True when the radio confirmed the send within the waiting time. */
+    /**
+     * The conversation key of every send: a broadcast on each chosen channel, a direct message to each chosen node. A
+     * direct message goes on the shared key slot when both radios have a public key, else on the channel the node was
+     * heard on, exactly as the chat does.
+     */
+    private fun targetKeys(config: SosConfig): List<String> {
+        val db = nodes.nodeDBbyNum.value
+        val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
+        // With nothing chosen at all the main channel is used, so the message never goes nowhere.
+        val channels = if (config.channels.isEmpty() && config.nodes.isEmpty()) listOf(0) else config.channels
+        val channelKeys = channels.map { ContactKey.broadcast(it).value }
+        val nodeKeys =
+            config.nodes.map { num ->
+                val node = db[num]
+                val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
+                NodeAddress.ByNum(num).toContactKey(slot).value
+            }
+        return channelKeys + nodeKeys
+    }
+
+    /** True when the radio confirmed every send within the waiting time. */
     @Suppress("ReturnCount")
-    private suspend fun waitForDelivery(packetId: Int): Boolean {
+    private suspend fun waitForDelivery(packetIds: List<Int>): Boolean {
         var waited = 0L
         while (waited < DELIVERY_WAIT_MS) {
-            val status = packets.getPacketByPacketId(packetId)?.status
-            if (status != null) mutableState.update { it.copy(status = status) }
-            when (status) {
-                MessageStatus.DELIVERED,
-                MessageStatus.SFPP_ROUTING,
-                MessageStatus.SFPP_CONFIRMED,
-                -> return true
-
-                MessageStatus.ERROR -> return false
-
-                else -> Unit
+            val statuses = packetIds.map { packets.getPacketByPacketId(it)?.status }
+            val known = statuses.filterNotNull()
+            // The least advanced send is the one worth showing; once all are confirmed, the last one.
+            (known.firstOrNull { !it.isConfirmed() } ?: known.lastOrNull())?.let { shown ->
+                mutableState.update { it.copy(status = shown) }
             }
+            if (statuses.all { it?.isConfirmed() == true }) return true
+            // Nothing more will happen when every send is either confirmed or failed.
+            if (statuses.all { it == MessageStatus.ERROR || it?.isConfirmed() == true }) return false
             delay(POLL_MS)
             waited += POLL_MS
         }
         return false
     }
+
+    private fun MessageStatus.isConfirmed(): Boolean =
+        this == MessageStatus.DELIVERED || this == MessageStatus.SFPP_ROUTING || this == MessageStatus.SFPP_CONFIRMED
 
     /** The phone's fix when it comes quickly, otherwise the position our own node reports; null when neither. */
     @Suppress("ReturnCount")

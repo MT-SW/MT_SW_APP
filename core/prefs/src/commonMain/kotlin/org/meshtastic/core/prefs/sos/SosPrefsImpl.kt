@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
 
@@ -42,7 +43,21 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_SOS] = config.encode() } }
     }
 
+    // Written as the keys joined by commas; an empty text means none (the button is off), no value means all.
+    override val barScreens: StateFlow<Set<String>> =
+        dataStore.data
+            .map { prefs ->
+                prefs[KEY_BAR]?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }?.toSet()
+                    ?: SosBarScreens.ALL.toSet()
+            }
+            .stateIn(scope, SharingStarted.Eagerly, SosBarScreens.ALL.toSet())
+
+    override fun setBarScreens(screens: Set<String>) {
+        scope.launch { dataStore.edit { it[KEY_BAR] = screens.joinToString(",") } }
+    }
+
     private companion object {
         val KEY_SOS = stringPreferencesKey("sos_config")
+        val KEY_BAR = stringPreferencesKey("sos_bar_screens")
     }
 }

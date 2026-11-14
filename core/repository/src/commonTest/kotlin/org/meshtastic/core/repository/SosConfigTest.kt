@@ -24,7 +24,8 @@ class SosConfigTest {
     fun encodedConfigReadsBackTheSame() {
         val config =
             SosConfig(
-                channel = 2,
+                channels = listOf(1, 2),
+                nodes = listOf(1234, -5),
                 message = "Pomocy | tu jestem",
                 includePosition = false,
                 repeatMinutes = 5,
@@ -41,6 +42,7 @@ class SosConfigTest {
         assertEquals(SosConfig(), SosConfig.decode(""))
         assertEquals(SosConfig(), SosConfig.decode("a|b|c"))
         assertEquals(SosConfig(), SosConfig.decode("x|1|0|3|1|2|tekst"))
+        assertEquals(SosConfig(), SosConfig.decode("c0|a|0|3|1|2||tekst"))
     }
 
     @Test
@@ -51,9 +53,24 @@ class SosConfigTest {
     @Test
     fun valuesAreKeptInRange() {
         val decoded = SosConfig.decode("99|1|-4|0|1|99|x")
-        assertEquals(7, decoded.channel)
+        assertEquals(listOf(7), decoded.channels)
         assertEquals(0, decoded.repeatMinutes)
         assertEquals(1, decoded.repeatCount)
         assertEquals(10, decoded.holdSeconds)
+    }
+
+    @Test
+    fun theOlderSingleChannelFormStillReads() {
+        val decoded = SosConfig.decode("2|0|5|10|0|3|Pomocy")
+        assertEquals(listOf(2), decoded.channels)
+        assertEquals(emptyList(), decoded.nodes)
+        assertEquals("Pomocy", decoded.message)
+    }
+
+    @Test
+    fun withNothingChosenTheMainChannelStays() {
+        assertEquals(listOf(0), SosConfig.decode("c|1|0|3|1|2||x").channels)
+        assertEquals(emptyList(), SosConfig.decode("c|1|0|3|1|2|42|x").channels)
+        assertEquals(listOf(42), SosConfig.decode("c|1|0|3|1|2|42|x").nodes)
     }
 }
