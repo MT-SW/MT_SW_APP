@@ -64,7 +64,23 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_RECEIVE] = on } }
     }
 
+    override val alarmFlash: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_FLASH] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setAlarmFlash(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_FLASH] = on } }
+    }
+
+    override val confirmToSender: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_CONFIRM] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setConfirmToSender(on: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_CONFIRM] = on } }
+    }
+
     private companion object {
+        val KEY_FLASH = booleanPreferencesKey("sos_alarm_flash")
+        val KEY_CONFIRM = booleanPreferencesKey("sos_confirm_to_sender")
         val KEY_RECEIVE = booleanPreferencesKey("sos_receive_alarm")
         val KEY_SOS = stringPreferencesKey("sos_config")
         val KEY_BAR = stringPreferencesKey("sos_bar_screens")

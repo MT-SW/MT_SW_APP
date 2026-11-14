@@ -549,7 +549,13 @@ class MeshDataHandlerImpl(
         if (!SosMarker.isSos(text)) return
         if (nowMillis - dataPacket.time > SOS_MAX_AGE_MS) return
         sosAlarm.raise(
-            SosAlert(id = nowMillis, contactKey = contactKey, senderName = getSenderName(dataPacket), text = text),
+            SosAlert(
+                id = nowMillis,
+                contactKey = contactKey,
+                senderName = getSenderName(dataPacket),
+                text = text,
+                fromNodeNum = nodeManager.getNodeById(dataPacket.from.orEmpty())?.num,
+            ),
         )
     }
 

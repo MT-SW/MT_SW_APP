@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+
 package org.meshtastic.ios
 
+import co.touchlab.kermit.Logger
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,35 +29,96 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.meshtastic.core.repository.SosAlarmSound
+import org.meshtastic.core.repository.SosSiren
+import org.meshtastic.ios.notification.toNSData
+import platform.AVFoundation.AVAudioPlayer
+import platform.AVFoundation.AVAudioSession
+import platform.AVFoundation.AVAudioSessionCategoryPlayback
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVCaptureTorchModeOff
+import platform.AVFoundation.AVCaptureTorchModeOn
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.hasTorch
+import platform.AVFoundation.torchMode
 import platform.AudioToolbox.AudioServicesPlaySystemSound
 
 /**
- * The alarm sound of a received SOS while the app is open on an iPhone or iPad: the system alarm tone and the vibration
- * repeated every second and a half until [stop]. The system does not let an app sound an alarm in the background
- * without a special permission from Apple, so with the app closed only the notification sounds.
+ * The alarm of a received SOS while the app is running (open, or kept alive in the background by "Praca w tle"): the
+ * siren in a loop at full volume on the playback channel (it sounds on a locked phone and with the silent switch on),
+ * the vibration, and the torch blinking, all until [stop]. When the app is not running, the notifications posted by
+ * the alarm (a new one every ten seconds, with the same siren) keep ringing instead.
  */
 internal object IosSosAlarmSound : SosAlarmSound {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private var job: Job? = null
+    private var sirenPlayer: AVAudioPlayer? = null
+    private var vibrationJob: Job? = null
+    private var torchJob: Job? = null
 
-    override fun start() {
-        if (job?.isActive == true) return
-        job =
+    override fun start(flash: Boolean) {
+        if (vibrationJob?.isActive == true) return
+        startSiren()
+        vibrationJob =
             scope.launch {
                 while (isActive) {
-                    AudioServicesPlaySystemSound(ALARM_SOUND_ID)
                     AudioServicesPlaySystemSound(VIBRATE_ID)
-                    delay(REPEAT_MS)
+                    delay(VIBRATE_MS)
+                }
+            }
+        if (flash) startTorch()
+    }
+
+    override fun stop() {
+        vibrationJob?.cancel()
+        vibrationJob = null
+        torchJob?.cancel()
+        torchJob = null
+        setTorch(false)
+        sirenPlayer?.stop()
+        sirenPlayer = null
+    }
+
+    private fun startSiren() {
+        runCatching {
+            val session = AVAudioSession.sharedInstance()
+            session.setCategory(AVAudioSessionCategoryPlayback, error = null)
+            session.setActive(true, error = null)
+            val player = AVAudioPlayer(data = SosSiren.wav(SIREN_SECONDS).toNSData(), error = null)
+            player.numberOfLoops = -1
+            player.volume = 1f
+            player.prepareToPlay()
+            player.play()
+            sirenPlayer = player
+        }
+            .onFailure { Logger.w(it) { "SOS alarm: the siren could not be started" } }
+    }
+
+    private fun startTorch() {
+        torchJob =
+            scope.launch {
+                try {
+                    while (isActive) {
+                        setTorch(true)
+                        delay(BLINK_MS)
+                        setTorch(false)
+                        delay(BLINK_MS)
+                    }
+                } finally {
+                    setTorch(false)
                 }
             }
     }
 
-    override fun stop() {
-        job?.cancel()
-        job = null
+    private fun setTorch(on: Boolean) {
+        val device = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo) ?: return
+        if (!device.hasTorch) return
+        if (device.lockForConfiguration(null)) {
+            device.torchMode = if (on) AVCaptureTorchModeOn else AVCaptureTorchModeOff
+            device.unlockForConfiguration()
+        }
     }
 
-    private const val ALARM_SOUND_ID = 1005u
     private const val VIBRATE_ID = 4095u
-    private const val REPEAT_MS = 1_500L
+    private const val VIBRATE_MS = 1_500L
+    private const val BLINK_MS = 400L
+    private const val SIREN_SECONDS = 1.4
 }

@@ -68,6 +68,7 @@ targets:
         UIBackgroundModes:
           - bluetooth-central
           - location
+          - audio
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
         NSMicrophoneUsageDescription: "MT_SW używa mikrofonu do dyktowania wiadomości."
         NSLocationAlwaysAndWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie i w kompasie, może ją wysłać do sieci mesh, a po włączeniu „Praca w tle” utrzymuje połączenie z radiem i zbieranie danych, gdy aplikacja nie jest na wierzchu."

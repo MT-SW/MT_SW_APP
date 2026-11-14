@@ -152,6 +152,16 @@ interface SosPrefs {
     val receiveAlarm: StateFlow<Boolean>
 
     fun setReceiveAlarm(on: Boolean)
+
+    /** True (the default) when the alarm also flashes the phone's torch. */
+    val alarmFlash: StateFlow<Boolean>
+
+    fun setAlarmFlash(on: Boolean)
+
+    /** True (the default) when confirming an alarm also tells the sender that the SOS was seen. */
+    val confirmToSender: StateFlow<Boolean>
+
+    fun setConfirmToSender(on: Boolean)
 }
 
 /**
@@ -189,7 +199,18 @@ data class SosAlert(
     val senderName: String,
     val text: String,
     val test: Boolean = false,
+    /** The node that sent it, when it is known: replies and the map go there. */
+    val fromNodeNum: Int? = null,
 )
+
+/** The ready answers of the alarm window; each is sent to the sender as a direct message. */
+enum class SosReply {
+    /** "I am coming to you." */
+    COMING,
+
+    /** "I am calling for help." */
+    CALLING_HELP,
+}
 
 /**
  * The alarm for an SOS that arrived from another copy of this app: it holds the alert that is ringing (shown on the
@@ -202,8 +223,14 @@ interface SosAlarmCenter {
     /** Starts the alarm (does nothing when the person turned the alarm off in the SOS screen, except for a test). */
     fun raise(alert: SosAlert)
 
-    /** The person confirmed it: the sound and the notification stop. */
+    /**
+     * The person confirmed it: the sound and the notification stop, and (when the setting is on) the sender is told
+     * that the SOS was seen.
+     */
     fun acknowledge()
+
+    /** Answers the sender with a ready message and confirms the alarm. Does nothing but confirm for a test. */
+    fun reply(reply: SosReply)
 }
 
 /**
@@ -211,7 +238,8 @@ interface SosAlarmCenter {
  * notification, which rings again and again by itself.
  */
 interface SosAlarmSound {
-    fun start()
+    /** Starts the alarm; [flash] says whether the torch should flash too (where the device has one). */
+    fun start(flash: Boolean)
 
     fun stop()
 }

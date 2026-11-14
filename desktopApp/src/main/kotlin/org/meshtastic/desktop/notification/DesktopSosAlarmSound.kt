@@ -18,27 +18,26 @@ package org.meshtastic.desktop.notification
 
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.repository.SosAlarmSound
+import org.meshtastic.core.repository.SosSiren
 import java.io.ByteArrayInputStream
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
-import kotlin.math.PI
-import kotlin.math.sin
 
 /**
- * The alarm sound of a received SOS on a computer: a two-tone siren made in memory and played in a loop until
- * [stop], so it needs no sound file. The notification of the system cannot ring again and again, so the app does it.
+ * The alarm sound of a received SOS on a computer: the shared siren played in a loop until [stop]. The notification of
+ * the system cannot ring again and again, so the app does it. A computer has no torch, so [start] ignores the flash.
  */
 internal class DesktopSosAlarmSound : SosAlarmSound {
     private var clip: Clip? = null
 
     @Synchronized
-    override fun start() {
+    override fun start(flash: Boolean) {
         if (clip != null) return
         runCatching {
-            val data = siren()
-            val format = AudioFormat(SAMPLE_RATE, SAMPLE_BITS, 1, true, false)
+            val data = SosSiren.pcm(SIREN_SECONDS)
+            val format = AudioFormat(SosSiren.SAMPLE_RATE.toFloat(), SAMPLE_BITS, 1, true, false)
             val stream = AudioInputStream(ByteArrayInputStream(data), format, (data.size / BYTES_PER_SAMPLE).toLong())
             val newClip = AudioSystem.getClip()
             newClip.open(stream)
@@ -57,30 +56,9 @@ internal class DesktopSosAlarmSound : SosAlarmSound {
         clip = null
     }
 
-    /** Four tones in turn (high, low, high, low), each with a short fade so the loop does not click. */
-    private fun siren(): ByteArray {
-        val samplesPerTone = (SAMPLE_RATE * TONE_SECONDS).toInt()
-        val fade = (SAMPLE_RATE * FADE_SECONDS).toInt()
-        val out = ByteArray(samplesPerTone * TONES.size * BYTES_PER_SAMPLE)
-        var index = 0
-        for (frequency in TONES) {
-            for (n in 0 until samplesPerTone) {
-                val envelope = minOf(1.0, n / fade.toDouble(), (samplesPerTone - n) / fade.toDouble())
-                val value = (sin(2 * PI * frequency * n / SAMPLE_RATE) * envelope * AMPLITUDE * Short.MAX_VALUE).toInt()
-                out[index++] = (value and 0xFF).toByte()
-                out[index++] = ((value shr 8) and 0xFF).toByte()
-            }
-        }
-        return out
-    }
-
     private companion object {
-        const val SAMPLE_RATE = 44_100f
         const val SAMPLE_BITS = 16
         const val BYTES_PER_SAMPLE = 2
-        const val TONE_SECONDS = 0.35
-        const val FADE_SECONDS = 0.01
-        const val AMPLITUDE = 0.9
-        val TONES = listOf(880.0, 660.0, 880.0, 660.0)
+        const val SIREN_SECONDS = 1.4
     }
 }

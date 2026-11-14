@@ -58,10 +58,12 @@ import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.SosAlarmSounds
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.discovery_interrupted_scan_restored
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.service.AndroidSosAlarmFeedback
 import org.meshtastic.core.service.worker.MeshLogCleanupWorker
 import org.meshtastic.feature.discovery.DiscoveryScanEngine
 import org.meshtastic.feature.widget.MeshStatusWidgetReceiver
@@ -113,6 +115,7 @@ open class MeshUtilApplication :
         if (BuildConfig.DEBUG) enableDebugVmPolicy()
         ContextServices.app = this
         AndroidLogging.install(this, applicationScope)
+        SosAlarmSounds.current = AndroidSosAlarmFeedback(this)
         configureFlavorApplication(BuildConfig.APPLICATION_ID)
 
         isSupportedDevice = bundledSqliteLoads(::loadBundledSqlite)

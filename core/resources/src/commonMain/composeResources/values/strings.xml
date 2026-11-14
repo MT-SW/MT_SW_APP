@@ -3354,7 +3354,9 @@
     <string name="solar_irradiance">Solar Irradiance</string>
     <!-- SOS -->
     <string name="sos_alarm_confirm">Confirm, stop the alarm</string>
+    <string name="sos_alarm_flash_switch">Flash the torch in the alarm</string>
     <string name="sos_alarm_from">SOS from %1$s</string>
+    <string name="sos_alarm_map">Show on the map</string>
     <string name="sos_alarm_notification_title">SOS from %1$s</string>
     <string name="sos_alarm_notifications">SOS alarm</string>
     <string name="sos_alarm_notifications_description">The alarm for an SOS that another copy of this app sent. It rings again and again until it is confirmed.</string>
@@ -3380,6 +3382,7 @@
     <string name="sos_button_tap">Tap to send</string>
     <string name="sos_cancel">Stop</string>
     <string name="sos_channel_n">Channel %1$d</string>
+    <string name="sos_confirm_switch">Tell the sender when I confirm</string>
     <string name="sos_default_message">SOS! I need help.</string>
     <string name="sos_hold_seconds">%1$d s</string>
     <string name="sos_hold_tap">Tap</string>
@@ -3398,11 +3401,16 @@
     <string name="sos_open">Open SOS</string>
     <string name="sos_position_attached">With position</string>
     <string name="sos_position_missing">Without position (no GPS fix)</string>
-    <string name="sos_receive_note">An SOS sent by another copy of MT_SW_APP (it carries a hidden mark, so an ordinary text with the word SOS does not count) opens the conversation, covers the whole screen with a big SOS and rings until you confirm it. On Android the alarm sounds even when the phone is locked.</string>
+    <string name="sos_receive_note">An SOS sent by another copy of MT_SW_APP (it carries a hidden mark, so an ordinary text with the word SOS does not count) opens the conversation, covers the whole screen with a big SOS and rings until you confirm it. On Android and iPhone/iPad the alarm also sounds when the phone is locked.</string>
     <string name="sos_receive_switch">Alarm when an SOS is received</string>
     <string name="sos_repeat_count">Number of sends</string>
     <string name="sos_repeat_every">Every %1$d min</string>
     <string name="sos_repeat_once">Once</string>
+    <string name="sos_reply_button_calling_help">I am calling for help</string>
+    <string name="sos_reply_button_coming">I am coming</string>
+    <string name="sos_reply_calling_help">I am calling for help.</string>
+    <string name="sos_reply_coming">I am coming to you.</string>
+    <string name="sos_reply_seen">SOS seen, I am reacting.</string>
     <string name="sos_result_delivered">Finished: the message was confirmed</string>
     <string name="sos_result_refused">Could not send: the chosen channels are not on the radio</string>
     <string name="sos_result_unconfirmed">Finished: no confirmation</string>

@@ -4120,7 +4120,15 @@
     <string name="sos_alarm_test_text">Tak będzie wyglądał i brzmiał SOS od innego węzła.</string>
     <string name="sos_nodes_missing">Tych wybranych węzłów nie ma już na liście węzłów: %1$s. Alarm i tak do nich zostanie wysłany.</string>
     <string name="sos_nodes_missing_remove">Usuń je z wyboru</string>
-    <string name="sos_receive_note">SOS wysłany z innej kopii MT_SW_APP (ma ukryty znacznik, więc zwykły tekst ze słowem SOS się nie liczy) otwiera rozmowę, zakrywa cały ekran wielkim napisem SOS i dzwoni, dopóki go nie potwierdzisz. Na Androidzie alarm dzwoni także przy zablokowanym telefonie.</string>
+    <string name="sos_receive_note">SOS wysłany z innej kopii MT_SW_APP (ma ukryty znacznik, więc zwykły tekst ze słowem SOS się nie liczy) otwiera rozmowę, zakrywa cały ekran wielkim napisem SOS i dzwoni, dopóki go nie potwierdzisz. Na Androidzie i iPhonie/iPadzie alarm dzwoni także przy zablokowanym telefonie.</string>
     <string name="sos_receive_switch">Alarm po odebraniu SOS</string>
     <string name="sos_section_receive">Odbiór SOS</string>
+    <string name="sos_alarm_map">Pokaż na mapie</string>
+    <string name="sos_alarm_flash_switch">Błysk latarki w alarmie</string>
+    <string name="sos_confirm_switch">Powiadom nadawcę po potwierdzeniu</string>
+    <string name="sos_reply_calling_help">Wzywam pomoc.</string>
+    <string name="sos_reply_coming">Jadę do Ciebie.</string>
+    <string name="sos_reply_seen">SOS odebrany, reaguję.</string>
+    <string name="sos_reply_button_calling_help">Wzywam pomoc</string>
+    <string name="sos_reply_button_coming">Jadę do Ciebie</string>
 </resources>

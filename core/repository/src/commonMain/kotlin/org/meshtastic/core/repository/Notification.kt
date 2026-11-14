@@ -26,6 +26,13 @@ data class Notification(
     val id: Int? = null,
     /** Link (meshtastic://...) opened when the notification is tapped, e.g. the conversation it came from. */
     val deepLink: String? = null,
+    /** An alarm (the SOS): shown whatever the category switch says, and may repeat (see [repeatTimes]). */
+    val alarm: Boolean = false,
+    /** Name of a sound file the platform plays instead of its default one (iPhone/iPad), or null. */
+    val soundName: String? = null,
+    /** How many times an alarm is posted, one every [repeatEverySeconds], until it is cancelled. */
+    val repeatTimes: Int = 1,
+    val repeatEverySeconds: Int = 0,
 ) {
     enum class Type {
         None,

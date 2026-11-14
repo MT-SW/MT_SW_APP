@@ -82,6 +82,7 @@ import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mt_sw_other_sos_body
+import org.meshtastic.core.resources.sos_alarm_flash_switch
 import org.meshtastic.core.resources.sos_alarm_test
 import org.meshtastic.core.resources.sos_alarm_test_sender
 import org.meshtastic.core.resources.sos_alarm_test_text
@@ -101,6 +102,7 @@ import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
 import org.meshtastic.core.resources.sos_cancel
 import org.meshtastic.core.resources.sos_channel_n
+import org.meshtastic.core.resources.sos_confirm_switch
 import org.meshtastic.core.resources.sos_hold_seconds
 import org.meshtastic.core.resources.sos_hold_tap
 import org.meshtastic.core.resources.sos_include_position
@@ -364,6 +366,18 @@ fun SosScreen(onBack: () -> Unit) {
                     checked = receiveAlarm,
                     text = stringResource(Res.string.sos_receive_switch),
                     onClick = { prefs.setReceiveAlarm(!receiveAlarm) },
+                )
+                val alarmFlash by prefs.alarmFlash.collectAsStateWithLifecycle()
+                SwitchListItem(
+                    checked = alarmFlash,
+                    text = stringResource(Res.string.sos_alarm_flash_switch),
+                    onClick = { prefs.setAlarmFlash(!alarmFlash) },
+                )
+                val confirmToSender by prefs.confirmToSender.collectAsStateWithLifecycle()
+                SwitchListItem(
+                    checked = confirmToSender,
+                    text = stringResource(Res.string.sos_confirm_switch),
+                    onClick = { prefs.setConfirmToSender(!confirmToSender) },
                 )
                 Button(
                     onClick = {

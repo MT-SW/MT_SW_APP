@@ -37,6 +37,7 @@ import org.meshtastic.core.resources.low_battery_message
 import org.meshtastic.core.resources.low_battery_title
 import org.meshtastic.core.resources.mesh_beacon_notification_body
 import org.meshtastic.core.resources.mesh_beacon_notification_title
+import org.meshtastic.core.resources.sos_alarm_notification_title
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Telemetry
 
@@ -44,6 +45,10 @@ private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
 
 /** The same link Android uses: a tap opens the conversation the notification came from. */
 private fun openMessageLink(contactKey: String) = "$DEEP_LINK_BASE_URI/messages/$contactKey"
+
+private const val SOS_ALARM_ID = 3
+private const val SOS_REPEATS = 60
+private const val SOS_REPEAT_SECONDS = 10
 
 /**
  * iPhone implementation of [MeshNotificationManager]: turns each mesh event into a [Notification] record and hands it
@@ -136,6 +141,29 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
             ),
         )
     }
+
+    /**
+     * The SOS alarm: ten minutes of the same notification posted every ten seconds with a ten-second siren as its
+     * sound, so it sounds without a break even when the app is closed. Confirming the alarm (in the app) removes the
+     * rest.
+     */
+    override suspend fun showSosAlarmNotification(contactKey: String, name: String, text: String) {
+        notificationManager.dispatch(
+            Notification(
+                title = getStringSuspend(Res.string.sos_alarm_notification_title, name),
+                message = text,
+                category = Notification.Category.Alert,
+                id = SOS_ALARM_ID,
+                deepLink = openMessageLink(contactKey),
+                alarm = true,
+                soundName = ensureSosSoundFile(),
+                repeatTimes = SOS_REPEATS,
+                repeatEverySeconds = SOS_REPEAT_SECONDS,
+            ),
+        )
+    }
+
+    override fun cancelSosAlarmNotification() = notificationManager.cancel(SOS_ALARM_ID)
 
     override suspend fun showMeshBeaconNotification(offer: MeshBeaconOffer) {
         notificationManager.dispatch(

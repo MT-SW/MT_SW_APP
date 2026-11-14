@@ -42,12 +42,16 @@ import platform.UserNotifications.UNNotificationPresentationOptions
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNNotificationResponse
 import platform.UserNotifications.UNNotificationSound
+import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
 private const val USER_INFO_DEEP_LINK = "deepLink"
+
+/** The most notifications one alarm posts (the system keeps at most 64 waiting). */
+private const val MAX_REPEATS = 60
 
 private val STACKING_CATEGORIES =
     setOf(
@@ -125,7 +129,7 @@ class IosNotificationManager(
     }
 
     override suspend fun dispatch(notification: Notification): Boolean {
-        val enabled =
+        val categoryEnabled =
             when (notification.category) {
                 Notification.Category.Message -> prefs.messagesEnabled.value
                 Notification.Category.Reaction -> prefs.loadReactionsEnabled()
@@ -138,6 +142,8 @@ class IosNotificationManager(
                 Notification.Category.Client -> prefs.radioNoticesEnabled.value
                 Notification.Category.Service -> prefs.updatesEnabled.value
             }
+        // An alarm (the SOS) is shown whatever the switch of its category says.
+        val enabled = notification.alarm || categoryEnabled
         if (!enabled) return false
         val content =
             UNMutableNotificationContent().apply {
@@ -147,7 +153,12 @@ class IosNotificationManager(
                 // Notifications of one conversation (or kind) are stacked together in the list.
                 notification.id?.let { setThreadIdentifier(it.toString()) }
                 // A quiet notification (app open on another screen) gets a sound only if the user switched that on.
-                if (!notification.isSilent || prefs.soundWhileOpen.value) setSound(UNNotificationSound.defaultSound)
+                if (!notification.isSilent || prefs.soundWhileOpen.value) {
+                    setSound(
+                        notification.soundName?.let { UNNotificationSound.soundNamed(it) }
+                            ?: UNNotificationSound.defaultSound,
+                    )
+                }
             }
         // A notification posted under an identifier that is already shown only replaces it, silently: no sound and no
         // vibration on the watch. So every message, reaction, waypoint and alert gets its own identifier (they stack
@@ -158,6 +169,7 @@ class IosNotificationManager(
             } else {
                 notification.id.toString()
             }
+        if (notification.repeatTimes > 1 && notification.id != null) return postRepeated(notification, content)
         val request = UNNotificationRequest.requestWithIdentifier(id, content, trigger = null)
         return suspendCancellableCoroutine { cont ->
             center.addNotificationRequest(request) { error ->
@@ -167,9 +179,35 @@ class IosNotificationManager(
         }
     }
 
+    /**
+     * An alarm that goes on ringing: the same notification posted again every few seconds (the system keeps up to 64
+     * waiting), so it sounds again and again even when the app is not running. [cancel] removes the ones that did
+     * not fire yet.
+     */
+    private suspend fun postRepeated(notification: Notification, content: UNMutableNotificationContent): Boolean {
+        val id = notification.id ?: return false
+        var accepted = true
+        for (n in 0 until notification.repeatTimes.coerceAtMost(MAX_REPEATS)) {
+            val seconds = (n * notification.repeatEverySeconds).coerceAtLeast(1).toDouble()
+            val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(seconds, repeats = false)
+            val request = UNNotificationRequest.requestWithIdentifier(repeatIdentifier(id, n), content, trigger)
+            accepted = accepted && suspendCancellableCoroutine { cont ->
+                center.addNotificationRequest(request) { error ->
+                    if (error != null) Logger.w { "Notification failed: ${error.localizedDescription}" }
+                    cont.resume(error == null)
+                }
+            }
+        }
+        return accepted
+    }
+
+    private fun repeatIdentifier(id: Int, n: Int) = "$id-r$n"
+
     override fun cancel(id: Int) {
         center.removeDeliveredNotificationsWithIdentifiers(listOf(id.toString()))
-        center.removePendingNotificationRequestsWithIdentifiers(listOf(id.toString()))
+        center.removePendingNotificationRequestsWithIdentifiers(
+            listOf(id.toString()) + (0 until MAX_REPEATS).map { repeatIdentifier(id, it) },
+        )
         // The stacked notifications of this conversation carry their own identifiers; find them by thread.
         center.getDeliveredNotificationsWithCompletionHandler { delivered ->
             val ids =

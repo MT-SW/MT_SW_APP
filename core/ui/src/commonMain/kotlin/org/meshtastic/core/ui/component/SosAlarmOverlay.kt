@@ -21,11 +21,13 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,18 +52,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.SosReply
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.sos_alarm_confirm
 import org.meshtastic.core.resources.sos_alarm_from
+import org.meshtastic.core.resources.sos_alarm_map
 import org.meshtastic.core.resources.sos_alarm_open
 import org.meshtastic.core.resources.sos_alarm_test_note
 import org.meshtastic.core.resources.sos_button
+import org.meshtastic.core.resources.sos_reply_button_calling_help
+import org.meshtastic.core.resources.sos_reply_button_coming
 import org.meshtastic.core.ui.viewmodel.UIViewModel
+
+/** A ready answer of the alarm window: white outline on the red, sent to the sender as a direct message. */
+@Composable
+private fun ReplyButton(label: StringResource, modifier: Modifier, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier,
+        border = BorderStroke(2.dp, Color.White),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+    ) {
+        Text(text = stringResource(label), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    }
+}
 
 private val AlarmRed = Color(0xFFD32F2F)
 private const val PULSE_MS = 600
@@ -140,14 +161,37 @@ fun SosAlarmOverlay(uiViewModel: UIViewModel) {
                     fontWeight = FontWeight.Bold,
                 )
             }
+            val sender = current.fromNodeNum
+            if (!current.test && sender != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    ReplyButton(Res.string.sos_reply_button_coming, Modifier.weight(1f)) {
+                        center.reply(SosReply.COMING)
+                    }
+                    ReplyButton(Res.string.sos_reply_button_calling_help, Modifier.weight(1f)) {
+                        center.reply(SosReply.CALLING_HELP)
+                    }
+                }
+            }
             if (!current.test) {
-                TextButton(
-                    onClick = {
-                        center.acknowledge()
-                        openConversation()
-                    },
-                ) {
-                    Text(text = stringResource(Res.string.sos_alarm_open), color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(
+                        onClick = {
+                            center.acknowledge()
+                            openConversation()
+                        },
+                    ) {
+                        Text(text = stringResource(Res.string.sos_alarm_open), color = Color.White)
+                    }
+                    if (sender != null) {
+                        TextButton(
+                            onClick = {
+                                center.acknowledge()
+                                uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/map/focus/$sender"))
+                            },
+                        ) {
+                            Text(text = stringResource(Res.string.sos_alarm_map), color = Color.White)
+                        }
+                    }
                 }
             }
         }
