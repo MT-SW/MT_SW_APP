@@ -40,6 +40,7 @@ class AndroidSosAlarmFeedback(context: Context) : SosAlarmSound {
     private var job: Job? = null
 
     @Synchronized
+    @Suppress("ReturnCount")
     override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (!flash || job?.isActive == true) return
         val manager = cameras ?: return
@@ -50,19 +51,18 @@ class AndroidSosAlarmFeedback(context: Context) : SosAlarmSound {
                 }
             }
                 .getOrNull() ?: return
-        job =
-            scope.launch {
-                try {
-                    while (isActive) {
-                        setTorch(manager, id, true)
-                        delay(BLINK_MS)
-                        setTorch(manager, id, false)
-                        delay(BLINK_MS)
-                    }
-                } finally {
+        job = scope.launch {
+            try {
+                while (isActive) {
+                    setTorch(manager, id, true)
+                    delay(BLINK_MS)
                     setTorch(manager, id, false)
+                    delay(BLINK_MS)
                 }
+            } finally {
+                setTorch(manager, id, false)
             }
+        }
     }
 
     @Synchronized

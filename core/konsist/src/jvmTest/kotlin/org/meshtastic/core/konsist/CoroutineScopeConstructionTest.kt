@@ -65,6 +65,7 @@ class CoroutineScopeConstructionTest {
             "core/prefs/commonMain/SosPrefsImpl.kt",
             "core/prefs/commonMain/TakPrefsImpl.kt",
             "core/prefs/commonMain/UiPrefsImpl.kt",
+            "core/service/androidMain/AndroidSosAlarmFeedback.kt",
             "core/service/androidMain/BootCompleteReceiver.kt",
             "core/service/androidMain/ConversationActionService.kt",
             "core/service/androidMain/MeshService.kt",
@@ -102,6 +103,7 @@ class CoroutineScopeConstructionTest {
             "feature/wifi-provision/commonMain/NymeaWifiService.kt",
             "iosShared/iosMain/IosLogControl.kt",
             "iosShared/iosMain/IosMessageQueue.kt",
+            "iosShared/iosMain/IosSosAlarmSound.kt",
         )
 
     /** A call to the `CoroutineScope(context)` factory; `rememberCoroutineScope()` has no word break before it. */

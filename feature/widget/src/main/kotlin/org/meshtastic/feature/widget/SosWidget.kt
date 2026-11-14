@@ -70,8 +70,7 @@ class SosWidget : GlanceAppWidget() {
     private fun Content() {
         val context = LocalContext.current
         val size = LocalSize.current
-        val open =
-            Intent(Intent.ACTION_VIEW, "$DEEP_LINK_BASE_URI/sos".toUri()).setPackage(context.packageName)
+        val open = Intent(Intent.ACTION_VIEW, "$DEEP_LINK_BASE_URI/sos".toUri()).setPackage(context.packageName)
         val textSp =
             minOf(size.height.value * HEIGHT_PART, size.width.value * WIDTH_PART).coerceIn(MIN_TEXT_SP, MAX_TEXT_SP)
         Box(

@@ -70,7 +70,7 @@ private const val LITE_MAX_BANDWIDTH_KHZ = 130
  * This component handles deep linking, shared dialogs (via [MeshtasticCommonAppSetup]), and provides the global
  * [MeshtasticSnackbarProvider]. Platform entry points should wrap their navigation layout inside this shell.
  */
-@Suppress("ViewModelForwarding")
+@Suppress("ViewModelForwarding", "LongMethod")
 @Composable
 fun MeshtasticAppShell(
     multiBackstack: MultiBackstack,

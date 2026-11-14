@@ -36,13 +36,13 @@ import org.meshtastic.core.repository.SosAckMarker
 import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlarmPolicy
-import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlarmSounds
-import org.meshtastic.core.repository.SosNotificationActions
+import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosHistory
 import org.meshtastic.core.repository.SosHistoryEntry
 import org.meshtastic.core.repository.SosMarker
+import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosReply
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
@@ -125,13 +125,12 @@ class SosAlarmCenterImpl(
     }
 
     /**
-     * True when the option "alarm only after a second SOS" is on and this is the first one from that node in the
-     * chosen time. Every real SOS is noted, so the next one from the same node counts as the second.
+     * True when the option "alarm only after a second SOS" is on and this is the first one from that node in the chosen
+     * time. Every real SOS is noted, so the next one from the same node counts as the second.
      */
     private fun waitsForSecond(alert: SosAlert): Boolean {
         val now = nowMillis
-        val second =
-            SosAlarmPolicy.isSecond(alert.fromNodeNum, lastSeen, now, prefs.repeatGateMinutes.value)
+        val second = SosAlarmPolicy.isSecond(alert.fromNodeNum, lastSeen, now, prefs.repeatGateMinutes.value)
         alert.fromNodeNum?.let { lastSeen[it] = now }
         return prefs.repeatGate.value && !second
     }

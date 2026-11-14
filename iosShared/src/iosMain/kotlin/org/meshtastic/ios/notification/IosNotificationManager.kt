@@ -177,6 +177,7 @@ class IosNotificationManager(
         }
     }
 
+    @Suppress("ReturnCount")
     override suspend fun dispatch(notification: Notification): Boolean {
         val categoryEnabled =
             when (notification.category) {
@@ -234,8 +235,8 @@ class IosNotificationManager(
 
     /**
      * An alarm that goes on ringing: the same notification posted again every few seconds (the system keeps up to 64
-     * waiting), so it sounds again and again even when the app is not running. [cancel] removes the ones that did
-     * not fire yet.
+     * waiting), so it sounds again and again even when the app is not running. [cancel] removes the ones that did not
+     * fire yet.
      */
     private suspend fun postRepeated(notification: Notification, content: UNMutableNotificationContent): Boolean {
         val id = notification.id ?: return false
@@ -244,12 +245,14 @@ class IosNotificationManager(
             val seconds = (n * notification.repeatEverySeconds).coerceAtLeast(1).toDouble()
             val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(seconds, repeats = false)
             val request = UNNotificationRequest.requestWithIdentifier(repeatIdentifier(id, n), content, trigger)
-            accepted = accepted && suspendCancellableCoroutine { cont ->
-                center.addNotificationRequest(request) { error ->
-                    if (error != null) Logger.w { "Notification failed: ${error.localizedDescription}" }
-                    cont.resume(error == null)
+            accepted =
+                accepted &&
+                suspendCancellableCoroutine { cont ->
+                    center.addNotificationRequest(request) { error ->
+                        if (error != null) Logger.w { "Notification failed: ${error.localizedDescription}" }
+                        cont.resume(error == null)
+                    }
                 }
-            }
         }
         return accepted
     }

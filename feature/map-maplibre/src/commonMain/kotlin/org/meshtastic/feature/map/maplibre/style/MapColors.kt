@@ -54,9 +54,11 @@ internal object MapColors {
     private val SosHelpBase = Color(0xFFD32F2F)
     val SosHelp: Color
         get() = SosHelpBase.monoSafe()
+
     private val SosComingBase = Color(0xFF388E3C)
     val SosComing: Color
         get() = SosComingBase.monoSafe()
+
     private val SosSeenBase = Color(0xFF757575)
     val SosSeen: Color
         get() = SosSeenBase.monoSafe()

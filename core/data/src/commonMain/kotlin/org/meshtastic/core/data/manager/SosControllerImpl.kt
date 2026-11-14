@@ -37,9 +37,9 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.SosAcks
 import org.meshtastic.core.repository.SosConfig
-import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosController
 import org.meshtastic.core.repository.SosMarker
+import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosState
 import org.meshtastic.core.repository.SosTargets
 import org.meshtastic.core.repository.usecase.SendMessageOutcome
@@ -87,12 +87,20 @@ class SosControllerImpl(
         val repeating = config.repeatMinutes > 0
         val unlimited = repeating && config.repeatCount == SosConfig.UNLIMITED_REPEATS
         // With no limit the total stays 0 ("sends so far" only); the run ends by a confirmation or by cancel().
-        val total = if (!repeating) 1 else if (unlimited) 0 else config.repeatCount.coerceAtLeast(1)
+        val total =
+            if (!repeating) {
+                1
+            } else if (unlimited) {
+                0
+            } else {
+                config.repeatCount.coerceAtLeast(1)
+            }
         mutableState.value = SosState(running = true, total = total)
         var delivered = false
         var answered = false
         try {
             var attempt = 0
+            @Suppress("LoopWithTooManyJumpStatements") // ends by a confirmation, an answer or when the sends run out
             while (unlimited || attempt < total) {
                 attempt++
                 val position = if (config.includePosition) currentPosition() else null
@@ -105,11 +113,10 @@ class SosControllerImpl(
                     answered = true
                     break
                 }
-                val queued =
-                    keys.mapNotNull { (key, own) ->
-                        val text = textFor(own ?: config.message, position)
-                        (sendMessage(text, key) as? SendMessageOutcome.Queued)?.packetId
-                    }
+                val queued = keys.mapNotNull { (key, own) ->
+                    val text = textFor(own ?: config.message, position)
+                    (sendMessage(text, key) as? SendMessageOutcome.Queued)?.packetId
+                }
                 if (queued.isEmpty()) {
                     mutableState.update { it.copy(running = false, refused = true) }
                     return
@@ -145,14 +152,17 @@ class SosControllerImpl(
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
         // With nothing chosen at all the main channel is used, so the message never goes nowhere.
         val channels = if (config.channels.isEmpty() && config.nodes.isEmpty()) listOf(0) else config.channels
-        val channelKeys =
-            channels.map { ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)] }
+        val channelKeys = channels.map {
+            ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)]
+        }
         val nodeKeys =
-            config.nodes.filter { it !in answeredNodes }.map { num ->
-                val node = db[num]
-                val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
-                NodeAddress.ByNum(num).toContactKey(slot).value to config.targetMessages[SosTargets.nodeKey(num)]
-            }
+            config.nodes
+                .filter { it !in answeredNodes }
+                .map { num ->
+                    val node = db[num]
+                    val slot = if (ourPkc && node?.hasPKC == true) NodeAddress.PKC_CHANNEL_INDEX else node?.channel ?: 0
+                    NodeAddress.ByNum(num).toContactKey(slot).value to config.targetMessages[SosTargets.nodeKey(num)]
+                }
         return channelKeys + nodeKeys
     }
 

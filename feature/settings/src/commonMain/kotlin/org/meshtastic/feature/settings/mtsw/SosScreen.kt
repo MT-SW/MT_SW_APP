@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalLayoutApi::class)
-@file:Suppress("LongMethod", "ModifierMissing")
+@file:Suppress("LongMethod", "ModifierMissing", "TooManyFunctions", "CyclomaticComplexMethod", "MultipleEmitters")
 
 package org.meshtastic.feature.settings.mtsw
 
@@ -76,11 +76,11 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
-import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAck
 import org.meshtastic.core.repository.SosAckEntry
 import org.meshtastic.core.repository.SosAckExport
 import org.meshtastic.core.repository.SosAcks
+import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosBarScreens
@@ -417,9 +417,10 @@ fun SosScreen(onBack: () -> Unit) {
                     )
                 }
                 for ((key, label) in targets) {
-                    var own by remember(key, config.targetMessages[key]) {
-                        mutableStateOf(config.targetMessages[key].orEmpty())
-                    }
+                    var own by
+                        remember(key, config.targetMessages[key]) {
+                            mutableStateOf(config.targetMessages[key].orEmpty())
+                        }
                     OutlinedTextField(
                         value = own,
                         onValueChange = {

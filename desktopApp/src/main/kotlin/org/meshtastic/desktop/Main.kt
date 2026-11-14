@@ -67,7 +67,14 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import coil3.util.DebugLogger
+import coil3.util.Logger as CoilLogger
 import io.ktor.client.HttpClient
+import java.awt.Desktop
+import java.io.File
+import java.util.Locale
+import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
@@ -158,13 +165,6 @@ import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNeighborMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
-import java.awt.Desktop
-import java.io.File
-import java.util.Locale
-import kotlin.system.exitProcess
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import coil3.util.Logger as CoilLogger
 
 /** Meshtastic Desktop — the first non-Android target for the shared KMP module graph. */
 private const val MEMORY_CACHE_MAX_BYTES = 64L * 1024L * 1024L // 64 MiB
@@ -195,10 +195,10 @@ private fun svgPainterResource(path: String, density: Density): Painter = rememb
     bytes.decodeToSvgPainter(density)
 }
 
-@OptIn(ExperimentalCoilApi::class)
 /** True when the program was started at login with the wish to wait in the tray (see [DesktopAutostart]). */
 private var startedMinimized = false
 
+@OptIn(ExperimentalCoilApi::class)
 fun main(args: Array<String>) {
     startedMinimized = DesktopAutostart.MINIMIZED_ARG in args
     // A second copy asks the first one to show its window and ends here, unless the person allowed several copies.
@@ -267,8 +267,8 @@ private fun ApplicationScope.DeepLinkHandler(
         args.forEach { arg ->
             if (
                 arg.startsWith("meshtastic://") ||
-                arg.startsWith("http://meshtastic.org") ||
-                arg.startsWith("https://meshtastic.org")
+                    arg.startsWith("http://meshtastic.org") ||
+                    arg.startsWith("https://meshtastic.org")
             ) {
                 uiViewModel.handleDeepLink(CommonUri.parse(arg)) {
                     Logger.e { "Invalid Meshtastic URI passed via args: $arg" }
@@ -384,12 +384,10 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
     val isDarkTheme =
         when (themePref) {
             1,
-            MODE_MONO_LIGHT,
-            -> false
+            MODE_MONO_LIGHT -> false
 
             2,
-            MODE_MONO_DARK,
-            -> true
+            MODE_MONO_DARK -> true
 
             else -> isVividDark(themePref) || (!isVividLight(themePref) && isSystemInDarkTheme())
         }
@@ -471,7 +469,7 @@ private fun ApplicationScope.MeshtasticDesktopApp(
                 uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos")) {
                     Logger.e { "The SOS screen link was not accepted" }
                 }
-            },
+            }
         )
         add(TrayMenuItem(quitLabel) { exitApplication() })
     }
@@ -625,7 +623,7 @@ private fun ApplicationScope.MeshtasticWindow(
                 TopLevelDestination.Connect.route
             } else {
                 TopLevelDestination.Nodes.route
-            },
+            }
         )
 
     Window(
@@ -736,7 +734,7 @@ private fun CoilImageLoaderSetup() {
                     KtorNetworkFetcherFactory(
                         httpClient = httpClient,
                         concurrentRequestStrategy = DeDupeConcurrentRequestStrategy(),
-                    ),
+                    )
                 )
                 // Render SVGs to a bitmap on Desktop to avoid Skiko vector rendering artifacts
                 // that show up as solid/black hardware images.

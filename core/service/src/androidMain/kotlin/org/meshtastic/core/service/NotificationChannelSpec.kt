@@ -54,11 +54,11 @@ import org.meshtastic.core.resources.meshtastic_waypoints_notifications_descript
 import org.meshtastic.core.resources.messages
 import org.meshtastic.core.resources.node_silence_notifications
 import org.meshtastic.core.resources.node_silence_notifications_description
+import org.meshtastic.core.resources.notification_group_mesh
 import org.meshtastic.core.resources.sos_alarm_bell_notifications
 import org.meshtastic.core.resources.sos_alarm_bell_notifications_description
 import org.meshtastic.core.resources.sos_alarm_notifications
 import org.meshtastic.core.resources.sos_alarm_notifications_description
-import org.meshtastic.core.resources.notification_group_mesh
 
 /** Meshtastic brand accent (Green 500, see .skills/design-standards): the small-icon tint and the LED colour. */
 internal val NOTIFICATION_COLOR = 0xFF67EA94.toInt()
@@ -245,8 +245,7 @@ internal enum class NotificationChannelSpec(
 
     private companion object {
         val defaultSound: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val alarmSound: Uri? =
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) ?: defaultSound
+        val alarmSound: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) ?: defaultSound
         val SOS_VIBRATION = longArrayOf(0, 800, 300, 800, 300, 800)
 
         fun soundAttributes(usage: Int): AudioAttributes =

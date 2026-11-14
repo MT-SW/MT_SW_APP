@@ -27,7 +27,6 @@ data class WhatsNewRequest(val full: Boolean, val fromRelease: Int)
 
 /**
  * The "what's new" list is a small text file in each language:
- *
  * ```
  * # 5 | Wersja v5(2.8.5)
  * ## new | Nowe funkcje
@@ -99,13 +98,7 @@ object WhatsNew {
      * stable build the last stable release they saw ([seenStable]; the one before it when none was seen yet). A null
      * [seenBuild] means the stored value is not read yet, so nothing is decided.
      */
-    fun plan(
-        firstRun: Boolean,
-        seenBuild: String?,
-        seenStable: Int,
-        release: Int,
-        test: Int,
-    ): WhatsNewRequest? = when {
+    fun plan(firstRun: Boolean, seenBuild: String?, seenStable: Int, release: Int, test: Int): WhatsNewRequest? = when {
         firstRun -> WhatsNewRequest(full = true, fromRelease = 0)
         seenBuild == null || seenBuild == buildKey(release, test) -> null
         test > 0 -> WhatsNewRequest(full = false, fromRelease = release - 1)

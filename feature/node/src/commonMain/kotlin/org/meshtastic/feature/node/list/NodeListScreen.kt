@@ -754,8 +754,8 @@ private fun NeighborReportDialog(
 }
 
 /**
- * The map of a neighbour report, full screen: the node that reported it and the neighbours that have a position, with
- * a line from each to the node in the colour of its SNR. Under the map, a note when some neighbours are missing from it
+ * The map of a neighbour report, full screen: the node that reported it and the neighbours that have a position, with a
+ * line from each to the node in the colour of its SNR. Under the map, a note when some neighbours are missing from it
  * because their position is not known.
  */
 @Composable

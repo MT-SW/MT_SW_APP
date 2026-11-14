@@ -37,6 +37,7 @@ import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosQuietHours
 import org.meshtastic.core.repository.SosTargets
 
+@Suppress("TooManyFunctions")
 @Single
 class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) : SosPrefs {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)

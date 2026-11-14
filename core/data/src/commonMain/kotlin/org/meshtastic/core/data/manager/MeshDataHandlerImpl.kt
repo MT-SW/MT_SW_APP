@@ -66,11 +66,11 @@ import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.RemoteShellHandler
 import org.meshtastic.core.repository.SenderMutePrefs
-import org.meshtastic.core.repository.SosAlarmCenter
+import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.SosAckMarker
+import org.meshtastic.core.repository.SosAlarmCenter
 import org.meshtastic.core.repository.SosAlert
 import org.meshtastic.core.repository.SosMarker
-import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.StoreForwardPacketHandler
 import org.meshtastic.core.repository.TelemetryPacketHandler
 import org.meshtastic.core.repository.TracerouteHandler

@@ -47,8 +47,8 @@ import platform.AudioToolbox.AudioServicesPlaySystemSound
 /**
  * The alarm of a received SOS while the app is running (open, or kept alive in the background by "Praca w tle"): the
  * siren in a loop at full volume on the playback channel (it sounds on a locked phone and with the silent switch on),
- * the vibration, and the torch blinking, all until [stop]. When the app is not running, the notifications posted by
- * the alarm (a new one every ten seconds, with the same siren) keep ringing instead.
+ * the vibration, and the torch blinking, all until [stop]. When the app is not running, the notifications posted by the
+ * alarm (a new one every ten seconds, with the same siren) keep ringing instead.
  */
 internal object IosSosAlarmSound : SosAlarmSound {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -59,13 +59,12 @@ internal object IosSosAlarmSound : SosAlarmSound {
     override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (vibrationJob?.isActive == true) return
         startSiren(style)
-        vibrationJob =
-            scope.launch {
-                while (isActive) {
-                    AudioServicesPlaySystemSound(VIBRATE_ID)
-                    delay(VIBRATE_MS)
-                }
+        vibrationJob = scope.launch {
+            while (isActive) {
+                AudioServicesPlaySystemSound(VIBRATE_ID)
+                delay(VIBRATE_MS)
             }
+        }
         if (flash) startTorch()
     }
 
@@ -84,8 +83,7 @@ internal object IosSosAlarmSound : SosAlarmSound {
             val session = AVAudioSession.sharedInstance()
             session.setCategory(AVAudioSessionCategoryPlayback, error = null)
             session.setActive(true, error = null)
-            val sound =
-                if (style == SosAlarmStyle.BELL) SosSiren.bellWav(BELL_SECONDS) else SosSiren.wav(SIREN_SECONDS)
+            val sound = if (style == SosAlarmStyle.BELL) SosSiren.bellWav(BELL_SECONDS) else SosSiren.wav(SIREN_SECONDS)
             val player = AVAudioPlayer(data = sound.toNSData(), error = null)
             player.numberOfLoops = -1
             player.volume = 1f
@@ -97,19 +95,18 @@ internal object IosSosAlarmSound : SosAlarmSound {
     }
 
     private fun startTorch() {
-        torchJob =
-            scope.launch {
-                try {
-                    while (isActive) {
-                        setTorch(true)
-                        delay(BLINK_MS)
-                        setTorch(false)
-                        delay(BLINK_MS)
-                    }
-                } finally {
+        torchJob = scope.launch {
+            try {
+                while (isActive) {
+                    setTorch(true)
+                    delay(BLINK_MS)
                     setTorch(false)
+                    delay(BLINK_MS)
                 }
+            } finally {
+                setTorch(false)
             }
+        }
     }
 
     private fun setTorch(on: Boolean) {

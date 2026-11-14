@@ -72,7 +72,7 @@ import org.meshtastic.core.ui.viewmodel.UIViewModel
 
 /** A ready answer of the alarm window: white outline on the red, sent to the sender as a direct message. */
 @Composable
-private fun ReplyButton(label: StringResource, modifier: Modifier, onClick: () -> Unit) {
+private fun ReplyButton(label: StringResource, onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedButton(
         onClick = onClick,
         modifier = modifier,
@@ -92,6 +92,7 @@ private const val PULSE_MIN = 0.7f
  * the person confirms it. When it appears the conversation it came in is opened underneath, so that is where the person
  * lands after confirming. The sound is the platform's (see [org.meshtastic.core.repository.SosAlarmSound]).
  */
+@Suppress("LongMethod", "ModifierMissing") // a full-screen overlay: it has no place to be given by a parent
 @Composable
 fun SosAlarmOverlay(uiViewModel: UIViewModel) {
     val center = koinInject<SosAlarmCenter>()
@@ -164,12 +165,16 @@ fun SosAlarmOverlay(uiViewModel: UIViewModel) {
             val sender = current.fromNodeNum
             if (!current.test && sender != null) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    ReplyButton(Res.string.sos_reply_button_coming, Modifier.weight(1f)) {
-                        center.reply(SosReply.COMING)
-                    }
-                    ReplyButton(Res.string.sos_reply_button_calling_help, Modifier.weight(1f)) {
-                        center.reply(SosReply.CALLING_HELP)
-                    }
+                    ReplyButton(
+                        label = Res.string.sos_reply_button_coming,
+                        onClick = { center.reply(SosReply.COMING) },
+                        modifier = Modifier.weight(1f),
+                    )
+                    ReplyButton(
+                        label = Res.string.sos_reply_button_calling_help,
+                        onClick = { center.reply(SosReply.CALLING_HELP) },
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
             if (!current.test) {

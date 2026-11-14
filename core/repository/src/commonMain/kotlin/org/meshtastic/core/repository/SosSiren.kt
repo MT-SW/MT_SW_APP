@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber") // sound synthesis: sample rates, frequencies and envelope times
+
 package org.meshtastic.core.repository
 
 import kotlin.math.PI
@@ -61,8 +63,8 @@ object SosSiren {
     }
 
     /**
-     * [seconds] of the gentler bell (rounded to whole two-second cycles): two soft strikes that die away, then a
-     * pause, as 16-bit little-endian mono samples. It loops without a click, because the last strike has died away.
+     * [seconds] of the gentler bell (rounded to whole two-second cycles): two soft strikes that die away, then a pause,
+     * as 16-bit little-endian mono samples. It loops without a click, because the last strike has died away.
      */
     fun bellPcm(seconds: Double): ByteArray {
         val cycles = (seconds / BELL_CYCLE_SECONDS).toInt().coerceAtLeast(1)
@@ -73,7 +75,14 @@ object SosSiren {
         repeat(cycles) {
             for (n in 0 until samplesPerCycle) {
                 // The time since the last strike (strikes at 0 and at half a second); silent after the second one.
-                val since = if (n < strike) n else if (n < 2 * strike) n - strike else -1
+                val since =
+                    if (n < strike) {
+                        n
+                    } else if (n < 2 * strike) {
+                        n - strike
+                    } else {
+                        -1
+                    }
                 val value =
                     if (since < 0) {
                         0

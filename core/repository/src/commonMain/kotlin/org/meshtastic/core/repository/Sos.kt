@@ -146,7 +146,8 @@ object SosTargets {
         .joinToString("$ENTRY_SEPARATOR") { "${it.key}$FIELD_SEPARATOR${it.value.filterNot(::isSeparator)}" }
 
     /** Reads what [encode] wrote; unreadable parts are skipped. */
-    fun decode(text: String?): Map<String, String> = text.orEmpty()
+    fun decode(text: String?): Map<String, String> = text
+        .orEmpty()
         .split(ENTRY_SEPARATOR)
         .mapNotNull { entry ->
             val parts = entry.split(FIELD_SEPARATOR, limit = 2)
@@ -175,6 +176,7 @@ object SosBarScreens {
 }
 
 /** Where the SOS settings are kept. */
+@Suppress("TooManyFunctions")
 interface SosPrefs {
     val config: StateFlow<SosConfig>
 
@@ -256,6 +258,7 @@ enum class SosAlarmStyle {
 
     /** Only the window on the screen: no sound, no vibration, no torch (the ordinary message notification stays). */
     SILENT,
+
     ;
 
     companion object {
@@ -267,7 +270,8 @@ enum class SosAlarmStyle {
             styles.filterValues { it != SIREN }.entries.joinToString(",") { "${it.key}:${it.value.name}" }
 
         /** Reads what [encodeMap] wrote; unreadable pairs are skipped. */
-        fun decodeMap(text: String?): Map<Int, SosAlarmStyle> = text.orEmpty()
+        fun decodeMap(text: String?): Map<Int, SosAlarmStyle> = text
+            .orEmpty()
             .split(',')
             .mapNotNull { pair ->
                 val parts = pair.split(':')
@@ -300,13 +304,14 @@ data class SosQuietHours(
         const val DEFAULT_FROM = 22 * 60
         const val DEFAULT_TO = 7 * 60
         const val DAY_MINUTES = 24 * 60
+        private const val PARTS = 3
 
         /** Reads what [encode] wrote; anything unreadable gives the defaults (off). */
         fun decode(text: String?): SosQuietHours {
-            val parts = text?.split('|') ?: return SosQuietHours()
-            if (parts.size != 3) return SosQuietHours()
-            val from = parts[1].toIntOrNull() ?: return SosQuietHours()
-            val to = parts[2].toIntOrNull() ?: return SosQuietHours()
+            val parts = text?.split('|').orEmpty()
+            val from = parts.getOrNull(1)?.toIntOrNull()
+            val to = parts.getOrNull(2)?.toIntOrNull()
+            if (parts.size != PARTS || from == null || to == null) return SosQuietHours()
             return SosQuietHours(
                 enabled = parts[0] == "1",
                 fromMinutes = from.coerceIn(0, DAY_MINUTES - 1),
@@ -334,11 +339,9 @@ object SosAlarmPolicy {
         quietExceptions: Set<Int>,
         minuteOfDay: Int,
     ): Boolean {
-        if (test) return true
-        if (!receive) return false
-        if (onlyChosen && (senderNum == null || senderNum !in chosen)) return false
-        if (quiet.contains(minuteOfDay) && (senderNum == null || senderNum !in quietExceptions)) return false
-        return true
+        val blockedByChoice = onlyChosen && (senderNum == null || senderNum !in chosen)
+        val blockedByQuiet = quiet.contains(minuteOfDay) && (senderNum == null || senderNum !in quietExceptions)
+        return test || (receive && !blockedByChoice && !blockedByQuiet)
     }
 
     /**
@@ -346,9 +349,8 @@ object SosAlarmPolicy {
      * ([lastSeen] holds the time of each node's last SOS). A sender that is not known cannot be judged, so it counts.
      */
     fun isSecond(senderNum: Int?, lastSeen: Map<Int, Long>, now: Long, windowMinutes: Int): Boolean {
-        if (senderNum == null) return true
-        val last = lastSeen[senderNum] ?: return false
-        return now - last <= windowMinutes * MILLIS_PER_MINUTE
+        val last = senderNum?.let { lastSeen[it] }
+        return senderNum == null || (last != null && now - last <= windowMinutes * MILLIS_PER_MINUTE)
     }
 
     private const val MILLIS_PER_MINUTE = 60_000L
@@ -519,6 +521,7 @@ object SosAckCodec {
     private const val ENTRY_SEPARATOR = '\u001E'
     private const val FIELD_SEPARATOR = '\u001F'
     private const val FIELDS = 4
+    private const val ACK_FIELD = 3
 
     fun encode(entries: List<SosAckEntry>): String = entries.take(MAX_ENTRIES).joinToString("$ENTRY_SEPARATOR") {
         listOf(it.time.toString(), it.nodeNum.toString(), it.name.filterNot(::isSeparator), it.ack.name)
@@ -531,7 +534,7 @@ object SosAckCodec {
             val f = entry.split(FIELD_SEPARATOR)
             val time = f.getOrNull(0)?.toLongOrNull()
             val num = f.getOrNull(1)?.toIntOrNull()
-            val ack = SosAck.entries.firstOrNull { it.name == f.getOrNull(3) }
+            val ack = SosAck.entries.firstOrNull { it.name == f.getOrNull(ACK_FIELD) }
             if (f.size != FIELDS || time == null || num == null || ack == null) {
                 null
             } else {
@@ -595,8 +598,8 @@ interface SosAlarmCenter {
  */
 interface SosAlarmSound {
     /**
-     * Starts the alarm in [style]; [flash] says whether the torch should flash too (where the device has one). A
-     * silent alarm is never started here.
+     * Starts the alarm in [style]; [flash] says whether the torch should flash too (where the device has one). A silent
+     * alarm is never started here.
      */
     fun start(flash: Boolean, style: SosAlarmStyle = SosAlarmStyle.SIREN)
 
@@ -675,15 +678,18 @@ object SosAckExport {
     private const val BOM = "\uFEFF"
     private const val HEADER = "time_utc,name,node,answer"
 
-    fun csv(entries: List<SosAckEntry>): String = BOM + HEADER + "\n" + entries.joinToString("") { e ->
-        listOf(
-            Instant.fromEpochMilliseconds(e.time).toString(),
-            e.name,
-            NodeAddress.numToDefaultId(e.nodeNum),
-            e.ack.name.lowercase(),
-        )
-            .joinToString(",") { "\"" + it.replace("\"", "\"\"") + "\"" } + "\n"
-    }
+    fun csv(entries: List<SosAckEntry>): String = BOM +
+        HEADER +
+        "\n" +
+        entries.joinToString("") { e ->
+            listOf(
+                Instant.fromEpochMilliseconds(e.time).toString(),
+                e.name,
+                NodeAddress.numToDefaultId(e.nodeNum),
+                e.ack.name.lowercase(),
+            )
+                .joinToString(",") { "\"" + it.replace("\"", "\"\"") + "\"" } + "\n"
+        }
 }
 
 /** The history as a text a spreadsheet opens: one line per SOS, a header first. */
@@ -691,18 +697,21 @@ object SosHistoryExport {
     private const val BOM = "\uFEFF"
     private const val HEADER = "time_utc,sender,sender_node,text,latitude,longitude,alarm"
 
-    fun csv(entries: List<SosHistoryEntry>): String = BOM + HEADER + "\n" + entries.joinToString("") { e ->
-        listOf(
-            Instant.fromEpochMilliseconds(e.time).toString(),
-            e.senderName,
-            e.senderNum?.let { NodeAddress.numToDefaultId(it) }.orEmpty(),
-            e.text,
-            e.latitude?.toString().orEmpty(),
-            e.longitude?.toString().orEmpty(),
-            if (e.alarmed) "yes" else "no",
-        )
-            .joinToString(",") { quote(it) } + "\n"
-    }
+    fun csv(entries: List<SosHistoryEntry>): String = BOM +
+        HEADER +
+        "\n" +
+        entries.joinToString("") { e ->
+            listOf(
+                Instant.fromEpochMilliseconds(e.time).toString(),
+                e.senderName,
+                e.senderNum?.let { NodeAddress.numToDefaultId(it) }.orEmpty(),
+                e.text,
+                e.latitude?.toString().orEmpty(),
+                e.longitude?.toString().orEmpty(),
+                if (e.alarmed) "yes" else "no",
+            )
+                .joinToString(",") { quote(it) } + "\n"
+        }
 
     private fun quote(field: String): String = "\"" + field.replace("\"", "\"\"") + "\""
 }

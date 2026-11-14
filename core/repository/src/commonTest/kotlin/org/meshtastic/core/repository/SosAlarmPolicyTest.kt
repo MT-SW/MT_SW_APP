@@ -213,8 +213,7 @@ class SosAlarmPolicyTest {
 
     @Test
     fun targetMessagesEncodeAndDecode() {
-        val messages = mapOf(SosTargets.channelKey(1) to "Dla rodziny
-Pomocy", SosTargets.nodeKey(42) to "Do Oleka")
+        val messages = mapOf(SosTargets.channelKey(1) to "Dla rodziny\nPomocy", SosTargets.nodeKey(42) to "Do Oleka")
         assertEquals(messages, SosTargets.decode(SosTargets.encode(messages)))
         assertEquals(emptyMap(), SosTargets.decode(SosTargets.encode(mapOf("c0" to "  "))))
         assertEquals(emptyMap(), SosTargets.decode(null))

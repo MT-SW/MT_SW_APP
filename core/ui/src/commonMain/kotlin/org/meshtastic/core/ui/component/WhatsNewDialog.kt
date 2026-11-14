@@ -163,6 +163,7 @@ fun WhatsNewHost(uiViewModel: UIViewModel) {
  * fixed bugs, changes against the original). The person can switch between "since the last stable release" and
  * "everything from the beginning".
  */
+@Suppress("LongMethod")
 @Composable
 fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
     var request by remember { mutableStateOf(initialRequest) }

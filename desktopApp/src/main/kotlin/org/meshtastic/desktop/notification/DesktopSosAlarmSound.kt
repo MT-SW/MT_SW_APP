@@ -28,8 +28,8 @@ import javax.sound.sampled.Clip
 
 /**
  * The alarm sound of a received SOS on a computer: the shared siren (or, for a node set to the bell, the bell) played
- * in a loop until [stop]. The notification of
- * the system cannot ring again and again, so the app does it. A computer has no torch, so [start] ignores the flash.
+ * in a loop until [stop]. The notification of the system cannot ring again and again, so the app does it. A computer
+ * has no torch, so [start] ignores the flash.
  */
 internal class DesktopSosAlarmSound : SosAlarmSound {
     private var clip: Clip? = null
@@ -38,8 +38,7 @@ internal class DesktopSosAlarmSound : SosAlarmSound {
     override fun start(flash: Boolean, style: SosAlarmStyle) {
         if (clip != null) return
         runCatching {
-            val data =
-                if (style == SosAlarmStyle.BELL) SosSiren.bellPcm(BELL_SECONDS) else SosSiren.pcm(SIREN_SECONDS)
+            val data = if (style == SosAlarmStyle.BELL) SosSiren.bellPcm(BELL_SECONDS) else SosSiren.pcm(SIREN_SECONDS)
             val format = AudioFormat(SosSiren.SAMPLE_RATE.toFloat(), SAMPLE_BITS, 1, true, false)
             val stream = AudioInputStream(ByteArrayInputStream(data), format, (data.size / BYTES_PER_SAMPLE).toLong())
             val newClip = AudioSystem.getClip()

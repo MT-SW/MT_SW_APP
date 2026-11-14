@@ -30,7 +30,7 @@ import org.meshtastic.core.ui.component.PlaceholderScreen
  * Parameters: the node the report came from, its neighbours as pairs of node number and SNR in dB, a lookup of the
  * nodes by number (for names and positions) and the modifier of the map.
  */
-@Suppress("Wrapping")
+@Suppress("Wrapping", "CompositionLocalAllowlist")
 val LocalNeighborMapProvider =
     compositionLocalOf<
         @Composable (

@@ -202,9 +202,12 @@ fun MapLibreNeighborMap(
     val basemaps = rememberBasemapSelection(customBasemaps()) ?: return
     val shown =
         remember(centerNum, neighbors, nodeLookup) {
-            (listOf(centerNum) + neighbors.map { it.first }).distinct().mapNotNull { nodeLookup[it] }.filter {
-                it.validPosition != null
-            }
+            (listOf(centerNum) + neighbors.map { it.first })
+                .distinct()
+                .mapNotNull { nodeLookup[it] }
+                .filter {
+                    it.validPosition != null
+                }
         }
 
     val mapState =

@@ -175,6 +175,7 @@ internal class DesktopAutostart private constructor(private val launcher: String
         }
 
         /** The control for the installed app, or null when the app was not started from its own launcher. */
+        @Suppress("ReturnCount")
         fun create(): DesktopAutostart? {
             val command = launcherPath() ?: return null
             val name = File(command).name.lowercase().removeSuffix(".exe")

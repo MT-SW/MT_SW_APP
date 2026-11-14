@@ -42,14 +42,16 @@ internal const val SOS_BELL_FILE = "mtsw_sos_bell.wav"
 private const val NOTIFICATION_SIREN_SECONDS = 10.0
 
 /** Bytes as [NSData], copied. */
-internal fun ByteArray.toNSData(): NSData =
-    usePinned { NSData.create(bytes = it.addressOf(0), length = size.toULong()) }
+internal fun ByteArray.toNSData(): NSData = usePinned {
+    NSData.create(bytes = it.addressOf(0), length = size.toULong())
+}
 
 /**
- * Writes the siren into the app's Library/Sounds folder (once per start), where the system looks for the custom
- * sounds of notifications, and returns its name; null when it could not be written (the default sound is used then).
- * The sound is ten seconds long, so notifications posted ten seconds apart sound as one siren without a break.
+ * Writes the siren into the app's Library/Sounds folder (once per start), where the system looks for the custom sounds
+ * of notifications, and returns its name; null when it could not be written (the default sound is used then). The sound
+ * is ten seconds long, so notifications posted ten seconds apart sound as one siren without a break.
  */
+@Suppress("ReturnCount")
 internal fun ensureSosSoundFile(style: SosAlarmStyle = SosAlarmStyle.SIREN): String? {
     val bell = style == SosAlarmStyle.BELL
     val name = if (bell) SOS_BELL_FILE else SOS_SOUND_FILE

@@ -76,8 +76,8 @@ internal fun TracerouteLayers(
 }
 
 /**
- * A neighbour report: a line from every neighbour to the node that reported it, in the colour of the signal quality
- * its SNR rates, with an arrowhead at the node and the SNR written along it (the traceroute drawing, as a star).
+ * A neighbour report: a line from every neighbour to the node that reported it, in the colour of the signal quality its
+ * SNR rates, with an arrowhead at the node and the SNR written along it (the traceroute drawing, as a star).
  */
 @Composable
 internal fun NeighborLinkLayers(centerNum: Int, neighbors: List<Pair<Int, Float>>, nodeLookup: Map<Int, Node>) {
