@@ -37,7 +37,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
 * **Komputer.** Opcja „Uruchamiaj z komputerem” i domyślnie jedna kopia programu.
 * **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji; ciemne tło jest szare zamiast niebieskawego, a w motywach „Nasycony” i „Bardzo nasycony” czysto czarne (dobre dla ekranów AMOLED).
-* **Pływający pasek nawigacji.** Dolny pasek kart (a na komputerze i tablecie także boczny) to zaokrąglona „wyspa” z podpisami pod ikonami i zaznaczoną aktywną kartą; wygląda tak samo na Androidzie, komputerze i iPhonie/iPadzie, a treść strony kończy się nad nim, więc ostatnią pozycję zawsze da się przewinąć. W „Funkcje MT_SW” przełącznik „Pływający pasek nawigacji na dole” przywraca stary pasek.
+* **Pływający pasek nawigacji.** Dolny pasek kart (a na komputerze i tablecie także boczny) to zaokrąglona „wyspa” z podpisami pod ikonami i zaznaczoną aktywną kartą; wygląda tak samo na Androidzie, komputerze i iPhonie/iPadzie, a treść strony kończy się nad nim, więc ostatnią pozycję zawsze da się przewinąć. W „Funkcje MT_SW” przełącznik „Pływający pasek nawigacji na dole” przywraca stary pasek. Opcjonalnie (domyślnie wyłączone) pasek chowa się przy przewijaniu w dół i wraca po przewinięciu w górę albo dopiero na samej górze strony.
 * **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
@@ -70,43 +70,45 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * iPhone/iPad: najstarszy obsługiwany system to iOS 17, a identyfikator aplikacji to pl.sw.mt, jak na Androidzie.
 * Budowanie dostosowane do nowego Gradle.
 
-#### Od początku do wersji v4 (2.8.4)
+#### Od początku powstawania aplikacji
 
 ##### Nowe funkcje
 
-* **Zdrowie sieci.** Zakładki zasilania, sygnału, eteru i środowiska, karta „Kondycja sieci”, podsumowanie z rankingami i eksport do PDF, HTML, Markdown, tekstu i CSV, wykresy w szczegółach węzła.
-* **Asystent AI, tłumacz i dyktowanie offline.** Jeden silnik (llama.cpp) i jeden wybór modeli (Gemma, Qwen, Bielik, DeepSeek), z użyciem NPU i karty graficznej; asystent liczy sam, zna aplikację i sieć, ma pamięć między rozmowami, pokazuje przyciski do ekranów i ustawień; opcjonalny internet; czytanie na głos. Treści AI są oznaczone.
-* **Planer łącza (Mesh Link Planer) i kalkulator anten.** Natywny planer z terenem, przeszkodami, pogodą na żywo i zasięgiem na mapie, kreator kabli i złączy, wymiary 13 typów anten.
-* **Widok sieci (panorama terenu).** Sylwetka terenu dookoła z węzłami, obracana kompasem, teren offline, widok AR z aparatu.
-* **Diagnostyka na żądanie i sniffer.** Zapytania do węzłów (port 354) oraz sniffer radiowy i MQTT na jednym ekranie z zapisem i grupowaniem duplikatów.
-* **Funkcje MT_SW i dokumentacja.** Osobny ekran z funkcjami forka, baza wiedzy, cała dokumentacja w aplikacji po polsku i angielsku, ekran powitalny „Co dodaje MT_SW”.
-* **Powiadomienia adaptacyjne** (Android 16+) i powiadomienia o nowych wersjach aplikacji.
-* **Trasy i sąsiedzi.** Traceroute na mapie z siłą sygnału, linie jakości sygnału między węzłami, ikona sąsiadów na liście węzłów.
-* **Węzły.** Nazwa węzła pośredniczącego (relay), ręczne dodawanie kontaktu, czyszczenie bazy węzłów (także automatyczne i przez Bluetooth), kolor węzła przy generowaniu klucza, dodatkowa telemetria MT_SW_FIRMWARE v3 i siła Wi-Fi.
-* **Czat.** Długie wiadomości dzielone i składane, zdjęcia przez link, podgląd obrazków z linków, tłumaczenie przed wysłaniem, czytanie na głos.
-* **Motywy i wygląd.** Czarno-białe motywy, „Skalowanie aplikacji”, wybór dowolnego koloru węzła, kolory statusów zgodne z aplikacją.
-* **Wersje na komputer i iPhone/iPad.** Aplikacja na macOS, Windows i Linuksa z ekranem powitalnym oraz podstawa aplikacji na iPhone/iPad.
+* **Zdrowie sieci.** Zakładki zasilania, sygnału, eteru, środowiska, ruchu, sąsiadów i zasobów (procesor, pamięć, flash), karta „Kondycja sieci”, podsumowanie z rankingami, wykresy w szczegółach węzła i eksport do PDF, HTML, Markdown, tekstu i CSV; dane są odczytywane na żywo z dziennika sieci.
+* **Asystent AI, tłumacz i dyktowanie offline.** Jeden silnik (llama.cpp) i jeden wybór modeli (Gemma, Qwen, Bielik, DeepSeek), z użyciem NPU i karty graficznej. Asystent sam liczy, zna aplikację i sieć, ma pamięć rozmowy, umie czytać na głos i, jeśli chcesz, korzystać z internetu; tłumacz działa bez sieci, a dyktowanie zamienia mowę na tekst w czacie.
+* **Planer łącza (Mesh Link Planer) i kalkulator anten.** Natywny planer z terenem, przeszkodami, pogodą na żywo i zasięgiem na mapie, kreator kabli i złączy oraz wymiary 13 rodzajów anten.
+* **Widok sieci (panorama terenu).** Sylwetka terenu dookoła z węzłami, obracana kompasem, teren offline i widok z aparatu (AR).
+* **Diagnostyka na żądanie i sniffer.** Dziesięć rodzajów zapytań do węzłów (port 354) oraz sniffer radiowy i MQTT na jednym ekranie: grupowanie duplikatów z listą odbiorów, zapis i wczytywanie dziennika (txt, JSON, CSV), kolorowe kategorie pakietów, dekodowanie po kliknięciu i bufor 5000 pakietów.
+* **Logi urządzenia i jakość sygnału.** Logi urządzenia na żywo z wyszukiwaniem i eksportem, korekta wzmocnienia LNA dla szumu i RSSI, ocena SNR zależna od presetu i kolory statusów zgodne w całej aplikacji.
+* **Mapa.** Wspólny silnik MapLibre na Androidzie i komputerze, domyślna mapa OpenStreetMap, cieniowanie terenu, radar pogody, mapy offline, rozsuwanie węzłów o tej samej pozycji, lepsze grupowanie i dopasowanie widoku do wszystkich węzłów.
+* **Węzły.** Nazwa węzła pośredniczącego (relay) i pełna lista relayów w statusie doręczenia, ręczne dodawanie kontaktu po ID, zdalne ulubione i ignorowanie przez sieć LoRa, zdalne sterowanie GPIO, czyszczenie bazy węzłów (także automatyczne i przez Bluetooth), kolor węzła przy generowaniu klucza, dodatkowa telemetria MT_SW_FIRMWARE.
+* **Trasy i sąsiedzi.** Traceroute na mapie z siłą sygnału, linie jakości sygnału między węzłami, ikona sąsiadów na liście węzłów i pasywny NeighborInfo.
+* **Czat.** Długie wiadomości dzielone i składane na bieżąco, zdjęcia przez link i podgląd obrazków z linków, tłumaczenie przed wysłaniem, czytanie na głos, przyciski szybkich komend (/ping, /hello, /test) i szablony Szybkiego Czatu.
+* **Funkcje MT_SW i dokumentacja.** Osobny ekran z funkcjami forka, baza wiedzy, cała dokumentacja w aplikacji po polsku i angielsku, ekran powitalny „Co dodaje MT_SW” i przywrócony ekran Traffic Management.
+* **Motywy i wygląd.** Czarno-białe motywy, „Skalowanie aplikacji”, wybór dowolnego koloru węzła, własna ikona i paleta kolorów oraz ekran „O aplikacji”.
+* **Powiadomienia.** Powiadomienia adaptacyjne (Android 16+) i powiadomienia o nowych wersjach aplikacji.
+* **Aplikacja na komputer i iPhone/iPad.** Wersje na macOS, Windows i Linuksa z ekranem powitalnym, paskiem szybkiego przewijania i trzecią kolumną podążającą za wybranym węzłem oraz podstawa aplikacji na iPhone/iPad.
 * **Wsparcie.** „Wesprzyj projekt”, zgłaszanie błędów i pomysłów, zbieranie logów.
 
 ##### Ulepszenia
 
 * Płynniejsza aplikacja: lżejsze listy węzłów i rozmów, mapa, szczegóły węzła i Zdrowie sieci przy dużej ilości danych, szybszy start na komputerze.
-* Nazwy presetów modemu po polsku z angielską nazwą w nawiasie, polskie nazwy ról urządzeń, pełne tłumaczenie na polski.
-* Jednolite kolory w całej aplikacji: złoty = dobrze, czerwony = średnio, fioletowy = źle.
+* Pełne tłumaczenie na polski (ponad tysiąc tekstów), nazwy presetów modemu po polsku z angielską nazwą w nawiasie, polskie nazwy ról urządzeń.
+* Jednolite kolory w całej aplikacji: złoty = dobrze, czerwony = średnio, fioletowy = źle; zaufanie do węzła na złoto, niezgodność klucza na czerwono.
 * Szum jest oceniany po korekcie LNA, ocena SNR zależy od presetu.
-* Ustawienia LoRa: przesunięcie częstotliwości, coding rate, domyślnie preset Narrow Fast i 869,44165 MHz.
-* Mapy offline także dla domyślnej mapy OpenStreetMap, domyślna mapa OpenStreetMap i mniejsze plakietki z ogonkiem.
-* Opisy „i” przy funkcjach, spokojniejsze okna informacyjne, pasek przewijania na komputerze.
+* Ustawienia LoRa: przesunięcie częstotliwości, coding rate, domyślnie preset Narrow Fast i 869,44165 MHz; ostrzeżenia o paśmie wąskim i o wyjściu poza region.
+* Mapy offline także dla domyślnej mapy OpenStreetMap i mniejsze plakietki z ogonkiem.
+* Opisy „i” przy funkcjach, spokojniejsze okna informacyjne, pasek przewijania na komputerze; na komputerze Enter to nowa linia, a Ctrl+Enter wysyła wiadomość.
 
 ##### Naprawione błędy
 
 * Ponowne łączenie Bluetooth z już sparowanym urządzeniem (Xiaomi/MIUI).
-* Puste listy rozwijane w spakowanej wersji na komputer.
+* Puste listy rozwijane i nieprawidłowo działająca mapa w spakowanej wersji na komputer.
 * Odzyskiwanie urządzenia zablokowanego w trybie DFU oraz aktualizacja własnym plikiem dla nieznanych urządzeń.
 * Zamykanie się aplikacji przy użyciu tłumacza i przy ogromnej ilości danych w Zdrowiu sieci.
 * Czyszczenie węzłów przez Bluetooth działa do końca; naprawione wysyłanie zdjęć przez link i gubienie zapytań diagnostyki.
 * Komputer: podwójne ekrany w nawigacji i nieprawidłowe kolumny po zapisanej sesji.
-* Poprawne zapisy liczby skoków w historii tras i „Czas trasy” zamiast angielskiego tekstu.
+* Poprawne zapisy liczby skoków w historii tras i „Czas trasy” zamiast angielskiego tekstu; mapa śladu pozycji nie zaczyna już w oceanie.
 
 ##### Zmiany względem oryginału
 
@@ -874,7 +876,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
 * **Computer.** The "Start with the computer" option and a single copy of the program by default.
 * **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option; the dark background is grey instead of bluish, and pure black in the "Saturated" and "Very saturated" themes (good for AMOLED screens).
-* **Floating navigation bar.** The bottom tab bar (and on a computer or tablet the side bar too) is a rounded "island" with a name under each icon and the open tab highlighted; it looks the same on Android, the computer and iPhone/iPad, and a page's content ends above it, so the last item can always be scrolled into view. In "MT_SW features" the switch "Floating navigation bar at the bottom" brings the old bar back.
+* **Floating navigation bar.** The bottom tab bar (and on a computer or tablet the side bar too) is a rounded "island" with a name under each icon and the open tab highlighted; it looks the same on Android, the computer and iPhone/iPad, and a page's content ends above it, so the last item can always be scrolled into view. In "MT_SW features" the switch "Floating navigation bar at the bottom" brings the old bar back. Optionally (off by default) the bar hides while scrolling down and returns on scrolling up or only at the very top of the page.
 * **Data.** "Add data from a backup" and synchronisation of the device statistics.
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
@@ -907,51 +909,53 @@ The main things of every version, split by kind of change (the "What's new in th
 * iPhone/iPad: the oldest supported system is iOS 17, and the app identifier is pl.sw.mt, like on Android.
 * The build was adapted to the new Gradle.
 
-#### From the start to version v4 (2.8.4)
+#### From the beginning of the app
 
 ##### New features
 
-* **Network health.** Tabs for power, signal, airtime and environment, a "Network condition" card, a summary with rankings and export to PDF, HTML, Markdown, text and CSV, charts in the node details.
-* **AI assistant, translator and dictation offline.** One engine (llama.cpp) and one choice of models (Gemma, Qwen, Bielik, DeepSeek), using the NPU and the graphics card; the assistant calculates by itself, knows the app and the network, remembers between conversations, shows buttons to screens and settings; optional internet; reading aloud. AI content is marked.
-* **Link planner (Mesh Link Planer) and antenna calculator.** A native planner with terrain, obstacles, live weather and the range on the map, a cable and connector wizard, the dimensions of 13 antenna types.
-* **Network view (terrain panorama).** The silhouette of the terrain all around with the nodes, turned by the compass, offline terrain, an AR view from the camera.
-* **On-demand diagnostics and sniffer.** Queries to nodes (port 354) and a radio and MQTT sniffer on one screen with saving and grouping of duplicates.
-* **MT_SW features and documentation.** A separate screen with the features of the fork, a knowledge base, all the documentation in the app in Polish and English, the welcome screen "What MT_SW adds".
-* **Adaptive notifications** (Android 16+) and notifications about new versions of the app.
-* **Routes and neighbours.** Traceroute on the map with signal strength, signal quality lines between nodes, a neighbours icon in the node list.
-* **Nodes.** The name of the relay node, adding a contact by hand, cleaning of the node database (also automatic and over Bluetooth), the node colour when generating a key, extra telemetry of MT_SW_FIRMWARE v3 and Wi-Fi strength.
-* **Chat.** Long messages split and put together, photos by link, a preview of images from links, translation before sending, reading aloud.
-* **Themes and look.** Black-and-white themes, "App scaling", any node colour, status colours matching the app.
-* **Computer and iPhone/iPad versions.** The app for macOS, Windows and Linux with a welcome screen and the base of the iPhone/iPad app.
+* **Network health.** Tabs for power, signal, airtime, environment, traffic, neighbours and resources (CPU, memory, flash), a "Network condition" card, a summary with rankings, charts in node details and export to PDF, HTML, Markdown, text and CSV; the data is decoded live from the mesh log.
+* **AI assistant, translator and dictation offline.** One engine (llama.cpp) and one choice of models (Gemma, Qwen, Bielik, DeepSeek), using the NPU and the graphics card. The assistant calculates by itself, knows the app and the network, remembers the conversation, can read aloud and, if you want, use the internet; the translator works without a network and dictation turns speech into text in the chat.
+* **Link planner (Mesh Link Planer) and antenna calculator.** A native planner with terrain, obstacles, live weather and the coverage on the map, a cable and connector wizard and the dimensions of 13 kinds of antennas.
+* **Network view (terrain panorama).** The silhouette of the terrain all around with the nodes, turned by the compass, offline terrain and a camera view (AR).
+* **On-demand diagnostics and sniffer.** Ten kinds of queries to nodes (port 354) and a radio and MQTT sniffer on one screen: grouping of duplicates with a list of receivers, saving and loading the log (txt, JSON, CSV), coloured packet categories, decoding on tap and a buffer of 5000 packets.
+* **Device logs and signal quality.** Live device logs with search and export, LNA gain correction for noise and RSSI, an SNR rating that depends on the preset and status colours that agree across the whole app.
+* **Map.** A shared MapLibre engine on Android and the computer, the OpenStreetMap map by default, terrain shading, a weather radar, offline maps, spreading nodes with the same position, better clustering and a view fitted to all the nodes.
+* **Nodes.** The name of the relaying node and the full list of relays in the delivery status, adding a contact by ID, remote favourite and ignore over the LoRa network, remote GPIO control, clearing the node database (also automatic and over Bluetooth), a node colour when generating a key, extra MT_SW_FIRMWARE telemetry.
+* **Routes and neighbours.** Traceroute on the map with signal strength, signal quality lines between nodes, a neighbours icon in the node list and passive NeighborInfo.
+* **Chat.** Long messages split and put together on the fly, photos by link and a preview of images from links, translation before sending, reading aloud, quick command buttons (/ping, /hello, /test) and Quick Chat templates.
+* **MT_SW features and documentation.** A separate screen with the features of the fork, a knowledge base, all the documentation in the app in Polish and English, a "What MT_SW adds" welcome screen and the restored Traffic Management screen.
+* **Themes and look.** Black-and-white themes, "App scaling", any node colour, an own icon and colour palette and an "About" screen.
+* **Notifications.** Adaptive notifications (Android 16+) and notifications about new versions of the app.
+* **App for the computer and iPhone/iPad.** Versions for macOS, Windows and Linux with a welcome screen, a quick scroll bar and a third column that follows the selected node, and the base of the iPhone/iPad app.
 * **Support.** "Support the project", reporting bugs and ideas, collecting logs.
 
 ##### Improvements
 
-* A smoother app: lighter node and conversation lists, the map, node details and Network health with a lot of data, a faster start on the computer.
-* Modem preset names in Polish with the English name in brackets, Polish names of device roles, a full Polish translation.
-* The same colours across the app: gold = good, red = medium, purple = bad.
+* A smoother app: lighter node and chat lists, the map, node details and Network health with a lot of data, a faster start on the computer.
+* A full Polish translation (over a thousand texts), modem preset names in Polish with the English name in brackets, Polish device role names.
+* The same colours across the whole app: gold = good, red = fair, purple = bad; trust in a node in gold, a key mismatch in red.
 * Noise is rated after the LNA correction, the SNR rating depends on the preset.
-* LoRa settings: frequency offset, coding rate, Narrow Fast preset and 869.44165 MHz by default.
-* Offline maps also for the default OpenStreetMap map, the default OpenStreetMap map and smaller plates with a tail.
-* "i" descriptions for features, calmer information windows, a scroll bar on the computer.
+* LoRa settings: frequency offset, coding rate, the Narrow Fast preset and 869.44165 MHz by default; warnings about the narrow band and about leaving the region.
+* Offline maps also for the default OpenStreetMap map and smaller badges with a tail.
+* "i" descriptions next to features, calmer information windows, a scroll bar on the computer; on the computer Enter is a new line and Ctrl+Enter sends the message.
 
 ##### Fixed bugs
 
 * Reconnecting Bluetooth to an already paired device (Xiaomi/MIUI).
-* Empty drop-down lists in the packaged computer version.
-* Recovering a device stuck in DFU mode and updating with an own file for unknown devices.
+* Empty drop-down lists and a map that did not work in the packaged computer version.
+* Recovering a device locked in DFU mode and updating with an own file for unknown devices.
 * The app closing when using the translator and with a huge amount of data in Network health.
-* Cleaning nodes over Bluetooth works to the end; fixed sending photos by link and lost diagnostic queries.
-* Computer: doubled screens in the navigation and wrong columns after a saved session.
-* The right count of hops in the route history and "Route time" instead of an English text.
+* Clearing nodes over Bluetooth now works to the end; sending photos by link and losing diagnostics queries fixed.
+* Computer: double screens in the navigation and wrong columns after a saved session.
+* Correct hop counts in the route history and "Route time" instead of English text; the position trail map no longer starts in the ocean.
 
 ##### Changes against the original
 
-* Renamed to MT_SW_APP with its own icon and its own identifier, so it installs next to the original.
+* Renamed to MT_SW_APP with an own icon and an own identifier, so the app installs next to the original.
 * A native link planner instead of the external Site Planner.
-* The NLLB-200 translator model was removed (its licence does not match ours).
-* Outdated device roles hidden (REPEATER, ROUTER_CLIENT); "Heap" is now called RAM.
-* Further merges with the original (protobufs, libraries, translations, new features), with our Polish translations first.
+* The NLLB-200 translator model removed (its licence does not agree with ours).
+* Obsolete device roles hidden (REPEATER, ROUTER_CLIENT); "Heap" is now called RAM.
+* Further merges with the original (protobufs, libraries, translations, new features), with our Polish translations taking priority.
 
 ## Full change log by version
 

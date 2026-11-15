@@ -250,6 +250,18 @@ class SettingsViewModel(
         uiPrefs.setFloatingNavBar(value)
     }
 
+    val floatingNavBarAutoHide = uiPrefs.floatingNavBarAutoHide
+
+    fun setFloatingNavBarAutoHide(value: Boolean) {
+        uiPrefs.setFloatingNavBarAutoHide(value)
+    }
+
+    val floatingNavBarOnlyAtTop = uiPrefs.floatingNavBarOnlyAtTop
+
+    fun setFloatingNavBarOnlyAtTop(value: Boolean) {
+        uiPrefs.setFloatingNavBarOnlyAtTop(value)
+    }
+
     fun setAutoLoadChatImages(value: Boolean) {
         uiPrefs.setAutoLoadChatImages(value)
     }

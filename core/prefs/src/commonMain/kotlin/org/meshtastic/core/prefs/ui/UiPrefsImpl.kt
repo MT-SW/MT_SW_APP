@@ -261,6 +261,22 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR] = value } }
     }
 
+    override val floatingNavBarAutoHide: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_FLOATING_NAV_BAR_AUTO_HIDE] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setFloatingNavBarAutoHide(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR_AUTO_HIDE] = value } }
+    }
+
+    override val floatingNavBarOnlyAtTop: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[KEY_FLOATING_NAV_BAR_ONLY_AT_TOP] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setFloatingNavBarOnlyAtTop(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR_ONLY_AT_TOP] = value } }
+    }
+
     override val translatorEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -944,6 +960,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_WIDGET_OTHERS_PICKED = stringPreferencesKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_FLOATING_NAV_BAR = booleanPreferencesKey("floating-nav-bar")
+        val KEY_FLOATING_NAV_BAR_AUTO_HIDE = booleanPreferencesKey("floating-nav-bar-auto-hide")
+        val KEY_FLOATING_NAV_BAR_ONLY_AT_TOP = booleanPreferencesKey("floating-nav-bar-only-at-top")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")

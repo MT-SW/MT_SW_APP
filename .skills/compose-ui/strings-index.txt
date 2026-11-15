@@ -1489,6 +1489,8 @@ firmware_update_wipe_usb_detail
 firmware_version
 fixed_position
 floating_nav_bar
+floating_nav_bar_auto_hide
+floating_nav_bar_only_at_top
 ### FONT ###
 font_default
 font_family

@@ -255,6 +255,16 @@ interface UiPrefs {
 
     fun setFloatingNavBar(value: Boolean)
 
+    /** MT_SW: the floating bar hides while a page is scrolled down and returns on scrolling up (off by default). */
+    val floatingNavBarAutoHide: StateFlow<Boolean>
+
+    fun setFloatingNavBarAutoHide(value: Boolean)
+
+    /** MT_SW: with [floatingNavBarAutoHide], the bar comes back only at the very top of the page. */
+    val floatingNavBarOnlyAtTop: StateFlow<Boolean>
+
+    fun setFloatingNavBarOnlyAtTop(value: Boolean)
+
     fun setAutoLoadChatImages(value: Boolean)
 
     /**

@@ -24,6 +24,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,14 +68,20 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -129,6 +137,8 @@ fun MeshtasticNavigationSuite(
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
     val floatingNavBar by uiViewModel.floatingNavBar.collectAsStateWithLifecycle()
+    val autoHide by uiViewModel.floatingNavBarAutoHide.collectAsStateWithLifecycle()
+    val onlyAtTop by uiViewModel.floatingNavBarOnlyAtTop.collectAsStateWithLifecycle()
     val translatorEnabled by uiViewModel.translatorEnabled.collectAsStateWithLifecycle()
     val assistantEnabled by uiViewModel.assistantEnabled.collectAsStateWithLifecycle()
     val showAiTab = translatorEnabled || assistantEnabled
@@ -188,6 +198,31 @@ fun MeshtasticNavigationSuite(
         }
     }
 
+    // The hiding bar: it goes away while a page is scrolled down and comes back on scrolling up (or, with the second
+    // switch, only when the page is pulled down at its very top). Opening another tab always shows it again.
+    var barShown by remember { mutableStateOf(true) }
+    LaunchedEffect(topLevelDestination, autoHide) { barShown = true }
+    val scrollConnection =
+        remember(autoHide, onlyAtTop) {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (autoHide) {
+                        when {
+                            available.y < -HIDE_SCROLL_STEP -> barShown = false
+                            available.y > HIDE_SCROLL_STEP && !onlyAtTop -> barShown = true
+                        }
+                    }
+                    return Offset.Zero
+                }
+
+                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                    // Whatever the page could not scroll any more is the top of the page: show the bar there.
+                    if (autoHide && available.y > 0f) barShown = true
+                    return Offset.Zero
+                }
+            }
+        }
+
     if (floatingNavBar) {
         // The floating bar: a rounded island above the screen's bottom edge, on the phone, the tablet and the computer
         // alike. The content ends above it, so the last line of every page can always be scrolled clear of the bar.
@@ -197,10 +232,14 @@ fun MeshtasticNavigationSuite(
             contentColor = NavigationSuiteScaffoldDefaults.contentColor,
         ) {
             Column(Modifier.fillMaxSize()) {
-                Row(Modifier.weight(1f).fillMaxWidth()) { content() }
+                Row(Modifier.weight(1f).fillMaxWidth().nestedScroll(scrollConnection)) { content() }
                 // While the keyboard is up the bar gives way to it, so the message field is not squeezed.
                 val keyboardUp = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-                if (!keyboardUp) {
+                AnimatedVisibility(
+                    visible = !keyboardUp && (barShown || !autoHide),
+                    enter = slideInVertically { it } + fadeIn(),
+                    exit = slideOutVertically { it } + fadeOut(),
+                ) {
                     FloatingNavBar(
                         entries = entries,
                         // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
@@ -325,6 +364,9 @@ private fun FloatingNavItem(entry: NavEntry, modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** How far (in pixels) a page has to move in one step before the hiding bar reacts, so a tiny shake does nothing. */
+private const val HIDE_SCROLL_STEP = 2f
 
 private val FLOATING_MAX_WIDTH = 560.dp
 private val FLOATING_CORNER = 32.dp

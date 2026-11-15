@@ -1531,6 +1531,8 @@
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
     <string name="floating_nav_bar">Floating navigation bar at the bottom</string>
+    <string name="floating_nav_bar_auto_hide">Hide the bar while scrolling down</string>
+    <string name="floating_nav_bar_only_at_top">Bring the bar back only at the top of the page</string>
     <!-- FONT -->
     <string name="font_default">As designed</string>
     <string name="font_family">Font</string>

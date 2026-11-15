@@ -474,6 +474,18 @@ class FakeUiPrefs : UiPrefs {
         floatingNavBar.value = value
     }
 
+    override val floatingNavBarAutoHide = MutableStateFlow(false)
+
+    override fun setFloatingNavBarAutoHide(value: Boolean) {
+        floatingNavBarAutoHide.value = value
+    }
+
+    override val floatingNavBarOnlyAtTop = MutableStateFlow(false)
+
+    override fun setFloatingNavBarOnlyAtTop(value: Boolean) {
+        floatingNavBarOnlyAtTop.value = value
+    }
+
     override val translatorEnabled = MutableStateFlow(false)
 
     override fun setTranslatorEnabled(value: Boolean) {

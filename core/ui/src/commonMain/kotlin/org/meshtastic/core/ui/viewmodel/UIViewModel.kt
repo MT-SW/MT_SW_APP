@@ -209,6 +209,10 @@ class UIViewModel(
     /** Whether the bottom navigation is the floating rounded bar (the default) or the classic bar. */
     val floatingNavBar: StateFlow<Boolean> = uiPrefs.floatingNavBar
 
+    /** Whether the floating bar hides while the page is scrolled down, and whether it returns only at the top. */
+    val floatingNavBarAutoHide: StateFlow<Boolean> = uiPrefs.floatingNavBarAutoHide
+    val floatingNavBarOnlyAtTop: StateFlow<Boolean> = uiPrefs.floatingNavBarOnlyAtTop
+
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
     val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled
 
