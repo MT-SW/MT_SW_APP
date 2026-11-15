@@ -25,6 +25,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -50,7 +53,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -293,20 +295,33 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
 
 private const val SELECTED_ALPHA = 0.12f
 
-private const val MIN_LABEL_SP = 6f
-private const val LABEL_SHRINK_STEP_SP = 0.5f
+private const val MIN_LABEL_SP = 5f
+private const val LABEL_FIT_MARGIN = 0.96f
 
-/** The name of a button on one line, made smaller until the whole of it fits (so "Network health" is never cut). */
+/**
+ * The name of a button on one line, as big as fits: it is measured at the normal size and, when wider than the room
+ * the button has, scaled down to that room (so "Network health" is never cut off).
+ */
 @Composable
 private fun FitLabel(text: String) {
-    var size by remember(text) { mutableFloatStateOf(LABEL_SIZE_SP.toFloat()) }
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall,
-        fontSize = size.sp,
-        maxLines = 1,
-        softWrap = false,
-        overflow = TextOverflow.Clip,
-        onTextLayout = { if (it.didOverflowWidth && size > MIN_LABEL_SP) size -= LABEL_SHRINK_STEP_SP },
-    )
+    val measurer = rememberTextMeasurer()
+    val base = MaterialTheme.typography.labelSmall.copy(fontSize = LABEL_SIZE_SP.sp)
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        val room = constraints.maxWidth
+        val wanted = remember(text, base) { measurer.measure(text, base, softWrap = false, maxLines = 1).size.width }
+        val sizeSp =
+            if (room == Constraints.Infinity || wanted <= room) {
+                LABEL_SIZE_SP.toFloat()
+            } else {
+                (LABEL_SIZE_SP * room * LABEL_FIT_MARGIN / wanted).coerceAtLeast(MIN_LABEL_SP)
+            }
+        Text(
+            text = text,
+            style = base,
+            fontSize = sizeSp.sp,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Clip,
+        )
+    }
 }

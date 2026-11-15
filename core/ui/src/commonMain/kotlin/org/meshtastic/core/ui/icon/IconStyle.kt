@@ -30,7 +30,7 @@ import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /** The share of the icon's width that the line of the outline and of the bold style takes. */
-private const val OUTLINE_LINE_SHARE = 0.042f
+private const val OUTLINE_LINE_SHARE = 0.05f
 private const val BOLD_LINE_SHARE = 0.022f
 
 /**

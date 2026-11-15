@@ -59,6 +59,7 @@ private const val SHADE_BOTTOM_ALPHA = 0.08f
 private const val RIM_TOP_ALPHA = 0.5f
 private const val RIM_BOTTOM_ALPHA = 0.06f
 private const val FLAT_SHADOW_DP = 14f
+private const val GLASS_FALLBACK_MIN_ALPHA = 0.78f
 private const val GLASS_TINT_LIGHT = 1
 private const val GLASS_TINT_DARK = 2
 private const val GLASS_TINT_ACCENT = 3
@@ -174,7 +175,17 @@ fun StyledSurface(
             Surface(
                 modifier = modifier.glassEdge(shape, rimWidth),
                 shape = shape,
-                color = baseColor.copy(alpha = seeThroughAlpha(style.strength)),
+                // Glass that cannot blur (over a map, on an old Android) imitates a frosted pane: it stays dense enough
+                // to read what is on it.
+                color =
+                baseColor.copy(
+                    alpha =
+                    if (style.look == ElementLook.GLASS) {
+                        maxOf(seeThroughAlpha(style.strength), GLASS_FALLBACK_MIN_ALPHA)
+                    } else {
+                        seeThroughAlpha(style.strength)
+                    },
+                ),
                 shadowElevation = if (floating) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
@@ -252,7 +263,7 @@ private const val EDGE_INNER_SHARE = 0.5f
  * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right,
  * with a second finer line just inside it, so the glass seems to have thickness.
  */
-private fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWithContent {
+internal fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWithContent {
     val outline = shape.createOutline(size, layoutDirection, this)
     drawOutline(
         outline = outline,

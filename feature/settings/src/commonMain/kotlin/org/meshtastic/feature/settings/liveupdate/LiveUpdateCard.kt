@@ -27,7 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
