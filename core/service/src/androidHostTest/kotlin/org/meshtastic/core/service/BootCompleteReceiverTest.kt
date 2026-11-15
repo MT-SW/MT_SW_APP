@@ -24,14 +24,18 @@ import android.os.Bundle
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -98,7 +102,7 @@ class BootCompleteReceiverTest {
         dispatchBootCompleted(BootCompleteReceiver(), application)
         runCurrent()
         persistedAddress.complete("xAA:BB:CC:DD:EE:FF")
-        advanceUntilIdle()
+        awaitBlockedNotification()
 
         assertTrue(shadowOf(application).allStartedServices.isEmpty(), "must not start a service that cannot connect")
         val (_, message) = recordingNotifications.reconnectBlocked.single()
@@ -194,6 +198,19 @@ class BootCompleteReceiverTest {
         assertTrue(shadowOf(application).allStartedServices.isEmpty())
     }
 
+    /**
+     * The receiver resolves its notification text off the caller's thread, so the post can land after the virtual clock
+     * has gone idle. Pump the scheduler and give the real thread a moment, instead of asserting on the first pass.
+     */
+    @Suppress("InjectDispatcher")
+    private suspend fun TestScope.awaitBlockedNotification() {
+        repeat(BLOCKED_NOTIFICATION_TRIES) {
+            advanceUntilIdle()
+            if (recordingNotifications.reconnectBlocked.isNotEmpty()) return
+            withContext(Dispatchers.Default) { delay(BLOCKED_NOTIFICATION_STEP_MILLIS) }
+        }
+    }
+
     private fun installDependencies(
         meshPrefs: MeshPrefs,
         ioDispatcher: CoroutineDispatcher,
@@ -265,6 +282,11 @@ class BootCompleteReceiverTest {
         override fun getStoreForwardLastRequest(address: String?): StateFlow<Int> = MutableStateFlow(0)
 
         override fun setStoreForwardLastRequest(address: String?, timestamp: Int) = Unit
+    }
+
+    private companion object {
+        const val BLOCKED_NOTIFICATION_TRIES = 200
+        const val BLOCKED_NOTIFICATION_STEP_MILLIS = 25L
     }
 
     private class StallingDispatcher : CoroutineDispatcher() {

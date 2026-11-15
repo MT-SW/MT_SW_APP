@@ -27,10 +27,14 @@ import org.robolectric.annotation.Config
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
- * The SceneView AAR's manifest marks GLES 3.0 as a required feature and requests VIBRATE. The 3D viewer is optional, so
- * the app manifest neutralizes both; these assertions read the merged manifest and fail if either override is dropped.
+ * The SceneView AAR's manifest marks GLES 3.0 as a required feature. The 3D viewer is optional, so the app manifest
+ * neutralizes that; these assertions read the merged manifest and fail if the override is dropped.
+ *
+ * MT_SW: the app itself requests VIBRATE (the SOS and send buttons buzz while held), so the merged manifest must keep
+ * it. Upstream removes it; Android 16 then throws a SecurityException on the first buzz.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class, sdk = [34])
@@ -50,12 +54,12 @@ class SceneViewManifestTest {
     }
 
     @Test
-    fun `vibrate is not requested`() {
+    fun `vibrate is requested for the held buttons`() {
         val permissions =
             context.packageManager
                 .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
                 .requestedPermissions
-        assertFalse(permissions.orEmpty().contains(android.Manifest.permission.VIBRATE))
+        assertTrue(permissions.orEmpty().contains(android.Manifest.permission.VIBRATE))
     }
 
     private companion object {
