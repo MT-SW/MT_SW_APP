@@ -59,6 +59,11 @@ import org.meshtastic.core.resources.nav_bar_hide
 import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.nav_bar_new_icons
 import org.meshtastic.core.resources.icon_style
+import org.meshtastic.core.resources.look_presets_title
+import org.meshtastic.core.resources.element_group_dialogs
+import org.meshtastic.core.resources.glass_tint
+import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.press_spring
 import org.meshtastic.core.resources.input_hold_buzz
 import org.meshtastic.core.resources.nav_bar_haptics
 import org.meshtastic.core.resources.soft_light_theme
@@ -263,6 +268,11 @@ object SettingsSearchCatalog {
             Res.string.nav_bar_haptics to SettingsRoute.ElementLook,
             Res.string.input_hold_buzz to SettingsRoute.ElementLook,
             Res.string.icon_style to SettingsRoute.ElementLook,
+            Res.string.look_presets_title to SettingsRoute.ElementLook,
+            Res.string.element_group_dialogs to SettingsRoute.ElementLook,
+            Res.string.glass_tint to SettingsRoute.ElementLook,
+            Res.string.glass_rim to SettingsRoute.ElementLook,
+            Res.string.press_spring to SettingsRoute.ElementLook,
             Res.string.soft_light_theme to SettingsRoute.ElementLook,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,

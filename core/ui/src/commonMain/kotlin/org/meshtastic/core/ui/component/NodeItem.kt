@@ -209,15 +209,15 @@ fun NodeItem(
 
     Card(
         modifier =
-        modifier.nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor).fillMaxWidth().elementLook(
-            UiOptions.GROUP_CARDS,
-            MaterialTheme.shapes.medium,
-        ).semantics(
-            mergeDescendants = true,
-        ) {
-            contentDescription = nodeDescription
-            role = Role.Button
-        },
+        modifier
+            .nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor)
+            .fillMaxWidth()
+            .pressSpring()
+            .elementLook(UiOptions.GROUP_CARDS, MaterialTheme.shapes.medium)
+            .semantics(mergeDescendants = true) {
+                contentDescription = nodeDescription
+                role = Role.Button
+            },
         colors = cardColors,
         border = cardBorder,
     ) {

@@ -4218,4 +4218,18 @@
     <string name="icon_style_bold">Pogrubione</string>
     <string name="icon_style_outline">Obrys (jak ikony liniowe w iPhonie)</string>
     <string name="icon_style_summary">Przerysowuje wszystkie ikony aplikacji w wybranym stylu, tak samo na każdej platformie.</string>
+    <string name="look_preset_classic">Klasyczny (wszystko matowe, jak dawniej)</string>
+    <string name="look_preset_iphone">Jak w iPhonie (szkło, ikony obrysem, głębia)</string>
+    <string name="look_preset_glass">Szkło (przezroczystość wszędzie)</string>
+    <string name="look_preset_depth">Głębia (cienie i jasne krawędzie wszędzie)</string>
+    <string name="look_presets_title">Gotowe wyglądy</string>
+    <string name="look_presets_summary">Jedno dotknięcie ustawia wiele opcji naraz; każdą możesz potem zmienić niżej.</string>
+    <string name="glass_tint">Kolor szkła</string>
+    <string name="glass_tint_theme">Z motywu</string>
+    <string name="glass_tint_light">Jasny</string>
+    <string name="glass_tint_dark">Ciemny</string>
+    <string name="glass_tint_accent">Kolor akcentu</string>
+    <string name="glass_rim">Grubość jasnej krawędzi</string>
+    <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
+    <string name="element_group_dialogs">Okna dialogowe</string>
 </resources>

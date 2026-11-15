@@ -1301,6 +1301,7 @@
     <!-- ELEMENT -->
     <string name="element_group_bubbles">Message bubbles</string>
     <string name="element_group_cards">Cards (devices, chats)</string>
+    <string name="element_group_dialogs">Dialogs</string>
     <string name="element_group_input">Message box and send buttons</string>
     <string name="element_group_navbar">Bottom bar</string>
     <string name="element_group_search">Search</string>
@@ -1593,6 +1594,13 @@
     <string name="geofence_set_area">Set area on map</string>
     <string name="get_started">Get started</string>
     <string name="github_repository">GitHub Repository</string>
+    <!-- GLASS -->
+    <string name="glass_rim">Thickness of the bright rim</string>
+    <string name="glass_tint">Colour of the glass</string>
+    <string name="glass_tint_accent">Accent colour</string>
+    <string name="glass_tint_dark">Dark</string>
+    <string name="glass_tint_light">Light</string>
+    <string name="glass_tint_theme">From the theme</string>
     <string name="good">Good</string>
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
@@ -1947,6 +1955,13 @@
     <string name="logs">Logs</string>
     <string name="long_name">Long Name</string>
     <string name="longitude">Longitude</string>
+    <!-- LOOK -->
+    <string name="look_preset_classic">Classic (everything plain, as before)</string>
+    <string name="look_preset_depth">Depth (shadows and light edges everywhere)</string>
+    <string name="look_preset_glass">Glass (see-through everywhere)</string>
+    <string name="look_preset_iphone">iPhone-like (glass, outline icons, depth)</string>
+    <string name="look_presets_summary">One tap sets many options at once; you can still change each of them below.</string>
+    <string name="look_presets_title">Ready-made looks</string>
     <!-- LORA -->
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
@@ -2911,6 +2926,7 @@
     <string name="preferences_system_default">System default</string>
     <string name="preserve_favorites">Preserve Favorites?</string>
     <string name="press_and_drag">Press and drag to reorder</string>
+    <string name="press_spring">Cards and bubbles give way under a finger (spring)</string>
     <string name="pressure">Pressure</string>
     <!-- PREVIEW -->
     <string name="preview_custom_composable_line_one">This is a custom composable</string>

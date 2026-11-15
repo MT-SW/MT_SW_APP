@@ -24,12 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.element_group_bubbles
 import org.meshtastic.core.resources.element_group_cards
+import org.meshtastic.core.resources.element_group_dialogs
 import org.meshtastic.core.resources.element_group_input
 import org.meshtastic.core.resources.element_group_navbar
 import org.meshtastic.core.resources.element_group_search
@@ -48,6 +50,19 @@ import org.meshtastic.core.resources.icon_style_outline
 import org.meshtastic.core.resources.icon_style_standard
 import org.meshtastic.core.resources.icon_style_summary
 import org.meshtastic.core.resources.input_hold_buzz
+import org.meshtastic.core.resources.look_preset_classic
+import org.meshtastic.core.resources.look_preset_iphone
+import org.meshtastic.core.resources.look_preset_glass
+import org.meshtastic.core.resources.look_preset_depth
+import org.meshtastic.core.resources.look_presets_title
+import org.meshtastic.core.resources.look_presets_summary
+import org.meshtastic.core.resources.glass_tint
+import org.meshtastic.core.resources.glass_tint_theme
+import org.meshtastic.core.resources.glass_tint_light
+import org.meshtastic.core.resources.glass_tint_dark
+import org.meshtastic.core.resources.glass_tint_accent
+import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.press_spring
 import org.meshtastic.core.resources.nav_bar_haptics
 import org.meshtastic.core.resources.nav_bar_hide
 import org.meshtastic.core.resources.nav_bar_hide_far
@@ -61,6 +76,7 @@ import org.meshtastic.core.resources.nav_bar_show_far
 import org.meshtastic.core.resources.nav_bar_show_small
 import org.meshtastic.core.resources.soft_light_theme
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SliderPreference
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.DisplaySettings
@@ -102,11 +118,14 @@ fun ElementLookSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         onItemSelected = { onChange(UiOptions.ICON_STYLE, it) },
         summary = stringResource(Res.string.icon_style_summary),
     )
+    ElementPresets(onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_navbar), UiOptions.GROUP_NAV, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_cards), UiOptions.GROUP_CARDS, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_bubbles), UiOptions.GROUP_BUBBLES, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_input), UiOptions.GROUP_INPUT, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_search), UiOptions.GROUP_SEARCH, options, onChange)
+    ElementGroupSettings(stringResource(Res.string.element_group_dialogs), UiOptions.GROUP_DIALOGS, options, onChange)
+    GlassDetailSettings(options, onChange)
     NavBarBehaviourSettings(options, onChange)
 }
 
@@ -199,5 +218,122 @@ private fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) 
         leadingIcon = MeshtasticIcons.DisplaySettings,
         checked = options.flag(UiOptions.HOLD_BUZZ),
         onClick = { onChange(UiOptions.HOLD_BUZZ, if (options.flag(UiOptions.HOLD_BUZZ)) 0 else 1) },
+    )
+}
+
+/** One ready-made set of looks: the options it sets, each with its value. */
+private class LookPreset(val title: StringResource, val values: Map<String, Int>)
+
+private fun look(group: String, look: Int, strength: Int, blur: Int = 20): Map<String, Int> =
+    mapOf("$group.look" to look, "$group.strength" to strength, "$group.blur" to blur)
+
+private const val PRESET_BLUR = 24
+
+private val LOOK_PRESETS =
+    listOf(
+        LookPreset(
+            Res.string.look_preset_classic,
+            listOf(
+                UiOptions.GROUP_NAV,
+                UiOptions.GROUP_CARDS,
+                UiOptions.GROUP_BUBBLES,
+                UiOptions.GROUP_INPUT,
+                UiOptions.GROUP_SEARCH,
+                UiOptions.GROUP_DIALOGS,
+            ).fold(
+                mapOf(
+                    UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
+                    UiOptions.SOFT_LIGHT to 0,
+                    UiOptions.PRESS_SPRING to 0,
+                ),
+            ) { acc, group -> acc + look(group, ElementLook.FLAT, 55) },
+        ),
+        LookPreset(
+            Res.string.look_preset_iphone,
+            mapOf(
+                UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
+                UiOptions.SOFT_LIGHT to 1,
+                UiOptions.PRESS_SPRING to 1,
+            ) + look(UiOptions.GROUP_NAV, ElementLook.GLASS, 45, PRESET_BLUR) +
+                look(UiOptions.GROUP_CARDS, ElementLook.DEPTH, 40) +
+                look(UiOptions.GROUP_BUBBLES, ElementLook.DEPTH, 35) +
+                look(UiOptions.GROUP_INPUT, ElementLook.GLASS, 50, PRESET_BLUR) +
+                look(UiOptions.GROUP_SEARCH, ElementLook.GLASS, 50, PRESET_BLUR) +
+                look(UiOptions.GROUP_DIALOGS, ElementLook.GLASS, 40, PRESET_BLUR),
+        ),
+        LookPreset(
+            Res.string.look_preset_glass,
+            mapOf(UiOptions.PRESS_SPRING to 1) +
+                look(UiOptions.GROUP_NAV, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(UiOptions.GROUP_CARDS, ElementLook.TRANSPARENT, 45) +
+                look(UiOptions.GROUP_BUBBLES, ElementLook.TRANSPARENT, 35) +
+                look(UiOptions.GROUP_INPUT, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(UiOptions.GROUP_SEARCH, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(UiOptions.GROUP_DIALOGS, ElementLook.GLASS, 45, PRESET_BLUR),
+        ),
+        LookPreset(
+            Res.string.look_preset_depth,
+            mapOf(UiOptions.PRESS_SPRING to 1) +
+                look(UiOptions.GROUP_NAV, ElementLook.DEPTH, 55) +
+                look(UiOptions.GROUP_CARDS, ElementLook.DEPTH, 55) +
+                look(UiOptions.GROUP_BUBBLES, ElementLook.DEPTH, 55) +
+                look(UiOptions.GROUP_INPUT, ElementLook.DEPTH, 55) +
+                look(UiOptions.GROUP_SEARCH, ElementLook.DEPTH, 55) +
+                look(UiOptions.GROUP_DIALOGS, ElementLook.DEPTH, 55),
+        ),
+    )
+
+/** Ready-made sets of looks: one tap sets many options at once, and each of them can still be changed below. */
+@Composable
+private fun ElementPresets(onChange: (String, Int) -> Unit) {
+    Text(
+        text = stringResource(Res.string.look_presets_title),
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+    Text(
+        text = stringResource(Res.string.look_presets_summary),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
+    for (preset in LOOK_PRESETS) {
+        ListItem(
+            text = stringResource(preset.title),
+            leadingIcon = MeshtasticIcons.DisplaySettings,
+        ) {
+            preset.values.forEach { (key, value) -> onChange(key, value) }
+        }
+    }
+}
+
+/** The colour of the glass, the thickness of its rim and the spring on touch. */
+@Composable
+private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
+    DropDownPreference(
+        title = stringResource(Res.string.glass_tint),
+        enabled = true,
+        items =
+        listOf(
+            0 to stringResource(Res.string.glass_tint_theme),
+            1 to stringResource(Res.string.glass_tint_light),
+            2 to stringResource(Res.string.glass_tint_dark),
+            3 to stringResource(Res.string.glass_tint_accent),
+        ),
+        selectedItem = options[UiOptions.GLASS_TINT],
+        onItemSelected = { onChange(UiOptions.GLASS_TINT, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.glass_rim),
+        enabled = true,
+        items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
+        selectedValue = options[UiOptions.RIM],
+        onValueChange = { onChange(UiOptions.RIM, it) },
+    )
+    SwitchListItem(
+        text = stringResource(Res.string.press_spring),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options.flag(UiOptions.PRESS_SPRING),
+        onClick = { onChange(UiOptions.PRESS_SPRING, if (options.flag(UiOptions.PRESS_SPRING)) 0 else 1) },
     )
 }

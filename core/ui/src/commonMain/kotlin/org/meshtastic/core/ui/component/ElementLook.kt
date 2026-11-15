@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeInput
 import dev.chrisbanes.haze.HazeState
@@ -40,6 +41,7 @@ import dev.chrisbanes.haze.blur.HazeColorEffect
 import dev.chrisbanes.haze.blur.hazeBlur
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.ElementStyle
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 
 private const val PERCENT = 100f
@@ -53,6 +55,10 @@ private const val RIM_TOP_ALPHA = 0.5f
 private const val RIM_BOTTOM_ALPHA = 0.06f
 private const val FLAT_SHADOW_DP = 8f
 private const val RIM_ALPHA_ON_GLASS = 0.35f
+private const val GLASS_TINT_LIGHT = 1
+private const val GLASS_TINT_DARK = 2
+private const val GLASS_TINT_ACCENT = 3
+private const val GLASS_TINT_MIX = 0.6f
 
 /** The share of the element's own colour that is left when [strength] percent of it is made see-through. */
 private fun seeThroughAlpha(strength: Int): Float = (1f - strength / PERCENT).coerceIn(MIN_ALPHA, 1f)
@@ -64,12 +70,26 @@ private fun seeThroughAlpha(strength: Int): Float = (1f - strength / PERCENT).co
  */
 @Composable
 fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)): Modifier {
-    val style = rememberUiOptions().element(group)
-    return if (style.look == ElementLook.DEPTH) depthLook(style.strength, shape) else this
+    val options = rememberUiOptions()
+    val style = options.element(group)
+    return if (style.look == ElementLook.DEPTH) depthLook(style.strength, shape, options.rimDp()) else this
+}
+
+/** The thickness of the rim chosen in the settings, in dp. */
+internal fun UiOptions.rimDp(): Float =
+    UiOptions.RIM_STEPS_DP[get(UiOptions.RIM).coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)]
+
+/** The colour of the glass: the given [base] colour changed by the "colour of the glass" option. */
+@Composable
+internal fun UiOptions.glassBase(base: Color): Color = when (get(UiOptions.GLASS_TINT)) {
+    GLASS_TINT_LIGHT -> lerp(base, Color.White, GLASS_TINT_MIX)
+    GLASS_TINT_DARK -> lerp(base, Color.Black, GLASS_TINT_MIX)
+    GLASS_TINT_ACCENT -> lerp(base, MaterialTheme.colorScheme.primary, GLASS_TINT_MIX)
+    else -> base
 }
 
 /** The depth look of [elementLook], with its strength 0-100. */
-fun Modifier.depthLook(strength: Int, shape: Shape): Modifier {
+fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier {
     val s = strength.coerceIn(0, PERCENT.toInt()) / PERCENT
     return this.shadow(elevation = (DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s).dp, shape = shape, clip = false)
         .drawWithContent {
@@ -90,7 +110,7 @@ fun Modifier.depthLook(strength: Int, shape: Shape): Modifier {
                 Brush.verticalGradient(
                     listOf(Color.White.copy(alpha = RIM_TOP_ALPHA * s), Color.White.copy(alpha = RIM_BOTTOM_ALPHA * s)),
                 ),
-                style = Stroke(width = 1.dp.toPx()),
+                style = Stroke(width = rimDp.dp.toPx()),
             )
         }
 }
@@ -111,8 +131,8 @@ fun StyledSurface(
     floating: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val style = rememberUiOptions().element(group)
-    StyledSurface(style, shape, modifier, hazeState, baseColor, floating, content)
+    val options = rememberUiOptions()
+    StyledSurface(options.element(group), shape, modifier, hazeState, options.glassBase(baseColor), floating, content)
 }
 
 /** The same as above for an already known [style]. */
@@ -126,7 +146,8 @@ fun StyledSurface(
     floating: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val rim = BorderStroke(1.dp, Color.White.copy(alpha = RIM_ALPHA_ON_GLASS))
+    val rimWidth = rememberUiOptions().rimDp()
+    val rim = BorderStroke(rimWidth.dp, Color.White.copy(alpha = RIM_ALPHA_ON_GLASS))
     when {
         style.look == ElementLook.GLASS && hazeState != null -> {
             val tint = baseColor.copy(alpha = seeThroughAlpha(style.strength) * GLASS_TINT_SHARE)

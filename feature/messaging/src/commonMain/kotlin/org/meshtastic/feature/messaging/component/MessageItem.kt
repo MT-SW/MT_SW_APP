@@ -126,6 +126,7 @@ import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.HighlightedText
@@ -569,6 +570,7 @@ fun MessageItem(
                     },
                 )
                 .then(messageModifier)
+                .pressSpring()
                 .elementLook(UiOptions.GROUP_BUBBLES, messageShape)
                 .semantics(mergeDescendants = true) {
                     contentDescription = messageA11yText

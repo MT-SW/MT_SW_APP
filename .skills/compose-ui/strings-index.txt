@@ -1259,6 +1259,7 @@ electrical_conductivity
 ### ELEMENT ###
 element_group_bubbles
 element_group_cards
+element_group_dialogs
 element_group_input
 element_group_navbar
 element_group_search
@@ -1551,6 +1552,13 @@ geofence_remove_area
 geofence_set_area
 get_started
 github_repository
+### GLASS ###
+glass_rim
+glass_tint
+glass_tint_accent
+glass_tint_dark
+glass_tint_light
+glass_tint_theme
 good
 ### GPIO ###
 gpio
@@ -1899,6 +1907,13 @@ log_retention_never
 logs
 long_name
 longitude
+### LOOK ###
+look_preset_classic
+look_preset_depth
+look_preset_glass
+look_preset_iphone
+look_presets_summary
+look_presets_title
 ### LORA ###
 lora
 lora_config
@@ -2845,6 +2860,7 @@ preferences_language
 preferences_system_default
 preserve_favorites
 press_and_drag
+press_spring
 pressure
 ### PREVIEW ###
 preview_custom_composable_line_one

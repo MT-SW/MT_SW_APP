@@ -51,6 +51,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.okay
@@ -128,10 +131,20 @@ fun MeshtasticDialog(
 
     BasicAlertDialog(onDismissRequest = { if (dismissable) onDismiss?.invoke() }, modifier = modifier) {
         CompositionLocalProvider(LocalDensity provides appDensity) {
+            // MT_SW: the look the person chose for dialogs (plain, with depth, see-through or glass).
+            val dialogLook = rememberUiOptions().element(UiOptions.GROUP_DIALOGS)
+            val dialogFade =
+                if (dialogLook.look == ElementLook.TRANSPARENT || dialogLook.look == ElementLook.GLASS) {
+                    (1f - dialogLook.strength / DIALOG_PERCENT).coerceIn(DIALOG_MIN_ALPHA, 1f)
+                } else {
+                    1f
+                }
             Surface(
-                modifier = Modifier.widthIn(min = 280.dp, max = 560.dp),
+                modifier =
+                Modifier.widthIn(min = 280.dp, max = 560.dp)
+                    .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp)),
                 shape = RoundedCornerShape(28.dp),
-                color = AlertDialogDefaults.containerColor,
+                color = AlertDialogDefaults.containerColor.copy(alpha = dialogFade),
                 tonalElevation = AlertDialogDefaults.TonalElevation,
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
@@ -259,3 +272,6 @@ fun MeshtasticTextDialog(
         dismissable = dismissable,
     )
 }
+
+private const val DIALOG_PERCENT = 100f
+private const val DIALOG_MIN_ALPHA = 0.12f

@@ -51,6 +51,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val GROUP_NAV = "navbar"
         const val GROUP_CARDS = "cards"
         const val GROUP_BUBBLES = "bubbles"
+        const val GROUP_DIALOGS = "dialogs"
         const val GROUP_INPUT = "input"
         const val GROUP_SEARCH = "search"
 
@@ -62,6 +63,16 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val NAV_SHOW = "navbar.show"
         const val NAV_ICONS = "navbar.icons"
         const val NAV_HAPTICS = "navbar.haptics"
+
+        /** The colour of the glass: 0 = from the theme, 1 = light, 2 = dark, 3 = the accent colour. */
+        const val GLASS_TINT = "glass.tint"
+
+        /** The thickness of the bright rim of glass and depth: a step of [RIM_STEPS_DP]. */
+        const val RIM = "glass.rim"
+        val RIM_STEPS_DP = floatArrayOf(0f, 0.5f, 1f, 1.5f, 2f)
+
+        /** Cards and bubbles give way a little under a finger, with a spring. */
+        const val PRESS_SPRING = "motion.pressSpring"
 
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
@@ -89,6 +100,12 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
                 NAV_HAPTICS to 1,
                 HOLD_BUZZ to 1,
                 ICON_STYLE to ICON_STYLE_STANDARD,
+                GLASS_TINT to 0,
+                RIM to 2,
+                PRESS_SPRING to 0,
+                "$GROUP_DIALOGS.look" to ElementLook.FLAT,
+                "$GROUP_DIALOGS.strength" to DEFAULT_STRENGTH,
+                "$GROUP_DIALOGS.blur" to DEFAULT_BLUR,
                 "$GROUP_NAV.look" to ElementLook.FLAT,
                 "$GROUP_NAV.strength" to DEFAULT_STRENGTH,
                 "$GROUP_NAV.blur" to DEFAULT_BLUR,
