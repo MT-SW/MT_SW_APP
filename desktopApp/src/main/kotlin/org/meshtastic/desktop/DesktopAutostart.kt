@@ -62,7 +62,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
 
     private fun readMinimized(): Boolean = runCatching {
         when {
-            os.contains("win") -> runOutput("reg", "query", RUN_KEY, "/v", NAME).second.contains(MINIMIZED_ARG)
+            os.contains("win") ->
+                runOutput("reg", "query", RUN_KEY, "/v", NAME).second.contains(MINIMIZED_ARG) ||
+                    startupFile().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
             os.contains("mac") -> macPlist().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
             else -> linuxEntry().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
         }
@@ -71,7 +73,7 @@ internal class DesktopAutostart private constructor(private val launcher: String
 
     private fun isRegistered(): Boolean = runCatching {
         when {
-            os.contains("win") -> run("reg", "query", RUN_KEY, "/v", NAME) == 0
+            os.contains("win") -> run("reg", "query", RUN_KEY, "/v", NAME) == 0 || startupFile().exists()
             os.contains("mac") -> macPlist().exists()
             else -> linuxEntry().exists()
         }
@@ -80,15 +82,7 @@ internal class DesktopAutostart private constructor(private val launcher: String
 
     private fun register() {
         when {
-            os.contains("win") -> {
-                // The command is written with its own escaped quotes, which Java wraps into one argument.
-                val command = if (minimized.value) "\\\"$launcher\\\" $MINIMIZED_ARG" else "\"$launcher\""
-                val code = run("reg", "add", RUN_KEY, "/v", NAME, "/t", "REG_SZ", "/d", command, "/f")
-                // Windows keeps a separate "disabled in Startup apps" mark per entry. Once the person (or the system)
-                // has turned the app off there, the Run entry is ignored for good, so the mark is removed here.
-                run("reg", "delete", APPROVED_KEY, "/v", NAME, "/f")
-                if (code != 0) Logger.w { "Autostart: reg add ended with $code" }
-            }
+            os.contains("win") -> registerWindows()
 
             os.contains("mac") ->
                 macPlist().apply {
@@ -114,7 +108,7 @@ internal class DesktopAutostart private constructor(private val launcher: String
                     val linuxArguments = if (minimized.value) " $MINIMIZED_ARG" else ""
                     writeText(
                         "[Desktop Entry]\nType=Application\nName=MT_SW\nExec=\"$launcher\"$linuxArguments\n" +
-                            "X-GNOME-Autostart-enabled=true\n",
+                            "Terminal=false\nX-GNOME-Autostart-enabled=true\n",
                     )
                 }
         }
@@ -122,10 +116,54 @@ internal class DesktopAutostart private constructor(private val launcher: String
 
     private fun unregister() {
         when {
-            os.contains("win") -> run("reg", "delete", RUN_KEY, "/v", NAME, "/f")
+            os.contains("win") -> {
+                run("reg", "delete", RUN_KEY, "/v", NAME, "/f")
+                startupFile().delete()
+            }
             os.contains("mac") -> macPlist().delete()
             else -> linuxEntry().delete()
         }
+    }
+
+    /**
+     * Windows: the `Run` value is written from a `.reg` file, not with `reg add /d`, because the quotes around a path
+     * with spaces do not survive the command line of `reg.exe` reliably. The entry is then read back; when it is not
+     * there (a policy that blocks the registry, a path `reg` cannot take), the same start is put in the Startup folder.
+     */
+    private fun registerWindows() {
+        val command = if (minimized.value) "\"$launcher\" $MINIMIZED_ARG" else "\"$launcher\""
+        val escaped = command.replace("\\", "\\\\").replace("\"", "\\\"")
+        val text =
+            "Windows Registry Editor Version 5.00\r\n\r\n[HKEY_CURRENT_USER\\$RUN_PATH]\r\n\"$NAME\"=\"$escaped\"\r\n"
+        val file = File.createTempFile("mt_sw_autostart", ".reg")
+        try {
+            // UTF-16 with a byte order mark: the only form of a .reg file that keeps non-ASCII characters of a path.
+            file.writeBytes(byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + text.toByteArray(Charsets.UTF_16LE))
+            val code = run("reg", "import", file.absolutePath)
+            if (code != 0) Logger.w { "Autostart: reg import ended with $code" }
+        } finally {
+            file.delete()
+        }
+        // Windows keeps a separate "disabled in Startup apps" mark per entry. Once the person (or the system) has
+        // turned the app off there, the entry is ignored for good, so the mark is removed here.
+        run("reg", "delete", APPROVED_KEY, "/v", NAME, "/f")
+        val (queryCode, shown) = runOutput("reg", "query", RUN_KEY, "/v", NAME)
+        if (queryCode == 0 && shown.contains(File(launcher).name, ignoreCase = true)) {
+            startupFile().delete()
+            return
+        }
+        Logger.w { "Autostart: the Run entry is not there after writing it ($queryCode: $shown); using the Startup folder" }
+        startupFile().apply {
+            parentFile?.mkdirs()
+            val arguments = if (minimized.value) " $MINIMIZED_ARG" else ""
+            writeText("@echo off\r\nchcp 65001 >nul\r\nstart \"\" \"$launcher\"$arguments\r\n")
+        }
+        run("reg", "delete", APPROVED_FOLDER_KEY, "/v", startupFile().name, "/f")
+    }
+
+    private fun startupFile(): File {
+        val base = System.getenv("APPDATA")?.takeIf { it.isNotBlank() } ?: "${System.getProperty("user.home")}\\AppData\\Roaming"
+        return File(base, "Microsoft\\Windows\\Start Menu\\Programs\\Startup\\MT_SW.cmd")
     }
 
     private fun macPlist() = File(System.getProperty("user.home"), "Library/LaunchAgents/$LABEL.plist")
@@ -158,7 +196,10 @@ internal class DesktopAutostart private constructor(private val launcher: String
         const val MINIMIZED_ARG = "--minimized"
         private const val NAME = "MT_SW"
         private const val LABEL = "pl.sw.mt.autostart"
-        private const val RUN_KEY = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+        private const val RUN_PATH = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+        private const val RUN_KEY = "HKCU\\$RUN_PATH"
+        private const val APPROVED_FOLDER_KEY =
+            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\StartupFolder"
         private const val APPROVED_KEY =
             "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run"
         private const val WAIT_SECONDS = 10L
