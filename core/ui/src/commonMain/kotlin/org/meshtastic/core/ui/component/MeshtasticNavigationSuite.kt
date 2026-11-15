@@ -276,7 +276,7 @@ fun MeshtasticNavigationSuite(
 }
 
 /** One button of the navigation bar (the same data feeds the bottom bar and the side bar). */
-private class NavEntry(
+internal class NavEntry(
     val selected: Boolean,
     val onClick: () -> Unit,
     val icon: @Composable () -> Unit,
