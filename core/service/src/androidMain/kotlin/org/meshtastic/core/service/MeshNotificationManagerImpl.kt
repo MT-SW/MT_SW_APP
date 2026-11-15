@@ -81,6 +81,7 @@ import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
+import org.meshtastic.core.repository.activeNodeCountFlow
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.NodeRepository
@@ -274,6 +275,8 @@ class MeshNotificationManagerImpl(
             val radioBattery: Int?,
             val localStats: LocalStats? = null,
             val extended: LocalStatsExtended? = null,
+            /** MT_SW: nodes that report an active user now; null while no node shares that status. */
+            val nodesActive: Int? = null,
         ) : LiveUpdateReading
 
         /** [tick] changes once a minute so the elapsed "heard" text and chip age without a node update. */
@@ -455,10 +458,12 @@ class MeshNotificationManagerImpl(
                 ) { online, total, unread, battery ->
                     LiveUpdateReading.MeshStatus(online, total, unread, battery)
                 }
-            combine(basics, nodes.localStats, nodes.localStatsExtended) { reading, stats, extended ->
+            val active = activeNodeCountFlow(meshLogRepository.value, nodes.nodeDBbyNum, uiPrefs.value.uiOptions)
+            combine(basics, nodes.localStats, nodes.localStatsExtended, active) { reading, stats, extended, count ->
                 reading.copy(
                     localStats = stats.takeIf { it.uptime_seconds != 0 },
                     extended = extended.takeIf { it != LocalStatsExtended() },
+                    nodesActive = count,
                 )
             }
                 .throttleLatest(LIVE_UPDATE_MIN_INTERVAL)
@@ -1141,6 +1146,7 @@ class MeshNotificationManagerImpl(
                 localStats = reading.localStats,
                 extended = reading.extended,
                 lnaGain = lnaGain,
+                nodesActive = reading.nodesActive,
             )
         val chip = "${reading.nodesOnline}/${reading.nodesTotal}".takeIf { state is ConnectionState.Connected }
         return createLiveUpdateNotification(

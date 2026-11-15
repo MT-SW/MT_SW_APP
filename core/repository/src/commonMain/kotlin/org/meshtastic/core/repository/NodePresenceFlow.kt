@@ -66,3 +66,19 @@ fun activeNodeNumsFlow(
         }
         .keys
 }
+
+/**
+ * MT_SW: how many nodes report that someone is at them now (the same rule as [activeNodeNumsFlow]), or null while no
+ * node shares an activity status, so a place that shows the count does not show a useless "0".
+ */
+fun activeNodeCountFlow(
+    meshLogRepository: MeshLogRepository,
+    nodes: Flow<Map<Int, Node>>,
+    uiOptions: Flow<Map<String, Int>>,
+): Flow<Int?> = combine(meshLogRepository.nodePresenceFlow(), activeNodeNumsFlow(meshLogRepository, nodes, uiOptions)) {
+    presence,
+    active,
+    ->
+    if (presence.isEmpty()) null else active.size
+}
+    .distinctUntilChanged()

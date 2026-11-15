@@ -77,6 +77,7 @@ object MeshStatsLines {
         localStats: LocalStats?,
         extended: LocalStatsExtended?,
         lnaGain: Int = 0,
+        nodesActive: Int? = null,
     ): List<String> = meshStatusGroups(
         nodesOnline,
         nodesTotal,
@@ -85,6 +86,7 @@ object MeshStatsLines {
         localStats,
         extended,
         lnaGain,
+        nodesActive,
     )
         .flatMap { it.lines }
 
