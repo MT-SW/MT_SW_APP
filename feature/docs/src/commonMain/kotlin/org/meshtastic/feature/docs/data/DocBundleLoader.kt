@@ -527,7 +527,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
     private suspend fun buildDeveloperGuideIndex(): List<KeywordIndexEntry> = listOf(
         KeywordIndexEntry(
             "architecture",
-            getString(CoreRes.string.doc_title_dev_architecture),
+            getStringSuspend(CoreRes.string.doc_title_dev_architecture),
             "developer",
             "en/developer/architecture.html",
             1,
@@ -538,7 +538,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "codebase",
-            getString(CoreRes.string.doc_title_dev_codebase),
+            getStringSuspend(CoreRes.string.doc_title_dev_codebase),
             "developer",
             "en/developer/codebase.html",
             2,
@@ -549,7 +549,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "adding-a-feature-module",
-            getString(CoreRes.string.doc_title_dev_adding_feature_module),
+            getStringSuspend(CoreRes.string.doc_title_dev_adding_feature_module),
             "developer",
             "en/developer/adding-a-feature-module.html",
             3,
@@ -560,7 +560,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "navigation-and-deep-links",
-            getString(CoreRes.string.doc_title_dev_navigation),
+            getStringSuspend(CoreRes.string.doc_title_dev_navigation),
             "developer",
             "en/developer/navigation-and-deep-links.html",
             4,
@@ -571,7 +571,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "transport",
-            getString(CoreRes.string.doc_title_dev_transport),
+            getStringSuspend(CoreRes.string.doc_title_dev_transport),
             "developer",
             "en/developer/transport.html",
             5,
@@ -582,7 +582,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "persistence",
-            getString(CoreRes.string.doc_title_dev_persistence),
+            getStringSuspend(CoreRes.string.doc_title_dev_persistence),
             "developer",
             "en/developer/persistence.html",
             6,
@@ -593,7 +593,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "testing",
-            getString(CoreRes.string.doc_title_dev_testing),
+            getStringSuspend(CoreRes.string.doc_title_dev_testing),
             "developer",
             "en/developer/testing.html",
             7,
@@ -604,7 +604,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "contributing",
-            getString(CoreRes.string.doc_title_dev_contributing),
+            getStringSuspend(CoreRes.string.doc_title_dev_contributing),
             "developer",
             "en/developer/contributing.html",
             8,
@@ -615,7 +615,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "measurement",
-            getString(CoreRes.string.doc_title_measurement),
+            getStringSuspend(CoreRes.string.doc_title_measurement),
             "developer",
             "en/developer/measurement.html",
             9,
@@ -626,7 +626,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "test-builds",
-            getString(CoreRes.string.doc_title_dev_test_builds),
+            getStringSuspend(CoreRes.string.doc_title_dev_test_builds),
             "developer",
             "en/developer/test-builds.html",
             10,
@@ -637,7 +637,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "documentation-style",
-            getString(CoreRes.string.doc_title_dev_documentation_style),
+            getStringSuspend(CoreRes.string.doc_title_dev_documentation_style),
             "developer",
             "en/developer/documentation-style.html",
             11,

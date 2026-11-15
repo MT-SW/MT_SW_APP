@@ -155,9 +155,9 @@ class DatabaseBackupViewModel(
             alertManager.showAlert(
                 message =
                 if (count == null) {
-                    getString(Res.string.app_database_merge_failed)
+                    getStringSuspend(Res.string.app_database_merge_failed)
                 } else {
-                    getString(Res.string.app_database_merge_done, count)
+                    getStringSuspend(Res.string.app_database_merge_done, count)
                 },
             )
         }

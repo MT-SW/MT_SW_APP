@@ -142,7 +142,7 @@ class CleanNodeDatabaseViewModel(
         safeLaunch(tag = "requestClearAppNodeDatabase") {
             alertManager.showAlert(
                 titleRes = Res.string.are_you_sure,
-                message = getString(Res.string.clean_app_node_db_confirmation),
+                message = getStringSuspend(Res.string.clean_app_node_db_confirmation),
                 confirmTextRes = Res.string.clean_now,
                 onConfirm = { clearAppNodeDatabase() },
             )
