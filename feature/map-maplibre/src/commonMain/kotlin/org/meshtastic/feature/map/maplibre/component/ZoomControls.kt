@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.maplibre.compose.map.MapState
 import org.meshtastic.feature.map.component.MapZoomControls
 import org.meshtastic.feature.map.maplibre.ZOOM_STEP
@@ -61,6 +62,6 @@ internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap) {
     MapZoomControls(
         onZoomIn = { scope.launch { mapState.zoomBy(ZOOM_STEP, zoomRange) } },
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
-        modifier = Modifier.align(Alignment.BottomEnd).padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp),
+        modifier = Modifier.align(Alignment.BottomEnd).padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current),
     )
 }

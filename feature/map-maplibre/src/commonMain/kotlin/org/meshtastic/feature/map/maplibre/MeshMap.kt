@@ -53,6 +53,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.koin.compose.koinInject
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
@@ -398,14 +400,14 @@ fun MeshMap(
                         }
                     }
                 },
-                overlay = { include(ornaments) },
+                overlay = { WithFloatingBarInset { include(ornaments) } },
             )
         }
         // As wide as the room left of the zoom buttons, with a small gap to them, and low so it covers little map.
         PropagationOverlay(
             Modifier.align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = 56.dp),
+                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = 56.dp + LocalFloatingBarInset.current),
         )
     }
 }

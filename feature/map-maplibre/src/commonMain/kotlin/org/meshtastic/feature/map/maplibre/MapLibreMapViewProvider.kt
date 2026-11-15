@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.maplibre.compose.camera.CameraAnimation
@@ -244,7 +245,7 @@ class MapLibreMapViewProvider(
                         .padding(
                             start = AUTHORING_BAR_SIDE.dp,
                             end = AUTHORING_BAR_SIDE.dp,
-                            bottom = AUTHORING_BAR_BOTTOM.dp,
+                            bottom = AUTHORING_BAR_BOTTOM.dp + LocalFloatingBarInset.current,
                         ),
                 )
             }
@@ -355,7 +356,11 @@ private fun BoxScope.BoxAuthoringSlot(editing: WaypointEditing, mapState: MapSta
         onUseVisibleRegion = { mapState.viewport?.visibleBounds?.toBoundingBox()?.let(editing.onUseVisibleRegion) },
         modifier =
         Modifier.align(Alignment.BottomCenter)
-            .padding(start = AUTHORING_BAR_SIDE.dp, end = AUTHORING_BAR_SIDE.dp, bottom = AUTHORING_BAR_BOTTOM.dp),
+            .padding(
+                start = AUTHORING_BAR_SIDE.dp,
+                end = AUTHORING_BAR_SIDE.dp,
+                bottom = AUTHORING_BAR_BOTTOM.dp + LocalFloatingBarInset.current,
+            ),
     )
 }
 

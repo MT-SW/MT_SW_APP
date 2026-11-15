@@ -43,6 +43,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -886,6 +888,9 @@ fun ConnectionsScreen(
             }
         }
 
+        // The device list runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
+        val barInset = LocalFloatingBarInset.current
         if (isAdaptiveTwoPaneSplit()) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
@@ -903,7 +908,7 @@ fun ConnectionsScreen(
                             header(this)
                         }
                     },
-                    second = { deviceList(Modifier.weight(1f).fillMaxWidth(), PaddingValues(0.dp), null) },
+                    second = { deviceList(Modifier.weight(1f).fillMaxWidth(), PaddingValues(bottom = barInset), null) },
                 )
             }
         } else {
@@ -914,7 +919,7 @@ fun ConnectionsScreen(
                     start = paddingValues.calculateStartPadding(layoutDirection) + 16.dp,
                     top = paddingValues.calculateTopPadding() + 20.dp,
                     end = paddingValues.calculateEndPadding(layoutDirection) + 16.dp,
-                    bottom = paddingValues.calculateBottomPadding(),
+                    bottom = paddingValues.calculateBottomPadding() + barInset,
                 ),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing)) { header(this) }

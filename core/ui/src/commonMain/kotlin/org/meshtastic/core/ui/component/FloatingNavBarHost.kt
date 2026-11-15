@@ -202,7 +202,9 @@ internal fun FloatingNavBarHost(
                     .padding(bottom = if (state.underlapCount > 0) 0.dp else inset)
                     .then(if (visible) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier),
             ) {
-                CompositionLocalProvider(LocalFloatingBar provides state, LocalFloatingBarInset provides inset) {
+                // Only a screen that runs under the bar pads its own list ends; the others end above it (padded below).
+                val padInset = if (state.underlapCount > 0) inset else 0.dp
+                CompositionLocalProvider(LocalFloatingBar provides state, LocalFloatingBarInset provides padInset) {
                     Row(Modifier.fillMaxSize()) { content() }
                 }
             }

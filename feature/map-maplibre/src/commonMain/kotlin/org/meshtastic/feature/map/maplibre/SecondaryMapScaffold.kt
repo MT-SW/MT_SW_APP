@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.interaction.MapInteractions
 import org.maplibre.compose.map.CameraConstraints
@@ -131,7 +132,11 @@ internal fun SecondaryMapSurface(
                 interactions = interactions,
                 uiOptions = uiOptions,
                 // The library's default, spelled out so the collapsed branch stays a narrowing of it.
-                overlay = { include(if (showAttribution) MaplibreOverlay.Default else CollapsedAttributionOrnaments) },
+                overlay = {
+                    WithFloatingBarInset {
+                        include(if (showAttribution) MaplibreOverlay.Default else CollapsedAttributionOrnaments)
+                    }
+                },
             )
         }
     }
