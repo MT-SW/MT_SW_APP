@@ -633,11 +633,9 @@ private fun ContactListView(
     val dmTitle = stringResource(Res.string.direct_messages)
     val uiPrefs = koinInject<UiPrefs>()
     val channelDescriptions by uiPrefs.channelDescriptions.collectAsStateWithLifecycle()
-    val showChannelDescription by uiPrefs.showChannelDescription.collectAsStateWithLifecycle()
 
-    CompositionLocalProvider(
-        LocalChannelDescriptions provides if (showChannelDescription) channelDescriptions else emptyMap(),
-    ) {
+    // A channel's description is shown in the list exactly when it was set in the channel's settings.
+    CompositionLocalProvider(LocalChannelDescriptions provides channelDescriptions) {
     Box(modifier = modifier.fillMaxSize()) {
         // The list runs under the floating bar (shows through its glass) and ends above it.
         FloatingBarUnderlap()

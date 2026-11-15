@@ -16,9 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,11 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeInput
@@ -58,8 +58,7 @@ private const val LIGHT_TOP_ALPHA = 0.18f
 private const val SHADE_BOTTOM_ALPHA = 0.08f
 private const val RIM_TOP_ALPHA = 0.5f
 private const val RIM_BOTTOM_ALPHA = 0.06f
-private const val FLAT_SHADOW_DP = 8f
-private const val RIM_ALPHA_ON_GLASS = 0.35f
+private const val FLAT_SHADOW_DP = 14f
 private const val GLASS_TINT_LIGHT = 1
 private const val GLASS_TINT_DARK = 2
 private const val GLASS_TINT_ACCENT = 3
@@ -152,7 +151,6 @@ fun StyledSurface(
     content: @Composable () -> Unit,
 ) {
     val rimWidth = rememberUiOptions().rimDp()
-    val rim = BorderStroke(rimWidth.dp, Color.White.copy(alpha = RIM_ALPHA_ON_GLASS))
     when {
         style.look == ElementLook.GLASS && hazeState != null -> {
             val tint = baseColor.copy(alpha = seeThroughAlpha(style.strength) * GLASS_TINT_SHARE)
@@ -166,7 +164,7 @@ fun StyledSurface(
                     .shadow(if (floating) FLAT_SHADOW_DP.dp else 0.dp, shape, clip = false)
                     .clip(shape)
                     .hazeBlur(input = HazeInput.Sources(hazeState), style = blur)
-                    .border(rim, shape),
+                    .glassEdge(shape, rimWidth),
             ) {
                 content()
             }
@@ -174,10 +172,9 @@ fun StyledSurface(
 
         style.look == ElementLook.GLASS || style.look == ElementLook.TRANSPARENT ->
             Surface(
-                modifier = modifier,
+                modifier = modifier.glassEdge(shape, rimWidth),
                 shape = shape,
                 color = baseColor.copy(alpha = seeThroughAlpha(style.strength)),
-                border = rim,
                 shadowElevation = if (floating) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
@@ -233,12 +230,62 @@ fun StyledCard(
     val options = rememberUiOptions()
     val style = options.element(group)
     val seeThrough = style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS
+    val look = modifier.elementLook(group, shape)
     Card(
-        modifier = modifier.elementLook(group, shape),
+        modifier = if (seeThrough) look.glassEdge(shape, options.rimDp()) else look,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = cardContainerColor(baseColor, group)),
-        border =
-        if (seeThrough) BorderStroke(options.rimDp().dp, Color.White.copy(alpha = RIM_ALPHA_ON_GLASS)) else null,
         content = content,
     )
+}
+
+private const val SHEEN_TOP_ALPHA = 0.22f
+private const val SHEEN_MID_STOP = 0.45f
+private const val SHEEN_BOTTOM_ALPHA = 0.10f
+private const val EDGE_LIGHT_ALPHA = 0.8f
+private const val EDGE_MID_ALPHA = 0.1f
+private const val EDGE_FAR_ALPHA = 0.4f
+private const val EDGE_INNER_SHARE = 0.5f
+
+/**
+ * The edge of a glass surface, like the glass of iPhone: a soft sheen across the upper part (light falling from the
+ * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right,
+ * with a second finer line just inside it, so the glass seems to have thickness.
+ */
+private fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWithContent {
+    val outline = shape.createOutline(size, layoutDirection, this)
+    drawOutline(
+        outline = outline,
+        brush =
+        Brush.verticalGradient(
+            0f to Color.White.copy(alpha = SHEEN_TOP_ALPHA),
+            SHEEN_MID_STOP to Color.Transparent,
+            1f to Color.Black.copy(alpha = SHEEN_BOTTOM_ALPHA),
+        ),
+    )
+    drawContent()
+    if (rimDp > 0f) {
+        val width = rimDp.dp.toPx()
+        val edge =
+            Brush.linearGradient(
+                colors =
+                listOf(
+                    Color.White.copy(alpha = EDGE_LIGHT_ALPHA),
+                    Color.White.copy(alpha = EDGE_MID_ALPHA),
+                    Color.White.copy(alpha = EDGE_FAR_ALPHA),
+                ),
+                start = Offset.Zero,
+                end = Offset(size.width, size.height),
+            )
+        drawOutline(outline = outline, brush = edge, style = Stroke(width = width))
+        inset(width) {
+            val inner = shape.createOutline(this.size, layoutDirection, this)
+            drawOutline(
+                outline = inner,
+                brush = edge,
+                alpha = EDGE_INNER_SHARE,
+                style = Stroke(width = width * EDGE_INNER_SHARE),
+            )
+        }
+    }
 }

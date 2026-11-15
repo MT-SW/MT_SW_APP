@@ -302,13 +302,6 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[intPreferencesKey(UI_OPTION_PREFIX + key)] = value } }
     }
 
-    override val showChannelDescription: StateFlow<Boolean> =
-        dataStore.data.map { it[KEY_SHOW_CHANNEL_DESCRIPTION] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
-
-    override fun setShowChannelDescription(value: Boolean) {
-        scope.launch { dataStore.edit { it[KEY_SHOW_CHANNEL_DESCRIPTION] = value } }
-    }
-
 
     override val translatorEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
@@ -993,7 +986,6 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_WIDGET_OTHERS_PICKED = stringPreferencesKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_FLOATING_NAV_BAR = booleanPreferencesKey("floating-nav-bar")
-        val KEY_SHOW_CHANNEL_DESCRIPTION = booleanPreferencesKey("show-channel-description")
         const val CHANNEL_DESCRIPTION_PREFIX = "channel-description-"
         const val UI_OPTION_PREFIX = "ui-option-"
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")

@@ -266,11 +266,6 @@ interface UiPrefs {
     /** Saves (or, for a blank [text], removes) the description of a channel; [oldKey] is dropped when it differs. */
     fun setChannelDescription(oldKey: String?, key: String, text: String)
 
-    /** MT_SW: the conversation list shows a channel's description in place of its last message (off by default). */
-    val showChannelDescription: StateFlow<Boolean>
-
-    fun setShowChannelDescription(value: Boolean)
-
 
     fun setAutoLoadChatImages(value: Boolean)
 

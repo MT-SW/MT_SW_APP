@@ -489,12 +489,6 @@ class FakeUiPrefs : UiPrefs {
         uiOptions.value = uiOptions.value + (key to value)
     }
 
-    override val showChannelDescription = MutableStateFlow(false)
-
-    override fun setShowChannelDescription(value: Boolean) {
-        showChannelDescription.value = value
-    }
-
 
     override val translatorEnabled = MutableStateFlow(false)
 

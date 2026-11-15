@@ -3224,7 +3224,6 @@ shared_contact_no_public_key
 short_name
 ### SHOW ###
 show_all_key_title
-show_channel_description
 show_full_message_timestamps
 show_full_message_timestamps_summary
 show_iaq_legend

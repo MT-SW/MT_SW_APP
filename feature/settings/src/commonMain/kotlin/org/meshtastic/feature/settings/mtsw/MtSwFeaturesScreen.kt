@@ -121,7 +121,6 @@ import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.notification_test_summary
 import org.meshtastic.core.resources.notification_test_title
-import org.meshtastic.core.resources.show_channel_description
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_description
@@ -194,7 +193,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
-    val showChannelDescription by settingsViewModel.showChannelDescription.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
@@ -260,12 +258,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.DisplaySettings,
                     checked = floatingNavBar,
                     onClick = { settingsViewModel.setFloatingNavBar(!floatingNavBar) },
-                )
-                SwitchListItem(
-                    text = stringResource(Res.string.show_channel_description),
-                    leadingIcon = MeshtasticIcons.Info,
-                    checked = showChannelDescription,
-                    onClick = { settingsViewModel.setShowChannelDescription(!showChannelDescription) },
                 )
                 AppUpdateSettings()
                 ListItem(
