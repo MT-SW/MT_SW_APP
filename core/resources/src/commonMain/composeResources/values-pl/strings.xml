@@ -4229,6 +4229,7 @@
     <string name="glass_tint_dark">Ciemny</string>
     <string name="glass_tint_accent">Kolor akcentu</string>
     <string name="glass_rim">Grubość jasnej krawędzi</string>
+    <string name="nav_bar_rim">Obrys paska (grubość krawędzi)</string>
     <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
     <string name="data_logs_title">Dane, logi i diagnostyka</string>

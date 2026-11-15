@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.Density
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlin.concurrent.Volatile
-import org.meshtastic.core.model.UiOptions
 
 private val lightScheme =
     lightColorScheme(
@@ -371,12 +370,11 @@ fun AppTheme(
 
     // The stronger-colour themes go to true black in the dark: on an AMOLED screen the pixels are then switched off.
     val uiOptions = rememberUiOptions()
-    val softLight = uiOptions.flag(UiOptions.SOFT_LIGHT)
     val colorScheme =
         when {
             !monochrome && darkTheme && saturation > 100 -> baseScheme.withTrueBlack()
-            // In the light the white goes slightly grey (a little more in the stronger-colour themes), as an option.
-            !monochrome && !darkTheme && dynamicScheme == null && softLight ->
+            // In the light the white always goes slightly grey (a little more in the stronger-colour themes), unlike the original.
+            !monochrome && !darkTheme && dynamicScheme == null ->
                 baseScheme.withSoftWhite(strong = saturation > 100)
             else -> baseScheme
         }

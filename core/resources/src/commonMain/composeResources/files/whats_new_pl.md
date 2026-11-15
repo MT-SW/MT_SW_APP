@@ -43,6 +43,9 @@
 - Usunięte widżety „Statystyki lokalne” i „Śledzenie węzła”: został jeden widżet MT_SW.
 - iPhone/iPad: najstarszy obsługiwany system to iOS 17, a identyfikator aplikacji to pl.sw.mt, jak na Androidzie.
 - Budowanie dostosowane do nowego Gradle.
+- Metryki środowiskowe: wszystkie wartości (temperatura, wilgotność, ciśnienie i inne) są na jednym wspólnym wykresie, jak dawniej; oryginał rozdzielił je na osobne wykresy. Zasilanie zostaje w osobnej zakładce.
+- Jasne motywy: biały jest zawsze lekko szary (inaczej niż w oryginale), bez osobnego przełącznika.
+- Pływający pasek: domyślnie bez obrysu krawędzi (osobne ustawienie „Obrys paska”), na karcie mapy jest lekko ciemniejszy, a „Zdrowie sieci” ma napis w dwóch wierszach.
 # 0 | Od początku powstawania aplikacji
 ## new | Nowe funkcje
 - **Zdrowie sieci.** Zakładki zasilania, sygnału, eteru, środowiska, ruchu, sąsiadów i zasobów (procesor, pamięć, flash), karta „Kondycja sieci”, podsumowanie z rankingami, wykresy w szczegółach węzła i eksport do PDF, HTML, Markdown, tekstu i CSV; dane są odczytywane na żywo z dziennika sieci.

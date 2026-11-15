@@ -34,7 +34,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -169,14 +168,12 @@ fun NetworkHealthScreen(
                         Icon(
                             imageVector = MeshtasticIcons.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                     IconButton(onClick = onSummaryClick) {
                         Icon(
                             imageVector = MeshtasticIcons.List,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 },

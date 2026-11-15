@@ -57,6 +57,7 @@ import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
 import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.nav_bar_rim
 import org.meshtastic.core.resources.glass_tint
 import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
@@ -98,7 +99,6 @@ import org.meshtastic.core.resources.nav_bar_show_at_top
 import org.meshtastic.core.resources.nav_bar_show_far
 import org.meshtastic.core.resources.nav_bar_show_small
 import org.meshtastic.core.resources.press_spring
-import org.meshtastic.core.resources.soft_light_theme
 import org.meshtastic.core.ui.component.LookPreview
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
@@ -185,17 +185,6 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         selectedItem = options[UiOptions.ICON_STYLE],
         onItemSelected = { onChange(UiOptions.ICON_STYLE, it) },
         summary = stringResource(Res.string.icon_style_summary),
-    )
-}
-
-/** The soft grey of the light themes (a look choice that belongs with the theme). */
-@Composable
-fun SoftLightSetting(options: UiOptions, onChange: (String, Int) -> Unit) {
-    SwitchListItem(
-        text = stringResource(Res.string.soft_light_theme),
-        leadingIcon = MeshtasticIcons.DisplaySettings,
-        checked = options.flag(UiOptions.SOFT_LIGHT),
-        onClick = { onChange(UiOptions.SOFT_LIGHT, if (options.flag(UiOptions.SOFT_LIGHT)) 0 else 1) },
     )
 }
 
@@ -368,6 +357,13 @@ fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) -> Unit)
         checked = options.flag(UiOptions.NAV_HAPTICS),
         onClick = { onChange(UiOptions.NAV_HAPTICS, if (options.flag(UiOptions.NAV_HAPTICS)) 0 else 1) },
     )
+    SliderPreference(
+        title = stringResource(Res.string.nav_bar_rim),
+        enabled = true,
+        items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
+        selectedValue = options[UiOptions.NAV_RIM],
+        onValueChange = { onChange(UiOptions.NAV_RIM, it) },
+    )
     SwitchListItem(
         text = stringResource(Res.string.input_hold_buzz),
         leadingIcon = MeshtasticIcons.DisplaySettings,
@@ -406,7 +402,6 @@ private val LOOK_PRESETS =
             Res.string.look_preset_classic,
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
-                UiOptions.SOFT_LIGHT to 0,
                 UiOptions.PRESS_SPRING to 0,
             ) + look(UiOptions.ALL_GROUPS, ElementLook.FLAT, 55),
         ),
@@ -414,7 +409,6 @@ private val LOOK_PRESETS =
             Res.string.look_preset_iphone,
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
-                UiOptions.SOFT_LIGHT to 1,
                 UiOptions.PRESS_SPRING to 1,
             ) + look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
                 look(CARDS, ElementLook.DEPTH, 45) +

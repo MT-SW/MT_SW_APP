@@ -72,6 +72,9 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Usunięte widżety „Statystyki lokalne” i „Śledzenie węzła”: został jeden widżet MT_SW.
 * iPhone/iPad: najstarszy obsługiwany system to iOS 17, a identyfikator aplikacji to pl.sw.mt, jak na Androidzie.
 * Budowanie dostosowane do nowego Gradle.
+* Metryki środowiskowe: wszystkie wartości (temperatura, wilgotność, ciśnienie i inne) są na jednym wspólnym wykresie, jak dawniej; oryginał rozdzielił je na osobne wykresy. Zasilanie zostaje w osobnej zakładce.
+* Jasne motywy: biały jest zawsze lekko szary (inaczej niż w oryginale), bez osobnego przełącznika.
+* Pływający pasek: domyślnie bez obrysu krawędzi (osobne ustawienie „Obrys paska”), na karcie mapy jest lekko ciemniejszy, a „Zdrowie sieci” ma napis w dwóch wierszach.
 
 #### Od początku powstawania aplikacji
 
@@ -920,6 +923,9 @@ The main things of every version, split by kind of change (the "What's new in th
 * The "Local statistics" and "Node tracker" widgets were removed: one MT_SW widget is left.
 * iPhone/iPad: the oldest supported system is iOS 17, and the app identifier is pl.sw.mt, like on Android.
 * The build was adapted to the new Gradle.
+* Environment metrics: all values (temperature, humidity, pressure and others) are on one shared chart, like before; the original split them into separate charts. Power stays in its own tab.
+* Light themes: the white is always slightly grey (unlike the original), without a separate switch.
+* Floating bar: no edge line by default (a separate "Bar edge line" setting), slightly darker on the map card, and "Network health" has its name on two lines.
 
 #### From the beginning of the app
 

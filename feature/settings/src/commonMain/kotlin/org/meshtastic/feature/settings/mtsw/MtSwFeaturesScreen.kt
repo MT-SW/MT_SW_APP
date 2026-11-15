@@ -177,7 +177,6 @@ import org.meshtastic.feature.settings.component.ElementAdvancedSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.ElementBasicSettings
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
-import org.meshtastic.feature.settings.component.SoftLightSetting
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
@@ -599,7 +598,6 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                 ) {
                     showThemePicker = true
                 }
-                SoftLightSetting(options = options, onChange = onChange)
                 ListItem(
                     text = stringResource(Res.string.ui_scale),
                     supportingText = uiScaleLabel(uiScale),

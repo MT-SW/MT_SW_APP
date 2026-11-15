@@ -81,11 +81,13 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** The groups that float above the content and so can be glass. */
         val GLASS_GROUPS = setOf(GROUP_NAV, GROUP_INPUT, GROUP_SEARCH, GROUP_TOPBAR, GROUP_MAP)
 
-        const val SOFT_LIGHT = "theme.softLight"
         const val NAV_HIDE = "navbar.hide"
         const val NAV_SHOW = "navbar.show"
         const val NAV_ICONS = "navbar.icons"
         const val NAV_HAPTICS = "navbar.haptics"
+
+        /** The thickness of the edge line of the floating bar alone: a step of [RIM_STEPS_DP] (0 = no line). */
+        const val NAV_RIM = "navbar.rim"
 
         /** The colour of the glass: 0 = from the theme, 1 = light, 2 = dark, 3 = the accent colour. */
         const val GLASS_TINT = "glass.tint"
@@ -116,11 +118,11 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         private const val DEFAULT_BLUR = 28
 
         val DEFAULTS: Map<String, Int> = buildMap {
-            put(SOFT_LIGHT, 0)
             put(NAV_HIDE, 0)
             put(NAV_SHOW, 0)
             put(NAV_ICONS, 1)
             put(NAV_HAPTICS, 1)
+            put(NAV_RIM, 0)
             put(HOLD_BUZZ, 1)
             // The app starts with the glass look and the thin line icons like on the iPhone; the person can go back to
             // the classic look in "Look" (every choice they make is saved and stays).

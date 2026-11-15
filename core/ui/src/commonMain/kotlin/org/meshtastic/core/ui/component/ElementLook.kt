@@ -154,7 +154,7 @@ fun StyledSurface(
     content: @Composable () -> Unit,
 ) {
     val options = rememberUiOptions()
-    StyledSurface(options.element(group), shape, modifier, hazeState, options.glassBase(baseColor), floating, content)
+    StyledSurface(options.element(group), shape, modifier, hazeState, options.glassBase(baseColor), floating, content = content)
 }
 
 /** The same as above for an already known [style]. */
@@ -166,9 +166,10 @@ fun StyledSurface(
     hazeState: HazeState? = null,
     baseColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     floating: Boolean = false,
+    rimDp: Float? = null,
     content: @Composable () -> Unit,
 ) {
-    val rimWidth = rememberUiOptions().rimDp()
+    val rimWidth = rimDp ?: rememberUiOptions().rimDp()
     when {
         style.look == ElementLook.GLASS && hazeState != null -> {
             val tint = baseColor.copy(alpha = seeThroughAlpha(style.strength) * GLASS_TINT_SHARE)

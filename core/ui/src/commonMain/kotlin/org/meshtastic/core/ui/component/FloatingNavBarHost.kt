@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,6 +92,9 @@ class FloatingBarState {
 
     /** How many screens draw under the bar and pad their own list ends (see [FloatingBarUnderlap]). */
     var underlapCount by mutableIntStateOf(0)
+
+    /** How many screens (the map) ask for a somewhat darker bar, see [FloatingBarDarker]. */
+    var darkerCount by mutableIntStateOf(0)
 }
 
 internal val LocalFloatingBar = staticCompositionLocalOf<FloatingBarState?> { null }
@@ -100,6 +104,16 @@ internal val LocalFloatingBar = staticCompositionLocalOf<FloatingBarState?> { nu
  * A screen that calls [FloatingBarUnderlap] adds this at the end of its lists.
  */
 val LocalFloatingBarInset = compositionLocalOf { 0.dp }
+
+/** Called by a screen (the map) that wants the floating bar a little darker than on the other cards. */
+@Composable
+fun FloatingBarDarker() {
+    val state = LocalFloatingBar.current
+    DisposableEffect(state) {
+        state?.let { it.darkerCount++ }
+        onDispose { state?.let { it.darkerCount-- } }
+    }
+}
 
 /**
  * Called by a scrolling screen to let its content run under the floating bar (so it shows through the glass): the
@@ -221,6 +235,8 @@ internal fun FloatingNavBarHost(
                     style = style,
                     hazeState = hazeState,
                     // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
+                    darker = state.darkerCount > 0,
+                    rimDp = UiOptions.RIM_STEPS_DP[options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)],
                     bottomMargin = if (barHeight != null) barBottomGap + BAR_LIFT_DP.dp else BAR_MARGIN_DP.dp,
                     onSelect = { entry ->
                         if (vibrate && !entry.selected) tapHaptic()
@@ -239,6 +255,8 @@ private fun FloatingNavBar(
     entries: List<NavEntry>,
     style: ElementStyle,
     hazeState: HazeState,
+    darker: Boolean,
+    rimDp: Float,
     bottomMargin: Dp,
     onSelect: (NavEntry) -> Unit,
     modifier: Modifier = Modifier,
@@ -257,6 +275,8 @@ private fun FloatingNavBar(
             modifier = Modifier.widthIn(max = BAR_MAX_WIDTH_DP.dp).fillMaxWidth(),
             hazeState = hazeState,
             floating = true,
+            baseColor = if (darker) lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE) else colorScheme.surfaceContainerHigh,
+            rimDp = rimDp,
         ) {
             Row(
                 modifier = Modifier.padding(6.dp),
@@ -264,7 +284,11 @@ private fun FloatingNavBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 for (entry in entries) {
-                    FloatingNavItem(entry = entry, onSelect = { onSelect(entry) }, modifier = Modifier.weight(1f))
+                    FloatingNavItem(
+                        entry = entry,
+                        onSelect = { onSelect(entry) },
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -296,12 +320,15 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
 
 private const val SELECTED_ALPHA = 0.12f
 
-private const val LABEL_MIN_SP = 5f
+/** How much darker the bar is on the map card. */
+private const val DARKER_SHARE = 0.22f
+
+private const val LABEL_MIN_SP = 6f
 private const val LABEL_STEP_SP = 0.25f
 
 /**
- * The name of a button on one line, as big as fits: the text system itself shrinks it step by step until the whole name
- * fits the width of the button (so "Network health" is never cut off).
+ * The name of a button: a short one stays on one line, a longer one ("Zdrowie sieci") goes on two lines, one word under
+ * the other, and the text system shrinks it a little only if a single word is still too wide.
  */
 @Composable
 private fun FitLabel(text: String) {
@@ -314,8 +341,9 @@ private fun FitLabel(text: String) {
             color = LocalContentColor.current,
             textAlign = TextAlign.Center,
         ),
-        // softWrap must stay on: with it off the text has endless width, always "fits" and is never shrunk.
-        maxLines = 1,
+        // Two lines always, so every button of the bar has the same height and the icons stand in one row.
+        minLines = 2,
+        maxLines = 2,
         autoSize =
         TextAutoSize.StepBased(
             minFontSize = LABEL_MIN_SP.sp,

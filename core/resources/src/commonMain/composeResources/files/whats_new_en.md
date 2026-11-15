@@ -43,6 +43,9 @@
 - The "Local statistics" and "Node tracker" widgets were removed: one MT_SW widget is left.
 - iPhone/iPad: the oldest supported system is iOS 17, and the app identifier is pl.sw.mt, like on Android.
 - The build was adapted to the new Gradle.
+- Environment metrics: all values (temperature, humidity, pressure and others) are on one shared chart, like before; the original split them into separate charts. Power stays in its own tab.
+- Light themes: the white is always slightly grey (unlike the original), without a separate switch.
+- Floating bar: no edge line by default (a separate "Bar edge line" setting), slightly darker on the map card, and "Network health" has its name on two lines.
 # 0 | From the beginning of the app
 ## new | New features
 - **Network health.** Tabs for power, signal, airtime, environment, traffic, neighbours and resources (CPU, memory, flash), a "Network condition" card, a summary with rankings, charts in node details and export to PDF, HTML, Markdown, text and CSV; the data is decoded live from the mesh log.
