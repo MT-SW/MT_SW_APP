@@ -60,13 +60,14 @@ internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Bo
     val zoomRange = basemap.zoomRange()
 
     MapZoomControls(
+        compact = centered,
         onZoomIn = { scope.launch { mapState.zoomBy(ZOOM_STEP, zoomRange) } },
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
         modifier =
         if (centered) {
-            // A map too short for the lifted corner (the thumbnail in the node details): the pair sits in the middle of
-            // the trailing edge, between the scale at the top and the credit button at the bottom.
-            Modifier.align(Alignment.CenterEnd).padding(end = ZOOM_INSET.dp)
+            // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair sits at the top
+            // of the trailing edge, so it never covers the credit strip along the bottom.
+            Modifier.align(Alignment.TopEnd).padding(end = ZOOM_INSET.dp, top = ZOOM_INSET.dp)
         } else {
             Modifier.align(Alignment.BottomEnd)
                 .padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current)

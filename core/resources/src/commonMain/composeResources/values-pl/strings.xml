@@ -4296,7 +4296,7 @@
     <string name="presence_replace_none">Nic, pokazuj obok pozostałych</string>
     <string name="presence_replace_favorite">Ikona ulubionego</string>
     <string name="presence_replace_muted">Ikona wyciszenia</string>
-    <string name="presence_replace_unmessageable">Ikona „Nie przyjmuje wiadomości”</string>
+    <string name="presence_replace_unmessageable">Ikona „Niemonitorowany”</string>
     <string name="presence_expiry_title">Jak długo trzyma „aktywny”</string>
     <string name="presence_expiry_summary">Gdy węzła nie słychać tak długo, nic dla niego nie jest pokazywane (mógł wyjść poza zasięg).</string>
     <string name="presence_expiry_min">%1$d min</string>

@@ -181,13 +181,13 @@ W **Ustawienia → Moduły → Telemetria** jest karta **Statystyki lokalne**. D
 
 Mała ikona przy węźle na liście (zwykłej i zwartej) mówi, czy ktoś jest przy węźle, czyli czy jest z nim połączona aplikacja. **Zielona kropka z jasną obwódką** to „aktywny”, **szary obrys** to „nieaktywny”. Gdy węzeł nie udostępnia statusu, nic nie jest pokazywane. Podpowiedź (przytrzymanie ikony) mówi, od ilu minut węzeł jest w tym stanie.
 
-**Włączenie na węźle.** W **Ustawienia → Użytkownik** jest przełącznik **Status aktywności**, zaraz pod „Bez wiadomości”. Zapisuje się tym samym paskiem co reszta ustawień użytkownika. Działa od MT_SW_FIRMWARE v3; gdy aplikacja wykryje starszy firmware albo węzeł jeszcze nie odpowiedział, przełącznik jest zablokowany, a pod nim stoi, od której wersji działa. Węzeł wysyła status sam (gdy stan utrzyma się 5 minut, nie częściej niż co 30 minut) i odpowiada na pytanie o status.
+**Włączenie na węźle.** W **Ustawienia → Użytkownik** jest przełącznik **Status aktywności**, zaraz pod „Nie przyjmuje wiadomości”. Zapisuje się tym samym paskiem co reszta ustawień użytkownika. Działa od MT_SW_FIRMWARE v3; gdy aplikacja wykryje starszy firmware albo węzeł jeszcze nie odpowiedział, przełącznik jest zablokowany, a pod nim stoi, od której wersji działa. Węzeł wysyła status sam (gdy stan utrzyma się 5 minut, nie częściej niż co 30 minut) i odpowiada na pytanie o status.
 
 **Opcje w aplikacji** (**Funkcje MT_SW → Status aktywności**, te same na wszystkich platformach):
 
 - **Pokazuj status aktywności** — włącza lub wyłącza ikonę.
 - **Wygląd ikony** — kropka, osoba z kropką albo kropka w kółku.
-- **Zastępuje inną ikonę** — nic (ikona obok pozostałych), ulubiony, wyciszony albo bez wiadomości; ta ikona nie jest wtedy pokazywana, dopóki status jest znany.
+- **Zastępuje inną ikonę** — nic (ikona obok pozostałych), ulubiony, wyciszony albo niemonitorowany; ta ikona nie jest wtedy pokazywana, dopóki status jest znany.
 - **Kolor ikony „aktywny”** — zielony albo kolor motywu.
 - **Jak długo trzyma „aktywny”** — 30 min, 1, 2, 6 lub 12 godz. (domyślnie 1 godz.). Gdy węzła nie słychać tak długo, nic dla niego nie jest pokazywane, bo mógł wyjść poza zasięg, zanim zdążył zgłosić „nieaktywny”.
 - **Pytaj o status automatycznie** — domyślnie wyłączone; po włączeniu otwarcie rozmowy bezpośredniej pyta ten węzeł o status (najwyżej raz na 10 minut).

@@ -54,20 +54,27 @@ import org.meshtastic.core.ui.theme.monochromeLayer
  * and belongs at the top; zoom belongs where the thumb is.
  */
 @Composable
-fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modifier = Modifier) {
+fun MapZoomControls(
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    modifier: Modifier = Modifier,
+    compact: Boolean = false,
+) {
     val style = rememberUiOptions().element(UiOptions.GROUP_MAP)
+    // The small thumbnail map is short: a smaller pair leaves its credit strip free.
+    val buttonDp = if (compact) COMPACT_ZOOM_BUTTON_DP else ZOOM_BUTTON_DP
     val buttons: @Composable () -> Unit = {
         MapButton(
             icon = MeshtasticIcons.Add,
             contentDescription = stringResource(Res.string.zoom_in),
             onClick = onZoomIn,
-            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(ZOOM_BUTTON_DP.dp),
+            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(buttonDp.dp),
         )
         MapButton(
             icon = MeshtasticIcons.Remove,
             contentDescription = stringResource(Res.string.zoom_out),
             onClick = onZoomOut,
-            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(ZOOM_BUTTON_DP.dp),
+            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(buttonDp.dp),
         )
     }
     if (style.look == ElementLook.FLAT) {
@@ -99,3 +106,6 @@ fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modif
 /** Size of one zoom button and the room around the pair (bigger than a toolbar icon: it is pressed often, by thumb). */
 private const val ZOOM_BUTTON_DP = 52
 private const val ZOOM_PADDING_DP = 4
+
+/** Size of one button in the pair on a small thumbnail map. */
+private const val COMPACT_ZOOM_BUTTON_DP = 34

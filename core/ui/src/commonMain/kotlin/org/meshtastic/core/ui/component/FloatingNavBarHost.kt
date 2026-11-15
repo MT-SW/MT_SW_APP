@@ -25,7 +25,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,7 +46,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -70,14 +68,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -150,6 +146,7 @@ private const val LABEL_SIZE_SP = 10
 /** The height of the room for a button name (as before), and the smaller size of a name broken into two lines. */
 private const val LABEL_LINE_HEIGHT_SP = 16
 private const val SMALL_LABEL_SIZE_SP = 8
+private const val TINY_LABEL_SIZE_SP = 7
 
 private const val BAR_PADDING_DP = 6
 private const val ITEM_SIDE_PADDING_DP = 1
@@ -299,32 +296,18 @@ private fun FloatingNavBar(
             baseColor = if (darker) lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE) else colorScheme.surfaceContainerHigh,
             rimDp = rimDp,
         ) {
-            // A name wider than its button is broken at the space into two smaller lines ("Zdrowie" / "sieci") that
-            // together take exactly the height of one normal line, so the bar is no taller than before.
-            val measurer = rememberTextMeasurer()
-            val density = LocalDensity.current
-            val labelStyle = navLabelStyle()
-            BoxWithConstraints {
-                val itemPx = (constraints.maxWidth - with(density) { (BAR_PADDING_DP * 2 + ITEM_SIDE_PADDING_DP * 2 * entries.size).dp.toPx() }) / entries.size
-                val wrapped =
-                    entries
-                        .filter { ' ' in it.labelText && measurer.measure(it.labelText, labelStyle, maxLines = 1, softWrap = false).size.width > itemPx }
-                        .map { it.labelText }
-                        .toSet()
-                Row(
-                    modifier = Modifier.padding(BAR_PADDING_DP.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    for (entry in entries) {
-                        FloatingNavItem(
-                            entry = entry,
-                            selectStyle = selectStyle,
-                            breakLabel = entry.labelText in wrapped,
-                            onSelect = { onSelect(entry) },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
+            Row(
+                modifier = Modifier.padding(BAR_PADDING_DP.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                for (entry in entries) {
+                    FloatingNavItem(
+                        entry = entry,
+                        selectStyle = selectStyle,
+                        onSelect = { onSelect(entry) },
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -340,7 +323,6 @@ private fun FloatingNavBar(
 private fun FloatingNavItem(
     entry: NavEntry,
     selectStyle: Int,
-    breakLabel: Boolean,
     onSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -361,8 +343,11 @@ private fun FloatingNavItem(
         CompositionLocalProvider(LocalContentColor provides color) {
             entry.icon()
             val areaHeight = with(LocalDensity.current) { LABEL_LINE_HEIGHT_SP.sp.toDp() }
-            Box(modifier = Modifier.padding(top = 2.dp).height(areaHeight), contentAlignment = Alignment.Center) {
-                FitLabel(if (breakLabel) entry.labelText.replaceFirst(' ', '\n') else entry.labelText, small = breakLabel)
+            Box(
+                modifier = Modifier.padding(top = 2.dp).fillMaxWidth().height(areaHeight),
+                contentAlignment = Alignment.Center,
+            ) {
+                FitLabel(entry.labelText)
             }
         }
         if (line) {
@@ -390,37 +375,37 @@ private const val DARKER_SHARE = 0.22f
 private const val MAP_BAR_DENSER = 30
 
 /**
- * The name of a button on one line, never cut off. It is measured as it really is laid out (one line, as wide as it
- * wants) and, when that is wider than the button, drawn smaller by exactly the ratio that makes it fit - so it holds
- * on every system, whatever the font, instead of relying on a guess of the text width.
+ * The name of a button, never cut off. It is first drawn normally; when the real layout reports that it did not fit
+ * the width of the button, it is drawn again smaller - broken at the space into two lines that together take the height
+ * of one normal line (so the bar is no taller), and, if even that does not fit, smaller still. Decided from the real
+ * layout, not from a guess of the text width, so it holds on every system and font.
  */
 @Composable
-private fun FitLabel(text: String, small: Boolean = false) {
+private fun FitLabel(text: String) {
+    var step by remember(text) { mutableIntStateOf(0) }
+    val small = step > 0
+    val shown = if (small && ' ' in text) text.replaceFirst(' ', '\n') else text
     BasicText(
-        text = text,
-        style = navLabelStyle(small).copy(color = LocalContentColor.current),
+        text = shown,
+        style = navLabelStyle(small = small, twoLines = small && ' ' in text, tiny = step > 1)
+            .copy(color = LocalContentColor.current),
         maxLines = 2,
         softWrap = false,
-        modifier =
-        Modifier.fillMaxWidth().layout { measurable, constraints ->
-            val placeable = measurable.measure(Constraints())
-            val available = if (constraints.hasBoundedWidth) constraints.maxWidth else placeable.width
-            val scale = if (placeable.width > available && placeable.width > 0) available.toFloat() / placeable.width else 1f
-            layout(available, placeable.height) {
-                placeable.placeWithLayer((available - placeable.width) / 2, 0) {
-                    scaleX = scale
-                    scaleY = scale
-                }
-            }
+        overflow = TextOverflow.Clip,
+        modifier = Modifier.fillMaxWidth(),
+        onTextLayout = { layout ->
+            val overflowing = layout.didOverflowWidth || layout.getLineRight(0) - layout.getLineLeft(0) > layout.size.width
+            if (overflowing && step < 2) step++
         },
     )
 }
 
 /** The text style of a button name (the colour is added where it is drawn). */
 @Composable
-private fun navLabelStyle(small: Boolean = false): TextStyle = MaterialTheme.typography.labelSmall.copy(
-    fontSize = (if (small) SMALL_LABEL_SIZE_SP else LABEL_SIZE_SP).sp,
-    // Two small lines fill exactly the room of one normal line.
-    lineHeight = (if (small) LABEL_LINE_HEIGHT_SP / 2 else LABEL_LINE_HEIGHT_SP).sp,
-    textAlign = TextAlign.Center,
-)
+private fun navLabelStyle(small: Boolean = false, twoLines: Boolean = false, tiny: Boolean = false): TextStyle =
+    MaterialTheme.typography.labelSmall.copy(
+        fontSize = (if (tiny) TINY_LABEL_SIZE_SP else if (small) SMALL_LABEL_SIZE_SP else LABEL_SIZE_SP).sp,
+        // Two small lines fill exactly the room of one normal line.
+        lineHeight = (if (twoLines) LABEL_LINE_HEIGHT_SP / 2 else LABEL_LINE_HEIGHT_SP).sp,
+        textAlign = TextAlign.Center,
+    )

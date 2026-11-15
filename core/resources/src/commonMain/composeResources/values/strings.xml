@@ -3019,7 +3019,7 @@
     <string name="presence_replace_muted">Muted icon</string>
     <string name="presence_replace_none">Nothing, shown next to the others</string>
     <string name="presence_replace_title">Replaces another icon</string>
-    <string name="presence_replace_unmessageable">"Does not accept messages" icon</string>
+    <string name="presence_replace_unmessageable">"Unmonitored" icon</string>
     <string name="presence_save_failed">The node did not confirm the activity status.</string>
     <string name="presence_show">Show the activity status</string>
     <string name="presence_show_summary">A small icon on the node list: active, inactive. Nothing is shown for a node that does not share it.</string>
