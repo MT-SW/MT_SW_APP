@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -63,6 +62,7 @@ import org.meshtastic.core.resources.debug_logs_export_warning
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.icon.FileDownload
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.util.isDesktopPlatform

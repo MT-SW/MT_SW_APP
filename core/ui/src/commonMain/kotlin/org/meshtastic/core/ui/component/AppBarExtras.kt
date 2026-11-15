@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ComposableParamOrder", "LongMethod")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.core.Animatable
@@ -58,7 +60,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.util.rememberHoldVibration
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
@@ -66,6 +67,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.sos_bar_hold_desc
 import org.meshtastic.core.resources.sos_button
 import org.meshtastic.core.resources.sos_open
+import org.meshtastic.core.ui.util.rememberHoldVibration
 
 /**
  * What every top bar shows beside its own buttons, provided once at the app root: the plate of our own node (when the

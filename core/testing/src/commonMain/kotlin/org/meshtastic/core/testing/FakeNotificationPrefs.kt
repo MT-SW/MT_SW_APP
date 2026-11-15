@@ -136,13 +136,15 @@ class FakeNotificationPrefs : NotificationPrefs {
     override val nodeActiveAlerts = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setNodeActiveAlert(nodeNum: Int, enabled: Boolean) {
-        nodeActiveAlerts.value = nodeActiveAlerts.value.toMutableSet().apply { if (enabled) add(nodeNum) else remove(nodeNum) }
+        nodeActiveAlerts.value =
+            nodeActiveAlerts.value.toMutableSet().apply { if (enabled) add(nodeNum) else remove(nodeNum) }
     }
 
     override val nodeAwayAlerts = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setNodeAwayAlert(nodeNum: Int, enabled: Boolean) {
-        nodeAwayAlerts.value = nodeAwayAlerts.value.toMutableSet().apply { if (enabled) add(nodeNum) else remove(nodeNum) }
+        nodeAwayAlerts.value =
+            nodeAwayAlerts.value.toMutableSet().apply { if (enabled) add(nodeNum) else remove(nodeNum) }
     }
 
     override val nodeSilenceCountRelayed = MutableStateFlow<Set<Int>>(emptySet())

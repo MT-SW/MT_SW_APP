@@ -30,9 +30,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -63,6 +61,8 @@ import org.meshtastic.core.resources.translator_outgoing_original
 import org.meshtastic.core.resources.translator_outgoing_send
 import org.meshtastic.core.resources.translator_outgoing_title
 import org.meshtastic.core.resources.translator_to
+import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.messaging.translation.MessageTranslationService

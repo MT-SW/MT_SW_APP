@@ -30,10 +30,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,9 +45,11 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.resources.delete
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /** Shared metric log/list UI components used by TracerouteLog, NeighborInfoLog, HostMetricsLog, and PositionLog. */

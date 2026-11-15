@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -47,6 +46,7 @@ import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.error
 import org.meshtastic.core.ui.assistant.assistantHighlight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme

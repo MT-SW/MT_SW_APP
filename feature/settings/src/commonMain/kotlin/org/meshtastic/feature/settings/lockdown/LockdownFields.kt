@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -44,6 +43,7 @@ import org.meshtastic.core.resources.lockdown_passphrases_do_not_match
 import org.meshtastic.core.resources.lockdown_session_minutes
 import org.meshtastic.core.resources.lockdown_session_minutes_help
 import org.meshtastic.core.resources.lockdown_show_passphrase
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff

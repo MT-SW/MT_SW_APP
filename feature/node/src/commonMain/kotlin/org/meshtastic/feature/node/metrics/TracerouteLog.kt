@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,14 +33,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -91,8 +88,11 @@ import org.meshtastic.core.resources.traceroute_route_towards_dest
 import org.meshtastic.core.resources.traceroute_traced_by
 import org.meshtastic.core.resources.traceroute_unknown_hop
 import org.meshtastic.core.resources.traceroute_waiting
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.Group
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MessageEnroute
 import org.meshtastic.core.ui.icon.PersonOff
@@ -107,8 +107,8 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateTraceroute
-import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.component.CooldownIconButton
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import org.meshtastic.proto.RouteDiscovery
 

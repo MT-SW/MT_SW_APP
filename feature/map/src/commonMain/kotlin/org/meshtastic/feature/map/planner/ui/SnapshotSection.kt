@@ -19,7 +19,6 @@ package org.meshtastic.feature.map.planner.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,6 +30,7 @@ import org.meshtastic.core.resources.planner_snapshot_clear
 import org.meshtastic.core.resources.planner_snapshot_row
 import org.meshtastic.core.resources.planner_snapshot_save
 import org.meshtastic.core.resources.planner_snapshot_title
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.feature.map.planner.state.PlannerUiState
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
 

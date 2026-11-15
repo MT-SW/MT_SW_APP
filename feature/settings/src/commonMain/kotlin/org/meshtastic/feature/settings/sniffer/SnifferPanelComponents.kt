@@ -29,7 +29,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -83,6 +82,7 @@ import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FolderOpen
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Settings

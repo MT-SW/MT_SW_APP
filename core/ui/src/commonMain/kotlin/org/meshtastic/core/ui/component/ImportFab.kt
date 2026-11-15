@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -60,6 +59,7 @@ import org.meshtastic.core.resources.share_connected_node
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.resources.url
 import org.meshtastic.core.ui.icon.Add
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Nfc

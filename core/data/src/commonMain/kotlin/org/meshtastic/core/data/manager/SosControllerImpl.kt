@@ -155,9 +155,10 @@ class SosControllerImpl(
     private fun targetKeys(config: SosConfig, answeredNodes: Set<Int>): List<Pair<String, String?>> {
         val db = nodes.nodeDBbyNum.value
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
-        val channelKeys = config.channels.map {
-            ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)]
-        }
+        val channelKeys =
+            config.channels.map {
+                ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)]
+            }
         val nodeKeys =
             config.nodes
                 .filter { it !in answeredNodes }

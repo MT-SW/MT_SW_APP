@@ -71,7 +71,6 @@ import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.DeepLinkRouter
-import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.repository.FirmwareReleaseRepository
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
@@ -88,6 +87,7 @@ import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.client_notification
 import org.meshtastic.core.resources.compromised_keys
@@ -217,7 +217,6 @@ class UIViewModel(
     /** Whether the bottom navigation is the floating rounded bar (the default) or the classic bar. */
     val floatingNavBar: StateFlow<Boolean> = uiPrefs.floatingNavBar
 
-
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
     val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled
 
@@ -270,8 +269,8 @@ class UIViewModel(
     val meshActivity: Flow<MeshActivity> = radioInterfaceService.meshActivity
 
     /**
-     * MT_SW: the last activity status of every node that shares one, read from the logged answers; empty while the
-     * icon is switched off. Provided to the node list as LocalNodePresence.
+     * MT_SW: the last activity status of every node that shares one, read from the logged answers; empty while the icon
+     * is switched off. Provided to the node list as LocalNodePresence.
      */
     val nodePresence: StateFlow<Map<Int, NodePresence>> =
         uiPrefs.uiOptions

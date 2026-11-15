@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CompositionLocalAllowlist", "LongMethod", "MatchingDeclarationName", "MissingReadOnlyComposable", "UnnecessaryLaunchedEffect")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
@@ -31,11 +33,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
@@ -52,19 +54,19 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -80,12 +82,12 @@ import androidx.compose.ui.unit.sp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import org.meshtastic.core.ui.util.rememberTapHaptic
-import org.meshtastic.core.model.ElementStyle
 import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.ElementStyle
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
+import org.meshtastic.core.ui.util.rememberTapHaptic
 
 /** What the floating bar tells the screens drawn next to it. */
 @Stable
@@ -109,14 +111,13 @@ class FloatingBarState {
 internal val LocalFloatingBar = staticCompositionLocalOf<FloatingBarState?> { null }
 
 /**
- * The height the floating bar takes from the bottom of the screen, in dp (0 when there is no such bar or it is out).
- * A screen that calls [FloatingBarUnderlap] adds this at the end of its lists.
+ * The height the floating bar takes from the bottom of the screen, in dp (0 when there is no such bar or it is out). A
+ * screen that calls [FloatingBarUnderlap] adds this at the end of its lists.
  */
 val LocalFloatingBarInset = compositionLocalOf { 0.dp }
 
 /** The room at the end of a scrolling page for the floating bar, so the last item can be scrolled above it. */
-@Composable
-fun Modifier.floatingBarEndPadding(): Modifier = padding(bottom = LocalFloatingBarInset.current)
+@Composable fun Modifier.floatingBarEndPadding(): Modifier = padding(bottom = LocalFloatingBarInset.current)
 
 /** Called by a screen (the map) that wants the floating bar a little darker than on the other cards. */
 @Composable
@@ -162,8 +163,8 @@ private const val ITEM_SIDE_PADDING_DP = 1
 private const val MIN_STEP_PX = 1f
 
 /**
- * The floating navigation bar over the screen: the content fills the whole area (and is what the glass blurs), the
- * bar floats at the bottom. The bar's look, hiding and vibration follow the "look of the elements" options.
+ * The floating navigation bar over the screen: the content fills the whole area (and is what the glass blurs), the bar
+ * floats at the bottom. The bar's look, hiding and vibration follow the "look of the elements" options.
  */
 @Composable
 internal fun FloatingNavBarHost(
@@ -263,7 +264,10 @@ internal fun FloatingNavBarHost(
                     // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
                     darker = state.darkerCount > 0,
                     selectStyle = options[UiOptions.NAV_SELECT],
-                    rimDp = UiOptions.RIM_STEPS_DP[options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)],
+                    rimDp =
+                    UiOptions.RIM_STEPS_DP[
+                        options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex),
+                    ],
                     sideWidth = sideWidth,
                     bottomMargin = if (barHeight != null) barBottomGap + BAR_LIFT_DP.dp else BAR_MARGIN_DP.dp,
                     onSelect = { entry ->
@@ -306,7 +310,12 @@ private fun FloatingNavBar(
             modifier = Modifier.widthIn(max = BAR_MAX_WIDTH_DP.dp).fillMaxWidth(),
             hazeState = hazeState,
             floating = true,
-            baseColor = if (darker) lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE) else colorScheme.surfaceContainerHigh,
+            baseColor =
+            if (darker) {
+                lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
+            } else {
+                colorScheme.surfaceContainerHigh
+            },
             rimDp = rimDp,
         ) {
             Row(
@@ -328,17 +337,12 @@ private fun FloatingNavBar(
 }
 
 /**
- * One button of the floating bar: the icon with its short name under it. The open one is marked by a rounded
- * highlight, by a short line under its name, or by both ([UiOptions.NAV_SELECT]); in every case it has the colour of
- * the theme while the others are white.
+ * One button of the floating bar: the icon with its short name under it. The open one is marked by a rounded highlight,
+ * by a short line under its name, or by both ([UiOptions.NAV_SELECT]); in every case it has the colour of the theme
+ * while the others are white.
  */
 @Composable
-private fun FloatingNavItem(
-    entry: NavEntry,
-    selectStyle: Int,
-    onSelect: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun FloatingNavItem(entry: NavEntry, selectStyle: Int, onSelect: () -> Unit, modifier: Modifier = Modifier) {
     val color = if (entry.selected) colorScheme.primary else colorScheme.onSurface
     val bubble = selectStyle != UiOptions.NAV_SELECT_LINE
     val line = selectStyle != UiOptions.NAV_SELECT_BUBBLE
@@ -347,7 +351,11 @@ private fun FloatingNavItem(
         modifier
             .clip(RoundedCornerShape(ITEM_CORNER_DP.dp))
             .background(
-                if (entry.selected && bubble) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
+                if (entry.selected && bubble) {
+                    colorScheme.onSurface.copy(alpha = SELECTED_ALPHA)
+                } else {
+                    Color.Transparent
+                },
             )
             .selectable(selected = entry.selected, onClick = onSelect, role = Role.Tab)
             .padding(horizontal = ITEM_SIDE_PADDING_DP.dp, vertical = 6.dp),
@@ -388,9 +396,9 @@ private const val DARKER_SHARE = 0.22f
 private const val MAP_BAR_DENSER = 30
 
 /**
- * The name of a button, never cut off. It is first drawn normally; when the real layout reports that it did not fit
- * the width of the button, it is drawn again smaller - broken at the space into two lines that together take the height
- * of one normal line (so the bar is no taller), and, if even that does not fit, smaller still. Decided from the real
+ * The name of a button, never cut off. It is first drawn normally; when the real layout reports that it did not fit the
+ * width of the button, it is drawn again smaller - broken at the space into two lines that together take the height of
+ * one normal line (so the bar is no taller), and, if even that does not fit, smaller still. Decided from the real
  * layout, not from a guess of the text width, so it holds on every system and font.
  */
 @Composable
@@ -401,7 +409,8 @@ private fun FitLabel(text: String) {
     val shown = if (small && ' ' in text) text.replaceFirst(' ', '\n') else text
     BasicText(
         text = shown,
-        style = navLabelStyle(small = small, twoLines = small && ' ' in text, tiny = step > 1)
+        style =
+        navLabelStyle(small = small, twoLines = small && ' ' in text, tiny = step > 1)
             .copy(color = LocalContentColor.current),
         maxLines = 2,
         softWrap = false,
@@ -411,7 +420,9 @@ private fun FitLabel(text: String) {
             // A name that only just fits is still cut: the rounded corners of the button's highlight take the first and
             // the last letter. So a little room is kept free on both sides.
             var widest = 0f
-            for (line in 0 until layout.lineCount) widest = maxOf(widest, layout.getLineRight(line) - layout.getLineLeft(line))
+            for (line in 0 until layout.lineCount) {
+                widest = maxOf(widest, layout.getLineRight(line) - layout.getLineLeft(line))
+            }
             val overflowing = layout.didOverflowWidth || widest > layout.size.width - marginPx
             if (overflowing && step < 2) step++
         },
@@ -422,7 +433,17 @@ private fun FitLabel(text: String) {
 @Composable
 private fun navLabelStyle(small: Boolean = false, twoLines: Boolean = false, tiny: Boolean = false): TextStyle =
     MaterialTheme.typography.labelSmall.copy(
-        fontSize = (if (tiny) TINY_LABEL_SIZE_SP else if (small) SMALL_LABEL_SIZE_SP else LABEL_SIZE_SP).sp,
+        fontSize =
+        (
+            if (tiny) {
+                TINY_LABEL_SIZE_SP
+            } else if (small) {
+                SMALL_LABEL_SIZE_SP
+            } else {
+                LABEL_SIZE_SP
+            }
+            )
+            .sp,
         // Two small lines fill exactly the room of one normal line.
         lineHeight = (if (twoLines) LABEL_LINE_HEIGHT_SP / 2 else LABEL_LINE_HEIGHT_SP).sp,
         textAlign = TextAlign.Center,

@@ -29,7 +29,6 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,11 +51,12 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.link
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.annotatedStringFromHtml
 
 /**

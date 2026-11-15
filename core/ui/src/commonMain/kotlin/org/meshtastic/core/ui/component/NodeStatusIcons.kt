@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
@@ -52,6 +51,7 @@ import org.meshtastic.core.resources.node_incomplete_description
 import org.meshtastic.core.resources.unmessageable
 import org.meshtastic.core.resources.unmonitored_or_infrastructure
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonQuestion
 import org.meshtastic.core.ui.icon.Unmessageable
@@ -77,7 +77,8 @@ fun NodeStatusIcons(
 ) {
     // MT_SW: the activity status of the node's user, and which icon (if any) it takes the place of.
     val presence = if (nodeNum != null && !isThisNode) rememberNodePresence(nodeNum, lastHeardSeconds) else null
-    val replace = if (presence != null) rememberUiOptions()[UiOptions.PRESENCE_REPLACE] else UiOptions.PRESENCE_REPLACE_NONE
+    val replace =
+        if (presence != null) rememberUiOptions()[UiOptions.PRESENCE_REPLACE] else UiOptions.PRESENCE_REPLACE_NONE
     Row(modifier = modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
         if (presence != null) NodePresenceBadge(presence = presence.first, state = presence.second)
         if (isUnknownUser) {

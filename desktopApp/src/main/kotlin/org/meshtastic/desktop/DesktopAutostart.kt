@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.desktop
 
 import co.touchlab.kermit.Logger
@@ -65,7 +67,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
             os.contains("win") ->
                 runOutput("reg", "query", RUN_KEY, "/v", NAME).second.contains(MINIMIZED_ARG) ||
                     startupFile().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
+
             os.contains("mac") -> macPlist().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
+
             else -> linuxEntry().takeIf { it.exists() }?.readText()?.contains(MINIMIZED_ARG) == true
         }
     }
@@ -120,7 +124,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
                 run("reg", "delete", RUN_KEY, "/v", NAME, "/f")
                 startupFile().delete()
             }
+
             os.contains("mac") -> macPlist().delete()
+
             else -> linuxEntry().delete()
         }
     }
@@ -152,7 +158,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
             startupFile().delete()
             return
         }
-        Logger.w { "Autostart: the Run entry is not there after writing it ($queryCode: $shown); using the Startup folder" }
+        Logger.w {
+            "Autostart: the Run entry is not there after writing it ($queryCode: $shown); using the Startup folder"
+        }
         startupFile().apply {
             parentFile?.mkdirs()
             val arguments = if (minimized.value) " $MINIMIZED_ARG" else ""
@@ -162,7 +170,9 @@ internal class DesktopAutostart private constructor(private val launcher: String
     }
 
     private fun startupFile(): File {
-        val base = System.getenv("APPDATA")?.takeIf { it.isNotBlank() } ?: "${System.getProperty("user.home")}\\AppData\\Roaming"
+        val base =
+            System.getenv("APPDATA")?.takeIf { it.isNotBlank() }
+                ?: "${System.getProperty("user.home")}\\AppData\\Roaming"
         return File(base, "Microsoft\\Windows\\Start Menu\\Programs\\Startup\\MT_SW.cmd")
     }
 

@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -99,6 +98,7 @@ import org.meshtastic.core.ui.icon.ArrowCircleUp
 import org.meshtastic.core.ui.icon.DeviceNumbers
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.HopCount
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyOff
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.LockOpen

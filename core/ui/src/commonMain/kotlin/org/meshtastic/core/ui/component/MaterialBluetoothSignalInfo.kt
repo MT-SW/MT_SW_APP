@@ -19,8 +19,6 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
-import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.dbm_value
 import org.meshtastic.core.ui.icon.Bluetooth
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SignalCellular0Bar
 import org.meshtastic.core.ui.icon.SignalCellular1Bar
@@ -46,6 +45,7 @@ import org.meshtastic.core.ui.icon.SignalCellular2Bar
 import org.meshtastic.core.ui.icon.SignalCellular3Bar
 import org.meshtastic.core.ui.icon.SignalCellular4Bar
 import org.meshtastic.core.ui.icon.SignalOff
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange

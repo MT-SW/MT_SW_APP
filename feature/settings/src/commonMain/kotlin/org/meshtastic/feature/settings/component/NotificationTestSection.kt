@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.notification_test_radio_button
 import org.meshtastic.core.resources.notification_test_radio_text
 import org.meshtastic.core.resources.notification_test_sender
 import org.meshtastic.core.resources.notification_test_title
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.proto.ClientNotification
 
 /** The first channel, where the tap on a test alarm leads (the alarm itself is not sent to anyone). */

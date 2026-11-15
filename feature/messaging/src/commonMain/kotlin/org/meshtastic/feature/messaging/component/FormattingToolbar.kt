@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -49,6 +48,7 @@ import org.meshtastic.core.resources.insert_link_url_hint
 import org.meshtastic.core.ui.component.InlineStyle
 import org.meshtastic.core.ui.icon.Bold
 import org.meshtastic.core.ui.icon.Code
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Italic
 import org.meshtastic.core.ui.icon.Link
 import org.meshtastic.core.ui.icon.MeshtasticIcons

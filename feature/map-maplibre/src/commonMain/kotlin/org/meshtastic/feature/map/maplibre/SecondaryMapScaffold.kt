@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.interaction.MapInteractions
 import org.maplibre.compose.map.CameraConstraints
@@ -47,6 +46,7 @@ import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.CollapsedAttributionOrnaments
 import org.meshtastic.feature.map.maplibre.component.MapZoom
 import org.meshtastic.feature.map.maplibre.component.SecondaryMapControls
+import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle

@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,15 +32,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.ButtonDefaults
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -102,11 +99,14 @@ import org.meshtastic.core.resources.wifi_drops_label
 import org.meshtastic.core.resources.wifi_export
 import org.meshtastic.core.resources.wifi_rssi_definition
 import org.meshtastic.core.resources.wifi_rssi_signal
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LoraSignalIndicator
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.determineRssiQuality
 import org.meshtastic.core.ui.component.determineSignalQuality
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Save
@@ -314,10 +314,10 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                 }
             } else {
                 LazyColumn(
-                modifier = contentModifier.fillMaxSize(),
-                state = lazyListState,
-                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
-            ) {
+                    modifier = contentModifier.fillMaxSize(),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+                ) {
                     itemsIndexed(
                         data,
                         key = { _, entry -> entry.key },

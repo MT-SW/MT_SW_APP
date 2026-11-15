@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -49,10 +47,12 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.traceroute_showing_nodes
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.CenterFocusStrong
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Route
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider

@@ -148,8 +148,8 @@ open class MetricsViewModel(
             .stateInWhileSubscribed(initialValue = null)
 
     /**
-     * Tells which kinds of logged data the screen shows, so only their full history is read. A screen calls it while
-     * it is first composed, before it starts to collect [state], so nothing else is read first.
+     * Tells which kinds of logged data the screen shows, so only their full history is read. A screen calls it while it
+     * is first composed, before it starts to collect [state], so nothing else is read first.
      */
     fun useSources(sources: Set<NodeLogSource>) {
         requestedSources.value = sources

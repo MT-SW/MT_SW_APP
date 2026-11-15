@@ -20,8 +20,6 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -29,10 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -91,12 +87,16 @@ import org.meshtastic.core.resources.archive_restore_preview_result
 import org.meshtastic.core.resources.archive_restore_result
 import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.mt_sw_other_archive_body
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.EditPasswordPreference
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
@@ -144,7 +144,11 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.archive_intro), style = MaterialTheme.typography.bodyMedium)

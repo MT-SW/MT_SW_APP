@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +36,9 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.device_configuration
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.navigation.ConfigRoute

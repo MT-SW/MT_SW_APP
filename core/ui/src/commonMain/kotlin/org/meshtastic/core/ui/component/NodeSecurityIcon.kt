@@ -31,7 +31,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -81,6 +80,7 @@ import org.meshtastic.core.resources.security_signed_node
 import org.meshtastic.core.resources.security_signed_node_help
 import org.meshtastic.core.resources.security_verified_contact
 import org.meshtastic.core.resources.security_verified_contact_help
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyOff
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.LockOpen

@@ -17,8 +17,6 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.clickable
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,9 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -68,12 +64,16 @@ import org.meshtastic.core.resources.discovery_history
 import org.meshtastic.core.resources.discovery_scan_complete
 import org.meshtastic.core.resources.discovery_scan_incomplete
 import org.meshtastic.core.resources.discovery_unique_nodes_count
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.EmptyState
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.feature.discovery.DiscoveryHistoryViewModel
@@ -110,7 +110,13 @@ fun DiscoveryHistoryScreen(
             LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+                contentPadding =
+                androidx.compose.foundation.layout.PaddingValues(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp + LocalFloatingBarInset.current,
+                ),
             ) {
                 items(sessions, key = { it.id }) { session ->
                     SessionListItem(

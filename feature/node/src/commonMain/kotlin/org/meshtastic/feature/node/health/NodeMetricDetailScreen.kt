@@ -19,8 +19,6 @@
 package org.meshtastic.feature.node.health
 
 import androidx.compose.animation.core.animateFloatAsState
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -38,10 +36,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -72,11 +68,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LoadingIndicator
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.GraphColors.Blue
 import org.meshtastic.core.ui.theme.GraphColors.Gold
@@ -126,7 +126,11 @@ fun NodeMetricDetailScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp).floatingBarEndPadding(),
+                Modifier.fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(contentPadding)
+                    .padding(16.dp)
+                    .floatingBarEndPadding(),
             ) {
                 NodeMetricHero(uiState = uiState)
                 Spacer(modifier = Modifier.height(12.dp))

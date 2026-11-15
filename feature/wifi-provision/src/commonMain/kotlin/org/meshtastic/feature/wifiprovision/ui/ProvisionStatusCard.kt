@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,7 +37,9 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.wifi_provision_sending_credentials
 import org.meshtastic.core.resources.wifi_provision_status_applied
 import org.meshtastic.core.resources.wifi_provision_status_failed
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Error
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Success
 import org.meshtastic.feature.wifiprovision.WifiProvisionUiState.ProvisionStatus

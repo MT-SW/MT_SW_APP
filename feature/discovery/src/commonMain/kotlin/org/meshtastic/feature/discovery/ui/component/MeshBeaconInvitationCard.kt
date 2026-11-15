@@ -22,10 +22,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -48,6 +46,8 @@ import org.meshtastic.core.resources.mesh_beacon_offer_preset
 import org.meshtastic.core.resources.mesh_beacon_offer_region
 import org.meshtastic.core.resources.mesh_beacon_offer_signal
 import org.meshtastic.core.resources.mesh_beacon_offer_title
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.proto.Config.LoRaConfig.RegionCode
 
 /**

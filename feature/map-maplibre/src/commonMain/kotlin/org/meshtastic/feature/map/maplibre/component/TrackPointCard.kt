@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.speed
 import org.meshtastic.core.resources.speed_kmh
 import org.meshtastic.core.resources.speed_mph
 import org.meshtastic.core.resources.timestamp
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.util.formatPositionTime
 import org.meshtastic.proto.Position
 

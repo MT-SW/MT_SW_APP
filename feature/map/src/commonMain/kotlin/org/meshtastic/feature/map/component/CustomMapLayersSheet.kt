@@ -22,11 +22,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ListItem
@@ -69,9 +67,11 @@ import org.meshtastic.core.resources.url
 import org.meshtastic.core.resources.url_cannot_be_empty
 import org.meshtastic.core.resources.url_http_localhost_only
 import org.meshtastic.core.resources.url_must_be_http
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Layers
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh

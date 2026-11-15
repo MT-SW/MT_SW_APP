@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LoopWithTooManyJumpStatements")
+
 package org.meshtastic.core.model
 
 import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
@@ -42,11 +44,12 @@ data class NodePresence(val state: NodePresenceState, val sinceMillis: Long, val
 
     /**
      * What to show now, or null for "nothing" (unknown). An ONLINE report holds only while the node is still heard:
-     * when neither the report nor the node's last packet is newer than [expiryMillis], the person has most likely
-     * left without the OFFLINE report arriving (a dead battery, out of range), so nothing is shown.
+     * when neither the report nor the node's last packet is newer than [expiryMillis], the person has most likely left
+     * without the OFFLINE report arriving (a dead battery, out of range), so nothing is shown.
      */
     fun effective(nowMillis: Long, lastHeardSeconds: Int, expiryMillis: Long): NodePresenceState? = when (state) {
         NodePresenceState.OFFLINE -> NodePresenceState.OFFLINE
+
         NodePresenceState.ONLINE -> {
             val lastSign = maxOf(receivedAtMillis, lastHeardSeconds * MILLIS_PER_SECOND)
             if (nowMillis - lastSign <= expiryMillis) NodePresenceState.ONLINE else null

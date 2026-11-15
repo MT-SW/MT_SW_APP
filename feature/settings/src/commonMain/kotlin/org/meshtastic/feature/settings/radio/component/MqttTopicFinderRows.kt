@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -80,6 +79,7 @@ import org.meshtastic.core.resources.mqtt_topic_finder_nearest
 import org.meshtastic.core.resources.mqtt_topic_finder_nodes
 import org.meshtastic.core.resources.mqtt_topic_finder_use
 import org.meshtastic.core.ui.icon.Check
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 private const val MAX_CHANNELS_SHOWN = 3

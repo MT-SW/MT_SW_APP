@@ -30,8 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -94,8 +92,10 @@ import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.resources.traceroute_outgoing_route
 import org.meshtastic.core.resources.traceroute_return_route
 import org.meshtastic.core.resources.traceroute_showing_nodes
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MyLocation
 import org.meshtastic.core.ui.icon.PhotoCamera

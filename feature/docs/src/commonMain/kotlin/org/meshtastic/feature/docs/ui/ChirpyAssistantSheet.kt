@@ -42,11 +42,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -80,6 +78,8 @@ import org.meshtastic.core.resources.chirpy_search_placeholder
 import org.meshtastic.core.resources.chirpy_thinking
 import org.meshtastic.core.resources.img_chirpy
 import org.meshtastic.core.resources.send
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.feature.docs.model.AIDocAssistantSessionState

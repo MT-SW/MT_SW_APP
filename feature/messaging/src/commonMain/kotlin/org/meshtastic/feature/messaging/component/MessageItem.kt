@@ -44,7 +44,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -96,10 +95,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.isAckProofForged
 import org.meshtastic.core.repository.MuteDurations
@@ -123,11 +124,6 @@ import org.meshtastic.core.resources.mute_sender_marker
 import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
-import org.meshtastic.core.model.ElementLook
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.elementLook
-import org.meshtastic.core.ui.component.pressSpring
-import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.HighlightedText
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -138,12 +134,15 @@ import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.TransportIcon
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.nodeBorderStroke
 import org.meshtastic.core.ui.component.nodeTintedContainer
+import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FormatQuote
 import org.meshtastic.core.ui.icon.HopCount
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Reply
 import org.meshtastic.core.ui.icon.Save
@@ -151,6 +150,7 @@ import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes

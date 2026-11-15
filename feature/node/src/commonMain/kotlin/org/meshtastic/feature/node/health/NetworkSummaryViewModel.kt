@@ -33,11 +33,11 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.NodePresence
 import org.meshtastic.core.model.NodePresenceLogs
-import org.meshtastic.core.model.PresenceChange
-import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.model.NodePresenceState
+import org.meshtastic.core.model.PresenceChange
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.swapBatteryPolarity
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
@@ -206,13 +206,13 @@ class NetworkSummaryViewModel(
                 NodePresence.EXPIRY_STEPS_MINUTES[
                     options[UiOptions.PRESENCE_EXPIRY].coerceIn(0, NodePresence.EXPIRY_STEPS_MINUTES.lastIndex),
                 ] * MILLIS_PER_MINUTE
+
             @Suppress("UNCHECKED_CAST")
             val presenceChanges = values[6] as List<PresenceChange>
             val presenceNow = nowMillis
-            val presenceStates =
-                nodes.mapNotNull { node ->
-                    presence[node.num]?.effective(presenceNow, node.lastHeard, presenceExpiryMillis)
-                }
+            val presenceStates = nodes.mapNotNull { node ->
+                presence[node.num]?.effective(presenceNow, node.lastHeard, presenceExpiryMillis)
+            }
             val telemetryLogs = allLogs.filter { it.portNum == PortNum.TELEMETRY_APP.value }
             // Newest first: only each node's latest report counts below.
             val neighborLogs = allLogs.filter { it.portNum == PortNum.NEIGHBORINFO_APP.value }.asReversed()

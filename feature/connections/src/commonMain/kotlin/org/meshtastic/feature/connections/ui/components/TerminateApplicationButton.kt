@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.terminate_app
 import org.meshtastic.core.resources.terminate_app_message
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 
 /**

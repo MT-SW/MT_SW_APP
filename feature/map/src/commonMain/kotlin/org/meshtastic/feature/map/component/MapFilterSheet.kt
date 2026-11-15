@@ -30,7 +30,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -57,10 +56,10 @@ import org.meshtastic.core.resources.map_filter_show_ignored
 import org.meshtastic.core.resources.map_filter_title
 import org.meshtastic.core.resources.node_filter_exclude_mqtt
 import org.meshtastic.core.resources.node_filter_include_unknown
+import org.meshtastic.core.resources.node_filter_only_active
 import org.meshtastic.core.resources.node_filter_only_direct
 import org.meshtastic.core.resources.node_filter_only_encrypted
 import org.meshtastic.core.resources.node_filter_only_online
-import org.meshtastic.core.resources.node_filter_only_active
 import org.meshtastic.core.resources.node_filter_only_signed
 import org.meshtastic.core.resources.only_favorites
 import org.meshtastic.core.resources.show_node_links
@@ -70,6 +69,7 @@ import org.meshtastic.core.resources.show_waypoints
 import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lens
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PinDrop

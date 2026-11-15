@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Scaffold
@@ -74,10 +72,12 @@ import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.logs
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.BarChart
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons

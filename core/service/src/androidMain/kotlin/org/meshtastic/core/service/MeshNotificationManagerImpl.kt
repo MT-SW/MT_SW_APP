@@ -81,7 +81,6 @@ import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
-import org.meshtastic.core.repository.activeNodeCountFlow
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.NodeRepository
@@ -91,6 +90,7 @@ import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.activeNodeCountFlow
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
 import org.meshtastic.core.resources.Res

@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooManyFunctions")
-
+@file:Suppress("LongMethod", "TooManyFunctions")
 package org.meshtastic.feature.map.maplibre
 
 import androidx.compose.foundation.layout.Box
@@ -54,12 +53,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
-import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.koin.compose.koinInject
-import org.meshtastic.core.repository.MeshLogRepository
-import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.repository.activeNodeNumsFlow
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
@@ -89,6 +83,10 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.repository.MeshLogRepository
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.activeNodeNumsFlow
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.core.ui.theme.WithSystemDensity
 import org.meshtastic.core.ui.util.MapViewReset
@@ -99,6 +97,7 @@ import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
+import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.meshtastic.feature.map.maplibre.component.ZOOM_BOTTOM_INSET
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
@@ -424,7 +423,11 @@ fun MeshMap(
         PropagationOverlay(
             Modifier.align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current),
+                .padding(
+                    start = 8.dp,
+                    end = PROPAGATION_END_CLEARANCE_DP.dp,
+                    bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current,
+                ),
         )
     }
 }

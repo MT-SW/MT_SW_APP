@@ -19,8 +19,6 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,6 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.background.SingleInstanceControls
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.WhatsNewRequest
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
@@ -58,12 +57,12 @@ import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.clean_node_database_title
-import org.meshtastic.core.resources.data_notice_settings_title
-import org.meshtastic.core.resources.data_notice_shortcut_summary
-import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.data_logs_summary
 import org.meshtastic.core.resources.data_logs_title
+import org.meshtastic.core.resources.data_notice_settings_title
+import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.data_storage_title
+import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.element_look_short
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.floating_nav_bar
@@ -72,16 +71,16 @@ import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_summary
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
+import org.meshtastic.core.resources.look_advanced
+import org.meshtastic.core.resources.look_section_bar
+import org.meshtastic.core.resources.look_section_basic
+import org.meshtastic.core.resources.look_section_layout
+import org.meshtastic.core.resources.look_section_theme
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
-import org.meshtastic.core.resources.look_advanced
-import org.meshtastic.core.resources.look_section_basic
-import org.meshtastic.core.resources.look_section_bar
-import org.meshtastic.core.resources.look_section_layout
-import org.meshtastic.core.resources.look_section_theme
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
@@ -119,17 +118,17 @@ import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.mt_sw_other_sos_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
-import org.meshtastic.core.resources.presence_device_switch
-import org.meshtastic.core.resources.presence_summary
-import org.meshtastic.core.resources.presence_more_summary
-import org.meshtastic.core.resources.presence_more_title
-import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
 import org.meshtastic.core.resources.mt_sw_terrain_open_summary
 import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.presence_device_switch
+import org.meshtastic.core.resources.presence_more_summary
+import org.meshtastic.core.resources.presence_more_title
+import org.meshtastic.core.resources.presence_summary
+import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_description
@@ -146,11 +145,13 @@ import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.resources.whats_new_open_desc
 import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.ui.assistant.SettingHighlight
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.component.WhatsNewDialog
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
@@ -179,22 +180,21 @@ import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ElementAdvancedSettings
-import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.ElementBasicSettings
-import org.meshtastic.feature.settings.component.PresenceManualAsk
-import org.meshtastic.feature.settings.component.PresenceSettings
-import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
-import org.meshtastic.core.model.UiOptions
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
+import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
+import org.meshtastic.feature.settings.component.NotificationTestSection
+import org.meshtastic.feature.settings.component.PresenceManualAsk
+import org.meshtastic.feature.settings.component.PresenceSettings
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SingleInstanceSettings
 import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
 /**
@@ -226,7 +226,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_switches)) {
@@ -324,7 +328,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             if (SingleInstanceControls.current != null) {
                 ExpressiveSection(title = stringResource(Res.string.single_instance_title)) { SingleInstanceSettings() }
             }
-
 
             // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
             ReportIssuesSection()
@@ -458,7 +461,11 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -499,7 +506,11 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.mt_sw_other_intro), style = MaterialTheme.typography.bodyMedium)
@@ -610,7 +621,11 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.look_section_basic)) {
@@ -691,7 +706,11 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) {

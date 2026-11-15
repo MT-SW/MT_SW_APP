@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +45,7 @@ import org.meshtastic.core.resources.discovery_stat_unselected
 import org.meshtastic.core.resources.mesh_beacon_preset_indicator
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Check
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 @Suppress("MagicNumber")

@@ -213,7 +213,9 @@ private fun MeshtasticNavDisplayHost(
 
     // The library draws the width slider only between two columns. On a wide desktop window (three columns) our own
     // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
-    val threeColumnWidths = remember { ThreeColumnWidths().also { it.chatListDetailShare = ThreeColumnWidths.chatListShare(windowWidthDp) } }
+    val threeColumnWidths = remember {
+        ThreeColumnWidths().also { it.chatListDetailShare = ThreeColumnWidths.chatListShare(windowWidthDp) }
+    }
     // Wide window: list, detail and extra screen. Narrower (but not phone-sized): the list slides away and the detail
     // and the extra screen share the window.
     val columnMode =

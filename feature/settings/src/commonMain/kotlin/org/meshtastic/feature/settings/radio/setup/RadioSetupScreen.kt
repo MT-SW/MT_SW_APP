@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.radio.setup
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,9 +57,11 @@ import org.meshtastic.core.resources.not_now
 import org.meshtastic.core.resources.radio_setup_title
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.resources.skip
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.OnboardingBottomBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.qr.ScannedQrCodeDialog
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.settings.navigation.ModuleRoute
@@ -204,7 +204,8 @@ fun RadioSetupScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding(),
+                modifier =
+                Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // The flow has a known length, so the page shows where it is in it.

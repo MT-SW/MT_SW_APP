@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
@@ -84,6 +83,7 @@ import org.meshtastic.core.resources.planner_unit_dbm
 import org.meshtastic.core.resources.planner_unit_km
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_yes
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.feature.map.planner.DirectionResult

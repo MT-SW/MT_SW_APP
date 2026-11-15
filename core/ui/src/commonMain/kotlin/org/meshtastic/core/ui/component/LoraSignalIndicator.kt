@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import org.meshtastic.core.resources.signal
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.unknown
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline

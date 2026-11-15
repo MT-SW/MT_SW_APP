@@ -21,8 +21,6 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
-import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +59,7 @@ import org.meshtastic.core.ui.icon.ArrowCircleUp
 import org.meshtastic.core.ui.icon.ElectricPower
 import org.meshtastic.core.ui.icon.HardwareModel
 import org.meshtastic.core.ui.icon.Humidity
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NodeId
 import org.meshtastic.core.ui.icon.PeopleCount
@@ -69,6 +68,7 @@ import org.meshtastic.core.ui.icon.Role
 import org.meshtastic.core.ui.icon.SoilMoisture
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.label
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import org.meshtastic.core.ui.icon.role
 import org.meshtastic.proto.Config
 

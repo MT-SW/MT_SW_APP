@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
@@ -73,6 +72,7 @@ import org.meshtastic.core.resources.device_model_load_failed
 import org.meshtastic.core.resources.device_model_view_in_space
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ViewInAr

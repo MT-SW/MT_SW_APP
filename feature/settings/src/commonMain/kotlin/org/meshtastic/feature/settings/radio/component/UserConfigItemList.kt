@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,12 +53,12 @@ import org.meshtastic.core.resources.ham_long_name_summary
 import org.meshtastic.core.resources.hardware_model
 import org.meshtastic.core.resources.long_name
 import org.meshtastic.core.resources.node_id
-import org.meshtastic.core.resources.short_name
-import org.meshtastic.core.resources.status_message
-import org.meshtastic.core.resources.status_message_summary
 import org.meshtastic.core.resources.presence_device_switch
 import org.meshtastic.core.resources.presence_device_switch_summary
 import org.meshtastic.core.resources.presence_needs_fw
+import org.meshtastic.core.resources.short_name
+import org.meshtastic.core.resources.status_message
+import org.meshtastic.core.resources.status_message_summary
 import org.meshtastic.core.resources.unmessageable
 import org.meshtastic.core.resources.unmonitored_or_infrastructure
 import org.meshtastic.core.resources.user
@@ -69,6 +68,7 @@ import org.meshtastic.core.ui.component.RegularPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.proto.ExcludedModules

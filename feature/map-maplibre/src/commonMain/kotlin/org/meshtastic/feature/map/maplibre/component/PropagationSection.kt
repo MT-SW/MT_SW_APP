@@ -33,10 +33,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -81,7 +79,9 @@ import org.meshtastic.core.resources.propagation_regions_title
 import org.meshtastic.core.resources.propagation_source
 import org.meshtastic.core.resources.propagation_title
 import org.meshtastic.core.resources.propagation_update_all
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.component.LayerOpacitySlider
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY

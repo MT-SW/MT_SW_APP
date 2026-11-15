@@ -53,14 +53,15 @@ fun Modifier.pressSpring(): Modifier {
     return this.graphicsLayer {
         scaleX = scale
         scaleY = scale
-    }.pointerInput(Unit) {
-        awaitEachGesture {
-            awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-            pressed = true
-            do {
-                val event = awaitPointerEvent(PointerEventPass.Final)
-            } while (event.changes.any { it.pressed })
-            pressed = false
-        }
     }
+        .pointerInput(Unit) {
+            awaitEachGesture {
+                awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                pressed = true
+                do {
+                    val event = awaitPointerEvent(PointerEventPass.Final)
+                } while (event.changes.any { it.pressed })
+                pressed = false
+            }
+        }
 }

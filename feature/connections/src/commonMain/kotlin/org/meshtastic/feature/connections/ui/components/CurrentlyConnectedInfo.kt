@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,6 +58,7 @@ import org.meshtastic.core.ui.component.MaterialBatteryInfo
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.icon.ChevronRight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalLnaCorrection

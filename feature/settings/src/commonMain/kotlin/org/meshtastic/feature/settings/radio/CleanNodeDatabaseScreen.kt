@@ -19,8 +19,6 @@
 package org.meshtastic.feature.settings.radio
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,10 +27,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -63,9 +59,13 @@ import org.meshtastic.core.resources.clean_now
 import org.meshtastic.core.resources.clean_unknown_nodes
 import org.meshtastic.core.resources.clean_unknown_nodes_any_date
 import org.meshtastic.core.resources.nodes_queued_for_deletion
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 
 /**
  * Composable screen for cleaning the node database. Allows users to specify criteria for deleting nodes. The list of
@@ -101,7 +101,13 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding()) {
+        Column(
+            modifier =
+            Modifier.padding(paddingValues)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+                .floatingBarEndPadding(),
+        ) {
             AutoCleanNodesSection(
                 autoCleanEnabled = autoCleanEnabled,
                 autoCleanInactivityDays = autoCleanInactivityDays,

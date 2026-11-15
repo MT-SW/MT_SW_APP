@@ -23,11 +23,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -97,11 +94,14 @@ import org.meshtastic.core.resources.radio_setup_restart_notice
 import org.meshtastic.core.resources.schema_lora_region
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.resources.status_message
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.OnboardingNotice
 import org.meshtastic.core.ui.component.OnboardingPageHeader
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Search

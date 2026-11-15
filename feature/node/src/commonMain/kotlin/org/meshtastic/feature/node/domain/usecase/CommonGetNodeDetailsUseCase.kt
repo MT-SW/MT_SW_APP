@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -108,8 +108,8 @@ constructor(
 
     /**
      * One source of log entries. The summary reads only the newest entries and answers at once (with an empty list
-     * first). The full history is read in two steps: the newest entries come at once (so a statistics screen opens
-     * and draws the latest data without waiting for thousands of rows to be read and decoded, which was slow on the
+     * first). The full history is read in two steps: the newest entries come at once (so a statistics screen opens and
+     * draws the latest data without waiting for thousands of rows to be read and decoded, which was slow on the
      * iPhone), and the whole history replaces them as soon as it is ready.
      */
     private fun <T> logSource(
@@ -273,8 +273,10 @@ constructor(
         // 5. Requests History (we still query request logs by the target nodeId)
         val requestsFlow =
             combine(
-                requestLogs(nodeId, PortNum.TRACEROUTE_APP, fullHistory && NodeLogSource.TRACEROUTE in sources).onStart { emit(emptyList()) },
-                requestLogs(nodeId, PortNum.NEIGHBORINFO_APP, fullHistory && NodeLogSource.NEIGHBORS in sources).onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.TRACEROUTE_APP, fullHistory && NodeLogSource.TRACEROUTE in sources)
+                    .onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.NEIGHBORINFO_APP, fullHistory && NodeLogSource.NEIGHBORS in sources)
+                    .onStart { emit(emptyList()) },
             ) { trReqs, niReqs ->
                 trReqs to niReqs
             }

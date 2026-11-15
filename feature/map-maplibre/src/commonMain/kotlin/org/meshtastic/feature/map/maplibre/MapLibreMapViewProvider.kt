@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.maplibre.compose.camera.CameraAnimation
@@ -51,6 +50,7 @@ import org.maplibre.compose.location.rememberSystemSettingsLauncher
 import org.maplibre.compose.map.MapState
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.antenna.PlannerHandoff
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.MapLinksViewModel

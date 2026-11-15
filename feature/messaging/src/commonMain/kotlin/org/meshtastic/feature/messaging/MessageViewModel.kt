@@ -545,8 +545,8 @@ class MessageViewModel(
     }
 
     /**
-     * MT_SW: opening a direct chat asks that node for its activity status (the use case limits how often and checks
-     * the settings). Broadcast and channel conversations are not asked.
+     * MT_SW: opening a direct chat asks that node for its activity status (the use case limits how often and checks the
+     * settings). Broadcast and channel conversations are not asked.
      */
     private fun askPresence(contactKey: String) {
         val userId = contactKey.drop(1)

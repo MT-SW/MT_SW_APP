@@ -14,23 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
-import org.meshtastic.core.ui.theme.rememberUiOptions
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.model.ElementLook
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import org.meshtastic.core.ui.icon.Icon
-import androidx.compose.material3.Icon as StandardIcon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,19 +34,25 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_meshtastic
 import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.LocalEventTheme
 import org.meshtastic.core.ui.theme.monochromeLayer
+import org.meshtastic.core.ui.theme.rememberUiOptions
+import androidx.compose.material3.Icon as StandardIcon
 
 /** Alpha for the ambient event accent wash over the app bar — subtle enough to keep title text legible. */
 private const val EVENT_ACCENT_ALPHA = 0.12f
@@ -132,7 +134,10 @@ fun MainAppBar(
                     // firmware is surfaced on the Connections screen instead (EventFirmwareCard).
                     {
                         // Our logo always stays as it is, whatever icon style is chosen.
-                        StandardIcon(imageVector = vectorResource(Res.drawable.ic_meshtastic), contentDescription = null)
+                        StandardIcon(
+                            imageVector = vectorResource(Res.drawable.ic_meshtastic),
+                            contentDescription = null,
+                        )
                     }
                 },
                 actions = {

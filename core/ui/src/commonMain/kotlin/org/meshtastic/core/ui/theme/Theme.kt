@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MatchingDeclarationName", "CompositionLocalAllowlist", "MagicNumber")
-
+@file:Suppress("CompositionLocalAllowlist", "MagicNumber", "MatchingDeclarationName", "TooManyFunctions")
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -230,32 +229,31 @@ private fun ColorScheme.withTrueBlack(): ColorScheme = copy(
  * The light scheme with the whites turned into very light greys: hardly noticeable in the ordinary theme, a little
  * stronger (still bright) in the stronger-colour ones. The coloured parts are left as they are.
  */
-private fun ColorScheme.withSoftWhite(strong: Boolean): ColorScheme =
-    if (strong) {
-        copy(
-            background = Color(0xFFEDEDEE),
-            surface = Color(0xFFEDEDEE),
-            surfaceDim = Color(0xFFD4D4D5),
-            surfaceBright = Color(0xFFEDEDEE),
-            surfaceContainerLowest = Color(0xFFF3F3F4),
-            surfaceContainerLow = Color(0xFFEBEBEC),
-            surfaceContainer = Color(0xFFE6E6E7),
-            surfaceContainerHigh = Color(0xFFE1E1E2),
-            surfaceContainerHighest = Color(0xFFDCDCDD),
-        )
-    } else {
-        copy(
-            background = Color(0xFFF3F3F4),
-            surface = Color(0xFFF3F3F4),
-            surfaceDim = Color(0xFFDADADB),
-            surfaceBright = Color(0xFFF3F3F4),
-            surfaceContainerLowest = Color(0xFFF8F8F9),
-            surfaceContainerLow = Color(0xFFF1F1F2),
-            surfaceContainer = Color(0xFFEDEDEE),
-            surfaceContainerHigh = Color(0xFFE8E8E9),
-            surfaceContainerHighest = Color(0xFFE3E3E4),
-        )
-    }
+private fun ColorScheme.withSoftWhite(strong: Boolean): ColorScheme = if (strong) {
+    copy(
+        background = Color(0xFFEDEDEE),
+        surface = Color(0xFFEDEDEE),
+        surfaceDim = Color(0xFFD4D4D5),
+        surfaceBright = Color(0xFFEDEDEE),
+        surfaceContainerLowest = Color(0xFFF3F3F4),
+        surfaceContainerLow = Color(0xFFEBEBEC),
+        surfaceContainer = Color(0xFFE6E6E7),
+        surfaceContainerHigh = Color(0xFFE1E1E2),
+        surfaceContainerHighest = Color(0xFFDCDCDD),
+    )
+} else {
+    copy(
+        background = Color(0xFFF3F3F4),
+        surface = Color(0xFFF3F3F4),
+        surfaceDim = Color(0xFFDADADB),
+        surfaceBright = Color(0xFFF3F3F4),
+        surfaceContainerLowest = Color(0xFFF8F8F9),
+        surfaceContainerLow = Color(0xFFF1F1F2),
+        surfaceContainer = Color(0xFFEDEDEE),
+        surfaceContainerHigh = Color(0xFFE8E8E9),
+        surfaceContainerHighest = Color(0xFFE3E3E4),
+    )
+}
 
 /** True while one of the two black-and-white themes is active; maps and charts can read it to drop their colour too. */
 val LocalMonochrome = compositionLocalOf { false }
@@ -373,9 +371,11 @@ fun AppTheme(
     val colorScheme =
         when {
             !monochrome && darkTheme && saturation > 100 -> baseScheme.withTrueBlack()
-            // In the light the white always goes slightly grey (a little more in the stronger-colour themes), unlike the original.
-            !monochrome && !darkTheme && dynamicScheme == null ->
-                baseScheme.withSoftWhite(strong = saturation > 100)
+
+            // In the light the white always goes slightly grey (a little more in the stronger-colour themes), unlike
+            // the original.
+            !monochrome && !darkTheme && dynamicScheme == null -> baseScheme.withSoftWhite(strong = saturation > 100)
+
             else -> baseScheme
         }
 
@@ -461,8 +461,8 @@ fun saturationFor(mode: Int): Int = when (mode) {
 }
 
 /**
- * The two colours that show a theme in the picker: its background and its main (accent) colour. Null for the theme
- * from the wallpaper, whose colours are not known until the system gives them.
+ * The two colours that show a theme in the picker: its background and its main (accent) colour. Null for the theme from
+ * the wallpaper, whose colours are not known until the system gives them.
  */
 @Composable
 fun themePreviewColors(mode: Int): Pair<Color, Color>? {
@@ -477,6 +477,7 @@ fun themePreviewColors(mode: Int): Pair<Color, Color>? {
     val scheme =
         when {
             isMonochromeMode(mode) -> if (dark) monoDarkScheme else monoLightScheme
+
             else -> {
                 val saturation = saturationFor(mode)
                 val base = (if (dark) darkScheme else lightScheme).withSaturation(saturation)

@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +34,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.hide_password
 import org.meshtastic.core.resources.show_password
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff

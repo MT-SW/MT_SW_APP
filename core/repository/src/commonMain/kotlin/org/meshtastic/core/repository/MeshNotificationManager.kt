@@ -95,7 +95,9 @@ interface MeshNotificationManager {
 
     fun cancelNodeSilenceNotification(nodeNum: Int)
 
-    /** MT_SW: the "active" alert: [node] reports that someone is at it (or is away). Its own category, off by default. */
+    /**
+     * MT_SW: the "active" alert: [node] reports that someone is at it (or is away). Its own category, off by default.
+     */
     suspend fun showNodeActiveNotification(node: Node, title: String)
 
     /**

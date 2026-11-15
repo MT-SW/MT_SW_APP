@@ -17,8 +17,6 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -64,8 +61,11 @@ import org.meshtastic.core.resources.doc_page_not_found
 import org.meshtastic.core.resources.doc_page_not_found_detail
 import org.meshtastic.core.resources.documentation
 import org.meshtastic.core.resources.navigate_back
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPageContent
@@ -261,7 +261,11 @@ fun DocsPageRouteScreen(
                                     )
                                 },
                             ),
-                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+                            modifier =
+                            Modifier.fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp)
+                                .floatingBarEndPadding(),
                         )
                     }
                 }

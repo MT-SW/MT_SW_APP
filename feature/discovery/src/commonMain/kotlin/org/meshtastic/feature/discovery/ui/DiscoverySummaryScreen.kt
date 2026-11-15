@@ -19,8 +19,6 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,11 +28,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -69,8 +65,12 @@ import org.meshtastic.core.resources.discovery_stat_total_unique_nodes
 import org.meshtastic.core.resources.discovery_summary_not_available
 import org.meshtastic.core.resources.discovery_view_map
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh

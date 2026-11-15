@@ -19,8 +19,6 @@
 package org.meshtastic.feature.node.detail
 
 import androidx.compose.foundation.background
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,13 +36,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.component.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -102,12 +97,6 @@ import org.meshtastic.core.resources.on_demand_hero_progress
 import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_lan_stats_desc
-import org.meshtastic.core.resources.on_demand_presence
-import org.meshtastic.core.resources.on_demand_presence_asking
-import org.meshtastic.core.resources.on_demand_presence_checking_version
-import org.meshtastic.core.resources.on_demand_presence_desc
-import org.meshtastic.core.resources.on_demand_presence_no_version
-import org.meshtastic.core.resources.on_demand_presence_too_old
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_nexthop_counter
 import org.meshtastic.core.resources.on_demand_no_answer
@@ -124,6 +113,12 @@ import org.meshtastic.core.resources.on_demand_ping_ack
 import org.meshtastic.core.resources.on_demand_ping_desc
 import org.meshtastic.core.resources.on_demand_port_counters
 import org.meshtastic.core.resources.on_demand_port_counters_desc
+import org.meshtastic.core.resources.on_demand_presence
+import org.meshtastic.core.resources.on_demand_presence_asking
+import org.meshtastic.core.resources.on_demand_presence_checking_version
+import org.meshtastic.core.resources.on_demand_presence_desc
+import org.meshtastic.core.resources.on_demand_presence_no_version
+import org.meshtastic.core.resources.on_demand_presence_too_old
 import org.meshtastic.core.resources.on_demand_psram
 import org.meshtastic.core.resources.on_demand_reboots
 import org.meshtastic.core.resources.on_demand_received_at
@@ -193,7 +188,11 @@ import org.meshtastic.core.resources.port_name_zps
 import org.meshtastic.core.resources.wifi_drop_reason_label
 import org.meshtastic.core.resources.wifi_drops_label
 import org.meshtastic.core.resources.wifi_rssi_signal
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FilledTonalButton
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.AirUtilization
@@ -206,6 +205,7 @@ import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.ErrorOutline
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.HopCount
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshRadio
@@ -529,10 +529,14 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                                 when (current) {
                                     PresenceNote.CheckingVersion ->
                                         stringResource(Res.string.on_demand_presence_checking_version)
+
                                     PresenceNote.Asking -> stringResource(Res.string.on_demand_presence_asking)
+
                                     is PresenceNote.TooOld ->
                                         stringResource(Res.string.on_demand_presence_too_old, current.version)
-                                    PresenceNote.NoVersion -> stringResource(Res.string.on_demand_presence_no_version)
+
+                                    PresenceNote.NoVersion ->
+                                        stringResource(Res.string.on_demand_presence_no_version)
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -76,6 +75,7 @@ import org.meshtastic.core.ui.icon.Copy
 import org.meshtastic.core.ui.icon.Dangerous
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyOff
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.More

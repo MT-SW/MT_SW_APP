@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +36,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_engine_unavailable
 import org.meshtastic.core.resources.map_engine_unavailable_detail
 import org.meshtastic.core.ui.icon.ErrorOutline
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme
 

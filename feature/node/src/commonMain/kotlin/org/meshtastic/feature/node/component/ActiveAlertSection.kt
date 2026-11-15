@@ -43,8 +43,8 @@ import org.meshtastic.core.resources.node_active_alert_hint
 import org.meshtastic.core.resources.node_away_alert
 
 /**
- * MT_SW: the "active" alert of one node: a notification when the activity status the node shares changes to active.
- * Off by default; the quiet hours are the ones of the silence alerts.
+ * MT_SW: the "active" alert of one node: a notification when the activity status the node shares changes to active. Off
+ * by default; the quiet hours are the ones of the silence alerts.
  */
 @Composable
 fun ActiveAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {

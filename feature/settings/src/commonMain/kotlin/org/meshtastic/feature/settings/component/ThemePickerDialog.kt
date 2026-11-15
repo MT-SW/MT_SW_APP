@@ -18,22 +18,22 @@
 
 package org.meshtastic.feature.settings.component
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.border
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
@@ -61,7 +61,6 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
-import org.meshtastic.core.ui.theme.themePreviewColors
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.MODE_VERY_VIVID
@@ -70,6 +69,7 @@ import org.meshtastic.core.ui.theme.MODE_VERY_VIVID_LIGHT
 import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.MODE_VIVID_DARK
 import org.meshtastic.core.ui.theme.MODE_VIVID_LIGHT
+import org.meshtastic.core.ui.theme.themePreviewColors
 
 /** Theme modes that match AppCompatDelegate constants for cross-platform use. */
 enum class ThemeOption(val label: StringResource, val mode: Int) {

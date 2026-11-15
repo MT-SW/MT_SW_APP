@@ -126,9 +126,9 @@ import org.meshtastic.proto.LoRaRegionPresetMap
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.Routing
 import org.meshtastic.proto.User
 import org.meshtastic.proto.metadata

@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "ReturnCount")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.BorderStroke
@@ -32,11 +34,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.ElementLook
@@ -50,8 +52,8 @@ import androidx.compose.material3.OutlinedButton as MaterialOutlinedButton
 private const val BUTTON_MIN_ALPHA = 0.8f
 
 /**
- * MT_SW: the buttons of the app. They follow the look chosen for the group of the current screen (see
- * [LocalCardGroup]) the same way the cards do: plain as before, with depth, see-through or glass.
+ * MT_SW: the buttons of the app. They follow the look chosen for the group of the current screen (see [LocalCardGroup])
+ * the same way the cards do: plain as before, with depth, see-through or glass.
  */
 @Composable
 private fun buttonLook(group: String, base: Color, fallback: Color = base): Color {
@@ -65,8 +67,7 @@ private fun buttonLook(group: String, base: Color, fallback: Color = base): Colo
  * MT_SW: gives any control (a row of segmented buttons, a chip row...) the look chosen for the group of the current
  * screen: depth, see-through or glass with a thin rim; with the plain look it changes nothing.
  */
-@Composable
-fun Modifier.styledControl(shape: Shape): Modifier = buttonStyle(LocalCardGroup.current, shape)
+@Composable fun Modifier.styledControl(shape: Shape): Modifier = buttonStyle(LocalCardGroup.current, shape)
 
 @Composable
 private fun Modifier.buttonStyle(group: String, shape: Shape): Modifier {
@@ -75,7 +76,8 @@ private fun Modifier.buttonStyle(group: String, shape: Shape): Modifier {
     if (style.look == ElementLook.FLAT) return this
     val gradient =
         UiOptions.BUTTON_GRADIENT_SHARE[
-            options[UiOptions.BUTTON_GRADIENT].coerceIn(0, UiOptions.BUTTON_GRADIENT_SHARE.lastIndex)]
+            options[UiOptions.BUTTON_GRADIENT].coerceIn(0, UiOptions.BUTTON_GRADIENT_SHARE.lastIndex),
+        ]
     if (gradient <= 0f) return this
     // Buttons get no shadow plate and no double glass rim (they looked like a shifted layer): only a gentle gradient
     // (light above, a little shade below) with one thin rim, a soft 3D feeling in every look.
@@ -119,8 +121,8 @@ private fun Modifier.softGradient(shape: Shape, strength: Int, gradient: Float):
 }
 
 /**
- * MT_SW: Material gives every button an invisible 48dp touch box and draws the modifiers on it, so the gradient and
- * the rim looked like a bigger plate behind the button. In the glass and depth looks the box is switched off, so the
+ * MT_SW: Material gives every button an invisible 48dp touch box and draws the modifiers on it, so the gradient and the
+ * rim looked like a bigger plate behind the button. In the glass and depth looks the box is switched off, so the
  * decoration is drawn exactly on the visible button.
  */
 @Composable
@@ -223,7 +225,8 @@ fun OutlinedButton(
             modifier = modifier.buttonStyle(group, shape),
             enabled = enabled,
             shape = shape,
-            colors = if (look == ElementLook.FLAT) colors else remember(colors, fill) { colors.copy(containerColor = fill) },
+            colors =
+            if (look == ElementLook.FLAT) colors else remember(colors, fill) { colors.copy(containerColor = fill) },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
             elevation = if (flat) elevation else null,
             border = border,
@@ -258,7 +261,12 @@ fun Button(
             shapes = shapes,
             modifier = modifier.buttonStyle(group, shapes.shape),
             enabled = enabled,
-            colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
+            colors =
+            if (look == ElementLook.FLAT) {
+                colors
+            } else {
+                remember(colors, styled) { colors.copy(containerColor = styled) }
+            },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
             elevation = if (flat) elevation else null,
             border = border,
@@ -293,7 +301,12 @@ fun FilledTonalButton(
             shapes = shapes,
             modifier = modifier.buttonStyle(group, shapes.shape),
             enabled = enabled,
-            colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
+            colors =
+            if (look == ElementLook.FLAT) {
+                colors
+            } else {
+                remember(colors, styled) { colors.copy(containerColor = styled) }
+            },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
             elevation = if (flat) elevation else null,
             border = border,
@@ -328,7 +341,12 @@ fun OutlinedButton(
             shapes = shapes,
             modifier = modifier.buttonStyle(group, shapes.shape),
             enabled = enabled,
-            colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
+            colors =
+            if (look == ElementLook.FLAT) {
+                colors
+            } else {
+                remember(colors, styled) { colors.copy(containerColor = styled) }
+            },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
             elevation = if (flat) elevation else null,
             border = border,

@@ -38,6 +38,7 @@ enum class NodeLogSource {
 
     /** Neighbour info. */
     NEIGHBORS,
+
     ;
 
     companion object {

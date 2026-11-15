@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "ModifierMissing", "MultipleEmitters", "MutableStateAutoboxing")
+
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,13 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
-import org.meshtastic.core.repository.NodeRepository
-import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.NodePresence
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.presence_ask_now_all
 import org.meshtastic.core.resources.presence_ask_now_favorites
@@ -154,8 +156,8 @@ private const val RECENT_SECONDS = 3600
 
 /**
  * MT_SW: asking for the activity status by hand, for all the nodes of a group at once. It works whether or not the
- * automatic asking above is on, and asks the nodes one after another (a query is a radio transmission). Nodes that
- * run an older firmware than MT_SW_FIRMWARE v3 are not sent the query.
+ * automatic asking above is on, and asks the nodes one after another (a query is a radio transmission). Nodes that run
+ * an older firmware than MT_SW_FIRMWARE v3 are not sent the query.
  */
 @Composable
 fun PresenceManualAsk() {

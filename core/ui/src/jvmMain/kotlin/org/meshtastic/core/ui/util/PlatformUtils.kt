@@ -24,9 +24,9 @@ import androidx.compose.ui.platform.LocalClipboard
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
-import org.meshtastic.core.resources.getStringSuspend
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.resources.getStringSuspend
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame

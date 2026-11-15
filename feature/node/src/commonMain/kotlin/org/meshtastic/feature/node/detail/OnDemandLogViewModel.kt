@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooManyFunctions", "UnsafeCallOnNullableType", "UnusedPrivateProperty")
-
+@file:Suppress("SuspendFunSwallowedCancellation", "TooManyFunctions", "UnsafeCallOnNullableType", "UnusedPrivateProperty")
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.ViewModel
@@ -27,7 +26,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration.Companion.seconds
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
@@ -46,12 +44,13 @@ import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemand
 import org.meshtastic.proto.OnDemandResponse
 import org.meshtastic.proto.OnDemandType
-import org.meshtastic.proto.Presence
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortCounterEntry
+import org.meshtastic.proto.Presence
 import org.meshtastic.proto.RoutingErrorEntry
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 
 /** UI state for the OnDemand diagnostics screen — one field per query type. */
 data class OnDemandLogUiState(
@@ -268,42 +267,43 @@ class OnDemandLogViewModel(
     val presenceNote: StateFlow<PresenceNote?> = _presenceNote.asStateFlow()
 
     /**
-     * Asks the node for its activity status, but first for its firmware version (unless that is already known): a
-     * node older than MT_SW_FIRMWARE v3 is not sent the status query at all.
+     * Asks the node for its activity status, but first for its firmware version (unless that is already known): a node
+     * older than MT_SW_FIRMWARE v3 is not sent the status query at all.
      */
-    fun requestPresence() =
-        safeLaunch(tag = "requestPresence") {
-            try {
-                var version = uiState.value.fwPlusVersion?.version_number
-                // Unknown, or known to be too old: the node may have been updated since, so it is asked again (this is
-                // a manual query, so the version answer is not held back for a week as in the automatic asking).
-                if (version == null || version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE) {
-                    _presenceNote.value = PresenceNote.CheckingVersion
-                    nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_FW_PLUS_VERSION)
-                    val old = version
-                    version =
-                        withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
-                            uiState
-                                .map { it.fwPlusVersion?.version_number }
-                                .filterNotNull()
-                                .first { old == null || it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE }
-                        } ?: old
-                }
-                when {
-                    version == null -> _presenceNote.value = PresenceNote.NoVersion
-                    version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE ->
-                        _presenceNote.value = PresenceNote.TooOld(version)
-                    else -> {
-                        _presenceNote.value = PresenceNote.Asking
-                        nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_PRESENCE)
-                        _presenceNote.value = null
-                    }
-                }
-            } catch (e: CancellationException) {
-                _presenceNote.value = null
-                throw e
+    fun requestPresence() = safeLaunch(tag = "requestPresence") {
+        try {
+            var version = uiState.value.fwPlusVersion?.version_number
+            // Unknown, or known to be too old: the node may have been updated since, so it is asked again (this is
+            // a manual query, so the version answer is not held back for a week as in the automatic asking).
+            if (version == null || version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE) {
+                _presenceNote.value = PresenceNote.CheckingVersion
+                nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_FW_PLUS_VERSION)
+                val old = version
+                version =
+                    withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
+                        uiState
+                            .map { it.fwPlusVersion?.version_number }
+                            .filterNotNull()
+                            .first { old == null || it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE }
+                    } ?: old
             }
+            when {
+                version == null -> _presenceNote.value = PresenceNote.NoVersion
+
+                version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE ->
+                    _presenceNote.value = PresenceNote.TooOld(version)
+
+                else -> {
+                    _presenceNote.value = PresenceNote.Asking
+                    nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_PRESENCE)
+                    _presenceNote.value = null
+                }
+            }
+        } catch (e: CancellationException) {
+            _presenceNote.value = null
+            throw e
         }
+    }
 
     private fun requestOnDemand(type: OnDemandType) =
         safeLaunch(tag = "requestOnDemand-${type.name}") { nodeRequestActions.requestOnDemand(destNum, longName, type) }

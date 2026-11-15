@@ -20,7 +20,6 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
@@ -40,6 +39,7 @@ import kotlinx.coroutines.launch
 import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.icon.Android
 import org.meshtastic.core.ui.icon.ChevronRight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.createClipEntry

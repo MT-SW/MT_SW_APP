@@ -25,7 +25,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -48,6 +47,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.display_name
 import org.meshtastic.core.resources.display_name_hint
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 

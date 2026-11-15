@@ -18,6 +18,7 @@ package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,14 +27,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
@@ -85,11 +82,14 @@ import org.meshtastic.core.resources.track_legend_show
 import org.meshtastic.core.resources.track_legend_snr
 import org.meshtastic.core.resources.track_legend_title
 import org.meshtastic.core.resources.track_snr_colors
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FileDownload
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Layers
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
@@ -225,10 +225,10 @@ fun PositionLogScreen(
             },
             listPart = { modifier, selectedX, lazyListState, onCardClick ->
                 LazyColumn(
-                modifier = modifier.fillMaxSize(),
-                state = lazyListState,
-                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
-            ) {
+                    modifier = modifier.fillMaxSize(),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+                ) {
                     if (hasTrackPoint) {
                         item(key = "icon_legend", contentType = "icon_legend") {
                             TrackIconLegend(

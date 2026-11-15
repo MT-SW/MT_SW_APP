@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +37,9 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.download
 import org.meshtastic.core.resources.firmware_version
 import org.meshtastic.core.resources.view_release
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.icon.Download
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.rememberOpenUrl

@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.radio.channel
 
 import androidx.compose.animation.AnimatedVisibility
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -32,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,6 +61,8 @@ import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.channels
 import org.meshtastic.core.resources.press_and_drag
 import org.meshtastic.core.resources.send
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
 import org.meshtastic.core.ui.component.SosBarScreen
@@ -71,6 +70,7 @@ import org.meshtastic.core.ui.component.dragContainer
 import org.meshtastic.core.ui.component.dragDropItemsIndexed
 import org.meshtastic.core.ui.component.rememberDragDropState
 import org.meshtastic.core.ui.icon.Add
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior

@@ -22,25 +22,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import org.meshtastic.core.model.ElementLook
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
-import org.meshtastic.core.ui.component.StyledSurface
-import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.zoom_in
 import org.meshtastic.core.resources.zoom_out
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
+import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
 import org.meshtastic.core.ui.theme.monochromeLayer
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /**
  * Zoom in and out, stacked, for the corner of a map.
@@ -96,7 +96,10 @@ fun MapZoomControls(
             floating = true,
             fallbackMinAlpha = MAP_GLASS_MIN_ALPHA,
         ) {
-            Column(modifier = Modifier.padding(ZOOM_PADDING_DP.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier.padding(ZOOM_PADDING_DP.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 CompositionLocalProvider(LocalMapButtonInToolbar provides true) { buttons() }
             }
         }

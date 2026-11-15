@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ReturnCount")
+
 package org.meshtastic.core.ui.icon
 
 import androidx.compose.material3.LocalContentColor
@@ -42,9 +44,13 @@ fun Icon(
     tint: Color = LocalContentColor.current,
 ) {
     val style = rememberUiOptions()[UiOptions.ICON_STYLE]
-    // An icon that keeps its own colours (tint "unspecified": a logo, a flag, a coloured sign) is never redrawn as a thin
+    // An icon that keeps its own colours (tint "unspecified": a logo, a flag, a coloured sign) is never redrawn as a
+    // thin
     // outline, because it would lose them and nearly vanish.
-    val drawn = remember(imageVector, style, tint) { if (tint == Color.Unspecified) imageVector else imageVector.restyledFor(style) }
+    val drawn =
+        remember(imageVector, style, tint) {
+            if (tint == Color.Unspecified) imageVector else imageVector.restyledFor(style)
+        }
     MaterialIcon(imageVector = drawn, contentDescription = contentDescription, modifier = modifier, tint = tint)
 }
 

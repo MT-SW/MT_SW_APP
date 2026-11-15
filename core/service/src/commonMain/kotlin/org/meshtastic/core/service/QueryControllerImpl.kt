@@ -23,8 +23,8 @@ import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.PresenceConfig
 
 /**
  * [QueryController] implementation: position, traceroute, telemetry, user info, and metadata "pull" queries.

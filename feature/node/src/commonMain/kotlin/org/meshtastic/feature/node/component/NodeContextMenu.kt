@@ -19,7 +19,6 @@ package org.meshtastic.feature.node.component
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
@@ -60,6 +59,7 @@ import org.meshtastic.core.ui.icon.DeleteNode
 import org.meshtastic.core.ui.icon.DoDisturb
 import org.meshtastic.core.ui.icon.Edit
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.NotFavorite

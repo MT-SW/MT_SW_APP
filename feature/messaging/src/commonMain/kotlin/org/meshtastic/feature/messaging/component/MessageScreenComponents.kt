@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
@@ -44,7 +43,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
@@ -113,6 +111,7 @@ import org.meshtastic.core.resources.translation_download_message
 import org.meshtastic.core.resources.translation_download_title
 import org.meshtastic.core.resources.translation_downloading
 import org.meshtastic.core.resources.unknown
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.NodeKeyStatusIcon
@@ -127,6 +126,7 @@ import org.meshtastic.core.ui.icon.Copy
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.FilterListOff
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowUp
 import org.meshtastic.core.ui.icon.MeshtasticIcons

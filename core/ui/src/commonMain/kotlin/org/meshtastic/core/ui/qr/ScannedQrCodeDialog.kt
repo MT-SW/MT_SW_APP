@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -77,6 +76,7 @@ import org.meshtastic.core.resources.schema_lora_region
 import org.meshtastic.core.resources.schema_lora_use_preset
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.component.ChannelSelection
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.getChannelPreviewForAdd
 import org.meshtastic.proto.ChannelSet

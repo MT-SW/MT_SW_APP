@@ -23,9 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.icon.Icon
 
 @Composable
 fun NodeActionButton(

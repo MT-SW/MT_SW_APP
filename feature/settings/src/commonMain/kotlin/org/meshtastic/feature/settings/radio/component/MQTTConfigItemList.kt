@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -102,6 +101,7 @@ import org.meshtastic.core.resources.schema_mqtt_tls_enabled
 import org.meshtastic.core.resources.schema_mqtt_username
 import org.meshtastic.core.resources.schema_mqtt_username_description
 import org.meshtastic.core.resources.tls_enabled_public_broker_summary
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.EditPasswordPreference
 import org.meshtastic.core.ui.component.EditTextPreference
 import org.meshtastic.core.ui.component.SwitchPreference

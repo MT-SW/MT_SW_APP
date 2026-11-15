@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.appfunctions
 
 import androidx.compose.foundation.layout.Column
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -50,9 +48,11 @@ import org.meshtastic.core.resources.app_functions_read_section
 import org.meshtastic.core.resources.app_functions_send_message
 import org.meshtastic.core.resources.app_functions_settings
 import org.meshtastic.core.resources.app_functions_write_section
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SettingsRemote
 import org.meshtastic.core.ui.theme.AppTheme

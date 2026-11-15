@@ -51,11 +51,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -182,7 +180,9 @@ import org.meshtastic.core.resources.terrain_horizon_saving
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera

@@ -26,7 +26,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -48,6 +47,7 @@ import org.meshtastic.core.resources.add_network_device
 import org.meshtastic.core.resources.address
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.ip_port
+import org.meshtastic.core.ui.component.Button
 
 /** Sheet for manually adding a TCP device by IP address and port. */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -27,8 +27,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.FilledTonalButton
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,10 +52,12 @@ import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.node_show_on_map
 import org.meshtastic.core.resources.open_compass
 import org.meshtastic.core.resources.planner_title
+import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Compass
 import org.meshtastic.core.ui.icon.Distance
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.LocalInlineMapProvider

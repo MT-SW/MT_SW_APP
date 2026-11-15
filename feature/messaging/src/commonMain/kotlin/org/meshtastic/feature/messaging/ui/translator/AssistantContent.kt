@@ -42,11 +42,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
@@ -123,6 +121,8 @@ import org.meshtastic.core.resources.resend
 import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isDesktopPlatform

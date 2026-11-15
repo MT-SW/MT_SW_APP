@@ -23,21 +23,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -139,18 +135,22 @@ import org.meshtastic.core.resources.unmute
 import org.meshtastic.core.resources.unmute_selected
 import org.meshtastic.core.resources.unpin_selected
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.smartScrollToTop
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.icon.FilterList
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Keep
 import org.meshtastic.core.ui.icon.MarkChatRead
@@ -640,54 +640,54 @@ private fun ContactListView(
 
     // A channel's description is shown in the list exactly when it was set in the channel's settings.
     CompositionLocalProvider(LocalChannelDescriptions provides channelDescriptions) {
-    Box(modifier = modifier.fillMaxSize()) {
-        // The list runs under the floating bar (shows through its glass) and ends above it.
-        FloatingBarUnderlap()
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
-            contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
-        ) {
-            contactSection(
-                section = ContactSection.CHANNELS,
-                title = channelsTitle,
-                sectionContacts = channelContacts,
-                collapsed = ContactSection.CHANNELS.key in collapsedSections,
-                onToggleCollapse = onToggleSectionCollapse,
-                selectedList = selectedList,
-                activeContactKey = activeContactKey,
-                onClick = onClick,
-                onLongClick = onLongClick,
-                onNodeChipClick = onNodeChipClick,
-                onSwipeMute = onSwipeMute,
-                onSwipeDelete = onSwipeDelete,
-                channels = channels,
-                haptic = haptic,
-            )
+        Box(modifier = modifier.fillMaxSize()) {
+            // The list runs under the floating bar (shows through its glass) and ends above it.
+            FloatingBarUnderlap()
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+            ) {
+                contactSection(
+                    section = ContactSection.CHANNELS,
+                    title = channelsTitle,
+                    sectionContacts = channelContacts,
+                    collapsed = ContactSection.CHANNELS.key in collapsedSections,
+                    onToggleCollapse = onToggleSectionCollapse,
+                    selectedList = selectedList,
+                    activeContactKey = activeContactKey,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    onNodeChipClick = onNodeChipClick,
+                    onSwipeMute = onSwipeMute,
+                    onSwipeDelete = onSwipeDelete,
+                    channels = channels,
+                    haptic = haptic,
+                )
 
-            contactSection(
-                section = ContactSection.DIRECT_MESSAGES,
-                title = dmTitle,
-                sectionContacts = dmContacts,
-                collapsed = ContactSection.DIRECT_MESSAGES.key in collapsedSections,
-                onToggleCollapse = onToggleSectionCollapse,
-                selectedList = selectedList,
-                activeContactKey = activeContactKey,
-                onClick = onClick,
-                onLongClick = onLongClick,
-                onNodeChipClick = onNodeChipClick,
-                onSwipeMute = onSwipeMute,
-                onSwipeDelete = onSwipeDelete,
-                channels = channels,
-                haptic = haptic,
+                contactSection(
+                    section = ContactSection.DIRECT_MESSAGES,
+                    title = dmTitle,
+                    sectionContacts = dmContacts,
+                    collapsed = ContactSection.DIRECT_MESSAGES.key in collapsedSections,
+                    onToggleCollapse = onToggleSectionCollapse,
+                    selectedList = selectedList,
+                    activeContactKey = activeContactKey,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    onNodeChipClick = onNodeChipClick,
+                    onSwipeMute = onSwipeMute,
+                    onSwipeDelete = onSwipeDelete,
+                    channels = channels,
+                    haptic = haptic,
+                )
+            }
+            FastScrollSidebar(
+                listState = listState,
+                itemCount = contacts.size,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
             )
         }
-        FastScrollSidebar(
-            listState = listState,
-            itemCount = contacts.size,
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-        )
-    }
     }
 }
 

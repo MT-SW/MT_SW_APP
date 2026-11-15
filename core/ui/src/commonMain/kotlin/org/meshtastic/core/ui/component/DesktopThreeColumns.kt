@@ -126,12 +126,19 @@ internal class ThreeColumnWidths {
         /** The conversations list is narrow so the messages beside it are wide; also used by the tablet layout. */
         const val CHAT_LIST_SHARE = 0.36f
 
-        /** The width the side bar used to take: the conversations list gets it now that the bar floats at the bottom. */
+        /**
+         * The width the side bar used to take: the conversations list gets it now that the bar floats at the bottom.
+         */
         const val CHAT_LIST_EXTRA_DP = 80f
 
-        /** The share of the conversations list for a window [windowWidthDp] wide: the usual one plus the old side bar. */
-        fun chatListShare(windowWidthDp: Float): Float =
-            if (windowWidthDp > 0f) (CHAT_LIST_SHARE + CHAT_LIST_EXTRA_DP / windowWidthDp).coerceAtMost(MAX_CHAT_LIST_SHARE) else CHAT_LIST_SHARE
+        /**
+         * The share of the conversations list for a window [windowWidthDp] wide: the usual one plus the old side bar.
+         */
+        fun chatListShare(windowWidthDp: Float): Float = if (windowWidthDp > 0f) {
+            (CHAT_LIST_SHARE + CHAT_LIST_EXTRA_DP / windowWidthDp).coerceAtMost(MAX_CHAT_LIST_SHARE)
+        } else {
+            CHAT_LIST_SHARE
+        }
 
         private const val MAX_CHAT_LIST_SHARE = 0.5f
         const val DEFAULT_DETAIL_EXTRA_SHARE = 0.5f
@@ -258,7 +265,8 @@ private fun Columns(
     // The conversations list beside an open conversation: the floating bar moves under it (see FloatingBarState).
     val bar = LocalFloatingBar.current
     val usablePx = (totalPx - dividerPx * dividerCount).coerceAtLeast(0)
-    val barSidePx = if (narrowList && usablePx > 0) (usablePx * widths.chatListDetailShare).toInt().coerceIn(0, usablePx) else 0
+    val barSidePx =
+        if (narrowList && usablePx > 0) (usablePx * widths.chatListDetailShare).toInt().coerceIn(0, usablePx) else 0
     SideEffect { bar?.sideWidthPx = barSidePx }
     DisposableEffect(bar) { onDispose { bar?.sideWidthPx = 0 } }
     // A plain Layout, not BoxWithConstraints: that one composes its content late (during layout), and while the window

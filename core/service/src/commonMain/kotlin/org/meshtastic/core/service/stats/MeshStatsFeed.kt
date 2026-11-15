@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ReturnCount")
+
 package org.meshtastic.core.service.stats
 
 import kotlinx.coroutines.FlowPreview
@@ -23,20 +25,20 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.effectiveLongName
-import org.meshtastic.core.model.util.LocalStatsExtended
-import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.NodePresence
 import org.meshtastic.core.model.NodePresenceState
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.repository.LiveUpdateMode
-import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.LiveUpdatePrefs
+import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.ServiceRepository
@@ -241,8 +243,7 @@ class MeshStatsFeed(
         if (activity.byNum.isEmpty()) return null
         val now = nowMillis
         return nodes.nodeDBbyNum.value.values.count { node ->
-            activity.byNum[node.num]?.effective(now, node.lastHeard, activity.expiryMillis) ==
-                NodePresenceState.ONLINE
+            activity.byNum[node.num]?.effective(now, node.lastHeard, activity.expiryMillis) == NodePresenceState.ONLINE
         }
     }
 

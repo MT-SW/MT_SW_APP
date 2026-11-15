@@ -39,13 +39,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -123,7 +118,11 @@ import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.resources.unknown_device
 import org.meshtastic.core.resources.wifi_unavailable
 import org.meshtastic.core.ui.component.AdaptiveTwoPane
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
@@ -133,6 +132,7 @@ import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CellTower
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
@@ -465,10 +465,9 @@ fun ConnectionsScreen(
     val rawFirmwareVersion = ourNode?.metadata?.firmware_version?.takeIf { it.isNotBlank() }
     val firmwareVersion by
         produceState<String?>(null, rawFirmwareVersion, resourceEnvironment) {
-            value =
-                rawFirmwareVersion?.let {
-                    getStringSuspend(resourceEnvironment, Res.string.firmware_version, it.shortFirmwareVersion())
-                }
+            value = rawFirmwareVersion?.let {
+                getStringSuspend(resourceEnvironment, Res.string.firmware_version, it.shortFirmwareVersion())
+            }
         }
     val lora = localConfig.lora
     val loraSummaryText by

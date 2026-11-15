@@ -21,6 +21,7 @@ package org.meshtastic.feature.node.metrics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,7 +30,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +57,6 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -80,6 +79,7 @@ import org.meshtastic.core.resources.device_metrics_voltage_value
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.voltage
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MaterialBatteryInfo
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.GraphColors.Cyan

@@ -55,7 +55,6 @@ import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.prefs.ui.UiPrefsDefaults
-import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PlatformAnalytics
@@ -67,6 +66,7 @@ import org.meshtastic.core.resources.discovery_interrupted_scan_restored
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.service.AndroidSosAlarmFeedback
 import org.meshtastic.core.service.worker.MeshLogCleanupWorker
+import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.feature.discovery.DiscoveryScanEngine
 import org.meshtastic.feature.widget.MeshStatusWidgetReceiver
 import kotlin.time.Duration.Companion.hours

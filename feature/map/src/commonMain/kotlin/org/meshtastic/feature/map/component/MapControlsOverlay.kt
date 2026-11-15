@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("CompositionLocalAllowlist")
-
+@file:Suppress("CompositionLocalAllowlist", "LongMethod")
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Box
-import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
-import org.meshtastic.core.ui.theme.rememberUiOptions
-import org.meshtastic.core.ui.component.StyledSurface
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.model.ElementLook
-import androidx.compose.ui.graphics.Color
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -36,11 +28,15 @@ import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter
 import org.meshtastic.core.resources.mesh_hud_open
@@ -48,6 +44,8 @@ import org.meshtastic.core.resources.orient_north
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.resources.toggle_my_position
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
+import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.LocationDisabled
@@ -60,6 +58,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.theme.monochromeLayer
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /**
  * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so
@@ -124,70 +123,71 @@ fun MapControlsOverlay(
                 FloatingToolbarDefaults.standardFloatingToolbarColors()
             },
         ) {
-        // Compass
-        CompassButton(onClick = onCompassClick, bearing = bearing, isFollowing = followPhoneBearing)
+            // Compass
+            CompassButton(onClick = onCompassClick, bearing = bearing, isFollowing = followPhoneBearing)
 
-        // Filter button + dropdown (optional)
-        onToggleFilterMenu?.let { onClick ->
-            Box {
-                BadgedBox(badge = { if (filtersActive) Badge() }) {
-                    MapButton(
-                        icon = MeshtasticIcons.Tune,
-                        contentDescription = stringResource(Res.string.map_filter),
-                        onClick = onClick,
-                    )
+            // Filter button + dropdown (optional)
+            onToggleFilterMenu?.let { onClick ->
+                Box {
+                    BadgedBox(badge = { if (filtersActive) Badge() }) {
+                        MapButton(
+                            icon = MeshtasticIcons.Tune,
+                            contentDescription = stringResource(Res.string.map_filter),
+                            onClick = onClick,
+                        )
+                    }
+                    filterDropdownContent()
                 }
-                filterDropdownContent()
             }
-        }
 
-        // Map type selector (flavor-specific)
-        mapTypeContent()
+            // Map type selector (flavor-specific)
+            mapTypeContent()
 
-        // Layers button (flavor-specific)
-        layersContent()
+            // Layers button (flavor-specific)
+            layersContent()
 
-        // MT_SW Planner (optional)
-        onPlannerClick?.let { onClick ->
-            MapButton(
-                icon = MeshtasticIcons.CellTower,
-                contentDescription = stringResource(Res.string.planner_title),
-                onClick = onClick,
-            )
-        }
-
-        // The mesh view (terrain panorama first, camera second), next to the planner (optional)
-        LocalOpenMeshHud.current?.let { onClick ->
-            MapButton(
-                icon = MeshtasticIcons.CenterFocusStrong,
-                contentDescription = stringResource(Res.string.mesh_hud_open),
-                onClick = onClick,
-            )
-        }
-
-        // Refresh button (optional)
-        if (showRefresh) {
-            if (isRefreshing) {
-                Box(modifier = Modifier.padding(8.dp)) {
-                    CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
-                }
-            } else {
+            // MT_SW Planner (optional)
+            onPlannerClick?.let { onClick ->
                 MapButton(
-                    icon = MeshtasticIcons.Refresh,
-                    contentDescription = stringResource(Res.string.refresh),
-                    onClick = onRefresh,
+                    icon = MeshtasticIcons.CellTower,
+                    contentDescription = stringResource(Res.string.planner_title),
+                    onClick = onClick,
                 )
             }
-        }
 
-        // Location tracking button (optional)
-        onToggleLocationTracking?.let { onClick ->
-            MapButton(
-                icon = if (isLocationTrackingEnabled) MeshtasticIcons.LocationDisabled else MeshtasticIcons.MyLocation,
-                contentDescription = stringResource(Res.string.toggle_my_position),
-                onClick = onClick,
-            )
-        }
+            // The mesh view (terrain panorama first, camera second), next to the planner (optional)
+            LocalOpenMeshHud.current?.let { onClick ->
+                MapButton(
+                    icon = MeshtasticIcons.CenterFocusStrong,
+                    contentDescription = stringResource(Res.string.mesh_hud_open),
+                    onClick = onClick,
+                )
+            }
+
+            // Refresh button (optional)
+            if (showRefresh) {
+                if (isRefreshing) {
+                    Box(modifier = Modifier.padding(8.dp)) {
+                        CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+                    }
+                } else {
+                    MapButton(
+                        icon = MeshtasticIcons.Refresh,
+                        contentDescription = stringResource(Res.string.refresh),
+                        onClick = onRefresh,
+                    )
+                }
+            }
+
+            // Location tracking button (optional)
+            onToggleLocationTracking?.let { onClick ->
+                MapButton(
+                    icon =
+                    if (isLocationTrackingEnabled) MeshtasticIcons.LocationDisabled else MeshtasticIcons.MyLocation,
+                    contentDescription = stringResource(Res.string.toggle_my_position),
+                    onClick = onClick,
+                )
+            }
         }
     }
     if (plain) {

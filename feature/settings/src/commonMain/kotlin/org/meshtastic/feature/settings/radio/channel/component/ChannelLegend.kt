@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +57,7 @@ import org.meshtastic.core.resources.security_icon_help_dismiss
 import org.meshtastic.core.resources.uplink_enabled
 import org.meshtastic.core.resources.uplink_feature_description
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 

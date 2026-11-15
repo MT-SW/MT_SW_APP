@@ -22,8 +22,8 @@ import org.meshtastic.core.model.NodePresence
 
 /**
  * MT_SW: the last activity status of the nodes (see `NodePresence`), provided once at the app root (see
- * MeshtasticAppShell). The provided value is the **State holder**, not the map: its reference is stable, so providing it
- * costs no recomposition, and only the small status badge of a node reads it. Null (previews, tests) shows nothing.
+ * MeshtasticAppShell). The provided value is the **State holder**, not the map: its reference is stable, so providing
+ * it costs no recomposition, and only the small status badge of a node reads it. Null (previews, tests) shows nothing.
  */
 @Suppress("CompositionLocalAllowlist")
 val LocalNodePresence = compositionLocalOf<State<Map<Int, NodePresence>>?> { null }

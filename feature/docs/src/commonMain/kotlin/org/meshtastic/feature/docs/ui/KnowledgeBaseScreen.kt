@@ -19,8 +19,6 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.clickable
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -30,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -58,6 +55,9 @@ import org.meshtastic.core.resources.kb_tier_main
 import org.meshtastic.core.resources.kb_tier_offtop
 import org.meshtastic.core.resources.kb_tier_related
 import org.meshtastic.core.resources.kb_title
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.feature.docs.data.KbEntry
 import org.meshtastic.feature.docs.data.KbTier
@@ -97,7 +97,13 @@ fun KnowledgeBaseScreen(onBack: () -> Unit) {
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding).fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+            contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp + LocalFloatingBarInset.current,
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {

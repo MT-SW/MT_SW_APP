@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CompositionLocalAllowlist")
+
 package org.meshtastic.feature.messaging.ui.contact
 
 import androidx.compose.animation.AnimatedVisibility
@@ -33,9 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,23 +57,25 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.model.Contact
 import org.meshtastic.core.model.ContactKey
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.util.descriptionKey
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archived_channel
 import org.meshtastic.core.resources.contact_draft_prefix
 import org.meshtastic.core.resources.contact_pinned
-import org.meshtastic.core.model.ElementLook
-import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.pressSpring
-import org.meshtastic.core.ui.theme.rememberUiOptions
-import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Keep
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.proto.ChannelSet
 
 /**
@@ -117,7 +119,9 @@ fun ContactItem(
         when {
             isOutlined && withDepth ->
                 CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+
             isOutlined -> CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
+
             else -> {
                 val containerColor = if (selected) Color.Gray else MaterialTheme.colorScheme.surfaceVariant
                 CardDefaults.cardColors(containerColor = containerColor.copy(alpha = fade))
@@ -148,9 +152,10 @@ fun ContactItem(
             ContactHeader(contact = contact, channels = channels, onNodeChipClick = onNodeChipClick)
 
             val descriptions = LocalChannelDescriptions.current
-            val description = remember(contact, channels, descriptions) {
-                contact.channelDescription(channels, descriptions)
-            }
+            val description =
+                remember(contact, channels, descriptions) {
+                    contact.channelDescription(channels, descriptions)
+                }
             ChatMetadata(modifier = Modifier.padding(top = 4.dp), contact = contact, description = description)
         }
     }

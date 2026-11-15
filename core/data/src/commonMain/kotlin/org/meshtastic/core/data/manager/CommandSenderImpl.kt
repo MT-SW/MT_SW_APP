@@ -67,7 +67,6 @@ import org.meshtastic.proto.HostMetrics
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.LockdownAuth
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Neighbor
@@ -78,6 +77,7 @@ import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.PowerMetrics
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.Telemetry
 import org.meshtastic.proto.ToRadio
 import kotlin.math.absoluteValue

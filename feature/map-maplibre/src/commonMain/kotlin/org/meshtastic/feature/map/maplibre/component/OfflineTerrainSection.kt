@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -55,7 +53,9 @@ import org.meshtastic.core.resources.offline_terrain_cache_detail
 import org.meshtastic.core.resources.offline_terrain_empty
 import org.meshtastic.core.resources.offline_terrain_manager
 import org.meshtastic.core.resources.offline_terrain_regional_detail
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.maplibre.terrain.OfflineTerrainRegion
 import org.meshtastic.feature.map.maplibre.terrain.OfflineTerrainRepository

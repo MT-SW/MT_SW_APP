@@ -33,7 +33,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -78,6 +77,7 @@ import org.meshtastic.core.resources.security_icon_insecure_no_precise
 import org.meshtastic.core.resources.security_icon_insecure_precise_only
 import org.meshtastic.core.resources.security_icon_secure
 import org.meshtastic.core.resources.security_icon_warning_precise_mqtt
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected

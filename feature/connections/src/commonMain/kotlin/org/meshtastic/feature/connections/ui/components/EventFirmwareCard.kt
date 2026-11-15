@@ -24,8 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,9 +41,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.EventFirmwareEdition
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.event_firmware_running
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.EventInfoSheet
 import org.meshtastic.core.ui.component.EventPaletteStrip
 import org.meshtastic.core.ui.icon.ChevronRight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.EventBrandingIcon
 import org.meshtastic.core.ui.util.brandPalette

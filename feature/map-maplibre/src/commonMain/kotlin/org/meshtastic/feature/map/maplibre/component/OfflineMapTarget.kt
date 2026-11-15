@@ -24,8 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -72,7 +70,9 @@ import org.meshtastic.core.resources.map_tile_download_estimate
 import org.meshtastic.core.resources.map_tile_limit_reached
 import org.meshtastic.core.resources.map_zoom_levels
 import org.meshtastic.core.resources.offline_maps_empty
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.feature.map.layers.mapLayerFileSystem

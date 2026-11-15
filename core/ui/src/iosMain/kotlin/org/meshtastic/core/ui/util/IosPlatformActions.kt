@@ -27,8 +27,8 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import org.jetbrains.compose.resources.StringResource
-import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.resources.getStringSuspend
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSData
@@ -220,7 +220,9 @@ internal fun showToastNow(text: String) {
 @Composable actual fun rememberShowToast(): suspend (String) -> Unit = { text -> showToastNow(text) }
 
 @Composable
-actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { res -> showToastNow(getStringSuspend(res)) }
+actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { res ->
+    showToastNow(getStringSuspend(res))
+}
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Composable

@@ -56,7 +56,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import org.meshtastic.core.resources.getStringSuspend
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.state.LaunchOptions
@@ -67,6 +66,7 @@ import org.meshtastic.core.model.WhatsNewRequest
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.whats_new_all
 import org.meshtastic.core.resources.whats_new_changelog
 import org.meshtastic.core.resources.whats_new_empty

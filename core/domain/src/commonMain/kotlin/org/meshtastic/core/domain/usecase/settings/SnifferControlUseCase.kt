@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.MeshLog
@@ -35,6 +33,8 @@ import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemand
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.PresenceConfig
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Use case for the Sniffer module's enable/disable/state protocol.
@@ -170,8 +170,8 @@ open class SnifferControlUseCase(
 
     /**
      * Asks [destNum] for its activity status, but first for its firmware version unless that is already known: a node
-     * older than [MIN_FW_PLUS_VERSION_FOR_PRESENCE] (or one that never tells its version) is not sent the status
-     * query. The answer arrives as RESPONSE_PRESENCE in the log.
+     * older than [MIN_FW_PLUS_VERSION_FOR_PRESENCE] (or one that never tells its version) is not sent the status query.
+     * The answer arrives as RESPONSE_PRESENCE in the log.
      */
     open suspend fun requestPresenceChecked(destNum: Int, forceVersionCheck: Boolean = false): Boolean {
         val known = fwPlusVersionStampedFlow(destNum).first()
@@ -185,7 +185,9 @@ open class SnifferControlUseCase(
             requestFwPlusVersion(destNum)
             val fresh =
                 withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
-                    fwPlusVersionStampedFlow(destNum).filterNotNull().first { known == null || it.second > known.second }
+                    fwPlusVersionStampedFlow(destNum).filterNotNull().first {
+                        known == null || it.second > known.second
+                    }
                 }
             version = fresh?.first ?: version
         }

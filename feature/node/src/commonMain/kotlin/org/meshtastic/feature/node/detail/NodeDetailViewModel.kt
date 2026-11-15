@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
-import org.meshtastic.core.resources.getStringSuspend
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
@@ -69,6 +68,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
 import org.meshtastic.core.resources.delivery_confirmed
+import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.gpio_off
 import org.meshtastic.core.resources.gpio_on
 import org.meshtastic.core.resources.gpio_read_result

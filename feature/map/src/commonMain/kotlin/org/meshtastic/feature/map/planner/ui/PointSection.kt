@@ -38,7 +38,6 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -98,6 +97,7 @@ import org.meshtastic.core.resources.planner_source_tap_map
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_unit_m_asl
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MyLocation

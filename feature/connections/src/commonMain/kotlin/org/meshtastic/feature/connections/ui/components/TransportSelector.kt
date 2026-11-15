@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -46,14 +45,15 @@ import org.meshtastic.core.resources.bluetooth
 import org.meshtastic.core.resources.network
 import org.meshtastic.core.resources.usb
 import org.meshtastic.core.ui.icon.Bluetooth
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
 
 /**
  * Single-choice transport selector rendered below the connection card. A Material 3 [SingleChoiceSegmentedButtonRow]
- * makes the mutually-exclusive choice explicit: the segments read as one grouped control and the selected transport
- * is marked by a fill, rather than three independent chips whose filled state was read as "enabled/available" instead of
+ * makes the mutually-exclusive choice explicit: the segments read as one grouped control and the selected transport is
+ * marked by a fill, rather than three independent chips whose filled state was read as "enabled/available" instead of
  * "selected".
  *
  * @param showBluetooth false on hardware with no Bluetooth LE, where the BLE segment could never find anything.
@@ -159,7 +159,8 @@ private fun SingleChoiceSegmentedButtonRowScope.TransportSegment(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        modifier = Modifier.size(SegmentedButtonDefaults.IconSize).testTag("$TRANSPORT_ICON_TAG:$label"),
+                        modifier =
+                        Modifier.size(SegmentedButtonDefaults.IconSize).testTag("$TRANSPORT_ICON_TAG:$label"),
                     )
                 }
             }

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +43,7 @@ import org.meshtastic.core.resources.external_power_short
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.BatteryUnknown
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PowerSupply
 import org.meshtastic.core.ui.theme.AppTheme

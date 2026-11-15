@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import org.meshtastic.core.resources.delete
 import org.meshtastic.core.ui.component.ChannelItem
 import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.Config

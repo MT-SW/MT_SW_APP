@@ -24,8 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.maplibre.compose.map.MapState
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.feature.map.component.MapZoomControls
 import org.meshtastic.feature.map.maplibre.ZOOM_STEP
 import org.meshtastic.feature.map.maplibre.style.Basemap
@@ -36,8 +36,8 @@ import org.meshtastic.feature.map.maplibre.zoomBy
 private const val ZOOM_INSET = 8
 
 /**
- * Lift above the credit strip (up to three lines) and the attribution button, which share this corner; the propagation legend is lifted by the same amount. More than the
- * cards need on the other side, where only the 23dp wordmark sits.
+ * Lift above the credit strip (up to three lines) and the attribution button, which share this corner; the propagation
+ * legend is lifted by the same amount. More than the cards need on the other side, where only the 23dp wordmark sits.
  *
  * The button is there either way — the small maps only collapse its credit, see [CollapsedAttributionOrnaments] — so
  * this clears it whether it is expanded or not.
@@ -51,8 +51,9 @@ internal const val ZOOM_BOTTOM_INSET = 88
  * extension because the placement is the point: a caller that had to align it itself would eventually align it
  * somewhere else.
  *
- * [centered] is for a map too short for the lifted corner (see [MapZoom] callers). Lifted clear of the wordmark and attribution button along the bottom edge, which every map shows. See
- * [meshMapOrnaments] for why the main map carries the credit outright and the small maps behind the button.
+ * [centered] is for a map too short for the lifted corner (see [MapZoom] callers). Lifted clear of the wordmark and
+ * attribution button along the bottom edge, which every map shows. See [meshMapOrnaments] for why the main map carries
+ * the credit outright and the small maps behind the button.
  */
 @Composable
 internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Boolean = false) {
@@ -65,7 +66,8 @@ internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Bo
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
         modifier =
         if (centered) {
-            // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair in the middle of the
+            // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair in the
+            // middle of the
             // trailing edge: small enough to clear the scale (top corner) and the credit button (bottom corner).
             Modifier.align(Alignment.CenterEnd).padding(end = ZOOM_INSET.dp)
         } else {

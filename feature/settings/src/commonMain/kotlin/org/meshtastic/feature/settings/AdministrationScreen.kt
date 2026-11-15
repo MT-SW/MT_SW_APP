@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +47,9 @@ import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.preserve_favorites
 import org.meshtastic.core.resources.reboot_into_dfu_warning
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.radio.AdminRoute
@@ -82,7 +82,8 @@ fun AdministrationScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
             val scrollState = rememberScrollState()
             Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
                 Column(
-                    modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
+                    modifier =
+                    Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     ExpressiveSection(

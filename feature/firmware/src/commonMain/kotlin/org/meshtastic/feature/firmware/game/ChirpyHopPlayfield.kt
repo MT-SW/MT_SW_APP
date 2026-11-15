@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -75,6 +74,7 @@ import org.meshtastic.core.resources.img_chirpy_hop_run_5
 import org.meshtastic.core.resources.img_chirpy_hop_run_6
 import org.meshtastic.core.resources.img_chirpy_hop_run_7
 import org.meshtastic.core.resources.img_chirpy_hop_run_8
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 

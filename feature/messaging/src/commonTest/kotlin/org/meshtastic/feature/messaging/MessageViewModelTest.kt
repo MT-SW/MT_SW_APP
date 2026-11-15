@@ -37,7 +37,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
-import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.ContactSettings
 import org.meshtastic.core.repository.ActiveConversationTracker

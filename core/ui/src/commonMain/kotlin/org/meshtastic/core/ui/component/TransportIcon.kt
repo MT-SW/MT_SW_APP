@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.ui.component
 
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import org.meshtastic.core.resources.transport_udp
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.Api
 import org.meshtastic.core.ui.icon.Device
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MqttConnected
 import org.meshtastic.core.ui.icon.Udp

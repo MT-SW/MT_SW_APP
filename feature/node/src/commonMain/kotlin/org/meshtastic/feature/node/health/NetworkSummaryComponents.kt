@@ -34,9 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +52,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 private const val GROW_MILLIS = 800

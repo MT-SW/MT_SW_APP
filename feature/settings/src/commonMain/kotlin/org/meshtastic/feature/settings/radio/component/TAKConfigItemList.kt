@@ -27,11 +27,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -114,6 +112,7 @@ import org.meshtastic.core.takserver.TakCertificateProvider
 import org.meshtastic.core.takserver.TakMeshTestRunner
 import org.meshtastic.core.takserver.TakProtocol
 import org.meshtastic.core.takserver.TakTestResult
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.component.SosBarAction
@@ -121,6 +120,7 @@ import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.icon.Refresh

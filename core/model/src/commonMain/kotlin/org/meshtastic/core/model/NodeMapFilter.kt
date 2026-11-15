@@ -34,7 +34,9 @@ data class NodeMapFilter(
     val excludeMqtt: Boolean = false,
     val lastHeardSeconds: Long = 0,
     val onlySigned: Boolean = false,
-    /** MT_SW: show only nodes that report someone is at them (the numbers come with the call, see [passesMapFilter]). */
+    /**
+     * MT_SW: show only nodes that report someone is at them (the numbers come with the call, see [passesMapFilter]).
+     */
     val onlyActive: Boolean = false,
     val onlyEncrypted: Boolean = false,
     /** Furthest hop count shown (0 = direct only); [MAP_FILTER_NO_HOP_LIMIT] means no limit. */

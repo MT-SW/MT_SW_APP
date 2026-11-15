@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +65,7 @@ import org.meshtastic.core.resources.mirror_key_left
 import org.meshtastic.core.resources.mirror_key_ok
 import org.meshtastic.core.resources.mirror_key_right
 import org.meshtastic.core.resources.mirror_key_up
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowLeft
 import org.meshtastic.core.ui.icon.KeyboardArrowRight

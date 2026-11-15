@@ -43,11 +43,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -84,6 +82,7 @@ import org.meshtastic.core.resources.network_health_info_title
 import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
@@ -91,6 +90,7 @@ import org.meshtastic.core.ui.icon.DataUsage
 import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.FilterAlt
 import org.meshtastic.core.ui.icon.FilterAltOff
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowUp
 import org.meshtastic.core.ui.icon.Memory

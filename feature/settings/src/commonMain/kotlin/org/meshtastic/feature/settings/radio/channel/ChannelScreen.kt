@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.radio.channel
 
 import androidx.compose.foundation.border
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,11 +30,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -86,14 +81,19 @@ import org.meshtastic.core.resources.share_channels_add_hint
 import org.meshtastic.core.resources.share_channels_replace_hint
 import org.meshtastic.core.resources.share_channels_subject
 import org.meshtastic.core.ui.component.AdaptiveTwoPane
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.ChannelSelection
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.PreferenceFooter
 import org.meshtastic.core.ui.component.QrDialog
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ChevronRight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.qr.ScannedQrCodeDialog
@@ -286,7 +286,8 @@ fun ChannelScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+            contentPadding =
+            PaddingValues(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp + LocalFloatingBarInset.current),
         ) {
             item {
                 ChannelListView(

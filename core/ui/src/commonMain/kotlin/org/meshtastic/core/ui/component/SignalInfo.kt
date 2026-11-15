@@ -19,7 +19,6 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +41,7 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset

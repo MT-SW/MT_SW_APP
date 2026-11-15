@@ -28,10 +28,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -70,9 +68,11 @@ import org.meshtastic.core.resources.scanning_network
 import org.meshtastic.core.resources.usb
 import org.meshtastic.core.resources.usb_blocked_hint
 import org.meshtastic.core.resources.usb_blocked_title
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.icon.Usb
@@ -269,9 +269,14 @@ private fun LazyListScope.usbSection(
     if (usbDevices.isEmpty()) {
         item(key = "empty:usb", contentType = "empty") {
             SectionEmptyState(
-                text = stringResource(if (blockedBySystem) Res.string.usb_blocked_title else Res.string.no_usb_devices_seen),
+                text =
+                stringResource(
+                    if (blockedBySystem) Res.string.usb_blocked_title else Res.string.no_usb_devices_seen,
+                ),
                 supportingText =
-                stringResource(if (blockedBySystem) Res.string.usb_blocked_hint else Res.string.no_usb_devices_hint),
+                stringResource(
+                    if (blockedBySystem) Res.string.usb_blocked_hint else Res.string.no_usb_devices_hint,
+                ),
                 imageVector = MeshtasticIcons.Usb,
             )
         }

@@ -44,8 +44,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
-import org.meshtastic.core.ui.component.floatingBarEndPadding
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.common.di.GOOGLE_SERVICES_AVAILABLE
 import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
@@ -66,8 +64,10 @@ import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.wifi_devices
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.HelpOutline
@@ -85,10 +85,10 @@ import org.meshtastic.feature.settings.component.PersistenceSettingsContent
 import org.meshtastic.feature.settings.component.PrivacySettingsContent
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.uiScaleLabel
 import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 import org.meshtastic.feature.settings.navigation.ConfigRoute

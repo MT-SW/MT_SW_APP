@@ -19,13 +19,13 @@ package org.meshtastic.feature.connections.ui.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.disconnect
+import org.meshtastic.core.ui.component.OutlinedButton
 
 /**
  * Full-width error-tinted [OutlinedButton] used by both the "currently connected" and "connecting" card states.

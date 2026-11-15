@@ -45,12 +45,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.meshtastic.core.resources.getStringSuspend
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.ReportTarget
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.report_done_computer
 import org.meshtastic.core.resources.report_done_phone
 import org.meshtastic.core.resources.report_failed
@@ -134,7 +134,11 @@ fun ReportIssuesDialog(
                         if (!control.sharesFileToApp || !handed) openUrl(target.url())
                         result =
                             if (control.sharesFileToApp && handed) {
-                                getStringSuspend(Res.string.report_done_phone, report.sizeKb.toString(), report.shownPath)
+                                getStringSuspend(
+                                    Res.string.report_done_phone,
+                                    report.sizeKb.toString(),
+                                    report.shownPath,
+                                )
                             } else {
                                 getStringSuspend(
                                     Res.string.report_done_computer,

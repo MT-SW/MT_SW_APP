@@ -30,7 +30,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,6 +66,7 @@ import org.meshtastic.core.resources.coverage_summary
 import org.meshtastic.core.resources.coverage_summary_filtered
 import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.feature.map.component.LayerOpacitySlider
 import org.meshtastic.feature.map.coverage.COVERAGE_LEVELS_DB
 import org.meshtastic.feature.map.coverage.COVERAGE_RANGES_KM

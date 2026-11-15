@@ -31,7 +31,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.planner_pick_banner
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.planner_title_by
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.planner.state.PlannerNodeOption
 import org.meshtastic.feature.map.planner.state.PlannerSide

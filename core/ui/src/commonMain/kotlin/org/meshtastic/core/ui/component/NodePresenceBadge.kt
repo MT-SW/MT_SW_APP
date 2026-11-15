@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ModifierWithoutDefault", "ReturnCount")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.Canvas
@@ -97,11 +99,13 @@ fun NodePresenceBadge(presence: NodePresence, state: NodePresenceState, modifier
     val tooltip =
         when {
             minutes <= 0 -> shortLabel
+
             minutes < MINUTES_PER_HOUR ->
                 stringResource(
                     if (active) Res.string.presence_active_min else Res.string.presence_inactive_min,
                     minutes,
                 )
+
             else ->
                 stringResource(
                     if (active) Res.string.presence_active_hours else Res.string.presence_inactive_hours,
@@ -125,6 +129,7 @@ fun NodePresenceBadge(presence: NodePresence, state: NodePresenceState, modifier
                     )
                     Dot(active, color, outline, Modifier.size(9.dp).align(Alignment.BottomEnd))
                 }
+
                 UiOptions.PRESENCE_ICON_RING -> {
                     val ringColor = color
                     Canvas(modifier = Modifier.size(18.dp)) {
@@ -143,6 +148,7 @@ fun NodePresenceBadge(presence: NodePresence, state: NodePresenceState, modifier
                         }
                     }
                 }
+
                 else -> Dot(active, color, outline, Modifier.size(12.dp))
             }
         }

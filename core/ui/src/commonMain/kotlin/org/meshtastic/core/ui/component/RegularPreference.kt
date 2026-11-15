@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.assistant.assistantHighlight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.AppTheme
 
 @Composable

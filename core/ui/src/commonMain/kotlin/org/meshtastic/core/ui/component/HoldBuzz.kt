@@ -36,8 +36,8 @@ private const val HOLD_START_MS = 350L
 /**
  * MT_SW: makes the device vibrate strongly and continuously for as long as a finger is held on the element (after a
  * short hold). The vibration stops when the finger is lifted, and also when [active] turns false (for example the
- * moment a message was sent and the button is no longer usable). It does not take over the touch, so the button's
- * own click works as before. It follows the "buzz on hold" option and uses the vibration motor of the platform (see
+ * moment a message was sent and the button is no longer usable). It does not take over the touch, so the button's own
+ * click works as before. It follows the "buzz on hold" option and uses the vibration motor of the platform (see
  * [rememberHoldVibration]); a computer has none, so there it does nothing.
  */
 @Composable
@@ -50,11 +50,10 @@ fun Modifier.holdBuzz(active: Boolean = true): Modifier {
             val scope: CoroutineScope = this
             awaitEachGesture {
                 awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-                val buzz =
-                    scope.launch {
-                        delay(HOLD_START_MS)
-                        vibration.start()
-                    }
+                val buzz = scope.launch {
+                    delay(HOLD_START_MS)
+                    vibration.start()
+                }
                 try {
                     do {
                         val event = awaitPointerEvent(PointerEventPass.Final)

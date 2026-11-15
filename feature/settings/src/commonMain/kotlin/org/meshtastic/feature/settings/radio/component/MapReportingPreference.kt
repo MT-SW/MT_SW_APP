@@ -19,7 +19,6 @@ package org.meshtastic.feature.settings.radio.component
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +51,7 @@ import org.meshtastic.core.resources.schema_mapreportsettings_publish_interval_s
 import org.meshtastic.core.resources.schema_mapreportsettings_should_report_location
 import org.meshtastic.core.resources.schema_mqtt_map_reporting_enabled
 import org.meshtastic.core.resources.schema_mqtt_map_reporting_enabled_description
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.feature.settings.util.FixedUpdateIntervals

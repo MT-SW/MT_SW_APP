@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +36,7 @@ import org.meshtastic.core.resources.back
 import org.meshtastic.core.resources.discovery_map
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.DiscoveryMapNode
 import org.meshtastic.core.ui.util.DiscoveryNeighborType
@@ -76,28 +76,27 @@ fun DiscoveryMapScreen(viewModel: DiscoveryMapViewModel, onNavigateUp: () -> Uni
             return@Scaffold
         }
 
-        val mapNodes =
-            allNodes.mapNotNull { entity ->
-                val lat = entity.latitude ?: return@mapNotNull null
-                val lon = entity.longitude ?: return@mapNotNull null
-                if (lat == 0.0 && lon == 0.0) return@mapNotNull null
-                DiscoveryMapNode(
-                    latitude = lat,
-                    longitude = lon,
-                    shortName = entity.shortName,
-                    longName = entity.longName,
-                    neighborType =
-                    if (entity.neighborType == "direct") {
-                        DiscoveryNeighborType.DIRECT
-                    } else {
-                        DiscoveryNeighborType.MESH
-                    },
-                    snr = entity.snr,
-                    rssi = entity.rssi,
-                    messageCount = entity.messageCount,
-                    sensorPacketCount = entity.sensorPacketCount,
-                )
-            }
+        val mapNodes = allNodes.mapNotNull { entity ->
+            val lat = entity.latitude ?: return@mapNotNull null
+            val lon = entity.longitude ?: return@mapNotNull null
+            if (lat == 0.0 && lon == 0.0) return@mapNotNull null
+            DiscoveryMapNode(
+                latitude = lat,
+                longitude = lon,
+                shortName = entity.shortName,
+                longName = entity.longName,
+                neighborType =
+                if (entity.neighborType == "direct") {
+                    DiscoveryNeighborType.DIRECT
+                } else {
+                    DiscoveryNeighborType.MESH
+                },
+                snr = entity.snr,
+                rssi = entity.rssi,
+                messageCount = entity.messageCount,
+                sensorPacketCount = entity.sensorPacketCount,
+            )
+        }
 
         discoveryMap(
             currentSession.userLatitude,

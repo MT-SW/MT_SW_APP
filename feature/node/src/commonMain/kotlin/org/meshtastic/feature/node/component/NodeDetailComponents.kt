@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +55,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_label_value
 import org.meshtastic.core.resources.copy
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.util.createClipEntry
 
 @Composable

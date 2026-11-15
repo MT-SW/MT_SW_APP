@@ -19,8 +19,6 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
@@ -39,10 +36,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -92,11 +87,16 @@ import org.meshtastic.core.resources.discovery_start_scan_reason_no_presets
 import org.meshtastic.core.resources.discovery_start_scan_reason_not_connected
 import org.meshtastic.core.resources.discovery_stop_scan
 import org.meshtastic.core.resources.mesh_beacon_invitations_title
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.icon.Warning

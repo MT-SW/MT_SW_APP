@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.debugging
 
 import androidx.compose.animation.core.animateFloatAsState
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,10 +31,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -84,14 +80,18 @@ import org.meshtastic.core.resources.debug_tab_device_logs
 import org.meshtastic.core.resources.debug_tab_mirror
 import org.meshtastic.core.resources.debug_tab_packets
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
@@ -255,7 +255,8 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
+                    contentPadding =
+                    androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
                 ) {
                     stickyHeader {
                         val animatedAlpha by

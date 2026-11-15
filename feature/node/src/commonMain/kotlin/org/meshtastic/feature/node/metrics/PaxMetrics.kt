@@ -47,7 +47,6 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.MeshLog
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.pax_wifi_format
 import org.meshtastic.core.resources.pax_wifi_marker
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.wifi_devices
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Purple
 import org.meshtastic.feature.node.domain.usecase.NodeLogSource

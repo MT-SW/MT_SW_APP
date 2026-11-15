@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.ColumnScope
@@ -30,7 +32,6 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ExpandedDockedSearchBar
 import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -58,16 +59,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.navigate_back
-import org.meshtastic.core.model.ElementLook
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Search
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /** Appended to the caller's tag for the field the expanded overlay shows, so a test can target one of the two. */
 const val SEARCH_BAR_EXPANDED_TAG_SUFFIX = "Expanded"
@@ -172,7 +174,9 @@ fun MeshtasticSearchBar(
         inputField = { inputField(inputFieldTag) },
         modifier = barModifier.elementLook(UiOptions.GROUP_SEARCH, SearchBarDefaults.inputFieldShape),
         colors =
-        SearchBarDefaults.colors(containerColor = SearchBarDefaults.colors().containerColor.copy(alpha = searchFade)),
+        SearchBarDefaults.colors(
+            containerColor = SearchBarDefaults.colors().containerColor.copy(alpha = searchFade),
+        ),
     )
 
     val expandedTag = inputFieldTag + SEARCH_BAR_EXPANDED_TAG_SUFFIX

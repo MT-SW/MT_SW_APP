@@ -26,13 +26,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -86,7 +83,10 @@ import org.meshtastic.core.resources.translator_source_label
 import org.meshtastic.core.resources.translator_swap
 import org.meshtastic.core.resources.translator_test_title
 import org.meshtastic.core.resources.translator_to
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation

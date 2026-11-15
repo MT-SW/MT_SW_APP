@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -58,6 +57,7 @@ import org.meshtastic.core.resources.img_hw_unknown
 import org.meshtastic.core.resources.supported
 import org.meshtastic.core.resources.supported_by_community
 import org.meshtastic.core.resources.supported_by_maker
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Verified
 import org.meshtastic.core.ui.icon.ViewInAr

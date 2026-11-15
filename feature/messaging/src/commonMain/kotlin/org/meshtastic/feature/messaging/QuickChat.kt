@@ -17,8 +17,6 @@
 package org.meshtastic.feature.messaging
 
 import androidx.compose.foundation.layout.Box
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,9 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.FloatingActionButton
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -72,6 +68,9 @@ import org.meshtastic.core.resources.quick_chat_edit
 import org.meshtastic.core.resources.quick_chat_instant
 import org.meshtastic.core.resources.quick_chat_new
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SosBarScreen
@@ -82,6 +81,7 @@ import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.DragHandle
 import org.meshtastic.core.ui.icon.Edit
 import org.meshtastic.core.ui.icon.FastForward
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 @Composable
@@ -126,7 +126,13 @@ fun QuickChatScreen(modifier: Modifier = Modifier, viewModel: QuickChatViewModel
             LazyColumn(
                 modifier = Modifier.dragContainer(dragDropState = dragDropState, haptics = LocalHapticFeedback.current),
                 state = listState,
-                contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+                contentPadding =
+                PaddingValues(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp + LocalFloatingBarInset.current,
+                ),
             ) {
                 dragDropItemsIndexed(items = actions, dragDropState = dragDropState, key = { _, item -> item.uuid }) {
                         _,

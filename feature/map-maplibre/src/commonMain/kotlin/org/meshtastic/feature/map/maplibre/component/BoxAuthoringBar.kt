@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +32,8 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.geofence_box_author_hint
 import org.meshtastic.core.resources.geofence_box_use_view
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Card
 
 /**
  * The bar shown while a waypoint's geofence box is being drawn on the map.

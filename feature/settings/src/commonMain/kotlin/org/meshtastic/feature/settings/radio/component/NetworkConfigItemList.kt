@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -77,6 +76,7 @@ import org.meshtastic.core.resources.wifi_config
 import org.meshtastic.core.resources.wifi_ip
 import org.meshtastic.core.resources.wifi_qr_code_error
 import org.meshtastic.core.resources.wifi_qr_code_scan
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditIPv4Preference
 import org.meshtastic.core.ui.component.EditPasswordPreference

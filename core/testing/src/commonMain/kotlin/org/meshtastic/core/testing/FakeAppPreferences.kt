@@ -489,7 +489,6 @@ class FakeUiPrefs : UiPrefs {
         uiOptions.value = uiOptions.value + (key to value)
     }
 
-
     override val translatorEnabled = MutableStateFlow(false)
 
     override fun setTranslatorEnabled(value: Boolean) {

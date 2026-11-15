@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CompositionLocalAllowlist", "MatchingDeclarationName")
+
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.meshtastic.core.model.UiOptions

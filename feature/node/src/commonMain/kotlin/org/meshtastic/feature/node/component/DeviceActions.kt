@@ -23,12 +23,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,10 +46,13 @@ import org.meshtastic.core.resources.mute_notifications
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.share_contact
 import org.meshtastic.core.resources.widget_adaptive_track_in
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.NotFavorite

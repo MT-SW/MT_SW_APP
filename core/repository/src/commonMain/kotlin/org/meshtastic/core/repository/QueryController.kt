@@ -18,8 +18,8 @@ package org.meshtastic.core.repository
 
 import org.meshtastic.core.model.Position
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.PresenceConfig
 
 /**
  * Mesh query operations — position, traceroute, telemetry, user info, and metadata.

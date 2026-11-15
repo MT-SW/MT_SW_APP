@@ -29,10 +29,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +59,9 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.isUnmessageableRole
 import org.meshtastic.core.model.util.toDistanceString
@@ -77,17 +77,16 @@ import org.meshtastic.core.resources.node_not_heard_on_current_lora
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.voltage
-import org.meshtastic.core.model.ElementLook
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.icon.AirUtilization
 import org.meshtastic.core.ui.icon.ChannelUtilization
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MapCompass
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.icon.SignalOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 

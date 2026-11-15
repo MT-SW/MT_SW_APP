@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -75,6 +74,7 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
 import org.meshtastic.core.ui.icon.Icecream
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons

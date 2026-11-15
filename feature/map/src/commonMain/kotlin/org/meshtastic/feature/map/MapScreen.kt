@@ -25,10 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.component.FloatingBarDarker
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map
+import org.meshtastic.core.ui.component.FloatingBarDarker
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.util.LocalMapViewProvider

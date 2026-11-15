@@ -26,10 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -76,9 +73,12 @@ import org.meshtastic.core.resources.widget_adaptive_off_summary
 import org.meshtastic.core.resources.widget_adaptive_title
 import org.meshtastic.core.resources.widget_adaptive_tracking_shown
 import org.meshtastic.core.ui.component.BasicListItem
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.icon
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.Search

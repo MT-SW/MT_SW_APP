@@ -32,8 +32,6 @@
 package org.meshtastic.feature.settings.antenna
 
 import androidx.compose.foundation.Canvas
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -274,9 +272,11 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.AntennaPatternPlot
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import kotlin.math.PI
@@ -451,7 +451,11 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             SetupsSection(

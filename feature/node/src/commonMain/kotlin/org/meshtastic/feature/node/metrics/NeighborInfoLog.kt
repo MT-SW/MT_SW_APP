@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ModifierNotUsedAtRoot")
+
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -25,9 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenu
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -46,11 +45,14 @@ import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.routing_error_no_response
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Groups
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
@@ -59,11 +61,11 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
-import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.component.CooldownIconButton
-import org.meshtastic.feature.node.list.toNeighborReport
-import org.meshtastic.feature.node.list.NeighborReport
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.list.NeighborMapDialog
+import org.meshtastic.feature.node.list.NeighborReport
+import org.meshtastic.feature.node.list.toNeighborReport
 import org.meshtastic.proto.MeshPacket
 
 /**

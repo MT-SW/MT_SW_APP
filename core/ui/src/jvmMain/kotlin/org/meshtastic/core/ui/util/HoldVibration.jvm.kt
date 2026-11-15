@@ -19,8 +19,7 @@ package org.meshtastic.core.ui.util
 import androidx.compose.runtime.Composable
 
 /** A computer has no vibration motor. */
-@Composable
-actual fun rememberHoldVibration(): HoldVibration = NoHoldVibration
+@Composable actual fun rememberHoldVibration(): HoldVibration = NoHoldVibration
 
 private object NoHoldVibration : HoldVibration {
     override fun start() = Unit

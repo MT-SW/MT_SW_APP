@@ -45,8 +45,8 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalMeshActivity
-import org.meshtastic.core.ui.util.LocalNodePresence
 import org.meshtastic.core.ui.util.LocalModemPreset
+import org.meshtastic.core.ui.util.LocalNodePresence
 import org.meshtastic.core.ui.util.LocalNoiseFloor
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.proto.Config

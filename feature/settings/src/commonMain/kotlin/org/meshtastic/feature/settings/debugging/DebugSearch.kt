@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -50,6 +49,7 @@ import org.meshtastic.core.resources.debug_search_next
 import org.meshtastic.core.resources.debug_search_prev
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FileDownload
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowUp
 import org.meshtastic.core.ui.icon.MeshtasticIcons

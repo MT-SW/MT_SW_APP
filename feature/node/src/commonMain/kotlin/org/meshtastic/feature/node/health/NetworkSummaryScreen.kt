@@ -19,8 +19,6 @@
 package org.meshtastic.feature.node.health
 
 import androidx.compose.foundation.background
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -31,11 +29,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -61,7 +57,10 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.coverage_export_all
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -70,6 +69,7 @@ import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.DataUsage
 import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Download
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
@@ -232,7 +232,8 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(contentPadding),
-            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+            contentPadding =
+            PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { SummaryHero(uiState) }

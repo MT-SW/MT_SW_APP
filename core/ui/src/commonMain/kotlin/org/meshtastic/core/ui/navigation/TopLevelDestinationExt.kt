@@ -56,16 +56,20 @@ val TopLevelDestination.icon: DrawableResource
  * MT_SW: the newer tab icons, drawn as an outline when the tab is not open and with a soft fill and a heavier line when
  * it is. The connection tab has no such pair: its icon is animated and shows the state of the connection.
  */
-fun TopLevelDestination.newIcon(selected: Boolean): DrawableResource? =
-    when (this) {
-        TopLevelDestination.Messages -> if (selected) Res.drawable.ic_nav_messages_sel else Res.drawable.ic_nav_messages
-        TopLevelDestination.Nodes -> if (selected) Res.drawable.ic_nav_nodes_sel else Res.drawable.ic_nav_nodes
-        TopLevelDestination.NetworkHealth ->
-            if (selected) Res.drawable.ic_nav_health_sel else Res.drawable.ic_nav_health
-        TopLevelDestination.Translator ->
-            if (selected) Res.drawable.ic_nav_translate_sel else Res.drawable.ic_nav_translate
-        TopLevelDestination.Map -> if (selected) Res.drawable.ic_nav_map_sel else Res.drawable.ic_nav_map
-        TopLevelDestination.Settings ->
-            if (selected) Res.drawable.ic_nav_settings_sel else Res.drawable.ic_nav_settings
-        TopLevelDestination.Connect -> null
-    }
+fun TopLevelDestination.newIcon(selected: Boolean): DrawableResource? = when (this) {
+    TopLevelDestination.Messages -> if (selected) Res.drawable.ic_nav_messages_sel else Res.drawable.ic_nav_messages
+
+    TopLevelDestination.Nodes -> if (selected) Res.drawable.ic_nav_nodes_sel else Res.drawable.ic_nav_nodes
+
+    TopLevelDestination.NetworkHealth ->
+        if (selected) Res.drawable.ic_nav_health_sel else Res.drawable.ic_nav_health
+
+    TopLevelDestination.Translator ->
+        if (selected) Res.drawable.ic_nav_translate_sel else Res.drawable.ic_nav_translate
+
+    TopLevelDestination.Map -> if (selected) Res.drawable.ic_nav_map_sel else Res.drawable.ic_nav_map
+
+    TopLevelDestination.Settings -> if (selected) Res.drawable.ic_nav_settings_sel else Res.drawable.ic_nav_settings
+
+    TopLevelDestination.Connect -> null
+}

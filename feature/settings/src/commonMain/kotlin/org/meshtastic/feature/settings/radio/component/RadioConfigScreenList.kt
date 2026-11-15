@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.animation.AnimatedVisibility
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
@@ -75,6 +73,8 @@ import org.meshtastic.core.resources.discard_changes
 import org.meshtastic.core.resources.save_and_restart
 import org.meshtastic.core.resources.save_changes
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
 import org.meshtastic.core.ui.component.SosBarScreen
@@ -194,7 +194,13 @@ fun <T : Message<T, *>> RadioConfigScreenList(
                             .padding(end = if (isDesktopPlatform) 20.dp else 0.dp)
                             .onGloballyPositioned { highlight.listCoordinates = it },
                         state = listState,
-                        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+                        contentPadding =
+                        PaddingValues(
+                            start = 16.dp,
+                            top = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp + LocalFloatingBarInset.current,
+                        ),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         keyIndex.reset()

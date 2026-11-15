@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.CircularWavyProgressIndicator
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +65,7 @@ import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.BluetoothConnected
 import org.meshtastic.core.ui.icon.BluetoothSearching
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi

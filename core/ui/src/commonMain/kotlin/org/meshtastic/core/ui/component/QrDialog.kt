@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
@@ -69,6 +68,7 @@ import org.meshtastic.core.resources.write_nfc_subtext
 import org.meshtastic.core.resources.write_nfc_success
 import org.meshtastic.core.resources.write_nfc_text
 import org.meshtastic.core.ui.icon.Copy
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Nfc
 import org.meshtastic.core.ui.icon.Share

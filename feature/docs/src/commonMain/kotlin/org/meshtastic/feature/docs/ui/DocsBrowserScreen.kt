@@ -17,8 +17,6 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.clickable
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +28,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -57,8 +54,11 @@ import org.meshtastic.core.resources.doc_section_developer
 import org.meshtastic.core.resources.doc_section_user
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.navigate_back
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPage
@@ -206,7 +206,10 @@ private fun DocsTocList(pages: List<DocPage>, onSelectPage: (String) -> Unit, mo
     val devGuidePages =
         remember(pages) { pages.filter { it.section == DocSection.DeveloperGuide }.sortedBy { it.navOrder } }
 
-    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp + LocalFloatingBarInset.current)) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 16.dp + LocalFloatingBarInset.current),
+    ) {
         if (userGuidePages.isNotEmpty()) {
             item {
                 Text(

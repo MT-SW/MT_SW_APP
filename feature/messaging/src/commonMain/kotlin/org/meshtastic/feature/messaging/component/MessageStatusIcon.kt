@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import org.meshtastic.core.resources.message_delivery_status
 import org.meshtastic.core.ui.icon.Acknowledged
 import org.meshtastic.core.ui.icon.AddLink
 import org.meshtastic.core.ui.icon.CloudUpload
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MessageEnroute

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,6 +41,7 @@ import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.ErrorOutline
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme

@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -62,6 +61,7 @@ import org.meshtastic.core.resources.sniffer_category_waypoint
 import org.meshtastic.core.resources.sniffer_content_title
 import org.meshtastic.core.resources.sniffer_packet_metadata_title
 import org.meshtastic.core.resources.sniffer_receipts_title
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.proto.PortNum
 

@@ -20,11 +20,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +63,8 @@ import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.resources.you
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.util.DiscoveryMapNode
 import org.meshtastic.core.ui.util.DiscoveryNeighborType
 import org.meshtastic.feature.map.maplibre.component.MapZoom
@@ -133,7 +133,8 @@ fun MapLibreInlineMap(
     // The same control every other map uses, at the same size. A shrunken variant was tried and looked out of place
     // against the rest of the map chrome for the ~25% of height it saved.
     //
-    // The thumbnail sits in the middle of a scrolling page, not under the floating bar, so the room the bar takes at the
+    // The thumbnail sits in the middle of a scrolling page, not under the floating bar, so the room the bar takes at
+    // the
     // bottom of a full-screen map is not reserved here (it pushed the credit button and the buttons out of this small
     // map); the zoom pair goes to the middle of the trailing edge instead of the lifted corner.
     CompositionLocalProvider(LocalFloatingBarInset provides 0.dp) {

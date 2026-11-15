@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -57,6 +56,7 @@ import org.meshtastic.core.resources.device_links_open_in_browser
 import org.meshtastic.core.resources.expanded
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 

@@ -35,8 +35,8 @@ private const val BOLD_LINE_SHARE = 0.022f
 
 /**
  * MT_SW: loads an icon the same way [vectorResource] does, and redraws it in the style the person chose ("icon style"
- * in the look of the elements): as it is, bolder, or as a thin outline (close to the line icons of iPhone). The same
- * on every platform, because only the vector is rebuilt.
+ * in the look of the elements): as it is, bolder, or as a thin outline (close to the line icons of iPhone). The same on
+ * every platform, because only the vector is rebuilt.
  */
 @Composable
 fun styledVectorResource(resource: DrawableResource): ImageVector {

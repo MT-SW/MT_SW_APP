@@ -43,7 +43,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,6 +67,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowUp
 import org.meshtastic.core.ui.icon.MeshtasticIcons

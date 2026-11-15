@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -71,6 +70,7 @@ import org.meshtastic.core.resources.preview_gradient
 import org.meshtastic.core.resources.preview_pill
 import org.meshtastic.core.resources.preview_text
 import org.meshtastic.core.resources.show_iaq_legend
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ThumbUp
 import org.meshtastic.core.ui.icon.Warning

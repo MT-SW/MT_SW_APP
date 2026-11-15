@@ -43,8 +43,6 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.ui.component.floatingBarEndPadding
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.navigation.DiscoveryRoute
@@ -78,9 +76,11 @@ import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.resources.zh_CN
 import org.meshtastic.core.resources.zh_TW
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.Distance
@@ -105,10 +105,10 @@ import org.meshtastic.feature.settings.component.NotificationSection
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.uiScaleLabel
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
@@ -263,11 +263,7 @@ fun DesktopSettingsScreen(
         FloatingBarUnderlap()
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Column(
-                modifier =
-                Modifier.verticalScroll(scrollState)
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .floatingBarEndPadding(),
+                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 SettingsSearchBar(

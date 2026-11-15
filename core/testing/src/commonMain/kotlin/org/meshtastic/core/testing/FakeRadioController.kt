@@ -33,9 +33,9 @@ import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.HamParameters
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.User
 
 /**

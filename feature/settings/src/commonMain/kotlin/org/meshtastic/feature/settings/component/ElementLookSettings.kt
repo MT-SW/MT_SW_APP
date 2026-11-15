@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber", "ModifierMissing", "MultipleEmitters")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.button_gradient
+import org.meshtastic.core.resources.button_gradient_normal
+import org.meshtastic.core.resources.button_gradient_off
+import org.meshtastic.core.resources.button_gradient_strong
+import org.meshtastic.core.resources.button_gradient_weak
+import org.meshtastic.core.resources.dialog_see_through
+import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_group_assistant
 import org.meshtastic.core.resources.element_group_bubbles
 import org.meshtastic.core.resources.element_group_cards
@@ -52,21 +61,9 @@ import org.meshtastic.core.resources.element_look_flat
 import org.meshtastic.core.resources.element_look_glass
 import org.meshtastic.core.resources.element_look_glass_summary
 import org.meshtastic.core.resources.element_look_strength
-import org.meshtastic.core.resources.dialog_see_through
-import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
-import org.meshtastic.core.resources.button_gradient
-import org.meshtastic.core.resources.button_gradient_normal
-import org.meshtastic.core.resources.button_gradient_off
-import org.meshtastic.core.resources.button_gradient_strong
-import org.meshtastic.core.resources.button_gradient_weak
 import org.meshtastic.core.resources.glass_rim
-import org.meshtastic.core.resources.nav_bar_rim
-import org.meshtastic.core.resources.nav_bar_select
-import org.meshtastic.core.resources.nav_select_bubble
-import org.meshtastic.core.resources.nav_select_both
-import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.glass_tint
 import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
@@ -103,14 +100,19 @@ import org.meshtastic.core.resources.nav_bar_hide_medium
 import org.meshtastic.core.resources.nav_bar_hide_off
 import org.meshtastic.core.resources.nav_bar_hide_small
 import org.meshtastic.core.resources.nav_bar_new_icons
+import org.meshtastic.core.resources.nav_bar_rim
+import org.meshtastic.core.resources.nav_bar_select
 import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.nav_bar_show_at_top
 import org.meshtastic.core.resources.nav_bar_show_far
 import org.meshtastic.core.resources.nav_bar_show_small
+import org.meshtastic.core.resources.nav_select_both
+import org.meshtastic.core.resources.nav_select_bubble
+import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
-import org.meshtastic.core.ui.component.LookPreview
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.LookPreview
 import org.meshtastic.core.ui.component.SliderPreference
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.DisplaySettings
@@ -150,9 +152,9 @@ private fun UiOptions.commonLook(groups: List<String>): Int {
 
 /**
  * MT_SW: the simple choices of the look of the app: ready-made looks, the style of all icons, one look for the whole
- * app and one look for each part of it (bars, cards and lists, messages, text fields and search, windows, the map,
- * the assistant and network health). The finer settings are in [ElementAdvancedSettings]. [onChange] saves one option
- * under its key.
+ * app and one look for each part of it (bars, cards and lists, messages, text fields and search, windows, the map, the
+ * assistant and network health). The finer settings are in [ElementAdvancedSettings]. [onChange] saves one option under
+ * its key.
  */
 @Composable
 fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
@@ -202,14 +204,13 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
 private fun AreaLookPicker(title: String, groups: List<String>, options: UiOptions, onChange: (String, Int) -> Unit) {
     val current = options.commonLook(groups)
     val canBeGlass = groups.any { it in UiOptions.GLASS_GROUPS }
-    val looks =
-        buildList {
-            add(ElementLook.FLAT to stringResource(Res.string.element_look_flat))
-            add(ElementLook.DEPTH to stringResource(Res.string.element_look_depth))
-            add(ElementLook.TRANSPARENT to stringResource(Res.string.element_look_transparent))
-            if (canBeGlass) add(ElementLook.GLASS to stringResource(Res.string.element_look_glass))
-            if (current == MIXED) add(MIXED to stringResource(Res.string.look_mixed))
-        }
+    val looks = buildList {
+        add(ElementLook.FLAT to stringResource(Res.string.element_look_flat))
+        add(ElementLook.DEPTH to stringResource(Res.string.element_look_depth))
+        add(ElementLook.TRANSPARENT to stringResource(Res.string.element_look_transparent))
+        if (canBeGlass) add(ElementLook.GLASS to stringResource(Res.string.element_look_glass))
+        if (current == MIXED) add(MIXED to stringResource(Res.string.look_mixed))
+    }
     DropDownPreference(
         title = title,
         enabled = true,
@@ -287,13 +288,12 @@ fun ElementAdvancedSettings(options: UiOptions, onChange: (String, Int) -> Unit)
 private fun ElementGroupSettings(title: String, group: String, options: UiOptions, onChange: (String, Int) -> Unit) {
     val style = options.element(group)
     val canBeGlass = group in UiOptions.GLASS_GROUPS
-    val looks =
-        buildList {
-            add(ElementLook.FLAT to stringResource(Res.string.element_look_flat))
-            add(ElementLook.DEPTH to stringResource(Res.string.element_look_depth))
-            add(ElementLook.TRANSPARENT to stringResource(Res.string.element_look_transparent))
-            if (canBeGlass) add(ElementLook.GLASS to stringResource(Res.string.element_look_glass))
-        }
+    val looks = buildList {
+        add(ElementLook.FLAT to stringResource(Res.string.element_look_flat))
+        add(ElementLook.DEPTH to stringResource(Res.string.element_look_depth))
+        add(ElementLook.TRANSPARENT to stringResource(Res.string.element_look_transparent))
+        if (canBeGlass) add(ElementLook.GLASS to stringResource(Res.string.element_look_glass))
+    }
     Column(modifier = Modifier.fillMaxWidth()) {
         DropDownPreference(
             title = "$title: ${stringResource(Res.string.element_look)}",
@@ -431,7 +431,8 @@ private val LOOK_PRESETS =
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
                 UiOptions.PRESS_SPRING to 1,
-            ) + look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
+            ) +
+                look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
                 look(CARDS, ElementLook.DEPTH, 45) +
                 look(BUBBLES, ElementLook.DEPTH, 40) +
                 look(FIELDS, ElementLook.GLASS, 50, PRESET_BLUR) +

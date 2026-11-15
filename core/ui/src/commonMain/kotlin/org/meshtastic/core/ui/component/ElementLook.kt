@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CompositionLocalAllowlist", "ContentSlotReused", "MagicNumber", "MissingReadOnlyComposable")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.background
@@ -22,9 +24,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -133,7 +135,10 @@ fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier
                 outline = outline,
                 brush =
                 Brush.verticalGradient(
-                    listOf(Color.White.copy(alpha = RIM_TOP_ALPHA * s), Color.White.copy(alpha = RIM_BOTTOM_ALPHA * s)),
+                    listOf(
+                        Color.White.copy(alpha = RIM_TOP_ALPHA * s),
+                        Color.White.copy(alpha = RIM_BOTTOM_ALPHA * s),
+                    ),
                 ),
                 style = Stroke(width = rimDp.dp.toPx()),
             )
@@ -157,7 +162,15 @@ fun StyledSurface(
     content: @Composable () -> Unit,
 ) {
     val options = rememberUiOptions()
-    StyledSurface(options.element(group), shape, modifier, hazeState, options.glassBase(baseColor), floating, content = content)
+    StyledSurface(
+        options.element(group),
+        shape,
+        modifier,
+        hazeState,
+        options.glassBase(baseColor),
+        floating,
+        content = content,
+    )
 }
 
 /** The same as above for an already known [style]. */
@@ -231,8 +244,8 @@ const val MAX_BLUR_DP = 60
 
 /**
  * The group of looks that the cards ([StyledCard], [TitledCard] and the like) of the current screen follow. Screens
- * with their own group of looks (node details, the assistant, network health, settings) provide it; everywhere else
- * it is the general "cards" group.
+ * with their own group of looks (node details, the assistant, network health, settings) provide it; everywhere else it
+ * is the general "cards" group.
  */
 val LocalCardGroup = staticCompositionLocalOf { UiOptions.GROUP_CARDS }
 
@@ -282,8 +295,8 @@ private const val EDGE_INNER_SHARE = 0.5f
 
 /**
  * The edge of a glass surface, like the glass of iPhone: a soft sheen across the upper part (light falling from the
- * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right,
- * with a second finer line just inside it, so the glass seems to have thickness.
+ * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right, with a
+ * second finer line just inside it, so the glass seems to have thickness.
  */
 internal fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWithContent {
     val outline = shape.createOutline(size, layoutDirection, this)

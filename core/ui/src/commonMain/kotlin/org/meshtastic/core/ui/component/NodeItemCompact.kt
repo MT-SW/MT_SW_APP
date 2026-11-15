@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "UnusedPrivateFunction")
-
+@file:Suppress("LongMethod", "MagicNumber", "UnusedPrivateFunction")
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.combinedClickable
@@ -25,9 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,6 +85,7 @@ import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.HardwareModel
 import org.meshtastic.core.ui.icon.HopCount
 import org.meshtastic.core.ui.icon.Humidity
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MapCompass
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MqttConnected

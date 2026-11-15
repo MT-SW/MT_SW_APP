@@ -316,7 +316,6 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[intPreferencesKey(UI_OPTION_PREFIX + key)] = value } }
     }
 
-
     override val translatorEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 

@@ -19,8 +19,6 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Box
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,6 +51,8 @@ import org.meshtastic.core.resources.planner_credits_line_openmeteo
 import org.meshtastic.core.resources.planner_credits_line_osm
 import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
 import org.meshtastic.core.resources.planner_credits_line_splat
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 

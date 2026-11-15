@@ -17,15 +17,11 @@
 package org.meshtastic.feature.messaging.ui.sharing
 
 import androidx.compose.foundation.layout.Column
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,8 +38,12 @@ import org.meshtastic.core.model.Contact
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.share
 import org.meshtastic.core.resources.share_to
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.feature.messaging.ui.contact.ContactItem
@@ -87,7 +87,8 @@ fun ShareScreen(contacts: List<Contact>, onConfirm: (String) -> Unit, onNavigate
         Column(modifier = Modifier.padding(innerPadding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 6.dp + LocalFloatingBarInset.current),
+                contentPadding =
+                PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 6.dp + LocalFloatingBarInset.current),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 itemsIndexed(contacts, key = { index, contact -> "${contact.contactKey}#$index" }) { _, contact ->

@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -76,6 +75,7 @@ import org.meshtastic.core.resources.planner_unit_db
 import org.meshtastic.core.resources.planner_unit_db_per_m
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.icon.Add
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
 import org.meshtastic.feature.map.planner.state.PlannerEnd

@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
@@ -74,6 +73,7 @@ import org.meshtastic.core.ui.component.TransportIcon
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.AddReaction
 import org.meshtastic.core.ui.icon.HopCount
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline

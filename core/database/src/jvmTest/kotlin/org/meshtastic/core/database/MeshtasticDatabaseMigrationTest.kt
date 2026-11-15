@@ -778,7 +778,10 @@ class MeshtasticDatabaseMigrationTest {
         }
 
         helper
-            .runMigrationsAndValidate(LOG_TYPE_INDEX_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_68_69))
+            .runMigrationsAndValidate(
+                LOG_TYPE_INDEX_TO_VERSION,
+                listOf(MeshtasticDatabase.MIGRATION_68_69),
+            )
             .use { connection ->
                 val logs = "FROM log ORDER BY received_date"
                 assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))

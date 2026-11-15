@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.feature.node.detail
 
 import androidx.compose.animation.Crossfade
@@ -41,9 +43,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.loading
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LocalCardGroup
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.feature.node.component.ActiveAlertSection
 import org.meshtastic.feature.node.component.AdministrationSection
 import org.meshtastic.feature.node.component.AvailabilityHistorySection
 import org.meshtastic.feature.node.component.DeviceActions
@@ -52,7 +55,6 @@ import org.meshtastic.feature.node.component.DisplayNameSection
 import org.meshtastic.feature.node.component.NodeDetailsSection
 import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.component.NotesSection
-import org.meshtastic.feature.node.component.ActiveAlertSection
 import org.meshtastic.feature.node.component.SilenceAlertSection
 import org.meshtastic.feature.node.model.NodeDetailAction
 
@@ -122,7 +124,8 @@ fun NodeDetailList(
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
             state = listState,
-            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+            contentPadding =
+            PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {

@@ -262,7 +262,6 @@ class SettingsViewModel(
         uiPrefs.setFloatingNavBar(value)
     }
 
-
     fun setAutoLoadChatImages(value: Boolean) {
         uiPrefs.setAutoLoadChatImages(value)
     }

@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.icon.Icon
-import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -50,11 +48,13 @@ import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.DeviceSleep
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
 import org.meshtastic.core.ui.icon.Reconnecting
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline

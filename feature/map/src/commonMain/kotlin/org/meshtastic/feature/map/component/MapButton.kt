@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CompositionLocalAllowlist")
+
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
 import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.component.glassContentColor
 import org.meshtastic.core.ui.icon.Icon

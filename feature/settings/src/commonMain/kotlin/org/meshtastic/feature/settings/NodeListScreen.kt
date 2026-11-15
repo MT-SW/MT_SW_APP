@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -32,8 +30,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.feature.settings.component.NodeLayoutSettings
 
 /**
@@ -72,7 +72,11 @@ fun NodeListScreen(settingsViewModel: SettingsViewModel, onNavigateUp: () -> Uni
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.verticalScroll(rememberScrollState())
+                .padding(paddingValues)
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             NodeLayoutSettings(

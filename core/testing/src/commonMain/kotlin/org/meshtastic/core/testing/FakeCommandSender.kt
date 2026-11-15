@@ -28,8 +28,8 @@ import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
-import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.PresenceConfig
 
 /** Shared recording [CommandSender] fake for tests that do not need transport behavior. */
 @Suppress("TooManyFunctions")

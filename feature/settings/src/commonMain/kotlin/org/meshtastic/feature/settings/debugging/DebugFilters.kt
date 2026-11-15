@@ -30,7 +30,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FilterChip
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -65,6 +64,7 @@ import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FilterAlt
 import org.meshtastic.core.ui.icon.FilterAltOff
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.debugging.DebugViewModel.UiMeshLog
 
@@ -117,14 +117,13 @@ fun DebugPresetFilters(
     onFilterTextsChange: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val availableFilters =
-        presetFilters.filter { filter ->
-            logs.any { log ->
-                log.logMessage.contains(filter, ignoreCase = true) ||
-                    log.messageType.contains(filter, ignoreCase = true) ||
-                    log.formattedReceivedDate.contains(filter, ignoreCase = true)
-            }
+    val availableFilters = presetFilters.filter { filter ->
+        logs.any { log ->
+            log.logMessage.contains(filter, ignoreCase = true) ||
+                log.messageType.contains(filter, ignoreCase = true) ||
+                log.formattedReceivedDate.contains(filter, ignoreCase = true)
         }
+    }
     Column(modifier = modifier) {
         Text(
             text = stringResource(Res.string.debug_filter_preset_title),

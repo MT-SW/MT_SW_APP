@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.discovery_stat_messages
 import org.meshtastic.core.resources.discovery_stat_sensor_pkts
 import org.meshtastic.core.resources.discovery_stat_unique_nodes
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.feature.discovery.ui.StatRow
 import kotlin.time.DurationUnit
 

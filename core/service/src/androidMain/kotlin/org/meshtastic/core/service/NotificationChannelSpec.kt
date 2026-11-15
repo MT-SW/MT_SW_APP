@@ -148,6 +148,7 @@ internal enum class NotificationChannelSpec(
         NotificationChannelGroupSpec.Mesh,
         NotificationManager.IMPORTANCE_HIGH,
     ),
+
     // MT_SW: created switched off (IMPORTANCE_NONE); the person turns it on in the system settings of the app.
     NodeActive(
         NotificationChannels.NODE_ACTIVE,

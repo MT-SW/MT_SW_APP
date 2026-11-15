@@ -17,8 +17,6 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +27,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -58,8 +54,12 @@ import org.meshtastic.core.resources.discovery_stat_total_messages
 import org.meshtastic.core.resources.discovery_stat_unique_nodes
 import org.meshtastic.core.resources.discovery_view_map
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.discovery.DiscoveryHistoryDetailViewModel
@@ -110,7 +110,12 @@ fun DiscoveryHistoryDetailScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(padding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             session?.let { s -> SessionMetadataCard(s) }

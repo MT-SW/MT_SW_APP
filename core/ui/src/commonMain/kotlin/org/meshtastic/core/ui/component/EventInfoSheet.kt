@@ -31,7 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
@@ -58,6 +57,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.event_use_event_theme
 import org.meshtastic.core.ui.icon.CalendarMonth
 import org.meshtastic.core.ui.icon.ChevronRight
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Place

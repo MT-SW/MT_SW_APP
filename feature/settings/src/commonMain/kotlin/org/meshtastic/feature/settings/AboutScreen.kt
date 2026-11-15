@@ -17,8 +17,6 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.animation.Crossfade
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -84,9 +82,11 @@ import org.meshtastic.core.resources.what_is_meshtastic_description
 import org.meshtastic.core.ui.component.DataNoticeReadDialog
 import org.meshtastic.core.ui.component.DataWipeDialog
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Code
 import org.meshtastic.core.ui.icon.Delete
@@ -161,7 +161,10 @@ fun AboutScreen(
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
                 modifier =
-                Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp, vertical = 16.dp).floatingBarEndPadding(),
+                Modifier.fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 WhatIsMeshtasticSection()

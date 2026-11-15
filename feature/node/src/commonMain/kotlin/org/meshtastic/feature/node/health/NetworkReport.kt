@@ -125,7 +125,10 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
                     listOf(
                         ReportLine("Aktywne", "$presenceActiveCount"),
                         ReportLine("Nieobecne", "$presenceAwayCount"),
-                        ReportLine("Podają stan aktywności", "${presenceActiveCount + presenceAwayCount} z $totalCount"),
+                        ReportLine(
+                            "Podają stan aktywności",
+                            "${presenceActiveCount + presenceAwayCount} z $totalCount",
+                        ),
                     ),
                 ),
             )
@@ -138,7 +141,9 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
                     presenceHistory.map {
                         ReportLine(
                             it.nodeName,
-                            "${if (it.active) "aktywny" else "nieobecny"} od ${DateFormatter.formatDateTimeShort(it.sinceMillis)}",
+                            "${if (it.active) "aktywny" else "nieobecny"} od ${DateFormatter.formatDateTimeShort(
+                                it.sinceMillis,
+                            )}",
                         )
                     },
                 ),

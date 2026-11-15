@@ -35,7 +35,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,7 +42,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -106,6 +104,8 @@ import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.time
 import org.meshtastic.core.resources.waypoint_edit
 import org.meshtastic.core.resources.waypoint_new
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.CalendarMonth
 import org.meshtastic.core.ui.icon.Lock

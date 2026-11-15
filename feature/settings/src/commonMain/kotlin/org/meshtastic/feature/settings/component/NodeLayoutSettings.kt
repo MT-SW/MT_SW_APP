@@ -30,10 +30,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -79,6 +77,7 @@ import org.meshtastic.core.resources.node_layout_preview
 import org.meshtastic.core.resources.node_layout_relative_last_heard
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_layout_signal_direct_only
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
 import org.meshtastic.core.ui.component.LocalNodeExtraStats
 import org.meshtastic.core.ui.component.LocalNodeExtraTick
@@ -88,6 +87,7 @@ import org.meshtastic.core.ui.component.NodeItem
 import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.nodeExtraLegend
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.NodeListSettingsState

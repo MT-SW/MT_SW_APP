@@ -26,12 +26,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -52,6 +49,9 @@ import org.meshtastic.core.resources.planner_point_not_set
 import org.meshtastic.core.resources.planner_point_unnamed
 import org.meshtastic.core.resources.planner_summary_radio
 import org.meshtastic.core.resources.planner_swap_ab
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.feature.map.planner.state.PlannerEnd

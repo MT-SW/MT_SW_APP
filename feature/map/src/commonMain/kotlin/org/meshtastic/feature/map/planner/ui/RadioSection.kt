@@ -31,7 +31,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -93,6 +92,7 @@ import org.meshtastic.core.resources.planner_weather_idle
 import org.meshtastic.core.resources.planner_weather_loading
 import org.meshtastic.core.resources.planner_weather_ready
 import org.meshtastic.core.resources.planner_weather_refresh
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.feature.map.planner.DuctingLevel
