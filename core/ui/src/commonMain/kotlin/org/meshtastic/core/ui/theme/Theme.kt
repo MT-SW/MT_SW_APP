@@ -20,6 +20,7 @@ package org.meshtastic.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme.Companion.expressive
 import androidx.compose.material3.darkColorScheme
@@ -210,6 +211,21 @@ private val monoDarkScheme =
         surfaceContainerHighest = Color(0xFF292929),
     )
 
+/** The dark scheme with pure black backgrounds (and very dark greys for the layers above them), for AMOLED screens. */
+private fun ColorScheme.withTrueBlack(): ColorScheme = copy(
+    background = Color(0xFF000000),
+    surface = Color(0xFF000000),
+    surfaceDim = Color(0xFF000000),
+    surfaceContainerLowest = Color(0xFF000000),
+    surfaceContainerLow = Color(0xFF0A0A0A),
+    surfaceContainer = Color(0xFF121212),
+    surfaceContainerHigh = Color(0xFF1B1B1B),
+    surfaceContainerHighest = Color(0xFF252525),
+    surfaceBright = Color(0xFF2E2E2E),
+    surfaceVariant = Color(0xFF2A2A2A),
+    outlineVariant = Color(0xFF333333),
+)
+
 /** True while one of the two black-and-white themes is active; maps and charts can read it to drop their colour too. */
 val LocalMonochrome = compositionLocalOf { false }
 
@@ -313,7 +329,7 @@ fun AppTheme(
     @Composable()
     () -> Unit,
 ) {
-    val colorScheme =
+    val baseScheme =
         if (monochrome) {
             if (darkTheme) monoDarkScheme else monoLightScheme
         } else {
@@ -323,6 +339,9 @@ fun AppTheme(
                 null
             } ?: (if (darkTheme) darkScheme else lightScheme).withSaturation(saturation)
         }
+
+    // The stronger-colour themes go to true black in the dark: on an AMOLED screen the pixels are then switched off.
+    val colorScheme = if (!monochrome && darkTheme && saturation > 100) baseScheme.withTrueBlack() else baseScheme
 
     // When a device is on event firmware (and the event theme isn't opted out), swap the whole typescale to the event
     // typeface. Null everywhere else (desktop, F-Droid, non-event, opted out) → default typography.

@@ -14,7 +14,7 @@
 - **Widżet statystyk.** Nowy widżet na Androidzie, a na iPhonie/iPadzie także małe widżety na ekran blokady; plakietka naszego węzła, wybór, które węzły pokazywać.
 - **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
 - **Komputer.** Opcja „Uruchamiaj z komputerem” z możliwością startu w zasobniku (okno się nie otwiera) i domyślnie jedna kopia programu.
-- **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji.
+- **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji; ciemne tło jest szare zamiast niebieskawego, a w motywach „Nasycony” i „Bardzo nasycony” czysto czarne (dobre dla ekranów AMOLED).
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 ## better | Ulepszenia

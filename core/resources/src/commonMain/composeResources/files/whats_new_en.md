@@ -14,7 +14,7 @@
 - **Statistics widget.** A new widget on Android, and on iPhone/iPad also small widgets for the lock screen; the plate of our node, a choice of which nodes to show.
 - **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
 - **Computer.** The "Start with the computer" option, with a start in the tray (the window does not open), and a single copy of the program by default.
-- **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option.
+- **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option; the dark background is grey instead of bluish, and pure black in the "Saturated" and "Very saturated" themes (good for AMOLED screens).
 - **Data.** "Add data from a backup" and synchronisation of the device statistics.
 - **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 ## better | Improvements

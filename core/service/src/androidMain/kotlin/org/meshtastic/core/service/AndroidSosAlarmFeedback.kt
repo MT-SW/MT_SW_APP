@@ -36,6 +36,7 @@ import org.meshtastic.core.repository.SosAlarmStyle
  */
 class AndroidSosAlarmFeedback(context: Context) : SosAlarmSound {
     private val cameras = context.applicationContext.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
+
     @Suppress("InjectDispatcher") // made by hand in the application class, so nothing to inject
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var job: Job? = null

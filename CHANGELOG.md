@@ -36,7 +36,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **Widżet statystyk.** Nowy widżet na Androidzie, a na iPhonie/iPadzie także małe widżety na ekran blokady; plakietka naszego węzła, wybór, które węzły pokazywać.
 * **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
 * **Komputer.** Opcja „Uruchamiaj z komputerem” i domyślnie jedna kopia programu.
-* **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji.
+* **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji; ciemne tło jest szare zamiast niebieskawego, a w motywach „Nasycony” i „Bardzo nasycony” czysto czarne (dobre dla ekranów AMOLED).
 * **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
@@ -871,7 +871,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **Statistics widget.** A new widget on Android, and on iPhone/iPad also small widgets for the lock screen; the plate of our node, a choice of which nodes to show.
 * **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
 * **Computer.** The "Start with the computer" option and a single copy of the program by default.
-* **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option.
+* **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option; the dark background is grey instead of bluish, and pure black in the "Saturated" and "Very saturated" themes (good for AMOLED screens).
 * **Data.** "Add data from a backup" and synchronisation of the device statistics.
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 

@@ -89,6 +89,9 @@
         }
       }
     },
+    "SOS" : {
+
+    },
     "Średni widżet" : {
       "extractionState" : "stale",
       "localizations" : {
