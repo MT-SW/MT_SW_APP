@@ -159,7 +159,7 @@ open class MeshLogRepositoryImpl(
             .flatMapLatest { logId ->
                 dbManager.observeCurrentDb("MeshLogRepository.getLogsFromLimited") {
                     // A specific port has its own query so the database can seek instead of walking all of the rows.
-                    if (portNum == -1) {
+                    if (portNum == ANY_PORT) {
                         it.meshLogDao().getLogsFrom(logId, portNum, maxItem)
                     } else {
                         it.meshLogDao().getLogsFromPort(logId, portNum, maxItem)
@@ -269,13 +269,10 @@ open class MeshLogRepositoryImpl(
     /** Returns the cached [MyNodeInfo] from the system logs. */
     override fun getMyNodeInfo(): Flow<MyNodeInfo?> = dbManager
         .observeCurrentDb("MeshLogRepository.getMyNodeInfo") { db ->
-            db.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS)
+            db.meshLogDao().getLatestOfType(MeshLog.TYPE_MY_INFO)
         }
-        // Newest first, and decoding stops at the first hit instead of reading every one of up to thousands of
-        // rows.
-        .mapLatest { list ->
-            list.asSequence().map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo
-        }
+        .mapLatest { log -> log?.asExternalModel()?.myNodeInfo }
+        .distinctUntilChanged()
         .flowOn(dispatchers.io)
 
     // Writes go through withDb so they register with the cross-transport merge drain barrier (see DatabaseProvider).
@@ -369,6 +366,9 @@ open class MeshLogRepositoryImpl(
 
     companion object {
         private const val TELEMETRY_SNAPSHOT_PAGE_SIZE = 512
+
+        /** The `portNum` that asks for a node's logs on every port. */
+        private const val ANY_PORT = -1
 
         /**
          * Rows per retention delete transaction. Each deleted row also dirties roughly one random page of the uuid

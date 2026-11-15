@@ -45,7 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
+import org.meshtastic.core.resources.getStringSuspend
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.ReportTarget
@@ -134,9 +134,9 @@ fun ReportIssuesDialog(
                         if (!control.sharesFileToApp || !handed) openUrl(target.url())
                         result =
                             if (control.sharesFileToApp && handed) {
-                                getString(Res.string.report_done_phone, report.sizeKb.toString(), report.shownPath)
+                                getStringSuspend(Res.string.report_done_phone, report.sizeKb.toString(), report.shownPath)
                             } else {
-                                getString(
+                                getStringSuspend(
                                     Res.string.report_done_computer,
                                     report.sizeKb.toString(),
                                     report.shownPath,

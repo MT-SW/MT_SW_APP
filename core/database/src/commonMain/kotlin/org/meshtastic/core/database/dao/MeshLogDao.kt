@@ -171,6 +171,10 @@ interface MeshLogDao {
     )
     fun getLatestLogPerNode(): Flow<List<MeshLog>>
 
+    /** The newest log of [type], or null. Re-runs on every log write, so it reads one row through its index. */
+    @Query("SELECT * FROM log WHERE type = :type ORDER BY received_date DESC LIMIT 1")
+    fun getLatestOfType(type: String): Flow<MeshLog?>
+
     /** Retrieves [MeshLog]s on 'port_num' (PortNum) from any node except [excludeFromNum]. */
     @Query(
         """

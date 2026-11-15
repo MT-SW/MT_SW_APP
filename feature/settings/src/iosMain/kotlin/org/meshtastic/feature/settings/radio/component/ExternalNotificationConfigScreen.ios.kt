@@ -28,7 +28,7 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.launch
 import okio.Buffer
-import org.jetbrains.compose.resources.getString
+import org.meshtastic.core.resources.getStringSuspend
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.repository.FileService
@@ -80,13 +80,13 @@ actual fun RingtoneTrailingIcon(ringtoneInput: String, onRingtoneImported: (Stri
                     }
                     if (text.isNotEmpty()) {
                         onRingtoneImported(text)
-                        showToast(getString(Res.string.ringtone_imported))
+                        showToast(getStringSuspend(Res.string.ringtone_imported))
                     } else {
-                        showToast(getString(Res.string.ringtone_file_empty))
+                        showToast(getStringSuspend(Res.string.ringtone_file_empty))
                     }
                 } catch (e: Exception) {
                     Logger.e(e) { "Error importing ringtone" }
-                    showToast(getString(Res.string.ringtone_import_error, e.message ?: e.toString()))
+                    showToast(getStringSuspend(Res.string.ringtone_import_error, e.message ?: e.toString()))
                 }
             }
         }

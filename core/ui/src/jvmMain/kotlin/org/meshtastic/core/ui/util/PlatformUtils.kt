@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
+import org.meshtastic.core.resources.getStringSuspend
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
 import java.awt.Desktop
@@ -54,7 +54,7 @@ actual fun rememberOpenNfcSettings(): () -> Unit = { Logger.w { "NFC settings no
 actual fun rememberShowToastResource(): suspend (StringResource) -> Unit {
     val snackbarManager = koinInject<SnackbarManager>()
     return { resource ->
-        val message = getString(resource)
+        val message = getStringSuspend(resource)
         Logger.i { "Toast: $message" }
         snackbarManager.showSnackbar(message)
     }

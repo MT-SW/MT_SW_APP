@@ -56,7 +56,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import org.jetbrains.compose.resources.getString
+import org.meshtastic.core.resources.getStringSuspend
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.state.LaunchOptions
@@ -178,7 +178,7 @@ fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
         produceState<List<WhatsNewRelease>?>(initialValue = null) {
             value =
                 try {
-                    val language = getString(Res.string.whats_new_language)
+                    val language = getStringSuspend(Res.string.whats_new_language)
                     WhatsNew.parse(Res.readBytes("files/whats_new_$language.md").decodeToString())
                 } catch (e: CancellationException) {
                     throw e

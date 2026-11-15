@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
+import org.meshtastic.core.resources.getStringSuspend
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
@@ -285,11 +285,11 @@ class NodeDetailViewModel(
             val value = radioController.readGpio(destNum, gpioMask)
             val resultText =
                 when {
-                    value == null -> getString(Res.string.remote_command_no_response)
-                    (value and gpioMask) == gpioMask -> getString(Res.string.gpio_on)
-                    else -> getString(Res.string.gpio_off)
+                    value == null -> getStringSuspend(Res.string.remote_command_no_response)
+                    (value and gpioMask) == gpioMask -> getStringSuspend(Res.string.gpio_on)
+                    else -> getStringSuspend(Res.string.gpio_off)
                 }
-            snackbarManager.showSnackbar(getString(Res.string.gpio_read_result, resultText))
+            snackbarManager.showSnackbar(getStringSuspend(Res.string.gpio_read_result, resultText))
         }
     }
 
@@ -302,7 +302,7 @@ class NodeDetailViewModel(
         val channel = if (node.hasPKC && !node.mismatchKey) NodeAddress.PKC_CHANNEL_INDEX else node.channel
         try {
             radioController.sendMessage(DataPacket(to = node.user.id, channel = channel, text = text))
-            snackbarManager.showSnackbar(getString(Res.string.quick_command_sent))
+            snackbarManager.showSnackbar(getStringSuspend(Res.string.quick_command_sent))
         } catch (e: PacketQueueRejectedException) {
             showNodeRequestFailure(e, QUEUE_REJECTION_LOG_MESSAGE, snackbarManager, resolveUiText)
         } catch (e: LocalNodeUnavailableException) {
@@ -317,7 +317,7 @@ class NodeDetailViewModel(
     /** Shows a snackbar confirming (or not) mesh delivery for a remote favorite/ignore command. */
     private suspend fun showRemoteCommandResult(delivered: Boolean) {
         val messageRes = if (delivered) Res.string.delivery_confirmed else Res.string.remote_command_no_response
-        snackbarManager.showSnackbar(getString(messageRes))
+        snackbarManager.showSnackbar(getStringSuspend(messageRes))
     }
 
     /** Dispatches high-level node management actions like removal, muting, or favoriting. */

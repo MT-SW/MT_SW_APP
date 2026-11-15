@@ -760,6 +760,37 @@ class MeshtasticDatabaseMigrationTest {
             }
     }
 
+    /**
+     * [MeshtasticDatabase.MIGRATION_68_69] indexes `log` by type in place: the rows keep their rowids, and the newest
+     * log of a type comes from the type index with no sort.
+     */
+    @Test
+    fun logGainsItsTypeIndexWithoutRebuildingLog() = runTest {
+        helper.createDatabase(LOG_TYPE_INDEX_FROM_VERSION).use { connection ->
+            connection.execSQL(
+                "INSERT INTO log (rowid, uuid, type, received_date, message) " +
+                    "VALUES (40, 'log-a', 'Packet', 1000, 'first')",
+            )
+            connection.execSQL(
+                "INSERT INTO log (rowid, uuid, type, received_date, message) " +
+                    "VALUES (7, 'log-b', 'MyInfo', 2000, 'second')",
+            )
+        }
+
+        helper
+            .runMigrationsAndValidate(LOG_TYPE_INDEX_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_68_69))
+            .use { connection ->
+                val logs = "FROM log ORDER BY received_date"
+                assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))
+                assertEquals(listOf("log-a", "log-b"), queryColumn(connection, "SELECT uuid $logs"))
+
+                val latestOfTypePlan =
+                    queryPlan(connection, "SELECT * FROM log WHERE type = 'MyInfo' ORDER BY received_date DESC LIMIT 1")
+                assertTrue(latestOfTypePlan.any { "index_log_type_received_date" in it }, latestOfTypePlan.toString())
+                assertTrue(latestOfTypePlan.none { "TEMP B-TREE" in it }, latestOfTypePlan.toString())
+            }
+    }
+
     /** The `detail` column of `EXPLAIN QUERY PLAN` for [sql], one entry per plan step. */
     private fun queryPlan(connection: SQLiteConnection, sql: String): List<String> =
         connection.prepare("EXPLAIN QUERY PLAN $sql").use { statement ->
@@ -815,15 +846,18 @@ class MeshtasticDatabaseMigrationTest {
         const val SCHEMA_66_TO_VERSION = 67
         const val REACTION_TRANSPORT_FROM_VERSION = 67
         const val REACTION_TRANSPORT_TO_VERSION = 68
+        const val LOG_TYPE_INDEX_FROM_VERSION = 68
+        const val LOG_TYPE_INDEX_TO_VERSION = 69
         const val QUERY_PLAN_DETAIL_COLUMN = 3
 
-        /** Every hand-written migration, which a walk across 52→53, 63→64 or 66→67 must be given. */
+        /** Every hand-written migration, which a walk across 52→53, 63→64, 66→67, 67→68 or 68→69 must be given. */
         val MANUAL_MIGRATIONS =
             listOf(
                 MeshtasticDatabase.MIGRATION_52_53,
                 MeshtasticDatabase.MIGRATION_63_64,
                 MeshtasticDatabase.MIGRATION_66_67,
                 MeshtasticDatabase.MIGRATION_67_68,
+                MeshtasticDatabase.MIGRATION_68_69,
             )
         const val PUBLIC_KEY_BYTES = 32
         const val STORED_CHANNEL_SET_HEX = "0A0612044D657368"

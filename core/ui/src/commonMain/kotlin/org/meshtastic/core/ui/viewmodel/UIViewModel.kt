@@ -50,7 +50,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.nowMillis
@@ -391,7 +390,8 @@ class UIViewModel(
                 val isCompromised = notification.low_entropy_key != null || notification.duplicated_public_key != null
                 showAlert(
                     titleRes = Res.string.client_notification,
-                    message = if (isCompromised) getString(Res.string.compromised_keys) else notification.message,
+                    message =
+                    if (isCompromised) getStringSuspend(Res.string.compromised_keys) else notification.message,
                     onConfirm = {
                         // Action for compromised keys should be handled via a callback or event
                         clearClientNotification(notification)

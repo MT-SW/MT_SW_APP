@@ -55,6 +55,7 @@ import org.meshtastic.core.model.MeshLog as ExternalMeshLog
         Index(value = ["port_num", "received_date"]),
         Index(value = ["from_num", "received_date"]),
         Index(value = ["port_num", "from_num", "received_date"]),
+        Index(value = ["type", "received_date"]),
     ],
 )
 data class MeshLog(

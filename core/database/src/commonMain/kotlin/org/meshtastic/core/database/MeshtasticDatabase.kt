@@ -26,7 +26,6 @@ import androidx.room3.migration.AutoMigrationSpec
 import androidx.room3.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.database.dao.BootloaderOtaQuirksDao
 import org.meshtastic.core.database.dao.ChannelSetDao
@@ -157,10 +156,10 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
         AutoMigration(from = 64, to = 65),
         AutoMigration(from = 65, to = 66),
-        // 66 -> 67 and 67 -> 68 are the manual MIGRATION_66_67 and MIGRATION_67_68 (the fork's own, guarded),
-        // applied via configureCommon().
+        // 66 -> 67, 67 -> 68 and 68 -> 69 are the manual MIGRATION_66_67, MIGRATION_67_68 and MIGRATION_68_69 (the
+        // fork's own, guarded), applied via configureCommon().
     ],
-    version = 68,
+    version = 69,
     exportSchema = true,
 )
 @androidx.room3.ConstructedBy(MeshtasticDatabaseConstructor::class)
@@ -341,30 +340,33 @@ abstract class MeshtasticDatabase : RoomDatabase() {
             }
 
         /**
+         * Brings every database to version 69: the index `log` gets for the newest log of a type (the original added it
+         * as its version 68, which the fork already uses for something else, so the fork takes the step as 69). The
+         * original's other new index, on one node's logs on one port, is not added: the fork's `port_num, from_num,
+         * received_date` index already answers that query. Created in place and guarded, like the steps before it.
+         */
+        internal val MIGRATION_68_69: Migration =
+            object : Migration(68, 69) {
+                override suspend fun migrate(connection: SQLiteConnection) {
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_type_received_date` ON `log` (`type`, `received_date`)",
+                    )
+                }
+            }
+
+        /**
          * Configures a [RoomDatabase.Builder] with standard settings for this project.
          *
-         * All platforms force [setSingleConnectionPool]. Without it, Room defaults to a 4-reader pool for named
-         * databases, and under coroutine cancellation churn (e.g. DB switches via `flatMapLatest`) the reader-pool
-         * permit semaphore can wedge: all reader connections report `Free` but `permits=0`, so every read acquisition
-         * waits indefinitely (Room logs "Timed out attempting to acquire a reader connection" and retries; nothing is
-         * thrown). Android hit this first; desktop (Flathub, 2026-07-10) reproduced the identical wedge in field logs,
-         * so JVM/iOS were moved off the multi-reader pool too. Single-connection eliminates the separate reader permit
-         * pool entirely.
-         *
-         * For in-memory databases (tests) this is a no-op for pooling — Room already serves `name == null` databases
-         * from a single connection — it just serializes the query dispatcher.
+         * A file database keeps Room's default pool: one writer and several readers in WAL, so the query every observed
+         * Flow re-runs after a write reads beside the next write instead of ahead of it on one connection. A reader
+         * pool that stops serving surfaces as a `DbFlowStalledException`, which [DatabaseManager] recovers by replacing
+         * the pool. Room serves an in-memory database (tests) from a single connection whatever is set here.
          */
-        @OptIn(ExperimentalCoroutinesApi::class)
         fun <T : RoomDatabase> RoomDatabase.Builder<T>.configureCommon(): RoomDatabase.Builder<T> =
             this.fallbackToDestructiveMigration(dropAllTables = false)
-                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_66_67, MIGRATION_67_68)
-                .setSingleConnectionPool()
+                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_66_67, MIGRATION_67_68, MIGRATION_68_69)
                 .setConnectionPoolTimeout(ROOM_POOL_ACQUIRE_TIMEOUT)
-                .setQueryCoroutineContext(
-                    // limitedParallelism(1) has the same throughput ceiling as the single-connection pool
-                    // (already serialized), so this only blocks the cancellation pileup — not real I/O concurrency.
-                    ioDispatcher.limitedParallelism(1),
-                )
+                .setQueryCoroutineContext(ioDispatcher)
     }
 }
 

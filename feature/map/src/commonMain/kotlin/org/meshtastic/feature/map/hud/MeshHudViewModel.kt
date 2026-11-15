@@ -261,11 +261,13 @@ class MeshHudViewModel(
      */
     val pose: StateFlow<CameraPoseState> =
         combine(poseProvider.poseUpdates().conflate(), declinationDeg) { state, declination ->
-            if (state.trueNorth) {
-                state.copy(pose = state.pose?.rotatedAboutVertical(-declination.toDouble()), trueNorth = false)
-            } else {
-                state
-            }
+            val magnetic =
+                if (state.trueNorth) {
+                    state.copy(pose = state.pose?.rotatedAboutVertical(-declination.toDouble()), trueNorth = false)
+                } else {
+                    state
+                }
+            magnetic.finiteOnly()
         }
             .flowOn(dispatchers.default)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), CameraPoseState())
@@ -379,7 +381,9 @@ class MeshHudViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), null)
 
     private fun declinationAt(here: PhoneLocation): Float =
-        magneticFieldProvider.getDeclination(here.latitude, here.longitude, here.altitude ?: 0.0, nowMillis)
+        magneticFieldProvider.getDeclination(here.latitude, here.longitude, here.altitude ?: 0.0, nowMillis).takeIf {
+            it.isFinite()
+        } ?: 0f
 
     /** Waypoint ids of foreign geofences the user opted in to crossing alerts for, as the map's dialog shows them. */
     val geofenceAlertOptIns: StateFlow<Set<Int>> = notificationPrefs.geofenceAlertOptIns
