@@ -77,6 +77,8 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.TracerouteResponseProvider
 import org.meshtastic.core.repository.TracerouteSnapshotRepository
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.neighbors_show_on_map
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
@@ -344,7 +346,14 @@ open class MetricsViewModel(
         }
     }
 
-    fun showLogDetail(titleRes: StringResource, annotatedMessage: AnnotatedString) {
+    /** All known nodes by number, for drawing a neighbour report on the map. */
+    fun nodesByNum(): Map<Int, org.meshtastic.core.model.Node> = nodeRepository.nodeDBbyNum.value
+
+    /**
+     * Shows a log entry in a window. With [onShowOnMap] the window has "Show on map" and "Close" (as the neighbour
+     * window on the node list); without it, a single "Close".
+     */
+    fun showLogDetail(titleRes: StringResource, annotatedMessage: AnnotatedString, onShowOnMap: (() -> Unit)? = null) {
         alertManager.showAlert(
             titleRes = titleRes,
             composableMessage = {
@@ -352,6 +361,9 @@ open class MetricsViewModel(
                     SelectionContainer { Text(text = annotatedMessage) }
                 }
             },
+            confirmTextRes = if (onShowOnMap != null) Res.string.neighbors_show_on_map else null,
+            onConfirm = onShowOnMap,
+            dismissTextRes = Res.string.close,
         )
     }
 

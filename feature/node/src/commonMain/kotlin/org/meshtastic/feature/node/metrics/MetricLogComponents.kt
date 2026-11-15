@@ -45,7 +45,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -53,9 +55,10 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 /** Shared metric log/list UI components used by TracerouteLog, NeighborInfoLog, HostMetricsLog, and PositionLog. */
 @Composable
 fun MetricLogItem(icon: ImageVector, text: String, contentDescription: String, modifier: Modifier = Modifier) {
-    Card(
+    StyledCard(
         modifier = modifier.fillMaxWidth().heightIn(min = 64.dp).padding(vertical = 4.dp, horizontal = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        baseColor = MaterialTheme.colorScheme.surfaceVariant,
+        group = UiOptions.GROUP_DETAILS,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),

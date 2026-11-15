@@ -548,3 +548,16 @@ data class NeighborReport(
     val neighbors: List<NeighborEntry>,
     val packet: org.meshtastic.proto.MeshPacket? = null,
 )
+
+/** The neighbour report held in a NeighborInfo packet (without the placeholder entry the app keeps for our node). */
+internal fun org.meshtastic.proto.MeshPacket.toNeighborReport(): NeighborReport? {
+    val payload = decoded?.payload ?: return null
+    val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return null
+    return NeighborReport(
+        receivedMillis = rx_time * MILLIS_PER_SECOND,
+        neighbors = info.neighbors.filter { it.node_id != 0 }.map { NeighborEntry(it.node_id, it.snr) },
+        packet = this,
+    )
+}
+
+private const val MILLIS_PER_SECOND = 1000L

@@ -58,6 +58,9 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.feature.node.component.CooldownIconButton
+import org.meshtastic.feature.node.list.toNeighborReport
+import org.meshtastic.feature.node.list.NeighborReport
+import org.meshtastic.feature.node.list.NeighborMapDialog
 import org.meshtastic.proto.MeshPacket
 
 /**
@@ -118,6 +121,17 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
                     .map { NeighborInfoLogItem.Overheard(it) }
             (requested + overheard).distinctBy { it.uuid }.sortedByDescending { it.receivedDate }
         }
+
+    // The neighbour report shown on the full-screen map (our "Show on map" button in the detail window).
+    var mapReport by remember { mutableStateOf<Pair<Int, NeighborReport>?>(null) }
+    mapReport?.let { (centerNum, report) ->
+        NeighborMapDialog(
+            centerNum = centerNum,
+            report = report,
+            nodeLookup = remember(centerNum) { viewModel.nodesByNum() },
+            onDismiss = { mapReport = null },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -190,7 +204,17 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
                                         statusRed = statusRed,
                                         modemPreset = modemPreset,
                                     )
-                                viewModel.showLogDetail(Res.string.neighbor_info, message)
+                                val report = item.packet?.toNeighborReport()
+                                viewModel.showLogDetail(
+                                    Res.string.neighbor_info,
+                                    message,
+                                    onShowOnMap =
+                                    if (report != null && state.node != null) {
+                                        { mapReport = state.node?.num?.let { it to report } }
+                                    } else {
+                                        null
+                                    },
+                                )
                             }
                         },
                     )

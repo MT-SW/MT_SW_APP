@@ -768,7 +768,7 @@ private fun NeighborReportDialog(
  * because their position is not known.
  */
 @Composable
-private fun NeighborMapDialog(
+internal fun NeighborMapDialog(
     centerNum: Int,
     report: NeighborReport?,
     nodeLookup: Map<Int, Node>,
