@@ -16,7 +16,17 @@
  */
 package org.meshtastic.feature.map.component
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
+import org.meshtastic.core.ui.component.StyledSurface
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -42,12 +52,8 @@ import org.meshtastic.core.ui.theme.monochromeLayer
  */
 @Composable
 fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modifier = Modifier) {
-    VerticalFloatingToolbar(
-        expanded = true,
-        // Grey in the black-and-white themes, like the other buttons over the map.
-        modifier = modifier.monochromeLayer(),
-        colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
-    ) {
+    val style = rememberUiOptions().element(UiOptions.GROUP_MAP)
+    val buttons: @Composable () -> Unit = {
         MapButton(
             icon = MeshtasticIcons.Add,
             contentDescription = stringResource(Res.string.zoom_in),
@@ -58,5 +64,29 @@ fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modif
             contentDescription = stringResource(Res.string.zoom_out),
             onClick = onZoomOut,
         )
+    }
+    if (style.look == ElementLook.FLAT) {
+        VerticalFloatingToolbar(
+            expanded = true,
+            // Grey in the black-and-white themes, like the other buttons over the map.
+            modifier = modifier.monochromeLayer(),
+            colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
+        ) {
+            buttons()
+        }
+    } else {
+        // Same see-through look as the toolbar at the top (the map must show through, so no solid plate).
+        StyledSurface(
+            style = style,
+            shape = CircleShape,
+            modifier = modifier,
+            baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            floating = true,
+            fallbackMinAlpha = MAP_GLASS_MIN_ALPHA,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CompositionLocalProvider(LocalMapButtonInToolbar provides true) { buttons() }
+            }
+        }
     }
 }

@@ -21,9 +21,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.styledControl
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -55,7 +53,7 @@ import org.meshtastic.core.ui.icon.Wifi
 /**
  * Single-choice transport selector rendered below the connection card. A Material 3 [SingleChoiceSegmentedButtonRow]
  * makes the mutually-exclusive choice explicit: the segments read as one grouped control and the selected transport
- * shows a check, rather than three independent chips whose filled state was read as "enabled/available" instead of
+ * is marked by a fill, rather than three independent chips whose filled state was read as "enabled/available" instead of
  * "selected".
  *
  * @param showBluetooth false on hardware with no Bluetooth LE, where the BLE segment could never find anything.
@@ -89,7 +87,7 @@ fun TransportSelector(
                     with(density) { textWidth.size.width.toDp() } + LabeledSegmentMinimumChrome <= segmentWidth
                 }
             }
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().styledControl(RoundedCornerShape(50))) {
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             transports.forEachIndexed { index, transport ->
                 TransportSegment(
                     selected = activeTransport == transport,
@@ -133,11 +131,9 @@ private val DeviceType.icon: ImageVector
 internal const val TRANSPORT_ICON_TAG = "TransportIcon"
 
 /**
- * A single transport segment. Labeled, it shows a check when [selected] and the transport [icon] otherwise, so
- * selection is unambiguous while the unselected segments still communicate which transport they represent. When
- * [showLabel] is false (some label would not fit at this width and font scale) the segment is icon-only: the transport
- * icon carries [label] as its content description and the check marks the selected one. The section header below names
- * the active pane, so nothing is lost visually.
+ * A single transport segment: always the transport [icon] (no check mark), the selected one is marked by the grey fill
+ * of its segment. When [showLabel] is false (some label would not fit at this width and font scale) the segment is
+ * icon-only: the transport icon carries [label] as its content description.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,22 +151,17 @@ private fun SingleChoiceSegmentedButtonRowScope.TransportSegment(
         onClick = onClick,
         shape = SegmentedButtonDefaults.itemShape(index = index, count = count),
         icon = {
+            // No check mark: the open transport is marked by the grey fill of its segment, the icon stays the same.
             // SegmentedButton measures this slot at the label's full height, which pins a bare 18dp icon to the top
-            // of the slot once the label is taller. Each icon centers itself in that height instead.
-            val activeIcon: @Composable () -> Unit = { CenteredSegmentIcon { SegmentedButtonDefaults.ActiveIcon() } }
+            // of the slot once the label is taller, so the icon centers itself in that height.
             if (showLabel) {
-                SegmentedButtonDefaults.Icon(active = selected, activeContent = activeIcon) {
-                    CenteredSegmentIcon {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            modifier =
-                            Modifier.size(SegmentedButtonDefaults.IconSize).testTag("$TRANSPORT_ICON_TAG:$label"),
-                        )
-                    }
+                CenteredSegmentIcon {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(SegmentedButtonDefaults.IconSize).testTag("$TRANSPORT_ICON_TAG:$label"),
+                    )
                 }
-            } else {
-                SegmentedButtonDefaults.Icon(active = selected, activeContent = activeIcon)
             }
         },
         label = {
