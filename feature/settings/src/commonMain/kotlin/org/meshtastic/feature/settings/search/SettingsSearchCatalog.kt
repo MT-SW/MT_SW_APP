@@ -49,6 +49,7 @@ import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
+import org.meshtastic.core.resources.data_logs_title
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.element_group_navbar
 import org.meshtastic.core.resources.element_group_bubbles
@@ -257,6 +258,7 @@ object SettingsSearchCatalog {
             Res.string.floating_nav_bar to SettingsRoute.MtSwFeatures,
             Res.string.show_channel_description to SettingsRoute.MtSwFeatures,
             Res.string.element_look_title to SettingsRoute.ElementLook,
+            Res.string.data_logs_title to SettingsRoute.DataAndLogs,
             Res.string.element_group_navbar to SettingsRoute.ElementLook,
             Res.string.element_group_cards to SettingsRoute.ElementLook,
             Res.string.element_group_bubbles to SettingsRoute.ElementLook,
@@ -282,7 +284,7 @@ object SettingsSearchCatalog {
             Res.string.filter_settings to SettingsRoute.FilterSettings,
             Res.string.device_links to SettingsRoute.DeviceLinks,
             Res.string.debug_panel to SettingsRoute.DebugPanel,
-            Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
+            Res.string.log_retention_days to SettingsRoute.DataAndLogs,
             Res.string.background_keepalive_title to SettingsRoute.MtSwFeatures,
             Res.string.autostart_title to SettingsRoute.MtSwFeatures,
             Res.string.single_instance_title to SettingsRoute.MtSwFeatures,
@@ -294,8 +296,8 @@ object SettingsSearchCatalog {
             Res.string.font_family to SettingsRoute.MtSwFeatures,
             Res.string.font_weight to SettingsRoute.MtSwFeatures,
             Res.string.font_size to SettingsRoute.MtSwFeatures,
-            Res.string.app_log_level to SettingsRoute.MtSwFeatures,
-            Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
+            Res.string.app_log_level to SettingsRoute.DataAndLogs,
+            Res.string.app_log_recent to SettingsRoute.DataAndLogs,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,
             Res.string.intro_mtsw_planner_title to SettingsRoute.MtSwFeatures,
             Res.string.terrain_horizon_title to SettingsRoute.MtSwFeatures,

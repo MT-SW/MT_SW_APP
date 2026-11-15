@@ -61,6 +61,7 @@ import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
 import org.meshtastic.feature.settings.mtsw.MessageArchiveScreen
 import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.MtSwOtherFeaturesScreen
+import org.meshtastic.feature.settings.mtsw.DataAndLogsScreen
 import org.meshtastic.feature.settings.mtsw.ElementLookScreen
 import org.meshtastic.feature.settings.mtsw.SmartFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.SosScreen
@@ -515,6 +516,14 @@ fun EntryProviderScope<NavKey>.settingsGraph(
     }
     entry<SettingsRoute.SmartFeatures> {
         SmartFeaturesScreen(
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigate = { backStack.add(it) },
+        )
+    }
+    entry<SettingsRoute.DataAndLogs> {
+        val settingsViewModel: SettingsViewModel = koinViewModel()
+        DataAndLogsScreen(
+            settingsViewModel = settingsViewModel,
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigate = { backStack.add(it) },
         )

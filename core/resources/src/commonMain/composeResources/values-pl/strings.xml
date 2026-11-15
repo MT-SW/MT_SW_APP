@@ -4232,4 +4232,7 @@
     <string name="glass_rim">Grubość jasnej krawędzi</string>
     <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
+    <string name="data_logs_title">Dane, logi i diagnostyka</string>
+    <string name="data_logs_summary">Zbieranie i przechowywanie logów, miejsce danych aplikacji, archiwum wiadomości i test powiadomień.</string>
+    <string name="data_storage_title">Dane aplikacji</string>
 </resources>

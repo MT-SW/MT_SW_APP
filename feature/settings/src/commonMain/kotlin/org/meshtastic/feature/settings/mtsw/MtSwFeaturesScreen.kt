@@ -60,6 +60,9 @@ import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.data_notice_settings_title
 import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.data_logs_summary
+import org.meshtastic.core.resources.data_logs_title
+import org.meshtastic.core.resources.data_storage_title
 import org.meshtastic.core.resources.element_look_short
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.floating_nav_bar
@@ -199,7 +202,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
     val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
     val appIconStyle by settingsViewModel.appIconStyle.collectAsStateWithLifecycle()
-    val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
     if (showThemePicker) {
@@ -272,12 +274,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(SettingsRoute.NodeList)
                 }
-                LogRetentionPreference(
-                    retentionDays = retentionDays,
-                    onSelected = { settingsViewModel.setMeshLogRetentionDays(it) },
-                )
-                // Where the app keeps all its data (not only the AI files): one folder on a computer.
-                AiStorageRow()
             }
 
             ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
@@ -287,6 +283,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.DisplaySettings,
                 ) {
                     onNavigate(SettingsRoute.ElementLook)
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.data_logs_title)) {
+                ListItem(
+                    text = stringResource(Res.string.data_logs_title),
+                    supportingText = stringResource(Res.string.data_logs_summary),
+                    leadingIcon = MeshtasticIcons.Save,
+                ) {
+                    onNavigate(SettingsRoute.DataAndLogs)
                 }
             }
 
@@ -350,7 +356,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ExpressiveSection(title = stringResource(Res.string.single_instance_title)) { SingleInstanceSettings() }
             }
 
-            ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
 
             // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
             ReportIssuesSection()
@@ -440,16 +445,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
-            ExpressiveSection(title = stringResource(Res.string.archive_title)) {
-                ListItem(
-                    text = stringResource(Res.string.archive_title),
-                    supportingText = stringResource(Res.string.archive_summary),
-                    leadingIcon = MeshtasticIcons.Save,
-                ) {
-                    onNavigate(SettingsRoute.MessageArchive)
-                }
-            }
-
             ExpressiveSection(title = stringResource(Res.string.whats_new_title)) { WhatsNewEntry() }
 
             ExpressiveSection(title = stringResource(Res.string.sos_title)) {
@@ -459,16 +454,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.Warning,
                 ) {
                     onNavigate(SettingsRoute.Sos)
-                }
-            }
-
-            ExpressiveSection(title = stringResource(Res.string.notification_test_title)) {
-                ListItem(
-                    text = stringResource(Res.string.notification_test_title),
-                    supportingText = stringResource(Res.string.notification_test_summary),
-                    leadingIcon = MeshtasticIcons.Notifications,
-                ) {
-                    onNavigate(SettingsRoute.Settings())
                 }
             }
 
@@ -631,6 +616,64 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) 
         ) {
             ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
                 ElementLookSettings(options = UiOptions(uiOptionsMap), onChange = settingsViewModel::setUiOption)
+            }
+        }
+    }
+}
+
+/** "Data, logs and diagnostics": collecting and keeping logs, where the app keeps its data, the archive and a test. */
+@Composable
+fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
+    val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
+    Scaffold(
+        topBar = {
+            MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
+                title = stringResource(Res.string.data_logs_title),
+                canNavigateUp = true,
+                onNavigateUp = onBack,
+                ourNode = null,
+                showNodeChip = false,
+                actions = {},
+                onClickChip = {},
+            )
+        },
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            ExpressiveSection(title = stringResource(Res.string.app_log_title)) {
+                AppLogSettings()
+                LogRetentionPreference(
+                    retentionDays = retentionDays,
+                    onSelected = { settingsViewModel.setMeshLogRetentionDays(it) },
+                )
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.data_storage_title)) {
+                // Where the app keeps all its data (not only the AI files): one folder on a computer.
+                AiStorageRow()
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.archive_title)) {
+                ListItem(
+                    text = stringResource(Res.string.archive_title),
+                    supportingText = stringResource(Res.string.archive_summary),
+                    leadingIcon = MeshtasticIcons.Save,
+                ) {
+                    onNavigate(SettingsRoute.MessageArchive)
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.notification_test_title)) {
+                ListItem(
+                    text = stringResource(Res.string.notification_test_title),
+                    supportingText = stringResource(Res.string.notification_test_summary),
+                    leadingIcon = MeshtasticIcons.Notifications,
+                ) {
+                    onNavigate(SettingsRoute.Settings())
+                }
             }
         }
     }

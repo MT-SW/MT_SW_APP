@@ -237,6 +237,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object ElementLook : SettingsRoute
 
+    @Serializable data object DataAndLogs : SettingsRoute
+
     @Serializable data object MtSwOtherFeatures : SettingsRoute
 
     @Serializable data object AntennaCalculator : SettingsRoute

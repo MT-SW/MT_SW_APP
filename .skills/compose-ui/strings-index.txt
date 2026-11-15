@@ -917,6 +917,8 @@ current_invert
 current_invert_description
 currently
 ### DATA ###
+data_logs_summary
+data_logs_title
 data_notice_accept
 data_notice_accepted_on
 data_notice_body
@@ -931,6 +933,7 @@ data_notice_settings_title
 data_notice_shortcut_summary
 data_notice_title
 data_notice_wait
+data_storage_title
 data_wipe_back
 data_wipe_body
 data_wipe_cancel
