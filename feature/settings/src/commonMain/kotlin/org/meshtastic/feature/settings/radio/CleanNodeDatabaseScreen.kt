@@ -101,7 +101,7 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState().padding(bottom = LocalFloatingBarInset.current)) {
+        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalFloatingBarInset.current)) {
             AutoCleanNodesSection(
                 autoCleanEnabled = autoCleanEnabled,
                 autoCleanInactivityDays = autoCleanInactivityDays,

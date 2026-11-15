@@ -91,7 +91,7 @@ fun AppFunctionsSettingsScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState().padding(bottom = LocalFloatingBarInset.current)) {
+        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = LocalFloatingBarInset.current)) {
             MasterToggleSection(
                 masterEnabled = masterEnabled,
                 onToggle = { viewModel.toggle(AppFunctionsSetting.MASTER) },
