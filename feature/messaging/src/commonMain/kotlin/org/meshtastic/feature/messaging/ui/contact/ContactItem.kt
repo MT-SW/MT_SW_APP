@@ -62,6 +62,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archived_channel
 import org.meshtastic.core.resources.contact_draft_prefix
 import org.meshtastic.core.resources.contact_pinned
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Keep
@@ -85,6 +89,9 @@ private fun Contact.channelDescription(channels: ChannelSet?, descriptions: Map<
     return index?.let { channels.settings.getOrNull(it) }?.let { descriptions[it.descriptionKey()] }
 }
 
+private const val PERCENT = 100f
+private const val MIN_CARD_ALPHA = 0.12f
+
 @Suppress("LongMethod")
 @Composable
 fun ContactItem(
@@ -99,16 +106,25 @@ fun ContactItem(
 ) = with(contact) {
     val isOutlined = !selected && !isActive
 
-    val colors =
-        if (isOutlined) {
-            CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
-        } else {
-            val containerColor = if (selected) Color.Gray else MaterialTheme.colorScheme.surfaceVariant
-            CardDefaults.cardColors(containerColor = containerColor)
+    // MT_SW: the look the person chose for the cards (plain, with depth or see-through).
+    val cardStyle = rememberUiOptions().element(UiOptions.GROUP_CARDS)
+    val withDepth = cardStyle.look == ElementLook.DEPTH
+    val seeThrough = cardStyle.look == ElementLook.TRANSPARENT || cardStyle.look == ElementLook.GLASS
+    val fade = if (seeThrough) (1f - cardStyle.strength / PERCENT).coerceIn(MIN_CARD_ALPHA, 1f) else 1f
+
+    val cardColors =
+        when {
+            isOutlined && withDepth ->
+                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            isOutlined -> CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
+            else -> {
+                val containerColor = if (selected) Color.Gray else MaterialTheme.colorScheme.surfaceVariant
+                CardDefaults.cardColors(containerColor = containerColor.copy(alpha = fade))
+            }
         }
 
     val border =
-        if (isOutlined) {
+        if (isOutlined && !withDepth) {
             CardDefaults.outlinedCardBorder()
         } else {
             null
@@ -120,9 +136,10 @@ fun ContactItem(
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
+            .elementLook(UiOptions.GROUP_CARDS, RoundedCornerShape(12.dp))
             .semantics { contentDescription = shortName },
         shape = RoundedCornerShape(12.dp),
-        colors = colors,
+        colors = cardColors,
         border = border,
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {

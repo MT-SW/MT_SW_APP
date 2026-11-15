@@ -284,6 +284,24 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         }
     }
 
+    override val uiOptions: StateFlow<Map<String, Int>> =
+        dataStore.data
+            .map { prefs ->
+                prefs
+                    .asMap()
+                    .filterKeys { it.name.startsWith(UI_OPTION_PREFIX) }
+                    .entries
+                    .mapNotNull { (key, value) ->
+                        (value as? Int)?.let { key.name.removePrefix(UI_OPTION_PREFIX) to it }
+                    }
+                    .toMap()
+            }
+            .stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
+    override fun setUiOption(key: String, value: Int) {
+        scope.launch { dataStore.edit { it[intPreferencesKey(UI_OPTION_PREFIX + key)] = value } }
+    }
+
     override val showChannelDescription: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_SHOW_CHANNEL_DESCRIPTION] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
 
@@ -291,21 +309,6 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_SHOW_CHANNEL_DESCRIPTION] = value } }
     }
 
-    override val floatingNavBarAutoHide: StateFlow<Boolean> =
-        dataStore.data.map { it[KEY_FLOATING_NAV_BAR_AUTO_HIDE] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
-
-    override fun setFloatingNavBarAutoHide(value: Boolean) {
-        scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR_AUTO_HIDE] = value } }
-    }
-
-    override val floatingNavBarOnlyAtTop: StateFlow<Boolean> =
-        dataStore.data
-            .map { it[KEY_FLOATING_NAV_BAR_ONLY_AT_TOP] ?: false }
-            .stateIn(scope, SharingStarted.Eagerly, false)
-
-    override fun setFloatingNavBarOnlyAtTop(value: Boolean) {
-        scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR_ONLY_AT_TOP] = value } }
-    }
 
     override val translatorEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
@@ -992,8 +995,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_FLOATING_NAV_BAR = booleanPreferencesKey("floating-nav-bar")
         val KEY_SHOW_CHANNEL_DESCRIPTION = booleanPreferencesKey("show-channel-description")
         const val CHANNEL_DESCRIPTION_PREFIX = "channel-description-"
-        val KEY_FLOATING_NAV_BAR_AUTO_HIDE = booleanPreferencesKey("floating-nav-bar-auto-hide")
-        val KEY_FLOATING_NAV_BAR_ONLY_AT_TOP = booleanPreferencesKey("floating-nav-bar-only-at-top")
+        const val UI_OPTION_PREFIX = "ui-option-"
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")

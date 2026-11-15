@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.Density
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlin.concurrent.Volatile
+import org.meshtastic.core.model.UiOptions
 
 private val lightScheme =
     lightColorScheme(
@@ -226,6 +227,37 @@ private fun ColorScheme.withTrueBlack(): ColorScheme = copy(
     outlineVariant = Color(0xFF333333),
 )
 
+/**
+ * The light scheme with the whites turned into very light greys: hardly noticeable in the ordinary theme, a little
+ * stronger (still bright) in the stronger-colour ones. The coloured parts are left as they are.
+ */
+private fun ColorScheme.withSoftWhite(strong: Boolean): ColorScheme =
+    if (strong) {
+        copy(
+            background = Color(0xFFEDEDEE),
+            surface = Color(0xFFEDEDEE),
+            surfaceDim = Color(0xFFD4D4D5),
+            surfaceBright = Color(0xFFEDEDEE),
+            surfaceContainerLowest = Color(0xFFF3F3F4),
+            surfaceContainerLow = Color(0xFFEBEBEC),
+            surfaceContainer = Color(0xFFE6E6E7),
+            surfaceContainerHigh = Color(0xFFE1E1E2),
+            surfaceContainerHighest = Color(0xFFDCDCDD),
+        )
+    } else {
+        copy(
+            background = Color(0xFFF3F3F4),
+            surface = Color(0xFFF3F3F4),
+            surfaceDim = Color(0xFFDADADB),
+            surfaceBright = Color(0xFFF3F3F4),
+            surfaceContainerLowest = Color(0xFFF8F8F9),
+            surfaceContainerLow = Color(0xFFF1F1F2),
+            surfaceContainer = Color(0xFFEDEDEE),
+            surfaceContainerHigh = Color(0xFFE8E8E9),
+            surfaceContainerHighest = Color(0xFFE3E3E4),
+        )
+    }
+
 /** True while one of the two black-and-white themes is active; maps and charts can read it to drop their colour too. */
 val LocalMonochrome = compositionLocalOf { false }
 
@@ -329,19 +361,24 @@ fun AppTheme(
     @Composable()
     () -> Unit,
 ) {
+    val dynamicScheme = if (!monochrome && dynamicColor) dynamicColorScheme(darkTheme) else null
     val baseScheme =
         if (monochrome) {
             if (darkTheme) monoDarkScheme else monoLightScheme
         } else {
-            if (dynamicColor) {
-                dynamicColorScheme(darkTheme)
-            } else {
-                null
-            } ?: (if (darkTheme) darkScheme else lightScheme).withSaturation(saturation)
+            dynamicScheme ?: (if (darkTheme) darkScheme else lightScheme).withSaturation(saturation)
         }
 
     // The stronger-colour themes go to true black in the dark: on an AMOLED screen the pixels are then switched off.
-    val colorScheme = if (!monochrome && darkTheme && saturation > 100) baseScheme.withTrueBlack() else baseScheme
+    val softLight = rememberUiOptions().flag(UiOptions.SOFT_LIGHT)
+    val colorScheme =
+        when {
+            !monochrome && darkTheme && saturation > 100 -> baseScheme.withTrueBlack()
+            // In the light the white goes slightly grey (a little more in the stronger-colour themes), as an option.
+            !monochrome && !darkTheme && dynamicScheme == null && softLight ->
+                baseScheme.withSoftWhite(strong = saturation > 100)
+            else -> baseScheme
+        }
 
     // When a device is on event firmware (and the event theme isn't opted out), swap the whole typescale to the event
     // typeface. Null everywhere else (desktop, F-Droid, non-event, opted out) → default typography.

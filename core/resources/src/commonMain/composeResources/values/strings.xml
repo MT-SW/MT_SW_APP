@@ -1298,6 +1298,21 @@
     <string name="edit_name">Edit name</string>
     <string name="eight_hours">8 Hours</string>
     <string name="electrical_conductivity">Conductivity</string>
+    <!-- ELEMENT -->
+    <string name="element_group_cards">Cards (devices, chats)</string>
+    <string name="element_group_input">Message box and send buttons</string>
+    <string name="element_group_navbar">Bottom bar</string>
+    <string name="element_group_search">Search</string>
+    <string name="element_look">look</string>
+    <string name="element_look_blur">Blur of the glass</string>
+    <string name="element_look_depth">With depth</string>
+    <string name="element_look_flat">Plain</string>
+    <string name="element_look_glass">Glass (blur)</string>
+    <string name="element_look_glass_summary">Glass lets the content show through the element, blurred.</string>
+    <string name="element_look_strength">Strength of the effect</string>
+    <string name="element_look_summary">Choose how the bar, the cards, the message box and the search are drawn. “Glass” blurs what is behind the element, the “see-through” look only fades its colour, “with depth” adds a soft shadow and light edges. On Android older than 12 the glass is a see-through pane without blur.</string>
+    <string name="element_look_title">Look of the elements</string>
+    <string name="element_look_transparent">See-through</string>
     <string name="elevation_suffix" translatable="false">MSL</string>
     <!-- EMOJI -->
     <string name="emoji_category_activities">Activities</string>
@@ -1349,7 +1364,7 @@
     <string name="favorite">Favorite</string>
     <string name="favorite_add">Add '%1$s' as a favorite node?</string>
     <string name="favorite_remove">Remove '%1$s' as a favorite node?</string>
-    <string name="feature_credits_description">The features of this fork build on other open-source projects; thanks to their authors. Full licences are on the "Acknowledgements" screen.\n\n• Sniffer mode and On-Demand diagnostics: adapted from a historical Meshtastic firmware fork (musznik/firmware, trunk-io/update-trunk branch).\n• Message translator: idea and approach from the RTranslator project (niedev, github.com/niedev/RTranslator); translation is done by the language models you download yourself (see below).\n• AI assistant, translator and dictation: the llama.cpp and whisper.cpp engines (ggml-org, MIT licence); the models (Gemma, Qwen, Bielik, Whisper and others) you download yourself, each under its own licence shown in the model list.\n• Mesh Link Planner: MeshMap Planner (ModerateWinGuy), Meshtastic Site Planner, SPLAT! (KD2BD), the NTIA/ITS ITM (Longley-Rice) propagation model, Mapterhorn terrain data, Open-Meteo weather and OpenStreetMap data.\n• Terrain panorama: method of the Horizon view of MeshRF (Ixitxachitl, github.com/Ixitxachitl/MeshRF), GPL-3.0-or-later licence.\n• Keep running in the background (iPhone/iPad): the approach of the original Meshtastic app for Apple (meshtastic/Meshtastic-Apple, GPL-3.0 licence) - background location keeps the app and its Wi-Fi/TCP link alive.\n• 3D device view on iPhone/iPad: the model-viewer component (Google, Apache-2.0 licence).\n• Map filter by hop count and distance, the list of nodes on one spot and the clean-up of readings with a wrong node clock on charts: ideas from the original Meshtastic app for Apple (meshtastic/Meshtastic-Apple, GPL-3.0 licence); the code is our own.</string>
+    <string name="feature_credits_description">The features of this fork build on other open-source projects; thanks to their authors. Full licences are on the "Acknowledgements" screen.\n\n• Sniffer mode and On-Demand diagnostics: adapted from a historical Meshtastic firmware fork (musznik/firmware, trunk-io/update-trunk branch).\n• Message translator: idea and approach from the RTranslator project (niedev, github.com/niedev/RTranslator); translation is done by the language models you download yourself (see below).\n• AI assistant, translator and dictation: the llama.cpp and whisper.cpp engines (ggml-org, MIT licence); the models (Gemma, Qwen, Bielik, Whisper and others) you download yourself, each under its own licence shown in the model list.\n• Mesh Link Planner: MeshMap Planner (ModerateWinGuy), Meshtastic Site Planner, SPLAT! (KD2BD), the NTIA/ITS ITM (Longley-Rice) propagation model, Mapterhorn terrain data, Open-Meteo weather and OpenStreetMap data.\n• Terrain panorama: method of the Horizon view of MeshRF (Ixitxachitl, github.com/Ixitxachitl/MeshRF), GPL-3.0-or-later licence.\n• Keep running in the background (iPhone/iPad): the approach of the original Meshtastic app for Apple (meshtastic/Meshtastic-Apple, GPL-3.0 licence) - background location keeps the app and its Wi-Fi/TCP link alive.\n• 3D device view on iPhone/iPad: the model-viewer component (Google, Apache-2.0 licence).\n• Map filter by hop count and distance, the list of nodes on one spot and the clean-up of readings with a wrong node clock on charts: ideas from the original Meshtastic app for Apple (meshtastic/Meshtastic-Apple, GPL-3.0 licence); the code is our own.\n• Glass look of the floating bar and of the fields (blur of what is behind them): the Haze library (Chris Banes, github.com/chrisbanes/haze, Apache-2.0 licence).</string>
     <string name="feature_credits_title">Feature credits</string>
     <string name="file_entry">- %1$s (%2$d bytes)</string>
     <string name="files_available">Files available (%1$d):</string>
@@ -1533,8 +1548,6 @@
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
     <string name="floating_nav_bar">Floating navigation bar at the bottom</string>
-    <string name="floating_nav_bar_auto_hide">Hide the bar while scrolling down</string>
-    <string name="floating_nav_bar_only_at_top">Bring the bar back only at the top of the page</string>
     <!-- FONT -->
     <string name="font_default">As designed</string>
     <string name="font_family">Font</string>
@@ -1660,6 +1673,7 @@
     <string name="indoor_air_quality_iaq">Indoor Air Quality (IAQ)</string>
     <string name="info">Information</string>
     <string name="input_channel_url">Input Shared Channels URL</string>
+    <string name="input_hold_buzz">Strong vibration while the send button is held</string>
     <string name="input_shared_contact_url">Input Shared Contact URL</string>
     <string name="insert">Insert</string>
     <string name="insert_link_message">Enter the URL for the selected text</string>
@@ -2383,6 +2397,18 @@
     <string name="mute_status_unmuted">Not muted</string>
     <string name="name">Name</string>
     <string name="name_cannot_be_empty">Name cannot be empty.</string>
+    <!-- NAV -->
+    <string name="nav_bar_haptics">Vibration when changing the tab</string>
+    <string name="nav_bar_hide">Hiding the bar while scrolling down</string>
+    <string name="nav_bar_hide_far">After a long scroll down</string>
+    <string name="nav_bar_hide_medium">After a medium scroll down</string>
+    <string name="nav_bar_hide_off">Never hide</string>
+    <string name="nav_bar_hide_small">After a short scroll down</string>
+    <string name="nav_bar_new_icons">New bar icons (off = the old icons)</string>
+    <string name="nav_bar_show">Bringing the bar back</string>
+    <string name="nav_bar_show_at_top">Only at the very top of the page</string>
+    <string name="nav_bar_show_far">After a longer scroll up</string>
+    <string name="nav_bar_show_small">After a short scroll up</string>
     <string name="navigate_back">Navigate Back</string>
     <string name="navigate_into_label">Navigate Into</string>
     <string name="nearby_devices_permission">Nearby devices permission</string>
@@ -3353,6 +3379,7 @@
     <string name="sniffer_warning_title">Enable Sniffer mode?</string>
     <string name="snr">SNR</string>
     <string name="snr_definition">Signal-to-Noise Ratio, a measure used in communications to quantify the level of a desired signal to the level of background noise. In Meshtastic and other wireless systems, a higher SNR indicates a clearer signal that can enhance the reliability and quality of data transmission.</string>
+    <string name="soft_light_theme">Slightly grey white in light themes</string>
     <string name="soil_moisture">Soil Moist</string>
     <string name="soil_ph">Soil pH</string>
     <string name="soil_temperature">Soil Temp</string>

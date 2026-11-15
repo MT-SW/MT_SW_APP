@@ -49,9 +49,18 @@ import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
+import org.meshtastic.core.resources.element_look_title
+import org.meshtastic.core.resources.element_group_navbar
+import org.meshtastic.core.resources.element_group_cards
+import org.meshtastic.core.resources.element_group_input
+import org.meshtastic.core.resources.element_group_search
+import org.meshtastic.core.resources.nav_bar_hide
+import org.meshtastic.core.resources.nav_bar_show
+import org.meshtastic.core.resources.nav_bar_new_icons
+import org.meshtastic.core.resources.input_hold_buzz
+import org.meshtastic.core.resources.nav_bar_haptics
+import org.meshtastic.core.resources.soft_light_theme
 import org.meshtastic.core.resources.floating_nav_bar
-import org.meshtastic.core.resources.floating_nav_bar_auto_hide
-import org.meshtastic.core.resources.floating_nav_bar_only_at_top
 import org.meshtastic.core.resources.font_family
 import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
@@ -240,8 +249,17 @@ object SettingsSearchCatalog {
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,
             Res.string.floating_nav_bar to SettingsRoute.MtSwFeatures,
             Res.string.show_channel_description to SettingsRoute.MtSwFeatures,
-            Res.string.floating_nav_bar_auto_hide to SettingsRoute.MtSwFeatures,
-            Res.string.floating_nav_bar_only_at_top to SettingsRoute.MtSwFeatures,
+            Res.string.element_look_title to SettingsRoute.MtSwFeatures,
+            Res.string.element_group_navbar to SettingsRoute.MtSwFeatures,
+            Res.string.element_group_cards to SettingsRoute.MtSwFeatures,
+            Res.string.element_group_input to SettingsRoute.MtSwFeatures,
+            Res.string.element_group_search to SettingsRoute.MtSwFeatures,
+            Res.string.nav_bar_hide to SettingsRoute.MtSwFeatures,
+            Res.string.nav_bar_show to SettingsRoute.MtSwFeatures,
+            Res.string.nav_bar_new_icons to SettingsRoute.MtSwFeatures,
+            Res.string.nav_bar_haptics to SettingsRoute.MtSwFeatures,
+            Res.string.input_hold_buzz to SettingsRoute.MtSwFeatures,
+            Res.string.soft_light_theme to SettingsRoute.MtSwFeatures,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,
             Res.string.node_layout_section_title to SettingsRoute.NodeList,

@@ -60,9 +60,9 @@ import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.data_notice_settings_title
 import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.floating_nav_bar
-import org.meshtastic.core.resources.floating_nav_bar_auto_hide
-import org.meshtastic.core.resources.floating_nav_bar_only_at_top
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_summary
@@ -168,6 +168,7 @@ import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
+import org.meshtastic.feature.settings.component.ElementLookSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
@@ -190,8 +191,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val showChannelDescription by settingsViewModel.showChannelDescription.collectAsStateWithLifecycle()
-    val navBarAutoHide by settingsViewModel.floatingNavBarAutoHide.collectAsStateWithLifecycle()
-    val navBarOnlyAtTop by settingsViewModel.floatingNavBarOnlyAtTop.collectAsStateWithLifecycle()
+    val uiOptionsMap by settingsViewModel.uiOptions.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
@@ -265,22 +265,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     checked = showChannelDescription,
                     onClick = { settingsViewModel.setShowChannelDescription(!showChannelDescription) },
                 )
-                if (floatingNavBar) {
-                    SwitchListItem(
-                        text = stringResource(Res.string.floating_nav_bar_auto_hide),
-                        leadingIcon = MeshtasticIcons.DisplaySettings,
-                        checked = navBarAutoHide,
-                        onClick = { settingsViewModel.setFloatingNavBarAutoHide(!navBarAutoHide) },
-                    )
-                    if (navBarAutoHide) {
-                        SwitchListItem(
-                            text = stringResource(Res.string.floating_nav_bar_only_at_top),
-                            leadingIcon = MeshtasticIcons.DisplaySettings,
-                            checked = navBarOnlyAtTop,
-                            onClick = { settingsViewModel.setFloatingNavBarOnlyAtTop(!navBarOnlyAtTop) },
-                        )
-                    }
-                }
                 AppUpdateSettings()
                 ListItem(
                     text = stringResource(Res.string.node_layout_section_title),
@@ -294,6 +278,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 )
                 // Where the app keeps all its data (not only the AI files): one folder on a computer.
                 AiStorageRow()
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
+                ElementLookSettings(
+                    options = UiOptions(uiOptionsMap),
+                    onChange = settingsViewModel::setUiOption,
+                )
             }
 
             ExpressiveSection(title = stringResource(Res.string.smart_features_title)) {

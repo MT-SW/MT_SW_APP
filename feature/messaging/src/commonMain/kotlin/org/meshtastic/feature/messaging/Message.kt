@@ -144,6 +144,12 @@ import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.theme.rememberUiOptions
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import org.meshtastic.core.ui.component.holdBuzz
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isFromSoftKeyboard
@@ -1078,10 +1084,31 @@ internal fun MessageInput(
                 FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
+        // MT_SW: the look the person chose for the message box (plain, with depth, see-through or glass).
+        val inputLook = rememberUiOptions().element(UiOptions.GROUP_INPUT)
+        val inputFade =
+            if (inputLook.look == ElementLook.TRANSPARENT || inputLook.look == ElementLook.GLASS) {
+                (1f - inputLook.strength / INPUT_PERCENT).coerceIn(INPUT_MIN_ALPHA, 1f)
+            } else {
+                1f
+            }
+        val inputContainer =
+            if (inputLook.look == ElementLook.FLAT) {
+                Color.Transparent
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = inputFade)
+            }
         OutlinedTextField(
+            colors =
+            OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = inputContainer,
+                unfocusedContainerColor = inputContainer,
+                disabledContainerColor = inputContainer,
+            ),
             modifier =
             Modifier.fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp)
+                .elementLook(UiOptions.GROUP_INPUT, RoundedCornerShape(ROUNDED_CORNER_PERCENT.toFloat()))
                 .onFocusChanged { isFocused = it.isFocused }
                 // Tunnel phase, not bubble: a multi-line field consumes Enter to insert its newline, so an
                 // Enter-to-send shortcut has to claim the event before the field ever sees it.
@@ -1152,7 +1179,11 @@ internal fun MessageInput(
                 val sendEnabled = isEnabled && (canSend || mentionActive)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (dictation.available) DictationButton(dictation = dictation, enabled = isEnabled)
-                    IconButton(onClick = onSendAction, enabled = sendEnabled) {
+                    IconButton(
+                        onClick = onSendAction,
+                        enabled = sendEnabled,
+                        modifier = Modifier.holdBuzz(sendEnabled),
+                    ) {
                         Icon(
                             imageVector = MeshtasticIcons.Send,
                             contentDescription = stringResource(Res.string.send),
@@ -1362,3 +1393,6 @@ private fun ImageUploadBar(state: ImageUploadState) {
             }
     }
 }
+
+private const val INPUT_PERCENT = 100f
+private const val INPUT_MIN_ALPHA = 0.12f

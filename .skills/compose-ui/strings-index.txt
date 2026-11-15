@@ -1256,6 +1256,21 @@ edit_custom_tile_source
 edit_name
 eight_hours
 electrical_conductivity
+### ELEMENT ###
+element_group_cards
+element_group_input
+element_group_navbar
+element_group_search
+element_look
+element_look_blur
+element_look_depth
+element_look_flat
+element_look_glass
+element_look_glass_summary
+element_look_strength
+element_look_summary
+element_look_title
+element_look_transparent
 elevation_suffix
 ### EMOJI ###
 emoji_category_activities
@@ -1491,8 +1506,6 @@ firmware_update_wipe_usb_detail
 firmware_version
 fixed_position
 floating_nav_bar
-floating_nav_bar_auto_hide
-floating_nav_bar_only_at_top
 ### FONT ###
 font_default
 font_family
@@ -1618,6 +1631,7 @@ incoming_messages
 indoor_air_quality_iaq
 info
 input_channel_url
+input_hold_buzz
 input_shared_contact_url
 insert
 insert_link_message
@@ -2332,6 +2346,18 @@ mute_status_muted_for_hours
 mute_status_unmuted
 name
 name_cannot_be_empty
+### NAV ###
+nav_bar_haptics
+nav_bar_hide
+nav_bar_hide_far
+nav_bar_hide_medium
+nav_bar_hide_off
+nav_bar_hide_small
+nav_bar_new_icons
+nav_bar_show
+nav_bar_show_at_top
+nav_bar_show_far
+nav_bar_show_small
 navigate_back
 navigate_into_label
 nearby_devices_permission
@@ -3281,6 +3307,7 @@ sniffer_warning_message
 sniffer_warning_title
 snr
 snr_definition
+soft_light_theme
 soil_moisture
 soil_ph
 soil_temperature

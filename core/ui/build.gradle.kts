@@ -40,6 +40,9 @@ kotlin {
             implementation(projects.core.repository)
             implementation(projects.core.resources)
 
+            implementation(libs.haze)
+            implementation(libs.haze.blur)
+
             implementation(libs.compose.multiplatform.animation)
             implementation(libs.compose.multiplatform.material3)
             implementation(libs.compose.multiplatform.ui)

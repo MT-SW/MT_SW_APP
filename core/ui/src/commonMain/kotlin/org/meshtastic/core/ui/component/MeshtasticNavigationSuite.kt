@@ -106,7 +106,10 @@ import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.resources.ic_auto_awesome
 import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.reconnecting
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.navigation.icon
+import org.meshtastic.core.ui.navigation.newIcon
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
@@ -137,8 +140,6 @@ fun MeshtasticNavigationSuite(
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
     val floatingNavBar by uiViewModel.floatingNavBar.collectAsStateWithLifecycle()
-    val autoHide by uiViewModel.floatingNavBarAutoHide.collectAsStateWithLifecycle()
-    val onlyAtTop by uiViewModel.floatingNavBarOnlyAtTop.collectAsStateWithLifecycle()
     val translatorEnabled by uiViewModel.translatorEnabled.collectAsStateWithLifecycle()
     val assistantEnabled by uiViewModel.assistantEnabled.collectAsStateWithLifecycle()
     val showAiTab = translatorEnabled || assistantEnabled
@@ -198,56 +199,17 @@ fun MeshtasticNavigationSuite(
         }
     }
 
-    // The hiding bar: it goes away while a page is scrolled down and comes back on scrolling up (or, with the second
-    // switch, only when the page is pulled down at its very top). Opening another tab always shows it again.
-    var barShown by remember { mutableStateOf(true) }
-    LaunchedEffect(topLevelDestination, autoHide) { barShown = true }
-    val scrollConnection =
-        remember(autoHide, onlyAtTop) {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    if (autoHide) {
-                        when {
-                            available.y < -HIDE_SCROLL_STEP -> barShown = false
-                            available.y > HIDE_SCROLL_STEP && !onlyAtTop -> barShown = true
-                        }
-                    }
-                    return Offset.Zero
-                }
-
-                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                    // Whatever the page could not scroll any more is the top of the page: show the bar there.
-                    if (autoHide && available.y > 0f) barShown = true
-                    return Offset.Zero
-                }
-            }
-        }
-
     if (floatingNavBar) {
         // The floating bar: a rounded island above the screen's bottom edge, on the phone, the tablet and the computer
-        // alike. The content ends above it, so the last line of every page can always be scrolled clear of the bar.
-        Surface(
-            modifier = modifier.hideKeyboardOnTapOrScroll(),
-            color = NavigationSuiteScaffoldDefaults.containerColor,
-            contentColor = NavigationSuiteScaffoldDefaults.contentColor,
-        ) {
-            Column(Modifier.fillMaxSize()) {
-                Row(Modifier.weight(1f).fillMaxWidth().nestedScroll(scrollConnection)) { content() }
-                // While the keyboard is up the bar gives way to it, so the message field is not squeezed.
-                val keyboardUp = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-                AnimatedVisibility(
-                    visible = !keyboardUp && (barShown || !autoHide),
-                    enter = slideInVertically { it } + fadeIn(),
-                    exit = slideOutVertically { it } + fadeOut(),
-                ) {
-                    FloatingNavBar(
-                        entries = entries,
-                        // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
-                        bottomMargin = if (barHeight != null) barBottomGap + FLOATING_LIFT else FLOATING_MARGIN,
-                    )
-                }
-            }
-        }
+        // alike (see FloatingNavBarHost for its look, hiding and vibration).
+        FloatingNavBarHost(
+            entries = entries,
+            destinationKey = topLevelDestination,
+            barHeight = barHeight,
+            barBottomGap = barBottomGap,
+            modifier = modifier,
+            content = content,
+        )
     } else if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
         Surface(
             modifier = modifier.hideKeyboardOnTapOrScroll(),
@@ -312,68 +274,6 @@ fun MeshtasticNavigationSuite(
         }
     }
 }
-
-/** The floating navigation bar: all the buttons in one rounded island, the open one marked by a rounded highlight. */
-@Composable
-private fun FloatingNavBar(entries: List<NavEntry>, bottomMargin: Dp, modifier: Modifier = Modifier) {
-    Box(
-        modifier =
-        modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = bottomMargin),
-        contentAlignment = Alignment.Center,
-    ) {
-        Surface(
-            modifier = Modifier.widthIn(max = FLOATING_MAX_WIDTH).fillMaxWidth(),
-            shape = RoundedCornerShape(FLOATING_CORNER),
-            color = colorScheme.surfaceContainerHigh,
-            shadowElevation = 8.dp,
-        ) {
-            Row(
-                modifier = Modifier.padding(6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                for (entry in entries) {
-                    FloatingNavItem(entry = entry, modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
-
-/** One button of the floating bar: the icon with its short name under it. */
-@Composable
-private fun FloatingNavItem(entry: NavEntry, modifier: Modifier = Modifier) {
-    val color = if (entry.selected) colorScheme.primary else colorScheme.onSurfaceVariant
-    Column(
-        modifier =
-        modifier
-            .clip(RoundedCornerShape(FLOATING_ITEM_CORNER))
-            .background(if (entry.selected) colorScheme.secondaryContainer else Color.Transparent)
-            .selectable(selected = entry.selected, onClick = entry.onClick, role = Role.Tab)
-            .padding(horizontal = 2.dp, vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CompositionLocalProvider(LocalContentColor provides color) {
-            entry.icon()
-            ProvideTextStyle(MaterialTheme.typography.labelSmall.copy(fontSize = FLOATING_LABEL_SIZE)) {
-                Box(modifier = Modifier.padding(top = 2.dp)) { entry.label?.invoke() }
-            }
-        }
-    }
-}
-
-/** How far (in pixels) a page has to move in one step before the hiding bar reacts, so a tiny shake does nothing. */
-private const val HIDE_SCROLL_STEP = 2f
-
-private val FLOATING_MAX_WIDTH = 560.dp
-private val FLOATING_CORNER = 32.dp
-private val FLOATING_ITEM_CORNER = 26.dp
-private val FLOATING_MARGIN = 8.dp
-private val FLOATING_LIFT = 8.dp
-private val FLOATING_LABEL_SIZE = 10.sp
 
 /** One button of the navigation bar (the same data feeds the bottom bar and the side bar). */
 private class NavEntry(
@@ -485,14 +385,16 @@ private fun NavigationIconContent(
                     }
                 },
             ) {
+                val newIcons = rememberUiOptions().flag(UiOptions.NAV_ICONS)
                 Crossfade(isSelected, label = "BottomBarIcon") { isSelectedState ->
                     Icon(
                         imageVector =
                         vectorResource(
-                            if (destination == TopLevelDestination.Translator && useAiIcon) {
-                                Res.drawable.ic_auto_awesome
-                            } else {
-                                destination.icon
+                            when {
+                                destination == TopLevelDestination.Translator && useAiIcon ->
+                                    Res.drawable.ic_auto_awesome
+                                newIcons -> destination.newIcon(isSelectedState) ?: destination.icon
+                                else -> destination.icon
                             },
                         ),
                         contentDescription = stringResource(destination.label),

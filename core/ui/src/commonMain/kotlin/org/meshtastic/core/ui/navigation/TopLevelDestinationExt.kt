@@ -21,6 +21,18 @@ import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_forum
 import org.meshtastic.core.resources.ic_map
+import org.meshtastic.core.resources.ic_nav_health
+import org.meshtastic.core.resources.ic_nav_health_sel
+import org.meshtastic.core.resources.ic_nav_map
+import org.meshtastic.core.resources.ic_nav_map_sel
+import org.meshtastic.core.resources.ic_nav_messages
+import org.meshtastic.core.resources.ic_nav_messages_sel
+import org.meshtastic.core.resources.ic_nav_nodes
+import org.meshtastic.core.resources.ic_nav_nodes_sel
+import org.meshtastic.core.resources.ic_nav_settings
+import org.meshtastic.core.resources.ic_nav_settings_sel
+import org.meshtastic.core.resources.ic_nav_translate
+import org.meshtastic.core.resources.ic_nav_translate_sel
 import org.meshtastic.core.resources.ic_nodes
 import org.meshtastic.core.resources.ic_settings
 import org.meshtastic.core.resources.ic_ssid_chart
@@ -39,3 +51,21 @@ val TopLevelDestination.icon: DrawableResource
             TopLevelDestination.Settings -> Res.drawable.ic_settings
             TopLevelDestination.Connect -> Res.drawable.ic_wifi
         }
+
+/**
+ * MT_SW: the newer tab icons, drawn as an outline when the tab is not open and with a soft fill and a heavier line when
+ * it is. The connection tab has no such pair: its icon is animated and shows the state of the connection.
+ */
+fun TopLevelDestination.newIcon(selected: Boolean): DrawableResource? =
+    when (this) {
+        TopLevelDestination.Messages -> if (selected) Res.drawable.ic_nav_messages_sel else Res.drawable.ic_nav_messages
+        TopLevelDestination.Nodes -> if (selected) Res.drawable.ic_nav_nodes_sel else Res.drawable.ic_nav_nodes
+        TopLevelDestination.NetworkHealth ->
+            if (selected) Res.drawable.ic_nav_health_sel else Res.drawable.ic_nav_health
+        TopLevelDestination.Translator ->
+            if (selected) Res.drawable.ic_nav_translate_sel else Res.drawable.ic_nav_translate
+        TopLevelDestination.Map -> if (selected) Res.drawable.ic_nav_map_sel else Res.drawable.ic_nav_map
+        TopLevelDestination.Settings ->
+            if (selected) Res.drawable.ic_nav_settings_sel else Res.drawable.ic_nav_settings
+        TopLevelDestination.Connect -> null
+    }

@@ -113,6 +113,8 @@ dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.10.0"
 wire = "6.4.7"
+# MT_SW: background blur ("glass") of the floating bars (Apache 2.0, github.com/chrisbanes/haze)
+haze = "2.1.0"
 meshtastic-protobufs = "2.8.2.31-g65b8791-SNAPSHOT"
 
 # Gradle Plugins
@@ -357,6 +359,8 @@ takpacket-sdk-kmp = { module = "org.meshtastic:takpacket-sdk", version.ref = "ta
 
 # Meshtastic Protobufs SDK (Wire-generated KMP models from meshtastic/protobufs)
 meshtastic-protobufs = { module = "org.meshtastic:protobufs", version.ref = "meshtastic-protobufs" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
 
 # Wire runtime for locally-compiled ondemand.proto (OnDemand/Sniffer port-354 protocol) -- not part of
 # the official protobufs artifact above.

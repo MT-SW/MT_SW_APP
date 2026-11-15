@@ -27,7 +27,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -636,9 +639,12 @@ private fun ContactListView(
         LocalChannelDescriptions provides if (showChannelDescription) channelDescriptions else emptyMap(),
     ) {
     Box(modifier = modifier.fillMaxSize()) {
+        // The list runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+            contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
         ) {
             contactSection(
                 section = ContactSection.CHANNELS,

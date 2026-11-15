@@ -61,6 +61,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.navigate_back
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -156,7 +159,21 @@ fun MeshtasticSearchBar(
         modifier.fillMaxWidth().let { base ->
             scrollBehavior?.let { behavior -> with(behavior) { base.searchBarScrollBehavior() } } ?: base
         }
-    SearchBar(state = searchBarState, inputField = { inputField(inputFieldTag) }, modifier = barModifier)
+    // MT_SW: the look the person chose for the search (plain, with depth, see-through or glass).
+    val searchLook = rememberUiOptions().element(UiOptions.GROUP_SEARCH)
+    val searchFade =
+        if (searchLook.look == ElementLook.TRANSPARENT || searchLook.look == ElementLook.GLASS) {
+            (1f - searchLook.strength / SEARCH_PERCENT).coerceIn(SEARCH_MIN_ALPHA, 1f)
+        } else {
+            1f
+        }
+    SearchBar(
+        state = searchBarState,
+        inputField = { inputField(inputFieldTag) },
+        modifier = barModifier.elementLook(UiOptions.GROUP_SEARCH, SearchBarDefaults.inputFieldShape),
+        colors =
+        SearchBarDefaults.colors(containerColor = SearchBarDefaults.colors().containerColor.copy(alpha = searchFade)),
+    )
 
     val expandedTag = inputFieldTag + SEARCH_BAR_EXPANDED_TAG_SUFFIX
     // Material docks the expanded bar on medium and larger windows and only goes full-screen on compact ones. The
@@ -264,3 +281,6 @@ private fun SearchInputField(
         modifier = Modifier.testTag(testTag).semantics { contentDescription = placeholder },
     )
 }
+
+private const val SEARCH_PERCENT = 100f
+private const val SEARCH_MIN_ALPHA = 0.12f

@@ -1643,7 +1643,7 @@
     <string name="mute_status_unmuted">Nie wyciszony</string>
     <string name="unofficial_fork_disclaimer">Nieoficjalny fork Meshtastic-Android. Niezwiązany z Meshtastic LLC ani przez nią niewspierany.</string>
     <string name="feature_credits_title">Źródła funkcji</string>
-    <string name="feature_credits_description">Funkcje tego forka korzystają z cudzych projektów otwartych źródeł; dziękujemy ich autorom. Pełne licencje są na ekranie „Podziękowania”.\n\n• Tryb Sniffer i diagnostyka na żądanie: zaadaptowane z historycznego forka firmware Meshtastic (musznik/firmware, gałąź trunk-io/update-trunk).\n• Tłumacz wiadomości: pomysł i podejście z projektu RTranslator (niedev, github.com/niedev/RTranslator); tłumaczenie wykonują modele językowe, które pobierasz sam (patrz niżej).\n• Asystent AI, tłumacz i dyktowanie: silniki llama.cpp i whisper.cpp (ggml-org, licencja MIT); modele (Gemma, Qwen, Bielik, Whisper i inne) pobierasz sam, każdy ma własną licencję podaną na liście modeli.\n• Mesh Link Planer: MeshMap Planner (ModerateWinGuy), Meshtastic Site Planner, SPLAT! (KD2BD), model propagacji NTIA/ITS ITM (Longley-Rice), dane terenu Mapterhorn, pogoda Open-Meteo i dane OpenStreetMap.\n• Panorama terenu: metoda z widoku Horizon programu MeshRF (Ixitxachitl, github.com/Ixitxachitl/MeshRF), licencja GPL-3.0-or-later.\n• Działanie w tle (iPhone/iPad): sposób oryginalnej aplikacji Meshtastic na urządzenia Apple (meshtastic/Meshtastic-Apple, licencja GPL-3.0) - lokalizacja w tle utrzymuje aplikację i jej połączenie Wi-Fi/TCP.\n• Widok 3D urządzeń na iPhonie/iPadzie: komponent model-viewer (Google, licencja Apache-2.0).\n• Filtr mapy po liczbie skoków i odległości, lista węzłów w tym samym miejscu oraz czyszczenie odczytów z błędnym zegarem węzła na wykresach: pomysły z oryginalnej aplikacji Meshtastic na Apple (meshtastic/Meshtastic-Apple, licencja GPL-3.0); kod jest nasz.</string>
+    <string name="feature_credits_description">Funkcje tego forka korzystają z cudzych projektów otwartych źródeł; dziękujemy ich autorom. Pełne licencje są na ekranie „Podziękowania”.\n\n• Tryb Sniffer i diagnostyka na żądanie: zaadaptowane z historycznego forka firmware Meshtastic (musznik/firmware, gałąź trunk-io/update-trunk).\n• Tłumacz wiadomości: pomysł i podejście z projektu RTranslator (niedev, github.com/niedev/RTranslator); tłumaczenie wykonują modele językowe, które pobierasz sam (patrz niżej).\n• Asystent AI, tłumacz i dyktowanie: silniki llama.cpp i whisper.cpp (ggml-org, licencja MIT); modele (Gemma, Qwen, Bielik, Whisper i inne) pobierasz sam, każdy ma własną licencję podaną na liście modeli.\n• Mesh Link Planer: MeshMap Planner (ModerateWinGuy), Meshtastic Site Planner, SPLAT! (KD2BD), model propagacji NTIA/ITS ITM (Longley-Rice), dane terenu Mapterhorn, pogoda Open-Meteo i dane OpenStreetMap.\n• Panorama terenu: metoda z widoku Horizon programu MeshRF (Ixitxachitl, github.com/Ixitxachitl/MeshRF), licencja GPL-3.0-or-later.\n• Działanie w tle (iPhone/iPad): sposób oryginalnej aplikacji Meshtastic na urządzenia Apple (meshtastic/Meshtastic-Apple, licencja GPL-3.0) - lokalizacja w tle utrzymuje aplikację i jej połączenie Wi-Fi/TCP.\n• Widok 3D urządzeń na iPhonie/iPadzie: komponent model-viewer (Google, licencja Apache-2.0).\n• Filtr mapy po liczbie skoków i odległości, lista węzłów w tym samym miejscu oraz czyszczenie odczytów z błędnym zegarem węzła na wykresach: pomysły z oryginalnej aplikacji Meshtastic na Apple (meshtastic/Meshtastic-Apple, licencja GPL-3.0); kod jest nasz.\n• Wygląd „szkła” pływającego paska i pól (rozmycie tego, co jest pod spodem): biblioteka Haze (Chris Banes, github.com/chrisbanes/haze, licencja Apache-2.0).</string>
     <string name="nag_timeout_seconds">Czas przypomnienia (sekundy)</string>
     <string name="name">Nazwa</string>
     <string name="name_cannot_be_empty">Nazwa nie może być pusta.</string>
@@ -3179,8 +3179,6 @@
     <string name="channel_description">Opis kanału (tylko w tej aplikacji)</string>
     <string name="channel_description_summary">Twoja własna notatka o tym kanale, do 200 znaków. Zostaje na tym telefonie i nie jest wysyłana do radia ani do innych osób. Gdy w „Funkcje MT_SW” włączysz „Pokazuj opis kanału na liście”, lista rozmów pokazuje ten opis zamiast ostatniej wiadomości (obok zostają tylko ikony i liczniki); w przeciwnym razie widać ostatnią wiadomość jak zawsze.</string>
     <string name="show_channel_description">Pokazuj opis kanału na liście</string>
-    <string name="floating_nav_bar_auto_hide">Chowaj pasek przy przewijaniu w dół</string>
-    <string name="floating_nav_bar_only_at_top">Pokaż pasek dopiero na samej górze strony</string>
     <string name="messages_read_visible">Czytaj widoczne wiadomości</string>
     <string name="messages_read_all">Czytaj wszystkie wiadomości</string>
     <string name="messages_translate_visible">Przetłumacz widoczne wiadomości</string>
@@ -4186,4 +4184,31 @@
     <string name="sos_alarm_bell_notifications">Alarm SOS (dzwonek)</string>
     <string name="sos_alarm_bell_notifications_description">Alarm po odebraniu SOS od węzła, dla którego wybrano dzwonek. Dzwoni w kółko, dopóki go nie potwierdzisz, ale łagodniej niż syrena.</string>
     <string name="sos_history_export">Zapisz historię do pliku</string>
+    <string name="element_look_title">Wygląd elementów</string>
+    <string name="element_look_summary">Wybierz, jak wyglądają pasek, karty, pole wiadomości i wyszukiwanie. „Szkło” rozmywa to, co jest za elementem, „przezroczysty” tylko rozjaśnia jego kolor, a „z głębią” dodaje miękki cień i jasne krawędzie. Na Androidzie starszym niż 12 szkło jest półprzezroczystą szybą bez rozmycia.</string>
+    <string name="element_group_navbar">Pasek dolny</string>
+    <string name="element_group_cards">Karty (urządzenia, rozmowy)</string>
+    <string name="element_group_input">Pole wiadomości i przyciski wysyłania</string>
+    <string name="element_group_search">Wyszukiwanie</string>
+    <string name="element_look">wygląd</string>
+    <string name="element_look_flat">Matowy</string>
+    <string name="element_look_depth">Z głębią</string>
+    <string name="element_look_transparent">Przezroczysty</string>
+    <string name="element_look_glass">Szkło (rozmycie)</string>
+    <string name="element_look_glass_summary">Szkło pokazuje treść spod elementu, rozmytą.</string>
+    <string name="element_look_strength">Siła efektu</string>
+    <string name="element_look_blur">Rozmycie szkła</string>
+    <string name="nav_bar_hide">Chowanie paska przy przewijaniu w dół</string>
+    <string name="nav_bar_hide_off">Nigdy nie chowaj</string>
+    <string name="nav_bar_hide_small">Po krótkim przewinięciu w dół</string>
+    <string name="nav_bar_hide_medium">Po średnim przewinięciu w dół</string>
+    <string name="nav_bar_hide_far">Po długim przewinięciu w dół</string>
+    <string name="nav_bar_show">Pokazywanie paska z powrotem</string>
+    <string name="nav_bar_show_small">Po krótkim przewinięciu w górę</string>
+    <string name="nav_bar_show_far">Po dłuższym przewinięciu w górę</string>
+    <string name="nav_bar_show_at_top">Tylko na samej górze strony</string>
+    <string name="nav_bar_new_icons">Nowe ikony paska (wyłączone = stare ikony)</string>
+    <string name="nav_bar_haptics">Wibracja przy zmianie karty</string>
+    <string name="soft_light_theme">Lekko szary biały w jasnych motywach</string>
+    <string name="input_hold_buzz">Mocna wibracja, gdy trzymasz przycisk wysyłania</string>
 </resources>

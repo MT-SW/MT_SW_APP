@@ -33,7 +33,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -406,9 +409,12 @@ fun NodeListScreen(
             },
         ) { contentPadding ->
             Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
+                // The list runs under the floating bar (shows through its glass) and ends above it.
+                FloatingBarUnderlap()
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
                 ) {
                     stickyHeader {
                         val animatedAlpha by

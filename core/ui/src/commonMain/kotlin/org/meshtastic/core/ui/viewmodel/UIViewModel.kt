@@ -60,6 +60,7 @@ import org.meshtastic.core.model.MeshActivity
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.TracerouteMapAvailability
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.asDeviceVersion
 import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.model.evaluateTracerouteMapAvailability
@@ -94,6 +95,7 @@ import org.meshtastic.core.resources.import_pending_channels_connect
 import org.meshtastic.core.resources.import_pending_contact_connect
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.theme.AppFontSettings
+import org.meshtastic.core.ui.theme.AppUiOptions
 import org.meshtastic.core.ui.theme.FontSettings
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.ComposableContent
@@ -206,12 +208,14 @@ class UIViewModel(
             .onEach { AppFontSettings.state.value = it }
             .launchIn(viewModelScope)
 
+    // The look-of-the-elements options reach every screen through one shared holder, like the typeface settings.
+    @Suppress("unused")
+    private val optionsSync =
+        uiPrefs.uiOptions.map { UiOptions(it) }.onEach { AppUiOptions.state.value = it }.launchIn(viewModelScope)
+
     /** Whether the bottom navigation is the floating rounded bar (the default) or the classic bar. */
     val floatingNavBar: StateFlow<Boolean> = uiPrefs.floatingNavBar
 
-    /** Whether the floating bar hides while the page is scrolled down, and whether it returns only at the top. */
-    val floatingNavBarAutoHide: StateFlow<Boolean> = uiPrefs.floatingNavBarAutoHide
-    val floatingNavBarOnlyAtTop: StateFlow<Boolean> = uiPrefs.floatingNavBarOnlyAtTop
 
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
     val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled

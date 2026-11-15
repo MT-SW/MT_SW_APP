@@ -77,6 +77,9 @@ import org.meshtastic.core.resources.node_not_heard_on_current_lora
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.voltage
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.icon.AirUtilization
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.MapCompass
@@ -159,7 +162,15 @@ fun NodeItem(
     val contentColor = MaterialTheme.colorScheme.onSurface
     val nodeColor =
         (if (isThisNode) thisNode?.colors?.second else thatNode.colors.second)?.let { Color(it) } ?: Color.Transparent
-    val cardColors = CardDefaults.cardColors(containerColor = nodeTintedContainer(nodeColor))
+    // MT_SW: the look the person chose for the cards (plain, with depth or see-through).
+    val cardLook = rememberUiOptions().element(UiOptions.GROUP_CARDS)
+    val cardFade =
+        if (cardLook.look == ElementLook.TRANSPARENT || cardLook.look == ElementLook.GLASS) {
+            (1f - cardLook.strength / CARD_PERCENT).coerceIn(MIN_CARD_ALPHA, 1f)
+        } else {
+            1f
+        }
+    val cardColors = CardDefaults.cardColors(containerColor = nodeTintedContainer(nodeColor).copy(alpha = cardFade))
     val cardBorder = nodeBorderStroke(nodeColor, active = isActive)
 
     val style =
@@ -198,7 +209,10 @@ fun NodeItem(
 
     Card(
         modifier =
-        modifier.nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor).fillMaxWidth().semantics(
+        modifier.nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor).fillMaxWidth().elementLook(
+            UiOptions.GROUP_CARDS,
+            MaterialTheme.shapes.medium,
+        ).semantics(
             mergeDescendants = true,
         ) {
             contentDescription = nodeDescription
@@ -732,3 +746,6 @@ private fun NodeItemFooter(thatNode: Node, contentColor: Color, deviceImageUrl: 
         NodeIdInfo(id = thatNode.user.id.ifEmpty { "???" }, contentColor = contentColor)
     }
 }
+
+private const val CARD_PERCENT = 100f
+private const val MIN_CARD_ALPHA = 0.12f
