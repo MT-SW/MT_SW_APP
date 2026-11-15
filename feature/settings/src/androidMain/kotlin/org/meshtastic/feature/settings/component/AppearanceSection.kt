@@ -48,6 +48,7 @@ internal fun ColumnScope.AppearanceSettingsContent(
     onShowFullMessageTimestampsChange: (Boolean) -> Unit,
     onShowLanguagePicker: () -> Unit,
     onShowThemePicker: () -> Unit,
+    themeSummary: String? = null,
     unitsSummary: String,
     onShowUnitsPicker: () -> Unit,
     uiScaleSummary: String,
@@ -79,7 +80,12 @@ internal fun ColumnScope.AppearanceSettingsContent(
         }
     }
 
-    ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint, trailingIcon = null) {
+    ListItem(
+        text = stringResource(Res.string.theme),
+        supportingText = themeSummary,
+        leadingIcon = MeshtasticIcons.FormatPaint,
+        trailingIcon = null,
+    ) {
         onShowThemePicker()
     }
 

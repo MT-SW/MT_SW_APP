@@ -184,6 +184,7 @@ import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SingleInstanceSettings
 import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.WidgetStatsSettingItem
 import org.meshtastic.feature.settings.component.uiScaleLabel
@@ -542,6 +543,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
     val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
     val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
     val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
@@ -549,7 +551,6 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
     if (showThemePicker) {
-        val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
         ThemePickerDialog(
             currentMode = currentTheme,
             onClickTheme = { settingsViewModel.setTheme(it) },
@@ -585,7 +586,11 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                 ElementBasicSettings(options = options, onChange = onChange)
             }
             ExpressiveSection(title = stringResource(Res.string.look_section_theme)) {
-                ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
+                ListItem(
+                    text = stringResource(Res.string.theme),
+                    supportingText = themeSummary(currentTheme),
+                    leadingIcon = MeshtasticIcons.FormatPaint,
+                ) {
                     showThemePicker = true
                 }
                 SoftLightSetting(options = options, onChange = onChange)

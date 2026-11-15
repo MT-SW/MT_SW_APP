@@ -105,6 +105,7 @@ import org.meshtastic.feature.settings.component.NotificationSection
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
@@ -159,6 +160,7 @@ fun DesktopSettingsScreen(
     var showLanguagePickerDialog by remember { mutableStateOf(false) }
     var showUiScalePickerDialog by remember { mutableStateOf(false) }
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
     if (showUiScalePickerDialog) {
         UiScalePickerDialog(
             current = uiScale,
@@ -176,7 +178,6 @@ fun DesktopSettingsScreen(
         )
     }
     if (showThemePickerDialog) {
-        val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
         ThemePickerDialog(
             currentMode = currentTheme,
             onClickTheme = { settingsViewModel.setTheme(it) },
@@ -314,6 +315,7 @@ fun DesktopSettingsScreen(
                     ExpressiveSection(title = stringResource(Res.string.app_settings)) {
                         ListItem(
                             text = stringResource(Res.string.theme),
+                            supportingText = themeSummary(currentTheme),
                             leadingIcon = MeshtasticIcons.FormatPaint,
                             trailingIcon = null,
                         ) {

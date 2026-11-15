@@ -96,6 +96,11 @@ private enum class ThemeGroup(val title: StringResource, val options: List<Theme
     OTHER(title = Res.string.theme_group_other, options = listOf(ThemeOption.DYNAMIC)),
 }
 
+/** The name of the theme with this [mode], for the line that opens the picker (null for an unknown value). */
+@Composable
+fun themeSummary(mode: Int): String? =
+    ThemeOption.entries.firstOrNull { it.mode == mode }?.let { stringResource(it.label) }
+
 /** Shared dialog for picking a theme option. Used by both Android and Desktop settings screens. */
 @Composable
 fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
@@ -113,7 +118,7 @@ fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: 
                         modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                     )
                     group.options.forEach { option ->
-                        // The theme in use: a tick and the accent colour, so the choice can be seen when the list opens.
+                        // The theme in use: a tick and the accent colour, so it can be seen when the list opens.
                         val selected = option.mode == currentMode
                         ListItem(
                             text = stringResource(option.label),

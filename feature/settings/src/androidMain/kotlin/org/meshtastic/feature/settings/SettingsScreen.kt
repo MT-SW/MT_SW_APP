@@ -85,6 +85,7 @@ import org.meshtastic.feature.settings.component.PersistenceSettingsContent
 import org.meshtastic.feature.settings.component.PrivacySettingsContent
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
+import org.meshtastic.feature.settings.component.themeSummary
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
@@ -199,6 +200,7 @@ fun SettingsScreen(
     var showThemePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showUiScalePickerDialog by rememberSaveable { mutableStateOf(false) }
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
     if (showUiScalePickerDialog) {
         UiScalePickerDialog(
             current = uiScale,
@@ -216,7 +218,6 @@ fun SettingsScreen(
         )
     }
     if (showThemePickerDialog) {
-        val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
         ThemePickerDialog(
             currentMode = currentTheme,
             onClickTheme = { settingsViewModel.setTheme(it) },
@@ -320,6 +321,7 @@ fun SettingsScreen(
                         onShowFullMessageTimestampsChange = settingsViewModel::setShowFullMessageTimestamps,
                         onShowLanguagePicker = { showLanguagePickerDialog = true },
                         onShowThemePicker = { showThemePickerDialog = true },
+                        themeSummary = themeSummary(currentTheme),
                         unitsSummary = stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
                         onShowUnitsPicker = { showUnitsPickerDialog = true },
                         uiScaleSummary = uiScaleLabel(uiScale),
