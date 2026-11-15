@@ -174,7 +174,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             // the classic look in "Look" (every choice they make is saved and stays).
             put(ICON_STYLE, ICON_STYLE_OUTLINE)
             put(GLASS_TINT, 0)
-            put(RIM, 2)
+            put(RIM, 0)
             put(PRESS_SPRING, 1)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
