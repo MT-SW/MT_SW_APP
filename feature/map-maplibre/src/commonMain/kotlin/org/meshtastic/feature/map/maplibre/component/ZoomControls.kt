@@ -44,6 +44,9 @@ private const val ZOOM_INSET = 8
  */
 internal const val ZOOM_BOTTOM_INSET = 88
 
+/** Where the smaller pair on a thumbnail map starts from the top: just below the scale. */
+private const val THUMBNAIL_ZOOM_TOP_INSET = 40
+
 /**
  * Zoom controls in the lower trailing corner of a map, where Google Maps draws its own.
  *
@@ -65,10 +68,9 @@ internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Bo
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
         modifier =
         if (centered) {
-            // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair sits in the middle
-            // of the leading edge: the scale is at the top trailing corner and the credit button at the bottom trailing
-            // one, and the wordmark is lower than the pair.
-            Modifier.align(Alignment.CenterStart).padding(start = ZOOM_INSET.dp)
+            // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair stays on the trailing
+            // edge, lowered below the scale (top corner) and ending above the credit button (bottom corner).
+            Modifier.align(Alignment.TopEnd).padding(end = ZOOM_INSET.dp, top = THUMBNAIL_ZOOM_TOP_INSET.dp)
         } else {
             Modifier.align(Alignment.BottomEnd)
                 .padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current)

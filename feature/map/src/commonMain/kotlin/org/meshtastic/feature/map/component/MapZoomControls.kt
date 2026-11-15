@@ -108,4 +108,4 @@ private const val ZOOM_BUTTON_DP = 52
 private const val ZOOM_PADDING_DP = 4
 
 /** Size of one button in the pair on a small thumbnail map. */
-private const val COMPACT_ZOOM_BUTTON_DP = 34
+private const val COMPACT_ZOOM_BUTTON_DP = 32
