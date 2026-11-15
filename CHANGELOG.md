@@ -37,6 +37,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **iPhone i iPad jak Android.** Skaner kodów QR, motyw wydarzenia, import warstw KML/KMZ/GeoJSON, widok terenu z aparatem, mapy offline, praca w tle, pełny asystent AI, sprawdzanie nowych wersji, lokalny serwer TAK, skrót Siri „Stan sieci MT_SW” i ustawienia powiadomień jak na Androidzie.
 * **Komputer.** Opcja „Uruchamiaj z komputerem” i domyślnie jedna kopia programu.
 * **Wygląd.** Motywy „Nasycony” i „Bardzo nasycony”, kategorie w wyborze motywu, opcja płaskiej ikony aplikacji; ciemne tło jest szare zamiast niebieskawego, a w motywach „Nasycony” i „Bardzo nasycony” czysto czarne (dobre dla ekranów AMOLED).
+* **Pływający pasek nawigacji.** Dolny pasek kart (a na komputerze i tablecie także boczny) to zaokrąglona „wyspa” z podpisami pod ikonami i zaznaczoną aktywną kartą; wygląda tak samo na Androidzie, komputerze i iPhonie/iPadzie, a treść strony kończy się nad nim, więc ostatnią pozycję zawsze da się przewinąć. W „Funkcje MT_SW” przełącznik „Pływający pasek nawigacji na dole” przywraca stary pasek.
 * **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
@@ -873,6 +874,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **iPhone and iPad like Android.** A QR code scanner, the event theme, import of KML/KMZ/GeoJSON layers, the terrain view with the camera, offline maps, background work, the full AI assistant, checks for new versions, the local TAK server, the Siri shortcut "MT_SW network status" and notification settings like on Android.
 * **Computer.** The "Start with the computer" option and a single copy of the program by default.
 * **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option; the dark background is grey instead of bluish, and pure black in the "Saturated" and "Very saturated" themes (good for AMOLED screens).
+* **Floating navigation bar.** The bottom tab bar (and on a computer or tablet the side bar too) is a rounded "island" with a name under each icon and the open tab highlighted; it looks the same on Android, the computer and iPhone/iPad, and a page's content ends above it, so the last item can always be scrolled into view. In "MT_SW features" the switch "Floating navigation bar at the bottom" brings the old bar back.
 * **Data.** "Add data from a backup" and synchronisation of the device statistics.
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 

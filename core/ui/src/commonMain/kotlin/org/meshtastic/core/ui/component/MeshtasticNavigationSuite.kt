@@ -25,23 +25,33 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -55,14 +65,20 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
@@ -112,6 +128,7 @@ fun MeshtasticNavigationSuite(
     val unreadMessageCount by uiViewModel.unreadMessageCount.collectAsStateWithLifecycle()
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
+    val floatingNavBar by uiViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val translatorEnabled by uiViewModel.translatorEnabled.collectAsStateWithLifecycle()
     val assistantEnabled by uiViewModel.assistantEnabled.collectAsStateWithLifecycle()
     val showAiTab = translatorEnabled || assistantEnabled
@@ -145,33 +162,54 @@ fun MeshtasticNavigationSuite(
                     )
                 }
             },
-            label =
-            if (showLabels) {
-                {
-                    Text(
-                        stringResource(
-                            when {
-                                destination != TopLevelDestination.Translator -> destination.label
-                                translatorEnabled && assistantEnabled -> Res.string.ai_tab_ai
-                                assistantEnabled -> Res.string.ai_tab_assistant
-                                else -> destination.label
-                            },
-                        ),
-                    )
-                }
-            } else {
-                null
+            label = {
+                Text(
+                    stringResource(
+                        when {
+                            destination != TopLevelDestination.Translator -> destination.label
+                            translatorEnabled && assistantEnabled -> Res.string.ai_tab_ai
+                            assistantEnabled -> Res.string.ai_tab_assistant
+                            else -> destination.label
+                        },
+                    ),
+                )
             },
         )
     }
 
     val items: NavigationSuiteScope.() -> Unit = {
         entries.forEach { entry ->
-            item(selected = entry.selected, onClick = entry.onClick, icon = entry.icon, label = entry.label)
+            item(
+                selected = entry.selected,
+                onClick = entry.onClick,
+                icon = entry.icon,
+                label = if (showLabels) entry.label else null,
+            )
         }
     }
 
-    if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
+    if (floatingNavBar) {
+        // The floating bar: a rounded island above the screen's bottom edge, on the phone, the tablet and the computer
+        // alike. The content ends above it, so the last line of every page can always be scrolled clear of the bar.
+        Surface(
+            modifier = modifier.hideKeyboardOnTapOrScroll(),
+            color = NavigationSuiteScaffoldDefaults.containerColor,
+            contentColor = NavigationSuiteScaffoldDefaults.contentColor,
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                Row(Modifier.weight(1f).fillMaxWidth()) { content() }
+                // While the keyboard is up the bar gives way to it, so the message field is not squeezed.
+                val keyboardUp = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+                if (!keyboardUp) {
+                    FloatingNavBar(
+                        entries = entries,
+                        // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
+                        bottomMargin = if (barHeight != null) barBottomGap + FLOATING_LIFT else FLOATING_MARGIN,
+                    )
+                }
+            }
+        }
+    } else if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
         Surface(
             modifier = modifier.hideKeyboardOnTapOrScroll(),
             color = NavigationSuiteScaffoldDefaults.containerColor,
@@ -235,6 +273,65 @@ fun MeshtasticNavigationSuite(
         }
     }
 }
+
+/** The floating navigation bar: all the buttons in one rounded island, the open one marked by a rounded highlight. */
+@Composable
+private fun FloatingNavBar(entries: List<NavEntry>, bottomMargin: Dp, modifier: Modifier = Modifier) {
+    Box(
+        modifier =
+        modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = bottomMargin),
+        contentAlignment = Alignment.Center,
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(max = FLOATING_MAX_WIDTH).fillMaxWidth(),
+            shape = RoundedCornerShape(FLOATING_CORNER),
+            color = colorScheme.surfaceContainerHigh,
+            shadowElevation = 8.dp,
+        ) {
+            Row(
+                modifier = Modifier.padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                for (entry in entries) {
+                    FloatingNavItem(entry = entry, modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+/** One button of the floating bar: the icon with its short name under it. */
+@Composable
+private fun FloatingNavItem(entry: NavEntry, modifier: Modifier = Modifier) {
+    val color = if (entry.selected) colorScheme.primary else colorScheme.onSurfaceVariant
+    Column(
+        modifier =
+        modifier
+            .clip(RoundedCornerShape(FLOATING_ITEM_CORNER))
+            .background(if (entry.selected) colorScheme.secondaryContainer else Color.Transparent)
+            .selectable(selected = entry.selected, onClick = entry.onClick, role = Role.Tab)
+            .padding(horizontal = 2.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CompositionLocalProvider(LocalContentColor provides color) {
+            entry.icon()
+            ProvideTextStyle(MaterialTheme.typography.labelSmall.copy(fontSize = FLOATING_LABEL_SIZE)) {
+                Box(modifier = Modifier.padding(top = 2.dp)) { entry.label?.invoke() }
+            }
+        }
+    }
+}
+
+private val FLOATING_MAX_WIDTH = 560.dp
+private val FLOATING_CORNER = 32.dp
+private val FLOATING_ITEM_CORNER = 26.dp
+private val FLOATING_MARGIN = 8.dp
+private val FLOATING_LIFT = 8.dp
+private val FLOATING_LABEL_SIZE = 10.sp
 
 /** One button of the navigation bar (the same data feeds the bottom bar and the side bar). */
 private class NavEntry(

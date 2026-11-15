@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.data_notice_settings_title
 import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.floating_nav_bar
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_summary
@@ -141,6 +142,7 @@ import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
+import org.meshtastic.core.ui.icon.DisplaySettings
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
@@ -183,6 +185,7 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
+    val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
@@ -243,6 +246,12 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.Add,
                     checked = importMenuInTopBar,
                     onClick = { settingsViewModel.setImportMenuInTopBar(!importMenuInTopBar) },
+                )
+                SwitchListItem(
+                    text = stringResource(Res.string.floating_nav_bar),
+                    leadingIcon = MeshtasticIcons.DisplaySettings,
+                    checked = floatingNavBar,
+                    onClick = { settingsViewModel.setFloatingNavBar(!floatingNavBar) },
                 )
                 AppUpdateSettings()
                 ListItem(

@@ -206,6 +206,9 @@ class UIViewModel(
             .onEach { AppFontSettings.state.value = it }
             .launchIn(viewModelScope)
 
+    /** Whether the bottom navigation is the floating rounded bar (the default) or the classic bar. */
+    val floatingNavBar: StateFlow<Boolean> = uiPrefs.floatingNavBar
+
     /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
     val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled
 

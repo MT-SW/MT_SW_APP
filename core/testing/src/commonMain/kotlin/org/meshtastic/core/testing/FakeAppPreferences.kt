@@ -468,6 +468,12 @@ class FakeUiPrefs : UiPrefs {
         autoLoadChatImages.value = value
     }
 
+    override val floatingNavBar = MutableStateFlow(true)
+
+    override fun setFloatingNavBar(value: Boolean) {
+        floatingNavBar.value = value
+    }
+
     override val translatorEnabled = MutableStateFlow(false)
 
     override fun setTranslatorEnabled(value: Boolean) {

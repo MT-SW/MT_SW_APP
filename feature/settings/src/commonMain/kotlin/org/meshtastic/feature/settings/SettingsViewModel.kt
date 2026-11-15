@@ -244,6 +244,12 @@ class SettingsViewModel(
         uiPrefs.setImportMenuInTopBar(value)
     }
 
+    val floatingNavBar = uiPrefs.floatingNavBar
+
+    fun setFloatingNavBar(value: Boolean) {
+        uiPrefs.setFloatingNavBar(value)
+    }
+
     fun setAutoLoadChatImages(value: Boolean) {
         uiPrefs.setAutoLoadChatImages(value)
     }

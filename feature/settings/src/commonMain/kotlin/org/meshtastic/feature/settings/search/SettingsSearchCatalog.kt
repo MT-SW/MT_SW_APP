@@ -49,6 +49,7 @@ import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
+import org.meshtastic.core.resources.floating_nav_bar
 import org.meshtastic.core.resources.font_family
 import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
@@ -234,6 +235,7 @@ object SettingsSearchCatalog {
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
             Res.string.skip_bad_time_chart_points to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,
+            Res.string.floating_nav_bar to SettingsRoute.MtSwFeatures,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,
             Res.string.node_layout_section_title to SettingsRoute.NodeList,

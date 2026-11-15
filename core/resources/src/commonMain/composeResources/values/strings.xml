@@ -1530,6 +1530,7 @@
     <string name="firmware_update_wipe_usb_detail">Wipes the device's flash completely, then installs the selected firmware from scratch.</string>
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
+    <string name="floating_nav_bar">Floating navigation bar at the bottom</string>
     <!-- FONT -->
     <string name="font_default">As designed</string>
     <string name="font_family">Font</string>

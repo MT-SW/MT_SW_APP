@@ -247,6 +247,14 @@ interface UiPrefs {
 
     fun setImportMenuInTopBar(value: Boolean)
 
+    /**
+     * MT_SW: the bottom navigation is a floating rounded bar (on, the default; on a computer and a tablet it replaces the
+     * side bar too) or the classic bottom bar / side bar (off).
+     */
+    val floatingNavBar: StateFlow<Boolean>
+
+    fun setFloatingNavBar(value: Boolean)
+
     fun setAutoLoadChatImages(value: Boolean)
 
     /**
