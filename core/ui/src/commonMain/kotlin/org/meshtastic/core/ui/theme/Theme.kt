@@ -457,6 +457,32 @@ fun saturationFor(mode: Int): Int = when (mode) {
     else -> 100
 }
 
+/**
+ * The two colours that show a theme in the picker: its background and its main (accent) colour. Null for the theme
+ * from the wallpaper, whose colours are not known until the system gives them.
+ */
+@Composable
+fun themePreviewColors(mode: Int): Pair<Color, Color>? {
+    if (mode == MODE_DYNAMIC) return null
+    val systemDark = isSystemInDarkTheme()
+    val dark =
+        when {
+            mode == MODE_MONO_DARK || isVividDark(mode) || mode == 2 -> true
+            mode == MODE_MONO_LIGHT || isVividLight(mode) || mode == 1 -> false
+            else -> systemDark
+        }
+    val scheme =
+        when {
+            isMonochromeMode(mode) -> if (dark) monoDarkScheme else monoLightScheme
+            else -> {
+                val saturation = saturationFor(mode)
+                val base = (if (dark) darkScheme else lightScheme).withSaturation(saturation)
+                if (dark && saturation > 100) base.withTrueBlack() else base
+            }
+        }
+    return scheme.background to scheme.primary
+}
+
 /** True when [mode] is a saturated theme that is always light. */
 fun isVividLight(mode: Int): Boolean = mode == MODE_VIVID_LIGHT || mode == MODE_VERY_VIVID_LIGHT
 

@@ -19,6 +19,14 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -53,6 +61,7 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
+import org.meshtastic.core.ui.theme.themePreviewColors
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.MODE_VERY_VIVID
@@ -120,14 +129,19 @@ fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: 
                     group.options.forEach { option ->
                         // The theme in use: a tick and the accent colour, so it can be seen when the list opens.
                         val selected = option.mode == currentMode
-                        ListItem(
-                            text = stringResource(option.label),
-                            textColor = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
-                            trailingIcon = if (selected) MeshtasticIcons.Check else null,
-                            trailingIconTint = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
-                        ) {
-                            onClickTheme(option.mode)
-                            onDismiss()
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            ThemeSwatch(option.mode, Modifier.padding(start = 16.dp))
+                            ListItem(
+                                text = stringResource(option.label),
+                                modifier = Modifier.weight(1f),
+                                textColor = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                                trailingIcon = if (selected) MeshtasticIcons.Check else null,
+                                trailingIconTint =
+                                if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                            ) {
+                                onClickTheme(option.mode)
+                                onDismiss()
+                            }
                         }
                     }
                 }
@@ -135,3 +149,25 @@ fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: 
         },
     )
 }
+
+/** A small circle with the theme's background and its accent colour, so the themes can be told apart at a glance. */
+@Composable
+private fun ThemeSwatch(mode: Int, modifier: Modifier = Modifier) {
+    val colors = themePreviewColors(mode)
+    // The wallpaper theme has no fixed colours: a ring in the colours of the theme in use stands for it.
+    val background = colors?.first ?: MaterialTheme.colorScheme.surfaceVariant
+    val accent = colors?.second ?: MaterialTheme.colorScheme.primary
+    Box(
+        modifier =
+        modifier
+            .size(SWATCH_SIZE_DP.dp)
+            .clip(CircleShape)
+            .background(background)
+            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(Modifier.size((SWATCH_SIZE_DP / 2).dp).clip(CircleShape).background(accent))
+    }
+}
+
+private const val SWATCH_SIZE_DP = 24
