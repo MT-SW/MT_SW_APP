@@ -17,6 +17,7 @@
 package org.meshtastic.core.domain.usecase.settings
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -24,7 +25,6 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.UiPrefs
-import kotlinx.coroutines.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 /**
