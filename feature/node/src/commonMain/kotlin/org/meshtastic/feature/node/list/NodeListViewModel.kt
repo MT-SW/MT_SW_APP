@@ -554,7 +554,7 @@ internal fun org.meshtastic.proto.MeshPacket.toNeighborReport(): NeighborReport?
     val payload = decoded?.payload ?: return null
     val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return null
     return NeighborReport(
-        receivedMillis = rx_time * MILLIS_PER_SECOND,
+        receivedMillis = (rx_time ?: 0) * MILLIS_PER_SECOND,
         neighbors = info.neighbors.filter { it.node_id != 0 }.map { NeighborEntry(it.node_id, it.snr) },
         packet = this,
     )
