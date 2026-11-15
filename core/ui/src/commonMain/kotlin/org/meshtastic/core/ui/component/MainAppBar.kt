@@ -173,10 +173,9 @@ private fun TopBarActions(
     val chipNode = ourNode ?: extras.ourNode
     // The plate is only for the main cards (they say so with showNodeChip); the others show just the SOS button.
     val chipVisible = chipNode != null && showNodeChip && (ourNode != null || extras.connected)
-    val openSos = extras.onOpenSos
-    val sosVisible = sosScreen != null && openSos != null && sosScreen.key in extras.sosScreens
+    val openSos = extras.onOpenSos?.takeIf { sosScreen != null && sosScreen.key in extras.sosScreens }
 
-    if (sosVisible && openSos != null) {
+    if (openSos != null) {
         SosChip(
             onClick = openSos,
             modifier = Modifier.padding(start = 8.dp),

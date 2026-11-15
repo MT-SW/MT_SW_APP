@@ -280,4 +280,4 @@ fun MeshtasticTextDialog(
 }
 
 private const val DIALOG_PERCENT = 100f
-private const val DIALOG_MIN_ALPHA = 0.92f
+private const val DIALOG_MIN_ALPHA = 0.85f
