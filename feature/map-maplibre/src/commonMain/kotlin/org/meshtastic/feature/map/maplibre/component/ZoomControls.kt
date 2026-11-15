@@ -36,13 +36,13 @@ import org.meshtastic.feature.map.maplibre.zoomBy
 private const val ZOOM_INSET = 8
 
 /**
- * Lift above the attribution button, which is 40dp of icon plus its pill padding and shares this corner. More than the
+ * Lift above the credit strip (up to three lines) and the attribution button, which share this corner; the propagation legend is lifted by the same amount. More than the
  * cards need on the other side, where only the 23dp wordmark sits.
  *
  * The button is there either way — the small maps only collapse its credit, see [CollapsedAttributionOrnaments] — so
  * this clears it whether it is expanded or not.
  */
-private const val ZOOM_BOTTOM_INSET = 56
+internal const val ZOOM_BOTTOM_INSET = 88
 
 /**
  * Zoom controls in the lower trailing corner of a map, where Google Maps draws its own.

@@ -50,7 +50,6 @@ import org.maplibre.compose.overlay.DisappearingScaleBar
 import org.maplibre.compose.overlay.LocalViewportInsets
 import org.maplibre.compose.overlay.MaplibreLogo
 import org.maplibre.compose.overlay.attributions
-import org.maplibre.compose.overlay.include
 import org.maplibre.compose.overlay.MapOverlay as MaplibreOverlay
 
 /**
@@ -87,22 +86,30 @@ internal fun meshMapOrnaments(extraCredits: List<String>): MaplibreOverlay = Map
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(MaplibreOverlay.Spacing),
     ) {
+        // Below the toolbar at the top, so the scale does not run under it.
         DisappearingScaleBar(
             metersPerDp = { mapState.viewport?.metersPerDpAtCenter ?: 0.0 },
             zoom = { mapState.cameraPosition.zoom },
-            modifier = Modifier.align(Alignment.TopStart),
+            modifier = Modifier.align(Alignment.TopStart).padding(top = SCALE_BAR_TOP_DP.dp),
         )
-        if (extraCredits.isNotEmpty()) {
-            // Ours rather than the library's button, which draws nothing when the style itself credits nobody, as a
-            // custom raster basemap may not.
-            MaplibreLogo(Modifier.align(Alignment.BottomStart))
-            CreditButton(Modifier.align(Alignment.BottomEnd), extraCredits = extraCredits, startExpanded = true)
-        }
+        // Ours rather than the library's button (which let the credit run under the logo): the credit takes at most
+        // MAIN_CREDIT_WIDTH_FRACTION of the width, so the logo on the left always stays clear. It also draws the
+        // credit of a custom raster basemap whose style credits nobody.
+        MaplibreLogo(Modifier.align(Alignment.BottomStart))
+        CreditButton(
+            Modifier.align(Alignment.BottomEnd),
+            extraCredits = extraCredits,
+            startExpanded = true,
+            widthFraction = MAIN_CREDIT_WIDTH_FRACTION,
+        )
     }
-
-    // The logo and the attribution button, in the places `MapOverlay.Default` puts them.
-    if (extraCredits.isEmpty()) include(MaplibreOverlay.AttributionOnly)
 }
+
+/** The scale bar sits this far from the top, under the toolbar of the main map. */
+private const val SCALE_BAR_TOP_DP = 64
+
+/** The credit of the main map may take this part of the width; the rest keeps the logo clear. */
+private const val MAIN_CREDIT_WIDTH_FRACTION = 0.7f
 
 /**
  * `MapOverlay.Default` with the credit collapsed, for a map too small to host the credit without it overflowing: the
@@ -151,6 +158,7 @@ private fun CreditButton(
     modifier: Modifier = Modifier,
     extraCredits: List<String> = emptyList(),
     startExpanded: Boolean = false,
+    widthFraction: Float = CREDIT_WIDTH_FRACTION,
 ) {
     val mapState = checkNotNull(LocalMapState.current)
     val mapStyle = mapState.style
@@ -172,7 +180,7 @@ private fun CreditButton(
 
     BoxWithConstraints(modifier.clip(RoundedCornerShape(24.dp)).background(AttributionDefaults.ContainerColor)) {
         // Read out here, not inside AnimatedVisibility: that lambda's receiver hides this scope.
-        val creditMaxWidth = maxWidth * CREDIT_WIDTH_FRACTION
+        val creditMaxWidth = maxWidth * widthFraction
         Row(verticalAlignment = Alignment.CenterVertically) {
             // The toggle is last: the container is trailing-aligned, so a leading toggle would sit inboard of the
             // credit

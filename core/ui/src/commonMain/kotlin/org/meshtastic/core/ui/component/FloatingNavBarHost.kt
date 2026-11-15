@@ -25,7 +25,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -70,9 +69,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -356,39 +356,34 @@ private const val DARKER_SHARE = 0.22f
 /** How much denser (less see-through, in strength points) the bar is on the map card. */
 private const val MAP_BAR_DENSER = 30
 
-private const val LABEL_MIN_SP = 5f
-private const val LABEL_STEP_SP = 0.25f
-
 /**
- * The name of a button on one line, as big as fits. The size is measured here (not left to the text system, which on
- * iPhone did not shrink it): from [LABEL_SIZE_SP] down in small steps until the whole name fits the width of the
- * button, so "Zdrowie sieci" is never cut off.
+ * The name of a button on one line, never cut off. It is measured as it really is laid out (one line, as wide as it
+ * wants) and, when that is wider than the button, drawn smaller by exactly the ratio that makes it fit - so it holds
+ * on every system, whatever the font, instead of relying on a guess of the text width.
  */
 @Composable
 private fun FitLabel(text: String) {
-    val measurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val style = MaterialTheme.typography.labelSmall.copy(color = LocalContentColor.current, textAlign = TextAlign.Center)
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val maxPx = constraints.maxWidth
-        val size =
-            remember(text, maxPx, style, density) {
-                var s = LABEL_SIZE_SP.toFloat()
-                while (
-                    s > LABEL_MIN_SP &&
-                    measurer.measure(text, style.copy(fontSize = s.sp), softWrap = false, maxLines = 1, density = density)
-                        .size.width > maxPx
-                ) {
-                    s -= LABEL_STEP_SP
+    BasicText(
+        text = text,
+        style =
+        MaterialTheme.typography.labelSmall.copy(
+            fontSize = LABEL_SIZE_SP.sp,
+            color = LocalContentColor.current,
+            textAlign = TextAlign.Center,
+        ),
+        maxLines = 1,
+        softWrap = false,
+        modifier =
+        Modifier.fillMaxWidth().layout { measurable, constraints ->
+            val placeable = measurable.measure(Constraints())
+            val available = if (constraints.hasBoundedWidth) constraints.maxWidth else placeable.width
+            val scale = if (placeable.width > available && placeable.width > 0) available.toFloat() / placeable.width else 1f
+            layout(available, placeable.height) {
+                placeable.placeWithLayer((available - placeable.width) / 2, 0) {
+                    scaleX = scale
+                    scaleY = scale
                 }
-                s
             }
-        BasicText(
-            text = text,
-            modifier = Modifier.fillMaxWidth(),
-            style = style.copy(fontSize = size.sp),
-            maxLines = 1,
-            softWrap = false,
-        )
-    }
+        },
+    )
 }

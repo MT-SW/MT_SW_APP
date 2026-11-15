@@ -40,7 +40,7 @@ import org.meshtastic.core.resources.propagation_hour_ahead
 import org.meshtastic.core.resources.propagation_hour_now
 import org.meshtastic.feature.map.propagation.PropagationController
 
-private const val OVERLAY_BACKGROUND_ALPHA = 0.85f
+private const val OVERLAY_BACKGROUND_ALPHA = 0.55f
 private const val HOUR_LABEL_WIDTH_DP = 64
 private const val SLIDER_HEIGHT_DP = 32
 

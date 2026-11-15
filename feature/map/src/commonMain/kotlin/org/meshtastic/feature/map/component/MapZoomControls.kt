@@ -17,11 +17,14 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
@@ -58,11 +61,13 @@ fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modif
             icon = MeshtasticIcons.Add,
             contentDescription = stringResource(Res.string.zoom_in),
             onClick = onZoomIn,
+            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(ZOOM_BUTTON_DP.dp),
         )
         MapButton(
             icon = MeshtasticIcons.Remove,
             contentDescription = stringResource(Res.string.zoom_out),
             onClick = onZoomOut,
+            modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(ZOOM_BUTTON_DP.dp),
         )
     }
     if (style.look == ElementLook.FLAT) {
@@ -84,9 +89,13 @@ fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modif
             floating = true,
             fallbackMinAlpha = MAP_GLASS_MIN_ALPHA,
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.padding(ZOOM_PADDING_DP.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 CompositionLocalProvider(LocalMapButtonInToolbar provides true) { buttons() }
             }
         }
     }
 }
+
+/** Size of one zoom button and the room around the pair (bigger than a toolbar icon: it is pressed often, by thumb). */
+private const val ZOOM_BUTTON_DP = 52
+private const val ZOOM_PADDING_DP = 4

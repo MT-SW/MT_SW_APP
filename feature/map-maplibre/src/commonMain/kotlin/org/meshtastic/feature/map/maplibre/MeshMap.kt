@@ -95,6 +95,7 @@ import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
+import org.meshtastic.feature.map.maplibre.component.ZOOM_BOTTOM_INSET
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -407,7 +408,7 @@ fun MeshMap(
         PropagationOverlay(
             Modifier.align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = 56.dp + LocalFloatingBarInset.current),
+                .padding(start = 8.dp, end = PROPAGATION_END_CLEARANCE_DP.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current),
         )
     }
 }
