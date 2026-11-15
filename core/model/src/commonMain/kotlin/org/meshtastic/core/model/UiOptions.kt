@@ -163,7 +163,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(PRESENCE_SHOW, 1)
             put(PRESENCE_ICON, PRESENCE_ICON_DOT)
             put(PRESENCE_REPLACE, PRESENCE_REPLACE_NONE)
-            put(PRESENCE_EXPIRY, 2)
+            put(PRESENCE_EXPIRY, 1)
             put(PRESENCE_COLOR, 0)
             put(PRESENCE_ASK, 1)
             put(HOLD_BUZZ, 1)
