@@ -3918,6 +3918,8 @@
     <string name="url_template">URL Template</string>
     <string name="url_template_hint" translatable="false">https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</string>
     <string name="usb">USB</string>
+    <string name="usb_blocked_hint">iPhone and iPad do not let apps use the USB serial port (it would need a special chip approved by Apple). Connect over Bluetooth or the network instead.</string>
+    <string name="usb_blocked_title">USB is not supported on this device</string>
     <string name="usb_permission_denied">USB permission denied. Reconnect the device to try again.</string>
     <string name="use_homoglyph_characters_encoding">Compact encoding for Cyrillic</string>
     <!-- USER -->

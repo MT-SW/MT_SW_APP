@@ -21,7 +21,7 @@
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 ## better | Ulepszenia
-- Przyciski + i − na mapie są teraz przezroczyste jak paski z ikonami, napis „Zdrowie sieci” na dolnym pasku zawsze mieści się w całości (rozmiar liczony ręcznie, także na iPhonie), a w wyborze Bluetooth / Sieć / USB nie ma już cienia ani ptaszka (wybrany jest zaznaczony szarym tłem). Na iPhonie i iPadzie nie ma przycisku USB, bo USB tam nie działa.
+- Przyciski + i − na mapie są teraz przezroczyste jak paski z ikonami, napis „Zdrowie sieci” na dolnym pasku zawsze mieści się w całości (rozmiar liczony ręcznie, także na iPhonie), a w wyborze Bluetooth / Sieć / USB nie ma już cienia ani ptaszka (wybrany jest zaznaczony szarym tłem). Na iPhonie i iPadzie przycisk USB zostaje, a pod nim jest krótka informacja, że system nie pozwala aplikacjom używać USB (do tego potrzebny byłby specjalny układ zatwierdzony przez Apple).
 - Mapa: paski z ikonami i przyciski przybliżania są bardziej przezroczyste, a dolny pasek nawigacji jest na mapie gęstszy, więc lepiej widać napisy.
 - Statystyki urządzenia (metryki w szczegółach węzła) otwierają się szybciej, zwłaszcza na iPhonie: najpierw pokazują najnowsze wpisy, a pełna historia dochodzi zaraz potem.
 - Wygląd: nowe ustawienia „Zaznaczenie otwartej karty” (zaokrąglone tło, kreska pod napisem albo oba) i „Gradient na przyciskach” (wyłączony, delikatny, normalny, mocny).

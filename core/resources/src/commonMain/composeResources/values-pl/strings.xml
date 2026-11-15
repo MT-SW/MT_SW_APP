@@ -1791,6 +1791,8 @@
     <string name="no_pax_metrics_logs">Brak dostępnych metryk PAX.</string>
     <string name="no_usb_devices_found">Nie znaleziono urządzeń USB</string>
     <string name="no_usb_devices_hint">Podłącz urządzenie kablem danych USB, aby użyć portu szeregowego.</string>
+    <string name="usb_blocked_title">USB nie jest tu obsługiwane</string>
+    <string name="usb_blocked_hint">iPhone i iPad nie pozwalają aplikacjom używać portu szeregowego USB (potrzebny byłby specjalny układ zatwierdzony przez Apple). Połącz się przez Bluetooth lub Sieć.</string>
     <string name="no_usb_devices_seen">Nie wykryto urządzeń USB</string>
     <!-- NODE -->
     <string name="node_count_online">%1$d online</string>

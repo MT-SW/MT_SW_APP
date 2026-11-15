@@ -3840,6 +3840,8 @@ url_must_contain_placeholders
 url_template
 url_template_hint
 usb
+usb_blocked_hint
+usb_blocked_title
 usb_permission_denied
 use_homoglyph_characters_encoding
 ### USER ###

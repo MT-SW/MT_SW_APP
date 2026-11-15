@@ -68,6 +68,8 @@ import org.meshtastic.core.resources.scan_network_devices
 import org.meshtastic.core.resources.scanning_bluetooth
 import org.meshtastic.core.resources.scanning_network
 import org.meshtastic.core.resources.usb
+import org.meshtastic.core.resources.usb_blocked_hint
+import org.meshtastic.core.resources.usb_blocked_title
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Close
@@ -111,6 +113,7 @@ fun DeviceList(
     virtualDevices: List<DeviceListEntry> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     header: (@Composable () -> Unit)? = null,
+    usbBlockedBySystem: Boolean = false,
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     val sheetState =
@@ -171,6 +174,7 @@ fun DeviceList(
                     connectionState = connectionState,
                     selectedDevice = selectedDevice,
                     onSelectDevice = onSelectDevice,
+                    blockedBySystem = usbBlockedBySystem,
                 )
         }
         if (virtualDevices.isNotEmpty()) {
@@ -251,6 +255,7 @@ private fun LazyListScope.usbSection(
     connectionState: ConnectionState,
     selectedDevice: String,
     onSelectDevice: (DeviceListEntry) -> Unit,
+    blockedBySystem: Boolean = false,
 ) {
     item(key = "header:usb", contentType = "header") { DeviceSectionHeader(title = stringResource(Res.string.usb)) }
     items(usbDevices, key = { device -> "usb:${device.fullAddress}" }, contentType = { "device" }) { device ->
@@ -264,8 +269,9 @@ private fun LazyListScope.usbSection(
     if (usbDevices.isEmpty()) {
         item(key = "empty:usb", contentType = "empty") {
             SectionEmptyState(
-                text = stringResource(Res.string.no_usb_devices_seen),
-                supportingText = stringResource(Res.string.no_usb_devices_hint),
+                text = stringResource(if (blockedBySystem) Res.string.usb_blocked_title else Res.string.no_usb_devices_seen),
+                supportingText =
+                stringResource(if (blockedBySystem) Res.string.usb_blocked_hint else Res.string.no_usb_devices_hint),
                 imageVector = MeshtasticIcons.Usb,
             )
         }

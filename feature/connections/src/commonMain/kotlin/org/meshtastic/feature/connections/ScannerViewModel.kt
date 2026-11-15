@@ -169,6 +169,12 @@ open class ScannerViewModel(
     val usbSupported: Boolean = true,
 ) : ViewModel() {
 
+    /**
+     * True where the system itself forbids USB serial access (iPhone / iPad): the USB pane stays visible but shows a
+     * note instead of a device search.
+     */
+    open val usbBlockedBySystem: Boolean = false
+
     // ── Mock / demo transport ─────────────────────────────────────────────────────────────────
 
     /**

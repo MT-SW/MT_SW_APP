@@ -784,6 +784,7 @@ fun ConnectionsScreen(
                     selectedDevice = selectedDevice,
                     bleDevices = bleDevices,
                     usbDevices = usbDevices,
+                    usbBlockedBySystem = scanModel.usbBlockedBySystem,
                     virtualDevices = virtualDevices,
                     discoveredTcpDevices = discoveredTcpDevices,
                     recentTcpDevices = recentTcpDevices,

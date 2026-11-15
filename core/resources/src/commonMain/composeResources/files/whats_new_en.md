@@ -21,7 +21,7 @@
 - **Data.** "Add data from a backup" and synchronisation of the device statistics.
 - **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 ## better | Improvements
-- The + and − buttons on the map are now see-through like the icon toolbars, the "Network health" name on the bottom bar always fits completely (the size is measured by hand, also on iPhone), and the Bluetooth / Network / USB switch has no shadow and no tick any more (the chosen one is marked with a grey fill). iPhone and iPad have no USB button, because USB does not work there.
+- The + and − buttons on the map are now see-through like the icon toolbars, the "Network health" name on the bottom bar always fits completely (the size is measured by hand, also on iPhone), and the Bluetooth / Network / USB switch has no shadow and no tick any more (the chosen one is marked with a grey fill). On iPhone and iPad the USB button stays, with a short note under it that the system does not let apps use USB (it would need a special chip approved by Apple).
 - Map: the toolbars with icons and the zoom buttons are more see-through, and the bottom navigation bar is denser on the map, so the names are easier to read.
 - Device statistics (the metrics in the node details) open faster, especially on the iPhone: they show the newest entries first and the full history follows right after.
 - Look: new settings "Marking of the open tab" (rounded highlight, a line under the name or both) and "Gradient on the buttons" (off, delicate, normal, strong).
