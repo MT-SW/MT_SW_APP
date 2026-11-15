@@ -20,10 +20,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
@@ -194,3 +198,47 @@ fun StyledSurface(
 
 /** The biggest blur the settings offer, in dp. */
 const val MAX_BLUR_DP = 60
+
+/**
+ * The group of looks that the cards ([StyledCard], [TitledCard] and the like) of the current screen follow. Screens
+ * with their own group of looks (node details, the assistant, network health, settings) provide it; everywhere else
+ * it is the general "cards" group.
+ */
+val LocalCardGroup = staticCompositionLocalOf { UiOptions.GROUP_CARDS }
+
+/** The colour of a card of [group]: [base], made see-through when the group is transparent or glass. */
+@Composable
+fun cardContainerColor(base: Color, group: String = LocalCardGroup.current): Color {
+    val options = rememberUiOptions()
+    val style = options.element(group)
+    return when (style.look) {
+        ElementLook.GLASS -> options.glassBase(base).copy(alpha = seeThroughAlpha(style.strength))
+        ElementLook.TRANSPARENT -> base.copy(alpha = seeThroughAlpha(style.strength))
+        else -> base
+    }
+}
+
+/**
+ * A card in the look chosen for its group (see [LocalCardGroup]): plain, with depth (shadow, light along the upper
+ * edge, a thin rim) or see-through with a thin rim.
+ */
+@Composable
+fun StyledCard(
+    modifier: Modifier = Modifier,
+    baseColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    shape: Shape = MaterialTheme.shapes.medium,
+    group: String = LocalCardGroup.current,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val options = rememberUiOptions()
+    val style = options.element(group)
+    val seeThrough = style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS
+    Card(
+        modifier = modifier.elementLook(group, shape),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = cardContainerColor(baseColor, group)),
+        border =
+        if (seeThrough) BorderStroke(options.rimDp().dp, Color.White.copy(alpha = RIM_ALPHA_ON_GLASS)) else null,
+        content = content,
+    )
+}

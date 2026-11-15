@@ -54,9 +54,32 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val GROUP_DIALOGS = "dialogs"
         const val GROUP_INPUT = "input"
         const val GROUP_SEARCH = "search"
+        const val GROUP_TOPBAR = "topbar"
+        const val GROUP_MAP = "map"
+        const val GROUP_DETAILS = "details"
+        const val GROUP_ASSISTANT = "assistant"
+        const val GROUP_HEALTH = "health"
+        const val GROUP_SETTINGS = "settingscards"
+
+        /** Every group of elements whose look can be chosen. */
+        val ALL_GROUPS =
+            listOf(
+                GROUP_NAV,
+                GROUP_TOPBAR,
+                GROUP_CARDS,
+                GROUP_DETAILS,
+                GROUP_BUBBLES,
+                GROUP_INPUT,
+                GROUP_SEARCH,
+                GROUP_DIALOGS,
+                GROUP_MAP,
+                GROUP_ASSISTANT,
+                GROUP_HEALTH,
+                GROUP_SETTINGS,
+            )
 
         /** The groups that float above the content and so can be glass. */
-        val GLASS_GROUPS = setOf(GROUP_NAV, GROUP_INPUT, GROUP_SEARCH)
+        val GLASS_GROUPS = setOf(GROUP_NAV, GROUP_INPUT, GROUP_SEARCH, GROUP_TOPBAR, GROUP_MAP)
 
         const val SOFT_LIGHT = "theme.softLight"
         const val NAV_HIDE = "navbar.hide"
@@ -91,36 +114,22 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         private const val DEFAULT_STRENGTH = 55
         private const val DEFAULT_BLUR = 20
 
-        val DEFAULTS: Map<String, Int> =
-            mapOf(
-                SOFT_LIGHT to 0,
-                NAV_HIDE to 0,
-                NAV_SHOW to 0,
-                NAV_ICONS to 1,
-                NAV_HAPTICS to 1,
-                HOLD_BUZZ to 1,
-                ICON_STYLE to ICON_STYLE_STANDARD,
-                GLASS_TINT to 0,
-                RIM to 2,
-                PRESS_SPRING to 0,
-                "$GROUP_DIALOGS.look" to ElementLook.FLAT,
-                "$GROUP_DIALOGS.strength" to DEFAULT_STRENGTH,
-                "$GROUP_DIALOGS.blur" to DEFAULT_BLUR,
-                "$GROUP_NAV.look" to ElementLook.FLAT,
-                "$GROUP_NAV.strength" to DEFAULT_STRENGTH,
-                "$GROUP_NAV.blur" to DEFAULT_BLUR,
-                "$GROUP_CARDS.look" to ElementLook.FLAT,
-                "$GROUP_CARDS.strength" to DEFAULT_STRENGTH,
-                "$GROUP_CARDS.blur" to DEFAULT_BLUR,
-                "$GROUP_BUBBLES.look" to ElementLook.FLAT,
-                "$GROUP_BUBBLES.strength" to DEFAULT_STRENGTH,
-                "$GROUP_BUBBLES.blur" to DEFAULT_BLUR,
-                "$GROUP_INPUT.look" to ElementLook.FLAT,
-                "$GROUP_INPUT.strength" to DEFAULT_STRENGTH,
-                "$GROUP_INPUT.blur" to DEFAULT_BLUR,
-                "$GROUP_SEARCH.look" to ElementLook.FLAT,
-                "$GROUP_SEARCH.strength" to DEFAULT_STRENGTH,
-                "$GROUP_SEARCH.blur" to DEFAULT_BLUR,
-            )
+        val DEFAULTS: Map<String, Int> = buildMap {
+            put(SOFT_LIGHT, 0)
+            put(NAV_HIDE, 0)
+            put(NAV_SHOW, 0)
+            put(NAV_ICONS, 1)
+            put(NAV_HAPTICS, 1)
+            put(HOLD_BUZZ, 1)
+            put(ICON_STYLE, ICON_STYLE_STANDARD)
+            put(GLASS_TINT, 0)
+            put(RIM, 2)
+            put(PRESS_SPRING, 0)
+            for (group in ALL_GROUPS) {
+                put("$group.look", ElementLook.FLAT)
+                put("$group.strength", DEFAULT_STRENGTH)
+                put("$group.blur", DEFAULT_BLUR)
+            }
+        }
     }
 }
