@@ -17,7 +17,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
+import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
