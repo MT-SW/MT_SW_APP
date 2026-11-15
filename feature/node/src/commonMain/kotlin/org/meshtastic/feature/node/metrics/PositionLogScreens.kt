@@ -26,10 +26,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
@@ -219,7 +221,11 @@ fun PositionLogScreen(
                 )
             },
             listPart = { modifier, selectedX, lazyListState, onCardClick ->
-                LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
+                LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+            ) {
                     if (hasTrackPoint) {
                         item(key = "icon_legend", contentType = "icon_legend") {
                             TrackIconLegend(

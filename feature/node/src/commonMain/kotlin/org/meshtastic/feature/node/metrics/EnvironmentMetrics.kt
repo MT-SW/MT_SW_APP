@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.FilterChip
@@ -47,6 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
@@ -183,7 +185,11 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
             }
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+            ) {
                 itemsIndexed(
                     filteredTelemetries,
                     key = { index, telemetry -> "${telemetry.time}_$index" },

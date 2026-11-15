@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -56,6 +57,7 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.TelemetryType
@@ -267,7 +269,11 @@ fun AirQualityMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Uni
             )
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+            ) {
                 itemsIndexed(
                     newestFirstSamples,
                     key = { index, sample -> "${sample.telemetry.time}_$index" },

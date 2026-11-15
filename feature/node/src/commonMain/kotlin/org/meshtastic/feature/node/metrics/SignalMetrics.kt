@@ -31,10 +31,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.ButtonDefaults
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -308,7 +310,11 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                     )
                 }
             } else {
-                LazyColumn(modifier = contentModifier.fillMaxSize(), state = lazyListState) {
+                LazyColumn(
+                modifier = contentModifier.fillMaxSize(),
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+            ) {
                     itemsIndexed(
                         data,
                         key = { _, entry -> entry.key },

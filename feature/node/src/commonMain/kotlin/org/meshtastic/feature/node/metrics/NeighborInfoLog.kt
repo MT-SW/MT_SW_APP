@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenu
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -162,9 +164,17 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
             FullScreenLoading(modifier = Modifier.padding(innerPadding))
             return@Scaffold
         }
+        // The list runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
         LazyColumn(
-            modifier = modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = modifier.fillMaxSize(),
+            contentPadding =
+            PaddingValues(
+                start = 16.dp,
+                top = innerPadding.calculateTopPadding(),
+                end = 16.dp,
+                bottom = innerPadding.calculateBottomPadding() + LocalFloatingBarInset.current,
+            ),
         ) {
             items(logItems, key = { it.uuid }) { item ->
                 val time = DateFormatter.formatDateTime(item.receivedDate)

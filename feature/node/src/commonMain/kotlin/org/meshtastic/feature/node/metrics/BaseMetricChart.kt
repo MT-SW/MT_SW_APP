@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
@@ -326,6 +327,8 @@ fun <T> BaseMetricScreen(
             )
         },
     ) { innerPadding ->
+        // The list runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
         Column(modifier = Modifier.padding(innerPadding)) {
             if (displayInfoDialog) {
                 LegendInfoDialog(
