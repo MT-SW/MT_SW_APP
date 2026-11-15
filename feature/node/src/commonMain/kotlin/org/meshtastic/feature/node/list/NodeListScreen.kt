@@ -43,7 +43,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import org.meshtastic.core.ui.icon.Icon

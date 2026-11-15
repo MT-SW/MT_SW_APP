@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ButtonDefaults
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalContentColor

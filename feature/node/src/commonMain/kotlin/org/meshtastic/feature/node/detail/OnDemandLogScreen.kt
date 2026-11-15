@@ -40,7 +40,7 @@ import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
+import org.meshtastic.core.ui.component.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.IconButton

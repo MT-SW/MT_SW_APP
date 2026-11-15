@@ -91,7 +91,7 @@ fun Card(
 }
 
 @Composable
-private fun Modifier.styledLook(group: String, shape: Shape, look: Int, rimDp: Float): Modifier {
+internal fun Modifier.styledLook(group: String, shape: Shape, look: Int, rimDp: Float): Modifier {
     val withDepth = elementLook(group, shape)
     val seeThrough = look == ElementLook.TRANSPARENT || look == ElementLook.GLASS
     return if (seeThrough) withDepth.glassEdge(shape, rimDp) else withDepth
