@@ -28,7 +28,8 @@ import org.meshtastic.core.ui.component.SosBarScreen
 
 /**
  * App bar for a screen that configures either the connected node or a remote one: while [isLocal] the subtitle is
- * [localSubtitle], otherwise it names [destNode] as the node being administered.
+ * [localSubtitle], otherwise it names [destNode] as the node being administered, and the plate in the bar is that
+ * node's short name.
  */
 @Composable
 internal fun RadioAdminAppBar(
@@ -53,8 +54,9 @@ internal fun RadioAdminAppBar(
         } else {
             stringResource(Res.string.remotely_administrating, destNode?.effectiveLongName.orEmpty())
         },
-        ourNode = ourNode,
-        showNodeChip = showNodeChip,
+        // MT_SW: while a remote node is administered the plate shows that node (its short name), not ours.
+        ourNode = if (isLocal) ourNode else destNode,
+        showNodeChip = if (isLocal) showNodeChip else destNode != null,
         canNavigateUp = canNavigateUp,
         onNavigateUp = onNavigateUp,
         onClickChip = onClickChip,

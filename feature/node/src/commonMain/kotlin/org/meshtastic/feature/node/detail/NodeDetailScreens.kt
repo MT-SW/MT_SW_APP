@@ -153,7 +153,7 @@ private fun NodeDetailScaffold(
                 title = stringResource(Res.string.details),
                 subtitle = uiState.nodeName.asString(),
                 ourNode = uiState.ourNode,
-                showNodeChip = false,
+                showNodeChip = uiState.ourNode != null,
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,
                 actions = {},
