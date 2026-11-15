@@ -150,6 +150,18 @@ fun MeshtasticNavigationSuite(
     val currentTabRoute = multiBackstack.currentTabRoute
     val topLevelDestination = TopLevelDestination.fromNavKey(currentTabRoute)
 
+    // The cards of each tab follow the look chosen for that part of the app (see LocalCardGroup).
+    val cardGroup =
+        when (topLevelDestination) {
+            TopLevelDestination.Settings -> UiOptions.GROUP_SETTINGS
+            TopLevelDestination.NetworkHealth -> UiOptions.GROUP_HEALTH
+            TopLevelDestination.Translator -> UiOptions.GROUP_ASSISTANT
+            else -> UiOptions.GROUP_CARDS
+        }
+    val tabContent: @Composable () -> Unit = {
+        CompositionLocalProvider(LocalCardGroup provides cardGroup) { content() }
+    }
+
     val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo).coerceNavigationType()
     val showLabels = layoutType == NavigationSuiteType.NavigationRail
 
@@ -208,7 +220,7 @@ fun MeshtasticNavigationSuite(
             barHeight = barHeight,
             barBottomGap = barBottomGap,
             modifier = modifier,
-            content = content,
+            content = tabContent,
         )
     } else if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
         Surface(
@@ -233,7 +245,7 @@ fun MeshtasticNavigationSuite(
                 },
                 layoutType = layoutType,
             ) {
-                Row { content() }
+                Row { tabContent() }
             }
         }
     } else if (layoutType == NavigationSuiteType.NavigationRail) {
@@ -261,7 +273,7 @@ fun MeshtasticNavigationSuite(
                 },
                 layoutType = layoutType,
             ) {
-                Row { content() }
+                Row { tabContent() }
             }
         }
     } else {
@@ -270,7 +282,7 @@ fun MeshtasticNavigationSuite(
             layoutType = layoutType,
             navigationSuiteItems = items,
         ) {
-            Row { content() }
+            Row { tabContent() }
         }
     }
 }

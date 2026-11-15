@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -35,9 +36,11 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.loading
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.LocalCardGroup
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.node.component.AdministrationSection
 import org.meshtastic.feature.node.component.AvailabilityHistorySection
@@ -70,17 +73,20 @@ fun NodeDetailContent(
 ) {
     Crossfade(targetState = uiState.node != null, label = "NodeDetailContent", modifier = modifier) { isNodePresent ->
         if (isNodePresent && uiState.node != null) {
-            NodeDetailList(
-                node = uiState.node,
-                ourNode = uiState.ourNode,
-                uiState = uiState,
-                listState = listState,
-                onAction = onAction,
-                onFirmwareSelect = onFirmwareSelect,
-                onSaveNotes = onSaveNotes,
-                onSaveDisplayName = onSaveDisplayName,
-                trackedInLiveUpdate = trackedInLiveUpdate,
-            )
+            // The cards of the node's details follow their own look (see the look of the elements).
+            CompositionLocalProvider(LocalCardGroup provides UiOptions.GROUP_DETAILS) {
+                NodeDetailList(
+                    node = uiState.node,
+                    ourNode = uiState.ourNode,
+                    uiState = uiState,
+                    listState = listState,
+                    onAction = onAction,
+                    onFirmwareSelect = onFirmwareSelect,
+                    onSaveNotes = onSaveNotes,
+                    onSaveDisplayName = onSaveDisplayName,
+                    trackedInLiveUpdate = trackedInLiveUpdate,
+                )
+            }
         } else {
             val loadingDescription = stringResource(Res.string.loading)
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
