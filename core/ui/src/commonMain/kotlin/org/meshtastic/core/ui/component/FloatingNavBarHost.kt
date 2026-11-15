@@ -79,6 +79,7 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import org.meshtastic.core.ui.util.rememberTapHaptic
 import org.meshtastic.core.model.ElementStyle
+import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
@@ -198,7 +199,8 @@ internal fun FloatingNavBarHost(
             // The content is the source the glass blurs; it runs under the bar only for screens that say so.
             Box(
                 Modifier.fillMaxSize()
-                    .hazeSource(hazeState)
+                    // Only the glass look blurs the content, so only then is it recorded as a source (saves the work).
+                    .then(if (style.look == ElementLook.GLASS) Modifier.hazeSource(hazeState) else Modifier)
                     .nestedScroll(scrollConnection)
                     .padding(bottom = if (state.underlapCount > 0) 0.dp else inset)
                     .then(if (visible) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier),
