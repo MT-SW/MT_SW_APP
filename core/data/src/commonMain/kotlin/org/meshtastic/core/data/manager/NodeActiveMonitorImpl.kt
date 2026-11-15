@@ -22,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -29,6 +31,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ConnectionState
@@ -48,6 +51,7 @@ import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.node_active_alert_notification
+import org.meshtastic.core.resources.node_away_alert_notification
 import org.meshtastic.core.resources.unknown_username
 import kotlin.time.Clock
 
@@ -67,16 +71,19 @@ class NodeActiveMonitorImpl(
     private val meshLogRepository: MeshLogRepository,
     private val uiPrefs: UiPrefs,
 ) : NodeActiveMonitor {
-    /** Node number → whether it was active at the last check; a node not in the map has not been seen yet. */
-    private val wasActive = mutableMapOf<Int, Boolean>()
+    /** Node number → what its status was at the last check; a node not in the map has not been seen yet. */
+    private val lastState = mutableMapOf<Int, NodePresenceState?>()
     private var connectedSince = 0L
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun start(scope: CoroutineScope) {
-        // The logs are read only while some node has the alert.
+        // The logs are read only while some node has an alert.
         val presence =
-            notificationPrefs.nodeActiveAlerts
-                .flatMapLatest { if (it.isEmpty()) flowOf(emptyMap()) else meshLogRepository.nodePresenceFlow() }
+            combine(notificationPrefs.nodeActiveAlerts, notificationPrefs.nodeAwayAlerts) { active, away ->
+                active.isNotEmpty() || away.isNotEmpty()
+            }
+                .distinctUntilChanged()
+                .flatMapLatest { any -> if (any) meshLogRepository.nodePresenceFlow() else flowOf(emptyMap()) }
                 .stateIn(scope, SharingStarted.Eagerly, emptyMap())
         scope.launch {
             while (isActive) {
@@ -96,13 +103,15 @@ class NodeActiveMonitorImpl(
         val nowMs = nowMillis
         if (connection.connectionState.value !is ConnectionState.Connected) {
             connectedSince = 0L
-            wasActive.clear()
+            lastState.clear()
             return
         }
         if (connectedSince == 0L) connectedSince = nowMs
-        val alerts = notificationPrefs.nodeActiveAlerts.value
-        wasActive.keys.retainAll(alerts)
-        if (alerts.isEmpty() || nowMs - connectedSince < SETTLE_MILLIS) return
+        val activeAlerts = notificationPrefs.nodeActiveAlerts.value
+        val awayAlerts = notificationPrefs.nodeAwayAlerts.value
+        val watched = activeAlerts + awayAlerts
+        lastState.keys.retainAll(watched)
+        if (watched.isEmpty() || nowMs - connectedSince < SETTLE_MILLIS) return
 
         val steps = NodePresence.EXPIRY_STEPS_MINUTES
         val expiryMillis =
@@ -113,21 +122,27 @@ class NodeActiveMonitorImpl(
                 Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour,
             ) == true
 
-        for (nodeNum in alerts) {
+        for (nodeNum in watched) {
             val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: continue
-            val active =
-                presence[nodeNum]?.effective(nowMs, node.lastHeard, expiryMillis) == NodePresenceState.ONLINE
-            val before = wasActive[nodeNum]
-            if (active && before == false && quiet) continue // held back: raised after the quiet hours
-            wasActive[nodeNum] = active
-            if (active && before == false) raise(node)
+            val now = presence[nodeNum]?.effective(nowMs, node.lastHeard, expiryMillis)
+            val seen = lastState.containsKey(nodeNum)
+            val before = lastState[nodeNum]
+            val becameActive = seen && now == NodePresenceState.ONLINE && before != NodePresenceState.ONLINE
+            val becameAway = seen && now == NodePresenceState.OFFLINE && before == NodePresenceState.ONLINE
+            val raiseActive = becameActive && nodeNum in activeAlerts
+            val raiseAway = becameAway && nodeNum in awayAlerts
+            // In quiet hours a change is held back and not remembered, so it is raised once they end.
+            if ((raiseActive || raiseAway) && quiet) continue
+            lastState[nodeNum] = now
+            if (raiseActive) raise(node, Res.string.node_active_alert_notification)
+            if (raiseAway) raise(node, Res.string.node_away_alert_notification)
         }
     }
 
-    private suspend fun raise(node: Node) {
+    private suspend fun raise(node: Node, text: StringResource) {
         val name = node.effectiveLongName.takeIf { it.isNotBlank() } ?: getStringSuspend(Res.string.unknown_username)
-        Logger.i { "Node ${node.num} became active; raising the alert" }
-        notifications.showNodeSilenceNotification(node, getStringSuspend(Res.string.node_active_alert_notification, name))
+        Logger.i { "Node ${node.num} changed its activity status; raising the alert" }
+        notifications.showNodeActiveNotification(node, getStringSuspend(text, name))
     }
 
     private companion object {

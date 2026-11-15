@@ -57,6 +57,8 @@ data class MapFilterPrefs(
     val onlyDirect: Boolean = false,
     val onlySigned: Boolean = false,
     val onlyEncrypted: Boolean = false,
+    /** MT_SW: show only nodes that report someone is at them. */
+    val onlyActive: Boolean = false,
     val excludeMqtt: Boolean = false,
     val showIgnored: Boolean = false,
     val includeUnknown: Boolean = true,
@@ -91,6 +93,7 @@ fun MapFilterPrefs.toNodeMapFilter() = NodeMapFilter(
     excludeMqtt = excludeMqtt,
     lastHeardSeconds = lastHeardSeconds,
     onlySigned = onlySigned,
+    onlyActive = onlyActive,
     onlyEncrypted = onlyEncrypted,
     maxHops = maxHops,
     maxDistanceMeters = maxDistanceMeters,

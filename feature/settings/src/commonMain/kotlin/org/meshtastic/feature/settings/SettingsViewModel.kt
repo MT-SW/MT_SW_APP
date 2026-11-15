@@ -144,6 +144,7 @@ class SettingsViewModel(
     val radioNoticesEnabled = notificationPrefs.radioNoticesEnabled
     val updatesEnabled = notificationPrefs.updatesEnabled
     val nodeSilenceEnabled = notificationPrefs.nodeSilenceEnabled
+    val nodeActiveEnabled = notificationPrefs.nodeActiveEnabled
     val notificationSoundWhileOpen = notificationPrefs.soundWhileOpen
 
     fun setMessagesEnabled(enabled: Boolean) = notificationPrefs.setMessagesEnabled(enabled)
@@ -155,6 +156,8 @@ class SettingsViewModel(
     fun setUpdatesEnabled(enabled: Boolean) = notificationPrefs.setUpdatesEnabled(enabled)
 
     fun setNodeSilenceEnabled(enabled: Boolean) = notificationPrefs.setNodeSilenceEnabled(enabled)
+
+    fun setNodeActiveEnabled(enabled: Boolean) = notificationPrefs.setNodeActiveEnabled(enabled)
 
     fun setNotificationSoundWhileOpen(enabled: Boolean) = notificationPrefs.setSoundWhileOpen(enabled)
 

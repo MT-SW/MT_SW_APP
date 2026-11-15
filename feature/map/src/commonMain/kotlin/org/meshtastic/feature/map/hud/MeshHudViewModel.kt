@@ -56,6 +56,8 @@ import org.meshtastic.core.repository.PhoneLocation
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.TracerouteResponseProvider
 import org.meshtastic.core.repository.TracerouteSnapshotRepository
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.activeNodeNumsFlow
 import org.meshtastic.core.repository.toNodeMapFilter
 import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.feature.map.mergeStationaryRuns
@@ -80,6 +82,8 @@ private data class HudSettings(
     val solo: Int?,
     /** Where the open route and track place the nodes they name (see `positionHints`). */
     val hints: PositionHints,
+    /** MT_SW: the nodes that report someone is at them, for the "Active only" filter. */
+    val active: Set<Int>,
 )
 
 /**
@@ -143,6 +147,7 @@ class MeshHudViewModel(
     nodeRepository: NodeRepository,
     packetRepository: PacketRepository,
     meshLogRepository: MeshLogRepository,
+    uiPrefs: UiPrefs,
     tracerouteResponseProvider: TracerouteResponseProvider,
     tracerouteSnapshotRepository: TracerouteSnapshotRepository,
     private val mapPrefs: MapPrefs,
@@ -274,9 +279,14 @@ class MeshHudViewModel(
                 localeUnitsProvider.measurementSystem,
                 focusKey,
                 mapPrefs.mapFilters,
-                combine(pinned, soloNodeNum, positionHints, ::Triple),
-            ) { units, focus, filters, (pinnedNums, solo, hints) ->
-                HudSettings(units, focus, filters, pinnedNums, solo, hints)
+                combine(
+                    combine(pinned, soloNodeNum, positionHints, ::Triple),
+                    activeNodeNumsFlow(meshLogRepository, nodeRepository.nodeDBbyNum, uiPrefs.uiOptions),
+                    ::Pair,
+                ),
+            ) { units, focus, filters, (triple, active) ->
+                val (pinnedNums, solo, hints) = triple
+                HudSettings(units, focus, filters, pinnedNums, solo, hints, active)
             },
             packetRepository.getWaypoints(),
         ) { location, nodes, myNode, settings, waypointPackets ->
@@ -294,7 +304,7 @@ class MeshHudViewModel(
                             } else {
                                 HudSubject.NodeSubject(node).key == settings.focusKey ||
                                     node.num in settings.pinned ||
-                                    node.passesMapFilter(filter, now, ourNode)
+                                    node.passesMapFilter(filter, now, ourNode, settings.active)
                             }
                     }
             val waypoints =

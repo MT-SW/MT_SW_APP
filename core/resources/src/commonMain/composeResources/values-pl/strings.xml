@@ -4299,8 +4299,8 @@
     <string name="presence_color_title">Kolor ikony „aktywny”</string>
     <string name="presence_color_green">Zielony</string>
     <string name="presence_color_theme">Kolor motywu</string>
-    <string name="presence_ask_title">Pytaj przy otwarciu rozmowy</string>
-    <string name="presence_ask_summary">Otwarcie rozmowy z węzłem pyta go o status (najwyżej raz na 10 minut).</string>
+    <string name="presence_ask_title">Pytaj o status automatycznie</string>
+    <string name="presence_ask_summary">Domyślnie wyłączone: o status innych węzłów pytasz ręcznie (Diagnostyka na żądanie), nawet jeśli sam masz MT_SW_FIRMWARE v3. Po włączeniu otwarcie rozmowy z węzłem pyta go o status (najwyżej raz na 10 minut).</string>
     <string name="presence_save_failed">Węzeł nie potwierdził statusu aktywności.</string>
     <string name="on_demand_presence">Status aktywności</string>
     <string name="on_demand_presence_desc">Czy ktoś jest przy węźle (jest z nim połączona aplikacja). Wymaga MT_SW_FIRMWARE v3.</string>
@@ -4314,8 +4314,20 @@
     <string name="node_sort_presence">Według aktywności (ulubione na górze)</string>
     <string name="node_filter_only_active">Tylko aktywni</string>
     <string name="node_active_alert">Powiadomienie o aktywności</string>
-    <string name="node_active_alert_hint">Powiadomienie, gdy ten węzeł zgłosi, że ktoś przy nim jest. Działa tylko dla węzłów, które podają stan aktywności (MT_SW_FIRMWARE v3). Godziny ciszy są te same co dla strażnika węzła.</string>
+    <string name="node_active_alert_hint">Powiadomienie, gdy ten węzeł zgłosi, że ktoś przy nim jest. Działa tylko dla węzłów, które podają stan aktywności (MT_SW_FIRMWARE v3). Wymaga też włączonych powiadomień „Aktywność węzła” (na Androidzie w systemowych ustawieniach aplikacji, na komputerze i iPhonie/iPadzie w ustawieniach powiadomień); domyślnie są wyłączone. Godziny ciszy są te same co dla strażnika węzła.</string>
     <string name="node_active_alert_notification">%1$s jest aktywny</string>
     <string name="presence_more_title">Gdzie jeszcze działa status</string>
-    <string name="presence_more_summary">Lista węzłów: sortowanie „Według aktywności” (ulubione na górze, potem aktywne) i filtr „Tylko aktywni”. Zdrowie sieci: sekcja „Aktywność” w podsumowaniu. Szczegóły węzła: powiadomienie, gdy węzeł stanie się aktywny. Diagnostyka na żądanie: status w postępie i w raporcie.</string>
+    <string name="presence_more_summary">Lista węzłów: sortowanie „Według aktywności” (ulubione na górze, potem aktywne), filtr „Tylko aktywni” i liczba aktywnych w nagłówku. Mapa: filtr „Tylko aktywni”. Zdrowie sieci: sekcja „Aktywność” w podsumowaniu. Szczegóły węzła: powiadomienie, gdy węzeł stanie się aktywny albo nieobecny (domyślnie wyłączone, także w ustawieniach powiadomień). Diagnostyka na żądanie: status w postępie i w raporcie.</string>
+    <string name="notifications_node_active">Aktywność węzła (węzeł jest aktywny)</string>
+    <string name="node_active_notifications">Aktywność węzła</string>
+    <string name="node_active_notifications_description">Wybrany przez Ciebie węzeł zgłasza, że ktoś przy nim jest (albo że go nie ma). Domyślnie wyłączone.</string>
+    <string name="node_away_alert">Także gdy stanie się nieobecny</string>
+    <string name="node_away_alert_notification">%1$s jest nieobecny</string>
+    <string name="node_count_active">%1$d aktywnych</string>
+    <string name="presence_ask_now_favorites">Zapytaj ulubione o status teraz</string>
+    <string name="presence_ask_now_summary">Pyta węzły po kolei (z przerwą, żeby nie zapchać sieci). Węzły ze starszym firmware niż MT_SW_FIRMWARE v3 nie dostają zapytania.</string>
+    <string name="presence_ask_now_recent">Zapytaj węzły słyszane w ostatniej godzinie</string>
+    <string name="presence_ask_now_all">Zapytaj wszystkie słyszane węzły</string>
+    <string name="presence_ask_now_progress">Zapytano %1$d z %2$d</string>
+    <string name="presence_ask_now_stop">Przerwij pytanie</string>
 </resources>

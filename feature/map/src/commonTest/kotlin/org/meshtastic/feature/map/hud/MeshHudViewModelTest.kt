@@ -136,6 +136,7 @@ class MeshHudViewModelTest {
                 nodeRepository = nodeRepository,
                 packetRepository = packetRepository,
                 meshLogRepository = FakeMeshLogRepository(),
+                uiPrefs = org.meshtastic.core.testing.FakeUiPrefs(),
                 tracerouteResponseProvider = traceroutes,
                 tracerouteSnapshotRepository = snapshots,
                 mapPrefs = mapPrefs,

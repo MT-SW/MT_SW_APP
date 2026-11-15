@@ -190,15 +190,17 @@ Mała ikona przy węźle na liście (zwykłej i zwartej) mówi, czy ktoś jest p
 - **Zastępuje inną ikonę** — nic (ikona obok pozostałych), ulubiony, wyciszony albo bez wiadomości; ta ikona nie jest wtedy pokazywana, dopóki status jest znany.
 - **Kolor ikony „aktywny”** — zielony albo kolor motywu.
 - **Jak długo trzyma „aktywny”** — 30 min, 1, 2, 6 lub 12 godz. (domyślnie 1 godz.). Gdy węzła nie słychać tak długo, nic dla niego nie jest pokazywane, bo mógł wyjść poza zasięg, zanim zdążył zgłosić „nieaktywny”.
-- **Pytaj przy otwarciu rozmowy** — otwarcie rozmowy bezpośredniej pyta ten węzeł o status (najwyżej raz na 10 minut).
+- **Pytaj o status automatycznie** — domyślnie wyłączone; po włączeniu otwarcie rozmowy bezpośredniej pyta ten węzeł o status (najwyżej raz na 10 minut).
 
 Zanim aplikacja zapyta obcy węzeł o status (przy otwarciu rozmowy albo w diagnostyce na żądanie), pyta go o wersję firmware, chyba że już ją zna. Jeśli wersja jest starsza niż MT_SW_FIRMWARE v3 albo węzeł jej nie poda, zapytanie o status nie jest wysyłane. W diagnostyce na żądanie karta statusu pokazuje to w opisie podczas czekania („Najpierw pytam o wersję firmware…”) oraz gdy nic nie wysłano.
 
 Statusy są czytane z zapisanych odpowiedzi OnDemand, więc przeżywają ponowne uruchomienie aplikacji.
 
-- **Lista węzłów** — sortowanie **Według aktywności (ulubione na górze)**: ulubione, potem aktywne, potem reszta, każda grupa od ostatnio słyszanych; filtr **Tylko aktywni** pokazuje tylko węzły ze statusem „aktywny”.
+- **Odpytywanie** — domyślnie tylko ręczne. W **Funkcje MT_SW → Status aktywności** są przyciski **Zapytaj ulubione / węzły słyszane w ostatniej godzinie / wszystkie słyszane węzły o status teraz** (pytają po kolei, z przerwą, i można przerwać) oraz przełącznik **Pytaj o status automatycznie**, który — gdy go włączysz — każe pytać przy otwarciu rozmowy z węzłem, nawet jeśli sam masz MT_SW_FIRMWARE v3. Ręcznie można też zapytać pojedynczy węzeł w „Diagnostyce na żądanie”.
+- **Lista węzłów** — sortowanie **Według aktywności (ulubione na górze)**: ulubione, potem aktywne, potem reszta, każda grupa od ostatnio słyszanych; filtr **Tylko aktywni**; w nagłówku liczba aktywnych obok „online”.
+- **Mapa** — filtr **Tylko aktywni** (Android, komputer, iPhone/iPad; także w widoku HUD).
 - **Zdrowie sieci** — w podsumowaniu sekcja **Aktywność**: ile węzłów jest aktywnych i nieobecnych oraz ile w ogóle podaje status (też w raporcie).
-- **Powiadomienie o aktywności** — w szczegółach węzła (pod strażnikiem węzła) przełącznik; gdy węzeł zgłosi, że ktoś przy nim jest, przychodzi powiadomienie. Używa godzin ciszy strażnika węzła i kanału jego powiadomień. Działa przy połączeniu z radiem.
+- **Powiadomienie o aktywności** — w szczegółach węzła (pod strażnikiem węzła) przełącznik „gdy stanie się aktywny” i drugi „także gdy stanie się nieobecny”. Powiadomienia tej kategorii (**Aktywność węzła**) są **domyślnie wyłączone**, jak powiadomienia o nowych węzłach: na Androidzie włączasz kanał w systemowych ustawieniach aplikacji, na komputerze i iPhonie/iPadzie w ustawieniach powiadomień. Używa godzin ciszy strażnika węzła. Działa przy połączeniu z radiem.
 - **Diagnostyka na żądanie** — status aktywności liczy się do postępu i trafia do raportu.
 
 ## Panel debugowania

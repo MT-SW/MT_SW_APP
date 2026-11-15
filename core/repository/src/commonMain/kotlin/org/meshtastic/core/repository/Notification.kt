@@ -53,6 +53,9 @@ data class Notification(
 
         /** The node watchdog: a node has been silent for the time set for it. */
         Silence,
+
+        /** MT_SW: a node with an "active" alert reports that someone is at it (or that it is away). Off by default. */
+        Active,
         Battery,
         Alert,
         Service,

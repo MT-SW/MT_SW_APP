@@ -138,7 +138,10 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** Colour of the active icon: green (0) or the colour of the theme / grey (1). */
         const val PRESENCE_COLOR = "presence.color"
 
-        /** Ask a node for its status when its conversation is opened (1) or only listen to its broadcasts (0). */
+        /**
+         * Ask a node for its status by itself when its conversation is opened (1) or only listen to its broadcasts and
+         * ask by hand in the on-demand diagnostics (0, the default), even when this app is MT_SW_FIRMWARE v3 itself.
+         */
         const val PRESENCE_ASK = "presence.ask"
 
         const val HOLD_BUZZ = "input.holdBuzz"
@@ -165,7 +168,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(PRESENCE_REPLACE, PRESENCE_REPLACE_NONE)
             put(PRESENCE_EXPIRY, 1)
             put(PRESENCE_COLOR, 0)
-            put(PRESENCE_ASK, 1)
+            put(PRESENCE_ASK, 0)
             put(HOLD_BUZZ, 1)
             // The app starts with the glass look and the thin line icons like on the iPhone; the person can go back to
             // the classic look in "Look" (every choice they make is saved and stays).

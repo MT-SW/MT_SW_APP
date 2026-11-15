@@ -76,6 +76,8 @@ class MacOSNotificationSender private constructor(private val bridge: MacNotific
 
         Notification.Category.Silence -> "Node Watchdog"
 
+        Notification.Category.Active -> "Node Active"
+
         Notification.Category.MeshBeacon -> "Mesh Invitation"
 
         Notification.Category.Battery -> "Low Battery"

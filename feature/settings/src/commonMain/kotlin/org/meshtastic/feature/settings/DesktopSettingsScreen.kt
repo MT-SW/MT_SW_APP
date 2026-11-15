@@ -430,6 +430,8 @@ fun DesktopSettingsScreen(
                             nodeSilenceEnabled =
                             settingsViewModel.nodeSilenceEnabled.collectAsStateWithLifecycle().value,
                             onToggleNodeSilence = { settingsViewModel.setNodeSilenceEnabled(it) },
+                            nodeActiveEnabled = settingsViewModel.nodeActiveEnabled.collectAsStateWithLifecycle().value,
+                            onToggleNodeActive = { settingsViewModel.setNodeActiveEnabled(it) },
                             showSoundWhileOpen = showNotificationSound,
                             soundWhileOpen =
                             settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,

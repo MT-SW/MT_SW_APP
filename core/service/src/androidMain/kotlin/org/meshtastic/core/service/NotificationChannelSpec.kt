@@ -52,6 +52,8 @@ import org.meshtastic.core.resources.meshtastic_service_notifications_descriptio
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications_description
 import org.meshtastic.core.resources.messages
+import org.meshtastic.core.resources.node_active_notifications
+import org.meshtastic.core.resources.node_active_notifications_description
 import org.meshtastic.core.resources.node_silence_notifications
 import org.meshtastic.core.resources.node_silence_notifications_description
 import org.meshtastic.core.resources.notification_group_mesh
@@ -146,6 +148,14 @@ internal enum class NotificationChannelSpec(
         NotificationChannelGroupSpec.Mesh,
         NotificationManager.IMPORTANCE_HIGH,
     ),
+    // MT_SW: created switched off (IMPORTANCE_NONE); the person turns it on in the system settings of the app.
+    NodeActive(
+        NotificationChannels.NODE_ACTIVE,
+        Res.string.node_active_notifications,
+        Res.string.node_active_notifications_description,
+        NotificationChannelGroupSpec.Mesh,
+        NotificationManager.IMPORTANCE_NONE,
+    ),
     MeshBeacon(
         NotificationChannels.MESH_BEACON,
         Res.string.meshtastic_mesh_beacon_notifications,
@@ -233,6 +243,7 @@ internal enum class NotificationChannelSpec(
                 Reactions,
                 NewNodes,
                 NodeSilence,
+                NodeActive,
                 LowBattery,
                 DeviceStatus,
                 -> channel.setSound(defaultSound, soundAttributes(AudioAttributes.USAGE_NOTIFICATION))

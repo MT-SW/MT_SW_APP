@@ -40,6 +40,7 @@ import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_active_alert
 import org.meshtastic.core.resources.node_active_alert_hint
+import org.meshtastic.core.resources.node_away_alert
 
 /**
  * MT_SW: the "active" alert of one node: a notification when the activity status the node shares changes to active.
@@ -49,6 +50,7 @@ import org.meshtastic.core.resources.node_active_alert_hint
 fun ActiveAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val prefs = koinInject<NotificationPrefs>()
     val alerts by prefs.nodeActiveAlerts.collectAsStateWithLifecycle()
+    val away by prefs.nodeAwayAlerts.collectAsStateWithLifecycle()
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -71,6 +73,15 @@ fun ActiveAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Spacer(Modifier.height(12.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(Res.string.node_away_alert),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Switch(checked = nodeNum in away, onCheckedChange = { prefs.setNodeAwayAlert(nodeNum, it) })
+            }
         }
     }
 }

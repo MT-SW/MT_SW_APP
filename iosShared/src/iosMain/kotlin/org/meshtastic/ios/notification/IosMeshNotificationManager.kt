@@ -211,6 +211,17 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
         notificationManager.cancel(nodeNum)
     }
 
+    override suspend fun showNodeActiveNotification(node: Node, title: String) {
+        notificationManager.dispatch(
+            Notification(
+                title = title,
+                message = node.effectiveLongName,
+                category = Notification.Category.Active,
+                id = node.num,
+            ),
+        )
+    }
+
     // An OS notification cannot be refreshed in place, and re-posting would alert again, so only an episode's first
     // reading shows.
     override suspend fun notifyLowBattery(node: Node, isRemote: Boolean) {

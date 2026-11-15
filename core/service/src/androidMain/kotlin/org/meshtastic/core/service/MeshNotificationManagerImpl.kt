@@ -230,6 +230,7 @@ class MeshNotificationManagerImpl(
         private const val SOS_ACTION_CODE_SCALE = 1000
         private const val TAG_NEW_NODE = "new_node"
         private const val TAG_NODE_SILENCE = "node_silence"
+        private const val TAG_NODE_ACTIVE = "node_active"
         private const val TAG_LOW_BATTERY = "low_battery"
         private const val TAG_CLIENT = "client"
         private const val TAG_MESH_BEACON = "mesh_beacon"
@@ -895,6 +896,15 @@ class MeshNotificationManagerImpl(
     }
 
     override fun cancelNodeSilenceNotification(nodeNum: Int) = notificationManager.cancel(TAG_NODE_SILENCE, nodeNum)
+
+    override suspend fun showNodeActiveNotification(node: Node, title: String) {
+        ensureChannels()
+        notificationManager.notify(
+            TAG_NODE_ACTIVE,
+            node.num,
+            createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeActive),
+        )
+    }
 
     /**
      * Recovery and device switches end an episode from separate work, so a post that was still resolving its text when

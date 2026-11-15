@@ -73,6 +73,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
             onlyOnline = this[KEY_ONLY_ONLINE_PREF] ?: defaults.onlyOnline,
             onlyDirect = this[KEY_ONLY_DIRECT_PREF] ?: defaults.onlyDirect,
             onlySigned = this[KEY_ONLY_SIGNED_PREF] ?: defaults.onlySigned,
+            onlyActive = this[KEY_ONLY_ACTIVE_PREF] ?: defaults.onlyActive,
             onlyEncrypted = this[KEY_ONLY_ENCRYPTED_PREF] ?: defaults.onlyEncrypted,
             excludeMqtt = this[KEY_EXCLUDE_MQTT_PREF] ?: defaults.excludeMqtt,
             showIgnored = this[KEY_SHOW_IGNORED_PREF] ?: defaults.showIgnored,
@@ -93,6 +94,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         this[KEY_ONLY_ONLINE_PREF] = prefs.onlyOnline
         this[KEY_ONLY_DIRECT_PREF] = prefs.onlyDirect
         this[KEY_ONLY_SIGNED_PREF] = prefs.onlySigned
+        this[KEY_ONLY_ACTIVE_PREF] = prefs.onlyActive
         this[KEY_ONLY_ENCRYPTED_PREF] = prefs.onlyEncrypted
         this[KEY_EXCLUDE_MQTT_PREF] = prefs.excludeMqtt
         this[KEY_SHOW_IGNORED_PREF] = prefs.showIgnored
@@ -283,6 +285,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_MAX_HOPS_PREF = intPreferencesKey("map_max_hops")
         val KEY_MAX_DISTANCE_PREF = intPreferencesKey("map_max_distance_m")
         val KEY_ONLY_SIGNED_PREF = booleanPreferencesKey("map_only_signed")
+        val KEY_ONLY_ACTIVE_PREF = booleanPreferencesKey("map_only_active")
         val KEY_ONLY_ENCRYPTED_PREF = booleanPreferencesKey("map_only_encrypted")
         val KEY_EXCLUDE_MQTT_PREF = booleanPreferencesKey("map_exclude_mqtt")
         val KEY_SHOW_IGNORED_PREF = booleanPreferencesKey("map_show_ignored")

@@ -2534,11 +2534,16 @@
     <string name="no_usb_devices_seen">No USB devices detected</string>
     <!-- NODE -->
     <string name="node_active_alert">Active alert</string>
-    <string name="node_active_alert_hint">A notification when this node reports that someone is at it. Works only for nodes that share their activity status (MT_SW_FIRMWARE v3). Quiet hours are the same as for the node watchdog.</string>
+    <string name="node_active_alert_hint">A notification when this node reports that someone is at it. Works only for nodes that share their activity status (MT_SW_FIRMWARE v3). It also needs the "Node activity" notifications switched on (in Android in the system settings of the app, on the computer and iPhone/iPad in the notification settings), off by default. Quiet hours are the same as for the node watchdog.</string>
     <string name="node_active_alert_notification">%1$s is active</string>
+    <string name="node_active_notifications">Node activity</string>
+    <string name="node_active_notifications_description">A node you chose reports that someone is at it (or that it is away). Off by default.</string>
+    <string name="node_away_alert">Also when it becomes away</string>
+    <string name="node_away_alert_notification">%1$s is away</string>
     <string name="node_color_pick">Pick colour</string>
     <string name="node_color_summary">Pick the colour of your node (its key) in the security settings.</string>
     <string name="node_color_title">Node colour</string>
+    <string name="node_count_active">%1$d active</string>
     <string name="node_count_online">%1$d online</string>
     <string name="node_count_shown">%1$d shown</string>
     <string name="node_count_template">(%1$d online / %2$d shown / %3$d total)</string>
@@ -2676,6 +2681,7 @@
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>
     <string name="notifications_for_low_battery_alerts">Notifications for low battery alerts for the connected device.</string>
     <string name="notifications_for_newly_discovered_nodes">Notifications for newly discovered nodes.</string>
+    <string name="notifications_node_active">Node activity (a node is active)</string>
     <string name="notifications_node_silence">Node watchdog (a node is silent)</string>
     <string name="notifications_on_alert_bell_receipt">Notifications on alert/bell receipt</string>
     <string name="notifications_on_message_receipt">Notifications on message receipt</string>
@@ -2980,8 +2986,14 @@
     <string name="presence_active">Active</string>
     <string name="presence_active_hours">Active for %1$d h</string>
     <string name="presence_active_min">Active for %1$d min</string>
-    <string name="presence_ask_summary">Opening a direct chat asks that node for its status (at most once per 10 minutes).</string>
-    <string name="presence_ask_title">Ask when a chat is opened</string>
+    <string name="presence_ask_now_all">Ask all heard nodes</string>
+    <string name="presence_ask_now_favorites">Ask favourites for the status now</string>
+    <string name="presence_ask_now_progress">Asked %1$d of %2$d</string>
+    <string name="presence_ask_now_recent">Ask nodes heard in the last hour</string>
+    <string name="presence_ask_now_stop">Stop asking</string>
+    <string name="presence_ask_now_summary">Asks the nodes one after another (a pause between them, so the mesh is not clogged). Nodes with an older firmware than MT_SW_FIRMWARE v3 are not sent the query.</string>
+    <string name="presence_ask_summary">Off by default: you ask other nodes for their status by hand (on-demand diagnostics), even if you have MT_SW_FIRMWARE v3 yourself. When on, opening a direct chat asks that node for its status (at most once per 10 minutes).</string>
+    <string name="presence_ask_title">Ask for the status by itself</string>
     <string name="presence_color_green">Green</string>
     <string name="presence_color_theme">Colour of the theme</string>
     <string name="presence_color_title">Colour of the active icon</string>
@@ -2998,7 +3010,7 @@
     <string name="presence_inactive">Inactive</string>
     <string name="presence_inactive_hours">Inactive for %1$d h</string>
     <string name="presence_inactive_min">Inactive for %1$d min</string>
-    <string name="presence_more_summary">Node list: sorting "By activity" (favourites on top, then active) and the "Active only" filter. Network health: the "Activity" section in the summary. Node details: an alert when the node becomes active. On-demand diagnostics: the status in the progress and the report.</string>
+    <string name="presence_more_summary">Node list: sorting "By activity" (favourites on top, then active), the "Active only" filter and the count of active nodes in the header. Map: the "Active only" filter. Network health: the "Activity" section in the summary. Node details: an alert when the node becomes active or away (off by default, also in the notification settings). On-demand diagnostics: the status in the progress and the report.</string>
     <string name="presence_more_title">Where else the status works</string>
     <string name="presence_needs_fw">Needs MT_SW_FIRMWARE v3 or newer.</string>
     <string name="presence_replace_favorite">Favourite</string>

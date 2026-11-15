@@ -103,6 +103,27 @@ class NodeListViewModel(
 
     val totalNodeCount = nodeRepository.totalNodeCount.stateInWhileSubscribed(initialValue = 0)
 
+    /**
+     * MT_SW: how many nodes report that someone is at them now; null while no node shares an activity status, so the
+     * header does not show a useless "0".
+     */
+    val activeNodeCount: StateFlow<Int?> =
+        combine(meshLogRepository.nodePresenceFlow(), nodeRepository.nodeDBbyNum, nodeFilterPreferences.uiOptions) {
+            presence,
+            nodes,
+            options,
+            ->
+            if (presence.isEmpty()) return@combine null
+            val steps = NodePresence.EXPIRY_STEPS_MINUTES
+            val expiryMillis =
+                steps[UiOptions(options)[UiOptions.PRESENCE_EXPIRY].coerceIn(0, steps.lastIndex)] * MILLIS_PER_MINUTE
+            val now = nowMillis
+            presence.count { (num, status) ->
+                status.effective(now, nodes[num]?.lastHeard ?: 0, expiryMillis) == NodePresenceState.ONLINE
+            }
+        }
+            .stateInWhileSubscribed(initialValue = null)
+
     val connectionState = connectionStateProvider.connectionState
 
     val deviceType: StateFlow<DeviceType?> =

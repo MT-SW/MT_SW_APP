@@ -181,6 +181,7 @@ import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ElementAdvancedSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.ElementBasicSettings
+import org.meshtastic.feature.settings.component.PresenceManualAsk
 import org.meshtastic.feature.settings.component.PresenceSettings
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
 import org.meshtastic.core.model.UiOptions
@@ -408,6 +409,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
 
             ExpressiveSection(title = stringResource(Res.string.presence_title)) {
                 PresenceSettings(options = options, onChange = onChange)
+                PresenceManualAsk()
                 ListItem(
                     text = stringResource(Res.string.presence_device_switch),
                     supportingText = stringResource(Res.string.presence_summary),

@@ -16,11 +16,34 @@
  */
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.nowSeconds
+import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
+import org.meshtastic.core.repository.NodeRepository
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.NodePresence
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.presence_ask_now_all
+import org.meshtastic.core.resources.presence_ask_now_favorites
+import org.meshtastic.core.resources.presence_ask_now_progress
+import org.meshtastic.core.resources.presence_ask_now_recent
+import org.meshtastic.core.resources.presence_ask_now_stop
+import org.meshtastic.core.resources.presence_ask_now_summary
 import org.meshtastic.core.resources.presence_ask_summary
 import org.meshtastic.core.resources.presence_ask_title
 import org.meshtastic.core.resources.presence_color_green
@@ -42,9 +65,11 @@ import org.meshtastic.core.resources.presence_replace_unmessageable
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_show_summary
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.DisplaySettings
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Refresh
 
 private const val MINUTES_PER_HOUR = 60
 
@@ -121,7 +146,67 @@ fun PresenceSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         supportingText = stringResource(Res.string.presence_ask_summary),
         leadingIcon = MeshtasticIcons.DisplaySettings,
         checked = options.flag(UiOptions.PRESENCE_ASK),
-        enabled = shown,
         onClick = { onChange(UiOptions.PRESENCE_ASK, if (options.flag(UiOptions.PRESENCE_ASK)) 0 else 1) },
     )
+}
+
+private const val RECENT_SECONDS = 3600
+
+/**
+ * MT_SW: asking for the activity status by hand, for all the nodes of a group at once. It works whether or not the
+ * automatic asking above is on, and asks the nodes one after another (a query is a radio transmission). Nodes that
+ * run an older firmware than MT_SW_FIRMWARE v3 are not sent the query.
+ */
+@Composable
+fun PresenceManualAsk() {
+    val nodeRepository = koinInject<NodeRepository>()
+    val useCase = koinInject<NodePresenceUseCase>()
+    val scope = rememberCoroutineScope()
+    val nodes by nodeRepository.nodeDBbyNum.collectAsStateWithLifecycle()
+    val me by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
+    var job by remember { mutableStateOf<Job?>(null) }
+    var done by remember { mutableStateOf(0) }
+    var total by remember { mutableStateOf(0) }
+    val running = job?.isActive == true
+
+    fun ask(nums: List<Int>) {
+        if (nums.isEmpty() || running) return
+        total = nums.size
+        done = 0
+        job = scope.launch { useCase.askNodes(nums) { done = it } }
+    }
+
+    val others = nodes.values.filter { it.num != me?.num }
+    val now = nowSeconds
+    ListItem(
+        text = stringResource(Res.string.presence_ask_now_favorites),
+        supportingText = stringResource(Res.string.presence_ask_now_summary),
+        leadingIcon = MeshtasticIcons.Refresh,
+        enabled = !running,
+    ) {
+        ask(others.filter { it.isFavorite }.map { it.num })
+    }
+    ListItem(
+        text = stringResource(Res.string.presence_ask_now_recent),
+        leadingIcon = MeshtasticIcons.Refresh,
+        enabled = !running,
+    ) {
+        ask(others.filter { it.lastHeard != 0 && now - it.lastHeard <= RECENT_SECONDS }.map { it.num })
+    }
+    ListItem(
+        text = stringResource(Res.string.presence_ask_now_all),
+        leadingIcon = MeshtasticIcons.Refresh,
+        enabled = !running,
+    ) {
+        ask(others.filter { it.lastHeard != 0 }.map { it.num })
+    }
+    if (running) {
+        Text(
+            text = stringResource(Res.string.presence_ask_now_progress, done, total),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        ListItem(text = stringResource(Res.string.presence_ask_now_stop), trailingIcon = null) { job?.cancel() }
+    }
 }

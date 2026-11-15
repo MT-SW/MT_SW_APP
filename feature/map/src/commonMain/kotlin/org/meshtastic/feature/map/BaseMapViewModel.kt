@@ -82,6 +82,9 @@ open class BaseMapViewModel(
 
     val myNodeInfo = nodeRepository.myNodeInfo
 
+    /** Every known node by number (MT_SW: the "Active only" filter reads the nodes' last-heard times from it). */
+    val nodeDb = nodeRepository.nodeDBbyNum
+
     /**
      * Whether the device currently has network connectivity, for the offline-basemap banner and (on the Google flavor)
      * the auto-fallback in [org.meshtastic.app.map.MapViewModel]. Optimistically `true` until the first emission
@@ -174,6 +177,8 @@ open class BaseMapViewModel(
 
     fun setMaxDistanceMeters(meters: Int) = mapPrefs.updateMapFilters { it.copy(maxDistanceMeters = meters) }
 
+    fun toggleOnlyActive() = mapPrefs.updateMapFilters { it.copy(onlyActive = !it.onlyActive) }
+
     fun toggleOnlySigned() = mapPrefs.updateMapFilters { it.copy(onlySigned = !it.onlySigned) }
 
     fun toggleOnlyEncrypted() = mapPrefs.updateMapFilters { it.copy(onlyEncrypted = !it.onlyEncrypted) }
@@ -261,6 +266,8 @@ open class BaseMapViewModel(
         val onlyDirect: Boolean = false,
         /** Show only nodes whose signed broadcasts the radio has verified (design#149). */
         val onlySigned: Boolean = false,
+        /** MT_SW: show only nodes that report someone is at them. */
+        val onlyActive: Boolean = false,
         /** Show only nodes a public key is on file for. */
         val onlyEncrypted: Boolean = false,
         val excludeMqtt: Boolean = false,
@@ -283,6 +290,7 @@ open class BaseMapViewModel(
                     maxHops != MAP_FILTER_NO_HOP_LIMIT ||
                     maxDistanceMeters > 0 ||
                     onlySigned ||
+                    onlyActive ||
                     onlyEncrypted ||
                     excludeMqtt ||
                     !includeUnknown ||
@@ -298,6 +306,7 @@ open class BaseMapViewModel(
             excludeMqtt = excludeMqtt,
             lastHeardSeconds = lastHeardFilter.seconds,
             onlySigned = onlySigned,
+            onlyActive = onlyActive,
             onlyEncrypted = onlyEncrypted,
             maxHops = maxHops,
             maxDistanceMeters = maxDistanceMeters,
@@ -319,6 +328,7 @@ open class BaseMapViewModel(
         onlyOnline = prefs.onlyOnline,
         onlyDirect = prefs.onlyDirect,
         onlySigned = prefs.onlySigned,
+        onlyActive = prefs.onlyActive,
         onlyEncrypted = prefs.onlyEncrypted,
         excludeMqtt = prefs.excludeMqtt,
         showIgnored = prefs.showIgnored,

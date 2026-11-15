@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.node_filter_include_unknown
 import org.meshtastic.core.resources.node_filter_only_direct
 import org.meshtastic.core.resources.node_filter_only_encrypted
 import org.meshtastic.core.resources.node_filter_only_online
+import org.meshtastic.core.resources.node_filter_only_active
 import org.meshtastic.core.resources.node_filter_only_signed
 import org.meshtastic.core.resources.only_favorites
 import org.meshtastic.core.resources.show_node_links
@@ -190,6 +191,11 @@ private fun NodeFilterToggles(filterState: BaseMapViewModel.MapFilterState, acti
         label = stringResource(Res.string.node_filter_only_direct),
         checked = filterState.onlyDirect,
         onToggle = actions.onToggleOnlyDirect,
+    )
+    FilterToggle(
+        label = stringResource(Res.string.node_filter_only_active),
+        checked = filterState.onlyActive,
+        onToggle = actions.onToggleOnlyActive,
     )
     FilterToggle(
         label = stringResource(Res.string.node_filter_only_signed),

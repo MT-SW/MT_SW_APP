@@ -108,6 +108,16 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>Node activity (a node is active)</string>
+			<key>Key</key>
+			<string>mtsw_notify_node_active</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>Notification sound while the app is open</string>
 			<key>Key</key>
 			<string>mtsw_notify_sound_while_open</string>

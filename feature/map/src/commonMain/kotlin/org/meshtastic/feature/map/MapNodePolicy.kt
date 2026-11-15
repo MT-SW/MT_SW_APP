@@ -64,10 +64,11 @@ object MapNodePolicy {
         nowSeconds: Long,
         myNodeNum: Int?,
         origin: Node? = null,
+        activeNodes: Set<Int>? = null,
     ): List<Node> {
         val filter = filterState.toNodeMapFilter()
         return nodes.filter { node ->
-            node.validPosition != null && (node.num == myNodeNum || node.passesMapFilter(filter, nowSeconds, origin))
+            node.validPosition != null && (node.num == myNodeNum || node.passesMapFilter(filter, nowSeconds, origin, activeNodes))
         }
     }
 }

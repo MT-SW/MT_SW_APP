@@ -2485,9 +2485,14 @@ no_usb_devices_seen
 node_active_alert
 node_active_alert_hint
 node_active_alert_notification
+node_active_notifications
+node_active_notifications_description
+node_away_alert
+node_away_alert_notification
 node_color_pick
 node_color_summary
 node_color_title
+node_count_active
 node_count_online
 node_count_shown
 node_count_template
@@ -2625,6 +2630,7 @@ notifications_alerts
 notifications_for_channel_and_direct_messages
 notifications_for_low_battery_alerts
 notifications_for_newly_discovered_nodes
+notifications_node_active
 notifications_node_silence
 notifications_on_alert_bell_receipt
 notifications_on_message_receipt
@@ -2914,6 +2920,12 @@ preferences_system_default
 presence_active
 presence_active_hours
 presence_active_min
+presence_ask_now_all
+presence_ask_now_favorites
+presence_ask_now_progress
+presence_ask_now_recent
+presence_ask_now_stop
+presence_ask_now_summary
 presence_ask_summary
 presence_ask_title
 presence_color_green

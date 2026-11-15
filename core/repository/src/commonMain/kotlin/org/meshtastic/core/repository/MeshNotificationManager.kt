@@ -95,6 +95,9 @@ interface MeshNotificationManager {
 
     fun cancelNodeSilenceNotification(nodeNum: Int)
 
+    /** MT_SW: the "active" alert: [node] reports that someone is at it (or is away). Its own category, off by default. */
+    suspend fun showNodeActiveNotification(node: Node, title: String)
+
     /**
      * Warns that [node]'s battery is low. The first reading of an episode posts and alerts; later ones only refresh a
      * warning still showing, so a dismissed one stays dismissed until [cancelLowBatteryNotification] or

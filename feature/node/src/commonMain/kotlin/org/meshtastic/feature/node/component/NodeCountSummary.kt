@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_count_active
 import org.meshtastic.core.resources.node_count_online
 import org.meshtastic.core.resources.node_count_shown
 import org.meshtastic.core.resources.node_count_template
@@ -52,11 +53,18 @@ private val LINE_GAP = 2.dp
  * Screen readers get one coherent sentence via [Res.string.node_count_template] rather than three disjointed fragments.
  */
 @Composable
-fun NodeCountSummary(onlineCount: Int, shownCount: Int, totalCount: Int, modifier: Modifier = Modifier) {
+fun NodeCountSummary(
+    onlineCount: Int,
+    shownCount: Int,
+    totalCount: Int,
+    modifier: Modifier = Modifier,
+    activeCount: Int? = null,
+) {
     NodeCountSummaryContent(
         labels =
-        listOf(
+        listOfNotNull(
             stringResource(Res.string.node_count_online, onlineCount),
+            activeCount?.let { stringResource(Res.string.node_count_active, it) },
             stringResource(Res.string.node_count_shown, shownCount),
             stringResource(Res.string.node_count_total, totalCount),
         ),

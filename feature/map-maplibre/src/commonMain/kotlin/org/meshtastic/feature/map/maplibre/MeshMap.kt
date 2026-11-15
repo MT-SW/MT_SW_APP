@@ -51,11 +51,15 @@ import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.koin.compose.koinInject
+import org.meshtastic.core.repository.MeshLogRepository
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.activeNodeNumsFlow
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
@@ -196,9 +200,21 @@ fun rememberMeshMapState(
     val focusedNode = remember(nodes, focusNodeNum) { focusNodeNum?.let { num -> nodes.firstOrNull { it.num == num } } }
     // The mesh-wide filter is computed once per data change, not per camera frame.
     // `nowSeconds` is deliberately not a key: a packet arriving already changes the node list.
+    // MT_SW: which nodes report someone is at them, read only while the "Active only" filter is on.
+    val meshLogRepository: MeshLogRepository = koinInject()
+    val uiPrefs: UiPrefs = koinInject()
+    val activeNodes by
+        remember(filterState.onlyActive) {
+            if (filterState.onlyActive) {
+                activeNodeNumsFlow(meshLogRepository, viewModel.nodeDb, uiPrefs.uiOptions)
+            } else {
+                flowOf(null)
+            }
+        }
+            .collectAsStateWithLifecycle(initialValue = null)
     val visibleNodes =
-        remember(nodes, filterState, myNodeInfo, ourNode) {
-            MapNodePolicy.visibleNodes(nodes, filterState, nowSeconds, myNodeInfo?.myNodeNum, ourNode)
+        remember(nodes, filterState, myNodeInfo, ourNode, activeNodes) {
+            MapNodePolicy.visibleNodes(nodes, filterState, nowSeconds, myNodeInfo?.myNodeNum, ourNode, activeNodes)
         }
 
     InstallRadarSmoothing()

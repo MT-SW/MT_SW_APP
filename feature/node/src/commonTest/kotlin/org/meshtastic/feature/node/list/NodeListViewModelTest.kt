@@ -91,6 +91,7 @@ class NodeListViewModelTest {
         every { nodeFilterPreferences.nodeSortOption } returns MutableStateFlow(NodeSortOption.LAST_HEARD)
         every { nodeFilterPreferences.filters } returns MutableStateFlow(NodeFilterPrefs())
         every { nodeFilterPreferences.keptUnheardNodes } returns MutableStateFlow(emptySet())
+        every { nodeFilterPreferences.uiOptions } returns MutableStateFlow(emptyMap())
         every { nodeManager.reportsHeardOnCurrentLora } returns reportsHeard
         every { nodeManager.isNodeDbReady } returns nodeDbReady
 

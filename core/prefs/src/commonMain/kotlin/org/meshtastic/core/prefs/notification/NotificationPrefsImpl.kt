@@ -143,6 +143,13 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         scope.launch { dataStore.edit { it[KEY_NODE_SILENCE_ENABLED] = enabled } }
     }
 
+    override val nodeActiveEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_NODE_ACTIVE_ENABLED] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setNodeActiveEnabled(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_NODE_ACTIVE_ENABLED] = enabled } }
+    }
+
     // Stored as an insertion-ordered CSV of ints (DataStore has no int-set key, and a plain set can't express age).
     // Ordering lets us evict the oldest opt-in once capped; non-numeric leftovers are ignored on read.
     override val geofenceAlertOptIns: StateFlow<Set<Int>> =
@@ -213,6 +220,22 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         }
     }
 
+    // MT_SW: stored as node numbers separated by commas.
+    override val nodeAwayAlerts: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs -> parseOptInIds(prefs[KEY_NODE_AWAY_ALERTS]).toSet() }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setNodeAwayAlert(nodeNum: Int, enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                val nodes = parseOptInIds(prefs[KEY_NODE_AWAY_ALERTS]).toMutableSet()
+                if (enabled) nodes.add(nodeNum) else nodes.remove(nodeNum)
+                prefs[KEY_NODE_AWAY_ALERTS] = nodes.joinToString(",")
+            }
+        }
+    }
+
     // Stored as "start-end" hours, or empty for none.
     override val nodeSilenceQuietHours: StateFlow<QuietHours?> =
         dataStore.data
@@ -259,6 +282,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private val KEY_NODE_SILENCE_ALERTS = stringPreferencesKey("notif_node_silence_alerts")
         private val KEY_NODE_SILENCE_RELAYED = stringPreferencesKey("notif_node_silence_relayed")
         private val KEY_NODE_ACTIVE_ALERTS = stringPreferencesKey("notif_node_active_alerts")
+        private val KEY_NODE_AWAY_ALERTS = stringPreferencesKey("notif_node_away_alerts")
         private val KEY_MESSAGES_ENABLED = booleanPreferencesKey("notif_messages_enabled")
         private val KEY_NODE_EVENTS_ENABLED = booleanPreferencesKey("notif_node_events_enabled")
         private val KEY_NODE_EVENTS_AUTO_DISABLED = booleanPreferencesKey("notif_node_events_auto_disabled_event")
@@ -269,6 +293,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private val KEY_RADIO_NOTICES_ENABLED = booleanPreferencesKey("notif_radio_notices_enabled")
         private val KEY_UPDATES_ENABLED = booleanPreferencesKey("notif_updates_enabled")
         private val KEY_NODE_SILENCE_ENABLED = booleanPreferencesKey("notif_node_silence_enabled")
+        private val KEY_NODE_ACTIVE_ENABLED = booleanPreferencesKey("notif_node_active_enabled")
         private val KEY_SOUND_WHILE_OPEN = booleanPreferencesKey("notif_sound_while_open")
         private val KEY_GEOFENCE_ALERT_OPT_INS = stringPreferencesKey("notif_geofence_alert_opt_ins")
     }

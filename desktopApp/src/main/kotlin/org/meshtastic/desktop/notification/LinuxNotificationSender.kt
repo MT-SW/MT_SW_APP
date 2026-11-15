@@ -302,6 +302,8 @@ class LinuxNotificationSender(
 
                 Notification.Category.Silence -> "network"
 
+                Notification.Category.Active -> "network"
+
                 Notification.Category.MeshBeacon -> "network"
 
                 Notification.Category.Service -> "device"

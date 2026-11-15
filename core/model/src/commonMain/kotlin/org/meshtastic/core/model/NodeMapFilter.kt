@@ -34,6 +34,8 @@ data class NodeMapFilter(
     val excludeMqtt: Boolean = false,
     val lastHeardSeconds: Long = 0,
     val onlySigned: Boolean = false,
+    /** MT_SW: show only nodes that report someone is at them (the numbers come with the call, see [passesMapFilter]). */
+    val onlyActive: Boolean = false,
     val onlyEncrypted: Boolean = false,
     /** Furthest hop count shown (0 = direct only); [MAP_FILTER_NO_HOP_LIMIT] means no limit. */
     val maxHops: Int = MAP_FILTER_NO_HOP_LIMIT,
@@ -55,9 +57,16 @@ const val MAP_FILTER_NO_HOP_LIMIT = -1
  * showIgnored`, so switching it on shows *only* ignored nodes); here it reads literally and adds them, because a map of
  * nothing but ignored nodes is not a view anyone asked for.
  */
-fun Node.passesMapFilter(filter: NodeMapFilter, nowSeconds: Long, origin: Node? = null): Boolean {
+fun Node.passesMapFilter(
+    filter: NodeMapFilter,
+    nowSeconds: Long,
+    origin: Node? = null,
+    activeNodes: Set<Int>? = null,
+): Boolean {
     val secondsSinceHeard = nowSeconds - lastHeard
-    return passesIdentityFilters(filter) &&
+    // MT_SW: without the set of active nodes (the status is not known) this filter does not narrow anything.
+    return (!filter.onlyActive || activeNodes == null || num in activeNodes) &&
+        passesIdentityFilters(filter) &&
         passesSecurityFilters(filter) &&
         passesReachabilityFilters(filter, secondsSinceHeard) &&
         passesRangeFilters(filter, origin)

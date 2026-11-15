@@ -190,15 +190,17 @@ A small icon by a node in the list (normal and compact) says whether someone is 
 - **Replaces another icon** — nothing (the icon sits next to the others), favourite, muted or unmessageable; that icon is then not shown while the status is known.
 - **Colour of the active icon** — green or the colour of the theme.
 - **How long "active" holds** — 30 min, 1, 2, 6 or 12 h (1 h by default). When the node is not heard for that long, nothing is shown for it, because it may have gone out of range before it could report "inactive".
-- **Ask when a chat is opened** — opening a direct chat asks that node for its status (at most once per 10 minutes).
+- **Ask for the status by itself** — off by default; when on, opening a direct chat asks that node for its status (at most once per 10 minutes).
 
 Before the app asks another node for its status (when a chat is opened or in on-demand diagnostics), it asks that node for its firmware version, unless it already knows it. If the version is older than MT_SW_FIRMWARE v3, or the node does not tell it, the status query is not sent. In on-demand diagnostics the status card shows this in its text while waiting ("First asking for the firmware version…") and when nothing was sent.
 
 The statuses are read from the saved OnDemand answers, so they survive a restart of the app.
 
-- **Node list** — sorting **By activity (favourites first)**: favourites, then active nodes, then the rest, each group by last heard; the **Active only** filter shows only nodes with the status "active".
+- **Asking** — by hand only by default. **MT_SW features → Activity status** has the buttons **Ask favourites / nodes heard in the last hour / all heard nodes for the status now** (they ask one after another with a pause, and can be stopped) and the switch **Ask for the status by itself**, which, when you turn it on, makes opening a chat with a node ask it, even if you have MT_SW_FIRMWARE v3 yourself. A single node can also be asked by hand in "On-demand diagnostics".
+- **Node list** — sorting **By activity (favourites first)**: favourites, then active nodes, then the rest, each group by last heard; the **Active only** filter; the header shows the count of active nodes next to "online".
+- **Map** — the **Active only** filter (Android, desktop, iPhone/iPad; also in the HUD view).
 - **Network health** — the summary has an **Activity** section: how many nodes are active and away, and how many share a status at all (also in the report).
-- **Active alert** — a switch in the node details (under the node watchdog); when the node reports that someone is at it, a notification arrives. It uses the quiet hours of the node watchdog and its notification channel. Works while connected to the radio.
+- **Active alert** — in the node details (under the node watchdog) a switch "when it becomes active" and a second "also when it becomes away". Notifications of this category (**Node activity**) are **off by default**, like the new-node ones: on Android you turn the channel on in the system settings of the app, on the computer and iPhone/iPad in the notification settings. It uses the quiet hours of the node watchdog. Works while connected to the radio.
 - **On-demand diagnostics** — the activity status counts in the progress and goes into the report.
 
 ## Debug panel

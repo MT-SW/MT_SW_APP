@@ -728,6 +728,14 @@ interface NotificationPrefs {
     fun setNodeSilenceEnabled(enabled: Boolean)
 
     /**
+     * MT_SW: desktop and iPhone/iPad opt-in for the "node is active" alerts; Android uses the system channel, which is
+     * created switched off. OFF by default, like nothing else is switched on that the person did not ask for.
+     */
+    val nodeActiveEnabled: StateFlow<Boolean>
+
+    fun setNodeActiveEnabled(enabled: Boolean)
+
+    /**
      * Waypoint ids of foreign (not locally-created) geofences the user has opted in to receiving crossing alerts for.
      * Geofences are mesh-broadcast, so by default only the creator is alerted; this is the per-geofence opt-in.
      */
@@ -769,6 +777,12 @@ interface NotificationPrefs {
 
     /** Turns the "active" alert of [nodeNum] on or off. */
     fun setNodeActiveAlert(nodeNum: Int, enabled: Boolean)
+
+    /** MT_SW: nodes whose "active" alert also fires when the node reports that it is away. */
+    val nodeAwayAlerts: StateFlow<Set<Int>>
+
+    /** Turns the "away" part of the alert of [nodeNum] on or off. */
+    fun setNodeAwayAlert(nodeNum: Int, enabled: Boolean)
 }
 
 /** Reactive interface for general map preferences. */

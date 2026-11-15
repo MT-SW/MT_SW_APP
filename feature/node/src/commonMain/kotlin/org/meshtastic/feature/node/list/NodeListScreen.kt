@@ -229,6 +229,7 @@ fun NodeListScreen(
     val nodes = remember(allNodes) { allNodes.distinctBy { it.num } }
     val ourNode by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
     val onlineNodeCount by viewModel.onlineNodeCount.collectAsStateWithLifecycle(0)
+    val activeNodeCount by viewModel.activeNodeCount.collectAsStateWithLifecycle()
     val totalNodeCount by viewModel.totalNodeCount.collectAsStateWithLifecycle(0)
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
     val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
@@ -433,6 +434,7 @@ fun NodeListScreen(
                         ) {
                             NodeCountSummary(
                                 onlineCount = onlineNodeCount,
+                                activeCount = activeNodeCount,
                                 shownCount = nodes.size,
                                 totalCount = totalNodeCount,
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),

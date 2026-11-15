@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.meshtastic_reactions_notifications
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications
 import org.meshtastic.core.resources.notification_sound_while_open
 import org.meshtastic.core.resources.notifications_alerts
+import org.meshtastic.core.resources.notifications_node_active
 import org.meshtastic.core.resources.notifications_node_silence
 import org.meshtastic.core.resources.notifications_radio_notices
 import org.meshtastic.core.resources.notifications_updates
@@ -37,6 +38,7 @@ import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.core.ui.icon.SystemUpdate
@@ -66,6 +68,8 @@ fun NotificationSection(
     onToggleUpdates: (Boolean) -> Unit = {},
     nodeSilenceEnabled: Boolean = true,
     onToggleNodeSilence: (Boolean) -> Unit = {},
+    nodeActiveEnabled: Boolean = false,
+    onToggleNodeActive: (Boolean) -> Unit = {},
     showSoundWhileOpen: Boolean = false,
     soundWhileOpen: Boolean = false,
     onToggleSoundWhileOpen: (Boolean) -> Unit = {},
@@ -106,6 +110,12 @@ fun NotificationSection(
             leadingIcon = MeshtasticIcons.History,
             checked = nodeSilenceEnabled,
             onClick = { onToggleNodeSilence(!nodeSilenceEnabled) },
+        )
+        SwitchListItem(
+            text = stringResource(Res.string.notifications_node_active),
+            leadingIcon = MeshtasticIcons.Person,
+            checked = nodeActiveEnabled,
+            onClick = { onToggleNodeActive(!nodeActiveEnabled) },
         )
         SwitchListItem(
             text = stringResource(Res.string.notifications_alerts),
