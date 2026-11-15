@@ -2047,7 +2047,6 @@
     <string name="powered">Zasilany</string>
     <string name="ppm">ppm</string>
     <string name="precise_location">Precyzyjna lokalizacja</string>
-    <string name="precise_location_insecure_channel">Niedostępne na kanale, który nie jest bezpiecznie szyfrowany</string>
     <string name="preferences_language">Język</string>
     <string name="preferences_system_default">Domyślny systemu</string>
     <string name="preserve_favorites">Zachować ulubione?</string>

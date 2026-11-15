@@ -35,8 +35,7 @@ data class ChannelReplacementPlan(val normalizedSettings: List<ChannelSettings>,
  *
  * Normalization runs before the firmware-slot bound is checked, allowing padded exports to shed blank or duplicate
  * secondaries before validation. [requirePrimary] lets profile installation reject an empty decoded set while the
- * explicit QR replacement flow retains its existing ability to clear every slot. Every channel on a publicly
- * decryptable key leaves with its position precision capped ([withOnWirePrecision]).
+ * explicit QR replacement flow retains its existing ability to clear every slot.
  *
  * @param currentSettings The destination's current settings. Only the size is used when deciding which trailing slots
  *   must be disabled.
@@ -48,8 +47,7 @@ fun ChannelSet.toChannelReplacementPlan(
     fallbackLoraConfig: Config.LoRaConfig?,
     requirePrimary: Boolean = false,
 ): ChannelReplacementPlan {
-    val normalizedSettings =
-        normalizeReplacementSettings(settings, lora_config ?: fallbackLoraConfig).withOnWirePrecision()
+    val normalizedSettings = normalizeReplacementSettings(settings, lora_config ?: fallbackLoraConfig)
     require(!requirePrimary || normalizedSettings.isNotEmpty()) {
         "Imported channel set must contain a primary channel"
     }
