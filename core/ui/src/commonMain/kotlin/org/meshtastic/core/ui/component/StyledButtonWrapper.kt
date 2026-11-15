@@ -29,8 +29,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.Button as MaterialButton
@@ -62,8 +67,52 @@ fun Modifier.styledControl(shape: Shape): Modifier = buttonStyle(LocalCardGroup.
 @Composable
 private fun Modifier.buttonStyle(group: String, shape: Shape): Modifier {
     val options = rememberUiOptions()
-    val look = options.element(group).look
-    return if (look == ElementLook.FLAT) this else styledLook(group, shape, look, options.rimDp())
+    val style = options.element(group)
+    if (style.look == ElementLook.FLAT) return this
+    // Buttons get no shadow plate (it looked like a shifted layer): only a gentle gradient (light above, a little
+    // shade below) and a thin rim, which is enough for a soft 3D feeling; glass and see-through keep their own rim.
+    val withRim =
+        if (style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS) {
+            styledLook(group, shape, style.look, options.rimDp())
+        } else {
+            this
+        }
+    return withRim.softGradient(shape, style.strength)
+}
+
+private const val GRADIENT_TOP_ALPHA = 0.16f
+private const val GRADIENT_BOTTOM_ALPHA = 0.18f
+private const val GRADIENT_RIM_TOP_ALPHA = 0.28f
+private const val GRADIENT_RIM_BOTTOM_ALPHA = 0.05f
+private const val GRADIENT_MIN_SHARE = 0.4f
+private const val GRADIENT_PERCENT = 100f
+private const val GRADIENT_MIDDLE = 0.55f
+
+/** A delicate vertical gradient with a thin rim, drawn over a button or a control. */
+private fun Modifier.softGradient(shape: Shape, strength: Int): Modifier {
+    val share = GRADIENT_MIN_SHARE + (1f - GRADIENT_MIN_SHARE) * strength.coerceIn(0, 100) / GRADIENT_PERCENT
+    return drawWithContent {
+        drawContent()
+        val outline = shape.createOutline(size, layoutDirection, this)
+        drawOutline(
+            outline = outline,
+            brush =
+            Brush.verticalGradient(
+                0f to Color.White.copy(alpha = GRADIENT_TOP_ALPHA * share),
+                GRADIENT_MIDDLE to Color.Transparent,
+                1f to Color.Black.copy(alpha = GRADIENT_BOTTOM_ALPHA * share),
+            ),
+        )
+        drawOutline(
+            outline = outline,
+            brush =
+            Brush.verticalGradient(
+                0f to Color.White.copy(alpha = GRADIENT_RIM_TOP_ALPHA * share),
+                1f to Color.White.copy(alpha = GRADIENT_RIM_BOTTOM_ALPHA * share),
+            ),
+            style = Stroke(width = 1.dp.toPx()),
+        )
+    }
 }
 
 @Composable
