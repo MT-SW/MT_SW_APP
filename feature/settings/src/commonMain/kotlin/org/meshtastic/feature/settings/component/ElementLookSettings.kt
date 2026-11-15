@@ -56,8 +56,17 @@ import org.meshtastic.core.resources.dialog_see_through
 import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
+import org.meshtastic.core.resources.button_gradient
+import org.meshtastic.core.resources.button_gradient_normal
+import org.meshtastic.core.resources.button_gradient_off
+import org.meshtastic.core.resources.button_gradient_strong
+import org.meshtastic.core.resources.button_gradient_weak
 import org.meshtastic.core.resources.glass_rim
 import org.meshtastic.core.resources.nav_bar_rim
+import org.meshtastic.core.resources.nav_bar_select
+import org.meshtastic.core.resources.nav_select_bubble
+import org.meshtastic.core.resources.nav_select_both
+import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.glass_tint
 import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
@@ -357,6 +366,18 @@ fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) -> Unit)
         checked = options.flag(UiOptions.NAV_HAPTICS),
         onClick = { onChange(UiOptions.NAV_HAPTICS, if (options.flag(UiOptions.NAV_HAPTICS)) 0 else 1) },
     )
+    DropDownPreference(
+        title = stringResource(Res.string.nav_bar_select),
+        enabled = true,
+        items =
+        listOf(
+            UiOptions.NAV_SELECT_BUBBLE to stringResource(Res.string.nav_select_bubble),
+            UiOptions.NAV_SELECT_LINE to stringResource(Res.string.nav_select_line),
+            UiOptions.NAV_SELECT_BOTH to stringResource(Res.string.nav_select_both),
+        ),
+        selectedItem = options[UiOptions.NAV_SELECT],
+        onItemSelected = { onChange(UiOptions.NAV_SELECT, it) },
+    )
     SliderPreference(
         title = stringResource(Res.string.nav_bar_rim),
         enabled = true,
@@ -478,5 +499,18 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.RIM],
         onValueChange = { onChange(UiOptions.RIM, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.button_gradient),
+        enabled = true,
+        items =
+        listOf(
+            0 to stringResource(Res.string.button_gradient_off),
+            1 to stringResource(Res.string.button_gradient_weak),
+            2 to stringResource(Res.string.button_gradient_normal),
+            3 to stringResource(Res.string.button_gradient_strong),
+        ),
+        selectedValue = options[UiOptions.BUTTON_GRADIENT],
+        onValueChange = { onChange(UiOptions.BUTTON_GRADIENT, it) },
     )
 }

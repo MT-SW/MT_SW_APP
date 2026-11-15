@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -329,7 +330,7 @@ fun ContactsScreen(
         floatingActionButton = {
             // The list runs under the floating bar, so the button is lifted above it.
             if (!importInTopBar && connectionState is ConnectionState.Connected) {
-                Box(modifier = Modifier.padding(bottom = LocalFloatingBarInset.current)) { importMenu(false) }
+                Box(modifier = Modifier.floatingBarEndPadding()) { importMenu(false) }
             }
         },
     ) { paddingValues ->

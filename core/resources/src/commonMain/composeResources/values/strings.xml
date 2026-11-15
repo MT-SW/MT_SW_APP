@@ -720,6 +720,12 @@
     <string name="boot_reconnect_blocked_title">Meshtastic can't reconnect</string>
     <string name="bottom_nav_settings">Settings</string>
     <string name="busy_noise_floor">Busy floor</string>
+    <!-- BUTTON -->
+    <string name="button_gradient">Gradient on the buttons</string>
+    <string name="button_gradient_normal">Normal</string>
+    <string name="button_gradient_off">Off</string>
+    <string name="button_gradient_strong">Strong</string>
+    <string name="button_gradient_weak">Delicate</string>
     <plurals name="cache_limit_eviction_warning">
         <item quantity="one">Lowering this will permanently delete the saved history for %1$d device.</item>
         <item quantity="other">Lowering this will permanently delete the saved history for %1$d devices.</item>
@@ -2456,10 +2462,14 @@
     <string name="nav_bar_hide_small">After a short scroll down</string>
     <string name="nav_bar_new_icons">New bar icons (off = the old icons)</string>
     <string name="nav_bar_rim">Edge line of the bar</string>
+    <string name="nav_bar_select">Marking of the open tab</string>
     <string name="nav_bar_show">Bringing the bar back</string>
     <string name="nav_bar_show_at_top">Only at the very top of the page</string>
     <string name="nav_bar_show_far">After a longer scroll up</string>
     <string name="nav_bar_show_small">After a short scroll up</string>
+    <string name="nav_select_both">Highlight and line</string>
+    <string name="nav_select_bubble">Rounded highlight</string>
+    <string name="nav_select_line">Line under the name</string>
     <string name="navigate_back">Navigate Back</string>
     <string name="navigate_into_label">Navigate Into</string>
     <string name="nearby_devices_permission">Nearby devices permission</string>

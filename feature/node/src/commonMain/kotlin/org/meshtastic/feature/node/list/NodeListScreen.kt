@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -398,7 +399,7 @@ fun NodeListScreen(
                 val shareCapable = ourNode?.capabilities?.supportsQrCodeSharing ?: false
                 if (!importInTopBar) {
                     // The list runs under the floating bar, so the button is lifted above it.
-                    Box(modifier = Modifier.padding(bottom = LocalFloatingBarInset.current)) {
+                    Box(modifier = Modifier.floatingBarEndPadding()) {
                         importMenu(
                             false,
                             Modifier.animateFloatingActionButton(

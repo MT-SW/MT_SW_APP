@@ -20,7 +20,7 @@ package org.meshtastic.feature.settings.radio
 
 import androidx.compose.foundation.layout.Arrangement
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -101,7 +101,7 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalFloatingBarInset.current)) {
+        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding()) {
             AutoCleanNodesSection(
                 autoCleanEnabled = autoCleanEnabled,
                 autoCleanInactivityDays = autoCleanInactivityDays,

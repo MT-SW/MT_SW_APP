@@ -20,7 +20,7 @@ package org.meshtastic.feature.node.health
 
 import androidx.compose.animation.core.animateFloatAsState
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -126,7 +126,7 @@ fun NodeMetricDetailScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp).floatingBarEndPadding(),
             ) {
                 NodeMetricHero(uiState = uiState)
                 Spacer(modifier = Modifier.height(12.dp))

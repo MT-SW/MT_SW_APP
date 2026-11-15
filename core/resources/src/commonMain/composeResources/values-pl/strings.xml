@@ -4230,6 +4230,15 @@
     <string name="glass_tint_accent">Kolor akcentu</string>
     <string name="glass_rim">Grubość jasnej krawędzi</string>
     <string name="nav_bar_rim">Obrys paska (grubość krawędzi)</string>
+    <string name="button_gradient">Gradient na przyciskach</string>
+    <string name="button_gradient_off">Wyłączony</string>
+    <string name="button_gradient_weak">Delikatny</string>
+    <string name="button_gradient_normal">Normalny</string>
+    <string name="button_gradient_strong">Mocny</string>
+    <string name="nav_bar_select">Zaznaczenie otwartej karty</string>
+    <string name="nav_select_bubble">Zaokrąglone tło</string>
+    <string name="nav_select_line">Kreska pod napisem</string>
+    <string name="nav_select_both">Tło i kreska</string>
     <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
     <string name="data_logs_title">Dane, logi i diagnostyka</string>

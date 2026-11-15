@@ -18,7 +18,7 @@ package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -72,7 +72,7 @@ fun NodeListScreen(settingsViewModel: SettingsViewModel, onNavigateUp: () -> Uni
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             NodeLayoutSettings(

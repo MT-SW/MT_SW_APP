@@ -21,6 +21,8 @@
 - **Data.** "Add data from a backup" and synchronisation of the device statistics.
 - **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 ## better | Improvements
+- Device statistics (the metrics in the node details) open faster, especially on the iPhone: they show the newest entries first and the full history follows right after.
+- Look: new settings "Marking of the open tab" (rounded highlight, a line under the name or both) and "Gradient on the buttons" (off, delicate, normal, strong).
 - The plate of your node (colour and short name) is in the top bar of the main cards, and the red SOS button is in the top bar of every screen, also in a conversation and in Network health; while it is held its border is traced around in white, and the SOS screen has the same button.
 - SOS: you can leave every channel unchosen (the alarm then goes only to the chosen people), and "Test the alarm" is a plain button that tries the alarm at once.
 - Map: the filters "Max. number of hops" and "Max. distance from my node", a "choose node" list for nodes in the same place, more exact touching of the bubbles and smoother panning.

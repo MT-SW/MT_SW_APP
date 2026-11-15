@@ -35,8 +35,11 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -104,6 +107,10 @@ internal val LocalFloatingBar = staticCompositionLocalOf<FloatingBarState?> { nu
  * A screen that calls [FloatingBarUnderlap] adds this at the end of its lists.
  */
 val LocalFloatingBarInset = compositionLocalOf { 0.dp }
+
+/** The room at the end of a scrolling page for the floating bar, so the last item can be scrolled above it. */
+@Composable
+fun Modifier.floatingBarEndPadding(): Modifier = padding(bottom = LocalFloatingBarInset.current)
 
 /** Called by a screen (the map) that wants the floating bar a little darker than on the other cards. */
 @Composable
@@ -236,6 +243,7 @@ internal fun FloatingNavBarHost(
                     hazeState = hazeState,
                     // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
                     darker = state.darkerCount > 0,
+                    selectStyle = options[UiOptions.NAV_SELECT],
                     rimDp = UiOptions.RIM_STEPS_DP[options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)],
                     bottomMargin = if (barHeight != null) barBottomGap + BAR_LIFT_DP.dp else BAR_MARGIN_DP.dp,
                     onSelect = { entry ->
@@ -257,6 +265,7 @@ private fun FloatingNavBar(
     hazeState: HazeState,
     darker: Boolean,
     rimDp: Float,
+    selectStyle: Int,
     bottomMargin: Dp,
     onSelect: (NavEntry) -> Unit,
     modifier: Modifier = Modifier,
@@ -286,6 +295,7 @@ private fun FloatingNavBar(
                 for (entry in entries) {
                     FloatingNavItem(
                         entry = entry,
+                        selectStyle = selectStyle,
                         onSelect = { onSelect(entry) },
                         modifier = Modifier.weight(1f),
                     )
@@ -295,17 +305,22 @@ private fun FloatingNavBar(
     }
 }
 
-/** One button of the floating bar: the icon with its short name under it. */
+/**
+ * One button of the floating bar: the icon with its short name under it. The open one is marked by a rounded
+ * highlight, by a short line under its name, or by both ([UiOptions.NAV_SELECT]); in every case it has the colour of
+ * the theme while the others are white.
+ */
 @Composable
-private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Modifier = Modifier) {
-    // The tabs that are not open are white (dark in the light themes), the open one has the colour of the theme.
+private fun FloatingNavItem(entry: NavEntry, selectStyle: Int, onSelect: () -> Unit, modifier: Modifier = Modifier) {
     val color = if (entry.selected) colorScheme.primary else colorScheme.onSurface
+    val bubble = selectStyle != UiOptions.NAV_SELECT_LINE
+    val line = selectStyle != UiOptions.NAV_SELECT_BUBBLE
     Column(
         modifier =
         modifier
             .clip(RoundedCornerShape(ITEM_CORNER_DP.dp))
             .background(
-                if (entry.selected) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
+                if (entry.selected && bubble) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
             )
             .selectable(selected = entry.selected, onClick = onSelect, role = Role.Tab)
             .padding(horizontal = 1.dp, vertical = 6.dp),
@@ -315,8 +330,21 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
             entry.icon()
             Box(modifier = Modifier.padding(top = 2.dp)) { FitLabel(entry.labelText) }
         }
+        if (line) {
+            // The line keeps its place when it is not drawn, so the buttons do not jump when another one is opened.
+            Box(
+                modifier =
+                Modifier.padding(top = 3.dp)
+                    .width(SELECT_LINE_WIDTH_DP.dp)
+                    .height(SELECT_LINE_HEIGHT_DP.dp)
+                    .background(if (entry.selected) colorScheme.primary else Color.Transparent, CircleShape),
+            )
+        }
     }
 }
+
+private const val SELECT_LINE_WIDTH_DP = 24
+private const val SELECT_LINE_HEIGHT_DP = 3
 
 private const val SELECTED_ALPHA = 0.12f
 
@@ -327,8 +355,8 @@ private const val LABEL_MIN_SP = 6f
 private const val LABEL_STEP_SP = 0.25f
 
 /**
- * The name of a button: a short one stays on one line, a longer one ("Zdrowie sieci") goes on two lines, one word under
- * the other, and the text system shrinks it a little only if a single word is still too wide.
+ * The name of a button on one line, as big as fits: the text system shrinks it step by step until the whole name fits
+ * the width of the button (so "Zdrowie sieci" is never cut off). Wrapping stays on, otherwise the shrinking would not work.
  */
 @Composable
 private fun FitLabel(text: String) {
@@ -341,9 +369,7 @@ private fun FitLabel(text: String) {
             color = LocalContentColor.current,
             textAlign = TextAlign.Center,
         ),
-        // Two lines always, so every button of the bar has the same height and the icons stand in one row.
-        minLines = 2,
-        maxLines = 2,
+        maxLines = 1,
         autoSize =
         TextAutoSize.StepBased(
             minFontSize = LABEL_MIN_SP.sp,

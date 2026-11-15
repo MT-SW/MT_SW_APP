@@ -20,7 +20,7 @@ package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -216,7 +216,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_switches)) {
@@ -432,7 +432,7 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -473,7 +473,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.mt_sw_other_intro), style = MaterialTheme.typography.bodyMedium)
@@ -584,7 +584,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.look_section_basic)) {
@@ -665,7 +665,7 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) {

@@ -696,6 +696,12 @@ boot_reconnect_blocked_message
 boot_reconnect_blocked_title
 bottom_nav_settings
 busy_noise_floor
+### BUTTON ###
+button_gradient
+button_gradient_normal
+button_gradient_off
+button_gradient_strong
+button_gradient_weak
 cache_limit_eviction_warning
 calculating
 call_sign
@@ -2405,10 +2411,14 @@ nav_bar_hide_off
 nav_bar_hide_small
 nav_bar_new_icons
 nav_bar_rim
+nav_bar_select
 nav_bar_show
 nav_bar_show_at_top
 nav_bar_show_far
 nav_bar_show_small
+nav_select_both
+nav_select_bubble
+nav_select_line
 navigate_back
 navigate_into_label
 nearby_devices_permission

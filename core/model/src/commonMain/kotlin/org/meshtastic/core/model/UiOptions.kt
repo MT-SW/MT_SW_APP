@@ -89,12 +89,22 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** The thickness of the edge line of the floating bar alone: a step of [RIM_STEPS_DP] (0 = no line). */
         const val NAV_RIM = "navbar.rim"
 
+        /** How the open card is marked on the bar: [NAV_SELECT_BUBBLE], [NAV_SELECT_LINE] or [NAV_SELECT_BOTH]. */
+        const val NAV_SELECT = "navbar.select"
+        const val NAV_SELECT_BUBBLE = 0
+        const val NAV_SELECT_LINE = 1
+        const val NAV_SELECT_BOTH = 2
+
         /** The colour of the glass: 0 = from the theme, 1 = light, 2 = dark, 3 = the accent colour. */
         const val GLASS_TINT = "glass.tint"
 
         /** The thickness of the bright rim of glass and depth: a step of [RIM_STEPS_DP]. */
         const val RIM = "glass.rim"
         val RIM_STEPS_DP = floatArrayOf(0f, 0.5f, 1f, 1.5f, 2f)
+
+        /** The strength of the soft gradient on the buttons: an index into [BUTTON_GRADIENT_SHARE] (0 = none). */
+        const val BUTTON_GRADIENT = "buttons.gradient"
+        val BUTTON_GRADIENT_SHARE = floatArrayOf(0f, 0.5f, 1f, 1.6f)
 
         /** Cards and bubbles give way a little under a finger, with a spring. */
         const val PRESS_SPRING = "motion.pressSpring"
@@ -123,6 +133,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(NAV_ICONS, 1)
             put(NAV_HAPTICS, 1)
             put(NAV_RIM, 0)
+            put(BUTTON_GRADIENT, 2)
+            put(NAV_SELECT, NAV_SELECT_BUBBLE)
             put(HOLD_BUZZ, 1)
             // The app starts with the glass look and the thin line icons like on the iPhone; the person can go back to
             // the classic look in "Look" (every choice they make is saved and stays).

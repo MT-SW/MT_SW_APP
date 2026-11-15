@@ -18,7 +18,7 @@ package org.meshtastic.feature.settings.appfunctions
 
 import androidx.compose.foundation.layout.Column
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -91,7 +91,7 @@ fun AppFunctionsSettingsScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = LocalFloatingBarInset.current)) {
+        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).floatingBarEndPadding()) {
             MasterToggleSection(
                 masterEnabled = masterEnabled,
                 onToggle = { viewModel.toggle(AppFunctionsSetting.MASTER) },

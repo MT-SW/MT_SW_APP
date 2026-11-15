@@ -18,7 +18,7 @@ package org.meshtastic.feature.settings.radio.setup
 
 import androidx.compose.foundation.layout.Arrangement
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -204,7 +204,7 @@ fun RadioSetupScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalFloatingBarInset.current),
+                modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // The flow has a known length, so the page shows where it is in it.

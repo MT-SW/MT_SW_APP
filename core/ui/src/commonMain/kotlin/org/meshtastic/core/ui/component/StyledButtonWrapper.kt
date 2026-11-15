@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.Button as MaterialButton
 import androidx.compose.material3.FilledTonalButton as MaterialFilledTonalButton
@@ -72,9 +73,13 @@ private fun Modifier.buttonStyle(group: String, shape: Shape): Modifier {
     val options = rememberUiOptions()
     val style = options.element(group)
     if (style.look == ElementLook.FLAT) return this
+    val gradient =
+        UiOptions.BUTTON_GRADIENT_SHARE[
+            options[UiOptions.BUTTON_GRADIENT].coerceIn(0, UiOptions.BUTTON_GRADIENT_SHARE.lastIndex)]
+    if (gradient <= 0f) return this
     // Buttons get no shadow plate and no double glass rim (they looked like a shifted layer): only a gentle gradient
     // (light above, a little shade below) with one thin rim, a soft 3D feeling in every look.
-    return softGradient(shape, style.strength)
+    return softGradient(shape, style.strength, gradient)
 }
 
 private const val GRADIENT_TOP_ALPHA = 0.16f
@@ -86,8 +91,9 @@ private const val GRADIENT_PERCENT = 100f
 private const val GRADIENT_MIDDLE = 0.55f
 
 /** A delicate vertical gradient with a thin rim, drawn over a button or a control. */
-private fun Modifier.softGradient(shape: Shape, strength: Int): Modifier {
-    val share = GRADIENT_MIN_SHARE + (1f - GRADIENT_MIN_SHARE) * strength.coerceIn(0, 100) / GRADIENT_PERCENT
+private fun Modifier.softGradient(shape: Shape, strength: Int, gradient: Float): Modifier {
+    val share =
+        (GRADIENT_MIN_SHARE + (1f - GRADIENT_MIN_SHARE) * strength.coerceIn(0, 100) / GRADIENT_PERCENT) * gradient
     return drawWithContent {
         drawContent()
         val outline = shape.createOutline(size, layoutDirection, this)

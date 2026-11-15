@@ -43,7 +43,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
@@ -267,7 +267,7 @@ fun DesktopSettingsScreen(
                 Modifier.verticalScroll(scrollState)
                     .fillMaxSize()
                     .padding(16.dp)
-                    .padding(bottom = LocalFloatingBarInset.current),
+                    .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 SettingsSearchBar(

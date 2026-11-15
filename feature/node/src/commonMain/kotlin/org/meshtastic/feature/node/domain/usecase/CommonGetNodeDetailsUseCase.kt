@@ -23,11 +23,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.transformLatest
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.LocaleUnitsProvider
@@ -99,10 +102,19 @@ constructor(
 
     /**
      * One source of log entries. The summary reads only the newest entries and answers at once (with an empty list
-     * first); the full history waits for the whole read, so a screen can show a loading indicator until it arrives.
+     * first). The full history is read in two steps: the newest entries come at once (so a statistics screen opens
+     * and draws the latest data without waiting for thousands of rows to be read and decoded, which was slow on the
+     * iPhone), and the whole history replaces them as soon as it is ready.
      */
     private fun <T> logSource(fullHistory: Boolean, newest: Flow<List<T>>, all: Flow<List<T>>): Flow<List<T>> =
-        if (fullHistory) all.calmed() else newest.calmed().onStart { emit(emptyList()) }
+        if (fullHistory) {
+            flow {
+                emitAll(newest.take(1))
+                emitAll(all.calmed())
+            }
+        } else {
+            newest.calmed().onStart { emit(emptyList()) }
+        }
 
     /** The summary only needs to know whether a request exists, so it decodes far fewer entries than the full read. */
     private fun requestLogs(nodeId: Int, port: PortNum, fullHistory: Boolean): Flow<List<MeshLog>> = if (fullHistory) {
