@@ -44,6 +44,7 @@ import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.message
 import org.meshtastic.core.resources.mute_notifications
 import org.meshtastic.core.resources.open_compass
+import org.meshtastic.core.resources.presence_ask_node
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.remove_favorite
 import org.meshtastic.core.resources.remove_ignored
@@ -96,6 +97,7 @@ fun NodeContextMenu(
     onOpenMeshView: () -> Unit = {},
     onOpenCompass: () -> Unit = {},
     onSetDisplayName: () -> Unit = {},
+    onAskPresence: (() -> Unit)? = null,
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
         DropdownMenuGroup(shapes = MenuDefaults.groupShapes()) {
@@ -111,6 +113,9 @@ fun NodeContextMenu(
                 MuteMenuItem(node, onMute, onDismiss)
             }
             TraceRouteMenuItem(node, lastTracerouteTime, onTraceRoute, onDismiss)
+            onAskPresence?.let {
+                MenuItem(MeshtasticIcons.Person, stringResource(Res.string.presence_ask_node), it, onDismiss)
+            }
             if (node.validPosition != null) {
                 MenuItem(MeshtasticIcons.Compass, stringResource(Res.string.open_compass), onOpenCompass, onDismiss)
                 if (rememberMeshHudSupported()) {

@@ -29,12 +29,19 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.util.LocalStatsExtended
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.NodePresence
+import org.meshtastic.core.model.NodePresenceState
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.LiveUpdateMode
+import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.current
 import org.meshtastic.core.resources.formatDurationSuspend
@@ -46,6 +53,9 @@ import org.meshtastic.core.resources.local_stats_utilization
 import org.meshtastic.core.resources.pressure
 import org.meshtastic.core.resources.temperature
 import org.meshtastic.core.resources.voltage
+import org.meshtastic.core.resources.widget_card_active
+import org.meshtastic.core.resources.widget_card_active_ago
+import org.meshtastic.core.resources.widget_card_active_on
 import org.meshtastic.core.resources.widget_card_heard
 import org.meshtastic.core.resources.widget_card_hops
 import org.meshtastic.core.resources.widget_card_model
@@ -93,8 +103,12 @@ class MeshStatsFeed(
     private val prefs: LiveUpdatePrefs,
     private val service: ServiceRepository,
     private val uiPrefs: UiPrefs,
+    private val meshLogRepository: MeshLogRepository,
 ) {
     private data class Basics(val online: Int, val total: Int, val unread: Int, val connected: Boolean)
+
+    /** MT_SW: the activity statuses heard from the nodes, and how long an "active" report holds (ms). */
+    private data class Activity(val byNum: Map<Int, NodePresence> = emptyMap(), val expiryMillis: Long = 0L)
 
     /**
      * [ownChoice]: follow the widget's own choice (Android Settings) instead of the adaptive notification's mode, which
@@ -121,19 +135,26 @@ class MeshStatsFeed(
             }
         val stats =
             combine(nodes.localStats, nodes.localStatsExtended, nodes.ourNodeInfo) { s, e, our -> Triple(s, e, our) }
+        val activity =
+            combine(meshLogRepository.nodePresenceFlow(), uiPrefs.uiOptions) { presence, options ->
+                val steps = NodePresence.EXPIRY_STEPS_MINUTES
+                val step = steps[UiOptions(options)[UiOptions.PRESENCE_EXPIRY].coerceIn(0, steps.lastIndex)]
+                Activity(presence, step * MILLIS_PER_MINUTE)
+            }
+        val modeAndActivity = combine(modeFlow, activity) { mode, act -> mode to act }
         // The gain of the antenna amplifier is part of the flow so a change of it refreshes the widget at once.
         return combine(
             basics,
             stats,
-            modeFlow,
+            modeAndActivity,
             nodes.nodeDBbyNum.map { it.size }.distinctUntilChanged(),
             uiPrefs.lnaGains,
-        ) { b, s, mode, _, _ ->
-            Triple(b, s, mode)
+        ) { b, s, modeAct, _, _ ->
+            Triple(b, s, modeAct)
         }
             // Every packet touches the node list; the widget is rebuilt at most every few seconds, not on each one.
             .sample(WIDGET_REFRESH_MS)
-            .map { (b, s, mode) -> build(b, s.first, s.second, s.third, mode, withNodes) }
+            .map { (b, s, modeAct) -> build(b, s.first, s.second, s.third, modeAct.first, modeAct.second, withNodes) }
     }
 
     @Suppress("LongParameterList")
@@ -143,6 +164,7 @@ class MeshStatsFeed(
         extended: LocalStatsExtended,
         our: Node?,
         mode: LiveUpdateMode,
+        activity: Activity,
         withNodes: Boolean = false,
     ): MeshStatsSnapshot {
         // Same display-only correction as in the app: the noise floor minus the gain of our own radio.
@@ -153,7 +175,7 @@ class MeshStatsFeed(
         val groups: List<MeshStatsLines.Group>
         if (tracked != null) {
             title = tracked.effectiveLongName
-            lines = trackedLines(tracked)
+            lines = trackedLines(tracked, activity)
             groups = listOf(MeshStatsLines.Group("", lines))
         } else {
             title = our?.effectiveLongName?.takeIf { it.isNotBlank() } ?: "MT_SW"
@@ -166,6 +188,7 @@ class MeshStatsFeed(
                     localStats = stats.takeIf { it.uptime_seconds != 0 },
                     extended = extended.takeIf { it != LocalStatsExtended() },
                     lnaGain = lnaGain,
+                    nodesActive = activeCount(activity),
                 )
             lines = groups.flatMap { it.lines }
         }
@@ -199,29 +222,64 @@ class MeshStatsFeed(
             b.connected,
             lines,
             groups,
-            favorites = favorites.map { card(it) },
-            others = rest.take(limit).map { card(it) },
+            favorites = favorites.map { card(it, activity) },
+            others = rest.take(limit).map { card(it, activity) },
             network =
             others
                 .filter { it.lastHeard > 0 && (picked.isEmpty() || it.num in picked || it.isFavorite) }
                 .sortedByDescending { it.lastHeard }
                 .take(limit.coerceAtLeast(favorites.size))
-                .map { card(it) },
+                .map { card(it, activity) },
             shortName = ownShort,
             color = ownColors?.second ?: 0,
             textColor = ownColors?.first ?: 0,
         )
     }
 
-    private suspend fun card(node: Node) = MeshStatsNodeCard(
+    /** How many nodes report an active user now; null when no node shares its status (nothing to count). */
+    private fun activeCount(activity: Activity): Int? {
+        if (activity.byNum.isEmpty()) return null
+        val now = nowMillis
+        return nodes.nodeDBbyNum.value.values.count { node ->
+            activity.byNum[node.num]?.effective(now, node.lastHeard, activity.expiryMillis) ==
+                NodePresenceState.ONLINE
+        }
+    }
+
+    /**
+     * "Active now", or when the node is not active how long ago it was (a duration up to a week, then the date), or
+     * null when the node shares no status.
+     */
+    private suspend fun activityLine(node: Node, activity: Activity): String? {
+        val presence = activity.byNum[node.num] ?: return null
+        val now = nowMillis
+        if (presence.effective(now, node.lastHeard, activity.expiryMillis) == NodePresenceState.ONLINE) {
+            return getStringSuspend(Res.string.widget_card_active)
+        }
+        // OFFLINE: since the node said it was left; an expired ONLINE: since the last sign of life from it.
+        val since =
+            when (presence.state) {
+                NodePresenceState.OFFLINE -> presence.sinceMillis
+                NodePresenceState.ONLINE -> maxOf(presence.receivedAtMillis, node.lastHeard * MILLIS_PER_SECOND)
+            }
+        val diff = (now - since).coerceAtLeast(0)
+        return if (diff <= MAX_RELATIVE_MILLIS) {
+            getStringSuspend(Res.string.widget_card_active_ago, formatDurationSuspend(diff / MILLIS_PER_SECOND))
+        } else {
+            val date = DateFormatter.formatDayMonth(since, withYear = diff >= YEAR_SHOWN_MILLIS)
+            getStringSuspend(Res.string.widget_card_active_on, date)
+        }
+    }
+
+    private suspend fun card(node: Node, activity: Activity) = MeshStatsNodeCard(
         title = node.effectiveLongName,
-        lines = trackedLines(node),
+        lines = trackedLines(node, activity),
         shortName = node.user.short_name,
         color = node.colors.second,
         textColor = node.colors.first,
     )
 
-    private suspend fun trackedLines(node: Node): List<String> = buildList {
+    private suspend fun trackedLines(node: Node, activity: Activity): List<String> = buildList {
         node.deviceMetrics.battery_level?.let { add(MeshStatsLines.batteryText(it)) }
         val snr = node.snrOrNull
         val rssi = node.rssiOrNull
@@ -246,6 +304,7 @@ class MeshStatsFeed(
             val ago = (Clock.System.now().epochSeconds - node.lastHeard).coerceAtLeast(0)
             add(getStringSuspend(Res.string.widget_card_heard, formatDurationSuspend(ago)))
         }
+        activityLine(node, activity)?.let { add(it) }
         if (node.hopsAway >= 0) add(getStringSuspend(Res.string.widget_card_hops, node.hopsAway))
         val role = node.user.role.name
         val model = node.user.hw_model.name
@@ -289,6 +348,11 @@ private suspend fun MutableList<String>.addSensorLines(node: Node) {
             add("${getStringSuspend(Res.string.pressure)} ${MetricFormatter.pressure(it)}")
         }
 }
+
+private const val MILLIS_PER_SECOND = 1000L
+private const val MILLIS_PER_MINUTE = 60_000L
+private const val MAX_RELATIVE_MILLIS = 7 * 24 * 3_600_000L
+private const val YEAR_SHOWN_MILLIS = 330 * 24 * 3_600_000L
 
 /** How many nodes of one kind the bigger widgets rotate through (all of them, within reason). */
 private const val CARD_LIMIT = 500

@@ -26,6 +26,7 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.live_update_ble
 import org.meshtastic.core.resources.live_update_cpu
 import org.meshtastic.core.resources.live_update_flash
+import org.meshtastic.core.resources.live_update_nodes_active
 import org.meshtastic.core.resources.live_update_nodes_online
 import org.meshtastic.core.resources.live_update_psram
 import org.meshtastic.core.resources.live_update_ram
@@ -91,6 +92,7 @@ object MeshStatsLines {
      * The statistics grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime,
      * traffic, diagnostics), the resources (CPU, RAM, flash, PSRAM) and the connections (Wi-Fi, Bluetooth). Empty
      * groups are left out. [lnaGain] is the display-only correction of the noise floor (the same as in the app).
+     * [nodesActive] is the number of nodes that report an active user, or null when no node shares that status.
      */
     @Suppress("LongParameterList")
     suspend fun meshStatusGroups(
@@ -101,12 +103,14 @@ object MeshStatsLines {
         localStats: LocalStats?,
         extended: LocalStatsExtended?,
         lnaGain: Int = 0,
+        nodesActive: Int? = null,
     ): List<Group> {
-        val network =
-            listOf(
-                getStringSuspend(Res.string.live_update_nodes_online, nodesOnline, nodesTotal),
-                getStringSuspend(Res.string.live_update_unread, unread),
-            )
+        val network = buildList {
+            add(getStringSuspend(Res.string.live_update_nodes_online, nodesOnline, nodesTotal))
+            // MT_SW: how many of them report that someone is at the node (only when any node shares its status).
+            nodesActive?.let { add(getStringSuspend(Res.string.live_update_nodes_active, it)) }
+            add(getStringSuspend(Res.string.live_update_unread, unread))
+        }
         val node = buildList {
             radioBattery?.let { add(batteryText(it)) }
             localStats?.let {

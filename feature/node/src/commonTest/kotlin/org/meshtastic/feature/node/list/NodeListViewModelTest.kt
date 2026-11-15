@@ -121,6 +121,7 @@ class NodeListViewModelTest {
         getFilteredNodesUseCase = getFilteredNodesUseCase,
         nodeFilterPreferences = prefs,
         nodeManager = nodeManager,
+        nodePresenceUseCase = mock(MockMode.autofill),
         localeUnitsProvider = localeUnitsProvider,
     )
 

@@ -578,6 +578,7 @@ fun NodeListScreen(
                                     onOpenMeshView = { navigateToMeshView(node.num) },
                                     onOpenCompass = { navigateToCompass(node.num) },
                                     onSetDisplayName = { showDisplayNameDialog = true },
+                                    onAskPresence = { viewModel.askPresence(node) },
                                 )
                             }
                         }

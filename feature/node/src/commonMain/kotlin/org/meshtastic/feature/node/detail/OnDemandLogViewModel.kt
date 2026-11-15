@@ -275,13 +275,19 @@ class OnDemandLogViewModel(
         safeLaunch(tag = "requestPresence") {
             try {
                 var version = uiState.value.fwPlusVersion?.version_number
-                if (version == null) {
+                // Unknown, or known to be too old: the node may have been updated since, so it is asked again (this is
+                // a manual query, so the version answer is not held back for a week as in the automatic asking).
+                if (version == null || version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE) {
                     _presenceNote.value = PresenceNote.CheckingVersion
                     nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_FW_PLUS_VERSION)
+                    val old = version
                     version =
                         withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
-                            uiState.map { it.fwPlusVersion?.version_number }.filterNotNull().first()
-                        }
+                            uiState
+                                .map { it.fwPlusVersion?.version_number }
+                                .filterNotNull()
+                                .first { old == null || it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE }
+                        } ?: old
                 }
                 when {
                     version == null -> _presenceNote.value = PresenceNote.NoVersion

@@ -59,15 +59,16 @@ open class NodePresenceUseCase(
                 }
             }
         // Asks for the firmware version first (when it is not known yet): an older node is not sent the status query.
-        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }
+        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum, forceVersionCheck) }
     }
 
     /**
      * Asks the given nodes for their status by hand, one after another with a pause between them (a query is a radio
      * transmission, so many at once would clog the mesh). It works whether or not the automatic asking is switched on.
-     * [onProgress] gets how many nodes have been asked so far; the work ends at once when the caller's job is cancelled.
+     * [forceVersionCheck] asks about the firmware version again even when an older one was learned less than a week ago
+     * (for a single node asked for by hand). [onProgress] gets how many nodes have been asked so far; the work ends at once when the caller's job is cancelled.
      */
-    open suspend fun askNodes(nodeNums: List<Int>, onProgress: (Int) -> Unit = {}) {
+    open suspend fun askNodes(nodeNums: List<Int>, forceVersionCheck: Boolean = false, onProgress: (Int) -> Unit = {}) {
         nodeNums.forEachIndexed { index, nodeNum ->
             askLock.withLock { askedAt[nodeNum] = nowMillis }
             runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }

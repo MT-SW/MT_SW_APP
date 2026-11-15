@@ -1844,6 +1844,7 @@
     <string name="live_update_mesh_status_shown_shade">Mesh status in the notification shade</string>
     <string name="live_update_mesh_status_summary">Everything about your node: connection, nodes online, unread messages, battery, uptime, channel load, traffic, CPU, RAM, flash, PSRAM and Wi-Fi</string>
     <string name="live_update_no_nodes">No nodes to track</string>
+    <string name="live_update_nodes_active">%1$d active</string>
     <string name="live_update_nodes_online">%1$d of %2$d nodes online</string>
     <string name="live_update_off_summary">Show the mesh or one node in the status bar and notification shade</string>
     <string name="live_update_promotion_off">Adaptive notifications are turned off for MT_SW_APP in system settings</string>
@@ -2986,6 +2987,7 @@
     <string name="presence_active">Active</string>
     <string name="presence_active_hours">Active for %1$d h</string>
     <string name="presence_active_min">Active for %1$d min</string>
+    <string name="presence_ask_node">Ask for activity status</string>
     <string name="presence_ask_now_all">Ask all heard nodes</string>
     <string name="presence_ask_now_favorites">Ask favourites for the status now</string>
     <string name="presence_ask_now_progress">Asked %1$d of %2$d</string>
@@ -4023,6 +4025,9 @@
     <string name="widget_adaptive_title">Adaptive widget</string>
     <string name="widget_adaptive_track_in">Track on the widget</string>
     <string name="widget_adaptive_tracking_shown">Tracking %1$s on the home-screen widget</string>
+    <string name="widget_card_active">Active now</string>
+    <string name="widget_card_active_ago">Active %1$s ago</string>
+    <string name="widget_card_active_on">Active %1$s</string>
     <string name="widget_card_heard">Heard %1$s ago</string>
     <string name="widget_card_hops">Hops: %1$d</string>
     <string name="widget_card_model">%1$s · %2$s</string>

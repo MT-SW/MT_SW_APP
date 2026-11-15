@@ -23,8 +23,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.repository.MeshLogRepository
@@ -50,6 +52,8 @@ open class SnifferControlUseCase(
     private val radioController: RadioController,
     private val meshLogRepository: MeshLogRepository,
 ) {
+    /** Node number → when we last asked it for its firmware version (see [requestPresenceChecked]). */
+    private val versionAskedAt = mutableMapOf<Int, Long>()
 
     /** Sends REQUEST_SNIFFER_STATE to [destNum]; the answer arrives asynchronously via [snifferEnabledFlow]. */
     open suspend fun requestState(destNum: Int) {
@@ -107,10 +111,13 @@ open class SnifferControlUseCase(
      * received yet -- either it hasn't been queried this session, or the connected firmware doesn't implement fw+
      * versioning at all (official Meshtastic firmware, or an fw+ build predating this query).
      */
-    open fun fwPlusVersionFlow(destNum: Int): Flow<Int?> =
+    open fun fwPlusVersionFlow(destNum: Int): Flow<Int?> = fwPlusVersionStampedFlow(destNum).map { it?.first }
+
+    /** Like [fwPlusVersionFlow], with the time (ms) the answer was received at. */
+    open fun fwPlusVersionStampedFlow(destNum: Int): Flow<Pair<Int, Long>?> =
         meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map(::decodeLatestFwPlusVersion)
 
-    private fun decodeLatestFwPlusVersion(logs: List<MeshLog>): Int? = logs
+    private fun decodeLatestFwPlusVersion(logs: List<MeshLog>): Pair<Int, Long>? = logs
         .mapNotNull { log ->
             log.fromRadio.packet
                 ?.decoded
@@ -123,7 +130,6 @@ open class SnifferControlUseCase(
                 ?.let { versionNumber -> versionNumber to log.received_date }
         }
         .maxByOrNull { it.second }
-        ?.first
 
     /** Sends REQUEST_LOCAL_STATS_BROADCAST_CONFIG to [destNum]; the answer arrives via [localStatsConfigFlow]. */
     open suspend fun requestLocalStatsConfig(destNum: Int) {
@@ -167,11 +173,21 @@ open class SnifferControlUseCase(
      * older than [MIN_FW_PLUS_VERSION_FOR_PRESENCE] (or one that never tells its version) is not sent the status
      * query. The answer arrives as RESPONSE_PRESENCE in the log.
      */
-    open suspend fun requestPresenceChecked(destNum: Int): Boolean {
-        var version = fwPlusVersionFlow(destNum).first()
-        if (version == null) {
+    open suspend fun requestPresenceChecked(destNum: Int, forceVersionCheck: Boolean = false): Boolean {
+        val known = fwPlusVersionStampedFlow(destNum).first()
+        var version = known?.first
+        // A version below the minimum (or none at all) is asked about again once a week, not on every attempt: the node
+        // may have been updated since, but a node that never answers is not pestered either.
+        val lastCheck = maxOf(known?.second ?: 0L, versionAskedAt[destNum] ?: 0L)
+        val due = forceVersionCheck || nowMillis - lastCheck > VERSION_RECHECK_MILLIS
+        if ((version == null || version < MIN_FW_PLUS_VERSION_FOR_PRESENCE) && due) {
+            versionAskedAt[destNum] = nowMillis
             requestFwPlusVersion(destNum)
-            version = withTimeoutOrNull(PRESENCE_VERSION_WAIT) { fwPlusVersionFlow(destNum).filterNotNull().first() }
+            val fresh =
+                withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
+                    fwPlusVersionStampedFlow(destNum).filterNotNull().first { known == null || it.second > known.second }
+                }
+            version = fresh?.first ?: version
         }
         if (version == null || version < MIN_FW_PLUS_VERSION_FOR_PRESENCE) return false
         radioController.requestOnDemand(destNum, OnDemandType.REQUEST_PRESENCE)
@@ -230,3 +246,6 @@ open class SnifferControlUseCase(
 }
 
 private val PRESENCE_VERSION_WAIT = 20.seconds
+
+/** How long an answer (or a missing one) about a node's firmware version holds before it is asked about again. */
+private val VERSION_RECHECK_MILLIS = 7.days.inWholeMilliseconds

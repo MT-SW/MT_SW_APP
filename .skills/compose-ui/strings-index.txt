@@ -1802,6 +1802,7 @@ live_update_mesh_status_shown
 live_update_mesh_status_shown_shade
 live_update_mesh_status_summary
 live_update_no_nodes
+live_update_nodes_active
 live_update_nodes_online
 live_update_off_summary
 live_update_promotion_off
@@ -2920,6 +2921,7 @@ preferences_system_default
 presence_active
 presence_active_hours
 presence_active_min
+presence_ask_node
 presence_ask_now_all
 presence_ask_now_favorites
 presence_ask_now_progress
@@ -3945,6 +3947,9 @@ widget_adaptive_off_summary
 widget_adaptive_title
 widget_adaptive_track_in
 widget_adaptive_tracking_shown
+widget_card_active
+widget_card_active_ago
+widget_card_active_on
 widget_card_heard
 widget_card_hops
 widget_card_model

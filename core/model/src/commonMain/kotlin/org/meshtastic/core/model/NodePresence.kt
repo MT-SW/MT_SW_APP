@@ -61,6 +61,9 @@ data class NodePresence(val state: NodePresenceState, val sinceMillis: Long, val
     }
 }
 
+/** One change of a node's activity status: it [state] since [sinceMillis]. */
+data class PresenceChange(val nodeNum: Int, val state: NodePresenceState, val sinceMillis: Long)
+
 /** Reads the last activity status of every node from the logged on-demand answers (port 354). */
 object NodePresenceLogs {
     private const val MILLIS_PER_SECOND = 1000L
@@ -77,16 +80,35 @@ object NodePresenceLogs {
             if (log.fromNum in answered) continue
             val presence = decode(log) ?: continue
             answered += log.fromNum
-            val state =
-                when (presence.state) {
-                    Presence.State.ONLINE -> NodePresenceState.ONLINE
-                    Presence.State.OFFLINE -> NodePresenceState.OFFLINE
-                    else -> null
-                } ?: continue
+            val state = stateOf(presence) ?: continue
             val since = log.received_date - (presence.secs_since_change ?: 0) * MILLIS_PER_SECOND
             result[log.fromNum] = NodePresence(state, sinceMillis = since, receivedAtMillis = log.received_date)
         }
         return result
+    }
+
+    /**
+     * The history of the statuses: for every node its first status heard and every later one that differs from the
+     * status before it, newest first. Repeated answers with the same status are one entry.
+     */
+    fun history(logs: List<MeshLog>): List<PresenceChange> {
+        val last = HashMap<Int, NodePresenceState>()
+        val changes = ArrayList<PresenceChange>()
+        for (log in logs.sortedBy { it.received_date }) {
+            val presence = decode(log) ?: continue
+            val state = stateOf(presence) ?: continue
+            if (last[log.fromNum] == state) continue
+            last[log.fromNum] = state
+            val since = log.received_date - (presence.secs_since_change ?: 0) * MILLIS_PER_SECOND
+            changes += PresenceChange(log.fromNum, state, since)
+        }
+        return changes.sortedByDescending { it.sinceMillis }
+    }
+
+    private fun stateOf(presence: Presence): NodePresenceState? = when (presence.state) {
+        Presence.State.ONLINE -> NodePresenceState.ONLINE
+        Presence.State.OFFLINE -> NodePresenceState.OFFLINE
+        else -> null
     }
 
     private fun decode(log: MeshLog): Presence? = log.fromRadio.packet

@@ -456,6 +456,8 @@
     <string name="live_update_mesh_status_summary">Wszystko o Twoim węźle: połączenie, węzły online, nieprzeczytane wiadomości, bateria, czas pracy, obciążenie kanału, ruch, CPU, RAM, flash, PSRAM i Wi‑Fi</string>
     <string name="live_update_no_nodes">Brak węzłów do śledzenia</string>
     <string name="live_update_nodes_online">%1$d z %2$d węzłów online</string>
+    <string name="presence_ask_node">Zapytaj o status aktywności</string>
+    <string name="live_update_nodes_active">%1$d aktywnych</string>
     <string name="live_update_mesh_status_shown">Stan sieci w pasku stanu i w panelu powiadomień</string>
     <string name="live_update_mesh_status_shown_shade">Stan sieci w panelu powiadomień</string>
     <string name="live_update_stop_action">Zatrzymaj powiadomienia adaptacyjne</string>
@@ -3891,6 +3893,9 @@
     <string name="planner_layer_buildings_link">Planer: budynki na trasie (© OpenStreetMap)</string>
     <string name="planner_layer_buildings_area">Planer: budynki w zasięgu (© OpenStreetMap)</string>
     <string name="widget_card_heard">Słyszany %1$s temu</string>
+    <string name="widget_card_active">Aktywny teraz</string>
+    <string name="widget_card_active_ago">Aktywny %1$s temu</string>
+    <string name="widget_card_active_on">Aktywny %1$s</string>
     <string name="widget_card_hops">Skoków: %1$d</string>
     <string name="widget_card_model">%1$s · %2$s</string>
     <string name="planner_layer_reflection">Planer: odbicie od ziemi</string>

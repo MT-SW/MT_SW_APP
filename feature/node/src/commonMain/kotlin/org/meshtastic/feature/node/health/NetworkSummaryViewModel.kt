@@ -26,11 +26,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.NodePresence
+import org.meshtastic.core.model.NodePresenceLogs
+import org.meshtastic.core.model.PresenceChange
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.model.NodePresenceState
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.swapBatteryPolarity
@@ -51,6 +55,9 @@ data class AttentionItem(val nodeName: String, val reason: String)
 data class UptimeLeader(val nodeName: String, val uptimeSeconds: Int)
 
 data class QuietNode(val nodeName: String, val hoursSilent: Long)
+
+/** MT_SW: one change of a node's activity status (for the history in the exported summary). */
+data class ActivityChange(val nodeName: String, val active: Boolean, val sinceMillis: Long)
 
 data class PositionSender(val nodeName: String, val positionCount: Int)
 
@@ -82,6 +89,8 @@ data class NetworkSummaryUiState(
     /** MT_SW: nodes whose activity status says someone is at the node / is away; the rest do not share a status. */
     val presenceActiveCount: Int = 0,
     val presenceAwayCount: Int = 0,
+    /** The last changes of the activity statuses of the week, newest first. */
+    val presenceHistory: List<ActivityChange> = emptyList(),
     val quietestNodes: List<QuietNode> = emptyList(),
     val averageBatteryLevel: Int? = null,
     val lowBatteryCount: Int = 0,
@@ -172,6 +181,11 @@ class NetworkSummaryViewModel(
             // MT_SW: the activity status the nodes share (port 354) and how long an "active" report holds.
             meshLogRepository.nodePresenceFlow(),
             uiPrefs.uiOptions,
+            // MT_SW: the changes of the activity statuses over the week (port 354).
+            meshLogRepository
+                .getLogsByPortNumSince(ON_DEMAND_PORT_NUM, nowMillis - WEEK_WINDOW_MILLIS)
+                .calmed()
+                .map { NodePresenceLogs.history(it) },
         ) { values ->
             @Suppress("UNCHECKED_CAST")
             val nodes = values[0] as List<org.meshtastic.core.model.Node>
@@ -192,6 +206,8 @@ class NetworkSummaryViewModel(
                 NodePresence.EXPIRY_STEPS_MINUTES[
                     options[UiOptions.PRESENCE_EXPIRY].coerceIn(0, NodePresence.EXPIRY_STEPS_MINUTES.lastIndex),
                 ] * MILLIS_PER_MINUTE
+            @Suppress("UNCHECKED_CAST")
+            val presenceChanges = values[6] as List<PresenceChange>
             val presenceNow = nowMillis
             val presenceStates =
                 nodes.mapNotNull { node ->
@@ -424,6 +440,14 @@ class NetworkSummaryViewModel(
                 isLoaded = true,
                 presenceActiveCount = presenceStates.count { it == NodePresenceState.ONLINE },
                 presenceAwayCount = presenceStates.count { it == NodePresenceState.OFFLINE },
+                presenceHistory =
+                presenceChanges.take(PRESENCE_HISTORY_LIMIT).map {
+                    ActivityChange(
+                        nodeName = nameByNum[it.nodeNum] ?: "?",
+                        active = it.state == NodePresenceState.ONLINE,
+                        sinceMillis = it.sinceMillis,
+                    )
+                },
                 onlineCount = nodes.count { it.isOnline },
                 totalCount = nodes.size,
                 quietestNodes = quietestNodes,
@@ -484,6 +508,7 @@ class NetworkSummaryViewModel(
         private const val SNR_BAD = -15f
         private const val HISTORY_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
         private const val WEEK_WINDOW_MILLIS = 7 * 24 * 60 * 60 * 1000L
+        private const val PRESENCE_HISTORY_LIMIT = 300
         private const val LOW_BATTERY_THRESHOLD = 20
         private const val MAINS_POWERED_THRESHOLD = 100
         private const val WEAK_SNR_THRESHOLD = -10f

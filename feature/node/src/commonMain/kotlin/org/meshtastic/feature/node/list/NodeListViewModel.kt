@@ -38,6 +38,7 @@ import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.TemperatureUnit
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
@@ -94,6 +95,7 @@ class NodeListViewModel(
     private val getFilteredNodesUseCase: GetFilteredNodesUseCase,
     val nodeFilterPreferences: NodeFilterPreferences,
     private val nodeManager: NodeManager,
+    private val nodePresenceUseCase: NodePresenceUseCase,
     localeUnitsProvider: LocaleUnitsProvider,
 ) : ViewModel() {
 
@@ -512,6 +514,11 @@ class NodeListViewModel(
     val lastTracerouteTime: StateFlow<Long?> = nodeRequestActions.lastTracerouteTime
 
     /** Initiates a trace route request to the specified node. */
+    /** MT_SW: asks the node for its activity status (its firmware version is checked first, see the use case). */
+    fun askPresence(node: Node) {
+        safeLaunch(tag = "askPresence") { nodePresenceUseCase.askNodes(listOf(node.num), forceVersionCheck = true) }
+    }
+
     fun traceRoute(node: Node) {
         safeLaunch(tag = "requestTraceroute") { nodeRequestActions.requestTraceroute(node.num, node.effectiveLongName) }
     }

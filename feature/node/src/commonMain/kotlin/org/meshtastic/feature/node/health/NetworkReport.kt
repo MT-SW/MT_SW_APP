@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.node.health
 
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import kotlin.math.PI
@@ -126,6 +127,20 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
                         ReportLine("Nieobecne", "$presenceAwayCount"),
                         ReportLine("Podają stan aktywności", "${presenceActiveCount + presenceAwayCount} z $totalCount"),
                     ),
+                ),
+            )
+        }
+        if (presenceHistory.isNotEmpty()) {
+            add(
+                ReportSection(
+                    title = "Historia aktywności (ostatnie zmiany)",
+                    lines =
+                    presenceHistory.map {
+                        ReportLine(
+                            it.nodeName,
+                            "${if (it.active) "aktywny" else "nieobecny"} od ${DateFormatter.formatDateTimeShort(it.sinceMillis)}",
+                        )
+                    },
                 ),
             )
         }
