@@ -1063,6 +1063,8 @@ device_sleeping
 device_storage_ui_title
 device_theme_language
 dew_point
+dialog_see_through
+dialog_see_through_summary
 dictation_enabled_summary
 dictation_enabled_title
 dictation_external_mic_summary

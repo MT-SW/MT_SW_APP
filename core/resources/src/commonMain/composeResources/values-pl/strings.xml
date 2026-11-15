@@ -4256,4 +4256,6 @@
     <string name="element_group_assistant">Asystent</string>
     <string name="element_group_health">Zdrowie sieci</string>
     <string name="element_group_settings">Ustawienia</string>
+    <string name="dialog_see_through">Przezroczystość okien</string>
+    <string name="dialog_see_through_summary">Jak bardzo okna (np. szczegóły węzła) przepuszczają to, co za nimi. Okna zawsze zostają czytelne.</string>
 </resources>

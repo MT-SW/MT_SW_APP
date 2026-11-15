@@ -52,6 +52,8 @@ import org.meshtastic.core.resources.element_look_flat
 import org.meshtastic.core.resources.element_look_glass
 import org.meshtastic.core.resources.element_look_glass_summary
 import org.meshtastic.core.resources.element_look_strength
+import org.meshtastic.core.resources.dialog_see_through
+import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
 import org.meshtastic.core.resources.glass_rim
@@ -161,6 +163,16 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     )
     AreaLookPicker(stringResource(Res.string.look_all), UiOptions.ALL_GROUPS, options, onChange)
     for (area in LOOK_AREAS) AreaLookPicker(stringResource(area.title), area.groups, options, onChange)
+    if (options.element(UiOptions.GROUP_DIALOGS).look != ElementLook.FLAT) {
+        SliderPreference(
+            title = stringResource(Res.string.dialog_see_through),
+            enabled = true,
+            items = (0..STRENGTH_MAX step STRENGTH_STEP).map { it to "$it%" },
+            selectedValue = options.element(UiOptions.GROUP_DIALOGS).strength,
+            onValueChange = { onChange("${UiOptions.GROUP_DIALOGS}.strength", it) },
+            summary = stringResource(Res.string.dialog_see_through_summary),
+        )
+    }
     DropDownPreference(
         title = stringResource(Res.string.icon_style),
         enabled = true,

@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import org.meshtastic.core.ui.icon.Icon
+import androidx.compose.material3.Icon as StandardIcon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -129,7 +130,10 @@ fun MainAppBar(
                 } else {
                     // The Meshtastic logo is never swapped for event branding — the app's identity stays put. Event
                     // firmware is surfaced on the Connections screen instead (EventFirmwareCard).
-                    { Icon(imageVector = vectorResource(Res.drawable.ic_meshtastic), contentDescription = null) }
+                    {
+                        // Our logo always stays as it is, whatever icon style is chosen.
+                        StandardIcon(imageVector = vectorResource(Res.drawable.ic_meshtastic), contentDescription = null)
+                    }
                 },
                 actions = {
                     TopBarActions(

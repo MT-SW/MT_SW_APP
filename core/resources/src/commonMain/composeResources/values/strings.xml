@@ -1102,6 +1102,8 @@
     <string name="device_storage_ui_title">Device Storage &amp; UI (Read-Only)</string>
     <string name="device_theme_language">Theme: %1$s, Language: %2$s</string>
     <string name="dew_point">Dew Point</string>
+    <string name="dialog_see_through">Window transparency</string>
+    <string name="dialog_see_through_summary">How much windows (for example node details) let through what is behind them. They always stay readable.</string>
     <string name="dictation_enabled_summary">Turns on voice dictation in chat and in the translator. Switching it off also frees the dictation model from memory.</string>
     <string name="dictation_enabled_title">Dictation</string>
     <string name="dictation_external_mic_summary">When a headset is connected (Bluetooth, wired or USB), dictation everywhere in the app records from its microphone instead of the phone's or computer's own.</string>

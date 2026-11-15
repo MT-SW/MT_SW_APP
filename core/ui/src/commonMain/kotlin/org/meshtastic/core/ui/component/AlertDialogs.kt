@@ -134,7 +134,8 @@ fun MeshtasticDialog(
             val dialogLook = rememberUiOptions().element(UiOptions.GROUP_DIALOGS)
             val dialogFade =
                 if (dialogLook.look == ElementLook.TRANSPARENT || dialogLook.look == ElementLook.GLASS) {
-                    (1f - dialogLook.strength / DIALOG_PERCENT).coerceIn(DIALOG_MIN_ALPHA, 1f)
+                    // The strength 0-100% covers the whole allowed range (from opaque down to the readable limit).
+                    (1f - dialogLook.strength / DIALOG_PERCENT * (1f - DIALOG_MIN_ALPHA)).coerceIn(DIALOG_MIN_ALPHA, 1f)
                 } else {
                     1f
                 }

@@ -42,7 +42,9 @@ fun Icon(
     tint: Color = LocalContentColor.current,
 ) {
     val style = rememberUiOptions()[UiOptions.ICON_STYLE]
-    val drawn = remember(imageVector, style) { imageVector.restyledFor(style) }
+    // An icon that keeps its own colours (tint "unspecified": a logo, a flag, a coloured sign) is never redrawn as a thin
+    // outline, because it would lose them and nearly vanish.
+    val drawn = remember(imageVector, style, tint) { if (tint == Color.Unspecified) imageVector else imageVector.restyledFor(style) }
     MaterialIcon(imageVector = drawn, contentDescription = contentDescription, modifier = modifier, tint = tint)
 }
 
