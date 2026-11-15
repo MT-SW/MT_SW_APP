@@ -1310,6 +1310,7 @@
     <string name="element_look_flat">Plain</string>
     <string name="element_look_glass">Glass (blur)</string>
     <string name="element_look_glass_summary">Glass lets the content show through the element, blurred.</string>
+    <string name="element_look_short">Bar, cards, bubbles, message box and search: plain, with depth, see-through or glass; soft grey white; vibrations.</string>
     <string name="element_look_strength">Strength of the effect</string>
     <string name="element_look_summary">Choose how the bar, the cards, the message box and the search are drawn. “Glass” blurs what is behind the element, the “see-through” look only fades its colour, “with depth” adds a soft shadow and light edges. On Android older than 12 the glass is a see-through pane without blur.</string>
     <string name="element_look_title">Look of the elements</string>

@@ -4212,4 +4212,5 @@
     <string name="soft_light_theme">Lekko szary biały w jasnych motywach</string>
     <string name="input_hold_buzz">Mocna wibracja, gdy trzymasz przycisk wysyłania</string>
     <string name="element_group_bubbles">Dymki wiadomości</string>
+    <string name="element_look_short">Pasek, karty, dymki, pole wiadomości i wyszukiwanie: matowy, z głębią, przezroczysty lub szkło; szary biały; wibracje.</string>
 </resources>

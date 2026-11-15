@@ -1268,6 +1268,7 @@ element_look_depth
 element_look_flat
 element_look_glass
 element_look_glass_summary
+element_look_short
 element_look_strength
 element_look_summary
 element_look_title

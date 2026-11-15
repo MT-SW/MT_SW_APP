@@ -270,6 +270,7 @@ object DeepLinkRouter {
             "mt-sw-features" to SettingsRoute.MtSwFeatures,
             "node-list" to SettingsRoute.NodeList,
             "smart-features" to SettingsRoute.SmartFeatures,
+            "element-look" to SettingsRoute.ElementLook,
             "mt-sw-other-features" to SettingsRoute.MtSwOtherFeatures,
             "antenna-calculator" to SettingsRoute.AntennaCalculator,
             "sos" to SettingsRoute.Sos,

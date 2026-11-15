@@ -60,7 +60,7 @@ import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.data_notice_settings_title
 import org.meshtastic.core.resources.data_notice_shortcut_summary
 import org.meshtastic.core.resources.debug_panel
-import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.resources.element_look_short
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.floating_nav_bar
 import org.meshtastic.core.resources.import_menu_in_top_bar
@@ -169,6 +169,7 @@ import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ElementLookSettings
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
@@ -191,7 +192,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val showChannelDescription by settingsViewModel.showChannelDescription.collectAsStateWithLifecycle()
-    val uiOptionsMap by settingsViewModel.uiOptions.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
@@ -281,10 +281,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             }
 
             ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
-                ElementLookSettings(
-                    options = UiOptions(uiOptionsMap),
-                    onChange = settingsViewModel::setUiOption,
-                )
+                ListItem(
+                    text = stringResource(Res.string.element_look_title),
+                    supportingText = stringResource(Res.string.element_look_short),
+                    leadingIcon = MeshtasticIcons.DisplaySettings,
+                ) {
+                    onNavigate(SettingsRoute.ElementLook)
+                }
             }
 
             ExpressiveSection(title = stringResource(Res.string.smart_features_title)) {
@@ -601,5 +604,34 @@ private fun WhatsNewEntry() {
             initialRequest = WhatsNewRequest(full = false, fromRelease = MtswRelease.RELEASE - 1),
             onDismiss = { open = false },
         )
+    }
+}
+
+/** "Look of the elements": the soft grey, the look of the bar, cards, bubbles, message box and search in one place. */
+@Composable
+fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
+    val uiOptionsMap by settingsViewModel.uiOptions.collectAsStateWithLifecycle()
+    Scaffold(
+        topBar = {
+            MainAppBar(
+                sosScreen = SosBarScreen.SETTINGS,
+                title = stringResource(Res.string.element_look_title),
+                canNavigateUp = true,
+                onNavigateUp = onBack,
+                ourNode = null,
+                showNodeChip = false,
+                actions = {},
+                onClickChip = {},
+            )
+        },
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
+                ElementLookSettings(options = UiOptions(uiOptionsMap), onChange = settingsViewModel::setUiOption)
+            }
+        }
     }
 }

@@ -61,6 +61,7 @@ import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
 import org.meshtastic.feature.settings.mtsw.MessageArchiveScreen
 import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.MtSwOtherFeaturesScreen
+import org.meshtastic.feature.settings.mtsw.ElementLookScreen
 import org.meshtastic.feature.settings.mtsw.SmartFeaturesScreen
 import org.meshtastic.feature.settings.mtsw.SosScreen
 import org.meshtastic.feature.settings.radio.CleanNodeDatabaseScreen
@@ -516,6 +517,12 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         SmartFeaturesScreen(
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigate = { backStack.add(it) },
+        )
+    }
+    entry<SettingsRoute.ElementLook> {
+        ElementLookScreen(
+            settingsViewModel = settingsViewModel,
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
         )
     }
     entry<SettingsRoute.AntennaCalculator> {
