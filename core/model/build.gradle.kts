@@ -23,6 +23,9 @@ plugins {
 }
 
 kotlin {
+    // The Wire-generated code of ondemand.proto (build/generated) has a needless `!!` in its decoder of repeated
+    // numbers; the file is rewritten at every build, so the warning is switched off here instead of in the file.
+    compilerOptions { freeCompilerArgs.add("-Xwarning-level=UNNECESSARY_NOT_NULL_ASSERTION:disabled") }
     android {
         withHostTest { isIncludeAndroidResources = true }
         withDeviceTest { instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
