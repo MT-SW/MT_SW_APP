@@ -51,6 +51,7 @@ import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.element_group_navbar
+import org.meshtastic.core.resources.element_group_bubbles
 import org.meshtastic.core.resources.element_group_cards
 import org.meshtastic.core.resources.element_group_input
 import org.meshtastic.core.resources.element_group_search
@@ -252,6 +253,7 @@ object SettingsSearchCatalog {
             Res.string.element_look_title to SettingsRoute.MtSwFeatures,
             Res.string.element_group_navbar to SettingsRoute.MtSwFeatures,
             Res.string.element_group_cards to SettingsRoute.MtSwFeatures,
+            Res.string.element_group_bubbles to SettingsRoute.MtSwFeatures,
             Res.string.element_group_input to SettingsRoute.MtSwFeatures,
             Res.string.element_group_search to SettingsRoute.MtSwFeatures,
             Res.string.nav_bar_hide to SettingsRoute.MtSwFeatures,

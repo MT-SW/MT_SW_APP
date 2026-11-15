@@ -123,6 +123,10 @@ import org.meshtastic.core.resources.mute_sender_marker
 import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.HighlightedText
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -364,7 +368,15 @@ fun MessageItem(
             message.filtered || (inSelectionMode && !selected) -> NODE_TINT_MUTED
             else -> NODE_TINT_NORMAL
         }
-    val containerColor = nodeTintedContainer(nodeColor, fraction = tintFraction)
+    // MT_SW: the look the person chose for the message bubbles (plain, with depth, see-through or glass).
+    val bubbleLook = rememberUiOptions().element(UiOptions.GROUP_BUBBLES)
+    val bubbleFade =
+        if (bubbleLook.look == ElementLook.TRANSPARENT || bubbleLook.look == ElementLook.GLASS) {
+            (1f - bubbleLook.strength / BUBBLE_PERCENT).coerceIn(BUBBLE_MIN_ALPHA, 1f)
+        } else {
+            1f
+        }
+    val containerColor = nodeTintedContainer(nodeColor, fraction = tintFraction).copy(alpha = bubbleFade)
     val cardBorder = nodeBorderStroke(nodeColor, active = selected)
     val contentColor = MaterialTheme.colorScheme.onSurface
     val metadataStyle = MaterialTheme.typography.labelSmall
@@ -557,6 +569,7 @@ fun MessageItem(
                     },
                 )
                 .then(messageModifier)
+                .elementLook(UiOptions.GROUP_BUBBLES, messageShape)
                 .semantics(mergeDescendants = true) {
                     contentDescription = messageA11yText
                     role = Role.Button
@@ -988,3 +1001,6 @@ private fun SaveImageButton(imageUrl: String, modifier: Modifier = Modifier) {
 
 /** Turns a mute length into an end time; "always" stays [Long.MAX_VALUE] instead of overflowing. */
 private fun Long.toUntilMillis(): Long = if (this == Long.MAX_VALUE) this else nowMillis + this
+
+private const val BUBBLE_PERCENT = 100f
+private const val BUBBLE_MIN_ALPHA = 0.12f

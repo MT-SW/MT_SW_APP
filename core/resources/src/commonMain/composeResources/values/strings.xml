@@ -1299,6 +1299,7 @@
     <string name="eight_hours">8 Hours</string>
     <string name="electrical_conductivity">Conductivity</string>
     <!-- ELEMENT -->
+    <string name="element_group_bubbles">Message bubbles</string>
     <string name="element_group_cards">Cards (devices, chats)</string>
     <string name="element_group_input">Message box and send buttons</string>
     <string name="element_group_navbar">Bottom bar</string>

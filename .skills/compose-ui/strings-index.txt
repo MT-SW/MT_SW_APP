@@ -1257,6 +1257,7 @@ edit_name
 eight_hours
 electrical_conductivity
 ### ELEMENT ###
+element_group_bubbles
 element_group_cards
 element_group_input
 element_group_navbar

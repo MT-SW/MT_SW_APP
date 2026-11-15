@@ -28,6 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.element_group_bubbles
 import org.meshtastic.core.resources.element_group_cards
 import org.meshtastic.core.resources.element_group_input
 import org.meshtastic.core.resources.element_group_navbar
@@ -85,6 +86,7 @@ fun ElementLookSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     )
     ElementGroupSettings(stringResource(Res.string.element_group_navbar), UiOptions.GROUP_NAV, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_cards), UiOptions.GROUP_CARDS, options, onChange)
+    ElementGroupSettings(stringResource(Res.string.element_group_bubbles), UiOptions.GROUP_BUBBLES, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_input), UiOptions.GROUP_INPUT, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_search), UiOptions.GROUP_SEARCH, options, onChange)
     NavBarBehaviourSettings(options, onChange)

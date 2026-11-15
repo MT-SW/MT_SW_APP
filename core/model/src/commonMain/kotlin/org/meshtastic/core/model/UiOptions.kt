@@ -50,6 +50,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
     companion object {
         const val GROUP_NAV = "navbar"
         const val GROUP_CARDS = "cards"
+        const val GROUP_BUBBLES = "bubbles"
         const val GROUP_INPUT = "input"
         const val GROUP_SEARCH = "search"
 
@@ -87,6 +88,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
                 "$GROUP_CARDS.look" to ElementLook.FLAT,
                 "$GROUP_CARDS.strength" to DEFAULT_STRENGTH,
                 "$GROUP_CARDS.blur" to DEFAULT_BLUR,
+                "$GROUP_BUBBLES.look" to ElementLook.FLAT,
+                "$GROUP_BUBBLES.strength" to DEFAULT_STRENGTH,
+                "$GROUP_BUBBLES.blur" to DEFAULT_BLUR,
                 "$GROUP_INPUT.look" to ElementLook.FLAT,
                 "$GROUP_INPUT.strength" to DEFAULT_STRENGTH,
                 "$GROUP_INPUT.blur" to DEFAULT_BLUR,
