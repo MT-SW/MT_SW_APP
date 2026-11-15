@@ -19,6 +19,7 @@ package org.meshtastic.core.ui.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.meshtastic.core.model.UiOptions
 
@@ -27,9 +28,18 @@ object AppUiOptions {
     val state = MutableStateFlow(UiOptions())
 }
 
+/**
+ * The options handed down once from the top of the app ([AppTheme]), so the hundreds of icons, cards and buttons on a
+ * screen read one value instead of each listening to the flow on its own (which made scrolling heavy).
+ */
+val LocalUiOptions = staticCompositionLocalOf<UiOptions?> { null }
+
 /** The current options as Compose state, so the elements redraw when a choice changes. */
 @Composable
 fun rememberUiOptions(): UiOptions {
+    LocalUiOptions.current?.let {
+        return it
+    }
     val options by AppUiOptions.state.collectAsState()
     return options
 }

@@ -370,7 +370,8 @@ fun AppTheme(
         }
 
     // The stronger-colour themes go to true black in the dark: on an AMOLED screen the pixels are then switched off.
-    val softLight = rememberUiOptions().flag(UiOptions.SOFT_LIGHT)
+    val uiOptions = rememberUiOptions()
+    val softLight = uiOptions.flag(UiOptions.SOFT_LIGHT)
     val colorScheme =
         when {
             !monochrome && darkTheme && saturation > 100 -> baseScheme.withTrueBlack()
@@ -419,7 +420,11 @@ fun AppTheme(
         }
     CompositionLocalProvider(LocalDensity provides textDensity) {
         MaterialExpressiveTheme(colorScheme = colorScheme, typography = typography, motionScheme = expressive()) {
-            CompositionLocalProvider(LocalMonochrome provides monochrome, LocalColorSaturation provides saturation) {
+            CompositionLocalProvider(
+                LocalMonochrome provides monochrome,
+                LocalColorSaturation provides saturation,
+                LocalUiOptions provides uiOptions,
+            ) {
                 if (monochrome) GrayscaleLayer(content) else content()
             }
         }

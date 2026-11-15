@@ -42,7 +42,7 @@ private const val BOLD_LINE_SHARE = 0.022f
 fun styledVectorResource(resource: DrawableResource): ImageVector {
     val vector = vectorResource(resource)
     val style = rememberUiOptions()[UiOptions.ICON_STYLE]
-    return remember(vector, style) { if (style == UiOptions.ICON_STYLE_STANDARD) vector else vector.restyled(style) }
+    return remember(vector, style) { vector.restyledFor(style) }
 }
 
 /** A copy of this icon drawn in the given [style] (see [UiOptions.ICON_STYLE_BOLD] and the outline). */

@@ -72,5 +72,16 @@ fun rememberStyledPainter(vector: ImageVector): Painter {
     return rememberVectorPainter(remember(vector, style) { vector.restyledFor(style) })
 }
 
-private fun ImageVector.restyledFor(style: Int): ImageVector =
-    if (style == UiOptions.ICON_STYLE_STANDARD) this else restyled(style)
+/** The icons already redrawn, so a list that shows hundreds of them does not rebuild every vector again and again. */
+private val restyledCache = HashMap<Pair<ImageVector, Int>, ImageVector>()
+private const val RESTYLED_CACHE_LIMIT = 1024
+
+internal fun ImageVector.restyledFor(style: Int): ImageVector {
+    if (style == UiOptions.ICON_STYLE_STANDARD) return this
+    val key = this to style
+    restyledCache[key]?.let {
+        return it
+    }
+    if (restyledCache.size >= RESTYLED_CACHE_LIMIT) restyledCache.clear()
+    return restyled(style).also { restyledCache[key] = it }
+}
