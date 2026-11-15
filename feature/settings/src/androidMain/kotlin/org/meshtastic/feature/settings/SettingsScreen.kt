@@ -44,6 +44,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.common.di.GOOGLE_SERVICES_AVAILABLE
 import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
@@ -237,8 +239,14 @@ fun SettingsScreen(
             )
         },
     ) { paddingValues ->
+        // The page runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp),
+            modifier =
+            Modifier.verticalScroll(rememberScrollState())
+                .padding(paddingValues)
+                .padding(16.dp)
+                .padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             SettingsSearchBar(

@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,6 +31,9 @@ import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.rememberUiOptions
+
+/** True inside a glass toolbar: its buttons are then plain icons on the toolbar's own surface (no nested glass). */
+internal val LocalMapButtonInToolbar = compositionLocalOf { false }
 
 /**
  * A compact round icon button used in map control overlays (zoom, layers, location...). In the plain look it is a
@@ -51,6 +55,14 @@ fun MapButton(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = iconTint ?: IconButtonDefaults.filledIconButtonColors().contentColor,
+            )
+        }
+    } else if (LocalMapButtonInToolbar.current) {
+        IconButton(onClick = onClick, modifier = modifier) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = iconTint ?: MaterialTheme.colorScheme.onSurface,
             )
         }
     } else {

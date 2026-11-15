@@ -27,6 +27,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import org.meshtastic.core.ui.icon.Icon
@@ -180,6 +183,8 @@ fun NetworkHealthScreen(
             )
         },
     ) { contentPadding ->
+        // The list runs under the floating bar (shows through its glass) and ends above it.
+        FloatingBarUnderlap()
         Column(modifier = Modifier.fillMaxWidth().padding(contentPadding).nestedScroll(foldConnection)) {
             androidx.compose.material3.OutlinedTextField(
                 value = uiState.searchText,
@@ -234,6 +239,7 @@ fun NetworkHealthScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
                 ) {
                     items(uiState.nodes, key = { it.num }) { node ->
                         NodeHealthRow(

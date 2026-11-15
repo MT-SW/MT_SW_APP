@@ -19,6 +19,13 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.component.StyledSurface
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.model.ElementLook
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Badge
@@ -100,13 +107,22 @@ fun MapControlsOverlay(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
-    HorizontalFloatingToolbar(
-        expanded = true,
-        // The black-and-white themes: the map pauses the app-wide grey layer, so the buttons over it (the compass
-        // with its red north) are turned grey here.
-        modifier = modifier.monochromeLayer(),
-        colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
-    ) {
+    // The look chosen for the map: plain toolbar as before, or a pill of that look (depth / see-through / glass).
+    val style = rememberUiOptions().element(UiOptions.GROUP_MAP)
+    val plain = style.look == ElementLook.FLAT
+    val toolbar: @Composable (Modifier, Boolean) -> Unit = { toolbarModifier, glass ->
+        HorizontalFloatingToolbar(
+            expanded = true,
+            // The black-and-white themes: the map pauses the app-wide grey layer, so the buttons over it (the compass
+            // with its red north) are turned grey here.
+            modifier = toolbarModifier.monochromeLayer(),
+            colors =
+            if (glass) {
+                FloatingToolbarDefaults.standardFloatingToolbarColors(toolbarContainerColor = Color.Transparent)
+            } else {
+                FloatingToolbarDefaults.standardFloatingToolbarColors()
+            },
+        ) {
         // Compass
         CompassButton(onClick = onCompassClick, bearing = bearing, isFollowing = followPhoneBearing)
 
@@ -170,6 +186,20 @@ fun MapControlsOverlay(
                 contentDescription = stringResource(Res.string.toggle_my_position),
                 onClick = onClick,
             )
+        }
+        }
+    }
+    if (plain) {
+        toolbar(modifier, false)
+    } else {
+        StyledSurface(
+            style = style,
+            shape = CircleShape,
+            modifier = modifier,
+            baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            floating = true,
+        ) {
+            CompositionLocalProvider(LocalMapButtonInToolbar provides true) { toolbar(Modifier, true) }
         }
     }
 }
