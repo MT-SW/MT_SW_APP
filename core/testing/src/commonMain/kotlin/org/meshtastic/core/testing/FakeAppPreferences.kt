@@ -474,6 +474,21 @@ class FakeUiPrefs : UiPrefs {
         floatingNavBar.value = value
     }
 
+    override val channelDescriptions = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    override fun setChannelDescription(oldKey: String?, key: String, text: String) {
+        val next = channelDescriptions.value.toMutableMap()
+        if (oldKey != null && oldKey != key) next.remove(oldKey)
+        if (text.isBlank()) next.remove(key) else next[key] = text.trim()
+        channelDescriptions.value = next
+    }
+
+    override val showChannelDescription = MutableStateFlow(false)
+
+    override fun setShowChannelDescription(value: Boolean) {
+        showChannelDescription.value = value
+    }
+
     override val floatingNavBarAutoHide = MutableStateFlow(false)
 
     override fun setFloatingNavBarAutoHide(value: Boolean) {

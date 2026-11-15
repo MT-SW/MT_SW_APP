@@ -16,6 +16,7 @@
 - **Computer.** The "Start with the computer" option, with a start in the tray (the window does not open), and a single copy of the program by default.
 - **Look.** "Saturated" and "Very saturated" themes, categories in the theme choice, a flat app icon option; the dark background is grey instead of bluish, and pure black in the "Saturated" and "Very saturated" themes (good for AMOLED screens).
 - **Floating navigation bar.** The bottom tab bar (and on a computer or tablet the side bar too) is a rounded "island" with a name under each icon and the open tab highlighted; it looks the same on Android, the computer and iPhone/iPad, and a page's content ends above it, so the last item can always be scrolled into view. In "MT_SW features" the switch "Floating navigation bar at the bottom" brings the old bar back. Optionally (off by default) the bar hides while scrolling down and returns on scrolling up or only at the very top of the page.
+- **Channel description.** Your own note of up to 200 characters on a channel (in the channel editor), kept on the phone only. An optional switch shows it in the conversation list in place of the last message.
 - **Data.** "Add data from a backup" and synchronisation of the device statistics.
 - **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 ## better | Improvements

@@ -33,8 +33,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Channel
+import org.meshtastic.core.model.util.CHANNEL_DESCRIPTION_MAX_LENGTH
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
+import org.meshtastic.core.resources.channel_description
+import org.meshtastic.core.resources.channel_description_summary
 import org.meshtastic.core.resources.channel_name
 import org.meshtastic.core.resources.default_
 import org.meshtastic.core.resources.downlink_enabled
@@ -58,18 +61,25 @@ fun EditChannelDialog(
     modifier: Modifier = Modifier,
     modemPresetName: String = stringResource(Res.string.default_),
     initialPskEditState: ChannelPskEditState = ChannelPskEditState(),
+    /** MT_SW: the private description of this channel (kept on the phone only) and what to do when it is saved. */
+    description: String = "",
+    onDescriptionSave: (String) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
 
     var channelInput by remember(channelSettings) { mutableStateOf(channelSettings) }
     var pskEditState by remember(channelSettings, initialPskEditState) { mutableStateOf(initialPskEditState) }
+    var descriptionInput by remember(channelSettings, description) { mutableStateOf(description) }
 
     MeshtasticDialog(
         onDismiss = onDismissRequest,
         dismissText = stringResource(Res.string.cancel),
         confirmText = stringResource(Res.string.save),
-        onConfirm = { onAddClick(channelInput, pskEditState) },
+        onConfirm = {
+            onDescriptionSave(descriptionInput)
+            onAddClick(channelInput, pskEditState)
+        },
         modifier = modifier,
         title = "", // Title is handled internally by specific items if needed, or we could add one
         text = {
@@ -94,6 +104,19 @@ fun EditChannelDialog(
                         pskEditState = update.pskEditState
                     },
                     onFocusChanged = { isFocused = it.isFocused },
+                )
+
+                EditTextPreference(
+                    title = stringResource(Res.string.channel_description),
+                    value = descriptionInput,
+                    summary = stringResource(Res.string.channel_description_summary),
+                    enabled = true,
+                    isError = false,
+                    multiline = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    // The limit counts characters (not bytes), so Polish letters take no more room than others.
+                    onValueChanged = { if (it.length <= CHANNEL_DESCRIPTION_MAX_LENGTH) descriptionInput = it },
                 )
 
                 EditBase64Preference(

@@ -45,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -79,6 +80,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.common.util.nowMillis
@@ -88,6 +90,7 @@ import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.ContactSettings
 import org.meshtastic.core.model.util.formatMuteRemainingTime
 import org.meshtastic.core.repository.MuteDurations
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.are_you_sure
 import org.meshtastic.core.resources.cancel
@@ -625,7 +628,13 @@ private fun ContactListView(
         }
     val channelsTitle = stringResource(Res.string.channels)
     val dmTitle = stringResource(Res.string.direct_messages)
+    val uiPrefs = koinInject<UiPrefs>()
+    val channelDescriptions by uiPrefs.channelDescriptions.collectAsStateWithLifecycle()
+    val showChannelDescription by uiPrefs.showChannelDescription.collectAsStateWithLifecycle()
 
+    CompositionLocalProvider(
+        LocalChannelDescriptions provides if (showChannelDescription) channelDescriptions else emptyMap(),
+    ) {
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
@@ -670,6 +679,7 @@ private fun ContactListView(
             itemCount = contacts.size,
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
         )
+    }
     }
 }
 

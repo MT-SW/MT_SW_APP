@@ -68,6 +68,7 @@ import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.notification_test_title
 import org.meshtastic.core.resources.report_issues_title
+import org.meshtastic.core.resources.show_channel_description
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title
@@ -238,6 +239,7 @@ object SettingsSearchCatalog {
             Res.string.skip_bad_time_chart_points to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,
             Res.string.floating_nav_bar to SettingsRoute.MtSwFeatures,
+            Res.string.show_channel_description to SettingsRoute.MtSwFeatures,
             Res.string.floating_nav_bar_auto_hide to SettingsRoute.MtSwFeatures,
             Res.string.floating_nav_bar_only_at_top to SettingsRoute.MtSwFeatures,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,

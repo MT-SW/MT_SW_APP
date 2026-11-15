@@ -752,6 +752,8 @@
         <item quantity="one">%1$d channel in this link is already on your radio and was left out.</item>
         <item quantity="other">%1$d channels in this link are already on your radio and were left out.</item>
     </plurals>
+    <string name="channel_description">Channel description (only in this app)</string>
+    <string name="channel_description_summary">Your own note about this channel, up to 200 characters. It stays on this phone and is not sent to the radio or to other people. When “Show channel description in the list” is on in „MT_SW features”, the conversation list shows this description in place of the last message (only the icons and counts stay beside it); otherwise the last message is shown as usual.</string>
     <string name="channel_features">Channel Features</string>
     <string name="channel_invalid">This Channel URL is invalid and can not be used</string>
     <string name="channel_name">Channel Name</string>
@@ -3241,6 +3243,7 @@
     <string name="short_name">Short Name</string>
     <!-- SHOW -->
     <string name="show_all_key_title">Encryption Key Meanings</string>
+    <string name="show_channel_description">Show channel description in the list</string>
     <string name="show_full_message_timestamps">Show full message timestamps</string>
     <string name="show_full_message_timestamps_summary">Always show the date and time in conversation headers and message actions</string>
     <string name="show_iaq_legend">Show air quality legend</string>

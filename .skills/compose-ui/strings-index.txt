@@ -722,6 +722,8 @@ channel_6
 channel_7
 channel_8
 channel_already_on_radio
+channel_description
+channel_description_summary
 channel_features
 channel_invalid
 channel_name
@@ -3169,6 +3171,7 @@ shared_contact_no_public_key
 short_name
 ### SHOW ###
 show_all_key_title
+show_channel_description
 show_full_message_timestamps
 show_full_message_timestamps_summary
 show_iaq_legend

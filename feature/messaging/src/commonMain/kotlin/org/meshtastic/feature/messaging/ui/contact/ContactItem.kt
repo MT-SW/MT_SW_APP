@@ -40,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +57,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.model.Contact
 import org.meshtastic.core.model.ContactKey
+import org.meshtastic.core.model.util.descriptionKey
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archived_channel
 import org.meshtastic.core.resources.contact_draft_prefix
@@ -67,6 +70,20 @@ import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.proto.ChannelSet
+
+/**
+ * MT_SW: the private channel descriptions the conversation list shows in place of the last message, by
+ * `ChannelSettings.descriptionKey()`. Empty (the default) means the last message is shown as always.
+ */
+val LocalChannelDescriptions = staticCompositionLocalOf<Map<String, String>> { emptyMap() }
+
+/** The description to show for this conversation, or null when it is not a channel or has no description. */
+private fun Contact.channelDescription(channels: ChannelSet?, descriptions: Map<String, String>): String? {
+    if (channels == null || descriptions.isEmpty()) return null
+    val isChannel = contactKey.getOrNull(1) == '^' || contactKey.endsWith("^all") || contactKey.endsWith("^broadcast")
+    val index = if (isChannel) ContactKey(contactKey).channelOrNull else null
+    return index?.let { channels.settings.getOrNull(it) }?.let { descriptions[it.descriptionKey()] }
+}
 
 @Suppress("LongMethod")
 @Composable
@@ -111,7 +128,11 @@ fun ContactItem(
         Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             ContactHeader(contact = contact, channels = channels, onNodeChipClick = onNodeChipClick)
 
-            ChatMetadata(modifier = Modifier.padding(top = 4.dp), contact = contact)
+            val descriptions = LocalChannelDescriptions.current
+            val description = remember(contact, channels, descriptions) {
+                contact.channelDescription(channels, descriptions)
+            }
+            ChatMetadata(modifier = Modifier.padding(top = 4.dp), contact = contact, description = description)
         }
     }
 }
@@ -193,9 +214,10 @@ private fun ContactHeader(
 }
 
 private const val UNREAD_MESSAGE_LIMIT = 99
+private const val DESCRIPTION_MAX_LINES = 4
 
 @Composable
-private fun ChatMetadata(contact: Contact, modifier: Modifier = Modifier) {
+private fun ChatMetadata(contact: Contact, modifier: Modifier = Modifier, description: String? = null) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -203,18 +225,25 @@ private fun ChatMetadata(contact: Contact, modifier: Modifier = Modifier) {
     ) {
         // An unsent draft outranks the last message: it is the thing this row is waiting on the user for.
         val hasDraft = contact.draft.isNotBlank()
+        // A channel with a description shows only that (and the icons beside it), so the row stays short.
+        val showDescription = description != null && !hasDraft
         Text(
             text =
-            if (hasDraft) {
-                stringResource(Res.string.contact_draft_prefix, contact.draft)
-            } else {
-                contact.lastMessageText.orEmpty()
+            when {
+                hasDraft -> stringResource(Res.string.contact_draft_prefix, contact.draft)
+                description != null -> description
+                else -> contact.lastMessageText.orEmpty()
             },
-            modifier = Modifier.weight(1f).semantics { isSensitiveData = true },
+            modifier = Modifier.weight(1f).semantics { isSensitiveData = !showDescription },
             style = MaterialTheme.typography.bodyMedium,
-            color = if (hasDraft) MaterialTheme.colorScheme.tertiary else Color.Unspecified,
+            color =
+            when {
+                hasDraft -> MaterialTheme.colorScheme.tertiary
+                showDescription -> MaterialTheme.colorScheme.onSurfaceVariant
+                else -> Color.Unspecified
+            },
             overflow = TextOverflow.Ellipsis,
-            maxLines = 2,
+            maxLines = if (showDescription) DESCRIPTION_MAX_LINES else 2,
         )
         AnimatedVisibility(visible = contact.isPinned) {
             Icon(

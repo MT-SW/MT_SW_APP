@@ -51,8 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.Channel
+import org.meshtastic.core.model.util.descriptionKey
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add
 import org.meshtastic.core.resources.cancel
@@ -84,9 +87,13 @@ import org.meshtastic.proto.Config
 @Composable
 fun ChannelConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
+    val uiPrefs = koinInject<UiPrefs>()
+    val descriptions by uiPrefs.channelDescriptions.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
         ChannelConfigScreen(
+            descriptions = descriptions,
+            onDescriptionSave = uiPrefs::setChannelDescription,
             title = stringResource(Res.string.channels),
             onBack = onBack,
             settingsList = state.channelList,
@@ -113,6 +120,8 @@ fun ChannelConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 private fun ChannelConfigScreen(
+    descriptions: Map<String, String>,
+    onDescriptionSave: (oldKey: String?, key: String, text: String) -> Unit,
     title: String,
     onBack: () -> Unit,
     settingsList: List<ChannelSettings>,
@@ -164,6 +173,7 @@ private fun ChannelConfigScreen(
             settingsList.zip(settingsListInput).any { (item1, item2) -> item1 != item2 }
 
     var showEditChannelDialog: Int? by rememberSaveable { mutableStateOf(null) }
+    var pendingDescription: Pair<String?, String>? by remember { mutableStateOf(null) }
     var showChannelLegendDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showEditChannelDialog != null) {
@@ -172,7 +182,14 @@ private fun ChannelConfigScreen(
             channelSettings = settingsListInput.getOrNull(index) ?: ChannelSettings.Builder().build(),
             modemPresetName = modemPresetName,
             initialPskEditState = pskEditStatesInput.getOrElse(index) { ChannelPskEditState() },
+            description = settingsListInput.getOrNull(index)?.let { descriptions[it.descriptionKey()] }.orEmpty(),
+            onDescriptionSave = { text ->
+                val old = settingsListInput.getOrNull(index)?.descriptionKey()
+                pendingDescription = old to text
+            },
             onAddClick = { settings, pskEditState ->
+                pendingDescription?.let { (old, text) -> onDescriptionSave(old, settings.descriptionKey(), text) }
+                pendingDescription = null
                 if (settingsListInput.size > index) {
                     settingsListInput[index] = settings
                     pskEditStatesInput[index] = pskEditState

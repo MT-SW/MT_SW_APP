@@ -3176,6 +3176,9 @@
     <string name="mt_sw_other_contacts_body">Na liście węzłów przycisk w rogu ma pozycję „Dodaj kontakt”: wpisujesz identyfikator węzła (np. !a1b2c3d4) i nazwę, a węzeł zapisuje się w Twoim urządzeniu. W szczegółach węzła (Administracja → Dodaj kontakt zdalnie) to samo zrobisz na zdalnym urządzeniu, przez sieć mesh.</string>
     <string name="import_menu_in_top_bar">Przenieś przycisk dodawania i udostępniania do górnej belki</string>
     <string name="floating_nav_bar">Pływający pasek nawigacji na dole</string>
+    <string name="channel_description">Opis kanału (tylko w tej aplikacji)</string>
+    <string name="channel_description_summary">Twoja własna notatka o tym kanale, do 200 znaków. Zostaje na tym telefonie i nie jest wysyłana do radia ani do innych osób. Gdy w „Funkcje MT_SW” włączysz „Pokazuj opis kanału na liście”, lista rozmów pokazuje ten opis zamiast ostatniej wiadomości (obok zostają tylko ikony i liczniki); w przeciwnym razie widać ostatnią wiadomość jak zawsze.</string>
+    <string name="show_channel_description">Pokazuj opis kanału na liście</string>
     <string name="floating_nav_bar_auto_hide">Chowaj pasek przy przewijaniu w dół</string>
     <string name="floating_nav_bar_only_at_top">Pokaż pasek dopiero na samej górze strony</string>
     <string name="messages_read_visible">Czytaj widoczne wiadomości</string>

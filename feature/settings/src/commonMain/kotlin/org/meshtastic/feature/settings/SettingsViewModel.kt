@@ -244,6 +244,12 @@ class SettingsViewModel(
         uiPrefs.setImportMenuInTopBar(value)
     }
 
+    val showChannelDescription = uiPrefs.showChannelDescription
+
+    fun setShowChannelDescription(value: Boolean) {
+        uiPrefs.setShowChannelDescription(value)
+    }
+
     val floatingNavBar = uiPrefs.floatingNavBar
 
     fun setFloatingNavBar(value: Boolean) {

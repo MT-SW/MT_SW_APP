@@ -255,6 +255,17 @@ interface UiPrefs {
 
     fun setFloatingNavBar(value: Boolean)
 
+    /** MT_SW: private channel descriptions, by `ChannelSettings.descriptionKey()`. They stay on this phone. */
+    val channelDescriptions: StateFlow<Map<String, String>>
+
+    /** Saves (or, for a blank [text], removes) the description of a channel; [oldKey] is dropped when it differs. */
+    fun setChannelDescription(oldKey: String?, key: String, text: String)
+
+    /** MT_SW: the conversation list shows a channel's description in place of its last message (off by default). */
+    val showChannelDescription: StateFlow<Boolean>
+
+    fun setShowChannelDescription(value: Boolean)
+
     /** MT_SW: the floating bar hides while a page is scrolled down and returns on scrolling up (off by default). */
     val floatingNavBarAutoHide: StateFlow<Boolean>
 

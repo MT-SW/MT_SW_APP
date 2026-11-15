@@ -261,6 +261,36 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_FLOATING_NAV_BAR] = value } }
     }
 
+    override val channelDescriptions: StateFlow<Map<String, String>> =
+        dataStore.data
+            .map { prefs ->
+                prefs
+                    .asMap()
+                    .filterKeys { it.name.startsWith(CHANNEL_DESCRIPTION_PREFIX) }
+                    .entries
+                    .associate { (key, value) -> key.name.removePrefix(CHANNEL_DESCRIPTION_PREFIX) to value.toString() }
+            }
+            .stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
+    override fun setChannelDescription(oldKey: String?, key: String, text: String) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                if (oldKey != null && oldKey != key) {
+                    prefs.remove(stringPreferencesKey(CHANNEL_DESCRIPTION_PREFIX + oldKey))
+                }
+                val entry = stringPreferencesKey(CHANNEL_DESCRIPTION_PREFIX + key)
+                if (text.isBlank()) prefs.remove(entry) else prefs[entry] = text.trim()
+            }
+        }
+    }
+
+    override val showChannelDescription: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_SHOW_CHANNEL_DESCRIPTION] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setShowChannelDescription(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_SHOW_CHANNEL_DESCRIPTION] = value } }
+    }
+
     override val floatingNavBarAutoHide: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_FLOATING_NAV_BAR_AUTO_HIDE] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
 
@@ -960,6 +990,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_WIDGET_OTHERS_PICKED = stringPreferencesKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_FLOATING_NAV_BAR = booleanPreferencesKey("floating-nav-bar")
+        val KEY_SHOW_CHANNEL_DESCRIPTION = booleanPreferencesKey("show-channel-description")
+        const val CHANNEL_DESCRIPTION_PREFIX = "channel-description-"
         val KEY_FLOATING_NAV_BAR_AUTO_HIDE = booleanPreferencesKey("floating-nav-bar-auto-hide")
         val KEY_FLOATING_NAV_BAR_ONLY_AT_TOP = booleanPreferencesKey("floating-nav-bar-only-at-top")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
