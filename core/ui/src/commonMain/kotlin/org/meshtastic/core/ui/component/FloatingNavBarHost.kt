@@ -276,7 +276,8 @@ private fun FloatingNavBar(
 /** One button of the floating bar: the icon with its short name under it. */
 @Composable
 private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Modifier = Modifier) {
-    val color = if (entry.selected) colorScheme.primary else colorScheme.onSurfaceVariant
+    // The tabs that are not open are white (dark in the light themes), the open one has the colour of the theme.
+    val color = if (entry.selected) colorScheme.primary else colorScheme.onSurface
     Column(
         modifier =
         modifier
