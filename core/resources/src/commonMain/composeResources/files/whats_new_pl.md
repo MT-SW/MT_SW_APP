@@ -43,6 +43,7 @@
 - Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 ## fix | Naprawione błędy
 - Android: przycisk SOS (i przycisk wysyłania z wibracją przy przytrzymaniu) wywalał aplikację na telefonach, które nie pozwalały na wibrację, bo aplikacja nie miała uprawnienia do wibracji. Dodano uprawnienie, a brak wibracji nigdy nie zamyka aplikacji.
+- Android: pasek z kartami nie wibrował przy zmianie karty, bo korzystał ze zwykłej haptyki systemu, którą wyłącza przełącznik dotyku w telefonie. Teraz daje krótką, prawdziwą wibrację silniczka (nadal do wyłączenia w „Wygląd” → pasek na dole).
 - „Uruchamiaj z komputerem” działa na Windowsie i w AppImage na Linuksie.
 - iPhone/iPad: przesunięte klikanie w dymki na mapie, brak dźwięku powiadomień przy zablokowanym telefonie, błąd kopii zapasowej, gaśnięcie ekranu podczas aktualizacji.
 - Zdalna administracja pyta o wersję MT_SW_FIRMWARE także węzeł zdalny.

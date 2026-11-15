@@ -30,6 +30,14 @@ import co.touchlab.kermit.Logger
 
 private const val BUZZ_ON_MS = 60L
 private const val BUZZ_OFF_MS = 15L
+private const val TAP_MS = 30L
+
+private fun Context.motor(): Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    getSystemService(VibratorManager::class.java)?.defaultVibrator
+} else {
+    @Suppress("DEPRECATION")
+    getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+}
 
 @Composable
 actual fun rememberHoldVibration(): HoldVibration {
@@ -39,13 +47,7 @@ actual fun rememberHoldVibration(): HoldVibration {
 
 /** Repeats a short strong pulse with a tiny pause, which feels like one continuous buzz, until stopped. */
 private class AndroidHoldVibration(context: Context) : HoldVibration {
-    private val vibrator: Vibrator? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.getSystemService(VibratorManager::class.java)?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        }
+    private val vibrator: Vibrator? = context.motor()
 
     override fun start() {
         val motor = vibrator?.takeIf { it.hasVibrator() } ?: return
@@ -69,8 +71,33 @@ private class AndroidHoldVibration(context: Context) : HoldVibration {
     }
 }
 
+/**
+ * One short, real vibration of the motor. The standard Compose haptics follow the "touch feedback" switch of the phone
+ * and are very faint on some of them, so the tab bar would stay silent; this uses the motor directly.
+ */
 @Composable
 actual fun rememberTapHaptic(): () -> Unit {
+    val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    return remember(haptic) { { haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) } }
+    return remember(context, haptic) {
+        val motor = context.applicationContext.motor()?.takeIf { it.hasVibrator() }
+        val tap: () -> Unit = {
+            if (motor == null) {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            } else {
+                vibrateOnce(motor)
+            }
+        }
+        tap
+    }
+}
+
+/** A phone that does not allow the vibration must never take the app down with it. */
+@Suppress("TooGenericExceptionCaught")
+private fun vibrateOnce(motor: Vibrator) {
+    try {
+        motor.vibrate(VibrationEffect.createOneShot(TAP_MS, VibrationEffect.DEFAULT_AMPLITUDE))
+    } catch (e: RuntimeException) {
+        Logger.w(e) { "Tap vibration could not start" }
+    }
 }
