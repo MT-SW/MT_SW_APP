@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_delete_fill0
 import org.meshtastic.core.resources.ic_do_not_disturb_on
@@ -26,10 +25,10 @@ import org.meshtastic.core.resources.ic_nodes
 import org.meshtastic.core.resources.ic_notes
 
 val MeshtasticIcons.Notes: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_notes)
+    @Composable get() = styledVectorResource(Res.drawable.ic_notes)
 val MeshtasticIcons.DoDisturb: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_do_not_disturb_on)
+    @Composable get() = styledVectorResource(Res.drawable.ic_do_not_disturb_on)
 val MeshtasticIcons.DeleteNode: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_delete_fill0)
+    @Composable get() = styledVectorResource(Res.drawable.ic_delete_fill0)
 val MeshtasticIcons.Nodes: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_nodes)
+    @Composable get() = styledVectorResource(Res.drawable.ic_nodes)

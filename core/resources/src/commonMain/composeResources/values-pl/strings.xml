@@ -4213,4 +4213,9 @@
     <string name="input_hold_buzz">Mocna wibracja, gdy trzymasz przycisk wysyłania</string>
     <string name="element_group_bubbles">Dymki wiadomości</string>
     <string name="element_look_short">Pasek, karty, dymki, pole wiadomości i wyszukiwanie: matowy, z głębią, przezroczysty lub szkło; szary biały; wibracje.</string>
+    <string name="icon_style">Styl ikon</string>
+    <string name="icon_style_standard">Standardowe</string>
+    <string name="icon_style_bold">Pogrubione</string>
+    <string name="icon_style_outline">Obrys (jak ikony liniowe w iPhonie)</string>
+    <string name="icon_style_summary">Przerysowuje wszystkie ikony aplikacji w wybranym stylu, tak samo na każdej platformie.</string>
 </resources>

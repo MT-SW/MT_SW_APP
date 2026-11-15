@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_cell_tower
 import org.meshtastic.core.resources.ic_cruelty_free
@@ -40,47 +39,47 @@ import org.meshtastic.core.resources.ic_tsunami
 import org.meshtastic.core.resources.ic_wifi_channel
 
 val MeshtasticIcons.HopCount: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cruelty_free)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cruelty_free)
 val MeshtasticIcons.Channel: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_wifi_channel)
+    @Composable get() = styledVectorResource(Res.drawable.ic_wifi_channel)
 val MeshtasticIcons.AirUtilization: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_ssid_chart)
+    @Composable get() = styledVectorResource(Res.drawable.ic_ssid_chart)
 
 // Signal measurement metrics
 val MeshtasticIcons.Snr: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_graphic_eq)
+    @Composable get() = styledVectorResource(Res.drawable.ic_graphic_eq)
 val MeshtasticIcons.Rssi: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_podcasts)
+    @Composable get() = styledVectorResource(Res.drawable.ic_podcasts)
 
 val MeshtasticIcons.SignalCellular0Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_0_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_0_bar)
 
 val MeshtasticIcons.SignalCellular1Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_1_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_1_bar)
 
 val MeshtasticIcons.SignalCellular2Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_2_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_2_bar)
 
 val MeshtasticIcons.SignalCellular3Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_3_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_3_bar)
 
 val MeshtasticIcons.SignalCellular4Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_4_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_4_bar)
 
 val MeshtasticIcons.MeshHub: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_hub)
+    @Composable get() = styledVectorResource(Res.drawable.ic_hub)
 val MeshtasticIcons.NearMe: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_near_me)
+    @Composable get() = styledVectorResource(Res.drawable.ic_near_me)
 val MeshtasticIcons.Tsunami: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_tsunami)
+    @Composable get() = styledVectorResource(Res.drawable.ic_tsunami)
 
 val MeshtasticIcons.SignalOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_off)
 val MeshtasticIcons.SignalAlt1Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_alt_1_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_alt_1_bar)
 val MeshtasticIcons.SignalAlt2Bar: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_alt_2_bar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_alt_2_bar)
 val MeshtasticIcons.CellTower: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cell_tower)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cell_tower)
 val MeshtasticIcons.ChannelUtilization: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_signal_cellular_alt)
+    @Composable get() = styledVectorResource(Res.drawable.ic_signal_cellular_alt)

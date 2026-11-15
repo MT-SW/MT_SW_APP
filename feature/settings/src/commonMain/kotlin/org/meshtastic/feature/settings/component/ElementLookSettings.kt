@@ -42,6 +42,11 @@ import org.meshtastic.core.resources.element_look_glass_summary
 import org.meshtastic.core.resources.element_look_strength
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
+import org.meshtastic.core.resources.icon_style
+import org.meshtastic.core.resources.icon_style_bold
+import org.meshtastic.core.resources.icon_style_outline
+import org.meshtastic.core.resources.icon_style_standard
+import org.meshtastic.core.resources.icon_style_summary
 import org.meshtastic.core.resources.input_hold_buzz
 import org.meshtastic.core.resources.nav_bar_haptics
 import org.meshtastic.core.resources.nav_bar_hide
@@ -83,6 +88,19 @@ fun ElementLookSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+    )
+    DropDownPreference(
+        title = stringResource(Res.string.icon_style),
+        enabled = true,
+        items =
+        listOf(
+            UiOptions.ICON_STYLE_STANDARD to stringResource(Res.string.icon_style_standard),
+            UiOptions.ICON_STYLE_BOLD to stringResource(Res.string.icon_style_bold),
+            UiOptions.ICON_STYLE_OUTLINE to stringResource(Res.string.icon_style_outline),
+        ),
+        selectedItem = options[UiOptions.ICON_STYLE],
+        onItemSelected = { onChange(UiOptions.ICON_STYLE, it) },
+        summary = stringResource(Res.string.icon_style_summary),
     )
     ElementGroupSettings(stringResource(Res.string.element_group_navbar), UiOptions.GROUP_NAV, options, onChange)
     ElementGroupSettings(stringResource(Res.string.element_group_cards), UiOptions.GROUP_CARDS, options, onChange)

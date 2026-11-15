@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_bluetooth
 import org.meshtastic.core.resources.ic_bluetooth_connected
@@ -41,45 +40,45 @@ import org.meshtastic.core.resources.ic_wifi
 
 /** The maker hardware mark from meshtastic/design#160: a wrench, Material Symbols "build". */
 val MeshtasticIcons.Wrench: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_build)
+    @Composable get() = styledVectorResource(Res.drawable.ic_build)
 
 /** Material Symbols "view_in_ar": the entry to a device's 3D model. */
 val MeshtasticIcons.ViewInAr: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_view_in_ar)
+    @Composable get() = styledVectorResource(Res.drawable.ic_view_in_ar)
 
 /** Material Symbols "photo_camera": capture the AR view. */
 val MeshtasticIcons.PhotoCamera: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_photo_camera)
+    @Composable get() = styledVectorResource(Res.drawable.ic_photo_camera)
 
 /** Material Symbols "center_focus_strong", a viewfinder: the camera mesh view. */
 val MeshtasticIcons.CenterFocusStrong: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_center_focus_strong)
+    @Composable get() = styledVectorResource(Res.drawable.ic_center_focus_strong)
 
 val MeshtasticIcons.BluetoothConnected: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bluetooth_connected)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bluetooth_connected)
 val MeshtasticIcons.BluetoothSearching: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bluetooth_searching)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bluetooth_searching)
 val MeshtasticIcons.UsbOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_usb_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_usb_off)
 val MeshtasticIcons.Antenna: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_settings_input_antenna)
+    @Composable get() = styledVectorResource(Res.drawable.ic_settings_input_antenna)
 val MeshtasticIcons.Speaker: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_speaker_phone)
+    @Composable get() = styledVectorResource(Res.drawable.ic_speaker_phone)
 val MeshtasticIcons.Reconnecting: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cached)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cached)
 val MeshtasticIcons.Nfc: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_nfc)
+    @Composable get() = styledVectorResource(Res.drawable.ic_nfc)
 val MeshtasticIcons.Bluetooth: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bluetooth)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bluetooth)
 val MeshtasticIcons.Wifi: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_wifi)
+    @Composable get() = styledVectorResource(Res.drawable.ic_wifi)
 val MeshtasticIcons.Usb: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_usb)
+    @Composable get() = styledVectorResource(Res.drawable.ic_usb)
 val MeshtasticIcons.Serial: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_terminal)
+    @Composable get() = styledVectorResource(Res.drawable.ic_terminal)
 val MeshtasticIcons.Memory: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_memory)
+    @Composable get() = styledVectorResource(Res.drawable.ic_memory)
 val MeshtasticIcons.DisplaySettings: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_display_settings)
+    @Composable get() = styledVectorResource(Res.drawable.ic_display_settings)
 val MeshtasticIcons.MeshRadio: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_mesh_radio)
+    @Composable get() = styledVectorResource(Res.drawable.ic_mesh_radio)

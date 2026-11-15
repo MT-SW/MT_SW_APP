@@ -1647,7 +1647,13 @@
     <string name="iaq_level_range_open">%1$s (%2$d+)</string>
     <string name="iaq_level_severely_polluted">Severely Polluted</string>
     <string name="iaq_value">IAQ %1$d</string>
+    <!-- ICON -->
     <string name="icon_meanings">Icon Meanings</string>
+    <string name="icon_style">Icon style</string>
+    <string name="icon_style_bold">Bolder</string>
+    <string name="icon_style_outline">Outline (like iPhone line icons)</string>
+    <string name="icon_style_standard">Standard</string>
+    <string name="icon_style_summary">Redraws all icons of the app in the chosen style, the same on every platform.</string>
     <string name="ignore">Ignore</string>
     <string name="ignore_add">Add '%1$s' to ignore list?</string>
     <string name="ignore_incoming">Ignore incoming</string>

@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_counter_0
 import org.meshtastic.core.resources.ic_counter_1
@@ -31,20 +30,20 @@ import org.meshtastic.core.resources.ic_counter_7
 import org.meshtastic.core.resources.ic_counter_8
 
 val MeshtasticIcons.Counter0: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_0)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_0)
 val MeshtasticIcons.Counter1: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_1)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_1)
 val MeshtasticIcons.Counter2: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_2)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_2)
 val MeshtasticIcons.Counter3: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_3)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_3)
 val MeshtasticIcons.Counter4: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_4)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_4)
 val MeshtasticIcons.Counter5: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_5)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_5)
 val MeshtasticIcons.Counter6: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_6)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_6)
 val MeshtasticIcons.Counter7: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_7)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_7)
 val MeshtasticIcons.Counter8: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_counter_8)
+    @Composable get() = styledVectorResource(Res.drawable.ic_counter_8)

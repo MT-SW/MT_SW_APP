@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_code
 import org.meshtastic.core.resources.ic_format_bold
@@ -27,12 +26,12 @@ import org.meshtastic.core.resources.ic_format_strikethrough
 import org.meshtastic.core.resources.ic_link
 
 val MeshtasticIcons.Bold: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_format_bold)
+    @Composable get() = styledVectorResource(Res.drawable.ic_format_bold)
 val MeshtasticIcons.Italic: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_format_italic)
+    @Composable get() = styledVectorResource(Res.drawable.ic_format_italic)
 val MeshtasticIcons.Strikethrough: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_format_strikethrough)
+    @Composable get() = styledVectorResource(Res.drawable.ic_format_strikethrough)
 val MeshtasticIcons.Code: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_code)
+    @Composable get() = styledVectorResource(Res.drawable.ic_code)
 val MeshtasticIcons.Link: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_link)
+    @Composable get() = styledVectorResource(Res.drawable.ic_link)

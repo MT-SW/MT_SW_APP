@@ -1605,7 +1605,13 @@ iaq_level_range
 iaq_level_range_open
 iaq_level_severely_polluted
 iaq_value
+### ICON ###
 icon_meanings
+icon_style
+icon_style_bold
+icon_style_outline
+icon_style_standard
+icon_style_summary
 ignore
 ignore_add
 ignore_incoming

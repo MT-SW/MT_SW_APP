@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_arrow_back
 import org.meshtastic.core.resources.ic_arrow_downward
@@ -33,24 +32,24 @@ import org.meshtastic.core.resources.ic_keyboard_arrow_up
 import org.meshtastic.core.resources.ic_open_in_full
 
 val MeshtasticIcons.ArrowBack: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_arrow_back)
+    @Composable get() = styledVectorResource(Res.drawable.ic_arrow_back)
 val MeshtasticIcons.ChevronRight: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_chevron_right)
+    @Composable get() = styledVectorResource(Res.drawable.ic_chevron_right)
 val MeshtasticIcons.KeyboardArrowDown: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_keyboard_arrow_down)
+    @Composable get() = styledVectorResource(Res.drawable.ic_keyboard_arrow_down)
 val MeshtasticIcons.KeyboardArrowUp: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_keyboard_arrow_up)
+    @Composable get() = styledVectorResource(Res.drawable.ic_keyboard_arrow_up)
 val MeshtasticIcons.KeyboardArrowLeft: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_keyboard_arrow_left)
+    @Composable get() = styledVectorResource(Res.drawable.ic_keyboard_arrow_left)
 val MeshtasticIcons.KeyboardArrowRight: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_keyboard_arrow_right)
+    @Composable get() = styledVectorResource(Res.drawable.ic_keyboard_arrow_right)
 val MeshtasticIcons.ArrowDownward: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_arrow_downward)
+    @Composable get() = styledVectorResource(Res.drawable.ic_arrow_downward)
 val MeshtasticIcons.ExpandMore: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_expand_more)
+    @Composable get() = styledVectorResource(Res.drawable.ic_expand_more)
 val MeshtasticIcons.ExpandLess: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_expand_less)
+    @Composable get() = styledVectorResource(Res.drawable.ic_expand_less)
 val MeshtasticIcons.OpenInFull: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_open_in_full)
+    @Composable get() = styledVectorResource(Res.drawable.ic_open_in_full)
 val MeshtasticIcons.CloseFullscreen: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_close_fullscreen)
+    @Composable get() = styledVectorResource(Res.drawable.ic_close_fullscreen)

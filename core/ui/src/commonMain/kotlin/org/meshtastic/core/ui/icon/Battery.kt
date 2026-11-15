@@ -18,17 +18,16 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_battery_alert
 import org.meshtastic.core.resources.ic_battery_horiz_000
 import org.meshtastic.core.resources.ic_battery_question_mark
 
 val MeshtasticIcons.BatteryEmpty: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_battery_horiz_000)
+    @Composable get() = styledVectorResource(Res.drawable.ic_battery_horiz_000)
 
 val MeshtasticIcons.BatteryUnknown: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_battery_question_mark)
+    @Composable get() = styledVectorResource(Res.drawable.ic_battery_question_mark)
 
 val MeshtasticIcons.BatteryAlert: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_battery_alert)
+    @Composable get() = styledVectorResource(Res.drawable.ic_battery_alert)

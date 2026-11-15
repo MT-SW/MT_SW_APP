@@ -63,6 +63,12 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val NAV_ICONS = "navbar.icons"
         const val NAV_HAPTICS = "navbar.haptics"
 
+        /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
+        const val ICON_STYLE = "icons.style"
+        const val ICON_STYLE_STANDARD = 0
+        const val ICON_STYLE_BOLD = 1
+        const val ICON_STYLE_OUTLINE = 2
+
         /** The send button buzzes while it is held. */
         const val HOLD_BUZZ = "input.holdBuzz"
 
@@ -82,6 +88,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
                 NAV_ICONS to 1,
                 NAV_HAPTICS to 1,
                 HOLD_BUZZ to 1,
+                ICON_STYLE to ICON_STYLE_STANDARD,
                 "$GROUP_NAV.look" to ElementLook.FLAT,
                 "$GROUP_NAV.strength" to DEFAULT_STRENGTH,
                 "$GROUP_NAV.blur" to DEFAULT_BLUR,

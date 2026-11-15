@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_calendar_month
 import org.meshtastic.core.resources.ic_layers
@@ -36,28 +35,28 @@ import org.meshtastic.core.resources.ic_tune
 
 // Map control icons
 val MeshtasticIcons.Layers: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_layers)
+    @Composable get() = styledVectorResource(Res.drawable.ic_layers)
 val MeshtasticIcons.MyLocation: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_my_location)
+    @Composable get() = styledVectorResource(Res.drawable.ic_my_location)
 val MeshtasticIcons.LocationDisabled: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_location_disabled)
+    @Composable get() = styledVectorResource(Res.drawable.ic_location_disabled)
 val MeshtasticIcons.PinDrop: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_pin_drop)
+    @Composable get() = styledVectorResource(Res.drawable.ic_pin_drop)
 val MeshtasticIcons.TripOrigin: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_trip_origin)
+    @Composable get() = styledVectorResource(Res.drawable.ic_trip_origin)
 val MeshtasticIcons.CalendarMonth: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_calendar_month)
+    @Composable get() = styledVectorResource(Res.drawable.ic_calendar_month)
 val MeshtasticIcons.MapCompass: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_navigation)
+    @Composable get() = styledVectorResource(Res.drawable.ic_navigation)
 val MeshtasticIcons.Tune: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_tune)
+    @Composable get() = styledVectorResource(Res.drawable.ic_tune)
 val MeshtasticIcons.Place: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_place)
+    @Composable get() = styledVectorResource(Res.drawable.ic_place)
 val MeshtasticIcons.Lens: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_lens)
+    @Composable get() = styledVectorResource(Res.drawable.ic_lens)
 val MeshtasticIcons.Map: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_map)
+    @Composable get() = styledVectorResource(Res.drawable.ic_map)
 val MeshtasticIcons.LocationOn: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_location_on)
+    @Composable get() = styledVectorResource(Res.drawable.ic_location_on)
 val MeshtasticIcons.Route: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_route)
+    @Composable get() = styledVectorResource(Res.drawable.ic_route)

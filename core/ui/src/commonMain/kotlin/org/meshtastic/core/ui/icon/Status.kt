@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_arrow_circle_up
 import org.meshtastic.core.resources.ic_bedtime
@@ -52,88 +51,88 @@ import org.meshtastic.core.resources.ic_warning
 
 // Favorites
 val MeshtasticIcons.Favorite: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_star)
+    @Composable get() = styledVectorResource(Res.drawable.ic_star)
 val MeshtasticIcons.NotFavorite: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_star_border)
+    @Composable get() = styledVectorResource(Res.drawable.ic_star_border)
 
 // Mute state
 val MeshtasticIcons.Muted: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_speaker_notes_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_speaker_notes_off)
 val MeshtasticIcons.Unmuted: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_speaker_notes)
+    @Composable get() = styledVectorResource(Res.drawable.ic_speaker_notes)
 
 // Volume
 val MeshtasticIcons.VolumeOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_volume_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_volume_off)
 val MeshtasticIcons.VolumeMute: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_volume_mute)
+    @Composable get() = styledVectorResource(Res.drawable.ic_volume_mute)
 
 // Time
 val MeshtasticIcons.History: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_history)
+    @Composable get() = styledVectorResource(Res.drawable.ic_history)
 
 // MQTT status
 val MeshtasticIcons.MqttDelivered: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cloud_done)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cloud_done)
 val MeshtasticIcons.MqttSyncing: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cloud_sync)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cloud_sync)
 
 // Connectivity
 val MeshtasticIcons.Unmessageable: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_no_cell)
+    @Composable get() = styledVectorResource(Res.drawable.ic_no_cell)
 val MeshtasticIcons.Udp: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_lan)
+    @Composable get() = styledVectorResource(Res.drawable.ic_lan)
 val MeshtasticIcons.Api: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_terminal)
+    @Composable get() = styledVectorResource(Res.drawable.ic_terminal)
 val MeshtasticIcons.Ethernet: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_settings_ethernet)
+    @Composable get() = styledVectorResource(Res.drawable.ic_settings_ethernet)
 
 // Update & lifecycle
 val MeshtasticIcons.ArrowCircleUp: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_arrow_circle_up)
+    @Composable get() = styledVectorResource(Res.drawable.ic_arrow_circle_up)
 val MeshtasticIcons.Dangerous: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_dangerous)
+    @Composable get() = styledVectorResource(Res.drawable.ic_dangerous)
 
 // Result states
 val MeshtasticIcons.CheckCircle: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_check_circle_fill0)
+    @Composable get() = styledVectorResource(Res.drawable.ic_check_circle_fill0)
 val MeshtasticIcons.Success: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_check_circle_fill1)
+    @Composable get() = styledVectorResource(Res.drawable.ic_check_circle_fill1)
 val MeshtasticIcons.Error: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_error_fill1)
+    @Composable get() = styledVectorResource(Res.drawable.ic_error_fill1)
 val MeshtasticIcons.ErrorOutline: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_error_fill0)
+    @Composable get() = styledVectorResource(Res.drawable.ic_error_fill0)
 val MeshtasticIcons.Info: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_info)
+    @Composable get() = styledVectorResource(Res.drawable.ic_info)
 
 // Acknowledgment
 val MeshtasticIcons.Acknowledged: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_how_to_reg)
+    @Composable get() = styledVectorResource(Res.drawable.ic_how_to_reg)
 
 // Selection state
 val MeshtasticIcons.RadioButtonUnchecked: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_radio_button_unchecked)
+    @Composable get() = styledVectorResource(Res.drawable.ic_radio_button_unchecked)
 
 // Device sleep
 val MeshtasticIcons.DeviceSleep: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bedtime)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bedtime)
 
 // Node connection state (non-MQTT)
 val MeshtasticIcons.Disconnected: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_link_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_link_off)
 val MeshtasticIcons.LinkOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_link_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_link_off)
 
 // Message delivery status
 val MeshtasticIcons.MessageEnroute: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_schedule)
+    @Composable get() = styledVectorResource(Res.drawable.ic_schedule)
 val MeshtasticIcons.MessageError: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_error_fill0)
+    @Composable get() = styledVectorResource(Res.drawable.ic_error_fill0)
 val MeshtasticIcons.Warning: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_warning)
+    @Composable get() = styledVectorResource(Res.drawable.ic_warning)
 val MeshtasticIcons.MqttConnected: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cloud)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cloud)
 val MeshtasticIcons.CloudUpload: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cloud_upload)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cloud_upload)
 val MeshtasticIcons.CloudDownload: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cloud_download)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cloud_download)

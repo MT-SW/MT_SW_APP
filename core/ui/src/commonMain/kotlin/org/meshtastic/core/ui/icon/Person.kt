@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_account_circle
 import org.meshtastic.core.resources.ic_group
@@ -30,21 +29,21 @@ import org.meshtastic.core.resources.ic_person_question
 import org.meshtastic.core.resources.ic_person_search
 
 val MeshtasticIcons.PersonOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_person_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_person_off)
 val MeshtasticIcons.PersonQuestion: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_person_question)
+    @Composable get() = styledVectorResource(Res.drawable.ic_person_question)
 val MeshtasticIcons.Group: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_group)
+    @Composable get() = styledVectorResource(Res.drawable.ic_group)
 val MeshtasticIcons.AccountCircle: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_account_circle)
+    @Composable get() = styledVectorResource(Res.drawable.ic_account_circle)
 val MeshtasticIcons.PersonSearch: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_person_search)
+    @Composable get() = styledVectorResource(Res.drawable.ic_person_search)
 
 val MeshtasticIcons.PersonAdd: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_person_add)
+    @Composable get() = styledVectorResource(Res.drawable.ic_person_add)
 val MeshtasticIcons.Person: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_person)
+    @Composable get() = styledVectorResource(Res.drawable.ic_person)
 val MeshtasticIcons.Groups: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_groups)
+    @Composable get() = styledVectorResource(Res.drawable.ic_groups)
 val MeshtasticIcons.PeopleCount: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_group)
+    @Composable get() = styledVectorResource(Res.drawable.ic_group)

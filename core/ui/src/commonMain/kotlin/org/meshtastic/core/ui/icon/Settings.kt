@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_abc
 import org.meshtastic.core.resources.ic_admin_panel_settings
@@ -40,36 +39,36 @@ import org.meshtastic.core.resources.ic_waving_hand
 
 // Config route icons
 val MeshtasticIcons.AdminPanelSettings: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_admin_panel_settings)
+    @Composable get() = styledVectorResource(Res.drawable.ic_admin_panel_settings)
 val MeshtasticIcons.AppSettingsAlt: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_app_settings_alt)
+    @Composable get() = styledVectorResource(Res.drawable.ic_app_settings_alt)
 val MeshtasticIcons.BugReport: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bug_report)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bug_report)
 val MeshtasticIcons.CleaningServices: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_cleaning_services)
+    @Composable get() = styledVectorResource(Res.drawable.ic_cleaning_services)
 val MeshtasticIcons.FormatPaint: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_format_paint)
+    @Composable get() = styledVectorResource(Res.drawable.ic_format_paint)
 val MeshtasticIcons.Language: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_language)
+    @Composable get() = styledVectorResource(Res.drawable.ic_language)
 val MeshtasticIcons.WavingHand: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_waving_hand)
+    @Composable get() = styledVectorResource(Res.drawable.ic_waving_hand)
 val MeshtasticIcons.Abc: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_abc)
+    @Composable get() = styledVectorResource(Res.drawable.ic_abc)
 val MeshtasticIcons.Settings: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_settings)
+    @Composable get() = styledVectorResource(Res.drawable.ic_settings)
 val MeshtasticIcons.ConfigChannels: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_list)
+    @Composable get() = styledVectorResource(Res.drawable.ic_list)
 val MeshtasticIcons.Notifications: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_notifications)
+    @Composable get() = styledVectorResource(Res.drawable.ic_notifications)
 val MeshtasticIcons.DataUsage: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_data_usage)
+    @Composable get() = styledVectorResource(Res.drawable.ic_data_usage)
 val MeshtasticIcons.PermScanWifi: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_perm_scan_wifi)
+    @Composable get() = styledVectorResource(Res.drawable.ic_perm_scan_wifi)
 val MeshtasticIcons.DetectionSensor: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_sensors)
+    @Composable get() = styledVectorResource(Res.drawable.ic_sensors)
 val MeshtasticIcons.SettingsRemote: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_settings_remote)
+    @Composable get() = styledVectorResource(Res.drawable.ic_settings_remote)
 val MeshtasticIcons.Storage: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_storage)
+    @Composable get() = styledVectorResource(Res.drawable.ic_storage)
 val MeshtasticIcons.HelpOutline: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_info)
+    @Composable get() = styledVectorResource(Res.drawable.ic_info)

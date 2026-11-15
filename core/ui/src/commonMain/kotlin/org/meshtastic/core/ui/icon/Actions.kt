@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_add
 import org.meshtastic.core.resources.ic_add_reaction
@@ -65,91 +64,91 @@ import org.meshtastic.core.resources.ic_translate
 import org.meshtastic.core.resources.ic_upload
 
 val MeshtasticIcons.Add: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_add)
+    @Composable get() = styledVectorResource(Res.drawable.ic_add)
 val MeshtasticIcons.AddReaction: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_add_reaction)
+    @Composable get() = styledVectorResource(Res.drawable.ic_add_reaction)
 val MeshtasticIcons.Close: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_close)
+    @Composable get() = styledVectorResource(Res.drawable.ic_close)
 val MeshtasticIcons.Copy: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_content_copy)
+    @Composable get() = styledVectorResource(Res.drawable.ic_content_copy)
 val MeshtasticIcons.Delete: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_delete_fill1)
+    @Composable get() = styledVectorResource(Res.drawable.ic_delete_fill1)
 val MeshtasticIcons.Edit: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_edit)
+    @Composable get() = styledVectorResource(Res.drawable.ic_edit)
 val MeshtasticIcons.More: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_more_vert)
+    @Composable get() = styledVectorResource(Res.drawable.ic_more_vert)
 val MeshtasticIcons.Refresh: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_refresh)
+    @Composable get() = styledVectorResource(Res.drawable.ic_refresh)
 val MeshtasticIcons.Remove: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_remove)
+    @Composable get() = styledVectorResource(Res.drawable.ic_remove)
 val MeshtasticIcons.Reply: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_reply)
+    @Composable get() = styledVectorResource(Res.drawable.ic_reply)
 val MeshtasticIcons.Save: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_save)
+    @Composable get() = styledVectorResource(Res.drawable.ic_save)
 val MeshtasticIcons.Search: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_search)
+    @Composable get() = styledVectorResource(Res.drawable.ic_search)
 val MeshtasticIcons.Mic: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_mic)
+    @Composable get() = styledVectorResource(Res.drawable.ic_mic)
 val MeshtasticIcons.Send: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_send)
+    @Composable get() = styledVectorResource(Res.drawable.ic_send)
 val MeshtasticIcons.Share: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_share)
+    @Composable get() = styledVectorResource(Res.drawable.ic_share)
 val MeshtasticIcons.Sort: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_sort)
+    @Composable get() = styledVectorResource(Res.drawable.ic_sort)
 val MeshtasticIcons.Folder: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_folder)
+    @Composable get() = styledVectorResource(Res.drawable.ic_folder)
 val MeshtasticIcons.SystemUpdate: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_system_update)
+    @Composable get() = styledVectorResource(Res.drawable.ic_system_update)
 val MeshtasticIcons.SelectAll: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_select_all)
+    @Composable get() = styledVectorResource(Res.drawable.ic_select_all)
 val MeshtasticIcons.ThumbUp: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_thumb_up)
+    @Composable get() = styledVectorResource(Res.drawable.ic_thumb_up)
 val MeshtasticIcons.MarkChatRead: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_mark_chat_read)
+    @Composable get() = styledVectorResource(Res.drawable.ic_mark_chat_read)
 val MeshtasticIcons.MarkChatUnread: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_mark_chat_unread)
+    @Composable get() = styledVectorResource(Res.drawable.ic_mark_chat_unread)
 
 /** Pushpin — pins a conversation above its unpinned siblings. */
 val MeshtasticIcons.Keep: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_keep)
+    @Composable get() = styledVectorResource(Res.drawable.ic_keep)
 val MeshtasticIcons.QrCode2: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_qr_code_2)
+    @Composable get() = styledVectorResource(Res.drawable.ic_qr_code_2)
 
 val MeshtasticIcons.Download: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_download)
+    @Composable get() = styledVectorResource(Res.drawable.ic_download)
 val MeshtasticIcons.Upload: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_upload)
+    @Composable get() = styledVectorResource(Res.drawable.ic_upload)
 val MeshtasticIcons.DragHandle: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_drag_handle)
+    @Composable get() = styledVectorResource(Res.drawable.ic_drag_handle)
 val MeshtasticIcons.Check: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_check)
+    @Composable get() = styledVectorResource(Res.drawable.ic_check)
 val MeshtasticIcons.QrCode: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_qr_code)
+    @Composable get() = styledVectorResource(Res.drawable.ic_qr_code)
 val MeshtasticIcons.FolderOpen: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_folder_open)
+    @Composable get() = styledVectorResource(Res.drawable.ic_folder_open)
 val MeshtasticIcons.Output: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_output)
+    @Composable get() = styledVectorResource(Res.drawable.ic_output)
 val MeshtasticIcons.FileDownload: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_file_download)
+    @Composable get() = styledVectorResource(Res.drawable.ic_file_download)
 val MeshtasticIcons.PlayArrow: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_play_arrow)
+    @Composable get() = styledVectorResource(Res.drawable.ic_play_arrow)
 val MeshtasticIcons.FilterAlt: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_filter_alt)
+    @Composable get() = styledVectorResource(Res.drawable.ic_filter_alt)
 val MeshtasticIcons.FilterAltOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_filter_alt_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_filter_alt_off)
 val MeshtasticIcons.OfflineShare: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_offline_share)
+    @Composable get() = styledVectorResource(Res.drawable.ic_offline_share)
 val MeshtasticIcons.QrCodeScanner: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_qr_code_scanner)
+    @Composable get() = styledVectorResource(Res.drawable.ic_qr_code_scanner)
 val MeshtasticIcons.RestartAlt: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_restart_alt)
+    @Composable get() = styledVectorResource(Res.drawable.ic_restart_alt)
 val MeshtasticIcons.PowerSettingsNew: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_power_settings_new)
+    @Composable get() = styledVectorResource(Res.drawable.ic_power_settings_new)
 val MeshtasticIcons.FactoryReset: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_restore)
+    @Composable get() = styledVectorResource(Res.drawable.ic_restore)
 val MeshtasticIcons.BarChart: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_bar_chart)
+    @Composable get() = styledVectorResource(Res.drawable.ic_bar_chart)
 val MeshtasticIcons.List: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_list)
+    @Composable get() = styledVectorResource(Res.drawable.ic_list)
 val MeshtasticIcons.Translate: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_translate)
+    @Composable get() = styledVectorResource(Res.drawable.ic_translate)

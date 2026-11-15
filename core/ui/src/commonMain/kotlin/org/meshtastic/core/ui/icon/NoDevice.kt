@@ -18,9 +18,8 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_no_device
 
 val MeshtasticIcons.NoDevice: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_no_device)
+    @Composable get() = styledVectorResource(Res.drawable.ic_no_device)

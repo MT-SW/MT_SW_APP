@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_add_link
 import org.meshtastic.core.resources.ic_chat_bubble_outline
@@ -34,24 +33,24 @@ import org.meshtastic.core.resources.ic_visibility_off
 
 // Messaging UI icons
 val MeshtasticIcons.ChatBubbleOutline: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_chat_bubble_outline)
+    @Composable get() = styledVectorResource(Res.drawable.ic_chat_bubble_outline)
 val MeshtasticIcons.FormatQuote: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_format_quote)
+    @Composable get() = styledVectorResource(Res.drawable.ic_format_quote)
 val MeshtasticIcons.FilterList: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_filter_list)
+    @Composable get() = styledVectorResource(Res.drawable.ic_filter_list)
 val MeshtasticIcons.FilterListOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_filter_list_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_filter_list_off)
 val MeshtasticIcons.FastForward: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_fast_forward)
+    @Composable get() = styledVectorResource(Res.drawable.ic_fast_forward)
 val MeshtasticIcons.Visibility: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_visibility)
+    @Composable get() = styledVectorResource(Res.drawable.ic_visibility)
 val MeshtasticIcons.VisibilityOff: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_visibility_off)
+    @Composable get() = styledVectorResource(Res.drawable.ic_visibility_off)
 val MeshtasticIcons.AddLink: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_add_link)
+    @Composable get() = styledVectorResource(Res.drawable.ic_add_link)
 val MeshtasticIcons.LinkIcon: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_link)
+    @Composable get() = styledVectorResource(Res.drawable.ic_link)
 val MeshtasticIcons.Message: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_message)
+    @Composable get() = styledVectorResource(Res.drawable.ic_message)
 val MeshtasticIcons.Conversations: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_forum)
+    @Composable get() = styledVectorResource(Res.drawable.ic_forum)

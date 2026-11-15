@@ -19,7 +19,6 @@ package org.meshtastic.core.ui.icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_android
 import org.meshtastic.core.resources.ic_fingerprint
@@ -56,25 +55,25 @@ import org.meshtastic.core.resources.role_tracker
 import org.meshtastic.proto.Config
 
 val MeshtasticIcons.Role: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_work)
+    @Composable get() = styledVectorResource(Res.drawable.ic_work)
 val MeshtasticIcons.NodeId: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_fingerprint)
+    @Composable get() = styledVectorResource(Res.drawable.ic_fingerprint)
 
 /** Returns a specific icon for a given [Config.DeviceConfig.Role]. */
 @Composable
 fun MeshtasticIcons.role(role: Config.DeviceConfig.Role?): ImageVector = when (role) {
-    Config.DeviceConfig.Role.CLIENT -> vectorResource(Res.drawable.ic_person)
-    Config.DeviceConfig.Role.CLIENT_MUTE -> vectorResource(Res.drawable.ic_person_off)
-    Config.DeviceConfig.Role.ROUTER -> vectorResource(Res.drawable.ic_mountain_flag)
-    Config.DeviceConfig.Role.TRACKER -> vectorResource(Res.drawable.ic_my_location)
-    Config.DeviceConfig.Role.SENSOR -> vectorResource(Res.drawable.ic_sensors)
-    Config.DeviceConfig.Role.TAK -> vectorResource(Res.drawable.ic_military_tech)
-    Config.DeviceConfig.Role.TAK_TRACKER -> vectorResource(Res.drawable.ic_my_location)
-    Config.DeviceConfig.Role.CLIENT_HIDDEN -> vectorResource(Res.drawable.ic_visibility_off)
-    Config.DeviceConfig.Role.LOST_AND_FOUND -> vectorResource(Res.drawable.ic_search)
-    Config.DeviceConfig.Role.CLIENT_BASE -> vectorResource(Res.drawable.ic_home)
-    Config.DeviceConfig.Role.ROUTER_LATE -> vectorResource(Res.drawable.ic_router)
-    else -> vectorResource(Res.drawable.ic_work)
+    Config.DeviceConfig.Role.CLIENT -> styledVectorResource(Res.drawable.ic_person)
+    Config.DeviceConfig.Role.CLIENT_MUTE -> styledVectorResource(Res.drawable.ic_person_off)
+    Config.DeviceConfig.Role.ROUTER -> styledVectorResource(Res.drawable.ic_mountain_flag)
+    Config.DeviceConfig.Role.TRACKER -> styledVectorResource(Res.drawable.ic_my_location)
+    Config.DeviceConfig.Role.SENSOR -> styledVectorResource(Res.drawable.ic_sensors)
+    Config.DeviceConfig.Role.TAK -> styledVectorResource(Res.drawable.ic_military_tech)
+    Config.DeviceConfig.Role.TAK_TRACKER -> styledVectorResource(Res.drawable.ic_my_location)
+    Config.DeviceConfig.Role.CLIENT_HIDDEN -> styledVectorResource(Res.drawable.ic_visibility_off)
+    Config.DeviceConfig.Role.LOST_AND_FOUND -> styledVectorResource(Res.drawable.ic_search)
+    Config.DeviceConfig.Role.CLIENT_BASE -> styledVectorResource(Res.drawable.ic_home)
+    Config.DeviceConfig.Role.ROUTER_LATE -> styledVectorResource(Res.drawable.ic_router)
+    else -> styledVectorResource(Res.drawable.ic_work)
 }
 
 /** Zasób tekstowy z nazwą danej roli — użyj przez `stringResource(role.label)` w miejscu wywołania. */
@@ -97,19 +96,19 @@ val Config.DeviceConfig.Role.label: StringResource
         }
 
 val MeshtasticIcons.Device: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_router)
+    @Composable get() = styledVectorResource(Res.drawable.ic_router)
 
 val MeshtasticIcons.PhoneAndroid: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_phone_android)
+    @Composable get() = styledVectorResource(Res.drawable.ic_phone_android)
 val MeshtasticIcons.ForkLeft: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_fork_left)
+    @Composable get() = styledVectorResource(Res.drawable.ic_fork_left)
 val MeshtasticIcons.Icecream: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_icecream)
+    @Composable get() = styledVectorResource(Res.drawable.ic_icecream)
 val MeshtasticIcons.DeviceNumbers: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_numbers)
+    @Composable get() = styledVectorResource(Res.drawable.ic_numbers)
 val MeshtasticIcons.Android: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_android)
+    @Composable get() = styledVectorResource(Res.drawable.ic_android)
 val MeshtasticIcons.HardwareModel: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_memory)
+    @Composable get() = styledVectorResource(Res.drawable.ic_memory)
 val MeshtasticIcons.Foxhunt: ImageVector
-    @Composable get() = vectorResource(Res.drawable.ic_foxhunt)
+    @Composable get() = styledVectorResource(Res.drawable.ic_foxhunt)
