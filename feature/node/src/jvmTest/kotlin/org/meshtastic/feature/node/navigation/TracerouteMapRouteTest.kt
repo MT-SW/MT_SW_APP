@@ -149,8 +149,10 @@ class TracerouteMapRouteTest {
         every { nodeRepository.nodeDBbyNum } returns MutableStateFlow(emptyMap())
         val node = Node(num = NODE_NUM, user = User.Builder().also { wb -> wb.long_name = NODE_NAME }.build())
         val getNodeDetailsUseCase: GetNodeDetailsUseCase = mock()
-        every { getNodeDetailsUseCase(NODE_NUM) } returns
-            flowOf(NodeDetailUiState(node = node, metricsState = MetricsState(node = node)))
+        val details = flowOf(NodeDetailUiState(node = node, metricsState = MetricsState(node = node)))
+        every { getNodeDetailsUseCase(NODE_NUM) } returns details
+        // The screen asks only for the traceroute data, which a mock does not forward to invoke on its own.
+        every { getNodeDetailsUseCase.forSources(NODE_NUM, any()) } returns details
 
         return MetricsViewModel(
             destNum = destNum,

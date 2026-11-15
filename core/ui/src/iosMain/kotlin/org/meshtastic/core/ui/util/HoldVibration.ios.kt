@@ -18,10 +18,9 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -39,32 +38,33 @@ private const val VIBRATE_REPEAT_MS = 380L
 private const val TAP_REPEAT_MS = 55L
 
 @Composable
-actual fun rememberHoldVibration(): HoldVibration = remember { IosHoldVibration() }
+actual fun rememberHoldVibration(): HoldVibration {
+    val scope = rememberCoroutineScope()
+    return remember(scope) { IosHoldVibration(scope) }
+}
 
 /** Plays the iPhone's own vibration again and again, until stopped. */
-private class IosHoldVibration : HoldVibration {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+private class IosHoldVibration(private val scope: CoroutineScope) : HoldVibration {
     private var job: Job? = null
 
     override fun start() {
         if (job?.isActive == true) return
-        job =
-            scope.launch {
-                // The Taptic Engine hammered with strong taps feels like one buzz; the system vibration is played too,
-                // for the phones where only that one is switched on in the sound settings.
-                val taps = UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleHeavy)
-                taps.prepare()
-                var sinceVibrate = VIBRATE_REPEAT_MS
-                while (isActive) {
-                    taps.impactOccurred()
-                    if (sinceVibrate >= VIBRATE_REPEAT_MS) {
-                        AudioServicesPlaySystemSound(SYSTEM_VIBRATE_ID)
-                        sinceVibrate = 0L
-                    }
-                    delay(TAP_REPEAT_MS)
-                    sinceVibrate += TAP_REPEAT_MS
+        job = scope.launch {
+            // The Taptic Engine hammered with strong taps feels like one buzz; the system vibration is played too,
+            // for the phones where only that one is switched on in the sound settings.
+            val taps = UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleHeavy)
+            taps.prepare()
+            var sinceVibrate = VIBRATE_REPEAT_MS
+            while (isActive) {
+                taps.impactOccurred()
+                if (sinceVibrate >= VIBRATE_REPEAT_MS) {
+                    AudioServicesPlaySystemSound(SYSTEM_VIBRATE_ID)
+                    sinceVibrate = 0L
                 }
+                delay(TAP_REPEAT_MS)
+                sinceVibrate += TAP_REPEAT_MS
             }
+        }
     }
 
     override fun stop() {

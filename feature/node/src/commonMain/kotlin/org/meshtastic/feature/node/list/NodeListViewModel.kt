@@ -111,19 +111,19 @@ class NodeListViewModel(
      */
     val activeNodeCount: StateFlow<Int?> =
         combine(meshLogRepository.nodePresenceFlow(), nodeRepository.nodeDBbyNum, nodeFilterPreferences.uiOptions) {
-            presence,
-            nodes,
-            options,
-            ->
-            if (presence.isEmpty()) return@combine null
-            val steps = NodePresence.EXPIRY_STEPS_MINUTES
-            val expiryMillis =
-                steps[UiOptions(options)[UiOptions.PRESENCE_EXPIRY].coerceIn(0, steps.lastIndex)] * MILLIS_PER_MINUTE
-            val now = nowMillis
-            presence.count { (num, status) ->
-                status.effective(now, nodes[num]?.lastHeard ?: 0, expiryMillis) == NodePresenceState.ONLINE
+                presence,
+                nodes,
+                options ->
+                if (presence.isEmpty()) return@combine null
+                val steps = NodePresence.EXPIRY_STEPS_MINUTES
+                val expiryMillis =
+                    steps[UiOptions(options)[UiOptions.PRESENCE_EXPIRY].coerceIn(0, steps.lastIndex)] *
+                        MILLIS_PER_MINUTE
+                val now = nowMillis
+                presence.count { (num, status) ->
+                    status.effective(now, nodes[num]?.lastHeard ?: 0, expiryMillis) == NodePresenceState.ONLINE
+                }
             }
-        }
             .stateInWhileSubscribed(initialValue = null)
 
     val connectionState = connectionStateProvider.connectionState
@@ -175,53 +175,53 @@ class NodeListViewModel(
      */
     val nodeExtraStats: StateFlow<Map<Int, NodeExtraStats>> =
         combine(nodeExtraPackets, nodeExtraHardware, nodeExtraEther) { packets, hardware, ether ->
-            packets || hardware || ether
-        }
+                packets || hardware || ether
+            }
             .flatMapLatest<Boolean, Map<Int, NodeExtraStats>> { anyOn ->
                 if (!anyOn) {
                     flowOf<Map<Int, NodeExtraStats>>(emptyMap())
                 } else {
                     combine(
-                        meshLogRepository
-                            .getLogsByPortNumSinceSlim(
-                                PortNum.TELEMETRY_APP.value,
-                                nowMillis - EXTRA_STATS_WINDOW_MILLIS,
-                            )
-                            .calmed(),
-                        nodeRepository.ourNodeInfo,
-                        nodeRepository.localStatsExtended,
-                    ) { logs, ourNode, localExt ->
-                        val myNum = ourNode?.num
-                        val result = HashMap<Int, NodeExtraStats>()
-                        val decoded = HashMap<Int, Int>()
-                        // Newest first: the first reading found for a node is its latest.
-                        for (log in logs) {
-                            val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
-                            // Stop reading a node once it has everything, or after a generous number of packets:
-                            // the Wi-Fi signal
-                            // arrives rarely (about every few hours), far apart from the many packets in between.
-                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE || result[num]?.isComplete == true) {
-                                continue
+                            meshLogRepository
+                                .getLogsByPortNumSinceSlim(
+                                    PortNum.TELEMETRY_APP.value,
+                                    nowMillis - EXTRA_STATS_WINDOW_MILLIS,
+                                )
+                                .calmed(),
+                            nodeRepository.ourNodeInfo,
+                            nodeRepository.localStatsExtended,
+                        ) { logs, ourNode, localExt ->
+                            val myNum = ourNode?.num
+                            val result = HashMap<Int, NodeExtraStats>()
+                            val decoded = HashMap<Int, Int>()
+                            // Newest first: the first reading found for a node is its latest.
+                            for (log in logs) {
+                                val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
+                                // Stop reading a node once it has everything, or after a generous number of packets:
+                                // the Wi-Fi signal
+                                // arrives rarely (about every few hours), far apart from the many packets in between.
+                                if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE || result[num]?.isComplete == true) {
+                                    continue
+                                }
+                                val payload =
+                                    runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
+                                val telemetry =
+                                    runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
+                                // The extended stats (CPU, flash, Wi-Fi) come in a telemetry packet of their own, apart
+                                // from the normal local stats, so a packet may carry either one or both.
+                                val stats = telemetry.local_stats
+                                val ext = runCatching { telemetry.decodeLocalStatsExtended() }.getOrNull()
+                                if (stats == null && ext == null) continue
+                                decoded[num] = (decoded[num] ?: 0) + 1
+                                val fresh = extraStatsOf(stats, ext)
+                                result[num] = result[num]?.orElse(fresh) ?: fresh
                             }
-                            val payload =
-                                runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
-                            val telemetry =
-                                runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
-                            // The extended stats (CPU, flash, Wi-Fi) come in a telemetry packet of their own, apart
-                            // from the normal local stats, so a packet may carry either one or both.
-                            val stats = telemetry.local_stats
-                            val ext = runCatching { telemetry.decodeLocalStatsExtended() }.getOrNull()
-                            if (stats == null && ext == null) continue
-                            decoded[num] = (decoded[num] ?: 0) + 1
-                            val fresh = extraStatsOf(stats, ext)
-                            result[num] = result[num]?.orElse(fresh) ?: fresh
+                            // Our own radio: its newest hardware data is also kept apart from the log.
+                            if (myNum != null) {
+                                result[myNum] = (result[myNum] ?: NodeExtraStats()).withHardware(localExt)
+                            }
+                            result as Map<Int, NodeExtraStats>
                         }
-                        // Our own radio: its newest hardware data is also kept apart from the log.
-                        if (myNum != null) {
-                            result[myNum] = (result[myNum] ?: NodeExtraStats()).withHardware(localExt)
-                        }
-                        result as Map<Int, NodeExtraStats>
-                    }
                         .flowOn(Dispatchers.Default)
                 }
             }
@@ -270,13 +270,13 @@ class NodeListViewModel(
 
     val nodesUiState: StateFlow<NodesUiState> =
         combine(nodeSortOption, nodeFilter, localeUnits) { sort, nodeFilter, units ->
-            NodesUiState(
-                sort = sort,
-                filter = nodeFilter,
-                distanceUnits = units.distanceUnits,
-                tempInFahrenheit = units.tempInFahrenheit,
-            )
-        }
+                NodesUiState(
+                    sort = sort,
+                    filter = nodeFilter,
+                    distanceUnits = units.distanceUnits,
+                    tempInFahrenheit = units.tempInFahrenheit,
+                )
+            }
             .stateInWhileSubscribed(initialValue = NodesUiState())
 
     val nodeList: StateFlow<List<Node>> =
@@ -287,18 +287,23 @@ class NodeListViewModel(
 
     /**
      * MT_SW: the list, with the activity status applied where the person asked for it: the "active only" filter, and
-     * the sort by activity (favourites first, then active nodes, then the rest, each by last heard). The status is
-     * not in the node database, so this is done here and not in the query.
+     * the sort by activity (favourites first, then active nodes, then the rest, each by last heard). The status is not
+     * in the node database, so this is done here and not in the query.
      */
     private fun withPresence(filter: NodeFilterState, sort: NodeSortOption): Flow<List<Node>> {
         val base = getFilteredNodesUseCase.invoke(filter, sort)
         if (!filter.onlyActive && sort != NodeSortOption.PRESENCE) return base
-        return combine(base, meshLogRepository.nodePresenceFlow(), nodeFilterPreferences.uiOptions) { nodes, presence, options ->
+        return combine(base, meshLogRepository.nodePresenceFlow(), nodeFilterPreferences.uiOptions) {
+            nodes,
+            presence,
+            options ->
             val expiryMillis =
                 NodePresence.EXPIRY_STEPS_MINUTES[
-                    UiOptions(options)[UiOptions.PRESENCE_EXPIRY]
-                        .coerceIn(0, NodePresence.EXPIRY_STEPS_MINUTES.lastIndex),
-                ] * MILLIS_PER_MINUTE
+                        UiOptions(options)[UiOptions.PRESENCE_EXPIRY].coerceIn(
+                            0,
+                            NodePresence.EXPIRY_STEPS_MINUTES.lastIndex,
+                        ),
+                    ] * MILLIS_PER_MINUTE
             val now = nowMillis
             val active =
                 nodes
@@ -390,17 +395,17 @@ class NodeListViewModel(
      */
     val neighborReports: StateFlow<Map<Int, NeighborReport>> =
         combine(
-            meshLogRepository.getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value),
-            ownNeighborReport,
-            nodeRepository.ourNodeInfo,
-        ) { logs, own, ours ->
-            val received =
-                logs
-                    .distinctBy { it.fromNum }
-                    .mapNotNull { log -> log.toNeighborReport()?.let { log.fromNum to it } }
-                    .toMap()
-            if (own != null && ours != null) received + (ours.num to own) else received
-        }
+                meshLogRepository.getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value),
+                ownNeighborReport,
+                nodeRepository.ourNodeInfo,
+            ) { logs, own, ours ->
+                val received =
+                    logs
+                        .distinctBy { it.fromNum }
+                        .mapNotNull { log -> log.toNeighborReport()?.let { log.fromNum to it } }
+                        .toMap()
+                if (own != null && ours != null) received + (ours.num to own) else received
+            }
             .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyMap())
 
@@ -416,8 +421,8 @@ class NodeListViewModel(
     /** The nodes the unheard banner offers for removal: see [selectRemovableUnheardNodes], less the ones kept. */
     val unheardBannerNodes: StateFlow<List<Node>> =
         combine(unfilteredNodeList, ourNodeInfo, nodeFilterPreferences.keptUnheardNodes) { nodes, ourNode, kept ->
-            selectRemovableUnheardNodes(nodes, ourNode?.num).filterNot { it.num in kept }
-        }
+                selectRemovableUnheardNodes(nodes, ourNode?.num).filterNot { it.num in kept }
+            }
             .stateInWhileSubscribed(initialValue = emptyList())
 
     fun keepUnheardNodes(nodes: List<Node>) = nodeFilterPreferences.keepUnheardNodes(nodes.mapTo(HashSet()) { it.num })
@@ -446,14 +451,13 @@ class NodeListViewModel(
             combine(nodeRepository.getNodes(), unheardFilterAllowed, nodeFilterPreferences.keptUnheardNodes) {
                     nodes,
                     authoritative,
-                    kept,
-                ->
-                if (!authoritative || kept.isEmpty()) {
-                    emptySet()
-                } else {
-                    nodes.filter { it.num in kept && it.heardOnCurrentLora }.mapTo(HashSet()) { it.num }
+                    kept ->
+                    if (!authoritative || kept.isEmpty()) {
+                        emptySet()
+                    } else {
+                        nodes.filter { it.num in kept && it.heardOnCurrentLora }.mapTo(HashSet()) { it.num }
+                    }
                 }
-            }
                 .collect { heardAgain ->
                     if (heardAgain.isNotEmpty()) nodeFilterPreferences.forgetKeptUnheardNodes(heardAgain)
                 }
@@ -477,13 +481,14 @@ class NodeListViewModel(
         nodeFilterPreferences.setNodeSort(sort)
     }
 
-    fun setChannels(channelSet: ChannelSet) = safeLaunch(tag = "setChannels") {
-        radioConfigRepository.replaceAllSettings(channelSet.settings)
-        val newLoraConfig = channelSet.lora_config
-        if (newLoraConfig != null) {
-            adminController.setLocalConfig(Config.Builder().also { wb -> wb.lora = newLoraConfig }.build())
+    fun setChannels(channelSet: ChannelSet) =
+        safeLaunch(tag = "setChannels") {
+            radioConfigRepository.replaceAllSettings(channelSet.settings)
+            val newLoraConfig = channelSet.lora_config
+            if (newLoraConfig != null) {
+                adminController.setLocalConfig(Config.Builder().also { wb -> wb.lora = newLoraConfig }.build())
+            }
         }
-    }
 
     fun favoriteNode(node: Node) = nodeManagementActions.requestFavoriteNode(viewModelScope, node)
 
@@ -513,7 +518,6 @@ class NodeListViewModel(
     /** Start time of the last traceroute, shared with the detail buttons: firmware allows one per 30 s window. */
     val lastTracerouteTime: StateFlow<Long?> = nodeRequestActions.lastTracerouteTime
 
-    /** Initiates a trace route request to the specified node. */
     /** MT_SW: asks the node for its activity status (its firmware version is checked first, see the use case). */
     fun askPresence(node: Node) {
         safeLaunch(tag = "askPresence") { nodePresenceUseCase.askNodes(listOf(node.num), forceVersionCheck = true) }
@@ -586,7 +590,7 @@ private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtr
                 rxDupe = stats.num_rx_dupe,
                 txRelay = stats.num_tx_relay,
                 heapUsedPercent =
-                if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0) * PERCENT / heapTotal else null,
+                    if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0) * PERCENT / heapTotal else null,
                 noiseFloor = stats.noiseFloorOrNull,
             )
         }
@@ -601,12 +605,12 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
     return copy(
         cpuPercent = if (reportsCpu) ext.cpuUsagePercent else cpuPercent,
         flashUsedPercent =
-        ext.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes }
-            ?: flashUsedPercent,
+            ext.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes }
+                ?: flashUsedPercent,
         psramUsedPercent =
-        ext.takeIf { it.memoryPsramTotal > 0 }
-            ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
-            ?: psramUsedPercent,
+            ext.takeIf { it.memoryPsramTotal > 0 }
+                ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
+                ?: psramUsedPercent,
         // A packet with either link signal replaces both old readings (WiFi and Bluetooth swap places).
         wifiRssi = if (reportsLink) ext.wifiRssi.takeIf { it != 0 } else wifiRssi,
         bleRssi = if (reportsLink) ext.bleRssi.takeIf { it != 0 } else bleRssi,

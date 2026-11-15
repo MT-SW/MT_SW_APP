@@ -20,8 +20,6 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.clickable
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -29,17 +27,14 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -194,10 +189,14 @@ import org.meshtastic.core.resources.sos_style_title
 import org.meshtastic.core.resources.sos_targets_note
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SosChip
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.util.rememberFileExporter
 import org.meshtastic.feature.settings.component.ExpressiveSection
 
@@ -290,7 +289,11 @@ fun SosScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).floatingBarEndPadding(),
+            modifier =
+            Modifier.padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.sos_intro), style = MaterialTheme.typography.bodyMedium)

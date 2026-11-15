@@ -454,6 +454,7 @@ class RadioConfigViewModelTest {
 
         every { snifferControlUseCase.snifferEnabledFlow(any(), any()) } returns MutableStateFlow(null)
         every { snifferControlUseCase.localStatsConfigFlow(any(), any()) } returns MutableStateFlow(null)
+        every { snifferControlUseCase.presenceConfigFlow(any(), any()) } returns MutableStateFlow(null)
 
         viewModel = createViewModel()
     }

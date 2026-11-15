@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.domain.usecase.settings
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -23,6 +24,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.UiPrefs
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -42,36 +44,49 @@ open class NodePresenceUseCase(
 
     /**
      * Asks [nodeNum] for its status when a conversation with it is opened (never in a loop): not more often than every
-     * [ASK_INTERVAL_MILLIS] per node, and only while the asking is switched on in the settings (off by default: the status is then asked for by hand).
+     * [ASK_INTERVAL_MILLIS] per node, and only while the asking is switched on in the settings (off by default: the
+     * status is then asked for by hand).
      */
     open suspend fun askOnOpen(nodeNum: Int) {
         val options = UiOptions(uiPrefs.uiOptions.value)
         if (!options.flag(UiOptions.PRESENCE_ASK)) return
         val now = nowMillis
-        val allowed =
-            askLock.withLock {
-                val last = askedAt[nodeNum]
-                if (last != null && now - last < ASK_INTERVAL_MILLIS) {
-                    false
-                } else {
-                    askedAt[nodeNum] = now
-                    true
-                }
+        val allowed = askLock.withLock {
+            val last = askedAt[nodeNum]
+            if (last != null && now - last < ASK_INTERVAL_MILLIS) {
+                false
+            } else {
+                askedAt[nodeNum] = now
+                true
             }
+        }
         // Asks for the firmware version first (when it is not known yet): an older node is not sent the status query.
-        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }
+        if (allowed) askQuietly(nodeNum, forceVersionCheck = false)
+    }
+
+    /** One status query whose failure is not worth more than a log line; a cancelled caller still stops the work. */
+    private suspend fun askQuietly(nodeNum: Int, forceVersionCheck: Boolean) {
+        @Suppress("TooGenericExceptionCaught")
+        try {
+            snifferControlUseCase.requestPresenceChecked(nodeNum, forceVersionCheck)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.d(e) { "Status query for node $nodeNum failed" }
+        }
     }
 
     /**
      * Asks the given nodes for their status by hand, one after another with a pause between them (a query is a radio
      * transmission, so many at once would clog the mesh). It works whether or not the automatic asking is switched on.
      * [forceVersionCheck] asks about the firmware version again even when an older one was learned less than a week ago
-     * (for a single node asked for by hand). [onProgress] gets how many nodes have been asked so far; the work ends at once when the caller's job is cancelled.
+     * (for a single node asked for by hand). [onProgress] gets how many nodes have been asked so far; the work ends at
+     * once when the caller's job is cancelled.
      */
     open suspend fun askNodes(nodeNums: List<Int>, forceVersionCheck: Boolean = false, onProgress: (Int) -> Unit = {}) {
         nodeNums.forEachIndexed { index, nodeNum ->
             askLock.withLock { askedAt[nodeNum] = nowMillis }
-            runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum, forceVersionCheck) }
+            askQuietly(nodeNum, forceVersionCheck)
             onProgress(index + 1)
             if (index < nodeNums.lastIndex) delay(MANUAL_ASK_SPACING)
         }

@@ -115,7 +115,6 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val ICON_STYLE_BOLD = 1
         const val ICON_STYLE_OUTLINE = 2
 
-        /** The send button buzzes while it is held. */
         /** Activity status: show the icon on the node list (1) or not (0). */
         const val PRESENCE_SHOW = "presence.show"
 
@@ -132,7 +131,10 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val PRESENCE_REPLACE_MUTED = 2
         const val PRESENCE_REPLACE_UNMESSAGEABLE = 3
 
-        /** How long an "active" status holds without hearing the node: an index into `NodePresence.EXPIRY_STEPS_MINUTES`. */
+        /**
+         * How long an "active" status holds without hearing the node: an index into
+         * `NodePresence.EXPIRY_STEPS_MINUTES`.
+         */
         const val PRESENCE_EXPIRY = "presence.expiry"
 
         /** Colour of the active icon: green (0) or the colour of the theme / grey (1). */
@@ -144,6 +146,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
          */
         const val PRESENCE_ASK = "presence.ask"
 
+        /** The send button buzzes while it is held. */
         const val HOLD_BUZZ = "input.holdBuzz"
 
         /** Scroll steps (in dp) of the choices of [NAV_HIDE] (1..3) and [NAV_SHOW] (0..1; 2 = only at the top). */
