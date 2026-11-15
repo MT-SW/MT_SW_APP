@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +49,8 @@ fun DeviceConfigurationScreen(viewModel: RadioConfigViewModel, onBack: () -> Uni
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
     val destNode by viewModel.destNode.collectAsStateWithLifecycle()
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             RadioAdminAppBar(
@@ -60,7 +64,7 @@ fun DeviceConfigurationScreen(viewModel: RadioConfigViewModel, onBack: () -> Uni
         val scrollState = rememberScrollState()
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Column(
-                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp),
+                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 ExpressiveSection(title = stringResource(Res.string.device_configuration)) {

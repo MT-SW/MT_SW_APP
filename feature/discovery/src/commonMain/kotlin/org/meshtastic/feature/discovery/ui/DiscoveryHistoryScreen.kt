@@ -17,6 +17,8 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.clickable
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,6 +88,8 @@ fun DiscoveryHistoryScreen(
 ) {
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -106,7 +110,7 @@ fun DiscoveryHistoryScreen(
             LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             ) {
                 items(sessions, key = { it.id }) { session ->
                     SessionListItem(

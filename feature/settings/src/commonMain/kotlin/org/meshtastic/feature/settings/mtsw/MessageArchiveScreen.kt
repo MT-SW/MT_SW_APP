@@ -20,6 +20,8 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -118,6 +120,8 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
         if (uri != null) prefs.setConfig(config.copy(folder = uri.toString(), enabled = true))
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -140,7 +144,7 @@ fun MessageArchiveScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.archive_intro), style = MaterialTheme.typography.bodyMedium)

@@ -17,6 +17,8 @@
 package org.meshtastic.feature.messaging.ui.sharing
 
 import androidx.compose.foundation.layout.Column
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -66,6 +68,8 @@ fun ShareScreen(contacts: List<Contact>, onConfirm: (String) -> Unit, onNavigate
         if (selectedContact.isNotEmpty() && contacts.none { it.contactKey == selectedContact }) selectedContact = ""
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -83,7 +87,7 @@ fun ShareScreen(contacts: List<Contact>, onConfirm: (String) -> Unit, onNavigate
         Column(modifier = Modifier.padding(innerPadding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(6.dp),
+                contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 6.dp + LocalFloatingBarInset.current),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 itemsIndexed(contacts, key = { index, contact -> "${contact.contactKey}#$index" }) { _, contact ->

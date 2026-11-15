@@ -40,6 +40,8 @@ import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.loading
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LocalCardGroup
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.node.component.AdministrationSection
@@ -113,11 +115,13 @@ fun NodeDetailList(
     modifier: Modifier = Modifier,
     trackedInLiveUpdate: Boolean? = null,
 ) {
+    // The details run under the floating bar (it shows through), so the list ends with the height of the bar.
+    FloatingBarUnderlap()
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
             state = listState,
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {

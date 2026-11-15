@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings.radio.channel
 
 import androidx.compose.animation.AnimatedVisibility
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -207,6 +209,8 @@ private fun ChannelConfigScreen(
         ChannelLegendDialog(capabilities) { showChannelLegendDialog = false }
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -263,7 +267,7 @@ private fun ChannelConfigScreen(
                     modifier =
                     Modifier.dragContainer(dragDropState = dragDropState, haptics = LocalHapticFeedback.current),
                     state = listState,
-                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = LocalFloatingBarInset.current),
                 ) {
                     dragDropItemsIndexed(items = settingsListInput, dragDropState = dragDropState) {
                             index,

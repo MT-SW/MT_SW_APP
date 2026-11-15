@@ -19,6 +19,8 @@
 package org.meshtastic.feature.node.detail
 
 import androidx.compose.foundation.background
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -259,6 +261,8 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
     val iconShare = MeshtasticIcons.Share
     val iconDownload = MeshtasticIcons.Download
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -334,7 +338,7 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                 top = paddingValues.calculateTopPadding() + 16.dp,
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 16.dp,
+                bottom = 16.dp + LocalFloatingBarInset.current,
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

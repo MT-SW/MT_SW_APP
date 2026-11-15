@@ -284,7 +284,7 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
                 if (entry.selected) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
             )
             .selectable(selected = entry.selected, onClick = onSelect, role = Role.Tab)
-            .padding(horizontal = 2.dp, vertical = 6.dp),
+            .padding(horizontal = 1.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CompositionLocalProvider(LocalContentColor provides color) {
@@ -314,8 +314,8 @@ private fun FitLabel(text: String) {
             color = LocalContentColor.current,
             textAlign = TextAlign.Center,
         ),
+        // softWrap must stay on: with it off the text has endless width, always "fits" and is never shrunk.
         maxLines = 1,
-        softWrap = false,
         autoSize =
         TextAutoSize.StepBased(
             minFontSize = LABEL_MIN_SP.sp,

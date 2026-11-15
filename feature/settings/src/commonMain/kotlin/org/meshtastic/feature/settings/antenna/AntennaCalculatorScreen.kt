@@ -32,6 +32,8 @@
 package org.meshtastic.feature.settings.antenna
 
 import androidx.compose.foundation.Canvas
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -432,6 +434,8 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
         loadCount++
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -447,7 +451,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             SetupsSection(

@@ -19,6 +19,8 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -199,6 +201,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             MainAppBar(
@@ -214,7 +217,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_switches)) {
@@ -414,6 +417,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
  */
 @Composable
 fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             MainAppBar(
@@ -429,7 +433,7 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -454,6 +458,7 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
 /** An information page: where the MT_SW features that live next to a node (not in Settings) are, and what they do. */
 @Composable
 fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             MainAppBar(
@@ -469,7 +474,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.mt_sw_other_intro), style = MaterialTheme.typography.bodyMedium)
@@ -564,6 +569,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
             onDismiss = { showUiScalePicker = false },
         )
     }
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             MainAppBar(
@@ -579,7 +585,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.look_section_basic)) {
@@ -645,6 +651,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
 @Composable
 fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             MainAppBar(
@@ -660,7 +667,7 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) {

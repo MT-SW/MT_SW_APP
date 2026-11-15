@@ -19,6 +19,8 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -155,6 +157,8 @@ fun DiscoveryScanScreen(
         }
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -202,7 +206,11 @@ fun DiscoveryScanScreen(
         },
     ) { padding ->
         LazyColumn(
-            contentPadding = padding,
+            contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                top = padding.calculateTopPadding(),
+                bottom = padding.calculateBottomPadding() + LocalFloatingBarInset.current,
+            ),
             verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
             modifier = Modifier.fillMaxSize().padding(horizontal = CONTENT_PADDING).padding(top = SECTION_SPACING),
         ) {

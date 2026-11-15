@@ -19,6 +19,8 @@
 package org.meshtastic.feature.settings.radio
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -83,6 +85,8 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
 
     SideEffect(olderThanDays, onlyUnknownNodes, ignoreDate, onlyMismatchedKeys) { viewModel.getNodesToDelete() }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -97,7 +101,7 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState().padding(bottom = LocalFloatingBarInset.current)) {
             AutoCleanNodesSection(
                 autoCleanEnabled = autoCleanEnabled,
                 autoCleanInactivityDays = autoCleanInactivityDays,

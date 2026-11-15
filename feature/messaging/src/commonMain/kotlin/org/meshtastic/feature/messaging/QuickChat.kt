@@ -17,6 +17,8 @@
 package org.meshtastic.feature.messaging
 
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -94,6 +96,8 @@ fun QuickChatScreen(modifier: Modifier = Modifier, viewModel: QuickChatViewModel
             viewModel.updateActionPositions(list)
         }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -122,7 +126,7 @@ fun QuickChatScreen(modifier: Modifier = Modifier, viewModel: QuickChatViewModel
             LazyColumn(
                 modifier = Modifier.dragContainer(dragDropState = dragDropState, haptics = LocalHapticFeedback.current),
                 state = listState,
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             ) {
                 dragDropItemsIndexed(items = actions, dragDropState = dragDropState, key = { _, item -> item.uuid }) {
                         _,

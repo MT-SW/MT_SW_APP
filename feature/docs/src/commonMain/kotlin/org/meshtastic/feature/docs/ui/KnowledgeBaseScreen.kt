@@ -19,6 +19,8 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.clickable
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -78,6 +80,8 @@ fun KnowledgeBaseScreen(onBack: () -> Unit) {
     val all = entries
     val shown = remember(all, query, tier) { all?.let { KnowledgeBaseParser.filter(it, query, tier) }.orEmpty() }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -93,7 +97,7 @@ fun KnowledgeBaseScreen(onBack: () -> Unit) {
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding).fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {

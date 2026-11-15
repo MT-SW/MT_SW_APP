@@ -19,6 +19,8 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -74,6 +76,8 @@ import org.meshtastic.core.ui.component.SosBarScreen
 fun AcknowledgementsScreen(onNavigateUp: () -> Unit, jsonProvider: suspend () -> String) {
     val libraries by produceLibraries(jsonProvider)
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -91,7 +95,11 @@ fun AcknowledgementsScreen(onNavigateUp: () -> Unit, jsonProvider: suspend () ->
         LibrariesContainer(
             libraries = libraries,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
+            contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding() + LocalFloatingBarInset.current,
+            ),
             badges = LibraryBadges(version = true, author = true, description = true, license = true, funding = true),
             header = {
                 item {

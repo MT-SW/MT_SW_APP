@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings.radio.channel
 
 import androidx.compose.foundation.border
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -254,6 +256,8 @@ fun ChannelScreen(
         )
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -282,7 +286,7 @@ fun ChannelScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+            contentPadding = PaddingValues(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp + LocalFloatingBarInset.current),
         ) {
             item {
                 ChannelListView(

@@ -17,6 +17,8 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.clickable
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -87,6 +89,8 @@ fun DocsBrowserScreen(
     onChirpyNavigateToPage: (String) -> Unit = {},
 ) {
     val searchScrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
+
+    FloatingBarUnderlap()
 
     Scaffold(
         topBar = {
@@ -202,7 +206,7 @@ private fun DocsTocList(pages: List<DocPage>, onSelectPage: (String) -> Unit, mo
     val devGuidePages =
         remember(pages) { pages.filter { it.section == DocSection.DeveloperGuide }.sortedBy { it.navOrder } }
 
-    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp)) {
+    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp + LocalFloatingBarInset.current)) {
         if (userGuidePages.isNotEmpty()) {
             item {
                 Text(

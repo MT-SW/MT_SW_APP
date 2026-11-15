@@ -17,6 +17,8 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -76,6 +78,8 @@ fun DiscoveryHistoryDetailScreen(
     val presetResults by viewModel.presetResults.collectAsStateWithLifecycle()
     val nodesByPreset by viewModel.nodesByPreset.collectAsStateWithLifecycle()
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -106,7 +110,7 @@ fun DiscoveryHistoryDetailScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             session?.let { s -> SessionMetadataCard(s) }

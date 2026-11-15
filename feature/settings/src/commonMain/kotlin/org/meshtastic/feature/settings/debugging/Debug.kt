@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings.debugging
 
 import androidx.compose.animation.core.animateFloatAsState
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -175,6 +177,8 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
     var showInfo by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -251,6 +255,7 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
                 ) {
                     stickyHeader {
                         val animatedAlpha by

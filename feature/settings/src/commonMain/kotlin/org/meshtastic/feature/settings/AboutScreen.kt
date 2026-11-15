@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.animation.Crossfade
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -138,6 +140,8 @@ fun AboutScreen(
 ) {
     val uriHandler = LocalUriHandler.current
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -157,7 +161,7 @@ fun AboutScreen(
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
                 modifier =
-                Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp, vertical = 16.dp),
+                Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp, vertical = 16.dp).padding(bottom = LocalFloatingBarInset.current),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 WhatIsMeshtasticSection()

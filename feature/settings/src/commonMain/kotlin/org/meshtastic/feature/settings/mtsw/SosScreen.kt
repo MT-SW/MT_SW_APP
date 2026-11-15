@@ -20,6 +20,8 @@
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.clickable
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -271,6 +273,8 @@ fun SosScreen(onBack: () -> Unit) {
         )
     }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -286,7 +290,7 @@ fun SosScreen(onBack: () -> Unit) {
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(text = stringResource(Res.string.sos_intro), style = MaterialTheme.typography.bodyMedium)

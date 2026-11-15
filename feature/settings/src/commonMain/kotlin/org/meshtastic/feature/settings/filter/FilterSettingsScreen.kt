@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings.filter
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,6 +71,8 @@ fun FilterSettingsScreen(viewModel: FilterSettingsViewModel, onBack: () -> Unit)
     val filterWords = remember(storedWords) { storedWords.sorted() }
     var newWord by remember { mutableStateOf("") }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -85,6 +89,7 @@ fun FilterSettingsScreen(viewModel: FilterSettingsViewModel, onBack: () -> Unit)
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.padding(paddingValues).padding(16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item { FilterEnableCard(filterEnabled) { viewModel.setFilterEnabled(it) } }

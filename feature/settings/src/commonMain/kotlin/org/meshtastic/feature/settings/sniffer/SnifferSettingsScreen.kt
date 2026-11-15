@@ -19,6 +19,8 @@
 package org.meshtastic.feature.settings.sniffer
 
 import androidx.compose.foundation.background
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -250,6 +252,8 @@ fun SnifferSettingsScreen(
             else -> null
         }
 
+    FloatingBarUnderlap()
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -295,7 +299,7 @@ fun SnifferSettingsScreen(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 28.dp, bottom = 16.dp),
+                        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 28.dp, bottom = 16.dp + LocalFloatingBarInset.current),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         if (display.showingMqtt) {

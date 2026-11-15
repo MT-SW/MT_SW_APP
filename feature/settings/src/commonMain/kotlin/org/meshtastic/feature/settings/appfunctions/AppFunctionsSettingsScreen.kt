@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings.appfunctions
 
 import androidx.compose.foundation.layout.Column
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -72,6 +74,8 @@ fun AppFunctionsSettingsScreen(
     val getRecentMessages by viewModel.getRecentMessagesEnabled.collectAsStateWithLifecycle()
     val getUnreadSummary by viewModel.getUnreadSummaryEnabled.collectAsStateWithLifecycle()
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -87,7 +91,7 @@ fun AppFunctionsSettingsScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState().padding(bottom = LocalFloatingBarInset.current)) {
             MasterToggleSection(
                 masterEnabled = masterEnabled,
                 onToggle = { viewModel.toggle(AppFunctionsSetting.MASTER) },

@@ -19,6 +19,8 @@
 package org.meshtastic.feature.node.health
 
 import androidx.compose.foundation.background
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -146,6 +148,8 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
     val iconDataUsage = MeshtasticIcons.DataUsage
     val iconNodes = MeshtasticIcons.Nodes
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -227,7 +231,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(contentPadding),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { SummaryHero(uiState) }

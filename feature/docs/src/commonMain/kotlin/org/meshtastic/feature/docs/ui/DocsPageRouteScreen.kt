@@ -17,6 +17,8 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -126,6 +128,7 @@ fun DocsPageRouteScreen(
     onNavigateToPage: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -258,7 +261,7 @@ fun DocsPageRouteScreen(
                                     )
                                 },
                             ),
-                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).padding(bottom = LocalFloatingBarInset.current),
                         )
                     }
                 }

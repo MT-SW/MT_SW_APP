@@ -19,6 +19,8 @@
 package org.meshtastic.feature.discovery.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -148,6 +150,7 @@ private fun DiscoverySummaryContent(
     onExport: () -> Unit,
     onRerunAnalysis: () -> Unit,
 ) {
+    FloatingBarUnderlap()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -184,6 +187,7 @@ private fun DiscoverySummaryContent(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { Spacer(modifier = Modifier.height(4.dp)) }

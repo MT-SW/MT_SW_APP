@@ -19,6 +19,8 @@
 package org.meshtastic.feature.firmware
 
 import androidx.compose.animation.AnimatedVisibility
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -392,6 +394,7 @@ private fun FirmwareUpdateScaffold(
     bootloaderFault: BootloaderFault?,
     modifier: Modifier = Modifier,
 ) {
+    FloatingBarUnderlap()
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -412,6 +415,7 @@ private fun FirmwareUpdateScaffold(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
+                .padding(bottom = LocalFloatingBarInset.current)
                 .animateContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

@@ -17,6 +17,8 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,6 +57,8 @@ fun DeviceLinkDirectoryScreen(
     val links by viewModel.links.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
 
+    FloatingBarUnderlap()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -75,6 +79,7 @@ fun DeviceLinkDirectoryScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                 state = listState,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
             ) {
                 if (links.isNotEmpty()) {
                     // The disclosure sits above the links it covers.
