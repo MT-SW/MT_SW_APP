@@ -520,6 +520,7 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         )
     }
     entry<SettingsRoute.ElementLook> {
+        val settingsViewModel: SettingsViewModel = koinViewModel()
         ElementLookScreen(
             settingsViewModel = settingsViewModel,
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
