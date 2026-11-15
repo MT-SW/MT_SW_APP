@@ -110,6 +110,20 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_THEME] = value } }
     }
 
+    // Once, on the first start of a version that has the saturated theme as the default: an installation that still
+    // has the old "follow the system" value (or none) gets the default. Any other stored choice is kept, and so is a
+    // later return to "follow the system" (the mark is set, so this does not run again).
+    init {
+        scope.launch {
+            dataStore.edit { prefs ->
+                if (prefs[KEY_THEME_DEFAULT_APPLIED] != true) {
+                    if ((prefs[KEY_THEME] ?: -1) == -1) prefs[KEY_THEME] = UiPrefsDefaults.theme
+                    prefs[KEY_THEME_DEFAULT_APPLIED] = true
+                }
+            }
+        }
+    }
+
     // Eagerly: the first frame already needs the scale, otherwise the UI would jump once after start.
     override val uiScale: StateFlow<Int> =
         dataStore.data.map { it[KEY_UI_SCALE] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
@@ -955,6 +969,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_DATA_NOTICE_ACCEPTED_AT = longPreferencesKey("data_notice_accepted_at")
         val KEY_DATA_NOTICE_VERSION = intPreferencesKey("data_notice_version")
         val KEY_THEME = intPreferencesKey("theme")
+        val KEY_THEME_DEFAULT_APPLIED = booleanPreferencesKey("theme_default_applied")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
         val KEY_FONT_FAMILY = stringPreferencesKey("font-family-name")
         val KEY_FONT_WEIGHT_SHIFT = intPreferencesKey("font-weight-shift")
