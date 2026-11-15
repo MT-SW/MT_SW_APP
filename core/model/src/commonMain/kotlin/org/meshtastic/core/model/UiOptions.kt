@@ -111,8 +111,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         val SHOW_STEPS_DP = intArrayOf(16, 72)
         const val SHOW_ONLY_AT_TOP = 2
 
-        private const val DEFAULT_STRENGTH = 55
-        private const val DEFAULT_BLUR = 20
+        private const val DEFAULT_STRENGTH = 45
+        private const val GLASS_STRENGTH = 55
+        private const val DEFAULT_BLUR = 28
 
         val DEFAULTS: Map<String, Int> = buildMap {
             put(SOFT_LIGHT, 0)
@@ -121,13 +122,16 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(NAV_ICONS, 1)
             put(NAV_HAPTICS, 1)
             put(HOLD_BUZZ, 1)
-            put(ICON_STYLE, ICON_STYLE_STANDARD)
+            // The app starts with the glass look and the thin line icons like on the iPhone; the person can go back to
+            // the classic look in "Look" (every choice they make is saved and stays).
+            put(ICON_STYLE, ICON_STYLE_OUTLINE)
             put(GLASS_TINT, 0)
             put(RIM, 2)
-            put(PRESS_SPRING, 0)
+            put(PRESS_SPRING, 1)
             for (group in ALL_GROUPS) {
-                put("$group.look", ElementLook.FLAT)
-                put("$group.strength", DEFAULT_STRENGTH)
+                // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
+                put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)
+                put("$group.strength", if (group in GLASS_GROUPS) GLASS_STRENGTH else DEFAULT_STRENGTH)
                 put("$group.blur", DEFAULT_BLUR)
             }
         }
