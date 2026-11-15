@@ -20,36 +20,32 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalHapticFeedback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.util.rememberHoldVibration
 
 /** How long the button must be held before it starts to buzz, so a normal tap stays quiet. */
 private const val HOLD_START_MS = 350L
 
-/** The pause between two ticks of the buzz: short enough to feel like one continuous, strong vibration. */
-private const val TICK_MS = 28L
-
 /**
- * MT_SW: makes the element buzz strongly for as long as a finger is held on it (after a short hold). The buzz stops
- * when the finger is lifted, and also when [active] turns false (for example the moment a message was sent and the
- * button is no longer usable). It does not take over the touch, so the button's own click works as before. It follows
- * the "buzz on hold" option; where the device cannot vibrate (a computer) it does nothing.
+ * MT_SW: makes the device vibrate strongly and continuously for as long as a finger is held on the element (after a
+ * short hold). The vibration stops when the finger is lifted, and also when [active] turns false (for example the
+ * moment a message was sent and the button is no longer usable). It does not take over the touch, so the button's
+ * own click works as before. It follows the "buzz on hold" option and uses the vibration motor of the platform (see
+ * [rememberHoldVibration]); a computer has none, so there it does nothing.
  */
 @Composable
 fun Modifier.holdBuzz(active: Boolean = true): Modifier {
-    val haptic = LocalHapticFeedback.current
+    val vibration = rememberHoldVibration()
     val allowed = rememberUiOptions().flag(UiOptions.HOLD_BUZZ)
     if (!active || !allowed) return this
-    return pointerInput(haptic) {
+    return pointerInput(vibration) {
         coroutineScope {
             val scope: CoroutineScope = this
             awaitEachGesture {
@@ -57,15 +53,16 @@ fun Modifier.holdBuzz(active: Boolean = true): Modifier {
                 val buzz =
                     scope.launch {
                         delay(HOLD_START_MS)
-                        while (isActive) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            delay(TICK_MS)
-                        }
+                        vibration.start()
                     }
-                do {
-                    val event = awaitPointerEvent(PointerEventPass.Final)
-                } while (event.changes.any { it.pressed })
-                buzz.cancel()
+                try {
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Final)
+                    } while (event.changes.any { it.pressed })
+                } finally {
+                    buzz.cancel()
+                    vibration.stop()
+                }
             }
         }
     }
