@@ -40,7 +40,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.background.AppBackgroundControls
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.background.SingleInstanceControls
-import org.meshtastic.core.model.MtswRelease
 import org.meshtastic.core.model.WhatsNewRequest
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
@@ -524,7 +523,8 @@ private fun WhatsNewEntry() {
     }
     if (open) {
         WhatsNewDialog(
-            initialRequest = WhatsNewRequest(full = false, fromRelease = MtswRelease.RELEASE - 1),
+            // From the settings the whole history is shown at once; "since the last release" is one tap away.
+            initialRequest = WhatsNewRequest(full = true, fromRelease = 0),
             onDismiss = { open = false },
         )
     }
