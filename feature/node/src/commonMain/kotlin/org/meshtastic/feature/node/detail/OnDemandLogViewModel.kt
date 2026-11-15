@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("SuspendFunSwallowedCancellation", "TooManyFunctions", "UnsafeCallOnNullableType", "UnusedPrivateProperty")
+@file:Suppress(
+    "SuspendFunSwallowedCancellation",
+    "TooManyFunctions",
+    "UnsafeCallOnNullableType",
+    "UnusedPrivateProperty",
+)
+
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.ViewModel

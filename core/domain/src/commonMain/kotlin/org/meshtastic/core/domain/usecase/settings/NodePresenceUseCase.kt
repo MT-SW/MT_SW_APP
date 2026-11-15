@@ -24,7 +24,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.UiPrefs
-import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 /**

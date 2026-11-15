@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("LongMethod", "TooManyFunctions")
+
 package org.meshtastic.feature.map.maplibre
 
 import androidx.compose.foundation.layout.Box

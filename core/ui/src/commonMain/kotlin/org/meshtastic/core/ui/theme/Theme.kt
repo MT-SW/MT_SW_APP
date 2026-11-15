@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("CompositionLocalAllowlist", "MagicNumber", "MatchingDeclarationName", "TooManyFunctions")
+
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme

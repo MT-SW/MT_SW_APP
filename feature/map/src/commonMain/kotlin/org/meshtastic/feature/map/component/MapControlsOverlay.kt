@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("CompositionLocalAllowlist", "LongMethod")
+
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Box

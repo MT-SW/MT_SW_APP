@@ -455,6 +455,7 @@ class MeshNotificationManagerImplTest {
     private fun stubMeshStatus(online: Int, total: Int, unread: Int) {
         every { nodeRepository.onlineNodeCount } returns flowOf(online)
         every { nodeRepository.totalNodeCount } returns flowOf(total)
+        every { nodeRepository.nodeDBbyNum } returns MutableStateFlow(emptyMap<Int, Node>())
         every { nodeRepository.ourNodeInfo } returns MutableStateFlow<Node?>(null)
         every { nodeRepository.localStats } returns MutableStateFlow(LocalStats.Builder().build())
         every { nodeRepository.localStatsExtended } returns MutableStateFlow(LocalStatsExtended())

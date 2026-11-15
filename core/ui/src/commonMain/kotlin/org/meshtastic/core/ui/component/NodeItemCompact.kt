@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("LongMethod", "MagicNumber", "UnusedPrivateFunction")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.combinedClickable
