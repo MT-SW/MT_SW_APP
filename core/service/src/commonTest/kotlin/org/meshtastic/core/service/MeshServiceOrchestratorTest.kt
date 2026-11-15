@@ -170,6 +170,7 @@ class MeshServiceOrchestratorTest {
             localNetworkAccess = localNetworkAccess,
             lastBleNodeRecorder = {},
             nodeSilenceMonitor = mock(MockMode.autofill),
+            nodeActiveMonitor = mock(MockMode.autofill),
             messageArchiveMonitor = {},
         )
     }

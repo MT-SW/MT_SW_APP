@@ -196,6 +196,11 @@ Before the app asks another node for its status (when a chat is opened or in on-
 
 The statuses are read from the saved OnDemand answers, so they survive a restart of the app.
 
+- **Node list** — sorting **By activity (favourites first)**: favourites, then active nodes, then the rest, each group by last heard; the **Active only** filter shows only nodes with the status "active".
+- **Network health** — the summary has an **Activity** section: how many nodes are active and away, and how many share a status at all (also in the report).
+- **Active alert** — a switch in the node details (under the node watchdog); when the node reports that someone is at it, a notification arrives. It uses the quiet hours of the node watchdog and its notification channel. Works while connected to the radio.
+- **On-demand diagnostics** — the activity status counts in the progress and goes into the report.
+
 ## Debug panel
 
 The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this app. See also [Debug logs](debug-logs).

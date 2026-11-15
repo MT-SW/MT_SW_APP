@@ -58,6 +58,7 @@ import org.meshtastic.core.resources.node_filter_include_unknown
 import org.meshtastic.core.resources.node_filter_only_direct
 import org.meshtastic.core.resources.node_filter_only_encrypted
 import org.meshtastic.core.resources.node_filter_only_online
+import org.meshtastic.core.resources.node_filter_only_active
 import org.meshtastic.core.resources.node_filter_only_signed
 import org.meshtastic.core.resources.node_filter_placeholder
 import org.meshtastic.core.resources.node_filter_show_ignored
@@ -142,6 +143,8 @@ data class NodeFilterToggles(
     val onToggleOnlySigned: () -> Unit,
     val onlyEncrypted: Boolean,
     val onToggleOnlyEncrypted: () -> Unit,
+    val onlyActive: Boolean = false,
+    val onToggleOnlyActive: () -> Unit = {},
 )
 
 @Suppress("LongMethod")
@@ -223,6 +226,12 @@ private fun NodeSortButton(
                 } else {
                     null
                 },
+            )
+
+            DropdownMenuCheck(
+                text = stringResource(Res.string.node_filter_only_active),
+                checked = toggles.onlyActive,
+                onClick = toggles.onToggleOnlyActive,
             )
 
             DropdownMenuCheck(

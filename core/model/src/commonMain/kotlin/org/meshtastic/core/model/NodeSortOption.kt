@@ -23,6 +23,7 @@ import org.meshtastic.core.resources.node_sort_channel
 import org.meshtastic.core.resources.node_sort_distance
 import org.meshtastic.core.resources.node_sort_hops_away
 import org.meshtastic.core.resources.node_sort_last_heard
+import org.meshtastic.core.resources.node_sort_presence
 import org.meshtastic.core.resources.node_sort_via_favorite
 import org.meshtastic.core.resources.node_sort_via_mqtt
 
@@ -34,4 +35,7 @@ enum class NodeSortOption(val sqlValue: String, val stringRes: StringResource) {
     CHANNEL("channel", Res.string.node_sort_channel),
     VIA_MQTT("via_mqtt", Res.string.node_sort_via_mqtt),
     VIA_FAVORITE("via_favorite", Res.string.node_sort_via_favorite),
+
+    /** MT_SW: favourites first, then the active nodes, then the rest; each group by last heard. Sorted in the app. */
+    PRESENCE("last_heard", Res.string.node_sort_presence),
 }

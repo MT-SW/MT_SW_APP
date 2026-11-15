@@ -45,7 +45,10 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.model.NodeListDensity
+import org.meshtastic.core.model.NodePresence
+import org.meshtastic.core.model.NodePresenceState
 import org.meshtastic.core.model.NodeSortOption
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.model.noiseFloorOrNull
@@ -60,6 +63,7 @@ import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioInterfaceService
+import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeManagementActions
@@ -230,6 +234,7 @@ class NodeListViewModel(
                 onlyEncrypted = prefs.onlyEncrypted,
                 excludeMqtt = prefs.excludeMqtt,
                 excludeUnheard = prefs.excludeUnheard && unheardAllowed,
+                onlyActive = prefs.onlyActive,
             )
         }
 
@@ -253,9 +258,47 @@ class NodeListViewModel(
 
     val nodeList: StateFlow<List<Node>> =
         combine(nodeFilter, nodeSortOption, ::Pair)
-            .flatMapLatest { (filter, sort) -> getFilteredNodesUseCase.invoke(filter, sort) }
+            .flatMapLatest { (filter, sort) -> withPresence(filter, sort) }
             .heardWhileUnsupported()
             .stateInWhileSubscribed(initialValue = emptyList())
+
+    /**
+     * MT_SW: the list, with the activity status applied where the person asked for it: the "active only" filter, and
+     * the sort by activity (favourites first, then active nodes, then the rest, each by last heard). The status is
+     * not in the node database, so this is done here and not in the query.
+     */
+    private fun withPresence(filter: NodeFilterState, sort: NodeSortOption): Flow<List<Node>> {
+        val base = getFilteredNodesUseCase.invoke(filter, sort)
+        if (!filter.onlyActive && sort != NodeSortOption.PRESENCE) return base
+        return combine(base, meshLogRepository.nodePresenceFlow(), nodeFilterPreferences.uiOptions) { nodes, presence, options ->
+            val expiryMillis =
+                NodePresence.EXPIRY_STEPS_MINUTES[
+                    UiOptions(options)[UiOptions.PRESENCE_EXPIRY]
+                        .coerceIn(0, NodePresence.EXPIRY_STEPS_MINUTES.lastIndex),
+                ] * MILLIS_PER_MINUTE
+            val now = nowMillis
+            val active =
+                nodes
+                    .filter { node ->
+                        presence[node.num]?.effective(now, node.lastHeard, expiryMillis) == NodePresenceState.ONLINE
+                    }
+                    .map { it.num }
+                    .toSet()
+            val shown = if (filter.onlyActive) nodes.filter { it.num in active } else nodes
+            if (sort == NodeSortOption.PRESENCE) {
+                // Stable sort: inside each group the order of the query (last heard) stays.
+                shown.sortedBy { node ->
+                    when {
+                        node.isFavorite -> 0
+                        node.num in active -> 1
+                        else -> 2
+                    }
+                }
+            } else {
+                shown
+            }
+        }
+    }
 
     val unfilteredNodeList: StateFlow<List<Node>> =
         nodeRepository.getNodes().heardWhileUnsupported().stateInWhileSubscribed(initialValue = emptyList())
@@ -454,6 +497,7 @@ class NodeListViewModel(
 
     companion object {
         private const val KEY_FILTER_TEXT = "filter_text"
+        private const val MILLIS_PER_MINUTE = 60_000L
         private const val EXTRA_STATS_WINDOW_MILLIS = 3 * 24 * 60 * 60 * 1000L
         private const val MAX_PACKETS_PER_NODE = 200
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
@@ -481,6 +525,7 @@ data class NodeFilterState(
     val onlyEncrypted: Boolean = false,
     val excludeMqtt: Boolean = false,
     val excludeUnheard: Boolean = false,
+    val onlyActive: Boolean = false,
 ) {
     /** True if any user-applied filter is narrowing the visible node set. Unknown nodes are shown unless opted out. */
     val isActive: Boolean
@@ -493,7 +538,8 @@ data class NodeFilterState(
                 onlySigned ||
                 onlyEncrypted ||
                 excludeMqtt ||
-                excludeUnheard
+                excludeUnheard ||
+                onlyActive
 }
 
 private const val PERCENT = 100f

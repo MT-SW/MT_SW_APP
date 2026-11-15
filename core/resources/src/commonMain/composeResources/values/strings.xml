@@ -2533,6 +2533,9 @@
     <string name="no_usb_devices_hint">Connect a device with a USB data cable to use serial.</string>
     <string name="no_usb_devices_seen">No USB devices detected</string>
     <!-- NODE -->
+    <string name="node_active_alert">Active alert</string>
+    <string name="node_active_alert_hint">A notification when this node reports that someone is at it. Works only for nodes that share their activity status (MT_SW_FIRMWARE v3). Quiet hours are the same as for the node watchdog.</string>
+    <string name="node_active_alert_notification">%1$s is active</string>
     <string name="node_color_pick">Pick colour</string>
     <string name="node_color_summary">Pick the colour of your node (its key) in the security settings.</string>
     <string name="node_color_title">Node colour</string>
@@ -2545,6 +2548,7 @@
     <string name="node_filter_exclude_unheard">Hide unheard nodes</string>
     <string name="node_filter_ignored">You are viewing ignored nodes,\nPress to return to the node list.</string>
     <string name="node_filter_include_unknown">Include unknown</string>
+    <string name="node_filter_only_active">Active only</string>
     <string name="node_filter_only_direct">Only show direct nodes</string>
     <string name="node_filter_only_encrypted">Encrypted only</string>
     <string name="node_filter_only_online">Hide offline nodes</string>
@@ -2620,6 +2624,7 @@
     <string name="node_sort_distance">Distance</string>
     <string name="node_sort_hops_away">Hops away</string>
     <string name="node_sort_last_heard">Last heard</string>
+    <string name="node_sort_presence">By activity (favourites first)</string>
     <string name="node_sort_title">Sort by</string>
     <string name="node_sort_via_favorite">via Favorite</string>
     <string name="node_sort_via_mqtt">via MQTT</string>
@@ -2993,6 +2998,8 @@
     <string name="presence_inactive">Inactive</string>
     <string name="presence_inactive_hours">Inactive for %1$d h</string>
     <string name="presence_inactive_min">Inactive for %1$d min</string>
+    <string name="presence_more_summary">Node list: sorting "By activity" (favourites on top, then active) and the "Active only" filter. Network health: the "Activity" section in the summary. Node details: an alert when the node becomes active. On-demand diagnostics: the status in the progress and the report.</string>
+    <string name="presence_more_title">Where else the status works</string>
     <string name="presence_needs_fw">Needs MT_SW_FIRMWARE v3 or newer.</string>
     <string name="presence_replace_favorite">Favourite</string>
     <string name="presence_replace_muted">Muted</string>

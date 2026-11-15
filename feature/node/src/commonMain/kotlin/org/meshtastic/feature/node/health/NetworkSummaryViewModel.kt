@@ -30,10 +30,14 @@ import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.NodePresence
+import org.meshtastic.core.model.NodePresenceState
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.swapBatteryPolarity
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.nodePresenceFlow
 import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.domain.usecase.positionSnrByTime
@@ -75,6 +79,9 @@ data class MapPoint(val nodeName: String, val latitude: Double, val longitude: D
 data class NetworkSummaryUiState(
     val onlineCount: Int = 0,
     val totalCount: Int = 0,
+    /** MT_SW: nodes whose activity status says someone is at the node / is away; the rest do not share a status. */
+    val presenceActiveCount: Int = 0,
+    val presenceAwayCount: Int = 0,
     val quietestNodes: List<QuietNode> = emptyList(),
     val averageBatteryLevel: Int? = null,
     val lowBatteryCount: Int = 0,
@@ -120,6 +127,8 @@ data class NetworkSummaryUiState(
 
 const val DAYS_IN_WEEK = 7
 
+private const val MILLIS_PER_MINUTE = 60_000L
+
 private const val MAX_REPORT_NODES = 300
 private const val MAX_REPORT_POINTS = 500
 
@@ -160,6 +169,9 @@ class NetworkSummaryViewModel(
                 .getLogsByPortNumSinceSlim(PortNum.TEXT_MESSAGE_APP.value, nowMillis - WEEK_WINDOW_MILLIS)
                 .calmed(),
             meshLogRepository.getMyNodeInfo(),
+            // MT_SW: the activity status the nodes share (port 354) and how long an "active" report holds.
+            meshLogRepository.nodePresenceFlow(),
+            uiPrefs.uiOptions,
         ) { values ->
             @Suppress("UNCHECKED_CAST")
             val nodes = values[0] as List<org.meshtastic.core.model.Node>
@@ -170,6 +182,21 @@ class NetworkSummaryViewModel(
             @Suppress("UNCHECKED_CAST")
             val messageLogsWeek = values[2] as List<org.meshtastic.core.model.MeshLog>
             val myNodeInfo = values[3] as org.meshtastic.proto.MyNodeInfo?
+
+            @Suppress("UNCHECKED_CAST")
+            val presence = values[4] as Map<Int, NodePresence>
+
+            @Suppress("UNCHECKED_CAST")
+            val options = UiOptions(values[5] as Map<String, Int>)
+            val presenceExpiryMillis =
+                NodePresence.EXPIRY_STEPS_MINUTES[
+                    options[UiOptions.PRESENCE_EXPIRY].coerceIn(0, NodePresence.EXPIRY_STEPS_MINUTES.lastIndex),
+                ] * MILLIS_PER_MINUTE
+            val presenceNow = nowMillis
+            val presenceStates =
+                nodes.mapNotNull { node ->
+                    presence[node.num]?.effective(presenceNow, node.lastHeard, presenceExpiryMillis)
+                }
             val telemetryLogs = allLogs.filter { it.portNum == PortNum.TELEMETRY_APP.value }
             // Newest first: only each node's latest report counts below.
             val neighborLogs = allLogs.filter { it.portNum == PortNum.NEIGHBORINFO_APP.value }.asReversed()
@@ -395,6 +422,8 @@ class NetworkSummaryViewModel(
 
             NetworkSummaryUiState(
                 isLoaded = true,
+                presenceActiveCount = presenceStates.count { it == NodePresenceState.ONLINE },
+                presenceAwayCount = presenceStates.count { it == NodePresenceState.OFFLINE },
                 onlineCount = nodes.count { it.isOnline },
                 totalCount = nodes.size,
                 quietestNodes = quietestNodes,

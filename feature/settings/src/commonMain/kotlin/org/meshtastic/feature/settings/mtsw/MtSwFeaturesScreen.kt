@@ -121,6 +121,8 @@ import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.presence_device_switch
 import org.meshtastic.core.resources.presence_summary
+import org.meshtastic.core.resources.presence_more_summary
+import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
 import org.meshtastic.core.resources.mt_sw_terrain_open_summary
@@ -413,6 +415,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(SettingsRoute.User)
                 }
+                ListItem(
+                    text = stringResource(Res.string.presence_more_title),
+                    supportingText = stringResource(Res.string.presence_more_summary),
+                    leadingIcon = MeshtasticIcons.Info,
+                ) {}
             }
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_title)) {
                 ListItem(

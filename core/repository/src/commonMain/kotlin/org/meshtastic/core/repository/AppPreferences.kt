@@ -760,6 +760,15 @@ interface NotificationPrefs {
     val nodeSilenceQuietHours: StateFlow<QuietHours?>
 
     fun setNodeSilenceQuietHours(hours: QuietHours?)
+
+    /**
+     * MT_SW: nodes with an "active" alert: the app raises a notification when the activity status the node shares
+     * changes to active. A node that is not in the set has no such alert. Set per node in the node details.
+     */
+    val nodeActiveAlerts: StateFlow<Set<Int>>
+
+    /** Turns the "active" alert of [nodeNum] on or off. */
+    fun setNodeActiveAlert(nodeNum: Int, enabled: Boolean)
 }
 
 /** Reactive interface for general map preferences. */

@@ -47,6 +47,9 @@ open class NodeFilterPreferences constructor(private val uiPrefs: UiPrefs) {
 
     open val keptUnheardNodes = uiPrefs.keptUnheardNodes
 
+    /** MT_SW: the look options, read for the activity status (how long "active" holds). */
+    open val uiOptions = uiPrefs.uiOptions
+
     open fun keepUnheardNodes(nodeNums: Set<Int>) {
         uiPrefs.keepUnheardNodes(nodeNums)
     }
@@ -124,6 +127,10 @@ open class NodeFilterPreferences constructor(private val uiPrefs: UiPrefs) {
 
     open fun toggleOnlySigned() {
         uiPrefs.updateNodeFilters { it.copy(onlySigned = !it.onlySigned) }
+    }
+
+    open fun toggleOnlyActive() {
+        uiPrefs.updateNodeFilters { it.copy(onlyActive = !it.onlyActive) }
     }
 
     open fun toggleOnlyEncrypted() {

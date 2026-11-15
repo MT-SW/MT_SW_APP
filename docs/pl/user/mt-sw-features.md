@@ -196,6 +196,11 @@ Zanim aplikacja zapyta obcy węzeł o status (przy otwarciu rozmowy albo w diagn
 
 Statusy są czytane z zapisanych odpowiedzi OnDemand, więc przeżywają ponowne uruchomienie aplikacji.
 
+- **Lista węzłów** — sortowanie **Według aktywności (ulubione na górze)**: ulubione, potem aktywne, potem reszta, każda grupa od ostatnio słyszanych; filtr **Tylko aktywni** pokazuje tylko węzły ze statusem „aktywny”.
+- **Zdrowie sieci** — w podsumowaniu sekcja **Aktywność**: ile węzłów jest aktywnych i nieobecnych oraz ile w ogóle podaje status (też w raporcie).
+- **Powiadomienie o aktywności** — w szczegółach węzła (pod strażnikiem węzła) przełącznik; gdy węzeł zgłosi, że ktoś przy nim jest, przychodzi powiadomienie. Używa godzin ciszy strażnika węzła i kanału jego powiadomień. Działa przy połączeniu z radiem.
+- **Diagnostyka na żądanie** — status aktywności liczy się do postępu i trafia do raportu.
+
 ## Panel debugowania
 
 Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej aplikacji dodatkową zakładkę. Zobacz też [Logi debugowania](debug-logs).

@@ -101,6 +101,7 @@ class QuickSettingsTileControllerTest {
             localNetworkAccess = LocalNetworkAccess { true },
             lastBleNodeRecorder = {},
             nodeSilenceMonitor = mock(MockMode.autofill),
+            nodeActiveMonitor = mock(MockMode.autofill),
             messageArchiveMonitor = {},
         )
     }

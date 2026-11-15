@@ -102,7 +102,9 @@ class FakeNodeRepository :
                 when (sort) {
                     NodeSortOption.ALPHABETICAL -> nodes.sortedBy { it.effectiveLongName.lowercase() }
 
-                    NodeSortOption.LAST_HEARD -> nodes.sortedByDescending { it.lastHeard }
+                    NodeSortOption.LAST_HEARD,
+                    NodeSortOption.PRESENCE,
+                    -> nodes.sortedByDescending { it.lastHeard }
 
                     NodeSortOption.DISTANCE -> nodes.sortedBy { it.position.latitude_i }
 

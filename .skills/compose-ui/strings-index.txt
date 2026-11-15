@@ -2482,6 +2482,9 @@ no_usb_devices_found
 no_usb_devices_hint
 no_usb_devices_seen
 ### NODE ###
+node_active_alert
+node_active_alert_hint
+node_active_alert_notification
 node_color_pick
 node_color_summary
 node_color_title
@@ -2494,6 +2497,7 @@ node_filter_exclude_mqtt
 node_filter_exclude_unheard
 node_filter_ignored
 node_filter_include_unknown
+node_filter_only_active
 node_filter_only_direct
 node_filter_only_encrypted
 node_filter_only_online
@@ -2569,6 +2573,7 @@ node_sort_channel
 node_sort_distance
 node_sort_hops_away
 node_sort_last_heard
+node_sort_presence
 node_sort_title
 node_sort_via_favorite
 node_sort_via_mqtt
@@ -2927,6 +2932,8 @@ presence_icon_title
 presence_inactive
 presence_inactive_hours
 presence_inactive_min
+presence_more_summary
+presence_more_title
 presence_needs_fw
 presence_replace_favorite
 presence_replace_muted

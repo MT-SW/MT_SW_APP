@@ -41,6 +41,8 @@ data class NodeFilterPrefs(
     val excludeMqtt: Boolean = false,
     /** Hide nodes not heard since the radio's current LoRa config took effect. */
     val excludeUnheard: Boolean = false,
+    /** MT_SW: show only nodes whose activity status says someone is at the node. */
+    val onlyActive: Boolean = false,
 )
 
 /**

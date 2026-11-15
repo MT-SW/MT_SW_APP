@@ -82,6 +82,8 @@ import org.meshtastic.core.resources.presence_device_switch
 import org.meshtastic.core.resources.presence_expiry_title
 import org.meshtastic.core.resources.presence_icon_title
 import org.meshtastic.core.resources.presence_show
+import org.meshtastic.core.resources.node_active_alert
+import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
@@ -319,6 +321,8 @@ object SettingsSearchCatalog {
             Res.string.translator_title to SettingsRoute.SmartFeatures,
             Res.string.local_stats_title to SettingsRoute.Telemetry,
             Res.string.presence_title to SettingsRoute.MtSwFeatures,
+            Res.string.presence_more_title to SettingsRoute.MtSwFeatures,
+            Res.string.node_active_alert to SettingsRoute.MtSwFeatures,
             Res.string.presence_show to SettingsRoute.MtSwFeatures,
             Res.string.presence_icon_title to SettingsRoute.MtSwFeatures,
             Res.string.presence_expiry_title to SettingsRoute.MtSwFeatures,

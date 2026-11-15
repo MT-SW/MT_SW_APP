@@ -295,6 +295,24 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                 }
             }
 
+            if (uiState.presenceActiveCount + uiState.presenceAwayCount > 0) {
+                item {
+                    SummarySection(title = "Aktywność", icon = MeshtasticIcons.Person) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                            BigNumber("${uiState.presenceActiveCount}", "aktywnych")
+                            BigNumber("${uiState.presenceAwayCount}", "nieobecnych")
+                        }
+                        Text(
+                            text =
+                            "Z ${uiState.totalCount} węzłów stan aktywności podaje " +
+                                "${uiState.presenceActiveCount + uiState.presenceAwayCount}.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
             item {
                 SummarySection(title = "Zasilanie", icon = MeshtasticIcons.BatteryEmpty) {
                     DistributionBar(counts = uiState.batteryDistribution)

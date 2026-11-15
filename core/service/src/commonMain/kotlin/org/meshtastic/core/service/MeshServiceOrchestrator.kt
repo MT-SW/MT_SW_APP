@@ -41,6 +41,7 @@ import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageArchiveMonitor
 import org.meshtastic.core.repository.NodeManager
+import org.meshtastic.core.repository.NodeActiveMonitor
 import org.meshtastic.core.repository.NodeSilenceMonitor
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceStateWriter
@@ -82,6 +83,7 @@ class MeshServiceOrchestrator(
     private val localNetworkAccess: LocalNetworkAccess,
     private val lastBleNodeRecorder: LastBleNodeRecorder,
     private val nodeSilenceMonitor: NodeSilenceMonitor,
+    private val nodeActiveMonitor: NodeActiveMonitor,
     private val messageArchiveMonitor: MessageArchiveMonitor,
 ) {
     // Per-start coroutine scope. A fresh scope is created on each start() and cancelled on stop(), so all collectors
@@ -225,6 +227,8 @@ class MeshServiceOrchestrator(
 
         // The silence alerts set per node in the node details.
         nodeSilenceMonitor.start(newScope)
+        // MT_SW: the "active" alerts set per node in the node details.
+        nodeActiveMonitor.start(newScope)
         // The automatic message archive in the chosen folder.
         messageArchiveMonitor.start(newScope)
     }

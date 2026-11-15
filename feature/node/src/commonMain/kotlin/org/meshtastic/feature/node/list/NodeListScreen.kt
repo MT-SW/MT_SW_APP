@@ -471,6 +471,8 @@ fun NodeListScreen(
                                     onToggleOnlySigned = filterPrefs::toggleOnlySigned,
                                     onlyEncrypted = state.filter.onlyEncrypted,
                                     onToggleOnlyEncrypted = filterPrefs::toggleOnlyEncrypted,
+                                    onlyActive = state.filter.onlyActive,
+                                    onToggleOnlyActive = filterPrefs::toggleOnlyActive,
                                 ),
                             )
                         }

@@ -4311,4 +4311,11 @@
     <string name="on_demand_presence_asking">Pytam o status…</string>
     <string name="on_demand_presence_too_old">Ten węzeł ma MT_SW_FIRMWARE v%1$d; status wymaga v3 lub nowszego, więc nic nie wysłano.</string>
     <string name="on_demand_presence_no_version">Węzeł nie podał wersji firmware, więc nie pytam o status.</string>
+    <string name="node_sort_presence">Według aktywności (ulubione na górze)</string>
+    <string name="node_filter_only_active">Tylko aktywni</string>
+    <string name="node_active_alert">Powiadomienie o aktywności</string>
+    <string name="node_active_alert_hint">Powiadomienie, gdy ten węzeł zgłosi, że ktoś przy nim jest. Działa tylko dla węzłów, które podają stan aktywności (MT_SW_FIRMWARE v3). Godziny ciszy są te same co dla strażnika węzła.</string>
+    <string name="node_active_alert_notification">%1$s jest aktywny</string>
+    <string name="presence_more_title">Gdzie jeszcze działa status</string>
+    <string name="presence_more_summary">Lista węzłów: sortowanie „Według aktywności” (ulubione na górze, potem aktywne) i filtr „Tylko aktywni”. Zdrowie sieci: sekcja „Aktywność” w podsumowaniu. Szczegóły węzła: powiadomienie, gdy węzeł stanie się aktywny. Diagnostyka na żądanie: status w postępie i w raporcie.</string>
 </resources>

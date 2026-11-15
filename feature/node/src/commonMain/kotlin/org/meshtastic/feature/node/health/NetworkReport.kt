@@ -116,6 +116,19 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
                 ),
             ),
         )
+        if (presenceActiveCount + presenceAwayCount > 0) {
+            add(
+                ReportSection(
+                    title = "Aktywność",
+                    lines =
+                    listOf(
+                        ReportLine("Aktywne", "$presenceActiveCount"),
+                        ReportLine("Nieobecne", "$presenceAwayCount"),
+                        ReportLine("Podają stan aktywności", "${presenceActiveCount + presenceAwayCount} z $totalCount"),
+                    ),
+                ),
+            )
+        }
         add(
             ReportSection(
                 title = "Sąsiedzi",

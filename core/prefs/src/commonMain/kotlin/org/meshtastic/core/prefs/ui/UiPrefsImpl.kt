@@ -921,6 +921,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         onlyEncrypted = this[KEY_ONLY_ENCRYPTED] ?: false,
         excludeMqtt = this[KEY_EXCLUDE_MQTT] ?: false,
         excludeUnheard = this[KEY_EXCLUDE_UNHEARD] ?: false,
+        onlyActive = this[KEY_ONLY_ACTIVE] ?: false,
     )
 
     private fun MutablePreferences.writeNodeFilterPrefs(prefs: NodeFilterPrefs) {
@@ -933,6 +934,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         this[KEY_ONLY_ENCRYPTED] = prefs.onlyEncrypted
         this[KEY_EXCLUDE_MQTT] = prefs.excludeMqtt
         this[KEY_EXCLUDE_UNHEARD] = prefs.excludeUnheard
+        this[KEY_ONLY_ACTIVE] = prefs.onlyActive
     }
 
     companion object {
@@ -976,6 +978,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_SHOW_IGNORED = booleanPreferencesKey("show-ignored")
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
         val KEY_EXCLUDE_UNHEARD = booleanPreferencesKey("exclude-unheard")
+        val KEY_ONLY_ACTIVE = booleanPreferencesKey("only-active")
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
         val KEY_SKIP_BAD_TIME_CHART_POINTS = booleanPreferencesKey("skip-bad-time-chart-points")
         val KEY_ANDROID_WIDGET_NODE = intPreferencesKey("android-widget-node")

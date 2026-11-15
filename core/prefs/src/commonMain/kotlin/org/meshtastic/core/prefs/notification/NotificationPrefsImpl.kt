@@ -197,6 +197,22 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         }
     }
 
+    // MT_SW: stored as node numbers separated by commas.
+    override val nodeActiveAlerts: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs -> parseOptInIds(prefs[KEY_NODE_ACTIVE_ALERTS]).toSet() }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setNodeActiveAlert(nodeNum: Int, enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                val nodes = parseOptInIds(prefs[KEY_NODE_ACTIVE_ALERTS]).toMutableSet()
+                if (enabled) nodes.add(nodeNum) else nodes.remove(nodeNum)
+                prefs[KEY_NODE_ACTIVE_ALERTS] = nodes.joinToString(",")
+            }
+        }
+    }
+
     // Stored as "start-end" hours, or empty for none.
     override val nodeSilenceQuietHours: StateFlow<QuietHours?> =
         dataStore.data
@@ -242,6 +258,7 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
         private val KEY_NODE_SILENCE_QUIET = stringPreferencesKey("notif_node_silence_quiet")
         private val KEY_NODE_SILENCE_ALERTS = stringPreferencesKey("notif_node_silence_alerts")
         private val KEY_NODE_SILENCE_RELAYED = stringPreferencesKey("notif_node_silence_relayed")
+        private val KEY_NODE_ACTIVE_ALERTS = stringPreferencesKey("notif_node_active_alerts")
         private val KEY_MESSAGES_ENABLED = booleanPreferencesKey("notif_messages_enabled")
         private val KEY_NODE_EVENTS_ENABLED = booleanPreferencesKey("notif_node_events_enabled")
         private val KEY_NODE_EVENTS_AUTO_DISABLED = booleanPreferencesKey("notif_node_events_auto_disabled_event")
