@@ -598,13 +598,13 @@ private fun OnDemandHero(answered: Set<OnDemandType>) {
                 MeshtasticIcons.Chart,
                 OnDemandType.RESPONSE_PACKET_RX_HISTORY,
             ),
-            Triple(Res.string.on_demand_lan_stats, MeshtasticIcons.MeshHub, OnDemandType.RESPONSE_LAN_STATS),
-            Triple(Res.string.on_demand_presence, MeshtasticIcons.Person, OnDemandType.RESPONSE_PRESENCE),
             Triple(
                 Res.string.on_demand_fw_plus_version,
                 MeshtasticIcons.MeshRadio,
                 OnDemandType.RESPONSE_FW_PLUS_VERSION,
             ),
+            Triple(Res.string.on_demand_lan_stats, MeshtasticIcons.MeshHub, OnDemandType.RESPONSE_LAN_STATS),
+            Triple(Res.string.on_demand_presence, MeshtasticIcons.Person, OnDemandType.RESPONSE_PRESENCE),
         )
     val done = capabilities.count { it.third in answered }
     val brush =

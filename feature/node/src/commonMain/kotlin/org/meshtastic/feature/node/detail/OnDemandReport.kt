@@ -193,6 +193,15 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                 ?.let {
                     add(ReportSection(historyTitle, lines = stamp(OnDemandType.RESPONSE_PACKET_RX_HISTORY), bars = it))
                 }
+            uiState.fwPlusVersion?.let {
+                add(
+                    ReportSection(
+                        fwTitle,
+                        lines =
+                        stamp(OnDemandType.RESPONSE_FW_PLUS_VERSION) + ReportLine(fwTitle, "v${it.version_number}"),
+                    ),
+                )
+            }
             uiState.lanStats?.let {
                 add(
                     ReportSection(
@@ -207,15 +216,6 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                         presenceTitle,
                         lines =
                         stamp(OnDemandType.RESPONSE_PRESENCE) + presenceLines.map { (l, v) -> ReportLine(l, v) },
-                    ),
-                )
-            }
-            uiState.fwPlusVersion?.let {
-                add(
-                    ReportSection(
-                        fwTitle,
-                        lines =
-                        stamp(OnDemandType.RESPONSE_FW_PLUS_VERSION) + ReportLine(fwTitle, "v${it.version_number}"),
                     ),
                 )
             }
