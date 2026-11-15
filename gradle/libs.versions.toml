@@ -113,7 +113,7 @@ dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.10.0"
 wire = "6.4.7"
-meshtastic-protobufs = "2.8.2.13-g0adaccd-SNAPSHOT"
+meshtastic-protobufs = "2.8.2.31-g65b8791-SNAPSHOT"
 
 # Gradle Plugins
 ccud = "2.8.0"
