@@ -16,17 +16,25 @@
  */
 package org.meshtastic.feature.map.component
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FilledIconButton
-import org.meshtastic.core.ui.icon.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import org.meshtastic.core.model.ElementLook
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.StyledSurface
+import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /**
- * A compact icon button used in map control overlays. Uses [FilledIconButton] for a consistent, compact appearance
- * across both Google and F-Droid flavors.
+ * A compact round icon button used in map control overlays (zoom, layers, location...). In the plain look it is a
+ * [FilledIconButton]; in the other looks chosen for the map ("look of the elements": with depth, see-through or glass)
+ * it is a round surface of that look, the same on both flavors.
  */
 @Composable
 fun MapButton(
@@ -36,11 +44,30 @@ fun MapButton(
     modifier: Modifier = Modifier,
     iconTint: Color? = null,
 ) {
-    FilledIconButton(onClick = onClick, modifier = modifier) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = iconTint ?: IconButtonDefaults.filledIconButtonColors().contentColor,
-        )
+    val style = rememberUiOptions().element(UiOptions.GROUP_MAP)
+    if (style.look == ElementLook.FLAT) {
+        FilledIconButton(onClick = onClick, modifier = modifier) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = iconTint ?: IconButtonDefaults.filledIconButtonColors().contentColor,
+            )
+        }
+    } else {
+        StyledSurface(
+            style = style,
+            shape = CircleShape,
+            modifier = modifier,
+            baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            floating = true,
+        ) {
+            IconButton(onClick = onClick) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    tint = iconTint ?: MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
     }
 }

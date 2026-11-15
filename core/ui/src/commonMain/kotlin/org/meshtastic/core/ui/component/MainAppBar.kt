@@ -17,6 +17,11 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
+import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.model.ElementLook
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
@@ -48,6 +53,7 @@ import org.meshtastic.core.ui.theme.monochromeLayer
 
 /** Alpha for the ambient event accent wash over the app bar — subtle enough to keep title text legible. */
 private const val EVENT_ACCENT_ALPHA = 0.12f
+private const val BAR_CORNER_DP = 20
 
 /** Height of the event brand rule under the app bar. A hairline: brand presence without stealing vertical space. */
 private val EVENT_BRAND_RULE_HEIGHT = 3.dp
@@ -83,54 +89,73 @@ fun MainAppBar(
         } else {
             TopAppBarDefaults.topAppBarColors()
         }
-    Column(modifier = modifier.monochromeLayer()) {
-        TopAppBar(
-            colors = colors,
-            title = {
-                Text(
-                    text = title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLargeEmphasized,
-                )
-            },
-            subtitle = {
-                subtitle?.let {
+    // The look chosen for the top bar: plain as before, or a surface with depth / see-through / glass (rounded below).
+    val barStyle = rememberUiOptions().element(UiOptions.GROUP_TOPBAR)
+    val plain = barStyle.look == ElementLook.FLAT
+    val barColors = if (plain) colors else TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+    val barContent: @Composable () -> Unit = {
+        Column(modifier = if (plain) modifier.monochromeLayer() else Modifier.monochromeLayer()) {
+            TopAppBar(
+                colors = barColors,
+                title = {
                     Text(
-                        text = it,
+                        text = title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.titleLargeEmphasized,
                     )
-                }
-            },
-            navigationIcon =
-            if (canNavigateUp) {
-                {
-                    IconButton(onClick = onNavigateUp) {
-                        Icon(
-                            imageVector = MeshtasticIcons.ArrowBack,
-                            contentDescription = stringResource(Res.string.navigate_back),
+                },
+                subtitle = {
+                    subtitle?.let {
+                        Text(
+                            text = it,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                }
-            } else {
-                // The Meshtastic logo is never swapped for event branding — the app's identity stays put. Event
-                // firmware is surfaced on the Connections screen instead (EventFirmwareCard).
-                { Icon(imageVector = vectorResource(Res.drawable.ic_meshtastic), contentDescription = null) }
-            },
-            actions = {
-                TopBarActions(
-                    ourNode = ourNode,
-                    showNodeChip = showNodeChip,
-                    sosScreen = sosScreen.takeIf { showSos },
-                    actions = actions,
-                    onClickChip = onClickChip,
-                )
-            },
-        )
-        EventPaletteStrip(palette = eventTheme?.palette.orEmpty(), height = EVENT_BRAND_RULE_HEIGHT)
+                },
+                navigationIcon =
+                if (canNavigateUp) {
+                    {
+                        IconButton(onClick = onNavigateUp) {
+                            Icon(
+                                imageVector = MeshtasticIcons.ArrowBack,
+                                contentDescription = stringResource(Res.string.navigate_back),
+                            )
+                        }
+                    }
+                } else {
+                    // The Meshtastic logo is never swapped for event branding — the app's identity stays put. Event
+                    // firmware is surfaced on the Connections screen instead (EventFirmwareCard).
+                    { Icon(imageVector = vectorResource(Res.drawable.ic_meshtastic), contentDescription = null) }
+                },
+                actions = {
+                    TopBarActions(
+                        ourNode = ourNode,
+                        showNodeChip = showNodeChip,
+                        sosScreen = sosScreen.takeIf { showSos },
+                        actions = actions,
+                        onClickChip = onClickChip,
+                    )
+                },
+            )
+            EventPaletteStrip(palette = eventTheme?.palette.orEmpty(), height = EVENT_BRAND_RULE_HEIGHT)
+        }
+    }
+    if (plain) {
+        barContent()
+    } else {
+        StyledSurface(
+            style = barStyle,
+            shape = RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
+            modifier = modifier,
+            baseColor = MaterialTheme.colorScheme.surface,
+            floating = true,
+        ) {
+            barContent()
+        }
     }
 }
 
