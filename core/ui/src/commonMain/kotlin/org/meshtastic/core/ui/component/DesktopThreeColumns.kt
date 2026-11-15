@@ -123,6 +123,15 @@ internal class ThreeColumnWidths {
 
         /** The conversations list is narrow so the messages beside it are wide; also used by the tablet layout. */
         const val CHAT_LIST_SHARE = 0.36f
+
+        /** The width the side bar used to take: the conversations list gets it now that the bar floats at the bottom. */
+        const val CHAT_LIST_EXTRA_DP = 80f
+
+        /** The share of the conversations list for a window [windowWidthDp] wide: the usual one plus the old side bar. */
+        fun chatListShare(windowWidthDp: Float): Float =
+            if (windowWidthDp > 0f) (CHAT_LIST_SHARE + CHAT_LIST_EXTRA_DP / windowWidthDp).coerceAtMost(MAX_CHAT_LIST_SHARE) else CHAT_LIST_SHARE
+
+        private const val MAX_CHAT_LIST_SHARE = 0.5f
         const val DEFAULT_DETAIL_EXTRA_SHARE = 0.5f
         const val MIN_PANE_DP = 220f
         const val MIN_DETAIL_DP = 320f

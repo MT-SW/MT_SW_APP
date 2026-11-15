@@ -193,13 +193,14 @@ private fun MeshtasticNavDisplayHost(
 
     // In the desktop app the list and the detail start at half of the width each (the divider can still be dragged);
     // other devices keep the original proportions.
+    val windowWidthDp = LocalWindowInfo.current.containerSize.width / LocalDensity.current.density
     val paneExpansionState = rememberPaneExpansionState()
     // The conversations list is narrow on desktop and tablet alike, so the messages beside it are wide. Other lists
     // (nodes, documentation) keep their usual proportions; leaving the conversations returns to those.
     val narrowList = entries.lastOrNull { MeshtasticPanes.isList(it) }?.let(MeshtasticPanes::isNarrowList) == true
     LaunchedEffect(paneExpansionState, narrowList) {
         when {
-            narrowList -> paneExpansionState.setFirstPaneProportion(ThreeColumnWidths.CHAT_LIST_SHARE)
+            narrowList -> paneExpansionState.setFirstPaneProportion(ThreeColumnWidths.chatListShare(windowWidthDp))
             isDesktopPlatform -> paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION)
             else -> paneExpansionState.clear()
         }
@@ -212,10 +213,9 @@ private fun MeshtasticNavDisplayHost(
 
     // The library draws the width slider only between two columns. On a wide desktop window (three columns) our own
     // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
-    val threeColumnWidths = remember { ThreeColumnWidths() }
+    val threeColumnWidths = remember { ThreeColumnWidths().also { it.chatListDetailShare = ThreeColumnWidths.chatListShare(windowWidthDp) } }
     // Wide window: list, detail and extra screen. Narrower (but not phone-sized): the list slides away and the detail
     // and the extra screen share the window.
-    val windowWidthDp = LocalWindowInfo.current.containerSize.width / LocalDensity.current.density
     val columnMode =
         when {
             !isDesktopPlatform -> ColumnMode.OFF

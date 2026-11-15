@@ -137,6 +137,7 @@ import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
+import org.meshtastic.core.ui.component.FloatingBarHidden
 import org.meshtastic.core.ui.component.InlineStyle
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.smartScrollToIndex
@@ -228,6 +229,8 @@ fun MessageScreen(
     navigateToFilterSettings: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
+    // The bar would cover the message field: it slides out to the left while a conversation is open.
+    FloatingBarHidden()
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = LocalClipboard.current
     val focusManager = LocalFocusManager.current
