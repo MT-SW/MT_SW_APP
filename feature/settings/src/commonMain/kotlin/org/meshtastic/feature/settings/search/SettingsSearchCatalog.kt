@@ -233,7 +233,7 @@ object SettingsSearchCatalog {
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.node_silence_alert to SettingsRoute.MtSwOtherFeatures,
-            Res.string.notification_test_title to SettingsRoute.Settings(),
+            Res.string.notification_test_title to SettingsRoute.DataAndLogs,
             Res.string.whats_new_title to SettingsRoute.MtSwFeatures,
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.sos_section_nodes to SettingsRoute.Sos,

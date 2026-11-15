@@ -124,8 +124,6 @@ import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_section_title
-import org.meshtastic.core.resources.notification_test_summary
-import org.meshtastic.core.resources.notification_test_title
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_description
@@ -162,7 +160,6 @@ import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.Warning
@@ -176,6 +173,7 @@ import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ElementAdvancedSettings
+import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.ElementBasicSettings
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
 import org.meshtastic.feature.settings.component.SoftLightSetting
@@ -678,15 +676,8 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                 }
             }
 
-            ExpressiveSection(title = stringResource(Res.string.notification_test_title)) {
-                ListItem(
-                    text = stringResource(Res.string.notification_test_title),
-                    supportingText = stringResource(Res.string.notification_test_summary),
-                    leadingIcon = MeshtasticIcons.Notifications,
-                ) {
-                    onNavigate(SettingsRoute.Settings())
-                }
-            }
+            // The three test buttons are right here (the link to the settings page did not lead anywhere useful).
+            NotificationTestSection()
         }
     }
 }
