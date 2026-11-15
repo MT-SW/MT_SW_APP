@@ -67,16 +67,21 @@ private fun VectorGroup.copyInto(builder: ImageVector.Builder, outline: Boolean,
     for (node in this) {
         when (node) {
             is VectorPath -> {
-                val color = (node.fill ?: node.stroke ?: SolidColor(Color.White))
+                // A path may have a fill that is fully transparent (the thin line icons are drawn only with a stroke):
+                // it counts as "no fill", otherwise its line would take the transparent colour and vanish.
+                val fillBrush = node.fill
+                val fillShown = fillBrush != null && !(fillBrush is SolidColor && fillBrush.value.alpha == 0f)
+                val hasStroke = node.stroke != null
+                val lineBrush = node.stroke ?: fillBrush ?: SolidColor(Color.White)
                 builder.addPath(
                     pathData = node.pathData,
                     pathFillType = node.pathFillType,
                     name = node.name,
-                    fill = if (outline) null else node.fill,
+                    fill = if (outline) null else fillBrush,
                     fillAlpha = node.fillAlpha,
-                    stroke = if (node.stroke != null && node.fill == null) node.stroke else color,
-                    strokeAlpha = if (node.stroke != null && node.fill == null) node.strokeAlpha else node.fillAlpha,
-                    strokeLineWidth = if (node.stroke != null && node.fill == null) node.strokeLineWidth else line,
+                    stroke = lineBrush,
+                    strokeAlpha = if (hasStroke) node.strokeAlpha else node.fillAlpha,
+                    strokeLineWidth = if (hasStroke) maxOf(node.strokeLineWidth, if (fillShown) line else 0f) else line,
                     strokeLineCap = node.strokeLineCap,
                     strokeLineJoin = StrokeJoin.Round,
                     strokeLineMiter = node.strokeLineMiter,

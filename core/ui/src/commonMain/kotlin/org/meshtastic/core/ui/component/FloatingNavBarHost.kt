@@ -297,7 +297,7 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
 private const val SELECTED_ALPHA = 0.12f
 
 private const val MIN_LABEL_SP = 5f
-private const val LABEL_FIT_MARGIN = 0.96f
+private const val LABEL_FIT_MARGIN = 0.88f
 
 /**
  * The name of a button on one line, as big as fits: it is measured at the normal size and, when wider than the room
@@ -322,7 +322,9 @@ private fun FitLabel(text: String) {
             fontSize = sizeSp.sp,
             maxLines = 1,
             softWrap = false,
-            overflow = TextOverflow.Clip,
+            // Never cut: even if the measured width is a little off, the whole name is drawn.
+            overflow = TextOverflow.Visible,
+            modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally, unbounded = true),
         )
     }
 }
