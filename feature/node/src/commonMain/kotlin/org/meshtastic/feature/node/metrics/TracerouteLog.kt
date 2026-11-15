@@ -107,6 +107,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateTraceroute
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.component.CooldownIconButton
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import org.meshtastic.proto.RouteDiscovery
@@ -125,6 +126,8 @@ fun TracerouteLogScreen(
     onNavigateUp: () -> Unit,
     onViewOnMap: (requestId: Int, responseLogUuid: String) -> Unit = { _, _ -> },
 ) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.TRACEROUTE)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()

@@ -22,6 +22,7 @@
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 ## better | Ulepszenia
+- **Szybsze statystyki węzła.** Każdy ekran statystyk czyta pełną historię tylko tych danych, które pokazuje (np. ekran baterii tylko telemetrię), a resztę jako kilka najnowszych wpisów, więc otwiera się szybciej, zwłaszcza na iPhonie i iPadzie. Najnowsze dane widać od razu, a pełna historia dochodzi zaraz potem.
 - Mapa: przyciski + i − są większe i wyżej, więc nie nachodzą na źródła map; logo mapy i źródła nie nachodzą na siebie (źródła zajmują najwyżej 70% szerokości), skala jest pod paskiem z ikonami, a legenda propagacji jest przezroczystsza i też leży wyżej. Napis „Zdrowie sieci” na dolnym pasku jest zawsze cały: mierzony jest rzeczywisty napis i zmniejszany dokładnie tyle, ile trzeba.
 - Przyciski + i − na mapie są teraz przezroczyste jak paski z ikonami, napis „Zdrowie sieci” na dolnym pasku zawsze mieści się w całości (rozmiar liczony ręcznie, także na iPhonie), a w wyborze Bluetooth / Sieć / USB nie ma już cienia ani ptaszka (wybrany jest zaznaczony szarym tłem). Na iPhonie i iPadzie przycisk USB zostaje, a pod nim jest krótka informacja, że system nie pozwala aplikacjom używać USB (do tego potrzebny byłby specjalny układ zatwierdzony przez Apple).
 - Mapa: paski z ikonami i przyciski przybliżania są bardziej przezroczyste, a dolny pasek nawigacji jest na mapie gęstszy, więc lepiej widać napisy.

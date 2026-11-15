@@ -70,6 +70,7 @@ import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Purple
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Paxcount as ProtoPaxcount
 
 private enum class PaxSeries(val color: Color, val legendRes: StringResource) {
@@ -169,6 +170,8 @@ private fun PaxMetricsChart(
 @Composable
 @Suppress("MagicNumber", "LongMethod")
 fun PaxMetricsScreen(metricsViewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(metricsViewModel) { metricsViewModel.useSources(setOf(NodeLogSource.PAX)) }
     val state by metricsViewModel.state.collectAsStateWithLifecycle()
     val isLoading by metricsViewModel.isLoading.collectAsStateWithLifecycle()
     val paxMetrics by metricsViewModel.filteredPaxMetrics.collectAsStateWithLifecycle()

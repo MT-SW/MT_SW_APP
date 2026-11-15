@@ -93,6 +93,7 @@ import org.meshtastic.core.ui.component.IndoorAirQuality
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Telemetry
 
 /** "<label> <value>" — the value arrives already formatted and unit-suffixed, so no numeric format here. */
@@ -109,6 +110,8 @@ private fun degreeUnit(isFahrenheit: Boolean) = MetricFormatter.degreeSymbol(isF
 
 @Composable
 fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.TELEMETRY)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val graphData by viewModel.environmentGraphingData.collectAsStateWithLifecycle()

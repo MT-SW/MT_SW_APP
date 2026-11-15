@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.local_stats_psram
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_string
 import org.meshtastic.core.ui.theme.GraphColors
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Telemetry
 
 /**
@@ -85,6 +86,8 @@ import org.meshtastic.proto.Telemetry
 @Suppress("LongMethod")
 @Composable
 fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.TELEMETRY)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()

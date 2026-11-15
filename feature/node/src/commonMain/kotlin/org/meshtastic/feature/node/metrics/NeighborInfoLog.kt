@@ -59,6 +59,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.component.CooldownIconButton
 import org.meshtastic.feature.node.list.toNeighborReport
 import org.meshtastic.feature.node.list.NeighborReport
@@ -91,6 +92,8 @@ private sealed interface NeighborInfoLogItem {
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.NEIGHBORS)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 

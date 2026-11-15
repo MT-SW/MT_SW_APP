@@ -123,6 +123,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Telemetry
 
@@ -200,6 +201,8 @@ internal sealed interface SignalLogEntry {
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.PACKETS, NodeLogSource.TELEMETRY)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()

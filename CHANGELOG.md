@@ -47,6 +47,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Ulepszenia
 
+* **Szybsze statystyki węzła.** Każdy ekran statystyk czyta pełną historię tylko tych danych, które pokazuje (np. ekran baterii tylko telemetrię), a resztę jako kilka najnowszych wpisów, więc otwiera się szybciej, zwłaszcza na iPhonie i iPadzie. Najnowsze dane widać od razu, a pełna historia dochodzi zaraz potem.
 * Mapa: przyciski + i − są większe i wyżej, więc nie nachodzą na źródła map; logo mapy i źródła nie nachodzą na siebie (źródła zajmują najwyżej 70% szerokości), skala jest pod paskiem z ikonami, a legenda propagacji jest przezroczystsza i też leży wyżej. Napis „Zdrowie sieci” na dolnym pasku jest zawsze cały: mierzony jest rzeczywisty napis i zmniejszany dokładnie tyle, ile trzeba.
 * Przyciski + i − na mapie są teraz przezroczyste jak paski z ikonami, napis „Zdrowie sieci” na dolnym pasku zawsze mieści się w całości (rozmiar liczony ręcznie, także na iPhonie), a w wyborze Bluetooth / Sieć / USB nie ma już cienia ani ptaszka (wybrany jest zaznaczony szarym tłem). Na iPhonie i iPadzie przycisk USB zostaje, a pod nim jest krótka informacja, że system nie pozwala aplikacjom używać USB (do tego potrzebny byłby specjalny układ zatwierdzony przez Apple).
 * Mapa: paski z ikonami i przyciski przybliżania są bardziej przezroczyste, a dolny pasek nawigacji jest na mapie gęstszy, więc lepiej widać napisy.
@@ -904,6 +905,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Improvements
 
+* **Faster node statistics.** Every statistics screen reads the full history only of the data it shows (for example the battery screen only the telemetry) and the rest as a few newest entries, so it opens faster, especially on iPhone and iPad. The newest data is shown at once and the full history follows right after.
 * Map: the toolbars with icons and the zoom buttons are more see-through, and the bottom navigation bar is denser on the map, so the names are easier to read.
 * Device statistics (the metrics in the node details) open faster, especially on the iPhone: they show the newest entries first and the full history follows right after.
 * Look: new settings "Marking of the open tab" (rounded highlight, a line under the name or both) and "Gradient on the buttons" (off, delicate, normal, strong).

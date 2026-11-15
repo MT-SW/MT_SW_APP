@@ -57,6 +57,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Route
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Position
 
 @Composable
@@ -68,6 +69,8 @@ fun TracerouteMapScreen(
     onOpenMeshHud: (() -> Unit)? = null,
     onNavigateUp: () -> Unit,
 ) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(metricsViewModel) { metricsViewModel.useSources(setOf(NodeLogSource.TRACEROUTE)) }
     val state by metricsViewModel.state.collectAsStateWithLifecycle()
     val snapshotPositions by
         remember(logUuid) {

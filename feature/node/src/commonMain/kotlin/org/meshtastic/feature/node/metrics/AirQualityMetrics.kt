@@ -88,6 +88,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Purple
 import org.meshtastic.core.ui.theme.GraphColors.Red
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Telemetry
 import org.meshtastic.proto.AirQualityMetrics as AirQualityMetricsProto
 
@@ -199,6 +200,8 @@ private val LEGEND_DATA =
 @Suppress("LongMethod")
 @Composable
 fun AirQualityMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.TELEMETRY)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()

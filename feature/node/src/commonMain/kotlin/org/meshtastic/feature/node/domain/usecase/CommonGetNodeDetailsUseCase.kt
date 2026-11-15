@@ -91,13 +91,19 @@ constructor(
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     override operator fun invoke(nodeId: Int): Flow<NodeDetailUiState> =
         nodeRepository.effectiveLogNodeId(nodeId).flatMapLatest { effectiveNodeId ->
-            buildFlow(nodeId, effectiveNodeId, fullHistory = true)
+            buildFlow(nodeId, effectiveNodeId, fullHistory = true, sources = NodeLogSource.ALL)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun forSources(nodeId: Int, sources: Set<NodeLogSource>): Flow<NodeDetailUiState> =
+        nodeRepository.effectiveLogNodeId(nodeId).flatMapLatest { effectiveNodeId ->
+            buildFlow(nodeId, effectiveNodeId, fullHistory = true, sources = sources)
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun summary(nodeId: Int): Flow<NodeDetailUiState> =
         nodeRepository.effectiveLogNodeId(nodeId).flatMapLatest { effectiveNodeId ->
-            buildFlow(nodeId, effectiveNodeId, fullHistory = false)
+            buildFlow(nodeId, effectiveNodeId, fullHistory = false, sources = NodeLogSource.ALL)
         }
 
     /**
@@ -106,15 +112,20 @@ constructor(
      * and draws the latest data without waiting for thousands of rows to be read and decoded, which was slow on the
      * iPhone), and the whole history replaces them as soon as it is ready.
      */
-    private fun <T> logSource(fullHistory: Boolean, newest: Flow<List<T>>, all: Flow<List<T>>): Flow<List<T>> =
-        if (fullHistory) {
-            flow {
-                emitAll(newest.take(1))
-                emitAll(all.calmed())
-            }
-        } else {
-            newest.calmed().onStart { emit(emptyList()) }
+    private fun <T> logSource(
+        fullHistory: Boolean,
+        newest: Flow<List<T>>,
+        all: Flow<List<T>>,
+        needed: Boolean = true,
+    ): Flow<List<T>> = if (fullHistory) {
+        flow {
+            emitAll(newest.take(1))
+            // A screen that does not show this kind keeps the newest entries and never reads the whole history.
+            if (needed) emitAll(all.calmed())
         }
+    } else {
+        newest.calmed().onStart { emit(emptyList()) }
+    }
 
     /** The summary only needs to know whether a request exists, so it decodes far fewer entries than the full read. */
     private fun requestLogs(nodeId: Int, port: PortNum, fullHistory: Boolean): Flow<List<MeshLog>> = if (fullHistory) {
@@ -124,7 +135,12 @@ constructor(
     }
 
     @Suppress("LongMethod", "CyclomaticComplexMethod")
-    private fun buildFlow(nodeId: Int, effectiveNodeId: Int, fullHistory: Boolean): Flow<NodeDetailUiState> {
+    private fun buildFlow(
+        nodeId: Int,
+        effectiveNodeId: Int,
+        fullHistory: Boolean,
+        sources: Set<NodeLogSource>,
+    ): Flow<NodeDetailUiState> {
         val nodeFlow =
             nodeRepository.nodeDBbyNum.map { it[nodeId] ?: Node.createFallback(nodeId, "") }.distinctUntilChanged()
 
@@ -137,11 +153,13 @@ constructor(
                     fullHistory,
                     meshLogRepository.getTelemetryFromLimited(effectiveNodeId, TELEMETRY_ITEMS),
                     meshLogRepository.getTelemetryFrom(effectiveNodeId),
+                    needed = NodeLogSource.TELEMETRY in sources,
                 ),
                 logSource(
                     fullHistory,
                     meshLogRepository.getMeshPacketsFromLimited(effectiveNodeId, maxItem = QUICK_LOG_ITEMS),
                     meshLogRepository.getMeshPacketsFrom(effectiveNodeId),
+                    needed = NodeLogSource.PACKETS in sources,
                 ),
                 logSource(
                     fullHistory,
@@ -151,6 +169,7 @@ constructor(
                         QUICK_LOG_ITEMS,
                     ),
                     meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value),
+                    needed = NodeLogSource.POSITION in sources,
                 ),
                 logSource(
                     fullHistory,
@@ -160,6 +179,7 @@ constructor(
                         QUICK_LOG_ITEMS,
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value),
+                    needed = NodeLogSource.PAX in sources,
                 ),
                 logSource(
                     fullHistory,
@@ -169,6 +189,7 @@ constructor(
                         QUICK_LOG_ITEMS,
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value),
+                    needed = NodeLogSource.TRACEROUTE in sources,
                 ),
                 logSource(
                     fullHistory,
@@ -178,9 +199,10 @@ constructor(
                         QUICK_LOG_ITEMS,
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value),
+                    needed = NodeLogSource.NEIGHBORS in sources,
                 ),
                 // Traceroutes other nodes ran to us are logged under each tracer, so our own page gathers them all.
-                if (effectiveNodeId == MeshLog.NODE_NUM_LOCAL) {
+                if (effectiveNodeId == MeshLog.NODE_NUM_LOCAL && NodeLogSource.TRACEROUTE in sources) {
                     meshLogRepository.getInboundRequestLogs(PortNum.TRACEROUTE_APP).onStart { emit(emptyList()) }
                 } else {
                     flowOf(emptyList())
@@ -251,8 +273,8 @@ constructor(
         // 5. Requests History (we still query request logs by the target nodeId)
         val requestsFlow =
             combine(
-                requestLogs(nodeId, PortNum.TRACEROUTE_APP, fullHistory).onStart { emit(emptyList()) },
-                requestLogs(nodeId, PortNum.NEIGHBORINFO_APP, fullHistory).onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.TRACEROUTE_APP, fullHistory && NodeLogSource.TRACEROUTE in sources).onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.NEIGHBORINFO_APP, fullHistory && NodeLogSource.NEIGHBORS in sources).onStart { emit(emptyList()) },
             ) { trReqs, niReqs ->
                 trReqs to niReqs
             }

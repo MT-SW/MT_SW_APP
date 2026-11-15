@@ -24,6 +24,12 @@ interface GetNodeDetailsUseCase {
     /** The full history of the node. Used by the statistics screens; it arrives only when everything is read. */
     operator fun invoke(nodeId: Int): Flow<NodeDetailUiState>
 
+    /**
+     * Like [invoke], but reads the full history only of the [sources] a screen shows; the other kinds are read as the
+     * newest few entries only.
+     */
+    fun forSources(nodeId: Int, sources: Set<NodeLogSource>): Flow<NodeDetailUiState> = invoke(nodeId)
+
     /** Only the newest entries: enough to know which statistics exist, and ready at once. For the detail screen. */
     fun summary(nodeId: Int): Flow<NodeDetailUiState>
 }

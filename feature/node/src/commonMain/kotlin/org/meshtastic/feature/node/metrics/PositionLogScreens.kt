@@ -100,6 +100,7 @@ import org.meshtastic.core.ui.util.LocalTrackOverlay
 import org.meshtastic.core.ui.util.TrackCompare
 import org.meshtastic.core.ui.util.TrackOverlay
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Position
 
 @Suppress("LongMethod", "ModifierMissing")
@@ -110,6 +111,8 @@ fun PositionLogScreen(
     /** Null hides the mesh view button, for platforms with no camera. */
     onOpenMeshHud: (() -> Unit)? = null,
 ) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.POSITION, NodeLogSource.PACKETS)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val positions = state.positionLogs

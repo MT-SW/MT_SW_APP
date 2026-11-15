@@ -86,6 +86,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.InfantryBlue
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Telemetry
 
 private enum class PowerMetric(val color: Color) {
@@ -161,6 +162,8 @@ private val LEGEND_DATA =
 @Suppress("LongMethod")
 @Composable
 fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+    // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
+    remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.TELEMETRY)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()

@@ -91,6 +91,7 @@ import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeDetailUiState
 import org.meshtastic.feature.node.detail.NodeRequestActions
 import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
+import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.TimeFrame
 import org.meshtastic.proto.MeshPacket
@@ -129,13 +130,30 @@ open class MetricsViewModel(
 
     // One shared pipeline for everything on this screen: it used to be built twice (metrics and environment), which
     // doubled the database reads and the decoding.
+    //
+    // A screen says with [useSources] which kinds of logged data it shows, so only their full history is read (the
+    // rest is read as the newest few entries). A screen that says nothing gets everything.
+    private val requestedSources = MutableStateFlow(NodeLogSource.ALL)
+
     private val nodeDetails: StateFlow<NodeDetailUiState?> =
-        activeNodeId
-            .flatMapLatest { nodeId ->
+        combine(activeNodeId, requestedSources) { nodeId, sources -> nodeId to sources }
+            .flatMapLatest { (nodeId, sources) ->
                 if (nodeId == null) return@flatMapLatest flowOf(null)
-                getNodeDetailsUseCase(nodeId)
+                if (sources == NodeLogSource.ALL) {
+                    getNodeDetailsUseCase(nodeId)
+                } else {
+                    getNodeDetailsUseCase.forSources(nodeId, sources)
+                }
             }
             .stateInWhileSubscribed(initialValue = null)
+
+    /**
+     * Tells which kinds of logged data the screen shows, so only their full history is read. A screen calls it while
+     * it is first composed, before it starts to collect [state], so nothing else is read first.
+     */
+    fun useSources(sources: Set<NodeLogSource>) {
+        requestedSources.value = sources
+    }
 
     /** True until the node's history has been read -- the statistics screens show a loading indicator meanwhile. */
     val isLoading: StateFlow<Boolean> = nodeDetails.map { it == null }.stateInWhileSubscribed(initialValue = true)
