@@ -148,6 +148,9 @@ private const val LABEL_LINE_HEIGHT_SP = 16
 private const val SMALL_LABEL_SIZE_SP = 8
 private const val TINY_LABEL_SIZE_SP = 7
 
+/** Room kept free across a button name (both sides together), so the corners of the highlight do not cut it. */
+private const val LABEL_SIDE_ROOM_DP = 6
+
 private const val BAR_PADDING_DP = 6
 private const val ITEM_SIDE_PADDING_DP = 1
 private const val MIN_STEP_PX = 1f
@@ -383,6 +386,7 @@ private const val MAP_BAR_DENSER = 30
 @Composable
 private fun FitLabel(text: String) {
     var step by remember(text) { mutableIntStateOf(0) }
+    val marginPx = with(LocalDensity.current) { LABEL_SIDE_ROOM_DP.dp.toPx() }
     val small = step > 0
     val shown = if (small && ' ' in text) text.replaceFirst(' ', '\n') else text
     BasicText(
@@ -394,7 +398,11 @@ private fun FitLabel(text: String) {
         overflow = TextOverflow.Clip,
         modifier = Modifier.fillMaxWidth(),
         onTextLayout = { layout ->
-            val overflowing = layout.didOverflowWidth || layout.getLineRight(0) - layout.getLineLeft(0) > layout.size.width
+            // A name that only just fits is still cut: the rounded corners of the button's highlight take the first and
+            // the last letter. So a little room is kept free on both sides.
+            var widest = 0f
+            for (line in 0 until layout.lineCount) widest = maxOf(widest, layout.getLineRight(line) - layout.getLineLeft(line))
+            val overflowing = layout.didOverflowWidth || widest > layout.size.width - marginPx
             if (overflowing && step < 2) step++
         },
     )
