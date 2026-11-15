@@ -25,9 +25,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,9 +36,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -71,9 +69,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
@@ -298,35 +296,31 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
 
 private const val SELECTED_ALPHA = 0.12f
 
-private const val MIN_LABEL_SP = 5f
-private const val LABEL_FIT_MARGIN = 0.88f
+private const val LABEL_MIN_SP = 5f
+private const val LABEL_STEP_SP = 0.25f
 
 /**
- * The name of a button on one line, as big as fits: it is measured at the normal size and, when wider than the room
- * the button has, scaled down to that room (so "Network health" is never cut off).
+ * The name of a button on one line, as big as fits: the text system itself shrinks it step by step until the whole name
+ * fits the width of the button (so "Network health" is never cut off).
  */
 @Composable
 private fun FitLabel(text: String) {
-    val measurer = rememberTextMeasurer()
-    val base = MaterialTheme.typography.labelSmall.copy(fontSize = LABEL_SIZE_SP.sp)
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        val room = constraints.maxWidth
-        val wanted = remember(text, base) { measurer.measure(text, base, softWrap = false, maxLines = 1).size.width }
-        val sizeSp =
-            if (room == Constraints.Infinity || wanted <= room) {
-                LABEL_SIZE_SP.toFloat()
-            } else {
-                (LABEL_SIZE_SP * room * LABEL_FIT_MARGIN / wanted).coerceAtLeast(MIN_LABEL_SP)
-            }
-        Text(
-            text = text,
-            style = base,
-            fontSize = sizeSp.sp,
-            maxLines = 1,
-            softWrap = false,
-            // Never cut: even if the measured width is a little off, the whole name is drawn.
-            overflow = TextOverflow.Visible,
-            modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally, unbounded = true),
-        )
-    }
+    BasicText(
+        text = text,
+        modifier = Modifier.fillMaxWidth(),
+        style =
+        MaterialTheme.typography.labelSmall.copy(
+            fontSize = LABEL_SIZE_SP.sp,
+            color = LocalContentColor.current,
+            textAlign = TextAlign.Center,
+        ),
+        maxLines = 1,
+        softWrap = false,
+        autoSize =
+        TextAutoSize.StepBased(
+            minFontSize = LABEL_MIN_SP.sp,
+            maxFontSize = LABEL_SIZE_SP.sp,
+            stepSize = LABEL_STEP_SP.sp,
+        ),
+    )
 }

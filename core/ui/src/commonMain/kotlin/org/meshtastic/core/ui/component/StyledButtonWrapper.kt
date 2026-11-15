@@ -69,15 +69,9 @@ private fun Modifier.buttonStyle(group: String, shape: Shape): Modifier {
     val options = rememberUiOptions()
     val style = options.element(group)
     if (style.look == ElementLook.FLAT) return this
-    // Buttons get no shadow plate (it looked like a shifted layer): only a gentle gradient (light above, a little
-    // shade below) and a thin rim, which is enough for a soft 3D feeling; glass and see-through keep their own rim.
-    val withRim =
-        if (style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS) {
-            styledLook(group, shape, style.look, options.rimDp())
-        } else {
-            this
-        }
-    return withRim.softGradient(shape, style.strength)
+    // Buttons get no shadow plate and no double glass rim (they looked like a shifted layer): only a gentle gradient
+    // (light above, a little shade below) with one thin rim, a soft 3D feeling in every look.
+    return softGradient(shape, style.strength)
 }
 
 private const val GRADIENT_TOP_ALPHA = 0.16f
@@ -129,6 +123,7 @@ fun Button(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val styled = buttonLook(group, colors.containerColor)
     MaterialButton(
         onClick = onClick,
@@ -136,7 +131,8 @@ fun Button(
         enabled = enabled,
         shape = shape,
         colors = remember(colors, styled) { colors.copy(containerColor = styled) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
@@ -158,6 +154,7 @@ fun FilledTonalButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val styled = buttonLook(group, colors.containerColor)
     MaterialFilledTonalButton(
         onClick = onClick,
@@ -165,7 +162,8 @@ fun FilledTonalButton(
         enabled = enabled,
         shape = shape,
         colors = remember(colors, styled) { colors.copy(containerColor = styled) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
@@ -187,6 +185,7 @@ fun OutlinedButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
     // The plain outlined button has no fill; with a look it gets a pane of the surface colour, so the shadow, the
     // glass and the rim have something to be drawn on.
@@ -197,7 +196,8 @@ fun OutlinedButton(
         enabled = enabled,
         shape = shape,
         colors = if (look == ElementLook.FLAT) colors else remember(colors, fill) { colors.copy(containerColor = fill) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
@@ -220,6 +220,7 @@ fun Button(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
     val styled = buttonLook(group, colors.containerColor)
     MaterialButton(
@@ -228,7 +229,8 @@ fun Button(
         modifier = modifier.buttonStyle(group, shapes.shape),
         enabled = enabled,
         colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
@@ -251,6 +253,7 @@ fun FilledTonalButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
     val styled = buttonLook(group, colors.containerColor)
     MaterialFilledTonalButton(
@@ -259,7 +262,8 @@ fun FilledTonalButton(
         modifier = modifier.buttonStyle(group, shapes.shape),
         enabled = enabled,
         colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
@@ -282,6 +286,7 @@ fun OutlinedButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val group = LocalCardGroup.current
+    val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
     val styled = buttonLook(group, MaterialTheme.colorScheme.surfaceContainerHigh, colors.containerColor)
     MaterialOutlinedButton(
@@ -290,7 +295,8 @@ fun OutlinedButton(
         modifier = modifier.buttonStyle(group, shapes.shape),
         enabled = enabled,
         colors = if (look == ElementLook.FLAT) colors else remember(colors, styled) { colors.copy(containerColor = styled) },
-        elevation = elevation,
+        // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
+        elevation = if (flat) elevation else null,
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
