@@ -68,6 +68,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Naprawione błędy
 
+* Android: przycisk SOS (i przycisk wysyłania z wibracją przy przytrzymaniu) wywalał aplikację na telefonach, które nie pozwalały na wibrację, bo aplikacja nie miała uprawnienia do wibracji. Dodano uprawnienie, a brak wibracji nigdy nie zamyka aplikacji.
 * „Uruchamiaj z komputerem” działa na Windowsie i w AppImage na Linuksie. Na Windowsie wpis jest zapisywany przez plik .reg i sprawdzany po zapisie, a gdy rejestr go nie przyjmie, start trafia do folderu Autostart; na Linuksie wpis ma też `Terminal=false`.
 * iPhone/iPad: przesunięte klikanie w dymki na mapie, brak dźwięku powiadomień przy zablokowanym telefonie, błąd kopii zapasowej, gaśnięcie ekranu podczas aktualizacji.
 * Zdalna administracja pyta o wersję MT_SW_FIRMWARE także węzeł zdalny.
@@ -929,6 +930,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 
+* Android: the SOS button (and the send button with the buzz while held) crashed the app on phones that did not allow vibration, because the app lacked the vibration permission. The permission was added, and a failed vibration never closes the app.
 * "Start with the computer" works on Windows and in the AppImage on Linux. On Windows the entry is written through a .reg file and checked after writing; when the registry does not take it, the start goes to the Startup folder; on Linux the entry also has `Terminal=false`.
 * iPhone/iPad: shifted taps on the map bubbles, no notification sound on a locked phone, an error of the backup, the screen going off during an update.
 * Remote administration asks for the MT_SW_FIRMWARE version of the remote node too.

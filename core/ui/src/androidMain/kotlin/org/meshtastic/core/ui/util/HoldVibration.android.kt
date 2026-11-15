@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import co.touchlab.kermit.Logger
 
 private const val BUZZ_ON_MS = 60L
 private const val BUZZ_OFF_MS = 15L
@@ -49,11 +50,22 @@ private class AndroidHoldVibration(context: Context) : HoldVibration {
     override fun start() {
         val motor = vibrator?.takeIf { it.hasVibrator() } ?: return
         val timings = longArrayOf(0L, BUZZ_ON_MS, BUZZ_OFF_MS)
-        motor.vibrate(VibrationEffect.createWaveform(timings, 0))
+        // A phone that does not allow the vibration (or has no working motor) must never take the app down with it.
+        @Suppress("TooGenericExceptionCaught")
+        try {
+            motor.vibrate(VibrationEffect.createWaveform(timings, 0))
+        } catch (e: RuntimeException) {
+            Logger.w(e) { "Hold vibration could not start" }
+        }
     }
 
     override fun stop() {
-        vibrator?.cancel()
+        @Suppress("TooGenericExceptionCaught")
+        try {
+            vibrator?.cancel()
+        } catch (e: RuntimeException) {
+            Logger.w(e) { "Hold vibration could not stop" }
+        }
     }
 }
 

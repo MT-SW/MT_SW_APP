@@ -41,6 +41,7 @@
 - Panorama: smoother ridges, new textures of mountains and forests, faster drawing of buildings; the buildings download in small pieces and each is saved at once.
 - Firmware update over Bluetooth on iPhone/iPad finds the device in update mode without a MAC address.
 ## fix | Fixed bugs
+- Android: the SOS button (and the send button with the buzz while held) crashed the app on phones that did not allow vibration, because the app lacked the vibration permission. The permission was added, and a failed vibration never closes the app.
 - "Start with the computer" works on Windows and in the AppImage on Linux.
 - iPhone/iPad: shifted taps on the map bubbles, no notification sound on a locked phone, an error of the backup, the screen going off during an update.
 - Remote administration asks for the MT_SW_FIRMWARE version of the remote node too.

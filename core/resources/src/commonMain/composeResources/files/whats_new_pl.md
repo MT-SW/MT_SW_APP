@@ -41,6 +41,7 @@
 - Panorama: gładsze grzbiety, nowe tekstury gór i lasów, szybsze rysowanie budynków; budynki pobierają się od małych kawałków i każdy zapisuje się od razu.
 - Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 ## fix | Naprawione błędy
+- Android: przycisk SOS (i przycisk wysyłania z wibracją przy przytrzymaniu) wywalał aplikację na telefonach, które nie pozwalały na wibrację, bo aplikacja nie miała uprawnienia do wibracji. Dodano uprawnienie, a brak wibracji nigdy nie zamyka aplikacji.
 - „Uruchamiaj z komputerem” działa na Windowsie i w AppImage na Linuksie.
 - iPhone/iPad: przesunięte klikanie w dymki na mapie, brak dźwięku powiadomień przy zablokowanym telefonie, błąd kopii zapasowej, gaśnięcie ekranu podczas aktualizacji.
 - Zdalna administracja pyta o wersję MT_SW_FIRMWARE także węzeł zdalny.
