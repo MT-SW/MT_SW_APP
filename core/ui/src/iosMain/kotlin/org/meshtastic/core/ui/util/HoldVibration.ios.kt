@@ -26,12 +26,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import platform.AudioToolbox.AudioServicesPlaySystemSound
+import platform.UIKit.UIImpactFeedbackGenerator
+import platform.UIKit.UIImpactFeedbackStyle
 
 /** The system sound id of the iPhone's standard vibration. */
 private const val SYSTEM_VIBRATE_ID = 4095u
 
 /** One system vibration lasts about this long, so the next one is started right after it. */
 private const val VIBRATE_REPEAT_MS = 380L
+
+/** The pause between two strong taps of the Taptic Engine. */
+private const val TAP_REPEAT_MS = 55L
 
 @Composable
 actual fun rememberHoldVibration(): HoldVibration = remember { IosHoldVibration() }
@@ -45,9 +50,19 @@ private class IosHoldVibration : HoldVibration {
         if (job?.isActive == true) return
         job =
             scope.launch {
+                // The Taptic Engine hammered with strong taps feels like one buzz; the system vibration is played too,
+                // for the phones where only that one is switched on in the sound settings.
+                val taps = UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleHeavy)
+                taps.prepare()
+                var sinceVibrate = VIBRATE_REPEAT_MS
                 while (isActive) {
-                    AudioServicesPlaySystemSound(SYSTEM_VIBRATE_ID)
-                    delay(VIBRATE_REPEAT_MS)
+                    taps.impactOccurred()
+                    if (sinceVibrate >= VIBRATE_REPEAT_MS) {
+                        AudioServicesPlaySystemSound(SYSTEM_VIBRATE_ID)
+                        sinceVibrate = 0L
+                    }
+                    delay(TAP_REPEAT_MS)
+                    sinceVibrate += TAP_REPEAT_MS
                 }
             }
     }
@@ -56,4 +71,12 @@ private class IosHoldVibration : HoldVibration {
         job?.cancel()
         job = null
     }
+}
+
+@Composable
+actual fun rememberTapHaptic(): () -> Unit = remember {
+    val generator = UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium)
+    generator.prepare()
+    val tap: () -> Unit = { generator.impactOccurred() }
+    tap
 }

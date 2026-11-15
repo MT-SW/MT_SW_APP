@@ -23,7 +23,9 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 
 private const val BUZZ_ON_MS = 60L
 private const val BUZZ_OFF_MS = 15L
@@ -53,4 +55,10 @@ private class AndroidHoldVibration(context: Context) : HoldVibration {
     override fun stop() {
         vibrator?.cancel()
     }
+}
+
+@Composable
+actual fun rememberTapHaptic(): () -> Unit {
+    val haptic = LocalHapticFeedback.current
+    return remember(haptic) { { haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) } }
 }

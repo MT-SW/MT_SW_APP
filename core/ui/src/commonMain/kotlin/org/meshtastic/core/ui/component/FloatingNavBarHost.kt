@@ -64,13 +64,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -79,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import org.meshtastic.core.ui.util.rememberTapHaptic
 import org.meshtastic.core.model.ElementStyle
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
@@ -145,7 +144,7 @@ internal fun FloatingNavBarHost(
     val keyboardUp = WindowInsets.ime.getBottom(density) > 0
     val hideStep = options[UiOptions.NAV_HIDE]
     val showStep = options[UiOptions.NAV_SHOW]
-    val haptic = LocalHapticFeedback.current
+    val tapHaptic = rememberTapHaptic()
     val vibrate = options.flag(UiOptions.NAV_HAPTICS)
 
     // Another tab, or turning the hiding off, always brings the bar back.
@@ -223,7 +222,7 @@ internal fun FloatingNavBarHost(
                     // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
                     bottomMargin = if (barHeight != null) barBottomGap + BAR_LIFT_DP.dp else BAR_MARGIN_DP.dp,
                     onSelect = { entry ->
-                        if (vibrate && !entry.selected) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        if (vibrate && !entry.selected) tapHaptic()
                         entry.onClick()
                     },
                     modifier = Modifier.onSizeChanged { barHeightPx = it.height },

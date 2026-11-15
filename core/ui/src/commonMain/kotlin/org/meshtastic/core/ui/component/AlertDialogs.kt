@@ -142,7 +142,14 @@ fun MeshtasticDialog(
             Surface(
                 modifier =
                 Modifier.widthIn(min = 280.dp, max = 560.dp)
-                    .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp)),
+                    .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp))
+                    .then(
+                        if (dialogFade < 1f) {
+                            Modifier.glassEdge(RoundedCornerShape(28.dp), rememberUiOptions().rimDp())
+                        } else {
+                            Modifier
+                        },
+                    ),
                 shape = RoundedCornerShape(28.dp),
                 color = AlertDialogDefaults.containerColor.copy(alpha = dialogFade),
                 tonalElevation = AlertDialogDefaults.TonalElevation,
@@ -274,4 +281,4 @@ fun MeshtasticTextDialog(
 }
 
 private const val DIALOG_PERCENT = 100f
-private const val DIALOG_MIN_ALPHA = 0.12f
+private const val DIALOG_MIN_ALPHA = 0.92f

@@ -27,3 +27,5 @@ private object NoHoldVibration : HoldVibration {
 
     override fun stop() = Unit
 }
+
+@Composable actual fun rememberTapHaptic(): () -> Unit = {}

@@ -32,3 +32,9 @@ interface HoldVibration {
 
 /** The vibration of this platform, remembered for as long as the screen exists. */
 @Composable expect fun rememberHoldVibration(): HoldVibration
+
+/**
+ * A single short tap of the vibration motor (for example when a tab of the bottom bar is changed). On the iPhone it is
+ * the Taptic Engine; the standard Compose haptics do nothing there.
+ */
+@Composable expect fun rememberTapHaptic(): () -> Unit

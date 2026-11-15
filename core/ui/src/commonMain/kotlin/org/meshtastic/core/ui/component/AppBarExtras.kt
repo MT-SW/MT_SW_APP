@@ -58,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.ui.util.rememberHoldVibration
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
@@ -122,10 +123,17 @@ fun SosChip(
     var pressed by remember { mutableStateOf(false) }
     val progress = remember { Animatable(0f) }
     val currentHold by rememberUpdatedState(onHoldComplete)
+    val vibration = rememberHoldVibration()
     LaunchedEffect(pressed, holdSeconds, enabled) {
         if (pressed && enabled && currentHold != null) {
             progress.snapTo(0f)
-            progress.animateTo(1f, tween(durationMillis = holdSeconds * MILLIS, easing = LinearEasing))
+            // The phone buzzes while the button is held, until the line closes or the finger is lifted.
+            try {
+                vibration.start()
+                progress.animateTo(1f, tween(durationMillis = holdSeconds * MILLIS, easing = LinearEasing))
+            } finally {
+                vibration.stop()
+            }
             currentHold?.invoke()
             pressed = false
         } else {
