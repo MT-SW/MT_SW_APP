@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeInput
 import dev.chrisbanes.haze.HazeState
@@ -59,7 +61,9 @@ private const val SHADE_BOTTOM_ALPHA = 0.08f
 private const val RIM_TOP_ALPHA = 0.5f
 private const val RIM_BOTTOM_ALPHA = 0.06f
 private const val FLAT_SHADOW_DP = 14f
-private const val GLASS_FALLBACK_MIN_ALPHA = 0.78f
+private const val GLASS_FALLBACK_MIN_ALPHA = 0.88f
+private const val READABLE_LUMINANCE = 0.5f
+private val READABLE_DARK = Color(0xFF1B1B1F)
 private const val GLASS_TINT_LIGHT = 1
 private const val GLASS_TINT_DARK = 2
 private const val GLASS_TINT_ACCENT = 3
@@ -91,6 +95,19 @@ internal fun UiOptions.glassBase(base: Color): Color = when (get(UiOptions.GLASS
     GLASS_TINT_DARK -> lerp(base, Color.Black, GLASS_TINT_MIX)
     GLASS_TINT_ACCENT -> lerp(base, MaterialTheme.colorScheme.primary, GLASS_TINT_MIX)
     else -> base
+}
+
+/**
+ * The colour for icons and letters placed on an element of [group] that follows the chosen look: the "colour of the
+ * glass" option can make the glass nearly white or black, so the usual text colour of the theme could vanish on it;
+ * this one is always dark on light glass and white on dark glass.
+ */
+@Composable
+fun glassContentColor(group: String, base: Color = MaterialTheme.colorScheme.surfaceContainerHigh): Color {
+    val options = rememberUiOptions()
+    if (options.element(group).look != ElementLook.GLASS) return MaterialTheme.colorScheme.contentColorFor(base)
+    val tinted = options.glassBase(base)
+    return if (tinted.luminance() > READABLE_LUMINANCE) READABLE_DARK else Color.White
 }
 
 /** The depth look of [elementLook], with its strength 0-100. */

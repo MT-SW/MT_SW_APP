@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.StyledSurface
+import org.meshtastic.core.ui.component.glassContentColor
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.rememberUiOptions
 
@@ -62,7 +63,7 @@ fun MapButton(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = iconTint ?: MaterialTheme.colorScheme.onSurface,
+                tint = iconTint ?: glassContentColor(UiOptions.GROUP_MAP),
             )
         }
     } else {
@@ -77,7 +78,7 @@ fun MapButton(
                 Icon(
                     imageVector = icon,
                     contentDescription = contentDescription,
-                    tint = iconTint ?: MaterialTheme.colorScheme.onSurface,
+                    tint = iconTint ?: glassContentColor(UiOptions.GROUP_MAP),
                 )
             }
         }
