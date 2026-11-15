@@ -168,6 +168,13 @@ fun WhatsNewHost(uiViewModel: UIViewModel) {
 @Composable
 fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
     var request by remember { mutableStateOf(initialRequest) }
+    // "Since the last stable" keeps the range the person was offered (for an update that may span several releases).
+    val sinceStable =
+        if (initialRequest.full) {
+            WhatsNewRequest(full = false, fromRelease = MtswRelease.RELEASE - 1)
+        } else {
+            initialRequest
+        }
     val all by
         produceState<List<WhatsNewRelease>?>(initialValue = null) {
             value =
@@ -193,7 +200,13 @@ fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
-                        text = stringResource(Res.string.whats_new_title) + "  " + releaseLabel(),
+                        // The version belongs only to "what changed lately"; the whole history is tied to no version.
+                        text =
+                        if (request.full) {
+                            stringResource(Res.string.whats_new_title)
+                        } else {
+                            stringResource(Res.string.whats_new_title) + "  " + releaseLabel()
+                        },
                         style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
@@ -208,9 +221,7 @@ fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
                             selected = !request.full,
-                            onClick = {
-                                request = WhatsNewRequest(full = false, fromRelease = MtswRelease.RELEASE - 1)
-                            },
+                            onClick = { request = sinceStable },
                             label = { Text(stringResource(Res.string.whats_new_since_stable)) },
                         )
                         FilterChip(

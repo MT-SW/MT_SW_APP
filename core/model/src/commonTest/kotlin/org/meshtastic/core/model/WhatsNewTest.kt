@@ -71,4 +71,26 @@ class WhatsNewTest {
         assertEquals(4, WhatsNew.plan(false, "", 0, 5, 0)!!.fromRelease)
         assertEquals(4, WhatsNew.plan(false, "4.0", 5, 5, 0)!!.fromRelease)
     }
+
+    @Test
+    fun `an update never shows the history from the beginning`() {
+        val request = WhatsNew.plan(false, "4.0", 3, 5, 0)!!
+        assertEquals(false, request.full)
+        val shown = WhatsNew.select(WhatsNew.parse(textWithFour), request.copy(fromRelease = 3), release = 5)
+        assertEquals(listOf(5, 4), shown.map { it.order })
+    }
+
+    private val textWithFour =
+        """
+        # 5 | Five
+        ## new | New
+        - a
+        # 4 | Four
+        ## new | New
+        - b
+        # 0 | Beginning
+        ## new | New
+        - c
+        """
+            .trimIndent()
 }

@@ -131,7 +131,7 @@ W „Funkcjach MT_SW” jest „Archiwum wiadomości”: trzyma kopię Twoich wi
 
 ## Nowości w aplikacji
 
-Po aktualizacji aplikacja sama pokazuje okno „Nowości w aplikacji” z listą zmian od ostatniej stabilnej wersji, podzieloną na: nowe funkcje, ulepszenia, naprawione błędy i zmiany względem oryginału. Nowa instalacja dostaje całą listę od początku tworzenia aplikacji, ale dopiero po zatwierdzeniu zgody, zamknięciu ekranów powitalnych i skonfigurowaniu radia (gdy radia nie ma — po kilku minutach w aplikacji). W oknie przełączasz „Od ostatniej stabilnej” i „Wszystko od początku”, a przycisk „Pełna lista zmian” otwiera CHANGELOG w przeglądarce. Listę możesz otworzyć w dowolnej chwili w „Funkcjach MT_SW” → „Nowości w aplikacji”. Działa tak samo na Androidzie, komputerze i iPhonie/iPadzie.
+Po aktualizacji aplikacja sama pokazuje okno „Nowości w aplikacji” z listą zmian od ostatniej stabilnej wersji, podzieloną na: nowe funkcje, ulepszenia, naprawione błędy i zmiany względem oryginału. Nowa instalacja dostaje całą listę od początku tworzenia aplikacji, ale dopiero po zatwierdzeniu zgody, zamknięciu ekranów powitalnych i skonfigurowaniu radia (gdy radia nie ma — po kilku minutach w aplikacji). W oknie przełączasz „Od ostatniej stabilnej” i „Wszystko od początku”, a przycisk „Pełna lista zmian” otwiera CHANGELOG w przeglądarce. Listę możesz otworzyć w dowolnej chwili w „Funkcjach MT_SW” → „Nowości w aplikacji”. Lista „od początku” nie jest związana z żadną wersją aplikacji, a numer wersji w tytule okna widać tylko przy zmianach od ostatniej stabilnej. Działa tak samo na Androidzie, komputerze i iPhonie/iPadzie.
 
 ## Start w zasobniku (komputer)
 
