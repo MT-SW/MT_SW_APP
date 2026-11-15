@@ -31,6 +31,8 @@ import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.movableContentOf
@@ -253,6 +255,12 @@ private fun Columns(
     // The usable width (without the dividers) in dp, for the dividers' drag maths.
     val usableDp = ((totalPx - dividerPx * dividerCount).coerceAtLeast(0)) / density.density
     val minShare = if (usableDp > 0f) ThreeColumnWidths.MIN_PANE_DP / usableDp else 0f
+    // The conversations list beside an open conversation: the floating bar moves under it (see FloatingBarState).
+    val bar = LocalFloatingBar.current
+    val usablePx = (totalPx - dividerPx * dividerCount).coerceAtLeast(0)
+    val barSidePx = if (narrowList && usablePx > 0) (usablePx * widths.chatListDetailShare).toInt().coerceIn(0, usablePx) else 0
+    SideEffect { bar?.sideWidthPx = barSidePx }
+    DisposableEffect(bar) { onDispose { bar?.sideWidthPx = 0 } }
     // A plain Layout, not BoxWithConstraints: that one composes its content late (during layout), and while the window
     // switches between layouts the same screen would then briefly exist in both at once ("Key ... was used multiple
     // times"). A plain Layout composes with the rest of the screen, as the library's does.

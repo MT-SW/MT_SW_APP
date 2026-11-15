@@ -20,12 +20,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -102,11 +99,11 @@ class FloatingBarState {
     /** How many screens (the map) ask for a somewhat darker bar, see [FloatingBarDarker]. */
     var darkerCount by mutableIntStateOf(0)
 
-    /** How many screens (an open conversation) ask for the bar to give way, see [FloatingBarHidden]. */
-    var hiddenCount by mutableIntStateOf(0)
-
-    /** The bar was called back by hand (the handle at the left edge) while a screen asks for it to give way. */
-    var peek by mutableStateOf(false)
+    /**
+     * The width in pixels of the conversations list when it stands beside an open conversation (0 when it does not).
+     * The bar then moves under that list, so it does not cover the message field of the conversation.
+     */
+    var sideWidthPx by mutableIntStateOf(0)
 }
 
 internal val LocalFloatingBar = staticCompositionLocalOf<FloatingBarState?> { null }
@@ -132,19 +129,6 @@ fun FloatingBarDarker() {
 }
 
 /**
- * Called by a screen that needs the whole bottom of the window (an open conversation, whose message field the bar
- * would cover): the bar slides out to the left and leaves a thin handle at the left edge that brings it back.
- */
-@Composable
-fun FloatingBarHidden() {
-    val state = LocalFloatingBar.current
-    DisposableEffect(state) {
-        state?.let { it.hiddenCount++ }
-        onDispose { state?.let { it.hiddenCount-- } }
-    }
-}
-
-/**
  * Called by a scrolling screen to let its content run under the floating bar (so it shows through the glass): the
  * screen then pads the end of its lists with [LocalFloatingBarInset]. A screen that does not call this simply ends
  * above the bar.
@@ -159,9 +143,6 @@ fun FloatingBarUnderlap() {
 }
 
 private const val BAR_MAX_WIDTH_DP = 560
-private const val HANDLE_WIDTH_DP = 14
-private const val HANDLE_HEIGHT_DP = 72
-private const val HANDLE_ALPHA = 0.35f
 private const val BAR_CORNER_DP = 32
 private const val ITEM_CORNER_DP = 26
 private const val BAR_MARGIN_DP = 8
@@ -205,11 +186,7 @@ internal fun FloatingNavBarHost(
     val vibrate = options.flag(UiOptions.NAV_HAPTICS)
 
     // Another tab, or turning the hiding off, always brings the bar back.
-    LaunchedEffect(destinationKey, hideStep) {
-        state.shown = true
-        state.peek = false
-    }
-    LaunchedEffect(state.hiddenCount) { if (state.hiddenCount == 0) state.peek = false }
+    LaunchedEffect(destinationKey, hideStep) { state.shown = true }
 
     val hideAfterPx =
         with(density) { UiOptions.HIDE_STEPS_DP[hideStep.coerceIn(0, UiOptions.HIDE_STEPS_DP.lastIndex)].dp.toPx() }
@@ -246,8 +223,9 @@ internal fun FloatingNavBarHost(
             }
         }
 
-    val givingWay = state.hiddenCount > 0
-    val visible = !keyboardUp && (state.shown || hideStep == 0) && (!givingWay || state.peek)
+    val visible = !keyboardUp && (state.shown || hideStep == 0)
+    // Beside an open conversation the bar stands under the conversations list only (the list's width), at the left.
+    val sideWidth = if (state.sideWidthPx > 0) with(density) { state.sideWidthPx.toDp() } else null
     var barHeightPx by remember { mutableIntStateOf(0) }
     val inset by animateDpAsState(if (visible) with(density) { barHeightPx.toDp() } else 0.dp, label = "BarInset")
 
@@ -263,32 +241,20 @@ internal fun FloatingNavBarHost(
                     // Only the glass look blurs the content, so only then is it recorded as a source (saves the work).
                     .then(if (style.look == ElementLook.GLASS) Modifier.hazeSource(hazeState) else Modifier)
                     .nestedScroll(scrollConnection)
-                    .padding(bottom = if (state.underlapCount > 0) 0.dp else inset)
+                    .padding(bottom = if (state.underlapCount > 0 || sideWidth != null) 0.dp else inset)
                     .then(if (visible) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier),
             ) {
                 // Only a screen that runs under the bar pads its own list ends; the others end above it (padded below).
-                val padInset = if (state.underlapCount > 0) inset else 0.dp
+                val padInset = if (state.underlapCount > 0 || sideWidth != null) inset else 0.dp
                 CompositionLocalProvider(LocalFloatingBar provides state, LocalFloatingBarInset provides padInset) {
                     Row(Modifier.fillMaxSize()) { content() }
                 }
             }
-            if (givingWay && !keyboardUp) {
-                // The handle: a thin tab at the left edge that calls the bar back (and sends it away again).
-                Box(
-                    modifier =
-                    Modifier.align(Alignment.CenterStart)
-                        .width(HANDLE_WIDTH_DP.dp)
-                        .height(HANDLE_HEIGHT_DP.dp)
-                        .clip(RoundedCornerShape(topEnd = HANDLE_WIDTH_DP.dp, bottomEnd = HANDLE_WIDTH_DP.dp))
-                        .background(colorScheme.onSurface.copy(alpha = HANDLE_ALPHA))
-                        .clickable(role = Role.Button) { state.peek = !state.peek },
-                )
-            }
             AnimatedVisibility(
                 visible = visible,
-                modifier = Modifier.align(Alignment.BottomCenter),
-                enter = if (givingWay) slideInHorizontally { -it } + fadeIn() else slideInVertically { it } + fadeIn(),
-                exit = if (givingWay) slideOutHorizontally { -it } + fadeOut() else slideOutVertically { it } + fadeOut(),
+                modifier = Modifier.align(if (sideWidth != null) Alignment.BottomStart else Alignment.BottomCenter),
+                enter = slideInVertically { it } + fadeIn(),
+                exit = slideOutVertically { it } + fadeOut(),
             ) {
                 FloatingNavBar(
                     entries = entries,
@@ -298,6 +264,7 @@ internal fun FloatingNavBarHost(
                     darker = state.darkerCount > 0,
                     selectStyle = options[UiOptions.NAV_SELECT],
                     rimDp = UiOptions.RIM_STEPS_DP[options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)],
+                    sideWidth = sideWidth,
                     bottomMargin = if (barHeight != null) barBottomGap + BAR_LIFT_DP.dp else BAR_MARGIN_DP.dp,
                     onSelect = { entry ->
                         if (vibrate && !entry.selected) tapHaptic()
@@ -319,6 +286,7 @@ private fun FloatingNavBar(
     darker: Boolean,
     rimDp: Float,
     selectStyle: Int,
+    sideWidth: Dp?,
     bottomMargin: Dp,
     onSelect: (NavEntry) -> Unit,
     modifier: Modifier = Modifier,
@@ -326,7 +294,7 @@ private fun FloatingNavBar(
     Box(
         modifier =
         modifier
-            .fillMaxWidth()
+            .then(if (sideWidth != null) Modifier.width(sideWidth) else Modifier.fillMaxWidth())
             .navigationBarsPadding()
             .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = bottomMargin),
         contentAlignment = Alignment.Center,
