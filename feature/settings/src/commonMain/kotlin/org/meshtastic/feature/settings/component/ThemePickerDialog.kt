@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -49,6 +50,8 @@ import org.meshtastic.core.resources.theme_vivid_dark
 import org.meshtastic.core.resources.theme_vivid_light
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.icon.Check
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
@@ -95,7 +98,7 @@ private enum class ThemeGroup(val title: StringResource, val options: List<Theme
 
 /** Shared dialog for picking a theme option. Used by both Android and Desktop settings screens. */
 @Composable
-fun ThemePickerDialog(onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
+fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
     MeshtasticDialog(
         title = stringResource(Res.string.choose_theme),
         onDismiss = onDismiss,
@@ -110,7 +113,14 @@ fun ThemePickerDialog(onClickTheme: (Int) -> Unit, onDismiss: () -> Unit) {
                         modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                     )
                     group.options.forEach { option ->
-                        ListItem(text = stringResource(option.label), trailingIcon = null) {
+                        // The theme in use: a tick and the accent colour, so the choice can be seen when the list opens.
+                        val selected = option.mode == currentMode
+                        ListItem(
+                            text = stringResource(option.label),
+                            textColor = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                            trailingIcon = if (selected) MeshtasticIcons.Check else null,
+                            trailingIconTint = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                        ) {
                             onClickTheme(option.mode)
                             onDismiss()
                         }

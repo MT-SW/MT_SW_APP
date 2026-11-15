@@ -549,7 +549,12 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
     if (showThemePicker) {
-        ThemePickerDialog(onClickTheme = { settingsViewModel.setTheme(it) }, onDismiss = { showThemePicker = false })
+        val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
+        ThemePickerDialog(
+            currentMode = currentTheme,
+            onClickTheme = { settingsViewModel.setTheme(it) },
+            onDismiss = { showThemePicker = false },
+        )
     }
     if (showUiScalePicker) {
         UiScalePickerDialog(

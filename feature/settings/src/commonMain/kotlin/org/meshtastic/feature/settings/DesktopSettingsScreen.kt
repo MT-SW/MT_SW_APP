@@ -176,7 +176,9 @@ fun DesktopSettingsScreen(
         )
     }
     if (showThemePickerDialog) {
+        val currentTheme by settingsViewModel.theme.collectAsStateWithLifecycle()
         ThemePickerDialog(
+            currentMode = currentTheme,
             onClickTheme = { settingsViewModel.setTheme(it) },
             onDismiss = { showThemePickerDialog = false },
         )

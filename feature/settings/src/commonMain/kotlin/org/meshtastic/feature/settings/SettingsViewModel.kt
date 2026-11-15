@@ -193,6 +193,9 @@ class SettingsViewModel(
 
     val uiScale = uiPrefs.uiScale
 
+    /** The theme in use (the picker marks it). */
+    val theme = uiPrefs.theme
+
     fun setUiScale(percent: Int) {
         uiPrefs.setUiScale(percent)
     }
