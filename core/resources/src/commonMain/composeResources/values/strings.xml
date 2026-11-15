@@ -3015,11 +3015,11 @@
     <string name="presence_more_summary">Node list: sorting "By activity" (favourites on top, then active), the "Active only" filter and the count of active nodes in the header. Map: the "Active only" filter. Network health: the "Activity" section in the summary. Node details: an alert when the node becomes active or away (off by default, also in the notification settings). On-demand diagnostics: the status in the progress and the report.</string>
     <string name="presence_more_title">Where else the status works</string>
     <string name="presence_needs_fw">Needs MT_SW_FIRMWARE v3 or newer.</string>
-    <string name="presence_replace_favorite">Favourite</string>
-    <string name="presence_replace_muted">Muted</string>
+    <string name="presence_replace_favorite">Favourite icon</string>
+    <string name="presence_replace_muted">Muted icon</string>
     <string name="presence_replace_none">Nothing, shown next to the others</string>
     <string name="presence_replace_title">Replaces another icon</string>
-    <string name="presence_replace_unmessageable">Unmessageable</string>
+    <string name="presence_replace_unmessageable">"Does not accept messages" icon</string>
     <string name="presence_save_failed">The node did not confirm the activity status.</string>
     <string name="presence_show">Show the activity status</string>
     <string name="presence_show_summary">A small icon on the node list: active, inactive. Nothing is shown for a node that does not share it.</string>

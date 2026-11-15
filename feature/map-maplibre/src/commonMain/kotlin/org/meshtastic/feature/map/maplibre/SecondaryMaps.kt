@@ -24,6 +24,8 @@ import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -130,15 +132,21 @@ fun MapLibreInlineMap(
     //
     // The same control every other map uses, at the same size. A shrunken variant was tried and looked out of place
     // against the rest of the map chrome for the ~25% of height it saved.
-    Box(modifier = modifier) {
-        SecondaryMapSurface(
-            mapState = mapState,
-            basemaps = basemaps,
-            uiOptions = InlineMapUiOptions,
-            showAttribution = false,
-        )
+    //
+    // The thumbnail sits in the middle of a scrolling page, not under the floating bar, so the room the bar takes at the
+    // bottom of a full-screen map is not reserved here (it pushed the credit button and the buttons out of this small
+    // map); the zoom pair goes to the middle of the trailing edge instead of the lifted corner.
+    CompositionLocalProvider(LocalFloatingBarInset provides 0.dp) {
+        Box(modifier = modifier) {
+            SecondaryMapSurface(
+                mapState = mapState,
+                basemaps = basemaps,
+                uiOptions = InlineMapUiOptions,
+                showAttribution = false,
+            )
 
-        MapZoom(mapState = mapState, basemap = basemaps.current)
+            MapZoom(mapState = mapState, basemap = basemaps.current, centered = true)
+        }
     }
 }
 

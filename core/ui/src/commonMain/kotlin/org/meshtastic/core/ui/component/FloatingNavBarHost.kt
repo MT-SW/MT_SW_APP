@@ -25,6 +25,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -74,6 +75,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -143,6 +146,13 @@ private const val ITEM_CORNER_DP = 26
 private const val BAR_MARGIN_DP = 8
 private const val BAR_LIFT_DP = 8
 private const val LABEL_SIZE_SP = 10
+
+/** The height of the room for a button name (as before), and the smaller size of a name broken into two lines. */
+private const val LABEL_LINE_HEIGHT_SP = 16
+private const val SMALL_LABEL_SIZE_SP = 8
+
+private const val BAR_PADDING_DP = 6
+private const val ITEM_SIDE_PADDING_DP = 1
 private const val MIN_STEP_PX = 1f
 
 /**
@@ -289,18 +299,32 @@ private fun FloatingNavBar(
             baseColor = if (darker) lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE) else colorScheme.surfaceContainerHigh,
             rimDp = rimDp,
         ) {
-            Row(
-                modifier = Modifier.padding(6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                for (entry in entries) {
-                    FloatingNavItem(
-                        entry = entry,
-                        selectStyle = selectStyle,
-                        onSelect = { onSelect(entry) },
-                        modifier = Modifier.weight(1f),
-                    )
+            // A name wider than its button is broken at the space into two smaller lines ("Zdrowie" / "sieci") that
+            // together take exactly the height of one normal line, so the bar is no taller than before.
+            val measurer = rememberTextMeasurer()
+            val density = LocalDensity.current
+            val labelStyle = navLabelStyle()
+            BoxWithConstraints {
+                val itemPx = (constraints.maxWidth - with(density) { (BAR_PADDING_DP * 2 + ITEM_SIDE_PADDING_DP * 2 * entries.size).dp.toPx() }) / entries.size
+                val wrapped =
+                    entries
+                        .filter { ' ' in it.labelText && measurer.measure(it.labelText, labelStyle, maxLines = 1, softWrap = false).size.width > itemPx }
+                        .map { it.labelText }
+                        .toSet()
+                Row(
+                    modifier = Modifier.padding(BAR_PADDING_DP.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    for (entry in entries) {
+                        FloatingNavItem(
+                            entry = entry,
+                            selectStyle = selectStyle,
+                            breakLabel = entry.labelText in wrapped,
+                            onSelect = { onSelect(entry) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
             }
         }
@@ -313,7 +337,13 @@ private fun FloatingNavBar(
  * the theme while the others are white.
  */
 @Composable
-private fun FloatingNavItem(entry: NavEntry, selectStyle: Int, onSelect: () -> Unit, modifier: Modifier = Modifier) {
+private fun FloatingNavItem(
+    entry: NavEntry,
+    selectStyle: Int,
+    breakLabel: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val color = if (entry.selected) colorScheme.primary else colorScheme.onSurface
     val bubble = selectStyle != UiOptions.NAV_SELECT_LINE
     val line = selectStyle != UiOptions.NAV_SELECT_BUBBLE
@@ -325,12 +355,15 @@ private fun FloatingNavItem(entry: NavEntry, selectStyle: Int, onSelect: () -> U
                 if (entry.selected && bubble) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
             )
             .selectable(selected = entry.selected, onClick = onSelect, role = Role.Tab)
-            .padding(horizontal = 1.dp, vertical = 6.dp),
+            .padding(horizontal = ITEM_SIDE_PADDING_DP.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CompositionLocalProvider(LocalContentColor provides color) {
             entry.icon()
-            Box(modifier = Modifier.padding(top = 2.dp)) { FitLabel(entry.labelText) }
+            val areaHeight = with(LocalDensity.current) { LABEL_LINE_HEIGHT_SP.sp.toDp() }
+            Box(modifier = Modifier.padding(top = 2.dp).height(areaHeight), contentAlignment = Alignment.Center) {
+                FitLabel(if (breakLabel) entry.labelText.replaceFirst(' ', '\n') else entry.labelText, small = breakLabel)
+            }
         }
         if (line) {
             // The line keeps its place when it is not drawn, so the buttons do not jump when another one is opened.
@@ -362,16 +395,11 @@ private const val MAP_BAR_DENSER = 30
  * on every system, whatever the font, instead of relying on a guess of the text width.
  */
 @Composable
-private fun FitLabel(text: String) {
+private fun FitLabel(text: String, small: Boolean = false) {
     BasicText(
         text = text,
-        style =
-        MaterialTheme.typography.labelSmall.copy(
-            fontSize = LABEL_SIZE_SP.sp,
-            color = LocalContentColor.current,
-            textAlign = TextAlign.Center,
-        ),
-        maxLines = 1,
+        style = navLabelStyle(small).copy(color = LocalContentColor.current),
+        maxLines = 2,
         softWrap = false,
         modifier =
         Modifier.fillMaxWidth().layout { measurable, constraints ->
@@ -387,3 +415,12 @@ private fun FitLabel(text: String) {
         },
     )
 }
+
+/** The text style of a button name (the colour is added where it is drawn). */
+@Composable
+private fun navLabelStyle(small: Boolean = false): TextStyle = MaterialTheme.typography.labelSmall.copy(
+    fontSize = (if (small) SMALL_LABEL_SIZE_SP else LABEL_SIZE_SP).sp,
+    // Two small lines fill exactly the room of one normal line.
+    lineHeight = (if (small) LABEL_LINE_HEIGHT_SP / 2 else LABEL_LINE_HEIGHT_SP).sp,
+    textAlign = TextAlign.Center,
+)

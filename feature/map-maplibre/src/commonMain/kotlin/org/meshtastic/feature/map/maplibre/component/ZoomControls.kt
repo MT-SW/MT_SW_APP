@@ -51,17 +51,25 @@ internal const val ZOOM_BOTTOM_INSET = 88
  * extension because the placement is the point: a caller that had to align it itself would eventually align it
  * somewhere else.
  *
- * Lifted clear of the wordmark and attribution button along the bottom edge, which every map shows. See
+ * [centered] is for a map too short for the lifted corner (see [MapZoom] callers). Lifted clear of the wordmark and attribution button along the bottom edge, which every map shows. See
  * [meshMapOrnaments] for why the main map carries the credit outright and the small maps behind the button.
  */
 @Composable
-internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap) {
+internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Boolean = false) {
     val scope = rememberCoroutineScope()
     val zoomRange = basemap.zoomRange()
 
     MapZoomControls(
         onZoomIn = { scope.launch { mapState.zoomBy(ZOOM_STEP, zoomRange) } },
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
-        modifier = Modifier.align(Alignment.BottomEnd).padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current),
+        modifier =
+        if (centered) {
+            // A map too short for the lifted corner (the thumbnail in the node details): the pair sits in the middle of
+            // the trailing edge, between the scale at the top and the credit button at the bottom.
+            Modifier.align(Alignment.CenterEnd).padding(end = ZOOM_INSET.dp)
+        } else {
+            Modifier.align(Alignment.BottomEnd)
+                .padding(end = ZOOM_INSET.dp, bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current)
+        },
     )
 }
