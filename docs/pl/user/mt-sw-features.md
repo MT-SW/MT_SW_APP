@@ -192,6 +192,8 @@ Mała ikona przy węźle na liście (zwykłej i zwartej) mówi, czy ktoś jest p
 - **Jak długo trzyma „aktywny”** — 30 min, 1, 2, 6 lub 12 godz. (domyślnie 2 godz.). Gdy węzła nie słychać tak długo, nic dla niego nie jest pokazywane, bo mógł wyjść poza zasięg, zanim zdążył zgłosić „nieaktywny”.
 - **Pytaj przy otwarciu rozmowy** — otwarcie rozmowy bezpośredniej pyta ten węzeł o status (najwyżej raz na 10 minut).
 
+Zanim aplikacja zapyta obcy węzeł o status (przy otwarciu rozmowy albo w diagnostyce na żądanie), pyta go o wersję firmware, chyba że już ją zna. Jeśli wersja jest starsza niż MT_SW_FIRMWARE v3 albo węzeł jej nie poda, zapytanie o status nie jest wysyłane. W diagnostyce na żądanie karta statusu pokazuje to w opisie podczas czekania („Najpierw pytam o wersję firmware…”) oraz gdy nic nie wysłano.
+
 Statusy są czytane z zapisanych odpowiedzi OnDemand, więc przeżywają ponowne uruchomienie aplikacji.
 
 ## Panel debugowania

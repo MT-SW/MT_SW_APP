@@ -2694,9 +2694,13 @@ on_demand_ping_desc
 on_demand_port_counters
 on_demand_port_counters_desc
 on_demand_presence
+on_demand_presence_asking
+on_demand_presence_checking_version
 on_demand_presence_desc
+on_demand_presence_no_version
 on_demand_presence_since
 on_demand_presence_state
+on_demand_presence_too_old
 on_demand_presence_unknown
 on_demand_psram
 on_demand_reboots

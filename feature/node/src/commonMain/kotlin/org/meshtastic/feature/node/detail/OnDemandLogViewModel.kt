@@ -19,10 +19,18 @@
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.seconds
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.repository.MeshLogRepository
@@ -255,8 +263,59 @@ class OnDemandLogViewModel(
 
     fun requestLanStats() = requestOnDemand(OnDemandType.REQUEST_LAN_STATS)
 
-    fun requestPresence() = requestOnDemand(OnDemandType.REQUEST_PRESENCE)
+    /** What the status query is doing now, for the card (null when it is not waiting for anything). */
+    private val _presenceNote = MutableStateFlow<PresenceNote?>(null)
+    val presenceNote: StateFlow<PresenceNote?> = _presenceNote.asStateFlow()
+
+    /**
+     * Asks the node for its activity status, but first for its firmware version (unless that is already known): a
+     * node older than MT_SW_FIRMWARE v3 is not sent the status query at all.
+     */
+    fun requestPresence() =
+        safeLaunch(tag = "requestPresence") {
+            try {
+                var version = uiState.value.fwPlusVersion?.version_number
+                if (version == null) {
+                    _presenceNote.value = PresenceNote.CheckingVersion
+                    nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_FW_PLUS_VERSION)
+                    version =
+                        withTimeoutOrNull(PRESENCE_VERSION_WAIT) {
+                            uiState.map { it.fwPlusVersion?.version_number }.filterNotNull().first()
+                        }
+                }
+                when {
+                    version == null -> _presenceNote.value = PresenceNote.NoVersion
+                    version < SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE ->
+                        _presenceNote.value = PresenceNote.TooOld(version)
+                    else -> {
+                        _presenceNote.value = PresenceNote.Asking
+                        nodeRequestActions.requestOnDemand(destNum, longName, OnDemandType.REQUEST_PRESENCE)
+                        _presenceNote.value = null
+                    }
+                }
+            } catch (e: CancellationException) {
+                _presenceNote.value = null
+                throw e
+            }
+        }
 
     private fun requestOnDemand(type: OnDemandType) =
         safeLaunch(tag = "requestOnDemand-${type.name}") { nodeRequestActions.requestOnDemand(destNum, longName, type) }
 }
+
+/** What the activity status query tells the person while it waits or when it did not send anything. */
+sealed interface PresenceNote {
+    /** The firmware version is not known yet, so it is asked for first. */
+    data object CheckingVersion : PresenceNote
+
+    /** The status itself is being asked for. */
+    data object Asking : PresenceNote
+
+    /** The node has an older firmware than the status needs, so nothing was sent. */
+    data class TooOld(val version: Int) : PresenceNote
+
+    /** The node did not tell its firmware version, so nothing was sent. */
+    data object NoVersion : PresenceNote
+}
+
+private val PRESENCE_VERSION_WAIT = 20.seconds

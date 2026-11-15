@@ -4307,4 +4307,8 @@
     <string name="on_demand_presence_state">Status</string>
     <string name="on_demand_presence_unknown">Nieznany (węzeł go nie udostępnia)</string>
     <string name="on_demand_presence_since">W tym stanie od</string>
+    <string name="on_demand_presence_checking_version">Najpierw pytam o wersję firmware (o status zapytam tylko, jeśli jest wystarczająco nowa)…</string>
+    <string name="on_demand_presence_asking">Pytam o status…</string>
+    <string name="on_demand_presence_too_old">Ten węzeł ma MT_SW_FIRMWARE v%1$d; status wymaga v3 lub nowszego, więc nic nie wysłano.</string>
+    <string name="on_demand_presence_no_version">Węzeł nie podał wersji firmware, więc nie pytam o status.</string>
 </resources>

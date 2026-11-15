@@ -103,7 +103,11 @@ import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_lan_stats_desc
 import org.meshtastic.core.resources.on_demand_presence
+import org.meshtastic.core.resources.on_demand_presence_asking
+import org.meshtastic.core.resources.on_demand_presence_checking_version
 import org.meshtastic.core.resources.on_demand_presence_desc
+import org.meshtastic.core.resources.on_demand_presence_no_version
+import org.meshtastic.core.resources.on_demand_presence_too_old
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_nexthop_counter
 import org.meshtastic.core.resources.on_demand_no_answer
@@ -517,8 +521,24 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                     onRequest = viewModel::requestPresence,
                     receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_PRESENCE],
                 ) {
-                    uiState.presence?.let { presence ->
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    val note by viewModel.presenceNote.collectAsStateWithLifecycle()
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        note?.let { current ->
+                            Text(
+                                text =
+                                when (current) {
+                                    PresenceNote.CheckingVersion ->
+                                        stringResource(Res.string.on_demand_presence_checking_version)
+                                    PresenceNote.Asking -> stringResource(Res.string.on_demand_presence_asking)
+                                    is PresenceNote.TooOld ->
+                                        stringResource(Res.string.on_demand_presence_too_old, current.version)
+                                    PresenceNote.NoVersion -> stringResource(Res.string.on_demand_presence_no_version)
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        uiState.presence?.let { presence ->
                             presence.lines().forEach { (label, value) ->
                                 Text(text = "$label: $value", style = MaterialTheme.typography.bodyMedium)
                             }

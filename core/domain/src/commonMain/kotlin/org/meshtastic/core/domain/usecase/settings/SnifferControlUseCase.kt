@@ -19,7 +19,11 @@
 package org.meshtastic.core.domain.usecase.settings
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.seconds
 import org.koin.core.annotation.Single
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
@@ -158,6 +162,22 @@ open class SnifferControlUseCase(
         .maxByOrNull { it.second }
         ?.first
 
+    /**
+     * Asks [destNum] for its activity status, but first for its firmware version unless that is already known: a node
+     * older than [MIN_FW_PLUS_VERSION_FOR_PRESENCE] (or one that never tells its version) is not sent the status
+     * query. The answer arrives as RESPONSE_PRESENCE in the log.
+     */
+    open suspend fun requestPresenceChecked(destNum: Int): Boolean {
+        var version = fwPlusVersionFlow(destNum).first()
+        if (version == null) {
+            requestFwPlusVersion(destNum)
+            version = withTimeoutOrNull(PRESENCE_VERSION_WAIT) { fwPlusVersionFlow(destNum).filterNotNull().first() }
+        }
+        if (version == null || version < MIN_FW_PLUS_VERSION_FOR_PRESENCE) return false
+        radioController.requestOnDemand(destNum, OnDemandType.REQUEST_PRESENCE)
+        return true
+    }
+
     /** Sends REQUEST_PRESENCE_CONFIG to [destNum]; the answer arrives via [presenceConfigFlow]. */
     open suspend fun requestPresenceConfig(destNum: Int) {
         radioController.requestOnDemand(destNum, OnDemandType.REQUEST_PRESENCE_CONFIG)
@@ -208,3 +228,5 @@ open class SnifferControlUseCase(
         const val MIN_FW_PLUS_VERSION_FOR_SNIFFER = 2
     }
 }
+
+private val PRESENCE_VERSION_WAIT = 20.seconds

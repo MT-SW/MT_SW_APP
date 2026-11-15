@@ -21,9 +21,7 @@ import kotlinx.coroutines.sync.withLock
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.proto.OnDemandType
 
 /**
  * MT_SW: the activity status of the nodes' users (whether someone is at the node, see `Presence` in ondemand.proto).
@@ -34,7 +32,7 @@ import org.meshtastic.proto.OnDemandType
  */
 @Single
 open class NodePresenceUseCase(
-    private val radioController: RadioController,
+    private val snifferControlUseCase: SnifferControlUseCase,
     private val uiPrefs: UiPrefs,
 ) {
     private val askedAt = mutableMapOf<Int, Long>()
@@ -58,7 +56,8 @@ open class NodePresenceUseCase(
                     true
                 }
             }
-        if (allowed) runCatching { radioController.requestOnDemand(nodeNum, OnDemandType.REQUEST_PRESENCE) }
+        // Asks for the firmware version first (when it is not known yet): an older node is not sent the status query.
+        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }
     }
 
     private companion object {

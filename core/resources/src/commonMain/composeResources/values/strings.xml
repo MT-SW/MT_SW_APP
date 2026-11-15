@@ -2745,9 +2745,13 @@
     <string name="on_demand_port_counters">Port Counters</string>
     <string name="on_demand_port_counters_desc">How many packets of each type (port) this node has processed.</string>
     <string name="on_demand_presence">Activity status</string>
+    <string name="on_demand_presence_asking">Asking for the status…</string>
+    <string name="on_demand_presence_checking_version">First asking for the firmware version (the status is asked for only if it is new enough)…</string>
     <string name="on_demand_presence_desc">Whether someone is at the node (an app is connected to it). Needs MT_SW_FIRMWARE v3.</string>
+    <string name="on_demand_presence_no_version">The node did not tell its firmware version, so the status was not asked for.</string>
     <string name="on_demand_presence_since">In this state for</string>
     <string name="on_demand_presence_state">Status</string>
+    <string name="on_demand_presence_too_old">This node has MT_SW_FIRMWARE v%1$d; the status needs v3 or newer, so nothing was sent.</string>
     <string name="on_demand_presence_unknown">Unknown (the node does not share it)</string>
     <string name="on_demand_psram">PSRAM</string>
     <string name="on_demand_reboots">Reboots</string>

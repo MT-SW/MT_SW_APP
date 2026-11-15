@@ -192,6 +192,8 @@ A small icon by a node in the list (normal and compact) says whether someone is 
 - **How long "active" holds** — 30 min, 1, 2, 6 or 12 h (2 h by default). When the node is not heard for that long, nothing is shown for it, because it may have gone out of range before it could report "inactive".
 - **Ask when a chat is opened** — opening a direct chat asks that node for its status (at most once per 10 minutes).
 
+Before the app asks another node for its status (when a chat is opened or in on-demand diagnostics), it asks that node for its firmware version, unless it already knows it. If the version is older than MT_SW_FIRMWARE v3, or the node does not tell it, the status query is not sent. In on-demand diagnostics the status card shows this in its text while waiting ("First asking for the firmware version…") and when nothing was sent.
+
 The statuses are read from the saved OnDemand answers, so they survive a restart of the app.
 
 ## Debug panel
