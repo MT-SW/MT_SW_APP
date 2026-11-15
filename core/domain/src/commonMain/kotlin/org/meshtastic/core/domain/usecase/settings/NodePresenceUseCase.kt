@@ -59,7 +59,7 @@ open class NodePresenceUseCase(
                 }
             }
         // Asks for the firmware version first (when it is not known yet): an older node is not sent the status query.
-        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum, forceVersionCheck) }
+        if (allowed) runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }
     }
 
     /**
@@ -71,7 +71,7 @@ open class NodePresenceUseCase(
     open suspend fun askNodes(nodeNums: List<Int>, forceVersionCheck: Boolean = false, onProgress: (Int) -> Unit = {}) {
         nodeNums.forEachIndexed { index, nodeNum ->
             askLock.withLock { askedAt[nodeNum] = nowMillis }
-            runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum) }
+            runCatching { snifferControlUseCase.requestPresenceChecked(nodeNum, forceVersionCheck) }
             onProgress(index + 1)
             if (index < nodeNums.lastIndex) delay(MANUAL_ASK_SPACING)
         }
