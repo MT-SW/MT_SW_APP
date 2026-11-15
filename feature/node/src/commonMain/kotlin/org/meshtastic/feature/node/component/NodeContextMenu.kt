@@ -64,6 +64,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.NotFavorite
 import org.meshtastic.core.ui.icon.Notes
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Route
 import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.icon.VolumeOff

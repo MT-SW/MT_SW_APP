@@ -74,6 +74,7 @@ import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.Nodes
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.icon.SignalCellular4Bar
 import org.meshtastic.core.ui.icon.Speed
