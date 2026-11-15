@@ -21,6 +21,7 @@
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 ## better | Ulepszenia
+- Mapa: paski z ikonami i przyciski przybliżania są bardziej przezroczyste, a dolny pasek nawigacji jest na mapie gęstszy, więc lepiej widać napisy.
 - Statystyki urządzenia (metryki w szczegółach węzła) otwierają się szybciej, zwłaszcza na iPhonie: najpierw pokazują najnowsze wpisy, a pełna historia dochodzi zaraz potem.
 - Wygląd: nowe ustawienia „Zaznaczenie otwartej karty” (zaokrąglone tło, kreska pod napisem albo oba) i „Gradient na przyciskach” (wyłączony, delikatny, normalny, mocny).
 - Plakietka Twojego węzła (kolor i krótka nazwa) jest na górnym pasku głównych kart, a czerwony przycisk SOS na górnym pasku wszystkich ekranów, także w rozmowie i w Zdrowiu sieci; podczas trzymania jego obwódka zakreśla się białą linią, a taki sam przycisk jest w ekranie SOS.

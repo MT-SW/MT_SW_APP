@@ -17,6 +17,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.shape.CircleShape
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -73,6 +74,7 @@ fun MapButton(
             modifier = modifier,
             baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             floating = true,
+            fallbackMinAlpha = MAP_GLASS_MIN_ALPHA,
         ) {
             IconButton(onClick = onClick) {
                 Icon(

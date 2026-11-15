@@ -19,6 +19,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.model.UiOptions
@@ -198,6 +199,7 @@ fun MapControlsOverlay(
             modifier = modifier,
             baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             floating = true,
+            fallbackMinAlpha = MAP_GLASS_MIN_ALPHA,
         ) {
             CompositionLocalProvider(LocalMapButtonInToolbar provides true) { toolbar(Modifier, true) }
         }

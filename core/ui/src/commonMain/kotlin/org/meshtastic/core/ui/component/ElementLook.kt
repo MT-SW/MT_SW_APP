@@ -62,6 +62,9 @@ private const val RIM_TOP_ALPHA = 0.5f
 private const val RIM_BOTTOM_ALPHA = 0.06f
 private const val FLAT_SHADOW_DP = 14f
 private const val GLASS_FALLBACK_MIN_ALPHA = 0.88f
+
+/** The least density of the toolbars lying on the map: they stay clearly more see-through than other glass. */
+const val MAP_GLASS_MIN_ALPHA = 0.6f
 private const val READABLE_LUMINANCE = 0.5f
 private val READABLE_DARK = Color(0xFF1B1B1F)
 private const val GLASS_TINT_LIGHT = 1
@@ -167,6 +170,7 @@ fun StyledSurface(
     baseColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     floating: Boolean = false,
     rimDp: Float? = null,
+    fallbackMinAlpha: Float = GLASS_FALLBACK_MIN_ALPHA,
     content: @Composable () -> Unit,
 ) {
     val rimWidth = rimDp ?: rememberUiOptions().rimDp()
@@ -199,7 +203,7 @@ fun StyledSurface(
                 baseColor.copy(
                     alpha =
                     if (style.look == ElementLook.GLASS) {
-                        maxOf(seeThroughAlpha(style.strength), GLASS_FALLBACK_MIN_ALPHA)
+                        maxOf(seeThroughAlpha(style.strength), fallbackMinAlpha)
                     } else {
                         seeThroughAlpha(style.strength)
                     },

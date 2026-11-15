@@ -278,8 +278,9 @@ private fun FloatingNavBar(
             .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = bottomMargin),
         contentAlignment = Alignment.Center,
     ) {
+        // On the map the bar is denser (it has a moving picture under it that cannot be blurred).
         StyledSurface(
-            style = style,
+            style = if (darker) style.copy(strength = (style.strength - MAP_BAR_DENSER).coerceAtLeast(0)) else style,
             shape = RoundedCornerShape(BAR_CORNER_DP.dp),
             modifier = Modifier.widthIn(max = BAR_MAX_WIDTH_DP.dp).fillMaxWidth(),
             hazeState = hazeState,
@@ -350,6 +351,9 @@ private const val SELECTED_ALPHA = 0.12f
 
 /** How much darker the bar is on the map card. */
 private const val DARKER_SHARE = 0.22f
+
+/** How much denser (less see-through, in strength points) the bar is on the map card. */
+private const val MAP_BAR_DENSER = 30
 
 private const val LABEL_MIN_SP = 6f
 private const val LABEL_STEP_SP = 0.25f
