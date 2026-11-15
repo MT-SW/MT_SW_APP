@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.connected
 import org.meshtastic.core.resources.connecting
@@ -56,6 +57,7 @@ import org.meshtastic.core.ui.icon.PersonQuestion
 import org.meshtastic.core.ui.icon.Unmessageable
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.LocalMeshActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,8 +72,14 @@ fun NodeStatusIcons(
     deviceType: DeviceType? = null,
     contentColor: Color = LocalContentColor.current,
     isUnknownUser: Boolean = false,
+    nodeNum: Int? = null,
+    lastHeardSeconds: Int = 0,
 ) {
-    Row(modifier = modifier.padding(4.dp)) {
+    // MT_SW: the activity status of the node's user, and which icon (if any) it takes the place of.
+    val presence = if (nodeNum != null && !isThisNode) rememberNodePresence(nodeNum, lastHeardSeconds) else null
+    val replace = if (presence != null) rememberUiOptions()[UiOptions.PRESENCE_REPLACE] else UiOptions.PRESENCE_REPLACE_NONE
+    Row(modifier = modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (presence != null) NodePresenceBadge(presence = presence.first, state = presence.second)
         if (isUnknownUser) {
             StatusBadge(
                 imageVector = MeshtasticIcons.PersonQuestion,
@@ -80,7 +88,7 @@ fun NodeStatusIcons(
                 tint = contentColor,
             )
         }
-        if (isUnmessageable) {
+        if (isUnmessageable && replace != UiOptions.PRESENCE_REPLACE_UNMESSAGEABLE) {
             StatusBadge(
                 imageVector = MeshtasticIcons.Unmessageable,
                 contentDescription = Res.string.unmessageable,
@@ -88,7 +96,7 @@ fun NodeStatusIcons(
                 tint = contentColor,
             )
         }
-        if (isMuted && !isThisNode) {
+        if (isMuted && !isThisNode && replace != UiOptions.PRESENCE_REPLACE_MUTED) {
             StatusBadge(
                 imageVector = MeshtasticIcons.VolumeOff,
                 contentDescription = Res.string.mute_always,
@@ -96,7 +104,7 @@ fun NodeStatusIcons(
                 tint = contentColor,
             )
         }
-        if (isFavorite && !isThisNode) {
+        if (isFavorite && !isThisNode && replace != UiOptions.PRESENCE_REPLACE_FAVORITE) {
             StatusBadge(
                 imageVector = MeshtasticIcons.Favorite,
                 contentDescription = Res.string.favorite,

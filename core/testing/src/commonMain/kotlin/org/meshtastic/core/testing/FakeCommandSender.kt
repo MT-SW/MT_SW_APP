@@ -28,6 +28,7 @@ import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
 
 /** Shared recording [CommandSender] fake for tests that do not need transport behavior. */
@@ -179,6 +180,10 @@ class FakeCommandSender :
     }
 
     override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
+        failCommandIfConfigured()
+    }
+
+    override suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig) {
         failCommandIfConfigured()
     }
 

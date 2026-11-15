@@ -119,6 +119,9 @@ import org.meshtastic.core.resources.mt_sw_other_sos_body
 import org.meshtastic.core.resources.mt_sw_other_sos_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
+import org.meshtastic.core.resources.presence_device_switch
+import org.meshtastic.core.resources.presence_summary
+import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
 import org.meshtastic.core.resources.mt_sw_terrain_open_summary
 import org.meshtastic.core.resources.node_color_pick
@@ -176,6 +179,7 @@ import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
 import org.meshtastic.feature.settings.component.ElementAdvancedSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.ElementBasicSettings
+import org.meshtastic.feature.settings.component.PresenceSettings
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -200,6 +204,9 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
+    val uiOptionsMap by settingsViewModel.uiOptions.collectAsStateWithLifecycle()
+    val options = UiOptions(uiOptionsMap)
+    val onChange = settingsViewModel::setUiOption
     FloatingBarUnderlap()
     Scaffold(
         topBar = {
@@ -397,6 +404,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.presence_title)) {
+                PresenceSettings(options = options, onChange = onChange)
+                ListItem(
+                    text = stringResource(Res.string.presence_device_switch),
+                    supportingText = stringResource(Res.string.presence_summary),
+                    leadingIcon = MeshtasticIcons.Info,
+                ) {
+                    onNavigate(SettingsRoute.User)
+                }
+            }
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_title)) {
                 ListItem(
                     text = stringResource(Res.string.mt_sw_other_title),

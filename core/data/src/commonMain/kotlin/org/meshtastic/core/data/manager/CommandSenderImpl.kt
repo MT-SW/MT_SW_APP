@@ -67,6 +67,7 @@ import org.meshtastic.proto.HostMetrics
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.LockdownAuth
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Neighbor
@@ -415,6 +416,19 @@ class CommandSenderImpl(
                 OnDemandRequest(
                     request_type = OnDemandType.REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG,
                     local_stats_broadcast_config = config,
+                ),
+            ),
+        )
+    }
+
+    override suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig) {
+        sendOnDemand(
+            destNum,
+            OnDemand(
+                request =
+                OnDemandRequest(
+                    request_type = OnDemandType.REQUEST_SET_PRESENCE_CONFIG,
+                    presence_config = config,
                 ),
             ),
         )

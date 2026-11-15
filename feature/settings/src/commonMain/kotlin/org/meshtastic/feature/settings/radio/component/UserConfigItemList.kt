@@ -40,6 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.HamName
 import org.meshtastic.core.model.excludes
@@ -56,6 +57,9 @@ import org.meshtastic.core.resources.node_id
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.resources.status_message
 import org.meshtastic.core.resources.status_message_summary
+import org.meshtastic.core.resources.presence_device_switch
+import org.meshtastic.core.resources.presence_device_switch_summary
+import org.meshtastic.core.resources.presence_needs_fw
 import org.meshtastic.core.resources.unmessageable
 import org.meshtastic.core.resources.unmonitored_or_infrastructure
 import org.meshtastic.core.resources.user
@@ -69,6 +73,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.proto.ExcludedModules
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.User
 
 private const val SHORT_NAME_MAX_LENGTH = 4 // short_name max_size:5
@@ -114,6 +119,13 @@ fun UserConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, focusS
     // The field is absent without the capability, so the input can only differ from the saved value when shown.
     val statusMessageDirty = statusMessageInput != statusMessage
 
+    // The activity status switch (MT_SW_FIRMWARE v3) is not part of the user config, but is saved with the same bar.
+    val presenceConfig = state.presenceConfig
+    val presenceSupported =
+        presenceConfig != null || (state.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE
+    var presenceForm by remember(presenceConfig) { mutableStateOf(presenceConfig ?: PresenceConfig()) }
+    val presenceDirty = presenceSupported && presenceConfig != null && presenceForm != presenceConfig
+
     // Ham onboarding repurposes the long-name field as the callsign, for the local node only (iOS parity).
     val hamMode = formState.value.is_licensed && state.isLocal
     val longNameValue = if (hamMode) HamName.split(formState.value.long_name).first else formState.value.long_name
@@ -130,9 +142,16 @@ fun UserConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, focusS
         responseState = state.responseState,
         showConnectPrompt = state.connectPromptVisible,
         onDismissPacketResponse = viewModel::clearPacketResponse,
-        additionalDirtyCheck = { statusMessageDirty },
-        onDiscard = { statusMessageInput = statusMessage },
-        onSave = { viewModel.save(it, formState.isDirty, statusMessageInput, statusMessageDirty) },
+        saveEnabled = state.connected && validNames && !state.presenceLoading,
+        additionalDirtyCheck = { statusMessageDirty || presenceDirty },
+        onDiscard = {
+            statusMessageInput = statusMessage
+            presenceForm = presenceConfig ?: PresenceConfig()
+        },
+        onSave = {
+            viewModel.save(it, formState.isDirty, statusMessageInput, statusMessageDirty)
+            if (presenceDirty) viewModel.setPresenceConfig(presenceForm)
+        },
     ) {
         item {
             TitledCard(title = stringResource(Res.string.user_config)) {
@@ -176,6 +195,22 @@ fun UserConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, focusS
                     onCheckedChange = {
                         formState.value = formState.value.newBuilder().also { wb -> wb.is_unmessagable = it }.build()
                     },
+                    containerColor = CardDefaults.cardColors().containerColor,
+                )
+                HorizontalDivider()
+                SwitchPreference(
+                    title = stringResource(Res.string.presence_device_switch),
+                    summary =
+                    stringResource(
+                        if (presenceSupported) {
+                            Res.string.presence_device_switch_summary
+                        } else {
+                            Res.string.presence_needs_fw
+                        },
+                    ),
+                    checked = presenceForm.enabled,
+                    enabled = state.connected && presenceSupported && presenceConfig != null && !state.presenceLoading,
+                    onCheckedChange = { presenceForm = PresenceConfig(enabled = it) },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()

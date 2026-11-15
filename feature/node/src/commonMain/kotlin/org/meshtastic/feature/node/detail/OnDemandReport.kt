@@ -29,6 +29,7 @@ import org.meshtastic.core.resources.on_demand_exchange_log
 import org.meshtastic.core.resources.on_demand_fw_plus_version
 import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_lan_stats
+import org.meshtastic.core.resources.on_demand_presence
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_no_errors
 import org.meshtastic.core.resources.on_demand_node_stats
@@ -73,6 +74,7 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
     val historyTitle = stringResource(Res.string.on_demand_rx_packet_history)
     val fwTitle = stringResource(Res.string.on_demand_fw_plus_version)
     val lanTitle = stringResource(Res.string.on_demand_lan_stats)
+    val presenceTitle = stringResource(Res.string.on_demand_presence)
     val roundTrip = stringResource(Res.string.on_demand_round_trip)
     val snr = stringResource(Res.string.on_demand_snr)
     val rssi = stringResource(Res.string.on_demand_rssi)
@@ -96,10 +98,11 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
         }
     // The texts of the LAN card need the string resources, so they are read here and not inside remember.
     val lanLines = uiState.lanStats?.lines().orEmpty()
+    val presenceLines = uiState.presence?.lines().orEmpty()
     val receivedLabel = stringResource(Res.string.on_demand_received_label)
     val received = uiState.receivedAt.mapValues { DateFormatter.formatDateTime(it.value) }
 
-    return remember(uiState, title, statsLines, ports, exchanges, lanLines) {
+    return remember(uiState, title, statsLines, ports, exchanges, lanLines, presenceLines) {
         fun stamp(type: OnDemandType): List<ReportLine> =
             received[type]?.let { listOf(ReportLine(receivedLabel, it)) }.orEmpty()
 
@@ -190,20 +193,29 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                 ?.let {
                     add(ReportSection(historyTitle, lines = stamp(OnDemandType.RESPONSE_PACKET_RX_HISTORY), bars = it))
                 }
+            uiState.lanStats?.let {
+                add(
+                    ReportSection(
+                        lanTitle,
+                        lines = stamp(OnDemandType.RESPONSE_LAN_STATS) + lanLines.map { (l, v) -> ReportLine(l, v) },
+                    ),
+                )
+            }
+            uiState.presence?.let {
+                add(
+                    ReportSection(
+                        presenceTitle,
+                        lines =
+                        stamp(OnDemandType.RESPONSE_PRESENCE) + presenceLines.map { (l, v) -> ReportLine(l, v) },
+                    ),
+                )
+            }
             uiState.fwPlusVersion?.let {
                 add(
                     ReportSection(
                         fwTitle,
                         lines =
                         stamp(OnDemandType.RESPONSE_FW_PLUS_VERSION) + ReportLine(fwTitle, "v${it.version_number}"),
-                    ),
-                )
-            }
-            uiState.lanStats?.let {
-                add(
-                    ReportSection(
-                        lanTitle,
-                        lines = stamp(OnDemandType.RESPONSE_LAN_STATS) + lanLines.map { (l, v) -> ReportLine(l, v) },
                     ),
                 )
             }

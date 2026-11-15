@@ -56,6 +56,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.isUnmessageableRole
 import org.meshtastic.core.model.util.toDistanceString
@@ -97,6 +98,7 @@ import org.meshtastic.core.ui.icon.Unmessageable
 import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 
@@ -313,6 +315,15 @@ private fun CompactNameRow(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
+                    // MT_SW: the activity status, which may take the place of the favourite / unmessageable icon.
+                    val presence = if (isThisNode) null else rememberNodePresence(nodeNum, thatNode.lastHeard)
+                    val replace =
+                        if (presence != null) {
+                            rememberUiOptions()[UiOptions.PRESENCE_REPLACE]
+                        } else {
+                            UiOptions.PRESENCE_REPLACE_NONE
+                        }
+                    if (presence != null) NodePresenceBadge(presence = presence.first, state = presence.second)
                     if (thatNode.isUnknownUser) {
                         Icon(
                             imageVector = MeshtasticIcons.PersonQuestion,
@@ -321,7 +332,7 @@ private fun CompactNameRow(
                             tint = MaterialTheme.colorScheme.outline,
                         )
                     }
-                    if (unmessageable) {
+                    if (unmessageable && replace != UiOptions.PRESENCE_REPLACE_UNMESSAGEABLE) {
                         Icon(
                             imageVector = MeshtasticIcons.Unmessageable,
                             contentDescription = null,
@@ -329,7 +340,7 @@ private fun CompactNameRow(
                             tint = MaterialTheme.colorScheme.outline,
                         )
                     }
-                    if (isFavorite) {
+                    if (isFavorite && replace != UiOptions.PRESENCE_REPLACE_FAVORITE) {
                         Icon(
                             imageVector = MeshtasticIcons.Favorite,
                             contentDescription = null,

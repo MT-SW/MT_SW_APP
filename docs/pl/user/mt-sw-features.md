@@ -123,7 +123,7 @@ Tor antenowy liczy się tak samo jak w Mesh Link Planerze: dowolna liczba złąc
 
 ## Diagnostyka na żądanie
 
-W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru, wersja firmware MT_SW oraz (od MT_SW_FIRMWARE v3) statystyki sieci LAN: adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.
+W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 11 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru, (od MT_SW_FIRMWARE v3) statystyki sieci LAN: adres IP węzła w Wi-Fi lub Ethernet, UDP w sieci lokalnej, MQTT i połączenie z brokerem, oraz status aktywności (czy ktoś jest przy węźle), a na samym końcu wersja firmware MT_SW. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.
 
 ## Archiwum wiadomości
 
@@ -176,6 +176,23 @@ W **Ustawienia → Moduły → Telemetria** jest karta **Statystyki lokalne**. D
 - **Najkrótszy interwał to 2 godziny.**
 - **Obie opcje zapisują się razem** zwykłym dolnym paskiem zapisu, razem z pozostałymi ustawieniami telemetrii. Aplikacja najpierw odczytuje obecny stan z węzła, więc zmiana jednej opcji nie rusza drugiej. Po zapisie pokazuje to, co węzeł naprawdę zapisał (może poprawić interwały); jeśli nie potwierdzi, dostajesz komunikat.
 - Zapis nie wymaga restartu węzła.
+
+## Status aktywności
+
+Mała ikona przy węźle na liście (zwykłej i zwartej) mówi, czy ktoś jest przy węźle, czyli czy jest z nim połączona aplikacja. **Zielona kropka z jasną obwódką** to „aktywny”, **szary obrys** to „nieaktywny”. Gdy węzeł nie udostępnia statusu, nic nie jest pokazywane. Podpowiedź (przytrzymanie ikony) mówi, od ilu minut węzeł jest w tym stanie.
+
+**Włączenie na węźle.** W **Ustawienia → Użytkownik** jest przełącznik **Status aktywności**, zaraz pod „Bez wiadomości”. Zapisuje się tym samym paskiem co reszta ustawień użytkownika. Działa od MT_SW_FIRMWARE v3; gdy aplikacja wykryje starszy firmware albo węzeł jeszcze nie odpowiedział, przełącznik jest zablokowany, a pod nim stoi, od której wersji działa. Węzeł wysyła status sam (gdy stan utrzyma się 5 minut, nie częściej niż co 30 minut) i odpowiada na pytanie o status.
+
+**Opcje w aplikacji** (**Funkcje MT_SW → Status aktywności**, te same na wszystkich platformach):
+
+- **Pokazuj status aktywności** — włącza lub wyłącza ikonę.
+- **Wygląd ikony** — kropka, osoba z kropką albo kropka w kółku.
+- **Zastępuje inną ikonę** — nic (ikona obok pozostałych), ulubiony, wyciszony albo bez wiadomości; ta ikona nie jest wtedy pokazywana, dopóki status jest znany.
+- **Kolor ikony „aktywny”** — zielony albo kolor motywu.
+- **Jak długo trzyma „aktywny”** — 30 min, 1, 2, 6 lub 12 godz. (domyślnie 2 godz.). Gdy węzła nie słychać tak długo, nic dla niego nie jest pokazywane, bo mógł wyjść poza zasięg, zanim zdążył zgłosić „nieaktywny”.
+- **Pytaj przy otwarciu rozmowy** — otwarcie rozmowy bezpośredniej pyta ten węzeł o status (najwyżej raz na 10 minut).
+
+Statusy są czytane z zapisanych odpowiedzi OnDemand, więc przeżywają ponowne uruchomienie aplikacji.
 
 ## Panel debugowania
 

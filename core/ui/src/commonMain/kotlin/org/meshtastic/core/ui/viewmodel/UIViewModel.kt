@@ -23,7 +23,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -36,10 +38,12 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -58,6 +62,8 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.EventFirmwareEdition
 import org.meshtastic.core.model.MeshActivity
 import org.meshtastic.core.model.MyNodeInfo
+import org.meshtastic.core.model.NodePresence
+import org.meshtastic.core.model.NodePresenceLogs
 import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.TracerouteMapAvailability
 import org.meshtastic.core.model.UiOptions
@@ -67,6 +73,7 @@ import org.meshtastic.core.model.evaluateTracerouteMapAvailability
 import org.meshtastic.core.model.geofence.GeofencePolygon
 import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
 import org.meshtastic.core.model.service.TracerouteResponse
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
@@ -107,6 +114,7 @@ import org.meshtastic.proto.SharedContact
 import kotlin.random.Random
 
 private const val TAB_OPENED_EVENT_DELAY_MS = 150L
+private const val PRESENCE_DEBOUNCE_MS = 3_000L
 
 /**
  * Shared base for the application-level ViewModel.
@@ -267,6 +275,30 @@ class UIViewModel(
 
     /** Emits events for mesh network send/receive activity. */
     val meshActivity: Flow<MeshActivity> = radioInterfaceService.meshActivity
+
+    /**
+     * MT_SW: the last activity status of every node that shares one, read from the logged answers; empty while the
+     * icon is switched off. Provided to the node list as LocalNodePresence.
+     */
+    @OptIn(FlowPreview::class)
+    val nodePresence: StateFlow<Map<Int, NodePresence>> =
+        uiPrefs.uiOptions
+            .map { UiOptions(it).flag(UiOptions.PRESENCE_SHOW) }
+            .distinctUntilChanged()
+            .flatMapLatest { show ->
+                if (!show) {
+                    flowOf(emptyMap())
+                } else {
+                    meshLogRepository
+                        .getLogsByPortNumSince(ON_DEMAND_PORT_NUM, nowMillis - NodePresenceLogs.WINDOW_MILLIS)
+                        // Every received packet touches the log: wait for a quiet moment instead of re-reading each time.
+                        .debounce(PRESENCE_DEBOUNCE_MS)
+                        .map { NodePresenceLogs.latestPerNode(it) }
+                        .flowOn(Dispatchers.Default)
+                }
+            }
+            .distinctUntilChanged()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
     val currentDeviceAddressFlow: StateFlow<String?> = radioInterfaceService.currentDeviceAddressFlow
 

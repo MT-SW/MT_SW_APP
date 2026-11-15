@@ -116,6 +116,31 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val ICON_STYLE_OUTLINE = 2
 
         /** The send button buzzes while it is held. */
+        /** Activity status: show the icon on the node list (1) or not (0). */
+        const val PRESENCE_SHOW = "presence.show"
+
+        /** Look of the activity status icon: [PRESENCE_ICON_DOT], [PRESENCE_ICON_PERSON] or [PRESENCE_ICON_RING]. */
+        const val PRESENCE_ICON = "presence.icon"
+        const val PRESENCE_ICON_DOT = 0
+        const val PRESENCE_ICON_PERSON = 1
+        const val PRESENCE_ICON_RING = 2
+
+        /** Which other icon the activity status replaces while it is known: none, favourite, muted or unmessageable. */
+        const val PRESENCE_REPLACE = "presence.replace"
+        const val PRESENCE_REPLACE_NONE = 0
+        const val PRESENCE_REPLACE_FAVORITE = 1
+        const val PRESENCE_REPLACE_MUTED = 2
+        const val PRESENCE_REPLACE_UNMESSAGEABLE = 3
+
+        /** How long an "active" status holds without hearing the node: an index into `NodePresence.EXPIRY_STEPS_MINUTES`. */
+        const val PRESENCE_EXPIRY = "presence.expiry"
+
+        /** Colour of the active icon: green (0) or the colour of the theme / grey (1). */
+        const val PRESENCE_COLOR = "presence.color"
+
+        /** Ask a node for its status when its conversation is opened (1) or only listen to its broadcasts (0). */
+        const val PRESENCE_ASK = "presence.ask"
+
         const val HOLD_BUZZ = "input.holdBuzz"
 
         /** Scroll steps (in dp) of the choices of [NAV_HIDE] (1..3) and [NAV_SHOW] (0..1; 2 = only at the top). */
@@ -135,6 +160,12 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(NAV_RIM, 0)
             put(BUTTON_GRADIENT, 2)
             put(NAV_SELECT, NAV_SELECT_BUBBLE)
+            put(PRESENCE_SHOW, 1)
+            put(PRESENCE_ICON, PRESENCE_ICON_DOT)
+            put(PRESENCE_REPLACE, PRESENCE_REPLACE_NONE)
+            put(PRESENCE_EXPIRY, 2)
+            put(PRESENCE_COLOR, 0)
+            put(PRESENCE_ASK, 1)
             put(HOLD_BUZZ, 1)
             // The app starts with the glass look and the thin line icons like on the iPhone; the person can go back to
             // the classic look in "Look" (every choice they make is saved and stays).

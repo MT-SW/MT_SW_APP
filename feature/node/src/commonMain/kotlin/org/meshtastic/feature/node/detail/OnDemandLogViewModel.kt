@@ -38,6 +38,7 @@ import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemand
 import org.meshtastic.proto.OnDemandResponse
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.Presence
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortCounterEntry
 import org.meshtastic.proto.RoutingErrorEntry
@@ -60,6 +61,7 @@ data class OnDemandLogUiState(
     val rxPacketHistory: List<Int> = emptyList(),
     val fwPlusVersion: FwPlusVersion? = null,
     val lanStats: LanStats? = null,
+    val presence: Presence? = null,
     val receivedAt: Map<OnDemandType, Long> = emptyMap(),
 )
 
@@ -169,6 +171,7 @@ class OnDemandLogViewModel(
             latest(OnDemandType.RESPONSE_PACKET_RX_HISTORY) { it.rx_packet_history }?.rx_packet_history.orEmpty(),
             fwPlusVersion = latest(OnDemandType.RESPONSE_FW_PLUS_VERSION) { it.fw_plus_version },
             lanStats = latest(OnDemandType.RESPONSE_LAN_STATS) { it.lan_stats },
+            presence = latest(OnDemandType.RESPONSE_PRESENCE) { it.presence },
             receivedAt =
             decoded
                 .mapNotNull { (od, ts) -> od.response?.response_type?.let { it to ts } }
@@ -251,6 +254,8 @@ class OnDemandLogViewModel(
     fun requestFwPlusVersion() = requestOnDemand(OnDemandType.REQUEST_FW_PLUS_VERSION)
 
     fun requestLanStats() = requestOnDemand(OnDemandType.REQUEST_LAN_STATS)
+
+    fun requestPresence() = requestOnDemand(OnDemandType.REQUEST_PRESENCE)
 
     private fun requestOnDemand(type: OnDemandType) =
         safeLaunch(tag = "requestOnDemand-${type.name}") { nodeRequestActions.requestOnDemand(destNum, longName, type) }

@@ -123,7 +123,7 @@ The feed line is worked out just like in the Mesh Link Planner: any number of co
 
 ## On-demand diagnostics
 
-In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity the MT_SW firmware version and, from MT_SW_FIRMWARE v3, the LAN statistics (the node's IP address on Wi-Fi or Ethernet, UDP on the local network, MQTT and the broker connection). The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.
+In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 11 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity, from MT_SW_FIRMWARE v3 the LAN statistics (the node's IP address on Wi-Fi or Ethernet, UDP on the local network, MQTT and the broker connection) and the activity status (whether someone is at the node), and, last, the MT_SW firmware version. The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.
 
 ## Message archive
 
@@ -176,6 +176,23 @@ In **Settings → Modules → Telemetry** there is a **Local statistics** card. 
 - **The shortest interval is 2 hours.**
 - **Both options are saved together** with the usual bottom save bar, together with the other telemetry settings. The app first reads the current state from the node, so changing one option leaves the other as it was. After saving it shows what the node really stored (it may correct the intervals); if the node does not confirm, you get a message.
 - Saving does not restart the node.
+
+## Activity status
+
+A small icon by a node in the list (normal and compact) says whether someone is at the node, that is, whether an app is connected to it. A **green dot with a light outline** means "active", a **grey outline** means "inactive". When a node does not share its status, nothing is shown. The tooltip (hold the icon) says for how many minutes the node has been in that state.
+
+**Switching it on at the node.** **Settings → User** has an **Activity status** switch, right under "Unmessageable". It is saved with the same bar as the rest of the user settings. It works from MT_SW_FIRMWARE v3; when the app detects an older firmware, or the node has not answered yet, the switch is locked and a note under it says from which version it works. The node sends its status by itself (once the state has held for 5 minutes, not more often than every 30 minutes) and answers a request for it.
+
+**Options in the app** (**MT_SW features → Activity status**, the same on every platform):
+
+- **Show the activity status** — turns the icon on or off.
+- **Look of the icon** — a dot, a person with a dot, or a dot in a ring.
+- **Replaces another icon** — nothing (the icon sits next to the others), favourite, muted or unmessageable; that icon is then not shown while the status is known.
+- **Colour of the active icon** — green or the colour of the theme.
+- **How long "active" holds** — 30 min, 1, 2, 6 or 12 h (2 h by default). When the node is not heard for that long, nothing is shown for it, because it may have gone out of range before it could report "inactive".
+- **Ask when a chat is opened** — opening a direct chat asks that node for its status (at most once per 10 minutes).
+
+The statuses are read from the saved OnDemand answers, so they survive a restart of the app.
 
 ## Debug panel
 

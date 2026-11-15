@@ -102,6 +102,7 @@ import org.meshtastic.core.resources.key_backup_restore_failed
 import org.meshtastic.core.resources.key_backup_restored
 import org.meshtastic.core.resources.key_backup_saved
 import org.meshtastic.core.resources.local_stats_save_failed
+import org.meshtastic.core.resources.presence_save_failed
 import org.meshtastic.core.resources.timeout
 import org.meshtastic.core.resources.unknown_error
 import org.meshtastic.core.ui.util.SnackbarManager
@@ -125,6 +126,7 @@ import org.meshtastic.proto.LoRaRegionPresetMap
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.Routing
@@ -217,6 +219,13 @@ data class RadioConfigState(
     val localStatsConfig: LocalStatsBroadcastConfig? = null,
     /** True while a read or save of the local stats broadcast settings is waiting for the radio's answer. */
     val localStatsLoading: Boolean = false,
+    /**
+     * Latest RESPONSE_PRESENCE_CONFIG (the activity status switch) for the node being configured (fw+ version 3 and
+     * newer), or null until the radio has answered this connection.
+     */
+    val presenceConfig: PresenceConfig? = null,
+    /** True while a read or save of the activity status switch is waiting for the radio's answer. */
+    val presenceLoading: Boolean = false,
     val analyticsAvailable: Boolean = true,
     val analyticsEnabled: Boolean = true,
     val nodeDbResetPreserveFavorites: Boolean = false,
@@ -573,6 +582,28 @@ open class RadioConfigViewModel(
             }
             .launchIn(viewModelScope)
 
+        // The activity status switch (MT_SW_FIRMWARE v3), read and saved the same way as the local stats above.
+        targetNumIfConnected
+            .flatMapLatest { targetNum ->
+                if (targetNum == null) {
+                    _radioConfigState.update { it.copy(presenceConfig = null, presenceLoading = false) }
+                    flowOf(null)
+                } else {
+                    val since = nowMillis
+                    requestPresenceConfig(targetNum)
+                    snifferControlUseCase.presenceConfigFlow(targetNum, since)
+                }
+            }
+            .onEach { config ->
+                _radioConfigState.update {
+                    it.copy(
+                        presenceConfig = config,
+                        presenceLoading = if (config != null) false else it.presenceLoading,
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+
         combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest -> dest ?: ni?.myNodeNum }
             .distinctUntilChanged()
             .flatMapLatest { targetNum -> targetNum?.let(snifferControlUseCase::fwPlusVersionFlow) ?: flowOf(null) }
@@ -899,6 +930,51 @@ open class RadioConfigViewModel(
                 delay(if (targetNum == myNodeNum) SNIFFER_STATE_ASK_INTERVAL else REMOTE_STATS_ASK_INTERVAL)
             }
             _radioConfigState.update { if (it.localStatsConfig == null) it.copy(localStatsLoading = false) else it }
+        }
+    }
+
+    /**
+     * Asks the radio for its activity status switch, but only after it reported fw+ version
+     * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE] or newer. Gives up quietly otherwise.
+     */
+    private fun requestPresenceConfig(targetNum: Int) {
+        safeLaunch(tag = "requestPresenceConfig") {
+            val supported =
+                withTimeoutOrNull(LOCAL_STATS_VERSION_WAIT) {
+                    radioConfigState.first {
+                        (it.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_PRESENCE
+                    }
+                }
+            if (supported == null) return@safeLaunch
+            _radioConfigState.update { it.copy(presenceLoading = true) }
+            repeat(SNIFFER_STATE_ASK_ATTEMPTS) {
+                // Stop when the user moved to another node or the answer is already here.
+                if ((destNum ?: myNodeNum) != targetNum || _radioConfigState.value.presenceConfig != null) {
+                    return@repeat
+                }
+                requestWithQueueRetry("requestPresenceConfig", targetNum) {
+                    snifferControlUseCase.requestPresenceConfig(targetNum)
+                }
+                delay(if (targetNum == myNodeNum) SNIFFER_STATE_ASK_INTERVAL else REMOTE_STATS_ASK_INTERVAL)
+            }
+            _radioConfigState.update { if (it.presenceConfig == null) it.copy(presenceLoading = false) else it }
+        }
+    }
+
+    /**
+     * Saves the activity status switch on the node being configured. The radio's answer replaces
+     * [RadioConfigState.presenceConfig]; when no answer comes, the user is told the save did not arrive.
+     */
+    fun setPresenceConfig(config: PresenceConfig) {
+        val destNum = destNum ?: destNode.value?.num ?: return
+        safeLaunch(tag = "setPresenceConfig") {
+            val before = _radioConfigState.value.presenceConfig
+            _radioConfigState.update { it.copy(presenceLoading = true) }
+            snifferControlUseCase.setPresenceConfig(destNum, config)
+            delay(LOCAL_STATS_SAVE_TIMEOUT)
+            val stillWaiting = _radioConfigState.value.presenceConfig == before
+            _radioConfigState.update { it.copy(presenceLoading = false) }
+            if (stillWaiting) sendError(Res.string.presence_save_failed)
         }
     }
 

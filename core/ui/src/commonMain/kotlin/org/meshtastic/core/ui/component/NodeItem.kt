@@ -725,6 +725,8 @@ private fun NodeItemHeader(
                 deviceType = deviceType,
                 contentColor = contentColor,
                 isUnknownUser = thatNode.isUnknownUser,
+                nodeNum = nodeNum,
+                lastHeardSeconds = thatNode.lastHeard,
             )
         }
     }

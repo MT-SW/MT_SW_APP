@@ -42,6 +42,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.currentLocaleCode
 import org.meshtastic.core.common.util.ioDispatcher
+import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
 import org.meshtastic.core.model.ContactSettings
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
@@ -113,6 +114,7 @@ class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val messageTranslationService: MessageTranslationService,
     private val snackbarManager: SnackbarManager,
+    private val nodePresenceUseCase: NodePresenceUseCase,
 ) : ViewModel() {
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
@@ -537,7 +539,22 @@ class MessageViewModel(
      * notification. Paired with [onConversationHidden] on pause — backgrounding the app hides the screen, which is what
      * makes a single signal enough.
      */
-    fun onConversationVisible(contactKey: String) = activeConversationTracker.setActive(contactKey)
+    fun onConversationVisible(contactKey: String) {
+        activeConversationTracker.setActive(contactKey)
+        askPresence(contactKey)
+    }
+
+    /**
+     * MT_SW: opening a direct chat asks that node for its activity status (the use case limits how often and checks
+     * the settings). Broadcast and channel conversations are not asked.
+     */
+    private fun askPresence(contactKey: String) {
+        val userId = contactKey.drop(1)
+        if (userId.isEmpty() || userId == NodeAddress.ID_BROADCAST) return
+        val nodeNum = nodeRepository.getNode(userId).num
+        if (nodeNum == 0) return
+        safeLaunch(context = ioDispatcher, tag = "askPresence") { nodePresenceUseCase.askOnOpen(nodeNum) }
+    }
 
     fun onConversationHidden(contactKey: String) = activeConversationTracker.clearActive(contactKey)
 

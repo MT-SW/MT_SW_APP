@@ -33,6 +33,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.meshtastic.core.domain.usecase.settings.NodePresenceUseCase
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.ContactSettings
 import org.meshtastic.core.model.Message
@@ -195,6 +196,7 @@ class MessageViewModelTranslationTest {
                 activeConversationTracker = ActiveConversationTracker(),
                 messageTranslationService = translationService,
                 snackbarManager = snackbarManager,
+                nodePresenceUseCase = mock(MockMode.autofill),
             )
     }
 

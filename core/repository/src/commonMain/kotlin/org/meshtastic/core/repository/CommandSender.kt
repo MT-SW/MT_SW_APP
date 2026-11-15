@@ -21,6 +21,7 @@ import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.core.model.Position as ModelPosition
 import org.meshtastic.proto.Position as ProtoPosition
@@ -194,6 +195,9 @@ interface CommandSender {
 
     /** Sets both local stats broadcast options on [destNum] at once (OnDemand request 32). */
     suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig)
+
+    /** Sets the activity status (presence) switch on [destNum] (OnDemand request 39). */
+    suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig)
 
     /**
      * Sends a Remote Hardware WRITE_GPIOS command to [destNum], setting the pins selected in [gpioMask] to the

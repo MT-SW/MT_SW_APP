@@ -23,6 +23,7 @@ import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
 
 /**
@@ -72,6 +73,10 @@ internal class QueryControllerImpl(
 
     override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
         commandSender.setLocalStatsBroadcastConfig(destNum, config)
+    }
+
+    override suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig) {
+        commandSender.setPresenceConfig(destNum, config)
     }
 
     override suspend fun requestTraceroute(requestId: Int, destNum: Int) {

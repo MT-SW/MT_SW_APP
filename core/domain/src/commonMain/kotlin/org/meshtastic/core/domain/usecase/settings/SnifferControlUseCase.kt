@@ -28,6 +28,7 @@ import org.meshtastic.core.repository.RadioController
 import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemand
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.PresenceConfig
 
 /**
  * Use case for the Sniffer module's enable/disable/state protocol.
@@ -157,7 +158,45 @@ open class SnifferControlUseCase(
         .maxByOrNull { it.second }
         ?.first
 
+    /** Sends REQUEST_PRESENCE_CONFIG to [destNum]; the answer arrives via [presenceConfigFlow]. */
+    open suspend fun requestPresenceConfig(destNum: Int) {
+        radioController.requestOnDemand(destNum, OnDemandType.REQUEST_PRESENCE_CONFIG)
+    }
+
+    /** Switches the activity status (presence) broadcasts on [destNum]; the radio answers with what it stored. */
+    open suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig) {
+        radioController.setPresenceConfig(destNum, config)
+    }
+
+    /**
+     * The most recent RESPONSE_PRESENCE_CONFIG logged for [destNum] at or after [sinceMillis], or `null` when none has
+     * arrived (not asked yet, or the firmware is older than fw+ version [MIN_FW_PLUS_VERSION_FOR_PRESENCE]).
+     */
+    open fun presenceConfigFlow(destNum: Int, sinceMillis: Long): Flow<PresenceConfig?> =
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map { decodeLatestPresenceConfig(it, sinceMillis) }
+
+    private fun decodeLatestPresenceConfig(logs: List<MeshLog>, sinceMillis: Long): PresenceConfig? = logs
+        .filter { it.received_date >= sinceMillis }
+        .mapNotNull { log ->
+            log.fromRadio.packet
+                ?.decoded
+                ?.payload
+                ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                ?.response
+                ?.takeIf { it.response_type == OnDemandType.RESPONSE_PRESENCE_CONFIG }
+                ?.presence_config
+                ?.let { config -> config to log.received_date }
+        }
+        .maxByOrNull { it.second }
+        ?.first
+
     companion object {
+        /**
+         * Minimum fw+ `version_number` that has the activity status (presence), OnDemand requests 35-39. It comes in
+         * the same firmware release as the local stats settings (MT_SW_FIRMWARE v3).
+         */
+        const val MIN_FW_PLUS_VERSION_FOR_PRESENCE = 3
+
         /** Minimum fw+ `version_number` that has the local stats broadcast settings (OnDemand requests 30-32). */
         const val MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS = 3
 

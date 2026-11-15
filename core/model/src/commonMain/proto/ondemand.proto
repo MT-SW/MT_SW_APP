@@ -156,6 +156,16 @@ enum OnDemandType {
     // that predates these (fw+ version below 4) answers with response_type UNKNOWN_TYPE.
     REQUEST_LAN_STATS = 33;
     RESPONSE_LAN_STATS = 34;
+    // Get this node's user presence (see Presence). Answered for any node in range; state is UNKNOWN while presence
+    // sharing is switched off. A node that predates these answers with response_type UNKNOWN_TYPE.
+    // RESPONSE_PRESENCE is also what the unsolicited broadcasts carry.
+    REQUEST_PRESENCE = 35;
+    RESPONSE_PRESENCE = 36;
+    // Get/set the presence switch (see PresenceConfig). GET is answered for any node in range; SET is honored only
+    // from the locally-attached phone or from a node whose public key is one of this node's admin keys.
+    REQUEST_PRESENCE_CONFIG = 37;
+    RESPONSE_PRESENCE_CONFIG = 38;
+    REQUEST_SET_PRESENCE_CONFIG = 39;
 }
 
 // Periodic broadcast of the node's own statistics: the basic ones and the extended ones, each with its own interval.
@@ -186,10 +196,34 @@ message LanStats {
     bool mqtt_connected = 5;
 }
 
+// Whether this node's user is around: an API client (phone app, CLI, web client, ...) is attached to the node. Sent
+// unsolicited as RESPONSE_PRESENCE broadcasts on the primary channel while PresenceConfig.enabled, and as the answer
+// to REQUEST_PRESENCE. A broadcast goes out once the state has held for 5 minutes and at least 30 minutes after the
+// previous one, and only if it differs from what was broadcast last.
+message Presence {
+    enum State {
+        // Presence sharing is switched off on that node (PresenceConfig.enabled false).
+        UNKNOWN = 0;
+        OFFLINE = 1;
+        ONLINE = 2;
+    }
+    State state = 1;
+    // Seconds the node has been in `state` (since boot if it never changed). Only in answers to REQUEST_PRESENCE,
+    // which report the state as it is at that moment, not the last broadcast one.
+    optional uint32 secs_since_change = 2;
+}
+
+// Switch for the Presence broadcasts and answers (see REQUEST_PRESENCE_CONFIG). Off by default.
+message PresenceConfig {
+    bool enabled = 1;
+}
+
 message OnDemandRequest {
     OnDemandType request_type = 1;
     // Only used with REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG; it sets both options at once.
     LocalStatsBroadcastConfig local_stats_broadcast_config = 3;
+    // Only used with REQUEST_SET_PRESENCE_CONFIG.
+    optional PresenceConfig presence_config = 4;
 }
 
 message SnifferState {
@@ -212,6 +246,8 @@ message OnDemandResponse {
         SnifferState sniffer_state = 12;
         LocalStatsBroadcastConfig local_stats_broadcast_config = 14;
         LanStats lan_stats = 15;
+        Presence presence = 16;
+        PresenceConfig presence_config = 17;
     }
 }
 

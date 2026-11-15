@@ -102,6 +102,8 @@ import org.meshtastic.core.resources.on_demand_hero_progress
 import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_lan_stats
 import org.meshtastic.core.resources.on_demand_lan_stats_desc
+import org.meshtastic.core.resources.on_demand_presence
+import org.meshtastic.core.resources.on_demand_presence_desc
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_nexthop_counter
 import org.meshtastic.core.resources.on_demand_no_answer
@@ -206,6 +208,7 @@ import org.meshtastic.core.ui.icon.MeshRadio
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NearMe
 import org.meshtastic.core.ui.icon.Nodes
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Reconnecting
 import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Send
@@ -486,6 +489,44 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                 }
             }
 
+            item(key = "lan-stats") {
+                QueryCard(
+                    title = stringResource(Res.string.on_demand_lan_stats),
+                    description = stringResource(Res.string.on_demand_lan_stats_desc),
+                    icon = MeshtasticIcons.MeshHub,
+                    accent = purple,
+                    onRequest = viewModel::requestLanStats,
+                    receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_LAN_STATS],
+                ) {
+                    uiState.lanStats?.let { lan ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            lan.lines().forEach { (label, value) ->
+                                Text(text = "$label: $value", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+            }
+
+            item(key = "presence") {
+                QueryCard(
+                    title = stringResource(Res.string.on_demand_presence),
+                    description = stringResource(Res.string.on_demand_presence_desc),
+                    icon = MeshtasticIcons.Person,
+                    accent = purple,
+                    onRequest = viewModel::requestPresence,
+                    receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_PRESENCE],
+                ) {
+                    uiState.presence?.let { presence ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            presence.lines().forEach { (label, value) ->
+                                Text(text = "$label: $value", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+            }
+
             item(key = "fw-plus-version") {
                 QueryCard(
                     title = stringResource(Res.string.on_demand_fw_plus_version),
@@ -502,25 +543,6 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                             fontWeight = FontWeight.Bold,
                             color = purple,
                         )
-                    }
-                }
-            }
-
-            item(key = "lan-stats") {
-                QueryCard(
-                    title = stringResource(Res.string.on_demand_lan_stats),
-                    description = stringResource(Res.string.on_demand_lan_stats_desc),
-                    icon = MeshtasticIcons.MeshHub,
-                    accent = purple,
-                    onRequest = viewModel::requestLanStats,
-                    receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_LAN_STATS],
-                ) {
-                    uiState.lanStats?.let { lan ->
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            lan.lines().forEach { (label, value) ->
-                                Text(text = "$label: $value", style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
                     }
                 }
             }
@@ -576,12 +598,13 @@ private fun OnDemandHero(answered: Set<OnDemandType>) {
                 MeshtasticIcons.Chart,
                 OnDemandType.RESPONSE_PACKET_RX_HISTORY,
             ),
+            Triple(Res.string.on_demand_lan_stats, MeshtasticIcons.MeshHub, OnDemandType.RESPONSE_LAN_STATS),
+            Triple(Res.string.on_demand_presence, MeshtasticIcons.Person, OnDemandType.RESPONSE_PRESENCE),
             Triple(
                 Res.string.on_demand_fw_plus_version,
                 MeshtasticIcons.MeshRadio,
                 OnDemandType.RESPONSE_FW_PLUS_VERSION,
             ),
-            Triple(Res.string.on_demand_lan_stats, MeshtasticIcons.MeshHub, OnDemandType.RESPONSE_LAN_STATS),
         )
     val done = capabilities.count { it.third in answered }
     val brush =

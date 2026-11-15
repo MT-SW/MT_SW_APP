@@ -45,6 +45,7 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalMeshActivity
+import org.meshtastic.core.ui.util.LocalNodePresence
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNoiseFloor
 import org.meshtastic.core.ui.viewmodel.UIViewModel
@@ -122,6 +123,8 @@ fun MeshtasticAppShell(
     // What every top bar shows: the plate of our node, and the red SOS button (on the cards chosen in the settings; all
     // by default). Provided once here so that no card has to be wired by hand.
     val sosPrefs = koinInject<SosPrefs>()
+    // The holder is passed on, never read here, so a change of a status redraws only the badges (LocalNodePresence).
+    val nodePresence = uiViewModel.nodePresence.collectAsStateWithLifecycle()
     val sosScreens by sosPrefs.barScreens.collectAsStateWithLifecycle()
     val sosConfig by sosPrefs.config.collectAsStateWithLifecycle()
     val sosController = koinInject<SosController>()
@@ -151,6 +154,7 @@ fun MeshtasticAppShell(
             LocalNoiseFloor provides noiseFloor,
             LocalLnaCorrection provides lnaCorrection,
             LocalMeshActivity provides uiViewModel.meshActivity,
+            LocalNodePresence provides nodePresence,
             LocalAppBarExtras provides appBarExtras,
         ) {
             // Inside the provider: dialogs raised here (e.g. the traceroute result) read LocalModemPreset etc.

@@ -18,6 +18,7 @@ package org.meshtastic.core.repository
 
 import org.meshtastic.core.model.Position
 import org.meshtastic.proto.LocalStatsBroadcastConfig
+import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.proto.OnDemandType
 
 /**
@@ -44,6 +45,9 @@ interface QueryController {
 
     /** Sets both local stats broadcast options (basic and extended, with intervals) on [destNum] at once. */
     suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig)
+
+    /** Sets the activity status (presence) switch on [destNum]. */
+    suspend fun setPresenceConfig(destNum: Int, config: PresenceConfig)
 
     /** Initiates a traceroute request to a remote node. */
     suspend fun requestTraceroute(requestId: Int, destNum: Int)
