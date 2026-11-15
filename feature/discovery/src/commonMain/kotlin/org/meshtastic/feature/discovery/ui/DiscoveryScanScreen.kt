@@ -90,6 +90,7 @@ import org.meshtastic.core.resources.discovery_start_scan_reason_no_presets
 import org.meshtastic.core.resources.discovery_start_scan_reason_not_connected
 import org.meshtastic.core.resources.discovery_stop_scan
 import org.meshtastic.core.resources.mesh_beacon_invitations_title
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Close
@@ -168,6 +169,7 @@ fun DiscoveryScanScreen(
                     }
                 },
                 actions = {
+                    SosBarAction()
                     IconButton(onClick = onNavigateToHistory) {
                         Icon(
                             imageVector = MeshtasticIcons.History,

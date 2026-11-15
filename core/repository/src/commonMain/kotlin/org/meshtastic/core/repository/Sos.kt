@@ -90,9 +90,8 @@ data class SosConfig(
         private fun decodeNew(parts: List<String>): SosConfig {
             val numbers = parts.subList(1, FIELDS - 2).map { it.toIntOrNull() ?: return SosConfig() }
             val nodes = numberList(parts[FIELDS - 2])
-            // Only nodes is fine (direct messages alone); with nothing chosen at all the main channel stays.
-            val chosen = channelList(parts[0].removePrefix(CHANNEL_MARK))
-            val channels = if (chosen.isEmpty() && nodes.isEmpty()) listOf(0) else chosen
+            // No channel at all is allowed (direct messages to the chosen nodes alone, or nothing chosen yet).
+            val channels = channelList(parts[0].removePrefix(CHANNEL_MARK))
             return SosConfig(
                 channels = channels,
                 nodes = nodes,

@@ -35,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.back
 import org.meshtastic.core.resources.discovery_map
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.DiscoveryMapNode
@@ -63,6 +64,7 @@ fun DiscoveryMapScreen(viewModel: DiscoveryMapViewModel, onNavigateUp: () -> Uni
                         Icon(MeshtasticIcons.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
     ) { padding ->

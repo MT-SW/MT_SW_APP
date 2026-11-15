@@ -3377,6 +3377,7 @@
     <string name="sos_alarm_test">Test the alarm (only on this device)</string>
     <string name="sos_alarm_test_note">This is a test of the alarm. Nothing was sent.</string>
     <string name="sos_alarm_test_sender">Alarm test</string>
+    <string name="sos_alarm_test_signal">Or try one signal:</string>
     <string name="sos_alarm_test_text">This is how an SOS from another node will look and sound.</string>
     <string name="sos_bar_ai">Assistant and translator</string>
     <string name="sos_bar_connections">Connections</string>
@@ -3395,6 +3396,7 @@
     <string name="sos_button_tap">Tap to send</string>
     <string name="sos_cancel">Stop</string>
     <string name="sos_channel_n">Channel %1$d</string>
+    <string name="sos_channels_note">You can leave every channel unchosen: the alarm then goes only to the chosen people as direct messages.</string>
     <string name="sos_confirm_switch">Tell the sender when I confirm</string>
     <string name="sos_default_message">SOS! I need help.</string>
     <string name="sos_history_clear">Clear the history</string>
@@ -3413,6 +3415,7 @@
     <string name="sos_intro">Sends an emergency message with your position to the chosen channels and as a direct message to the chosen nodes, and watches whether it was delivered. Hold the button for the set time so it cannot be pressed by accident.</string>
     <string name="sos_message_for">Text for: %1$s</string>
     <string name="sos_message_label">Text (empty = default)</string>
+    <string name="sos_no_targets">Nothing is chosen yet. Choose a channel or a person to be able to send the alarm.</string>
     <string name="sos_nodes_add">Add or remove nodes</string>
     <string name="sos_nodes_done">Done</string>
     <string name="sos_nodes_empty">No nodes to choose from.</string>

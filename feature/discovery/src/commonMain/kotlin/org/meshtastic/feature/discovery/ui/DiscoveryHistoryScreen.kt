@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.discovery_scan_complete
 import org.meshtastic.core.resources.discovery_scan_incomplete
 import org.meshtastic.core.resources.discovery_unique_nodes_count
 import org.meshtastic.core.ui.component.EmptyState
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.Delete
@@ -95,6 +96,7 @@ fun DiscoveryHistoryScreen(
                         Icon(MeshtasticIcons.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
     ) { padding ->

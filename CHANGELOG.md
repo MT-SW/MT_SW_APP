@@ -42,7 +42,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Ulepszenia
 
-* Plakietka Twojego węzła jest teraz na górnym pasku wszystkich kart, także w Ustawieniach, Asystencie, Tłumaczu i Zdrowiu sieci.
+* Plakietka Twojego węzła (kolor i krótka nazwa) jest na górnym pasku głównych kart, a czerwony przycisk SOS na górnym pasku wszystkich ekranów, także w rozmowie i w Zdrowiu sieci; podczas trzymania jego obwódka zakreśla się białą linią, a taki sam przycisk jest w ekranie SOS.
+* SOS: kanałów można nie wybierać wcale (alarm idzie wtedy tylko do wybranych osób), a „Sprawdź alarm” jest zwykłym przyciskiem, który od razu próbuje alarm.
 * Mapa: filtr „Maks. liczba skoków” i „Maks. odległość od mojego węzła”, lista „wybierz węzeł” dla węzłów w tym samym miejscu, dokładniejsze dotykanie dymków i płynniejsze przesuwanie.
 * Dolne zakładki otwierają stronę tam, gdzie ją zostawiłeś, a kliknięcie powiadomienia otwiera rozmowę, z której przyszło.
 * Wykresy pomijają odczyty z błędnym zegarem węzła, baza zapisuje szybciej, a logi na iPhonie/iPadzie są dużo szybsze.
@@ -877,7 +878,8 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Improvements
 
-* The plate of your node is now in the top bar of all cards, also in Settings, the Assistant, the Translator and Network health.
+* The plate of your node (colour and short name) is in the top bar of the main cards, and the red SOS button is in the top bar of every screen, also in a conversation and in Network health; while it is held its border is traced around in white, and the SOS screen has the same button.
+* SOS: you can leave every channel unchosen (the alarm then goes only to the chosen people), and "Test the alarm" is a plain button that tries the alarm at once.
 * Map: the filters "Max. number of hops" and "Max. distance from my node", a "choose node" list for nodes in the same place, more exact touching of the bubbles and smoother panning.
 * The bottom tabs open the page where you left it, and a tap on a notification opens the conversation it came from.
 * Charts skip readings with a wrong node clock, the database writes faster, and the logs on iPhone/iPad are much faster.

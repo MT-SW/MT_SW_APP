@@ -139,6 +139,7 @@ import org.meshtastic.core.resources.wifi_provision_success_username_value
 import org.meshtastic.core.resources.wifi_provisioning
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CheckCircle
@@ -194,6 +195,7 @@ fun WifiProvisionScreen(
                         Icon(MeshtasticIcons.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

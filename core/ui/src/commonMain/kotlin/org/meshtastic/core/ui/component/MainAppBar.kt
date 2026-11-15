@@ -146,7 +146,8 @@ private fun TopBarActions(
     // that was given no node of its own takes the one from the app root, so no card is left without them.
     val extras = LocalAppBarExtras.current
     val chipNode = ourNode ?: extras.ourNode
-    val chipVisible = chipNode != null && (showNodeChip || extras.connected)
+    // The plate is only for the main cards (they say so with showNodeChip); the others show just the SOS button.
+    val chipVisible = chipNode != null && showNodeChip && (ourNode != null || extras.connected)
     val openSos = extras.onOpenSos
     val sosVisible = sosScreen != null && openSos != null && sosScreen.key in extras.sosScreens
 

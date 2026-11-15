@@ -56,6 +56,7 @@ import org.meshtastic.core.resources.discovery_stat_total_messages
 import org.meshtastic.core.resources.discovery_stat_unique_nodes
 import org.meshtastic.core.resources.discovery_view_map
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -86,6 +87,7 @@ fun DiscoveryHistoryDetailScreen(
                     }
                 },
                 actions = {
+                    SosBarAction()
                     val s = session
                     val hasAnyMappableNodes =
                         nodesByPreset.values.flatten().any {

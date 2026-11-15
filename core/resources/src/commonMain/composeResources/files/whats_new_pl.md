@@ -18,7 +18,8 @@
 - **Dane.** „Dołącz dane z kopii” oraz synchronizacja statystyk urządzeń.
 - **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 ## better | Ulepszenia
-- Plakietka Twojego węzła jest teraz na górnym pasku wszystkich kart, także w Ustawieniach, Asystencie, Tłumaczu i Zdrowiu sieci.
+- Plakietka Twojego węzła (kolor i krótka nazwa) jest na górnym pasku głównych kart, a czerwony przycisk SOS na górnym pasku wszystkich ekranów, także w rozmowie i w Zdrowiu sieci; podczas trzymania jego obwódka zakreśla się białą linią, a taki sam przycisk jest w ekranie SOS.
+- SOS: kanałów można nie wybierać wcale (alarm idzie wtedy tylko do wybranych osób), a „Sprawdź alarm” jest zwykłym przyciskiem, który od razu próbuje alarm.
 - Mapa: filtr „Maks. liczba skoków” i „Maks. odległość od mojego węzła”, lista „wybierz węzeł” dla węzłów w tym samym miejscu, dokładniejsze dotykanie dymków i płynniejsze przesuwanie.
 - Dolne zakładki otwierają stronę tam, gdzie ją zostawiłeś, a kliknięcie powiadomienia otwiera rozmowę, z której przyszło.
 - Wykresy pomijają odczyty z błędnym zegarem węzła, baza zapisuje szybciej, a logi na iPhonie/iPadzie są dużo szybsze.

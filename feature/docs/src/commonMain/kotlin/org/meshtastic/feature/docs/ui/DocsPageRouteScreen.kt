@@ -62,6 +62,7 @@ import org.meshtastic.core.resources.doc_page_not_found
 import org.meshtastic.core.resources.doc_page_not_found_detail
 import org.meshtastic.core.resources.documentation
 import org.meshtastic.core.resources.navigate_back
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
@@ -151,6 +152,7 @@ fun DocsPageRouteScreen(
                     }
                 },
                 actions = {
+                    SosBarAction()
                     TextButton(
                         onClick = {
                             DocsTextScale.value = (DocsTextScale.value - TEXT_SCALE_STEP).coerceAtLeast(TEXT_SCALE_MIN)

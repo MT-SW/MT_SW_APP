@@ -116,6 +116,8 @@ import org.meshtastic.core.takserver.TakProtocol
 import org.meshtastic.core.takserver.TakTestResult
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -322,6 +324,7 @@ fun TakServerScreen(onBack: () -> Unit) {
                     }
                 },
                 actions = {
+                    SosBarAction(screen = SosBarScreen.SETTINGS)
                     if (isTakServerEnabled) {
                         IconButton(onClick = { exportLauncher("Meshtastic_TAK_Server.zip") }) {
                             Icon(

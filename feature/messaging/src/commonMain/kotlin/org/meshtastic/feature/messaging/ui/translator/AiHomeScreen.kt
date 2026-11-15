@@ -228,7 +228,7 @@ fun AiHomeScreen(
                 canNavigateUp = canNavigateUp,
                 onNavigateUp = onBack,
                 ourNode = null,
-                showNodeChip = false,
+                showNodeChip = !canNavigateUp,
                 actions = {
                     if ((showAssistant && assistantOn) || (!showAssistant && translatorOn)) {
                         IconButton(onClick = { showInfo = true }) {

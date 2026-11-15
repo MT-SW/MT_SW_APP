@@ -180,6 +180,7 @@ import org.meshtastic.core.resources.save
 import org.meshtastic.core.resources.skip
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CheckCircle
@@ -401,6 +402,7 @@ private fun FirmwareUpdateScaffold(
                         Icon(MeshtasticIcons.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
     ) { padding ->

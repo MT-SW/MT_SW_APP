@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.discovery_stat_total_unique_nodes
 import org.meshtastic.core.resources.discovery_summary_not_available
 import org.meshtastic.core.resources.discovery_view_map
 import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -157,6 +158,7 @@ private fun DiscoverySummaryContent(
                     }
                 },
                 actions = {
+                    SosBarAction()
                     if (session != null) {
                         IconButton(onClick = { onNavigateToMap(session.id) }) {
                             Icon(

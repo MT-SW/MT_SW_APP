@@ -60,6 +60,8 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.coverage_export_all
 import org.meshtastic.core.ui.component.FullScreenLoading
+import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
@@ -155,6 +157,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                     }
                 },
                 actions = {
+                    SosBarAction(screen = SosBarScreen.HEALTH)
                     IconButton(
                         onClick = {
                             val report = uiState.toReport(generatedStamp())

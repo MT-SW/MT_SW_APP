@@ -72,6 +72,8 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LoadingIndicator
+import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.GraphColors.Blue
@@ -109,6 +111,7 @@ fun NodeMetricDetailScreen(
                         Icon(imageVector = MeshtasticIcons.ArrowBack, contentDescription = null)
                     }
                 },
+                actions = { SosBarAction(screen = SosBarScreen.HEALTH) },
             )
         },
     ) { contentPadding ->

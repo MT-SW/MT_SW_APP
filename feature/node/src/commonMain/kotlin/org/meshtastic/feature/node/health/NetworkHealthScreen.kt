@@ -157,7 +157,7 @@ fun NetworkHealthScreen(
                 sosScreen = SosBarScreen.HEALTH,
                 title = "Zdrowie sieci",
                 ourNode = null,
-                showNodeChip = false,
+                showNodeChip = true,
                 canNavigateUp = false,
                 onNavigateUp = {},
                 onClickChip = {},

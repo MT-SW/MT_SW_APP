@@ -90,8 +90,8 @@ class SosConfigTest {
     }
 
     @Test
-    fun withNothingChosenTheMainChannelStays() {
-        assertEquals(listOf(0), SosConfig.decode("c|1|0|3|1|2||x").channels)
+    fun noChannelAtAllIsKept() {
+        assertEquals(emptyList(), SosConfig.decode("c|1|0|3|1|2||x").channels)
         assertEquals(emptyList(), SosConfig.decode("c|1|0|3|1|2|42|x").channels)
         assertEquals(listOf(42), SosConfig.decode("c|1|0|3|1|2|42|x").nodes)
     }

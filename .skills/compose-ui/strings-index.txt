@@ -3305,6 +3305,7 @@ sos_alarm_open
 sos_alarm_test
 sos_alarm_test_note
 sos_alarm_test_sender
+sos_alarm_test_signal
 sos_alarm_test_text
 sos_bar_ai
 sos_bar_connections
@@ -3323,6 +3324,7 @@ sos_button_hold
 sos_button_tap
 sos_cancel
 sos_channel_n
+sos_channels_note
 sos_confirm_switch
 sos_default_message
 sos_history_clear
@@ -3341,6 +3343,7 @@ sos_include_position
 sos_intro
 sos_message_for
 sos_message_label
+sos_no_targets
 sos_nodes_add
 sos_nodes_done
 sos_nodes_empty

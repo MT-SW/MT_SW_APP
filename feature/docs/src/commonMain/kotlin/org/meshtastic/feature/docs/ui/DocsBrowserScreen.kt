@@ -55,6 +55,7 @@ import org.meshtastic.core.resources.doc_section_developer
 import org.meshtastic.core.resources.doc_section_user
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.navigate_back
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
@@ -99,6 +100,7 @@ fun DocsBrowserScreen(
                         )
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
         floatingActionButton = {

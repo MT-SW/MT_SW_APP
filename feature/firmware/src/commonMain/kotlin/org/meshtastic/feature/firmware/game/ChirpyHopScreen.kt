@@ -41,6 +41,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.back
 import org.meshtastic.core.resources.chirpy_hop
 import org.meshtastic.core.resources.chirpy_hop_controls
+import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.KeepScreenOn
@@ -61,6 +62,7 @@ fun ChirpyHopScreen(viewModel: ChirpyHopViewModel, onNavigateUp: () -> Unit, mod
                         Icon(MeshtasticIcons.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
+                actions = { SosBarAction() },
             )
         },
     ) { padding ->

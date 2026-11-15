@@ -95,6 +95,11 @@ class SosControllerImpl(
             } else {
                 config.repeatCount.coerceAtLeast(1)
             }
+        // Nothing chosen at all (no channel and no node): there is nowhere to send, so nothing is sent.
+        if (config.channels.isEmpty() && config.nodes.isEmpty()) {
+            mutableState.value = SosState(refused = true)
+            return
+        }
         mutableState.value = SosState(running = true, total = total)
         var delivered = false
         var answered = false
@@ -150,9 +155,7 @@ class SosControllerImpl(
     private fun targetKeys(config: SosConfig, answeredNodes: Set<Int>): List<Pair<String, String?>> {
         val db = nodes.nodeDBbyNum.value
         val ourPkc = nodes.ourNodeInfo.value?.hasPKC == true
-        // With nothing chosen at all the main channel is used, so the message never goes nowhere.
-        val channels = if (config.channels.isEmpty() && config.nodes.isEmpty()) listOf(0) else config.channels
-        val channelKeys = channels.map {
+        val channelKeys = config.channels.map {
             ContactKey.broadcast(it).value to config.targetMessages[SosTargets.channelKey(it)]
         }
         val nodeKeys =

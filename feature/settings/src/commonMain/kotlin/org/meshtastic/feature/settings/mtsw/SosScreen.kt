@@ -19,14 +19,8 @@
 
 package org.meshtastic.feature.settings.mtsw
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -37,12 +31,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -51,16 +43,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -112,6 +100,7 @@ import org.meshtastic.core.resources.sos_alarm_only_chosen_switch
 import org.meshtastic.core.resources.sos_alarm_open
 import org.meshtastic.core.resources.sos_alarm_test
 import org.meshtastic.core.resources.sos_alarm_test_sender
+import org.meshtastic.core.resources.sos_alarm_test_signal
 import org.meshtastic.core.resources.sos_alarm_test_text
 import org.meshtastic.core.resources.sos_bar_ai
 import org.meshtastic.core.resources.sos_bar_connections
@@ -124,11 +113,11 @@ import org.meshtastic.core.resources.sos_bar_note
 import org.meshtastic.core.resources.sos_bar_other
 import org.meshtastic.core.resources.sos_bar_settings
 import org.meshtastic.core.resources.sos_bar_show
-import org.meshtastic.core.resources.sos_button
 import org.meshtastic.core.resources.sos_button_hold
 import org.meshtastic.core.resources.sos_button_tap
 import org.meshtastic.core.resources.sos_cancel
 import org.meshtastic.core.resources.sos_channel_n
+import org.meshtastic.core.resources.sos_channels_note
 import org.meshtastic.core.resources.sos_confirm_switch
 import org.meshtastic.core.resources.sos_history_clear
 import org.meshtastic.core.resources.sos_history_empty
@@ -146,6 +135,7 @@ import org.meshtastic.core.resources.sos_include_position
 import org.meshtastic.core.resources.sos_intro
 import org.meshtastic.core.resources.sos_message_for
 import org.meshtastic.core.resources.sos_message_label
+import org.meshtastic.core.resources.sos_no_targets
 import org.meshtastic.core.resources.sos_nodes_add
 import org.meshtastic.core.resources.sos_nodes_done
 import org.meshtastic.core.resources.sos_nodes_empty
@@ -204,6 +194,7 @@ import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SosChip
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.util.rememberFileExporter
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -213,11 +204,8 @@ private val REPEAT_COUNTS = listOf(2, 3, 5, 10, 20, 50)
 private val HOLD_SECONDS = listOf(0, 1, 2, 3, 5)
 private val GATE_MINUTES = listOf(2, 5, 10, 15, 30)
 private val KEEP_DAYS = listOf(0, 7, 30, 90, 365)
-private const val MILLIS = 1000
 private const val QUIET_STEP_MINUTES = 30
 private const val MINUTES_PER_HOUR = 60
-private const val BUTTON_SIZE = 160
-private const val RING_SIZE = 184
 
 /**
  * The SOS mode: a big button that, held for the set time, sends an emergency message with the position to the chosen
@@ -232,6 +220,8 @@ fun SosScreen(onBack: () -> Unit) {
     val state by controller.state.collectAsStateWithLifecycle()
     val channelSet by radioConfig.channelSetFlow.collectAsStateWithLifecycle(null)
     val channelNames = channelSet?.settings?.map { it.name }.orEmpty()
+    // Nothing chosen at all: there is nowhere to send. Channels alone, or only nodes (private persons), are fine.
+    val noTargets = config.channels.isEmpty() && config.nodes.isEmpty()
     val nodeRepository = koinInject<NodeRepository>()
     val nodeDb by nodeRepository.nodeDBbyNum.collectAsStateWithLifecycle()
     val myInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
@@ -302,11 +292,26 @@ fun SosScreen(onBack: () -> Unit) {
             Text(text = stringResource(Res.string.sos_intro), style = MaterialTheme.typography.bodyMedium)
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                SosButton(
+                // The same red button as in the top bars (big): hold it and the white line traces the border.
+                SosChip(
+                    onClick = { if (config.holdSeconds == 0) controller.start(config) },
                     holdSeconds = config.holdSeconds,
-                    enabled = !state.running,
-                    onTrigger = { controller.start(config) },
+                    onHoldComplete = if (config.holdSeconds > 0) ({ controller.start(config) }) else null,
+                    large = true,
+                    enabled = !state.running && !noTargets,
+                    hint =
+                    stringResource(
+                        if (config.holdSeconds > 0) Res.string.sos_button_hold else Res.string.sos_button_tap,
+                    ),
                 )
+                if (noTargets) {
+                    Text(
+                        text = stringResource(Res.string.sos_no_targets),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
             }
             val sosAcks = koinInject<SosAcks>()
             val ackEntries by sosAcks.entries.collectAsStateWithLifecycle()
@@ -319,6 +324,11 @@ fun SosScreen(onBack: () -> Unit) {
             )
 
             ExpressiveSection(title = stringResource(Res.string.sos_section_channel)) {
+                Text(
+                    text = stringResource(Res.string.sos_channels_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
                 FlowRow(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -632,9 +642,26 @@ fun SosScreen(onBack: () -> Unit) {
                     onRemoveException = { prefs.setQuietExceptions(quietExceptions - it) },
                     onPickExceptions = { pickingQuietNodes = true },
                 )
+                // One plain button tries the alarm as it is for an SOS from any node; the three below try a signal.
+                Button(
+                    onClick = {
+                        alarmCenter.raise(
+                            SosAlert(
+                                id = nowMillis,
+                                contactKey = ContactKey.broadcast(0).value,
+                                senderName = testSender,
+                                text = testText,
+                                test = true,
+                            ),
+                        )
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    Text(stringResource(Res.string.sos_alarm_test))
+                }
                 Text(
-                    text = stringResource(Res.string.sos_alarm_test),
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(Res.string.sos_alarm_test_signal),
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
                 FlowRow(
@@ -980,65 +1007,6 @@ private fun SosNodePicker(nodes: List<Node>, selected: List<Int>, onToggle: (Int
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sos_nodes_done)) } },
     )
-}
-
-/** The round button; with a hold time a ring fills while it is held and the send starts when the ring is full. */
-@Composable
-private fun SosButton(holdSeconds: Int, enabled: Boolean, onTrigger: () -> Unit) {
-    var pressed by remember { mutableStateOf(false) }
-    val progress = remember { Animatable(0f) }
-    val currentTrigger by rememberUpdatedState(onTrigger)
-    LaunchedEffect(pressed) {
-        if (pressed && holdSeconds > 0) {
-            progress.snapTo(0f)
-            progress.animateTo(1f, tween(durationMillis = holdSeconds * MILLIS, easing = LinearEasing))
-            currentTrigger()
-            pressed = false
-        } else {
-            progress.snapTo(0f)
-        }
-    }
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(RING_SIZE.dp)) {
-        CircularProgressIndicator(
-            progress = { progress.value },
-            modifier = Modifier.size(RING_SIZE.dp),
-            strokeWidth = 8.dp,
-        )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier =
-            Modifier.size(BUTTON_SIZE.dp)
-                .clip(CircleShape)
-                .background(if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline)
-                .pointerInput(enabled, holdSeconds) {
-                    detectTapGestures(
-                        onPress = {
-                            if (enabled) {
-                                pressed = true
-                                tryAwaitRelease()
-                                pressed = false
-                            }
-                        },
-                        onTap = { if (enabled && holdSeconds == 0) currentTrigger() },
-                    )
-                },
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(Res.string.sos_button),
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onError,
-                )
-                Text(
-                    text =
-                    stringResource(if (holdSeconds > 0) Res.string.sos_button_hold else Res.string.sos_button_tap),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onError,
-                )
-            }
-        }
-    }
 }
 
 /** What the last run did: progress while sending, then the result. Nothing before the first run. */

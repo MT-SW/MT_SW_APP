@@ -117,6 +117,8 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.NodeKeyStatusIcon
 import org.meshtastic.core.ui.component.SecurityIcon
+import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.ArrowDownward
 import org.meshtastic.core.ui.icon.ChatBubbleOutline
@@ -432,6 +434,7 @@ fun MessageTopBar(
         }
     },
     actions = {
+        SosBarAction(screen = SosBarScreen.MESSAGES)
         IconButton(onClick = onSearchClick) {
             Icon(
                 imageVector = MeshtasticIcons.Search,
