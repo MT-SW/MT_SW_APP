@@ -533,6 +533,7 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         ElementLookScreen(
             settingsViewModel = settingsViewModel,
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigate = { backStack.add(it) },
         )
     }
     entry<SettingsRoute.AntennaCalculator> {

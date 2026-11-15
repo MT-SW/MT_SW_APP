@@ -1260,12 +1260,18 @@ edit_name
 eight_hours
 electrical_conductivity
 ### ELEMENT ###
+element_group_assistant
 element_group_bubbles
 element_group_cards
+element_group_details
 element_group_dialogs
+element_group_health
 element_group_input
+element_group_map
 element_group_navbar
 element_group_search
+element_group_settings
+element_group_topbar
 element_look
 element_look_blur
 element_look_depth
@@ -1911,12 +1917,28 @@ logs
 long_name
 longitude
 ### LOOK ###
+look_advanced
+look_advanced_summary
+look_all
+look_area_ai
+look_area_bars
+look_area_cards
+look_area_dialogs
+look_area_fields
+look_area_map
+look_area_messages
+look_basic_summary
+look_mixed
 look_preset_classic
 look_preset_depth
 look_preset_glass
 look_preset_iphone
 look_presets_summary
 look_presets_title
+look_section_bar
+look_section_basic
+look_section_layout
+look_section_theme
 ### LORA ###
 lora
 lora_config

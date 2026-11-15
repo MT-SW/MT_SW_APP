@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
@@ -29,12 +33,18 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.element_group_assistant
 import org.meshtastic.core.resources.element_group_bubbles
 import org.meshtastic.core.resources.element_group_cards
+import org.meshtastic.core.resources.element_group_details
 import org.meshtastic.core.resources.element_group_dialogs
+import org.meshtastic.core.resources.element_group_health
 import org.meshtastic.core.resources.element_group_input
+import org.meshtastic.core.resources.element_group_map
 import org.meshtastic.core.resources.element_group_navbar
 import org.meshtastic.core.resources.element_group_search
+import org.meshtastic.core.resources.element_group_settings
+import org.meshtastic.core.resources.element_group_topbar
 import org.meshtastic.core.resources.element_look
 import org.meshtastic.core.resources.element_look_blur
 import org.meshtastic.core.resources.element_look_depth
@@ -44,25 +54,36 @@ import org.meshtastic.core.resources.element_look_glass_summary
 import org.meshtastic.core.resources.element_look_strength
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
+import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.glass_tint
+import org.meshtastic.core.resources.glass_tint_accent
+import org.meshtastic.core.resources.glass_tint_dark
+import org.meshtastic.core.resources.glass_tint_light
+import org.meshtastic.core.resources.glass_tint_theme
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.icon_style_bold
 import org.meshtastic.core.resources.icon_style_outline
 import org.meshtastic.core.resources.icon_style_standard
 import org.meshtastic.core.resources.icon_style_summary
 import org.meshtastic.core.resources.input_hold_buzz
+import org.meshtastic.core.resources.look_advanced
+import org.meshtastic.core.resources.look_advanced_summary
+import org.meshtastic.core.resources.look_all
+import org.meshtastic.core.resources.look_area_ai
+import org.meshtastic.core.resources.look_area_bars
+import org.meshtastic.core.resources.look_area_cards
+import org.meshtastic.core.resources.look_area_dialogs
+import org.meshtastic.core.resources.look_area_fields
+import org.meshtastic.core.resources.look_area_map
+import org.meshtastic.core.resources.look_area_messages
+import org.meshtastic.core.resources.look_basic_summary
+import org.meshtastic.core.resources.look_mixed
 import org.meshtastic.core.resources.look_preset_classic
-import org.meshtastic.core.resources.look_preset_iphone
-import org.meshtastic.core.resources.look_preset_glass
 import org.meshtastic.core.resources.look_preset_depth
-import org.meshtastic.core.resources.look_presets_title
+import org.meshtastic.core.resources.look_preset_glass
+import org.meshtastic.core.resources.look_preset_iphone
 import org.meshtastic.core.resources.look_presets_summary
-import org.meshtastic.core.resources.glass_tint
-import org.meshtastic.core.resources.glass_tint_theme
-import org.meshtastic.core.resources.glass_tint_light
-import org.meshtastic.core.resources.glass_tint_dark
-import org.meshtastic.core.resources.glass_tint_accent
-import org.meshtastic.core.resources.glass_rim
-import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.look_presets_title
 import org.meshtastic.core.resources.nav_bar_haptics
 import org.meshtastic.core.resources.nav_bar_hide
 import org.meshtastic.core.resources.nav_bar_hide_far
@@ -74,6 +95,7 @@ import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.nav_bar_show_at_top
 import org.meshtastic.core.resources.nav_bar_show_far
 import org.meshtastic.core.resources.nav_bar_show_small
+import org.meshtastic.core.resources.press_spring
 import org.meshtastic.core.resources.soft_light_theme
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
@@ -85,26 +107,58 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 private const val STRENGTH_STEP = 5
 private const val STRENGTH_MAX = 100
 private const val BLUR_MAX = 60
+private const val MIXED = -1
+
+/** One part of the app that has a simple look choice: the groups of elements it covers. */
+private class LookArea(val title: StringResource, val groups: List<String>)
+
+private val LOOK_AREAS =
+    listOf(
+        LookArea(Res.string.look_area_bars, listOf(UiOptions.GROUP_NAV, UiOptions.GROUP_TOPBAR)),
+        LookArea(
+            Res.string.look_area_cards,
+            listOf(UiOptions.GROUP_CARDS, UiOptions.GROUP_DETAILS, UiOptions.GROUP_SETTINGS),
+        ),
+        LookArea(Res.string.look_area_messages, listOf(UiOptions.GROUP_BUBBLES)),
+        LookArea(Res.string.look_area_fields, listOf(UiOptions.GROUP_INPUT, UiOptions.GROUP_SEARCH)),
+        LookArea(Res.string.look_area_dialogs, listOf(UiOptions.GROUP_DIALOGS)),
+        LookArea(Res.string.look_area_map, listOf(UiOptions.GROUP_MAP)),
+        LookArea(Res.string.look_area_ai, listOf(UiOptions.GROUP_ASSISTANT, UiOptions.GROUP_HEALTH)),
+    )
+
+/** The look that [group] really gets when the person asks for [look]: only floating groups can be glass. */
+private fun lookFor(group: String, look: Int): Int =
+    if (look == ElementLook.GLASS && group !in UiOptions.GLASS_GROUPS) ElementLook.TRANSPARENT else look
+
+/** The one look all of [groups] have, or [MIXED] when they differ. */
+private fun UiOptions.commonLook(groups: List<String>): Int {
+    val candidates = listOf(ElementLook.FLAT, ElementLook.DEPTH, ElementLook.TRANSPARENT, ElementLook.GLASS)
+    return candidates.firstOrNull { c -> groups.all { lookFor(it, c) == element(it).look } } ?: MIXED
+}
 
 /**
- * MT_SW: the settings of the look of the elements: the soft grey of the light themes, the look of the floating bar,
- * the cards, the message box and the search (plain, with depth, see-through or glass, each with its strength and
- * blur), and how the bar hides, its icons and its vibration. [onChange] saves one option under its key.
+ * MT_SW: the simple choices of the look of the app: ready-made looks, the style of all icons, one look for the whole
+ * app and one look for each part of it (bars, cards and lists, messages, text fields and search, windows, the map,
+ * the assistant and network health). The finer settings are in [ElementAdvancedSettings]. [onChange] saves one option
+ * under its key.
  */
 @Composable
-fun ElementLookSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
-    SwitchListItem(
-        text = stringResource(Res.string.soft_light_theme),
-        leadingIcon = MeshtasticIcons.DisplaySettings,
-        checked = options.flag(UiOptions.SOFT_LIGHT),
-        onClick = { onChange(UiOptions.SOFT_LIGHT, if (options.flag(UiOptions.SOFT_LIGHT)) 0 else 1) },
-    )
+fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     Text(
         text = stringResource(Res.string.element_look_summary),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
     )
+    ElementPresets(onChange)
+    Text(
+        text = stringResource(Res.string.look_basic_summary),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+    AreaLookPicker(stringResource(Res.string.look_all), UiOptions.ALL_GROUPS, options, onChange)
+    for (area in LOOK_AREAS) AreaLookPicker(stringResource(area.title), area.groups, options, onChange)
     DropDownPreference(
         title = stringResource(Res.string.icon_style),
         enabled = true,
@@ -118,15 +172,102 @@ fun ElementLookSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         onItemSelected = { onChange(UiOptions.ICON_STYLE, it) },
         summary = stringResource(Res.string.icon_style_summary),
     )
-    ElementPresets(onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_navbar), UiOptions.GROUP_NAV, options, onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_cards), UiOptions.GROUP_CARDS, options, onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_bubbles), UiOptions.GROUP_BUBBLES, options, onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_input), UiOptions.GROUP_INPUT, options, onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_search), UiOptions.GROUP_SEARCH, options, onChange)
-    ElementGroupSettings(stringResource(Res.string.element_group_dialogs), UiOptions.GROUP_DIALOGS, options, onChange)
-    GlassDetailSettings(options, onChange)
-    NavBarBehaviourSettings(options, onChange)
+}
+
+/** The soft grey of the light themes (a look choice that belongs with the theme). */
+@Composable
+fun SoftLightSetting(options: UiOptions, onChange: (String, Int) -> Unit) {
+    SwitchListItem(
+        text = stringResource(Res.string.soft_light_theme),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options.flag(UiOptions.SOFT_LIGHT),
+        onClick = { onChange(UiOptions.SOFT_LIGHT, if (options.flag(UiOptions.SOFT_LIGHT)) 0 else 1) },
+    )
+}
+
+/** One look for all the groups of a part of the app. */
+@Composable
+private fun AreaLookPicker(title: String, groups: List<String>, options: UiOptions, onChange: (String, Int) -> Unit) {
+    val current = options.commonLook(groups)
+    val canBeGlass = groups.any { it in UiOptions.GLASS_GROUPS }
+    val looks =
+        buildList {
+            add(ElementLook.FLAT to stringResource(Res.string.element_look_flat))
+            add(ElementLook.DEPTH to stringResource(Res.string.element_look_depth))
+            add(ElementLook.TRANSPARENT to stringResource(Res.string.element_look_transparent))
+            if (canBeGlass) add(ElementLook.GLASS to stringResource(Res.string.element_look_glass))
+            if (current == MIXED) add(MIXED to stringResource(Res.string.look_mixed))
+        }
+    DropDownPreference(
+        title = title,
+        enabled = true,
+        items = looks,
+        selectedItem = current,
+        onItemSelected = { picked ->
+            if (picked != MIXED) groups.forEach { onChange("$it.look", lookFor(it, picked)) }
+        },
+    )
+}
+
+/**
+ * MT_SW: the finer settings of the look, folded away until the person opens them: the look, strength and blur of every
+ * group of elements separately, and the colour and edge of the glass.
+ */
+@Composable
+fun ElementAdvancedSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    ListItem(
+        text = stringResource(Res.string.look_advanced),
+        supportingText = stringResource(Res.string.look_advanced_summary),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+    ) {
+        expanded = !expanded
+    }
+    if (expanded) {
+        ElementGroupSettings(stringResource(Res.string.element_group_navbar), UiOptions.GROUP_NAV, options, onChange)
+        ElementGroupSettings(stringResource(Res.string.element_group_topbar), UiOptions.GROUP_TOPBAR, options, onChange)
+        ElementGroupSettings(stringResource(Res.string.element_group_cards), UiOptions.GROUP_CARDS, options, onChange)
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_details),
+            UiOptions.GROUP_DETAILS,
+            options,
+            onChange,
+        )
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_bubbles),
+            UiOptions.GROUP_BUBBLES,
+            options,
+            onChange,
+        )
+        ElementGroupSettings(stringResource(Res.string.element_group_input), UiOptions.GROUP_INPUT, options, onChange)
+        ElementGroupSettings(stringResource(Res.string.element_group_search), UiOptions.GROUP_SEARCH, options, onChange)
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_dialogs),
+            UiOptions.GROUP_DIALOGS,
+            options,
+            onChange,
+        )
+        ElementGroupSettings(stringResource(Res.string.element_group_map), UiOptions.GROUP_MAP, options, onChange)
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_assistant),
+            UiOptions.GROUP_ASSISTANT,
+            options,
+            onChange,
+        )
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_health),
+            UiOptions.GROUP_HEALTH,
+            options,
+            onChange,
+        )
+        ElementGroupSettings(
+            stringResource(Res.string.element_group_settings),
+            UiOptions.GROUP_SETTINGS,
+            options,
+            onChange,
+        )
+        GlassDetailSettings(options, onChange)
+    }
 }
 
 /** The look, the strength and (for glass) the blur of one group of elements. */
@@ -171,9 +312,9 @@ private fun ElementGroupSettings(title: String, group: String, options: UiOption
     }
 }
 
-/** How the floating bar hides and comes back, its icons and the vibration when a tab is changed. */
+/** How the floating bar hides and comes back, its icons, the vibration of a tab change and of the held send button. */
 @Composable
-private fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
+fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     DropDownPreference(
         title = stringResource(Res.string.nav_bar_hide),
         enabled = true,
@@ -219,34 +360,41 @@ private fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) 
         checked = options.flag(UiOptions.HOLD_BUZZ),
         onClick = { onChange(UiOptions.HOLD_BUZZ, if (options.flag(UiOptions.HOLD_BUZZ)) 0 else 1) },
     )
+    SwitchListItem(
+        text = stringResource(Res.string.press_spring),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options.flag(UiOptions.PRESS_SPRING),
+        onClick = { onChange(UiOptions.PRESS_SPRING, if (options.flag(UiOptions.PRESS_SPRING)) 0 else 1) },
+    )
 }
 
 /** One ready-made set of looks: the options it sets, each with its value. */
 private class LookPreset(val title: StringResource, val values: Map<String, Int>)
 
-private fun look(group: String, look: Int, strength: Int, blur: Int = 20): Map<String, Int> =
-    mapOf("$group.look" to look, "$group.strength" to strength, "$group.blur" to blur)
+private fun look(groups: List<String>, look: Int, strength: Int, blur: Int = 20): Map<String, Int> =
+    groups.fold(emptyMap()) { acc, group ->
+        acc + mapOf("$group.look" to lookFor(group, look), "$group.strength" to strength, "$group.blur" to blur)
+    }
 
-private const val PRESET_BLUR = 24
+private const val PRESET_BLUR = 28
+
+private val BARS = listOf(UiOptions.GROUP_NAV, UiOptions.GROUP_TOPBAR)
+private val CARDS = listOf(UiOptions.GROUP_CARDS, UiOptions.GROUP_DETAILS, UiOptions.GROUP_SETTINGS)
+private val FIELDS = listOf(UiOptions.GROUP_INPUT, UiOptions.GROUP_SEARCH)
+private val AI = listOf(UiOptions.GROUP_ASSISTANT, UiOptions.GROUP_HEALTH)
+private val BUBBLES = listOf(UiOptions.GROUP_BUBBLES)
+private val DIALOGS = listOf(UiOptions.GROUP_DIALOGS)
+private val MAP = listOf(UiOptions.GROUP_MAP)
 
 private val LOOK_PRESETS =
     listOf(
         LookPreset(
             Res.string.look_preset_classic,
-            listOf(
-                UiOptions.GROUP_NAV,
-                UiOptions.GROUP_CARDS,
-                UiOptions.GROUP_BUBBLES,
-                UiOptions.GROUP_INPUT,
-                UiOptions.GROUP_SEARCH,
-                UiOptions.GROUP_DIALOGS,
-            ).fold(
-                mapOf(
-                    UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
-                    UiOptions.SOFT_LIGHT to 0,
-                    UiOptions.PRESS_SPRING to 0,
-                ),
-            ) { acc, group -> acc + look(group, ElementLook.FLAT, 55) },
+            mapOf(
+                UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
+                UiOptions.SOFT_LIGHT to 0,
+                UiOptions.PRESS_SPRING to 0,
+            ) + look(UiOptions.ALL_GROUPS, ElementLook.FLAT, 55),
         ),
         LookPreset(
             Res.string.look_preset_iphone,
@@ -254,32 +402,28 @@ private val LOOK_PRESETS =
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
                 UiOptions.SOFT_LIGHT to 1,
                 UiOptions.PRESS_SPRING to 1,
-            ) + look(UiOptions.GROUP_NAV, ElementLook.GLASS, 45, PRESET_BLUR) +
-                look(UiOptions.GROUP_CARDS, ElementLook.DEPTH, 40) +
-                look(UiOptions.GROUP_BUBBLES, ElementLook.DEPTH, 35) +
-                look(UiOptions.GROUP_INPUT, ElementLook.GLASS, 50, PRESET_BLUR) +
-                look(UiOptions.GROUP_SEARCH, ElementLook.GLASS, 50, PRESET_BLUR) +
-                look(UiOptions.GROUP_DIALOGS, ElementLook.GLASS, 40, PRESET_BLUR),
+            ) + look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
+                look(CARDS, ElementLook.DEPTH, 45) +
+                look(BUBBLES, ElementLook.DEPTH, 40) +
+                look(FIELDS, ElementLook.GLASS, 50, PRESET_BLUR) +
+                look(DIALOGS, ElementLook.GLASS, 40, PRESET_BLUR) +
+                look(MAP, ElementLook.GLASS, 45, PRESET_BLUR) +
+                look(AI, ElementLook.DEPTH, 40),
         ),
         LookPreset(
             Res.string.look_preset_glass,
             mapOf(UiOptions.PRESS_SPRING to 1) +
-                look(UiOptions.GROUP_NAV, ElementLook.GLASS, 55, PRESET_BLUR) +
-                look(UiOptions.GROUP_CARDS, ElementLook.TRANSPARENT, 45) +
-                look(UiOptions.GROUP_BUBBLES, ElementLook.TRANSPARENT, 35) +
-                look(UiOptions.GROUP_INPUT, ElementLook.GLASS, 55, PRESET_BLUR) +
-                look(UiOptions.GROUP_SEARCH, ElementLook.GLASS, 55, PRESET_BLUR) +
-                look(UiOptions.GROUP_DIALOGS, ElementLook.GLASS, 45, PRESET_BLUR),
+                look(BARS, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(CARDS, ElementLook.TRANSPARENT, 45) +
+                look(BUBBLES, ElementLook.TRANSPARENT, 35) +
+                look(FIELDS, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(DIALOGS, ElementLook.GLASS, 45, PRESET_BLUR) +
+                look(MAP, ElementLook.GLASS, 55, PRESET_BLUR) +
+                look(AI, ElementLook.TRANSPARENT, 40),
         ),
         LookPreset(
             Res.string.look_preset_depth,
-            mapOf(UiOptions.PRESS_SPRING to 1) +
-                look(UiOptions.GROUP_NAV, ElementLook.DEPTH, 55) +
-                look(UiOptions.GROUP_CARDS, ElementLook.DEPTH, 55) +
-                look(UiOptions.GROUP_BUBBLES, ElementLook.DEPTH, 55) +
-                look(UiOptions.GROUP_INPUT, ElementLook.DEPTH, 55) +
-                look(UiOptions.GROUP_SEARCH, ElementLook.DEPTH, 55) +
-                look(UiOptions.GROUP_DIALOGS, ElementLook.DEPTH, 55),
+            mapOf(UiOptions.PRESS_SPRING to 1) + look(UiOptions.ALL_GROUPS, ElementLook.DEPTH, 60),
         ),
     )
 
@@ -298,16 +442,13 @@ private fun ElementPresets(onChange: (String, Int) -> Unit) {
         modifier = Modifier.padding(horizontal = 16.dp),
     )
     for (preset in LOOK_PRESETS) {
-        ListItem(
-            text = stringResource(preset.title),
-            leadingIcon = MeshtasticIcons.DisplaySettings,
-        ) {
+        ListItem(text = stringResource(preset.title), leadingIcon = MeshtasticIcons.DisplaySettings) {
             preset.values.forEach { (key, value) -> onChange(key, value) }
         }
     }
 }
 
-/** The colour of the glass, the thickness of its rim and the spring on touch. */
+/** The colour of the glass and the thickness of its edge. */
 @Composable
 private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     DropDownPreference(
@@ -329,11 +470,5 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.RIM],
         onValueChange = { onChange(UiOptions.RIM, it) },
-    )
-    SwitchListItem(
-        text = stringResource(Res.string.press_spring),
-        leadingIcon = MeshtasticIcons.DisplaySettings,
-        checked = options.flag(UiOptions.PRESS_SPRING),
-        onClick = { onChange(UiOptions.PRESS_SPRING, if (options.flag(UiOptions.PRESS_SPRING)) 0 else 1) },
     )
 }

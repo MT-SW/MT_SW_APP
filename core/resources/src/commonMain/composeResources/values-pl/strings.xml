@@ -2848,7 +2848,7 @@
     <string name="mt_sw_features_title">Funkcje MT_SW</string>
     <string name="mt_sw_features_summary">Wszystko, co dodaje MT_SW_APP, w jednym miejscu</string>
     <string name="mt_sw_features_switches">Przełączniki</string>
-    <string name="mt_sw_features_own">Wygląd, widżet i dane</string>
+    <string name="mt_sw_features_own">Widżet i dane</string>
     <string name="mt_sw_features_links">Skróty</string>
     <string name="mt_sw_features_links_hint">Te ustawienia zostają w swoich zwykłych miejscach. Wiersze poniżej tylko je otwierają.</string>
     <string name="mt_sw_features_lora_summary">Korekta wzmocnienia LNA, przesunięcie częstotliwości (kHz)</string>
@@ -4183,8 +4183,8 @@
     <string name="sos_alarm_bell_notifications">Alarm SOS (dzwonek)</string>
     <string name="sos_alarm_bell_notifications_description">Alarm po odebraniu SOS od węzła, dla którego wybrano dzwonek. Dzwoni w kółko, dopóki go nie potwierdzisz, ale łagodniej niż syrena.</string>
     <string name="sos_history_export">Zapisz historię do pliku</string>
-    <string name="element_look_title">Wygląd elementów</string>
-    <string name="element_look_summary">Wybierz, jak wyglądają pasek, karty, pole wiadomości i wyszukiwanie. „Szkło” rozmywa to, co jest za elementem, „przezroczysty” tylko rozjaśnia jego kolor, a „z głębią” dodaje miękki cień i jasne krawędzie. Na Androidzie starszym niż 12 szkło jest półprzezroczystą szybą bez rozmycia.</string>
+    <string name="element_look_title">Wygląd</string>
+    <string name="element_look_summary">Wybierz gotowy wygląd albo ustaw go osobno dla każdej części aplikacji. „Szkło” rozmywa to, co jest za elementem, „przezroczysty” tylko rozjaśnia jego kolor, a „z głębią” dodaje miękki cień i jasne krawędzie. Na Androidzie starszym niż 12 szkło jest półprzezroczystą szybą bez rozmycia.</string>
     <string name="element_group_navbar">Pasek dolny</string>
     <string name="element_group_cards">Karty (urządzenia, rozmowy)</string>
     <string name="element_group_input">Pole wiadomości i przyciski wysyłania</string>
@@ -4211,7 +4211,7 @@
     <string name="soft_light_theme">Lekko szary biały w jasnych motywach</string>
     <string name="input_hold_buzz">Mocna wibracja, gdy trzymasz przycisk wysyłania</string>
     <string name="element_group_bubbles">Dymki wiadomości</string>
-    <string name="element_look_short">Pasek, karty, dymki, pole wiadomości i wyszukiwanie: matowy, z głębią, przezroczysty lub szkło; szary biały; wibracje.</string>
+    <string name="element_look_short">Motyw, rozmiar, czcionki, ikony oraz wygląd pasków, kart, wiadomości, mapy, asystenta i zdrowia sieci: od prostych wyborów po każdy szczegół.</string>
     <string name="icon_style">Styl ikon</string>
     <string name="icon_style_standard">Standardowe</string>
     <string name="icon_style_bold">Pogrubione</string>
@@ -4234,4 +4234,26 @@
     <string name="data_logs_title">Dane, logi i diagnostyka</string>
     <string name="data_logs_summary">Zbieranie i przechowywanie logów, miejsce danych aplikacji, archiwum wiadomości i test powiadomień.</string>
     <string name="data_storage_title">Dane aplikacji</string>
+    <string name="look_section_theme">Motyw, rozmiar i czcionki</string>
+    <string name="look_section_basic">Wygląd aplikacji</string>
+    <string name="look_basic_summary">Proste wybory: jeden wygląd dla całej części aplikacji. Każdą część można dopracować w ustawieniach zaawansowanych niżej.</string>
+    <string name="look_all">Wszystko naraz</string>
+    <string name="look_mixed">Różnie w częściach</string>
+    <string name="look_area_bars">Paski (dolny i górny)</string>
+    <string name="look_area_cards">Karty i listy</string>
+    <string name="look_area_messages">Wiadomości</string>
+    <string name="look_area_fields">Pola tekstowe i wyszukiwanie</string>
+    <string name="look_area_dialogs">Okna</string>
+    <string name="look_area_map">Przyciski i paski na mapie</string>
+    <string name="look_area_ai">Asystent i zdrowie sieci</string>
+    <string name="look_section_layout">Układ i listy</string>
+    <string name="look_section_bar">Pasek na dole i dotyk</string>
+    <string name="look_advanced">Ustawienia zaawansowane</string>
+    <string name="look_advanced_summary">Wygląd, siła i rozmycie każdej części aplikacji osobno, kolor i krawędź szkła.</string>
+    <string name="element_group_topbar">Górny pasek</string>
+    <string name="element_group_map">Przyciski i paski na mapie</string>
+    <string name="element_group_details">Szczegóły węzła</string>
+    <string name="element_group_assistant">Asystent</string>
+    <string name="element_group_health">Zdrowie sieci</string>
+    <string name="element_group_settings">Ustawienia</string>
 </resources>

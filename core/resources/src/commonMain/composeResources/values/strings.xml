@@ -1302,22 +1302,28 @@
     <string name="eight_hours">8 Hours</string>
     <string name="electrical_conductivity">Conductivity</string>
     <!-- ELEMENT -->
+    <string name="element_group_assistant">Assistant</string>
     <string name="element_group_bubbles">Message bubbles</string>
     <string name="element_group_cards">Cards (devices, chats)</string>
+    <string name="element_group_details">Node details</string>
     <string name="element_group_dialogs">Dialogs</string>
+    <string name="element_group_health">Network health</string>
     <string name="element_group_input">Message box and send buttons</string>
+    <string name="element_group_map">Map buttons and bars</string>
     <string name="element_group_navbar">Bottom bar</string>
     <string name="element_group_search">Search</string>
+    <string name="element_group_settings">Settings</string>
+    <string name="element_group_topbar">Top bar</string>
     <string name="element_look">look</string>
     <string name="element_look_blur">Blur of the glass</string>
     <string name="element_look_depth">With depth</string>
     <string name="element_look_flat">Plain</string>
     <string name="element_look_glass">Glass (blur)</string>
     <string name="element_look_glass_summary">Glass lets the content show through the element, blurred.</string>
-    <string name="element_look_short">Bar, cards, bubbles, message box and search: plain, with depth, see-through or glass; soft grey white; vibrations.</string>
+    <string name="element_look_short">Theme, size, fonts, icons and the look of bars, cards, messages, map, assistant and network health: from simple choices to every detail.</string>
     <string name="element_look_strength">Strength of the effect</string>
-    <string name="element_look_summary">Choose how the bar, the cards, the message box and the search are drawn. “Glass” blurs what is behind the element, the “see-through” look only fades its colour, “with depth” adds a soft shadow and light edges. On Android older than 12 the glass is a see-through pane without blur.</string>
-    <string name="element_look_title">Look of the elements</string>
+    <string name="element_look_summary">Pick a ready-made look or choose it for each part of the app. “Glass” blurs what is behind the element, “see-through” only fades its colour, “with depth” adds a soft shadow and light edges. On Android older than 12 the glass is a see-through pane without blur.</string>
+    <string name="element_look_title">Look</string>
     <string name="element_look_transparent">See-through</string>
     <string name="elevation_suffix" translatable="false">MSL</string>
     <!-- EMOJI -->
@@ -1959,12 +1965,28 @@
     <string name="long_name">Long Name</string>
     <string name="longitude">Longitude</string>
     <!-- LOOK -->
+    <string name="look_advanced">Advanced settings</string>
+    <string name="look_advanced_summary">The look, strength and blur of every part of the app separately, the colour and edge of the glass.</string>
+    <string name="look_all">Everything at once</string>
+    <string name="look_area_ai">Assistant and network health</string>
+    <string name="look_area_bars">Bars (bottom and top)</string>
+    <string name="look_area_cards">Cards and lists</string>
+    <string name="look_area_dialogs">Windows</string>
+    <string name="look_area_fields">Text fields and search</string>
+    <string name="look_area_map">Map buttons and bars</string>
+    <string name="look_area_messages">Messages</string>
+    <string name="look_basic_summary">The simple choices: one look for a whole part of the app. Every part can be fine-tuned in the advanced settings below.</string>
+    <string name="look_mixed">Different in parts</string>
     <string name="look_preset_classic">Classic (everything plain, as before)</string>
     <string name="look_preset_depth">Depth (shadows and light edges everywhere)</string>
     <string name="look_preset_glass">Glass (see-through everywhere)</string>
     <string name="look_preset_iphone">iPhone-like (glass, outline icons, depth)</string>
     <string name="look_presets_summary">One tap sets many options at once; you can still change each of them below.</string>
     <string name="look_presets_title">Ready-made looks</string>
+    <string name="look_section_bar">Bottom bar and touch</string>
+    <string name="look_section_basic">Look of the app</string>
+    <string name="look_section_layout">Layout and lists</string>
+    <string name="look_section_theme">Theme, size and fonts</string>
     <!-- LORA -->
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
@@ -2357,7 +2379,7 @@
     <string name="mt_sw_features_links">Shortcuts</string>
     <string name="mt_sw_features_links_hint">These settings stay in their usual places. The rows below only open them.</string>
     <string name="mt_sw_features_lora_summary">LNA gain correction, frequency offset (kHz)</string>
-    <string name="mt_sw_features_own">Looks, widget and data</string>
+    <string name="mt_sw_features_own">Widget and data</string>
     <string name="mt_sw_features_summary">Everything MT_SW_APP adds, in one place</string>
     <string name="mt_sw_features_switches">Switches</string>
     <string name="mt_sw_features_title">MT_SW features</string>

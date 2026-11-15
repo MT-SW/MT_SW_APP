@@ -76,6 +76,11 @@ import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
+import org.meshtastic.core.resources.look_advanced
+import org.meshtastic.core.resources.look_section_basic
+import org.meshtastic.core.resources.look_section_bar
+import org.meshtastic.core.resources.look_section_layout
+import org.meshtastic.core.resources.look_section_theme
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
@@ -170,7 +175,10 @@ import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.AutostartSettings
 import org.meshtastic.feature.settings.component.DatabaseSyncSettingItems
-import org.meshtastic.feature.settings.component.ElementLookSettings
+import org.meshtastic.feature.settings.component.ElementAdvancedSettings
+import org.meshtastic.feature.settings.component.ElementBasicSettings
+import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
+import org.meshtastic.feature.settings.component.SoftLightSetting
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
@@ -191,31 +199,8 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 @Composable
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
-    val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
-    val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
     val skipBadTimes by settingsViewModel.skipBadTimeChartPoints.collectAsStateWithLifecycle()
     val dbStatsSyncEnabled by settingsViewModel.dbStatsSyncEnabled.collectAsStateWithLifecycle()
-    val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
-    val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
-    val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
-    val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
-    val appIconStyle by settingsViewModel.appIconStyle.collectAsStateWithLifecycle()
-    var showUiScalePicker by remember { mutableStateOf(false) }
-    var showThemePicker by remember { mutableStateOf(false) }
-    if (showThemePicker) {
-        ThemePickerDialog(
-            onClickTheme = { settingsViewModel.setTheme(it) },
-            onDismiss = { showThemePicker = false },
-        )
-    }
-    if (showUiScalePicker) {
-        UiScalePickerDialog(
-            current = uiScale,
-            onClickScale = { settingsViewModel.setUiScale(it) },
-            onDismiss = { showUiScalePicker = false },
-        )
-    }
-
     Scaffold(
         topBar = {
             MainAppBar(
@@ -247,25 +232,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     checked = skipBadTimes,
                     onClick = { settingsViewModel.setSkipBadTimeChartPoints(!skipBadTimes) },
                 )
-                SwitchListItem(
-                    text = stringResource(Res.string.import_menu_in_top_bar),
-                    leadingIcon = MeshtasticIcons.Add,
-                    checked = importMenuInTopBar,
-                    onClick = { settingsViewModel.setImportMenuInTopBar(!importMenuInTopBar) },
-                )
-                SwitchListItem(
-                    text = stringResource(Res.string.floating_nav_bar),
-                    leadingIcon = MeshtasticIcons.DisplaySettings,
-                    checked = floatingNavBar,
-                    onClick = { settingsViewModel.setFloatingNavBar(!floatingNavBar) },
-                )
                 AppUpdateSettings()
-                ListItem(
-                    text = stringResource(Res.string.node_layout_section_title),
-                    leadingIcon = MeshtasticIcons.List,
-                ) {
-                    onNavigate(SettingsRoute.NodeList)
-                }
             }
 
             ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
@@ -356,30 +323,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
 
             // Real settings that live here (not just links elsewhere): looks, the widget and the statistics sync.
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_own)) {
-                ListItem(
-                    text = stringResource(Res.string.ui_scale),
-                    supportingText = uiScaleLabel(uiScale),
-                    leadingIcon = MeshtasticIcons.FormatPaint,
-                ) {
-                    showUiScalePicker = true
-                }
-                ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
-                    showThemePicker = true
-                }
-                AppIconSettingsItem(current = appIconStyle, onPick = { settingsViewModel.setAppIconStyle(it) })
                 WidgetStatsSettingItem()
                 DatabaseSyncSettingItems(
                     autoEnabled = dbStatsSyncEnabled,
                     onAutoChange = { settingsViewModel.setDbStatsSyncEnabled(it) },
                     syncNow = { settingsViewModel.syncDbStatsNow() },
-                )
-                FontSettingsItems(
-                    family = fontFamily,
-                    weight = fontWeight,
-                    size = fontSize,
-                    onFamily = { settingsViewModel.setFontFamily(it) },
-                    onWeight = { settingsViewModel.setFontWeightShift(it) },
-                    onSize = { settingsViewModel.setFontSizePercent(it) },
                 )
             }
 
@@ -584,10 +532,34 @@ private fun WhatsNewEntry() {
     }
 }
 
-/** "Look of the elements": the soft grey, the look of the bar, cards, bubbles, message box and search in one place. */
+/**
+ * "Look": everything that changes how the app looks, in one place: the theme, size and fonts, simple choices of the
+ * look of each part of the app (with the finer settings folded away), the layout of lists and the bottom bar.
+ */
 @Composable
-fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
+fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val uiOptionsMap by settingsViewModel.uiOptions.collectAsStateWithLifecycle()
+    val options = UiOptions(uiOptionsMap)
+    val onChange = settingsViewModel::setUiOption
+    val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
+    val floatingNavBar by settingsViewModel.floatingNavBar.collectAsStateWithLifecycle()
+    val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val fontFamily by settingsViewModel.fontFamily.collectAsStateWithLifecycle()
+    val fontWeight by settingsViewModel.fontWeightShift.collectAsStateWithLifecycle()
+    val fontSize by settingsViewModel.fontSizePercent.collectAsStateWithLifecycle()
+    val appIconStyle by settingsViewModel.appIconStyle.collectAsStateWithLifecycle()
+    var showUiScalePicker by remember { mutableStateOf(false) }
+    var showThemePicker by remember { mutableStateOf(false) }
+    if (showThemePicker) {
+        ThemePickerDialog(onClickTheme = { settingsViewModel.setTheme(it) }, onDismiss = { showThemePicker = false })
+    }
+    if (showUiScalePicker) {
+        UiScalePickerDialog(
+            current = uiScale,
+            onClickScale = { settingsViewModel.setUiScale(it) },
+            onDismiss = { showUiScalePicker = false },
+        )
+    }
     Scaffold(
         topBar = {
             MainAppBar(
@@ -606,8 +578,56 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) 
             modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
-                ElementLookSettings(options = UiOptions(uiOptionsMap), onChange = settingsViewModel::setUiOption)
+            ExpressiveSection(title = stringResource(Res.string.look_section_basic)) {
+                ElementBasicSettings(options = options, onChange = onChange)
+            }
+            ExpressiveSection(title = stringResource(Res.string.look_section_theme)) {
+                ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
+                    showThemePicker = true
+                }
+                SoftLightSetting(options = options, onChange = onChange)
+                ListItem(
+                    text = stringResource(Res.string.ui_scale),
+                    supportingText = uiScaleLabel(uiScale),
+                    leadingIcon = MeshtasticIcons.FormatPaint,
+                ) {
+                    showUiScalePicker = true
+                }
+                AppIconSettingsItem(current = appIconStyle, onPick = { settingsViewModel.setAppIconStyle(it) })
+                FontSettingsItems(
+                    family = fontFamily,
+                    weight = fontWeight,
+                    size = fontSize,
+                    onFamily = { settingsViewModel.setFontFamily(it) },
+                    onWeight = { settingsViewModel.setFontWeightShift(it) },
+                    onSize = { settingsViewModel.setFontSizePercent(it) },
+                )
+            }
+            ExpressiveSection(title = stringResource(Res.string.look_section_layout)) {
+                ListItem(
+                    text = stringResource(Res.string.node_layout_section_title),
+                    leadingIcon = MeshtasticIcons.List,
+                ) {
+                    onNavigate(SettingsRoute.NodeList)
+                }
+                SwitchListItem(
+                    text = stringResource(Res.string.import_menu_in_top_bar),
+                    leadingIcon = MeshtasticIcons.Add,
+                    checked = importMenuInTopBar,
+                    onClick = { settingsViewModel.setImportMenuInTopBar(!importMenuInTopBar) },
+                )
+            }
+            ExpressiveSection(title = stringResource(Res.string.look_section_bar)) {
+                SwitchListItem(
+                    text = stringResource(Res.string.floating_nav_bar),
+                    leadingIcon = MeshtasticIcons.DisplaySettings,
+                    checked = floatingNavBar,
+                    onClick = { settingsViewModel.setFloatingNavBar(!floatingNavBar) },
+                )
+                NavBarBehaviourSettings(options = options, onChange = onChange)
+            }
+            ExpressiveSection(title = stringResource(Res.string.look_advanced)) {
+                ElementAdvancedSettings(options = options, onChange = onChange)
             }
         }
     }
