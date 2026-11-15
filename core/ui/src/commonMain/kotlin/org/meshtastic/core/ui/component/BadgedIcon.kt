@@ -17,6 +17,7 @@
 package org.meshtastic.core.ui.component
 
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,7 +32,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 
 /** Badge size as a fraction of the icon's shorter side. Sized so the person glyph keeps its torso at 18dp. */
 private const val BADGE_FRACTION = 0.48f
@@ -54,7 +54,7 @@ fun BadgedIcon(
     tint: Color = LocalContentColor.current,
     badgeTint: Color = tint,
 ) {
-    val badgePainter = rememberVectorPainter(badge)
+    val badgePainter = rememberStyledPainter(badge)
     Icon(
         imageVector = icon,
         contentDescription = contentDescription,

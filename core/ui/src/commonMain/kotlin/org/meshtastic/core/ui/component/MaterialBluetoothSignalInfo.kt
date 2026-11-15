@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +31,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -86,7 +86,7 @@ fun MaterialSignalInfo(
                 else -> MeshtasticIcons.SignalOff to MaterialTheme.colorScheme.onSurfaceVariant
             }
 
-        val foregroundPainter = typeIcon?.let { rememberVectorPainter(typeIcon) }
+        val foregroundPainter = typeIcon?.let { rememberStyledPainter(typeIcon) }
         Icon(
             imageVector = iconVector,
             contentDescription = null,

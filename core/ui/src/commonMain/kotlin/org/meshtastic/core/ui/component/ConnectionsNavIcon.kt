@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.rememberStyledPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -37,7 +38,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
@@ -72,7 +72,7 @@ fun ConnectionsNavIcon(
 
     val (backgroundIcon, connectionTypeIcon) = getIconPair(deviceType = deviceType, connectionState = connectionState)
 
-    val foregroundPainter = connectionTypeIcon?.let { rememberVectorPainter(it) }
+    val foregroundPainter = connectionTypeIcon?.let { rememberStyledPainter(it) }
 
     Crossfade(targetState = backgroundIcon, label = "ConnectionIcon") {
         Icon(

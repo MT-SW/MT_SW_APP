@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.Icon as MaterialIcon
@@ -60,6 +61,16 @@ fun Icon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
 ) = MaterialIcon(bitmap = bitmap, contentDescription = contentDescription, modifier = modifier, tint = tint)
+
+/**
+ * A painter for [vector] in the chosen icon style: for the small icons that are painted over another icon (a badge, the
+ * connection type) and so do not go through [Icon].
+ */
+@Composable
+fun rememberStyledPainter(vector: ImageVector): Painter {
+    val style = rememberUiOptions()[UiOptions.ICON_STYLE]
+    return rememberVectorPainter(remember(vector, style) { vector.restyledFor(style) })
+}
 
 private fun ImageVector.restyledFor(style: Int): ImageVector =
     if (style == UiOptions.ICON_STYLE_STANDARD) this else restyled(style)
