@@ -97,6 +97,7 @@ import org.meshtastic.core.resources.nav_bar_show_far
 import org.meshtastic.core.resources.nav_bar_show_small
 import org.meshtastic.core.resources.press_spring
 import org.meshtastic.core.resources.soft_light_theme
+import org.meshtastic.core.ui.component.LookPreview
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SliderPreference
@@ -150,6 +151,7 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
     )
+    LookPreview(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
     ElementPresets(onChange)
     Text(
         text = stringResource(Res.string.look_basic_summary),
