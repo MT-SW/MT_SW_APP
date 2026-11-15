@@ -397,14 +397,17 @@ fun NodeListScreen(
             floatingActionButton = {
                 val shareCapable = ourNode?.capabilities?.supportsQrCodeSharing ?: false
                 if (!importInTopBar) {
-                    importMenu(
-                        false,
-                        Modifier.animateFloatingActionButton(
-                            visible =
-                            !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
-                            alignment = androidx.compose.ui.Alignment.BottomEnd,
-                        ),
-                    )
+                    // The list runs under the floating bar, so the button is lifted above it.
+                    Box(modifier = Modifier.padding(bottom = LocalFloatingBarInset.current)) {
+                        importMenu(
+                            false,
+                            Modifier.animateFloatingActionButton(
+                                visible =
+                                !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
+                                alignment = androidx.compose.ui.Alignment.BottomEnd,
+                            ),
+                        )
+                    }
                 }
             },
         ) { contentPadding ->

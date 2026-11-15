@@ -167,6 +167,15 @@ fun MeshtasticNavigationSuite(
 
     val entries = visibleDestinations.map { destination ->
         val isSelected = destination == topLevelDestination
+        val labelText =
+            stringResource(
+                when {
+                    destination != TopLevelDestination.Translator -> destination.label
+                    translatorEnabled && assistantEnabled -> Res.string.ai_tab_ai
+                    assistantEnabled -> Res.string.ai_tab_assistant
+                    else -> destination.label
+                },
+            )
         NavEntry(
             selected = isSelected,
             onClick = { handleNavigation(destination, topLevelDestination, multiBackstack, uiViewModel) },
@@ -185,18 +194,8 @@ fun MeshtasticNavigationSuite(
                     )
                 }
             },
-            label = {
-                Text(
-                    stringResource(
-                        when {
-                            destination != TopLevelDestination.Translator -> destination.label
-                            translatorEnabled && assistantEnabled -> Res.string.ai_tab_ai
-                            assistantEnabled -> Res.string.ai_tab_assistant
-                            else -> destination.label
-                        },
-                    ),
-                )
-            },
+            label = { Text(labelText) },
+            labelText = labelText,
         )
     }
 
@@ -293,6 +292,8 @@ internal class NavEntry(
     val onClick: () -> Unit,
     val icon: @Composable () -> Unit,
     val label: (@Composable () -> Unit)?,
+    /** The name of the button as plain text (the floating bar shrinks it to fit). */
+    val labelText: String,
 )
 
 /**

@@ -327,7 +327,10 @@ fun ContactsScreen(
             )
         },
         floatingActionButton = {
-            if (!importInTopBar && connectionState is ConnectionState.Connected) importMenu(false)
+            // The list runs under the floating bar, so the button is lifted above it.
+            if (!importInTopBar && connectionState is ConnectionState.Connected) {
+                Box(modifier = Modifier.padding(bottom = LocalFloatingBarInset.current)) { importMenu(false) }
+            }
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {

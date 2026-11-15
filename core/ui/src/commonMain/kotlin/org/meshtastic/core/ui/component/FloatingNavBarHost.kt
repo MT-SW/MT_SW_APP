@@ -42,14 +42,15 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +72,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
@@ -274,7 +276,7 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
         modifier
             .clip(RoundedCornerShape(ITEM_CORNER_DP.dp))
             .background(
-                if (entry.selected) colorScheme.secondaryContainer.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
+                if (entry.selected) colorScheme.onSurface.copy(alpha = SELECTED_ALPHA) else Color.Transparent,
             )
             .selectable(selected = entry.selected, onClick = onSelect, role = Role.Tab)
             .padding(horizontal = 2.dp, vertical = 6.dp),
@@ -282,11 +284,27 @@ private fun FloatingNavItem(entry: NavEntry, onSelect: () -> Unit, modifier: Mod
     ) {
         CompositionLocalProvider(LocalContentColor provides color) {
             entry.icon()
-            ProvideTextStyle(MaterialTheme.typography.labelSmall.copy(fontSize = LABEL_SIZE_SP.sp)) {
-                Box(modifier = Modifier.padding(top = 2.dp)) { entry.label?.invoke() }
-            }
+            Box(modifier = Modifier.padding(top = 2.dp)) { FitLabel(entry.labelText) }
         }
     }
 }
 
-private const val SELECTED_ALPHA = 0.85f
+private const val SELECTED_ALPHA = 0.12f
+
+private const val MIN_LABEL_SP = 6f
+private const val LABEL_SHRINK_STEP_SP = 0.5f
+
+/** The name of a button on one line, made smaller until the whole of it fits (so "Network health" is never cut). */
+@Composable
+private fun FitLabel(text: String) {
+    var size by remember(text) { mutableFloatStateOf(LABEL_SIZE_SP.toFloat()) }
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        fontSize = size.sp,
+        maxLines = 1,
+        softWrap = false,
+        overflow = TextOverflow.Clip,
+        onTextLayout = { if (it.didOverflowWidth && size > MIN_LABEL_SP) size -= LABEL_SHRINK_STEP_SP },
+    )
+}
