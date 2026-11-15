@@ -18,8 +18,8 @@ package org.meshtastic.core.prefs.ui
 
 /**
  * Defaults the platform may change before the preferences are first read. The theme default is -1 (follow the system)
- * everywhere; the iPhone and the computer set it to the saturated theme at start, because they have no wallpaper
- * colours.
+ * when nothing sets it; Android, the iPhone and the computer all set it to the saturated theme (which follows the
+ * system's light or dark) at start. A theme the user has chosen is kept.
  */
 object UiPrefsDefaults {
     var theme: Int = -1

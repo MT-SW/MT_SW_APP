@@ -54,6 +54,8 @@ import org.meshtastic.core.common.ContextServices
 import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.network.update.AppUpdateService
+import org.meshtastic.core.prefs.ui.UiPrefsDefaults
+import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PlatformAnalytics
@@ -111,6 +113,9 @@ open class MeshUtilApplication :
 
     override fun onCreate() {
         super.onCreate()
+        // The saturated theme (following the system, light or dark) is the default look, as on the computer and the
+        // iPhone; a theme the user has chosen is kept.
+        UiPrefsDefaults.theme = MODE_VIVID
         RoomPoolTimeoutLog.install()
         if (BuildConfig.DEBUG) enableDebugVmPolicy()
         ContextServices.app = this
