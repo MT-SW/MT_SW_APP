@@ -14,6 +14,7 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
 
 <!-- Widget-picker preview of "Statystyki MT_SW" (android:previewLayout in widget_mesh_status_info.xml). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
