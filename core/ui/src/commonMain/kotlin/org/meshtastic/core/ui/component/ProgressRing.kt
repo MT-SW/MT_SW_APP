@@ -27,11 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
@@ -108,8 +105,9 @@ fun ProgressRing(
 
 /**
  * A horizontal progress bar filled to [progress]. In the thin look it is an empty rounded outline (not a filled bar):
- * the outline is grey and, as the progress grows, its edge takes the theme colour (or [color]) from the start along the
- * way round; with the classic look it is the old Material bar.
+ * two grey edges closed by round ends. As the progress grows, a coloured outline (the theme colour, or [color]) starts
+ * at the left end as a small rounded loop and its front, rounded too, moves along both grey edges until it reaches the
+ * other end. With the classic look it is the old Material bar.
  */
 @Composable
 fun ProgressLine(progress: Float, modifier: Modifier = Modifier, color: Color = Color.Unspecified) {
@@ -128,12 +126,23 @@ fun ProgressLine(progress: Float, modifier: Modifier = Modifier, color: Color = 
         val inset = stroke / 2
         val w = size.width - stroke
         val h = size.height - stroke
-        val outline = Path().apply { addRoundRect(RoundRect(inset, inset, inset + w, inset + h, CornerRadius(h / 2))) }
-        drawPath(outline, track, style = Stroke(width = stroke))
-        val measure = PathMeasure().apply { setPath(outline, false) }
-        val done = Path()
-        measure.getSegment(0f, measure.length * progress.coerceIn(0f, 1f), done, true)
-        drawPath(done, edge, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        drawRoundRect(
+            color = track,
+            topLeft = Offset(inset, inset),
+            size = Size(w, h),
+            cornerRadius = CornerRadius(h / 2),
+            style = Stroke(width = stroke),
+        )
+        val fraction = progress.coerceIn(0f, 1f)
+        if (fraction > 0f) {
+            drawRoundRect(
+                color = edge,
+                topLeft = Offset(inset, inset),
+                size = Size(maxOf(w * fraction, h), h),
+                cornerRadius = CornerRadius(h / 2),
+                style = Stroke(width = stroke),
+            )
+        }
     }
 }
 
