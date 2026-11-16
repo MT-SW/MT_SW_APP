@@ -145,7 +145,7 @@ internal fun scaleFor(metric: NetworkHealthMetric, label: String): LevelScale? =
 
     metric == NetworkHealthMetric.ETHER && label == "Zajęcie kanału" -> LevelScale(15f, 25f, 40f, false, 0f, 60f)
 
-    metric == NetworkHealthMetric.SIGNAL && label == "Poziom szumu" ->
+    metric == NetworkHealthMetric.SIGNAL && label == "Szum tła" ->
         LevelScale(-100f, -90f, -80f, false, -130f, -60f)
 
     else -> null

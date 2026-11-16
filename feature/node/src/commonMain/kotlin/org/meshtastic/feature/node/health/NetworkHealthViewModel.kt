@@ -562,7 +562,7 @@ private fun NetworkHealthMetric.rawHistoryValue(entry: org.meshtastic.core.model
 /** Sub-series labels for a metric tab's detail chart. Most metrics have one; several tabs have multiple. */
 internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.POWER -> listOf("Bateria", "Napięcie", "Prąd")
-    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Poziom szumu", "RSSI Wi-Fi", "Zerwania WiFi", "RSSI Bluetooth")
+    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Szum tła", "RSSI Wi-Fi", "Zerwania WiFi", "RSSI Bluetooth")
     NetworkHealthMetric.ETHER -> listOf("Zajęcie kanału", "Czas nadawania")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
@@ -582,7 +582,7 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.SIGNAL ->
         listOf(
             listOf("SNR"),
-            listOf("RSSI", "Poziom szumu"),
+            listOf("RSSI", "Szum tła"),
             listOf("RSSI Wi-Fi", "Zerwania WiFi"),
             listOf("RSSI Bluetooth"),
         )
@@ -615,7 +615,7 @@ internal fun NetworkHealthMetric.historySeriesValue(
         when (seriesLabel) {
             "SNR" -> entry.snr
             "RSSI" -> entry.rssi?.toFloat()
-            "Poziom szumu" -> entry.noiseFloor?.toFloat()
+            "Szum tła" -> entry.noiseFloor?.toFloat()
             "RSSI Wi-Fi" -> entry.wifiRssi?.toFloat()
             "Zerwania WiFi" -> entry.wifiDrops?.toFloat()
             "RSSI Bluetooth" -> entry.bleRssi?.toFloat()

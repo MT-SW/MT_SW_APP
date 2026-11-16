@@ -191,7 +191,7 @@ class NodeMetricDetailViewModel(
                                     maxValue = hopPoints.maxOfOrNull { it.value },
                                     latestValue = hopPoints.lastOrNull()?.value,
                                 )
-                            val noiseFloorSeries = series.find { it.label == "Poziom szumu" && it.points.isNotEmpty() }
+                            val noiseFloorSeries = series.find { it.label == "Szum tła" && it.points.isNotEmpty() }
                             // The WiFi series are the device's own report too, so they stay as well.
                             val wifiSeries = series.filter {
                                 (it.label == "RSSI Wi-Fi" || it.label == "Zerwania WiFi" || it.label == "RSSI Bluetooth") &&

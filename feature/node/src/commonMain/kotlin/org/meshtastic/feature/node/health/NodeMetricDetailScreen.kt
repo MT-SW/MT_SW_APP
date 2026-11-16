@@ -223,7 +223,7 @@ fun NodeMetricDetailScreen(
 /** Which series the top card shows: the noise floor on the signal tab (the colour still comes from the SNR). */
 private fun headlineLabelFor(uiState: NodeMetricDetailUiState): String {
     val first = uiState.metric.seriesLabels().firstOrNull().orEmpty()
-    val preferred = if (uiState.metric == NetworkHealthMetric.SIGNAL) "Poziom szumu" else first
+    val preferred = if (uiState.metric == NetworkHealthMetric.SIGNAL) "Szum tła" else first
     return if (uiState.series.any { it.label == preferred && it.points.isNotEmpty() }) {
         preferred
     } else {
@@ -329,12 +329,12 @@ private const val DIMMED_ALPHA = 0.4f
 private const val DIM_DELAY_MILLIS = 200
 private const val DIM_FADE_MILLIS = 250
 
-/** RSSI is corrected by our own LNA gain, "Poziom szumu" by the viewed node's gain; other series are untouched. */
+/** RSSI is corrected by our own LNA gain, "Szum tła" by the viewed node's gain; other series are untouched. */
 private fun MetricSeries.withLnaCorrection(lna: LnaCorrection, nodeNum: Int): MetricSeries {
     val gain =
         when (label) {
             "RSSI" -> lna.localGain
-            "Poziom szumu" -> lna.gains[nodeNum] ?: 0
+            "Szum tła" -> lna.gains[nodeNum] ?: 0
             else -> 0
         }
     if (gain == 0) return this
@@ -389,7 +389,7 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
 
     "RSSI" -> MetricFormatter.rssi(value.toInt())
 
-    "Poziom szumu" -> "${NumberFormatter.format(value, 1)} dBm"
+    "Szum tła" -> "${NumberFormatter.format(value, 1)} dBm"
 
     "RSSI Wi-Fi",
     "RSSI Bluetooth",
@@ -465,7 +465,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
         } else {
             latest
         }
-    val noiseRaw = uiState.series.firstOrNull { it.label == "Poziom szumu" }?.latestValue
+    val noiseRaw = uiState.series.firstOrNull { it.label == "Szum tła" }?.latestValue
     // The signal tab shows the noise floor, so the verdict and the ring follow it; without one the SNR decides.
     val level =
         if (uiState.metric == NetworkHealthMetric.SIGNAL && noiseRaw != null) {

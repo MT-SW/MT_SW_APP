@@ -74,7 +74,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Naprawione błędy
 * Link „meshtastic://meshtastic/sos” (widżet, kafelek, skrót, menu przy zegarze) nigdy nie otwierał ekranu SOS; teraz otwiera.
-* „Zdrowie sieci”, szczegóły węzła: nazwy serii po angielsku („Noise Floor”, „Ch. Util”, „Air Util”, „WiFi RSSI”, „BLE RSSI”) są teraz po polsku („Poziom szumu”, „Zajęcie kanału”, „Czas nadawania”, „RSSI Wi-Fi”, „RSSI Bluetooth”), a poziom szumu ma jednostkę dBm zamiast dB.
+* „Zdrowie sieci”, szczegóły węzła: nazwy serii po angielsku („Noise Floor”, „Ch. Util”, „Air Util”, „WiFi RSSI”, „BLE RSSI”) są teraz po polsku („Szum tła”, „Zajęcie kanału”, „Czas nadawania”, „RSSI Wi-Fi”, „RSSI Bluetooth”), a poziom szumu ma jednostkę dBm zamiast dB.
 * Przycisk SOS na górnym pasku pokazywał się w każdej kolumnie naraz (komputer, tablet); teraz jest tylko jeden, przy skrajnej prawej widocznej kolumnie.
 * Pole wyszukiwania w „Zdrowiu sieci” przeskakiwało z kursorem na początek po każdej literze.
 * iPhone/iPad: wolne zapisy bazy (tryb WAL) i ostrzeżenie o braku danych oprogramowania układowego (pliki JSON w pakiecie aplikacji, także na komputerze).
@@ -948,7 +948,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 * The "meshtastic://meshtastic/sos" link (widget, tile, shortcut, tray menu) never opened the SOS screen; now it does.
-* Network health, node details: series names in English ("Noise Floor", "Ch. Util", "Air Util", "WiFi RSSI", "BLE RSSI") are now in Polish ("Poziom szumu", "Zajęcie kanału", "Czas nadawania", "RSSI Wi-Fi", "RSSI Bluetooth"), and the noise level has the unit dBm instead of dB.
+* Network health, node details: series names in English ("Noise Floor", "Ch. Util", "Air Util", "WiFi RSSI", "BLE RSSI") are now in Polish ("Szum tła", "Zajęcie kanału", "Czas nadawania", "RSSI Wi-Fi", "RSSI Bluetooth"), and the noise level has the unit dBm instead of dB.
 * The SOS button in the top bar showed in every column at once (computer, tablet); now there is only one, at the rightmost visible column.
 * The search field in "Network health" jumped the cursor to the start after every letter.
 * iPhone/iPad: slow database writes (WAL mode) and the warning about missing firmware data (JSON files bundled in the app, also on the computer).
