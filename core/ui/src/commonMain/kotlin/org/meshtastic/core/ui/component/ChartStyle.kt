@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.runtime.Composable
@@ -79,9 +81,13 @@ private fun fade(c: Color, alpha: Float) = c.copy(alpha = alpha)
 fun DrawScope.drawChartBar(style: Int, color: Color, topLeft: Offset, size: Size, corner: Float) {
     when (style) {
         UiOptions.CHART_STYLE_GLASS -> glassBar(color, topLeft, size, corner)
+
         UiOptions.CHART_STYLE_GRADIENT -> gradientBar(color, topLeft, size, corner)
+
         UiOptions.CHART_STYLE_OUTLINE -> outlineBar(color, topLeft, size, corner)
+
         UiOptions.CHART_STYLE_GLOW -> glowBar(color, topLeft, size, corner)
+
         else ->
             drawRoundRect(color = color, topLeft = topLeft, size = size, cornerRadius = CornerRadius(corner, corner))
     }
@@ -226,6 +232,7 @@ private class ArcBand(
     val inner = radius - stroke / 2
 
     /** A radial gradient over the band: each stop is (share of the band thickness, colour). */
+    @Suppress("SpreadOperator")
     fun brush(vararg stops: Pair<Float, Color>): Brush {
         val start = (inner / outer).coerceIn(0f, MAX_BAND_START)
         val first = stops.first().second

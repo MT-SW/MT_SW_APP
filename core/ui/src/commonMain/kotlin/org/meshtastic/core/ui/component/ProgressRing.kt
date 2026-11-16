@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@file:Suppress("TooManyFunctions")
 
 package org.meshtastic.core.ui.component
 
@@ -138,14 +139,20 @@ fun ProgressRing(
     classicStrokeWidth: Dp = 4.dp,
 ) {
     if (rememberThinRings()) {
-        ThinProgressRing(progress, modifier, size, color)
+        ThinProgressRing(progress, size, color, modifier)
     } else {
-        ClassicProgressRing(progress, modifier, size, color, classicStrokeWidth)
+        ClassicProgressRing(progress, size, color, classicStrokeWidth, modifier)
     }
 }
 
 @Composable
-private fun ClassicProgressRing(progress: Float, modifier: Modifier, size: Dp, color: Color, strokeWidth: Dp) {
+private fun ClassicProgressRing(
+    progress: Float,
+    size: Dp,
+    color: Color,
+    strokeWidth: Dp,
+    modifier: Modifier = Modifier,
+) {
     if (color == Color.Unspecified) {
         CircularProgressIndicator(
             progress = { progress },
@@ -165,7 +172,7 @@ private fun ClassicProgressRing(progress: Float, modifier: Modifier, size: Dp, c
 }
 
 @Composable
-private fun ThinProgressRing(progress: Float, modifier: Modifier, size: Dp, color: Color) {
+private fun ThinProgressRing(progress: Float, size: Dp, color: Color, modifier: Modifier = Modifier) {
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     Canvas(modifier = modifier.size(size)) {
@@ -211,7 +218,7 @@ fun SegmentedProgressRing(segments: List<Pair<Color, Float>>, modifier: Modifier
 @Composable
 fun ProgressSpinner(modifier: Modifier = Modifier, size: Dp = 48.dp, color: Color = Color.Unspecified) {
     if (rememberThinRings()) {
-        ThinProgressSpinner(modifier, size, color)
+        ThinProgressSpinner(size, color, modifier)
     } else if (color == Color.Unspecified) {
         CircularWavyProgressIndicator(modifier = modifier.size(size))
     } else {
@@ -220,7 +227,7 @@ fun ProgressSpinner(modifier: Modifier = Modifier, size: Dp = 48.dp, color: Colo
 }
 
 @Composable
-private fun ThinProgressSpinner(modifier: Modifier, size: Dp, color: Color) {
+private fun ThinProgressSpinner(size: Dp, color: Color, modifier: Modifier = Modifier) {
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     val turn by
