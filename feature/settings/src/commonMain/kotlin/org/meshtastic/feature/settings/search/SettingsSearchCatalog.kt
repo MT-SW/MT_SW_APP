@@ -64,6 +64,7 @@ import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
 import org.meshtastic.core.resources.glass_rim
 import org.meshtastic.core.resources.glass_tint
+import org.meshtastic.core.resources.chart_style
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.input_hold_buzz
@@ -283,6 +284,7 @@ object SettingsSearchCatalog {
             Res.string.nav_bar_select to SettingsRoute.ElementLook,
             Res.string.input_hold_buzz to SettingsRoute.ElementLook,
             Res.string.icon_style to SettingsRoute.ElementLook,
+            Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.look_presets_title to SettingsRoute.ElementLook,
             Res.string.element_group_dialogs to SettingsRoute.ElementLook,
             Res.string.glass_tint to SettingsRoute.ElementLook,

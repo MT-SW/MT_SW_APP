@@ -69,6 +69,13 @@ import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
 import org.meshtastic.core.resources.glass_tint_light
 import org.meshtastic.core.resources.glass_tint_theme
+import org.meshtastic.core.resources.chart_style
+import org.meshtastic.core.resources.chart_style_flat
+import org.meshtastic.core.resources.chart_style_glass
+import org.meshtastic.core.resources.chart_style_glow
+import org.meshtastic.core.resources.chart_style_gradient
+import org.meshtastic.core.resources.chart_style_outline
+import org.meshtastic.core.resources.chart_style_summary
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.icon_style_bold
 import org.meshtastic.core.resources.icon_style_outline
@@ -208,6 +215,21 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
             val thin = options[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN
             onChange(UiOptions.RING_STYLE, if (thin) UiOptions.RING_STYLE_CLASSIC else UiOptions.RING_STYLE_THIN)
         },
+    )
+    DropDownPreference(
+        title = stringResource(Res.string.chart_style),
+        enabled = true,
+        items =
+        listOf(
+            UiOptions.CHART_STYLE_GLASS to stringResource(Res.string.chart_style_glass),
+            UiOptions.CHART_STYLE_GRADIENT to stringResource(Res.string.chart_style_gradient),
+            UiOptions.CHART_STYLE_OUTLINE to stringResource(Res.string.chart_style_outline),
+            UiOptions.CHART_STYLE_GLOW to stringResource(Res.string.chart_style_glow),
+            UiOptions.CHART_STYLE_FLAT to stringResource(Res.string.chart_style_flat),
+        ),
+        selectedItem = options[UiOptions.CHART_STYLE],
+        onItemSelected = { onChange(UiOptions.CHART_STYLE, it) },
+        summary = stringResource(Res.string.chart_style_summary),
     )
 }
 
@@ -436,6 +458,7 @@ private val LOOK_PRESETS =
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_CLASSIC,
+                UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_FLAT,
                 UiOptions.PRESS_SPRING to 0,
             ) + look(UiOptions.ALL_GROUPS, ElementLook.FLAT, 55),
         ),
@@ -444,6 +467,7 @@ private val LOOK_PRESETS =
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_THIN,
+                UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS,
                 UiOptions.PRESS_SPRING to 1,
             ) +
                 look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
@@ -456,7 +480,7 @@ private val LOOK_PRESETS =
         ),
         LookPreset(
             Res.string.look_preset_glass,
-            mapOf(UiOptions.PRESS_SPRING to 1) +
+            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS) +
                 look(BARS, ElementLook.GLASS, 55, PRESET_BLUR) +
                 look(CARDS, ElementLook.TRANSPARENT, 45) +
                 look(BUBBLES, ElementLook.TRANSPARENT, 35) +
@@ -467,7 +491,7 @@ private val LOOK_PRESETS =
         ),
         LookPreset(
             Res.string.look_preset_depth,
-            mapOf(UiOptions.PRESS_SPRING to 1) + look(UiOptions.ALL_GROUPS, ElementLook.DEPTH, 60),
+            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GRADIENT) + look(UiOptions.ALL_GROUPS, ElementLook.DEPTH, 60),
         ),
     )
 

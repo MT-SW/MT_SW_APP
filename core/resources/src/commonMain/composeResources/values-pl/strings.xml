@@ -4060,6 +4060,13 @@
     <string name="nav_select_line">Kreska pod napisem</string>
     <string name="nav_select_both">Tło i kreska</string>
     <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
+    <string name="chart_style">Styl wykresów</string>
+    <string name="chart_style_glass">Szkło 3D (gradient i połysk)</string>
+    <string name="chart_style_gradient">Gradient</string>
+    <string name="chart_style_outline">Obrys (cienkie linie)</string>
+    <string name="chart_style_glow">Poświata</string>
+    <string name="chart_style_flat">Płaski (jak dawniej)</string>
+    <string name="chart_style_summary">Wygląd słupków, mapy cieplnej i półokrągłego miernika w „Zdrowie sieci” i metrykach węzła. „Płaski” przywraca stary wygląd.</string>
     <string name="ring_style_thin">Cienkie paski postępu (jak w iPhonie)</string>
     <string name="ring_style_thin_summary">Paski postępu i kręcące się kółka oczekiwania to dwie cienkie szare linie (pusty obrys), a zapełniana część to też obrys w kolorze motywu. Zamiast zygzaku jest kółko lub pasek z kręcącym się, przesuwającym się elementem z cienkich linii. Po wyłączeniu wraca stary wygląd.</string>
     <string name="element_group_dialogs">Okna dialogowe</string>

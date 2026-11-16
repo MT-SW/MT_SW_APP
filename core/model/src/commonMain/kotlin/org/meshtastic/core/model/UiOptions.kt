@@ -114,6 +114,18 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val RING_STYLE_CLASSIC = 0
         const val RING_STYLE_THIN = 1
 
+        /**
+         * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
+         * [CHART_STYLE_GLASS] (default: glossy 3D glass with a gradient), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE] or
+         * [CHART_STYLE_GLOW].
+         */
+        const val CHART_STYLE = "charts.style"
+        const val CHART_STYLE_FLAT = 0
+        const val CHART_STYLE_GLASS = 1
+        const val CHART_STYLE_GRADIENT = 2
+        const val CHART_STYLE_OUTLINE = 3
+        const val CHART_STYLE_GLOW = 4
+
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
         const val ICON_STYLE_STANDARD = 0
@@ -185,6 +197,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RIM, 0)
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
+            put(CHART_STYLE, CHART_STYLE_GLASS)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
                 put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)

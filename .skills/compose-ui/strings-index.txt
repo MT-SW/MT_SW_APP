@@ -748,6 +748,14 @@ channel_slots_used
 channel_url
 channel_utilization
 channels
+### CHART ###
+chart_style
+chart_style_flat
+chart_style_glass
+chart_style_glow
+chart_style_gradient
+chart_style_outline
+chart_style_summary
 chat_info_body
 chat_info_title
 chemical_oxygen_demand

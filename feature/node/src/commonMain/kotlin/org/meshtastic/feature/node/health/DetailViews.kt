@@ -55,11 +55,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +75,9 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.time.Instant
+import org.meshtastic.core.ui.component.drawChartArc
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 /** The ways the same numbers can be shown on the node detail screen. */
 internal enum class DetailViewMode(val label: String) {
@@ -262,12 +263,11 @@ internal fun GaugeView(
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Box(modifier = Modifier.fillMaxWidth().height(GAUGE_HEIGHT_DP.dp), contentAlignment = Alignment.BottomCenter) {
+            val chartStyle = rememberChartStyle()
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val stroke = GAUGE_STROKE_DP.dp.toPx()
                 val radius = min(size.width / 2, size.height) - stroke
                 val center = Offset(size.width / 2, size.height - stroke / 2)
-                val topLeft = Offset(center.x - radius, center.y - radius)
-                val arcSize = Size(radius * 2, radius * 2)
 
                 fun frac(v: Float) = ((v - gMin) / range).coerceIn(0f, 1f)
                 if (scale != null) {
@@ -275,20 +275,20 @@ internal fun GaugeView(
                         val f1 = frac(lowB ?: gMin)
                         val f2 = frac(upB ?: gMax)
                         if (f2 > f1) {
-                            drawArc(
+                            drawChartArc(
+                                style = chartStyle,
                                 color = (palette[level] ?: Color.Gray).copy(alpha = 0.85f),
                                 startAngle = 180f + f1 * 180f,
-                                sweepAngle = (f2 - f1) * 180f,
-                                useCenter = false,
-                                topLeft = topLeft,
-                                size = arcSize,
-                                style = Stroke(width = stroke),
+                                sweep = (f2 - f1) * 180f,
+                                center = center,
+                                radius = radius,
+                                stroke = stroke,
                             )
                         }
                     }
                 } else {
-                    drawArc(track, 180f, 180f, false, topLeft, arcSize, style = Stroke(width = stroke))
-                    drawArc(color, 180f, 180f * fraction, false, topLeft, arcSize, style = Stroke(width = stroke))
+                    drawChartArc(chartStyle, track, 180f, 180f, center, radius, stroke)
+                    drawChartArc(chartStyle, color, 180f, 180f * fraction, center, radius, stroke)
                 }
                 val angle = (180f + fraction * 180f) * (kotlin.math.PI.toFloat() / 180f)
                 val marker = Offset(center.x + radius * cos(angle), center.y + radius * sin(angle))
@@ -407,6 +407,7 @@ internal fun BucketBarsView(
             }
         }
         Column(modifier = Modifier.weight(1f)) {
+            val chartStyle = rememberChartStyle()
             Canvas(
                 modifier =
                 Modifier.fillMaxWidth()
@@ -430,11 +431,13 @@ internal fun BucketBarsView(
                         val barH = ((bucket.value - lo) / (hi - lo)).coerceIn(0f, 1f) * size.height
                         val tint = scale?.let { palette[it.level(bucket.value)] } ?: color
                         val alpha = if (selectedIndex == null || selectedIndex == i) 1f else 0.45f
-                        drawRoundRect(
+                        val height = barH.coerceAtLeast(2f)
+                        drawChartBar(
+                            style = chartStyle,
                             color = tint.copy(alpha = alpha),
-                            topLeft = Offset(i * slot + slot * BAR_GAP_FRACTION / 2, size.height - barH),
-                            size = Size(slot * (1 - BAR_GAP_FRACTION), barH.coerceAtLeast(2f)),
-                            cornerRadius = CornerRadius(6f, 6f),
+                            topLeft = Offset(i * slot + slot * BAR_GAP_FRACTION / 2, size.height - height),
+                            size = Size(slot * (1 - BAR_GAP_FRACTION), height),
+                            corner = 6f,
                         )
                     }
                 }
@@ -518,6 +521,7 @@ internal fun HeatmapView(
                     }
                 }
             }
+            val chartStyle = rememberChartStyle()
             Canvas(
                 modifier =
                 Modifier.weight(1f).height((HEAT_CELL_DP * days.size).dp).pointerInput(days, averages) {
@@ -541,11 +545,12 @@ internal fun HeatmapView(
                                 scale != null -> palette[scale.level(cell.value)] ?: color
                                 else -> color.copy(alpha = 0.2f + 0.8f * ((cell.value - minV) / spread))
                             }
-                        drawRoundRect(
+                        drawChartBar(
+                            style = chartStyle,
                             color = tint,
                             topLeft = Offset(hour * cw + HEAT_CELL_GAP_PX / 2, r * ch + HEAT_CELL_GAP_PX / 2),
                             size = Size(cw - HEAT_CELL_GAP_PX, ch - HEAT_CELL_GAP_PX),
-                            cornerRadius = CornerRadius(HEAT_CELL_CORNER_PX, HEAT_CELL_CORNER_PX),
+                            corner = HEAT_CELL_CORNER_PX,
                         )
                     }
                 }

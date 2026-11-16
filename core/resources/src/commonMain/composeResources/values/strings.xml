@@ -781,6 +781,14 @@
     <string name="channel_url">Channel URL</string>
     <string name="channel_utilization">ChUtil</string>
     <string name="channels">Channels</string>
+    <!-- CHART -->
+    <string name="chart_style">Chart style</string>
+    <string name="chart_style_flat">Flat (as before)</string>
+    <string name="chart_style_glass">3D glass (gradient and gloss)</string>
+    <string name="chart_style_glow">Glow</string>
+    <string name="chart_style_gradient">Gradient</string>
+    <string name="chart_style_outline">Outline (thin lines)</string>
+    <string name="chart_style_summary">The look of the bars, the heat map and the half-round gauge in Network health and node metrics. "Flat" brings back the old look.</string>
     <string name="chat_info_body">Chat list\n• Tap a conversation to open it.\n• Long-press a conversation to select it. Then you can mute it, pin it, mark it as unread or delete it. Swiping a row also mutes or deletes it.\n• Mute lengths are the same everywhere: 1 hour, 24 hours, 2 days, 1 week, 2 weeks, 1 month or always. Muted messages are still saved; only notifications and sound are off.\n\nInside a conversation\n• Long-press a message to react, reply, copy, select or delete it.\n• On a channel the same menu also lets you mute messages from that one device on that one channel (and unmute it later). A small speaker icon next to the name shows who is muted.\n• Under your own messages a small delivery label shows the state. Tap it to see how many devices relayed the message and which ones. This relay detail is available only in this app.</string>
     <string name="chat_info_title">How conversations work</string>
     <string name="chemical_oxygen_demand">COD</string>
