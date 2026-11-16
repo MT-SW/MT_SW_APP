@@ -34,9 +34,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -53,6 +56,8 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
@@ -97,6 +102,75 @@ enum class SosBarScreen(val key: String) {
     AI(SosBarScreens.AI),
     HEALTH(SosBarScreens.HEALTH),
     OTHER(SosBarScreens.OTHER),
+}
+
+/**
+ * Decides which of the top bars on the screen shows the SOS button. A wide window (desktop, tablet) shows several
+ * cards side by side, each with its own bar, and every bar would otherwise draw the button. Each bar reports where its
+ * button would be; the one furthest to the right wins (the top one on a tie), so the button sits at the window's
+ * right edge and appears once. A bar that has not reported yet shows the button only while no other bar is known.
+ */
+@Stable
+class SosBarSlots {
+    private val places = mutableStateMapOf<Any, Pair<Float, Float>>()
+
+    fun report(id: Any, right: Float, top: Float) {
+        val old = places[id]
+        if (old == null || old.first != right || old.second != top) places[id] = right to top
+    }
+
+    fun release(id: Any) {
+        places.remove(id)
+    }
+
+    fun shows(id: Any): Boolean {
+        if (id !in places) return places.isEmpty()
+        val mine = places.getValue(id)
+        return places.none { (other, place) -> other != id && place.beats(mine) }
+    }
+
+    private fun Pair<Float, Float>.beats(other: Pair<Float, Float>): Boolean =
+        if (kotlin.math.abs(first - other.first) > SAME_EDGE_PX) first > other.first else second < other.second
+
+    private companion object {
+        /** Bars of one column differ by a few pixels at most (their other buttons); a pane is far wider. */
+        const val SAME_EDGE_PX = 24f
+    }
+}
+
+/** Null (previews, tests): no bar has to give way, every bar shows the button. */
+@Suppress("CompositionLocalAllowlist")
+val LocalSosBarSlots = compositionLocalOf<SosBarSlots?> { null }
+
+/** Wraps the SOS button of a top bar so that, with several bars on screen, only one of them draws it. */
+@Composable
+private fun SosBarSlot(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val slots = LocalSosBarSlots.current
+    if (slots == null) {
+        Box(modifier) { content() }
+        return
+    }
+    val id = remember { Any() }
+    DisposableEffect(slots, id) { onDispose { slots.release(id) } }
+    Box(
+        modifier.onGloballyPositioned {
+            val bounds = it.boundsInWindow()
+            slots.report(id, bounds.right, bounds.top)
+        },
+    ) {
+        if (slots.shows(id)) content()
+    }
+}
+
+/** The SOS button as the top bars draw it: one for the whole window, whatever number of cards are side by side. */
+@Composable
+fun SosBarChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    holdSeconds: Int = SosConfig.BAR_MIN_HOLD_SECONDS,
+    onHoldComplete: (() -> Unit)? = null,
+) {
+    SosBarSlot(modifier) { SosChip(onClick = onClick, holdSeconds = holdSeconds, onHoldComplete = onHoldComplete) }
 }
 
 private val SosRed = Color(0xFFD32F2F)
@@ -217,7 +291,7 @@ fun SosBarAction(screen: SosBarScreen = SosBarScreen.OTHER, modifier: Modifier =
     val extras = LocalAppBarExtras.current
     val open = extras.onOpenSos ?: return
     if (screen.key !in extras.sosScreens) return
-    SosChip(
+    SosBarChip(
         onClick = open,
         modifier = modifier,
         holdSeconds = extras.sosHoldSeconds,

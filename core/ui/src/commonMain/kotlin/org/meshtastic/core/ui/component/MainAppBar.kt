@@ -185,7 +185,7 @@ private fun TopBarActions(
     val openSos = extras.onOpenSos?.takeIf { sosScreen != null && sosScreen.key in extras.sosScreens }
 
     if (openSos != null) {
-        SosChip(
+        SosBarChip(
             onClick = openSos,
             modifier = Modifier.padding(start = 8.dp),
             holdSeconds = extras.sosHoldSeconds,
