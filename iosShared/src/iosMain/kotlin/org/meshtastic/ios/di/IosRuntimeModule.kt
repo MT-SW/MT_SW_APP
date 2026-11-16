@@ -26,6 +26,8 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okio.FileSystem
+import okio.Path.Companion.toPath
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.ble.BleConnectionFactory
@@ -55,6 +57,7 @@ import org.meshtastic.ios.notification.IosMeshNotificationManager
 import org.meshtastic.ios.notification.IosNotificationManager
 import org.meshtastic.ios.radio.IosMessageQueue
 import org.meshtastic.ios.radio.IosRadioTransportFactory
+import platform.Foundation.NSBundle
 
 /** Radio, network, notifications and message queue for iPhone. */
 @Module
@@ -120,5 +123,14 @@ class IosRuntimeModule {
         install(HttpRequestRetry) { configureDefaultRetry() }
     }
 
-    @Single fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { null }
+    /**
+     * The bundled JSON assets (firmware releases, device list, links ...) are copied into the app by `project.yml` from
+     * the same folder the Android app reads, so a fresh install has them before the first network refresh.
+     */
+    @Single
+    fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { name ->
+        val path =
+            NSBundle.mainBundle.pathForResource(name.substringBeforeLast('.'), name.substringAfterLast('.', ""))
+        path?.let { runCatching { FileSystem.SYSTEM.source(it.toPath()) }.getOrNull() }
+    }
 }

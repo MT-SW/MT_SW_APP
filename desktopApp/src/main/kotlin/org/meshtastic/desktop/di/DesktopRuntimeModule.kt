@@ -28,6 +28,7 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okio.source
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.ble.BleConnectionFactory
@@ -160,5 +161,9 @@ class DesktopRuntimeModule {
     }
 
     /** Desktop has no bundled Android assets; repositories seed from the network instead. */
-    @Single fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { null }
+    /** The bundled JSON assets are packed into the app from the folder the Android app reads (see `build.gradle.kts`). */
+    @Single
+    fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { name ->
+        Thread.currentThread().contextClassLoader?.getResourceAsStream(name)?.source()
+    }
 }

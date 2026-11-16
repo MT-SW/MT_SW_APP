@@ -106,7 +106,11 @@ val generateBuildConfig =
         outputDir.set(buildConfigOutputDir.map { it.dir("org/meshtastic/desktop") })
     }
 
-sourceSets.main { kotlin.srcDir(generateBuildConfig.map { buildConfigOutputDir }) }
+sourceSets.main {
+    kotlin.srcDir(generateBuildConfig.map { buildConfigOutputDir })
+    // The bundled JSON assets (firmware releases, device list ...) come from the folder the Android app reads.
+    resources.srcDir(rootProject.file("androidApp/src/main/assets"))
+}
 
 // ── ProGuard configuration ───────────────────────────────────────────────────
 // compose-jb's standalone ProGuard task does NOT auto-include

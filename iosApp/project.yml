@@ -12,6 +12,11 @@ targets:
     platform: iOS
     sources:
       - path: MTSWApp
+      # The bundled JSON assets (firmware releases, device list ...), the same files the Android app reads.
+      - path: ../androidApp/src/main/assets
+        includes:
+          - "*.json"
+        buildPhase: resources
     info:
       path: MTSWApp/Info.plist
       properties:
