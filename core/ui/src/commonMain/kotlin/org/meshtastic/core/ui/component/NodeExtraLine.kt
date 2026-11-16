@@ -174,7 +174,8 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
     (env.temperature ?: aq.co2_temperature).ok()?.let {
         add(ExtraChip({ MeshtasticIcons.Temperature }, "Temp.", MetricFormatter.temperature(it, tempF)))
     }
-    (env.relative_humidity.ok()?.takeIf { it != 0f } ?: aq.co2_humidity.ok()?.takeIf { it != 0f })?.let {
+    // A reported 0% is a reading: only a missing or NaN value hides the chip (same rule as the node tiles).
+    reportedHumidity(env.relative_humidity.ok(), aq.co2_humidity.ok())?.let {
         add(ExtraChip({ MeshtasticIcons.Humidity }, "Wilg.", MetricFormatter.humidity(it)))
     }
     env.barometric_pressure
