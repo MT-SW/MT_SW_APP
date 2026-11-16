@@ -50,7 +50,7 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * Unit tests for [TelemetryWidget.WidgetContent] on Glance's own harness, which asserts on the composed tree rather
- * than pixels. As in [LocalStatsWidgetContentTest], any string rendering at all proves the [WidgetResourceEnvironment]
+ * than pixels. Any string rendering at all proves the [WidgetResourceEnvironment]
  * bridge still resolves Compose Multiplatform resources.
  */
 @RunWith(RobolectricTestRunner::class)

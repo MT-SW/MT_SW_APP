@@ -44,7 +44,7 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * Unit tests for [NodeTrackerWidget.WidgetContent] on Glance's own harness, which asserts on the composed tree rather
- * than pixels. As in [LocalStatsWidgetContentTest], any string rendering at all proves the [WidgetResourceEnvironment]
+ * than pixels. Any string rendering at all proves the [WidgetResourceEnvironment]
  * bridge still resolves Compose Multiplatform resources.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -172,7 +172,7 @@ class NodeTrackerWidgetContentTest {
         const val WIDGET_ID = 7
         val PIXEL_6A_2X2 = DpSize(179.dp, 202.dp)
 
-        /** Same budget as LocalStatsWidgetContentTest, for the same reason: Robolectric plus resource loading. */
+        /** Budget for Robolectric plus resource loading. */
         val TEST_TIMEOUT = 30.seconds
     }
 }

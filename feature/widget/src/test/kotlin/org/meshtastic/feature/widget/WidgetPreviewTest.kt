@@ -29,11 +29,7 @@ import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.runner.RunWith
-import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.meshtastic.core.testing.FakeNodeRepository
-import org.meshtastic.core.testing.FakeServiceRepository
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import kotlin.test.Test
@@ -61,15 +57,6 @@ class WidgetPreviewTest {
     fun `the telemetry picker preview composes without a glance id`() = runTest {
         val views = TelemetryWidget().composeForPreview(context, AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN)
         assertContains(texts(views), "21°C")
-    }
-
-    @Test
-    fun `the local stats picker preview composes without a glance id`() = runTest {
-        startKoin {
-            modules(module { single { LocalStatsWidgetStateProvider(FakeNodeRepository(), FakeServiceRepository()) } })
-        }
-        val views = LocalStatsWidget().composeForPreview(context, AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN)
-        assertContains(texts(views), "ME")
     }
 
     /** Inflates [views] and returns every string a TextView in it shows, so a test sees the mock state rendered. */

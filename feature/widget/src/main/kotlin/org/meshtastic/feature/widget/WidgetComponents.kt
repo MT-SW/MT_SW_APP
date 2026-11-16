@@ -18,14 +18,8 @@
 
 package org.meshtastic.feature.widget
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,13 +27,10 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.appwidget.CircularProgressIndicator
-import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
@@ -225,83 +216,6 @@ internal fun StatGrid(
 }
 
 private val GRID_GUTTER = 12.dp
-
-/**
- * A [StatRow] over a 0..1 bar, for utilization. With [thin] (the "Thin progress bars" look) the bar is two thin lines,
- * empty inside, like the bars in the app; otherwise it is the old filled bar.
- */
-@Composable
-internal fun BarRow(
-    label: String,
-    value: String,
-    progress: Float,
-    modifier: GlanceModifier = GlanceModifier,
-    thin: Boolean = true,
-) {
-    Column(modifier = modifier) {
-        StatRow(label, value)
-        Spacer(GlanceModifier.height(2.dp))
-        if (thin) {
-            OutlinedBar(progress)
-        } else {
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = GlanceModifier.fillMaxWidth().height(4.dp).cornerRadius(2.dp),
-                color = GlanceTheme.colors.primary,
-                backgroundColor = GlanceTheme.colors.surfaceVariant,
-            )
-        }
-    }
-}
-
-private val OUTLINED_BAR_HEIGHT = 8.dp
-private const val OUTLINED_BAR_WIDTH_DP = 160
-private const val OUTLINED_BAR_STROKE_DP = 1.2f
-private const val OUTLINED_BAR_GAP_DP = 2.2f
-private const val OUTLINED_BAR_TRACK_ALPHA = 0.55f
-
-/** A grey capsule outline with the theme-coloured outlined progress inside it (Glance cannot draw a hollow bar). */
-@Composable
-private fun OutlinedBar(progress: Float) {
-    val context = LocalContext.current
-    val track = GlanceTheme.colors.outline.getColor(context).copy(alpha = OUTLINED_BAR_TRACK_ALPHA).toArgb()
-    val fill = GlanceTheme.colors.primary.getColor(context).toArgb()
-    val bitmap = remember(progress, track, fill) { outlinedBarBitmap(context.resources.displayMetrics.density, progress, track, fill) }
-    Image(
-        provider = ImageProvider(bitmap),
-        contentDescription = null,
-        contentScale = ContentScale.FillBounds,
-        modifier = GlanceModifier.fillMaxWidth().height(OUTLINED_BAR_HEIGHT),
-    )
-}
-
-private fun outlinedBarBitmap(density: Float, progress: Float, trackColor: Int, fillColor: Int): Bitmap {
-    val width = (OUTLINED_BAR_WIDTH_DP * density).toInt().coerceAtLeast(1)
-    val height = (OUTLINED_BAR_HEIGHT.value * density).toInt().coerceAtLeast(1)
-    val stroke = OUTLINED_BAR_STROKE_DP * density
-    val gap = OUTLINED_BAR_GAP_DP * density
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmap)
-    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = stroke
-    }
-    val half = stroke / 2f
-    val outer = RectF(half, half, width - half, height - half)
-    paint.color = trackColor
-    canvas.drawRoundRect(outer, outer.height() / 2f, outer.height() / 2f, paint)
-    val value = progress.coerceIn(0f, 1f)
-    if (value > 0f) {
-        val inset = half + gap
-        val inner = RectF(inset, inset, width - inset, height - inset)
-        val minWidth = inner.height()
-        val end = inner.left + (inner.width() * value).coerceAtLeast(minWidth)
-        val piece = RectF(inner.left, inner.top, end.coerceAtMost(inner.right), inner.bottom)
-        paint.color = fillColor
-        canvas.drawRoundRect(piece, piece.height() / 2f, piece.height() / 2f, paint)
-    }
-    return bitmap
-}
 
 /**
  * An inline label and value that size to their text, for rows that hold two readings; [label] null shows the value

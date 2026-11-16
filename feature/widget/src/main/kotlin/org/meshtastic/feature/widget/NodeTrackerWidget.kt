@@ -110,7 +110,7 @@ class NodeTrackerWidget :
         }
     }
 
-    /** Same last-resort error UI as [LocalStatsWidget.onCompositionError]. */
+    /** Last-resort error UI when composition fails. */
     override fun onCompositionError(context: Context, glanceId: GlanceId, appWidgetId: Int, throwable: Throwable) {
         Logger.e(throwable) { "NodeTrackerWidget composition failed; rendering error UI" }
         val errorViews =

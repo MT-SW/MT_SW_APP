@@ -98,7 +98,6 @@ class CoroutineScopeConstructionTest {
             "feature/messaging/commonMain/LlamaAssistantService.kt",
             "feature/messaging/jvmAndroidMain/ModelDictationService.kt",
             "feature/widget/main/AndroidAppWidgetUpdater.kt",
-            "feature/widget/main/LocalStatsWidgetState.kt",
             "feature/widget/main/MeshStatusWidgetStateProvider.kt",
             "feature/wifi-provision/commonMain/NymeaWifiService.kt",
             "iosShared/iosMain/IosLogControl.kt",

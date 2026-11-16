@@ -185,7 +185,7 @@ class MeshConnectionManagerImpl(
             } catch (e: CancellationException) {
                 throw e
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                Logger.e(e) { "Failed to kickstart LocalStatsWidget" }
+                Logger.e(e) { "Failed to kickstart the widgets" }
             }
         }
 

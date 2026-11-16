@@ -38,12 +38,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.factory.KoinWorkerFactory
@@ -70,7 +67,6 @@ import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.feature.discovery.DiscoveryScanEngine
 import org.meshtastic.feature.widget.MeshStatusWidgetReceiver
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 /**
@@ -188,19 +184,6 @@ open class MeshUtilApplication :
                 }
 
                 pushPreview()
-
-                val widgetStateProvider: org.meshtastic.feature.widget.LocalStatsWidgetStateProvider = get()
-                try {
-                    // Wait for real data for up to 30 seconds before pushing an updated preview
-                    withTimeout(30.seconds) {
-                        widgetStateProvider.state.first { it.showContent && it.nodeShortName != null }
-                    }
-
-                    Logger.i { "Real node data acquired. Pushing updated widget preview." }
-                    pushPreview()
-                } catch (e: TimeoutCancellationException) {
-                    Logger.i(e) { "Timed out waiting for real node data for widget preview." }
-                }
             }
         }
 

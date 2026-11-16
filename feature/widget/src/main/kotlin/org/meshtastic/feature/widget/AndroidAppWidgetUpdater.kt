@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
@@ -38,14 +37,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.AppWidgetUpdater
 
-private const val WIDGET_UPDATE_DEBOUNCE_MS = 500L
 private const val TRACKER_UPDATE_SAMPLE_MS = 1_000L
 private const val MESH_STATUS_ROTATION_MS = 60_000L
 
 @Single
 class AndroidAppWidgetUpdater(
     private val context: Context,
-    stateProvider: LocalStatsWidgetStateProvider,
     trackerDataSource: NodeTrackerWidgetDataSource,
     meshStatusProvider: MeshStatusWidgetStateProvider,
     telemetryDataSource: TelemetryWidgetDataSource,
@@ -54,17 +51,6 @@ class AndroidAppWidgetUpdater(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     init {
-        // Observe state changes and trigger a widget re-render whenever the data changes.
-        // Glance compositions are ephemeral — the widget cannot self-update via collectAsState()
-        // alone, so we must call updateAll() externally to drive re-renders.
-        @OptIn(FlowPreview::class)
-        scope.launch {
-            stateProvider.state
-                .debounce(WIDGET_UPDATE_DEBOUNCE_MS)
-                .distinctUntilChanged { old, new -> old.copy(updateTimeMillis = 0) == new.copy(updateTimeMillis = 0) }
-                .collect { if (hasInstances(LocalStatsWidget::class.java)) update(LocalStatsWidget()) }
-        }
-
         scope.launch {
             meshStatusProvider.state.collect {
                 if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
@@ -119,7 +105,6 @@ class AndroidAppWidgetUpdater(
         }
 
     override suspend fun updateAll() {
-        update(LocalStatsWidget())
         update(NodeTrackerWidget())
         update(MeshStatusWidget())
         update(TelemetryWidget())
