@@ -2,14 +2,15 @@
 title: Mapa i punkty trasy
 parent: Przewodnik użytkownika
 nav_order: 6
-last_updated: 2026-11-12
-description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy i Site Planner oraz kontrola udostępniania pozycji i prywatności.
+last_updated: 2026-11-16
+description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy, Site Planner i badania sygnału oraz kontrola udostępniania pozycji i prywatności.
 aliases:
   - map
   - waypoints
   - gps
   - location
   - site-planner
+  - signal-survey
   - map-layers
   - geojson
   - kml
@@ -57,6 +58,7 @@ Dotknij przycisku widoku sieci (**Otwórz widok sieci**) wśród przycisków map
 - **Przytrzymaj** węzeł lub punkt trasy, aby go znaleźć. Widok podpowiada, o ile obrócić i pochylić telefon, telefon tyka coraz szybciej w miarę zbliżania się, a gdy trafisz w cel, raz pulsuje.
 - Węzeł, którego niepewność pozycji obejmuje Twoje miejsce, nie ma sensownego kierunku, więc trafia na radar na dole. Skieruj telefon w dół, aby powiększyć radar.
 - Strefy punktów trasy są obrysowane, a widok informuje, gdy jesteś w jednej z nich.
+- Sesje [badania sygnału](#badanie-sygnału) pokazane na mapie są rysowane na ziemi wokół Ciebie, w tych samych kolorach, do około 300 m. Gdy badanie nagrywa, widok mówi o tym i podaje liczbę odczytów, więc możesz iść trasą i patrzeć, jak zasięg się wypełnia.
 
 Gdy pozycja telefonu nie ma wysokości, cele są na Twoim poziomie, a widok informuje, że wysokość jest przybliżona. Bez dostępu do aparatu lub gdy telefon jest zbyt gorący, widok działa dalej jako kompas.
 
@@ -111,7 +113,9 @@ Ponieważ punkty trasy (i ich geofence) są rozsyłane do całej sieci mesh, dom
 
 ## Warstwy mapy
 
-Dotknij ikony warstw na mapie, aby otworzyć **Zarządzaj warstwami map**. Pozwala ona zaimportować własne nakładki w formacie `.kml`, `.kmz` lub GeoJSON, w tym nakładki naziemne KMZ (obrazy z georeferencją, na przykład wyeksportowane kafelki topograficzne lub lotnicze), które są nakładane w podanych granicach. Dodaj nakładkę, wybierając plik przez **Dodaj warstwę**, otwierając plik w MT_SW_APP lub udostępniając go do aplikacji z innej aplikacji. Plik otwarty lub udostępniony w ten sposób jest odrzucany, jeśli ma ponad 50 MB. **Dodaj warstwę sieciową** zamiast tego przyjmuje nazwę oraz adres URL `https://` wskazujący plik KML lub GeoJSON (`http://` też działa na Desktopie, a na Androidzie tylko dla `localhost`); taka warstwa ma wtedy w arkuszu własny przycisk odświeżania. W wersjach **Google Play** przycisk odświeżania na pasku narzędzi pobiera ponownie wszystkie widoczne warstwy sieciowe naraz.
+Dotknij ikony warstw na mapie, aby otworzyć **Zarządzaj warstwami map**. Pozwala ona zaimportować własne nakładki w formacie `.kml`, `.kmz` lub GeoJSON, w tym nakładki naziemne KMZ (obrazy z georeferencją, na przykład wyeksportowane kafelki topograficzne lub lotnicze), które są nakładane w podanych granicach. Dodaj nakładkę, wybierając plik przez **Dodaj warstwę**, otwierając plik w MT_SW_APP lub udostępniając go do aplikacji z innej aplikacji. Plik otwarty lub udostępniony w ten sposób jest odrzucany, jeśli ma ponad 50 MB (10 MB dla GeoJSON). **Dodaj warstwę sieciową** zamiast tego przyjmuje nazwę oraz adres URL `https://` wskazujący plik KML lub GeoJSON (`http://` też działa na Desktopie, a na Androidzie tylko dla `localhost`); taka warstwa ma wtedy w arkuszu własny przycisk odświeżania. Arkusz przewija się jako jedna strona, więc lista warstw pozostaje w zasięgu pod długą listą pobranych regionów. W wersjach **Google Play** przycisk odświeżania na pasku narzędzi pobiera ponownie wszystkie widoczne warstwy sieciowe naraz.
+
+Rozmiar warstwy jest ograniczony, aby chronić pamięć: warstwa GeoJSON powyżej 10 MB oraz KML lub KMZ powyżej 50 MB są odrzucane przy imporcie i nie są rysowane, a plik `.json`, który nie jest GeoJSON, jest odrzucany. W wersjach **Google Play** warstwa z większą szczegółowością, niż mapa ma miejsca na narysowanie, zostaje nienarysowana, a komunikat podaje jej nazwę.
 
 Zaimportowane warstwy są wymienione z przełącznikiem pokazywania/ukrywania każdej z nich i opcją usunięcia. Każda warstwa — zaimportowana lub wbudowana nakładka — ma własny suwak przezroczystości, gdy jest włączona, więc nakładkę można przyciemnić, a nie tylko wyłączyć. Działa to w wersji Google Play, wersji F-Droid i na **Desktopie**, który korzysta z tego samego magazynu warstw i selektora plików.
 
@@ -125,6 +129,22 @@ Zaimportowane warstwy są wymienione z przełącznikiem pokazywania/ukrywania ka
 - **Wyświetlanie**: **Paleta kolorów**.
 
 Dotknij **Oszacuj zasięg**, aby uruchomić obliczenia. Aplikacja liczy oszacowanie sama, modelem propagacji ITU-R P.1812 na terenie z Mapterhorn — tak samo w Google Play, F-Droid i na Desktopie. Teren pobiera się przy pierwszym szacowaniu danego obszaru, więc ten krok wymaga połączenia z siecią; jeśli się nie uda, formularz wraca z uwagą, żeby sprawdzić połączenie. Gotowe oszacowanie jest dodawane w **Zarządzaj warstwami map** jako warstwa oszacowania zasięgu, a mapa przesuwa się do niego.
+
+### Badanie sygnału
+
+Site Planner przewiduje zasięg, a **Badanie sygnału** go mierzy. Włącz **Nagrywaj** na dole arkusza warstw, a potem idź lub jedź z radiem. Każdy pakiet, który radio usłyszy przez LoRa, jest zapisywany z siłą sygnału (RSSI i SNR) i lokalizacją telefonu w tej chwili. Badanie tylko słucha: nic nie wysyła do sieci mesh.
+
+![Sterowanie badaniem sygnału nagrywającym sesję, z legendą kolorów, przełącznikiem mapy cieplnej i dwiema sesjami na liście](../../assets/screenshots/map_signal_survey.png)
+
+Każde włączenie **Nagrywaj** zaczyna nową sesję, a wyłączenie ją kończy. Sesja rysuje się na mapie w trakcie nagrywania: kolorowe kwadraty wzdłuż Twojej trasy, z których każdy oznacza najlepszy odczyt wewnątrz niego. Kwadraty mają około 50 m na poziomie ulicy i rosną przy oddalaniu, więc badanie jest widoczne w skali miasta.
+
+- **Kolory** oceniają najlepszy SNR kwadratu względem presetu modemu, na którym nagrano sesję, tak samo jak miernik sygnału: zielony to dobry, żółty średni, pomarańczowy zły, a czerwony za słaby, by na nim polegać. Zobacz [Jak działa miernik sygnału](signal-meter).
+- **Dotknij kwadratu**, aby zobaczyć jego SNR i RSSI, ile odczytów zawiera, ile węzłów tam usłyszano i kiedy przyszedł ostatni. Linie biegną od kwadratu do każdego węzła słyszanego tam bezpośrednio, w kolorze sygnału tego węzła, więc widać, który węzeł pokrywa którą ulicę. Linia kończy się tam, gdzie węzeł zgłasza swoją pozycję, z dokładnością, którą udostępnia; węzeł bez udostępnionej pozycji nie ma linii.
+- **Pokaż jako mapę cieplną** zamienia kwadraty na gładką poświatę w tych samych kolorach. Każdy kolor świeci tam, gdzie trasa przeszła przez kwadraty tej oceny, więc miejsce, w którym stałeś dłużej, świeci tak samo jak to, które minąłeś w aucie. Gdy widać mapę cieplną, kwadratów nie można dotykać.
+- **W [widoku AR sieci](#widok-ar-sieci)** widoczne sesje są rysowane na ziemi wokół Ciebie.
+- **Sesje** są wymienione pod przełącznikiem, od najnowszej. Oko pokazuje lub ukrywa sesję na mapie, przycisk pobierania eksportuje jej odczyty do CSV w wybranym pliku, a kosz ją usuwa.
+
+Nagrywanie jest wyłączone, dopóki go nie włączysz, i trwa, dopóki go nie wyłączysz albo aplikacja się nie zamknie, więc używa lokalizacji także wtedy, gdy aplikacja działa w tle. Odczyty są przechowywane osobno dla każdego radia. Zostają na Twoim urządzeniu, chyba że je wyeksportujesz, i wchodzą do kopii zapasowej bazy danych. Odczyt jest umieszczany tam, gdzie jest radio: według własnego GPS radia, dopóki jego ostatnia pozycja ma mniej niż 15 sekund, a w przeciwnym razie według pozycji telefonu, jeśli ma mniej niż 15 sekund i dokładność do 50 m albo wcale nie podaje dokładności. Radio ze stałą pozycją albo z GPS zgłaszającym postój jest umieszczane w tej pozycji. Dla radia połączonego przez sieć pozycja telefonu jest używana tylko wtedy, gdy radio nie zgłasza własnej, bo może być gdzie indziej. Gdy nie ma żadnej, nic nie jest zapisywane; wiersz pod **Nagrywaj** mówi, czego brakuje, z przyciskiem do nadania dostępu albo otwarcia ustawień lokalizacji. Nagrywanie jest też wstrzymane, gdy żadne radio nie jest połączone, i przez pierwsze 15 sekund po połączeniu. Badanie sygnału jest tylko na Androidzie.
 
 ## Udostępnianie pozycji
 
@@ -140,7 +160,7 @@ Zachowanie pozycji skonfigurujesz w **Ustawienia → Konfiguracja urządzenia �
 
 ### Kwestie prywatności
 
-> 🔒 **Prywatność:** Dane o pozycji są rozsyłane do wszystkich węzłów na Twoim kanale. Jeśli nie chcesz udostępniać swojej lokalizacji, ustaw **Tryb GPS** na **Wyłączony** albo użyj **Położenia stałego** w innym miejscu. Aby nadal udostępniać pozycję, nie wskazując dokładnie swojego miejsca, edytuj kanał w **Ustawienia → Kanały**, wyłącz **Precyzyjna lokalizacja** i ustaw suwak pod nią — kanał będzie wtedy publikował przybliżony obszar, pokazany jako ± odległość, zamiast dokładnego punktu.
+> 🔒 **Prywatność:** Dane o pozycji są rozsyłane do wszystkich węzłów na Twoim kanale. Jeśli nie chcesz udostępniać swojej lokalizacji, ustaw **Tryb GPS** na **Wyłączony** albo użyj **Położenia stałego** w innym miejscu. Aby nadal udostępniać pozycję, nie wskazując dokładnie swojego miejsca, edytuj kanał w **Ustawienia → Kanały**, wyłącz **Precyzyjna lokalizacja** i ustaw suwak pod nią — kanał będzie wtedy publikował przybliżony obszar, pokazany jako ± odległość, zamiast dokładnego punktu. Kanał, który nie jest bezpiecznie szyfrowany (klucz jednobajtowy, klucz domyślny albo brak klucza na kanale głównym lub na dodatkowym, którego głównym jest jeden z tych), nie może przenosić dokładnej lokalizacji: przełącznik jest wyłączony z napisem „Niedostępne na kanale, który nie jest bezpiecznie szyfrowany”, a suwak zatrzymuje się na 15 bitach.
 
 ## Źródła map
 
@@ -193,7 +213,7 @@ opisany niżej teren offline działa tam bez problemu.
 Cieniowanie rzeźby terenu i warstwice można również pobrać do użytku offline, aby pobrany obszar nadal
 pokazywał, dlaczego łącze nie działa, gdy nie ma sieci. Dane terenu pochodzą z Mapterhorn i są wskazane jako źródło na
 mapie. W **Google Play** każdy pobrany region na liście **Menedżer map offline** ma przycisk **Pobierz teren**. Teren jest dołączany do tego regionu i dzieli jego limit miejsca, a obszar
-zbyt duży dla terenu prosi o przybliżenie lub wybranie mniejszego regionu. Gdy teren jest pobrany, przycisk ustępuje miejsca przełącznikom **Cieniowanie rzeźby terenu** i **Warstwice**, obu wyłączonym, dopóki ich nie włączysz. Cieniowanie rysuje się z pełną siłą do jednego poziomu przybliżenia poza najgłębszym pobranym terenem w danym miejscu, zanika na następnym poziomie i potem się kończy; warstwice rysują się dalej. W **Google Play** włączenie **Cieniowania rzeźby terenu** oferuje też **Cieniowanie dolin**, domyślnie wyłączone, które przyciemnia doliny i wąwozy tym mocniej, im mniej nieba widzą, niezależnie od tego, w którą stronę są zwrócone do światła. W **F-Droid** i na **Desktopie** arkusz warstw ma własną sekcję **Teren offline**: ustaw obszar, dotknij **Rozpocznij pobieranie**, a cieniowanie rzeźby terenu i warstwice będą od tej pory rysowane automatycznie z pobranych kafelków, gdy pobrany obszar jest w widoku.
+zbyt duży dla terenu prosi o przybliżenie lub wybranie mniejszego regionu. Gdy teren jest pobrany, przycisk ustępuje miejsca przełącznikom **Cieniowanie rzeźby terenu** i **Warstwice**, obu wyłączonym, dopóki ich nie włączysz. Cieniowanie rysuje się z pełną siłą do jednego poziomu przybliżenia poza najgłębszym pobranym terenem w danym miejscu, zanika do połowy siły dwa poziomy dalej, a trzy poziomy dalej znika; warstwice rysują się dalej. W **Google Play** włączenie **Cieniowania rzeźby terenu** oferuje też **Cieniowanie dolin**, domyślnie wyłączone, które przyciemnia doliny i wąwozy tym mocniej, im mniej nieba widzą, niezależnie od tego, w którą stronę są zwrócone do światła. W **F-Droid** i na **Desktopie** arkusz warstw ma własną sekcję **Teren offline**: ustaw obszar, dotknij **Rozpocznij pobieranie**, a cieniowanie rzeźby terenu i warstwice będą od tej pory rysowane automatycznie z pobranych kafelków, gdy pobrany obszar jest w widoku.
 
 ### Praca offline
 

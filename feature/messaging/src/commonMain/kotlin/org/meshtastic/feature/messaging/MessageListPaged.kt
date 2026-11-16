@@ -186,12 +186,15 @@ internal fun MessageListPaged(
         remember(state.contactKey) { ContactKey(state.contactKey).addressString != NodeAddress.ID_BROADCAST }
 
     var showStatusDialog by remember { mutableStateOf<Message?>(null) }
-    showStatusDialog?.let { message ->
+    showStatusDialog?.let { clicked ->
+        // Read the live row so an ack landing while the dialog is open updates its status and relay.
+        val message = state.messages.itemSnapshotList.items.firstOrNull { it.uuid == clicked.uuid } ?: clicked
         val relayNodeNames =
             remember(nodeMap, message.relayNodes) { resolveRelayNodeNames(message, nodeMap, state.ourNode) }
         MessageStatusDialog(
             message = message,
             isDirectMessage = isDirectMessageConversation,
+            relayNodeLabel = relayNodeLabel(message.relayNode, state.nodes, state.ourNode?.num),
             resendOption = message.isStatusRetryable(isDirectMessageConversation) && state.canSend,
             relayNodeNames = relayNodeNames,
             onResend = {

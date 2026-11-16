@@ -91,6 +91,7 @@ import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.core.ui.theme.WithSystemDensity
 import org.meshtastic.core.ui.util.MapViewReset
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy
@@ -115,6 +116,9 @@ import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
 import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
+import org.meshtastic.feature.map.maplibre.layers.SignalSurveyHeatmapLayer
+import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLayer
+import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLinkLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
 import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
@@ -126,6 +130,8 @@ import org.meshtastic.feature.map.maplibre.style.toBaseStyle
 import org.meshtastic.feature.map.maplibre.style.zoomRange
 import org.meshtastic.feature.map.maplibre.tiles.InstallRadarSmoothing
 import org.meshtastic.feature.map.propagation.PropagationController
+import org.meshtastic.feature.map.survey.SurveyCellUi
+import org.meshtastic.feature.map.survey.SurveyLink
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
@@ -183,6 +189,14 @@ fun rememberMeshMapState(
     focusNodeNum: Int? = null,
     /** Radio links between nodes, drawn under the node chips while the "links" filter is on. */
     links: List<MapLink> = emptyList(),
+    /** The signal survey's squares, with the color each quality draws in. Drawn above imports, below the mesh. */
+    surveyCells: List<SurveyCellUi> = emptyList(),
+    /** The survey as heatmap points instead, one per street-level square. */
+    surveyHeatPoints: List<SurveyCellUi> = emptyList(),
+    surveyColors: Map<Quality, Color> = emptyMap(),
+    /** Lines from the tapped survey square to the nodes heard directly there. */
+    surveyLinks: List<SurveyLink> = emptyList(),
+    onSurveyCellClick: (String) -> Unit = {},
 ): MapState {
     val nodes by viewModel.nodesWithPosition.collectAsStateWithLifecycle()
     val waypoints by viewModel.waypoints.collectAsStateWithLifecycle()
@@ -245,6 +259,9 @@ fun rememberMeshMapState(
             )
             CustomLayers(customLayers, layerOpacity)
             CoverageLayer(coverage, layerOpacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY)
+            SignalSurveyLayer(surveyCells, surveyColors, onSurveyCellClick)
+            SignalSurveyHeatmapLayer(surveyHeatPoints, surveyColors)
+            SignalSurveyLinkLayer(surveyLinks, surveyColors)
 
             if (filterState.showWaypoints) {
                 WaypointLayers(waypoints = waypoints.values, onWaypointClick = onWaypointClick)

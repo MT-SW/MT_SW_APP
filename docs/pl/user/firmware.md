@@ -2,7 +2,7 @@
 title: Aktualizacje firmware
 parent: Przewodnik użytkownika
 nav_order: 13
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Aktualizuj firmware radia przez Bluetooth, Wi-Fi lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
@@ -47,7 +47,7 @@ Najczęstsza metoda aktualizacji dla użytkowników Androida:
 4. Dotknij **Aktualizuj przez BLE OTA**. Okno **Ostrzeżenie o aktualizacji** wymienia kontrole przed aktualizacją — przeczytaj je, a następnie dotknij **Wiem, co robię.**, aby rozpocząć. To okno pojawia się dla każdej metody aktualizacji, w tym Wi-Fi OTA, USB i lokalnego pliku firmware.
 5. Poczekaj na zakończenie aktualizacji. Nie rozłączaj w trakcie aktualizacji.
 
-Gdy aktualizacja jest pobierana, wgrywana lub weryfikowana, możesz dotknąć **Zagraj w Chirpy Hop**, aby zagrać w krótką grę biegową: dotknij, aby skoczyć, przesuń w dół, aby się schylić. Postęp aktualizacji pozostaje widoczny nad grą, a przycisk wstecz wraca do ekranu aktualizacji. Gdy aktualizacja się zakończy lub nie powiedzie, gra się zatrzymuje i oferuje **Wróć do aktualizacji**. Twój najlepszy wynik jest zapisywany na tym urządzeniu.
+Gdy aktualizacja jest pobierana, przetwarzana, wgrywana lub weryfikowana, ekran pozostaje włączony. Systemowy przycisk lub gest wstecz podczas aktualizacji, także przy przeglądzie bootloadera, pyta **Zatrzymać aktualizację?** z wyborem **Zatrzymaj** i **Kontynuuj**. Strzałka na górnym pasku wychodzi bez pytania. Węzeł w trakcie aktualizacji zostaje w trybie aktualizacji, dopóki jej nie dokończysz lub go nie odzyskasz. Możesz też dotknąć **Zagraj w Chirpy Hop**, aby zagrać w krótką grę biegową: dotknij, aby skoczyć, przesuń w dół, aby się schylić. Postęp aktualizacji pozostaje widoczny nad grą, a przycisk wstecz wraca do ekranu aktualizacji. Gdy aktualizacja się zakończy lub nie powiedzie, gra się zatrzymuje i oferuje **Wróć do aktualizacji**. Twój najlepszy wynik jest zapisywany na tym urządzeniu.
 
 ![Firmware — sprawdzanie aktualizacji](../../assets/screenshots/firmware_checking.png)
 
@@ -90,7 +90,7 @@ Ta sama informacja pojawia się na ekranie aktualizacji, gdy wybierzesz **Plik l
 
 Gdy radio nRF52 lub RP2040 jest połączone przez **USB/port szeregowy** (a nie Bluetooth), ekran Aktualizacja oprogramowania oferuje **Transfer pliku przez USB**. Aplikacja restartuje urządzenie w tryb DFU, a następnie prosi o zapisanie pliku `.uf2` na dysku DFU urządzenia za pomocą systemowego selektora plików. Ta opcja pojawia się tylko przy połączeniu USB/szeregowym. Nie jest dostępna przez Bluetooth, a radia ESP32 nie mają w aplikacji aktualizacji przez USB.
 
-Bootloader nRF od producenta dostarczany jako `.zip` (np. RAK WisBlock RAK4631) trzeba wgrać narzędziem szeregowego DFU, takim jak `adafruit-nrfutil` — skopiowanie tego `.zip` na dysk nie zadziała. Bootloader dostarczany jako `update-....uf2` **można** zainstalować, kopiując go na dysk; tak działa aktualizacja bootloadera w samej aplikacji. Gdy dotyczy to drogi tylko przez port szeregowy, aplikacja wyświetla podpowiedź.
+Bootloadera nRF od producenta dostarczanego jako `.zip` (np. RAK WisBlock RAK4631) nie można skopiować na dysk. Użyj aktualizacji bootloadera w aplikacji albo wgraj ten `.zip` narzędziem szeregowego DFU, takim jak `adafruit-nrfutil`. Bootloader dostarczany jako `update-....uf2` **można** zainstalować, kopiując go na dysk; tak działa aktualizacja bootloadera w samej aplikacji. Gdy dotyczy to drogi tylko przez port szeregowy, aplikacja wyświetla podpowiedź.
 
 ### Kasowanie fabryczne i aktualizacja bootloadera
 
@@ -98,7 +98,7 @@ Przy połączeniu **USB/szeregowym** urządzenia nRF52 i RP2040 można wykasowa�
 
 ### Wersja bootloadera i aktualizacja przez Bluetooth
 
-Węzeł nRF52 z firmware nowszym niż 2.8.2 zgłasza wersję swojego bootloadera podczas pracy. Karta urządzenia na ekranie firmware pokazuje wtedy wiersz **Bootloader** z najnowszym wydaniem obok, przy dowolnym połączeniu. Każdy bootloader sprzed 2.6.0 zgłasza tę samą wartość, więc takie węzły pokazują **Bootloader: starszy niż 2.6.0**. Węzeł, który nie zgłasza wersji, nie ma tego wiersza. Węzeł, który zgłasza najnowsze wydanie, nie dostaje propozycji aktualizacji.
+Węzeł nRF52 z firmware, które zgłasza wersję bootloadera, pokazuje ją podczas pracy. Karta urządzenia na ekranie firmware pokazuje wtedy wiersz **Bootloader** z najnowszym wydaniem obok, przy dowolnym połączeniu. Każdy bootloader sprzed 2.6.0 zgłasza tę samą wartość, więc takie węzły pokazują **Bootloader: starszy niż 2.6.0**. Węzeł, który nie zgłasza wersji, nie ma tego wiersza. Węzeł, który zgłasza najnowsze wydanie, nie dostaje propozycji aktualizacji.
 
 Ekran oferuje **Zaktualizuj bootloader** przez Bluetooth, gdy spełnione jest wszystko naraz:
 
@@ -110,7 +110,7 @@ Przed startem odłącz kabel USB. Przy podłączonym kablu nowy bootloader uruch
 
 Aplikacja wysyła nowy bootloader przez Bluetooth, a potem instaluje ponownie wybrane firmware, bo zapis bootloadera je kasuje. Cała aktualizacja trwa około 10 minut. Potem wiersz **Bootloader** pokazuje najnowsze wydanie.
 
-Przed zapisem aplikacja sprawdza pobrany pakiet i odczytuje z bootloadera nazwę płyty. Jeśli pakiet nie przejdzie weryfikacji, nic nie jest zapisywane. Jeśli bootloader podaje inną płytę albo żadnej, nic nie jest zapisywane, a węzeł uruchamia się ponownie w swoim firmware.
+Przed zapisem aplikacja sprawdza pobrany pakiet i odczytuje z bootloadera nazwę płyty. Jeśli pakiet nie przejdzie weryfikacji, nic nie jest zapisywane. Przez Bluetooth aktualizacja działa tylko na bootloaderze używającym Legacy DFU. Na każdym innym aktualizacja się zatrzymuje, nic nie jest zapisywane, a aplikacja próbuje przywrócić węzeł do jego firmware. Jeśli zostaje w trybie aktualizacji, zobacz [Aktualizacja się zawiesiła](#aktualizacja-się-zawiesiła). Jeśli bootloader podaje inną płytę albo żadnej, nic nie jest zapisywane, a węzeł uruchamia się ponownie w swoim firmware.
 
 Węzeł, który po zapisie bootloadera nie wraca przez Bluetooth, można dokończyć na dwa sposoby: zainstalować firmware z jego dysku aktualizacji przez USB albo odłączyć go, zresetować i użyć **Wznów aktualizację firmware** w zakładce **Połącz**.
 
@@ -120,6 +120,7 @@ Wersja 2.6.0 i nowsze Meshtastic nRF52 Bootloader robi poniższe, gdy dysk aktua
 
 - **Kopia zapasowa.** `CURRENT.UF2` na dysku to kopia zainstalowanego firmware. Skopiuj go, aby zrobić kopię zapasową, albo skopiuj z powrotem na dysk, aby zainstalować ponownie.
 - **Ekran.** W węźle z ekranem tytuł brzmi BOOTLOADER, ERASE, WRONG FILE lub NO FIRMWARE, a pasek postępu pokazuje kopiowanie.
+- **Raport o błędzie.** Po awarii bootloader zapisuje ją jednokrotnie, a aplikacja przy pierwszym odczycie dysku podczas aktualizacji przez USB pokazuje **Bootloader zgłosił błąd:** z wartościami `id`, `pc` i `info`.
 - **Zły plik.** Plik firmware, którego płyta nie przyjmie, jest odrzucany jako WRONG FILE.
 - **Przerwane kopiowanie.** Jeśli kabel zostanie wyciągnięty w trakcie kopiowania, węzeł nie ma firmware. Podłącz go ponownie i skopiuj firmware jeszcze raz.
 - **Bezczynność.** Po 6 minutach bez aktywności aktualizacji węzeł z firmware uruchamia je. Węzeł bez firmware dalej czeka.
@@ -139,7 +140,7 @@ Zarówno kasowanie przez USB, jak i aktualizacja bootloadera zapisują po kolei 
 
 Aplikacja odczytuje `INFO_UF2.TXT` z wybranego dysku, aby potwierdzić, że to naprawdę dysk aktualizacji urządzenia, i rozpoznać płytę przed zapisaniem czegokolwiek.
 
-Przy aktualizacji bootloadera aplikacja odczytuje też zainstalowaną wersję bootloadera z `INFO_UF2.TXT` i pokazuje ją obok najnowszego wydania przed zapisaniem czegokolwiek. Na firmware 2.8.2 i starszym działające firmware nie zgłasza swojego bootloadera, więc zainstalowana wersja pojawia się dopiero po restarcie urządzenia w tryb aktualizacji. Jeśli obie wersje są takie same, bootloader zostaje bez zmian, a aplikacja przechodzi od razu do ponownej instalacji firmware. W przeciwnym razie wybierz **Zaktualizuj bootloader**, aby go zapisać, lub **Pomiń**, aby ponownie zainstalować firmware bez zmiany bootloadera.
+Przy aktualizacji bootloadera aplikacja odczytuje też zainstalowaną wersję bootloadera z `INFO_UF2.TXT` i pokazuje ją obok najnowszego wydania przed zapisaniem czegokolwiek. Gdy działające firmware nie zgłasza swojego bootloadera, zainstalowana wersja pojawia się dopiero po restarcie urządzenia w tryb aktualizacji. Jeśli obie wersje są takie same, bootloader zostaje bez zmian, a aplikacja przechodzi od razu do ponownej instalacji firmware. W przeciwnym razie wybierz **Zaktualizuj bootloader**, aby go zapisać, lub **Pomiń**, aby ponownie zainstalować firmware bez zmiany bootloadera.
 
 W nRF52 aplikacja musi już znać stos Bluetooth używany przez Twoje urządzenie, zanim zacznie, ponieważ nie może odczytać bootloadera, dopóki urządzenie się nie zrestartuje. Jeśli nie może potwierdzić stosu, odmawia kasowania i kieruje Cię do [Web Flashera](https://flasher.meshtastic.org). W Web Flasherze wybranie złego stosu Bluetooth może sprawić, że radio da się odzyskać tylko programatorem sprzętowym.
 
@@ -196,7 +197,7 @@ Jeśli aktualizacja wygląda na zamarzniętą:
 - Jeśli po tym czasie nadal się zawiesza, wyłącz i włącz zasilanie radia.
 - Spróbuj aktualizacji ponownie.
 
-Komunikat **Upłynął limit czasu weryfikacji. Urządzenie nie podłączyło się ponownie w czasie.** oznacza, że obraz został zapisany, ale radio nie wróciło w tym oknie czasowym — wyłącz i włącz jego zasilanie i sprawdź wersję w **Aktualnie zainstalowano**, zanim ponowisz aktualizację.
+Komunikat **Upłynął limit czasu weryfikacji. Urządzenie nie podłączyło się ponownie w czasie.** oznacza, że obraz został zapisany, ale radio nie wróciło w tym oknie czasowym. **Ponów próbę** czeka na radio jeszcze raz, niczego nie zapisując, a **Wykonano** zamyka ekran. Jeśli radio nadal nie wraca, wyłącz i włącz jego zasilanie i sprawdź wersję w **Aktualnie zainstalowano**, zanim ponowisz aktualizację.
 
 ![Błąd aktualizacji firmware](../../assets/screenshots/firmware_error.png)
 

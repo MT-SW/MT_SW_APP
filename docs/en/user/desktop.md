@@ -2,7 +2,7 @@
 title: Desktop App
 parent: User Guide
 nav_order: 14
-last_updated: 2026-11-12
+last_updated: 2026-11-15
 description: Install and use the Meshtastic Desktop app on Linux, macOS, and Windows — connections, feature parity, and keyboard shortcuts.
 aliases:
   - desktop
@@ -21,6 +21,7 @@ This page covers installing the Meshtastic desktop app, connecting a node, and h
 ### Linux
 
 - Download the `.deb`, `.rpm`, or `.AppImage` package from the [releases page](https://github.com/meshtastic/Meshtastic-Android/releases). Each comes in an x86_64 and an arm64 (aarch64) build.
+- The `.deb` recommends the `fonts-noto-color-emoji` package. Emoji are drawn from the system's fonts, so on a minimal desktop without a color emoji font, such as Raspberry Pi OS, install it or emoji show as boxes. The `.rpm` and `.AppImage` carry no such recommendation.
 - The AppImage carries its own update information, so AppImageUpdate and other zsync-based updaters can update it in place to the latest production release.
 - Or install from Flathub: `flatpak install flathub org.meshtastic.MeshtasticDesktop`
 - Or build from source using `./gradlew :desktopApp:run`
@@ -35,7 +36,7 @@ This page covers installing the Meshtastic desktop app, connecting a node, and h
 - Download the `.msi` or `.exe` installer from the [releases page](https://github.com/meshtastic/Meshtastic-Android/releases). Both are x64 builds.
 - Or build from source
 
-## Connecting Your Radio
+## Connecting your node
 
 All three transports live on the **Connect** tab, the same as on Android. Pick one with the transport selector. See [Connections](connections) for the full walkthrough.
 

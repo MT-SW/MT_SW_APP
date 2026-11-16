@@ -231,6 +231,7 @@
     <string name="canned_message_enabled">Wiadomości predefiniowane włączone</string>
     <string name="cant_change_no_radio">Nie można zmienić kanału, ponieważ urządzenie nie jest jeszcze podłączone. Proszę, spróbuj ponownie.</string>
     <string name="cant_shutdown">Wyłączenie nie jest obsługiwane w tym urządzeniu</string>
+    <!-- CARDINAL -->
     <string name="ch_util_definition">Wykorzystanie dla bieżącego kanału, w tym prawidłowego TX/RX oraz zniekształconego RX (czyli szumu).</string>
     <!-- CHANNEL -->
     <string name="channel">Kan.</string>
@@ -312,6 +313,8 @@
     <string name="collapse_chart">Zwiń wykres</string>
     <string name="collapsed">Zwinięte</string>
     <string name="communicate_off_the_grid">Komunikuj się z przyjaciółmi i społecznością bez zasięgu sieci komórkowej.</string>
+    <!-- CO2 -->
+    <string name="co2_level_good">dobry</string>
     <!-- COMPASS -->
     <string name="compass_bearing">Kurs: %1$s</string>
     <string name="compass_bearing_na">Kurs: B/D</string>
@@ -2255,6 +2258,7 @@
     <string name="shutdown_node_name">Węzeł: %1$s</string>
     <string name="shutdown_on_power_loss">Wyłącz przy utracie zasilania</string>
     <string name="shutdown_warning">⚠️ Spowoduje to WYŁĄCZENIE węzła. Do ponownego włączenia węzła, konieczna będzie fizyczna interakcja.</string>
+    <!-- SIGNAL -->
     <string name="signal">Sygnał:</string>
     <string name="signal_quality">Jakość sygnału</string>
     <string name="sniffer_enabled_summary">Przekazuj do aplikacji lokalnie odsłuchane pakiety nieadresowane do tego węzła</string>
@@ -2583,6 +2587,7 @@
     <string name="what_is_meshtastic_description">MT_SW to aplikacja i społeczność wokół otwartej sieci mesh LoRa, która działa bez internetu i bez stacji bazowych: radia przekazują sobie wiadomości z węzła do węzła. Aplikacja rozbudowuje oryginał o m.in. planer łączy, panoramę terenu, asystenta AI i tłumacza działających offline, dodatkowe statystyki, bogatszą listę węzłów i wiele ustawień. Tworzymy ją razem z lokalną społecznością z Świętokrzyskiego, a dołączyć może każdy.</string>
     <!-- WIDGET -->
     <string name="widget_packets_bad">słaby</string>
+    <string name="widget_telemetry_title">Telemetria</string>
     <!-- WIFI -->
     <string name="widget_node_tracker_choose">Wybierz węzeł do śledzenia</string>
     <string name="widget_node_tracker_not_found">Nie znaleziono węzła. Dotknij, aby wybrać węzeł.</string>
@@ -4138,4 +4143,75 @@
     <string name="presence_ask_now_all">Zapytaj wszystkie słyszane węzły</string>
     <string name="presence_ask_now_progress">Zapytano %1$d z %2$d</string>
     <string name="presence_ask_now_stop">Przerwij pytanie</string>
+    <string name="ack_relayed_by">Potwierdzenie przekazał(a) %1$s</string>
+    <string name="cardinal_e">Wsch</string>
+    <string name="cardinal_n">Pn</string>
+    <string name="cardinal_ne">Pn-Wsch</string>
+    <string name="cardinal_nw">Pn-Zach</string>
+    <string name="cardinal_s">Pd</string>
+    <string name="cardinal_se">Pd-Wsch</string>
+    <string name="cardinal_sw">Pd-Zach</string>
+    <string name="cardinal_w">Zach</string>
+    <string name="co2_level_evacuate">Ewakuacja</string>
+    <string name="co2_level_poor">Słabe</string>
+    <string name="co2_level_stuffy">Duszno</string>
+    <string name="co2_level_unsafe">Niebezpieczne</string>
+    <string name="pressure_high">Wysokie</string>
+    <string name="pressure_low">Niskie</string>
+    <string name="relayed_by">Przekazał(a) %1$s</string>
+    <string name="signal_survey_delete_confirm">Usunąć tę sesję i jej odczyty?</string>
+    <string name="signal_survey_description">Tylko nasłuchuje: zapisuje siłę sygnału każdego pakietu, który słyszy radio, razem z lokalizacją telefonu i rysuje ją na mapie. Nic nie jest wysyłane, a zapis zostaje na tym urządzeniu.</string>
+    <string name="signal_survey_export">Eksportuj CSV</string>
+    <string name="signal_survey_heard_directly">Słyszane bezpośrednio tutaj</string>
+    <string name="signal_survey_heatmap">Pokaż jako mapę cieplną</string>
+    <string name="signal_survey_hud_recording">Badanie sygnału trwa · %1$s</string>
+    <string name="signal_survey_last_reading">Ostatni odczyt %1$s</string>
+    <string name="signal_survey_location_off">Włącz lokalizację, aby zapisywać odczyty</string>
+    <string name="signal_survey_location_permission">Zezwól na dostęp do lokalizacji, aby zapisywać odczyty</string>
+    <string name="signal_survey_no_fix">Czekam na ustalenie lokalizacji</string>
+    <string name="signal_survey_record">Nagrywaj</string>
+    <string name="signal_survey_title">Badanie sygnału</string>
+    <string name="widget_telemetry_change_node">Zmień węzeł</string>
+    <string name="widget_telemetry_choose">Wybierz węzeł. Na liście są tylko węzły, które wysłały odczyty środowiska, jakości powietrza lub zasilania.</string>
+    <string name="widget_telemetry_dew">Rosa %1$s</string>
+    <string name="widget_telemetry_gust">Porywy %1$s</string>
+    <string name="widget_telemetry_next_page">Następne odczyty, strona %1$d z %2$d</string>
+    <string name="widget_telemetry_no_nodes_hint">Węzły pojawią się tutaj, gdy wyślą odczyty środowiska, jakości powietrza lub zasilania.</string>
+    <string name="widget_telemetry_no_nodes_title">Brak telemetrii</string>
+    <string name="widget_telemetry_no_readings">Brak odczytów do pokazania</string>
+    <string name="widget_telemetry_not_found">Nie wybrano węzła. Dotknij, aby go wybrać.</string>
+    <string name="widget_telemetry_page">%1$d/%2$d</string>
+    <string name="widget_telemetry_readings_hint">Widżet pokazuje każdy odczyt, który zgłasza węzeł. Wyłącz te, których nie chcesz.</string>
+    <string name="widget_telemetry_stale">Starsze niż 2 godziny</string>
+    <string name="widget_telemetry_updated">Zaktualizowano %1$s</string>
+    <plurals name="channel_already_on_radio">
+        <item quantity="one">%1$d kanał z tego linku jest już w Twoim radiu i został pominięty.</item>
+        <item quantity="few">%1$d kanały z tego linku są już w Twoim radiu i zostały pominięte.</item>
+        <item quantity="many">%1$d kanałów z tego linku jest już w Twoim radiu i zostało pominiętych.</item>
+        <item quantity="other">%1$d kanału z tego linku jest już w Twoim radiu i zostało pominiętych.</item>
+    </plurals>
+    <plurals name="channel_slots_full">
+        <item quantity="one">Twoje radio mieści %2$d kanałów. Odznacz %1$d kanał, aby zrobić miejsce. Odznaczenie kanału, który już jest w radiu, usuwa go.</item>
+        <item quantity="few">Twoje radio mieści %2$d kanałów. Odznacz %1$d kanały, aby zrobić miejsce. Odznaczenie kanału, który już jest w radiu, usuwa go.</item>
+        <item quantity="many">Twoje radio mieści %2$d kanałów. Odznacz %1$d kanałów, aby zrobić miejsce. Odznaczenie kanału, który już jest w radiu, usuwa go.</item>
+        <item quantity="other">Twoje radio mieści %2$d kanałów. Odznacz %1$d kanału, aby zrobić miejsce. Odznaczenie kanału, który już jest w radiu, usuwa go.</item>
+    </plurals>
+    <plurals name="signal_survey_readings">
+        <item quantity="one">%1$d odczyt</item>
+        <item quantity="few">%1$d odczyty</item>
+        <item quantity="many">%1$d odczytów</item>
+        <item quantity="other">%1$d odczytu</item>
+    </plurals>
+    <plurals name="signal_survey_senders">
+        <item quantity="one">Słyszano %1$d węzeł</item>
+        <item quantity="few">Słyszano %1$d węzły</item>
+        <item quantity="many">Słyszano %1$d węzłów</item>
+        <item quantity="other">Słyszano %1$d węzła</item>
+    </plurals>
+    <plurals name="signal_survey_unplaced">
+        <item quantity="one">Jeszcze %1$d słyszany bezpośrednio węzeł nie ma pozycji</item>
+        <item quantity="few">Jeszcze %1$d słyszane bezpośrednio węzły nie mają pozycji</item>
+        <item quantity="many">Jeszcze %1$d słyszanych bezpośrednio węzłów nie ma pozycji</item>
+        <item quantity="other">Jeszcze %1$d słyszanego bezpośrednio węzła nie ma pozycji</item>
+    </plurals>
 </resources>

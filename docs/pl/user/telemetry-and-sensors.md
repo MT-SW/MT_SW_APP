@@ -2,7 +2,7 @@
 title: Telemetria i czujniki
 parent: Przewodnik użytkownika
 nav_order: 9
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Dane z czujników w sieci mesh — obsługiwane czujniki środowiska, jakości powietrza i zasilania oraz poradniki konfiguracji i podglądu.
 aliases:
   - sensors
@@ -93,7 +93,7 @@ Węzły z czujnikami zasilania serii INA mogą raportować:
 | Napięcie | Odczyt napięcia dla każdego kanału |
 | Prąd | Pobór prądu dla każdego kanału, w mA |
 
-Ekran szczegółów węzła pokazuje karty tylko do odczytu dla kanałów od 1 do 3. Przyciskiem wykresu w wierszu **Metryki zasilania** otwierasz ekran wykresu, który wyświetla chip dla każdego kanału, który przysłał dane — do ośmiu — i rysuje wykres wybranego. Tam, w polu etykiety pod chipami, możesz nazwać kanał, np. Solar albo Bateria. Nie ma osobnego odczytu mocy w watach; aplikacja rysuje napięcie i prąd i nie wylicza z nich mocy.
+Ekran szczegółów węzła pokazuje karty tylko do odczytu dla każdego kanału, który przysłał dane, do ośmiu. Przyciskiem wykresu w wierszu **Metryki zasilania** otwierasz ekran wykresu, który wyświetla chip dla każdego kanału, który przysłał dane — do ośmiu — i rysuje wykres wybranego. Tam, w polu etykiety pod chipami, możesz nazwać kanał, np. Solar albo Bateria. Nie ma osobnego odczytu mocy w watach; aplikacja rysuje napięcie i prąd i nie wylicza z nich mocy.
 
 Przydatne do monitorowania ładowania słonecznego lub stanu baterii w odległych węzłach.
 

@@ -74,6 +74,7 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.QuickChatAction
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ack_relayed_by
 import org.meshtastic.core.resources.alert_bell_text
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.cancel_reply
@@ -101,6 +102,7 @@ import org.meshtastic.core.resources.overflow_menu
 import org.meshtastic.core.resources.quick_chat
 import org.meshtastic.core.resources.quick_chat_hide
 import org.meshtastic.core.resources.quick_chat_show
+import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.replying_to
 import org.meshtastic.core.resources.scroll_to_bottom
@@ -764,8 +766,10 @@ fun MessageStatusDialog(
     onDismiss: () -> Unit,
     isDirectMessage: Boolean = false,
     relayNodeNames: List<String> = emptyList(),
+    relayNodeLabel: String? = null,
 ) {
     val (title, text) = message.getStatusStringRes(isDirectMessage)
+    val relayRes = if (message.fromLocal && isDirectMessage) Res.string.ack_relayed_by else Res.string.relayed_by
     DeliveryInfo(
         title = title,
         resendOption = resendOption,
@@ -773,6 +777,7 @@ fun MessageStatusDialog(
         detail = message.getStatusDetailRes(),
         relays = message.relays,
         relayNodeNames = relayNodeNames,
+        relay = relayNodeLabel?.let { stringResource(relayRes, it) },
         onConfirm = onResend,
         onDismiss = onDismiss,
     )

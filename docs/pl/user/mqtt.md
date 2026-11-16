@@ -2,7 +2,7 @@
 title: MQTT
 parent: Przewodnik użytkownika
 nav_order: 11
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Połącz swoją sieć mesh z internetem — konfiguracja brokera MQTT, warstwy szyfrowania i raportowanie na mapę.
 aliases:
   - mqtt
@@ -46,9 +46,11 @@ Węzeł-brama z dostępem do internetu (Wi-Fi lub Ethernet) publikuje wiadomośc
 | **Szyfrowanie włączone** (Encryption Enabled) | Publikuj pakiety nadal zaszyfrowane kluczem kanału | Włączone |
 | **Włącz wyjście JSON** | Pokazywane tylko dla radia z firmware starszym niż 2.8 albo dopóki ustawienie jest jeszcze włączone. Zobacz [Formaty wiadomości](#formaty-wiadomości) | Wyłączone |
 | **Włącz TLS** (TLS Enabled) | Bezpieczne połączenie z brokerem | Wyłączone |
-| **Główny temat** (Root Topic) | Podstawowy temat wiadomości | `msh`, który radio zamienia na `msh/<REGION>`, gdy ustawisz region, a radio używa brokera publicznego |
+| **Główny temat** (Root Topic) | Podstawowy temat wiadomości. Litery w dowolnym alfabecie są przyjmowane. Puste pole używa domyślnej wartości firmware | `msh`, który radio zamienia na `msh/<REGION>`, gdy ustawisz region, a radio używa brokera publicznego |
 | **Proxy do klienta włączone** (MQTT Client Proxy) | Przekazuj MQTT przez połączoną aplikację | Wyłączone |
 | **Raportowanie mapy** (Map Reporting) | Raportuj pozycję na publiczną mapę | Wyłączone |
+
+Główny temat, który radio by odrzuciło, zaznacza pole na czerwono i blokuje **Zapisz**: spacje lub znaki sterujące, `+` lub `#`, ukośnik na początku lub na końcu, dwa ukośniki z rzędu albo ostatni segment równy `2`. Pole przyjmuje najwyżej 31 bajtów (æ, ø i å liczą się jako dwa) i ignoruje dalsze wpisywanie.
 
 ### Stan połączenia i test połączenia
 
@@ -101,7 +103,7 @@ Skonfiguruj węzeł tak, aby łączył się z Twoim prywatnym brokerem z odpowie
 
 Gdy **Raportowanie mapy** jest włączone, Twój węzeł okresowo publikuje w brokerze raport dla mapy. Raport jest wysyłany bez szyfrowania, niezależnie od kluczy Twoich kanałów, i zawiera identyfikator węzła, długą i krótką nazwę, przybliżoną lokalizację, model sprzętu, rolę, wersję firmware, region LoRa, preset modemu i nazwę kanału głównego.
 
-Włączenie otwiera kartę zgody. Włącz **Zgadzam się.** i wybierz **Interwał raportowania map** wynoszący godzinę lub więcej — ekran nie zapisze się, dopóki tego nie zrobisz. Suwak ustawia dokładność pozycji, a aplikacja pokazuje wynikową dokładność jako odległość ±, dzięki czemu możesz opublikować lokalizację przybliżoną zamiast dokładnej.
+Włączenie otwiera kartę zgody. Włącz **Zgadzam się.** i wybierz **Interwał raportowania map** wynoszący godzinę lub więcej — ekran nie zapisze się, dopóki tego nie zrobisz. Suwak, bez własnej etykiety, ustawia dokładność pozycji od 12 do 15, a aplikacja pokazuje wynikową dokładność jako odległość ±, dzięki czemu możesz opublikować lokalizację przybliżoną zamiast dokładnej.
 
 Raporty pojawiają się na [meshmap.net](https://meshmap.net) i podobnych społecznościowych serwisach map.
 

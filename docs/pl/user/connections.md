@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -31,9 +31,9 @@ Bluetooth Low Energy to domyślna i najczęstsza metoda połączenia na Androidz
 
 ### Łączenie z kodu QR lub tagu NFC
 
-Niektóre węzły mają kod połączenia, wydrukowany na naklejce albo pokazany na ekranie węzła. Zeskanuj go aparatem telefonu, przyłóż telefon do tagu NFC z tym samym linkiem albo dotknij ikony skanowania u góry karty **Połącz**. Aplikacja zapyta, czy się połączyć, i pokaże adres węzła oraz jego PIN do parowania, jeśli kod go zawiera. Dotknij **Połącz**, a aplikacja skopiuje PIN i sparuje urządzenia. Do Androida 16 aplikacja sama wpisuje PIN; na Androidzie 17 okno parowania o niego prosi i trzeba go wkleić. Na iPhonie/iPadzie ikona skanowania też jest (skanuje aparatem, iOS poprosi o zgodę na aparat), a tagów NFC nie ma.
+Niektóre węzły mają kod połączenia, wydrukowany na naklejce albo pokazany na ekranie węzła. Zeskanuj go aparatem telefonu albo dotknij ikony skanowania (**Zeskanuj kod połączenia**) u góry karty **Połącz** i skieruj aparat na kod. Kod może też pochodzić z tagu NFC: przyłóż telefon do tagu z linkiem w postaci `meshtastic://meshtastic/connections`. Aplikacja zapyta, czy się połączyć, i pokaże adres węzła oraz jego PIN do parowania, jeśli kod go zawiera. Dotknij **Połącz**, a aplikacja skopiuje PIN i sparuje urządzenia. Do Androida 16 aplikacja sama wpisuje PIN, a jeśli Android to odrzuci, o PIN pyta okno parowania; na Androidzie 17 okno parowania o niego prosi i trzeba go wkleić. Na iPhonie/iPadzie ikona skanowania też jest (skanuje aparatem, iOS poprosi o zgodę na aparat), a tagów NFC nie ma.
 
-Kod, który nie jest kodem połączenia Meshtastic, albo kod z adresem nieobsługiwanym przez aplikację, nie połączy z niczym. PIN w kodzie, który nie jest sześcioma cyframi od 100000 do 999999, jest pomijany, a parowanie pyta o niego jak zwykle.
+Zeskanowany kod, który nie jest kodem połączenia mesh, albo kod z adresem nieobsługiwanym przez aplikację, pokazuje „Ten kod nie jest kodem połączenia mesh.” i nie połączy z niczym. Adres sieciowy musi mieć nazwę hosta, a adres USB nazwę portu. PIN w kodzie, który nie jest sześcioma cyframi od 100000 do 999999 (czyli bez zera na początku), jest pomijany, a parowanie pyta o niego jak zwykle.
 
 Metodę parowania możesz zmienić, lub włączyć Bluetooth w radiu dostarczanym z wyłączonym, w **Ustawienia → Konfiguracja urządzenia → Bluetooth** — zobacz [Ustawienia — Radio i użytkownik](settings-radio-user). Więcej informacji znajdziesz w [konfiguracji Bluetooth](https://meshtastic.org/docs/configuration/radio/bluetooth) na meshtastic.org.
 
@@ -138,22 +138,26 @@ Wykrywanie w sieci używa mDNS, które działa tylko wtedy, gdy telefon i radio 
 2. Dotknij **Skanuj sieci**, a następnie wybierz sieć z **Dostępne sieci** — albo włącz **Sieć ukryta** i wpisz nazwę w **Nazwa sieci (SSID)**.
 3. Wpisz **Hasło** i dotknij **Zastosuj**.
 
+Gdy urządzenie dołączy do sieci, ekran pokazuje **Urządzenie połączone** z jego **Adresem IP** (**IP niedostępne**, gdy go nie podało) oraz kartę **Dokończ konfigurację urządzenia** z domyślnym logowaniem i przyciskiem **Otwórz klienta SSH**. Zaloguj się przez SSH, aby zmienić domyślną nazwę użytkownika i hasło.
+
 Jeśli skanowanie zgłosi **Nie znaleziono sieci** lub całkowicie się nie powiedzie, zbliż telefon do urządzenia i zeskanuj ponownie. Jeśli wróci **Nie udało się zastosować konfiguracji WiFi**, sprawdź hasło i spróbuj ponownie.
 
 ## Po pierwszym połączeniu
 
 Bycie połączonym nie oznacza możliwości nadawania.
 
-Radio opuszcza fabrykę bez ustawionego regionu LoRa i nie nadaje, dopóki go nie ustawisz. Przy pierwszym połączeniu takiego radia aplikacja otwiera prowadzoną konfigurację, a zakładka **Połącz** pokazuje kartę **Wybierz swój region**, która otwiera ją ponownie. Konfiguracja prowadzi przez cztery wybory i kończy się podsumowaniem:
+Radio opuszcza fabrykę bez ustawionego regionu LoRa i nie nadaje, dopóki go nie ustawisz. Przy pierwszym połączeniu takiego radia aplikacja otwiera prowadzoną konfigurację, a zakładka **Połącz** pokazuje kartę **Wybierz swój region**, która otwiera ją ponownie. Konfiguracja zaczyna się od wprowadzenia (**Dalej**, albo **Nie teraz**, aby wyjść) i prowadzi przez cztery wybory przed podsumowaniem:
 
-1. **Region.** Wyszukaj na liście region, w którym jesteś. Aplikacja podpowiada ten, który pasuje do ustawienia regionu w telefonie; potwierdź go albo wybierz inny.
-2. **Preset.** Preset modemu ustala zasięg i szybkość sieci mesh, a wszyscy w jednej sieci używają tego samego. Na firmware starszym niż 2.8 radio po zapisaniu restartuje się, a konfiguracja trwa dalej po ponownym połączeniu.
-3. **Nazwa.** Wpisz nazwy, które inni widzą na swoich listach węzłów i mapach. Licencjonowani operatorzy pomijają tę stronę.
-4. **Pobliskie sieci.** Na węźle z modułem [Meshbeacon](discovery#mesh-beacon) włącz nasłuchiwanie zaproszeń od pobliskich sieci i dołącz do jednej z tych, które usłyszałeś.
+1. **Region.** Wyszukaj na liście region, w którym jesteś. Aplikacja podpowiada ten, który pasuje do ustawienia regionu w telefonie; potwierdź go albo wybierz inny. **Dalej** jest niedostępne, dopóki nie wybierzesz regionu.
+2. **Preset.** Preset modemu ustala zasięg i szybkość sieci mesh, a wszyscy w jednej sieci używają tego samego. **Zapisz** zapisuje region i preset razem. Na firmware starszym niż 2.8 radio po zapisaniu restartuje się, a konfiguracja trwa dalej po ponownym połączeniu.
+3. **Nazwa.** Wpisz nazwy, które inni widzą na swoich listach węzłów i mapach. Na firmware, który to oferuje, strona ma też **Wiadomość statusu**. **Zapisz** zapisuje nazwy, a **Pomiń** idzie dalej bez zapisywania. Licencjonowani operatorzy pomijają tę stronę.
+4. **Pobliskie sieci.** Na węźle z modułem [Meshbeacon](discovery#mesh-beacon) włącz **Nasłuchuj pakietów meshbeacon**, aby zachować zaproszenia od pobliskich sieci, a potem dotknij **Dołącz** albo **Dodaj kanał** przy tej, którą usłyszałeś.
 
-Jeśli zamkniesz konfigurację, aplikacja nie otworzy jej sama ponownie dla tego węzła. Po ustawieniu regionu karta nazywa się **Konfiguracja radia**, a ekran **Ustawienia** ma wiersz **Konfiguracja radia** dla własnego węzła.
+Konfiguracja zapisuje dane tylko do węzła, z którym jesteś połączony, i tylko dopóki trwa to połączenie. Jeśli zamkniesz konfigurację, aplikacja nie otworzy jej sama ponownie dla tego węzła. Po ustawieniu regionu karta nazywa się **Konfiguracja radia**, a ekran **Ustawienia** ma wiersz **Konfiguracja radia** dla własnego węzła.
 
-Po ustawieniu regionu zakładka ostrzega też, jeśli radio jest tylko do odbioru: karta **Nadawanie jest wyłączone** z treścią „To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.” Dotknij jej, aby otworzyć ekran LoRa i ponownie włączyć **Nadawanie włączone** (Transmit Enabled). Naraz pojawia się tylko jedna z tych dwóch kart — nieustawiony region sam w sobie zatrzymuje nadawanie radia, więc aplikacja wskazuje najpierw to i wstrzymuje kartę nadawania, dopóki nie ustawisz regionu.
+Po ustawieniu regionu zakładka ostrzega też, jeśli radio jest tylko do odbioru: karta **Nadawanie jest wyłączone** z treścią „To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.” Dotknij jej, aby otworzyć ekran LoRa i ponownie włączyć **Nadawanie włączone** (Transmit Enabled). Nieustawiony region sam w sobie zatrzymuje nadawanie radia, więc aplikacja wskazuje najpierw to i wstrzymuje kartę nadawania, dopóki nie ustawisz regionu.
+
+Te karty pojawiają się tylko dla węzła, z którym jesteś połączony, gdy nie jest w trybie zarządzanym i jego ustawienia można zapisywać.
 
 Więcej informacji znajdziesz w [Ustawienia — Radio i użytkownik](settings-radio-user#lora-config).
 

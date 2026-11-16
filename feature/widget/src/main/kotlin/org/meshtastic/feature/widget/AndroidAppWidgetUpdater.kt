@@ -48,6 +48,7 @@ class AndroidAppWidgetUpdater(
     stateProvider: LocalStatsWidgetStateProvider,
     trackerDataSource: NodeTrackerWidgetDataSource,
     meshStatusProvider: MeshStatusWidgetStateProvider,
+    telemetryDataSource: TelemetryWidgetDataSource,
 ) : AppWidgetUpdater {
     @Suppress("InjectDispatcher") // feature:widget does not depend on core:di, where CoroutineDispatchers lives
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -88,7 +89,26 @@ class AndroidAppWidgetUpdater(
                 .distinctUntilChanged()
                 .collect { states -> if (states.isNotEmpty()) update(NodeTrackerWidget()) }
         }
+
+        // Each telemetry packet replaces its group on the node, so a change to a shown node's metrics is a new
+        // reading. The instance reads the reading's time from the log when it renders.
+        @OptIn(FlowPreview::class)
+        scope.launch {
+            telemetryDataSource.checkedInputs
+                .sample(TRACKER_UPDATE_SAMPLE_MS)
+                .map { inputs ->
+                    val units = listOf(inputs.units, inputs.temperatureUnit)
+                    units + telemetryNodeNums().map { num -> num?.let { inputs.nodes[it]?.telemetryKey() } }
+                }
+                .distinctUntilChanged()
+                .collect { keys -> if (keys.isNotEmpty()) update(TelemetryWidget()) }
+        }
     }
+
+    private suspend fun telemetryNodeNums(): List<Int?> =
+        GlanceAppWidgetManager(context).getGlanceIds(TelemetryWidget::class.java).map { id ->
+            getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, id)[TELEMETRY_NODE_NUM_KEY]
+        }
 
     private suspend fun hasInstances(widget: Class<out GlanceAppWidget>): Boolean =
         GlanceAppWidgetManager(context).getGlanceIds(widget).isNotEmpty()
@@ -102,6 +122,7 @@ class AndroidAppWidgetUpdater(
         update(LocalStatsWidget())
         update(NodeTrackerWidget())
         update(MeshStatusWidget())
+        update(TelemetryWidget())
     }
 
     private suspend fun update(widget: GlanceAppWidget) {

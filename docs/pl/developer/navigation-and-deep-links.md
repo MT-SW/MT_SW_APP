@@ -2,7 +2,7 @@
 title: Nawigacja i deep linki
 parent: Przewodnik dewelopera
 nav_order: 4
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Jak współpracują typowane trasy Navigation 3 i DeepLinkRouter, obsługiwane URI deep linków oraz jak dodać nowy.
 aliases:
   - deeplinks
@@ -109,7 +109,7 @@ null, a wywołujący przekazuje je do swojego mechanizmu importu.
 | `/settings/local-mesh-discovery/session/{sessionId}` | `DiscoveryRoute.DiscoverySummary(sessionId)` | Wynik sesji discovery |
 | `/nodes` | `NodesRoute.Nodes` | Lista węzłów |
 | `/nodes/{destNum}` | `NodesRoute.NodeDetail(destNum)` | Szczegóły węzła; działa też `/nodes?destNum={destNum}` |
-| `/nodes/{destNum}/{metric}` | np. `NodeDetailRoute.DeviceMetrics(destNum)` | Konkretna karta metryki węzła (`device-metrics`, `map` lub `position`, `environment`, `signal`, `power`, `traceroute`, `host-metrics`, `pax`, `neighbors`), z `nodeDetailSubRoutes` |
+| `/nodes/{destNum}/{metric}` | np. `NodeDetailRoute.DeviceMetrics(destNum)` | Konkretna karta metryki węzła (`device-metrics`, `map` lub `position`, `environment`, `signal`, `power`, `traceroute`, `host-metrics`, `pax`, `neighbors`), z `nodeDetailSubRoutes`; `mesh-view` otwiera `MapRoute.MeshHud` skupiony na tym węźle |
 | `/messages` | `ContactsRoute.Contacts` | Lista rozmów |
 | `/messages/{contactKey}` | `ContactsRoute.Messages(contactKey)` | Konkretna rozmowa; `?message={text}` wstępnie wypełnia pole wiadomości, działa też `/messages?contactKey={contactKey}` |
 | `/share` | `ContactsRoute.Share("")` | Kompozytor udostępniania do kontaktu, pusty |

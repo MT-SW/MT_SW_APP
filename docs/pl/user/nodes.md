@@ -2,7 +2,7 @@
 title: Węzły
 parent: Przewodnik użytkownika
 nav_order: 4
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
@@ -136,7 +136,7 @@ Awatar zawsze pokazuje krótką nazwę rozgłaszaną przez węzeł. Gdy nazwa w�
 
 Nazwy własne są zapisane tylko na tym urządzeniu. Nigdy nie są wysyłane przez sieć mesh ani przekazywane innej aplikacji, więc kody QR, udostępnianie kontaktu, otwieranie pozycji w aplikacji map oraz eksporty wiadomości, bazy węzłów i GPX używają prawdziwej nazwy węzła. Kopie zapasowe aplikacji zawierają nazwy własne, tak samo jak notatki. Usunięcie węzła usuwa też jego nazwę własną.
 
-Własny węzeł też może mieć nazwę własną, z jego karty **Nazwa własna**. Pozycja **Edytuj nazwę** w menu długiego dotknięcia własnego węzła robi coś innego: otwiera [Ustawienia - Radio i użytkownik](settings-radio-user), gdzie zmieniasz nazwę, którą węzeł rozgłasza wszystkim.
+Własny węzeł też może mieć nazwę własną, z jego karty **Nazwa własna**. Pozycja **Edytuj nazwę** w menu długiego dotknięcia własnego węzła robi coś innego: zmienia nazwę, którą węzeł rozgłasza wszystkim.
 
 ### Wskaźniki bezpieczeństwa
 
@@ -173,10 +173,11 @@ Z listy węzłów możesz:
 
 Gdy węzeł jest ignorowany, jego akcje ulubionych, wiadomości, śledzenia trasy i usuwania są wyłączone.
 
-Jeśli dotkniesz i przytrzymasz **własny węzeł**, dostaniesz jedną akcję, **Status aktualizacji**, która otwiera
-ekran ustawień Użytkownika z kursorem już w polu Status Message. Pojawia się tylko wtedy, gdy
-węzeł jest połączony i ma firmware 2.7.20 lub nowsze z dołączonym modułem Status Message. Samo pole opisano w
-[Ustawienia — Radio i użytkownik](settings-radio-user).
+Jeśli dotkniesz i przytrzymasz **własny węzeł**, dostaniesz osobne menu, tylko z tymi akcjami, z których każda pojawia się tylko wtedy, gdy węzeł jest połączony:
+
+- **Status aktualizacji** otwiera ekran ustawień Użytkownika z kursorem już w polu Status Message. Wymaga firmware 2.7.20 lub nowszego z dołączonym modułem Status Message. Samo pole opisano w [Ustawienia — Radio i użytkownik](settings-radio-user).
+- **Edytuj nazwę** otwiera [Ustawienia - Radio i użytkownik](settings-radio-user), gdzie zmieniasz nazwę, którą węzeł rozgłasza wszystkim.
+- **Udostępnij kontakt** otwiera [okno kontaktu](#udostępnianie-kontaktu), na firmware 2.6.8 lub nowszym.
 
 ## Udostępnianie kontaktu
 

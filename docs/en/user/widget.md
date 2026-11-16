@@ -2,86 +2,43 @@
 title: Home Screen Widget
 parent: User Guide
 nav_order: 20
-last_updated: 2026-11-04
-description: Add Meshtastic home screen widgets to glance at your connected node's local stats, or keep an eye on one node you pick, without opening the app.
+last_updated: 2026-11-16
+description: Add the MT_SW statistics and SOS widgets to your Android home screen to see your node and mesh at a glance, or reach the SOS screen in one tap.
 aliases:
   - widget
   - home-screen-widget
-  - local-stats-widget
-  - node-tracker-widget
+  - mesh-status-widget
+  - sos-widget
 ---
 
 # Home Screen Widget
 
-On Android, Meshtastic provides two home screen **widgets**:
+On Android, MT_SW provides two home screen **widgets**:
 
-- **Meshtastic** shows live local statistics from your connected node.
-- **Node Tracker** follows one node you choose: its battery, signal, when it was last heard, how many hops away it is, and how far it is from your connected node.
+- **MT_SW statistics** shows the same statistics as the permanent notification: the state of the whole mesh, or one tracked node.
+- **SOS** opens the SOS screen, where the alarm is sent by holding its button.
 
-You can place as many of each as you like. Each Node Tracker remembers its own node.
+The statistics widget shows readings the app has already saved, so it works with no radio connected, and it never sends anything over the mesh.
 
-## Local Stats
+## MT_SW statistics
 
-The **Meshtastic** widget displays the **connected node's** current local stats:
+The widget shows the nodes online, unread messages, battery, uptime, channel load, traffic and the rest of what your radio reports. What it shows (the whole mesh or one chosen node) is set in the adaptive display on the **Connections** screen. When it follows the whole mesh, it switches between the nodes every minute.
 
-- A **node chip** carrying the node's short name in its own colors, with the **battery** level beside it, or *Powered* when running on external power
-- **ChUtil** — channel utilization (how busy the LoRa channel is, as a percentage)
-- **AirUtil** — the percentage of airtime this node used transmitting in the last hour
-- **Nodes** — how many nodes are online, out of the total known
-- **Uptime** — how long the node has been running since its last reboot
-- **Sent** and **Received** — the node's packet counters
-- **Noise floor** — the background noise level in dBm
-- **Memory** — memory in use, as a percentage of the whole; with the extended statistics also **CPU**, **PSRAM** and **Flash** (whatever the node reports)
-- **Relayed** — packets the node relayed for others
-- **Bad** — corrupt packets received
-- **Dropped** — packets the node discarded
-- **Relays canceled** — relays the node started and then canceled
-- **Updated** — the time the stats last refreshed, along the foot of a three-row widget
+## SOS
 
-The widget shows as many of those as its size holds, in that order, so a small widget keeps the readings people glance at most. A two-by-two widget shows the node, battery, utilization and the first few readings; four cells wide lays the readings out in two columns, and a taller widget adds lines until every reading is on screen.
-
-Tap the widget to open the app, or use its refresh control to request fresh stats.
-
-> ℹ️ **Note:** The values reflect the connected node. If the node disconnects, the widget replaces the stats with a status line: **Disconnected**, **Connecting**, or **Device sleeping**. It does not keep the last-known numbers on screen.
-
-## Node Tracker
-
-The **Node Tracker** widget shows one node from your node list:
-
-- The node's **chip** and **long name**
-- **Battery**: the node's last reported battery level, or *Powered* on external power
-- **Last heard**: the time your connected node last heard it, or the date if it was more than a day ago
-
-From two rows tall it adds, in this order, as many as fit (a wide widget under two rows tall shows Hops Away beside the name):
-
-- **Hops Away**: how many hops away the node is, or *Direct*
-- **Distance**: how far the node is from your connected node. It appears only while you are connected and both nodes have a position
-- **SNR** and **RSSI**: the signal of the node's last packet, shown only when the node is heard directly rather than through other nodes or MQTT
-- **Voltage** and **Current**: from the node's sensor (not the system's), on one line, with the same short labels as the node details list. Below them, when the node sends them, **Temperature**, **Humidity** and **Pressure**.
-
-Four cells wide lays the readings out in two columns, so at the default font size every one fits in a two-row widget. A larger font size drops readings from the end of that list, RSSI first.
-
-When a node has not been heard within the last two hours, the widget dims its readings so they do not read as current. Tap the widget to open that node's details in the app.
-
-After you disconnect from your node in the app, the widget keeps the tracked node's last readings on screen, dimmed, until you reconnect.
-
-If your node list does not include the node you picked, because you removed it or connected to a different node, the widget says **Node not found**. Tap it to choose another node.
+Tapping the widget opens the SOS screen. The alarm is not sent by the widget itself: you still hold the button on the SOS screen for the set time, so it cannot be sent by accident. See [SOS](mt-sw-features) for the message, channels and nodes it uses.
 
 ## Adding a Widget
 
 1. Touch & hold an empty area of your Android home screen.
-2. Tap **Widgets**, then find **Meshtastic** in the list.
-3. Drag the **Meshtastic** (local stats) or **Node Tracker** widget to your home screen.
-4. For a Node Tracker, pick the node to follow. Your favorites are listed first, then the most recently heard nodes; type in the search field to filter by name or node ID. Backing out without picking cancels the widget.
-5. Resize it as needed — the layout adapts to the available space.
+2. Tap **Widgets**, then find **MT_SW** in the list.
+3. Drag **MT_SW statistics** (4x2) or **SOS** to your home screen.
+4. Resize it as needed — the layout adapts to the available space.
 
-To track a different node later, touch & hold the Node Tracker and choose the widget's settings or reconfigure option. The exact wording depends on your launcher.
-
-> ℹ️ **Note:** The widgets are Android-only. They are not available in the desktop app.
+> ℹ️ **Note:** The widgets are Android-only. On iPhone and iPad the statistics are a widget added from the home screen's **+** button, and on the desktop they are in the tray icon and the main window.
 
 ## Related Topics
 
-- [Node Metrics](node-metrics) — the full Signal Quality and Local Stats history inside the app
 - [Nodes](nodes) — favorites, last heard, and node details
-- [Connections](connections) — connect to a node so the widgets have data to show
+- [Connections](connections) — connect to a node so the widget has data to show
 - [Local Mesh Discovery](discovery) — channel and airtime utilization across the mesh

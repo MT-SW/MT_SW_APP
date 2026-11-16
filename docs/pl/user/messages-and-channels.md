@@ -2,7 +2,7 @@
 title: Wiadomości i kanały
 parent: Przewodnik użytkownika
 nav_order: 3
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
@@ -48,7 +48,7 @@ Sama długość klucza nie zmienia ikony: klucz 128-bitowy i 256-bitowy pokazuj�
 6. Dotknij **Wyślij** na dole listy kanałów, aby zapisać zmiany w węźle. **Anuluj** albo opuszczenie ekranu bez dotknięcia **Wyślij** odrzuca zmiany.
 7. Opcjonalnie: udostępnij kanały osobom, które potrzebują dostępu — zobacz [Udostępnianie i importowanie kanałów](#udostępnianie-i-importowanie-kanałów).
 
-Dotknięcie istniejącego kanału otwiera ten sam edytor, w którym możesz zmienić nazwę, PSK, wysyłanie i pobieranie przez MQTT oraz dokładność pozycji. Każda zmiana na tym ekranie — dodanie, edycja, usunięcie lub przeciągnięcie kanału w nowe miejsce — czeka na **Wyślij** w ten sam sposób.
+Dotknięcie istniejącego kanału otwiera ten sam edytor, w którym możesz zmienić nazwę, PSK, wysyłanie i pobieranie przez MQTT oraz dokładność pozycji. Na kanale, który nie jest bezpiecznie szyfrowany, **Precyzyjna lokalizacja** jest wyłączona, a suwak dokładności zatrzymuje się na 15 bitach. Każda zmiana na tym ekranie — dodanie, edycja, usunięcie lub przeciągnięcie kanału w nowe miejsce — czeka na **Wyślij** w ten sam sposób.
 
 ### Udostępnianie i importowanie kanałów
 

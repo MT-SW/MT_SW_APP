@@ -2,7 +2,7 @@
 title: Dzienniki debugowania
 parent: Przewodnik użytkownika
 nav_order: 22
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Przeglądaj i eksportuj własne dzienniki debugowania aplikacji z wnętrza aplikacji oraz dołącz zrzut do zgłoszenia na GitHubie, aby pomóc w diagnozie błędów — bez adb.
 aliases:
   - debug-logs
@@ -21,13 +21,14 @@ Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#export
 
 ## Dwie zakładki
 
-Panel debugowania ma trzy zakładki (trzecia, **Logi urządzenia**, to dodatek MT_SW):
+Panel debugowania ma cztery zakładki (**Logi urządzenia** to dodatek MT_SW):
 
 - **Pakiety** — zdekodowany ruch sieci mesh, który Twój węzeł wysłał i odebrał (wiadomości na poziomie protokołu). Przydatne do diagnozowania zachowania sieci mesh i routingu.
 - **Dzienniki aplikacji** — własny dziennik diagnostyczny aplikacji (Android *logcat*), w tym ostrzeżenia, błędy i ślady stosu z samej aplikacji. Zwykle to właśnie tego potrzebuje zgłoszenie błędu.
 - **Logi urządzenia** — logi wysyłane na żywo przez samo radio (te same, co na jego porcie szeregowym), z wyszukiwaniem, kolorami poziomów i eksportem. Najpierw włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia. Przez Bluetooth działa z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.
+- **Lustro** — podgląd na żywo ekranu połączonego węzła ze zdalnym sterowaniem; zobacz [Lustro](#lustro).
 
-Każda zakładka ma własny przycisk **eksportu** i tworzy własny plik, więc możesz zabrać ten, który jest istotny — albo oba.
+Zakładki **Pakiety**, **Dzienniki aplikacji** i **Logi urządzenia** mają własny przycisk **eksportu** i tworzą własny plik, więc możesz zabrać ten, który jest istotny — albo oba.
 
 ## Przeglądanie pakietów
 
@@ -47,6 +48,18 @@ Zakładka **Dzienniki aplikacji** pokazuje najnowsze linie dziennika **tylko z t
 - **Odśwież** — ikona odświeżania odczytuje najnowsze dzienniki jeszcze raz.
 
 Linie błędów i ostrzeżeń są podkolorowane, aby problemy rzucały się w oczy.
+
+## Lustro
+
+Zakładka **Lustro** pokazuje ekran połączonego węzła. Bez połączenia widać napis **Brak połączenia z urządzeniem.**, a gdy węzeł nie zgłasza wyświetlacza, widać **Lustro ekranu wymaga nowszego firmware**; klawisze kierunkowe nadal wysyłają przyciski.
+
+- **Lustro wyłączone / Lustro działa** — przełącznik przesyła ekran w sposób ciągły, a **Odśwież** pobiera jedną klatkę. Na wyświetlaczu e-ink lepiej używać **Odśwież**, bo ekran odświeża się powoli.
+- **Klawisze kierunkowe** — strzałki, **OK** i **Wstecz** naciskają przyciski węzła.
+- **Klawiatura** — chip **Klawiatura** przechwytuje klawisze: strzałki nawigują, Enter to OK, Esc to wstecz, a wpisany tekst trafia do węzła. Na węźle bez panelu dotykowego dotknięcie odbitego ekranu też przełącza. Na węźle z dotykiem dotknięcie lub przytrzymanie obrazu wysyła dotyk, a przesunięcie wysyła jeden kierunek.
+
+Lustro wyłącza się po opuszczeniu zakładki, a sterowanie jest wyłączone na węźle w trybie zarządzanym.
+
+Lustro wymaga firmware nowszego niż 2.8.2 na węźle z BaseUI. Węzłów z InkHUD nie można odbić, a węzły z Meshtastic UI (MUI) tylko na firmware zbudowanym z odbiciem MUI, którego żadne wydanie nie włącza, i tylko na płytkach, które potrafią też uruchomić BaseUI. Węzeł MUI przesyła obraz do jednego połączenia naraz, więc druga aplikacja nie dostanie obrazu, dopóki pierwsza nie przestanie.
 
 ## Eksportowanie
 

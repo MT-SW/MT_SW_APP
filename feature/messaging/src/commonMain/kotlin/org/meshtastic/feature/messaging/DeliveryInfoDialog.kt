@@ -43,6 +43,7 @@ fun DeliveryInfo(
     detail: StringResource? = null,
     relays: Int = 0,
     relayNodeNames: List<String> = emptyList(),
+    relay: String? = null,
     onConfirm: (() -> Unit) = {},
     onDismiss: () -> Unit = {},
 ) = MeshtasticDialog(
@@ -84,6 +85,14 @@ fun DeliveryInfo(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+            relay?.let {
+                Text(
+                    text = it,
+                    modifier = Modifier.padding(top = 8.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
     },

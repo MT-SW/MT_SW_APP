@@ -2,7 +2,7 @@
 title: Debug Logs
 parent: User Guide
 nav_order: 22
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: View and export the app's own debug logs from inside the app, and attach a capture to a bug report to help diagnose bugs — no adb required.
 aliases:
   - debug-logs
@@ -21,13 +21,14 @@ If you're filing an issue, export your logs (see [Exporting](#exporting)) and at
 
 ## The two tabs
 
-The Debug Panel has three tabs (the third, **Device logs**, is an MT_SW addition):
+The Debug Panel has four tabs (**Device logs** is an MT_SW addition):
 
 - **Packets** — the decoded mesh traffic your node has sent and received (protocol-level messages). Useful for diagnosing mesh and routing behavior.
 - **App logs** — the app's own diagnostic log (Android *logcat*), including warnings, errors, and stack traces from the app itself. This is usually what a bug report needs.
 - **Device logs** — live logs sent by the radio itself (the same as on its serial port), with search, level colours and export. Enable "Debug logs" in the device security settings first. Over Bluetooth it works with any firmware; over Wi-Fi and USB only with MT_SW firmware.
+- **Mirror** — a live view of the connected node's screen with remote controls; see [Mirror](#mirror).
 
-Each tab has its own **export** button and produces its own file, so you can grab whichever is relevant — or both.
+The **Packets** and **App logs** tabs each have their own **export** button and produce their own file, so you can grab whichever is relevant — or both.
 
 ## Viewing packets
 
@@ -47,6 +48,18 @@ The **App logs** tab shows the most recent log lines from **this app only** — 
 - **Refresh** — the refresh icon re-reads the latest logs.
 
 Error and warning lines are tinted so problems stand out.
+
+## Mirror
+
+The **Mirror** tab shows the screen of the connected node. It reads **Not connected to a device.** with no connection, and **Screen mirroring needs newer firmware** when the node does not report a display; the D-pad still sends keys in that case.
+
+- **Mirror off / Mirroring** — the switch streams the screen continuously, and **Refresh** fetches one frame. On an e-ink display prefer **Refresh**, since the screen updates slowly.
+- **D-pad** — arrow keys, **OK**, and **Back** press the node's buttons.
+- **Keyboard** — the **Keyboard** chip captures keys: arrows navigate, Enter is OK, Esc is back, and typed text reaches the node. On a node without a touch panel, tapping the mirrored screen toggles it too. On a touch-capable node, a tap or touch & hold on the image sends a touch, and a swipe sends one direction.
+
+Mirroring stops when you leave the tab, and the controls are off on a managed node.
+
+Mirroring needs firmware newer than 2.8.2 on a node running BaseUI. InkHUD nodes can't be mirrored, and Meshtastic UI (MUI) nodes only on firmware built with MUI mirroring, which no release enables, and only on boards that can also run BaseUI. An MUI node streams to one connection at a time, so a second app gets no picture until the first stops.
 
 ## Exporting
 

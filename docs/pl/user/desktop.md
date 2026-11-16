@@ -2,7 +2,7 @@
 title: Aplikacja na komputer
 parent: Przewodnik użytkownika
 nav_order: 14
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Instalacja i obsługa aplikacji MT_SW_APP na komputerze z Linuxem, macOS i Windows — połączenia, zgodność funkcji i skróty klawiszowe.
 aliases:
   - desktop
@@ -21,6 +21,7 @@ Ta strona opisuje instalację aplikacji na komputer, podłączanie radia i róż
 ### Linux
 
 - Pobierz pakiet `.deb`, `.rpm` lub `.AppImage` ze [strony wydań](https://github.com/meshtastic/Meshtastic-Android/releases). Każdy jest w wersji x86_64 i arm64 (aarch64).
+- Pakiet `.deb` zaleca pakiet `fonts-noto-color-emoji`. Emoji są rysowane z czcionek systemu, więc na minimalnym pulpicie bez kolorowej czcionki emoji, na przykład w Raspberry Pi OS, zainstaluj go, bo inaczej emoji pokażą się jako kwadraty. Pakiety `.rpm` i `.AppImage` nie mają takiego zalecenia.
 - AppImage ma własne informacje o aktualizacji, więc AppImageUpdate i inne programy oparte na zsync mogą zaktualizować go na miejscu do najnowszego wydania produkcyjnego.
 - Albo zainstaluj z Flathub: `flatpak install flathub org.meshtastic.MeshtasticDesktop`
 - Albo zbuduj ze źródeł poleceniem `./gradlew :desktopApp:run`
@@ -35,7 +36,7 @@ Ta strona opisuje instalację aplikacji na komputer, podłączanie radia i róż
 - Pobierz instalator `.msi` lub `.exe` ze [strony wydań](https://github.com/meshtastic/Meshtastic-Android/releases). Oba są w wersji x64.
 - Albo zbuduj ze źródeł
 
-## Podłączanie radia
+## Podłączanie węzła
 
 Wszystkie trzy transporty są w zakładce **Połącz**, tak samo jak na Androidzie. Wybierz jeden selektorem transportu. Pełny opis znajdziesz w [Połączenia](connections).
 

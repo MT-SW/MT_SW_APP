@@ -2,7 +2,7 @@
 title: Pierwsze kroki
 parent: Przewodnik użytkownika
 nav_order: 1
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Konfiguracja przy pierwszym uruchomieniu — uprawnienia, przebieg wprowadzenia i dalsze kroki po połączeniu węzła.
 aliases:
   - first-launch
@@ -76,7 +76,7 @@ Ten krok nie jest zwykłym oknem z prośbą o uprawnienie. Nie ma okna zezwól/o
 
 ### Późniejsze przeglądanie uprawnień
 
-Sekcja **Uprawnienia** w **Ustawieniach** podsumowuje stan każdego uprawnienia. W Androidzie 12 i nowszym wymienia pięć: **Uprawnienie do pobliskich urządzeń** (Bluetooth), **Uprawnienie do lokalizacji**, **Powiadomienia aplikacji**, **Pozwolenie na dostęp do kamery** (skanowanie kodów QR kanałów i kontaktów) oraz **Uprawnienie do sieci lokalnej** (znajdowanie węzłów w Twojej sieci Wi-Fi i łączenie się z nimi). Na sprzęcie bez Bluetooth LE wiersz **Uprawnienie do pobliskich urządzeń** jest pomijany. W Androidzie 11 i starszych jeden wiersz **Uprawnienie do lokalizacji** obejmuje Bluetooth i lokalizację, więc są cztery. Dwa ostatnie nigdy nie są wymagane podczas konfiguracji, tylko wtedy, gdy funkcja po raz pierwszy ich potrzebuje.
+Sekcja **Uprawnienia** w **Ustawieniach** podsumowuje stan każdego uprawnienia. W Androidzie 12 i nowszym wymienia pięć: **Uprawnienie do pobliskich urządzeń** (Bluetooth), **Uprawnienie do lokalizacji**, **Powiadomienia aplikacji**, **Pozwolenie na dostęp do kamery** (skanowanie kodów QR kanałów, kontaktów i połączenia) oraz **Uprawnienie do sieci lokalnej** (znajdowanie węzłów w Twojej sieci Wi-Fi i łączenie się z nimi). Na sprzęcie bez Bluetooth LE wiersz **Uprawnienie do pobliskich urządzeń** jest pomijany. W Androidzie 11 i starszych jeden wiersz **Uprawnienie do lokalizacji** obejmuje Bluetooth i lokalizację, więc są cztery. Dwa ostatnie nigdy nie są wymagane podczas konfiguracji, tylko wtedy, gdy funkcja po raz pierwszy ich potrzebuje.
 
 Sekcja pokazuje *Wszystkie dozwolone*, gdy każde uprawnienie jest przyznane, *Nic nie wymaga Twojej uwagi*, gdy o niektóre jeszcze nie pytano, i podaje liczbę, gdy któreś odrzucono — wtedy sama się rozwija. Dotknij wiersza, aby w każdej chwili rozwinąć lub zwinąć sekcję:
 
@@ -93,7 +93,7 @@ Najbardziej liczy się to przy powiadomieniach. Jeśli odmówisz ich podczas kon
 
 ## Po konfiguracji
 
-Po przyznaniu uprawnień aplikacja otwiera główny interfejs. Pierwszą rzeczą powinno być połączenie z węzłem Meshtastic — zobacz [Połączenia](connections), aby poznać szczegóły.
+Po przyznaniu uprawnień aplikacja otwiera główny interfejs. Pierwszą rzeczą powinno być połączenie z węzłem Meshtastic — zobacz [Połączenia](connections), aby poznać szczegóły. Węzeł, który nie ma jeszcze regionu LoRa, otwiera prowadzoną konfigurację przy pierwszym połączeniu — zobacz [Po pierwszym połączeniu](connections#po-pierwszym-połączeniu).
 
 > 💡 **Wskazówka:** Jeśli podczas konfiguracji pominąłeś jakieś uprawnienia, otwórz sekcję **Uprawnienia** w **Ustawieniach** aplikacji. Każde uprawnienie jest tam wymienione ze stanem i drogą powrotną do niego — także powiadomienia, o które system nie zapyta drugi raz samodzielnie.
 

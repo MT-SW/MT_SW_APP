@@ -17,6 +17,12 @@ Dokumentacja korzystania z aplikacji MT_SW_APP na Androida i komputery stacjonar
 Keep the last 5–8 entries and archive older ones by removing them.
 -->
 
+**Listopad 2026** — [Widżet ekranu głównego](user/widget) — Widżet Telemetria pokazuje odczyty środowiska, jakości powietrza i zasilania jednego węzła jako kafelki.
+
+**Listopad 2026** — [MQTT](user/mqtt) — Główny temat może zawierać litery w dowolnym alfabecie, a pole podaje reguły, przez które radio odrzuciłoby temat.
+
+**Listopad 2026** — [Połączenia](user/connections) — Kod połączenia można zeskanować z karty **Połącz** albo odczytać z tagu NFC, a PIN z zerem na początku jest pomijany.
+
 **Listopad 2026** — [Połączenia](user/connections) — Węzeł bez regionu otwiera prowadzoną konfigurację regionu, presetu, nazwy i pobliskich sieci.
 
 **Listopad 2026** — [Aktualizacje firmware](user/firmware) — Ekran firmware pokazuje wersję bootloadera nRF52 zgłaszaną przez węzeł, a przestarzały bootloader można zaktualizować przez Bluetooth.

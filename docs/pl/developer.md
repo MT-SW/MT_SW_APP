@@ -30,6 +30,8 @@ Rzeczy, na których potykają się nowi współtwórcy — sprawdź je, zanim po
 Keep the last 5–8 entries and trim older ones from the bottom.
 -->
 
+**Listopad 2026** — [Trwałe przechowywanie danych](developer/persistence) — Baza w pliku obsługuje odczyty z puli czytelników Room, a `MeshLog` ma indeksy dla zapytań per węzeł i per typ (wersja schematu 68).
+
 **Październik 2026** — [Nawigacja i deep linki](developer/navigation-and-deep-links) — Tabela tras obejmuje każdy wzorzec, który router przyjmuje, w tym rozwiązania zapasowe, które dla nieznanej podścieżki otwierają najbliższą trasę węzłów, mapy lub ustawień.
 
 **Październik 2026** — [Trwałe przechowywanie danych](developer/persistence) — Każdy podłączony węzeł ma własną bazę danych, opisano kopię zapasową i przywracanie danych aplikacji, a telemetria jest czytana z `MeshLog`, a nie z `Packet`.

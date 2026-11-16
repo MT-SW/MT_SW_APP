@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import org.maplibre.compose.map.MapState
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.MapLinksViewModel
@@ -85,6 +87,8 @@ import org.meshtastic.feature.map.maplibre.style.MapOverlays
 import org.meshtastic.feature.map.planner.ui.PlannerMapBridge
 import org.meshtastic.feature.map.planner.ui.PlannerMapPickBanner
 import org.meshtastic.feature.map.planner.ui.PlannerSheet
+import org.meshtastic.feature.map.survey.SignalSurveyCellInfo
+import org.meshtastic.feature.map.survey.SignalSurveyViewModel
 
 /**
  * MapLibre implementation of [MapViewProvider], shared by the F-Droid flavor and the desktop app.
@@ -172,6 +176,7 @@ class MapLibreMapViewProvider(
             )
 
         SaveCameraPosition(mapState)
+        SurveyCellSizeFollowsZoom(mapState)
 
         val plannerBridge = rememberPlannerBridge(mapState)
 
@@ -259,7 +264,22 @@ class MapLibreMapViewProvider(
                 editing = waypoints,
                 editor = waypointEditor,
             )
+
+            SignalSurveyCellInfo(modifier = Modifier.align(Alignment.BottomStart))
         }
+    }
+}
+
+/**
+ * Keeps the signal survey's squares large enough to see as the map zooms out. MapLibre counts zoom in 512 px tiles, one
+ * level below the 256 px convention the survey's sizing uses.
+ */
+@Composable
+private fun SurveyCellSizeFollowsZoom(mapState: MapState) {
+    val survey: SignalSurveyViewModel = koinViewModel()
+    LaunchedEffect(mapState, survey) {
+        snapshotFlow { mapState.cameraPosition }
+            .collect { camera -> survey.setCamera(zoom = camera.zoom + 1, latitude = camera.center.latitude) }
     }
 }
 
@@ -277,7 +297,17 @@ private fun rememberMapScreenMapState(
     val viewModel: SharedMapViewModel = koinViewModel()
     val linksViewModel: MapLinksViewModel = koinViewModel()
     val links by linksViewModel.links.collectAsStateWithLifecycle()
+    val survey: SignalSurveyViewModel = koinViewModel()
+    val surveyCells by survey.cells.collectAsStateWithLifecycle()
+    val surveyHeatPoints by survey.heatPoints.collectAsStateWithLifecycle()
+    val surveyLinks by survey.selectedLinks.collectAsStateWithLifecycle()
+    val surveyColors = Quality.entries.associateWith { it.color() }
     return rememberMeshMapState(
+        surveyCells = surveyCells,
+        surveyHeatPoints = surveyHeatPoints,
+        surveyLinks = surveyLinks.links,
+        surveyColors = surveyColors,
+        onSurveyCellClick = survey::selectCell,
         viewModel = viewModel,
         navigateToNodeDetails = navigateToNodeDetails,
         basemap = basemap,

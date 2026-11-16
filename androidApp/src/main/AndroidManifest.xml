@@ -526,7 +526,7 @@
             and actionRunCallback() a direct PendingIntent.getBroadcast() to ActionCallbackBroadcastReceiver.
 
             So this is dead-but-launchable library code: an exported=false activity that crashes the process on every
-            launch and that our widgets can never legitimately reach (neither LocalStatsWidget nor NodeTrackerWidget has a
+            launch and that our widgets can never legitimately reach (none of LocalStatsWidget, NodeTrackerWidget or TelemetryWidget has a
             lazy collection, and a tap on either dispatches its own PendingIntent directly). Same defect class as the ATAK marker below. Removing the
             node is the whole fix - it takes the component out of the merged manifest so it cannot be started.
 

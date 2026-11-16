@@ -2,14 +2,15 @@
 title: Map & Waypoints
 parent: User Guide
 nav_order: 6
-last_updated: 2026-11-12
-description: View node positions on the map, create and share waypoints, manage map layers and Site Planner, and control position sharing and privacy.
+last_updated: 2026-11-15
+description: View node positions on the map, create and share waypoints, manage map layers, Site Planner and signal surveys, and control position sharing and privacy.
 aliases:
   - map
   - waypoints
   - gps
   - location
   - site-planner
+  - signal-survey
   - map-layers
   - geojson
   - kml
@@ -60,6 +61,7 @@ Tap the mesh view button (**Open mesh view**) in the map's top bar to see the wh
 - **Touch & hold** a node or waypoint to find it. The view says how far to turn and tilt, the phone ticks as you turn closer, and it pulses once you are on target.
 - A node whose position uncertainty covers your own spot has no meaningful direction, so it goes on the radar at the bottom instead. Point the phone down to enlarge the radar.
 - Waypoint geofences are outlined, and the view says when you are inside one.
+- [Signal survey](#signal-survey) sessions shown on the map are painted on the ground around you, in the same colors, out to about 300 m. While a survey records, the view says so with its reading count, so you can walk a route and watch coverage fill in.
 
 When your phone's position has no altitude, targets sit level with you and the view says elevation is approximate. Without camera access, or while the phone is too hot, the view carries on as a compass.
 
@@ -69,12 +71,13 @@ On an Android XR headset, the Google Play build adds a **Full Space** button. Fu
 
 **3D map** stands a terrain table beside the app, built from the positions your nodes have shared and anchored on your connected node. The table shows:
 
-- the terrain in relief, with any of the 2D map's base maps draped over it
-- elevation contours, in meters or feet by your [units setting](units-and-locale)
+- the terrain in relief, with any of the 2D map's raster base maps draped over it, satellite first, or in elevation colors when you pick **Elevation**
+- elevation contours when you turn on **Contours**, in meters or feet by your [units setting](units-and-locale)
 - buildings, where a downloaded offline region reaches zoom 13 or closer
-- nodes as the same chips as the 2D map, the links between them in signal colors, and the last traceroute
+- nodes as chips like the 2D map's, with routers and other infrastructure nodes standing as towers
+- comets that fly along the links from each node your node hears, colored by signal quality, and along both directions of the last traceroute that had a route
 
-The table's control panel holds the layer, **Buildings**, contour, and **Zoom** controls. With no positioned nodes there is no area to show. Where no terrain data exists, the ground is drawn flat.
+The table's control panel holds the base map and **Elevation** chips, **Contours**, **Buildings** and a **Zoom** slider, plus the credits for what is on the table. **Buildings** appears only when a downloaded region has them. The terrain downloads as the table builds, so it needs a network connection; if that fails the app says the terrain could not be loaded. With no positioned nodes there is no area to show. Where no terrain data exists, the ground is drawn flat.
 
 ## Waypoints
 
@@ -127,7 +130,9 @@ Since waypoints (and their geofences) are broadcast to the whole mesh, only the 
 
 ## Map Layers
 
-Tap the layers icon on the map to open **Manage Map Layers**. It imports your own overlays in `.kml`, `.kmz`, or GeoJSON format, including KMZ ground overlays (georeferenced images, such as exported topo or aerial tiles), which drape at their stated bounds. Add one by picking a file with **Add Layer**, opening a file with Meshtastic, or sharing it into the app from another app. A file opened or shared this way is refused if it is over 50 MB. **Add Network Layer** instead takes a name and an `https://` URL pointing at a KML or GeoJSON file (`http://` also works on Desktop, but on Android only for `localhost`); that layer then carries its own refresh button in the sheet. On **Google Play** builds the toolbar's refresh button re-fetches every visible network layer at once.
+Tap the layers icon on the map to open **Manage Map Layers**. It imports your own overlays in `.kml`, `.kmz`, or GeoJSON format, including KMZ ground overlays (georeferenced images, such as exported topo or aerial tiles), which drape at their stated bounds. Add one by picking a file with **Add Layer**, opening a file with Meshtastic, or sharing it into the app from another app. A file opened or shared this way is refused if it is over 50 MB (10 MB for GeoJSON). **Add Network Layer** instead takes a name and an `https://` URL pointing at a KML or GeoJSON file (`http://` also works on Desktop, but on Android only for `localhost`); that layer then carries its own refresh button in the sheet. The sheet scrolls as one page, so the layer list stays reachable under a long list of downloaded regions. On **Google Play** builds the toolbar's refresh button re-fetches every visible network layer at once.
+
+A layer's size is capped to protect memory: a GeoJSON layer over 10 MB and a KML or KMZ over 50 MB are refused at import and not drawn, and a `.json` file that isn't GeoJSON is refused. On **Google Play** builds, a layer with more detail than the map has room to draw is left undrawn, and a message names the layer.
 
 Imported layers are listed with a toggle to show/hide each one and an option to remove it. Each layer — imported or built-in overlay — carries its own opacity slider while it is switched on, so an overlay can be faded back rather than only switched off. This works on the Google Play build, the F-Droid build, and **Desktop**, which shares the same layer store and file picker.
 
@@ -141,6 +146,22 @@ Imported layers are listed with a toggle to show/hide each one and an option to 
 - **Display**: **Color palette**.
 
 Tap **Estimate coverage** to run it. The app computes the estimate itself, using the ITU-R P.1812 propagation model over Mapterhorn terrain, on Google Play, F-Droid, and Desktop alike. The terrain downloads the first time an area is estimated, so that step needs a network connection; if it fails, the form comes back with a note to check your connection. The finished estimate is added under **Manage Map Layers** as a coverage estimate layer, and the map moves to it.
+
+### Signal Survey
+
+Site Planner predicts coverage; **Signal survey** measures it. Turn on **Record** at the bottom of the layers sheet, then walk or drive with your radio. Each packet the radio hears over LoRa is logged with its signal strength (RSSI and SNR) and your phone's location at that moment. The survey only listens: it sends nothing onto the mesh.
+
+![Signal survey controls recording a session, with the color legend, the heatmap switch, and two sessions listed](../../assets/screenshots/map_signal_survey.png)
+
+Each time you turn **Record** on starts a new session, and turning it off ends it. The session draws on the map as it records: colored squares along your route, each standing for the clearest reading taken inside it. Squares are about 50 m across at street level and grow as you zoom out, so a survey stays visible at city scale.
+
+- **Colors** rate the square's best SNR against the modem preset the session was recorded on, the same rating the signal meter uses: green is good, yellow fair, orange bad, and red too weak to rely on. See [How the Signal Meter Works](signal-meter).
+- **Tap a square** for its SNR and RSSI, how many readings it holds, how many nodes were heard there, and when the last one arrived. Lines run from the square to each node heard there directly, in the color of that node's signal, so you can see which node covers which street. A line ends where the node reports its position, at the precision it shares; a node that shares no position gets no line.
+- **Show as heatmap** swaps the squares for a smooth glow in the same colors. Each color glows where the route passed through squares of that rating, so a spot you stood at for a while glows no brighter than one you drove past. Squares cannot be tapped while the heatmap shows.
+- **In the [AR mesh view](#ar-mesh-view)** the visible sessions are painted on the ground around you.
+- **Sessions** are listed under the switch, newest first. The eye shows or hides a session on the map, the download button exports its readings as CSV to a file you choose, and the trash deletes it.
+
+Recording is off until you turn it on, and stays on until you turn it off or the app shuts down, so it keeps using location while the app runs in the background. Readings are kept per radio. They stay on your device unless you export them, and they are included in a database backup. A reading is placed where the radio is: by the radio's own GPS while its last fix is under 15 seconds old, otherwise by your phone's fix if that is under 15 seconds old and accurate to 50 m, or reports no accuracy at all. A radio with a fixed position, or a GPS reporting it is standing still, is placed at that position. For a radio connected over the network the phone's location is used only while the radio reports no position of its own, since the radio may be somewhere else. With neither, nothing is logged; the line under **Record** says what is missing, with a button to grant access or open location settings. Recording is also paused while no radio is connected and for the first 15 seconds after connecting. Signal survey is on Android only.
 
 ## Position Sharing
 
@@ -157,7 +178,7 @@ Configure position behavior in **Settings → Device configuration → Position*
 
 ### Privacy Considerations
 
-> 🔒 **Privacy:** Position data is broadcast to all nodes on your channel. If you don't want your location shared, set **GPS Mode** to **Disabled**, or use a **Fixed Position** somewhere else. To keep sharing a position without pinpointing yourself, edit the channel in **Settings → Channels**, turn **Precise location** off, and set the slider beneath it — the channel then publishes an approximate area, shown as ± a distance, instead of an exact point.
+> 🔒 **Privacy:** Position data is broadcast to all nodes on your channel. If you don't want your location shared, set **GPS Mode** to **Disabled**, or use a **Fixed Position** somewhere else. To keep sharing a position without pinpointing yourself, edit the channel in **Settings → Channels**, turn **Precise location** off, and set the slider beneath it — the channel then publishes an approximate area, shown as ± a distance, instead of an exact point. A channel that is not securely encrypted (a one-byte key, the default key, or no key on the primary channel or on a secondary whose primary is one of these) cannot carry precise location: the switch is disabled with "Not available on a channel that is not securely encrypted", and the slider stops at 15 bits.
 
 ## Map Sources
 
@@ -222,7 +243,7 @@ the map. On **Google Play**, each downloaded region in the **Offline Manager** l
 button. Terrain attaches to that region and shares its storage limit, and an area too large for terrain asks
 you to zoom in or pick a smaller region. Once the terrain is downloaded, the button gives way to **Hillshade**
 and **Contours** switches, both off until you turn them on. Hillshade draws at full strength to one zoom level past
-the deepest terrain downloaded for that spot, fades over the next level and stops after it; contours keep drawing.
+the deepest terrain downloaded for that spot, fades to half strength at two levels past and is gone at three; contours keep drawing.
 On **Google Play**, turning on **Hillshade** also offers **Shade Valleys**, off by default, which darkens valleys and
 gorges by how little sky they see, whichever way they face the light. On **F-Droid** and **Desktop**, the layers sheet
 has an **Offline Terrain** section of its own: frame the area, tap **Start Download**, and the hillshade and

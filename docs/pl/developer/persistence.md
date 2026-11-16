@@ -2,7 +2,7 @@
 title: Trwałe przechowywanie danych
 parent: Przewodnik dewelopera
 nav_order: 6
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Trzy warstwy trwałego przechowywania danych w aplikacji — Room, DataStore i core:prefs — oraz kiedy współtwórca powinien używać każdej z nich.
 aliases:
   - room
@@ -29,11 +29,12 @@ Główny magazyn danych strukturalnych:
 ### Kluczowe informacje
 
 - Używa Room KMP dla zgodności między platformami
-- Migracje są zarządzane przez wbudowany system migracji Room
+- Zmiany schematu używają automatycznych migracji Room oraz ręcznych `Migration` (rejestrowanych w `MeshtasticDatabase.configureCommon`) tam, gdzie automatyczna migracja kopiowałaby dużą tabelę, jak przy indeksach `MeshLog` dodanych w wersji 68
 - Interfejsy DAO znajdują się w `core:database`
 - Warstwa repozytoriów w `core:repository` udostępnia publiczne API
 - Pełnotekstowe wyszukiwanie wiadomości opiera się na tabeli treści FTS5 (`PacketFts`) nad `Packet`, utrzymywanej w synchronizacji przez wyzwalacze zarządzane przez Room
 - `DatabaseManager` trzyma jedną bazę Room na każde podłączone urządzenie, z wypychaniem najdawniej używanych (LRU)
+- Baza w pliku zachowuje domyślną pulę połączeń Room: jeden zapisujący i kilku czytających w trybie WAL, więc zapytanie, które obserwowany Flow uruchamia ponownie po zapisie, czyta obok następnego zapisu. Strzeżony Flow, który nie wyśle pierwszej wartości na czas, zgłasza `DbFlowStalledException`, a `DatabaseManager` naprawia to, wymieniając pulę. Bazy testowe w pamięci używają jednego połączenia
 - `DatabaseBackupService` eksportuje bazę urządzenia do pliku wskazanego przez użytkownika oraz przygotowuje zweryfikowane przywrócenie, które zastępuje bazę przy jej następnym otwarciu; przywrócenie nigdy nie jest stosowane do otwartej bazy. `DatabaseBackup.SCHEMA_VERSION` musi być równe wersji z `@Database`, co sprawdza test `jvmTest`
 
 ### Co jest przechowywane w Room

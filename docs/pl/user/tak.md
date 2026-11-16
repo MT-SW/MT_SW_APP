@@ -2,7 +2,7 @@
 title: Integracja TAK
 parent: Przewodnik użytkownika
 nav_order: 10
-last_updated: 2026-10-21
+last_updated: 2026-11-16
 description: Współpraca z ATAK i WinTAK — udostępnianie pozycji CoT, role TAK i konfiguracja wtyczki.
 aliases:
   - tak
@@ -56,18 +56,19 @@ Kolory zespołów to standardowe kolory zespołów TAK, więc uzgodnij ze swoim 
 
 Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK na **tym samym telefonie** albo WinTAK na tym samym komputerze, na którym działa aplikacja na komputer, albo ATAK/iTAK na tym samym iPhonie czy iPadzie, mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
 
-Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0. W Androidzie 17 i nowszych włączenie serwera prosi o uprawnienie do sieci lokalnej, którego potrzebuje do otwarcia gniazda. Jeśli to uprawnienie zostanie odmówione na stałe, aplikacja wyłącza serwer z powrotem i proponuje otwarcie ustawień aplikacji:
+Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0. W Androidzie 17 i nowszych włączenie serwera prosi o uprawnienie do sieci lokalnej, którego potrzebuje do otwarcia gniazda, a jeśli raz je odrzuciłeś, najpierw wyjaśnia dlaczego. Jeśli Android nie zapyta ponownie, aplikacja wyłącza serwer z powrotem i proponuje otwarcie ustawień aplikacji:
 
 ![Ustawienia lokalnego serwera TAK z przełącznikiem włączania i opcją eksportu](../../assets/screenshots/tak_server_enabled.png)
 
-- **Włącz lokalny serwer TAK** — uruchamia serwer mTLS tylko na pętli zwrotnej, na porcie **8089**, dla połączeń ATAK z tego samego urządzenia.
-- **Stan** — pod przełącznikiem: *Wyłączony*, *Uruchamianie serwera TAK*, *Nasłuchuje na 127.0.0.1:8089 — czeka na ATAK*, liczba lokalnych połączeń klientów albo *Nie udało się uruchomić serwera TAK. Wyłącz go i włącz ponownie, aby spróbować jeszcze raz.*
-- **Kanał sieci TAK** — wybiera, na którym kanale MT_SW wysyłany jest wychodzący ruch TAK (domyślnie: kanał podstawowy, indeks 0). Przychodzący ruch TAK jest przyjmowany z dowolnego kanału. Odpowiada analogicznemu ustawieniu w iOS i w starszej wtyczce ATAK.
-- **Konwerter Mesh na CoT** — domyślnie wyłączony, pokazywany pod przełącznikiem serwera. Przy uruchomionym serwerze
+- **Włącz lokalny serwer TAK** — uruchamia serwer mTLS tylko na pętli zwrotnej, na porcie **8089**, dla połączeń ATAK z tego samego urządzenia. **Konwerter Mesh na CoT**, **Kanał sieci TAK**, eksport i **Wygeneruj certyfikaty ponownie** pojawiają się tylko wtedy, gdy serwer jest włączony.
+- **Stan** — pod przełącznikiem: *Wyłączony*, *Uruchamianie serwera TAK*, *Nasłuchuje na 127.0.0.1:8089 — czeka na ATAK*, liczba lokalnych połączeń klientów, *Serwer TAK nie jest uruchomiony* albo *Nie udało się uruchomić serwera TAK. Wyłącz go i włącz ponownie, aby spróbować jeszcze raz.* Jeśli klient zostanie odrzucony, bo jego certyfikat nie należy do tej instalacji, pod stanem pojawia się ostrzeżenie; wyeksportuj pakiet danych ponownie i zaimportuj go w ATAK.
+- **Konwerter Mesh na CoT** — domyślnie wyłączony. Przy uruchomionym serwerze
   tworzy kontakt CoT dla każdego węzła w Twojej bazie węzłów, więc zwykłe
   węzły MT_SW pojawiają się na mapie ATAK jako kontakty. **To właśnie zastąpiło widoczność
-  węzłów starej wtyczki** — bez tego pokazują się tylko węzły z rolą TAK. Gdy połączony węzeł ma firmware starsze niż 2.8.0, uwaga pod przełącznikiem mówi, że do ATAK przechodzą tylko pozycje i wiadomości czatu.
-- **Eksportuj pakiet danych TAK** — generuje pakiet danych `.zip`, który ATAK może zaimportować, aby połączyć się z tym serwerem. To samo robi ikona udostępniania na górnym pasku.
+  węzłów starej wtyczki** — bez tego pokazują się tylko węzły z rolą TAK. Gdy połączony węzeł ma firmware starsze niż 2.8.0, a przełącznik jest włączony, uwaga pod nim mówi, że do ATAK przechodzą tylko pozycje i wiadomości czatu.
+- **Kanał sieci TAK** — wybiera, na którym kanale MT_SW wysyłany jest wychodzący ruch TAK (domyślnie: kanał podstawowy, indeks 0). Przychodzący ruch TAK jest przyjmowany z dowolnego kanału. Odpowiada analogicznemu ustawieniu w iOS i w starszej wtyczce ATAK.
+- **Eksportuj pakiet danych TAK** — generuje pakiet danych `.zip`, który ATAK może zaimportować, aby połączyć się z tym serwerem. To samo robi ikona udostępniania na górnym pasku. Certyfikaty w pakiecie są unikalne dla tej instalacji.
+- **Wygeneruj certyfikaty ponownie** — po potwierdzeniu wydaje nową tożsamość serwera i klienta. Każdy pakiet wyeksportowany wcześniej przestaje działać, więc wyeksportuj go ponownie i zaimportuj w ATAK.
 
 ## Role TAK
 

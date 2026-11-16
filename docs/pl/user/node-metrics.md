@@ -2,7 +2,7 @@
 title: Metryki węzła
 parent: Przewodnik użytkownika
 nav_order: 5
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Panele telemetrii każdego węzła sieci mesh — stan urządzenia, czujniki środowiskowe, jakość powietrza, jakość sygnału, zasilanie, traceroute i historia pozycji.
 aliases:
   - metrics
@@ -104,7 +104,7 @@ Odczyty CO₂ są oznaczone kolorami według dotkliwości, aby jakość powietrz
 
 Wiersz **Metryki jakości powietrza** jest zawsze widoczny na ekranie szczegółów węzła; jego przycisk wykresu pojawia się, gdy węzeł zgłosi telemetrię jakości powietrza. W widoku Jakości powietrza możesz:
 
-- Wybrać **przedział czasu** dla wykresów.
+- Wybrać **przedział czasu** dla wykresów. Odczyty pyłów mają jedną wspólną oś, skalowaną tak, aby zerowe odczyty pozostały widoczne, a CO₂ ma własną oś po prawej, żeby ich nie spłaszczała.
 - Filtrować za pomocą **chipów metryk** — pokazywane są tylko metryki, które mają dane.
 - **Odświeżyć / zażądać** najnowszej telemetrii jakości powietrza.
 - **Wyeksportować do CSV** do analizy w arkuszu kalkulacyjnym.
@@ -159,7 +159,7 @@ Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 2. Aplikacja wysyła żądanie traceroute do docelowego węzła. W historii żądanie pokazuje **Czekam na odpowiedź**, dopóki się nie rozstrzygnie.
 3. Wyniki pokazują każdy skok wraz z jego SNR.
 
-Pierścień na przycisku traceroute odlicza sekundy do chwili, gdy można wysłać następne żądanie.
+Pierścień na przycisku traceroute pokazuje sekundy pozostałe do chwili, gdy można wysłać następne żądanie, a **Śledzenie trasy** na liście węzłów pokazuje w tym czasie **Trasa za** *N* **s**.
 
 ### Odczytywanie wyników traceroute
 

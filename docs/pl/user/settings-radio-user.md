@@ -2,7 +2,7 @@
 title: Ustawienia — Radio i użytkownik
 parent: Przewodnik użytkownika
 nav_order: 7
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 description: Konfiguracja sprzętu węzła, presetów LoRa, profilu użytkownika, udostępniania pozycji, zarządzania energią i bezpieczeństwa.
 aliases:
   - settings
@@ -219,8 +219,8 @@ W **Ustawienia → Konfiguracja urządzenia → Bluetooth**, w węzłach z Bluet
 | Ustawienie | Opis | Domyślnie |
 |---------|-------------|---------|
 | Bluetooth włączony | Włącza lub wyłącza Bluetooth węzła | Włączony, oprócz niektórych węzłów z kolorowym ekranem |
-| Stały PIN (Fixed PIN) | Kod PIN do parowania, używany z `FIXED_PIN`. Musi mieć **sześć cyfr, od 100000 do 999999** — pole odrzuca wszystko inne | 123456 |
-| Tryb parowania | Wymieniony pod nazwami z firmware: `RANDOM_PIN`, `FIXED_PIN` lub `NO_PIN` | `RANDOM_PIN` w węzłach z ekranem, `FIXED_PIN` w węzłach bez ekranu |
+| Stały PIN (Fixed PIN) | Kod PIN do parowania, używany ze **Stałym PIN**. Musi mieć **sześć cyfr, od 100000 do 999999**, więc zero na początku jest niedozwolone. Pole robi się czerwone, a **Zapisz** pozostaje wyłączone, gdy zmienisz PIN na nieprawidłowy albo gdy **Tryb parowania** to **Stały PIN**, a PIN jest nieprawidłowy | 123456 |
+| Tryb parowania | **Losowy PIN**, **Stały PIN** lub **Brak PINu (po prostu działa)** | **Losowy PIN** w węzłach z ekranem, **Stały PIN** w węzłach bez ekranu |
 
 ## Konfiguracja bezpieczeństwa
 
@@ -232,7 +232,7 @@ W **Ustawienia → Bezpieczeństwo**. Ekran jest podzielony na karty: **Autentyc
 | Kopia kluczy | Zapisuje zaszyfrowaną kopię zapasową kluczy węzła na tym telefonie. Tylko dla własnego węzła i nie w aplikacji na komputer | — |
 | API dziennika debugowania włączone | Wysyła na żywo logi debugowania przez port szeregowy oraz pozwala przeglądać i eksportować logi węzła z zaciemnioną pozycją przez Bluetooth | Wyłączone |
 | Usuń kopię zapasową kluczy | Usuwa zapisaną kopię zapasową kluczy z tego telefonu | — |
-| Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero po ustawieniu **Klucza administratora**, a zapis bez żadnego klucza administratora wyłącza go. Jeśli wszystkie klucze administratora zostaną utracone, jedynym ratunkiem jest wykasowanie węzła przez [Web Flasher](https://flasher.meshtastic.org) | Wyłączone |
+| Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero wtedy, gdy **Klucz administratora** zawiera klucz 32-bajtowy, a zapis bez żadnego 32-bajtowego klucza administratora wyłącza go. Aplikacja sprawdza tylko długość, więc przed włączeniem upewnij się, że urządzenie administratora ma pasujący klucz prywatny. Jeśli wszystkie klucze administratora zostaną utracone, jedynym ratunkiem jest wykasowanie węzła przez [Web Flasher](https://flasher.meshtastic.org) | Wyłączone |
 | Klucz prywatny | Klucz prywatny Twojego węzła (obchodź się z nim bezpiecznie). Pokazany jako zaciemniony, gdy oglądasz inny węzeł przez zdalne zarządzanie — firmware go nie wysyła | Tworzy go węzeł |
 | Poziom ochrony | Jak traktowane są pakiety niepodpisane: **Ścisły — Wymagaj uwierzytelnienia**, **Zrównoważony — Preferuj uwierzytelnione** lub **Kompatybilny — Akceptuj niepodpisane**. Wymaga firmware obsługującego podpisywanie pakietów; **Ścisły** prosi o potwierdzenie | Kompatybilny |
 | Klucz publiczny | Klucz publiczny Twojego węzła (tylko do odczytu) | Wyliczany z klucza prywatnego |
