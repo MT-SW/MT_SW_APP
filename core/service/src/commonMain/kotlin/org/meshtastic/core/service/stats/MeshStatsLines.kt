@@ -91,8 +91,8 @@ object MeshStatsLines {
 
     /**
      * The statistics grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime,
-     * traffic, diagnostics), the resources (CPU, RAM, flash, PSRAM) and the connections (Wi-Fi, Bluetooth). Empty
-     * groups are left out. [lnaGain] is the display-only correction of the noise floor (the same as in the app).
+     * traffic, bad and dropped packets), the resources (CPU, RAM, flash, PSRAM) and the connections (noise floor, Wi-Fi,
+     * Bluetooth). Empty groups are left out. [lnaGain] is the display-only correction of the noise floor (the same as in the app).
      * [nodesActive] is the number of nodes that report an active user, or null when no node shares that status.
      */
     @Suppress("LongParameterList")
@@ -118,10 +118,10 @@ object MeshStatsLines {
                 add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.uptime_seconds.toLong())))
             }
         }
-        val radio = localStats?.let { radioLines(it, lnaGain) }.orEmpty()
+        val radio = localStats?.let { radioLines(it) }.orEmpty()
         val heapLine = localStats?.let { heapLine(it) }
         val resources = resourceLines(extended, ramAlreadyShown = heapLine != null, ramLine = heapLine)
-        val connections = connectionLines(extended)
+        val connections = listOfNotNull(localStats?.let { noiseLine(it, lnaGain) }) + connectionLines(extended)
         return listOf(
             Group(getStringSuspend(Res.string.widget_group_network), network),
             Group(getStringSuspend(Res.string.widget_group_node), node, RIGHT_COLUMN),
@@ -139,7 +139,7 @@ object MeshStatsLines {
     }
 
     @Suppress("LongMethod", "CyclomaticComplexMethod")
-    private suspend fun radioLines(stats: LocalStats, lnaGain: Int): List<String> = buildList {
+    private suspend fun radioLines(stats: LocalStats): List<String> = buildList {
         add(
             getStringSuspend(
                 Res.string.local_stats_utilization,
@@ -160,9 +160,8 @@ object MeshStatsLines {
         if (stats.num_tx_relay > 0) {
             add(getStringSuspend(Res.string.local_stats_relays, stats.num_tx_relay, stats.num_tx_relay_canceled))
         }
-        // The noise floor has its own line and the bad and dropped counters share another, so no line of the widget gets
-        // so long that it forces small letters (the longest line decides how big the text can be).
-        stats.noiseFloorOrNull?.let { add(getStringSuspend(Res.string.local_stats_noise, it - lnaGain)) }
+        // The bad and dropped counters share one line, so no line of the widget gets so long that it forces small
+        // letters (the longest line decides how big the text can be). The noise floor is in the connections group.
         val faults = mutableListOf<String>()
         if (stats.num_packets_rx_bad > 0) {
             faults.add(getStringSuspend(Res.string.local_stats_bad, stats.num_packets_rx_bad))
@@ -172,6 +171,10 @@ object MeshStatsLines {
         }
         if (faults.isNotEmpty()) add(faults.joinToString(" | "))
     }
+
+    /** The noise floor line (with the display-only LNA gain correction), or null when the node does not report it. */
+    private suspend fun noiseLine(stats: LocalStats, lnaGain: Int): String? =
+        stats.noiseFloorOrNull?.let { getStringSuspend(Res.string.local_stats_noise, it - lnaGain) }
 
     /** The RAM line from the node's own counters (used and total heap), or null when the node does not report it. */
     private suspend fun heapLine(stats: LocalStats): String? {

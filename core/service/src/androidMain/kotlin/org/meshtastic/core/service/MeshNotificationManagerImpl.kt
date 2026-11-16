@@ -1799,6 +1799,10 @@ class MeshNotificationManagerImpl(
 
         // Diagnostic Fields
         val diagnosticParts = mutableListOf<String>()
+        if (num_packets_rx_bad > 0) {
+            diagnosticParts.add(getStringSuspend(Res.string.local_stats_bad, num_packets_rx_bad))
+        }
+        if (num_tx_dropped > 0) diagnosticParts.add(getStringSuspend(Res.string.local_stats_dropped, num_tx_dropped))
         val noiseFloor = noiseFloorOrNull
         if (noiseFloor != null) {
             // Shown with the same LNA gain correction as in the app (display-only; raw data is unchanged).
@@ -1806,10 +1810,6 @@ class MeshNotificationManagerImpl(
             val gain = myNodeNum?.let { uiPrefs.value.lnaGains.value[it] } ?: 0
             diagnosticParts.add(getStringSuspend(Res.string.local_stats_noise, noiseFloor - gain))
         }
-        if (num_packets_rx_bad > 0) {
-            diagnosticParts.add(getStringSuspend(Res.string.local_stats_bad, num_packets_rx_bad))
-        }
-        if (num_tx_dropped > 0) diagnosticParts.add(getStringSuspend(Res.string.local_stats_dropped, num_tx_dropped))
 
         if (diagnosticParts.isNotEmpty()) {
             parts.add(
