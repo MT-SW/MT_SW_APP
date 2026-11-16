@@ -103,7 +103,7 @@ import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 private const val RING_SIZE_DP = 96
-private const val RING_STROKE_DP = 12
+private const val RING_STROKE_DP = 8
 private const val RING_ANIMATION_MILLIS = 900
 private const val FULL_CIRCLE = 360f
 private const val RING_START_ANGLE = -90f

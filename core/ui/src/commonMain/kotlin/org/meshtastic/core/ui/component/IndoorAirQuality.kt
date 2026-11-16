@@ -250,8 +250,10 @@ fun IndoorAirQuality(iaq: Int?, displayMode: IaqDisplayMode = IaqDisplayMode.Pil
                                 role = Role.Button,
                                 onClick = { isLegendOpen = true },
                             ),
-                        strokeWidth = 8.dp,
+                        strokeWidth = 4.dp,
                         color = iaqEnum.color,
+                        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+                        gapSize = 0.dp,
                     )
                     Text(text = stringResource(iaqEnum.label))
                 }

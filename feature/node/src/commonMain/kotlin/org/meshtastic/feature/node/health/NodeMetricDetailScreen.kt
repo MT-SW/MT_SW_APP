@@ -56,7 +56,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
@@ -553,39 +552,39 @@ private fun gaugeFraction(metric: NetworkHealthMetric, value: Float?): Float {
     }.coerceIn(0f, 1f)
 }
 
-private const val GAUGE_START_ANGLE = 135f
-private const val GAUGE_SWEEP = 270f
+private const val GAUGE_TOP_ANGLE = -90f
+private const val GAUGE_FULL_SWEEP = 360f
+private const val GAUGE_STROKE_DP = 4
 private const val GAUGE_ANIMATION_MILLIS = 900
 
-/** The tab icon in the middle of a glowing 270 degree gauge that fills to [fraction]. */
+/**
+ * The tab icon in the middle of a thin ring (like the rings on iPhone): a faint full circle with a slim arc over it that
+ * fills to [fraction] and takes the colour [accent] of the verdict.
+ */
 @Composable
 private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
     var target by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(fraction) { target = fraction }
     val filled by animateFloatAsState(target, tween(GAUGE_ANIMATION_MILLIS), label = "gauge")
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)
     Box(modifier = Modifier.size(HERO_ICON_DP.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = 7.dp.toPx()
+            val stroke = GAUGE_STROKE_DP.dp.toPx()
             val topLeft = Offset(stroke / 2, stroke / 2)
             val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawCircle(
-                brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
-                radius = size.minDimension / 2,
-            )
             drawArc(
                 color = track,
-                startAngle = GAUGE_START_ANGLE,
-                sweepAngle = GAUGE_SWEEP,
+                startAngle = GAUGE_TOP_ANGLE,
+                sweepAngle = GAUGE_FULL_SWEEP,
                 useCenter = false,
                 topLeft = topLeft,
                 size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round),
+                style = Stroke(width = stroke),
             )
             drawArc(
                 color = accent,
-                startAngle = GAUGE_START_ANGLE,
-                sweepAngle = GAUGE_SWEEP * filled,
+                startAngle = GAUGE_TOP_ANGLE,
+                sweepAngle = GAUGE_FULL_SWEEP * filled,
                 useCenter = false,
                 topLeft = topLeft,
                 size = arcSize,

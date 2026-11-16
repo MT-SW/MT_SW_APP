@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -121,6 +122,9 @@ private fun CooldownBaseButton(
                 CircularProgressIndicator(
                     progress = { progress },
                     modifier = Modifier.size(28.dp),
+                    strokeWidth = 2.dp,
+                    trackColor = Color.Transparent,
+                    gapSize = 0.dp,
                     strokeCap = StrokeCap.Round,
                 )
                 Text(text = remainingSeconds.toString(), style = MaterialTheme.typography.labelSmall)

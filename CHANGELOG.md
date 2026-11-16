@@ -48,6 +48,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Okrągłe paski procentów w nowym stylu iPhone'a: cienka obwódka z delikatnym torem i cienkim łukiem, który zmienia kolor wraz z wynikiem (ikona w szczegółach zdrowia węzła, miernik jakości powietrza, odliczanie przycisku, wykres kołowy zdrowia sieci jest cieńszy).
+* „Funkcje MT_SW” w Ustawieniach: kilkanaście osobnych sekcji scalone w kilka grup (Wygląd, dane i asystent; Bezpieczeństwo i obecność; Nowości i reszta), na wszystkich platformach.
 
 * Górny pasek: na karcie szczegółów węzła jest tabliczka naszego węzła obok przycisku SOS, a przy zdalnej administracji w ustawieniach tabliczka pokazuje krótką nazwę zdalnego węzła.
 * **Szybsze statystyki węzła.** Każdy ekran statystyk czyta pełną historię tylko tych danych, które pokazuje (np. ekran baterii tylko telemetrię), a resztę jako kilka najnowszych wpisów, więc otwiera się szybciej, zwłaszcza na iPhonie i iPadzie. Najnowsze dane widać od razu, a pełna historia dochodzi zaraz potem.
@@ -918,6 +920,8 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* Round percentage rings in the new iPhone style: a thin outline with a faint track and a slim arc that changes colour with the result (the icon in the node health details, the air quality gauge, the countdown of the button; the network health donut is thinner).
+* "MT_SW features" in Settings: the many separate sections are merged into a few groups (Look, data and assistant; Safety and presence; News and more), on all platforms.
 
 * Top bar: the node details card shows the plate of our node next to the SOS button, and while a remote node is administered in the settings the plate shows that node's short name.
 * **Faster node statistics.** Every statistics screen reads the full history only of the data it shows (for example the battery screen only the telemetry) and the rest as a few newest entries, so it opens faster, especially on iPhone and iPad. The newest data is shown at once and the full history follows right after.
