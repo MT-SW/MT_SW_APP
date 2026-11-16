@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -293,5 +294,37 @@ fun IndeterminateProgressLine(modifier: Modifier = Modifier, color: Color = Colo
         drawLineOutline(track, 0f, size.width, stroke)
         val loop = max(size.width * LOOP_SHARE, size.height)
         drawLineOutline(edge, (size.width - loop) * slide, loop, stroke)
+    }
+}
+
+/**
+ * A wide bar split into coloured parts ([segments] are (colour, weight) pairs), in the thin outlined look: an empty
+ * rounded outline of two thin grey edges where each part is the same outline in its own colour, so multi-colour values
+ * keep their colours. The parts fill [fillFraction] (0 to 1) of the bar, left to right.
+ */
+@Composable
+fun SegmentedProgressLine(
+    segments: List<Pair<Color, Float>>,
+    modifier: Modifier = Modifier,
+    fillFraction: Float = 1f,
+    height: Dp = LINE_HEIGHT_DP.dp,
+) {
+    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
+    Canvas(modifier = modifier.height(height).fillMaxWidth()) {
+        val stroke = (height.toPx() / LINE_STROKE_DIVISOR).coerceIn(MIN_LINE_DP.dp.toPx(), LINE_STROKE_DP.dp.toPx())
+        drawLineOutline(track, 0f, size.width, stroke)
+        val total = segments.sumOf { it.second.toDouble() }.toFloat()
+        if (total <= 0f) return@Canvas
+        var x = 0f
+        segments.forEach { (color, weight) ->
+            val part = size.width * weight / total * fillFraction.coerceIn(0f, 1f)
+            if (part > 0f) {
+                clipRect(left = x, top = 0f, right = x + part, bottom = size.height) {
+                    drawLineOutline(color, 0f, size.width, stroke)
+                }
+                if (x > 0f) drawLine(track, Offset(x, stroke), Offset(x, size.height - stroke), strokeWidth = stroke)
+            }
+            x += part
+        }
     }
 }

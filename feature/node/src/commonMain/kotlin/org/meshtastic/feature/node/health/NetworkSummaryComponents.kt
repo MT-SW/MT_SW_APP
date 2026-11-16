@@ -54,11 +54,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.SegmentedProgressLine
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 private const val GROW_MILLIS = 800
+private const val BAR_CORNER_PX = 12f
 private const val MIN_SEGMENT_WEIGHT = 0.0001f
 private const val HEADER_ICON_ALPHA = 0.18f
 private const val TRACK_ALPHA = 0.10f
@@ -140,7 +147,12 @@ internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
     val total = counts.sum()
     val grow = rememberGrow()
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(
+        if (rememberThinRings()) {
+            SegmentedProgressLine(
+                segments = DISTRIBUTION_LEVELS.mapIndexed { index, level -> level.color() to counts.getOrElse(index) { 0 }.toFloat() },
+                fillFraction = grow,
+            )
+        } else Row(
             modifier =
             Modifier.fillMaxWidth()
                 .height(14.dp)
@@ -276,6 +288,7 @@ internal fun GaugeRow(label: String, percentText: String, fraction: Float, color
 internal fun ColumnChart(values: List<Int>, labels: List<String>, color: Color, modifier: Modifier = Modifier) {
     val max = (values.maxOrNull() ?: 0).coerceAtLeast(1)
     val grow = rememberGrow()
+    val chartStyle = rememberChartStyle()
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -294,12 +307,18 @@ internal fun ColumnChart(values: List<Int>, labels: List<String>, color: Color, 
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal,
                 )
+                val barModifier = Modifier.fillMaxWidth().height((CHART_HEIGHT_DP * value / max * grow).dp.coerceAtLeast(2.dp))
                 Box(
                     modifier =
-                    Modifier.fillMaxWidth()
-                        .height((CHART_HEIGHT_DP * value / max * grow).dp.coerceAtLeast(2.dp))
-                        .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                        .background(Brush.verticalGradient(listOf(tint, tint.copy(alpha = 0.5f)))),
+                    if (chartStyle == UiOptions.CHART_STYLE_FLAT) {
+                        barModifier
+                            .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
+                            .background(Brush.verticalGradient(listOf(tint, tint.copy(alpha = 0.5f))))
+                    } else {
+                        barModifier.drawBehind {
+                            drawChartBar(chartStyle, tint, Offset.Zero, size, BAR_CORNER_PX)
+                        }
+                    },
                 )
                 Text(
                     text = labels.getOrElse(index) { "" },

@@ -244,6 +244,10 @@ import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortNum
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 /** OnDemand diagnostics screen: an overview of what it can do, then one card per query with its own request button. */
 @Composable
@@ -1189,6 +1193,7 @@ private fun AirActivityChart(entries: List<org.meshtastic.proto.AirActivityEntry
     val red = HealthLevel.MEDIUM.color()
     val purple = HealthLevel.BAD.color()
     val maxTotal = entries.maxOf { it.tx_time + it.rx_time + it.rxBad_time }.coerceAtLeast(1)
+    val chartStyle = rememberChartStyle()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth().height(AIR_CHART_DP.dp),
@@ -1204,7 +1209,14 @@ private fun AirActivityChart(entries: List<org.meshtastic.proto.AirActivityEntry
                         .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
                 ) {
                     listOf(e.rxBad_time to purple, e.rx_time to red, e.tx_time to gold).forEach { (part, tint) ->
-                        if (part > 0) Box(modifier = Modifier.weight(part.toFloat()).fillMaxWidth().background(tint))
+                        if (part > 0) {
+                            Box(
+                                modifier =
+                                Modifier.weight(part.toFloat()).fillMaxWidth().drawBehind {
+                                    drawChartBar(chartStyle, tint, Offset.Zero, size, 0f)
+                                },
+                            )
+                        }
                     }
                 }
             }

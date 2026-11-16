@@ -61,6 +61,8 @@ import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.ui.component.InfoButton
 import kotlin.time.DurationUnit
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 /**
  * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it and
@@ -130,6 +132,7 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
             } else {
                 val barColor = MaterialTheme.colorScheme.primary
                 val emptyColor = MaterialTheme.colorScheme.surfaceVariant
+                val chartStyle = rememberChartStyle()
                 Canvas(modifier = Modifier.fillMaxWidth().height(56.dp)) {
                     val slot = size.width / counts.size
                     val gap = if (slot > 4f) 1f else 0f
@@ -145,11 +148,12 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
                             )
                         } else {
                             val h = size.height * fraction
-                            drawRoundRect(
+                            drawChartBar(
+                                style = chartStyle,
                                 color = barColor,
                                 topLeft = Offset(x, size.height - h),
                                 size = Size((slot - gap).coerceAtLeast(1f), h),
-                                cornerRadius = CornerRadius(2f, 2f),
+                                corner = 2f,
                             )
                         }
                     }

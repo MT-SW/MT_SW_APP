@@ -562,8 +562,8 @@ private fun NetworkHealthMetric.rawHistoryValue(entry: org.meshtastic.core.model
 /** Sub-series labels for a metric tab's detail chart. Most metrics have one; several tabs have multiple. */
 internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.POWER -> listOf("Bateria", "Napięcie", "Prąd")
-    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Noise Floor", "WiFi RSSI", "Zerwania WiFi", "BLE RSSI")
-    NetworkHealthMetric.ETHER -> listOf("Ch. Util", "Air Util")
+    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Poziom szumu", "RSSI Wi-Fi", "Zerwania WiFi", "RSSI Bluetooth")
+    NetworkHealthMetric.ETHER -> listOf("Zajęcie kanału", "Czas nadawania")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
     NetworkHealthMetric.RESOURCES -> listOf("CPU", "RAM", "Flash", "PSRAM")
@@ -582,12 +582,12 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.SIGNAL ->
         listOf(
             listOf("SNR"),
-            listOf("RSSI", "Noise Floor"),
-            listOf("WiFi RSSI", "Zerwania WiFi"),
-            listOf("BLE RSSI"),
+            listOf("RSSI", "Poziom szumu"),
+            listOf("RSSI Wi-Fi", "Zerwania WiFi"),
+            listOf("RSSI Bluetooth"),
         )
 
-    NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
+    NetworkHealthMetric.ETHER -> listOf(listOf("Zajęcie kanału", "Czas nadawania"))
 
     NetworkHealthMetric.ENVIRONMENT -> listOf(listOf("Temperatura", "Wilgotność"), listOf("Ciśnienie"))
 
@@ -615,17 +615,17 @@ internal fun NetworkHealthMetric.historySeriesValue(
         when (seriesLabel) {
             "SNR" -> entry.snr
             "RSSI" -> entry.rssi?.toFloat()
-            "Noise Floor" -> entry.noiseFloor?.toFloat()
-            "WiFi RSSI" -> entry.wifiRssi?.toFloat()
+            "Poziom szumu" -> entry.noiseFloor?.toFloat()
+            "RSSI Wi-Fi" -> entry.wifiRssi?.toFloat()
             "Zerwania WiFi" -> entry.wifiDrops?.toFloat()
-            "BLE RSSI" -> entry.bleRssi?.toFloat()
+            "RSSI Bluetooth" -> entry.bleRssi?.toFloat()
             else -> null
         }
 
     NetworkHealthMetric.ETHER ->
         when (seriesLabel) {
-            "Ch. Util" -> entry.channelUtilization
-            "Air Util" -> entry.airUtilTx
+            "Zajęcie kanału" -> entry.channelUtilization
+            "Czas nadawania" -> entry.airUtilTx
             else -> null
         }
 
