@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -124,11 +124,7 @@ private fun LoadingContent(state: ResponseState.Loading, onComplete: () -> Unit)
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
+        ProgressLine(progress = progress, modifier = Modifier.fillMaxWidth().padding(top = 24.dp))
         state.status?.let {
             Text(
                 text = it,

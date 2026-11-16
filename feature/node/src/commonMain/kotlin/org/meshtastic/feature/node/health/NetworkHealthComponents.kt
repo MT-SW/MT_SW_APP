@@ -82,6 +82,7 @@ import org.meshtastic.core.resources.network_health_info_title
 import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.BatteryEmpty
@@ -103,7 +104,8 @@ import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 private const val RING_SIZE_DP = 96
-private const val RING_STROKE_DP = 8
+private const val RING_STROKE_DP = 12
+private const val THIN_RING_STROKE_DP = 8
 private const val RING_ANIMATION_MILLIS = 900
 private const val FULL_CIRCLE = 360f
 private const val RING_START_ANGLE = -90f
@@ -303,10 +305,11 @@ internal fun DonutChart(
             label = "donut",
         )
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val thin = rememberThinRings()
 
     Box(modifier = modifier.size(sizeDp.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = RING_STROKE_DP.dp.toPx()
+            val stroke = (if (thin) THIN_RING_STROKE_DP else RING_STROKE_DP).dp.toPx()
             val topLeft = Offset(stroke / 2, stroke / 2)
             val arcSize = Size(size.width - stroke, size.height - stroke)
             drawArc(

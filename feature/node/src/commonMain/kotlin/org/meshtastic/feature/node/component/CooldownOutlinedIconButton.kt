@@ -17,8 +17,6 @@
 package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,11 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.ui.component.ProgressRing
 
 internal const val COOL_DOWN_TIME_MS = 10000L
 internal const val REQUEST_NEIGHBORS_COOL_DOWN_TIME_MS = 10000L //  10 seconds
@@ -119,14 +116,7 @@ private fun CooldownBaseButton(
         if (isCoolingDown) {
             // The seconds left say when the radio will take the next request, before it would refuse one.
             Box(contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.size(28.dp),
-                    strokeWidth = 2.dp,
-                    trackColor = Color.Transparent,
-                    gapSize = 0.dp,
-                    strokeCap = StrokeCap.Round,
-                )
+                ProgressRing(progress = progress, size = 28.dp, classicStrokeWidth = 4.dp)
                 Text(text = remainingSeconds.toString(), style = MaterialTheme.typography.labelSmall)
             }
         } else {

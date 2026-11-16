@@ -48,7 +48,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
-* Okrągłe paski procentów w nowym stylu iPhone'a: cienka obwódka z delikatnym torem i cienkim łukiem, który zmienia kolor wraz z wynikiem (ikona w szczegółach zdrowia węzła, miernik jakości powietrza, odliczanie przycisku, wykres kołowy zdrowia sieci jest cieńszy).
+* Paski postępu w nowym stylu iPhone'a: okrągłe paski i paski poziome to cienka szara obwódka, której zapełniona część ma kolor motywu, z zaokrąglonymi końcami (potwierdzanie ustawień w zdalnym zarządzaniu węzłami, ikona w szczegółach zdrowia węzła, miernik jakości powietrza, odliczanie przycisku, wykres kołowy zdrowia sieci). W „Wygląd” jest przełącznik „Cienkie paski postępu”; gotowy wygląd „Klasyczny” przywraca starą grubą linię.
+* Widżet statystyk: szum jest w osobnej linii, a „Błędne” i „Odrzucone” w jednej (bez długiego „Diagnostyka:”), więc napisy w widżecie mogą być większe.
 * „Funkcje MT_SW” w Ustawieniach: kilkanaście osobnych sekcji scalone w kilka grup (Wygląd, dane i asystent; Bezpieczeństwo i obecność; Nowości i reszta), na wszystkich platformach.
 
 * Górny pasek: na karcie szczegółów węzła jest tabliczka naszego węzła obok przycisku SOS, a przy zdalnej administracji w ustawieniach tabliczka pokazuje krótką nazwę zdalnego węzła.
@@ -920,7 +921,8 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
-* Round percentage rings in the new iPhone style: a thin outline with a faint track and a slim arc that changes colour with the result (the icon in the node health details, the air quality gauge, the countdown of the button; the network health donut is thinner).
+* Progress bars in the new iPhone style: round rings and horizontal bars are a thin grey outline whose filled part takes the theme colour, with rounded ends (confirming settings in the remote node management, the icon in the node health details, the air quality gauge, the countdown of the button, the network health donut). "Look" has a "Thin progress bars" switch; the ready-made "Classic" look brings back the old thick line.
+* Statistics widget: the noise has its own line and "Bad" and "Dropped" share one (without the long "Diagnostics:"), so the text in the widget can be larger.
 * "MT_SW features" in Settings: the many separate sections are merged into a few groups (Look, data and assistant; Safety and presence; News and more), on all platforms.
 
 * Top bar: the node details card shows the plate of our node next to the SOS button, and while a remote node is administered in the settings the plate shows that node's short name.

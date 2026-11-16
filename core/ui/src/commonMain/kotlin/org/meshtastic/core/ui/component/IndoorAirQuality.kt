@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -241,19 +240,17 @@ fun IndoorAirQuality(iaq: Int?, displayMode: IaqDisplayMode = IaqDisplayMode.Pil
 
                 IaqDisplayMode.Gauge -> {
                     val legendLabel = stringResource(Res.string.show_iaq_legend)
-                    CircularProgressIndicator(
-                        progress = { iaq / 500f },
-                        modifier =
-                        Modifier.size(60.dp)
-                            .clickable(
-                                onClickLabel = legendLabel,
-                                role = Role.Button,
-                                onClick = { isLegendOpen = true },
-                            ),
-                        strokeWidth = 4.dp,
+                    ProgressRing(
+                        progress = iaq / 500f,
+                        size = 60.dp,
                         color = iaqEnum.color,
-                        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
-                        gapSize = 0.dp,
+                        classicStrokeWidth = 8.dp,
+                        modifier =
+                        Modifier.clickable(
+                            onClickLabel = legendLabel,
+                            role = Role.Button,
+                            onClick = { isLegendOpen = true },
+                        ),
                     )
                     Text(text = stringResource(iaqEnum.label))
                 }

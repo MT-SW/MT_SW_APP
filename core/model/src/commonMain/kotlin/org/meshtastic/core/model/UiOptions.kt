@@ -109,6 +109,11 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** Cards and bubbles give way a little under a finger, with a spring. */
         const val PRESS_SPRING = "motion.pressSpring"
 
+        /** How the round progress rings look: the old thick line or the thin iPhone-style outline. */
+        const val RING_STYLE = "rings.style"
+        const val RING_STYLE_CLASSIC = 0
+        const val RING_STYLE_THIN = 1
+
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
         const val ICON_STYLE_STANDARD = 0
@@ -179,6 +184,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(GLASS_TINT, 0)
             put(RIM, 0)
             put(PRESS_SPRING, 1)
+            put(RING_STYLE, RING_STYLE_THIN)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
                 put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)

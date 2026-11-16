@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.ui.component.ProgressRing
 import org.meshtastic.feature.settings.radio.ResponseState
 
 private const val LOADING_OVERLAY_ALPHA = 0.8f
@@ -68,11 +67,7 @@ fun LoadingOverlay(state: ResponseState<*>, modifier: Modifier = Modifier) {
                     val progress by animateFloatAsState(targetValue = clampedProgress, label = "loadingProgress")
 
                     Box(contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier.size(80.dp),
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
+                        ProgressRing(progress = progress, size = 80.dp)
                         Text(
                             text = MetricFormatter.percent(progress * PERCENTAGE_FACTOR, decimalPlaces = 0),
                             style = MaterialTheme.typography.titleMedium,

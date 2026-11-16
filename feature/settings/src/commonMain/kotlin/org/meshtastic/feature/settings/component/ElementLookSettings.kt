@@ -110,6 +110,8 @@ import org.meshtastic.core.resources.nav_select_both
 import org.meshtastic.core.resources.nav_select_bubble
 import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.ring_style_thin
+import org.meshtastic.core.resources.ring_style_thin_summary
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.LookPreview
@@ -196,6 +198,16 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         selectedItem = options[UiOptions.ICON_STYLE],
         onItemSelected = { onChange(UiOptions.ICON_STYLE, it) },
         summary = stringResource(Res.string.icon_style_summary),
+    )
+    SwitchListItem(
+        text = stringResource(Res.string.ring_style_thin),
+        supportingText = stringResource(Res.string.ring_style_thin_summary),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN,
+        onClick = {
+            val thin = options[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN
+            onChange(UiOptions.RING_STYLE, if (thin) UiOptions.RING_STYLE_CLASSIC else UiOptions.RING_STYLE_THIN)
+        },
     )
 }
 
@@ -423,6 +435,7 @@ private val LOOK_PRESETS =
             Res.string.look_preset_classic,
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
+                UiOptions.RING_STYLE to UiOptions.RING_STYLE_CLASSIC,
                 UiOptions.PRESS_SPRING to 0,
             ) + look(UiOptions.ALL_GROUPS, ElementLook.FLAT, 55),
         ),
@@ -430,6 +443,7 @@ private val LOOK_PRESETS =
             Res.string.look_preset_iphone,
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
+                UiOptions.RING_STYLE to UiOptions.RING_STYLE_THIN,
                 UiOptions.PRESS_SPRING to 1,
             ) +
                 look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
