@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -76,6 +75,7 @@ import org.meshtastic.core.resources.app_data_summary_fixed
 import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.translator_cancel
+import org.meshtastic.core.ui.component.ProgressLine
 
 /** On a computer, a model download that would leave less than this much free space (50 GB) asks first. */
 private const val LOW_SPACE_MB = 50L * 1024L
@@ -171,7 +171,7 @@ internal fun AiStorageRow() {
         when (val m = move) {
             is AiStorageMove.Moving -> {
                 Text(stringResource(Res.string.ai_storage_moving), style = MaterialTheme.typography.bodySmall)
-                LinearProgressIndicator(progress = { m.fraction }, modifier = Modifier.fillMaxWidth())
+                ProgressLine(progress = m.fraction, modifier = Modifier.fillMaxWidth())
             }
 
             is AiStorageMove.Failed ->

@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +69,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.feature.connections.model.DeviceListEntry
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 private const val RSSI_UPDATE_RATE_MS = 2000L
 
@@ -183,7 +183,7 @@ fun DeviceListItem(
                 }
 
                 if (connectionState is ConnectionState.Connecting) {
-                    CircularWavyProgressIndicator(modifier = Modifier.size(32.dp))
+                    ProgressSpinner(size = 32.dp)
                 } else {
                     RadioButton(selected = connectionState is ConnectionState.Connected, onClick = null)
                 }

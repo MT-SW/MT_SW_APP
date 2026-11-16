@@ -28,7 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -95,6 +94,7 @@ import org.meshtastic.feature.messaging.translation.TranslatorError
 import org.meshtastic.feature.messaging.translation.TranslatorHistoryEntry
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 /** The translator itself: type a text, pick the languages, translate and copy. Works fully offline. */
 @Composable
@@ -180,7 +180,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
         }
 
         if (state.busy) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
             Text(
                 text = stringResource(Res.string.translator_loading_hint),
                 style = MaterialTheme.typography.bodySmall,

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -64,6 +63,7 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPage
 import org.meshtastic.feature.docs.model.DocSection
 import org.meshtastic.feature.docs.model.ModelReadiness
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** Main documentation browser screen showing a grouped TOC. */
 @Suppress("LongMethod", "LongParameterList")
@@ -166,7 +166,7 @@ private fun DocsResultsContent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                CircularProgressIndicator()
+                ProgressSpinner()
                 Text(
                     text = stringResource(Res.string.doc_loading),
                     style = MaterialTheme.typography.bodyMedium,

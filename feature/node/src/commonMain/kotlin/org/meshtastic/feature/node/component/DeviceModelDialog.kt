@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
@@ -77,6 +76,7 @@ import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ViewInAr
 import org.meshtastic.core.ui.util.LocalDeviceModelArViewer
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** The hardware's real-size 3D model, orbitable, over the whole window; the illustration when it cannot be shown. */
 @Composable
@@ -203,7 +203,7 @@ private fun OrbitContent(
             }
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 when (val current = state) {
-                    DeviceModelState.Loading -> CircularProgressIndicator()
+                    DeviceModelState.Loading -> ProgressSpinner()
 
                     DeviceModelState.Failed -> ModelFallback(deviceHardware)
 

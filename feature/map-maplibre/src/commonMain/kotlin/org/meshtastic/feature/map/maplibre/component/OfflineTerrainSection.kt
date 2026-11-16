@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +65,7 @@ import org.meshtastic.feature.map.terrain.MapterhornEndpoints
 import org.meshtastic.feature.map.terrain.TerrainDownloadState
 import org.meshtastic.feature.map.terrain.TerrainRegionExtractor
 import org.meshtastic.feature.map.terrain.terrainTileCount
+import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * Offline terrain — hillshade and elevation contours for the viewport, downloaded as its own section of the layers
@@ -180,8 +180,8 @@ private fun TerrainDownloadControls(
                 } else {
                     0f
                 }
-            LinearProgressIndicator(
-                progress = { fraction.coerceIn(0f, 1f) },
+            ProgressLine(
+                progress = fraction.coerceIn(0f, 1f),
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             )
         }

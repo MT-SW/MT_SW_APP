@@ -43,10 +43,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -87,6 +85,9 @@ import org.meshtastic.feature.docs.model.ChirpyMessage
 import org.meshtastic.feature.docs.model.ChirpyRole
 import org.meshtastic.feature.docs.model.ModelReadiness
 import org.meshtastic.core.resources.Res as CoreRes
+import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 
 /** Chirpy AI Assistant bottom sheet with chat UI. Hidden entirely when the assistant reports unsupported. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,7 +200,7 @@ private const val PERCENT_MULTIPLIER = 100
 private fun ChirpyCheckingSheet(onDismiss: () -> Unit, modifier: Modifier = Modifier) {
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+            ProgressSpinner(size = 32.dp)
             Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(CoreRes.string.chirpy_checking), style = MaterialTheme.typography.bodyMedium)
         }
@@ -234,8 +235,8 @@ private fun ChirpyDownloadingSheet(
             Spacer(modifier = Modifier.height(12.dp))
             val progress = readiness.progress
             if (progress != null) {
-                LinearProgressIndicator(
-                    progress = { progress },
+                ProgressLine(
+                    progress = progress,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -245,7 +246,7 @@ private fun ChirpyDownloadingSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp))
+                IndeterminateProgressLine(modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp))
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(

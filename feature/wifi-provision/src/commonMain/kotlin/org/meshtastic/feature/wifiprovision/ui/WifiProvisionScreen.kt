@@ -52,7 +52,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
@@ -157,6 +156,7 @@ import org.meshtastic.feature.wifiprovision.WifiProvisionUiState.Phase
 import org.meshtastic.feature.wifiprovision.WifiProvisionUiState.ProvisionStatus
 import org.meshtastic.feature.wifiprovision.WifiProvisionViewModel
 import org.meshtastic.feature.wifiprovision.model.WifiNetwork
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val NETWORK_LIST_MAX_HEIGHT_DP = 240
 
@@ -203,7 +203,7 @@ fun WifiProvisionScreen(
         Column(modifier = Modifier.padding(padding).fillMaxSize().animateContentSize()) {
             // Indeterminate progress bar for active operations
             if (uiState.phase.isLoading) {
-                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
+                IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
             } else {
                 Spacer(Modifier.height(4.dp))
             }

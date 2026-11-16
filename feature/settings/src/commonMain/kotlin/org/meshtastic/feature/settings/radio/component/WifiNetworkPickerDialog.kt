@@ -29,7 +29,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -62,6 +61,7 @@ import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.PhoneWifiNetwork
 import org.meshtastic.core.ui.util.PhoneWifiScanner
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val GOOD_DBM = -60
 private const val OK_DBM = -70
@@ -123,7 +123,7 @@ fun WifiNetworkPickerDialog(scanner: PhoneWifiScanner, onPick: (PhoneWifiNetwork
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (loading) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
                     Text("Szukam sieci…", style = MaterialTheme.typography.bodyMedium)
                 } else if (rows.isEmpty()) {
                     Text(

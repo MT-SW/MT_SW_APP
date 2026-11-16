@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -57,6 +56,7 @@ import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.component.NotesSection
 import org.meshtastic.feature.node.component.SilenceAlertSection
 import org.meshtastic.feature.node.model.NodeDetailAction
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Shared content composable for node details, usable from both Android and Desktop.
@@ -95,7 +95,7 @@ fun NodeDetailContent(
         } else {
             val loadingDescription = stringResource(Res.string.loading)
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularWavyProgressIndicator(modifier = Modifier.semantics { contentDescription = loadingDescription })
+                ProgressSpinner(modifier = Modifier.semantics { contentDescription = loadingDescription })
             }
         }
     }

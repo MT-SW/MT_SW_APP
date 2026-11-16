@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.RadioButton
@@ -122,6 +121,7 @@ import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * The offline translator and assistant: two independent switches, and below them the models, one tab per function
@@ -576,7 +576,7 @@ private fun ModelRow(
                             text = stringResource(Res.string.translator_downloading, (state.progress * 100).toInt()),
                             style = MaterialTheme.typography.bodySmall,
                         )
-                        LinearProgressIndicator(progress = { state.progress }, modifier = Modifier.fillMaxWidth())
+                        ProgressLine(progress = state.progress, modifier = Modifier.fillMaxWidth())
                         TextButton(onClick = onCancel) { Text(stringResource(Res.string.ai_model_cancel)) }
                     }
 

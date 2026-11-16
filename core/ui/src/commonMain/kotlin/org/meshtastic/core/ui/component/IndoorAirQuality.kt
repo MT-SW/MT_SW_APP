@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -266,8 +265,8 @@ fun IndoorAirQuality(iaq: Int?, displayMode: IaqDisplayMode = IaqDisplayMode.Pil
                             onClick = { isLegendOpen = true },
                         ),
                     ) {
-                        LinearProgressIndicator(
-                            progress = { iaq / 500f },
+                        ProgressLine(
+                            progress = iaq / 500f,
                             modifier = Modifier.fillMaxWidth().height(20.dp),
                             color = iaqEnum.color,
                         )

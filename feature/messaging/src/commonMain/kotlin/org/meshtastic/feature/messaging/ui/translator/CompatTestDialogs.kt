@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -72,6 +71,7 @@ import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.CompatStep
 import org.meshtastic.feature.messaging.translation.CompatUi
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 /** The offer, the progress and the report window (with the finished package) of the assistant's compatibility test. */
 @Composable
@@ -199,7 +199,7 @@ private fun CompatRunningDialog(compat: CompatUi.Running, onCancel: () -> Unit) 
                     ),
                 )
                 if (compat.detail.isNotBlank()) Text(compat.detail)
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
                 CompatTips()
             }
         },

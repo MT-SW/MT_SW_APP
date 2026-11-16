@@ -19,7 +19,6 @@ package org.meshtastic.feature.discovery.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -42,6 +41,7 @@ import org.meshtastic.core.ui.util.DiscoveryMapNode
 import org.meshtastic.core.ui.util.DiscoveryNeighborType
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.feature.discovery.DiscoveryMapViewModel
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Full-screen map showing all discovered nodes from a scan session. Delegates to the flavor-specific map implementation
@@ -71,7 +71,7 @@ fun DiscoveryMapScreen(viewModel: DiscoveryMapViewModel, onNavigateUp: () -> Uni
         val currentSession = session
         if (currentSession == null) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                ProgressSpinner()
             }
             return@Scaffold
         }

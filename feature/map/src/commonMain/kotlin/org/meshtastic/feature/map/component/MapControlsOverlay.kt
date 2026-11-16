@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +59,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so
@@ -169,7 +169,7 @@ fun MapControlsOverlay(
             if (showRefresh) {
                 if (isRefreshing) {
                     Box(modifier = Modifier.padding(8.dp)) {
-                        CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+                        ProgressSpinner(size = 24.dp)
                     }
                 } else {
                     MapButton(

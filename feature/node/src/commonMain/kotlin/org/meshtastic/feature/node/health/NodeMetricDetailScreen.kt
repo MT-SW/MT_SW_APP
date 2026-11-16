@@ -68,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.ui.component.ProgressRing
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
@@ -556,9 +557,6 @@ private fun gaugeFraction(metric: NetworkHealthMetric, value: Float?): Float {
 
 private const val GAUGE_START_ANGLE = 135f
 private const val GAUGE_SWEEP = 270f
-private const val GAUGE_TOP_ANGLE = -90f
-private const val GAUGE_FULL_SWEEP = 360f
-private const val GAUGE_STROKE_DP = 4
 private const val GAUGE_CLASSIC_STROKE_DP = 7
 private const val GAUGE_ANIMATION_MILLIS = 900
 
@@ -573,20 +571,20 @@ private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
     LaunchedEffect(fraction) { target = fraction }
     val filled by animateFloatAsState(target, tween(GAUGE_ANIMATION_MILLIS), label = "gauge")
     val thin = rememberThinRings()
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = if (thin) 0.10f else 0.12f)
-    val startAngle = if (thin) GAUGE_TOP_ANGLE else GAUGE_START_ANGLE
-    val fullSweep = if (thin) GAUGE_FULL_SWEEP else GAUGE_SWEEP
+    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val startAngle = GAUGE_START_ANGLE
+    val fullSweep = GAUGE_SWEEP
     Box(modifier = Modifier.size(HERO_ICON_DP.dp), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = (if (thin) GAUGE_STROKE_DP else GAUGE_CLASSIC_STROKE_DP).dp.toPx()
+        if (thin) {
+            ProgressRing(progress = filled, size = HERO_ICON_DP.dp, color = accent)
+        } else Canvas(modifier = Modifier.fillMaxSize()) {
+            val stroke = GAUGE_CLASSIC_STROKE_DP.dp.toPx()
             val topLeft = Offset(stroke / 2, stroke / 2)
             val arcSize = Size(size.width - stroke, size.height - stroke)
-            if (!thin) {
-                drawCircle(
-                    brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
-                    radius = size.minDimension / 2,
-                )
-            }
+            drawCircle(
+                brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
+                radius = size.minDimension / 2,
+            )
             drawArc(
                 color = track,
                 startAngle = startAngle,
@@ -594,7 +592,7 @@ private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
                 useCenter = false,
                 topLeft = topLeft,
                 size = arcSize,
-                style = Stroke(width = stroke, cap = if (thin) StrokeCap.Butt else StrokeCap.Round),
+                style = Stroke(width = stroke, cap = StrokeCap.Round),
             )
             drawArc(
                 color = accent,

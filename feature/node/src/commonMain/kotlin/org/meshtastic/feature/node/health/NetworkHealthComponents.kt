@@ -82,6 +82,8 @@ import org.meshtastic.core.resources.network_health_info_title
 import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.SegmentedProgressRing
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -103,9 +105,9 @@ import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
+private const val THIN_BAR_HEIGHT_DP = 8
 private const val RING_SIZE_DP = 96
 private const val RING_STROKE_DP = 12
-private const val THIN_RING_STROKE_DP = 8
 private const val RING_ANIMATION_MILLIS = 900
 private const val FULL_CIRCLE = 360f
 private const val RING_START_ANGLE = -90f
@@ -308,8 +310,14 @@ internal fun DonutChart(
     val thin = rememberThinRings()
 
     Box(modifier = modifier.size(sizeDp.dp), contentAlignment = Alignment.Center) {
+        if (thin) {
+            SegmentedProgressRing(
+                segments = segments.map { (color, count) -> color to if (total > 0) count.toFloat() / total * progress else 0f },
+                size = sizeDp.dp,
+            )
+        } else {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = (if (thin) THIN_RING_STROKE_DP else RING_STROKE_DP).dp.toPx()
+            val stroke = RING_STROKE_DP.dp.toPx()
             val topLeft = Offset(stroke / 2, stroke / 2)
             val arcSize = Size(size.width - stroke, size.height - stroke)
             drawArc(
@@ -339,6 +347,7 @@ internal fun DonutChart(
                     }
                 }
             }
+        }
         }
         Text(text = centerText, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     }
@@ -537,6 +546,10 @@ private fun NameBadge(text: String, color: Color) {
 /** Thin bar that shows how full the value is (battery level, channel use, signal strength, neighbor count). */
 @Composable
 private fun LevelBar(fraction: Float, color: Color) {
+    if (rememberThinRings()) {
+        ProgressLine(progress = fraction, color = color, height = THIN_BAR_HEIGHT_DP.dp)
+        return
+    }
     Box(
         modifier =
         Modifier.fillMaxWidth()

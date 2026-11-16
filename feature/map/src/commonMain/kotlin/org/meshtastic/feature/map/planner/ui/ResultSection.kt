@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,6 +91,7 @@ import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.state.MeasuredComparison
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerUiState
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val RECOMMENDED_FRESNEL_RATIO = 0.6
 
@@ -100,7 +100,7 @@ private const val RECOMMENDED_FRESNEL_RATIO = 0.6
 internal fun ResultSection(state: PlannerUiState) {
     PlannerCard(title = stringResource(Res.string.planner_section_result), info = PlannerInfoTopic.LINK_RESULT) {
         state.error?.let { PlannerNotice(text = errorText(it), isError = true) }
-        if (state.computing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        if (state.computing) IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
         if (!state.isLinkReady) {
             PlannerNotice(text = stringResource(Res.string.planner_result_need_points))
             PlannerSide.entries.forEach { side ->

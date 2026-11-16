@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,6 +76,7 @@ import org.meshtastic.proto.Config.LoRaConfig.RegionCode
 import org.meshtastic.proto.ExcludedModules
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.User
+import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * The guided setup for the connected radio: region, preset and name, then a summary. Every write goes through
@@ -210,7 +210,7 @@ fun RadioSetupScreen(
             ) {
                 // The flow has a known length, so the page shows where it is in it.
                 val progress = (stepIndex + 1).toFloat() / steps.size
-                LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+                ProgressLine(progress = progress, modifier = Modifier.fillMaxWidth())
                 when (step) {
                     RadioSetupStep.INTRO -> IntroPage()
 

@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -87,6 +86,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.feature.settings.export.LogExportSaverLauncher
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** The three top-bar actions for [SnifferSettingsScreen] -- save, open the gear menu, and clear. */
 @Composable
@@ -242,7 +242,7 @@ private fun SnifferSourceSelector(
         onClick = { onSelectSource(SnifferSource.RADIO) },
         trailingContent = {
             if (radioLoading) {
-                CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+                ProgressSpinner(size = 24.dp)
             } else {
                 RadioButton(selected = activeSource == SnifferSource.RADIO, onClick = null, enabled = radioSelectable)
             }

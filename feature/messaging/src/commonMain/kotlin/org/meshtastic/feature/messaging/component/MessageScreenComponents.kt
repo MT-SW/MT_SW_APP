@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
@@ -146,6 +145,7 @@ import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.feature.messaging.DeliveryInfo
 import org.meshtastic.feature.messaging.TranslationDialogState
 import org.meshtastic.proto.ChannelSet
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 // region ── ScrollToBottomFab ──
 
@@ -323,7 +323,7 @@ internal fun TranslationModelDownloadDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        ProgressSpinner(size = 24.dp)
                         Text(stringResource(Res.string.translation_downloading))
                     }
                 },

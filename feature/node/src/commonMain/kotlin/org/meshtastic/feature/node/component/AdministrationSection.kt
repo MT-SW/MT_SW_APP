@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -87,6 +86,7 @@ import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.NodeDetailAction
 import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.HardwareModel
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 @Composable
 fun AdministrationSection(
@@ -211,7 +211,7 @@ private fun RemoteAdminListItem(
         )
         AnimatedVisibility(visible = isEnsuringSession) {
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
-                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
+                IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
                 androidx.compose.material3.Text(
                     text = stringResource(Res.string.establishing_session),
                     style = MaterialTheme.typography.bodySmall,

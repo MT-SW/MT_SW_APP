@@ -4061,7 +4061,7 @@
     <string name="nav_select_both">Tło i kreska</string>
     <string name="press_spring">Karty i dymki uginają się pod palcem (sprężyna)</string>
     <string name="ring_style_thin">Cienkie paski postępu (jak w iPhonie)</string>
-    <string name="ring_style_thin_summary">Okrągłe paski i paski postępu są cienką szarą obwódką, która w miarę zapełniania przybiera kolor motywu. Po wyłączeniu wraca stara gruba linia.</string>
+    <string name="ring_style_thin_summary">Paski postępu i kręcące się kółka oczekiwania to dwie cienkie szare linie (pusty obrys), a zapełniana część to też obrys w kolorze motywu. Zamiast zygzaku jest kółko lub pasek z kręcącym się, przesuwającym się elementem z cienkich linii. Po wyłączeniu wraca stary wygląd.</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
     <string name="data_logs_title">Dane, logi i diagnostyka</string>
     <string name="data_logs_summary">Zbieranie i przechowywanie logów, miejsce danych aplikacji, archiwum wiadomości i test powiadomień.</string>

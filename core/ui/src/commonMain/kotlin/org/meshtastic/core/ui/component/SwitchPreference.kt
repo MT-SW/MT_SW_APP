@@ -22,7 +22,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -61,7 +60,7 @@ fun SwitchPreference(
         trailingContent = {
             AnimatedContent(targetState = loading) { loading ->
                 if (loading) {
-                    CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+                    ProgressSpinner(size = 24.dp)
                 } else {
                     Switch(enabled = enabled, checked = checked, onCheckedChange = null)
                 }

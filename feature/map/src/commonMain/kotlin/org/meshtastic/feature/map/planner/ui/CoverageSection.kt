@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -89,6 +88,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.roundToInt
+import org.meshtastic.core.ui.component.ProgressLine
 
 private const val GRID = 80
 private const val METERS_PER_DEG_LAT = 110_574.0
@@ -211,7 +211,7 @@ internal fun CoverageSection(
             }
         }
         if (state.coverageComputing) {
-            LinearProgressIndicator(progress = { state.coverageProgress }, modifier = Modifier.fillMaxWidth())
+            ProgressLine(progress = state.coverageProgress, modifier = Modifier.fillMaxWidth())
             state.clutterProgress?.let { p ->
                 Text(
                     text = stringResource(Res.string.planner_precise_progress, p.done, p.total),

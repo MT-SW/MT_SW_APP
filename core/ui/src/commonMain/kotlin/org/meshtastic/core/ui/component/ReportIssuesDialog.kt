@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -218,7 +217,7 @@ fun ReportIssuesDialog(
                 }
                 if (busy) {
                     Spacer(Modifier.height(8.dp))
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
                     Text(stringResource(Res.string.report_sending), style = MaterialTheme.typography.bodySmall)
                 }
                 result?.let {

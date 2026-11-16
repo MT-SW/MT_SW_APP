@@ -53,6 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
@@ -230,6 +232,10 @@ private fun medal(index: Int): String = when (index) {
 /** A thin rounded bar filled to [fraction] (0 to 1). */
 @Composable
 internal fun ProgressTrack(fraction: Float, color: Color, modifier: Modifier = Modifier, height: Int = 8) {
+    if (rememberThinRings()) {
+        ProgressLine(progress = fraction, modifier = modifier, color = color, height = height.dp)
+        return
+    }
     Box(
         modifier =
         modifier

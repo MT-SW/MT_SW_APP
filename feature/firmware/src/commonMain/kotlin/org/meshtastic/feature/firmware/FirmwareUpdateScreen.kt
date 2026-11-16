@@ -39,11 +39,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -204,6 +202,9 @@ import org.meshtastic.feature.firmware.game.ChirpyHopDialog
 import org.meshtastic.feature.firmware.game.ChirpyHopPlayButton
 import org.meshtastic.feature.firmware.game.ChirpyHopUpdatePhase
 import org.meshtastic.feature.firmware.game.toChirpyHopStatus
+import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.ProgressRing
+import org.meshtastic.core.ui.component.ProgressLine
 
 private const val CYCLE_DELAY_MS = 4500L
 
@@ -553,7 +554,7 @@ private fun FirmwareUpdateContent(
 
 @Composable
 internal fun VerifyingState(onPlayChirpyHop: (() -> Unit)? = null) {
-    CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
+    ProgressSpinner(size = 64.dp)
     Spacer(Modifier.height(24.dp))
     Text(stringResource(Res.string.firmware_update_verifying), style = MaterialTheme.typography.titleMedium)
     Spacer(Modifier.height(8.dp))
@@ -572,7 +573,7 @@ internal fun VerifyingState(onPlayChirpyHop: (() -> Unit)? = null) {
 
 @Composable
 internal fun CheckingState() {
-    CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
+    ProgressSpinner(size = 64.dp)
     Spacer(Modifier.height(24.dp))
     Text(stringResource(Res.string.firmware_update_checking), style = MaterialTheme.typography.bodyLarge)
 }
@@ -1379,10 +1380,10 @@ private fun ProgressContent(
                 tint = MaterialTheme.colorScheme.primary,
             )
         } else if (isUpdating) {
-            CircularWavyProgressIndicator(progress = { progressState.progress }, modifier = Modifier.size(64.dp))
+            ProgressRing(progress = progressState.progress, size = 64.dp)
         } else {
             // Waits (reboot, bootloader swap) have no measure of progress; a full static ring read as stalled.
-            CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
+            ProgressSpinner(size = 64.dp)
         }
 
         Spacer(Modifier.height(24.dp))
@@ -1418,8 +1419,8 @@ private fun ProgressContent(
         Spacer(Modifier.height(12.dp))
 
         if (isDownloading || isUpdating) {
-            LinearWavyProgressIndicator(
-                progress = { progressState.progress },
+            ProgressLine(
+                progress = progressState.progress,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             )
         }
@@ -1472,7 +1473,7 @@ internal fun AwaitingFileSaveState(
         )
     }
 
-    CircularWavyProgressIndicator(modifier = Modifier.size(64.dp))
+    ProgressSpinner(size = 64.dp)
     Spacer(Modifier.height(24.dp))
     Text(
         stringResource(Res.string.firmware_update_save_dfu_file),

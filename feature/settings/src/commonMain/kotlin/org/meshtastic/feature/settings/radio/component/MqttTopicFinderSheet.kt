@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
@@ -63,6 +62,8 @@ import org.meshtastic.core.resources.mqtt_topic_finder_only_above
 import org.meshtastic.core.resources.mqtt_topic_finder_sample_again
 import org.meshtastic.core.resources.mqtt_topic_finder_subscribing
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 
 private const val MAX_ACTIVE_ROWS = 30
 private const val DEFAULT_BROKER = "mqtt.meshtastic.org"
@@ -162,8 +163,8 @@ private fun StatusBlock(state: MqttTopicFinderViewModel.UiState, host: String, o
                         Text(stringResource(Res.string.mqtt_topic_finder_listening), modifier = Modifier.weight(1f))
                         Text(clock(phase.secondsRemaining), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    LinearProgressIndicator(
-                        progress = { (1f - phase.secondsRemaining / total).coerceIn(0f, 1f) },
+                    ProgressLine(
+                        progress = (1f - phase.secondsRemaining / total).coerceIn(0f, 1f),
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -202,7 +203,7 @@ private fun SampleAgain(onRestart: () -> Unit) {
 private fun Busy(label: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label)
-        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
     }
 }
 

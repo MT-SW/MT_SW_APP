@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -138,6 +137,7 @@ import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.MemberRole
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.Team
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 // ── TAK Config Screen (Module Settings) ─────────────────────────────────────
 // Shows only the firmware module config: team and role dropdowns.
@@ -635,7 +635,7 @@ internal fun TakMeshTestCardContent(
                 )
             }
             if (isRunning) {
-                CircularProgressIndicator()
+                ProgressSpinner()
             } else {
                 Button(onClick = onRunTests) {
                     Icon(imageVector = MeshtasticIcons.PlayArrow, contentDescription = null)

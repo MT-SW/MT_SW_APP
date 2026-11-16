@@ -51,11 +51,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -200,6 +198,9 @@ import kotlin.math.tan
 import kotlin.time.Clock
 import kotlin.time.TimeSource
 import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
+import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -510,7 +511,7 @@ fun TerrainHorizonScreen(
             when {
                 state.loading ->
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator()
+                        ProgressSpinner()
                         Text(
                             stringResource(Res.string.terrain_horizon_loading),
                             color = MaterialTheme.colorScheme.onBackground,
@@ -1852,12 +1853,12 @@ private fun OfflineBuildings(
                     fontSize = 12.sp,
                 )
                 if (progress != null && progress.total > 0) {
-                    LinearProgressIndicator(
-                        progress = { progress.done.toFloat() / progress.total },
+                    ProgressLine(
+                        progress = progress.done.toFloat() / progress.total,
                         modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     )
                 } else {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+                    IndeterminateProgressLine(modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
                 }
             }
 

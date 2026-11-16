@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 /**
  * Section header used to group content in the Connections list.
@@ -64,7 +64,7 @@ fun DeviceSectionHeader(
             trailing()
         }
         if (showProgress) {
-            LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
+            IndeterminateProgressLine(modifier = Modifier.fillMaxWidth())
         }
     }
 }

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +39,7 @@ import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.reconnecting
 import org.meshtastic.core.resources.stop_connecting
 import org.meshtastic.core.ui.viewmodel.ConnectionStatus
+import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Displays the currently connecting (or connected) device with its name, address, connection status, and a disconnect
@@ -85,7 +85,7 @@ fun ConnectingDeviceInfo(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            CircularWavyProgressIndicator(modifier = Modifier.size(40.dp))
+            ProgressSpinner(size = 40.dp)
 
             Column {
                 Text(text = deviceName, style = MaterialTheme.typography.headlineSmall)

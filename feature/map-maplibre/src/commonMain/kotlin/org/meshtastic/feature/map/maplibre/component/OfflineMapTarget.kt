@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,6 +80,8 @@ import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.offlineStyleJson
 import org.meshtastic.feature.map.maplibre.tileCount
 import kotlin.math.roundToInt
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 
 /** What the map must tell the offline sheet: which style to pack, and which region is on screen. */
 internal class OfflineMapTarget(
@@ -147,7 +148,7 @@ internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (Boundin
 
         when {
             managerState is OfflineStorageState.Loading ->
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+                IndeterminateProgressLine(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
 
             managerState is OfflineStorageState.Failed -> {
                 Text(
@@ -233,8 +234,8 @@ private fun OfflinePackRow(
         ) {
             Text(text = pack.label(), style = MaterialTheme.typography.bodyLarge)
             if (progress is DownloadProgress.Healthy && progress.status != DownloadStatus.Complete) {
-                LinearProgressIndicator(
-                    progress = { progress.fraction() },
+                ProgressLine(
+                    progress = progress.fraction(),
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 )
             } else {
