@@ -36,6 +36,11 @@ class DeepLinkRouterTest {
     }
 
     @Test
+    fun `sos link opens the SOS screen under settings`() {
+        assertEquals(listOf(SettingsRoute.Settings(), SettingsRoute.Sos), route("/sos"))
+    }
+
+    @Test
     fun `unrecognized segment returns null`() {
         assertNull(route("/unknown-page"))
     }

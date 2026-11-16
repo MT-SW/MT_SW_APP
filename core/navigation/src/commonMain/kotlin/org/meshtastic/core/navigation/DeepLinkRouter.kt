@@ -54,6 +54,7 @@ private typealias DeepLinkArgs = Map<String, List<String>>
  * - `/messages/{contactKey}` -> Specific conversation
  * - `/settings` -> Settings root
  * - `/settings/{destNum}/{page}` -> Specific settings page for a node
+ * - `/sos` -> SOS screen (app-only link used by the widget, the shortcut and the quick tile)
  * - `/wifi-provision` -> WiFi provisioning screen
  * - `/wifi-provision?address={mac}` -> WiFi provisioning targeting a specific device MAC address
  * - `/connections?address={prefixedAddress}` -> Connections screen, auto-connecting to a prefixed device address (e.g.
@@ -61,6 +62,8 @@ private typealias DeepLinkArgs = Map<String, List<String>>
  *   `address=n` disconnects instead of connecting. A BLE address may add `&pin={pin}`, the node's fixed pairing PIN.
  */
 object DeepLinkRouter {
+    private const val SOS_SEGMENT = "sos"
+
     /**
      * Canonical set of top-level path segments this router dispatches on. [route] refuses segments outside this set, so
      * a new pattern stays dead (and its feature tests fail) until its segment is added here. Every entry must also be
@@ -101,6 +104,10 @@ object DeepLinkRouter {
      */
     fun route(uri: CommonUri): List<NavKey>? {
         val firstSegment = uri.pathSegments.firstOrNull { it.isNotBlank() }?.lowercase()
+
+        // The SOS shortcut, the home-screen widget and the quick tile open `meshtastic://meshtastic/sos`. It is an
+        // app-only link (it is not in the App Links filter), so it is answered here and not through the pattern list.
+        if (firstSegment == SOS_SEGMENT) return listOf(SettingsRoute.Settings(), SettingsRoute.Sos)
 
         if (firstSegment !in topLevelPathSegments) {
             // /e/ and /v/ are channel-set/contact import links, not navigation routes: returning null here lets
