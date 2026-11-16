@@ -110,6 +110,10 @@ import org.meshtastic.core.resources.nav_select_both
 import org.meshtastic.core.resources.nav_select_bubble
 import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.button_style_glass
+import org.meshtastic.core.resources.button_style_glass_summary
+import org.meshtastic.core.resources.control_style_thin
+import org.meshtastic.core.resources.control_style_thin_summary
 import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.ring_style_thin_summary
 import org.meshtastic.core.ui.component.DropDownPreference
@@ -207,6 +211,32 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         onClick = {
             val thin = options[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN
             onChange(UiOptions.RING_STYLE, if (thin) UiOptions.RING_STYLE_CLASSIC else UiOptions.RING_STYLE_THIN)
+        },
+    )
+    SwitchListItem(
+        text = stringResource(Res.string.control_style_thin),
+        supportingText = stringResource(Res.string.control_style_thin_summary),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options[UiOptions.CONTROL_STYLE] == UiOptions.CONTROL_STYLE_THIN,
+        onClick = {
+            val thin = options[UiOptions.CONTROL_STYLE] == UiOptions.CONTROL_STYLE_THIN
+            onChange(
+                UiOptions.CONTROL_STYLE,
+                if (thin) UiOptions.CONTROL_STYLE_CLASSIC else UiOptions.CONTROL_STYLE_THIN,
+            )
+        },
+    )
+    SwitchListItem(
+        text = stringResource(Res.string.button_style_glass),
+        supportingText = stringResource(Res.string.button_style_glass_summary),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options[UiOptions.BUTTON_STYLE] == UiOptions.BUTTON_STYLE_GLASS,
+        onClick = {
+            val glass = options[UiOptions.BUTTON_STYLE] == UiOptions.BUTTON_STYLE_GLASS
+            onChange(
+                UiOptions.BUTTON_STYLE,
+                if (glass) UiOptions.BUTTON_STYLE_CLASSIC else UiOptions.BUTTON_STYLE_GLASS,
+            )
         },
     )
     ChartStyleSettings(options, onChange)
@@ -437,6 +467,8 @@ private val LOOK_PRESETS =
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_STANDARD,
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_CLASSIC,
+                UiOptions.CONTROL_STYLE to UiOptions.CONTROL_STYLE_CLASSIC,
+                UiOptions.BUTTON_STYLE to UiOptions.BUTTON_STYLE_CLASSIC,
                 UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_FLAT,
                 UiOptions.PRESS_SPRING to 0,
             ) + look(UiOptions.ALL_GROUPS, ElementLook.FLAT, 55),
@@ -446,6 +478,8 @@ private val LOOK_PRESETS =
             mapOf(
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_THIN,
+                UiOptions.CONTROL_STYLE to UiOptions.CONTROL_STYLE_THIN,
+                UiOptions.BUTTON_STYLE to UiOptions.BUTTON_STYLE_GLASS,
                 UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS,
                 UiOptions.PRESS_SPRING to 1,
             ) +

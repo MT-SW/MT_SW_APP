@@ -114,6 +114,16 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val RING_STYLE_CLASSIC = 0
         const val RING_STYLE_THIN = 1
 
+        /** How sliders, switches and check boxes look: the Material ones or the thin iPhone-style outlines. */
+        const val CONTROL_STYLE = "controls.style"
+        const val CONTROL_STYLE_CLASSIC = 0
+        const val CONTROL_STYLE_THIN = 1
+
+        /** How the filled buttons look: the plain Material ones or glossy glass. */
+        const val BUTTON_STYLE = "buttons.style"
+        const val BUTTON_STYLE_CLASSIC = 0
+        const val BUTTON_STYLE_GLASS = 1
+
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
          * [CHART_STYLE_GLASS] (default: glossy 3D glass with a gradient), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
@@ -205,6 +215,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RIM, 0)
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
+            put(CONTROL_STYLE, CONTROL_STYLE_THIN)
+            put(BUTTON_STYLE, BUTTON_STYLE_GLASS)
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)

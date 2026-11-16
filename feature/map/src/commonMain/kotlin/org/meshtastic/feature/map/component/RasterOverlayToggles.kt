@@ -17,7 +17,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Checkbox
+import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

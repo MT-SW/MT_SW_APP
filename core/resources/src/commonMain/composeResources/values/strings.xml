@@ -727,6 +727,8 @@
     <string name="button_gradient_off">Off</string>
     <string name="button_gradient_strong">Strong</string>
     <string name="button_gradient_weak">Delicate</string>
+    <string name="button_style_glass">Glass buttons</string>
+    <string name="button_style_glass_summary">The filled buttons (the coloured ones) look like glass: lighter at the top and darker at the bottom, with a soft gloss on the upper half and a thin light rim. Off brings back the plain buttons.</string>
     <plurals name="cache_limit_eviction_warning">
         <item quantity="one">Lowering this will permanently delete the saved history for %1$d device.</item>
         <item quantity="other">Lowering this will permanently delete the saved history for %1$d devices.</item>
@@ -951,6 +953,8 @@
     <string name="contrast_high">High</string>
     <string name="contrast_medium">Medium</string>
     <string name="contrast_standard">Standard</string>
+    <string name="control_style_thin">Thin sliders, switches and check boxes (like on the iPhone)</string>
+    <string name="control_style_thin_summary">Sliders, switches and check boxes everywhere in the app are drawn only as thin outlines with rounded ends and no filled areas: an empty track with a coloured outline up to the value, a ring instead of a knob, an outlined switch with a ring that slides, and an outlined box with a thin tick. Off brings back the old look.</string>
     <string name="conversations">Conversations</string>
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
