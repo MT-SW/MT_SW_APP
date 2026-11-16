@@ -21,7 +21,6 @@ import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.update
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
 import org.koin.core.component.KoinComponent
