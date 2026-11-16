@@ -16,10 +16,8 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -126,7 +124,9 @@ private fun MapLayersSheet(
     // The whole sheet scrolls, and the imported layers (with their add buttons) come first with their own bounded
     // height, so they are never pushed off the bottom of a full-screen sheet.
     Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-        Box(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)) { extra() }
+        // A column, not a box: the slot can bring several parts (imported layers, signal survey) and a box would draw
+        // them on top of each other.
+        Column(modifier = Modifier.fillMaxWidth()) { extra() }
 
         HorizontalDivider()
 

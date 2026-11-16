@@ -16,8 +16,13 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
 import org.meshtastic.feature.map.component.CustomMapLayersSheet
@@ -39,14 +44,17 @@ fun ImportedLayersSlot() {
     val opacity by opacityStore.opacity.collectAsStateWithLifecycle()
     val picker = rememberMapLayerPicker(onPick = manager::addMapLayer)
 
-    CustomMapLayersSheet(
-        mapLayers = layers,
-        onToggleVisibility = manager::toggleLayerVisibility,
-        onRemoveLayer = manager::removeMapLayer,
-        onAddLayerClicked = picker::pick,
-        onRefreshLayer = manager::refreshMapLayer,
-        onAddNetworkLayer = manager::addNetworkMapLayer,
-        opacity = opacity,
-        onOpacityChange = opacityStore::setOpacity,
-    )
+    // Bounded here so a long list of imported layers never pushes the parts below it off the sheet.
+    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)) {
+        CustomMapLayersSheet(
+            mapLayers = layers,
+            onToggleVisibility = manager::toggleLayerVisibility,
+            onRemoveLayer = manager::removeMapLayer,
+            onAddLayerClicked = picker::pick,
+            onRefreshLayer = manager::refreshMapLayer,
+            onAddNetworkLayer = manager::addNetworkMapLayer,
+            opacity = opacity,
+            onOpacityChange = opacityStore::setOpacity,
+        )
+    }
 }
