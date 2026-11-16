@@ -19,6 +19,7 @@
     android:label="@string/widget_sos_label"
     android:description="@string/widget_sos_description"
     android:initialLayout="@layout/glance_default_loading_layout"
+    android:previewLayout="@layout/widget_sos_preview"
     android:minWidth="110dp"
     android:minHeight="55dp"
     android:targetCellWidth="2"

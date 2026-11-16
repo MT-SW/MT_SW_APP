@@ -22,6 +22,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
@@ -56,30 +57,38 @@ private val MIN_PUBLISH_INTERVAL = 30.seconds
 /** The widget is asked to reload at most this often: iOS limits the reloads and ignores them once they run out. */
 private val MIN_RELOAD_INTERVAL = 5.minutes
 
+/** Everything one written file depends on; a change of any part writes a new file. */
+private data class WidgetInputs(val snapshot: MeshStatsSnapshot, val small: Int, val second: Int, val sosTaps: Int)
+
 /**
  * Publishes the statistics for the widget of iPhone/iPad: the same lines as the permanent notification on Android (the
  * shared [MeshStatsFeed]). Without the App Group (for example a build signed without it) nothing is written and the
  * widget shows a hint to open the app.
  */
-class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: UiPrefs) {
+class IosWidgetPublisher(
+    private val feed: MeshStatsFeed,
+    private val uiPrefs: UiPrefs,
+    private val sosPrefs: SosPrefs,
+) {
     private var lastReload = Clock.System.now() - MIN_RELOAD_INTERVAL
 
     /** Runs for as long as the caller lives: writes a new file whenever the statistics change (at most every 30 s). */
     suspend fun run() {
         // What the widget shows in its sizes is chosen in the app settings and travels with the statistics.
-        combine(feed.snapshots(withNodes = true), uiPrefs.androidWidgetSmall, uiPrefs.androidWidgetSecond) {
-                snapshot,
-                small,
-                second,
-            ->
-            Triple(snapshot, small, second)
+        combine(
+            feed.snapshots(withNodes = true),
+            uiPrefs.androidWidgetSmall,
+            uiPrefs.androidWidgetSecond,
+            sosPrefs.widgetTaps,
+        ) { snapshot, small, second, sosTaps ->
+            WidgetInputs(snapshot, small, second, sosTaps)
         }
             .conflate()
-            .collect { (snapshot, small, second) ->
+            .collect { (snapshot, small, second, sosTaps) ->
                 runCatching {
                     // The words on the widget follow the language of the app, not of the phone: the app writes them.
                     val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                    write(json(snapshot, updated, small, second))
+                    write(json(snapshot, updated, small, second, sosTaps))
                 }
                     .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
                 delay(MIN_PUBLISH_INTERVAL)
@@ -88,7 +97,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
 
     private fun clockTime(): String = NSDateFormatter().apply { dateFormat = "HH:mm" }.stringFromDate(NSDate())
 
-    private fun json(snapshot: MeshStatsSnapshot, updatedText: String, small: Int, second: Int): String =
+    private fun json(snapshot: MeshStatsSnapshot, updatedText: String, small: Int, second: Int, sosTaps: Int): String =
         "{\"title\":${quote(snapshot.title)},\"chip\":${quote(snapshot.chip)}," +
             "${chipJson(snapshot.shortName, snapshot.color, snapshot.textColor)}," +
             "\"connected\":${snapshot.connected}," +
@@ -96,7 +105,7 @@ class IosWidgetPublisher(private val feed: MeshStatsFeed, private val uiPrefs: U
             "\"groups\":[${snapshot.groups.joinToString(",") { group ->
                 "{\"title\":${quote(group.title)},\"column\":${group.column},\"lines\":${lines(group.lines)}}"
             }}]," +
-            "\"small\":$small,\"second\":$second,\"favorites\":${cards(
+            "\"small\":$small,\"second\":$second,\"sosTaps\":$sosTaps,\"favorites\":${cards(
                 snapshot.favorites,
             )},\"others\":${cards(snapshot.others)},\"network\":${cards(snapshot.network)}}"
 

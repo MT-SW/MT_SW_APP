@@ -477,17 +477,87 @@ struct MTSWStatsWidget: Widget {
     }
 }
 
-/// Widżet „SOS”: dotknięcie otwiera ekran SOS w aplikacji (jak skrót „SOS MT_SW”). Alarm wysyła się dopiero po przytrzymaniu
-/// przycisku na tym ekranie, więc dotknięcie widżetu w kieszeni nie wyśle fałszywego alarmu.
+/// Widżet „SOS”: alarm wysyła się po kilku szybkich dotknięciach pod rząd (liczbę ustawia się w ustawieniach SOS w aplikacji,
+/// najmniej trzy), żeby kieszeń nie wysłała fałszywego alarmu. Przytrzymanie nie działa w widżecie. Dotknięcia liczy
+/// `SosTapIntent`; ostatnie dotknięcie otwiera aplikację, a ta wysyła alarm (widżet sam nie ma połączenia z radiem).
+/// Ile dotknięć zlicza się do jednej serii: kolejne dotknięcie musi przyjść w tym czasie (sekundy).
+private let sosTapWindow: Double = 2.5
+private let sosMinTaps = 3
+
+private func sosGroupFolder() -> URL? {
+    FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)
+}
+
+/// Ile dotknięć wysyła alarm: aplikacja zapisuje to w pliku ze statystykami (`sosTaps`), nigdy mniej niż trzy.
+private func sosNeededTaps() -> Int {
+    guard let folder = sosGroupFolder(),
+          let raw = try? Data(contentsOf: folder.appendingPathComponent("widget-stats.json")),
+          let json = try? JSONSerialization.jsonObject(with: raw) as? [String: Any],
+          let taps = json["sosTaps"] as? Int else { return sosMinTaps }
+    return max(taps, sosMinTaps)
+}
+
+/// Zliczone dotknięcia i chwila ostatniego (sekundy od 1970); seria starsza niż okno liczy się jako zero.
+private func sosReadTaps() -> (count: Int, last: Double) {
+    guard let folder = sosGroupFolder(),
+          let text = try? String(contentsOf: folder.appendingPathComponent("sos-taps.txt"), encoding: .utf8) else { return (0, 0) }
+    let parts = text.split(separator: ",")
+    guard parts.count == 2, let count = Int(parts[0]), let last = Double(parts[1]) else { return (0, 0) }
+    return (count, last)
+}
+
+private func sosWriteTaps(_ count: Int, _ last: Double) {
+    guard let folder = sosGroupFolder() else { return }
+    try? "\(count),\(last)".write(to: folder.appendingPathComponent("sos-taps.txt"), atomically: true, encoding: .utf8)
+}
+
+/// Jedno dotknięcie widżetu SOS (liczone w widżecie). Przedostatnie dotknięcie „uzbraja” ostatnie: zapisuje chwilę w pliku,
+/// który aplikacja sprawdza, zanim wyśle alarm.
+struct SosTapIntent: AppIntent {
+    static var title: LocalizedStringResource = "SOS MT_SW: dotknięcie"
+    static var isDiscoverable: Bool = false
+    static var openAppWhenRun: Bool = false
+
+    func perform() async throws -> some IntentResult {
+        let now = Date().timeIntervalSince1970
+        let previous = sosReadTaps()
+        let count = (previous.count > 0 && now - previous.last >= 0 && now - previous.last <= sosTapWindow)
+            ? previous.count + 1 : 1
+        sosWriteTaps(count, now)
+        if count >= sosNeededTaps() - 1, let folder = sosGroupFolder() {
+            try? "\(now)".write(to: folder.appendingPathComponent("sos-armed.txt"), atomically: true, encoding: .utf8)
+        }
+        WidgetCenter.shared.reloadTimelines(ofKind: "MTSWSosWidget")
+        return .result()
+    }
+}
+
 struct SosEntry: TimelineEntry {
     let date: Date
+    var count: Int = 0
+    var needed: Int = sosMinTaps
+    /// Zostało jedno dotknięcie: wtedy widżet jest odnośnikiem, który otwiera aplikację i wysyła alarm.
+    var armed: Bool = false
 }
 
 struct SosProvider: TimelineProvider {
     func placeholder(in context: Context) -> SosEntry { SosEntry(date: .now) }
     func getSnapshot(in context: Context, completion: @escaping (SosEntry) -> Void) { completion(SosEntry(date: .now)) }
     func getTimeline(in context: Context, completion: @escaping (Timeline<SosEntry>) -> Void) {
-        completion(Timeline(entries: [SosEntry(date: .now)], policy: .never))
+        let now = Date()
+        let needed = sosNeededTaps()
+        let taps = sosReadTaps()
+        let age = now.timeIntervalSince1970 - taps.last
+        guard taps.count > 0, age >= 0, age <= sosTapWindow else {
+            completion(Timeline(entries: [SosEntry(date: now, needed: needed)], policy: .never))
+            return
+        }
+        // Po upływie okna seria się kończy: drugi wpis wraca do stanu wyjściowego.
+        let end = now.addingTimeInterval(sosTapWindow - age + 0.1)
+        completion(Timeline(
+            entries: [SosEntry(date: now, count: taps.count, needed: needed, armed: taps.count >= needed - 1),
+                      SosEntry(date: end, needed: needed)],
+            policy: .never))
     }
 }
 
@@ -497,52 +567,78 @@ private let sosGold = Color(red: 0xF5 / 255, green: 0xC8 / 255, blue: 0x39 / 255
 
 struct SosView: View {
     @Environment(\.widgetFamily) private var family
+    let entry: SosEntry
+
+    /// Podpis pod napisem SOS: ile dotknięć już jest i ile jeszcze trzeba (pusty, gdy seria się nie zaczęła).
+    private var note: String {
+        guard entry.count > 0 else { return "" }
+        let left = max(entry.needed - entry.count, 0)
+        return isPolish ? "Dotknij jeszcze \(left)" : "Tap \(left) more"
+    }
+
+    /// Dotknięcia liczy przycisk; ostatnie jest odnośnikiem, który otwiera aplikację (ona wysyła alarm).
+    @ViewBuilder
+    private func tappable<C: View>(_ content: C) -> some View {
+        if entry.armed {
+            Link(destination: sosSendURL) { content }
+        } else {
+            Button(intent: SosTapIntent()) { content }.buttonStyle(.plain)
+        }
+    }
 
     var body: some View {
         switch family {
         case .accessoryInline:
+            // Napis w jednej linii nie jest interaktywny: otwiera ekran SOS w aplikacji.
             Text("SOS").widgetURL(sosURL)
         case .accessoryCircular:
-            ZStack {
+            tappable(ZStack {
                 AccessoryWidgetBackground()
                 Text("SOS").font(.system(size: 17, weight: .black)).minimumScaleFactor(0.5).lineLimit(1)
-            }
-            .widgetURL(sosURL)
+            })
             .containerBackground(for: .widget) { Color.clear }
         case .accessoryRectangular:
-            HStack(spacing: 6) {
+            tappable(HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                Text("SOS").font(.system(size: 22, weight: .black))
-            }
-            .widgetURL(sosURL)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("SOS").font(.system(size: 22, weight: .black))
+                    if !note.isEmpty { Text(note).font(.caption2) }
+                }
+            })
             .containerBackground(for: .widget) { Color.clear }
         default:
-            ZStack {
+            tappable(ZStack {
                 RoundedRectangle(cornerRadius: 22).strokeBorder(sosGold, lineWidth: 6).padding(6)
-                Text("SOS")
-                    .font(.system(size: 54, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.4)
-                    .lineLimit(1)
-                    .padding(.horizontal, 18)
-            }
-            .widgetURL(sosURL)
+                VStack(spacing: 2) {
+                    Text("SOS")
+                        .font(.system(size: 54, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .minimumScaleFactor(0.4)
+                        .lineLimit(1)
+                    if !note.isEmpty {
+                        Text(note).font(.system(size: 14, weight: .semibold)).foregroundStyle(.white)
+                    }
+                }
+                .padding(.horizontal, 18)
+            })
             .containerBackground(for: .widget) { sosRed }
         }
     }
 
     private var sosURL: URL { URL(string: "meshtastic://meshtastic/sos")! }
+    /// Ostatnie dotknięcie: aplikacja sprawdza plik „uzbrojenia” i dopiero wtedy wysyła alarm.
+    private var sosSendURL: URL { URL(string: "meshtastic://meshtastic/sos-widget")! }
 }
 
 struct MTSWSosWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "MTSWSosWidget", provider: SosProvider()) { _ in
-            SosView()
+        StaticConfiguration(kind: "MTSWSosWidget", provider: SosProvider()) { entry in
+            SosView(entry: entry)
         }
         .configurationDisplayName("SOS")
         .description(isPolish
-            ? "Otwiera ekran SOS w aplikacji MT_SW. Alarm wysyłasz, przytrzymując przycisk na tym ekranie. Jest też na ekranie blokady (iPhone): okrągły, prostokątny i w jednej linii."
-            : "Opens the SOS screen in the MT_SW app. You send the alarm by holding the button on that screen. It is also on the lock screen (iPhone): round, rectangular and one line.")
+            ? "Alarm wysyłasz, dotykając widżetu kilka razy pod rząd (liczbę ustawisz w SOS w aplikacji MT_SW, najmniej trzy). Ostatnie dotknięcie otwiera aplikację i wysyła alarm. Jest też na ekranie blokady (iPhone): okrągły, prostokątny i w jednej linii."
+            : "You send the alarm by tapping the widget several times in a row (set the number in SOS in the MT_SW app, at least three). The last tap opens the app and sends the alarm. It is also on the lock screen (iPhone): round, rectangular and one line.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
         .contentMarginsDisabled()
     }

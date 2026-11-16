@@ -73,6 +73,10 @@ data class SosConfig(
 
         /** The shortest hold of the bar button, so it never fires by accident; a shorter setting is raised to it. */
         const val BAR_MIN_HOLD_SECONDS = 2
+
+        /** The fewest quick taps that send the alarm from the home-screen widget, so a pocket cannot send it. */
+        const val WIDGET_MIN_TAPS = 3
+        const val WIDGET_DEFAULT_TAPS = 3
         private const val FIELDS = 8
         private const val OLD_FIELDS = 7
         private const val CHANNEL_MARK = "c"
@@ -185,6 +189,14 @@ interface SosPrefs {
     val barScreens: StateFlow<Set<String>>
 
     fun setBarScreens(screens: Set<String>)
+
+    /**
+     * How many quick taps in a row on the home-screen widget send the alarm (the widget cannot be held: the launcher
+     * then starts editing it). Never fewer than [SosConfig.WIDGET_MIN_TAPS].
+     */
+    val widgetTaps: StateFlow<Int>
+
+    fun setWidgetTaps(taps: Int)
 
     /** True (the default) when a received SOS from another copy of this app raises the full-screen alarm. */
     val receiveAlarm: StateFlow<Boolean>

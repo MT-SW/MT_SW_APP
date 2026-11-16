@@ -45,6 +45,8 @@ import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.prefs.ui.UiPrefsDefaults
 import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.SosAlarmSounds
+import org.meshtastic.core.repository.SosController
+import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
@@ -115,6 +117,15 @@ fun handleIosDeepLink(url: String) {
     sharedUiViewModel.handleDeepLink(CommonUri.parse(url)) { Logger.e { "Invalid link from iOS: $url" } }
 }
 
+/**
+ * Called from the iPhone app after the last tap on the SOS widget (the widget checked its "armed" file first): sends the
+ * alarm with the settings of the SOS screen and opens that screen to follow the answers.
+ */
+fun handleIosSosFromWidget() {
+    koin.get<SosController>(SosController::class).start(koin.get<SosPrefs>(SosPrefs::class).config.value)
+    handleIosDeepLink("meshtastic://meshtastic/sos")
+}
+
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 // The name is called from Swift (iosApp), so it has to start with a capital letter.
 @Suppress("FunctionName", "ktlint:standard:function-naming")
@@ -172,7 +183,11 @@ private fun NotificationSettingsSync() {
 private fun WidgetPublishing() {
     @Suppress("LongMethod")
     val publisher = remember {
-        IosWidgetPublisher(koin.get<MeshStatsFeed>(MeshStatsFeed::class), koin.get<UiPrefs>(UiPrefs::class))
+        IosWidgetPublisher(
+            koin.get<MeshStatsFeed>(MeshStatsFeed::class),
+            koin.get<UiPrefs>(UiPrefs::class),
+            koin.get<SosPrefs>(SosPrefs::class),
+        )
     }
     LaunchedEffect(Unit) { withContext(Dispatchers.Default) { publisher.run() } }
 }

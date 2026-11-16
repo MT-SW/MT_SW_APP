@@ -19,6 +19,7 @@
     android:label="@string/widget_mesh_status_label"
     android:description="@string/widget_mesh_status_description"
     android:initialLayout="@layout/glance_default_loading_layout"
+    android:previewLayout="@layout/widget_mesh_status_preview"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:targetCellWidth="4"

@@ -3581,6 +3581,7 @@ sos_section_message
 sos_section_nodes
 sos_section_receive
 sos_section_repeat
+sos_section_widget
 sos_status_answered
 sos_status_delivered
 sos_status_enroute
@@ -3598,6 +3599,7 @@ sos_style_title
 sos_summary
 sos_targets_note
 sos_title
+sos_widget_taps_note
 speed
 speed_kmh
 speed_mph

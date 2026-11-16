@@ -3662,6 +3662,7 @@
     <string name="sos_section_nodes">Nodes (direct message)</string>
     <string name="sos_section_receive">Receiving an SOS</string>
     <string name="sos_section_repeat">Repeating</string>
+    <string name="sos_section_widget">Home-screen widget</string>
     <string name="sos_status_answered">Someone answered the SOS, so the repeating was stopped.</string>
     <string name="sos_status_delivered">delivered, confirmed</string>
     <string name="sos_status_enroute">sent to the radio, waiting for confirmation</string>
@@ -3679,6 +3680,7 @@
     <string name="sos_summary">An emergency button: sends a message with your position to the chosen channels and as a direct message to the chosen nodes, and checks whether it was delivered.</string>
     <string name="sos_targets_note">You can set a different text for each chosen channel or node below (empty = the text above).</string>
     <string name="sos_title">SOS</string>
+    <string name="sos_widget_taps_note">The widget sends the alarm after this many quick taps in a row (at least %1$d, so a pocket cannot send it by accident). A hold is not used, because the launcher then starts editing the widget.</string>
     <string name="speed">Speed</string>
     <string name="speed_kmh">%1$d Km/h</string>
     <string name="speed_mph">%1$d mph</string>

@@ -70,6 +70,15 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         scope.launch { dataStore.edit { it[KEY_BAR] = screens.joinToString(",") } }
     }
 
+    override val widgetTaps: StateFlow<Int> =
+        dataStore.data
+            .map { (it[KEY_WIDGET_TAPS] ?: SosConfig.WIDGET_DEFAULT_TAPS).coerceAtLeast(SosConfig.WIDGET_MIN_TAPS) }
+            .stateIn(scope, SharingStarted.Eagerly, SosConfig.WIDGET_DEFAULT_TAPS)
+
+    override fun setWidgetTaps(taps: Int) {
+        scope.launch { dataStore.edit { it[KEY_WIDGET_TAPS] = taps.coerceAtLeast(SosConfig.WIDGET_MIN_TAPS) } }
+    }
+
     override val receiveAlarm: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_RECEIVE] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
 
@@ -183,6 +192,7 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
         val KEY_ONLY_CHOSEN = booleanPreferencesKey("sos_alarm_only_chosen")
         val KEY_QUIET = stringPreferencesKey("sos_quiet_hours")
         val KEY_FLASH = booleanPreferencesKey("sos_alarm_flash")
+        val KEY_WIDGET_TAPS = intPreferencesKey("sos_widget_taps")
         val KEY_CONFIRM = booleanPreferencesKey("sos_confirm_to_sender")
         val KEY_RECEIVE = booleanPreferencesKey("sos_receive_alarm")
         val KEY_SOS = stringPreferencesKey("sos_config")

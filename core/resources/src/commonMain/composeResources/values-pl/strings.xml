@@ -3799,6 +3799,8 @@
     <string name="sos_acks_export">Zapisz listę do pliku</string>
     <string name="sos_status_answered">Ktoś odpowiedział na SOS, więc powtarzanie zostało zatrzymane.</string>
     <string name="sos_section_hold">Przytrzymanie przycisku</string>
+    <string name="sos_section_widget">Widżet na ekranie głównym</string>
+    <string name="sos_widget_taps_note">Widżet wysyła alarm po tylu szybkich dotknięciach pod rząd (co najmniej %1$d, żeby kieszeń nie mogła go wysłać przypadkiem). Przytrzymanie nie jest używane, bo wtedy launcher zaczyna edycję widżetu.</string>
     <string name="sos_hold_tap">Dotyk</string>
     <string name="sos_hold_seconds">%1$d s</string>
     <string name="mt_sw_other_sos_title">SOS</string>

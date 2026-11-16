@@ -168,6 +168,7 @@ import org.meshtastic.core.resources.sos_section_bar
 import org.meshtastic.core.resources.sos_section_channel
 import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_hold
+import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_section_message
 import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_receive
@@ -179,6 +180,7 @@ import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
 import org.meshtastic.core.resources.sos_status_sending_unlimited
+import org.meshtastic.core.resources.sos_widget_taps_note
 import org.meshtastic.core.resources.sos_stop_on_answer
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_style_bell
@@ -203,6 +205,9 @@ import org.meshtastic.feature.settings.component.ExpressiveSection
 private val REPEAT_MINUTES = listOf(0, 1, 2, 5, 10, 15, 30)
 private val REPEAT_COUNTS = listOf(2, 3, 5, 10, 20, 50)
 private val HOLD_SECONDS = listOf(0, 1, 2, 3, 5)
+
+/** The numbers of quick widget taps to choose from; none is below [SosConfig.WIDGET_MIN_TAPS]. */
+private val WIDGET_TAP_CHOICES = listOf(3, 4, 5, 6, 8, 10)
 private val GATE_MINUTES = listOf(2, 5, 10, 15, 30)
 private val KEEP_DAYS = listOf(0, 7, 30, 90, 365)
 private const val QUIET_STEP_MINUTES = 30
@@ -766,6 +771,27 @@ fun SosScreen(onBack: () -> Unit) {
                         }
                     }
                 }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.sos_section_widget)) {
+                val widgetTaps by prefs.widgetTaps.collectAsStateWithLifecycle()
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    for (taps in WIDGET_TAP_CHOICES) {
+                        FilterChip(
+                            selected = widgetTaps == taps,
+                            onClick = { prefs.setWidgetTaps(taps) },
+                            label = { Text("$taps×") },
+                        )
+                    }
+                }
+                Text(
+                    text = stringResource(Res.string.sos_widget_taps_note, SosConfig.WIDGET_MIN_TAPS),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
             }
 
             ExpressiveSection(title = stringResource(Res.string.sos_section_hold)) {

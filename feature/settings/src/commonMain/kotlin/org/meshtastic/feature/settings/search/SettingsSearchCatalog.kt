@@ -104,6 +104,7 @@ import org.meshtastic.core.resources.sos_notify_on_answer
 import org.meshtastic.core.resources.sos_quiet_switch
 import org.meshtastic.core.resources.sos_repeat_gate_switch
 import org.meshtastic.core.resources.sos_section_bar
+import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_receive
@@ -249,6 +250,7 @@ object SettingsSearchCatalog {
             Res.string.sos_title to SettingsRoute.Sos,
             Res.string.sos_section_nodes to SettingsRoute.Sos,
             Res.string.sos_section_bar to SettingsRoute.Sos,
+            Res.string.sos_section_widget to SettingsRoute.Sos,
             Res.string.sos_section_receive to SettingsRoute.Sos,
             Res.string.sos_section_history to SettingsRoute.Sos,
             Res.string.sos_quiet_switch to SettingsRoute.Sos,

@@ -3,7 +3,7 @@ title: Widżet ekranu głównego
 parent: Przewodnik użytkownika
 nav_order: 20
 last_updated: 2026-11-16
-description: Dodaj na ekran główny Androida widżety Statystyki MT_SW i SOS, aby widzieć swój węzeł i sieć jednym spojrzeniem albo otworzyć ekran SOS jednym dotknięciem.
+description: Dodaj na ekran główny Androida widżety Statystyki MT_SW i SOS, aby widzieć swój węzeł i sieć jednym spojrzeniem albo wysłać alarm kilkoma szybkimi dotknięciami.
 aliases:
   - widget
   - home-screen-widget
@@ -16,7 +16,7 @@ aliases:
 Na Androidzie MT_SW udostępnia dwa **widżety** ekranu głównego:
 
 - **Statystyki MT_SW** pokazuje te same statystyki co stałe powiadomienie: stan całej sieci mesh albo jednego śledzonego węzła.
-- **SOS** otwiera ekran SOS, na którym alarm wysyła się przytrzymaniem jego przycisku.
+- **SOS** wysyła alarm po kilku szybkich dotknięciach pod rząd.
 
 Widżet statystyk pokazuje odczyty, które aplikacja już zapisała, więc działa bez połączenia z radiem i nigdy niczego nie wysyła przez sieć mesh.
 
@@ -26,7 +26,7 @@ Widżet pokazuje węzły online, nieprzeczytane wiadomości, baterię, czas prac
 
 ## SOS
 
-Dotknięcie widżetu otwiera ekran SOS. Alarm nie jest wysyłany z samego widżetu: nadal trzeba przytrzymać przycisk na ekranie SOS przez ustawiony czas, żeby nie dało się go wysłać przypadkiem. Wiadomość, kanały i węzły, których używa, opisuje [Funkcje MT_SW](mt-sw-features).
+Alarm wysyła się kilkoma szybkimi dotknięciami widżetu pod rząd (odstęp między dotknięciami najwyżej 2,5 s). Przytrzymanie nie działa, bo launcher wtedy zaczyna edycję widżetu. Liczbę dotknięć ustawisz w ekranie **SOS** w sekcji „Widżet na ekranie głównym”: od 3 (domyślnie 3), żeby kieszeń nie wysłała alarmu przypadkiem. W trakcie widżet pokazuje „Dotknij jeszcze N”, a po wysłaniu „Wysłano”; dotknięcie wtedy otwiera ekran SOS z odpowiedziami. Wiadomość, kanały i węzły opisuje [SOS](mt-sw-features). Na iPhonie/iPadzie ostatnie dotknięcie otwiera aplikację, która wysyła alarm.
 
 ## Dodawanie widżetu
 

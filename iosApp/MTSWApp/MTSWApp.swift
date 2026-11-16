@@ -35,7 +35,11 @@ struct MTSWApp: App {
             ContentView()
                 .ignoresSafeArea(.keyboard)
                 .onOpenURL { url in
-                    MainViewControllerKt.handleIosDeepLink(url: url.absoluteString)
+                    if url.absoluteString == "meshtastic://meshtastic/sos-widget" {
+                        sendSosFromWidget()
+                    } else {
+                        MainViewControllerKt.handleIosDeepLink(url: url.absoluteString)
+                    }
                 }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active {
@@ -44,6 +48,21 @@ struct MTSWApp: App {
                     }
                 }
         }
+    }
+}
+
+/// Ostatnie dotknięcie widżetu SOS: alarm wysyła się tylko wtedy, gdy widżet przed chwilą zapisał „uzbrojenie” (przedostatnie
+/// dotknięcie). Sam adres z innej aplikacji nie wyśle alarmu, tylko otworzy ekran SOS.
+private func sendSosFromWidget() {
+    guard let folder = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.pl.sw.mt")
+    else { return }
+    let file = folder.appendingPathComponent("sos-armed.txt")
+    let armedAt = (try? String(contentsOf: file, encoding: .utf8)).flatMap { Double($0) } ?? 0
+    try? FileManager.default.removeItem(at: file)
+    if Date().timeIntervalSince1970 - armedAt <= 8 {
+        MainViewControllerKt.handleIosSosFromWidget()
+    } else {
+        MainViewControllerKt.handleIosDeepLink(url: "meshtastic://meshtastic/sos")
     }
 }
 
