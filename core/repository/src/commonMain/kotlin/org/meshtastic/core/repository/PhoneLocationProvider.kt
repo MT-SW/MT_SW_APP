@@ -45,5 +45,9 @@ data class PhoneLocationState(
 }
 
 interface PhoneLocationProvider {
+    /** False where the device has no location of its own (desktop): only the radio's position can be used. */
+    val isAvailable: Boolean
+        get() = true
+
     fun locationUpdates(): Flow<PhoneLocationState>
 }

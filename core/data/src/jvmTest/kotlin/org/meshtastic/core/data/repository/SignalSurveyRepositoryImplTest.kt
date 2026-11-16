@@ -78,11 +78,17 @@ class SignalSurveyRepositoryImplTest {
     /** Swapped by a test that needs the provider's flow to end, as Android's does without permission. */
     private var locationFlow: () -> Flow<PhoneLocationState> = { location }
 
+    /** False for a device with no location of its own, like a desktop. */
+    private var phoneHasLocation = true
+
     private val repository =
         SignalSurveyRepositoryImpl(
             serviceRepository = service,
             phoneLocationProvider =
             object : PhoneLocationProvider {
+                override val isAvailable: Boolean
+                    get() = phoneHasLocation
+
                 override fun locationUpdates(): Flow<PhoneLocationState> = locationFlow()
             },
             radio = SignalSurveyRadio(radioPrefs, radioConfig, nodes),
@@ -396,6 +402,18 @@ class SignalSurveyRepositoryImplTest {
 
         location.value = PhoneLocationState(permissionGranted = false, providerEnabled = true)
         repository.stop()
+        awaitBlocker(null)
+    }
+
+    @Test
+    fun `a device with no location of its own waits for the radio's position`() = runBlocking {
+        phoneHasLocation = false
+        service.setConnectionState(ConnectionState.Connected)
+        location.value = PhoneLocationState(permissionGranted = false, providerEnabled = false)
+        startRecording()
+        awaitBlocker(SignalSurveyBlocker.RADIO_NO_FIX)
+
+        nodes.setOurNode(Node(num = 1, position = radioPosition(31.0, Position.LocSource.LOC_MANUAL)))
         awaitBlocker(null)
     }
 

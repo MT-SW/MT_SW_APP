@@ -16,6 +16,7 @@
  */
 package org.meshtastic.ios.map
 
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
@@ -23,6 +24,7 @@ import org.meshtastic.feature.map.layers.MapLayersManager
 import org.meshtastic.feature.map.maplibre.MapLibreMapViewProvider
 import org.meshtastic.feature.map.maplibre.component.ImportedLayersSlot
 import org.meshtastic.feature.map.maplibre.layers.rememberRenderableLayers
+import org.meshtastic.feature.map.survey.SignalSurveySection
 
 /**
  * The iPhone map provider: the shared MapLibre surfaces (which include the native MT_SW Planner) and — through the same
@@ -35,7 +37,12 @@ internal fun iosMapViewProvider(): MapLibreMapViewProvider = MapLibreMapViewProv
         val importedLayers by layersManager.mapLayers.collectAsStateWithLifecycle()
         rememberRenderableLayers(layersManager, importedLayers.filter { it.isVisible })
     },
-    layersSheetExtra = { ImportedLayersSlot() },
+    // The signal survey sits under the imported layers, as on Android.
+    layersSheetExtra = {
+        ImportedLayersSlot()
+        HorizontalDivider()
+        SignalSurveySection()
+    },
     // MapLibre Native on iPhone and iPad downloads offline packs the same way as on Android.
     offlineMapsSupported = true,
 )

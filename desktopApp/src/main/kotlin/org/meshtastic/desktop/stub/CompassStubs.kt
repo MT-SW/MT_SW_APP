@@ -35,6 +35,8 @@ class NoopCompassHeadingProvider : CompassHeadingProvider {
 
 /** No-op [PhoneLocationProvider] — desktop has no GPS provider. */
 class NoopPhoneLocationProvider : PhoneLocationProvider {
+    override val isAvailable: Boolean = false
+
     override fun locationUpdates(): Flow<PhoneLocationState> =
         flowOf(PhoneLocationState(permissionGranted = false, providerEnabled = false))
 }

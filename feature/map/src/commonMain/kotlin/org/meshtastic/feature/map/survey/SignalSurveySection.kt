@@ -72,6 +72,7 @@ import org.meshtastic.core.resources.signal_survey_heatmap
 import org.meshtastic.core.resources.signal_survey_location_off
 import org.meshtastic.core.resources.signal_survey_location_permission
 import org.meshtastic.core.resources.signal_survey_no_fix
+import org.meshtastic.core.resources.signal_survey_radio_no_fix
 import org.meshtastic.core.resources.signal_survey_readings
 import org.meshtastic.core.resources.signal_survey_record
 import org.meshtastic.core.resources.signal_survey_title
@@ -297,6 +298,7 @@ private fun statusText(blocker: SignalSurveyBlocker?, readingCount: Int): String
     SignalSurveyBlocker.LOCATION_PERMISSION -> stringResource(Res.string.signal_survey_location_permission)
     SignalSurveyBlocker.LOCATION_OFF -> stringResource(Res.string.signal_survey_location_off)
     SignalSurveyBlocker.NO_FIX -> stringResource(Res.string.signal_survey_no_fix)
+    SignalSurveyBlocker.RADIO_NO_FIX -> stringResource(Res.string.signal_survey_radio_no_fix)
     null -> pluralStringResource(Res.plurals.signal_survey_readings, readingCount, readingCount)
 }
 

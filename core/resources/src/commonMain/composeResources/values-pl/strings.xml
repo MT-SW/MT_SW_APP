@@ -4174,7 +4174,7 @@
     <string name="pressure_low">Niskie</string>
     <string name="relayed_by">Przekazał(a) %1$s</string>
     <string name="signal_survey_delete_confirm">Usunąć tę sesję i jej odczyty?</string>
-    <string name="signal_survey_description">Tylko nasłuchuje: zapisuje siłę sygnału każdego pakietu, który słyszy radio, razem z lokalizacją telefonu i rysuje ją na mapie. Nic nie jest wysyłane, a zapis zostaje na tym urządzeniu.</string>
+    <string name="signal_survey_description">Tylko nasłuchuje: zapisuje siłę sygnału każdego pakietu, który słyszy radio, razem z lokalizacją (telefonu albo własną pozycją radia z GPS, gdy ją podaje) i rysuje ją na mapie. Nic nie jest wysyłane, a zapis zostaje na tym urządzeniu.</string>
     <string name="signal_survey_export">Eksportuj CSV</string>
     <string name="signal_survey_heard_directly">Słyszane bezpośrednio tutaj</string>
     <string name="signal_survey_heatmap">Pokaż jako mapę cieplną</string>
@@ -4183,6 +4183,7 @@
     <string name="signal_survey_location_off">Włącz lokalizację, aby zapisywać odczyty</string>
     <string name="signal_survey_location_permission">Zezwól na dostęp do lokalizacji, aby zapisywać odczyty</string>
     <string name="signal_survey_no_fix">Czekam na ustalenie lokalizacji</string>
+    <string name="signal_survey_radio_no_fix">Czekam, aż radio poda własną pozycję z GPS</string>
     <string name="signal_survey_record">Nagrywaj</string>
     <string name="signal_survey_title">Badanie sygnału</string>
     <string name="widget_telemetry_change_node">Zmień węzeł</string>

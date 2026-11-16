@@ -182,6 +182,8 @@ class SignalSurveyRepositoryImpl(
         // The radio says where it is, so the phone's location settings no longer decide whether a survey can log.
         radioFix != null -> null
 
+        !phoneLocationProvider.isAvailable -> SignalSurveyBlocker.RADIO_NO_FIX
+
         !state.permissionGranted -> SignalSurveyBlocker.LOCATION_PERMISSION
 
         !state.providerEnabled -> SignalSurveyBlocker.LOCATION_OFF

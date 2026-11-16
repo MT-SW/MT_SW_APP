@@ -27,6 +27,9 @@ enum class SignalSurveyBlocker {
     LOCATION_PERMISSION,
     LOCATION_OFF,
     NO_FIX,
+
+    /** The device has no location of its own (desktop) and the radio has not reported a GPS position yet. */
+    RADIO_NO_FIX,
 }
 
 /**

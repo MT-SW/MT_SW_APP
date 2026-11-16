@@ -46,7 +46,7 @@ fun getMapViewProvider(): MapViewProvider = MapLibreMapViewProvider(
     // MapLibre's offline packs actually download here; on desktop they never do, so the default is off.
     offlineMapsSupported = true,
     // The same imported-layer manager the Google flavour opens from its layers button.
-    // The survey follows it here and not in the shared slot: desktop has no location provider to log against.
+    // The signal survey sits under it; iPhone and desktop mount the same section in their own providers.
     layersSheetExtra = {
         ImportedLayersSlot()
         HorizontalDivider()
