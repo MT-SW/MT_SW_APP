@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +65,8 @@ import org.meshtastic.core.repository.UiPrefs
 import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.Instant
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 private const val GROW_MILLIS = 900
 private const val MAX_DRAWN_POINTS = 300
@@ -121,6 +124,7 @@ internal fun LineAreaChart(
     val selected = selectedX?.let { x -> sorted.minByOrNull { abs(xOf(it) - x) } }
     LaunchedEffect(selected) { onSelect(selected) }
 
+    val chartStyle = rememberChartStyle()
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = GRID_ALPHA)
     val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
     val labelStyle = MaterialTheme.typography.labelSmall
@@ -167,6 +171,7 @@ internal fun LineAreaChart(
                     maxPoint = sorted.maxByOrNull { it.value },
                     scale = scale,
                     palette = palette,
+                    style = chartStyle,
                 )
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -193,6 +198,7 @@ private fun DrawScope.drawChart(
     maxPoint: MetricPoint?,
     scale: LevelScale?,
     palette: Map<HealthLevel, Color>,
+    style: Int,
 ) {
     val w = size.width
     val h = size.height
@@ -238,22 +244,25 @@ private fun DrawScope.drawChart(
             close()
         }
     clipRect(left = 0f, top = 0f, right = w * reveal, bottom = h) {
-        drawPath(area, Brush.verticalGradient(listOf(color.copy(alpha = FILL_ALPHA), Color.Transparent)))
-        drawPath(
-            line,
-            color.copy(alpha = 0.25f),
-            style = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round),
-        )
-        drawPath(line, color, style = Stroke(width = 4f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+        drawLineChartBody(style, color, line, area, h)
     }
 
+    val outline = style == UiOptions.CHART_STYLE_OUTLINE
     listOfNotNull(minPoint, maxPoint).distinct().forEach {
-        drawCircle(color, radius = 5f, center = Offset(x(it), y(it)))
-        drawCircle(Color.White.copy(alpha = 0.9f), radius = 2f, center = Offset(x(it), y(it)))
+        if (outline) {
+            drawCircle(color, radius = 5f, center = Offset(x(it), y(it)), style = Stroke(width = 2f))
+        } else {
+            drawCircle(color, radius = 5f, center = Offset(x(it), y(it)))
+            drawCircle(Color.White.copy(alpha = 0.9f), radius = 2f, center = Offset(x(it), y(it)))
+        }
     }
     val last = sorted.last()
     drawCircle(color.copy(alpha = 0.25f), radius = 13f, center = Offset(x(last), y(last)))
-    drawCircle(color, radius = 7f, center = Offset(x(last), y(last)))
+    if (outline) {
+        drawCircle(color, radius = 7f, center = Offset(x(last), y(last)), style = Stroke(width = 3f))
+    } else {
+        drawCircle(color, radius = 7f, center = Offset(x(last), y(last)))
+    }
 
     selected?.let {
         drawLine(color.copy(alpha = 0.6f), Offset(x(it), 0f), Offset(x(it), h), strokeWidth = 2f)
@@ -262,6 +271,69 @@ private fun DrawScope.drawChart(
         drawCircle(Color.White, radius = 3.5f, center = Offset(x(it), y(it)))
     }
 }
+
+/**
+ * The area and the line of the chart in the chosen chart [style]: flat (the old look), glass (a gradient below, a glowing
+ * line with a bright highlight, like a glossy tube), gradient, outline (a thin line with a very light area) or glow.
+ */
+private fun DrawScope.drawLineChartBody(style: Int, color: Color, line: Path, area: Path, height: Float) {
+    val round = Stroke(width = LINE_WIDTH, cap = StrokeCap.Round, join = StrokeJoin.Round)
+    fun glow(width: Float, alpha: Float) =
+        drawPath(line, color.copy(alpha = alpha), style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    fun fill(top: Float) =
+        drawPath(area, Brush.verticalGradient(listOf(color.copy(alpha = top), Color.Transparent), endY = height))
+    when (style) {
+        UiOptions.CHART_STYLE_GLASS -> {
+            fill(GLASS_FILL_ALPHA)
+            glow(GLASS_HALO_WIDTH, GLASS_HALO_ALPHA)
+            drawPath(line, color, style = round)
+            translate(top = -HIGHLIGHT_SHIFT) {
+                drawPath(
+                    line,
+                    Color.White.copy(alpha = HIGHLIGHT_ALPHA),
+                    style = Stroke(width = HIGHLIGHT_WIDTH, cap = StrokeCap.Round, join = StrokeJoin.Round),
+                )
+            }
+        }
+        UiOptions.CHART_STYLE_GRADIENT -> {
+            fill(GLASS_FILL_ALPHA)
+            drawPath(line, color, style = round)
+        }
+        UiOptions.CHART_STYLE_OUTLINE -> {
+            fill(OUTLINE_FILL_ALPHA)
+            drawPath(
+                line,
+                color,
+                style = Stroke(width = OUTLINE_WIDTH, cap = StrokeCap.Round, join = StrokeJoin.Round),
+            )
+        }
+        UiOptions.CHART_STYLE_GLOW -> {
+            fill(FILL_ALPHA)
+            glow(GLOW_FAR_WIDTH, GLOW_FAR_ALPHA)
+            glow(GLASS_HALO_WIDTH, GLASS_HALO_ALPHA)
+            drawPath(line, color, style = round)
+        }
+        else -> {
+            fill(FILL_ALPHA)
+            glow(FLAT_HALO_WIDTH, FLAT_HALO_ALPHA)
+            drawPath(line, color, style = round)
+        }
+    }
+}
+
+private const val LINE_WIDTH = 4f
+private const val GLASS_FILL_ALPHA = 0.40f
+private const val GLASS_HALO_WIDTH = 12f
+private const val GLASS_HALO_ALPHA = 0.22f
+private const val HIGHLIGHT_SHIFT = 1.2f
+private const val HIGHLIGHT_ALPHA = 0.45f
+private const val HIGHLIGHT_WIDTH = 1.4f
+private const val OUTLINE_FILL_ALPHA = 0.08f
+private const val OUTLINE_WIDTH = 2.5f
+private const val GLOW_FAR_WIDTH = 22f
+private const val GLOW_FAR_ALPHA = 0.10f
+private const val FLAT_HALO_ALPHA = 0.25f
+private const val FLAT_HALO_WIDTH = 10f
 
 private const val MAX_FUTURE_MILLIS = 30L * 24 * 60 * 60 * 1000
 private const val MAX_AGE_MILLIS = 365L * 24 * 60 * 60 * 1000
