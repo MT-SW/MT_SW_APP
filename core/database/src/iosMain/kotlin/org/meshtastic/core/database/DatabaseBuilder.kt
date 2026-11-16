@@ -24,6 +24,8 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.sqlite.execSQL
+import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import okio.FileSystem
 import okio.Path
@@ -37,12 +39,36 @@ import platform.Foundation.NSUserDomainMask
 @OptIn(ExperimentalForeignApi::class)
 actual fun getDatabaseBuilder(dbName: String): RoomDatabase.Builder<MeshtasticDatabase> {
     val dbFilePath = documentDirectory() + "/$dbName.db"
+    ensureWriteAheadLogging(dbFilePath)
     return Room.databaseBuilder<MeshtasticDatabase>(
         name = dbFilePath,
         factory = { MeshtasticDatabaseConstructor.initialize() },
     )
         .configureCommon()
+        .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
         .setDriver(BusyTimeoutSQLiteDriver(BundledSQLiteDriver()))
+}
+
+/**
+ * Puts an existing database file in write-ahead-log mode before Room opens it. On the iPhone every write took over a
+ * second because the file was in the older rollback-journal mode, where each commit waits for the disk several times;
+ * the faster `synchronous = NORMAL` setting of [BusyTimeoutSQLiteDriver] only applies to a file already in WAL mode,
+ * and the mode stays in the file once set. Nothing else has the file open at this point, so the change cannot clash
+ * with another connection. A failure is only logged: Room then opens the file as it did before.
+ */
+private fun ensureWriteAheadLogging(path: String) {
+    if (!NSFileManager.defaultManager.fileExistsAtPath(path)) return
+    runCatching {
+        val connection = BundledSQLiteDriver().open(path)
+        try {
+            connection.execSQL("PRAGMA busy_timeout = ${BusyTimeoutSQLiteDriver.DEFAULT_BUSY_TIMEOUT_MS}")
+            val mode = connection.prepare("PRAGMA journal_mode = WAL").use { if (it.step()) it.getText(0) else "" }
+            Logger.i { "Database $path: journal mode is $mode" }
+        } finally {
+            connection.close()
+        }
+    }
+        .onFailure { Logger.w(it) { "Database $path: could not switch to WAL mode" } }
 }
 
 /** Returns a [RoomDatabase.Builder] configured for an in-memory iOS database. */

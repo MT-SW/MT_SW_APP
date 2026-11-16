@@ -19,6 +19,7 @@ package org.meshtastic.core.database
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.execSQL
+import co.touchlab.kermit.Logger
 
 /**
  * Wraps a [SQLiteDriver] so every connection it opens waits up to [busyTimeoutMs] for a competing connection's lock
@@ -68,6 +69,9 @@ class BusyTimeoutSQLiteDriver(
         runCatching {
             val mode = connection.prepare("PRAGMA journal_mode").use { if (it.step()) it.getText(0) else "" }
             if (mode.equals("wal", ignoreCase = true)) connection.execSQL("PRAGMA synchronous = NORMAL")
+            // Only for the log: slow writes were traced to this setting once, so each connection says what it got.
+            val sync = connection.prepare("PRAGMA synchronous").use { if (it.step()) it.getText(0) else "" }
+            Logger.i { "Database connection: journal mode $mode, synchronous $sync (0 off, 1 normal, 2 full)" }
         }
     }
 
