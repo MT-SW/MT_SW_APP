@@ -80,6 +80,7 @@ import org.meshtastic.core.ui.component.drawChartArc
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle
 import org.meshtastic.core.ui.component.rememberThinRings
+import org.meshtastic.core.model.UiOptions
 
 /** The ways the same numbers can be shown on the node detail screen. */
 internal enum class DetailViewMode(val label: String) {
@@ -270,7 +271,7 @@ internal fun GaugeView(
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Box(modifier = Modifier.fillMaxWidth().height(GAUGE_HEIGHT_DP.dp), contentAlignment = Alignment.BottomCenter) {
-            val chartStyle = rememberChartStyle()
+            val chartStyle = rememberChartStyle(UiOptions.CHART_STYLE_HEALTH)
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val stroke = GAUGE_STROKE_DP.dp.toPx()
                 val radius = min(size.width / 2, size.height) - stroke
@@ -414,7 +415,7 @@ internal fun BucketBarsView(
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            val chartStyle = rememberChartStyle()
+            val chartStyle = rememberChartStyle(UiOptions.CHART_STYLE_HEALTH)
             Canvas(
                 modifier =
                 Modifier.fillMaxWidth()
@@ -528,7 +529,7 @@ internal fun HeatmapView(
                     }
                 }
             }
-            val chartStyle = rememberChartStyle()
+            val chartStyle = rememberChartStyle(UiOptions.CHART_STYLE_HEALTH)
             Canvas(
                 modifier =
                 Modifier.weight(1f).height((HEAT_CELL_DP * days.size).dp).pointerInput(days, averages) {

@@ -25,23 +25,29 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.onlineTimeThreshold
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.proto.LocalStats
 
 data class LocalStatsWidgetUiState(
     val connectionState: ConnectionState = ConnectionState.Disconnected,
     val isConnecting: Boolean = false,
     val showContent: Boolean = false,
+
+    /** The "Thin progress bars" look: the utilization bars are outlined instead of filled. */
+    val thinBars: Boolean = true,
 
     // Node Identity
     val nodeShortName: String? = null,
@@ -85,7 +91,11 @@ data class LocalStatsWidgetUiState(
 )
 
 @Single
-class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionStateProvider: ConnectionStateProvider) {
+class LocalStatsWidgetStateProvider(
+    nodeRepository: NodeRepository,
+    connectionStateProvider: ConnectionStateProvider,
+    uiPrefs: UiPrefs? = null,
+) {
     @Suppress("InjectDispatcher") // feature:widget does not depend on core:di, where CoroutineDispatchers lives
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -114,6 +124,9 @@ class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionSt
                     input.localNode,
                     input.statsExtended,
                 )
+            }
+            .combine(uiPrefs?.uiOptions ?: flowOf(emptyMap())) { state, options ->
+                state.copy(thinBars = UiOptions(options)[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN)
             }
             .stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = LocalStatsWidgetUiState())
 

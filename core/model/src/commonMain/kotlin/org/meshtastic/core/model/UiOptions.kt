@@ -126,6 +126,14 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CHART_STYLE_OUTLINE = 3
         const val CHART_STYLE_GLOW = 4
 
+        /**
+         * Own chart style of "Network health" and of the node details; [CHART_STYLE_SAME] (the default) means the
+         * general [CHART_STYLE].
+         */
+        const val CHART_STYLE_HEALTH = "charts.style.health"
+        const val CHART_STYLE_NODE = "charts.style.node"
+        const val CHART_STYLE_SAME = -1
+
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
         const val ICON_STYLE_STANDARD = 0
@@ -198,6 +206,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
             put(CHART_STYLE, CHART_STYLE_GLASS)
+            put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
+            put(CHART_STYLE_NODE, CHART_STYLE_SAME)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
                 put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)

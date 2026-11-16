@@ -69,13 +69,6 @@ import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
 import org.meshtastic.core.resources.glass_tint_light
 import org.meshtastic.core.resources.glass_tint_theme
-import org.meshtastic.core.resources.chart_style
-import org.meshtastic.core.resources.chart_style_flat
-import org.meshtastic.core.resources.chart_style_glass
-import org.meshtastic.core.resources.chart_style_glow
-import org.meshtastic.core.resources.chart_style_gradient
-import org.meshtastic.core.resources.chart_style_outline
-import org.meshtastic.core.resources.chart_style_summary
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.icon_style_bold
 import org.meshtastic.core.resources.icon_style_outline
@@ -216,21 +209,7 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
             onChange(UiOptions.RING_STYLE, if (thin) UiOptions.RING_STYLE_CLASSIC else UiOptions.RING_STYLE_THIN)
         },
     )
-    DropDownPreference(
-        title = stringResource(Res.string.chart_style),
-        enabled = true,
-        items =
-        listOf(
-            UiOptions.CHART_STYLE_GLASS to stringResource(Res.string.chart_style_glass),
-            UiOptions.CHART_STYLE_GRADIENT to stringResource(Res.string.chart_style_gradient),
-            UiOptions.CHART_STYLE_OUTLINE to stringResource(Res.string.chart_style_outline),
-            UiOptions.CHART_STYLE_GLOW to stringResource(Res.string.chart_style_glow),
-            UiOptions.CHART_STYLE_FLAT to stringResource(Res.string.chart_style_flat),
-        ),
-        selectedItem = options[UiOptions.CHART_STYLE],
-        onItemSelected = { onChange(UiOptions.CHART_STYLE, it) },
-        summary = stringResource(Res.string.chart_style_summary),
-    )
+    ChartStyleSettings(options, onChange)
 }
 
 /** One look for all the groups of a part of the app. */

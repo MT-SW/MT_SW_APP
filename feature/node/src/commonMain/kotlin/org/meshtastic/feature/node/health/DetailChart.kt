@@ -124,7 +124,7 @@ internal fun LineAreaChart(
     val selected = selectedX?.let { x -> sorted.minByOrNull { abs(xOf(it) - x) } }
     LaunchedEffect(selected) { onSelect(selected) }
 
-    val chartStyle = rememberChartStyle()
+    val chartStyle = rememberChartStyle(UiOptions.CHART_STYLE_HEALTH)
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = GRID_ALPHA)
     val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
     val labelStyle = MaterialTheme.typography.labelSmall

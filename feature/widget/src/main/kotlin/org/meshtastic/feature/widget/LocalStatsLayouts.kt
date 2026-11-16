@@ -141,6 +141,7 @@ private fun ChUtilBar(state: LocalStatsWidgetUiState, modifier: GlanceModifier =
         value = MetricFormatter.percent(state.channelUtilization),
         progress = state.channelUtilizationProgress,
         modifier = modifier,
+        thin = state.thinBars,
     )
 }
 
@@ -151,6 +152,7 @@ private fun AirUtilBar(state: LocalStatsWidgetUiState, modifier: GlanceModifier 
         value = MetricFormatter.percent(state.airUtilization),
         progress = state.airUtilizationProgress,
         modifier = modifier,
+        thin = state.thinBars,
     )
 }
 

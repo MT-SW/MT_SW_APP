@@ -248,6 +248,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle
+import org.meshtastic.core.model.UiOptions
 
 /** OnDemand diagnostics screen: an overview of what it can do, then one card per query with its own request button. */
 @Composable
@@ -1183,7 +1184,7 @@ private fun WindowColumns(values: List<Int>, color: Color) {
                 else -> ""
             }
         }
-    ColumnChart(values = values, labels = labels, color = color)
+    ColumnChart(values = values, labels = labels, color = color, styleScope = UiOptions.CHART_STYLE_NODE)
 }
 
 /** Time on air per window, stacked: sending (gold), receiving (red) and bad receptions (purple). */
@@ -1193,7 +1194,7 @@ private fun AirActivityChart(entries: List<org.meshtastic.proto.AirActivityEntry
     val red = HealthLevel.MEDIUM.color()
     val purple = HealthLevel.BAD.color()
     val maxTotal = entries.maxOf { it.tx_time + it.rx_time + it.rxBad_time }.coerceAtLeast(1)
-    val chartStyle = rememberChartStyle()
+    val chartStyle = rememberChartStyle(UiOptions.CHART_STYLE_NODE)
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth().height(AIR_CHART_DP.dp),

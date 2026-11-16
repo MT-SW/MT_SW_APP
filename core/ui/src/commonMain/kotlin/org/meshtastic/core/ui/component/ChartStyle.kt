@@ -53,8 +53,17 @@ private const val TUBE_LIGHT_STOP = 0.78f
 private const val HALO_FAR_SCALE = 1.6f
 private const val HALO_NEAR_SCALE = 1.25f
 
-/** The chart style chosen in "Look" (one of the `UiOptions.CHART_STYLE_*` values). */
-@Composable fun rememberChartStyle(): Int = rememberUiOptions()[UiOptions.CHART_STYLE]
+/**
+ * The chart style chosen in "Look" (one of the `UiOptions.CHART_STYLE_*` values). [scope] is the own style of a part of
+ * the app ([UiOptions.CHART_STYLE_HEALTH] or [UiOptions.CHART_STYLE_NODE]); when it says "same" the general style is
+ * used.
+ */
+@Composable
+fun rememberChartStyle(scope: String = UiOptions.CHART_STYLE): Int {
+    val options = rememberUiOptions()
+    val own = options[scope]
+    return if (own >= 0) own else options[UiOptions.CHART_STYLE]
+}
 
 private fun lighter(c: Color) = lerp(c, Color.White, LIGHTEN)
 

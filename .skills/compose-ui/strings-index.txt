@@ -754,7 +754,11 @@ chart_style_flat
 chart_style_glass
 chart_style_glow
 chart_style_gradient
+chart_style_health
+chart_style_node
 chart_style_outline
+chart_style_preview_hint
+chart_style_same
 chart_style_summary
 chat_info_body
 chat_info_title

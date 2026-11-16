@@ -285,10 +285,16 @@ internal fun GaugeRow(label: String, percentText: String, fraction: Float, color
 
 /** Vertical bars with a number on top and a short label below; the last bar is highlighted. */
 @Composable
-internal fun ColumnChart(values: List<Int>, labels: List<String>, color: Color, modifier: Modifier = Modifier) {
+internal fun ColumnChart(
+    values: List<Int>,
+    labels: List<String>,
+    color: Color,
+    modifier: Modifier = Modifier,
+    styleScope: String = UiOptions.CHART_STYLE_HEALTH,
+) {
     val max = (values.maxOrNull() ?: 0).coerceAtLeast(1)
     val grow = rememberGrow()
-    val chartStyle = rememberChartStyle()
+    val chartStyle = rememberChartStyle(styleScope)
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(6.dp),

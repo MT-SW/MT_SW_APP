@@ -4228,4 +4228,8 @@
         <item quantity="many">Jeszcze %1$d słyszanych bezpośrednio węzłów nie ma pozycji</item>
         <item quantity="other">Jeszcze %1$d słyszanego bezpośrednio węzła nie ma pozycji</item>
     </plurals>
+    <string name="chart_style_health">Styl wykresów w „Zdrowie sieci”</string>
+    <string name="chart_style_node">Styl wykresów w szczegółach węzła</string>
+    <string name="chart_style_same">Taki sam jak ogólny</string>
+    <string name="chart_style_preview_hint">Wszystkie style na jednym ekranie. Dotknij stylu, żeby ustawić go dla wszystkich wykresów.</string>
 </resources>
