@@ -2661,6 +2661,9 @@
     <string name="app_update_tests_title">Także wersje testowe</string>
     <string name="app_update_tests_summary">Powiadamiaj również o wersjach testowych (pre-release).</string>
     <string name="mt_sw_features_title">Funkcje MT_SW</string>
+    <string name="mt_sw_group_look">Wygląd, dane i asystent</string>
+    <string name="mt_sw_group_safety">Bezpieczeństwo i obecność</string>
+    <string name="mt_sw_group_help">Nowości i reszta</string>
     <string name="mt_sw_features_summary">Wszystko, co dodaje MT_SW_APP, w jednym miejscu</string>
     <string name="mt_sw_features_switches">Przełączniki</string>
     <string name="mt_sw_features_own">Widżet i dane</string>

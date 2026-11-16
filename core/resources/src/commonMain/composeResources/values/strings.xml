@@ -2408,6 +2408,9 @@
     <string name="mt_sw_features_summary">Everything MT_SW_APP adds, in one place</string>
     <string name="mt_sw_features_switches">Switches</string>
     <string name="mt_sw_features_title">MT_SW features</string>
+    <string name="mt_sw_group_help">News and more</string>
+    <string name="mt_sw_group_look">Look, data and assistant</string>
+    <string name="mt_sw_group_safety">Safety and presence</string>
     <string name="mt_sw_map_filter_summary">Limit the map to nodes within a number of hops and a distance from your node. Opens the map; the limits are in its filters.</string>
     <string name="mt_sw_map_filter_title">Map filter: hops and distance</string>
     <string name="mt_sw_map_title">Network planning</string>

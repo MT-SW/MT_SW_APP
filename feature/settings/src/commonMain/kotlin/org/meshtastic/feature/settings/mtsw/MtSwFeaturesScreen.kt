@@ -81,6 +81,9 @@ import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
+import org.meshtastic.core.resources.mt_sw_group_help
+import org.meshtastic.core.resources.mt_sw_group_look
+import org.meshtastic.core.resources.mt_sw_group_safety
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
@@ -128,7 +131,6 @@ import org.meshtastic.core.resources.presence_device_switch
 import org.meshtastic.core.resources.presence_more_summary
 import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_summary
-import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_description
@@ -249,7 +251,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 AppUpdateSettings()
             }
 
-            ExpressiveSection(title = stringResource(Res.string.element_look_title)) {
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_group_look)) {
                 ListItem(
                     text = stringResource(Res.string.element_look_title),
                     supportingText = stringResource(Res.string.element_look_short),
@@ -257,9 +259,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(SettingsRoute.ElementLook)
                 }
-            }
-
-            ExpressiveSection(title = stringResource(Res.string.data_logs_title)) {
                 ListItem(
                     text = stringResource(Res.string.data_logs_title),
                     supportingText = stringResource(Res.string.data_logs_summary),
@@ -267,9 +266,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(SettingsRoute.DataAndLogs)
                 }
-            }
-
-            ExpressiveSection(title = stringResource(Res.string.smart_features_title)) {
                 ListItem(
                     text = stringResource(Res.string.smart_features_title),
                     supportingText = stringResource(Res.string.smart_features_summary),
@@ -312,6 +308,40 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_group_safety)) {
+                ListItem(
+                    text = stringResource(Res.string.sos_title),
+                    supportingText = stringResource(Res.string.sos_summary),
+                    leadingIcon = MeshtasticIcons.Warning,
+                ) {
+                    onNavigate(SettingsRoute.Sos)
+                }
+                PresenceSettings(options = options, onChange = onChange)
+                PresenceManualAsk()
+                ListItem(
+                    text = stringResource(Res.string.presence_device_switch),
+                    supportingText = stringResource(Res.string.presence_summary),
+                    leadingIcon = MeshtasticIcons.Info,
+                ) {
+                    onNavigate(SettingsRoute.User)
+                }
+                ListItem(
+                    text = stringResource(Res.string.presence_more_title),
+                    supportingText = stringResource(Res.string.presence_more_summary),
+                    leadingIcon = MeshtasticIcons.Info,
+                ) {}
+            }
+
+            // Real settings that live here (not just links elsewhere): looks, the widget and the statistics sync.
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_features_own)) {
+                WidgetStatsSettingItem()
+                DatabaseSyncSettingItems(
+                    autoEnabled = dbStatsSyncEnabled,
+                    onAutoChange = { settingsViewModel.setDbStatsSyncEnabled(it) },
+                    syncNow = { settingsViewModel.syncDbStatsNow() },
+                )
+            }
+
             // Only where the platform installs it (iPhone and iPad); hidden elsewhere.
             if (AppBackgroundControls.current != null) {
                 ExpressiveSection(title = stringResource(Res.string.background_section_title)) {
@@ -327,21 +357,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             // Only on the computer app: one copy of the program by default, a second one only when allowed.
             if (SingleInstanceControls.current != null) {
                 ExpressiveSection(title = stringResource(Res.string.single_instance_title)) { SingleInstanceSettings() }
-            }
-
-            // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
-            ReportIssuesSection()
-
-            SupportProjectSection()
-
-            // Real settings that live here (not just links elsewhere): looks, the widget and the statistics sync.
-            ExpressiveSection(title = stringResource(Res.string.mt_sw_features_own)) {
-                WidgetStatsSettingItem()
-                DatabaseSyncSettingItems(
-                    autoEnabled = dbStatsSyncEnabled,
-                    onAutoChange = { settingsViewModel.setDbStatsSyncEnabled(it) },
-                    syncNow = { settingsViewModel.syncDbStatsNow() },
-                )
             }
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
@@ -398,35 +413,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
-            ExpressiveSection(title = stringResource(Res.string.whats_new_title)) { WhatsNewEntry() }
-
-            ExpressiveSection(title = stringResource(Res.string.sos_title)) {
-                ListItem(
-                    text = stringResource(Res.string.sos_title),
-                    supportingText = stringResource(Res.string.sos_summary),
-                    leadingIcon = MeshtasticIcons.Warning,
-                ) {
-                    onNavigate(SettingsRoute.Sos)
-                }
-            }
-
-            ExpressiveSection(title = stringResource(Res.string.presence_title)) {
-                PresenceSettings(options = options, onChange = onChange)
-                PresenceManualAsk()
-                ListItem(
-                    text = stringResource(Res.string.presence_device_switch),
-                    supportingText = stringResource(Res.string.presence_summary),
-                    leadingIcon = MeshtasticIcons.Info,
-                ) {
-                    onNavigate(SettingsRoute.User)
-                }
-                ListItem(
-                    text = stringResource(Res.string.presence_more_title),
-                    supportingText = stringResource(Res.string.presence_more_summary),
-                    leadingIcon = MeshtasticIcons.Info,
-                ) {}
-            }
-            ExpressiveSection(title = stringResource(Res.string.mt_sw_other_title)) {
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_group_help)) {
+                WhatsNewEntry()
                 ListItem(
                     text = stringResource(Res.string.mt_sw_other_title),
                     supportingText = stringResource(Res.string.mt_sw_other_summary),
@@ -435,6 +423,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onNavigate(SettingsRoute.MtSwOtherFeatures)
                 }
             }
+
+            // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
+            ReportIssuesSection()
+
+            SupportProjectSection()
         }
     }
 }

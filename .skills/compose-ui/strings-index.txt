@@ -2357,6 +2357,9 @@ mt_sw_features_own
 mt_sw_features_summary
 mt_sw_features_switches
 mt_sw_features_title
+mt_sw_group_help
+mt_sw_group_look
+mt_sw_group_safety
 mt_sw_map_filter_summary
 mt_sw_map_filter_title
 mt_sw_map_title
