@@ -59,6 +59,7 @@ import org.meshtastic.core.resources.skip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.OnboardingBottomBar
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.qr.ScannedQrCodeDialog
@@ -76,7 +77,6 @@ import org.meshtastic.proto.Config.LoRaConfig.RegionCode
 import org.meshtastic.proto.ExcludedModules
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.User
-import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * The guided setup for the connected radio: region, preset and name, then a summary. Every write goes through

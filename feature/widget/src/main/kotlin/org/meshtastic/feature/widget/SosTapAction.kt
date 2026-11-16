@@ -32,7 +32,8 @@ import org.meshtastic.core.repository.SosPrefs
 
 /** The number of quick taps the SOS widget needs, read from the SOS settings. */
 internal object SosTapSettings {
-    fun current(): Int = KoinPlatform.getKoin().get<SosPrefs>().widgetTaps.value.coerceAtLeast(SosConfig.WIDGET_MIN_TAPS)
+    fun current(): Int =
+        KoinPlatform.getKoin().get<SosPrefs>().widgetTaps.value.coerceAtLeast(SosConfig.WIDGET_MIN_TAPS)
 }
 
 /**
@@ -67,8 +68,11 @@ class SosTapAction :
             sosController.start(sosPrefs.config.value)
         }
         SosWidget().update(context, glanceId)
-        if (reached) forgetAfter(context, glanceId, SOS_SENT_SHOW_MS) { it[SOS_SENT_AT_KEY] == now }
-        else forgetAfter(context, glanceId, SOS_TAP_WINDOW_MS) { it[SOS_LAST_TAP_KEY] == now }
+        if (reached) {
+            forgetAfter(context, glanceId, SOS_SENT_SHOW_MS) { it[SOS_SENT_AT_KEY] == now }
+        } else {
+            forgetAfter(context, glanceId, SOS_TAP_WINDOW_MS) { it[SOS_LAST_TAP_KEY] == now }
+        }
     }
 
     /** After [waitMs], clears the counted taps and the "Sent" note unless a newer tap has come ([stillMine] false). */

@@ -38,8 +38,8 @@ import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.reconnecting
 import org.meshtastic.core.resources.stop_connecting
-import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 
 /**
  * Displays the currently connecting (or connected) device with its name, address, connection status, and a disconnect

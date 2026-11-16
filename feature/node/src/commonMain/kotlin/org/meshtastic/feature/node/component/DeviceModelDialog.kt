@@ -70,13 +70,13 @@ import org.meshtastic.core.resources.device_model_banana_for_scale
 import org.meshtastic.core.resources.device_model_load_failed
 import org.meshtastic.core.resources.device_model_view_in_space
 import org.meshtastic.core.resources.info
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ViewInAr
 import org.meshtastic.core.ui.util.LocalDeviceModelArViewer
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** The hardware's real-size 3D model, orbitable, over the whole window; the illustration when it cannot be shown. */
 @Composable

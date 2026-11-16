@@ -88,10 +88,10 @@ import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.activeNodeNumsFlow
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import org.meshtastic.core.ui.theme.WithSystemDensity
 import org.meshtastic.core.ui.util.MapViewReset
-import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy

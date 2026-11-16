@@ -69,6 +69,7 @@ import org.meshtastic.core.resources.remote_shell_open
 import org.meshtastic.core.resources.remote_shell_open_description
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
@@ -86,7 +87,6 @@ import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.NodeDetailAction
 import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.HardwareModel
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 @Composable
 fun AdministrationSection(

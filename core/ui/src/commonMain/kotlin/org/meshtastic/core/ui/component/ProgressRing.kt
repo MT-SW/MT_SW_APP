@@ -50,12 +50,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.theme.rememberUiOptions
 
 private const val START_ANGLE = -90f
 private const val FULL_CIRCLE = 360f
@@ -137,25 +137,35 @@ fun ProgressRing(
     color: Color = Color.Unspecified,
     classicStrokeWidth: Dp = 4.dp,
 ) {
-    if (!rememberThinRings()) {
-        if (color == Color.Unspecified) {
-            CircularProgressIndicator(
-                progress = { progress },
-                modifier = modifier.size(size),
-                strokeWidth = classicStrokeWidth,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        } else {
-            CircularProgressIndicator(
-                progress = { progress },
-                modifier = modifier.size(size),
-                strokeWidth = classicStrokeWidth,
-                color = color,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
-        return
+    if (rememberThinRings()) {
+        ThinProgressRing(progress, modifier, size, color)
+    } else {
+        ClassicProgressRing(progress, modifier, size, color, classicStrokeWidth)
     }
+}
+
+@Composable
+private fun ClassicProgressRing(progress: Float, modifier: Modifier, size: Dp, color: Color, strokeWidth: Dp) {
+    if (color == Color.Unspecified) {
+        CircularProgressIndicator(
+            progress = { progress },
+            modifier = modifier.size(size),
+            strokeWidth = strokeWidth,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    } else {
+        CircularProgressIndicator(
+            progress = { progress },
+            modifier = modifier.size(size),
+            strokeWidth = strokeWidth,
+            color = color,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun ThinProgressRing(progress: Float, modifier: Modifier, size: Dp, color: Color) {
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     Canvas(modifier = modifier.size(size)) {
@@ -172,7 +182,8 @@ fun ProgressRing(
 /**
  * A round chart made of several coloured parts, in the thin outlined look of [ProgressRing] (use it only when
  * [rememberThinRings] is true). Each part is an outlined piece of the band in its own colour, so multi-colour values
- * keep their colours; [segments] are (colour, share of the whole circle from 0 to 1) pairs drawn clockwise from the top.
+ * keep their colours; [segments] are (colour, share of the whole circle from 0 to 1) pairs drawn clockwise from the
+ * top.
  */
 @Composable
 fun SegmentedProgressRing(segments: List<Pair<Color, Float>>, modifier: Modifier = Modifier, size: Dp = 96.dp) {
@@ -199,14 +210,17 @@ fun SegmentedProgressRing(segments: List<Pair<Color, Float>>, modifier: Modifier
  */
 @Composable
 fun ProgressSpinner(modifier: Modifier = Modifier, size: Dp = 48.dp, color: Color = Color.Unspecified) {
-    if (!rememberThinRings()) {
-        if (color == Color.Unspecified) {
-            CircularWavyProgressIndicator(modifier = modifier.size(size))
-        } else {
-            CircularWavyProgressIndicator(modifier = modifier.size(size), color = color)
-        }
-        return
+    if (rememberThinRings()) {
+        ThinProgressSpinner(modifier, size, color)
+    } else if (color == Color.Unspecified) {
+        CircularWavyProgressIndicator(modifier = modifier.size(size))
+    } else {
+        CircularWavyProgressIndicator(modifier = modifier.size(size), color = color)
     }
+}
+
+@Composable
+private fun ThinProgressSpinner(modifier: Modifier, size: Dp, color: Color) {
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     val turn by
@@ -286,7 +300,8 @@ fun IndeterminateProgressLine(modifier: Modifier = Modifier, color: Color = Colo
             .animateFloat(
                 initialValue = 0f,
                 targetValue = 1f,
-                animationSpec = infiniteRepeatable(tween(LOOP_MILLIS, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+                animationSpec =
+                infiniteRepeatable(tween(LOOP_MILLIS, easing = FastOutSlowInEasing), RepeatMode.Reverse),
                 label = "lineSlide",
             )
     Canvas(modifier = modifier.height(LINE_HEIGHT_DP.dp).fillMaxWidth()) {

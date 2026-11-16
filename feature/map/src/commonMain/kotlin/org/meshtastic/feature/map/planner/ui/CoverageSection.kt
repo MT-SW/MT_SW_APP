@@ -79,6 +79,7 @@ import org.meshtastic.core.resources.planner_unit_km
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.feature.map.planner.marginAt
 import org.meshtastic.feature.map.planner.state.PlannerSide
@@ -88,7 +89,6 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.roundToInt
-import org.meshtastic.core.ui.component.ProgressLine
 
 private const val GRID = 80
 private const val METERS_PER_DEG_LAT = 110_574.0

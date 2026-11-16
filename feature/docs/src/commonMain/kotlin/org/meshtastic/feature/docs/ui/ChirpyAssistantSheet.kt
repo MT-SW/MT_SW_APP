@@ -77,6 +77,9 @@ import org.meshtastic.core.resources.chirpy_thinking
 import org.meshtastic.core.resources.img_chirpy
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Send
@@ -85,9 +88,6 @@ import org.meshtastic.feature.docs.model.ChirpyMessage
 import org.meshtastic.feature.docs.model.ChirpyRole
 import org.meshtastic.feature.docs.model.ModelReadiness
 import org.meshtastic.core.resources.Res as CoreRes
-import org.meshtastic.core.ui.component.ProgressSpinner
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
-import org.meshtastic.core.ui.component.ProgressLine
 
 /** Chirpy AI Assistant bottom sheet with chat UI. Hidden entirely when the assistant reports unsupported. */
 @OptIn(ExperimentalMaterial3Api::class)

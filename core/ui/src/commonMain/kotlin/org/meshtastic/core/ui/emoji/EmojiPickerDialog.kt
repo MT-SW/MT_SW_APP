@@ -101,12 +101,12 @@ import org.meshtastic.core.resources.emoji_load_error
 import org.meshtastic.core.resources.emoji_no_results
 import org.meshtastic.core.resources.emoji_recently_used
 import org.meshtastic.core.resources.search_emoji
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 

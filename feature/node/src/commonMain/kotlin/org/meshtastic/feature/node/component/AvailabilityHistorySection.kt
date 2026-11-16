@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.availability_empty
@@ -60,10 +61,9 @@ import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.ui.component.InfoButton
-import kotlin.time.DurationUnit
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle
-import org.meshtastic.core.model.UiOptions
+import kotlin.time.DurationUnit
 
 /**
  * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it and

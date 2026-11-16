@@ -45,6 +45,7 @@ import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.resources.toggle_my_position
 import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
@@ -59,7 +60,6 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.theme.rememberUiOptions
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so

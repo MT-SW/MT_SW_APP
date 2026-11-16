@@ -61,9 +61,9 @@ import org.meshtastic.core.resources.mqtt_topic_finder_nothing_yet
 import org.meshtastic.core.resources.mqtt_topic_finder_only_above
 import org.meshtastic.core.resources.mqtt_topic_finder_sample_again
 import org.meshtastic.core.resources.mqtt_topic_finder_subscribing
-import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.proto.ModuleConfig
 
 private const val MAX_ACTIVE_ROWS = 30
 private const val DEFAULT_BROKER = "mqtt.meshtastic.org"

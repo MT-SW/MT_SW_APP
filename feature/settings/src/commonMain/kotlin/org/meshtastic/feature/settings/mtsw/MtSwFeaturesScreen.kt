@@ -81,11 +81,11 @@ import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
+import org.meshtastic.core.resources.mt_sw_features_switches
+import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_group_help
 import org.meshtastic.core.resources.mt_sw_group_look
 import org.meshtastic.core.resources.mt_sw_group_safety
-import org.meshtastic.core.resources.mt_sw_features_switches
-import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
 import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title

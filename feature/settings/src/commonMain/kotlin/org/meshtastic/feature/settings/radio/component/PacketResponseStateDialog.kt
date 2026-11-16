@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
-import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -44,6 +43,7 @@ import org.meshtastic.core.resources.delivery_confirmed
 import org.meshtastic.core.resources.delivery_confirmed_reboot_warning
 import org.meshtastic.core.resources.error
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.icon.Error
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

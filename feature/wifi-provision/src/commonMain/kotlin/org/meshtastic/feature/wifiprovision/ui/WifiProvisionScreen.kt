@@ -136,6 +136,7 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.FilledTonalButton
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -156,7 +157,6 @@ import org.meshtastic.feature.wifiprovision.WifiProvisionUiState.Phase
 import org.meshtastic.feature.wifiprovision.WifiProvisionUiState.ProvisionStatus
 import org.meshtastic.feature.wifiprovision.WifiProvisionViewModel
 import org.meshtastic.feature.wifiprovision.model.WifiNetwork
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val NETWORK_LIST_MAX_HEIGHT_DP = 240
 

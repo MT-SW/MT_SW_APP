@@ -91,9 +91,10 @@ object MeshStatsLines {
 
     /**
      * The statistics grouped as: the network (nodes, unread), the node itself (power, uptime), the radio (airtime,
-     * traffic, bad and dropped packets), the resources (CPU, RAM, flash, PSRAM) and the connections (noise floor, Wi-Fi,
-     * Bluetooth). Empty groups are left out. [lnaGain] is the display-only correction of the noise floor (the same as in the app).
-     * [nodesActive] is the number of nodes that report an active user, or null when no node shares that status.
+     * traffic, bad and dropped packets), the resources (CPU, RAM, flash, PSRAM) and the connections (noise floor,
+     * Wi-Fi, Bluetooth). Empty groups are left out. [lnaGain] is the display-only correction of the noise floor (the
+     * same as in the app). [nodesActive] is the number of nodes that report an active user, or null when no node shares
+     * that status.
      */
     @Suppress("LongParameterList")
     suspend fun meshStatusGroups(

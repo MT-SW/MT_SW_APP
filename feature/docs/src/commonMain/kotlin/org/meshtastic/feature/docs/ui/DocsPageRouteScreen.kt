@@ -61,6 +61,7 @@ import org.meshtastic.core.resources.doc_page_not_found_detail
 import org.meshtastic.core.resources.documentation
 import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -70,7 +71,6 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPageContent
 import org.meshtastic.feature.docs.model.ModelReadiness
 import org.meshtastic.feature.docs.model.TranslationSource
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 private const val TEXT_SCALE_DEFAULT = 1.0f
 private const val TEXT_SCALE_MIN = 0.6f

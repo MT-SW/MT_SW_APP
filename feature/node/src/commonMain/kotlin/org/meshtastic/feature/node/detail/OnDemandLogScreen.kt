@@ -52,6 +52,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -65,6 +67,7 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.shortFirmwareVersion
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ble_rssi_signal
@@ -195,6 +198,8 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 import org.meshtastic.core.ui.icon.AirUtilization
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.Chart
@@ -244,11 +249,6 @@ import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortNum
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import org.meshtastic.core.ui.component.drawChartBar
-import org.meshtastic.core.ui.component.rememberChartStyle
-import org.meshtastic.core.model.UiOptions
 
 /** OnDemand diagnostics screen: an overview of what it can do, then one card per query with its own request button. */
 @Composable

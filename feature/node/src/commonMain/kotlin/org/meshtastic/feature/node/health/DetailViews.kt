@@ -65,6 +65,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.SegmentedProgressLine
+import org.meshtastic.core.ui.component.drawChartArc
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
+import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.KeyboardArrowDown
 import org.meshtastic.core.ui.icon.KeyboardArrowUp
@@ -75,12 +81,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.time.Instant
-import org.meshtastic.core.ui.component.SegmentedProgressLine
-import org.meshtastic.core.ui.component.drawChartArc
-import org.meshtastic.core.ui.component.drawChartBar
-import org.meshtastic.core.ui.component.rememberChartStyle
-import org.meshtastic.core.ui.component.rememberThinRings
-import org.meshtastic.core.model.UiOptions
 
 /** The ways the same numbers can be shown on the node detail screen. */
 internal enum class DetailViewMode(val label: String) {
@@ -141,14 +141,9 @@ internal data class LevelScale(
 /** Same limits as the rest of the Network Health screens. */
 internal fun scaleFor(metric: NetworkHealthMetric, label: String): LevelScale? = when {
     metric == NetworkHealthMetric.POWER && label == "Bateria" -> LevelScale(50f, 20f, 5f, true, 0f, 100f)
-
     metric == NetworkHealthMetric.SIGNAL && label == "SNR" -> LevelScale(0f, -7.5f, -15f, true, -20f, 10f)
-
     metric == NetworkHealthMetric.ETHER && label == "Zajęcie kanału" -> LevelScale(15f, 25f, 40f, false, 0f, 60f)
-
-    metric == NetworkHealthMetric.SIGNAL && label == "Szum tła" ->
-        LevelScale(-100f, -90f, -80f, false, -130f, -60f)
-
+    metric == NetworkHealthMetric.SIGNAL && label == "Szum tła" -> LevelScale(-100f, -90f, -80f, false, -130f, -60f)
     else -> null
 }
 
@@ -192,18 +187,20 @@ internal fun TimeInStateStrip(
                 segments = LEVEL_ORDER.mapIndexed { i, level -> (palette[level] ?: Color.Gray) to weights[i] },
                 height = STRIP_HEIGHT_DP.dp,
             )
-        } else Row(
-            modifier =
-            Modifier.fillMaxWidth().height(STRIP_HEIGHT_DP.dp).clip(RoundedCornerShape(STRIP_HEIGHT_DP.dp / 2)),
-        ) {
-            LEVEL_ORDER.forEachIndexed { i, level ->
-                if (weights[i] > 0f) {
-                    Box(
-                        modifier =
-                        Modifier.weight(weights[i].coerceAtLeast(MIN_WEIGHT))
-                            .fillMaxHeight()
-                            .background(palette[level] ?: Color.Gray),
-                    )
+        } else {
+            Row(
+                modifier =
+                Modifier.fillMaxWidth().height(STRIP_HEIGHT_DP.dp).clip(RoundedCornerShape(STRIP_HEIGHT_DP.dp / 2)),
+            ) {
+                LEVEL_ORDER.forEachIndexed { i, level ->
+                    if (weights[i] > 0f) {
+                        Box(
+                            modifier =
+                            Modifier.weight(weights[i].coerceAtLeast(MIN_WEIGHT))
+                                .fillMaxHeight()
+                                .background(palette[level] ?: Color.Gray),
+                        )
+                    }
                 }
             }
         }

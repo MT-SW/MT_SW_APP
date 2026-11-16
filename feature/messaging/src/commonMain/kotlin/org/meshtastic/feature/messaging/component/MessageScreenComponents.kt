@@ -116,6 +116,7 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.NodeKeyStatusIcon
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SosBarScreen
@@ -145,7 +146,6 @@ import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.feature.messaging.DeliveryInfo
 import org.meshtastic.feature.messaging.TranslationDialogState
 import org.meshtastic.proto.ChannelSet
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 // region ── ScrollToBottomFab ──
 

@@ -118,8 +118,8 @@ fun handleIosDeepLink(url: String) {
 }
 
 /**
- * Called from the iPhone app after the last tap on the SOS widget (the widget checked its "armed" file first): sends the
- * alarm with the settings of the SOS screen and opens that screen to follow the answers.
+ * Called from the iPhone app after the last tap on the SOS widget (the widget checked its "armed" file first): sends
+ * the alarm with the settings of the SOS screen and opens that screen to follow the answers.
  */
 fun handleIosSosFromWidget() {
     koin.get<SosController>(SosController::class).start(koin.get<SosPrefs>(SosPrefs::class).config.value)

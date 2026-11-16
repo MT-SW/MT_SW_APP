@@ -470,7 +470,8 @@ private val LOOK_PRESETS =
         ),
         LookPreset(
             Res.string.look_preset_depth,
-            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GRADIENT) + look(UiOptions.ALL_GROUPS, ElementLook.DEPTH, 60),
+            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GRADIENT) +
+                look(UiOptions.ALL_GROUPS, ElementLook.DEPTH, 60),
         ),
     )
 

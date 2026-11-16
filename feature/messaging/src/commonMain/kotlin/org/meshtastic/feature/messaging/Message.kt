@@ -139,6 +139,7 @@ import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
 import org.meshtastic.core.ui.component.InlineStyle
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.holdBuzz
@@ -165,7 +166,6 @@ import org.meshtastic.feature.messaging.component.QuickChatRow
 import org.meshtastic.feature.messaging.component.ReplySnippet
 import org.meshtastic.feature.messaging.component.ScrollToBottomFab
 import org.meshtastic.feature.messaging.component.TranslationModelDownloadDialog
-import org.meshtastic.core.ui.component.ProgressLine
 
 private const val ROUNDED_CORNER_PERCENT = 100
 private const val MAX_LINES = 3

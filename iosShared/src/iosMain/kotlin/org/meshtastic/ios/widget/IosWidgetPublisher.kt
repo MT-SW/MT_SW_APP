@@ -84,11 +84,11 @@ class IosWidgetPublisher(
             WidgetInputs(snapshot, small, second, sosTaps)
         }
             .conflate()
-            .collect { (snapshot, small, second, sosTaps) ->
+            .collect { inputs ->
                 runCatching {
                     // The words on the widget follow the language of the app, not of the phone: the app writes them.
                     val updated = getStringSuspend(Res.string.widget_updated) + " " + clockTime()
-                    write(json(snapshot, updated, small, second, sosTaps))
+                    write(json(inputs.snapshot, updated, inputs.small, inputs.second, inputs.sosTaps))
                 }
                     .onFailure { Logger.w(it) { "Could not publish the widget statistics" } }
                 delay(MIN_PUBLISH_INTERVAL)

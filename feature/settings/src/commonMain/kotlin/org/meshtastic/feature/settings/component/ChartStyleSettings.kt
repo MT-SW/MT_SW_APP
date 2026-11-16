@@ -74,63 +74,64 @@ private val BAR_SHARES = listOf(0.45f, 0.8f, 0.6f, 1f)
  */
 @Composable
 fun ChartStyleSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
-    val general = options[UiOptions.CHART_STYLE]
-    Text(
-        text = stringResource(Res.string.chart_style_preview_hint),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-    )
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        for (style in CHART_STYLES) {
-            ChartStyleSample(
-                label = chartStyleName(style),
-                style = style,
-                selected = style == general,
-                onClick = { onChange(UiOptions.CHART_STYLE, style) },
-            )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        val general = options[UiOptions.CHART_STYLE]
+        Text(
+            text = stringResource(Res.string.chart_style_preview_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            for (style in CHART_STYLES) {
+                ChartStyleSample(
+                    label = chartStyleName(style),
+                    style = style,
+                    selected = style == general,
+                    onClick = { onChange(UiOptions.CHART_STYLE, style) },
+                )
+            }
         }
+        val styleItems = CHART_STYLES.map { it to chartStyleName(it) }
+        DropDownPreference(
+            title = stringResource(Res.string.chart_style),
+            enabled = true,
+            items = styleItems,
+            selectedItem = general,
+            onItemSelected = { onChange(UiOptions.CHART_STYLE, it) },
+            summary = stringResource(Res.string.chart_style_summary),
+        )
+        val scopeItems = listOf(UiOptions.CHART_STYLE_SAME to stringResource(Res.string.chart_style_same)) + styleItems
+        DropDownPreference(
+            title = stringResource(Res.string.chart_style_health),
+            enabled = true,
+            items = scopeItems,
+            selectedItem = options[UiOptions.CHART_STYLE_HEALTH],
+            onItemSelected = { onChange(UiOptions.CHART_STYLE_HEALTH, it) },
+            summary = null,
+        )
+        DropDownPreference(
+            title = stringResource(Res.string.chart_style_node),
+            enabled = true,
+            items = scopeItems,
+            selectedItem = options[UiOptions.CHART_STYLE_NODE],
+            onItemSelected = { onChange(UiOptions.CHART_STYLE_NODE, it) },
+            summary = null,
+        )
     }
-    val styleItems = CHART_STYLES.map { it to chartStyleName(it) }
-    DropDownPreference(
-        title = stringResource(Res.string.chart_style),
-        enabled = true,
-        items = styleItems,
-        selectedItem = general,
-        onItemSelected = { onChange(UiOptions.CHART_STYLE, it) },
-        summary = stringResource(Res.string.chart_style_summary),
-    )
-    val scopeItems = listOf(UiOptions.CHART_STYLE_SAME to stringResource(Res.string.chart_style_same)) + styleItems
-    DropDownPreference(
-        title = stringResource(Res.string.chart_style_health),
-        enabled = true,
-        items = scopeItems,
-        selectedItem = options[UiOptions.CHART_STYLE_HEALTH],
-        onItemSelected = { onChange(UiOptions.CHART_STYLE_HEALTH, it) },
-        summary = null,
-    )
-    DropDownPreference(
-        title = stringResource(Res.string.chart_style_node),
-        enabled = true,
-        items = scopeItems,
-        selectedItem = options[UiOptions.CHART_STYLE_NODE],
-        onItemSelected = { onChange(UiOptions.CHART_STYLE_NODE, it) },
-        summary = null,
-    )
 }
 
 @Composable
-private fun chartStyleName(style: Int): String =
-    when (style) {
-        UiOptions.CHART_STYLE_GLASS -> stringResource(Res.string.chart_style_glass)
-        UiOptions.CHART_STYLE_GRADIENT -> stringResource(Res.string.chart_style_gradient)
-        UiOptions.CHART_STYLE_OUTLINE -> stringResource(Res.string.chart_style_outline)
-        UiOptions.CHART_STYLE_GLOW -> stringResource(Res.string.chart_style_glow)
-        else -> stringResource(Res.string.chart_style_flat)
-    }
+private fun chartStyleName(style: Int): String = when (style) {
+    UiOptions.CHART_STYLE_GLASS -> stringResource(Res.string.chart_style_glass)
+    UiOptions.CHART_STYLE_GRADIENT -> stringResource(Res.string.chart_style_gradient)
+    UiOptions.CHART_STYLE_OUTLINE -> stringResource(Res.string.chart_style_outline)
+    UiOptions.CHART_STYLE_GLOW -> stringResource(Res.string.chart_style_glow)
+    else -> stringResource(Res.string.chart_style_flat)
+}
 
 /** One row of the preview: the name of a style with sample bars and a half-round gauge drawn in that style. */
 @Composable
@@ -141,7 +142,8 @@ private fun ChartStyleSample(label: String, style: Int, selected: Boolean, onCli
     val palette = listOf(colors.primary, colors.tertiary, colors.secondary, colors.error)
     val track = colors.surfaceVariant
     Row(
-        modifier = Modifier.fillMaxWidth().clip(shape).border(border, shape).clickable(onClick = onClick).padding(12.dp),
+        modifier =
+        Modifier.fillMaxWidth().clip(shape).border(border, shape).clickable(onClick = onClick).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

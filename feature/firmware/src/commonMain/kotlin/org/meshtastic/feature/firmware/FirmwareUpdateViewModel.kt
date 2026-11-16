@@ -684,11 +684,10 @@ class FirmwareUpdateViewModel(
     private suspend fun maybeRecordRecovery(state: FirmwareUpdateState.Ready): Boolean {
         val type = _selectedReleaseType.value
         val recoverable = state.updateMethod is FirmwareUpdateMethod.Ble && !state.deviceHardware.isEsp32Arc
-        if (!recoverable) return false
         val fullAddress = radioPrefs.devAddr.value
+        if (!recoverable || fullAddress == null) return false
         // An unlisted device may report no environment name; recovery then runs on the model number alone.
         val pioEnv = nodeRepository.myNodeInfo.value?.pioEnv.orEmpty()
-        if (fullAddress == null) return false
         firmwareRecoveryDataSource.set(
             PendingFirmwareRecovery(
                 fullAddress = fullAddress,

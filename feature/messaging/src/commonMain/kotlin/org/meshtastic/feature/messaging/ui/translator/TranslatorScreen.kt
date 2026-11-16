@@ -85,6 +85,7 @@ import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.messaging.DictationPhase
@@ -94,7 +95,6 @@ import org.meshtastic.feature.messaging.translation.TranslatorError
 import org.meshtastic.feature.messaging.translation.TranslatorHistoryEntry
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 /** The translator itself: type a text, pick the languages, translate and copy. Works fully offline. */
 @Composable

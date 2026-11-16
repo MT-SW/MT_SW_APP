@@ -187,9 +187,10 @@ fun NetworkHealthScreen(
         Column(modifier = Modifier.fillMaxWidth().padding(contentPadding).nestedScroll(foldConnection)) {
             // The text is kept here and only reported to the view model: the list behind it recomputes slowly, and
             // taking the text back from that result moved the cursor in front of the letter just typed.
-            var searchField by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                mutableStateOf(TextFieldValue(uiState.searchText))
-            }
+            var searchField by
+                rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                    mutableStateOf(TextFieldValue(uiState.searchText))
+                }
             androidx.compose.material3.OutlinedTextField(
                 value = searchField,
                 onValueChange = {

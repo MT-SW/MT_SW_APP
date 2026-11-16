@@ -102,6 +102,7 @@ object DeepLinkRouter {
      * @param uri The incoming OS intent URI (e.g. "meshtastic://meshtastic/share?message=hello")
      * @return A list of strongly-typed NavKeys representing the backstack, or null if the URI is not recognized.
      */
+    @Suppress("ReturnCount")
     fun route(uri: CommonUri): List<NavKey>? {
         val firstSegment = uri.pathSegments.firstOrNull { it.isNotBlank() }?.lowercase()
 

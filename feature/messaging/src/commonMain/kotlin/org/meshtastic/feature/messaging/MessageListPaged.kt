@@ -69,6 +69,7 @@ import org.meshtastic.core.model.Reaction
 import org.meshtastic.core.model.hasDisplayName
 import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
@@ -76,7 +77,6 @@ import org.meshtastic.feature.messaging.component.MessageStatusDialog
 import org.meshtastic.feature.messaging.component.ReactionDialog
 import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
 import kotlin.math.abs
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 private const val HEX_RADIX = 16
 private const val RELAY_NODE_SUFFIX_MASK = 0xFF

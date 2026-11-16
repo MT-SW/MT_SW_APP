@@ -68,15 +68,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
-import org.meshtastic.core.ui.component.ProgressRing
-import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LoadingIndicator
+import org.meshtastic.core.ui.component.ProgressRing
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -561,9 +561,9 @@ private const val GAUGE_CLASSIC_STROKE_DP = 7
 private const val GAUGE_ANIMATION_MILLIS = 900
 
 /**
- * The tab icon in the middle of a gauge that fills to [fraction] in the colour [accent] of the verdict. In the thin look
- * (default, like on the iPhone) it is a slim ring; with the classic look chosen in "Look" it is the old glowing, thick
- * 270 degree gauge.
+ * The tab icon in the middle of a gauge that fills to [fraction] in the colour [accent] of the verdict. In the thin
+ * look (default, like on the iPhone) it is a slim ring; with the classic look chosen in "Look" it is the old glowing,
+ * thick 270 degree gauge.
  */
 @Composable
 private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
@@ -577,32 +577,34 @@ private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
     Box(modifier = Modifier.size(HERO_ICON_DP.dp), contentAlignment = Alignment.Center) {
         if (thin) {
             ProgressRing(progress = filled, size = HERO_ICON_DP.dp, color = accent)
-        } else Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = GAUGE_CLASSIC_STROKE_DP.dp.toPx()
-            val topLeft = Offset(stroke / 2, stroke / 2)
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawCircle(
-                brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
-                radius = size.minDimension / 2,
-            )
-            drawArc(
-                color = track,
-                startAngle = startAngle,
-                sweepAngle = fullSweep,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round),
-            )
-            drawArc(
-                color = accent,
-                startAngle = startAngle,
-                sweepAngle = fullSweep * filled,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round),
-            )
+        } else {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val stroke = GAUGE_CLASSIC_STROKE_DP.dp.toPx()
+                val topLeft = Offset(stroke / 2, stroke / 2)
+                val arcSize = Size(size.width - stroke, size.height - stroke)
+                drawCircle(
+                    brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
+                    radius = size.minDimension / 2,
+                )
+                drawArc(
+                    color = track,
+                    startAngle = startAngle,
+                    sweepAngle = fullSweep,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                )
+                drawArc(
+                    color = accent,
+                    startAngle = startAngle,
+                    sweepAngle = fullSweep * filled,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                )
+            }
         }
         Icon(imageVector = icon, contentDescription = null, tint = accent, modifier = Modifier.size(HERO_GLYPH_DP.dp))
     }

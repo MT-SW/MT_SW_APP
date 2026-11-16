@@ -160,8 +160,9 @@ class DesktopRuntimeModule {
         }
     }
 
-    /** Desktop has no bundled Android assets; repositories seed from the network instead. */
-    /** The bundled JSON assets are packed into the app from the folder the Android app reads (see `build.gradle.kts`). */
+    /**
+     * The bundled JSON assets are packed into the app from the folder the Android app reads (see `build.gradle.kts`).
+     */
     @Single
     fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { name ->
         Thread.currentThread().contextClassLoader?.getResourceAsStream(name)?.source()

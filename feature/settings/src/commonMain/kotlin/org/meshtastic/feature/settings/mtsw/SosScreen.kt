@@ -168,11 +168,11 @@ import org.meshtastic.core.resources.sos_section_bar
 import org.meshtastic.core.resources.sos_section_channel
 import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_hold
-import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_section_message
 import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_receive
 import org.meshtastic.core.resources.sos_section_repeat
+import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_status_answered
 import org.meshtastic.core.resources.sos_status_delivered
 import org.meshtastic.core.resources.sos_status_enroute
@@ -180,7 +180,6 @@ import org.meshtastic.core.resources.sos_status_error
 import org.meshtastic.core.resources.sos_status_queued
 import org.meshtastic.core.resources.sos_status_sending
 import org.meshtastic.core.resources.sos_status_sending_unlimited
-import org.meshtastic.core.resources.sos_widget_taps_note
 import org.meshtastic.core.resources.sos_stop_on_answer
 import org.meshtastic.core.resources.sos_stop_when_delivered
 import org.meshtastic.core.resources.sos_style_bell
@@ -190,6 +189,7 @@ import org.meshtastic.core.resources.sos_style_siren
 import org.meshtastic.core.resources.sos_style_title
 import org.meshtastic.core.resources.sos_targets_note
 import org.meshtastic.core.resources.sos_title
+import org.meshtastic.core.resources.sos_widget_taps_note
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FloatingBarUnderlap

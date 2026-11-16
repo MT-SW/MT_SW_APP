@@ -70,6 +70,8 @@ import org.meshtastic.core.resources.map_tile_limit_reached
 import org.meshtastic.core.resources.map_zoom_levels
 import org.meshtastic.core.resources.offline_maps_empty
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -80,8 +82,6 @@ import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.offlineStyleJson
 import org.meshtastic.feature.map.maplibre.tileCount
 import kotlin.math.roundToInt
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
-import org.meshtastic.core.ui.component.ProgressLine
 
 /** What the map must tell the offline sheet: which style to pack, and which region is on screen. */
 internal class OfflineMapTarget(

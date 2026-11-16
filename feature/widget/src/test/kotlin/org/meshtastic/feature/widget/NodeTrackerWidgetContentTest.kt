@@ -44,8 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * Unit tests for [NodeTrackerWidget.WidgetContent] on Glance's own harness, which asserts on the composed tree rather
- * than pixels. Any string rendering at all proves the [WidgetResourceEnvironment]
- * bridge still resolves Compose Multiplatform resources.
+ * than pixels. Any string rendering at all proves the [WidgetResourceEnvironment] bridge still resolves Compose
+ * Multiplatform resources.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class, sdk = [34])

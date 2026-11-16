@@ -119,9 +119,9 @@ import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.component.SwitchPreference
-import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * The offline translator and assistant: two independent switches, and below them the models, one tab per function

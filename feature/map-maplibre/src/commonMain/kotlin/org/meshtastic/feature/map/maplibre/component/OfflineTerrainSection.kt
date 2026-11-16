@@ -53,6 +53,7 @@ import org.meshtastic.core.resources.offline_terrain_empty
 import org.meshtastic.core.resources.offline_terrain_manager
 import org.meshtastic.core.resources.offline_terrain_regional_detail
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -65,7 +66,6 @@ import org.meshtastic.feature.map.terrain.MapterhornEndpoints
 import org.meshtastic.feature.map.terrain.TerrainDownloadState
 import org.meshtastic.feature.map.terrain.TerrainRegionExtractor
 import org.meshtastic.feature.map.terrain.terrainTileCount
-import org.meshtastic.core.ui.component.ProgressLine
 
 /**
  * Offline terrain — hillshade and elevation contours for the viewport, downloaded as its own section of the layers

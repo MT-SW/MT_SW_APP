@@ -82,11 +82,11 @@ import org.meshtastic.core.resources.network_health_info_title
 import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.SegmentedProgressRing
 import org.meshtastic.core.ui.component.rememberThinRings
-import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.DataUsage
@@ -312,42 +312,45 @@ internal fun DonutChart(
     Box(modifier = modifier.size(sizeDp.dp), contentAlignment = Alignment.Center) {
         if (thin) {
             SegmentedProgressRing(
-                segments = segments.map { (color, count) -> color to if (total > 0) count.toFloat() / total * progress else 0f },
+                segments =
+                segments.map { (color, count) ->
+                    color to if (total > 0) count.toFloat() / total * progress else 0f
+                },
                 size = sizeDp.dp,
             )
         } else {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = RING_STROKE_DP.dp.toPx()
-            val topLeft = Offset(stroke / 2, stroke / 2)
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawArc(
-                color = track,
-                startAngle = 0f,
-                sweepAngle = FULL_CIRCLE,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(width = stroke),
-            )
-            if (total > 0) {
-                var start = RING_START_ANGLE
-                segments.forEach { (color, count) ->
-                    if (count > 0) {
-                        val sweep = FULL_CIRCLE * count / total * progress
-                        drawArc(
-                            color = color,
-                            startAngle = start,
-                            sweepAngle = sweep,
-                            useCenter = false,
-                            topLeft = topLeft,
-                            size = arcSize,
-                            style = Stroke(width = stroke),
-                        )
-                        start += sweep
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val stroke = RING_STROKE_DP.dp.toPx()
+                val topLeft = Offset(stroke / 2, stroke / 2)
+                val arcSize = Size(size.width - stroke, size.height - stroke)
+                drawArc(
+                    color = track,
+                    startAngle = 0f,
+                    sweepAngle = FULL_CIRCLE,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = stroke),
+                )
+                if (total > 0) {
+                    var start = RING_START_ANGLE
+                    segments.forEach { (color, count) ->
+                        if (count > 0) {
+                            val sweep = FULL_CIRCLE * count / total * progress
+                            drawArc(
+                                color = color,
+                                startAngle = start,
+                                sweepAngle = sweep,
+                                useCenter = false,
+                                topLeft = topLeft,
+                                size = arcSize,
+                                style = Stroke(width = stroke),
+                            )
+                            start += sweep
+                        }
                     }
                 }
             }
-        }
         }
         Text(text = centerText, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     }

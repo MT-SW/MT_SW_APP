@@ -59,6 +59,7 @@ import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.serial
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Bluetooth
@@ -69,7 +70,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.feature.connections.model.DeviceListEntry
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 private const val RSSI_UPDATE_RATE_MS = 2000L
 

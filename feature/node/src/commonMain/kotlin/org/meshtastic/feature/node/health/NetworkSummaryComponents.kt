@@ -46,23 +46,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.SegmentedProgressLine
+import org.meshtastic.core.ui.component.drawChartBar
+import org.meshtastic.core.ui.component.rememberChartStyle
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.drawChartBar
-import org.meshtastic.core.ui.component.rememberChartStyle
 
 private const val GROW_MILLIS = 800
 private const val BAR_CORNER_PX = 12f
@@ -149,26 +149,31 @@ internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (rememberThinRings()) {
             SegmentedProgressLine(
-                segments = DISTRIBUTION_LEVELS.mapIndexed { index, level -> level.color() to counts.getOrElse(index) { 0 }.toFloat() },
+                segments =
+                DISTRIBUTION_LEVELS.mapIndexed { index, level ->
+                    level.color() to counts.getOrElse(index) { 0 }.toFloat()
+                },
                 fillFraction = grow,
             )
-        } else Row(
-            modifier =
-            Modifier.fillMaxWidth()
-                .height(14.dp)
-                .clip(RoundedCornerShape(7.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)),
-        ) {
-            if (total > 0) {
-                DISTRIBUTION_LEVELS.forEachIndexed { index, level ->
-                    val count = counts.getOrElse(index) { 0 }
-                    if (count > 0) {
-                        Box(
-                            modifier =
-                            Modifier.weight((count.toFloat() * grow).coerceAtLeast(MIN_SEGMENT_WEIGHT))
-                                .fillMaxHeight()
-                                .background(level.color()),
-                        )
+        } else {
+            Row(
+                modifier =
+                Modifier.fillMaxWidth()
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(7.dp))
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)),
+            ) {
+                if (total > 0) {
+                    DISTRIBUTION_LEVELS.forEachIndexed { index, level ->
+                        val count = counts.getOrElse(index) { 0 }
+                        if (count > 0) {
+                            Box(
+                                modifier =
+                                Modifier.weight((count.toFloat() * grow).coerceAtLeast(MIN_SEGMENT_WEIGHT))
+                                    .fillMaxHeight()
+                                    .background(level.color()),
+                            )
+                        }
                     }
                 }
             }
@@ -313,7 +318,8 @@ internal fun ColumnChart(
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal,
                 )
-                val barModifier = Modifier.fillMaxWidth().height((CHART_HEIGHT_DP * value / max * grow).dp.coerceAtLeast(2.dp))
+                val barModifier =
+                    Modifier.fillMaxWidth().height((CHART_HEIGHT_DP * value / max * grow).dp.coerceAtLeast(2.dp))
                 Box(
                     modifier =
                     if (chartStyle == UiOptions.CHART_STYLE_FLAT) {

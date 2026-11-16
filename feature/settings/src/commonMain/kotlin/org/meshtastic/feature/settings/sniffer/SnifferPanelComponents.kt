@@ -78,6 +78,7 @@ import org.meshtastic.core.resources.sniffer_source_mqtt_unavailable_summary
 import org.meshtastic.core.resources.sniffer_source_off
 import org.meshtastic.core.resources.sniffer_source_title
 import org.meshtastic.core.ui.component.BasicListItem
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FolderOpen
@@ -86,7 +87,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.feature.settings.export.LogExportSaverLauncher
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** The three top-bar actions for [SnifferSettingsScreen] -- save, open the gear menu, and clear. */
 @Composable

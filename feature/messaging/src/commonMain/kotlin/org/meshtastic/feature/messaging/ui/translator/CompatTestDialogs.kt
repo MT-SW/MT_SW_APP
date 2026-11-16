@@ -66,12 +66,12 @@ import org.meshtastic.core.resources.compat_tip_7
 import org.meshtastic.core.resources.compat_tip_8
 import org.meshtastic.core.resources.compat_tip_9
 import org.meshtastic.core.resources.compat_tips_title
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.CompatStep
 import org.meshtastic.feature.messaging.translation.CompatUi
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 /** The offer, the progress and the report window (with the finished package) of the assistant's compatibility test. */
 @Composable

@@ -84,10 +84,10 @@ internal fun nextSosTapCount(previous: Int, lastTap: Long, now: Long, windowMs: 
 
 /**
  * Widget "SOS": a red plate with a gold border and big white letters, the same look as the SOS button in the app's top
- * bar. It cannot be held (the launcher then starts editing it), so the alarm is sent by several quick taps in a row:
- * as many as are set in the SOS settings (never fewer than three, so a pocket cannot send it). While the taps are
- * counted the widget shows how many are done; once the alarm has gone out it says so, and a tap then opens the SOS
- * screen of the app to follow the answers.
+ * bar. It cannot be held (the launcher then starts editing it), so the alarm is sent by several quick taps in a row: as
+ * many as are set in the SOS settings (never fewer than three, so a pocket cannot send it). While the taps are counted
+ * the widget shows how many are done; once the alarm has gone out it says so, and a tap then opens the SOS screen of
+ * the app to follow the answers.
  */
 class SosWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
@@ -106,7 +106,8 @@ class SosWidget : GlanceAppWidget() {
         val count = state[SOS_TAP_COUNT_KEY] ?: 0
         val sent = (state[SOS_SENT_AT_KEY] ?: 0L) > 0L
         val open = Intent(Intent.ACTION_VIEW, "$DEEP_LINK_BASE_URI/sos".toUri()).setPackage(context.packageName)
-        val onClick: Action = if (sent) actionStartActivity(open) else actionRunCallback<SosTapAction>(actionParametersOf())
+        val onClick: Action =
+            if (sent) actionStartActivity(open) else actionRunCallback<SosTapAction>(actionParametersOf())
         val textSp =
             minOf(size.height.value * HEIGHT_PART, size.width.value * WIDTH_PART).coerceIn(MIN_TEXT_SP, MAX_TEXT_SP)
         val note =

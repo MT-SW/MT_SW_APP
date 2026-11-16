@@ -129,8 +129,7 @@ class IosRuntimeModule {
      */
     @Single
     fun bundledAssetReader(): BundledAssetReader = BundledAssetReader { name ->
-        val path =
-            NSBundle.mainBundle.pathForResource(name.substringBeforeLast('.'), name.substringAfterLast('.', ""))
+        val path = NSBundle.mainBundle.pathForResource(name.substringBeforeLast('.'), name.substringAfterLast('.', ""))
         path?.let { runCatching { FileSystem.SYSTEM.source(it.toPath()) }.getOrNull() }
     }
 }

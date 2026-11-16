@@ -105,10 +105,10 @@ enum class SosBarScreen(val key: String) {
 }
 
 /**
- * Decides which of the top bars on the screen shows the SOS button. A wide window (desktop, tablet) shows several
- * cards side by side, each with its own bar, and every bar would otherwise draw the button. Each bar reports where its
- * button would be; the one furthest to the right wins (the top one on a tie), so the button sits at the window's
- * right edge and appears once. A bar that has not reported yet shows the button only while no other bar is known.
+ * Decides which of the top bars on the screen shows the SOS button. A wide window (desktop, tablet) shows several cards
+ * side by side, each with its own bar, and every bar would otherwise draw the button. Each bar reports where its button
+ * would be; the one furthest to the right wins (the top one on a tie), so the button sits at the window's right edge
+ * and appears once. A bar that has not reported yet shows the button only while no other bar is known.
  */
 @Stable
 class SosBarSlots {
@@ -146,20 +146,18 @@ val LocalSosBarSlots = compositionLocalOf<SosBarSlots?> { null }
 @Composable
 private fun SosBarSlot(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val slots = LocalSosBarSlots.current
-    if (slots == null) {
-        Box(modifier) { content() }
-        return
-    }
     val id = remember { Any() }
-    DisposableEffect(slots, id) { onDispose { slots.release(id) } }
-    Box(
-        modifier.onGloballyPositioned {
-            val bounds = it.boundsInWindow()
-            slots.report(id, bounds.right, bounds.top)
-        },
-    ) {
-        if (slots.shows(id)) content()
-    }
+    if (slots != null) DisposableEffect(slots, id) { onDispose { slots.release(id) } }
+    val placed =
+        if (slots == null) {
+            modifier
+        } else {
+            modifier.onGloballyPositioned {
+                val bounds = it.boundsInWindow()
+                slots.report(id, bounds.right, bounds.top)
+            }
+        }
+    Box(placed) { if (slots == null || slots.shows(id)) content() }
 }
 
 /** The SOS button as the top bars draw it: one for the whole window, whatever number of cards are side by side. */

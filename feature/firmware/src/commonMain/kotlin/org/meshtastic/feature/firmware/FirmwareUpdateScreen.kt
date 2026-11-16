@@ -178,6 +178,9 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ProgressRing
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -202,9 +205,6 @@ import org.meshtastic.feature.firmware.game.ChirpyHopDialog
 import org.meshtastic.feature.firmware.game.ChirpyHopPlayButton
 import org.meshtastic.feature.firmware.game.ChirpyHopUpdatePhase
 import org.meshtastic.feature.firmware.game.toChirpyHopStatus
-import org.meshtastic.core.ui.component.ProgressSpinner
-import org.meshtastic.core.ui.component.ProgressRing
-import org.meshtastic.core.ui.component.ProgressLine
 
 private const val CYCLE_DELAY_MS = 4500L
 

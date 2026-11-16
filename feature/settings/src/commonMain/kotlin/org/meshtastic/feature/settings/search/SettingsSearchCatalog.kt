@@ -42,6 +42,9 @@ import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.background_keepalive_title
 import org.meshtastic.core.resources.button_gradient
+import org.meshtastic.core.resources.chart_style
+import org.meshtastic.core.resources.chart_style_health
+import org.meshtastic.core.resources.chart_style_node
 import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.resources.data_logs_title
 import org.meshtastic.core.resources.db_sync_auto
@@ -64,9 +67,6 @@ import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
 import org.meshtastic.core.resources.glass_rim
 import org.meshtastic.core.resources.glass_tint
-import org.meshtastic.core.resources.chart_style
-import org.meshtastic.core.resources.chart_style_health
-import org.meshtastic.core.resources.chart_style_node
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.input_hold_buzz
@@ -107,10 +107,10 @@ import org.meshtastic.core.resources.sos_notify_on_answer
 import org.meshtastic.core.resources.sos_quiet_switch
 import org.meshtastic.core.resources.sos_repeat_gate_switch
 import org.meshtastic.core.resources.sos_section_bar
-import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_section_history
 import org.meshtastic.core.resources.sos_section_nodes
 import org.meshtastic.core.resources.sos_section_receive
+import org.meshtastic.core.resources.sos_section_widget
 import org.meshtastic.core.resources.sos_stop_on_answer
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.support_project_title

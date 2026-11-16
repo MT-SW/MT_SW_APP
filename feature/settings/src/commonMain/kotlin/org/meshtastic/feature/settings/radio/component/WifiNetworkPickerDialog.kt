@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -61,7 +62,6 @@ import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.PhoneWifiNetwork
 import org.meshtastic.core.ui.util.PhoneWifiScanner
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val GOOD_DBM = -60
 private const val OK_DBM = -70

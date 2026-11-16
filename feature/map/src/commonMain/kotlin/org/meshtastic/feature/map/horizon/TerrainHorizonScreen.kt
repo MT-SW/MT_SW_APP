@@ -179,6 +179,9 @@ import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
@@ -198,9 +201,6 @@ import kotlin.math.tan
 import kotlin.time.Clock
 import kotlin.time.TimeSource
 import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
-import org.meshtastic.core.ui.component.ProgressSpinner
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
-import org.meshtastic.core.ui.component.ProgressLine
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)

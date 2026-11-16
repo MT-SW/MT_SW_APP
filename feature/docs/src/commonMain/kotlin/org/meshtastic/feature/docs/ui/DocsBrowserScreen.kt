@@ -55,6 +55,7 @@ import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.navigate_back
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
@@ -63,7 +64,6 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPage
 import org.meshtastic.feature.docs.model.DocSection
 import org.meshtastic.feature.docs.model.ModelReadiness
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 /** Main documentation browser screen showing a grouped TOC. */
 @Suppress("LongMethod", "LongParameterList")

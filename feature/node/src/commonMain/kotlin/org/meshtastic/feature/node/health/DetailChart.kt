@@ -61,12 +61,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.ui.component.rememberChartStyle
 import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.Instant
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.rememberChartStyle
 
 private const val GROW_MILLIS = 900
 private const val MAX_DRAWN_POINTS = 300
@@ -273,13 +273,17 @@ private fun DrawScope.drawChart(
 }
 
 /**
- * The area and the line of the chart in the chosen chart [style]: flat (the old look), glass (a gradient below, a glowing
- * line with a bright highlight, like a glossy tube), gradient, outline (a thin line with a very light area) or glow.
+ * The area and the line of the chart in the chosen chart [style]: flat (the old look), glass (a gradient below, a
+ * glowing line with a bright highlight, like a glossy tube), gradient, outline (a thin line with a very light area) or
+ * glow.
  */
 private fun DrawScope.drawLineChartBody(style: Int, color: Color, line: Path, area: Path, height: Float) {
     val round = Stroke(width = LINE_WIDTH, cap = StrokeCap.Round, join = StrokeJoin.Round)
-    fun glow(width: Float, alpha: Float) =
-        drawPath(line, color.copy(alpha = alpha), style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    fun glow(width: Float, alpha: Float) = drawPath(
+        line,
+        color.copy(alpha = alpha),
+        style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round),
+    )
     fun fill(top: Float) =
         drawPath(area, Brush.verticalGradient(listOf(color.copy(alpha = top), Color.Transparent), endY = height))
     when (style) {
@@ -295,10 +299,12 @@ private fun DrawScope.drawLineChartBody(style: Int, color: Color, line: Path, ar
                 )
             }
         }
+
         UiOptions.CHART_STYLE_GRADIENT -> {
             fill(GLASS_FILL_ALPHA)
             drawPath(line, color, style = round)
         }
+
         UiOptions.CHART_STYLE_OUTLINE -> {
             fill(OUTLINE_FILL_ALPHA)
             drawPath(
@@ -307,12 +313,14 @@ private fun DrawScope.drawLineChartBody(style: Int, color: Color, line: Path, ar
                 style = Stroke(width = OUTLINE_WIDTH, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
         }
+
         UiOptions.CHART_STYLE_GLOW -> {
             fill(FILL_ALPHA)
             glow(GLOW_FAR_WIDTH, GLOW_FAR_ALPHA)
             glow(GLASS_HALO_WIDTH, GLASS_HALO_ALPHA)
             drawPath(line, color, style = round)
         }
+
         else -> {
             fill(FILL_ALPHA)
             glow(FLAT_HALO_WIDTH, FLAT_HALO_ALPHA)

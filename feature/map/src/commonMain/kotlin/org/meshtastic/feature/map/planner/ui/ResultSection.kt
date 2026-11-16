@@ -83,6 +83,7 @@ import org.meshtastic.core.resources.planner_unit_km
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_yes
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.feature.map.planner.DirectionResult
@@ -91,7 +92,6 @@ import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.state.MeasuredComparison
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerUiState
-import org.meshtastic.core.ui.component.IndeterminateProgressLine
 
 private const val RECOMMENDED_FRESNEL_RATIO = 0.6
 

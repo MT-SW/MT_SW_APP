@@ -114,6 +114,7 @@ import org.meshtastic.core.takserver.TakTestResult
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -137,7 +138,6 @@ import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.MemberRole
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.Team
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 // ── TAK Config Screen (Module Settings) ─────────────────────────────────────
 // Shows only the firmware module config: team and role dropdowns.

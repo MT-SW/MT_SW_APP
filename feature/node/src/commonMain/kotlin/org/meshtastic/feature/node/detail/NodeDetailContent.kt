@@ -44,6 +44,7 @@ import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalCardGroup
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.node.component.ActiveAlertSection
 import org.meshtastic.feature.node.component.AdministrationSection
@@ -56,7 +57,6 @@ import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.component.NotesSection
 import org.meshtastic.feature.node.component.SilenceAlertSection
 import org.meshtastic.feature.node.model.NodeDetailAction
-import org.meshtastic.core.ui.component.ProgressSpinner
 
 /**
  * Shared content composable for node details, usable from both Android and Desktop.
