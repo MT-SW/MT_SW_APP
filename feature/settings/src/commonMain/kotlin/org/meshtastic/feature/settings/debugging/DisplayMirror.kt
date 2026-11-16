@@ -34,9 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -80,7 +78,9 @@ import org.meshtastic.core.resources.mirror_unsupported
 import org.meshtastic.core.resources.mirror_unsupported_hint
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.ui.component.EmptyState
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.input.RemoteKey

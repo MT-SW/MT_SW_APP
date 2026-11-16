@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -79,6 +78,7 @@ import org.meshtastic.core.resources.pm_sensor_status
 import org.meshtastic.core.resources.pm_status_unknown_flags
 import org.meshtastic.core.resources.ppm
 import org.meshtastic.core.ui.component.Co2Severity
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.PmAqiSeverity
 import org.meshtastic.core.ui.theme.AppTheme

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +40,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_active_alert
 import org.meshtastic.core.resources.node_active_alert_hint
 import org.meshtastic.core.resources.node_away_alert
+import org.meshtastic.core.ui.component.Switch
 
 /**
  * MT_SW: the "active" alert of one node: a notification when the activity status the node shares changes to active. Off

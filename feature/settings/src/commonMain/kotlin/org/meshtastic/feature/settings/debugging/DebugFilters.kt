@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenu
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -59,6 +58,7 @@ import org.meshtastic.core.resources.filter_icon
 import org.meshtastic.core.resources.match_all
 import org.meshtastic.core.resources.match_any
 import org.meshtastic.core.resources.remove_filter
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.Close

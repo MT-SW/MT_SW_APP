@@ -24,9 +24,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,6 +53,8 @@ import org.meshtastic.core.resources.planner_pattern_reset
 import org.meshtastic.core.resources.planner_pattern_tilt
 import org.meshtastic.core.resources.planner_pattern_title
 import org.meshtastic.core.ui.component.AntennaPatternPlot
+import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.feature.map.planner.state.PlannerEnd
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerViewModel

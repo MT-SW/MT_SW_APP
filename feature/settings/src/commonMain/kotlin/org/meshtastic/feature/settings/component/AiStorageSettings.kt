@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -76,6 +75,7 @@ import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.RadioButton
 
 /** On a computer, a model download that would leave less than this much free space (50 GB) asks first. */
 private const val LOW_SPACE_MB = 50L * 1024L

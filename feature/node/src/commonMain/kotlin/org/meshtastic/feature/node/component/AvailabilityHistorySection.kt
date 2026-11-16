@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +59,7 @@ import org.meshtastic.core.resources.availability_summary
 import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.mt_sw_other_availability_body
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle

@@ -27,7 +27,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -87,6 +86,7 @@ import org.meshtastic.core.resources.schema_device_rebroadcast_mode
 import org.meshtastic.core.resources.schema_device_role
 import org.meshtastic.core.resources.schema_device_tzdef
 import org.meshtastic.core.resources.triple_click_adhoc_ping
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditTextPreference
 import org.meshtastic.core.ui.component.InsetDivider

@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
@@ -51,6 +50,7 @@ import org.meshtastic.core.resources.planner_summary_radio
 import org.meshtastic.core.resources.planner_swap_ab
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Warning

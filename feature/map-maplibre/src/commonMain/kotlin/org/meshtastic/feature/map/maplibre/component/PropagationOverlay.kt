@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +37,7 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.propagation_hour_ahead
 import org.meshtastic.core.resources.propagation_hour_now
+import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.feature.map.propagation.PropagationController
 
 private const val OVERLAY_BACKGROUND_ALPHA = 0.55f

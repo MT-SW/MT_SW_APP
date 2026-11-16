@@ -30,8 +30,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import org.meshtastic.core.ui.component.Slider
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -64,7 +62,9 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 
 /**

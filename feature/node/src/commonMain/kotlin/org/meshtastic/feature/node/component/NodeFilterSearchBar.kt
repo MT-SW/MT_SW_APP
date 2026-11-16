@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
@@ -34,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
-import org.meshtastic.core.ui.component.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,7 +62,9 @@ import org.meshtastic.core.resources.node_filter_show_ignored
 import org.meshtastic.core.resources.node_filter_title
 import org.meshtastic.core.resources.node_sort_button
 import org.meshtastic.core.resources.node_sort_title
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.MeshtasticSearchBar
+import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.SignedNodeIcon
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock

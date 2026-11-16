@@ -19,7 +19,6 @@ package org.meshtastic.feature.map.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_layer_opacity
+import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.feature.map.layers.LAYER_OPACITY_OPAQUE
 import kotlin.math.roundToInt
 

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
@@ -59,6 +58,7 @@ import org.meshtastic.core.resources.planner_tx_power_w
 import org.meshtastic.core.resources.planner_unit_dbi
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.feature.map.planner.state.PlannerEnd
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerUiState

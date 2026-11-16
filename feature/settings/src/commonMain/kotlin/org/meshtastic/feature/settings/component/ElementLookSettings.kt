@@ -40,6 +40,10 @@ import org.meshtastic.core.resources.button_gradient_normal
 import org.meshtastic.core.resources.button_gradient_off
 import org.meshtastic.core.resources.button_gradient_strong
 import org.meshtastic.core.resources.button_gradient_weak
+import org.meshtastic.core.resources.button_style_glass
+import org.meshtastic.core.resources.button_style_glass_summary
+import org.meshtastic.core.resources.control_style_thin
+import org.meshtastic.core.resources.control_style_thin_summary
 import org.meshtastic.core.resources.dialog_see_through
 import org.meshtastic.core.resources.dialog_see_through_summary
 import org.meshtastic.core.resources.element_group_assistant
@@ -110,10 +114,6 @@ import org.meshtastic.core.resources.nav_select_both
 import org.meshtastic.core.resources.nav_select_bubble
 import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
-import org.meshtastic.core.resources.button_style_glass
-import org.meshtastic.core.resources.button_style_glass_summary
-import org.meshtastic.core.resources.control_style_thin
-import org.meshtastic.core.resources.control_style_thin_summary
 import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.ring_style_thin_summary
 import org.meshtastic.core.ui.component.DropDownPreference

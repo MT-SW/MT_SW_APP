@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -89,6 +88,7 @@ import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.mt_sw_other_archive_body
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.EditPasswordPreference
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ListItem

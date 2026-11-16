@@ -30,14 +30,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import org.meshtastic.core.ui.component.Slider
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -79,7 +75,11 @@ import org.meshtastic.core.resources.propagation_regions_title
 import org.meshtastic.core.resources.propagation_source
 import org.meshtastic.core.resources.propagation_title
 import org.meshtastic.core.resources.propagation_update_all
+import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.Slider
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

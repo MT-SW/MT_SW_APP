@@ -147,23 +147,21 @@ private fun glassBase(colors: ButtonColors, enabled: Boolean, glassOn: Boolean):
 }
 
 /** The colours of a filled button: clear for glass (the glass is drawn behind it), otherwise the styled colour. */
-private fun ButtonColors.filledColors(styled: Color, glass: Color?): ButtonColors =
-    if (glass != null) {
-        copy(containerColor = Color.Transparent, disabledContainerColor = Color.Transparent)
-    } else {
-        copy(containerColor = styled)
-    }
+private fun ButtonColors.filledColors(styled: Color, glass: Color?): ButtonColors = if (glass != null) {
+    copy(containerColor = Color.Transparent, disabledContainerColor = Color.Transparent)
+} else {
+    copy(containerColor = styled)
+}
 
 @Composable
 private fun Modifier.filledLook(glass: Color?, group: String, shape: Shape): Modifier =
     if (glass != null) glassSurface(shape, glass) else buttonStyle(group, shape)
 
-private fun outlinePath(outline: Outline): Path =
-    when (outline) {
-        is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
-        is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
-        is Outline.Generic -> outline.path
-    }
+private fun outlinePath(outline: Outline): Path = when (outline) {
+    is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+    is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+    is Outline.Generic -> outline.path
+}
 
 /**
  * MT_SW: a glass button, like on the iPhone: the colour goes from lighter at the top to darker at the bottom, a soft

@@ -30,7 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.translator_sessions_new
 import org.meshtastic.core.resources.translator_sessions_title
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info

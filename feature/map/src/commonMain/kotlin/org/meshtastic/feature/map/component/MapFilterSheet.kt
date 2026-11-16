@@ -26,9 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +64,8 @@ import org.meshtastic.core.resources.show_node_links
 import org.meshtastic.core.resources.show_node_links_summary
 import org.meshtastic.core.resources.show_precision_circle
 import org.meshtastic.core.resources.show_waypoints
+import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Favorite

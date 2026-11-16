@@ -32,8 +32,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Checkbox
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -192,6 +190,8 @@ import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.sos_widget_taps_note
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar

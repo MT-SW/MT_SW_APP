@@ -33,12 +33,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -79,9 +77,11 @@ import org.meshtastic.core.resources.widget_telemetry_no_nodes_hint
 import org.meshtastic.core.resources.widget_telemetry_no_nodes_title
 import org.meshtastic.core.resources.widget_telemetry_readings_hint
 import org.meshtastic.core.resources.widget_telemetry_title
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.MeshtasticSearchBar
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Nodes
 import org.meshtastic.core.ui.icon.Search

@@ -44,11 +44,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,9 +81,11 @@ import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.SegmentedProgressRing
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization

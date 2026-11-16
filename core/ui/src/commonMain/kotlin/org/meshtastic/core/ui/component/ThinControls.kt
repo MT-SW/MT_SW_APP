@@ -127,8 +127,7 @@ fun Switch(
 @Composable
 private fun ThinSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier, enabled: Boolean) {
     val scheme = MaterialTheme.colorScheme
-    val progress by
-        animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinSwitch")
+    val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinSwitch")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
     val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
     val tint = scheme.primary.copy(alpha = ON_TINT_ALPHA * progress * alpha)
@@ -140,30 +139,27 @@ private fun ThinSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, 
         }
     Box(
         modifier =
-        modifier
-            .then(toggle)
-            .size(SWITCH_WIDTH_DP.dp, SWITCH_HEIGHT_DP.dp)
-            .drawBehind {
-                val stroke = STROKE_DP.dp.toPx()
-                val radius = size.height / 2
-                drawRoundRect(color = tint, cornerRadius = CornerRadius(radius))
-                drawRoundRect(
-                    color = edge,
-                    topLeft = Offset(stroke / 2, stroke / 2),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    cornerRadius = CornerRadius(radius - stroke / 2),
-                    style = Stroke(stroke),
-                )
-                // The thumb is a ring too: it slides from the left end to the right one.
-                val thumbRadius = radius - SWITCH_THUMB_INSET_DP.dp.toPx() + stroke
-                val centerX = lerp(radius, size.width - radius, progress)
-                drawCircle(
-                    color = edge,
-                    radius = thumbRadius - stroke / 2,
-                    center = Offset(centerX, radius),
-                    style = Stroke(stroke),
-                )
-            },
+        modifier.then(toggle).size(SWITCH_WIDTH_DP.dp, SWITCH_HEIGHT_DP.dp).drawBehind {
+            val stroke = STROKE_DP.dp.toPx()
+            val radius = size.height / 2
+            drawRoundRect(color = tint, cornerRadius = CornerRadius(radius))
+            drawRoundRect(
+                color = edge,
+                topLeft = Offset(stroke / 2, stroke / 2),
+                size = Size(size.width - stroke, size.height - stroke),
+                cornerRadius = CornerRadius(radius - stroke / 2),
+                style = Stroke(stroke),
+            )
+            // The thumb is a ring too: it slides from the left end to the right one.
+            val thumbRadius = radius - SWITCH_THUMB_INSET_DP.dp.toPx() + stroke
+            val centerX = lerp(radius, size.width - radius, progress)
+            drawCircle(
+                color = edge,
+                radius = thumbRadius - stroke / 2,
+                center = Offset(centerX, radius),
+                style = Stroke(stroke),
+            )
+        },
     )
 }
 
@@ -191,10 +187,14 @@ fun Checkbox(
 }
 
 @Composable
-private fun ThinCheckbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier, enabled: Boolean) {
+private fun ThinCheckbox(
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)?,
+    modifier: Modifier,
+    enabled: Boolean,
+) {
     val scheme = MaterialTheme.colorScheme
-    val progress by
-        animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinCheckbox")
+    val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinCheckbox")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
     val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
     val mark = scheme.primary.copy(alpha = progress * alpha)
@@ -347,8 +347,7 @@ fun RadioButton(
 @Composable
 private fun ThinRadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier, enabled: Boolean) {
     val scheme = MaterialTheme.colorScheme
-    val progress by
-        animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
+    val progress by animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
     val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
     val mark = scheme.primary.copy(alpha = progress * alpha)

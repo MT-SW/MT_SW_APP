@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -60,6 +59,7 @@ import org.meshtastic.core.resources.hop_histogram_empty
 import org.meshtastic.core.resources.hop_histogram_title
 import org.meshtastic.core.resources.one_hour
 import org.meshtastic.core.resources.twenty_four_hours
+import org.meshtastic.core.ui.component.FilterChip
 import kotlin.time.Duration.Companion.hours
 
 /**

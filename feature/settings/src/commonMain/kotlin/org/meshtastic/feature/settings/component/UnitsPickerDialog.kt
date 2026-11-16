@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.units_imperial
 import org.meshtastic.core.resources.units_metric
 import org.meshtastic.core.resources.units_scope_summary
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.RadioButton
 
 /** The [UnitsOverride] choices with their labels; System default follows the OS locale. */
 enum class UnitsOption(val label: StringResource, val override: UnitsOverride) {

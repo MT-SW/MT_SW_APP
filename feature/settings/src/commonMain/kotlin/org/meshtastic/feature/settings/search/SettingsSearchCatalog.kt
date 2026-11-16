@@ -46,6 +46,7 @@ import org.meshtastic.core.resources.button_style_glass
 import org.meshtastic.core.resources.chart_style
 import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
+import org.meshtastic.core.resources.control_style_thin
 import org.meshtastic.core.resources.coverage_title
 import org.meshtastic.core.resources.data_logs_title
 import org.meshtastic.core.resources.db_sync_auto
@@ -68,7 +69,6 @@ import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
 import org.meshtastic.core.resources.glass_rim
 import org.meshtastic.core.resources.glass_tint
-import org.meshtastic.core.resources.control_style_thin
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.input_hold_buzz
@@ -100,8 +100,8 @@ import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.press_spring
-import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.report_issues_title
+import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
 import org.meshtastic.core.resources.smart_features_title

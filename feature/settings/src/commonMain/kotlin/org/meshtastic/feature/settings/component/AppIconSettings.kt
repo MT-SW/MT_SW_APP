@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.app_icon_hint
 import org.meshtastic.core.resources.app_icon_standard
 import org.meshtastic.core.resources.app_icon_tinted
 import org.meshtastic.core.resources.app_icon_title
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.FormatPaint

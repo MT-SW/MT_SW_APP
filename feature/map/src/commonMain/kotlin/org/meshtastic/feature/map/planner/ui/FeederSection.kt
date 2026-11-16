@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -74,6 +73,7 @@ import org.meshtastic.core.resources.planner_feeder_warn_unknown
 import org.meshtastic.core.resources.planner_unit_db
 import org.meshtastic.core.resources.planner_unit_db_per_m
 import org.meshtastic.core.resources.planner_unit_m
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

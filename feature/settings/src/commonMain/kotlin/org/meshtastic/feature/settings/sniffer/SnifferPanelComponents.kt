@@ -31,8 +31,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import org.meshtastic.core.ui.component.RadioButton
-import org.meshtastic.core.ui.component.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
@@ -79,6 +77,8 @@ import org.meshtastic.core.resources.sniffer_source_off
 import org.meshtastic.core.resources.sniffer_source_title
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.RadioButton
+import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FolderOpen

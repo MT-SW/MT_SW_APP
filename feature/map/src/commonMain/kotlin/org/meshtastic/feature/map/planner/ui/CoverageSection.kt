@@ -29,10 +29,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import org.meshtastic.core.ui.component.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -80,6 +78,8 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.SegmentedButton
+import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.feature.map.planner.CoverageResult
 import org.meshtastic.feature.map.planner.marginAt
 import org.meshtastic.feature.map.planner.state.PlannerSide

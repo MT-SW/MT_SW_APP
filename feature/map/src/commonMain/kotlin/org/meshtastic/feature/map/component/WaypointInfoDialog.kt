@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.geofence_alerts_opt_in_desc
 import org.meshtastic.core.resources.geofence_radius
 import org.meshtastic.core.resources.geofence_set_area
 import org.meshtastic.core.ui.component.BasicListItem
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.proto.Waypoint
 
 /**

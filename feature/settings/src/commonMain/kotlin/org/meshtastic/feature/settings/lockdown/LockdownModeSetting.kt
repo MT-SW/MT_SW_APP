@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,6 +55,7 @@ import org.meshtastic.core.resources.lockdown_mode_summary_off
 import org.meshtastic.core.resources.lockdown_mode_summary_unlocked
 import org.meshtastic.core.resources.lockdown_passphrase
 import org.meshtastic.core.resources.lockdown_set_passphrase
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.feature.settings.radio.component.NodeActionButton
 

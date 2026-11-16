@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedCard
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.discovery_preset_home_label
 import org.meshtastic.core.resources.discovery_stat_selected
 import org.meshtastic.core.resources.discovery_stat_unselected
 import org.meshtastic.core.resources.mesh_beacon_preset_indicator
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.Icon

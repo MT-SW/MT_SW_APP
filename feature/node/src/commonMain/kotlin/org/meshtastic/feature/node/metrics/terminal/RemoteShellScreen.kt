@@ -36,7 +36,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AssistChip
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
@@ -103,6 +102,7 @@ import org.meshtastic.core.resources.remote_shell_status_failed
 import org.meshtastic.core.resources.remote_shell_status_not_connected
 import org.meshtastic.core.resources.remote_shell_status_opening
 import org.meshtastic.core.resources.remote_shell_subtitle_round_trip
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Add

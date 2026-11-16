@@ -31,11 +31,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,8 +71,10 @@ import org.meshtastic.core.resources.node_silence_quiet_to
 import org.meshtastic.core.resources.node_silence_test_button
 import org.meshtastic.core.resources.node_silence_test_hint
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

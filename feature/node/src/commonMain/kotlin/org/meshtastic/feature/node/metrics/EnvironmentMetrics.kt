@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -87,6 +86,7 @@ import org.meshtastic.core.resources.wind_direction
 import org.meshtastic.core.resources.wind_gust
 import org.meshtastic.core.resources.wind_lull
 import org.meshtastic.core.resources.wind_speed
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.IaqDisplayMode
 import org.meshtastic.core.ui.component.IndoorAirQuality
 import org.meshtastic.core.ui.component.LocalFloatingBarInset

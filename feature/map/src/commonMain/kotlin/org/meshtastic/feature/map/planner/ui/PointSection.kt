@@ -36,7 +36,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -96,6 +95,7 @@ import org.meshtastic.core.resources.planner_source_station_used
 import org.meshtastic.core.resources.planner_source_tap_map
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_unit_m_asl
+import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map

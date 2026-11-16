@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
-import org.meshtastic.core.ui.component.RadioButton
 import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -120,6 +119,7 @@ import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.component.SwitchPreference
 

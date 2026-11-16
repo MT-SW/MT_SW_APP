@@ -34,7 +34,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
@@ -85,6 +84,7 @@ import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
 import org.meshtastic.core.ui.component.NodeExtraConfig
 import org.meshtastic.core.ui.component.NodeItem
 import org.meshtastic.core.ui.component.NodeItemCompact
+import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.nodeExtraLegend
 import org.meshtastic.core.ui.icon.Icon

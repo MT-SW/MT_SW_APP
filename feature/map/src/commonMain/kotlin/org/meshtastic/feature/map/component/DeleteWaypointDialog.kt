@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
-import org.meshtastic.core.ui.component.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +37,7 @@ import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.delete_for_everyone
 import org.meshtastic.core.resources.waypoint_delete
+import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.MeshtasticDialog
 
 /**
