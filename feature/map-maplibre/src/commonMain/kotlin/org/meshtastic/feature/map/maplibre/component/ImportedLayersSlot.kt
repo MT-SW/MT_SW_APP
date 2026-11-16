@@ -37,7 +37,7 @@ import org.meshtastic.feature.map.layers.rememberMapLayerPicker
  * which is what makes "import a KML on desktop" the same feature rather than a port of one.
  */
 @Composable
-fun ImportedLayersSlot() {
+fun ImportedLayersSlot(modifier: Modifier = Modifier) {
     val manager: MapLayersManager = koinInject()
     val opacityStore: LayerOpacityStore = koinInject()
     val layers by manager.mapLayers.collectAsStateWithLifecycle()
@@ -45,7 +45,7 @@ fun ImportedLayersSlot() {
     val picker = rememberMapLayerPicker(onPick = manager::addMapLayer)
 
     // Bounded here so a long list of imported layers never pushes the parts below it off the sheet.
-    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)) {
+    Box(modifier = modifier.fillMaxWidth().heightIn(max = 420.dp)) {
         CustomMapLayersSheet(
             mapLayers = layers,
             onToggleVisibility = manager::toggleLayerVisibility,

@@ -48,6 +48,7 @@ import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -125,7 +126,12 @@ fun Switch(
 }
 
 @Composable
-private fun ThinSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier, enabled: Boolean) {
+private fun ThinSwitch(
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinSwitch")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
@@ -190,8 +196,8 @@ fun Checkbox(
 private fun ThinCheckbox(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
-    modifier: Modifier,
-    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinCheckbox")
@@ -345,7 +351,12 @@ fun RadioButton(
 
 /** Like on the iPhone: an empty circle, and when chosen a circle in the theme colour with a thin tick inside. */
 @Composable
-private fun ThinRadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier, enabled: Boolean) {
+private fun ThinRadioButton(
+    selected: Boolean,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
@@ -369,6 +380,7 @@ private fun ThinRadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier:
 
 /** The thin outline of a chip or a segment: grey when off, in the theme colour when chosen. */
 @Composable
+@ReadOnlyComposable
 private fun thinChoiceBorder(selected: Boolean, enabled: Boolean): BorderStroke {
     val scheme = MaterialTheme.colorScheme
     val alpha = if (enabled) 1f else DISABLED_ALPHA
