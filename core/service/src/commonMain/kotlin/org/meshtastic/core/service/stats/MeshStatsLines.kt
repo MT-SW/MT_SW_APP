@@ -34,7 +34,6 @@ import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_battery
-import org.meshtastic.core.resources.local_stats_diagnostics_prefix
 import org.meshtastic.core.resources.local_stats_dropped
 import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.local_stats_heap_value_kb
@@ -161,17 +160,17 @@ object MeshStatsLines {
         if (stats.num_tx_relay > 0) {
             add(getStringSuspend(Res.string.local_stats_relays, stats.num_tx_relay, stats.num_tx_relay_canceled))
         }
-        val diagnostics = mutableListOf<String>()
-        stats.noiseFloorOrNull?.let { diagnostics.add(getStringSuspend(Res.string.local_stats_noise, it - lnaGain)) }
+        // The noise floor has its own line and the bad and dropped counters share another, so no line of the widget gets
+        // so long that it forces small letters (the longest line decides how big the text can be).
+        stats.noiseFloorOrNull?.let { add(getStringSuspend(Res.string.local_stats_noise, it - lnaGain)) }
+        val faults = mutableListOf<String>()
         if (stats.num_packets_rx_bad > 0) {
-            diagnostics.add(getStringSuspend(Res.string.local_stats_bad, stats.num_packets_rx_bad))
+            faults.add(getStringSuspend(Res.string.local_stats_bad, stats.num_packets_rx_bad))
         }
         if (stats.num_tx_dropped > 0) {
-            diagnostics.add(getStringSuspend(Res.string.local_stats_dropped, stats.num_tx_dropped))
+            faults.add(getStringSuspend(Res.string.local_stats_dropped, stats.num_tx_dropped))
         }
-        if (diagnostics.isNotEmpty()) {
-            add(getStringSuspend(Res.string.local_stats_diagnostics_prefix, diagnostics.joinToString(" | ")))
-        }
+        if (faults.isNotEmpty()) add(faults.joinToString(" | "))
     }
 
     /** The RAM line from the node's own counters (used and total heap), or null when the node does not report it. */
