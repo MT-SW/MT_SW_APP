@@ -953,8 +953,8 @@
     <string name="contrast_high">High</string>
     <string name="contrast_medium">Medium</string>
     <string name="contrast_standard">Standard</string>
-    <string name="control_style_thin">Thin sliders, switches and check boxes (like on the iPhone)</string>
-    <string name="control_style_thin_summary">Sliders, switches and check boxes everywhere in the app are drawn only as thin outlines with rounded ends and no filled areas: an empty track with a coloured outline up to the value, a ring instead of a knob, an outlined switch with a ring that slides, and an outlined box with a thin tick. Off brings back the old look.</string>
+    <string name="control_style_thin">Thin sliders, switches, check boxes and choice buttons (like on the iPhone)</string>
+    <string name="control_style_thin_summary">Sliders, switches and check boxes everywhere in the app are drawn only as thin outlines with rounded ends and no filled areas: an empty track with a coloured outline up to the value, a ring instead of a knob, an outlined switch with a ring that slides, and an outlined box with a thin tick. The round choice buttons, the choice chips and the segmented buttons are outlines too: grey when off, in the theme colour with a faint tint when chosen. Off brings back the old look.</string>
     <string name="conversations">Conversations</string>
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>

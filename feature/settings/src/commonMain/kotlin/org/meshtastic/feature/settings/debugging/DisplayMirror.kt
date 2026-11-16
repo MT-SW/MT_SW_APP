@@ -34,7 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FilterChip
+import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text

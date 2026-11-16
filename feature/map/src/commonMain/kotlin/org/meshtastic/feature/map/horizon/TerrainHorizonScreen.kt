@@ -51,12 +51,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.FilterChip
+import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
+import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton

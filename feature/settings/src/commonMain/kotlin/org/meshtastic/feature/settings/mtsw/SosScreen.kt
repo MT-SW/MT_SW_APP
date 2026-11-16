@@ -33,7 +33,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import org.meshtastic.core.ui.component.Checkbox
-import androidx.compose.material3.FilterChip
+import org.meshtastic.core.ui.component.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold

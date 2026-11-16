@@ -14,23 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "LongParameterList")
+@file:Suppress("MagicNumber", "LongParameterList", "TooManyFunctions")
 
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButtonColors
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SegmentedButtonColors
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SelectableChipColors
+import androidx.compose.material3.SelectableChipElevation
+import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SliderState
@@ -48,6 +58,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -59,6 +70,9 @@ import androidx.compose.ui.util.lerp
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import androidx.compose.material3.Checkbox as MaterialCheckbox
+import androidx.compose.material3.FilterChip as MaterialFilterChip
+import androidx.compose.material3.RadioButton as MaterialRadioButton
+import androidx.compose.material3.SegmentedButton as MaterialSegmentedButton
 import androidx.compose.material3.Slider as MaterialSlider
 import androidx.compose.material3.Switch as MaterialSwitch
 
@@ -201,13 +215,7 @@ private fun ThinCheckbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?
                 cornerRadius = CornerRadius(CHECK_BOX_CORNER_DP.dp.toPx()),
                 style = Stroke(stroke),
             )
-            val tick =
-                Path().apply {
-                    moveTo(size.width * 0.24f, size.height * 0.52f)
-                    lineTo(size.width * 0.43f, size.height * 0.70f)
-                    lineTo(size.width * 0.78f, size.height * 0.30f)
-                }
-            drawPath(tick, mark, style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round))
+            thinTick(mark, stroke)
         }
     }
 }
@@ -299,4 +307,174 @@ private fun ThinSliderThumb(enabled: Boolean) {
             drawCircle(color = ring, radius = size.minDimension / 2 - stroke / 2, style = Stroke(stroke))
         },
     )
+}
+
+/** The thin check mark of the check box and the radio button. */
+private fun DrawScope.thinTick(color: Color, stroke: Float) {
+    val tick =
+        Path().apply {
+            moveTo(size.width * 0.24f, size.height * 0.52f)
+            lineTo(size.width * 0.43f, size.height * 0.70f)
+            lineTo(size.width * 0.78f, size.height * 0.30f)
+        }
+    drawPath(tick, color, style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round))
+}
+
+@Composable
+fun RadioButton(
+    selected: Boolean,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: RadioButtonColors = RadioButtonDefaults.colors(),
+    interactionSource: MutableInteractionSource? = null,
+) {
+    if (rememberThinControls()) {
+        ThinRadioButton(selected, onClick, modifier, enabled)
+    } else {
+        MaterialRadioButton(
+            selected = selected,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            colors = colors,
+            interactionSource = interactionSource,
+        )
+    }
+}
+
+/** Like on the iPhone: an empty circle, and when chosen a circle in the theme colour with a thin tick inside. */
+@Composable
+private fun ThinRadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier, enabled: Boolean) {
+    val scheme = MaterialTheme.colorScheme
+    val progress by
+        animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
+    val alpha = if (enabled) 1f else DISABLED_ALPHA
+    val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
+    val mark = scheme.primary.copy(alpha = progress * alpha)
+    val touch =
+        if (onClick != null) {
+            Modifier.minimumInteractiveComponentSize()
+                .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
+        } else {
+            Modifier.size(CHECK_BOX_TOUCH_DP.dp)
+        }
+    Box(modifier = modifier.then(touch), contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(CHECK_BOX_DP.dp)) {
+            val stroke = STROKE_DP.dp.toPx()
+            drawCircle(color = edge, radius = size.minDimension / 2 - stroke / 2, style = Stroke(stroke))
+            thinTick(mark, stroke)
+        }
+    }
+}
+
+/** The thin outline of a chip or a segment: grey when off, in the theme colour when chosen. */
+@Composable
+private fun thinChoiceBorder(selected: Boolean, enabled: Boolean): BorderStroke {
+    val scheme = MaterialTheme.colorScheme
+    val alpha = if (enabled) 1f else DISABLED_ALPHA
+    val color = if (selected) scheme.primary.copy(alpha = alpha) else scheme.outline.copy(alpha = EDGE_ALPHA * alpha)
+    return BorderStroke(STROKE_DP.dp, color)
+}
+
+@Composable
+fun FilterChip(
+    selected: Boolean,
+    onClick: () -> Unit,
+    label: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    shape: Shape = FilterChipDefaults.shape,
+    colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
+    elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
+    border: BorderStroke? = FilterChipDefaults.filterChipBorder(enabled, selected),
+    interactionSource: MutableInteractionSource? = null,
+) {
+    if (rememberThinControls()) {
+        val scheme = MaterialTheme.colorScheme
+        MaterialFilterChip(
+            selected = selected,
+            onClick = onClick,
+            label = label,
+            modifier = modifier,
+            enabled = enabled,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            shape = shape,
+            colors =
+            FilterChipDefaults.filterChipColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                selectedContainerColor = scheme.primary.copy(alpha = ON_TINT_ALPHA),
+                selectedLabelColor = scheme.primary,
+            ),
+            elevation = null,
+            border = thinChoiceBorder(selected, enabled),
+            interactionSource = interactionSource,
+        )
+    } else {
+        MaterialFilterChip(
+            selected = selected,
+            onClick = onClick,
+            label = label,
+            modifier = modifier,
+            enabled = enabled,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            shape = shape,
+            colors = colors,
+            elevation = elevation,
+            border = border,
+            interactionSource = interactionSource,
+        )
+    }
+}
+
+@Composable
+fun SingleChoiceSegmentedButtonRowScope.SegmentedButton(
+    selected: Boolean,
+    onClick: () -> Unit,
+    shape: Shape,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: SegmentedButtonColors = SegmentedButtonDefaults.colors(),
+    interactionSource: MutableInteractionSource? = null,
+    icon: @Composable () -> Unit = { SegmentedButtonDefaults.Icon(selected) },
+    label: @Composable () -> Unit,
+) {
+    if (rememberThinControls()) {
+        val scheme = MaterialTheme.colorScheme
+        MaterialSegmentedButton(
+            selected = selected,
+            onClick = onClick,
+            shape = shape,
+            modifier = modifier,
+            enabled = enabled,
+            colors =
+            SegmentedButtonDefaults.colors(
+                activeContainerColor = scheme.primary.copy(alpha = ON_TINT_ALPHA),
+                activeContentColor = scheme.primary,
+                inactiveContainerColor = Color.Transparent,
+                inactiveContentColor = scheme.onSurface,
+            ),
+            border = thinChoiceBorder(selected, enabled),
+            interactionSource = interactionSource,
+            icon = icon,
+            label = label,
+        )
+    } else {
+        MaterialSegmentedButton(
+            selected = selected,
+            onClick = onClick,
+            shape = shape,
+            modifier = modifier,
+            enabled = enabled,
+            colors = colors,
+            interactionSource = interactionSource,
+            icon = icon,
+            label = label,
+        )
+    }
 }

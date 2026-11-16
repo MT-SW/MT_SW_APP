@@ -4069,8 +4069,8 @@
     <string name="chart_style_summary">Wygląd słupków, mapy cieplnej i półokrągłego miernika w „Zdrowie sieci” i metrykach węzła. „Płaski” przywraca stary wygląd.</string>
     <string name="ring_style_thin">Cienkie paski postępu (jak w iPhonie)</string>
     <string name="ring_style_thin_summary">Paski postępu i kręcące się kółka oczekiwania to dwie cienkie szare linie (pusty obrys), a zapełniana część to też obrys w kolorze motywu. Zamiast zygzaku jest kółko lub pasek z kręcącym się, przesuwającym się elementem z cienkich linii. Po wyłączeniu wraca stary wygląd.</string>
-    <string name="control_style_thin">Cienkie suwaki, przełączniki i pola wyboru (jak w iPhonie)</string>
-    <string name="control_style_thin_summary">Suwaki, przełączniki i pola wyboru w całej aplikacji są rysowane tylko jako cienkie obrysy z zaokrąglonymi końcami, bez wypełnienia: pusty tor z kolorowym obrysem do wartości, kółko z samym obrysem zamiast gałki, przełącznik z obrysu z przesuwającym się kółkiem oraz kwadrat z obrysu z cienkim haczykiem. Po wyłączeniu wraca stary wygląd.</string>
+    <string name="control_style_thin">Cienkie suwaki, przełączniki, pola wyboru i przyciski wyboru (jak w iPhonie)</string>
+    <string name="control_style_thin_summary">Suwaki, przełączniki i pola wyboru w całej aplikacji są rysowane tylko jako cienkie obrysy z zaokrąglonymi końcami, bez wypełnienia: pusty tor z kolorowym obrysem do wartości, kółko z samym obrysem zamiast gałki, przełącznik z obrysu z przesuwającym się kółkiem oraz kwadrat z obrysu z cienkim haczykiem. Okrągłe przyciski wyboru, chipy wyboru i przyciski segmentowe też są obrysami: szare, gdy wyłączone, a wybrane w kolorze motywu z delikatnym tłem. Po wyłączeniu wraca stary wygląd.</string>
     <string name="button_style_glass">Szklane przyciski</string>
     <string name="button_style_glass_summary">Wypełnione (kolorowe) przyciski wyglądają jak szkło: jaśniejsze u góry, ciemniejsze na dole, z delikatnym połyskiem na górnej połowie i cienką jasną obwódką. Po wyłączeniu wracają zwykłe przyciski.</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
