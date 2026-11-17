@@ -27,13 +27,14 @@ import org.meshtastic.core.database.entity.NodeEntity
  *
  * For such a node the newer node row (by last heard) refreshes the older one's telemetry, position and identity, while
  * the reception data of each radio (signal, hops, channel, route, last heard) and what the user wrote (notes, name,
- * favourite, ignore, mute) stay as they were in each database. The history of
- * telemetry, position and similar packets of the node is completed in both directions, without duplicates (a packet
- * heard by both radios counts once).
+ * favourite, ignore, mute) stay as they were in each database. The history of telemetry, position, neighbours,
+ * traceroute and map reports of the node is completed in both directions, without duplicates (a packet heard by both
+ * radios counts once).
  */
 object DatabaseStatsSync {
-    // Position, paxcounter, telemetry, neighbour info (PortNum values).
-    private val PORTS = listOf(3, 34, 67, 71)
+    // Position, paxcounter, telemetry, traceroute, neighbour info and map report (PortNum values): everything the
+    // other nodes report about themselves, so the map, the neighbours and the charts match on every radio.
+    private val PORTS = listOf(3, 34, 67, 70, 71, 73)
     private const val CHUNK = 400
 
     /** Synchronizes [a] and [b] both ways; returns how many rows were written (nodes + history entries). */
