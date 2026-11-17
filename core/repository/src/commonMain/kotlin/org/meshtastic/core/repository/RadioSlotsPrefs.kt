@@ -36,6 +36,15 @@ interface RadioSlotsPrefs {
     /** The id of the radio the screens show, or null when no radio is saved. Always one of [slots]. */
     val selectedId: StateFlow<Int?>
 
+    /**
+     * The radios the user switched off ("Rozłącz"): they are not connected in the background either. A radio that is
+     * saved and not in this set is kept connected whenever the app can.
+     */
+    val offIds: StateFlow<Set<Int>>
+
+    /** Switches the radio [id] off (true) or back on (false). */
+    suspend fun setOff(id: Int, off: Boolean)
+
     /** Saves [address] in the radio [id] (a free one when null). Returns the id used, or null when all are taken. */
     suspend fun put(address: String, name: String?, id: Int? = null): Int?
 

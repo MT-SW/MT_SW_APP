@@ -17,11 +17,15 @@
 package org.meshtastic.core.repository
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Starts the background collection (MT_SW) from the saved radios that are not in use: while the mesh service runs, each
  * of them is connected quietly and the packets it hears are kept in its own database.
  */
-fun interface RadioBackgroundMonitor {
+interface RadioBackgroundMonitor {
+    /** The addresses of the radios that are connected quietly right now (the radio in use is not among them). */
+    val connectedAddresses: StateFlow<Set<String>>
+
     fun start(scope: CoroutineScope)
 }

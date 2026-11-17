@@ -3177,12 +3177,10 @@ radio_bridge_port_summary
 radio_bridge_radio
 radio_bridge_read_only
 radio_bridge_title
-radio_chooser_add
 radio_chooser_connect
 radio_chooser_count
 radio_chooser_disconnect
 radio_chooser_dropped
-radio_chooser_hint
 radio_chooser_remove
 radio_chooser_settings
 radio_chooser_title
@@ -3212,6 +3210,10 @@ radio_setup_region_search
 radio_setup_region_suggested
 radio_setup_restart_notice
 radio_setup_title
+radio_slot_background
+radio_slot_empty
+radio_slot_position
+radio_slot_use
 radio_status_connected
 radio_status_connecting
 radio_status_disconnected

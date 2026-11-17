@@ -56,6 +56,16 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
 
     override val selectedId: StateFlow<Int?> = state.map { it.second }.stateIn(scope, SharingStarted.Eagerly, null)
 
+    override val offIds: StateFlow<Set<Int>> =
+        dataStore.data.map { prefs -> decodeIds(prefs[KEY_OFF]) }.stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override suspend fun setOff(id: Int, off: Boolean) {
+        dataStore.edit { prefs ->
+            val next = decodeIds(prefs[KEY_OFF]).let { if (off) it + id else it - id }
+            if (next.isEmpty()) prefs.remove(KEY_OFF) else prefs[KEY_OFF] = next.sorted().joinToString(",")
+        }
+    }
+
     override suspend fun put(address: String, name: String?, id: Int?): Int? {
         var used: Int? = null
         dataStore.edit { prefs ->
@@ -76,6 +86,8 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
             val next = current.filterNot { it.id == id }
             // Written even when empty, so an emptied list is not read as "never written" and migrated back.
             prefs[KEY_SLOTS] = RadioSlotsCodec.encode(next)
+            val off = decodeIds(prefs[KEY_OFF]) - id
+            if (off.isEmpty()) prefs.remove(KEY_OFF) else prefs[KEY_OFF] = off.sorted().joinToString(",")
             if (prefs[KEY_SELECTED] == id || next.none { it.id == prefs[KEY_SELECTED] }) {
                 next.firstOrNull()?.let { prefs[KEY_SELECTED] = it.id } ?: prefs.remove(KEY_SELECTED)
             }
@@ -101,11 +113,20 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
         }
     }
 
+    private fun decodeIds(text: String?): Set<Int> =
+        text
+            .orEmpty()
+            .split(',')
+            .mapNotNull { it.trim().toIntOrNull() }
+            .filter { it in 1..RadioSlotsPrefs.MAX_SLOTS }
+            .toSet()
+
     private fun freeId(slots: List<RadioSlot>): Int? =
         (1..RadioSlotsPrefs.MAX_SLOTS).firstOrNull { id -> slots.none { it.id == id } }
 
     companion object {
         val KEY_SLOTS = stringPreferencesKey("radio-slots")
         val KEY_SELECTED = intPreferencesKey("radio-slot-selected")
+        val KEY_OFF = stringPreferencesKey("radio-slots-off")
     }
 }

@@ -142,8 +142,8 @@ fun MeshtasticAppShell(
                 onChoose = radioChooser::choose,
                 onDisconnect = radioChooser::disconnect,
                 onRemove = radioChooser::remove,
+                onTargetNextPick = radioChooser::targetForNextPick,
                 onSeen = radioChooser::acknowledgeDrop,
-                onAdd = { uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/connections")) },
             )
         }
     val appBarExtras =

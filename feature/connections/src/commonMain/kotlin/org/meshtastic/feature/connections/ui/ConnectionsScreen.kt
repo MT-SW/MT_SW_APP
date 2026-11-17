@@ -20,6 +20,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -121,6 +125,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ImportKind
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.LocalAppBarExtras
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
@@ -164,6 +169,7 @@ import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedText
 import org.meshtastic.feature.connections.ui.components.DeviceList
 import org.meshtastic.feature.connections.ui.components.EventFirmwareCard
 import org.meshtastic.feature.connections.ui.components.LoraSummary
+import org.meshtastic.feature.connections.ui.components.RadioSlotCard
 import org.meshtastic.feature.connections.ui.components.TerminateApplicationButton
 import org.meshtastic.feature.connections.ui.components.TransportSelector
 import org.meshtastic.feature.connections.ui.components.loraSummary
@@ -175,6 +181,9 @@ import org.meshtastic.proto.Config
  * transitions. Sized to comfortably fit the CONNECTED state (battery/RSSI row + node row + disconnect button).
  */
 private val CardMinHeight = 100.dp
+
+/** How many radios the connection card can hold (one page each). */
+private const val SLOT_COUNT = 3
 
 /** Whether the connected card's config warning cards (region, transmit) may render for this connection. */
 internal fun canShowConfigWarnings(
@@ -285,6 +294,14 @@ fun ConnectionsScreen(
     val activeNodeInfoReady by connectionsViewModel.activeNodeInfoReady.collectAsStateWithLifecycle()
     val lockdownState by connectionsViewModel.lockdownState.collectAsStateWithLifecycle()
     val localConfig by connectionsViewModel.localConfig.collectAsStateWithLifecycle()
+
+    // The saved radios (the places of the card). The page shown is the place the next picked device is saved in.
+    val radios = LocalAppBarExtras.current.radios
+    val activeRadioId = radios.state.radios.firstOrNull { it.active }?.id
+    val disconnectActive: () -> Unit = { activeRadioId?.let(radios.onDisconnect) ?: scanModel.disconnect() }
+    val activePage = ((activeRadioId ?: 1) - 1).coerceIn(0, SLOT_COUNT - 1)
+    val slotPager = rememberPagerState(initialPage = activePage) { SLOT_COUNT }
+    LaunchedEffect(activeRadioId) { if (activeRadioId != null) slotPager.animateScrollToPage(activePage) }
 
     val selectedDevice by scanModel.selectedNotNullFlow.collectAsStateWithLifecycle()
     val persistedDeviceName by scanModel.persistedDeviceName.collectAsStateWithLifecycle()
@@ -574,48 +591,75 @@ fun ConnectionsScreen(
             // A single Card shell hosts all three states; AnimatedContent animates the size between them and
             // `heightIn(min = CardMinHeight)` keeps a stable floor. No animateContentSize here: under the two-pane
             // scaffold's lookahead it stuck the card at an earlier, narrower width.
-            Card(modifier = Modifier.fillMaxWidth()) {
-                AnimatedContent(
-                    targetState = uiState,
-                    label = "connection_state",
-                    transitionSpec = { fadeIn() togetherWith fadeOut() },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { state ->
-                    Box(
-                        modifier = Modifier.fillMaxWidth().heightIn(min = CardMinHeight),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        when (state) {
-                            ConnectionUiState.CONNECTED_WITH_NODE ->
-                                ConnectedDeviceContent(
-                                    ourNode = ourNode,
-                                    selectedDevice = selectedDevice,
-                                    bleDevices = bleDevices,
-                                    text = currentlyConnectedText,
-                                    onNavigateToNodeDetails = onNavigateToNodeDetails,
-                                    onClickDisconnect = { scanModel.disconnect() },
-                                    onClickLora = { onConfigNavigate(SettingsRoute.LoRa) },
-                                )
+            val activeCard: @Composable () -> Unit = {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    AnimatedContent(
+                        targetState = uiState,
+                        label = "connection_state",
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { state ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth().heightIn(min = CardMinHeight),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            when (state) {
+                                ConnectionUiState.CONNECTED_WITH_NODE ->
+                                    ConnectedDeviceContent(
+                                        ourNode = ourNode,
+                                        selectedDevice = selectedDevice,
+                                        bleDevices = bleDevices,
+                                        text = currentlyConnectedText,
+                                        onNavigateToNodeDetails = onNavigateToNodeDetails,
+                                        onClickDisconnect = disconnectActive,
+                                        onClickLora = { onConfigNavigate(SettingsRoute.LoRa) },
+                                    )
 
-                            ConnectionUiState.CONNECTING ->
-                                ConnectingDeviceContent(
-                                    selectedDevice = selectedDevice,
-                                    persistedDeviceName = persistedDeviceName,
-                                    bleDevices = bleDevices,
-                                    discoveredTcpDevices = discoveredTcpDevices,
-                                    recentTcpDevices = recentTcpDevices,
-                                    usbDevices = usbDevices,
-                                    virtualDevices = virtualDevices,
-                                    connectionStatus = connectionStatus,
-                                    connectionProgress = connectionProgress,
-                                    onClickDisconnect = { scanModel.disconnect() },
-                                )
+                                ConnectionUiState.CONNECTING ->
+                                    ConnectingDeviceContent(
+                                        selectedDevice = selectedDevice,
+                                        persistedDeviceName = persistedDeviceName,
+                                        bleDevices = bleDevices,
+                                        discoveredTcpDevices = discoveredTcpDevices,
+                                        recentTcpDevices = recentTcpDevices,
+                                        usbDevices = usbDevices,
+                                        virtualDevices = virtualDevices,
+                                        connectionStatus = connectionStatus,
+                                        connectionProgress = connectionProgress,
+                                        onClickDisconnect = disconnectActive,
+                                    )
 
-                            else -> NoDeviceContent()
+                                else -> NoDeviceContent()
+                            }
                         }
                     }
                 }
             }
+            HorizontalPager(
+                state = slotPager,
+                modifier = Modifier.fillMaxWidth(),
+                pageSpacing = 8.dp,
+                verticalAlignment = Alignment.Top,
+            ) { page ->
+                val slotId = page + 1
+                val radio = radios.state.radios.firstOrNull { it.id == slotId }
+                if (radio?.active == true || (radio == null && radios.state.radios.isEmpty() && slotId == 1)) {
+                    activeCard()
+                } else {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        RadioSlotCard(
+                            slotId = slotId,
+                            slotCount = SLOT_COUNT,
+                            radio = radio,
+                            onUse = { radios.onChoose(slotId) },
+                            onDisconnect = { radios.onDisconnect(slotId) },
+                            onRemove = { radios.onRemove(slotId) },
+                            minHeight = CardMinHeight,
+                        )
+                    }
+                }
+            }
+            SlotDots(count = SLOT_COUNT, current = slotPager.currentPage)
 
             TerminateApplicationButton()
 
@@ -813,6 +857,8 @@ fun ConnectionsScreen(
                     isNetworkScanning = isNetworkScanning,
                     activeTransport = activeTransport,
                     onSelectDevice = { entry ->
+                        // The device is saved in the place of the page that is shown (see RadioChooserActions).
+                        radios.onTargetNextPick(slotPager.currentPage + 1)
                         // Recent TCP addresses are persisted, so this list renders without a scan — and
                         // therefore without the scan toggle's permission request ever having run. BLE and
                         // USB are unaffected by ACCESS_LOCAL_NETWORK, so only gate Tcp.
@@ -1094,6 +1140,28 @@ private fun NoDeviceContent() {
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.outline,
         )
+    }
+}
+
+/** Small dots under the pages of the connection card; the one of the shown page is filled. */
+@Composable
+private fun SlotDots(count: Int, current: Int) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        repeat(count) { index ->
+            Box(
+                modifier =
+                Modifier.padding(horizontal = 3.dp)
+                    .size(7.dp)
+                    .background(
+                        if (index == current) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outlineVariant
+                        },
+                        CircleShape,
+                    ),
+            )
+        }
     }
 }
 

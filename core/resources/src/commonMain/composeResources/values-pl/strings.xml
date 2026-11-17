@@ -4261,12 +4261,10 @@
     <string name="radio_chooser_title">Radia</string>
     <string name="radio_chooser_count">Podłączone radia: %1$d</string>
     <string name="radio_chooser_dropped">Radio rozłączone</string>
-    <string name="radio_chooser_add">Dodaj radio</string>
     <string name="radio_chooser_connect">Połącz</string>
     <string name="radio_chooser_disconnect">Rozłącz</string>
     <string name="radio_chooser_remove">Usuń z listy</string>
     <string name="radio_chooser_unnamed">Radio %1$d</string>
-    <string name="radio_chooser_hint">Przesuń w prawo, aby połączyć lub rozłączyć, w lewo, aby usunąć z listy.</string>
     <string name="radio_status_connected">Połączone</string>
     <string name="radio_status_connecting">Łączenie…</string>
     <string name="radio_status_disconnected">Rozłączone</string>
@@ -4368,4 +4366,8 @@
     <string name="connection_center_title">Centrum połączeń</string>
     <string name="connection_center_summary">Wiele radiów, wybór w górnym pasku, mostek TCP i konsola</string>
     <string name="connection_center_intro">Wszystko o kilku radiach w jednym miejscu: lista radiów w górnym pasku, zbieranie w tle z pozostałych radiów, mostek TCP do dzielenia radia z innymi programami i konsola z poleceniami.</string>
+    <string name="radio_slot_background">Połączone w tle</string>
+    <string name="radio_slot_empty">Puste miejsce na radio. Wybierz urządzenie z listy poniżej, a zostanie zapisane tutaj.</string>
+    <string name="radio_slot_position">Radio %1$d z %2$d</string>
+    <string name="radio_slot_use">Użyj tego radia</string>
 </resources>

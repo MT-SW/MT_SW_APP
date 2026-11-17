@@ -23,9 +23,12 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
@@ -34,6 +37,7 @@ import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioPrefs
@@ -60,17 +64,22 @@ class BackgroundRadioCollector(
     private val databaseManager: DatabaseManager,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBackgroundMonitor {
+    private val connected = MutableStateFlow<Set<String>>(emptySet())
+
+    override val connectedAddresses: StateFlow<Set<String>> = connected
+
     override fun start(scope: CoroutineScope) {
         scope.launch {
-            combine(slotsPrefs.slots, slotsPrefs.selectedId, radioPrefs.devAddr, uiPrefs.uiOptions) {
-                slots,
-                selectedId,
-                active,
-                options,
-                ->
-                if (options[UiOptions.RADIO_BACKGROUND] != 1) return@combine emptySet()
+            combine(
+                combine(slotsPrefs.slots, slotsPrefs.selectedId, slotsPrefs.offIds) { slots, selectedId, off ->
+                    Triple(slots, selectedId, off)
+                },
+                radioPrefs.devAddr,
+                uiPrefs.uiOptions,
+            ) { (slots, selectedId, off), active, options ->
+                if (options[UiOptions.RADIO_BACKGROUND] != 1) return@combine emptySet<String>()
                 slots
-                    .filter { it.id != selectedId && it.address != active }
+                    .filter { it.id != selectedId && it.address != active && it.id !in off }
                     .map { it.address }
                     .filter { isValidDeviceAddress(it) && transportFactory.isAddressValid(it) }
                     .toSet()
@@ -83,6 +92,8 @@ class BackgroundRadioCollector(
     }
 
     private suspend fun keepCollecting(address: String) {
+        // A short pause first: a radio that has just been in use may still be closing its connection.
+        delay(START_DELAY_MS)
         while (true) {
             try {
                 collectOnce(address)
@@ -103,6 +114,11 @@ class BackgroundRadioCollector(
         link.attach(transport::handleSendToRadio)
         try {
             supervisorScope {
+                val status = launch {
+                    link.connectionState.collect { state ->
+                        connected.update { if (state is ConnectionState.Connected) it + address else it - address }
+                    }
+                }
                 val writer = launch { writeLogs(address, link) }
                 val beat = launch {
                     val heartbeat = ToRadio.Builder().also { it.heartbeat = Heartbeat.Builder().build() }.build()
@@ -112,11 +128,13 @@ class BackgroundRadioCollector(
                     }
                 }
                 link.ended.await()
+                status.cancel()
                 beat.cancel()
                 link.logs.close()
                 writer.join()
             }
         } finally {
+            connected.update { it - address }
             withContext(NonCancellable) {
                 runCatching { transport.close() }
                 linkScope.cancel()
@@ -154,6 +172,7 @@ class BackgroundRadioCollector(
     }
 
     private companion object {
+        const val START_DELAY_MS = 2_000L
         const val RETRY_MS = 30_000L
         const val HEARTBEAT_MS = 5 * 60 * 1_000L
         const val BATCH_SIZE = 100

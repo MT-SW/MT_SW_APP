@@ -192,12 +192,13 @@ private fun TopBarActions(
             onHoldComplete = extras.onSendSos,
         )
     }
-    RadioChooserButton(actions = extras.radios)
     AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
         chipNode?.let { node ->
-            NodeChip(modifier = Modifier.padding(horizontal = 16.dp), node = node, onClick = onClickChip)
+            NodeChip(modifier = Modifier.padding(start = 16.dp), node = node, onClick = onClickChip)
         }
     }
+    // The radio chooser sits right next to the plate of our node (after the SOS button when there is no plate).
+    RadioChooserButton(actions = extras.radios, modifier = Modifier.padding(end = 8.dp))
 
     actions()
 }

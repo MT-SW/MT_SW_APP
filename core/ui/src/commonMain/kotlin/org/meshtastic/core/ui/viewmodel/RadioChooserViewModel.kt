@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlot
@@ -41,13 +42,18 @@ enum class RadioStatus {
     Disconnected,
 }
 
-/** One row of the radio chooser: a saved radio and its state. */
+/**
+ * One saved radio and its state. [active] is the radio the screens show (the one in use); a radio that is connected
+ * but not [active] is kept connected in the background. [off] is true after the user disconnected it.
+ */
 data class RadioChoice(
     val id: Int,
     val name: String?,
     val address: String,
     val selected: Boolean,
     val status: RadioStatus,
+    val active: Boolean = false,
+    val off: Boolean = false,
 )
 
 /**
@@ -63,9 +69,10 @@ data class RadioChooserState(
 )
 
 /**
- * Keeps the saved radios in step with the address the app connects to, and carries out the actions of the chooser
- * (choose, connect, disconnect, remove). Only the chosen radio is connected at a time; choosing another one switches
- * the connection (the databases of the radios stay separate, as before).
+ * Keeps the saved radios in step with the address the app connects to, and carries out the actions of the chooser and
+ * of the connection card (choose, connect, disconnect, remove). One radio is in use (the screens show it); the other
+ * saved radios stay connected in the background while that is allowed, so choosing another radio does not disconnect
+ * the first one. Their databases stay separate.
  */
 @KoinViewModel
 class RadioChooserViewModel(
@@ -73,6 +80,7 @@ class RadioChooserViewModel(
     private val radioPrefs: RadioPrefs,
     private val radioController: RadioController,
     serviceRepository: ServiceRepository,
+    background: RadioBackgroundMonitor,
 ) : ViewModel() {
 
     // True after a change the user asked for (disconnect, another radio, removal): the disconnection that follows is
@@ -82,14 +90,19 @@ class RadioChooserViewModel(
     // True from the moment a connected radio drops by itself until it is connected again, or the list is opened.
     private val dropped = MutableStateFlow(false)
 
+    // The slot that the next device picked from the list is saved in (null: a free one). Used once.
+    private var targetSlot: Int? = null
+
     val state: StateFlow<RadioChooserState> =
         combine(
-            slotsPrefs.slots,
-            slotsPrefs.selectedId,
+            combine(slotsPrefs.slots, slotsPrefs.selectedId, slotsPrefs.offIds) { slots, selectedId, off ->
+                Triple(slots, selectedId, off)
+            },
             radioPrefs.devAddr,
             serviceRepository.connectionState,
+            background.connectedAddresses,
             dropped,
-        ) { slots, selectedId, address, connection, droppedByItself ->
+        ) { (slots, selectedId, off), address, connection, quiet, droppedByItself ->
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices =
                 slots.map { slot ->
@@ -99,7 +112,14 @@ class RadioChooserViewModel(
                         name = slot.name,
                         address = slot.address,
                         selected = slot.id == selectedId,
-                        status = if (active) connection.toStatus() else RadioStatus.Disconnected,
+                        status =
+                        when {
+                            active -> connection.toStatus()
+                            slot.address in quiet -> RadioStatus.Connected
+                            else -> RadioStatus.Disconnected
+                        },
+                        active = active,
+                        off = slot.id in off,
                     )
                 }
             RadioChooserState(
@@ -116,10 +136,15 @@ class RadioChooserViewModel(
         // Every radio the app connects to is remembered; the one in use is the selected one. A radio that is already
         // saved only gets its name refreshed; when all places are taken, the selected radio's place is reused.
         viewModelScope.launch {
+            var lastAddress: String? = null
             combine(radioPrefs.devAddr, radioPrefs.devName) { address, name -> address to name }
                 .distinctUntilChanged()
                 .collect { (address, name) ->
-                    if (!isValidDeviceAddress(address)) return@collect
+                    // The name is written just before the address, so a change of the name alone still belongs to
+                    // the radio that was in use: it must not rename that radio.
+                    val changed = address != lastAddress
+                    lastAddress = address
+                    if (!changed || !isValidDeviceAddress(address)) return@collect
                     remember(address!!, name)
                 }
         }
@@ -146,30 +171,54 @@ class RadioChooserViewModel(
 
     private suspend fun remember(address: String, name: String?) {
         val known = slotsPrefs.slots.value.firstOrNull { it.address == address }
+        val target = targetSlot
+        targetSlot = null
         val id =
-            if (known != null) {
-                slotsPrefs.put(address, name ?: known.name, known.id)
-            } else {
-                slotsPrefs.put(address, name) ?: slotsPrefs.selectedId.value?.let { slotsPrefs.put(address, name, it) }
+            when {
+                // The same radio is never saved twice, whatever place it was picked for.
+                known != null -> slotsPrefs.put(address, name ?: known.name, known.id)
+                target != null -> slotsPrefs.put(address, name, target)
+                else ->
+                    slotsPrefs.put(address, name)
+                        ?: slotsPrefs.selectedId.value?.let { slotsPrefs.put(address, name, it) }
             }
-        id?.let { slotsPrefs.select(it) }
+        id?.let {
+            slotsPrefs.setOff(it, false)
+            slotsPrefs.select(it)
+        }
     }
 
-    /** Switches the connection to the saved radio [id]. */
+    /**
+     * Says which place the next radio picked from the list goes to: [id] when that place is free or all places are
+     * taken, otherwise a free place. Called by the connection card just before a device is picked.
+     */
+    fun targetForNextPick(id: Int) {
+        val slots = slotsPrefs.slots.value
+        val taken = slots.any { it.id == id }
+        targetSlot = if (!taken || slots.size >= RadioSlotsPrefs.MAX_SLOTS) id else null
+    }
+
+    /** Makes the saved radio [id] the one in use. The radio that was in use stays connected in the background. */
     fun choose(id: Int) {
         val slot = slotsPrefs.slots.value.firstOrNull { it.id == id } ?: return
         viewModelScope.launch {
+            slotsPrefs.setOff(slot.id, false)
             slotsPrefs.select(slot.id)
             if (slot.address != radioPrefs.devAddr.value) expectChange()
             radioController.setDeviceAddress(slot.address)
         }
     }
 
-    /** Disconnects the radio in use; it stays saved. */
-    fun disconnect() {
+    /** Disconnects the saved radio [id] (in use or in the background); it stays saved and stays off until connected. */
+    fun disconnect(id: Int) {
+        val slot = slotsPrefs.slots.value.firstOrNull { it.id == id } ?: return
         viewModelScope.launch {
-            expectChange()
-            radioController.setDeviceAddress(NO_DEVICE)
+            slotsPrefs.setOff(slot.id, true)
+            if (slot.address == radioPrefs.devAddr.value) {
+                expectChange()
+                radioPrefs.setDevName(null)
+                radioController.setDeviceAddress(NO_DEVICE)
+            }
         }
     }
 
