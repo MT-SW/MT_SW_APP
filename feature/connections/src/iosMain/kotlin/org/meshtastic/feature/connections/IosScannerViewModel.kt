@@ -63,4 +63,5 @@ class IosScannerViewModel(
     // iOS gives apps no access to a USB serial port (it would need Apple's special accessory chip), so the USB pane
     // stays visible but says so instead of searching.
     override val usbBlockedBySystem: Boolean = true
+    override val scansBluetoothOnEntry: Boolean = true
 }

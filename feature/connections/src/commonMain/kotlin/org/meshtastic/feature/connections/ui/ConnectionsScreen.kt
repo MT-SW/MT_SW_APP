@@ -317,6 +317,7 @@ fun ConnectionsScreen(
     val virtualDevices by scanModel.virtualDevicesForUi.collectAsStateWithLifecycle()
     val blePermissionRefusal by scanModel.blePermissionRefusal.collectAsStateWithLifecycle()
     val bleAutoScan by scanModel.bleAutoScan.collectAsStateWithLifecycle()
+    val autoScanBle = bleAutoScan || scanModel.scansBluetoothOnEntry
     val networkAutoScan by scanModel.networkAutoScan.collectAsStateWithLifecycle()
 
     // Android 17 (API 37) gates NSD/mDNS behind ACCESS_LOCAL_NETWORK. Without this prompt the platform falls back to
@@ -436,14 +437,14 @@ fun ConnectionsScreen(
     // permission request persists the intent, and this is what turns the resulting grant into the scan the user
     // already asked for rather than a second trip to the button.
     LifecycleStartEffect(activeTransport, bluetoothPermission.isGranted) {
-        if (activeTransport == DeviceType.BLE && bleAutoScan && bluetoothPermission.isGranted && !isBleScanning) {
+        if (activeTransport == DeviceType.BLE && autoScanBle && bluetoothPermission.isGranted && !isBleScanning) {
             scanModel.startBleAutoScan()
         }
         onStopOrDispose { scanModel.stopBleScan() }
     }
 
-    LaunchedEffect(activeTransport, bluetoothPermission.isGranted, bleAutoScan) {
-        if (activeTransport == DeviceType.BLE && bleAutoScan && bluetoothPermission.isGranted && !isBleScanning) {
+    LaunchedEffect(activeTransport, bluetoothPermission.isGranted, autoScanBle) {
+        if (activeTransport == DeviceType.BLE && autoScanBle && bluetoothPermission.isGranted && !isBleScanning) {
             scanModel.startBleAutoScan()
         }
     }

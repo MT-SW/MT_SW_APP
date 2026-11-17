@@ -175,6 +175,12 @@ open class ScannerViewModel(
      */
     open val usbBlockedBySystem: Boolean = false
 
+    /**
+     * True where the system has no list of paired radios (iPhone / iPad): the Bluetooth list is filled by a search that
+     * starts by itself whenever the pane is opened, also while a radio is connected (to add another one).
+     */
+    open val scansBluetoothOnEntry: Boolean = false
+
     // ── Mock / demo transport ─────────────────────────────────────────────────────────────────
 
     /**
@@ -507,7 +513,7 @@ open class ScannerViewModel(
     fun startBleAutoScan() {
         if (activeTransport.value != DeviceType.BLE) return
         val selectedAddress = selectedAddressFlow.value
-        if (selectedAddress != null && selectedAddress != NO_DEVICE_SELECTED) return
+        if (!scansBluetoothOnEntry && selectedAddress != null && selectedAddress != NO_DEVICE_SELECTED) return
         startBleScan()
     }
 
