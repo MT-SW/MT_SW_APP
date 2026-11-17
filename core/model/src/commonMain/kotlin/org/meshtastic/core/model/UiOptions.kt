@@ -154,7 +154,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** Whether the radio chooser shows the number of connected radios (1 = yes). */
         const val RADIO_COUNT = "radios.count"
 
-        /** 1 = the saved radios that are not in use keep collecting packets in the background (0 = off, default). */
+        /** 1 = the saved radios that are not in use keep collecting packets in the background (0 = off; on by default). */
         const val RADIO_BACKGROUND = "radios.background"
 
         /**
@@ -256,7 +256,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_ALERT_COLOR, 0)
             put(RADIO_ALERT_SPEED, 1)
             put(RADIO_COUNT, 1)
-            put(RADIO_BACKGROUND, 0)
+            put(RADIO_BACKGROUND, 1)
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)
