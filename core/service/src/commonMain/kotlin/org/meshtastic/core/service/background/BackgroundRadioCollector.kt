@@ -77,7 +77,9 @@ class BackgroundRadioCollector(
                 radioPrefs.devAddr,
                 uiPrefs.uiOptions,
             ) { (slots, selectedId, off), active, options ->
-                if (options[UiOptions.RADIO_BACKGROUND] != 1) return@combine emptySet<String>()
+                if (UiOptions(options)[UiOptions.RADIO_BACKGROUND] != 1) {
+                    return@combine emptySet<String>()
+                }
                 slots
                     .filter { it.id != selectedId && it.address != active && it.id !in off }
                     .map { it.address }
