@@ -956,6 +956,9 @@
     <string name="connected_device">Connected Device</string>
     <string name="connected_sleeping">Connected to radio, but it is sleeping</string>
     <string name="connecting">Connecting</string>
+    <string name="connection_center_intro">Everything about several radios in one place: the radio list in the top bar, background collection from the other radios, the TCP bridge for sharing a radio with other programs and the console with commands.</string>
+    <string name="connection_center_summary">Several radios, the top bar chooser, the TCP bridge and the console</string>
+    <string name="connection_center_title">Connection center</string>
     <string name="connection_status">Current connections:</string>
     <string name="connections">Connection</string>
     <!-- CONSOLE -->

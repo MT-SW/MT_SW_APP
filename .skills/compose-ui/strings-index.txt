@@ -923,6 +923,9 @@ connected
 connected_device
 connected_sleeping
 connecting
+connection_center_intro
+connection_center_summary
+connection_center_title
 connection_status
 connections
 ### CONSOLE ###

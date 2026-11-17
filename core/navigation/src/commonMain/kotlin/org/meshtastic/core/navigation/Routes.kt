@@ -249,6 +249,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object Console : SettingsRoute
 
+    @Serializable data object ConnectionCenter : SettingsRoute
+
     // endregion
 
     // region help & documentation routes

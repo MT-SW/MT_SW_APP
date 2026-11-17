@@ -4365,4 +4365,7 @@
     <string name="radio_background">Zbieranie w tle z pozostałych radiów</string>
     <string name="radio_background_on">Włączone (każde zapisane radio zbiera pakiety do swojej bazy)</string>
     <string name="radio_background_off">Wyłączone</string>
+    <string name="connection_center_title">Centrum połączeń</string>
+    <string name="connection_center_summary">Wiele radiów, wybór w górnym pasku, mostek TCP i konsola</string>
+    <string name="connection_center_intro">Wszystko o kilku radiach w jednym miejscu: lista radiów w górnym pasku, zbieranie w tle z pozostałych radiów, mostek TCP do dzielenia radia z innymi programami i konsola z poleceniami.</string>
 </resources>

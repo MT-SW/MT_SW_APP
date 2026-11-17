@@ -105,6 +105,8 @@ import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.connection_center_summary
+import org.meshtastic.core.resources.connection_center_title
 import org.meshtastic.core.resources.console_summary
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.radio_bridge_title
@@ -270,16 +272,18 @@ object SettingsSearchCatalog {
     private val appSettings: List<Pair<StringResource, Route>> =
         listOf(
             Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_title to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_title to SettingsRoute.ConnectionCenter,
+            Res.string.connection_center_title to SettingsRoute.ConnectionCenter,
+            Res.string.connection_center_summary to SettingsRoute.ConnectionCenter,
             Res.string.console_title to SettingsRoute.Console,
             Res.string.console_summary to SettingsRoute.Console,
-            Res.string.radio_bridge_enabled to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_port to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_lan to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_max_clients to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_read_only to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_block_admin to SettingsRoute.MtSwFeatures,
-            Res.string.radio_bridge_block_messages to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_enabled to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_port to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_lan to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_max_clients to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_read_only to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_block_admin to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_block_messages to SettingsRoute.ConnectionCenter,
             Res.string.antenna_calc_title to SettingsRoute.AntennaCalculator,
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
@@ -327,12 +331,12 @@ object SettingsSearchCatalog {
             Res.string.button_style to SettingsRoute.ElementLook,
             Res.string.button_glow to SettingsRoute.ElementLook,
             Res.string.button_outline to SettingsRoute.ElementLook,
-            Res.string.radio_alert to SettingsRoute.ElementLook,
-            Res.string.radio_background to SettingsRoute.ElementLook,
-            Res.string.radio_alert_color to SettingsRoute.ElementLook,
-            Res.string.radio_alert_speed to SettingsRoute.ElementLook,
-            Res.string.radio_count to SettingsRoute.ElementLook,
-            Res.string.radio_chooser_settings to SettingsRoute.ElementLook,
+            Res.string.radio_alert to SettingsRoute.ConnectionCenter,
+            Res.string.radio_background to SettingsRoute.ConnectionCenter,
+            Res.string.radio_alert_color to SettingsRoute.ConnectionCenter,
+            Res.string.radio_alert_speed to SettingsRoute.ConnectionCenter,
+            Res.string.radio_count to SettingsRoute.ConnectionCenter,
+            Res.string.radio_chooser_settings to SettingsRoute.ConnectionCenter,
             Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.chart_style_health to SettingsRoute.ElementLook,
             Res.string.chart_style_node to SettingsRoute.ElementLook,

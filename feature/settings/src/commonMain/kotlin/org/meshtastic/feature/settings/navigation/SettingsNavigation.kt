@@ -59,6 +59,7 @@ import org.meshtastic.feature.settings.debugging.DebugViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
 import org.meshtastic.feature.settings.console.ConsoleScreen
+import org.meshtastic.feature.settings.mtsw.ConnectionCenterScreen
 import org.meshtastic.feature.settings.mtsw.DataAndLogsScreen
 import org.meshtastic.feature.settings.mtsw.ElementLookScreen
 import org.meshtastic.feature.settings.mtsw.MessageArchiveScreen
@@ -532,6 +533,14 @@ fun EntryProviderScope<NavKey>.settingsGraph(
     entry<SettingsRoute.ElementLook> {
         val settingsViewModel: SettingsViewModel = koinViewModel()
         ElementLookScreen(
+            settingsViewModel = settingsViewModel,
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigate = { backStack.add(it) },
+        )
+    }
+    entry<SettingsRoute.ConnectionCenter> {
+        val settingsViewModel: SettingsViewModel = koinViewModel()
+        ConnectionCenterScreen(
             settingsViewModel = settingsViewModel,
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigate = { backStack.add(it) },
