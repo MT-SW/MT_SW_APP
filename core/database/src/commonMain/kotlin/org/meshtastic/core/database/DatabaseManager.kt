@@ -120,6 +120,9 @@ internal const val MAX_WEDGE_POOL_RECOVERIES_PER_WINDOW = 3
 /** Pause after a database switch before the optional statistics sync, so the connection settles first. */
 private const val STATS_SYNC_DELAY_MS = 30_000L
 
+/** How often the statistics of shared nodes are synchronized between all device databases. */
+private const val STATS_SYNC_PERIOD_MS = 15 * 60 * 1_000L
+
 /** Returns database names that form either side of an unfinished, crash-recoverable association route. */
 internal fun pendingRouteDbNames(preferences: Preferences): Set<String> = preferences
     .asMap()
@@ -300,7 +303,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
     private val statsSyncKey = booleanPreferencesKey("db_stats_sync_enabled")
 
     override val statsSyncEnabled: StateFlow<Boolean> =
-        datastore.data.map { it[statsSyncKey] ?: false }.stateIn(managerScope, SharingStarted.Eagerly, false)
+        datastore.data.map { it[statsSyncKey] ?: true }.stateIn(managerScope, SharingStarted.Eagerly, true)
 
     override fun setStatsSyncEnabled(enabled: Boolean) {
         launchManagerWork { datastore.edit { it[statsSyncKey] = enabled } }
@@ -931,18 +934,33 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * In-memory test fixtures override it to no-op because they do not have a filesystem-backed database directory and
      * must not access platform context singletons (e.g. `ContextServices.app`).
      */
+    @Volatile private var statsSyncLoopStarted = false
+
+    private suspend fun runStatsSyncOnce() {
+        if (!statsSyncEnabled.value) return
+        @Suppress("TooGenericExceptionCaught")
+        try {
+            syncSharedNodeStats()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.w(e) { "Statistics sync between device databases failed" }
+        }
+    }
+
     protected open fun schedulePostSwitchMaintenance(dbName: String, db: MeshtasticDatabase) {
-        // Optional: bring the statistics of nodes shared with the other device databases up to date.
+        // Bring the statistics of nodes shared with ALL the other device databases up to date (newer data wins, both
+        // ways): once after a switch, and then again every STATS_SYNC_PERIOD_MS while the app runs.
         launchManagerWork(dispatchers.io) {
             delay(STATS_SYNC_DELAY_MS)
-            if (statsSyncEnabled.value) {
-                @Suppress("TooGenericExceptionCaught")
-                try {
-                    syncSharedNodeStats()
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.w(e) { "Statistics sync between device databases failed" }
+            runStatsSyncOnce()
+        }
+        if (!statsSyncLoopStarted) {
+            statsSyncLoopStarted = true
+            launchManagerWork(dispatchers.io) {
+                while (true) {
+                    delay(STATS_SYNC_PERIOD_MS)
+                    runStatsSyncOnce()
                 }
             }
         }
