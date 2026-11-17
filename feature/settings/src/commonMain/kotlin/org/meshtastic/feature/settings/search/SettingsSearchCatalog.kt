@@ -105,6 +105,8 @@ import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.console_summary
+import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_bridge_enabled
 import org.meshtastic.core.resources.radio_bridge_port
@@ -268,6 +270,8 @@ object SettingsSearchCatalog {
         listOf(
             Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
             Res.string.radio_bridge_title to SettingsRoute.MtSwFeatures,
+            Res.string.console_title to SettingsRoute.Console,
+            Res.string.console_summary to SettingsRoute.Console,
             Res.string.radio_bridge_enabled to SettingsRoute.MtSwFeatures,
             Res.string.radio_bridge_port to SettingsRoute.MtSwFeatures,
             Res.string.radio_bridge_lan to SettingsRoute.MtSwFeatures,

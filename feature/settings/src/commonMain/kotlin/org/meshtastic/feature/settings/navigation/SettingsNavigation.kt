@@ -58,6 +58,7 @@ import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
+import org.meshtastic.feature.settings.console.ConsoleScreen
 import org.meshtastic.feature.settings.mtsw.DataAndLogsScreen
 import org.meshtastic.feature.settings.mtsw.ElementLookScreen
 import org.meshtastic.feature.settings.mtsw.MessageArchiveScreen
@@ -536,6 +537,7 @@ fun EntryProviderScope<NavKey>.settingsGraph(
             onNavigate = { backStack.add(it) },
         )
     }
+    entry<SettingsRoute.Console> { ConsoleScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() }) }
     entry<SettingsRoute.AntennaCalculator> {
         AntennaCalculatorScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() })
     }

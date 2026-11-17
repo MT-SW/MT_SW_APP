@@ -284,6 +284,7 @@ object DeepLinkRouter {
             "antenna-calculator" to SettingsRoute.AntennaCalculator,
             "sos" to SettingsRoute.Sos,
             "message-archive" to SettingsRoute.MessageArchive,
+            "console" to SettingsRoute.Console,
             "knowledge-base" to SettingsRoute.KnowledgeBase,
             "helpdocs" to SettingsRoute.HelpDocs,
             "help-docs" to SettingsRoute.HelpDocs,

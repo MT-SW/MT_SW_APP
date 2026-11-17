@@ -47,6 +47,8 @@ import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.console_summary
+import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.resources.ai_section_title
@@ -270,6 +272,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.Save,
                 ) {
                     onNavigate(SettingsRoute.DataAndLogs)
+                }
+                ListItem(
+                    text = stringResource(Res.string.console_title),
+                    supportingText = stringResource(Res.string.console_summary),
+                    leadingIcon = MeshtasticIcons.Language,
+                ) {
+                    onNavigate(SettingsRoute.Console)
                 }
                 ListItem(
                     text = stringResource(Res.string.smart_features_title),
