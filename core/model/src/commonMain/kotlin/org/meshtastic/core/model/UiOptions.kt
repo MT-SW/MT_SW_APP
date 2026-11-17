@@ -137,6 +137,23 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val BUTTON_OUTLINE = "buttons.outline"
         val BUTTON_OUTLINE_DP = floatArrayOf(1f, 1.5f, 2f, 3f)
 
+        /** How the radio chooser shows a dropped radio: [RADIO_ALERT_OFF], [RADIO_ALERT_DIGIT] or [RADIO_ALERT_PULSE]. */
+        const val RADIO_ALERT = "radios.alert"
+        const val RADIO_ALERT_OFF = 0
+        const val RADIO_ALERT_DIGIT = 1
+        const val RADIO_ALERT_PULSE = 2
+
+        /** The colour of the pulse: an index into [RADIO_ALERT_COLORS] (white, purple, theme colour, amber, red). */
+        const val RADIO_ALERT_COLOR = "radios.alert.color"
+        val RADIO_ALERT_COLORS = longArrayOf(0xFFFFFFFF, 0xFFB388FF, 0L, 0xFFFFB300, 0xFFE53935)
+
+        /** The length of one pulse: an index into [RADIO_ALERT_PERIOD_MS]. */
+        const val RADIO_ALERT_SPEED = "radios.alert.speed"
+        val RADIO_ALERT_PERIOD_MS = intArrayOf(2400, 1600, 1000)
+
+        /** Whether the radio chooser shows the number of connected radios (1 = yes). */
+        const val RADIO_COUNT = "radios.count"
+
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
          * [CHART_STYLE_GLASS] (default: glossy 3D glass with a gradient), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
@@ -232,6 +249,10 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(BUTTON_STYLE, BUTTON_STYLE_OUTLINE_GLASS)
             put(BUTTON_GLOW, 2)
             put(BUTTON_OUTLINE, 1)
+            put(RADIO_ALERT, RADIO_ALERT_PULSE)
+            put(RADIO_ALERT_COLOR, 0)
+            put(RADIO_ALERT_SPEED, 1)
+            put(RADIO_COUNT, 1)
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)
