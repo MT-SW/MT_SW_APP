@@ -102,12 +102,13 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     /** A frame from the client [clientId]. */
     fun onClientFrame(clientId: Int, payload: ByteArray): BridgeClientResult {
         val frame = runCatching { ToRadio.ADAPTER.decode(payload) }.getOrNull() ?: return BridgeClientResult()
-        if (frame.disconnect) return BridgeClientResult(close = true)
-        if (frame.want_config_id != 0) {
+        if (frame.disconnect == true) return BridgeClientResult(close = true)
+        val nonce = frame.want_config_id ?: 0
+        if (nonce != 0) {
             return if (configComplete) {
-                BridgeClientResult(replies = replay(clientId, frame.want_config_id))
+                BridgeClientResult(replies = replay(clientId, nonce))
             } else {
-                waiting[clientId] = frame.want_config_id
+                waiting[clientId] = nonce
                 BridgeClientResult()
             }
         }
