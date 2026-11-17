@@ -3643,6 +3643,9 @@
     <string name="radio_setup_restart_notice">Radio uruchomi się ponownie po zapisaniu. Konfiguracja będzie kontynuowana po ponownym połączeniu.</string>
     <string name="radio_setup_title">Konfiguracja radia</string>
     <string name="scan_connect_code">Zeskanuj kod połączenia</string>
+    <string name="scan_connect_code_nfc">Zeskanuj kod połączenia (NFC)</string>
+    <string name="scan_connect_code_qr">Zeskanuj kod połączenia (kod QR)</string>
+    <string name="input_connect_code_url">Wpisz adres URL kodu połączenia</string>
     <string name="traceroute_available_in">Trasa za %1$d s</string>
     <string name="traceroute_rate_limited">Limit szybkości: radio wysyła jedną trasę (traceroute) co 10 sekund</string>
     <string name="traceroute_waiting">Czekam na odpowiedź</string>

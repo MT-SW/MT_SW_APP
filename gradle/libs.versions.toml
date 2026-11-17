@@ -115,7 +115,7 @@ takpacket-sdk = "0.10.0"
 wire = "6.4.7"
 # MT_SW: background blur ("glass") of the floating bars (Apache 2.0, github.com/chrisbanes/haze)
 haze = "2.1.0"
-meshtastic-protobufs = "2.8.2.31-g65b8791-SNAPSHOT"
+meshtastic-protobufs = "2.8.2.44-g8649b79-SNAPSHOT"
 
 # Gradle Plugins
 ccud = "2.8.0"

@@ -41,7 +41,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -110,7 +109,6 @@ import org.meshtastic.core.resources.open_location_settings
 import org.meshtastic.core.resources.open_settings
 import org.meshtastic.core.resources.open_wifi_settings
 import org.meshtastic.core.resources.rssi
-import org.meshtastic.core.resources.scan_connect_code
 import org.meshtastic.core.resources.set_your_region
 import org.meshtastic.core.resources.transmit_disabled
 import org.meshtastic.core.resources.transmit_disabled_summary
@@ -121,14 +119,17 @@ import org.meshtastic.core.ui.component.AdaptiveTwoPane
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.ImportKind
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CellTower
@@ -136,7 +137,6 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
-import org.meshtastic.core.ui.icon.QrCodeScanner
 import org.meshtastic.core.ui.icon.SystemUpdate
 import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.PermissionGateAction
@@ -271,7 +271,7 @@ fun ConnectionsScreen(
     onClickNodeChip: (Int) -> Unit,
     onNavigateToNodeDetails: (Int) -> Unit,
     onConfigNavigate: (Route) -> Unit,
-    onScanConnectCode: (() -> Unit)? = null,
+    onConnectCode: ((String) -> Unit)? = null,
 ) {
     val connectionProgress by scanModel.connectionProgressText.collectAsStateWithLifecycle()
     val connectionStatus by connectionsViewModel.connectionStatus.collectAsStateWithLifecycle()
@@ -474,6 +474,12 @@ fun ConnectionsScreen(
         produceState<LoraSummary?>(null, lora, resourceEnvironment) {
             value = lora?.let { loraSummaryText(resourceEnvironment, it) }
         }
+    // MT_SW option: the connect-code / import menu in the top bar instead of the floating button.
+    val importInTopBar by
+        org.koin.compose
+            .koinInject<org.meshtastic.core.repository.UiPrefs>()
+            .importMenuInTopBar
+            .collectAsStateWithLifecycle()
     val currentlyConnectedText =
         CurrentlyConnectedText(
             unknownLabel = stringResource(Res.string.unknown),
@@ -493,17 +499,33 @@ fun ConnectionsScreen(
                 canNavigateUp = false,
                 onNavigateUp = {},
                 actions = {
-                    onScanConnectCode?.let { scan ->
-                        IconButton(onClick = scan) {
-                            Icon(
-                                imageVector = MeshtasticIcons.QrCodeScanner,
-                                contentDescription = stringResource(Res.string.scan_connect_code),
+                    if (importInTopBar) {
+                        onConnectCode?.let {
+                            MeshtasticImportFAB(
+                                asTopBarMenu = true,
+                                onImport = it,
+                                importKind = ImportKind.ConnectCode,
+                                testTag = "connect_code_fab",
                             )
                         }
                     }
                 },
                 onClickChip = { onClickNodeChip(it.num) },
             )
+        },
+        floatingActionButton = {
+            if (!importInTopBar) {
+                onConnectCode?.let {
+                    // The list runs under the floating bar, so the button is lifted above it.
+                    Box(modifier = Modifier.floatingBarEndPadding()) {
+                        MeshtasticImportFAB(
+                            onImport = it,
+                            importKind = ImportKind.ConnectCode,
+                            testTag = "connect_code_fab",
+                        )
+                    }
+                }
+            }
         },
     ) { paddingValues ->
         val uiState =
@@ -891,6 +913,8 @@ fun ConnectionsScreen(
         // The device list runs under the floating bar (shows through its glass) and ends above it.
         FloatingBarUnderlap()
         val barInset = LocalFloatingBarInset.current
+        // The connect-code button floats over the list (above the bar) unless the MT_SW top-bar menu option is on.
+        val fabClearance = if (onConnectCode != null && !importInTopBar) FabClearance else 0.dp
         if (isAdaptiveTwoPaneSplit()) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
@@ -908,7 +932,13 @@ fun ConnectionsScreen(
                             header(this)
                         }
                     },
-                    second = { deviceList(Modifier.weight(1f).fillMaxWidth(), PaddingValues(bottom = barInset), null) },
+                    second = {
+                        deviceList(
+                            Modifier.weight(1f).fillMaxWidth(),
+                            PaddingValues(bottom = barInset + fabClearance),
+                            null,
+                        )
+                    },
                 )
             }
         } else {
@@ -919,7 +949,7 @@ fun ConnectionsScreen(
                     start = paddingValues.calculateStartPadding(layoutDirection) + 16.dp,
                     top = paddingValues.calculateTopPadding() + 20.dp,
                     end = paddingValues.calculateEndPadding(layoutDirection) + 16.dp,
-                    bottom = paddingValues.calculateBottomPadding() + barInset,
+                    bottom = paddingValues.calculateBottomPadding() + barInset + fabClearance,
                 ),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing)) { header(this) }
@@ -930,6 +960,9 @@ fun ConnectionsScreen(
 
 /** The one gap between the header's cards and controls; the device list spaces its own items. */
 private val HeaderItemSpacing = 12.dp
+
+/** Room under the last list row so the connect-code FAB never covers it. */
+private val FabClearance = 112.dp
 
 /** Informational, non-dismissible nudge for a connected device with a newer stable firmware release. */
 @Composable
