@@ -18,6 +18,7 @@ package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /** Shared metric log/list UI components used by TracerouteLog, NeighborInfoLog, HostMetricsLog, and PositionLog. */
 @Composable
@@ -65,15 +67,27 @@ fun MetricLogItem(icon: ImageVector, text: String, contentDescription: String, m
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // With the outline icon style (the default) the disc is a thin ring and the icon takes the theme colour,
+            // like the other outline elements; the old filled disc stays for the standard and bold icon styles.
+            val outlined = rememberUiOptions()[UiOptions.ICON_STYLE] == UiOptions.ICON_STYLE_OUTLINE
             Box(
                 modifier =
-                Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
+                if (outlined) {
+                    Modifier.size(40.dp).border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                } else {
+                    Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer)
+                },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = contentDescription,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint =
+                    if (outlined) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    },
                     modifier = Modifier.size(24.dp),
                 )
             }
