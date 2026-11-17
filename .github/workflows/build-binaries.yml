@@ -361,7 +361,6 @@ jobs:
       - name: Build the unsigned .ipa
         # Release needs a lot of memory; the Intel Mac has about 14 GB (the Apple-silicon one only 7 GB).
         env:
-          IPA_CONFIG: Release
           IPA_NATIVE_HEAP: 10g
         run: bash ./scripts/build-ios-ipa.sh
 

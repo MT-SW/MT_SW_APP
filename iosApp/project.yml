@@ -6,6 +6,27 @@ options:
   deploymentTarget:
     iOS: "17.5"
   createIntermediateGroups: true
+  defaultConfig: Release
+# Tylko Release: nie ma konfiguracji Debug (szybka aplikacja; Debug Compose jest bardzo wolny).
+# Release only: there is no Debug configuration (a fast app; Debug Compose is very slow).
+configs:
+  Release: release
+schemes:
+  MTSWApp:
+    build:
+      targets:
+        MTSWApp: all
+        MTSWWidget: all
+    run:
+      config: Release
+    test:
+      config: Release
+    profile:
+      config: Release
+    analyze:
+      config: Release
+    archive:
+      config: Release
 targets:
   MTSWApp:
     type: application
