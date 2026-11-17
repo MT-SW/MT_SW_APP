@@ -142,6 +142,8 @@ class RadioBridgeServer(
         val writer = launch {
             try {
                 for (bytes in outbox) output.writeFully(bytes)
+                // The outbox was closed (the client said goodbye, or was too slow): end the connection.
+                runCatching { socket.close() }
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 if (e is CancellationException) throw e
                 Logger.d { "Radio bridge: client $id write ended: ${e.message}" }
@@ -155,7 +157,6 @@ class RadioBridgeServer(
                 val n = input.readAvailable(buffer)
                 if (n < 0) break
                 for (i in 0 until n) codec.processInputByte(buffer[i])
-                if (outbox.isClosedForSend) break
             }
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             if (e is CancellationException) throw e
