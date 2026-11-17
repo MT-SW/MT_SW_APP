@@ -40,6 +40,7 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageArchiveMonitor
+import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.NodeActiveMonitor
 import org.meshtastic.core.repository.NodeManager
@@ -87,6 +88,7 @@ class MeshServiceOrchestrator(
     private val nodeActiveMonitor: NodeActiveMonitor,
     private val messageArchiveMonitor: MessageArchiveMonitor,
     private val radioBridge: RadioBridgeMonitor,
+    private val radioBackground: RadioBackgroundMonitor,
 ) {
     // Per-start coroutine scope. A fresh scope is created on each start() and cancelled on stop(), so all collectors
     // launched from start() are torn down cleanly and do not accumulate across start/stop/start cycles.
@@ -236,6 +238,7 @@ class MeshServiceOrchestrator(
         // The automatic message archive in the chosen folder.
         messageArchiveMonitor.start(newScope)
         radioBridge.start(newScope)
+        radioBackground.start(newScope)
     }
 
     /**

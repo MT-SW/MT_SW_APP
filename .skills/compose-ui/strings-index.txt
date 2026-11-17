@@ -3159,6 +3159,9 @@ radio_alert_speed
 radio_alert_speed_fast
 radio_alert_speed_medium
 radio_alert_speed_slow
+radio_background
+radio_background_off
+radio_background_on
 radio_bridge_address
 radio_bridge_block_admin
 radio_bridge_block_messages

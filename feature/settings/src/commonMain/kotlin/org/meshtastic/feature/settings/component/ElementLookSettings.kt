@@ -35,6 +35,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.radio_background
+import org.meshtastic.core.resources.radio_background_off
+import org.meshtastic.core.resources.radio_background_on
 import org.meshtastic.core.resources.radio_count
 import org.meshtastic.core.resources.radio_count_hide
 import org.meshtastic.core.resources.radio_count_show
@@ -409,6 +412,17 @@ fun RadioChooserSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         ),
         selectedItem = options[UiOptions.RADIO_COUNT],
         onItemSelected = { onChange(UiOptions.RADIO_COUNT, it) },
+    )
+    DropDownPreference(
+        title = stringResource(Res.string.radio_background),
+        enabled = true,
+        items =
+        listOf(
+            0 to stringResource(Res.string.radio_background_off),
+            1 to stringResource(Res.string.radio_background_on),
+        ),
+        selectedItem = options[UiOptions.RADIO_BACKGROUND],
+        onItemSelected = { onChange(UiOptions.RADIO_BACKGROUND, it) },
     )
 }
 

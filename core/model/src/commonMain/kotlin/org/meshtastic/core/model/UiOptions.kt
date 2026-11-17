@@ -154,6 +154,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** Whether the radio chooser shows the number of connected radios (1 = yes). */
         const val RADIO_COUNT = "radios.count"
 
+        /** 1 = the saved radios that are not in use keep collecting packets in the background (0 = off, default). */
+        const val RADIO_BACKGROUND = "radios.background"
+
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
          * [CHART_STYLE_GLASS] (default: glossy 3D glass with a gradient), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
@@ -253,6 +256,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_ALERT_COLOR, 0)
             put(RADIO_ALERT_SPEED, 1)
             put(RADIO_COUNT, 1)
+            put(RADIO_BACKGROUND, 0)
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)

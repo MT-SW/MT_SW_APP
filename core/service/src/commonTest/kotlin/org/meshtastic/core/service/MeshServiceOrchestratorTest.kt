@@ -180,6 +180,7 @@ class MeshServiceOrchestratorTest {
 
                 override fun onFromRadio(payload: ByteString) = Unit
             },
+            radioBackground = {},
         )
     }
 

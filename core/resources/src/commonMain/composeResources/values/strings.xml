@@ -3225,6 +3225,9 @@
     <string name="radio_alert_speed_fast">Fast</string>
     <string name="radio_alert_speed_medium">Medium</string>
     <string name="radio_alert_speed_slow">Slow</string>
+    <string name="radio_background">Background collection from the other radios</string>
+    <string name="radio_background_off">Off</string>
+    <string name="radio_background_on">On (every saved radio keeps collecting packets in its own database)</string>
     <string name="radio_bridge_address">Bridge address: %1$s, port %2$d</string>
     <string name="radio_bridge_block_admin">Block remote administration</string>
     <string name="radio_bridge_block_messages">Block sending messages</string>

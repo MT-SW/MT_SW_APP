@@ -330,6 +330,26 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         withContext(dispatchers.io) { mutex.withLock { DatabaseStatsSync.sync(getOrOpenDatabase(dbName), backup) } }
     }
 
+    /**
+     * Runs [block] on the database of the device [address], which need not be the active one (the background
+     * collection of a radio that is not in use writes there). Returns null when that radio has no database yet: one is
+     * only created when the radio is used first. The manager lock is held while [block] runs, so keep it short.
+     */
+    suspend fun <T> withDeviceDb(address: String, block: suspend (MeshtasticDatabase) -> T): T? =
+        withManagerOperation {
+            withContext(dispatchers.io) {
+                mutex.withLock {
+                    checkOpen()
+                    if (!hasDatabaseFor(address)) {
+                        null
+                    } else {
+                        val dbName = resolveDbName(address, canReclaimRecoveredSource = false)
+                        block(getOrOpenDatabase(dbName))
+                    }
+                }
+            }
+        }
+
     override fun setCacheLimit(limit: Int) {
         val clamped = limit.coerceIn(DatabaseConstants.MIN_CACHE_LIMIT, DatabaseConstants.MAX_CACHE_LIMIT)
         launchManagerWork {

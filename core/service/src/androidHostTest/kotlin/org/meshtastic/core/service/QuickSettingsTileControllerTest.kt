@@ -111,6 +111,7 @@ class QuickSettingsTileControllerTest {
 
                 override fun onFromRadio(payload: ByteString) = Unit
             },
+            radioBackground = {},
         )
     }
 }

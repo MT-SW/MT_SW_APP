@@ -116,6 +116,7 @@ import org.meshtastic.core.resources.radio_bridge_read_only
 import org.meshtastic.core.resources.radio_bridge_block_admin
 import org.meshtastic.core.resources.radio_bridge_block_messages
 import org.meshtastic.core.resources.radio_alert
+import org.meshtastic.core.resources.radio_background
 import org.meshtastic.core.resources.radio_alert_color
 import org.meshtastic.core.resources.radio_alert_speed
 import org.meshtastic.core.resources.radio_chooser_settings
@@ -327,6 +328,7 @@ object SettingsSearchCatalog {
             Res.string.button_glow to SettingsRoute.ElementLook,
             Res.string.button_outline to SettingsRoute.ElementLook,
             Res.string.radio_alert to SettingsRoute.ElementLook,
+            Res.string.radio_background to SettingsRoute.ElementLook,
             Res.string.radio_alert_color to SettingsRoute.ElementLook,
             Res.string.radio_alert_speed to SettingsRoute.ElementLook,
             Res.string.radio_count to SettingsRoute.ElementLook,
