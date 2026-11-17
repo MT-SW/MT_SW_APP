@@ -16,6 +16,8 @@
  */
 package org.meshtastic.core.service
 
+import okio.ByteString
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import androidx.test.core.app.ApplicationProvider
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -103,6 +105,12 @@ class QuickSettingsTileControllerTest {
             nodeSilenceMonitor = mock(MockMode.autofill),
             nodeActiveMonitor = mock(MockMode.autofill),
             messageArchiveMonitor = {},
+            radioBridge =
+            object : RadioBridgeMonitor {
+                override fun start(scope: CoroutineScope) = Unit
+
+                override fun onFromRadio(payload: ByteString) = Unit
+            },
         )
     }
 }

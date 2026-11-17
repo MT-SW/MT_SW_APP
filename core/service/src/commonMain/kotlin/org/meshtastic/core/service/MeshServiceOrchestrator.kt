@@ -40,6 +40,7 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageArchiveMonitor
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.NodeActiveMonitor
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeSilenceMonitor
@@ -85,6 +86,7 @@ class MeshServiceOrchestrator(
     private val nodeSilenceMonitor: NodeSilenceMonitor,
     private val nodeActiveMonitor: NodeActiveMonitor,
     private val messageArchiveMonitor: MessageArchiveMonitor,
+    private val radioBridge: RadioBridgeMonitor,
 ) {
     // Per-start coroutine scope. A fresh scope is created on each start() and cancelled on stop(), so all collectors
     // launched from start() are torn down cleanly and do not accumulate across start/stop/start cycles.
@@ -216,6 +218,8 @@ class MeshServiceOrchestrator(
                     Logger.d { "Dropping queued frame from stale transport session gen=${session.generation}" }
                     return@onEach
                 }
+                safeCatching { radioBridge.onFromRadio(frame.payload) }
+                    .onFailure { Logger.w(it) { "Radio bridge could not take a frame" } }
                 safeCatching { messageProcessor.handleFromRadio(frame, nodeManager.myNodeNum.value) }
                     .onFailure { Logger.e(it) { "Dropped inbound frame after a receive-loop error" } }
             }
@@ -231,6 +235,7 @@ class MeshServiceOrchestrator(
         nodeActiveMonitor.start(newScope)
         // The automatic message archive in the chosen folder.
         messageArchiveMonitor.start(newScope)
+        radioBridge.start(newScope)
     }
 
     /**

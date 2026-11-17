@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kermit)
+            implementation(libs.ktor.network)
         }
 
         matching { it.name == "iosMain" }.configureEach { dependencies { implementation(libs.okio) } }

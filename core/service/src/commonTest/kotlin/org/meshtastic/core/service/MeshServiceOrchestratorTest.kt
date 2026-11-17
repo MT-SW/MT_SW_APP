@@ -16,6 +16,8 @@
  */
 package org.meshtastic.core.service
 
+import kotlinx.coroutines.CoroutineScope
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import co.touchlab.kermit.Severity
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -172,6 +174,12 @@ class MeshServiceOrchestratorTest {
             nodeSilenceMonitor = mock(MockMode.autofill),
             nodeActiveMonitor = mock(MockMode.autofill),
             messageArchiveMonitor = {},
+            radioBridge =
+            object : RadioBridgeMonitor {
+                override fun start(scope: CoroutineScope) = Unit
+
+                override fun onFromRadio(payload: ByteString) = Unit
+            },
         )
     }
 
