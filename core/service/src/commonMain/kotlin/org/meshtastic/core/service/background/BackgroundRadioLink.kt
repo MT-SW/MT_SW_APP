@@ -17,6 +17,8 @@
 package org.meshtastic.core.service.background
 
 import co.touchlab.kermit.Logger
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -58,8 +60,33 @@ class BackgroundRadioLink(
     /** Completes when the radio went away (or the link was closed). */
     val ended = CompletableDeferred<Unit>()
 
-    /** Set by the owner right after the transport is created; used to ask the radio for its packets. */
-    var send: (ByteArray) -> Boolean = { false }
+    private val lock = SynchronizedObject()
+    private var sender: ((ByteArray) -> Boolean)? = null
+    private var connected = false
+    private var configAsked = false
+
+    /**
+     * Given by the owner right after the transport is created. A transport may connect before this is called, so
+     * whichever of the two happens last asks the radio for its packets.
+     */
+    fun attach(send: (ByteArray) -> Boolean) {
+        synchronized(lock) { sender = send }
+        askForConfig()
+    }
+
+    /** Sends [bytes] to the radio through the transport; false when there is no transport yet. */
+    fun send(bytes: ByteArray): Boolean = synchronized(lock) { sender }?.invoke(bytes) ?: false
+
+    private fun askForConfig() {
+        val send =
+            synchronized(lock) {
+                if (!connected || configAsked) return
+                sender?.also { configAsked = true }
+            } ?: return
+        // Asking for the configuration is what makes the radio send the packets it hears.
+        val request = ToRadio.Builder().also { it.want_config_id = (1..Int.MAX_VALUE).random() }.build()
+        send(request.encode())
+    }
 
     private var myNodeNum = 0
 
@@ -77,9 +104,8 @@ class BackgroundRadioLink(
     override fun onConnect() {
         state.value = ConnectionState.Connected
         Logger.i { "Background radio link connected" }
-        // Asking for the configuration is what makes the radio send the packets it hears.
-        val request = ToRadio.Builder().also { it.want_config_id = (1..Int.MAX_VALUE).random() }.build()
-        send(request.encode())
+        synchronized(lock) { connected = true }
+        askForConfig()
     }
 
     override fun onDisconnect(isPermanent: Boolean, errorMessage: String?, reason: TransportDisconnectReason?) {

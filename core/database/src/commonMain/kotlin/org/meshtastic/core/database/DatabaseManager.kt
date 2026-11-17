@@ -332,8 +332,9 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
     /**
      * Runs [block] on the database of the device [address], which need not be the active one (the background
-     * collection of a radio that is not in use writes there). Returns null when that radio has no database yet: one is
-     * only created when the radio is used first. The manager lock is held while [block] runs, so keep it short.
+     * collection of a radio that is not in use writes there). Returns null when that radio has no database yet (one is
+     * only created when the radio is used first) or when its database is the active one (the app writes that itself).
+     * The manager lock is held while [block] runs, so keep it short.
      */
     suspend fun <T> withDeviceDb(address: String, block: suspend (MeshtasticDatabase) -> T): T? =
         withManagerOperation {
@@ -344,7 +345,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
                         null
                     } else {
                         val dbName = resolveDbName(address, canReclaimRecoveredSource = false)
-                        block(getOrOpenDatabase(dbName))
+                        // The active database is written by the app itself: a second writer would duplicate packets.
+                        if (dbName == currentDbName) null else block(getOrOpenDatabase(dbName))
                     }
                 }
             }

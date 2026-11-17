@@ -100,7 +100,7 @@ class BackgroundRadioCollector(
         val linkScope = CoroutineScope(SupervisorJob() + dispatchers.io)
         val link = BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes)
         val transport = transportFactory.createTransport(address, link)
-        link.send = transport::handleSendToRadio
+        link.attach(transport::handleSendToRadio)
         try {
             supervisorScope {
                 val writer = launch { writeLogs(address, link) }
