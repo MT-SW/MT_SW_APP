@@ -137,7 +137,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val BUTTON_OUTLINE = "buttons.outline"
         val BUTTON_OUTLINE_DP = floatArrayOf(1f, 1.5f, 2f, 3f)
 
-        /** How the radio chooser shows a dropped radio: [RADIO_ALERT_OFF], [RADIO_ALERT_DIGIT] or [RADIO_ALERT_PULSE]. */
+        /** How the radio chooser shows a dropped radio: [RADIO_ALERT_OFF], [RADIO_ALERT_DIGIT], [RADIO_ALERT_PULSE]. */
         const val RADIO_ALERT = "radios.alert"
         const val RADIO_ALERT_OFF = 0
         const val RADIO_ALERT_DIGIT = 1
