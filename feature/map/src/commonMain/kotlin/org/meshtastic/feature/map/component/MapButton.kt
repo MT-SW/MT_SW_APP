@@ -19,7 +19,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FilledIconButton
+import org.meshtastic.core.ui.component.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme

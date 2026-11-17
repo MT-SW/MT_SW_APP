@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -134,28 +135,97 @@ private const val GLASS_GLOSS_HEIGHT = 0.5f
 private const val GLASS_RIM_TOP_ALPHA = 0.55f
 private const val GLASS_RIM_BOTTOM_ALPHA = 0.12f
 
-/** MT_SW: true when the filled buttons are drawn as glass (the default); "Look" can bring back the plain ones. */
-@Composable
-private fun rememberGlassButtons(): Boolean =
-    rememberUiOptions()[UiOptions.BUTTON_STYLE] == UiOptions.BUTTON_STYLE_GLASS
-
-/** The colour a glass button is built from, or null when it has none (then it stays as it is). */
-private fun glassBase(colors: ButtonColors, enabled: Boolean, glassOn: Boolean): Color? {
-    if (!glassOn) return null
-    val base = if (enabled) colors.containerColor else colors.disabledContainerColor
-    return base.takeIf { it.isSpecified && it.alpha > 0f }
+/** How a filled button is drawn: as glass, as a thin outline on clear glass, or (both null) the plain way. */
+internal data class FilledDecor(
+    val glass: Color? = null,
+    val outline: OutlineGlassLook? = null,
+    val outlineWidthDp: Float = 1.5f,
+    val glow: Float = 1f,
+) {
+    /** True when the button draws its own surface, so the Material container is cleared. */
+    val custom: Boolean
+        get() = glass != null || outline != null
 }
 
-/** The colours of a filled button: clear for glass (the glass is drawn behind it), otherwise the styled colour. */
-private fun ButtonColors.filledColors(styled: Color, glass: Color?): ButtonColors = if (glass != null) {
-    copy(containerColor = Color.Transparent, disabledContainerColor = Color.Transparent)
-} else {
-    copy(containerColor = styled)
+/** The colours of an outline-glass button: the accent of a working one, or the grey of a switched-off one. */
+internal data class OutlineGlassLook(val accent: Color, val active: Boolean, val text: Color, val disabledText: Color)
+
+private const val OUTLINE_TEXT_MIX = 0.25f
+private const val OUTLINE_DISABLED_ALPHA = 0.38f
+
+/**
+ * MT_SW: the look of a filled button. With the default "outline and glass" style it is a thin outline on a clear glass
+ * pane, with a soft glow in the colour of the theme while the button works and grey when it is switched off. "Look"
+ * can choose filled glass or the plain Material buttons instead.
+ */
+@Composable
+private fun rememberFilledDecor(colors: ButtonColors, enabled: Boolean, tonal: Boolean): FilledDecor =
+    rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled, tonal)
+
+/** The same for any filled control (a floating button, a filled icon button) from its [container] colours. */
+@Composable
+internal fun rememberDecorFor(
+    container: Color,
+    disabledContainer: Color,
+    enabled: Boolean,
+    tonal: Boolean,
+): FilledDecor {
+    val options = rememberUiOptions()
+    val scheme = MaterialTheme.colorScheme
+    return when (options[UiOptions.BUTTON_STYLE]) {
+        UiOptions.BUTTON_STYLE_GLASS -> {
+            val base = if (enabled) container else disabledContainer
+            FilledDecor(glass = base.takeIf { it.isSpecified && it.alpha > 0f })
+        }
+
+        UiOptions.BUTTON_STYLE_OUTLINE_GLASS -> {
+            val accent =
+                when {
+                    !enabled -> scheme.onSurface
+                    tonal && container == scheme.secondaryContainer -> scheme.primary
+                    container.isSpecified && container.alpha > 0f -> container
+                    else -> scheme.primary
+                }
+            val steps = UiOptions.BUTTON_GLOW_SHARE
+            val widths = UiOptions.BUTTON_OUTLINE_DP
+            FilledDecor(
+                outline =
+                OutlineGlassLook(
+                    accent = accent,
+                    active = enabled,
+                    text = lerp(accent, scheme.onSurface, OUTLINE_TEXT_MIX),
+                    disabledText = scheme.onSurface.copy(alpha = OUTLINE_DISABLED_ALPHA),
+                ),
+                outlineWidthDp = widths[options[UiOptions.BUTTON_OUTLINE].coerceIn(0, widths.lastIndex)],
+                glow = steps[options[UiOptions.BUTTON_GLOW].coerceIn(0, steps.lastIndex)],
+            )
+        }
+
+        else -> FilledDecor()
+    }
+}
+
+/** The colours of a filled button: clear when the button draws its own surface, otherwise the styled colour. */
+private fun ButtonColors.filledColors(styled: Color, decor: FilledDecor): ButtonColors = when {
+    decor.outline != null ->
+        copy(
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            contentColor = decor.outline.text,
+            disabledContentColor = decor.outline.disabledText,
+        )
+
+    decor.glass != null -> copy(containerColor = Color.Transparent, disabledContainerColor = Color.Transparent)
+
+    else -> copy(containerColor = styled)
 }
 
 @Composable
-private fun Modifier.filledLook(glass: Color?, group: String, shape: Shape): Modifier =
-    if (glass != null) glassSurface(shape, glass) else buttonStyle(group, shape)
+private fun Modifier.filledLook(decor: FilledDecor, group: String, shape: Shape): Modifier = when {
+    decor.outline != null -> outlineGlassSurface(shape, decor)
+    decor.glass != null -> glassSurface(shape, decor.glass)
+    else -> buttonStyle(group, shape)
+}
 
 private fun outlinePath(outline: Outline): Path = when (outline) {
     is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
@@ -167,7 +237,7 @@ private fun outlinePath(outline: Outline): Path = when (outline) {
  * MT_SW: a glass button, like on the iPhone: the colour goes from lighter at the top to darker at the bottom, a soft
  * gloss lies on the upper half and a thin light rim runs around it. It is drawn behind the button's content.
  */
-private fun Modifier.glassSurface(shape: Shape, base: Color): Modifier = drawBehind {
+internal fun Modifier.glassSurface(shape: Shape, base: Color): Modifier = drawBehind {
     val outline = shape.createOutline(size, layoutDirection, this)
     drawOutline(
         outline = outline,
@@ -196,6 +266,67 @@ private fun Modifier.glassSurface(shape: Shape, base: Color): Modifier = drawBeh
             1f to Color.White.copy(alpha = GLASS_RIM_BOTTOM_ALPHA),
         ),
         style = Stroke(width = 1.dp.toPx()),
+    )
+}
+
+private const val OUTLINE_FILL_TOP_ALPHA = 0.26f
+private const val OUTLINE_FILL_BOTTOM_ALPHA = 0.08f
+private const val OUTLINE_OFF_FILL_ALPHA = 0.05f
+private const val OUTLINE_OFF_EDGE_ALPHA = 0.28f
+private const val OUTLINE_GLOSS_ALPHA = 0.16f
+private const val OUTLINE_EDGE_BOTTOM_ALPHA = 0.65f
+private const val OUTLINE_GLOW_LAYERS = 5
+private const val OUTLINE_GLOW_STEP_DP = 2f
+private const val OUTLINE_GLOW_LAYER_ALPHA = 0.055f
+
+/**
+ * MT_SW: a thin outline on a clear glass pane. A working button has a soft glow in its colour (a few wide, faint
+ * strokes around the edge), a gloss on the upper half and a bright outline; a switched-off one is grey, without a glow.
+ */
+internal fun Modifier.outlineGlassSurface(shape: Shape, decor: FilledDecor): Modifier = drawBehind {
+    val look = decor.outline ?: return@drawBehind
+    val accent = look.accent
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val edge = decor.outlineWidthDp.dp.toPx()
+    if (look.active && decor.glow > 0f) {
+        for (layer in OUTLINE_GLOW_LAYERS downTo 1) {
+            drawOutline(
+                outline = outline,
+                color = accent.copy(alpha = (OUTLINE_GLOW_LAYER_ALPHA * decor.glow).coerceAtMost(1f)),
+                style = Stroke(width = edge + layer * OUTLINE_GLOW_STEP_DP.dp.toPx()),
+            )
+        }
+    }
+    drawOutline(
+        outline = outline,
+        brush =
+        Brush.verticalGradient(
+            0f to accent.copy(alpha = if (look.active) OUTLINE_FILL_TOP_ALPHA else OUTLINE_OFF_FILL_ALPHA),
+            1f to accent.copy(alpha = if (look.active) OUTLINE_FILL_BOTTOM_ALPHA else OUTLINE_OFF_FILL_ALPHA),
+        ),
+    )
+    if (look.active) {
+        clipPath(outlinePath(outline)) {
+            drawRect(
+                brush =
+                Brush.verticalGradient(
+                    0f to Color.White.copy(alpha = OUTLINE_GLOSS_ALPHA),
+                    1f to Color.Transparent,
+                    endY = size.height * GLASS_GLOSS_HEIGHT,
+                ),
+                size = Size(size.width, size.height * GLASS_GLOSS_HEIGHT),
+            )
+        }
+    }
+    drawOutline(
+        outline = outline,
+        brush =
+        if (look.active) {
+            Brush.verticalGradient(0f to accent, 1f to accent.copy(alpha = OUTLINE_EDGE_BOTTOM_ALPHA))
+        } else {
+            SolidColor(accent.copy(alpha = OUTLINE_OFF_EDGE_ALPHA))
+        },
+        style = Stroke(width = edge),
     )
 }
 
@@ -228,17 +359,17 @@ fun Button(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val glass = glassBase(colors, enabled, rememberGlassButtons())
+    val decor = rememberFilledDecor(colors, enabled, tonal = false)
     val styled = buttonLook(group, colors.containerColor)
-    WithoutTouchBox(!flat || glass != null) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialButton(
             onClick = onClick,
-            modifier = modifier.filledLook(glass, group, shape),
+            modifier = modifier.filledLook(decor, group, shape),
             enabled = enabled,
             shape = shape,
-            colors = remember(colors, styled, glass) { colors.filledColors(styled, glass) },
+            colors = remember(colors, styled, decor) { colors.filledColors(styled, decor) },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat && glass == null) elevation else null,
+            elevation = if (flat && !decor.custom) elevation else null,
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
@@ -262,17 +393,17 @@ fun FilledTonalButton(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val glass = glassBase(colors, enabled, rememberGlassButtons())
+    val decor = rememberFilledDecor(colors, enabled, tonal = true)
     val styled = buttonLook(group, colors.containerColor)
-    WithoutTouchBox(!flat || glass != null) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialFilledTonalButton(
             onClick = onClick,
-            modifier = modifier.filledLook(glass, group, shape),
+            modifier = modifier.filledLook(decor, group, shape),
             enabled = enabled,
             shape = shape,
-            colors = remember(colors, styled, glass) { colors.filledColors(styled, glass) },
+            colors = remember(colors, styled, decor) { colors.filledColors(styled, decor) },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat && glass == null) elevation else null,
+            elevation = if (flat && !decor.custom) elevation else null,
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
@@ -334,17 +465,17 @@ fun Button(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val glass = glassBase(colors, enabled, rememberGlassButtons())
+    val decor = rememberFilledDecor(colors, enabled, tonal = false)
     val styled = buttonLook(group, colors.containerColor)
-    WithoutTouchBox(!flat || glass != null) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialButton(
             onClick = onClick,
             shapes = shapes,
-            modifier = modifier.filledLook(glass, group, shapes.shape),
+            modifier = modifier.filledLook(decor, group, shapes.shape),
             enabled = enabled,
-            colors = remember(colors, styled, glass) { colors.filledColors(styled, glass) },
+            colors = remember(colors, styled, decor) { colors.filledColors(styled, decor) },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat && glass == null) elevation else null,
+            elevation = if (flat && !decor.custom) elevation else null,
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
@@ -369,17 +500,17 @@ fun FilledTonalButton(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val glass = glassBase(colors, enabled, rememberGlassButtons())
+    val decor = rememberFilledDecor(colors, enabled, tonal = true)
     val styled = buttonLook(group, colors.containerColor)
-    WithoutTouchBox(!flat || glass != null) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialFilledTonalButton(
             onClick = onClick,
             shapes = shapes,
-            modifier = modifier.filledLook(glass, group, shapes.shape),
+            modifier = modifier.filledLook(decor, group, shapes.shape),
             enabled = enabled,
-            colors = remember(colors, styled, glass) { colors.filledColors(styled, glass) },
+            colors = remember(colors, styled, decor) { colors.filledColors(styled, decor) },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat && glass == null) elevation else null,
+            elevation = if (flat && !decor.custom) elevation else null,
             border = border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,

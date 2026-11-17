@@ -42,7 +42,9 @@ import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.background_keepalive_title
 import org.meshtastic.core.resources.button_gradient
-import org.meshtastic.core.resources.button_style_glass
+import org.meshtastic.core.resources.button_glow
+import org.meshtastic.core.resources.button_outline
+import org.meshtastic.core.resources.button_style
 import org.meshtastic.core.resources.chart_style
 import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
@@ -296,7 +298,9 @@ object SettingsSearchCatalog {
             Res.string.icon_style to SettingsRoute.ElementLook,
             Res.string.ring_style_thin to SettingsRoute.ElementLook,
             Res.string.control_style_thin to SettingsRoute.ElementLook,
-            Res.string.button_style_glass to SettingsRoute.ElementLook,
+            Res.string.button_style to SettingsRoute.ElementLook,
+            Res.string.button_glow to SettingsRoute.ElementLook,
+            Res.string.button_outline to SettingsRoute.ElementLook,
             Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.chart_style_health to SettingsRoute.ElementLook,
             Res.string.chart_style_node to SettingsRoute.ElementLook,

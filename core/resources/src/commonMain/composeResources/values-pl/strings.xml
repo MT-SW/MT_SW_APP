@@ -4074,8 +4074,7 @@
     <string name="ring_style_thin_summary">Paski postępu i kręcące się kółka oczekiwania to dwie cienkie szare linie (pusty obrys), a zapełniana część to też obrys w kolorze motywu. Zamiast zygzaku jest kółko lub pasek z kręcącym się, przesuwającym się elementem z cienkich linii. Po wyłączeniu wraca stary wygląd.</string>
     <string name="control_style_thin">Cienkie suwaki, przełączniki, pola wyboru i przyciski wyboru (jak w iPhonie)</string>
     <string name="control_style_thin_summary">Suwaki, przełączniki i pola wyboru w całej aplikacji są rysowane tylko jako cienkie obrysy z zaokrąglonymi końcami, bez wypełnienia: pusty tor z kolorowym obrysem do wartości, kółko z samym obrysem zamiast gałki, przełącznik z obrysu z przesuwającym się kółkiem oraz kwadrat z obrysu z cienkim haczykiem. Okrągłe przyciski wyboru, chipy wyboru i przyciski segmentowe też są obrysami: szare, gdy wyłączone, a wybrane w kolorze motywu z delikatnym tłem. Po wyłączeniu wraca stary wygląd.</string>
-    <string name="button_style_glass">Szklane przyciski</string>
-    <string name="button_style_glass_summary">Wypełnione (kolorowe) przyciski wyglądają jak szkło: jaśniejsze u góry, ciemniejsze na dole, z delikatnym połyskiem na górnej połowie i cienką jasną obwódką. Po wyłączeniu wracają zwykłe przyciski.</string>
+    <string name="button_style_glass">Pełne szkło</string>
     <string name="element_group_dialogs">Okna dialogowe</string>
     <string name="data_logs_title">Dane, logi i diagnostyka</string>
     <string name="data_logs_summary">Zbieranie i przechowywanie logów, miejsce danych aplikacji, archiwum wiadomości i test powiadomień.</string>
@@ -4253,4 +4252,10 @@
     <string name="look_restore_done">Wygląd przywrócony.</string>
     <string name="look_backup_title">Zapis i przywracanie wyglądu</string>
     <string name="look_backup_summary">Zapisuje do pliku tylko wygląd aplikacji, żeby można było do niego wrócić albo przenieść go na inne urządzenie. Plik działa na Androidzie, komputerze i iPhone/iPad.</string>
+    <string name="button_style">Przyciski</string>
+    <string name="button_style_summary">Wygląd przycisków. Obrys i szkło (domyślnie): cienki obrys na przezroczystej szybie; działający przycisk ma delikatną poświatę w kolorze motywu, wyłączony jest szary. Pełne szkło: kolorowe, błyszczące przyciski, jaśniejsze u góry i ciemniejsze na dole. Klasyczne: zwykłe przyciski. Gradient poniżej (miękkie wrażenie 3D) działa z każdym z nich.</string>
+    <string name="button_style_classic">Klasyczne (zwykłe)</string>
+    <string name="button_style_outline_glass">Obrys i szkło</string>
+    <string name="button_glow">Poświata działających przycisków</string>
+    <string name="button_outline">Grubość obrysu przycisków</string>
 </resources>

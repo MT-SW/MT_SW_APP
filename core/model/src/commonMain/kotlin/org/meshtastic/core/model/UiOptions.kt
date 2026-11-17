@@ -119,10 +119,23 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CONTROL_STYLE_CLASSIC = 0
         const val CONTROL_STYLE_THIN = 1
 
-        /** How the filled buttons look: the plain Material ones or glossy glass. */
+        /**
+         * How the buttons look: [BUTTON_STYLE_CLASSIC] (the plain Material ones), [BUTTON_STYLE_GLASS] (filled glossy
+         * glass) or [BUTTON_STYLE_OUTLINE_GLASS] (the default: a thin outline on a clear glass pane; a working button
+         * has a soft glow in the colour of the theme, a switched-off one is grey).
+         */
         const val BUTTON_STYLE = "buttons.style"
         const val BUTTON_STYLE_CLASSIC = 0
         const val BUTTON_STYLE_GLASS = 1
+        const val BUTTON_STYLE_OUTLINE_GLASS = 2
+
+        /** The strength of the glow of a working outline-glass button: an index into [BUTTON_GLOW_SHARE] (0 = none). */
+        const val BUTTON_GLOW = "buttons.glow"
+        val BUTTON_GLOW_SHARE = floatArrayOf(0f, 0.5f, 1f, 1.6f)
+
+        /** The thickness of the outline of an outline-glass button: an index into [BUTTON_OUTLINE_DP]. */
+        const val BUTTON_OUTLINE = "buttons.outline"
+        val BUTTON_OUTLINE_DP = floatArrayOf(1f, 1.5f, 2f, 3f)
 
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
@@ -216,7 +229,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
             put(CONTROL_STYLE, CONTROL_STYLE_THIN)
-            put(BUTTON_STYLE, BUTTON_STYLE_GLASS)
+            put(BUTTON_STYLE, BUTTON_STYLE_OUTLINE_GLASS)
+            put(BUTTON_GLOW, 2)
+            put(BUTTON_OUTLINE, 1)
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)

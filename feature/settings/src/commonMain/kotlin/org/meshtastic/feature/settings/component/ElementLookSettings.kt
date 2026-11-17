@@ -42,7 +42,12 @@ import org.meshtastic.core.resources.button_gradient_off
 import org.meshtastic.core.resources.button_gradient_strong
 import org.meshtastic.core.resources.button_gradient_weak
 import org.meshtastic.core.resources.button_style_glass
-import org.meshtastic.core.resources.button_style_glass_summary
+import org.meshtastic.core.resources.button_glow
+import org.meshtastic.core.resources.button_outline
+import org.meshtastic.core.resources.button_style
+import org.meshtastic.core.resources.button_style_classic
+import org.meshtastic.core.resources.button_style_outline_glass
+import org.meshtastic.core.resources.button_style_summary
 import org.meshtastic.core.resources.control_style_thin
 import org.meshtastic.core.resources.control_style_thin_summary
 import org.meshtastic.core.resources.dialog_see_through
@@ -234,18 +239,18 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
             )
         },
     )
-    SwitchListItem(
-        text = stringResource(Res.string.button_style_glass),
-        supportingText = stringResource(Res.string.button_style_glass_summary),
-        leadingIcon = MeshtasticIcons.DisplaySettings,
-        checked = options[UiOptions.BUTTON_STYLE] == UiOptions.BUTTON_STYLE_GLASS,
-        onClick = {
-            val glass = options[UiOptions.BUTTON_STYLE] == UiOptions.BUTTON_STYLE_GLASS
-            onChange(
-                UiOptions.BUTTON_STYLE,
-                if (glass) UiOptions.BUTTON_STYLE_CLASSIC else UiOptions.BUTTON_STYLE_GLASS,
-            )
-        },
+    DropDownPreference(
+        title = stringResource(Res.string.button_style),
+        enabled = true,
+        items =
+        listOf(
+            UiOptions.BUTTON_STYLE_OUTLINE_GLASS to stringResource(Res.string.button_style_outline_glass),
+            UiOptions.BUTTON_STYLE_GLASS to stringResource(Res.string.button_style_glass),
+            UiOptions.BUTTON_STYLE_CLASSIC to stringResource(Res.string.button_style_classic),
+        ),
+        selectedItem = options[UiOptions.BUTTON_STYLE],
+        onItemSelected = { onChange(UiOptions.BUTTON_STYLE, it) },
+        summary = stringResource(Res.string.button_style_summary),
     )
     ChartStyleSettings(options, onChange)
 }
@@ -487,7 +492,7 @@ private val LOOK_PRESETS =
                 UiOptions.ICON_STYLE to UiOptions.ICON_STYLE_OUTLINE,
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_THIN,
                 UiOptions.CONTROL_STYLE to UiOptions.CONTROL_STYLE_THIN,
-                UiOptions.BUTTON_STYLE to UiOptions.BUTTON_STYLE_GLASS,
+                UiOptions.BUTTON_STYLE to UiOptions.BUTTON_STYLE_OUTLINE_GLASS,
                 UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS,
                 UiOptions.PRESS_SPRING to 1,
             ) +
@@ -587,6 +592,26 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.RIM],
         onValueChange = { onChange(UiOptions.RIM, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.button_glow),
+        enabled = true,
+        items =
+        listOf(
+            0 to stringResource(Res.string.button_gradient_off),
+            1 to stringResource(Res.string.button_gradient_weak),
+            2 to stringResource(Res.string.button_gradient_normal),
+            3 to stringResource(Res.string.button_gradient_strong),
+        ),
+        selectedValue = options[UiOptions.BUTTON_GLOW],
+        onValueChange = { onChange(UiOptions.BUTTON_GLOW, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.button_outline),
+        enabled = true,
+        items = UiOptions.BUTTON_OUTLINE_DP.indices.map { it to "${UiOptions.BUTTON_OUTLINE_DP[it]} dp" },
+        selectedValue = options[UiOptions.BUTTON_OUTLINE],
+        onValueChange = { onChange(UiOptions.BUTTON_OUTLINE, it) },
     )
     SliderPreference(
         title = stringResource(Res.string.button_gradient),

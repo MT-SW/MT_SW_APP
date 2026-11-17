@@ -729,13 +729,18 @@
     <string name="bottom_nav_settings">Settings</string>
     <string name="busy_noise_floor">Busy floor</string>
     <!-- BUTTON -->
+    <string name="button_glow">Glow of working buttons</string>
     <string name="button_gradient">Gradient on the buttons</string>
     <string name="button_gradient_normal">Normal</string>
     <string name="button_gradient_off">Off</string>
     <string name="button_gradient_strong">Strong</string>
     <string name="button_gradient_weak">Delicate</string>
-    <string name="button_style_glass">Glass buttons</string>
-    <string name="button_style_glass_summary">The filled buttons (the coloured ones) look like glass: lighter at the top and darker at the bottom, with a soft gloss on the upper half and a thin light rim. Off brings back the plain buttons.</string>
+    <string name="button_outline">Thickness of the button outline</string>
+    <string name="button_style">Buttons</string>
+    <string name="button_style_classic">Classic (plain)</string>
+    <string name="button_style_glass">Filled glass</string>
+    <string name="button_style_outline_glass">Outline and glass</string>
+    <string name="button_style_summary">How the buttons look. Outline and glass (default): a thin outline on a clear glass pane; a working button has a soft glow in the colour of the theme, a switched-off one is grey. Filled glass: coloured glossy buttons, lighter at the top and darker at the bottom. Classic: the plain buttons. The gradient below (a soft 3D feeling) works with all of them.</string>
     <plurals name="cache_limit_eviction_warning">
         <item quantity="one">Lowering this will permanently delete the saved history for %1$d device.</item>
         <item quantity="other">Lowering this will permanently delete the saved history for %1$d devices.</item>

@@ -88,7 +88,6 @@ fun rememberThinControls(): Boolean = rememberUiOptions()[UiOptions.CONTROL_STYL
 
 private const val STROKE_DP = 1.5f
 private const val DISABLED_ALPHA = 0.38f
-private const val EDGE_ALPHA = 0.7f
 private const val SWITCH_ANIMATION_MILLIS = 180
 private const val SWITCH_WIDTH_DP = 52
 private const val SWITCH_HEIGHT_DP = 30
@@ -135,7 +134,7 @@ private fun ThinSwitch(
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinSwitch")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
+    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
     val tint = scheme.primary.copy(alpha = ON_TINT_ALPHA * progress * alpha)
     val toggle =
         if (onCheckedChange != null) {
@@ -202,7 +201,7 @@ private fun ThinCheckbox(
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinCheckbox")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
+    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
     val mark = scheme.primary.copy(alpha = progress * alpha)
     val touch =
         if (onCheckedChange != null) {
@@ -289,8 +288,8 @@ private fun ThinSliderTrack(state: SliderState, enabled: Boolean) {
     val span = state.valueRange.endInclusive - state.valueRange.start
     val fraction = if (span > 0f) ((state.value - state.valueRange.start) / span).coerceIn(0f, 1f) else 0f
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val inactive = scheme.outline.copy(alpha = EDGE_ALPHA * alpha)
-    val active = scheme.primary.copy(alpha = alpha)
+    val inactive = thinTrackColor().let { it.copy(alpha = it.alpha * alpha) }
+    val active = thinFillColor(fraction).copy(alpha = alpha)
     Canvas(modifier = Modifier.fillMaxWidth().height(TRACK_HEIGHT_DP.dp)) {
         capsuleOutline(0f, size.width, inactive)
         // The coloured outline grows from the left end up to the middle of the thumb.
@@ -360,7 +359,7 @@ private fun ThinRadioButton(
     val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(scheme.outline.copy(alpha = EDGE_ALPHA), scheme.primary, progress).copy(alpha = alpha)
+    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
     val mark = scheme.primary.copy(alpha = progress * alpha)
     val touch =
         if (onClick != null) {
@@ -384,7 +383,8 @@ private fun ThinRadioButton(
 private fun thinChoiceBorder(selected: Boolean, enabled: Boolean): BorderStroke {
     val scheme = MaterialTheme.colorScheme
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val color = if (selected) scheme.primary.copy(alpha = alpha) else scheme.outline.copy(alpha = EDGE_ALPHA * alpha)
+    val track = thinTrackColor()
+    val color = if (selected) scheme.primary.copy(alpha = alpha) else track.copy(alpha = track.alpha * alpha)
     return BorderStroke(STROKE_DP.dp, color)
 }
 

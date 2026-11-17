@@ -37,6 +37,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -44,6 +45,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -61,7 +64,11 @@ import kotlin.math.sin
 private const val START_ANGLE = -90f
 private const val FULL_CIRCLE = 360f
 private const val HALF_CIRCLE = 180f
-private const val TRACK_ALPHA = 0.28f
+private const val DARK_TRACK_ALPHA = 0.55f
+private const val LIGHT_TRACK_ALPHA = 0.85f
+private const val DARK_THEME_LUMINANCE = 0.5f
+private val LIGHT_THEME_START = Color(0xFF9E9E9E)
+private val DARK_THEME_START = Color(0xFFBDBDBD)
 private const val BAND_SHARE = 0.14f
 private const val LINE_SHARE = 0.028f
 private const val MIN_LINE_DP = 1f
@@ -73,6 +80,31 @@ private const val LINE_STROKE_DP = 2
 private const val LINE_STROKE_DIVISOR = 7f
 private const val LOOP_SHARE = 0.3f
 private const val LOOP_MILLIS = 1400
+
+/**
+ * MT_SW: the empty part (the track) of the thin progress bars, rings and sliders: black on the light theme, light grey
+ * on the dark theme, so it is always clearly visible.
+ */
+@Composable
+@ReadOnlyComposable
+internal fun thinTrackColor(): Color = if (MaterialTheme.colorScheme.surface.luminance() < DARK_THEME_LUMINANCE) {
+    Color.White.copy(alpha = DARK_TRACK_ALPHA)
+} else {
+    Color.Black.copy(alpha = LIGHT_TRACK_ALPHA)
+}
+
+/**
+ * MT_SW: the colour of the filled outline of the thin bars, rings and sliders. A chosen [color] stays as it is;
+ * otherwise it grows from grey to the colour of the theme (yellow in the default theme) as [progress] goes from 0 to 1.
+ */
+@Composable
+@ReadOnlyComposable
+internal fun thinFillColor(progress: Float, color: Color = Color.Unspecified): Color {
+    if (color != Color.Unspecified) return color
+    val dark = MaterialTheme.colorScheme.surface.luminance() < DARK_THEME_LUMINANCE
+    val start = if (dark) DARK_THEME_START else LIGHT_THEME_START
+    return lerp(start, MaterialTheme.colorScheme.primary, progress.coerceIn(0f, 1f))
+}
 
 /** True when the progress indicators are drawn as thin iPhone-style outlines (the "Look" setting). */
 @Composable fun rememberThinRings(): Boolean = rememberUiOptions()[UiOptions.RING_STYLE] == UiOptions.RING_STYLE_THIN
@@ -173,8 +205,8 @@ private fun ClassicProgressRing(
 
 @Composable
 private fun ThinProgressRing(progress: Float, size: Dp, color: Color, modifier: Modifier = Modifier) {
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
-    val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
+    val track = thinTrackColor()
+    val edge = thinFillColor(progress, color)
     Canvas(modifier = modifier.size(size)) {
         val g = bandGeometry()
         drawBandTrack(g, track)
@@ -194,7 +226,7 @@ private fun ThinProgressRing(progress: Float, size: Dp, color: Color, modifier: 
  */
 @Composable
 fun SegmentedProgressRing(segments: List<Pair<Color, Float>>, modifier: Modifier = Modifier, size: Dp = 96.dp) {
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
+    val track = thinTrackColor()
     Canvas(modifier = modifier.size(size)) {
         val g = bandGeometry()
         drawBandTrack(g, track)
@@ -228,7 +260,7 @@ fun ProgressSpinner(modifier: Modifier = Modifier, size: Dp = 48.dp, color: Colo
 
 @Composable
 private fun ThinProgressSpinner(size: Dp, color: Color, modifier: Modifier = Modifier) {
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
+    val track = thinTrackColor()
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     val turn by
         rememberInfiniteTransition(label = "spinner")
@@ -277,8 +309,8 @@ fun ProgressLine(
         )
         return
     }
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
-    val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
+    val track = thinTrackColor()
+    val edge = thinFillColor(progress, color)
     Canvas(modifier = modifier.height(height).fillMaxWidth()) {
         val stroke = (height.toPx() / LINE_STROKE_DIVISOR).coerceIn(MIN_LINE_DP.dp.toPx(), LINE_STROKE_DP.dp.toPx())
         drawLineOutline(track, 0f, size.width, stroke)
@@ -300,7 +332,7 @@ fun IndeterminateProgressLine(modifier: Modifier = Modifier, color: Color = Colo
         LinearWavyProgressIndicator(modifier = modifier)
         return
     }
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
+    val track = thinTrackColor()
     val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
     val slide by
         rememberInfiniteTransition(label = "line")
@@ -331,7 +363,7 @@ fun SegmentedProgressLine(
     fillFraction: Float = 1f,
     height: Dp = LINE_HEIGHT_DP.dp,
 ) {
-    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)
+    val track = thinTrackColor()
     Canvas(modifier = modifier.height(height).fillMaxWidth()) {
         val stroke = (height.toPx() / LINE_STROKE_DIVISOR).coerceIn(MIN_LINE_DP.dp.toPx(), LINE_STROKE_DP.dp.toPx())
         drawLineOutline(track, 0f, size.width, stroke)
