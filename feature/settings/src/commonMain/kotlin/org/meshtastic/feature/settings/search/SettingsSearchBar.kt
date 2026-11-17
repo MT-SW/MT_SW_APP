@@ -39,10 +39,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.navigation.Route
+import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.settings_search_no_results
 import org.meshtastic.core.resources.settings_search_placeholder
 import org.meshtastic.core.ui.component.MeshtasticSearchBar
+import org.meshtastic.core.ui.util.TabRepress
 
 /** Tag for the collapsed settings search field, so a test can target it rather than the expanded overlay's copy. */
 const val SETTINGS_SEARCH_BAR_INPUT_FIELD_TAG = "SettingsSearchBarInputField"
@@ -64,6 +66,11 @@ fun SettingsSearchBar(
     val results by viewModel.results.collectAsStateWithLifecycle()
 
     LaunchedEffect(includeAppLocal) { viewModel.setIncludeAppLocal(includeAppLocal) }
+
+    // The bottom button of the Settings tab, pressed again, clears the search.
+    LaunchedEffect(Unit) {
+        TabRepress.events.collect { tab -> if (tab == TopLevelDestination.Settings) viewModel.setQuery("") }
+    }
 
     MeshtasticSearchBar(
         query = query,

@@ -57,6 +57,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FastScrollSidebar
@@ -69,6 +70,7 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.util.TabRepress
 import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private const val FOLD_MILLIS = 250
@@ -191,6 +193,18 @@ fun NetworkHealthScreen(
                 rememberSaveable(stateSaver = TextFieldValue.Saver) {
                     mutableStateOf(TextFieldValue(uiState.searchText))
                 }
+            // The bottom button of this tab, pressed again, brings the screen back to how it first looked.
+            LaunchedEffect(Unit) {
+                TabRepress.events.collect { tab ->
+                    if (tab == TopLevelDestination.NetworkHealth) {
+                        searchField = TextFieldValue("")
+                        viewModel.setSearchText("")
+                        viewModel.setActiveMetric(NetworkHealthMetric.entries.first())
+                        foldToNow(false)
+                        listState.scrollToItem(0)
+                    }
+                }
+            }
             androidx.compose.material3.OutlinedTextField(
                 value = searchField,
                 onValueChange = {

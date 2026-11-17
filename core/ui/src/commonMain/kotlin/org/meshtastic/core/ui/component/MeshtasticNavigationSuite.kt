@@ -304,6 +304,8 @@ private fun handleNavigation(
             else -> null
         }
     if (destination == TopLevelDestination.Map) MapViewReset.events.tryEmit(Unit)
+    // Every other screen with a search field or a scroll position goes back to its start too.
+    uiViewModel.emitTabRepress(destination, delayed = !wasOnRoot)
     if (event != null) {
         // On the list itself the screen is already there; after going back to it, it has to be built first.
         if (wasOnRoot) uiViewModel.emitScrollToTopEvent(event) else uiViewModel.emitScrollToTopEventDelayed(event)

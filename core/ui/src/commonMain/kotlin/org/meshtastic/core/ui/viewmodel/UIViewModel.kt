@@ -71,6 +71,7 @@ import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.DeepLinkRouter
+import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.repository.FirmwareReleaseRepository
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
@@ -95,6 +96,7 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.import_pending_channels_connect
 import org.meshtastic.core.resources.import_pending_contact_connect
 import org.meshtastic.core.ui.component.ScrollToTopEvent
+import org.meshtastic.core.ui.util.TabRepress
 import org.meshtastic.core.ui.theme.AppFontSettings
 import org.meshtastic.core.ui.theme.AppUiOptions
 import org.meshtastic.core.ui.theme.FontSettings
@@ -294,6 +296,18 @@ class UIViewModel(
 
     fun emitScrollToTopEvent(event: ScrollToTopEvent) {
         _scrollToTopEventFlow.tryEmit(event)
+    }
+
+    /** The button of the already open tab was pressed again; [delayed] when its first screen has to be rebuilt first. */
+    fun emitTabRepress(destination: TopLevelDestination, delayed: Boolean) {
+        if (!delayed) {
+            TabRepress.events.tryEmit(destination)
+            return
+        }
+        viewModelScope.launch {
+            delay(TAB_OPENED_EVENT_DELAY_MS)
+            TabRepress.events.tryEmit(destination)
+        }
     }
 
     /** Same, but after the screen of a tab that was just opened has had time to start listening. */
