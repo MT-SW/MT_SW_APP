@@ -35,6 +35,23 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.radio_count
+import org.meshtastic.core.resources.radio_count_hide
+import org.meshtastic.core.resources.radio_count_show
+import org.meshtastic.core.resources.radio_alert_speed_fast
+import org.meshtastic.core.resources.radio_alert_speed_medium
+import org.meshtastic.core.resources.radio_alert_speed_slow
+import org.meshtastic.core.resources.radio_alert_speed
+import org.meshtastic.core.resources.radio_alert_color_red
+import org.meshtastic.core.resources.radio_alert_color_amber
+import org.meshtastic.core.resources.radio_alert_color_theme
+import org.meshtastic.core.resources.radio_alert_color_purple
+import org.meshtastic.core.resources.radio_alert_color_white
+import org.meshtastic.core.resources.radio_alert_color
+import org.meshtastic.core.resources.radio_alert_pulse
+import org.meshtastic.core.resources.radio_alert_digit
+import org.meshtastic.core.resources.radio_alert_off
+import org.meshtastic.core.resources.radio_alert
 import org.meshtastic.core.resources.backup_look
 import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_gradient_normal
@@ -337,6 +354,62 @@ fun ElementAdvancedSettings(options: UiOptions, onChange: (String, Int) -> Unit)
         )
         GlassDetailSettings(options, onChange)
     }
+}
+
+/** How the radio chooser of the top bar tells that a radio dropped: the way, the colour, the speed, the number. */
+@Composable
+fun RadioChooserSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
+    DropDownPreference(
+        title = stringResource(Res.string.radio_alert),
+        enabled = true,
+        items =
+        listOf(
+            UiOptions.RADIO_ALERT_OFF to stringResource(Res.string.radio_alert_off),
+            UiOptions.RADIO_ALERT_DIGIT to stringResource(Res.string.radio_alert_digit),
+            UiOptions.RADIO_ALERT_PULSE to stringResource(Res.string.radio_alert_pulse),
+        ),
+        selectedItem = options[UiOptions.RADIO_ALERT],
+        onItemSelected = { onChange(UiOptions.RADIO_ALERT, it) },
+    )
+    if (options[UiOptions.RADIO_ALERT] == UiOptions.RADIO_ALERT_PULSE) {
+        DropDownPreference(
+            title = stringResource(Res.string.radio_alert_color),
+            enabled = true,
+            items =
+            listOf(
+                0 to stringResource(Res.string.radio_alert_color_white),
+                1 to stringResource(Res.string.radio_alert_color_purple),
+                2 to stringResource(Res.string.radio_alert_color_theme),
+                3 to stringResource(Res.string.radio_alert_color_amber),
+                4 to stringResource(Res.string.radio_alert_color_red),
+            ),
+            selectedItem = options[UiOptions.RADIO_ALERT_COLOR],
+            onItemSelected = { onChange(UiOptions.RADIO_ALERT_COLOR, it) },
+        )
+        DropDownPreference(
+            title = stringResource(Res.string.radio_alert_speed),
+            enabled = true,
+            items =
+            listOf(
+                0 to stringResource(Res.string.radio_alert_speed_slow),
+                1 to stringResource(Res.string.radio_alert_speed_medium),
+                2 to stringResource(Res.string.radio_alert_speed_fast),
+            ),
+            selectedItem = options[UiOptions.RADIO_ALERT_SPEED],
+            onItemSelected = { onChange(UiOptions.RADIO_ALERT_SPEED, it) },
+        )
+    }
+    DropDownPreference(
+        title = stringResource(Res.string.radio_count),
+        enabled = true,
+        items =
+        listOf(
+            1 to stringResource(Res.string.radio_count_show),
+            0 to stringResource(Res.string.radio_count_hide),
+        ),
+        selectedItem = options[UiOptions.RADIO_COUNT],
+        onItemSelected = { onChange(UiOptions.RADIO_COUNT, it) },
+    )
 }
 
 /** The look, the strength and (for glass) the blur of one group of elements. */

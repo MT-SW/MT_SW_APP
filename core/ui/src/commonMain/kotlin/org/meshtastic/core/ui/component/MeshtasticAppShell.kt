@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.noiseFloorOrNull
@@ -48,6 +49,7 @@ import org.meshtastic.core.ui.util.LocalMeshActivity
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNodePresence
 import org.meshtastic.core.ui.util.LocalNoiseFloor
+import org.meshtastic.core.ui.viewmodel.RadioChooserViewModel
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.proto.Config
 
@@ -130,8 +132,22 @@ fun MeshtasticAppShell(
     val sosController = koinInject<SosController>()
     val ourNode by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
     val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
+    // The saved radios (up to three) and what the chooser of the top bar can do with them.
+    val radioChooser = koinViewModel<RadioChooserViewModel>()
+    val radioChooserState by radioChooser.state.collectAsStateWithLifecycle()
+    val radioActions =
+        remember(radioChooserState, radioChooser, uiViewModel) {
+            RadioChooserActions(
+                state = radioChooserState,
+                onChoose = radioChooser::choose,
+                onDisconnect = radioChooser::disconnect,
+                onRemove = radioChooser::remove,
+                onSeen = radioChooser::acknowledgeDrop,
+                onAdd = { uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/connections")) },
+            )
+        }
     val appBarExtras =
-        remember(ourNode, connectionState, sosScreens, sosConfig.barHoldSeconds, uiViewModel) {
+        remember(ourNode, connectionState, sosScreens, sosConfig.barHoldSeconds, uiViewModel, radioActions) {
             AppBarExtras(
                 ourNode = ourNode,
                 connected = connectionState is ConnectionState.Connected,
@@ -143,6 +159,7 @@ fun MeshtasticAppShell(
                     uiViewModel.handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/sos"))
                 },
                 sosHoldSeconds = sosConfig.barHoldSeconds,
+                radios = radioActions,
             )
         }
 

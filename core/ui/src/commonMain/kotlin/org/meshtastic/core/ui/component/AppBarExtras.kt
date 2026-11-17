@@ -87,6 +87,8 @@ data class AppBarExtras(
     /** Sends the alarm; the SOS button of the bars calls it after being held for [sosHoldSeconds]. Null: no sending. */
     val onSendSos: (() -> Unit)? = null,
     val sosHoldSeconds: Int = SosConfig.BAR_MIN_HOLD_SECONDS,
+    /** The radio chooser shown before the plate of our node; empty when no radio is saved. */
+    val radios: RadioChooserActions = RadioChooserActions(),
 )
 
 @Suppress("CompositionLocalAllowlist")

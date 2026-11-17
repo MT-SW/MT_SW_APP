@@ -192,6 +192,7 @@ private fun TopBarActions(
             onHoldComplete = extras.onSendSos,
         )
     }
+    RadioChooserButton(actions = extras.radios)
     AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
         chipNode?.let { node ->
             NodeChip(modifier = Modifier.padding(horizontal = 16.dp), node = node, onClick = onClickChip)

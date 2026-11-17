@@ -41,8 +41,10 @@ import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.background_keepalive_title
-import org.meshtastic.core.resources.button_gradient
+import org.meshtastic.core.resources.backup_app_settings
+import org.meshtastic.core.resources.backup_look
 import org.meshtastic.core.resources.button_glow
+import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_outline
 import org.meshtastic.core.resources.button_style
 import org.meshtastic.core.resources.chart_style
@@ -78,12 +80,8 @@ import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.log_retention_days
-import org.meshtastic.core.resources.backup_app_settings
-import org.meshtastic.core.resources.backup_look
 import org.meshtastic.core.resources.look_backup_title
 import org.meshtastic.core.resources.look_presets_title
-import org.meshtastic.core.resources.restore_app_settings
-import org.meshtastic.core.resources.restore_look
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.nav_bar_haptics
@@ -107,7 +105,14 @@ import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.radio_alert
+import org.meshtastic.core.resources.radio_alert_color
+import org.meshtastic.core.resources.radio_alert_speed
+import org.meshtastic.core.resources.radio_chooser_settings
+import org.meshtastic.core.resources.radio_count
 import org.meshtastic.core.resources.report_issues_title
+import org.meshtastic.core.resources.restore_app_settings
+import org.meshtastic.core.resources.restore_look
 import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.single_instance_title
 import org.meshtastic.core.resources.skip_bad_time_chart_points
@@ -301,6 +306,11 @@ object SettingsSearchCatalog {
             Res.string.button_style to SettingsRoute.ElementLook,
             Res.string.button_glow to SettingsRoute.ElementLook,
             Res.string.button_outline to SettingsRoute.ElementLook,
+            Res.string.radio_alert to SettingsRoute.ElementLook,
+            Res.string.radio_alert_color to SettingsRoute.ElementLook,
+            Res.string.radio_alert_speed to SettingsRoute.ElementLook,
+            Res.string.radio_count to SettingsRoute.ElementLook,
+            Res.string.radio_chooser_settings to SettingsRoute.ElementLook,
             Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.chart_style_health to SettingsRoute.ElementLook,
             Res.string.chart_style_node to SettingsRoute.ElementLook,

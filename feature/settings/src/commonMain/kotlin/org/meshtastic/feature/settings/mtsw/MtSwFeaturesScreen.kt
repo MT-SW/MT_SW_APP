@@ -47,6 +47,7 @@ import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
@@ -187,6 +188,7 @@ import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
+import org.meshtastic.feature.settings.component.RadioChooserSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
 import org.meshtastic.feature.settings.component.PresenceManualAsk
 import org.meshtastic.feature.settings.component.PresenceSettings
@@ -671,6 +673,9 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                     onClick = { settingsViewModel.setFloatingNavBar(!floatingNavBar) },
                 )
                 NavBarBehaviourSettings(options = options, onChange = onChange)
+            }
+            ExpressiveSection(title = stringResource(Res.string.radio_chooser_settings)) {
+                RadioChooserSettings(options = options, onChange = onChange)
             }
             ExpressiveSection(title = stringResource(Res.string.look_advanced)) {
                 ElementAdvancedSettings(options = options, onChange = onChange)
