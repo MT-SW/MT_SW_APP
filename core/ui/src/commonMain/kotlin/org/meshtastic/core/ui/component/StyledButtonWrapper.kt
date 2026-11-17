@@ -205,6 +205,27 @@ internal fun rememberDecorFor(
     }
 }
 
+/**
+ * The outline-glass look for an outlined button: its outline takes the colour of the button's own text (the theme
+ * colour, or red for a dangerous action) and glows while it works. In the other styles it stays as it was.
+ */
+@Composable
+private fun rememberOutlinedDecor(colors: ButtonColors, enabled: Boolean): FilledDecor {
+    val options = rememberUiOptions()
+    if (options[UiOptions.BUTTON_STYLE] != UiOptions.BUTTON_STYLE_OUTLINE_GLASS) return FilledDecor()
+    val scheme = MaterialTheme.colorScheme
+    val accent = colors.contentColor.takeIf { it.isSpecified && it.alpha > 0f } ?: scheme.primary
+    return rememberDecorFor(container = accent, disabledContainer = scheme.onSurface, enabled = enabled, tonal = false)
+}
+
+/** An outlined button that draws its own outline and glass: clear container, text in the colour of the outline. */
+private fun ButtonColors.outlinedColors(decor: FilledDecor): ButtonColors = copy(
+    containerColor = Color.Transparent,
+    disabledContainerColor = Color.Transparent,
+    contentColor = decor.outline?.text ?: contentColor,
+    disabledContentColor = decor.outline?.disabledText ?: disabledContentColor,
+)
+
 /** The colours of a filled button: clear when the button draws its own surface, otherwise the styled colour. */
 private fun ButtonColors.filledColors(styled: Color, decor: FilledDecor): ButtonColors = when {
     decor.outline != null ->
@@ -428,20 +449,31 @@ fun OutlinedButton(
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
+    val decor = rememberOutlinedDecor(colors, enabled)
     // The plain outlined button has no fill; with a look it gets a pane of the surface colour, so the shadow, the
     // glass and the rim have something to be drawn on.
     val fill = buttonLook(group, MaterialTheme.colorScheme.surfaceContainerHigh, colors.containerColor)
-    WithoutTouchBox(!flat) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialOutlinedButton(
             onClick = onClick,
-            modifier = modifier.buttonStyle(group, shape),
+            modifier =
+            if (decor.custom) {
+                modifier.outlineGlassSurface(shape, decor)
+            } else {
+                modifier.buttonStyle(group, shape)
+            },
             enabled = enabled,
             shape = shape,
             colors =
-            if (look == ElementLook.FLAT) colors else remember(colors, fill) { colors.copy(containerColor = fill) },
+            when {
+                decor.custom -> remember(colors, decor) { colors.outlinedColors(decor) }
+                look == ElementLook.FLAT -> colors
+                else -> remember(colors, fill) { colors.copy(containerColor = fill) }
+            },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat) elevation else null,
-            border = border,
+            elevation = if (flat && !decor.custom) elevation else null,
+            // The outline-glass look draws its own outline.
+            border = if (decor.custom) null else border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
             content = content,
@@ -536,22 +568,29 @@ fun OutlinedButton(
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
     val look = rememberUiOptions().element(group).look
+    val decor = rememberOutlinedDecor(colors, enabled)
     val styled = buttonLook(group, MaterialTheme.colorScheme.surfaceContainerHigh, colors.containerColor)
-    WithoutTouchBox(!flat) {
+    WithoutTouchBox(!flat || decor.custom) {
         MaterialOutlinedButton(
             onClick = onClick,
             shapes = shapes,
-            modifier = modifier.buttonStyle(group, shapes.shape),
+            modifier =
+            if (decor.custom) {
+                modifier.outlineGlassSurface(shapes.shape, decor)
+            } else {
+                modifier.buttonStyle(group, shapes.shape)
+            },
             enabled = enabled,
             colors =
-            if (look == ElementLook.FLAT) {
-                colors
-            } else {
-                remember(colors, styled) { colors.copy(containerColor = styled) }
+            when {
+                decor.custom -> remember(colors, decor) { colors.outlinedColors(decor) }
+                look == ElementLook.FLAT -> colors
+                else -> remember(colors, styled) { colors.copy(containerColor = styled) }
             },
             // No shadow under a button in the glass and depth looks (it looked like a shifted plate).
-            elevation = if (flat) elevation else null,
-            border = border,
+            elevation = if (flat && !decor.custom) elevation else null,
+            // The outline-glass look draws its own outline.
+            border = if (decor.custom) null else border,
             contentPadding = contentPadding,
             interactionSource = interactionSource,
             content = content,
