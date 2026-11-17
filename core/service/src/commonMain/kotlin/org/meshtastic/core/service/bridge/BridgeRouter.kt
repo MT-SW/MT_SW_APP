@@ -80,7 +80,7 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
             configComplete = false
         }
         if (!configComplete) {
-            if (frame.config_complete_id != 0) {
+            if ((frame.config_complete_id ?: 0) != 0) {
                 configComplete = true
                 return waiting.keys.toList().filter { it in clients }.flatMap { replay(it, waiting.getValue(it)) }
                     .also { waiting.clear() }
