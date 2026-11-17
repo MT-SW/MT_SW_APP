@@ -47,6 +47,7 @@ import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
@@ -252,6 +253,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 )
                 AppUpdateSettings()
             }
+
+            ExpressiveSection(title = stringResource(Res.string.radio_bridge_title)) { RadioBridgeSettings() }
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_group_look)) {
                 ListItem(

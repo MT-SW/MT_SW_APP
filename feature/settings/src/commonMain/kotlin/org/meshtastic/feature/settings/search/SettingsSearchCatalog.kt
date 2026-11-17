@@ -105,6 +105,14 @@ import org.meshtastic.core.resources.presence_more_title
 import org.meshtastic.core.resources.presence_show
 import org.meshtastic.core.resources.presence_title
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.radio_bridge_title
+import org.meshtastic.core.resources.radio_bridge_enabled
+import org.meshtastic.core.resources.radio_bridge_port
+import org.meshtastic.core.resources.radio_bridge_lan
+import org.meshtastic.core.resources.radio_bridge_max_clients
+import org.meshtastic.core.resources.radio_bridge_read_only
+import org.meshtastic.core.resources.radio_bridge_block_admin
+import org.meshtastic.core.resources.radio_bridge_block_messages
 import org.meshtastic.core.resources.radio_alert
 import org.meshtastic.core.resources.radio_alert_color
 import org.meshtastic.core.resources.radio_alert_speed
@@ -259,6 +267,14 @@ object SettingsSearchCatalog {
     private val appSettings: List<Pair<StringResource, Route>> =
         listOf(
             Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_title to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_enabled to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_port to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_lan to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_max_clients to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_read_only to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_block_admin to SettingsRoute.MtSwFeatures,
+            Res.string.radio_bridge_block_messages to SettingsRoute.MtSwFeatures,
             Res.string.antenna_calc_title to SettingsRoute.AntennaCalculator,
             Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,

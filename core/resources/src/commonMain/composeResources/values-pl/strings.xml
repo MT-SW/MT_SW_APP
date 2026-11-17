@@ -4288,4 +4288,16 @@
     <string name="radio_chooser_settings">Wybór radia w górnym pasku</string>
     <string name="radio_count_show">Pokazuj</string>
     <string name="radio_count_hide">Ukrywaj</string>
+    <string name="radio_bridge_title">Mostek TCP radia</string>
+    <string name="radio_bridge_enabled">Włącz mostek</string>
+    <string name="radio_bridge_no_radio">Najpierw zapisz radio w górnym pasku.</string>
+    <string name="radio_bridge_radio">Radio: %1$s</string>
+    <string name="radio_bridge_address">Adres mostka: %1$s, port %2$d</string>
+    <string name="radio_bridge_port">Port</string>
+    <string name="radio_bridge_port_summary">0 oznacza port domyślny tego radia (%1$d)</string>
+    <string name="radio_bridge_lan">Dostęp z sieci lokalnej (domyślnie tylko to urządzenie)</string>
+    <string name="radio_bridge_max_clients">Najwięcej podłączonych programów</string>
+    <string name="radio_bridge_read_only">Tylko odczyt (nic nie trafia do radia)</string>
+    <string name="radio_bridge_block_admin">Blokuj zdalne administrowanie</string>
+    <string name="radio_bridge_block_messages">Blokuj wysyłanie wiadomości</string>
 </resources>
