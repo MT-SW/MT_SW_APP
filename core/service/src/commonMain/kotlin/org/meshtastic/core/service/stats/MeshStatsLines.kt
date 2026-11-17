@@ -219,8 +219,10 @@ object MeshStatsLines {
                     ),
                 )
             }
+            // Flash and PSRAM share one line ("Flash: 3% | PSRAM: 5%"), so the widget needs fewer rows.
+            val memories = mutableListOf<String>()
             if (ext.flashTotalBytes > 0) {
-                add(
+                memories.add(
                     getStringSuspend(
                         Res.string.live_update_flash,
                         MetricFormatter.usedPercent(ext.flashUsedBytes.toLong(), ext.flashTotalBytes.toLong()),
@@ -229,13 +231,14 @@ object MeshStatsLines {
             }
             if (ext.memoryPsramTotal > 0) {
                 val used = (ext.memoryPsramTotal - ext.memoryPsramFree).toLong()
-                add(
+                memories.add(
                     getStringSuspend(
                         Res.string.live_update_psram,
                         MetricFormatter.usedPercent(used, ext.memoryPsramTotal.toLong()),
                     ),
                 )
             }
+            if (memories.isNotEmpty()) add(memories.joinToString(" | "))
         }
     }
 
