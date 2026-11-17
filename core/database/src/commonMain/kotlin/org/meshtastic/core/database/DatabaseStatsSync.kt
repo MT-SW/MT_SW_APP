@@ -25,8 +25,9 @@ import org.meshtastic.core.database.entity.NodeEntity
  * same node (heard by two radios) has its own telemetry history in each. Only nodes present in BOTH databases are
  * touched: a node known to one database only is never copied to the other.
  *
- * For such a node the newer node row (by last heard) refreshes the older one's telemetry, position and signal, while
- * what the user wrote (notes, name, favourite, ignore, mute) stays as it was in each database. The history of
+ * For such a node the newer node row (by last heard) refreshes the older one's telemetry, position and identity, while
+ * the reception data of each radio (signal, hops, channel, route, last heard) and what the user wrote (notes, name,
+ * favourite, ignore, mute) stay as they were in each database. The history of
  * telemetry, position and similar packets of the node is completed in both directions, without duplicates (a packet
  * heard by both radios counts once).
  */
@@ -47,9 +48,10 @@ object DatabaseStatsSync {
         for (num in common) {
             val na = nodesA.getValue(num)
             val nb = nodesB.getValue(num)
+            // Only a row that really changes is written, so a repeated sync does not rewrite the same nodes again.
             when {
-                na.lastHeard > nb.lastHeard -> toB.add(refreshed(older = nb, newer = na))
-                nb.lastHeard > na.lastHeard -> toA.add(refreshed(older = na, newer = nb))
+                na.lastHeard > nb.lastHeard -> refreshed(older = nb, newer = na).takeIf { it != nb }?.let(toB::add)
+                nb.lastHeard > na.lastHeard -> refreshed(older = na, newer = nb).takeIf { it != na }?.let(toA::add)
             }
         }
         if (toA.isNotEmpty()) a.nodeInfoDao().putAll(toA)
@@ -76,13 +78,26 @@ object DatabaseStatsSync {
         return if (id != 0) "${log.fromNum}|${log.portNum}|$id" else log.uuid
     }
 
-    private fun refreshed(older: NodeEntity, newer: NodeEntity): NodeEntity = newer.copy(
-        notes = older.notes,
-        displayName = older.displayName,
-        isFavorite = older.isFavorite,
-        isIgnored = older.isIgnored,
-        isMuted = older.isMuted,
-        manuallyVerified = older.manuallyVerified,
-        powerChannelLabels = older.powerChannelLabels,
+    /**
+     * The older row with the newer one's telemetry, position and identity. What belongs to how THIS radio heard the
+     * node (signal, hops, channel, route, when it was heard) and what the user wrote in this database stays as it was,
+     * so a radio keeps its own reception data exactly as the original app records it.
+     */
+    private fun refreshed(older: NodeEntity, newer: NodeEntity): NodeEntity = older.copy(
+        user = newer.user,
+        longName = newer.longName,
+        shortName = newer.shortName,
+        position = newer.position,
+        latitude = newer.latitude,
+        longitude = newer.longitude,
+        deviceTelemetry = newer.deviceTelemetry,
+        environmentTelemetry = newer.environmentTelemetry,
+        powerTelemetry = newer.powerTelemetry,
+        airQualityTelemetry = newer.airQualityTelemetry,
+        soilWaterTelemetry = newer.soilWaterTelemetry,
+        paxcounter = newer.paxcounter,
+        publicKey = newer.publicKey,
+        nodeStatus = newer.nodeStatus,
+        signsPackets = newer.signsPackets,
     )
 }
