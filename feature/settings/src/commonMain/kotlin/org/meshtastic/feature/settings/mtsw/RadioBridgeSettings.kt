@@ -39,8 +39,12 @@ import org.meshtastic.core.resources.radio_bridge_read_only
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditTextPreference
 import org.meshtastic.core.ui.component.SwitchListItem
-import org.meshtastic.core.ui.icon.Language
+import org.meshtastic.core.ui.icon.AdminPanelSettings
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Message
+import org.meshtastic.core.ui.icon.Share
+import org.meshtastic.core.ui.icon.Udp
+import org.meshtastic.core.ui.icon.Visibility
 
 /**
  * The settings of the TCP bridge of the chosen radio. Everything is off by default; the restrictions only limit what
@@ -58,7 +62,7 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
     Text(stringResource(Res.string.radio_bridge_radio, state.name.orEmpty()))
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_enabled),
-        leadingIcon = MeshtasticIcons.Language,
+        leadingIcon = MeshtasticIcons.Share,
         checked = config.enabled,
         onClick = { viewModel.update { it.copy(enabled = !it.enabled) } },
     )
@@ -78,7 +82,7 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_lan),
-        leadingIcon = MeshtasticIcons.Language,
+        leadingIcon = MeshtasticIcons.Udp,
         checked = config.lanAccess,
         onClick = { viewModel.update { it.copy(lanAccess = !it.lanAccess) } },
     )
@@ -91,19 +95,19 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_read_only),
-        leadingIcon = MeshtasticIcons.Language,
+        leadingIcon = MeshtasticIcons.Visibility,
         checked = config.readOnly,
         onClick = { viewModel.update { it.copy(readOnly = !it.readOnly) } },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_block_admin),
-        leadingIcon = MeshtasticIcons.Language,
+        leadingIcon = MeshtasticIcons.AdminPanelSettings,
         checked = config.blockAdmin,
         onClick = { viewModel.update { it.copy(blockAdmin = !it.blockAdmin) } },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_block_messages),
-        leadingIcon = MeshtasticIcons.Language,
+        leadingIcon = MeshtasticIcons.Message,
         checked = config.blockMessages,
         onClick = { viewModel.update { it.copy(blockMessages = !it.blockMessages) } },
     )

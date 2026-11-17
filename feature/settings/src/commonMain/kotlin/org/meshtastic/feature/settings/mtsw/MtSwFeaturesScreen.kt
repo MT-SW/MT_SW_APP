@@ -161,6 +161,7 @@ import org.meshtastic.core.ui.component.WhatsNewDialog
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
+import org.meshtastic.core.ui.icon.AutoAwesome
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
@@ -173,8 +174,10 @@ import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
+import org.meshtastic.core.ui.icon.MeshRadio
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
+import org.meshtastic.core.ui.icon.Serial
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.Upload
 import org.meshtastic.core.ui.icon.Warning
@@ -275,14 +278,14 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ListItem(
                     text = stringResource(Res.string.connection_center_title),
                     supportingText = stringResource(Res.string.connection_center_summary),
-                    leadingIcon = MeshtasticIcons.Language,
+                    leadingIcon = MeshtasticIcons.MeshRadio,
                 ) {
                     onNavigate(SettingsRoute.ConnectionCenter)
                 }
                 ListItem(
                     text = stringResource(Res.string.smart_features_title),
                     supportingText = stringResource(Res.string.smart_features_summary),
-                    leadingIcon = MeshtasticIcons.Language,
+                    leadingIcon = MeshtasticIcons.AutoAwesome,
                 ) {
                     onNavigate(SettingsRoute.SmartFeatures)
                 }
@@ -417,7 +420,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ListItem(text = stringResource(Res.string.debug_panel), leadingIcon = MeshtasticIcons.BugReport) {
                     onNavigate(SettingsRoute.DebugPanel)
                 }
-                ListItem(text = stringResource(Res.string.console_title), leadingIcon = MeshtasticIcons.Language) {
+                ListItem(text = stringResource(Res.string.console_title), leadingIcon = MeshtasticIcons.Serial) {
                     onNavigate(SettingsRoute.Console)
                 }
                 // Our backups sit in the radio settings; the row is shown there and marked.

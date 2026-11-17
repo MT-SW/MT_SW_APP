@@ -45,8 +45,8 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
-import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Serial
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.RadioChooserSettings
@@ -92,7 +92,7 @@ fun ConnectionCenterScreen(settingsViewModel: SettingsViewModel, onBack: () -> U
                 ListItem(
                     text = stringResource(Res.string.console_title),
                     supportingText = stringResource(Res.string.console_summary),
-                    leadingIcon = MeshtasticIcons.Language,
+                    leadingIcon = MeshtasticIcons.Serial,
                 ) {
                     onNavigate(SettingsRoute.Console)
                 }

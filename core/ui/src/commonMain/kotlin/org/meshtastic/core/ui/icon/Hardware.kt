@@ -19,6 +19,7 @@ package org.meshtastic.core.ui.icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ic_auto_awesome
 import org.meshtastic.core.resources.ic_bluetooth
 import org.meshtastic.core.resources.ic_bluetooth_connected
 import org.meshtastic.core.resources.ic_bluetooth_searching
@@ -82,3 +83,5 @@ val MeshtasticIcons.DisplaySettings: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_display_settings)
 val MeshtasticIcons.MeshRadio: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_mesh_radio)
+val MeshtasticIcons.AutoAwesome: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_auto_awesome)
