@@ -59,6 +59,7 @@ The offline assistant gets `knowledge/core.md` (core facts about MT_SW: network 
 
 <mtsw_backup_rule>
 Everything the user can keep in the app must be in the backups, on every platform, in the same file format. "Kopia ustawień" (core/prefs `AppSettingsBackupImpl`) saves only the settings; "Kopia danych aplikacji" saves everything (the settings and the radio database, one file, `AppDataBundle`). Whenever you add a new preference store, a new key that belongs to the user, or any other stored data: make sure it is covered by the backup (a new store goes into the `stores` map; a key that belongs to one installation or one radio goes into `EXCLUDED_KEYS`/`EXCLUDED_PREFIXES`; a look option under `LOOK_KEYS`/`LOOK_PREFIXES`; other data files go into the data bundle), extend `AppSettingsBackupTest`, and mention it in the docs and CHANGELOG.
+The saved radios of the connection center (`RadioSlotsPrefsImpl`, in the radio store) are deliberately not in the backup: their addresses only work on the device that saved them.
 </mtsw_backup_rule>
 
 <documentation_sync>
