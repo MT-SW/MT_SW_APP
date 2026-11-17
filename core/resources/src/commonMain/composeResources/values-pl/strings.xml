@@ -4360,8 +4360,8 @@
     <string name="console_out_bridge_changed">Mostek TCP: %1$s.</string>
     <string name="console_out_nodes_none">Brak pasujących węzłów.</string>
     <string name="console_out_nodes_more">…i jeszcze %1$d.</string>
-    <string name="console_out_node_online">online</string>
-    <string name="console_out_node_offline">offline</string>
+    <string name="console_out_node_online">w sieci</string>
+    <string name="console_out_node_offline">poza siecią</string>
     <string name="radio_background">Zbieranie w tle z pozostałych radiów</string>
     <string name="radio_background_on">Włączone (każde zapisane radio zbiera pakiety do swojej bazy)</string>
     <string name="radio_background_off">Wyłączone</string>

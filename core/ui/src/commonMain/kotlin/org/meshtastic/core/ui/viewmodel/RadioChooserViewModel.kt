@@ -18,6 +18,7 @@ package org.meshtastic.core.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -79,7 +80,7 @@ class RadioChooserViewModel(
     private var expectedChange = false
 
     // True from the moment a connected radio drops by itself until it is connected again, or the list is opened.
-    private val dropped = kotlinx.coroutines.flow.MutableStateFlow(false)
+    private val dropped = MutableStateFlow(false)
 
     val state: StateFlow<RadioChooserState> =
         combine(
