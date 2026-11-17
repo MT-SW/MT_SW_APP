@@ -533,6 +533,10 @@
     <string name="app_log_title">Logs</string>
     <string name="app_notifications">App Notifications</string>
     <string name="app_settings">App</string>
+    <string name="app_settings_backup_saved">Settings saved.</string>
+    <string name="app_settings_restore_confirmation">The settings from the file replace the current ones. Settings tied to this radio or phone (the chosen device, one-time notices, AI models) are not touched. Some changes show after the app is restarted.</string>
+    <string name="app_settings_restore_done">Settings restored (%1$d values).</string>
+    <string name="app_settings_restore_not_backup">This file is not an app settings backup.</string>
     <string name="app_too_old">Application update required</string>
     <string name="app_update_check_summary">Checks GitHub twice a day for a newer MT_SW_APP release and shows a reminder every two days until you update.</string>
     <string name="app_update_check_title">Notify about new versions</string>
@@ -670,9 +674,12 @@
     <string name="background_keepalive_summary">Off by default. An iPhone or iPad suspends an app that is not on the screen, which cuts the Wi-Fi/TCP link to the radio (also over Tailscale) and stops collecting data. When on, the app keeps running in the background with the system's background location, the same way the original Meshtastic app for Apple does. The position is read rarely and only to keep the app alive; it is not sent anywhere. Needs the "Always" location permission. Uses more battery, and the system shows the location arrow.</string>
     <string name="background_keepalive_title">Keep running in the background</string>
     <string name="background_section_title">Work in the background</string>
+    <!-- BACKUP -->
     <string name="backup_app_database">Back up app data</string>
+    <string name="backup_app_settings">Back up app settings</string>
     <string name="backup_keys">Backup Keys</string>
     <string name="backup_keys_confirmation">Saves the public and private keys to secure, encrypted storage on this device.</string>
+    <string name="backup_look">Save the look to a file</string>
     <string name="backup_restore">Backup &amp; Restore</string>
     <string name="bad">Bad</string>
     <string name="bandwidth_default">Default (%1$s kHz)</string>
@@ -2017,6 +2024,8 @@
     <string name="look_area_fields">Text fields and search</string>
     <string name="look_area_map">Map buttons and bars</string>
     <string name="look_area_messages">Messages</string>
+    <string name="look_backup_summary">Saves only the look of the app to a file, so you can go back to it or move it to another device. The file works on Android, computer and iPhone/iPad.</string>
+    <string name="look_backup_title">Save and restore the look</string>
     <string name="look_basic_summary">The simple choices: one look for a whole part of the app. Every part can be fine-tuned in the advanced settings below.</string>
     <string name="look_mixed">Different in parts</string>
     <string name="look_preset_classic">Classic (everything plain, as before)</string>
@@ -2025,6 +2034,9 @@
     <string name="look_preset_iphone">iPhone-like (glass, outline icons, depth)</string>
     <string name="look_presets_summary">One tap sets many options at once; you can still change each of them below.</string>
     <string name="look_presets_title">Ready-made looks</string>
+    <string name="look_restore_confirmation">The look from the file replaces the current one: colours, fonts, buttons, bars and all the options above. Other settings are not touched.</string>
+    <string name="look_restore_done">Look restored.</string>
+    <string name="look_saved">Look saved.</string>
     <string name="look_section_bar">Bottom bar and touch</string>
     <string name="look_section_basic">Look of the app</string>
     <string name="look_section_layout">Layout and lists</string>
@@ -3284,10 +3296,13 @@
     <string name="resend">Resend</string>
     <string name="reset">Reset</string>
     <string name="reset_to_defaults">Reset to defaults</string>
+    <!-- RESTORE -->
     <string name="restore_app_database">Restore app data</string>
+    <string name="restore_app_settings">Restore app settings</string>
     <string name="restore_keys">Restore Keys</string>
     <string name="restore_keys_confirmation">Restores the backed-up public and private keys to this node.</string>
     <string name="restore_keys_pick_backup">Pick the backup to restore to this node. A factory reset or a new key changes the node's ID, so older backups stay under the old ID. Only restore a backup taken from this same radio: another radio's key gives both radios the same identity.</string>
+    <string name="restore_look">Restore the look from a file</string>
     <string name="retry">Retry</string>
     <string name="ring_style_thin">Thin progress bars (like on the iPhone)</string>
     <string name="ring_style_thin_summary">Progress bars and waiting spinners are two thin grey lines (an empty outline), and the filled part is an outline in the theme colour too. Instead of the zigzag there is a ring or bar with a spinning or sliding piece made of thin lines. Off brings back the old look.</string>

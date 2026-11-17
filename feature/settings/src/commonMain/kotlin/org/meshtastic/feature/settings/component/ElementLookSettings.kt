@@ -35,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.backup_look
 import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_gradient_normal
 import org.meshtastic.core.resources.button_gradient_off
@@ -89,6 +90,8 @@ import org.meshtastic.core.resources.look_area_dialogs
 import org.meshtastic.core.resources.look_area_fields
 import org.meshtastic.core.resources.look_area_map
 import org.meshtastic.core.resources.look_area_messages
+import org.meshtastic.core.resources.look_backup_summary
+import org.meshtastic.core.resources.look_backup_title
 import org.meshtastic.core.resources.look_basic_summary
 import org.meshtastic.core.resources.look_mixed
 import org.meshtastic.core.resources.look_preset_classic
@@ -114,6 +117,7 @@ import org.meshtastic.core.resources.nav_select_both
 import org.meshtastic.core.resources.nav_select_bubble
 import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.restore_look
 import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.ring_style_thin_summary
 import org.meshtastic.core.ui.component.DropDownPreference
@@ -122,7 +126,10 @@ import org.meshtastic.core.ui.component.LookPreview
 import org.meshtastic.core.ui.component.SliderPreference
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.DisplaySettings
+import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Upload
+import org.meshtastic.feature.settings.radio.rememberSettingsBackupActions
 
 private const val STRENGTH_STEP = 5
 private const val STRENGTH_MAX = 100
@@ -172,6 +179,7 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
     )
     LookPreview(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
     ElementPresets(onChange)
+    LookBackup()
     Text(
         text = stringResource(Res.string.look_basic_summary),
         style = MaterialTheme.typography.bodySmall,
@@ -528,6 +536,33 @@ private fun ElementPresets(onChange: (String, Int) -> Unit) {
             preset.values.forEach { (key, value) -> onChange(key, value) }
         }
     }
+}
+
+/** Saves the whole look to a file and brings it back, so a look can always be returned to or moved to another device. */
+@Composable
+private fun LookBackup() {
+    val backup = rememberSettingsBackupActions()
+    Text(
+        text = stringResource(Res.string.look_backup_title),
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+    Text(
+        text = stringResource(Res.string.look_backup_summary),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
+    ListItem(
+        text = stringResource(Res.string.backup_look),
+        leadingIcon = MeshtasticIcons.Upload,
+        onClick = backup.onBackupLook,
+    )
+    ListItem(
+        text = stringResource(Res.string.restore_look),
+        leadingIcon = MeshtasticIcons.Download,
+        onClick = backup.onRestoreLook,
+    )
 }
 
 /** The colour of the glass and the thickness of its edge. */

@@ -27,12 +27,14 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.repository)
             implementation(projects.core.common)
+            implementation(projects.core.datastore)
             implementation(projects.core.di)
 
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

@@ -57,6 +57,10 @@ Forking, rebranding, and selling this app are allowed by its GPL-3.0-or-later li
 The offline assistant gets `knowledge/core.md` (core facts about MT_SW: network settings, parts of the project, main features) with every answer. Whenever something about MT_SW changes (network settings, a new feature, a new part of the project), update `knowledge/core.md` (PL and EN parts) in the same change. It is bundled at every build and also fetched from the repository when the assistant's internet access is on.
 </mtsw_assistant_knowledge>
 
+<mtsw_backup_rule>
+Everything the user can keep in the app must be in the backups, on every platform, in the same file format. "Kopia ustawień" (core/prefs `AppSettingsBackupImpl`) saves only the settings; "Kopia danych aplikacji" saves everything (the settings and the radio database, one file, `AppDataBundle`). Whenever you add a new preference store, a new key that belongs to the user, or any other stored data: make sure it is covered by the backup (a new store goes into the `stores` map; a key that belongs to one installation or one radio goes into `EXCLUDED_KEYS`/`EXCLUDED_PREFIXES`; a look option under `LOOK_KEYS`/`LOOK_PREFIXES`; other data files go into the data bundle), extend `AppSettingsBackupTest`, and mention it in the docs and CHANGELOG.
+</mtsw_backup_rule>
+
 <documentation_sync>
 `AGENTS.md` is the source of truth for rules and principles. `.github/copilot-instructions.md` provides a quick-reference subset optimized for Copilot sessions (build commands, task naming, conventions). `CLAUDE.md` and `GEMINI.md` redirect here.
 </documentation_sync>

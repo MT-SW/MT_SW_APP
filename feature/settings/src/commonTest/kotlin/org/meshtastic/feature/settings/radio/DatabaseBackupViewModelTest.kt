@@ -33,7 +33,9 @@ import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.database.DatabaseBackupOperations
 import org.meshtastic.core.database.RestoreStageResult
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.repository.AppSettingsBackupOperations
 import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.repository.SettingsBackupScope
 import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.core.testing.FakeRadioController
 import org.meshtastic.core.testing.FakeRadioPrefs
@@ -81,6 +83,12 @@ class DatabaseBackupViewModelTest {
         }
     }
 
+    private class FakeSettingsBackup : AppSettingsBackupOperations {
+        override suspend fun export(scope: SettingsBackupScope, sink: BufferedSink) = Unit
+
+        override suspend fun import(scope: SettingsBackupScope, source: BufferedSource): Int? = 0
+    }
+
     private class FakeFileService : FileService {
         override suspend fun write(uri: CommonUri, block: suspend (BufferedSink) -> Unit): Boolean {
             block(Buffer())
@@ -107,6 +115,7 @@ class DatabaseBackupViewModelTest {
                 radioController = radioController,
                 radioPrefs = radioPrefs,
                 alertManager = alertManager,
+                settingsBackup = FakeSettingsBackup(),
             )
     }
 

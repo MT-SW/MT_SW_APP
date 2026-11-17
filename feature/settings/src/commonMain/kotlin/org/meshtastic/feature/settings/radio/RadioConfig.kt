@@ -52,6 +52,7 @@ import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.advanced_title
 import org.meshtastic.core.resources.app_database_backup_no_device
 import org.meshtastic.core.resources.backup_app_database
+import org.meshtastic.core.resources.backup_app_settings
 import org.meshtastic.core.resources.backup_restore
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.configuration
@@ -78,6 +79,7 @@ import org.meshtastic.core.resources.radio_setup_title
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.reboot_into_dfu
 import org.meshtastic.core.resources.restore_app_database
+import org.meshtastic.core.resources.restore_app_settings
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
 import org.meshtastic.core.resources.sniffer_settings_title
@@ -298,6 +300,17 @@ private fun BackupRestoreSection(
             leadingIcon = MeshtasticIcons.Download,
             enabled = databaseBackupAvailable,
             onClick = onMergeDatabase,
+        )
+        val settingsBackup = rememberSettingsBackupActions()
+        ListItem(
+            text = stringResource(Res.string.backup_app_settings),
+            leadingIcon = MeshtasticIcons.Upload,
+            onClick = settingsBackup.onBackupAll,
+        )
+        ListItem(
+            text = stringResource(Res.string.restore_app_settings),
+            leadingIcon = MeshtasticIcons.Download,
+            onClick = settingsBackup.onRestoreAll,
         )
     }
 }

@@ -4240,4 +4240,17 @@
     <string name="chart_style_node">Styl wykresów w szczegółach węzła</string>
     <string name="chart_style_same">Taki sam jak ogólny</string>
     <string name="chart_style_preview_hint">Wszystkie style na jednym ekranie. Dotknij stylu, żeby ustawić go dla wszystkich wykresów.</string>
+    <string name="backup_app_settings">Kopia ustawień aplikacji</string>
+    <string name="restore_app_settings">Przywróć ustawienia aplikacji</string>
+    <string name="app_settings_backup_saved">Ustawienia zapisane.</string>
+    <string name="app_settings_restore_confirmation">Ustawienia z pliku zastąpią obecne. Ustawienia związane z tym radiem lub telefonem (wybrane urządzenie, jednorazowe komunikaty, modele AI) nie zostaną zmienione. Część zmian będzie widoczna po ponownym uruchomieniu aplikacji.</string>
+    <string name="app_settings_restore_done">Ustawienia przywrócone (wartości: %1$d).</string>
+    <string name="app_settings_restore_not_backup">Ten plik nie jest kopią ustawień aplikacji.</string>
+    <string name="backup_look">Zapisz wygląd do pliku</string>
+    <string name="restore_look">Przywróć wygląd z pliku</string>
+    <string name="look_saved">Wygląd zapisany.</string>
+    <string name="look_restore_confirmation">Wygląd z pliku zastąpi obecny: kolory, czcionki, przyciski, paski i wszystkie opcje powyżej. Pozostałe ustawienia nie zostaną zmienione.</string>
+    <string name="look_restore_done">Wygląd przywrócony.</string>
+    <string name="look_backup_title">Zapis i przywracanie wyglądu</string>
+    <string name="look_backup_summary">Zapisuje do pliku tylko wygląd aplikacji, żeby można było do niego wrócić albo przenieść go na inne urządzenie. Plik działa na Androidzie, komputerze i iPhone/iPad.</string>
 </resources>

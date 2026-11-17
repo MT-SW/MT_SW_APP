@@ -19,6 +19,7 @@ package org.meshtastic.feature.settings.radio
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import okio.Buffer
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.nowInstant
@@ -27,10 +28,13 @@ import org.meshtastic.core.database.DatabaseBackup
 import org.meshtastic.core.database.DatabaseBackupOperations
 import org.meshtastic.core.database.RestoreStageResult
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.repository.AppDataBundle
+import org.meshtastic.core.repository.AppSettingsBackupOperations
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
+import org.meshtastic.core.repository.SettingsBackupScope
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_database_backup_disconnect_confirmation
 import org.meshtastic.core.resources.app_database_backup_failed
@@ -60,6 +64,7 @@ class DatabaseBackupViewModel(
     private val radioController: RadioController,
     private val radioPrefs: RadioPrefs,
     private val alertManager: AlertManager,
+    private val settingsBackup: AppSettingsBackupOperations,
 ) : ViewModel() {
 
     /** The database and device a backup or restore acts on, captured before disconnecting switches databases. */
@@ -113,7 +118,13 @@ class DatabaseBackupViewModel(
     fun backup(uri: CommonUri) {
         val dbName = target?.dbName ?: return
         safeLaunch(tag = "databaseBackup") {
-            val written = fileService.write(uri) { sink -> backupService.export(dbName, sink) }
+            // One file holds everything: first all the app settings, then the radio's database.
+            val settings = Buffer().also { settingsBackup.export(SettingsBackupScope.All, it) }.readByteArray()
+            val written =
+                fileService.write(uri) { sink ->
+                    AppDataBundle.writeHeader(sink, settings)
+                    backupService.export(dbName, sink)
+                }
             val message =
                 getStringSuspend(
                     if (written) Res.string.app_database_backup_saved else Res.string.app_database_backup_failed,
@@ -138,7 +149,16 @@ class DatabaseBackupViewModel(
         val dbName = target?.dbName ?: return
         safeLaunch(tag = "databaseRestore") {
             var result: RestoreStageResult = RestoreStageResult.Failed(IllegalStateException("file not readable"))
-            fileService.read(uri) { source -> result = backupService.stageRestore(dbName, source) }
+            var settings: ByteArray? = null
+            fileService.read(uri) { source ->
+                settings = AppDataBundle.readHeader(source)
+                result = backupService.stageRestore(dbName, source)
+            }
+            // The settings apply only once the database part has been accepted, so a bad file changes nothing.
+            val saved = settings
+            if (result is RestoreStageResult.Staged && saved != null) {
+                settingsBackup.import(SettingsBackupScope.All, Buffer().write(saved))
+            }
             alertManager.showAlert(message = restoreMessage(result))
         }
     }
@@ -149,7 +169,10 @@ class DatabaseBackupViewModel(
             val dbName = backupService.backupTargetName()
             var written: Int? = null
             if (dbName != null) {
-                fileService.read(uri) { source -> written = backupService.mergeFromBackup(dbName, source) }
+                fileService.read(uri) { source ->
+                    AppDataBundle.readHeader(source)
+                    written = backupService.mergeFromBackup(dbName, source)
+                }
             }
             val count = written
             alertManager.showAlert(

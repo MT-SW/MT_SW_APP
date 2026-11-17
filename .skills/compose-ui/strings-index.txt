@@ -512,6 +512,10 @@ app_log_summary
 app_log_title
 app_notifications
 app_settings
+app_settings_backup_saved
+app_settings_restore_confirmation
+app_settings_restore_done
+app_settings_restore_not_backup
 app_too_old
 app_update_check_summary
 app_update_check_title
@@ -649,9 +653,12 @@ background_keepalive_permission
 background_keepalive_summary
 background_keepalive_title
 background_section_title
+### BACKUP ###
 backup_app_database
+backup_app_settings
 backup_keys
 backup_keys_confirmation
+backup_look
 backup_restore
 bad
 bandwidth_default
@@ -1969,6 +1976,8 @@ look_area_dialogs
 look_area_fields
 look_area_map
 look_area_messages
+look_backup_summary
+look_backup_title
 look_basic_summary
 look_mixed
 look_preset_classic
@@ -1977,6 +1986,9 @@ look_preset_glass
 look_preset_iphone
 look_presets_summary
 look_presets_title
+look_restore_confirmation
+look_restore_done
+look_saved
 look_section_bar
 look_section_basic
 look_section_layout
@@ -3212,10 +3224,13 @@ requesting_from
 resend
 reset
 reset_to_defaults
+### RESTORE ###
 restore_app_database
+restore_app_settings
 restore_keys
 restore_keys_confirmation
 restore_keys_pick_backup
+restore_look
 retry
 ring_style_thin
 ring_style_thin_summary

@@ -76,7 +76,12 @@ import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.log_retention_days
+import org.meshtastic.core.resources.backup_app_settings
+import org.meshtastic.core.resources.backup_look
+import org.meshtastic.core.resources.look_backup_title
 import org.meshtastic.core.resources.look_presets_title
+import org.meshtastic.core.resources.restore_app_settings
+import org.meshtastic.core.resources.restore_look
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.nav_bar_haptics
@@ -296,6 +301,11 @@ object SettingsSearchCatalog {
             Res.string.chart_style_health to SettingsRoute.ElementLook,
             Res.string.chart_style_node to SettingsRoute.ElementLook,
             Res.string.look_presets_title to SettingsRoute.ElementLook,
+            Res.string.look_backup_title to SettingsRoute.ElementLook,
+            Res.string.backup_look to SettingsRoute.ElementLook,
+            Res.string.restore_look to SettingsRoute.ElementLook,
+            Res.string.backup_app_settings to SettingsRoute.Settings(),
+            Res.string.restore_app_settings to SettingsRoute.Settings(),
             Res.string.element_group_dialogs to SettingsRoute.ElementLook,
             Res.string.glass_tint to SettingsRoute.ElementLook,
             Res.string.glass_rim to SettingsRoute.ElementLook,
