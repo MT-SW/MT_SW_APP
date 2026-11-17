@@ -58,7 +58,10 @@ import org.meshtastic.core.resources.archive_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.autostart_title
 import org.meshtastic.core.resources.background_section_title
+import org.meshtastic.core.resources.backup_app_database
+import org.meshtastic.core.resources.backup_app_settings
 import org.meshtastic.core.resources.clean_node_database_title
+import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.data_logs_summary
 import org.meshtastic.core.resources.data_logs_title
 import org.meshtastic.core.resources.data_notice_settings_title
@@ -173,6 +176,7 @@ import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Tune
+import org.meshtastic.core.ui.icon.Upload
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
@@ -412,6 +416,20 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 ListItem(text = stringResource(Res.string.debug_panel), leadingIcon = MeshtasticIcons.BugReport) {
                     onNavigate(SettingsRoute.DebugPanel)
+                }
+                ListItem(text = stringResource(Res.string.console_title), leadingIcon = MeshtasticIcons.Language) {
+                    onNavigate(SettingsRoute.Console)
+                }
+                // Our backups sit in the radio settings; the row is shown there and marked.
+                val backupSettings = stringResource(Res.string.backup_app_settings)
+                ListItem(text = backupSettings, leadingIcon = MeshtasticIcons.Upload) {
+                    SettingHighlight.show(backupSettings)
+                    onNavigate(SettingsRoute.Settings())
+                }
+                val backupData = stringResource(Res.string.backup_app_database)
+                ListItem(text = backupData, leadingIcon = MeshtasticIcons.Upload) {
+                    SettingHighlight.show(backupData)
+                    onNavigate(SettingsRoute.Settings())
                 }
                 ListItem(
                     text = stringResource(Res.string.data_notice_settings_title),
