@@ -42,7 +42,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -131,6 +130,7 @@ import org.meshtastic.core.ui.component.NODE_TINT_EMPHASIZED
 import org.meshtastic.core.ui.component.NODE_TINT_MUTED
 import org.meshtastic.core.ui.component.NODE_TINT_NORMAL
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.TransportIcon
@@ -664,7 +664,7 @@ fun MessageItem(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                                    ProgressSpinner(size = 14.dp)
                                     Text(
                                         text = stringResource(Res.string.image_preview_loading),
                                         style = MaterialTheme.typography.bodySmall,
@@ -994,7 +994,7 @@ private fun SaveImageButton(imageUrl: String, modifier: Modifier = Modifier) {
         },
     ) {
         if (isSaving) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+            ProgressSpinner(size = 20.dp, color = Color.White)
         } else {
             Icon(imageVector = MeshtasticIcons.Save, contentDescription = "Zapisz zdjęcie", tint = Color.White)
         }

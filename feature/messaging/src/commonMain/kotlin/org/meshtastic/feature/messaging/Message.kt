@@ -47,7 +47,6 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -140,6 +139,7 @@ import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
 import org.meshtastic.core.ui.component.InlineStyle
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.holdBuzz
@@ -1233,7 +1233,7 @@ private fun DictationButton(dictation: Dictation, enabled: Boolean) {
         contentAlignment = Alignment.Center,
     ) {
         if (working) {
-            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+            ProgressSpinner(size = 18.dp)
         } else {
             Icon(
                 imageVector = MeshtasticIcons.Mic,

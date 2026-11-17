@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,6 +53,8 @@ import org.meshtastic.core.resources.chirpy_hop_update_complete
 import org.meshtastic.core.resources.chirpy_hop_update_interrupted
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FilledTonalButton
+import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.Icon
@@ -171,11 +172,11 @@ private fun ChirpyStatusBand(status: ChirpyHopUpdateStatus, onClose: () -> Unit)
                 }
             val progress = status.progress
             if (progress != null) {
-                LinearProgressIndicator(progress = { progress }, color = barColor, modifier = Modifier.fillMaxWidth())
+                ProgressLine(progress = progress, color = barColor, modifier = Modifier.fillMaxWidth())
             } else if (status.phase == ChirpyHopUpdatePhase.Active) {
-                LinearProgressIndicator(color = barColor, modifier = Modifier.fillMaxWidth())
+                IndeterminateProgressLine(color = barColor, modifier = Modifier.fillMaxWidth())
             } else {
-                LinearProgressIndicator(progress = { 0f }, color = barColor, modifier = Modifier.fillMaxWidth())
+                ProgressLine(progress = 0f, color = barColor, modifier = Modifier.fillMaxWidth())
             }
         }
     }

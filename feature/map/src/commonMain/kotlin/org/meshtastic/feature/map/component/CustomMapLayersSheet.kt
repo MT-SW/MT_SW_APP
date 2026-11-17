@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -69,6 +68,7 @@ import org.meshtastic.core.resources.url_http_localhost_only
 import org.meshtastic.core.resources.url_must_be_http
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
@@ -246,7 +246,7 @@ private fun MapLayerActions(
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         if (layer.isNetwork) {
             if (layer.isRefreshing) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp).padding(4.dp), strokeWidth = 2.dp)
+                ProgressSpinner(modifier = Modifier.padding(4.dp), size = 24.dp)
             } else {
                 IconButton(onClick = { onRefreshLayer(layer.id) }) {
                     Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = stringResource(Res.string.refresh))

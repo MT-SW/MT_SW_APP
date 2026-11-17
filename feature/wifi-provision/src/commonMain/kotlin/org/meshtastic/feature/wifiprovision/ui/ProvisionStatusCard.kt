@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import org.meshtastic.core.resources.wifi_provision_sending_credentials
 import org.meshtastic.core.resources.wifi_provision_status_applied
 import org.meshtastic.core.resources.wifi_provision_status_failed
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Error
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -88,7 +88,7 @@ private fun statusCardColors(provisionStatus: ProvisionStatus, isProvisioning: B
 @Composable
 private fun StatusIcon(provisionStatus: ProvisionStatus, isProvisioning: Boolean, tint: Color) {
     when {
-        isProvisioning -> LoadingIndicator(modifier = Modifier.size(20.dp), color = tint)
+        isProvisioning -> ProgressSpinner(size = 20.dp, color = tint)
 
         provisionStatus == ProvisionStatus.Success ->
             Icon(MeshtasticIcons.Success, contentDescription = null, modifier = Modifier.size(20.dp), tint = tint)

@@ -36,7 +36,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -64,6 +63,7 @@ import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Slider
 import kotlin.math.max
 import kotlin.math.min
@@ -332,7 +332,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                 when (val current = status) {
                     is VanityGrindStatus.Grinding -> {
                         Row(modifier = Modifier.padding(top = 16.dp)) {
-                            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                            ProgressSpinner(size = 20.dp)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = "Szukam klucza... $seconds s")
                         }

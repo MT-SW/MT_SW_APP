@@ -17,7 +17,6 @@
 package org.meshtastic.feature.docs.ui
 
 import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,7 +27,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import org.meshtastic.core.ui.component.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -46,16 +42,16 @@ import org.meshtastic.core.resources.chirpy_checking
 import org.meshtastic.core.resources.chirpy_downloading_progress
 import org.meshtastic.core.resources.chirpy_ready
 import org.meshtastic.core.resources.img_chirpy
+import org.meshtastic.core.ui.component.ProgressRing
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.feature.docs.model.ModelReadiness
 import org.meshtastic.core.resources.Res as CoreRes
 
 private const val FAB_ICON_SIZE = 32
 private const val FAB_PROGRESS_SIZE = 56
-private const val PROGRESS_STROKE_WIDTH = 3
 private const val PULSE_SCALE_MIN = 0.96f
 private const val PULSE_SCALE_MAX = 1.04f
 private const val PULSE_DURATION_MS = 1800
-private const val SPIN_DURATION_MS = 1200
 private const val PERCENT_MULTIPLIER = 100
 
 /**
@@ -111,16 +107,6 @@ private fun AvailableFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 private fun CheckingFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "chirpySpin")
-    val rotation by
-        infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec =
-            infiniteRepeatable(animation = tween(durationMillis = SPIN_DURATION_MS, easing = LinearEasing)),
-            label = "spinRotation",
-        )
-
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier,
@@ -128,12 +114,7 @@ private fun CheckingFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
         Box(contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(FAB_PROGRESS_SIZE.dp).graphicsLayer { rotationZ = rotation },
-                strokeWidth = PROGRESS_STROKE_WIDTH.dp,
-                color = MaterialTheme.colorScheme.tertiary,
-                strokeCap = StrokeCap.Round,
-            )
+            ProgressSpinner(size = FAB_PROGRESS_SIZE.dp, color = MaterialTheme.colorScheme.tertiary)
             Image(
                 painter = painterResource(CoreRes.drawable.img_chirpy),
                 contentDescription = stringResource(CoreRes.string.chirpy_checking),
@@ -162,21 +143,13 @@ private fun DownloadingFab(readiness: ModelReadiness.Downloading, onClick: () ->
     ) {
         Box(contentAlignment = Alignment.Center) {
             if (targetProgress > 0f) {
-                CircularProgressIndicator(
-                    progress = { animatedProgress },
-                    modifier = Modifier.size(FAB_PROGRESS_SIZE.dp),
-                    strokeWidth = PROGRESS_STROKE_WIDTH.dp,
+                ProgressRing(
+                    progress = animatedProgress,
+                    size = FAB_PROGRESS_SIZE.dp,
                     color = MaterialTheme.colorScheme.tertiary,
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    strokeCap = StrokeCap.Round,
                 )
             } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(FAB_PROGRESS_SIZE.dp),
-                    strokeWidth = PROGRESS_STROKE_WIDTH.dp,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    strokeCap = StrokeCap.Round,
-                )
+                ProgressSpinner(size = FAB_PROGRESS_SIZE.dp, color = MaterialTheme.colorScheme.tertiary)
             }
             Image(
                 painter = painterResource(CoreRes.drawable.img_chirpy),

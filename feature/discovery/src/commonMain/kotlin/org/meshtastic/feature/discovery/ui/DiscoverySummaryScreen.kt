@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +66,9 @@ import org.meshtastic.core.resources.discovery_view_map
 import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.LoadingIndicator
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
@@ -181,7 +182,7 @@ private fun DiscoverySummaryContent(
         },
     ) { padding ->
         if (session == null) {
-            CircularProgressIndicator(modifier = Modifier.fillMaxSize().padding(padding))
+            LoadingIndicator(modifier = Modifier.fillMaxSize().padding(padding))
             return@Scaffold
         }
 
@@ -280,7 +281,7 @@ private fun AiSummaryCard(
                     fontWeight = FontWeight.Bold,
                 )
                 if (isGenerating) {
-                    CircularProgressIndicator(modifier = Modifier.padding(4.dp), strokeWidth = 2.dp)
+                    ProgressSpinner(modifier = Modifier.padding(4.dp), size = 24.dp)
                 } else {
                     IconButton(onClick = onRerunAnalysis) {
                         Icon(

@@ -54,7 +54,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -137,6 +136,7 @@ import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -300,7 +300,7 @@ internal fun ScanningBleContent(error: WifiProvisionError.ConnectFailed? = null,
             Spacer(Modifier.height(16.dp))
             FilledTonalButton(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
         } else {
-            LoadingIndicator(modifier = Modifier.size(48.dp))
+            ProgressSpinner(size = 48.dp)
             Spacer(Modifier.height(24.dp))
             Text(stringResource(Res.string.wifi_provision_scanning_ble), style = MaterialTheme.typography.bodyLarge)
         }
@@ -354,7 +354,7 @@ internal fun DeviceFoundContent(deviceName: String?, onProceed: () -> Unit, onCa
 @Composable
 internal fun ScanningNetworksContent() {
     CenteredStatusContent {
-        LoadingIndicator(modifier = Modifier.size(48.dp))
+        ProgressSpinner(size = 48.dp)
         Spacer(Modifier.height(24.dp))
         Text(stringResource(Res.string.wifi_provision_scanning_wifi), style = MaterialTheme.typography.bodyLarge)
     }
@@ -411,7 +411,7 @@ internal fun ConnectedContent(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (isScanning) {
-                LoadingIndicator(modifier = Modifier.size(18.dp))
+                ProgressSpinner(size = 18.dp)
             } else {
                 Icon(MeshtasticIcons.Wifi, contentDescription = null, modifier = Modifier.size(18.dp))
             }
@@ -529,7 +529,7 @@ internal fun ConnectedContent(
                 modifier = Modifier.weight(1f),
             ) {
                 if (isProvisioning) {
-                    LoadingIndicator(modifier = Modifier.size(18.dp))
+                    ProgressSpinner(size = 18.dp)
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(Res.string.wifi_provision_sending_credentials))
                 } else {

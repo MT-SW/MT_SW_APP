@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +36,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.discovery_dwell_progress
 import org.meshtastic.core.resources.discovery_stat_dwelling_on
 import org.meshtastic.core.resources.discovery_time_remaining
+import org.meshtastic.core.ui.component.ProgressLine
 
 @Suppress("MagicNumber")
 private val CONTENT_PADDING = 8.dp
@@ -72,7 +72,7 @@ fun DwellProgressIndicator(
             text = stringResource(Res.string.discovery_stat_dwelling_on, presetName),
             style = MaterialTheme.typography.titleSmall,
         )
-        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().clearAndSetSemantics {})
+        ProgressLine(progress = progress, modifier = Modifier.fillMaxWidth().clearAndSetSemantics {})
         Text(
             text = stringResource(Res.string.discovery_time_remaining, timeText),
             style = MaterialTheme.typography.bodyMedium,
