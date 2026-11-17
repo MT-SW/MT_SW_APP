@@ -137,7 +137,7 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(MeshtasticIcons.Antenna, contentDescription = description, modifier = Modifier.size(22.dp))
-                if (options[UiOptions.RADIO_COUNT] == 1) {
+                if (options[UiOptions.RADIO_COUNT] == 1 || mode == UiOptions.RADIO_ALERT_DIGIT) {
                     Text(
                         text = state.connectedCount.toString(),
                         fontSize = 10.sp,
