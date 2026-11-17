@@ -19,17 +19,18 @@ package org.meshtastic.core.database
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.database.entity.NodeEntity
+import org.meshtastic.proto.Telemetry
 
 /**
  * Keeps the statistics of the nodes that two device databases both know equal. Each radio has its own database, so the
  * same node (heard by two radios) has its own telemetry history in each. Only nodes present in BOTH databases are
  * touched: a node known to one database only is never copied to the other.
  *
- * For such a node the newer node row (by last heard) refreshes the older one's telemetry, position and identity, while
- * the reception data of each radio (signal, hops, channel, route, last heard) and what the user wrote (notes, name,
- * favourite, ignore, mute) stay as they were in each database. The history of telemetry, position, neighbours,
- * traceroute and map reports of the node is completed in both directions, without duplicates (a packet heard by both
- * radios counts once).
+ * For such a node each telemetry kind and the position come from the database that has the later report, the names
+ * and key from the one that heard the node last, while the reception data of each radio (signal, hops, channel,
+ * route, last heard) and what the user wrote (notes, favourite, ignore, mute) stay as they were in each database. The
+ * history of telemetry, position, neighbours, traceroute and map reports of the node is completed in both directions,
+ * without duplicates (a packet heard by both radios counts once).
  */
 object DatabaseStatsSync {
     // Position, paxcounter, telemetry, traceroute, neighbour info and map report (PortNum values): everything the
@@ -50,10 +51,8 @@ object DatabaseStatsSync {
             val na = nodesA.getValue(num)
             val nb = nodesB.getValue(num)
             // Only a row that really changes is written, so a repeated sync does not rewrite the same nodes again.
-            when {
-                na.lastHeard > nb.lastHeard -> refreshed(older = nb, newer = na).takeIf { it != nb }?.let(toB::add)
-                nb.lastHeard > na.lastHeard -> refreshed(older = na, newer = nb).takeIf { it != na }?.let(toA::add)
-            }
+            merged(own = na, other = nb).takeIf { it != na }?.let(toA::add)
+            merged(own = nb, other = na).takeIf { it != nb }?.let(toB::add)
         }
         if (toA.isNotEmpty()) a.nodeInfoDao().putAll(toA)
         if (toB.isNotEmpty()) b.nodeInfoDao().putAll(toB)
@@ -80,25 +79,34 @@ object DatabaseStatsSync {
     }
 
     /**
-     * The older row with the newer one's telemetry, position and identity. What belongs to how THIS radio heard the
-     * node (signal, hops, channel, route, when it was heard) and what the user wrote in this database stays as it was,
-     * so a radio keeps its own reception data exactly as the original app records it.
+     * [own] with whatever [other] knows newer. Each telemetry kind and the position are taken from the row that has
+     * the later report time (a node heard more recently is not necessarily the one with the newer telemetry); the
+     * identity (names, model, key, status) comes from the row that heard the node last. What belongs to how THIS radio
+     * heard the node (signal, hops, channel, route, when it was heard) and what the user wrote in this database stays
+     * as it was, so a radio keeps its own reception data exactly as the original app records it.
      */
-    private fun refreshed(older: NodeEntity, newer: NodeEntity): NodeEntity = older.copy(
-        user = newer.user,
-        longName = newer.longName,
-        shortName = newer.shortName,
-        position = newer.position,
-        latitude = newer.latitude,
-        longitude = newer.longitude,
-        deviceTelemetry = newer.deviceTelemetry,
-        environmentTelemetry = newer.environmentTelemetry,
-        powerTelemetry = newer.powerTelemetry,
-        airQualityTelemetry = newer.airQualityTelemetry,
-        soilWaterTelemetry = newer.soilWaterTelemetry,
-        paxcounter = newer.paxcounter,
-        publicKey = newer.publicKey,
-        nodeStatus = newer.nodeStatus,
-        signsPackets = newer.signsPackets,
-    )
+    private fun merged(own: NodeEntity, other: NodeEntity): NodeEntity {
+        val otherHeardLater = other.lastHeard > own.lastHeard
+        val newerPosition = other.position.time > own.position.time
+        val identity = if (otherHeardLater) other else own
+        return own.copy(
+            user = identity.user,
+            longName = identity.longName,
+            shortName = identity.shortName,
+            publicKey = identity.publicKey,
+            nodeStatus = identity.nodeStatus,
+            signsPackets = identity.signsPackets,
+            paxcounter = identity.paxcounter,
+            position = if (newerPosition) other.position else own.position,
+            latitude = if (newerPosition) other.latitude else own.latitude,
+            longitude = if (newerPosition) other.longitude else own.longitude,
+            deviceTelemetry = newer(own.deviceTelemetry, other.deviceTelemetry),
+            environmentTelemetry = newer(own.environmentTelemetry, other.environmentTelemetry),
+            powerTelemetry = newer(own.powerTelemetry, other.powerTelemetry),
+            airQualityTelemetry = newer(own.airQualityTelemetry, other.airQualityTelemetry),
+            soilWaterTelemetry = newer(own.soilWaterTelemetry, other.soilWaterTelemetry),
+        )
+    }
+
+    private fun newer(own: Telemetry, other: Telemetry): Telemetry = if (other.time > own.time) other else own
 }
