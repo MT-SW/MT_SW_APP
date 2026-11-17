@@ -85,7 +85,7 @@ fun ConsoleScreen(
                 ConsoleEnvironment(
                     radios = { chooser.state.value.radios },
                     choose = chooser::choose,
-                    disconnect = chooser::disconnect,
+                    disconnect = { chooser.state.value.radios.firstOrNull { it.active }?.id?.let(chooser::disconnect) },
                     remove = chooser::remove,
                     connection = viewModel::connection,
                     nodes = viewModel::nodes,
