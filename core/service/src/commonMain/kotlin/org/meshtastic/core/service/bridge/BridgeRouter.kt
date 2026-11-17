@@ -59,6 +59,18 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     val hasConfiguration: Boolean
         get() = configComplete
 
+    /** True when a client waits for a configuration and no handshake of the app with the radio has been seen. */
+    val waitingWithoutHandshake: Boolean
+        get() = waiting.isNotEmpty() && !configComplete && configFrames.isEmpty()
+
+    /** Forgets everything kept so far (the bridge starts again). */
+    fun reset() {
+        configFrames.clear()
+        configComplete = false
+        owners.clear()
+        waiting.clear()
+    }
+
     /** A frame from the radio. [clients] are the connected clients. */
     fun onFromRadio(payload: ByteArray, clients: Set<Int>): List<BridgeOut> {
         val frame = runCatching { FromRadio.ADAPTER.decode(payload) }.getOrNull() ?: return emptyList()

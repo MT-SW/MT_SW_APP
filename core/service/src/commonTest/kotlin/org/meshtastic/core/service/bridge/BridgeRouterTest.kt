@@ -151,4 +151,25 @@ class BridgeRouterTest {
 
         assertTrue(!router.hasConfiguration)
     }
+
+    @Test
+    fun `a client that asks before any handshake was seen is reported as waiting without a handshake`() {
+        val router = BridgeRouter()
+        router.onClientFrame(1, wantConfig(5))
+
+        assertTrue(router.waitingWithoutHandshake)
+
+        router.onFromRadio(myInfo(), setOf(1))
+        assertTrue(!router.waitingWithoutHandshake)
+    }
+
+    @Test
+    fun `reset forgets the copy and the waiting clients`() {
+        val router = BridgeRouter()
+        ready(router)
+        router.reset()
+
+        assertTrue(!router.hasConfiguration)
+        assertTrue(!router.waitingWithoutHandshake)
+    }
 }
