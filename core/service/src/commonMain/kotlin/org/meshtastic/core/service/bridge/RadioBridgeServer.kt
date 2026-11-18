@@ -120,12 +120,15 @@ class RadioBridgeServer(
             val listen = Listen(config.portFor(slot.id), config.lanAccess)
             val running = synchronized(lock) { instances[slot.id] }
             if (running != null && running.listen == listen) continue
+            // The old server of this device must be gone (its port free) before the new one binds.
+            val previous = running?.job ?: toStop.firstOrNull { it.slot.id == slot.id }?.job
             running?.job?.cancel()
             val instance = Instance(slot, listen).also { it.router.config = config }
             synchronized(lock) { instances[slot.id] = instance }
             instance.job =
                 scope.launch {
                     try {
+                        previous?.join()
                         serve(instance)
                     } catch (e: CancellationException) {
                         throw e

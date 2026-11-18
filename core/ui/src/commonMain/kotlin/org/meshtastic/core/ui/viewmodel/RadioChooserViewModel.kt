@@ -174,15 +174,19 @@ class RadioChooserViewModel(
         // app just started, the radio is off) or that the user disconnected or replaced is not: no signal for those.
         viewModelScope.launch {
             var wasConnected = false
+            var connectedAddress: String? = null
             serviceRepository.connectionState.collect { connection ->
                 when (connection) {
                     is ConnectionState.Connected -> {
                         wasConnected = true
+                        connectedAddress = radioPrefs.devAddr.value
                         expectedChange = false
                         dropped.value = false
                     }
                     is ConnectionState.Disconnected -> {
-                        if (wasConnected && !expectedChange) dropped.value = true
+                        // A switch to another device (also from a notification) is not a drop.
+                        val switched = radioPrefs.devAddr.value != connectedAddress
+                        if (wasConnected && !expectedChange && !switched) dropped.value = true
                         wasConnected = false
                     }
                     else -> Unit

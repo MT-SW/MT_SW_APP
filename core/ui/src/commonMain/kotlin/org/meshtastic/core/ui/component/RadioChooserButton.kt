@@ -172,7 +172,8 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
-                state.radios.forEach { radio ->
+                // Only the devices that are really connected: connecting and disconnecting is done on the Connect tab.
+                state.radios.filter { it.status == RadioStatus.Connected }.forEach { radio ->
                     RadioRow(
                         radio = radio,
                         onChoose = {
@@ -197,7 +198,8 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
         // The plate of the device: its short name in the colour of its node, like the plate of our node on the bar.
         radio.nodeNum?.let { num ->
             NodeChip(
-                node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
+                node =
+                Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
                 modifier = Modifier.padding(end = 12.dp),
             )
         }

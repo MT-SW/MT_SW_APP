@@ -140,16 +140,17 @@ class BackgroundRadioCollector(
             } catch (e: CancellationException) {
                 throw e
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                Logger.w(e) { "Background collection from a radio failed: ${e.message}" }
+                Logger.w(e) { "Background collection from a device failed: ${e.message}" }
             }
             delay(RETRY_MS)
         }
     }
 
-    /** One connection: until the radio goes away or this is cancelled. */
+    /** One connection: until the device goes away or this is cancelled. */
     private suspend fun collectOnce(address: String) {
         val linkScope = CoroutineScope(SupervisorJob() + dispatchers.io)
-        val link = BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes) { bytes ->
+        val link =
+            BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes) { bytes ->
                 bridge.onDeviceFrame(address, bytes.toByteString())
             }
         link.attach { bytes -> pool.send(address, bytes) }
@@ -204,7 +205,7 @@ class BackgroundRadioCollector(
             val toWrite = batch.toList()
             batch.clear()
             val written = databaseManager.withDeviceDb(address) { it.meshLogDao().insertIgnore(toWrite) }
-            if (written == null) Logger.d { "Background collection: this radio has no database yet, packets dropped" }
+            if (written == null) Logger.d { "Background collection: this device has no database yet, packets dropped" }
         }
         while (true) {
             val first = link.logs.receiveCatching().getOrNull() ?: break

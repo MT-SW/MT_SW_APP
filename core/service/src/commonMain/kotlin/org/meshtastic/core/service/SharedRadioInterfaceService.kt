@@ -866,7 +866,8 @@ class SharedRadioInterfaceService(
                 if (sanitized != null && previousAddress != null && sanitized != previousAddress) {
                     gattCacheInvalidationRequested.value = false
                 }
-                handOverOnNextStop = previousAddress != sanitized
+                // Switching to another device hands the open connection to the background; a plain deselect closes it.
+                handOverOnNextStop = sanitized != null && previousAddress != sanitized
                 ignoreExceptionSuspend { stopTransportLocked() }
                 handOverOnNextStop = false
                 if (sanitized != null) {
