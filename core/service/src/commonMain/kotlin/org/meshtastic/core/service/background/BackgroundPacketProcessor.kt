@@ -37,7 +37,7 @@ import org.meshtastic.proto.User
 
 /**
  * What a device that is kept connected in the background does with the packets it hears (MT_SW), next to the log entry:
- * a text message goes to the database of that device and raises a notification that carries the device name; node
+ * a text message or alert goes to the database of that device and raises a notification that carries the device name; node
  * names, positions and telemetry update the node list of that device. When the app shows the device later, everything
  * is already there. [deviceName] and [onMessage] are asked fresh each time, so a renamed device and the unread counter
  * stay current. Errors only go to the log.
@@ -67,7 +67,7 @@ class BackgroundPacketProcessor(
         val decoded = packet.decoded ?: return
         try {
             when (decoded.portnum) {
-                PortNum.TEXT_MESSAGE_APP -> text(myNodeNum, packet)
+                PortNum.TEXT_MESSAGE_APP, PortNum.ALERT_APP -> text(myNodeNum, packet)
                 PortNum.NODEINFO_APP -> user(packet)
                 PortNum.POSITION_APP -> position(packet)
                 PortNum.TELEMETRY_APP -> telemetry(packet)
@@ -86,7 +86,8 @@ class BackgroundPacketProcessor(
         if (packet.from == myNodeNum || (decoded.reply_id != 0 && decoded.emoji != 0)) return
         val data = mapper.toDataPacket(packet) ?: return
         data.status = MessageStatus.RECEIVED
-        val body = data.text ?: return
+        val isAlert = decoded.portnum == PortNum.ALERT_APP
+        val body = (if (isAlert) data.alert else data.text) ?: return
         val isBroadcast = data.to == NodeAddress.ID_BROADCAST
         val contactKey = "${data.channel}${if (isBroadcast) data.to else data.from}"
         var sender: String? = null
@@ -121,6 +122,11 @@ class BackgroundPacketProcessor(
         if (!stored) return
         onMessage()
         if (muted) return
+        if (isAlert) {
+            // A critical alert breaks through like on the device in use: its own notification, with the sender's name.
+            notifier.showAlertNotification(contactKey, "${deviceName()} · ${sender ?: data.from.orEmpty()}", body)
+            return
+        }
         notifier.showBackgroundMessageNotification(
             deviceAddress = address,
             deviceName = deviceName(),
