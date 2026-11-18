@@ -48,6 +48,22 @@ interface MeshNotificationManager {
         isSilent: Boolean = false,
     )
 
+    /**
+     * A message that reached a device kept connected in the background (MT_SW). The title carries [deviceName] so it is
+     * clear which device it came to; a tap switches the app to that device ([deviceAddress]) and opens the
+     * conversation [contactKey]. Only platforms that show notifications override it.
+     */
+    @Suppress("LongParameterList")
+    suspend fun showBackgroundMessageNotification(
+        deviceAddress: String,
+        deviceName: String,
+        contactKey: String,
+        sender: String,
+        text: String,
+        isBroadcast: Boolean,
+        channelName: String?,
+    ) = Unit
+
     suspend fun updateWaypointNotification(
         contactKey: String,
         name: String,

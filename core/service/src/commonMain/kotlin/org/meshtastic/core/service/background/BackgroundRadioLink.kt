@@ -43,6 +43,9 @@ import org.meshtastic.proto.ToRadio
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+/** A packet heard by a background device together with that device's own node number. */
+class BackgroundPacket(val myNodeNum: Int, val packet: org.meshtastic.proto.MeshPacket)
+
 /**
  * The quiet link (MT_SW) to one saved radio that is not in use. A transport talks to it as to the radio service of the
  * app, but nothing here reaches the rest of the app: the link only asks the radio for its packets and turns each packet
@@ -56,6 +59,9 @@ class BackgroundRadioLink(
 ) : RadioInterfaceService {
     /** Log entries waiting to be written; a full queue drops the newest ones. */
     val logs = Channel<MeshLog>(LOG_QUEUE)
+
+    /** Packets that need more than a log entry (messages, node names, positions, telemetry), for the processor. */
+    val packets = Channel<BackgroundPacket>(PACKET_QUEUE)
 
     /** Completes when the radio went away (or the link was closed). */
     val ended = CompletableDeferred<Unit>()
@@ -134,6 +140,7 @@ class BackgroundRadioLink(
                 fromRadio = FromRadio.Builder().also { it.packet = packet }.build(),
             )
         if (!logs.trySend(log).isSuccess) Logger.w { "Background radio link: log queue is full, a packet was dropped" }
+        if (decoded != null) packets.trySend(BackgroundPacket(myNodeNum, packet))
     }
 
     // Everything below belongs to the app's own connection and is not used by a quiet link.
@@ -168,5 +175,6 @@ class BackgroundRadioLink(
 
     private companion object {
         const val LOG_QUEUE = 2_000
+        const val PACKET_QUEUE = 500
     }
 }

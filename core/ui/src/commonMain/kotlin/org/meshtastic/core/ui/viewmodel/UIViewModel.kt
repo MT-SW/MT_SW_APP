@@ -73,6 +73,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.DeepLinkRouter
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.repository.EventFirmwareRepository
+import org.meshtastic.core.repository.DeviceSwitcher
 import org.meshtastic.core.repository.FirmwareReleaseRepository
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LocationService
@@ -124,6 +125,7 @@ class UIViewModel(
     private val nodeDB: NodeRepository,
     protected val serviceRepository: ServiceRepository,
     private val radioController: RadioController,
+    private val deviceSwitcher: DeviceSwitcher,
     private val lockdownCoordinator: LockdownCoordinator,
     radioInterfaceService: RadioInterfaceService,
     meshLogRepository: MeshLogRepository,
@@ -180,6 +182,8 @@ class UIViewModel(
      *    [dispatchMeshtasticUri]. This triggers import dialogs for shared nodes or channel configurations.
      */
     fun handleDeepLink(uri: CommonUri, onInvalid: () -> Unit = {}) {
+        // A notification from a device kept in the background carries that device: the app switches to it first.
+        uri.getQueryParameter("device")?.takeIf { it.isNotBlank() }?.let { deviceSwitcher.switchTo(it) }
         // Try navigation routing first
         val navKeys = DeepLinkRouter.route(uri)
         if (navKeys != null) {

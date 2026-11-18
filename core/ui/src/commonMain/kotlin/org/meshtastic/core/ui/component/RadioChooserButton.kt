@@ -22,15 +22,18 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.radio_chooser_count
@@ -64,6 +68,7 @@ import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.viewmodel.RadioChoice
 import org.meshtastic.core.ui.viewmodel.RadioChooserState
 import org.meshtastic.core.ui.viewmodel.RadioStatus
+import org.meshtastic.proto.User
 
 /**
  * What the radio chooser of the top bar and the connection card can do; they only draw it. The top bar only uses
@@ -81,6 +86,7 @@ data class RadioChooserActions(
 
 private const val PULSE_MAX_ALPHA = 0.55f
 private const val PULSE_MIN_ALPHA = 0.08f
+private const val UNREAD_MAX = 99
 
 /**
  * The radio chooser: one grey radio icon with the number of connected radios, next to the plate of our node. When the
@@ -130,6 +136,24 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(MeshtasticIcons.MeshRadio, contentDescription = description, modifier = Modifier.size(22.dp))
+                // The circle with the number of new messages on the devices that are not shown (nothing when zero).
+                if (state.unreadTotal > 0) {
+                    Box(
+                        modifier =
+                        Modifier.align(Alignment.TopEnd)
+                            .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
+                            .background(MaterialTheme.colorScheme.error, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = if (state.unreadTotal > UNREAD_MAX) "$UNREAD_MAX+" else state.unreadTotal.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onError,
+                            modifier = Modifier.padding(horizontal = 3.dp),
+                        )
+                    }
+                }
                 if (options[UiOptions.RADIO_COUNT] == 1 || mode == UiOptions.RADIO_ALERT_DIGIT) {
                     Text(
                         text = state.connectedCount.toString(),
@@ -170,6 +194,13 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // The plate of the device: its short name in the colour of its node, like the plate of our node on the bar.
+        radio.nodeNum?.let { num ->
+            NodeChip(
+                node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
+                modifier = Modifier.padding(end = 12.dp),
+            )
+        }
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = radio.name ?: stringResource(Res.string.radio_chooser_unnamed, radio.id),
@@ -186,6 +217,18 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (radio.unread > 0) {
+            Text(
+                text = radio.unread.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onError,
+                modifier =
+                Modifier.background(MaterialTheme.colorScheme.error, CircleShape)
+                    .defaultMinSize(minWidth = 20.dp)
+                    .padding(horizontal = 6.dp, vertical = 1.dp),
             )
         }
     }

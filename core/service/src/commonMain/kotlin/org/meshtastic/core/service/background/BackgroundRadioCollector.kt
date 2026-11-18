@@ -24,7 +24,10 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -36,6 +39,8 @@ import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.RadioTransportFactory
@@ -58,11 +63,34 @@ class BackgroundRadioCollector(
     private val transportFactory: RadioTransportFactory,
     private val pool: RadioTransportPool,
     private val databaseManager: DatabaseManager,
+    private val notifier: MeshNotificationManager,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBackgroundMonitor {
     override val connectedAddresses: StateFlow<Set<String>> = pool.connectedAddresses
 
+    private val badgeMap = MutableStateFlow<Map<String, DeviceBadge>>(emptyMap())
+
+    override val badges: StateFlow<Map<String, DeviceBadge>> = badgeMap
+
+    private val unread = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    override val unreadByAddress: StateFlow<Map<String, Int>> = unread
+
+    override fun clearUnread(address: String) {
+        unread.update { it - address }
+    }
+
     override fun start(scope: CoroutineScope) {
+        // The plates are read from the database of each saved device; the device in use is left as it was (the app
+        // writes to that database itself and draws its own plate).
+        scope.launch {
+            slotsPrefs.slots.collectLatest { slots ->
+                while (true) {
+                    slots.forEach { slot -> readBadge(slot.address) }
+                    delay(BADGE_MS)
+                }
+            }
+        }
         scope.launch {
             combine(slotsPrefs.slots, slotsPrefs.offIds, uiPrefs.uiOptions) { slots, off, options ->
                 if (UiOptions(options)[UiOptions.RADIO_BACKGROUND] != 1) {
@@ -86,6 +114,19 @@ class BackgroundRadioCollector(
     }
 
     private val workers = mutableMapOf<String, Job>()
+
+    private suspend fun readBadge(address: String) {
+        val badge =
+            runCatching {
+                databaseManager.withDeviceDb(address) { db ->
+                    val mine = db.nodeInfoDao().getMyNodeEntity() ?: return@withDeviceDb null
+                    val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(mine.myNodeNum)).firstOrNull()
+                    DeviceBadge(mine.myNodeNum, node?.user?.short_name.orEmpty())
+                }
+            }
+                .getOrNull()
+        if (badge != null) badgeMap.update { it + (address to badge) }
+    }
 
     private suspend fun keepCollecting(address: String) {
         // A short pause first: a radio that has just been in use may still be closing its connection.
@@ -111,6 +152,7 @@ class BackgroundRadioCollector(
         try {
             supervisorScope {
                 val writer = launch { writeLogs(address, link) }
+                val processor = launch { processPackets(address, link) }
                 val beat = launch {
                     val heartbeat = ToRadio.Builder().also { it.heartbeat = Heartbeat.Builder().build() }.build()
                     while (true) {
@@ -121,7 +163,9 @@ class BackgroundRadioCollector(
                 link.ended.await()
                 beat.cancel()
                 link.logs.close()
+                link.packets.close()
                 writer.join()
+                processor.join()
             }
         } finally {
             withContext(NonCancellable) {
@@ -129,6 +173,22 @@ class BackgroundRadioCollector(
                 linkScope.cancel()
             }
         }
+    }
+
+    /** Hands the packets of a background device to the processor: messages, notifications, node data. */
+    private suspend fun processPackets(address: String, link: BackgroundRadioLink) {
+        val processor =
+            BackgroundPacketProcessor(
+                address = address,
+                databaseManager = databaseManager,
+                notifier = notifier,
+                deviceName = {
+                    slotsPrefs.slots.value.firstOrNull { it.address == address }?.name?.takeIf { it.isNotBlank() }
+                        ?: address
+                },
+                onMessage = { unread.update { it + (address to ((it[address] ?: 0) + 1)) } },
+            )
+        for (item in link.packets) processor.process(item.myNodeNum, item.packet)
     }
 
     /** Writes the waiting log entries to the radio's own database in small batches. */
@@ -161,6 +221,7 @@ class BackgroundRadioCollector(
     }
 
     private companion object {
+        const val BADGE_MS = 60_000L
         const val START_DELAY_MS = 2_000L
         const val RETRY_MS = 10_000L
         const val HEARTBEAT_MS = 5 * 60 * 1_000L

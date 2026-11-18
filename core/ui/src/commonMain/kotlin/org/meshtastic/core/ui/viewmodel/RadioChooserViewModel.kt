@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
@@ -54,6 +55,11 @@ data class RadioChoice(
     val status: RadioStatus,
     val active: Boolean = false,
     val off: Boolean = false,
+    /** Short name and node number of the device, for its coloured plate (null while not known yet). */
+    val shortName: String? = null,
+    val nodeNum: Int? = null,
+    /** New messages that reached this device in the background since it was last shown. */
+    val unread: Int = 0,
 )
 
 /**
@@ -66,6 +72,8 @@ data class RadioChooserState(
     val connectedCount: Int = 0,
     val dropped: Boolean = false,
     val canAdd: Boolean = true,
+    /** New messages on the devices that are not shown; the circle near the icon of the top bar. */
+    val unreadTotal: Int = 0,
 )
 
 /**
@@ -80,7 +88,8 @@ class RadioChooserViewModel(
     private val radioPrefs: RadioPrefs,
     private val radioController: RadioController,
     serviceRepository: ServiceRepository,
-    background: RadioBackgroundMonitor,
+    private val background: RadioBackgroundMonitor,
+    nodeRepository: NodeRepository,
 ) : ViewModel() {
 
     // True after a change the user asked for (disconnect, another radio, removal): the disconnection that follows is
@@ -93,6 +102,11 @@ class RadioChooserViewModel(
     // The slot that the next device picked from the list is saved in (null: a free one). Used once.
     private var targetSlot: Int? = null
 
+    private val plates =
+        combine(background.badges, background.unreadByAddress, nodeRepository.ourNodeInfo) { badges, unread, ours ->
+            Triple(badges, unread, ours)
+        }
+
     val state: StateFlow<RadioChooserState> =
         combine(
             combine(slotsPrefs.slots, slotsPrefs.selectedId, slotsPrefs.offIds) { slots, selectedId, off ->
@@ -101,8 +115,9 @@ class RadioChooserViewModel(
             radioPrefs.devAddr,
             serviceRepository.connectionState,
             background.connectedAddresses,
-            dropped,
-        ) { (slots, selectedId, off), address, connection, quiet, droppedByItself ->
+            combine(dropped, plates) { d, p -> d to p },
+        ) { (slots, selectedId, off), address, connection, quiet, (droppedByItself, plate) ->
+            val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices =
                 slots.map { slot ->
@@ -120,6 +135,10 @@ class RadioChooserViewModel(
                         },
                         active = active,
                         off = slot.id in off,
+                        shortName =
+                        if (active && ours != null) ours.user.short_name else badges[slot.address]?.shortName,
+                        nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
+                        unread = if (active) 0 else unread[slot.address] ?: 0,
                     )
                 }
             RadioChooserState(
@@ -127,6 +146,7 @@ class RadioChooserViewModel(
                 connectedCount = choices.count { it.status == RadioStatus.Connected },
                 dropped = droppedByItself && isValidDeviceAddress(address),
                 canAdd = slots.size < RadioSlotsPrefs.MAX_SLOTS,
+                unreadTotal = choices.sumOf { it.unread },
             )
         }
             .distinctUntilChanged()
@@ -144,6 +164,8 @@ class RadioChooserViewModel(
                     // the radio that was in use: it must not rename that radio.
                     val changed = address != lastAddress
                     lastAddress = address
+                    // The device is shown now: its count of new messages starts again.
+                    if (changed && isValidDeviceAddress(address)) background.clearUnread(address!!)
                     if (!changed || !isValidDeviceAddress(address)) return@collect
                     remember(address!!, name)
                 }

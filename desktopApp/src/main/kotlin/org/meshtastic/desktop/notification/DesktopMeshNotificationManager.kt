@@ -43,7 +43,8 @@ import org.meshtastic.proto.Telemetry
 private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
 
 /** The same link Android uses: a tap opens the conversation the notification came from. */
-private fun openMessageLink(contactKey: String) = "$DEEP_LINK_BASE_URI/messages/$contactKey"
+private fun openMessageLink(contactKey: String, deviceAddress: String? = null) =
+    "$DEEP_LINK_BASE_URI/messages/$contactKey" + (deviceAddress?.let { "?device=$it" } ?: "")
 
 /**
  * Desktop implementation of [MeshNotificationManager]: turns each mesh event into a [Notification] record and hands it
@@ -89,6 +90,27 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
                 isSilent = isSilent,
                 id = contactKey.hashCode(),
                 deepLink = openMessageLink(contactKey),
+            ),
+        )
+    }
+
+    @Suppress("LongParameterList")
+    override suspend fun showBackgroundMessageNotification(
+        deviceAddress: String,
+        deviceName: String,
+        contactKey: String,
+        sender: String,
+        text: String,
+        isBroadcast: Boolean,
+        channelName: String?,
+    ) {
+        notificationManager.dispatch(
+            Notification(
+                title = "$deviceName · ${channelName?.takeIf { isBroadcast } ?: sender}",
+                message = if (isBroadcast) "$sender: $text" else text,
+                category = Notification.Category.Message,
+                id = (deviceAddress + contactKey).hashCode(),
+                deepLink = openMessageLink(contactKey, deviceAddress),
             ),
         )
     }

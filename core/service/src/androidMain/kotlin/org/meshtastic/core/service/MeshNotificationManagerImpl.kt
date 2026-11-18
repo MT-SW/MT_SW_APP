@@ -214,6 +214,7 @@ class MeshNotificationManagerImpl(
         // overwrite the foreground-service notification, or num == 1 the group summary). notify()/cancel() must use
         // the same (tag, id) pair.
         private const val TAG_MESSAGE = "message"
+        private const val TAG_BACKGROUND_MESSAGE = "background_message"
 
         /**
          * Fully-qualified name of the bubble host, as a string to avoid a module dependency back onto `:androidApp`.
@@ -667,6 +668,33 @@ class MeshNotificationManagerImpl(
                 .setAutoCancel(true)
         if (isSilent) builder.setSilent(true)
         notificationManager.notify(TAG_REACTION, contactKey.hashCode(), builder.build())
+    }
+
+    @Suppress("LongParameterList")
+    override suspend fun showBackgroundMessageNotification(
+        deviceAddress: String,
+        deviceName: String,
+        contactKey: String,
+        sender: String,
+        text: String,
+        isBroadcast: Boolean,
+        channelName: String?,
+    ) {
+        ensureChannels()
+        val type = if (isBroadcast) NotificationChannelSpec.Broadcasts else NotificationChannelSpec.DirectMessages
+        val id = (deviceAddress + contactKey).hashCode()
+        val intent =
+            createDeepLinkIntent("messages/$contactKey?device=${android.net.Uri.encode(deviceAddress)}", id)
+        val title = "$deviceName · ${channelName?.takeIf { isBroadcast } ?: sender}"
+        val body = if (isBroadcast) "$sender: $text" else text
+        val builder =
+            commonBuilder(type, intent)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
+        notificationManager.notify(TAG_BACKGROUND_MESSAGE, id, builder.build())
     }
 
     override suspend fun updateWaypointNotification(
