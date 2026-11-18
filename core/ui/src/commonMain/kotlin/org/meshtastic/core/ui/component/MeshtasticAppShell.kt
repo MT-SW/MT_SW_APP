@@ -174,6 +174,7 @@ fun MeshtasticAppShell(
             LocalNodePresence provides nodePresence,
             LocalAppBarExtras provides appBarExtras,
             LocalSosBarSlots provides remember { SosBarSlots() },
+            LocalDeviceBarSlots provides remember { SosBarSlots() },
         ) {
             // Inside the provider: dialogs raised here (e.g. the traceroute result) read LocalModemPreset etc.
             MeshtasticCommonAppSetup(

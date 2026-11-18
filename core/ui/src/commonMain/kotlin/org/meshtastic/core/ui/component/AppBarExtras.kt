@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -160,6 +162,34 @@ private fun SosBarSlot(modifier: Modifier = Modifier, content: @Composable () ->
             }
         }
     Box(placed) { if (slots == null || slots.shows(id)) content() }
+}
+
+/** Same as [LocalSosBarSlots] for the plate of our node and the device list: they too appear once for the window. */
+@Suppress("CompositionLocalAllowlist")
+val LocalDeviceBarSlots = compositionLocalOf<SosBarSlots?> { null }
+
+/**
+ * Wraps the plate of our node and the device list of a top bar so that, with several bars on screen (desktop, tablet),
+ * only the one furthest to the right draws them, like the SOS button.
+ */
+@Composable
+fun DeviceBarSlot(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+    val slots = LocalDeviceBarSlots.current
+    if (slots == null) {
+        Row(modifier, verticalAlignment = Alignment.CenterVertically) { content() }
+        return
+    }
+    val id = remember { Any() }
+    DisposableEffect(slots, id) { onDispose { slots.release(id) } }
+    Row(
+        modifier.onGloballyPositioned {
+            val bounds = it.boundsInWindow()
+            slots.report(id, bounds.right, bounds.top)
+        },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (slots.shows(id)) content()
+    }
 }
 
 /** The SOS button as the top bars draw it: one for the whole window, whatever number of cards are side by side. */

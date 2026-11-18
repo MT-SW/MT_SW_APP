@@ -192,13 +192,16 @@ private fun TopBarActions(
             onHoldComplete = extras.onSendSos,
         )
     }
-    AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
-        chipNode?.let { node ->
-            NodeChip(modifier = Modifier.padding(start = 16.dp), node = node, onClick = onClickChip)
+    // With several cards side by side (desktop, tablet) the plate and the device list appear once, on the right bar.
+    DeviceBarSlot {
+        AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
+            chipNode?.let { node ->
+                NodeChip(modifier = Modifier.padding(start = 16.dp), node = node, onClick = onClickChip)
+            }
         }
+        // The radio chooser sits right next to the plate of our node (after the SOS button when there is no plate).
+        RadioChooserButton(actions = extras.radios, modifier = Modifier.padding(end = 8.dp))
     }
-    // The radio chooser sits right next to the plate of our node (after the SOS button when there is no plate).
-    RadioChooserButton(actions = extras.radios, modifier = Modifier.padding(end = 8.dp))
 
     actions()
 }
