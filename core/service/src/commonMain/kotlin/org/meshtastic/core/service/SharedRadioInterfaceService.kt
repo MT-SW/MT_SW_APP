@@ -958,6 +958,8 @@ class SharedRadioInterfaceService(
         runningTransportId = DeviceAddress.parse(address)?.interfaceId
         isStarted = true
         startHeartbeat()
+        // A transport taken over from the background is already connected: the app is told now that it holds it.
+        newTransport.announceIfConnected()
     }
 
     /**

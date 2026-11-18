@@ -155,15 +155,12 @@ class RadioTransportPool(
 
     /**
      * The device in use takes the transport of [address]. [consumer] then receives every event. If the transport is
-     * already connected, [consumer] is told so at once (no new connection is made).
+     * already connected, nothing is opened again; the owner calls [PooledRadioTransport.announceIfConnected] once it
+     * has stored the returned handle, so that [consumer] hears about the open connection.
      */
     fun attachForeground(address: String, consumer: RadioInterfaceService): PooledRadioTransport {
         val entry = entryFor(address)
-        val connected = synchronized(lock) {
-            entry.foreground = consumer
-            entry.connected
-        }
-        if (connected) consumer.onConnect()
+        synchronized(lock) { entry.foreground = consumer }
         return PooledRadioTransport(entry.address, consumer)
     }
 
@@ -219,6 +216,12 @@ class RadioTransportPool(
 
         override fun keepAlive() {
             current()?.transport?.keepAlive()
+        }
+
+        /** Tells the consumer that the transport it took over is already connected (no new connection is made). */
+        fun announceIfConnected() {
+            val connected = synchronized(lock) { entries[address]?.connected == true }
+            if (connected) consumer.onConnect()
         }
 
         /** Closes the transport for good, whoever else listens (restart of a broken connection). */
