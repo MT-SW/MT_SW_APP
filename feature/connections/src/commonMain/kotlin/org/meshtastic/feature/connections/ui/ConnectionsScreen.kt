@@ -17,10 +17,12 @@
 package org.meshtastic.feature.connections.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,8 +40,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -52,13 +52,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
@@ -185,6 +188,9 @@ private val CardMinHeight = 100.dp
 /** How many radios the connection card can hold (one page each). */
 private const val SLOT_COUNT = 3
 
+/** How far (in pixels) a swipe on the connection card must go to move to the next place. */
+private const val SLOT_SWIPE_PX = 80f
+
 /** Whether the connected card's config warning cards (region, transmit) may render for this connection. */
 internal fun canShowConfigWarnings(
     connectedWithNode: Boolean,
@@ -300,8 +306,11 @@ fun ConnectionsScreen(
     val activeRadioId = radios.state.radios.firstOrNull { it.active }?.id
     val disconnectActive: () -> Unit = { activeRadioId?.let(radios.onDisconnect) ?: scanModel.disconnect() }
     val activePage = ((activeRadioId ?: 1) - 1).coerceIn(0, SLOT_COUNT - 1)
-    val slotPager = rememberPagerState(initialPage = activePage) { SLOT_COUNT }
-    LaunchedEffect(activeRadioId) { if (activeRadioId != null) slotPager.animateScrollToPage(activePage) }
+    // The page of the card that is shown. It is plain state with a swipe gesture and a cross-fade (no pager): a pager
+    // is a lazy layout that is measured again on every change of the window width, which broke the desktop app when
+    // the window was resized.
+    var slotPage by rememberSaveable { mutableIntStateOf(activePage) }
+    LaunchedEffect(activeRadioId) { if (activeRadioId != null) slotPage = activePage }
 
     val selectedDevice by scanModel.selectedNotNullFlow.collectAsStateWithLifecycle()
     val persistedDeviceName by scanModel.persistedDeviceName.collectAsStateWithLifecycle()
@@ -636,11 +645,24 @@ fun ConnectionsScreen(
                     }
                 }
             }
-            HorizontalPager(
-                state = slotPager,
-                modifier = Modifier.fillMaxWidth(),
-                pageSpacing = 8.dp,
-                verticalAlignment = Alignment.Top,
+            Crossfade(
+                targetState = slotPage,
+                modifier =
+                Modifier.fillMaxWidth().pointerInput(Unit) {
+                    var drag = 0f
+                    detectHorizontalDragGestures(
+                        onDragStart = { drag = 0f },
+                        onDragEnd = {
+                            when {
+                                drag < -SLOT_SWIPE_PX && slotPage < SLOT_COUNT - 1 -> slotPage += 1
+                                drag > SLOT_SWIPE_PX && slotPage > 0 -> slotPage -= 1
+                            }
+                        },
+                        onDragCancel = { drag = 0f },
+                        onHorizontalDrag = { _, amount -> drag += amount },
+                    )
+                },
+                label = "connection_slot",
             ) { page ->
                 val slotId = page + 1
                 val radio = radios.state.radios.firstOrNull { it.id == slotId }
@@ -660,7 +682,7 @@ fun ConnectionsScreen(
                     }
                 }
             }
-            SlotDots(count = SLOT_COUNT, current = slotPager.currentPage)
+            SlotDots(count = SLOT_COUNT, current = slotPage)
 
             TerminateApplicationButton()
 
@@ -859,7 +881,7 @@ fun ConnectionsScreen(
                     activeTransport = activeTransport,
                     onSelectDevice = { entry ->
                         // The device is saved in the place of the page that is shown (see RadioChooserActions).
-                        radios.onTargetNextPick(slotPager.currentPage + 1)
+                        radios.onTargetNextPick(slotPage + 1)
                         // Recent TCP addresses are persisted, so this list renders without a scan — and
                         // therefore without the scan toggle's permission request ever having run. BLE and
                         // USB are unaffected by ACCESS_LOCAL_NETWORK, so only gate Tcp.
