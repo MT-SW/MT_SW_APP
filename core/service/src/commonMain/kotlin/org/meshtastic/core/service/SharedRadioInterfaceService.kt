@@ -994,8 +994,10 @@ class SharedRadioInterfaceService(
         // close() cancels their write scope. BLE's retry path backs off 500ms, so this window
         // also covers one retry on flaky GATT links.
         val pooled = currentTransport as? RadioTransportPool.PooledRadioTransport
-        val handOver =
-            handOverOnNextStop && pooled != null && currentSession?.address?.let { pool.hasBackground(it) } == true
+        // Switching to another device keeps this one connected: the background collector takes the open transport over
+        // (it may only start listening a moment later, the pool keeps the connection open for that).
+        val handOverTo = pooled.takeIf { handOverOnNextStop }
+        val handOver = handOverTo != null
         try {
             if (
                 sendPoliteDisconnect &&
@@ -1015,7 +1017,7 @@ class SharedRadioInterfaceService(
             radioTransport = null
             runningTransportId = null
             try {
-                if (handOver && pooled != null) pooled.release(handOver = true) else currentTransport?.close()
+                if (handOverTo != null) handOverTo.release(handOver = true) else currentTransport?.close()
             } finally {
                 _serviceScope.cancel("stopping transport")
                 _serviceScope = CoroutineScope(dispatchers.io + SupervisorJob())

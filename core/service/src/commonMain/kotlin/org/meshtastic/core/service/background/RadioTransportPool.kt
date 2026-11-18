@@ -23,10 +23,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
@@ -57,6 +59,7 @@ class RadioTransportPool(
     private val dispatchers: CoroutineDispatchers,
 ) {
     private val lock = SynchronizedObject()
+    private val orphanScope = CoroutineScope(SupervisorJob() + dispatchers.io)
     private val entries = mutableMapOf<String, Entry>()
     private val live = MutableStateFlow<Set<String>>(emptySet())
 
@@ -193,6 +196,16 @@ class RadioTransportPool(
         toClose?.let { closeEntry(it) }
     }
 
+    /** A transport handed over with nobody listening is closed after a while, so it never stays open for nothing. */
+    private fun scheduleOrphanCheck(entry: Entry) {
+        orphanScope.launch {
+            delay(ORPHAN_GRACE_MS)
+            val toClose =
+                synchronized(lock) { if (entries[entry.address] === entry) closeIfUnusedLocked(entry) else null }
+            toClose?.let { closeEntry(it) }
+        }
+    }
+
     private fun closeIfUnusedLocked(entry: Entry): Entry? {
         if (entry.foreground != null || entry.background != null) return null
         entries.remove(entry.address)
@@ -237,7 +250,10 @@ class RadioTransportPool(
                 synchronized(lock) {
                     val entry = entries[address] ?: return
                     if (entry.foreground === consumer) entry.foreground = null
-                    if (handOver && entry.background != null) {
+                    if (handOver) {
+                        // Kept open even when the background collector does not listen yet (it starts a moment after
+                        // a switch); if nobody takes it over in time, it is closed.
+                        if (entry.background == null) scheduleOrphanCheck(entry)
                         null
                     } else {
                         background = entry.background
@@ -257,3 +273,5 @@ class RadioTransportPool(
         }
     }
 }
+
+private const val ORPHAN_GRACE_MS = 60_000L

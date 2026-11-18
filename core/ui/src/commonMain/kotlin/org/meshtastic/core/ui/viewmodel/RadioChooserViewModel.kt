@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -155,6 +156,18 @@ class RadioChooserViewModel(
     init {
         // Every radio the app connects to is remembered; the one in use is the selected one. A radio that is already
         // saved only gets its name refreshed; when all places are taken, the selected radio's place is reused.
+        // Devices saved earlier with the same name (the old switch wrote the name of the device shown before): a
+        // network device gets its address back as the name, any other duplicate loses the wrong name.
+        viewModelScope.launch {
+            val slots = slotsPrefs.slots.first()
+            val seen = mutableSetOf<String>()
+            for (slot in slots) {
+                val name = slot.name?.takeIf { it.isNotBlank() } ?: continue
+                if (seen.add(name)) continue
+                val fixed = if (slot.address.startsWith(NETWORK_PREFIX)) slot.address.drop(1) else null
+                slotsPrefs.put(slot.address, fixed, slot.id)
+            }
+        }
         viewModelScope.launch {
             var lastAddress: String? = null
             combine(radioPrefs.devAddr, radioPrefs.devName) { address, name -> address to name }
@@ -202,7 +215,9 @@ class RadioChooserViewModel(
         val id =
             when {
                 // The same radio is never saved twice, whatever place it was picked for.
-                known != null -> slotsPrefs.put(address, name ?: known.name, known.id)
+                // A saved device keeps its name: when the app only switches to it, the stored name is still the one of
+                // the device that was shown before.
+                known != null -> slotsPrefs.put(address, known.name?.takeIf { it.isNotBlank() } ?: name, known.id)
                 target != null -> slotsPrefs.put(address, name, target)
                 else ->
                     slotsPrefs.put(address, name)
@@ -278,6 +293,7 @@ class RadioChooserViewModel(
 
     private companion object {
         const val NO_DEVICE = "n"
+        const val NETWORK_PREFIX = "t"
         const val STOP_TIMEOUT_MS = 5_000L
     }
 }

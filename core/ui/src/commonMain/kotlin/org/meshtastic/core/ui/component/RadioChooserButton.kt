@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,9 +59,6 @@ import org.meshtastic.core.resources.radio_chooser_count
 import org.meshtastic.core.resources.radio_chooser_dropped
 import org.meshtastic.core.resources.radio_chooser_title
 import org.meshtastic.core.resources.radio_chooser_unnamed
-import org.meshtastic.core.resources.radio_status_connected
-import org.meshtastic.core.resources.radio_status_connecting
-import org.meshtastic.core.resources.radio_status_disconnected
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshRadio
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -203,23 +201,16 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
                 modifier = Modifier.padding(end = 12.dp),
             )
         }
-        Column(modifier = Modifier.weight(1f)) {
+        // Only the plate is shown (no extra names). A device whose node is not known yet shows its saved name.
+        if (radio.nodeNum == null) {
             Text(
                 text = radio.name ?: stringResource(Res.string.radio_chooser_unnamed, radio.id),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = if (radio.active) FontWeight.Bold else FontWeight.Normal,
                 maxLines = 1,
+                modifier = Modifier.weight(1f),
             )
-            Text(
-                text =
-                when (radio.status) {
-                    RadioStatus.Connected -> stringResource(Res.string.radio_status_connected)
-                    RadioStatus.Connecting -> stringResource(Res.string.radio_status_connecting)
-                    RadioStatus.Disconnected -> stringResource(Res.string.radio_status_disconnected)
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
         }
         if (radio.unread > 0) {
             Text(
