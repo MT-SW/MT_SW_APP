@@ -21,7 +21,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -139,6 +138,7 @@ import org.meshtastic.core.ui.component.RecoveryCard
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.styledIndicator
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CellTower
@@ -1197,9 +1197,7 @@ private fun SlotDots(count: Int, current: Int, onPrevious: () -> Unit, onNext: (
         repeat(count) { index ->
             Box(
                 modifier =
-                Modifier.padding(horizontal = 3.dp)
-                    .size(7.dp)
-                    .background(if (index == current) active else inactive, CircleShape),
+                Modifier.padding(horizontal = 5.dp).size(10.dp).styledIndicator(CircleShape, index == current),
             )
         }
         val hasNext = current < count - 1

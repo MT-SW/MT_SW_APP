@@ -19,6 +19,7 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -255,6 +256,21 @@ private fun Modifier.filledLook(decor: FilledDecor, group: String, shape: Shape)
     decor.outline != null -> outlineGlassSurface(shape, decor)
     decor.glass != null -> glassSurface(shape, decor.glass)
     else -> buttonStyle(group, shape)
+}
+
+/**
+ * MT_SW: a small indicator (a dot of a page indicator) in the look of the chosen button style: a thin outline on clear
+ * glass (the shown one glows in the theme colour, the others are grey), filled glass, or plain circles.
+ */
+@Composable
+fun Modifier.styledIndicator(shape: Shape, active: Boolean): Modifier {
+    val scheme = MaterialTheme.colorScheme
+    val decor = rememberDecorFor(scheme.primary, scheme.outlineVariant, active, tonal = false)
+    return when {
+        decor.outline != null -> outlineGlassSurface(shape, decor)
+        decor.glass != null -> glassSurface(shape, decor.glass)
+        else -> background(if (active) scheme.primary else scheme.outlineVariant, shape)
+    }
 }
 
 private fun outlinePath(outline: Outline): Path = when (outline) {
