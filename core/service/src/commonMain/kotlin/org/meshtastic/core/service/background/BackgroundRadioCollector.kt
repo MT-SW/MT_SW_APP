@@ -42,10 +42,12 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
 import org.meshtastic.core.repository.MeshNotificationManager
+import org.meshtastic.core.repository.MessageFilter
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.RadioTransportFactory
+import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.proto.Heartbeat
 import org.meshtastic.proto.ToRadio
@@ -67,6 +69,8 @@ class BackgroundRadioCollector(
     private val databaseManager: DatabaseManager,
     private val notifier: MeshNotificationManager,
     private val bridge: RadioBridgeMonitor,
+    private val senderMutePrefs: SenderMutePrefs,
+    private val messageFilter: MessageFilter,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBackgroundMonitor {
     override val connectedAddresses: StateFlow<Set<String>> = pool.connectedAddresses
@@ -193,6 +197,8 @@ class BackgroundRadioCollector(
                         ?: address
                 },
                 onMessage = { unread.update { it + (address to ((it[address] ?: 0) + 1)) } },
+                senderMutes = { senderMutePrefs.mutes.value },
+                isFiltered = messageFilter::shouldFilter,
             )
         for (item in link.packets) processor.process(item.myNodeNum, item.packet)
     }

@@ -89,7 +89,7 @@ import org.meshtastic.feature.settings.mtsw.RadioBridgeState
 class ConsoleEnvironment(
     val radios: () -> List<RadioChoice>,
     val choose: (Int) -> Unit,
-    val disconnect: () -> Unit,
+    val disconnect: (Int?) -> Unit,
     val remove: (Int) -> Unit,
     val connection: () -> ConnectionState,
     val nodes: () -> List<Node>,
@@ -273,9 +273,17 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     )
                 }
             },
-            ConsoleCommand(labels.disconnect.name, labels.disconnect.summary, labels.disconnect.usage) {
-                env.disconnect()
-                ConsoleResult(listOf(getStringSuspend(Res.string.console_out_disconnecting)))
+            ConsoleCommand(labels.disconnect.name, labels.disconnect.summary, labels.disconnect.usage, complete = { args ->
+                if (args.isEmpty()) radioNumbers() else emptyList()
+            }) { args ->
+                val given = args.firstOrNull()
+                val radio = given?.let { radioNamed(it) }
+                if (given != null && radio == null) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_radio_missing, given)))
+                } else {
+                    env.disconnect(radio?.id)
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_disconnecting)))
+                }
             },
             ConsoleCommand(labels.remove.name, labels.remove.summary, labels.remove.usage, complete = { args ->
                 if (args.isEmpty()) radioNumbers() else emptyList()

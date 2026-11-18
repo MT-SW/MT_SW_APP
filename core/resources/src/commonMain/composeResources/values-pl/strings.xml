@@ -4299,7 +4299,7 @@
     <string name="radio_bridge_block_admin">Blokuj zdalne administrowanie</string>
     <string name="radio_bridge_block_messages">Blokuj wysyłanie wiadomości</string>
     <string name="console_title">Konsola</string>
-    <string name="console_info_body">Konsola: proste polecenia do urządzeń, połączeń i mostka. Wpisz polecenie i stuknij Wyślij (albo naciśnij Enter). W trakcie pisania pod polem pojawiają się podpowiedzi; dotknięcie uzupełnia polecenie lub argument. Przyciski „Wcześniejsze” i „Następne” przywołują wcześniej wpisane linie.\n\nPolecenia:\npomoc – lista poleceń albo opis jednego (pomoc &lt;polecenie&gt;)\nwyczyść – czyści ekran\nurządzenia – zapisane urządzenia, ich numery i stan\nurządzenie &lt;numer&gt; – przełącza wyświetlanie na to urządzenie (nic nie jest rozłączane)\nrozłącz – rozłącza pokazywane urządzenie (zostaje zapisane i wyłączone, także w tle, dopóki go nie połączysz w zakładce „Połącz”)\nusuń &lt;numer&gt; – usuwa urządzenie z listy zapisanych\nstan – połączenie, liczba węzłów i mostek TCP\nwęzły [tekst] – szuka węzłów po nazwie, skrócie albo numerze\nmost [włącz|wyłącz] – pokazuje, włącza albo wyłącza mostek TCP wybranego urządzenia\n\nPolecenia można pisać bez polskich liter. Łączenie urządzenia robisz w zakładce „Połącz”.</string>
+    <string name="console_info_body">Konsola: proste polecenia do urządzeń, połączeń i mostka. Wpisz polecenie i stuknij Wyślij (albo naciśnij Enter). W trakcie pisania pod polem pojawiają się podpowiedzi; dotknięcie uzupełnia polecenie lub argument. Przyciski „Wcześniejsze” i „Następne” przywołują wcześniej wpisane linie.\n\nPolecenia:\npomoc – lista poleceń albo opis jednego (pomoc &lt;polecenie&gt;)\nwyczyść – czyści ekran\nurządzenia – zapisane urządzenia, ich numery i stan\nurządzenie &lt;numer&gt; – przełącza wyświetlanie na to urządzenie (nic nie jest rozłączane)\nrozłącz [numer] – rozłącza pokazywane urządzenie albo to o podanym numerze (zostaje zapisane i wyłączone, także w tle, dopóki go nie połączysz w zakładce „Połącz”)\nusuń &lt;numer&gt; – usuwa urządzenie z listy zapisanych\nstan – połączenie, liczba węzłów i mostek TCP\nwęzły [tekst] – szuka węzłów po nazwie, skrócie albo numerze\nmost [włącz|wyłącz] – pokazuje, włącza albo wyłącza mostek TCP wybranego urządzenia\n\nPolecenia można pisać bez polskich liter. Łączenie urządzenia robisz w zakładce „Połącz”.</string>
     <string name="console_summary">Polecenia do urządzenia, połączeń i mostka</string>
     <string name="console_intro">Wpisz polecenie i naciśnij Enter. Polecenie „pomoc” pokazuje wszystkie.</string>
     <string name="console_input">Polecenie</string>
@@ -4321,8 +4321,8 @@
     <string name="console_cmd_radio_summary">Przełącza połączenie na zapisane urządzenie</string>
     <string name="console_cmd_radio_usage">urządzenie &lt;numer&gt;</string>
     <string name="console_cmd_disconnect_name">rozłącz</string>
-    <string name="console_cmd_disconnect_summary">Rozłącza urządzenie w użyciu (zostaje zapisane)</string>
-    <string name="console_cmd_disconnect_usage">rozłącz</string>
+    <string name="console_cmd_disconnect_summary">Rozłącza pokazywane urządzenie albo wskazane numerem (zostaje zapisane)</string>
+    <string name="console_cmd_disconnect_usage">rozłącz [numer]</string>
     <string name="console_cmd_remove_name">usuń</string>
     <string name="console_cmd_remove_summary">Usuwa urządzenie z listy zapisanych</string>
     <string name="console_cmd_remove_usage">usuń &lt;numer&gt;</string>

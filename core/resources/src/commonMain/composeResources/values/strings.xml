@@ -971,8 +971,8 @@
     <string name="console_cmd_clear_summary">Clears the screen</string>
     <string name="console_cmd_clear_usage">clear</string>
     <string name="console_cmd_disconnect_name">disconnect</string>
-    <string name="console_cmd_disconnect_summary">Disconnects the device in use (it stays saved)</string>
-    <string name="console_cmd_disconnect_usage">disconnect</string>
+    <string name="console_cmd_disconnect_summary">Disconnects the shown device or the one with the given number (it stays saved)</string>
+    <string name="console_cmd_disconnect_usage">disconnect [number]</string>
     <string name="console_cmd_help_name">help</string>
     <string name="console_cmd_help_summary">Shows the commands or the description of one</string>
     <string name="console_cmd_help_usage">help [command]</string>
@@ -991,7 +991,7 @@
     <string name="console_cmd_status_name">status</string>
     <string name="console_cmd_status_summary">Shows the state of the connection, the nodes and the bridge</string>
     <string name="console_cmd_status_usage">status</string>
-    <string name="console_info_body">Console: simple commands for the devices, the connections and the bridge. Type a command and tap Send (or press Enter). While you type, hints appear under the field; a tap completes the command or its argument. The buttons "Earlier" and "Next" bring back lines typed before.\n\nCommands:\nhelp – the list of commands, or the description of one (help &lt;command&gt;)\nclear – clears the screen\ndevices – the saved devices, their numbers and their state\ndevice &lt;number&gt; – switches what the app shows to that device (nothing is disconnected)\ndisconnect – disconnects the device that is shown (it stays saved and stays off, also in the background, until you connect it on the Connect tab)\nremove &lt;number&gt; – removes a device from the saved list\nstatus – the connection, the number of nodes and the TCP bridge\nnodes [text] – finds nodes by name, short name or number\nbridge [on|off] – shows, turns on or turns off the TCP bridge of the chosen device\n\nThe commands can be typed without Polish letters. Connecting a device is done on the Connect tab.</string>
+    <string name="console_info_body">Console: simple commands for the devices, the connections and the bridge. Type a command and tap Send (or press Enter). While you type, hints appear under the field; a tap completes the command or its argument. The buttons "Earlier" and "Next" bring back lines typed before.\n\nCommands:\nhelp – the list of commands, or the description of one (help &lt;command&gt;)\nclear – clears the screen\ndevices – the saved devices, their numbers and their state\ndevice &lt;number&gt; – switches what the app shows to that device (nothing is disconnected)\ndisconnect [number] – disconnects the shown device or the one with the given number (it stays saved and stays off, also in the background, until you connect it on the Connect tab)\nremove &lt;number&gt; – removes a device from the saved list\nstatus – the connection, the number of nodes and the TCP bridge\nnodes [text] – finds nodes by name, short name or number\nbridge [on|off] – shows, turns on or turns off the TCP bridge of the chosen device\n\nThe commands can be typed without Polish letters. Connecting a device is done on the Connect tab.</string>
     <string name="console_input">Command</string>
     <string name="console_intro">Type a command and press Enter. The \"help\" command shows all of them.</string>
     <string name="console_next">Next</string>

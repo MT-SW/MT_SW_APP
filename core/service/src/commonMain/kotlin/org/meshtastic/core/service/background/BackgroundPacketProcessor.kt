@@ -24,11 +24,13 @@ import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.textMentionsNode
 import org.meshtastic.core.model.util.MeshDataMapper
 import org.meshtastic.core.model.util.NodeIdLookup
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.repository.MeshNotificationManager
+import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Position
@@ -48,6 +50,8 @@ class BackgroundPacketProcessor(
     private val notifier: MeshNotificationManager,
     private val deviceName: () -> String,
     private val onMessage: () -> Unit,
+    private val senderMutes: () -> Map<String, Long> = { emptyMap() },
+    private val isFiltered: (String, Boolean) -> Boolean = { _, _ -> false },
 ) {
     private val mapper =
         MeshDataMapper(
@@ -93,13 +97,20 @@ class BackgroundPacketProcessor(
         var sender: String? = null
         var muted = false
         var stored = false
+        var filtered = false
         databaseManager.withDeviceDb(address) { db ->
             val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(packet.from)).firstOrNull()
             if (node?.isIgnored == true) return@withDeviceDb
             if (db.packetDao().findPacketsWithId(data.id).any { it.data.from == data.from }) return@withDeviceDb
             sender = node?.displayName?.ifBlank { null } ?: node?.longName ?: node?.user?.long_name?.ifBlank { null }
-            val muteUntil = db.packetDao().getContactSettings(contactKey)?.muteUntil ?: 0L
-            muted = node?.isMuted == true || muteUntil > nowMillis
+            val settings = db.packetDao().getContactSettings(contactKey)
+            // Like on the device in use: a muted node or sender stays muted, a muted conversation is broken through
+            // by a message that mentions this device.
+            val mentionsMe = textMentionsNode(body, NodeAddress.numToDefaultId(myNodeNum))
+            val senderMuted = senderMutes().isSenderMuted(contactKey, packet.from, nowMillis)
+            val conversationMuted = settings?.isMuted == true
+            muted = node?.isMuted == true || senderMuted || (conversationMuted && !mentionsMe)
+            filtered = !isAlert && isFiltered(body, settings?.filteringDisabled == true)
             db.packetDao()
                 .insertAndGetId(
                     Packet(
@@ -115,11 +126,12 @@ class BackgroundPacketProcessor(
                         rssi = data.rssi,
                         hopsAway = data.hopsAway,
                         messageText = body,
+                        filtered = filtered,
                     ),
                 )
             stored = true
         }
-        if (!stored) return
+        if (!stored || filtered) return
         onMessage()
         if (muted) return
         if (isAlert) {
