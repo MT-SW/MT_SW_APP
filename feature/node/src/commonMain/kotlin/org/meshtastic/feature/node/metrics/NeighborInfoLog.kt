@@ -41,8 +41,8 @@ import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.neighbor_info_received
+import org.meshtastic.core.resources.neighbor_info_requested
 import org.meshtastic.core.resources.routing_error_no_response
-import org.meshtastic.core.resources.success
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
@@ -148,8 +148,10 @@ fun NeighborInfoLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit,
                     val text =
                         when {
                             entry is NeighborInfoEntry.Received -> stringResource(Res.string.neighbor_info_received)
-                            report != null -> stringResource(Res.string.success)
-                            else -> stringResource(Res.string.routing_error_no_response)
+                            report != null -> stringResource(Res.string.neighbor_info_requested)
+                            else ->
+                                "${stringResource(Res.string.neighbor_info_requested)} - " +
+                                    stringResource(Res.string.routing_error_no_response)
                         }
                     var expanded by remember { mutableStateOf(false) }
 

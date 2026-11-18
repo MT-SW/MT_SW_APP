@@ -2548,6 +2548,7 @@ neighbor_count_description
 neighbor_info
 neighbor_info_config
 neighbor_info_received
+neighbor_info_requested
 neighbor_mean_snr
 neighbor_mean_snr_description
 ### NEIGHBORS ###

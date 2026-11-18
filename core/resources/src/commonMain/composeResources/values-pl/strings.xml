@@ -4288,7 +4288,7 @@
     <string name="radio_count_hide">Ukrywaj</string>
     <string name="radio_bridge_title">Mostek TCP urządzeń</string>
     <string name="radio_bridge_enabled">Włącz mostek</string>
-    <string name="radio_bridge_no_radio">Najpierw zapisz urządzenie w górnym pasku.</string>
+    <string name="radio_bridge_no_radio">Najpierw zapisz urządzenie w oknie „Połącz”.</string>
     <string name="radio_bridge_device_number">Urządzenie %1$d</string>
     <string name="radio_bridge_address">Adres mostka: %1$s, port %2$d</string>
     <string name="radio_bridge_port">Port</string>
@@ -4338,7 +4338,7 @@
     <string name="console_out_unknown">Nieznane polecenie: %1$s. Wpisz „pomoc”.</string>
     <string name="console_out_help_header">Dostępne polecenia:</string>
     <string name="console_out_help_usage">Użycie: %1$s</string>
-    <string name="console_out_no_radios">Brak zapisanych urządzeń. Dodaj urządzenie w górnym pasku.</string>
+    <string name="console_out_no_radios">Brak zapisanych urządzeń. Dodaj urządzenie w oknie „Połącz”.</string>
     <string name="console_out_radio_line">%1$d: %2$s – %3$s%4$s</string>
     <string name="console_out_selected"> (wybrane)</string>
     <string name="console_out_state_connected">podłączone</string>
@@ -4355,7 +4355,7 @@
     <string name="console_out_status_bridge">Mostek TCP: %1$s</string>
     <string name="console_out_bridge_on">włączony, port %1$d</string>
     <string name="console_out_bridge_off">wyłączony</string>
-    <string name="console_out_bridge_none">Najpierw zapisz urządzenie w górnym pasku.</string>
+    <string name="console_out_bridge_none">Najpierw zapisz urządzenie w oknie „Połącz”.</string>
     <string name="console_out_bridge_changed">Mostek TCP: %1$s.</string>
     <string name="console_out_nodes_none">Brak pasujących węzłów.</string>
     <string name="console_out_nodes_more">…i jeszcze %1$d.</string>
@@ -4373,7 +4373,8 @@
     <string name="radio_slot_use">Użyj tego urządzenia</string>
     <string name="neighbor_count">Sąsiedzi</string>
     <string name="neighbor_count_description">Ilu sąsiadów ten węzeł usłyszał bezpośrednio, tak jak ich zgłosił.</string>
-    <string name="neighbor_info_received">Odebrano</string>
+    <string name="neighbor_info_received">Odebrano automatycznie</string>
+    <string name="neighbor_info_requested">Poproszono ręcznie</string>
     <string name="neighbor_mean_snr">Średni SNR sąsiadów</string>
     <string name="neighbor_mean_snr_description">Średni SNR, z jakim ten węzeł usłyszał zgłoszonych sąsiadów.</string>
     <string name="requesting_neighbor_info_from">Proszę o informacje o sąsiadach od %1$s. Odpowie tylko wtedy, gdy ma włączony moduł informacji o sąsiadach.</string>

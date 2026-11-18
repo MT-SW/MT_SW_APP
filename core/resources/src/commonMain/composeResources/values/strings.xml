@@ -995,13 +995,13 @@
     <string name="console_intro">Type a command and press Enter. The "help" command shows all of them.</string>
     <string name="console_next">Next</string>
     <string name="console_out_bridge_changed">TCP bridge: %1$s.</string>
-    <string name="console_out_bridge_none">Save a device in the top bar first.</string>
+    <string name="console_out_bridge_none">Save a device in the Connect window first.</string>
     <string name="console_out_bridge_off">off</string>
     <string name="console_out_bridge_on">on, port %1$d</string>
     <string name="console_out_disconnecting">Disconnecting the device.</string>
     <string name="console_out_help_header">Available commands:</string>
     <string name="console_out_help_usage">Usage: %1$s</string>
-    <string name="console_out_no_radios">No saved devices. Add a device in the top bar.</string>
+    <string name="console_out_no_radios">No saved devices. Add a device in the Connect window.</string>
     <string name="console_out_node_offline">offline</string>
     <string name="console_out_node_online">online</string>
     <string name="console_out_nodes_more">…and %1$d more.</string>
@@ -2598,7 +2598,8 @@
     <string name="neighbor_count_description">How many nodes this node heard directly, as it reported them.</string>
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
-    <string name="neighbor_info_received">Received</string>
+    <string name="neighbor_info_received">Received automatically</string>
+    <string name="neighbor_info_requested">Requested manually</string>
     <string name="neighbor_mean_snr">Mean neighbor SNR</string>
     <string name="neighbor_mean_snr_description">The average SNR at which this node heard its reported neighbors.</string>
     <!-- NEIGHBORS -->
@@ -3241,7 +3242,7 @@
     <string name="radio_bridge_enabled">Turn on the bridge</string>
     <string name="radio_bridge_lan">Access from the local network (default: this device only)</string>
     <string name="radio_bridge_max_clients">Most connected programs</string>
-    <string name="radio_bridge_no_radio">Save a device in the top bar first.</string>
+    <string name="radio_bridge_no_radio">Save a device in the Connect window first.</string>
     <string name="radio_bridge_port">Port</string>
     <string name="radio_bridge_port_summary">0 means the default port of this device (%1$d)</string>
     <string name="radio_bridge_read_only">Read only (nothing reaches the device)</string>
