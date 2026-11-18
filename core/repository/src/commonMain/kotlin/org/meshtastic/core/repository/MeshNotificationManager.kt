@@ -166,3 +166,7 @@ interface MeshNotificationManager {
      */
     suspend fun refreshConversationAfterReply(contactKey: String) = cancelMessageNotification(contactKey)
 }
+
+/** Title of a notification from another device: its short name, then [subject]; just [subject] when unknown. */
+fun deviceNotificationTitle(deviceShortName: String, subject: String): String =
+    if (deviceShortName.isBlank()) subject else "$deviceShortName · $subject"

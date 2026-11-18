@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -193,25 +192,7 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // The plate of the device: its short name in the colour of its node, like the plate of our node on the bar.
-        radio.nodeNum?.let { num ->
-            NodeChip(
-                node =
-                Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
-                modifier = Modifier.padding(end = 12.dp),
-            )
-        }
-        // Only the plate is shown (no extra names). A device whose node is not known yet shows its saved name.
-        if (radio.nodeNum == null) {
-            Text(
-                text = radio.name ?: stringResource(Res.string.radio_chooser_unnamed, radio.id),
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                modifier = Modifier.weight(1f),
-            )
-        } else {
-            Spacer(modifier = Modifier.weight(1f))
-        }
+        Box(modifier = Modifier.weight(1f)) { RadioPlate(radio) }
         if (radio.unread > 0) {
             Text(
                 text = radio.unread.toString(),
@@ -224,5 +205,27 @@ private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
                     .padding(horizontal = 6.dp, vertical = 1.dp),
             )
         }
+    }
+}
+
+/**
+ * The device by its plate only: the short name in the colour of its node, with no other name. A device whose node
+ * is not known yet shows its saved name.
+ */
+@Composable
+fun RadioPlate(radio: RadioChoice, modifier: Modifier = Modifier) {
+    val num = radio.nodeNum
+    if (num != null) {
+        NodeChip(
+            node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
+            modifier = modifier,
+        )
+    } else {
+        Text(
+            text = radio.name ?: stringResource(Res.string.radio_chooser_unnamed, radio.id),
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            modifier = modifier,
+        )
     }
 }

@@ -26,6 +26,7 @@ import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.SosAlarmStyle
+import org.meshtastic.core.repository.deviceNotificationTitle
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_update_message
@@ -109,7 +110,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     ) {
         notificationManager.dispatch(
             Notification(
-                title = "$deviceName · ${channelName?.takeIf { isBroadcast } ?: sender}",
+                title = deviceNotificationTitle(deviceName, channelName?.takeIf { isBroadcast } ?: sender),
                 message = if (isBroadcast) "$sender: $text" else text,
                 category = Notification.Category.Message,
                 id = (deviceAddress + contactKey).hashCode(),

@@ -36,7 +36,12 @@ data class RadioBridgeState(
 )
 
 /** The bridge settings of one saved device. [name] is null while the device is not connected (its name is not shown). */
-data class RadioBridgeDevice(val slotId: Int, val name: String?, val config: RadioBridgeConfig)
+data class RadioBridgeDevice(
+    val slotId: Int,
+    val name: String?,
+    val nodeNum: Int?,
+    val config: RadioBridgeConfig,
+)
 
 /** The settings of the TCP bridges (see [RadioBridgeConfig]): one set per saved device, and the chosen device. */
 @KoinViewModel
@@ -46,12 +51,19 @@ class RadioBridgeViewModel(
     background: RadioBackgroundMonitor,
 ) : ViewModel() {
     val devices: StateFlow<List<RadioBridgeDevice>> =
-        combine(slotsPrefs.slots, bridgePrefs.configs, background.connectedAddresses) { slots, configs, connected ->
+        combine(slotsPrefs.slots, bridgePrefs.configs, background.connectedAddresses, background.badges) {
+                slots,
+                configs,
+                connected,
+                badges,
+            ->
             slots.map { slot ->
-                val name = slot.name?.takeIf { it.isNotBlank() } ?: slot.address
+                // Only the short name of the device's node is shown.
+                val name = badges[slot.address]?.shortName?.takeIf { it.isNotBlank() }
                 RadioBridgeDevice(
                     slotId = slot.id,
                     name = name.takeIf { slot.address in connected },
+                    nodeNum = badges[slot.address]?.nodeNum?.takeIf { slot.address in connected },
                     config = configs[slot.id] ?: RadioBridgeConfig(),
                 )
             }

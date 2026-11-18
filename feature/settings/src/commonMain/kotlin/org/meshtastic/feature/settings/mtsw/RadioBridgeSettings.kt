@@ -16,13 +16,17 @@
  */
 package org.meshtastic.feature.settings.mtsw
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.radio_bridge_address
@@ -38,6 +42,7 @@ import org.meshtastic.core.resources.radio_bridge_port_summary
 import org.meshtastic.core.resources.radio_bridge_read_only
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditTextPreference
+import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.AdminPanelSettings
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -45,6 +50,7 @@ import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.icon.Udp
 import org.meshtastic.core.ui.icon.Visibility
+import org.meshtastic.proto.User
 
 /**
  * The settings of the TCP bridges: one block for every saved device, so several devices can be shared at the same
@@ -70,7 +76,14 @@ private fun RadioBridgeDeviceSettings(
 ) {
     val slotId = device.slotId
     val config = device.config
-    Text(device.name ?: stringResource(Res.string.radio_bridge_device_number, slotId))
+    if (device.name != null && device.nodeNum != null) {
+        NodeChip(
+            node = Node(num = device.nodeNum, user = User.Builder().also { it.short_name = device.name }.build()),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+    } else {
+        Text(stringResource(Res.string.radio_bridge_device_number, slotId))
+    }
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_enabled),
         leadingIcon = MeshtasticIcons.Share,

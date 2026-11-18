@@ -29,7 +29,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.radio_chooser_connect
 import org.meshtastic.core.resources.radio_chooser_disconnect
 import org.meshtastic.core.resources.radio_chooser_remove
-import org.meshtastic.core.resources.radio_chooser_unnamed
 import org.meshtastic.core.resources.radio_slot_background
 import org.meshtastic.core.resources.radio_slot_empty
 import org.meshtastic.core.resources.radio_slot_position
@@ -47,6 +45,7 @@ import org.meshtastic.core.resources.radio_status_connecting
 import org.meshtastic.core.resources.radio_status_disconnected
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.RadioPlate
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshRadio
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -94,12 +93,7 @@ fun RadioSlotCard(
             )
             return@Column
         }
-        Text(
-            text = radio.name ?: stringResource(Res.string.radio_chooser_unnamed, radio.id),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-        )
+        RadioPlate(radio)
         Text(
             text =
             when (radio.status) {

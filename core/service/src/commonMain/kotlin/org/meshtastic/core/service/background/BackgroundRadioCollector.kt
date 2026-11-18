@@ -125,7 +125,7 @@ class BackgroundRadioCollector(
     private suspend fun readBadge(address: String) {
         val badge =
             runCatching {
-                databaseManager.withDeviceDb(address) { db ->
+                databaseManager.withDeviceDb(address, includeActive = true) { db ->
                     val mine = db.nodeInfoDao().getMyNodeEntity() ?: return@withDeviceDb null
                     val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(mine.myNodeNum)).firstOrNull()
                     DeviceBadge(mine.myNodeNum, node?.user?.short_name.orEmpty())
@@ -192,10 +192,8 @@ class BackgroundRadioCollector(
                 address = address,
                 databaseManager = databaseManager,
                 notifier = notifier,
-                deviceName = {
-                    slotsPrefs.slots.value.firstOrNull { it.address == address }?.name?.takeIf { it.isNotBlank() }
-                        ?: address
-                },
+                // Only the short name of the device's own node, nothing else.
+                deviceName = { badgeMap.value[address]?.shortName.orEmpty() },
                 onMessage = { unread.update { it + (address to ((it[address] ?: 0) + 1)) } },
                 senderMutes = { senderMutePrefs.mutes.value },
                 isFiltered = messageFilter::shouldFilter,

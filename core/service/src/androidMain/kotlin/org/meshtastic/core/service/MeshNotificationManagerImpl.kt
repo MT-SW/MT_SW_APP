@@ -91,6 +91,7 @@ import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.activeNodeCountFlow
+import org.meshtastic.core.repository.deviceNotificationTitle
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
 import org.meshtastic.core.resources.Res
@@ -685,7 +686,7 @@ class MeshNotificationManagerImpl(
         val id = (deviceAddress + contactKey).hashCode()
         val intent =
             createDeepLinkIntent("messages/$contactKey?device=${android.net.Uri.encode(deviceAddress)}", id)
-        val title = "$deviceName · ${channelName?.takeIf { isBroadcast } ?: sender}"
+        val title = deviceNotificationTitle(deviceName, channelName?.takeIf { isBroadcast } ?: sender)
         val body = if (isBroadcast) "$sender: $text" else text
         val builder =
             commonBuilder(type, intent)

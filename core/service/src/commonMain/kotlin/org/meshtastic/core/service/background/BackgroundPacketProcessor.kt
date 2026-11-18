@@ -30,6 +30,7 @@ import org.meshtastic.core.model.util.NodeIdLookup
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.repository.MeshNotificationManager
+import org.meshtastic.core.repository.deviceNotificationTitle
 import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
@@ -136,7 +137,7 @@ class BackgroundPacketProcessor(
         if (muted) return
         if (isAlert) {
             // A critical alert breaks through like on the device in use: its own notification, with the sender's name.
-            notifier.showAlertNotification(contactKey, "${deviceName()} · ${sender ?: data.from.orEmpty()}", body)
+            notifier.showAlertNotification(contactKey, deviceNotificationTitle(deviceName(), sender ?: data.from.orEmpty()), body)
             return
         }
         notifier.showBackgroundMessageNotification(
