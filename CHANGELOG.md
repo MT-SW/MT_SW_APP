@@ -80,6 +80,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 
 ##### Naprawione błędy
+* iPhone/iPad: ekran „Informacje o sąsiadach” zamykał aplikację przy otwarciu (wykres nie przyjmował czasów z ułamkami sekund); czasy są teraz w pełnych sekundach.
 * Arkusz warstw mapy na iPhonie/iPadzie nie ma już nakładających się napisów: lista zaimportowanych warstw ma własne ograniczenie wysokości, a części pod nią (w tym badanie sygnału) zawsze zostają na swoim miejscu.
 * Link „meshtastic://meshtastic/sos” (widżet, kafelek, skrót, menu przy zegarze) nigdy nie otwierał ekranu SOS; teraz otwiera.
 * „Zdrowie sieci”, szczegóły węzła: nazwy serii po angielsku („Noise Floor”, „Ch. Util”, „Air Util”, „WiFi RSSI”, „BLE RSSI”) są teraz po polsku („Szum tła”, „Zajęcie kanału”, „Czas nadawania”, „RSSI Wi-Fi”, „RSSI Bluetooth”), a poziom szumu ma jednostkę dBm zamiast dB.

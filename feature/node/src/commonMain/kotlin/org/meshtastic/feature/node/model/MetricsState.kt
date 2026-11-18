@@ -136,9 +136,12 @@ sealed interface NeighborInfoEntry {
     /** The packet carrying the neighbor list, or null for a request nothing answered. */
     val report: MeshLog?
 
-    /** When the neighbor list arrived, or when the request went out if it never did. */
+    /**
+     * When the neighbor list arrived, or when the request went out if it never did. Whole seconds: the chart library
+     * refuses times with more than four decimal places, which fractional seconds hit through rounding errors.
+     */
     val timeSeconds: Double
-        get() = (report ?: log).received_date / MS_PER_SEC_DOUBLE
+        get() = ((report ?: log).received_date / MS_PER_SEC).toDouble()
 
     /** A request we sent, with the reply if one came back. */
     data class Requested(override val log: MeshLog, val reply: MeshLog?) : NeighborInfoEntry {
@@ -153,4 +156,4 @@ sealed interface NeighborInfoEntry {
     }
 }
 
-private const val MS_PER_SEC_DOUBLE = 1000.0
+private const val MS_PER_SEC = 1000L
