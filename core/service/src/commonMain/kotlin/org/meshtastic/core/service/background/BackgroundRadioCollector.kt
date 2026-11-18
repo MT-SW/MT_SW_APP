@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.toByteString
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.database.DatabaseManager
@@ -42,6 +43,7 @@ import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.RadioBackgroundMonitor
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.UiPrefs
@@ -64,6 +66,7 @@ class BackgroundRadioCollector(
     private val pool: RadioTransportPool,
     private val databaseManager: DatabaseManager,
     private val notifier: MeshNotificationManager,
+    private val bridge: RadioBridgeMonitor,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBackgroundMonitor {
     override val connectedAddresses: StateFlow<Set<String>> = pool.connectedAddresses
@@ -146,7 +149,9 @@ class BackgroundRadioCollector(
     /** One connection: until the radio goes away or this is cancelled. */
     private suspend fun collectOnce(address: String) {
         val linkScope = CoroutineScope(SupervisorJob() + dispatchers.io)
-        val link = BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes)
+        val link = BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes) { bytes ->
+                bridge.onDeviceFrame(address, bytes.toByteString())
+            }
         link.attach { bytes -> pool.send(address, bytes) }
         pool.attachBackground(address, link)
         try {

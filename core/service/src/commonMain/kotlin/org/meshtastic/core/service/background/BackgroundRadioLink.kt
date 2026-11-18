@@ -56,6 +56,7 @@ class BackgroundRadioLink(
     private val address: String,
     override val serviceScope: CoroutineScope,
     override val supportedDeviceTypes: List<DeviceType>,
+    private val onFrame: (ByteArray) -> Unit = {},
 ) : RadioInterfaceService {
     /** Log entries waiting to be written; a full queue drops the newest ones. */
     val logs = Channel<MeshLog>(LOG_QUEUE)
@@ -125,6 +126,8 @@ class BackgroundRadioLink(
     }
 
     override fun handleFromRadio(bytes: ByteArray) {
+        // The bridge of this device (if it is on) gets every frame, also while the device is not shown in the app.
+        onFrame(bytes)
         val frame = runCatching { FromRadio.ADAPTER.decode(bytes) }.getOrNull() ?: return
         frame.my_info?.let { myNodeNum = it.my_node_num }
         val packet = frame.packet ?: return

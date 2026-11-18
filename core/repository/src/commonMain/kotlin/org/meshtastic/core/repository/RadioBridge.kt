@@ -67,6 +67,9 @@ interface RadioBridgePrefs {
 interface RadioBridgeMonitor {
     fun start(scope: CoroutineScope)
 
-    /** One frame (a FromRadio message) the radio sent to the app. */
+    /** One frame (a FromRadio message) the device shown in the app sent to the app. */
     fun onFromRadio(payload: ByteString)
+
+    /** One frame (a FromRadio message) sent by a device kept in the background, identified by its [address]. */
+    fun onDeviceFrame(address: String, payload: ByteString) = Unit
 }

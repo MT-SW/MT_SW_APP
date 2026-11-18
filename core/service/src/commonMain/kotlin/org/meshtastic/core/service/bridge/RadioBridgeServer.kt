@@ -29,11 +29,10 @@ import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import okio.ByteString
 import org.koin.core.annotation.Single
@@ -43,60 +42,91 @@ import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioBridgePrefs
 import org.meshtastic.core.repository.RadioInterfaceService
+import org.meshtastic.core.repository.RadioSlot
 import org.meshtastic.core.repository.RadioSlotsPrefs
+import org.meshtastic.core.service.background.RadioTransportPool
+import org.meshtastic.proto.ToRadio
 import kotlin.concurrent.Volatile
 
 /**
- * The TCP bridge (MT_SW) of the selected radio, written for this app: a server on the device that speaks the same
- * stream protocol as the radio's own TCP port, so other programs can connect to the radio through the app while the
- * app keeps its single connection. What clients may see and send is decided by [BridgeRouter]. Errors only go to the
- * log. The server runs while the mesh service runs and follows the settings: it stops when the bridge is switched off,
- * moves when the port, the local-network access or the radio changes, and takes the restrictions and the number of
- * clients live, without dropping anyone.
+ * The TCP bridges (MT_SW), written for this app: for every saved device that has its bridge switched on, a server on
+ * the computer or phone that speaks the same stream protocol as the device's own TCP port, so other programs can
+ * connect to that device through the app while the app keeps its single connection. Several devices can be shared at
+ * the same time, each on its own port. What clients may see and send is decided by one [BridgeRouter] per device. The
+ * frames of the device shown in the app come from the app's own session ([onFromRadio]); the frames of a device kept
+ * in the background come from its quiet link ([onDeviceFrame]). Errors only go to the log. A server moves when its
+ * port, the local-network access or its device changes, stops when its bridge is switched off, and takes the
+ * restrictions and the number of clients live, without dropping anyone.
  *
- * The router and the client list are shared by the radio receive loop and the sockets, so every access goes through
+ * The routers and the client lists are shared by the receive loops and the sockets, so every access goes through
  * [lock] (never held while suspending).
  */
 @Single
 class RadioBridgeServer(
     private val radioInterfaceService: RadioInterfaceService,
+    private val pool: RadioTransportPool,
     private val slotsPrefs: RadioSlotsPrefs,
     private val bridgePrefs: RadioBridgePrefs,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBridgeMonitor {
     private val lock = SynchronizedObject()
-    private val router = BridgeRouter()
-    private val clients = LinkedHashMap<Int, Channel<ByteArray>>()
+    private val instances = LinkedHashMap<Int, Instance>()
     private var nextClientId = 1
 
-    @Volatile private var serving = false
-
-    // True from the moment the app was asked to connect to the radio again (to get a configuration to hand out) until
-    // the configuration is there.
-    @Volatile private var handshakeAsked = false
-    private val handshakeRequests = Channel<Unit>(Channel.CONFLATED)
-
-    /** Where the server listens; a change of this moves the server, a change of anything else does not. */
+    /** Where a server listens; a change of this moves the server, a change of anything else does not. */
     private data class Listen(val port: Int, val lanAccess: Boolean)
 
+    /** The bridge of one saved device. */
+    private inner class Instance(val slot: RadioSlot, var listen: Listen) {
+        val router = BridgeRouter()
+        val clients = LinkedHashMap<Int, Channel<ByteArray>>()
+
+        @Volatile var serving = false
+
+        // True from the moment the device was asked for its configuration again (to get one to hand out) until the
+        // configuration is there.
+        @Volatile var handshakeAsked = false
+        val handshakeRequests = Channel<Unit>(Channel.CONFLATED)
+        var job: Job? = null
+    }
+
     override fun start(scope: CoroutineScope) {
-        // Restrictions and the number of clients apply at once.
         scope.launch {
-            combine(slotsPrefs.selectedId, bridgePrefs.configs) { id, all ->
-                id?.let { all[it] } ?: RadioBridgeConfig()
+            combine(slotsPrefs.slots, bridgePrefs.configs) { slots, all ->
+                slots.associateWith { slot -> all[slot.id] ?: RadioBridgeConfig() }
             }
-                .collect { config -> synchronized(lock) { router.config = config } }
+                .collect { desired -> reconcile(scope, desired) }
         }
-        scope.launch {
-            combine(slotsPrefs.selectedId, bridgePrefs.configs) { id, all ->
-                val config = id?.let { all[it] } ?: RadioBridgeConfig()
-                if (id == null || !config.enabled) null else Listen(config.portFor(id), config.lanAccess)
+    }
+
+    /** Starts, moves or stops the servers so that they match the settings of the saved devices. */
+    private fun reconcile(scope: CoroutineScope, desired: Map<RadioSlot, RadioBridgeConfig>) {
+        val wanted = desired.filter { it.value.enabled }.mapKeys { it.key.id }
+        val toStop = ArrayList<Instance>()
+        synchronized(lock) {
+            for ((id, instance) in instances.toList()) {
+                val entry = wanted[id]
+                val slot = desired.keys.firstOrNull { it.id == id }
+                if (entry == null || slot == null || slot.address != instance.slot.address) {
+                    instances.remove(id)
+                    toStop.add(instance)
+                }
             }
-                .distinctUntilChanged()
-                .collectLatest { listen ->
-                    if (listen == null) return@collectLatest
+            // Restrictions and the number of clients apply at once.
+            for ((id, instance) in instances) wanted[id]?.let { instance.router.config = it }
+        }
+        toStop.forEach { it.job?.cancel() }
+        for ((slot, config) in desired.filter { it.value.enabled }) {
+            val listen = Listen(config.portFor(slot.id), config.lanAccess)
+            val running = synchronized(lock) { instances[slot.id] }
+            if (running != null && running.listen == listen) continue
+            running?.job?.cancel()
+            val instance = Instance(slot, listen).also { it.router.config = config }
+            synchronized(lock) { instances[slot.id] = instance }
+            instance.job =
+                scope.launch {
                     try {
-                        serve(listen)
+                        serve(instance)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
@@ -107,19 +137,25 @@ class RadioBridgeServer(
     }
 
     override fun onFromRadio(payload: ByteString) {
-        if (!serving) return
+        val address = radioInterfaceService.getDeviceAddress() ?: return
+        onDeviceFrame(address, payload)
+    }
+
+    override fun onDeviceFrame(address: String, payload: ByteString) {
+        val instance = synchronized(lock) { instances.values.firstOrNull { it.slot.address == address } } ?: return
+        if (!instance.serving) return
         val bytes = payload.toByteArray()
         val outs =
             synchronized(lock) {
-                val result = router.onFromRadio(bytes, clients.keys.toSet())
-                if (router.hasConfiguration) handshakeAsked = false
+                val result = instance.router.onFromRadio(bytes, instance.clients.keys.toSet())
+                if (instance.router.hasConfiguration) instance.handshakeAsked = false
                 result
             }
-        for (out in outs) send(out)
+        for (out in outs) send(instance, out)
     }
 
-    private fun send(out: BridgeOut) {
-        val channel = synchronized(lock) { clients[out.clientId] } ?: return
+    private fun send(instance: Instance, out: BridgeOut) {
+        val channel = synchronized(lock) { instance.clients[out.clientId] } ?: return
         // A client that cannot keep up is closed instead of being sent a stream with holes in it.
         if (!channel.trySend(frame(out.payload)).isSuccess) {
             Logger.w { "Radio bridge: client ${out.clientId} is too slow, closing it" }
@@ -127,57 +163,78 @@ class RadioBridgeServer(
         }
     }
 
-    private suspend fun serve(listen: Listen) = coroutineScope {
+    /** Sends a frame of a client to the device of [instance], through the app's session or the quiet link. */
+    private fun toDevice(instance: Instance, bytes: ByteArray) {
+        if (instance.slot.address == radioInterfaceService.getDeviceAddress()) {
+            radioInterfaceService.sendToRadio(bytes)
+        } else if (!pool.send(instance.slot.address, bytes)) {
+            Logger.d { "Radio bridge: the device is not connected, a frame of a client was not sent" }
+        }
+    }
+
+    /** Makes the device send its configuration once more, so that one passes by and is kept for the clients. */
+    private suspend fun askConfiguration(instance: Instance) {
+        if (instance.slot.address == radioInterfaceService.getDeviceAddress()) {
+            // The device shown in the app: connecting again makes the app itself receive the configuration.
+            radioInterfaceService.restartTransport()
+        } else {
+            val request = ToRadio.Builder().also { it.want_config_id = (1..Int.MAX_VALUE).random() }.build()
+            pool.send(instance.slot.address, request.encode())
+        }
+    }
+
+    private suspend fun serve(instance: Instance) = coroutineScope {
+        val listen = instance.listen
         val selector = SelectorManager(dispatchers.io)
         val host = if (listen.lanAccess) "0.0.0.0" else "127.0.0.1"
         val server = aSocket(selector).tcp().bind(InetSocketAddress(host, listen.port))
         val scopeText = if (listen.lanAccess) "local network" else "this device only"
-        Logger.i { "Radio bridge listening on port ${listen.port} ($scopeText)" }
-        synchronized(lock) { router.reset() }
-        handshakeAsked = false
-        serving = true
-        // A client that asks for the configuration before the app has one (the bridge was turned on while connected)
-        // makes the app connect to the radio again once, so that the configuration passes by and is kept.
+        val label = instance.slot.name?.takeIf { it.isNotBlank() } ?: "device ${instance.slot.id}"
+        Logger.i { "Radio bridge ($label) listening on port ${listen.port} ($scopeText)" }
+        synchronized(lock) { instance.router.reset() }
+        instance.handshakeAsked = false
+        instance.serving = true
         launch {
             while (true) {
-                handshakeRequests.receive()
-                if (handshakeAsked) continue
-                handshakeAsked = true
-                Logger.i { "Radio bridge: reconnecting the radio once to get its configuration for clients" }
-                radioInterfaceService.restartTransport()
+                instance.handshakeRequests.receive()
+                if (instance.handshakeAsked) continue
+                instance.handshakeAsked = true
+                Logger.i { "Radio bridge ($label): asking the device for its configuration for clients" }
+                askConfiguration(instance)
             }
         }
         try {
             while (true) {
                 val socket = server.accept()
-                val admitted = synchronized(lock) { clients.size < router.config.maxClients.coerceAtLeast(1) }
+                val admitted =
+                    synchronized(lock) { instance.clients.size < instance.router.config.maxClients.coerceAtLeast(1) }
                 if (!admitted) {
-                    Logger.i { "Radio bridge: too many clients, refusing one" }
+                    Logger.i { "Radio bridge ($label): too many clients, refusing one" }
                     socket.close()
                     continue
                 }
-                launch { handleClient(socket) }
+                launch { handleClient(instance, socket, label) }
             }
         } finally {
-            serving = false
+            instance.serving = false
             server.close()
             selector.close()
             synchronized(lock) {
-                clients.values.forEach { it.close() }
-                clients.clear()
+                instance.clients.values.forEach { it.close() }
+                instance.clients.clear()
             }
         }
     }
 
-    private suspend fun handleClient(socket: Socket) = coroutineScope {
+    private suspend fun handleClient(instance: Instance, socket: Socket, label: String) = coroutineScope {
         val outbox = Channel<ByteArray>(OUTBOX_CAPACITY)
         val id =
             synchronized(lock) {
                 val newId = nextClientId++
-                clients[newId] = outbox
+                instance.clients[newId] = outbox
                 newId
             }
-        Logger.i { "Radio bridge: client $id connected" }
+        Logger.i { "Radio bridge ($label): client $id connected" }
         val output = socket.openWriteChannel(autoFlush = true)
         val input = socket.openReadChannel()
         val writer = launch {
@@ -187,11 +244,14 @@ class RadioBridgeServer(
                 runCatching { socket.close() }
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 if (e is CancellationException) throw e
-                Logger.d { "Radio bridge: client $id write ended: ${e.message}" }
+                Logger.d { "Radio bridge ($label): client $id write ended: ${e.message}" }
             }
         }
         val codec =
-            StreamFrameCodec(onPacketReceived = { payload -> onClientFrame(id, payload, outbox) }, logTag = "Bridge")
+            StreamFrameCodec(
+                onPacketReceived = { payload -> onClientFrame(instance, id, payload, outbox) },
+                logTag = "Bridge",
+            )
         try {
             val buffer = ByteArray(READ_BUFFER)
             while (true) {
@@ -201,26 +261,28 @@ class RadioBridgeServer(
             }
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             if (e is CancellationException) throw e
-            Logger.d { "Radio bridge: client $id read ended: ${e.message}" }
+            Logger.d { "Radio bridge ($label): client $id read ended: ${e.message}" }
         } finally {
             synchronized(lock) {
-                clients.remove(id)
-                router.onClientGone(id)
+                instance.clients.remove(id)
+                instance.router.onClientGone(id)
             }
             outbox.close()
             writer.cancel()
             runCatching { socket.close() }
-            Logger.i { "Radio bridge: client $id gone" }
+            Logger.i { "Radio bridge ($label): client $id gone" }
         }
     }
 
-    private fun onClientFrame(id: Int, payload: ByteArray, outbox: Channel<ByteArray>) {
+    private fun onClientFrame(instance: Instance, id: Int, payload: ByteArray, outbox: Channel<ByteArray>) {
         val (result, needsHandshake) =
-            synchronized(lock) { router.onClientFrame(id, payload) to router.waitingWithoutHandshake }
-        for (reply in result.replies) send(reply)
-        result.toRadio?.let { radioInterfaceService.sendToRadio(it) }
+            synchronized(lock) {
+                instance.router.onClientFrame(id, payload) to instance.router.waitingWithoutHandshake
+            }
+        for (reply in result.replies) send(instance, reply)
+        result.toRadio?.let { toDevice(instance, it) }
         if (result.close) outbox.close()
-        if (needsHandshake) handshakeRequests.trySend(Unit)
+        if (needsHandshake) instance.handshakeRequests.trySend(Unit)
     }
 
     private fun frame(payload: ByteArray): ByteArray {
