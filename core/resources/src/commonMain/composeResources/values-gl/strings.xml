@@ -152,6 +152,7 @@
     <string name="mute_always">Sempre</string>
     <string name="mute_notifications">Silenciar notificacións</string>
     <string name="name">Nome</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">Novo enlace de canle recibida</string>
     <!-- NO -->
     <!-- NODE -->
@@ -209,6 +210,7 @@
     <string name="resend">Reenviar</string>
     <string name="reset">Restablecer</string>
     <string name="reset_to_defaults">Restablecer a por defecto</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <string name="role_client">Cliente</string>
     <!-- ROUTING -->

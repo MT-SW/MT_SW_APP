@@ -136,6 +136,7 @@
     <string name="must_update">Þú verður að uppfæra þetta smáforrit í app store (eða Github). Það er of gamalt til að geta talað við fastbúnað þessa radíó. Vinsamlegast lestu <a href="https://meshtastic.org/docs/software/android/installation">leiðbeiningar </a> okkar um þetta mál.</string>
     <!-- MUTE -->
     <string name="name">Heiti</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">Ný slóð fyrir rás móttekin</string>
     <!-- NO -->
     <!-- NODE -->
@@ -180,6 +181,7 @@
     <string name="resend">Endursenda</string>
     <string name="reset">Endurræsa</string>
     <string name="reset_to_defaults">Endursetja tæki</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="save">Vista</string>

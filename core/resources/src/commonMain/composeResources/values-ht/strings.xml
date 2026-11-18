@@ -173,6 +173,7 @@
     <string name="mute_notifications">Fèmen notifikasyon</string>
     <string name="name">Non</string>
     <string name="navigate_back">Navige Tounen</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">Nouvo kanal URL resevwa</string>
     <!-- NO -->
     <!-- NODE -->
@@ -233,6 +234,7 @@
     <string name="resend">Reenvwaye</string>
     <string name="reset">Reyajiste</string>
     <string name="reset_to_defaults">Reyajiste nan paramèt default yo</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Rekòmanse avèk yon refi negatif</string>

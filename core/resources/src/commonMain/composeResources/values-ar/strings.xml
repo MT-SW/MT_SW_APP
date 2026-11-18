@@ -167,6 +167,7 @@
     <string name="mute_notifications">كتم الإشهارات</string>
     <string name="name">الاسم</string>
     <string name="navigate_back">العودة إلى الخلف</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">تم تلقي رابط القناة الجديدة</string>
     <!-- NO -->
     <!-- NODE -->
@@ -217,6 +218,7 @@
     <string name="resend">إعادة الإرسال</string>
     <string name="reset">إعادة التشغيل</string>
     <string name="reset_to_defaults">العودة إلى الإعدادات الأصلية</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="routing_error_got_nak">لم يستلم</string>

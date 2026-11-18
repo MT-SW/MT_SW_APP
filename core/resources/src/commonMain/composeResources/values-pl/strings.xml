@@ -1136,7 +1136,6 @@
     <string name="ip">IP</string>
     <string name="ip_address">Adres IP:</string>
     <string name="ip_port">Port:</string>
-    <string name="json_output_enabled">Włącz wyjście JSON</string>
     <string name="jump_to_latest_from">%1$s</string>
     <string name="jump_to_latest_from_and_more">%1$s +%2$d</string>
     <!-- KEY -->
@@ -2098,6 +2097,7 @@
     <string name="restore_keys">Przywróć klucze</string>
     <string name="restore_keys_confirmation">Przywraca zapasowe klucze publiczny i prywatny do tego węzła.</string>
     <string name="retry">Ponów próbę</string>
+    <!-- RINGTONE -->
     <string name="ringtone">Dzwonek</string>
     <string name="ringtone_file_empty">Plik jest pusty</string>
     <string name="ringtone_import_error">Błąd importu: %1$s</string>
@@ -4371,4 +4371,13 @@
     <string name="radio_slot_empty">Puste miejsce na urządzenie. Wybierz urządzenie z listy poniżej, a zostanie zapisane tutaj.</string>
     <string name="radio_slot_position">Urządzenie %1$d z %2$d</string>
     <string name="radio_slot_use">Użyj tego urządzenia</string>
+    <string name="neighbor_count">Sąsiedzi</string>
+    <string name="neighbor_count_description">Ilu sąsiadów ten węzeł usłyszał bezpośrednio, tak jak ich zgłosił.</string>
+    <string name="neighbor_info_received">Odebrano</string>
+    <string name="neighbor_mean_snr">Średni SNR sąsiadów</string>
+    <string name="neighbor_mean_snr_description">Średni SNR, z jakim ten węzeł usłyszał zgłoszonych sąsiadów.</string>
+    <string name="requesting_neighbor_info_from">Proszę o informacje o sąsiadach od %1$s. Odpowie tylko wtedy, gdy ma włączony moduł informacji o sąsiadach.</string>
+    <string name="ringtone_play_on_node">Odtwórz na węźle</string>
+    <string name="ringtone_play_on_node_summary">Raz odtwarza zapisany dzwonek na węźle. Wymaga buzzera.</string>
+    <string name="ringtone_play_on_node_unsaved">Najpierw zapisz dzwonek, aby odtworzyć go na węźle.</string>
 </resources>

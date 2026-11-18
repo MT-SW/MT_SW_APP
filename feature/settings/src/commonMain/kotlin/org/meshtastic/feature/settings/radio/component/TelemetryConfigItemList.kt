@@ -35,6 +35,8 @@ import org.meshtastic.core.resources.schema_telemetry_air_quality_enabled
 import org.meshtastic.core.resources.schema_telemetry_air_quality_enabled_description
 import org.meshtastic.core.resources.schema_telemetry_air_quality_interval
 import org.meshtastic.core.resources.schema_telemetry_air_quality_interval_description
+import org.meshtastic.core.resources.schema_telemetry_air_quality_screen_enabled
+import org.meshtastic.core.resources.schema_telemetry_air_quality_screen_enabled_description
 import org.meshtastic.core.resources.schema_telemetry_device_telemetry_enabled
 import org.meshtastic.core.resources.schema_telemetry_device_telemetry_enabled_description
 import org.meshtastic.core.resources.schema_telemetry_device_update_interval
@@ -69,6 +71,7 @@ import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.proto.air_quality_screen_enabled
 import org.meshtastic.proto.device_telemetry_enabled
 
 @Composable
@@ -242,6 +245,21 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     },
                 )
                 HorizontalDivider()
+                if (capabilities.offers(ModuleConfig.TelemetryConfig.air_quality_screen_enabled)) {
+                    SwitchPreference(
+                        title = stringResource(Res.string.schema_telemetry_air_quality_screen_enabled),
+                        modifier = Modifier.settingsField(Res.string.schema_telemetry_air_quality_screen_enabled),
+                        summary = stringResource(Res.string.schema_telemetry_air_quality_screen_enabled_description),
+                        checked = formState.value.air_quality_screen_enabled,
+                        enabled = state.connected,
+                        onCheckedChange = {
+                            formState.value =
+                                formState.value.newBuilder().also { wb -> wb.air_quality_screen_enabled = it }.build()
+                        },
+                        containerColor = CardDefaults.cardColors().containerColor,
+                    )
+                    HorizontalDivider()
+                }
                 SwitchPreference(
                     title = stringResource(Res.string.schema_telemetry_power_measurement_enabled),
                     modifier = Modifier.settingsField(Res.string.schema_telemetry_power_measurement_enabled),

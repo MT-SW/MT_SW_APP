@@ -176,6 +176,7 @@
     <string name="mute_always">Πάντα</string>
     <string name="mute_notifications">Σίγαση ειδοποιήσεων</string>
     <string name="name">Ονομα</string>
+    <!-- NEIGHBOR -->
     <string name="network">Δίκτυο</string>
     <string name="new_channel_rcvd">Λήψη URL νέου καναλιού</string>
     <!-- NO -->
@@ -237,6 +238,7 @@
     <string name="resend">Αποστολή ξανά</string>
     <string name="reset">Επαναφορά</string>
     <string name="reset_to_defaults">Επαναφορά προεπιλογών</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <string name="role_client_base">Πελάτης Βάση</string>
     <!-- ROUTING -->

@@ -57,8 +57,11 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
     /** Ability to mute notifications from specific nodes via admin messages. */
     val canMuteNode = atLeast(V2_7_18)
 
-    /** Ability to request neighbor information from other nodes. Gated to [UNRELEASED] until working reliably. */
-    val canRequestNeighborInfo = atLeast(V2_7_18)
+    /**
+     * Ability to play the saved ringtone on the node via `AdminMessage.play_ringtone_request`. Gated to [UNRELEASED]
+     * until a release carries the handler (meshtastic/firmware#12351); firmware without it ignores the request.
+     */
+    val canPlayRingtone = atLeast(UNRELEASED)
 
     /** Ability to send verified shared contacts. Supported since firmware v2.7.12. */
     val canSendVerifiedContacts = atLeast(V2_7_12)

@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ModifierNotUsedAtRoot")
-
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,26 +36,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
+import org.meshtastic.core.resources.neighbor_info_received
 import org.meshtastic.core.resources.routing_error_no_response
-import org.meshtastic.core.ui.component.FloatingBarUnderlap
-import org.meshtastic.core.ui.component.FullScreenLoading
-import org.meshtastic.core.ui.component.LocalFloatingBarInset
-import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.core.ui.component.Quality
-import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.resources.success
 import org.meshtastic.core.ui.icon.Groups
-import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
-import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
-import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
+import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.theme.StatusColors.StatusRed
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.feature.node.component.CooldownIconButton
@@ -66,67 +58,38 @@ import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.feature.node.list.NeighborMapDialog
 import org.meshtastic.feature.node.list.NeighborReport
 import org.meshtastic.feature.node.list.toNeighborReport
-import org.meshtastic.proto.MeshPacket
+import org.meshtastic.feature.node.model.NeighborInfoEntry
+import org.meshtastic.feature.node.model.neighborInfoEntries
 
 /**
- * A row in the Neighbor Info log — either a response to a request we sent, or a NeighborInfo packet overheard on the
- * mesh without any matching outgoing request from this device.
+ * Neighbor-info log with chart and list, built on [BaseMetricScreen]: our requests with their replies, and neighbor
+ * info the node sent on its own, newest first.
  */
-private sealed interface NeighborInfoLogItem {
-    val uuid: String
-    val receivedDate: Long
-    val packet: MeshPacket?
-
-    data class Requested(val requestLog: MeshLog, val result: MeshLog?) : NeighborInfoLogItem {
-        override val uuid: String = requestLog.uuid
-        override val receivedDate: Long = requestLog.received_date
-        override val packet: MeshPacket? = result?.fromRadio?.packet
-    }
-
-    data class Overheard(val resultLog: MeshLog) : NeighborInfoLogItem {
-        override val uuid: String = resultLog.uuid
-        override val receivedDate: Long = resultLog.received_date
-        override val packet: MeshPacket? = resultLog.fromRadio.packet
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
-@Suppress("LongMethod", "CyclomaticComplexMethod")
+@Suppress("LongMethod")
 @Composable
-fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
+fun NeighborInfoLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
     // Only the kinds of data this screen shows are read in full (the rest as the newest entries).
     remember(viewModel) { viewModel.useSources(setOf(NodeLogSource.NEIGHBORS)) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
+    val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
+    val lastRequestNeighborsTime by viewModel.lastRequestNeighborsTime.collectAsStateWithLifecycle()
 
     fun getUsername(nodeNum: Int): String = with(viewModel.getUser(nodeNum)) { "$long_name ($short_name)" }
 
-    // Named by SNR tier (good/sufficient/weak/none); the palette matches the signal-quality colours.
-    val statusGreen = MaterialTheme.colorScheme.StatusOnline
-    val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
-    val statusOrange = MaterialTheme.colorScheme.StatusPurple
-    val statusRed = Quality.NONE.color.invoke()
+    val statusGreen = MaterialTheme.colorScheme.StatusGreen
+    val statusYellow = MaterialTheme.colorScheme.StatusYellow
+    val statusOrange = MaterialTheme.colorScheme.StatusOrange
+    val statusRed = MaterialTheme.colorScheme.StatusRed
     val modemPreset = LocalModemPreset.current
+    val header = stringResource(Res.string.neighbor_info)
 
-    // Combine our own requests (matched to a result, or "no response") with any NeighborInfo packets overheard on
-    // the mesh that don't correspond to a request we sent — sorted newest-first.
-    val logItems =
-        remember(state.neighborInfoRequests, state.neighborInfoResults) {
-            val requested =
-                state.neighborInfoRequests.map { req ->
-                    val result =
-                        state.neighborInfoResults.find {
-                            it.fromRadio.packet?.decoded?.request_id == req.fromRadio.packet?.id
-                        }
-                    NeighborInfoLogItem.Requested(req, result)
-                }
-            val matchedResultUuids = requested.mapNotNull { it.result?.uuid }.toSet()
-            val requestedUuids = requested.map { it.uuid }.toSet()
-            val overheard =
-                state.neighborInfoResults
-                    .filter { it.uuid !in matchedResultUuids && it.uuid !in requestedUuids }
-                    .map { NeighborInfoLogItem.Overheard(it) }
-            (requested + overheard).distinctBy { it.uuid }.sortedByDescending { it.receivedDate }
+    val threshold = timeFrame.timeThreshold()
+    val entries =
+        remember(state.neighborInfoRequests, state.neighborInfoResults, threshold) {
+            state.neighborInfoEntries().filter { it.timeSeconds >= threshold }
         }
 
     // The neighbour report shown on the full-screen map (our "Show on map" button in the detail window).
@@ -140,107 +103,103 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
         )
     }
 
-    Scaffold(
-        topBar = {
-            val lastRequestNeighborsTime by viewModel.lastRequestNeighborsTime.collectAsStateWithLifecycle()
-            MainAppBar(
-                sosScreen = SosBarScreen.NODES,
-                title = state.node?.effectiveLongName.orEmpty(),
-                subtitle = stringResource(Res.string.neighbor_info),
-                ourNode = null,
-                showNodeChip = false,
-                canNavigateUp = true,
-                onNavigateUp = onNavigateUp,
-                actions = {
-                    if (!state.isLocal) {
-                        CooldownIconButton(
-                            onClick = { viewModel.requestNeighborInfo() },
-                            cooldownTimestamp = lastRequestNeighborsTime,
-                        ) {
-                            Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = null)
-                        }
-                    }
-                },
-                onClickChip = {},
+    BaseMetricScreen(
+        isLoading = isLoading,
+        modifier = modifier,
+        onNavigateUp = onNavigateUp,
+        telemetryType = null,
+        titleRes = Res.string.neighbor_info,
+        nodeName = state.node?.effectiveLongName.orEmpty(),
+        data = entries,
+        timeProvider = { it.timeSeconds },
+        infoData = NEIGHBOR_INFO_INFO_DATA,
+        extraActions = {
+            if (!state.isLocal && state.canRequestNeighborInfo) {
+                CooldownIconButton(
+                    onClick = { viewModel.requestNeighborInfo() },
+                    cooldownTimestamp = lastRequestNeighborsTime,
+                ) {
+                    Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = null)
+                }
+            }
+        },
+        controlPart = {
+            TimeFrameSelector(
+                selectedTimeFrame = timeFrame,
+                availableTimeFrames = availableTimeFrames,
+                onTimeFrameSelected = viewModel::setTimeFrame,
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
         },
-    ) { innerPadding ->
-        if (isLoading) {
-            FullScreenLoading(modifier = Modifier.padding(innerPadding))
-            return@Scaffold
-        }
-        // The list runs under the floating bar (shows through its glass) and ends above it.
-        FloatingBarUnderlap()
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding =
-            PaddingValues(
-                start = 16.dp,
-                top = innerPadding.calculateTopPadding(),
-                end = 16.dp,
-                bottom = innerPadding.calculateBottomPadding() + LocalFloatingBarInset.current,
-            ),
-        ) {
-            items(logItems, key = { it.uuid }) { item ->
-                val time = DateFormatter.formatDateTime(item.receivedDate)
-                val header = stringResource(Res.string.neighbor_info)
+        chartPart = { chartModifier, selectedX, vicoScrollState, onPointSelected ->
+            NeighborInfoChart(
+                entries = entries,
+                vicoScrollState = vicoScrollState,
+                selectedX = selectedX,
+                onSelectPoint = onPointSelected,
+                modifier = chartModifier,
+            )
+        },
+        listPart = { listModifier, _, lazyListState, onCardClick ->
+            LazyColumn(modifier = listModifier.fillMaxSize(), state = lazyListState) {
+                items(entries, key = { it.log.uuid }) { entry ->
+                    val report = entry.report
+                    val time = DateFormatter.formatDateTime((report ?: entry.log).received_date)
+                    val text =
+                        when {
+                            entry is NeighborInfoEntry.Received -> stringResource(Res.string.neighbor_info_received)
+                            report != null -> stringResource(Res.string.success)
+                            else -> stringResource(Res.string.routing_error_no_response)
+                        }
+                    var expanded by remember { mutableStateOf(false) }
 
-                val (icon, text) =
-                    when (item) {
-                        is NeighborInfoLogItem.Requested ->
-                            if (item.result != null) {
-                                MeshtasticIcons.Groups to "$time - Poproszono ręcznie"
-                            } else {
-                                MeshtasticIcons.PersonOff to
-                                    "$time - Poproszono ręcznie - ${stringResource(
-                                        Res.string.routing_error_no_response,
-                                    )}"
+                    Box {
+                        MetricLogItem(
+                            icon = if (report != null) MeshtasticIcons.Groups else MeshtasticIcons.PersonOff,
+                            text = "$time - $text",
+                            contentDescription = header,
+                            modifier =
+                            Modifier.combinedClickable(onLongClick = { expanded = true }) {
+                                onCardClick(entry.timeSeconds)
+                                report
+                                    ?.fromRadio
+                                    ?.packet
+                                    ?.getNeighborInfoResponse(::getUsername, header = header)
+                                    ?.let {
+                                        val message =
+                                            annotateNeighborInfo(
+                                                it,
+                                                statusGreen = statusGreen,
+                                                statusYellow = statusYellow,
+                                                statusOrange = statusOrange,
+                                                statusRed = statusRed,
+                                                modemPreset = modemPreset,
+                                            )
+                                        val neighborReport = report.fromRadio.packet?.toNeighborReport()
+                                        viewModel.showLogDetail(
+                                            Res.string.neighbor_info,
+                                            message,
+                                            onShowOnMap =
+                                            if (neighborReport != null && state.node != null) {
+                                                { mapReport = state.node?.num?.let { it to neighborReport } }
+                                            } else {
+                                                null
+                                            },
+                                        )
+                                    }
+                            },
+                        )
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            DeleteItem {
+                                // A request's reply goes too, or it would reappear as received.
+                                viewModel.deleteLog(entry.log.uuid)
+                                (entry as? NeighborInfoEntry.Requested)?.reply?.uuid?.let(viewModel::deleteLog)
+                                expanded = false
                             }
-
-                        is NeighborInfoLogItem.Overheard -> MeshtasticIcons.Groups to "$time - Odebrano automatycznie"
-                    }
-
-                var expanded by remember { mutableStateOf(false) }
-
-                Box {
-                    MetricLogItem(
-                        icon = icon,
-                        text = text,
-                        contentDescription = stringResource(Res.string.neighbor_info),
-                        modifier =
-                        Modifier.combinedClickable(onLongClick = { expanded = true }) {
-                            item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
-                                val message =
-                                    annotateNeighborInfo(
-                                        it,
-                                        statusGreen = statusGreen,
-                                        statusYellow = statusYellow,
-                                        statusOrange = statusOrange,
-                                        statusRed = statusRed,
-                                        modemPreset = modemPreset,
-                                    )
-                                val report = item.packet?.toNeighborReport()
-                                viewModel.showLogDetail(
-                                    Res.string.neighbor_info,
-                                    message,
-                                    onShowOnMap =
-                                    if (report != null && state.node != null) {
-                                        { mapReport = state.node?.num?.let { it to report } }
-                                    } else {
-                                        null
-                                    },
-                                )
-                            }
-                        },
-                    )
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        DeleteItem {
-                            viewModel.deleteLog(item.uuid)
-                            expanded = false
                         }
                     }
                 }
             }
-        }
-    }
+        },
+    )
 }

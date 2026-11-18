@@ -177,6 +177,7 @@
     <string name="mute_notifications">Nutildyti pranešimus</string>
     <string name="name">Pavadinimas</string>
     <string name="navigate_back">Grįžti atgal</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">Gautas naujo kanalo URL</string>
     <!-- NO -->
     <!-- NODE -->
@@ -242,6 +243,7 @@
     <string name="resend">Siųsti iš naujo</string>
     <string name="reset">Nustatyti iš naujo</string>
     <string name="reset_to_defaults">Atkurti numatytuosius parametrus</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Gautas negatyvus patvirtinimas</string>

@@ -179,6 +179,7 @@
     <string name="mute_8_hours">8 гадзін</string>
     <string name="mute_always">Назаўсёды</string>
     <string name="name">Назва</string>
+    <!-- NEIGHBOR -->
     <string name="network">Сетка</string>
     <string name="new_node_seen">Убачылі новы вузел: %1$s</string>
     <string name="next">Далей</string>
@@ -245,6 +246,7 @@
     <!-- REQUEST -->
     <string name="reset">Скінуць</string>
     <string name="retry">Паспрабаваць яшчэ раз</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <string name="role_client">CLIENT</string>
     <string name="role_client_hidden">CLIENT HIDDEN</string>

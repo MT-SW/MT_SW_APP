@@ -177,6 +177,7 @@
     <string name="mute_notifications">Cuir foláirimh i gcíocha</string>
     <string name="name">Ainm</string>
     <string name="navigate_back">Súil Siar</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">URL Cainéal nua faighte</string>
     <!-- NO -->
     <!-- NODE -->
@@ -237,6 +238,7 @@
     <string name="resend">Seol arís</string>
     <string name="reset">Athshocraigh</string>
     <string name="reset_to_defaults">Athshocrú go dtí na réamhshocruithe</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Fáilte atá faighte le haghaidh niúúáil</string>

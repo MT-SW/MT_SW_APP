@@ -99,7 +99,7 @@ okio = "3.18.2"
 bouncycastle = "1.87"
 uri-kmp = "0.0.21"
 spotless = "8.11.0"
-sceneview = "4.69.5"
+sceneview = "4.69.6"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
@@ -115,7 +115,7 @@ takpacket-sdk = "0.10.0"
 wire = "6.4.7"
 # MT_SW: background blur ("glass") of the floating bars (Apache 2.0, github.com/chrisbanes/haze)
 haze = "2.1.0"
-meshtastic-protobufs = "2.8.2.44-g8649b79-SNAPSHOT"
+meshtastic-protobufs = "2.8.3"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -275,7 +275,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
-robolectric = { module = "org.robolectric:robolectric", version = "4.18" }
+robolectric = { module = "org.robolectric:robolectric", version = "4.18.1" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 # Other

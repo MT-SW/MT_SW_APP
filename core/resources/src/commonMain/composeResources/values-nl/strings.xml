@@ -180,7 +180,6 @@
     <string name="ip">IP-adres</string>
     <string name="ip_address">IP-adres:</string>
     <string name="ip_port">Poort:</string>
-    <string name="json_output_enabled">JSON uitvoer ingeschakeld</string>
     <!-- KEY -->
     <string name="latitude">Breedtegraad</string>
     <!-- LAYER -->
@@ -256,6 +255,7 @@
     <string name="mute_notifications">Meldingen dempen</string>
     <string name="name">Naam</string>
     <string name="navigate_back">Ga terug</string>
+    <!-- NEIGHBOR -->
     <string name="network">Netwerk</string>
     <string name="new_channel_rcvd">Nieuw kanaal URL ontvangen</string>
     <!-- NO -->
@@ -343,6 +343,7 @@
     <string name="resend">Verzend opnieuw</string>
     <string name="reset">Reset</string>
     <string name="reset_to_defaults">Standaardinstellingen terugzetten</string>
+    <!-- RINGTONE -->
     <string name="ringtone">Beltoon</string>
     <!-- ROLE -->
     <!-- ROUTING -->

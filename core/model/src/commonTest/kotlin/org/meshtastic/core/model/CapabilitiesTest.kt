@@ -41,9 +41,10 @@ class CapabilitiesTest {
     }
 
     @Test
-    fun canRequestNeighborInfo_requires_V2_7_18() {
-        assertFalse(caps("2.7.17").canRequestNeighborInfo)
-        assertTrue(caps("2.7.18").canRequestNeighborInfo)
+    fun canPlayRingtone_waits_for_a_firmware_release() {
+        assertFalse(caps("2.8.2").canPlayRingtone)
+        assertFalse(caps("3.0.0").canPlayRingtone)
+        assertTrue(Capabilities("2.8.2", forceEnableAll = true).canPlayRingtone)
     }
 
     @Test
@@ -245,7 +246,7 @@ class CapabilitiesTest {
     fun nullFirmware_returns_all_false() {
         val c = caps(null)
         assertFalse(c.canMuteNode)
-        assertFalse(c.canRequestNeighborInfo)
+        assertFalse(c.canPlayRingtone)
         assertFalse(c.canSendVerifiedContacts)
         assertFalse(c.canToggleUnmessageable)
         assertFalse(c.supportsQrCodeSharing)

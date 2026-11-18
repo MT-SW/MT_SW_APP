@@ -688,7 +688,6 @@
     <string name="bandwidth_unsupported_summary">This bandwidth is not supported by the connected radio in the selected region. Choose a supported value before saving.</string>
     <string name="baro_pressure">Baro</string>
     <string name="battery">Battery</string>
-    <string name="battery_ina_2xx_i2c_address">Battery INA_2XX I2C address</string>
     <string name="battery_invert">Swap powered / battery indication</string>
     <string name="battery_invert_description">Turn this on if a power monitor on the bus is wired backwards: the node then shows powered while it runs on battery, and a battery percentage while it charges. Only this indication is swapped, nothing else. The percentage is estimated from the voltage.</string>
     <string name="biochemical_oxygen_demand">BOD</string>
@@ -993,7 +992,7 @@
     <string name="console_cmd_status_usage">status</string>
     <string name="console_info_body">Console: simple commands for the devices, the connections and the bridge. Type a command and tap Send (or press Enter). While you type, hints appear under the field; a tap completes the command or its argument. The buttons "Earlier" and "Next" bring back lines typed before.\n\nCommands:\nhelp – the list of commands, or the description of one (help &lt;command&gt;)\nclear – clears the screen\ndevices – the saved devices, their numbers and their state\ndevice &lt;number&gt; – switches what the app shows to that device (nothing is disconnected)\ndisconnect [number] – disconnects the shown device or the one with the given number (it stays saved and stays off, also in the background, until you connect it on the Connect tab)\nremove &lt;number&gt; – removes a device from the saved list\nstatus – the connection, the number of nodes and the TCP bridge\nnodes [text] – finds nodes by name, short name or number\nbridge [on|off] – shows, turns on or turns off the TCP bridge of the chosen device\n\nThe commands can be typed without Polish letters. Connecting a device is done on the Connect tab.</string>
     <string name="console_input">Command</string>
-    <string name="console_intro">Type a command and press Enter. The \"help\" command shows all of them.</string>
+    <string name="console_intro">Type a command and press Enter. The "help" command shows all of them.</string>
     <string name="console_next">Next</string>
     <string name="console_out_bridge_changed">TCP bridge: %1$s.</string>
     <string name="console_out_bridge_none">Save a device in the top bar first.</string>
@@ -1008,7 +1007,7 @@
     <string name="console_out_nodes_more">…and %1$d more.</string>
     <string name="console_out_nodes_none">No matching nodes.</string>
     <string name="console_out_radio_line">%1$d: %2$s – %3$s%4$s</string>
-    <string name="console_out_radio_missing">There is no device with the number \"%1$s\". See the \"devices\" command.</string>
+    <string name="console_out_radio_missing">There is no device with the number "%1$s". See the "devices" command.</string>
     <string name="console_out_radio_switching">Switching to device %1$d: %2$s.</string>
     <string name="console_out_removed">Device %1$d removed from the list.</string>
     <string name="console_out_selected"> (chosen)</string>
@@ -1020,7 +1019,7 @@
     <string name="console_out_status_connection">Connection: %1$s</string>
     <string name="console_out_status_nodes">Nodes: %1$d (online: %2$d)</string>
     <string name="console_out_status_radio">Device: %1$s</string>
-    <string name="console_out_unknown">Unknown command: %1$s. Type \"help\".</string>
+    <string name="console_out_unknown">Unknown command: %1$s. Type "help".</string>
     <string name="console_prev">Earlier</string>
     <string name="console_send">Run</string>
     <string name="console_summary">Commands for the device, connections and the bridge</string>
@@ -1865,7 +1864,6 @@
     <string name="ip">IP</string>
     <string name="ip_address">IP Address:</string>
     <string name="ip_port">Port:</string>
-    <string name="json_output_enabled">JSON output enabled</string>
     <string name="jump_to_latest_from">%1$s</string>
     <string name="jump_to_latest_from_and_more">%1$s +%2$d</string>
     <!-- KB -->
@@ -2399,7 +2397,6 @@
     <string name="metric_channel_label">%1$s %2$d</string>
     <string name="micrograms_per_cubic_meter">µg/m³</string>
     <string name="min">Min</string>
-    <string name="minimum_wake_time_seconds">Minimum wake time</string>
     <!-- MIRROR -->
     <string name="mirror_active">Mirroring</string>
     <string name="mirror_back">Back</string>
@@ -2596,8 +2593,14 @@
     <string name="nearby_devices_permission">Nearby devices permission</string>
     <string name="need_hardware">Need Hardware?</string>
     <string name="need_hardware_description">MT_SW works with LoRa radios running mesh firmware (the original or MT_SW_FIRMWARE). The documentation and the project website explain how to choose the hardware and set it up.</string>
+    <!-- NEIGHBOR -->
+    <string name="neighbor_count">Neighbors</string>
+    <string name="neighbor_count_description">How many nodes this node heard directly, as it reported them.</string>
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
+    <string name="neighbor_info_received">Received</string>
+    <string name="neighbor_mean_snr">Mean neighbor SNR</string>
+    <string name="neighbor_mean_snr_description">The average SNR at which this node heard its reported neighbors.</string>
     <!-- NEIGHBORS -->
     <string name="neighbors_dialog_empty">No neighbour list saved from this node.</string>
     <string name="neighbors_map_center_unknown">This node has no known position, so the lines to its neighbours cannot be drawn.</string>
@@ -2922,7 +2925,6 @@
     <string name="orient_north">Orient north</string>
     <string name="orp">ORP</string>
     <string name="overflow_menu">Overflow menu</string>
-    <string name="override_console_serial_port">Override console serial port</string>
     <!-- PACKET -->
     <string name="packet_authenticity">Packet authenticity</string>
     <string name="packet_authenticity_balanced">Balanced — Prefer authenticated</string>
@@ -3124,7 +3126,7 @@
     <string name="presence_expiry_hours">%1$d h</string>
     <string name="presence_expiry_min">%1$d min</string>
     <string name="presence_expiry_summary">When the node is not heard for this long, nothing is shown for it (it may have gone out of range).</string>
-    <string name="presence_expiry_title">How long \"active\" holds</string>
+    <string name="presence_expiry_title">How long "active" holds</string>
     <string name="presence_icon_dot">Dot</string>
     <string name="presence_icon_person">Person with a dot</string>
     <string name="presence_icon_ring">Dot in a ring</string>
@@ -3412,6 +3414,7 @@
     <string name="request_telemetry">Request Telemetry</string>
     <string name="request_user_info">Request User Info</string>
     <string name="requesting_from">Requesting %1$s from %2$s</string>
+    <string name="requesting_neighbor_info_from">Requesting neighbor info from %1$s. It only answers if its Neighbor Info module is enabled.</string>
     <string name="resend">Resend</string>
     <string name="reset">Reset</string>
     <string name="reset_to_defaults">Reset to defaults</string>
@@ -3425,10 +3428,14 @@
     <string name="retry">Retry</string>
     <string name="ring_style_thin">Thin progress bars (like on the iPhone)</string>
     <string name="ring_style_thin_summary">Progress bars and waiting spinners are two thin grey lines (an empty outline), and the filled part is an outline in the theme colour too. Instead of the zigzag there is a ring or bar with a spinning or sliding piece made of thin lines. Off brings back the old look.</string>
+    <!-- RINGTONE -->
     <string name="ringtone">Ringtone</string>
     <string name="ringtone_file_empty">File is empty</string>
     <string name="ringtone_import_error">Error importing: %1$s</string>
     <string name="ringtone_imported">Imported ringtone</string>
+    <string name="ringtone_play_on_node">Play on node</string>
+    <string name="ringtone_play_on_node_summary">Plays the saved ringtone on the node once. Needs a buzzer.</string>
+    <string name="ringtone_play_on_node_unsaved">Save the ringtone first to play it on the node.</string>
     <!-- ROLE -->
     <string name="role">Device Role</string>
     <string name="role_client">Client</string>
@@ -3852,7 +3859,6 @@
     <string name="store_forward">Store &amp; Forward</string>
     <string name="store_forward_config">Store &amp; Forward Config</string>
     <string name="success">Success</string>
-    <string name="super_deep_sleep_duration_seconds">Super deep sleep duration</string>
     <string name="support_project_description">MT_SW is free and is made by a community, in spare time. If you want to help, you can voluntarily support the maintenance and development of the app, MT_SW_FIRMWARE and the Home Assistant integration. Donations go to the account of the app developer (spontanicznemajsterkowanie), who shares them among the needs of the whole team: cheaterenator (MT_SW_FIRMWARE) and kamkom21 (local bot). The app always stays free.</string>
     <string name="support_project_summary">Voluntary donation to the developer for maintaining and developing the app</string>
     <string name="support_project_title">Support the project</string>

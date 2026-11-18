@@ -92,6 +92,7 @@ internal fun TelemetricActionsSection(
     onAction: (NodeDetailAction) -> Unit,
     isLocal: Boolean = false,
     airQualityHistory: List<Telemetry> = emptyList(),
+    canRequestNeighborInfo: Boolean = false,
 ) {
     val features =
         rememberTelemetricFeatures(
@@ -103,6 +104,7 @@ internal fun TelemetricActionsSection(
             isFahrenheit,
             isLocal,
             airQualityHistory,
+            canRequestNeighborInfo,
         )
 
     SectionCard(title = Res.string.telemetry) {
@@ -139,6 +141,7 @@ private fun rememberTelemetricFeatures(
     isFahrenheit: Boolean,
     isLocal: Boolean,
     airQualityHistory: List<Telemetry>,
+    canRequestNeighborInfo: Boolean,
 ): List<TelemetricFeature> = remember(
     node,
     ourNode,
@@ -148,6 +151,7 @@ private fun rememberTelemetricFeatures(
     isFahrenheit,
     isLocal,
     airQualityHistory,
+    canRequestNeighborInfo,
 ) {
     listOf(
         TelemetricFeature(
@@ -167,9 +171,9 @@ private fun rememberTelemetricFeatures(
         TelemetricFeature(
             titleRes = LogsType.NEIGHBOR_INFO.titleRes,
             icon = LogsType.NEIGHBOR_INFO.icon,
-            requestAction = { NodeMenuAction.RequestNeighborInfo(it) },
+            requestAction = if (canRequestNeighborInfo) { n -> NodeMenuAction.RequestNeighborInfo(n) } else null,
             logsType = LogsType.NEIGHBOR_INFO,
-            // isVisible = { it.capabilities.canRequestNeighborInfo },
+            isVisible = { canRequestNeighborInfo },
             cooldownTimestamp = lastRequestNeighborsTime,
             cooldownDuration = REQUEST_NEIGHBORS_COOL_DOWN_TIME_MS,
         ),

@@ -179,6 +179,7 @@
     <string name="mute_notifications">Hesht njoftimet</string>
     <string name="name">Emri</string>
     <string name="navigate_back">Kthehu pas</string>
+    <!-- NEIGHBOR -->
     <string name="new_channel_rcvd">Ju keni një kanal radio të ri URL</string>
     <!-- NO -->
     <!-- NODE -->
@@ -240,6 +241,7 @@
     <string name="resend">Përsëri dërguar</string>
     <string name="reset">Rivendos</string>
     <string name="reset_to_defaults">Rivendos në parazgjedhje</string>
+    <!-- RINGTONE -->
     <!-- ROLE -->
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Marrë një njohje negative</string>
