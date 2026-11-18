@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.ButtonShapes
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
@@ -179,11 +180,11 @@ internal fun rememberDecorFor(
         }
 
         UiOptions.BUTTON_STYLE_OUTLINE_GLASS -> {
+            // A working button glows in the colour of the theme; only a dangerous action (disconnecting) is red.
             val accent =
                 when {
                     !enabled -> scheme.onSurface
-                    tonal && container == scheme.secondaryContainer -> scheme.primary
-                    container.isSpecified && container.alpha > 0f -> container
+                    container.isSpecified && container.alpha > 0f && isDangerColor(container, scheme) -> container
                     else -> scheme.primary
                 }
             val steps = UiOptions.BUTTON_GLOW_SHARE
@@ -214,7 +215,9 @@ private fun rememberOutlinedDecor(colors: ButtonColors, enabled: Boolean): Fille
     val options = rememberUiOptions()
     if (options[UiOptions.BUTTON_STYLE] != UiOptions.BUTTON_STYLE_OUTLINE_GLASS) return FilledDecor()
     val scheme = MaterialTheme.colorScheme
-    val accent = colors.contentColor.takeIf { it.isSpecified && it.alpha > 0f } ?: scheme.primary
+    val content = colors.contentColor
+    val danger = content.isSpecified && content.alpha > 0f && isDangerColor(content, scheme)
+    val accent = if (danger) content else scheme.primary
     return rememberDecorFor(container = accent, disabledContainer = scheme.onSurface, enabled = enabled, tonal = false)
 }
 
