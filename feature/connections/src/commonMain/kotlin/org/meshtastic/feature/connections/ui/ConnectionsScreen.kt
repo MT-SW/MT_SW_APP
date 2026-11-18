@@ -22,6 +22,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -142,6 +143,8 @@ import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.KeyboardArrowLeft
+import org.meshtastic.core.ui.icon.KeyboardArrowRight
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
@@ -682,7 +685,12 @@ fun ConnectionsScreen(
                     }
                 }
             }
-            SlotDots(count = SLOT_COUNT, current = slotPage)
+            SlotDots(
+                count = SLOT_COUNT,
+                current = slotPage,
+                onPrevious = { if (slotPage > 0) slotPage -= 1 },
+                onNext = { if (slotPage < SLOT_COUNT - 1) slotPage += 1 },
+            )
 
             TerminateApplicationButton()
 
@@ -1166,27 +1174,45 @@ private fun NoDeviceContent() {
     }
 }
 
-/** Small dots under the pages of the connection card; the one of the shown page is filled. */
+/**
+ * Small dots under the pages of the connection card; the one of the shown page is filled. Arrows on both sides in the
+ * colour of the dots change the page where swiping is not possible (mouse on the computer); the same on every system.
+ */
 @Composable
-private fun SlotDots(count: Int, current: Int) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+private fun SlotDots(count: Int, current: Int, onPrevious: () -> Unit, onNext: () -> Unit) {
+    val active = MaterialTheme.colorScheme.primary
+    val inactive = MaterialTheme.colorScheme.outlineVariant
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val hasPrevious = current > 0
+        Icon(
+            imageVector = MeshtasticIcons.KeyboardArrowLeft,
+            contentDescription = null,
+            tint = if (hasPrevious) active else inactive,
+            modifier = Modifier.size(SLOT_ARROW_SIZE).clickable(enabled = hasPrevious, onClick = onPrevious),
+        )
         repeat(count) { index ->
             Box(
                 modifier =
                 Modifier.padding(horizontal = 3.dp)
                     .size(7.dp)
-                    .background(
-                        if (index == current) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outlineVariant
-                        },
-                        CircleShape,
-                    ),
+                    .background(if (index == current) active else inactive, CircleShape),
             )
         }
+        val hasNext = current < count - 1
+        Icon(
+            imageVector = MeshtasticIcons.KeyboardArrowRight,
+            contentDescription = null,
+            tint = if (hasNext) active else inactive,
+            modifier = Modifier.size(SLOT_ARROW_SIZE).clickable(enabled = hasNext, onClick = onNext),
+        )
     }
 }
+
+private val SLOT_ARROW_SIZE = 28.dp
 
 /** Visual state for the connection screen's [AnimatedContent] transition between the three card body variants. */
 private enum class ConnectionUiState {

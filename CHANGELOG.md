@@ -80,6 +80,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 
 ##### Naprawione błędy
+* Komputer: karty urządzeń w „Połącz” przełączają się teraz także strzałkami po bokach kropek (w kolorze kropek, takie same na wszystkich systemach), bo myszą nie da się ich przesunąć palcem.
 * Szczegóły węzła: wybór zakresu czasu znowu ma wszystkie opcje (1 godz., 24 godz., 2 dni, 7 dni, 2 tyg., 30 dni, wszystko), jak w zdrowiu sieci, a nie tylko te, na które starcza danych.
 * Informacje o sąsiadach: z powrotem nasze kolory jakości sygnału na liście, a linia średniego SNR na wykresie ma ten sam zielony co w wykresach sygnału.
 * Przełączanie między urządzeniami nie rozłącza już urządzenia, które było w użyciu: jego połączenie przechodzi do tła.
