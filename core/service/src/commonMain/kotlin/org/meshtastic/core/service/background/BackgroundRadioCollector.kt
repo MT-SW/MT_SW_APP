@@ -19,16 +19,14 @@ package org.meshtastic.core.service.background
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
@@ -37,10 +35,8 @@ import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
-import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.RadioBackgroundMonitor
-import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.UiPrefs
@@ -48,50 +44,48 @@ import org.meshtastic.proto.Heartbeat
 import org.meshtastic.proto.ToRadio
 
 /**
- * Background collection (MT_SW). While the mesh service runs and the option is on, every saved radio that is not in
- * use (and not the chosen one) is connected quietly through [BackgroundRadioLink]; the packets it hears are written to
- * the database of that radio, so its history, charts and statistics keep growing like in a separate app. Only the log
- * of packets is kept this way; the full node list of a radio is loaded when it becomes the radio in use. A radio
- * without a database yet (never used) is skipped. A link that drops is tried again after a pause. Errors only go to
- * the log. Switching the option off or choosing another radio closes the links that are no longer wanted.
+ * Background collection (MT_SW). While the mesh service runs and the option is on, every saved device that is not
+ * switched off is kept connected through the [RadioTransportPool]; there is exactly one connection per device. While a
+ * device is not the one shown in the app, the packets it hears are written through [BackgroundRadioLink] to the
+ * database of that device, so its history, charts and statistics keep growing. When the app shows a device, the pool
+ * hands the already open connection over, and back again afterwards, without any disconnect. A link that drops is
+ * tried again after a pause. Errors only go to the log.
  */
 @Single
 class BackgroundRadioCollector(
     private val slotsPrefs: RadioSlotsPrefs,
-    private val radioPrefs: RadioPrefs,
     private val uiPrefs: UiPrefs,
     private val transportFactory: RadioTransportFactory,
+    private val pool: RadioTransportPool,
     private val databaseManager: DatabaseManager,
     private val dispatchers: CoroutineDispatchers,
 ) : RadioBackgroundMonitor {
-    private val connected = MutableStateFlow<Set<String>>(emptySet())
-
-    override val connectedAddresses: StateFlow<Set<String>> = connected
+    override val connectedAddresses: StateFlow<Set<String>> = pool.connectedAddresses
 
     override fun start(scope: CoroutineScope) {
         scope.launch {
-            combine(
-                combine(slotsPrefs.slots, slotsPrefs.selectedId, slotsPrefs.offIds) { slots, selectedId, off ->
-                    Triple(slots, selectedId, off)
-                },
-                radioPrefs.devAddr,
-                uiPrefs.uiOptions,
-            ) { (slots, selectedId, off), active, options ->
+            combine(slotsPrefs.slots, slotsPrefs.offIds, uiPrefs.uiOptions) { slots, off, options ->
                 if (UiOptions(options)[UiOptions.RADIO_BACKGROUND] != 1) {
                     return@combine emptySet<String>()
                 }
                 slots
-                    .filter { it.id != selectedId && it.address != active && it.id !in off }
+                    .filter { it.id !in off }
                     .map { it.address }
                     .filter { isValidDeviceAddress(it) && transportFactory.isAddressValid(it) }
                     .toSet()
             }
                 .distinctUntilChanged()
-                .collectLatest { wanted ->
-                    supervisorScope { wanted.forEach { address -> launch { keepCollecting(address) } } }
+                .collect { wanted ->
+                    // Only the devices that were added or removed are touched; the others keep their connection.
+                    (workers.keys - wanted).forEach { workers.remove(it)?.cancel() }
+                    (wanted - workers.keys).forEach { address ->
+                        workers[address] = scope.launch { keepCollecting(address) }
+                    }
                 }
         }
     }
+
+    private val workers = mutableMapOf<String, Job>()
 
     private suspend fun keepCollecting(address: String) {
         // A short pause first: a radio that has just been in use may still be closing its connection.
@@ -112,15 +106,10 @@ class BackgroundRadioCollector(
     private suspend fun collectOnce(address: String) {
         val linkScope = CoroutineScope(SupervisorJob() + dispatchers.io)
         val link = BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes)
-        val transport = transportFactory.createTransport(address, link)
-        link.attach(transport::handleSendToRadio)
+        link.attach { bytes -> pool.send(address, bytes) }
+        pool.attachBackground(address, link)
         try {
             supervisorScope {
-                val status = launch {
-                    link.connectionState.collect { state ->
-                        connected.update { if (state is ConnectionState.Connected) it + address else it - address }
-                    }
-                }
                 val writer = launch { writeLogs(address, link) }
                 val beat = launch {
                     val heartbeat = ToRadio.Builder().also { it.heartbeat = Heartbeat.Builder().build() }.build()
@@ -130,15 +119,13 @@ class BackgroundRadioCollector(
                     }
                 }
                 link.ended.await()
-                status.cancel()
                 beat.cancel()
                 link.logs.close()
                 writer.join()
             }
         } finally {
-            connected.update { it - address }
             withContext(NonCancellable) {
-                runCatching { transport.close() }
+                pool.detachBackground(address, link)
                 linkScope.cancel()
             }
         }
@@ -175,7 +162,7 @@ class BackgroundRadioCollector(
 
     private companion object {
         const val START_DELAY_MS = 2_000L
-        const val RETRY_MS = 30_000L
+        const val RETRY_MS = 10_000L
         const val HEARTBEAT_MS = 5 * 60 * 1_000L
         const val BATCH_SIZE = 100
         const val FLUSH_MS = 5_000L

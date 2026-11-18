@@ -52,6 +52,7 @@ import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.network.radio.BaseRadioTransportFactory
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.network.repository.SerialDevicePresence
+import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioPrefs
@@ -312,6 +313,7 @@ class SharedRadioInterfaceServiceLivenessTest {
                 processLifecycle = processLifecycleOwner.lifecycle,
                 radioPrefs = radioPrefs,
                 transportFactory = transportFactory,
+                pool = RadioTransportPool(transportFactory, dispatchers),
                 analytics = analytics,
                 radioOperationLock = radioOperationLock,
             )
@@ -439,6 +441,7 @@ class SharedRadioInterfaceServiceLivenessTest {
                     processLifecycle = processLifecycleOwner.lifecycle,
                     radioPrefs = radioPrefs,
                     transportFactory = realFactory,
+                    pool = RadioTransportPool(realFactory, dispatchers),
                     analytics = analytics,
                     radioOperationLock = radioOperationLock,
                 )

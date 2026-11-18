@@ -104,7 +104,11 @@ class BackgroundRadioLink(
     override fun onConnect() {
         state.value = ConnectionState.Connected
         Logger.i { "Background radio link connected" }
-        synchronized(lock) { connected = true }
+        synchronized(lock) {
+            connected = true
+            // A new start of the conversation (also after the device was in use): ask for the configuration again.
+            configAsked = false
+        }
         askForConfig()
     }
 

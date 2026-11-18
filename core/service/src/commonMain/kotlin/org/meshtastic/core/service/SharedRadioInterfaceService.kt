@@ -83,6 +83,7 @@ import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ReceivedRadioFrame
 import org.meshtastic.core.repository.TransportDisconnectReason
+import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.proto.ToRadio
 import kotlin.concurrent.Volatile
 
@@ -177,6 +178,7 @@ class SharedRadioInterfaceService(
     @Named(PROCESS_LIFECYCLE) private val processLifecycle: Lifecycle,
     private val radioPrefs: RadioPrefs,
     private val transportFactory: RadioTransportFactory,
+    private val pool: RadioTransportPool,
     private val analytics: PlatformAnalytics,
     private val radioOperationLock: RadioOperationLock,
 ) : RadioInterfaceService {
@@ -462,6 +464,9 @@ class SharedRadioInterfaceService(
     private var _serviceScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
     @Volatile private var radioTransport: RadioTransport? = null
+
+    /** Set while the device in use is being switched: the open transport is passed on to the background, not closed. */
+    @Volatile private var handOverOnNextStop = false
     private var runningTransportId: InterfaceId? = null
     private var isStarted = false
 
@@ -861,7 +866,9 @@ class SharedRadioInterfaceService(
                 if (sanitized != null && previousAddress != null && sanitized != previousAddress) {
                     gattCacheInvalidationRequested.value = false
                 }
+                handOverOnNextStop = previousAddress != sanitized
                 ignoreExceptionSuspend { stopTransportLocked() }
+                handOverOnNextStop = false
                 if (sanitized != null) {
                     // setDeviceAddress() is fire-and-forget. startTransportLocked() has already rolled back any
                     // partially admitted session, so contain a recoverable factory failure instead of crashing the
@@ -910,7 +917,7 @@ class SharedRadioInterfaceService(
         Logger.i { "Starting radio transport for ${address.anonymize} (generation=$generation)" }
         val newTransport =
             try {
-                transportFactory.createTransport(address, sessionBoundService)
+                pool.attachForeground(address, sessionBoundService)
             } catch (failure: Throwable) {
                 // A failed factory call consumed a generation that may already have reached observers. Keep the
                 // generation monotonic, but revoke the admitted session and every transport-lifecycle field before
@@ -983,9 +990,13 @@ class SharedRadioInterfaceService(
         // transport's own scope; the drain delay gives async transports a window to flush before
         // close() cancels their write scope. BLE's retry path backs off 500ms, so this window
         // also covers one retry on flaky GATT links.
+        val pooled = currentTransport as? RadioTransportPool.PooledRadioTransport
+        val handOver =
+            handOverOnNextStop && pooled != null && currentSession?.address?.let { pool.hasBackground(it) } == true
         try {
             if (
                 sendPoliteDisconnect &&
+                !handOver &&
                 currentTransport != null &&
                 _connectionState.value != ConnectionState.Disconnected
             ) {
@@ -1001,7 +1012,7 @@ class SharedRadioInterfaceService(
             radioTransport = null
             runningTransportId = null
             try {
-                currentTransport?.close()
+                if (handOver && pooled != null) pooled.release(handOver = true) else currentTransport?.close()
             } finally {
                 _serviceScope.cancel("stopping transport")
                 _serviceScope = CoroutineScope(dispatchers.io + SupervisorJob())
