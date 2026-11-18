@@ -334,9 +334,15 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * Runs [block] on the database of the device [address], which need not be the active one (the background
      * collection of a radio that is not in use writes there). Returns null when that radio has no database yet (one is
      * only created when the radio is used first) or when its database is the active one (the app writes that itself).
-     * The manager lock is held while [block] runs, so keep it short.
+     * With [includeActive] the active database is used too: the background collector sets it, because every packet
+     * goes to exactly one consumer (the app or the collector), so no packet is written twice, and packets heard while
+     * the app switches between devices are not lost. The manager lock is held while [block] runs, so keep it short.
      */
-    suspend fun <T> withDeviceDb(address: String, block: suspend (MeshtasticDatabase) -> T): T? =
+    suspend fun <T> withDeviceDb(
+        address: String,
+        includeActive: Boolean = false,
+        block: suspend (MeshtasticDatabase) -> T,
+    ): T? =
         withManagerOperation {
             withContext(dispatchers.io) {
                 mutex.withLock {
@@ -346,7 +352,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
                     } else {
                         val dbName = resolveDbName(address, canReclaimRecoveredSource = false)
                         // The active database is written by the app itself: a second writer would duplicate packets.
-                        if (dbName == currentDbName) null else block(getOrOpenDatabase(dbName))
+                        if (dbName == currentDbName && !includeActive) null else block(getOrOpenDatabase(dbName))
                     }
                 }
             }

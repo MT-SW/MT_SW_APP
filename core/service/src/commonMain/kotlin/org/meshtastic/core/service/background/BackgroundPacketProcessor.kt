@@ -39,10 +39,10 @@ import org.meshtastic.proto.User
 
 /**
  * What a device that is kept connected in the background does with the packets it hears (MT_SW), next to the log entry:
- * a text message or alert goes to the database of that device and raises a notification that carries the device name; node
- * names, positions and telemetry update the node list of that device. When the app shows the device later, everything
- * is already there. [deviceName] and [onMessage] are asked fresh each time, so a renamed device and the unread counter
- * stay current. Errors only go to the log.
+ * a text message or alert goes to the database of that device and raises a notification that carries the device
+ * name; node names, positions and telemetry update the node list of that device. When the app shows the device later,
+ * everything is already there. [deviceName] and [onMessage] are asked fresh each time, so a renamed device and the
+ * unread counter stay current. Errors only go to the log.
  */
 class BackgroundPacketProcessor(
     private val address: String,
@@ -98,7 +98,7 @@ class BackgroundPacketProcessor(
         var muted = false
         var stored = false
         var filtered = false
-        databaseManager.withDeviceDb(address) { db ->
+        databaseManager.withDeviceDb(address, includeActive = true) { db ->
             val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(packet.from)).firstOrNull()
             if (node?.isIgnored == true) return@withDeviceDb
             if (db.packetDao().findPacketsWithId(data.id).any { it.data.from == data.from }) return@withDeviceDb
@@ -188,7 +188,7 @@ class BackgroundPacketProcessor(
 
     /** Applies [change] to the node that sent [packet] in the database of this device and refreshes its reception. */
     private suspend fun updateNode(packet: MeshPacket, create: Boolean, change: (NodeEntity) -> Unit) {
-        databaseManager.withDeviceDb(address) { db ->
+        databaseManager.withDeviceDb(address, includeActive = true) { db ->
             val dao = db.nodeInfoDao()
             val existing = dao.getNodeEntitiesByNums(listOf(packet.from)).firstOrNull()
             if (existing == null && !create) return@withDeviceDb

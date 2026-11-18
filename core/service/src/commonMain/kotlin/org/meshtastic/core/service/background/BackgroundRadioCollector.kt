@@ -210,7 +210,8 @@ class BackgroundRadioCollector(
             if (batch.isEmpty()) return
             val toWrite = batch.toList()
             batch.clear()
-            val written = databaseManager.withDeviceDb(address) { it.meshLogDao().insertIgnore(toWrite) }
+            val written =
+                databaseManager.withDeviceDb(address, includeActive = true) { it.meshLogDao().insertIgnore(toWrite) }
             if (written == null) Logger.d { "Background collection: this device has no database yet, packets dropped" }
         }
         while (true) {
