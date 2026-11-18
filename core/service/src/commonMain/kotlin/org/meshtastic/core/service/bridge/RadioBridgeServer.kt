@@ -244,8 +244,9 @@ class RadioBridgeServer(
                 for (bytes in outbox) output.writeFully(bytes)
                 // The outbox was closed (the client said goodbye, or was too slow): end the connection.
                 closeQuietly(socket)
+            } catch (e: CancellationException) {
+                throw e
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                if (e is CancellationException) throw e
                 Logger.d { "Radio bridge ($label): client $id write ended: ${e.message}" }
             }
         }
@@ -261,8 +262,9 @@ class RadioBridgeServer(
                 if (n < 0) break
                 for (i in 0 until n) codec.processInputByte(buffer[i])
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            if (e is CancellationException) throw e
             Logger.d { "Radio bridge ($label): client $id read ended: ${e.message}" }
         } finally {
             synchronized(lock) {
@@ -297,17 +299,17 @@ class RadioBridgeServer(
         return out
     }
 
-    private fun closeQuietly(socket: Socket) {
-        try {
-            socket.close()
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Logger.d { "Radio bridge: closing a client socket failed: ${e.message}" }
-        }
-    }
-
     private companion object {
         const val LENGTH_LOW_INDEX = 3
         const val OUTBOX_CAPACITY = 256
         const val READ_BUFFER = 1024
+    }
+}
+
+private fun closeQuietly(socket: Socket) {
+    try {
+        socket.close()
+    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+        Logger.d { "Radio bridge: closing a client socket failed: ${e.message}" }
     }
 }

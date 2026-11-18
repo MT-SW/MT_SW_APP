@@ -510,7 +510,7 @@ class RadioControllerImplTest {
         val controller = createController(scope = backgroundScope)
         every { meshPrefs.deviceAddress } returns MutableStateFlow("old:addr")
         val callOrder = mutableListOf<String>()
-        everySuspend { radioInterfaceService.disconnect() } calls { callOrder += "disconnect" }
+        everySuspend { radioInterfaceService.disconnectForSwitch() } calls { callOrder += "disconnect" }
         every { nodeManager.setAllowNodeDbWrites(false) } calls { callOrder += "writes-off" }
         every { meshPrefs.setDeviceAddress("tcp:192.168.1.1") } calls { callOrder += "prefs" }
         everySuspend { messageProcessor.clearEarlyPackets() } calls { callOrder += "buffer" }
@@ -540,7 +540,7 @@ class RadioControllerImplTest {
 
         assertFailsWith<IllegalStateException> { controller.setDeviceAddress("tcp:192.168.1.1") }
 
-        verifySuspend { radioInterfaceService.disconnect() }
+        verifySuspend { radioInterfaceService.disconnectForSwitch() }
         verifySuspend { databaseManager.switchActiveDatabase("tcp:192.168.1.1") }
         verifySuspend { databaseManager.switchActiveDatabase("old:addr") }
         verify { meshPrefs.setDeviceAddress("tcp:192.168.1.1") }
@@ -610,7 +610,7 @@ class RadioControllerImplTest {
 
         assertFailsWith<IllegalStateException> { controller.setDeviceAddress("tcp:192.168.1.1") }
 
-        verifySuspend { radioInterfaceService.disconnect() }
+        verifySuspend { radioInterfaceService.disconnectForSwitch() }
         verifySuspend(exactly(0)) { databaseManager.switchActiveDatabase("tcp:192.168.1.1") }
         verifySuspend { databaseManager.switchActiveDatabase("old:addr") }
         verify(exactly(0)) { meshPrefs.setDeviceAddress("tcp:192.168.1.1") }
@@ -664,7 +664,7 @@ class RadioControllerImplTest {
 
         // Database work is skipped, while both selectors are converged on the requested address.
         verify { radioInterfaceService.setDeviceAddress("tcp:192.168.1.1") }
-        verifySuspend(exactly(0)) { radioInterfaceService.disconnect() }
+        verifySuspend(exactly(0)) { radioInterfaceService.disconnectForSwitch() }
         verify(exactly(1)) { meshPrefs.setDeviceAddress("tcp:192.168.1.1") }
     }
 

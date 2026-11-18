@@ -606,7 +606,7 @@ class MeshServiceOrchestratorTest {
     }
 }
 
-private object NoRadioBackground : RadioBackgroundMonitor {
+internal object NoRadioBackground : RadioBackgroundMonitor {
     override val badges = MutableStateFlow<Map<String, DeviceBadge>>(emptyMap())
     override val connectedAddresses = MutableStateFlow<Set<String>>(emptySet())
     override val unreadByAddress = MutableStateFlow<Map<String, Int>>(emptyMap())

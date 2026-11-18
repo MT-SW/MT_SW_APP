@@ -172,11 +172,7 @@ private fun rememberFilledDecor(colors: ButtonColors, enabled: Boolean): FilledD
 
 /** The same for any filled control (a floating button, a filled icon button) from its [container] colours. */
 @Composable
-internal fun rememberDecorFor(
-    container: Color,
-    disabledContainer: Color,
-    enabled: Boolean,
-): FilledDecor {
+internal fun rememberDecorFor(container: Color, disabledContainer: Color, enabled: Boolean): FilledDecor {
     val options = rememberUiOptions()
     val scheme = MaterialTheme.colorScheme
     return when (options[UiOptions.BUTTON_STYLE]) {

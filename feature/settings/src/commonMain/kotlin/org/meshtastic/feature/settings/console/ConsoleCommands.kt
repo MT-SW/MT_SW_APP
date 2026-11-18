@@ -331,7 +331,11 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                                 radio.name?.takeIf { name -> name.isNotBlank() } ?: radio.address,
                             )
                         },
-                        getStringSuspend(Res.string.console_out_status_nodes, nodes.size, nodes.count { node -> node.isOnline }),
+                        getStringSuspend(
+                            Res.string.console_out_status_nodes,
+                            nodes.size,
+                            nodes.count { node -> node.isOnline },
+                        ),
                         getStringSuspend(Res.string.console_out_status_bridge, bridgeText(env.bridge())),
                     ),
                 )
