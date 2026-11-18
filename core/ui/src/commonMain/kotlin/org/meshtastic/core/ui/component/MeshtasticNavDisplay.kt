@@ -73,6 +73,7 @@ fun MeshtasticNavDisplay(
     analytics: PlatformAnalytics? = null,
 ) {
     val activeTab = multiBackstack.currentTabRoute
+    ReloadNodeDetailsOnDeviceChange(multiBackstack)
     MeshtasticNavDisplayHost(
         backStack = multiBackstack.activeBackStack,
         onBack = { multiBackstack.goBack() },
