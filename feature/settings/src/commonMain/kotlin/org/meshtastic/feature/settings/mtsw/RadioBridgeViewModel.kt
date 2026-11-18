@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgePrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
@@ -34,9 +35,29 @@ data class RadioBridgeState(
     val config: RadioBridgeConfig = RadioBridgeConfig(),
 )
 
-/** The settings of the TCP bridge (see [RadioBridgeConfig]) for the radio that is chosen now. */
+/** The bridge settings of one saved device. [name] is null while the device is not connected (its name is not shown). */
+data class RadioBridgeDevice(val slotId: Int, val name: String?, val config: RadioBridgeConfig)
+
+/** The settings of the TCP bridges (see [RadioBridgeConfig]): one set per saved device, and the chosen device. */
 @KoinViewModel
-class RadioBridgeViewModel(slotsPrefs: RadioSlotsPrefs, private val bridgePrefs: RadioBridgePrefs) : ViewModel() {
+class RadioBridgeViewModel(
+    slotsPrefs: RadioSlotsPrefs,
+    private val bridgePrefs: RadioBridgePrefs,
+    background: RadioBackgroundMonitor,
+) : ViewModel() {
+    val devices: StateFlow<List<RadioBridgeDevice>> =
+        combine(slotsPrefs.slots, bridgePrefs.configs, background.connectedAddresses) { slots, configs, connected ->
+            slots.map { slot ->
+                val name = slot.name?.takeIf { it.isNotBlank() } ?: slot.address
+                RadioBridgeDevice(
+                    slotId = slot.id,
+                    name = name.takeIf { slot.address in connected },
+                    config = configs[slot.id] ?: RadioBridgeConfig(),
+                )
+            }
+        }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
+
     val state: StateFlow<RadioBridgeState> =
         combine(slotsPrefs.slots, slotsPrefs.selectedId, bridgePrefs.configs) { slots, selected, configs ->
             val slot = slots.firstOrNull { it.id == selected }
@@ -45,6 +66,13 @@ class RadioBridgeViewModel(slotsPrefs: RadioSlotsPrefs, private val bridgePrefs:
         }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RadioBridgeState())
 
+    /** Changes the bridge settings of the device with the saved id [slotId]. */
+    fun update(slotId: Int, change: (RadioBridgeConfig) -> RadioBridgeConfig) {
+        val current = devices.value.firstOrNull { it.slotId == slotId }?.config ?: RadioBridgeConfig()
+        bridgePrefs.setConfig(slotId, change(current))
+    }
+
+    /** Changes the bridge settings of the device shown in the app (used by the console). */
     fun update(change: (RadioBridgeConfig) -> RadioBridgeConfig) {
         val current = state.value
         val id = current.slotId ?: return

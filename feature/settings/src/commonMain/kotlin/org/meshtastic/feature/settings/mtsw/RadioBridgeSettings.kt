@@ -28,13 +28,13 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.radio_bridge_address
 import org.meshtastic.core.resources.radio_bridge_block_admin
 import org.meshtastic.core.resources.radio_bridge_block_messages
+import org.meshtastic.core.resources.radio_bridge_device_number
 import org.meshtastic.core.resources.radio_bridge_enabled
 import org.meshtastic.core.resources.radio_bridge_lan
 import org.meshtastic.core.resources.radio_bridge_max_clients
 import org.meshtastic.core.resources.radio_bridge_no_radio
 import org.meshtastic.core.resources.radio_bridge_port
 import org.meshtastic.core.resources.radio_bridge_port_summary
-import org.meshtastic.core.resources.radio_bridge_radio
 import org.meshtastic.core.resources.radio_bridge_read_only
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditTextPreference
@@ -47,24 +47,35 @@ import org.meshtastic.core.ui.icon.Udp
 import org.meshtastic.core.ui.icon.Visibility
 
 /**
- * The settings of the TCP bridge of the chosen radio. Everything is off by default; the restrictions only limit what
- * the connected programs may send.
+ * The settings of the TCP bridges: one block for every saved device, so several devices can be shared at the same
+ * time, each on its own port. Everything is off by default; the restrictions only limit what the connected programs
+ * may send. The name of a device that is not connected is not shown.
  */
 @Composable
 fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val slotId = state.slotId
-    if (slotId == null) {
+    val devices by viewModel.devices.collectAsStateWithLifecycle()
+    if (devices.isEmpty()) {
         Text(stringResource(Res.string.radio_bridge_no_radio))
         return
     }
-    val config = state.config
-    Text(stringResource(Res.string.radio_bridge_radio, state.name.orEmpty()))
+    devices.forEach { device ->
+        RadioBridgeDeviceSettings(device) { change -> viewModel.update(device.slotId, change) }
+    }
+}
+
+@Composable
+private fun RadioBridgeDeviceSettings(
+    device: RadioBridgeDevice,
+    update: ((RadioBridgeConfig) -> RadioBridgeConfig) -> Unit,
+) {
+    val slotId = device.slotId
+    val config = device.config
+    Text(device.name ?: stringResource(Res.string.radio_bridge_device_number, slotId))
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_enabled),
         leadingIcon = MeshtasticIcons.Share,
         checked = config.enabled,
-        onClick = { viewModel.update { it.copy(enabled = !it.enabled) } },
+        onClick = { update { it.copy(enabled = !it.enabled) } },
     )
     if (!config.enabled) return
     val port = config.portFor(slotId)
@@ -77,38 +88,38 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
         isError = config.port != 0 && config.port !in RadioBridgeConfig.MIN_PORT..RadioBridgeConfig.MAX_PORT,
         keyboardActions = KeyboardActions {},
         onValueChanged = { value ->
-            viewModel.update { it.copy(port = value.coerceIn(0, RadioBridgeConfig.MAX_PORT)) }
+            update { it.copy(port = value.coerceIn(0, RadioBridgeConfig.MAX_PORT)) }
         },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_lan),
         leadingIcon = MeshtasticIcons.Udp,
         checked = config.lanAccess,
-        onClick = { viewModel.update { it.copy(lanAccess = !it.lanAccess) } },
+        onClick = { update { it.copy(lanAccess = !it.lanAccess) } },
     )
     DropDownPreference(
         title = stringResource(Res.string.radio_bridge_max_clients),
         enabled = true,
         items = RadioBridgeConfig.MAX_CLIENTS_CHOICES.map { it to it.toString() },
         selectedItem = config.maxClients,
-        onItemSelected = { value -> viewModel.update { it.copy(maxClients = value) } },
+        onItemSelected = { value -> update { it.copy(maxClients = value) } },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_read_only),
         leadingIcon = MeshtasticIcons.Visibility,
         checked = config.readOnly,
-        onClick = { viewModel.update { it.copy(readOnly = !it.readOnly) } },
+        onClick = { update { it.copy(readOnly = !it.readOnly) } },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_block_admin),
         leadingIcon = MeshtasticIcons.AdminPanelSettings,
         checked = config.blockAdmin,
-        onClick = { viewModel.update { it.copy(blockAdmin = !it.blockAdmin) } },
+        onClick = { update { it.copy(blockAdmin = !it.blockAdmin) } },
     )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_block_messages),
         leadingIcon = MeshtasticIcons.Message,
         checked = config.blockMessages,
-        onClick = { viewModel.update { it.copy(blockMessages = !it.blockMessages) } },
+        onClick = { update { it.copy(blockMessages = !it.blockMessages) } },
     )
 }
