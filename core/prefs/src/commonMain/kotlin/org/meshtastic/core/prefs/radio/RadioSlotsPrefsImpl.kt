@@ -16,8 +16,8 @@
  */
 package org.meshtastic.core.prefs.radio
 
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
@@ -38,8 +38,7 @@ import org.meshtastic.core.repository.RadioSlotsPrefs
  * nowhere. The radio saved before this existed is read as radio 1 until the list is first written.
  */
 @Single
-class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: CoroutineDispatchers) :
-    RadioSlotsPrefs {
+class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: CoroutineDispatchers) : RadioSlotsPrefs {
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
     private val state: StateFlow<Pair<List<RadioSlot>, Int?>> =
@@ -113,13 +112,12 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
         }
     }
 
-    private fun decodeIds(text: String?): Set<Int> =
-        text
-            .orEmpty()
-            .split(',')
-            .mapNotNull { it.trim().toIntOrNull() }
-            .filter { it in 1..RadioSlotsPrefs.MAX_SLOTS }
-            .toSet()
+    private fun decodeIds(text: String?): Set<Int> = text
+        .orEmpty()
+        .split(',')
+        .mapNotNull { it.trim().toIntOrNull() }
+        .filter { it in 1..RadioSlotsPrefs.MAX_SLOTS }
+        .toSet()
 
     private fun freeId(slots: List<RadioSlot>): Int? =
         (1..RadioSlotsPrefs.MAX_SLOTS).firstOrNull { id -> slots.none { it.id == id } }

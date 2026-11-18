@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.quick_chat_instant
 import org.meshtastic.core.resources.quick_chat_new
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FloatingActionButton
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar

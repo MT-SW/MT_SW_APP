@@ -35,13 +35,10 @@ data class RadioBridgeState(
     val config: RadioBridgeConfig = RadioBridgeConfig(),
 )
 
-/** The bridge settings of one saved device. [name] is null while the device is not connected (its name is not shown). */
-data class RadioBridgeDevice(
-    val slotId: Int,
-    val name: String?,
-    val nodeNum: Int?,
-    val config: RadioBridgeConfig,
-)
+/**
+ * The bridge settings of one saved device. [name] is null while the device is not connected (its name is not shown).
+ */
+data class RadioBridgeDevice(val slotId: Int, val name: String?, val nodeNum: Int?, val config: RadioBridgeConfig)
 
 /** The settings of the TCP bridges (see [RadioBridgeConfig]): one set per saved device, and the chosen device. */
 @KoinViewModel

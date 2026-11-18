@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongMethod", "MagicNumber", "ModifierMissing", "MultipleEmitters")
+@file:Suppress("LongMethod", "MagicNumber", "ModifierMissing", "MultipleEmitters", "TooManyFunctions")
 
 package org.meshtastic.feature.settings.component
 
@@ -35,37 +35,17 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.radio_background
-import org.meshtastic.core.resources.radio_background_off
-import org.meshtastic.core.resources.radio_background_on
-import org.meshtastic.core.resources.radio_count
-import org.meshtastic.core.resources.radio_count_hide
-import org.meshtastic.core.resources.radio_count_show
-import org.meshtastic.core.resources.radio_alert_speed_fast
-import org.meshtastic.core.resources.radio_alert_speed_medium
-import org.meshtastic.core.resources.radio_alert_speed_slow
-import org.meshtastic.core.resources.radio_alert_speed
-import org.meshtastic.core.resources.radio_alert_color_red
-import org.meshtastic.core.resources.radio_alert_color_amber
-import org.meshtastic.core.resources.radio_alert_color_theme
-import org.meshtastic.core.resources.radio_alert_color_purple
-import org.meshtastic.core.resources.radio_alert_color_white
-import org.meshtastic.core.resources.radio_alert_color
-import org.meshtastic.core.resources.radio_alert_pulse
-import org.meshtastic.core.resources.radio_alert_digit
-import org.meshtastic.core.resources.radio_alert_off
-import org.meshtastic.core.resources.radio_alert
 import org.meshtastic.core.resources.backup_look
+import org.meshtastic.core.resources.button_glow
 import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_gradient_normal
 import org.meshtastic.core.resources.button_gradient_off
 import org.meshtastic.core.resources.button_gradient_strong
 import org.meshtastic.core.resources.button_gradient_weak
-import org.meshtastic.core.resources.button_style_glass
-import org.meshtastic.core.resources.button_glow
 import org.meshtastic.core.resources.button_outline
 import org.meshtastic.core.resources.button_style
 import org.meshtastic.core.resources.button_style_classic
+import org.meshtastic.core.resources.button_style_glass
 import org.meshtastic.core.resources.button_style_outline_glass
 import org.meshtastic.core.resources.button_style_summary
 import org.meshtastic.core.resources.control_style_thin
@@ -142,6 +122,26 @@ import org.meshtastic.core.resources.nav_select_both
 import org.meshtastic.core.resources.nav_select_bubble
 import org.meshtastic.core.resources.nav_select_line
 import org.meshtastic.core.resources.press_spring
+import org.meshtastic.core.resources.radio_alert
+import org.meshtastic.core.resources.radio_alert_color
+import org.meshtastic.core.resources.radio_alert_color_amber
+import org.meshtastic.core.resources.radio_alert_color_purple
+import org.meshtastic.core.resources.radio_alert_color_red
+import org.meshtastic.core.resources.radio_alert_color_theme
+import org.meshtastic.core.resources.radio_alert_color_white
+import org.meshtastic.core.resources.radio_alert_digit
+import org.meshtastic.core.resources.radio_alert_off
+import org.meshtastic.core.resources.radio_alert_pulse
+import org.meshtastic.core.resources.radio_alert_speed
+import org.meshtastic.core.resources.radio_alert_speed_fast
+import org.meshtastic.core.resources.radio_alert_speed_medium
+import org.meshtastic.core.resources.radio_alert_speed_slow
+import org.meshtastic.core.resources.radio_background
+import org.meshtastic.core.resources.radio_background_off
+import org.meshtastic.core.resources.radio_background_on
+import org.meshtastic.core.resources.radio_count
+import org.meshtastic.core.resources.radio_count_hide
+import org.meshtastic.core.resources.radio_count_show
 import org.meshtastic.core.resources.restore_look
 import org.meshtastic.core.resources.ring_style_thin
 import org.meshtastic.core.resources.ring_style_thin_summary
@@ -630,7 +630,9 @@ private fun ElementPresets(onChange: (String, Int) -> Unit) {
     }
 }
 
-/** Saves the whole look to a file and brings it back, so a look can always be returned to or moved to another device. */
+/**
+ * Saves the whole look to a file and brings it back, so a look can always be returned to or moved to another device.
+ */
 @Composable
 private fun LookBackup() {
     val backup = rememberSettingsBackupActions()

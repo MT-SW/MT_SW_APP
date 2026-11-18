@@ -40,11 +40,13 @@ class BridgeRouterTest {
                 MeshPacket.Builder()
                     .also { p ->
                         p.id = id
-                        p.decoded = Data.Builder().also { d ->
-                            d.portnum = port
-                            d.request_id = requestId
-                        }
-                            .build()
+                        p.decoded =
+                            Data.Builder()
+                                .also { d ->
+                                    d.portnum = port
+                                    d.request_id = requestId
+                                }
+                                .build()
                     }
                     .build()
         }

@@ -40,11 +40,11 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageArchiveMonitor
-import org.meshtastic.core.repository.RadioBackgroundMonitor
-import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.NodeActiveMonitor
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeSilenceMonitor
+import org.meshtastic.core.repository.RadioBackgroundMonitor
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.TakPrefs

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.database
 
 import androidx.room3.Room
@@ -43,13 +42,12 @@ class DatabaseStatsSyncTest {
     @Before
     fun create() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        fun open() =
-            Room.inMemoryDatabaseBuilder<MeshtasticDatabase>(
-                context = context,
-                factory = { MeshtasticDatabaseConstructor.initialize() },
-            )
-                .setDriver(BundledSQLiteDriver())
-                .build()
+        fun open() = Room.inMemoryDatabaseBuilder<MeshtasticDatabase>(
+            context = context,
+            factory = { MeshtasticDatabaseConstructor.initialize() },
+        )
+            .setDriver(BundledSQLiteDriver())
+            .build()
         a = open()
         b = open()
     }

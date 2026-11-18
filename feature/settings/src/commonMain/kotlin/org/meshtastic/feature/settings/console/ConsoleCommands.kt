@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "CyclomaticComplexMethod", "LongParameterList")
+
 package org.meshtastic.feature.settings.console
 
 import androidx.compose.runtime.Composable
@@ -25,7 +27,6 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.console_arg_off
 import org.meshtastic.core.resources.console_arg_on
 import org.meshtastic.core.resources.console_cmd_bridge_name
@@ -81,6 +82,7 @@ import org.meshtastic.core.resources.console_out_status_connection
 import org.meshtastic.core.resources.console_out_status_nodes
 import org.meshtastic.core.resources.console_out_status_radio
 import org.meshtastic.core.resources.console_out_unknown
+import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.ui.viewmodel.RadioChoice
 import org.meshtastic.core.ui.viewmodel.RadioStatus
 import org.meshtastic.feature.settings.mtsw.RadioBridgeState
@@ -221,9 +223,14 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
 
     val commands =
         listOf(
-            ConsoleCommand(labels.help.name, labels.help.summary, labels.help.usage, complete = { args ->
-                if (args.isEmpty()) registry.commands.map { it.name } else emptyList()
-            }) { args ->
+            ConsoleCommand(
+                labels.help.name,
+                labels.help.summary,
+                labels.help.usage,
+                complete = { args ->
+                    if (args.isEmpty()) registry.commands.map { it.name } else emptyList()
+                },
+            ) { args ->
                 val one = args.firstOrNull()?.let { registry.find(it) }
                 if (one != null) {
                     ConsoleResult(listOf(one.summary, getStringSuspend(Res.string.console_out_help_usage, one.usage)))
@@ -241,21 +248,26 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_no_radios)))
                 } else {
                     ConsoleResult(
-                        radios.map {
+                        radios.map { radio ->
                             getStringSuspend(
                                 Res.string.console_out_radio_line,
-                                it.id,
-                                it.name?.takeIf { name -> name.isNotBlank() } ?: it.address,
-                                stateText(it.status),
-                                if (it.selected) getStringSuspend(Res.string.console_out_selected) else "",
+                                radio.id,
+                                radio.name?.takeIf { name -> name.isNotBlank() } ?: radio.address,
+                                stateText(radio.status),
+                                if (radio.selected) getStringSuspend(Res.string.console_out_selected) else "",
                             )
                         },
                     )
                 }
             },
-            ConsoleCommand(labels.radio.name, labels.radio.summary, labels.radio.usage, complete = { args ->
-                if (args.isEmpty()) radioNumbers() else emptyList()
-            }) { args ->
+            ConsoleCommand(
+                labels.radio.name,
+                labels.radio.summary,
+                labels.radio.usage,
+                complete = { args ->
+                    if (args.isEmpty()) radioNumbers() else emptyList()
+                },
+            ) { args ->
                 val radio = radioNamed(args.firstOrNull())
                 if (radio == null) {
                     val missing = getStringSuspend(Res.string.console_out_radio_missing, args.firstOrNull().orEmpty())
@@ -273,9 +285,14 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     )
                 }
             },
-            ConsoleCommand(labels.disconnect.name, labels.disconnect.summary, labels.disconnect.usage, complete = { args ->
-                if (args.isEmpty()) radioNumbers() else emptyList()
-            }) { args ->
+            ConsoleCommand(
+                labels.disconnect.name,
+                labels.disconnect.summary,
+                labels.disconnect.usage,
+                complete = { args ->
+                    if (args.isEmpty()) radioNumbers() else emptyList()
+                },
+            ) { args ->
                 val given = args.firstOrNull()
                 val radio = given?.let { radioNamed(it) }
                 if (given != null && radio == null) {
@@ -285,9 +302,14 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_disconnecting)))
                 }
             },
-            ConsoleCommand(labels.remove.name, labels.remove.summary, labels.remove.usage, complete = { args ->
-                if (args.isEmpty()) radioNumbers() else emptyList()
-            }) { args ->
+            ConsoleCommand(
+                labels.remove.name,
+                labels.remove.summary,
+                labels.remove.usage,
+                complete = { args ->
+                    if (args.isEmpty()) radioNumbers() else emptyList()
+                },
+            ) { args ->
                 val radio = radioNamed(args.firstOrNull())
                 if (radio == null) {
                     val missing = getStringSuspend(Res.string.console_out_radio_missing, args.firstOrNull().orEmpty())
@@ -298,18 +320,18 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                 }
             },
             ConsoleCommand(labels.status.name, labels.status.summary, labels.status.usage) {
-                val chosen = env.radios().firstOrNull { it.selected }
+                val chosen = env.radios().firstOrNull { radio -> radio.selected }
                 val nodes = env.nodes()
                 ConsoleResult(
                     listOfNotNull(
                         getStringSuspend(Res.string.console_out_status_connection, connectionText(env.connection())),
-                        chosen?.let {
+                        chosen?.let { radio ->
                             getStringSuspend(
                                 Res.string.console_out_status_radio,
-                                it.name?.takeIf { name -> name.isNotBlank() } ?: it.address,
+                                radio.name?.takeIf { name -> name.isNotBlank() } ?: radio.address,
                             )
                         },
-                        getStringSuspend(Res.string.console_out_status_nodes, nodes.size, nodes.count { it.isOnline }),
+                        getStringSuspend(Res.string.console_out_status_nodes, nodes.size, nodes.count { node -> node.isOnline }),
                         getStringSuspend(Res.string.console_out_status_bridge, bridgeText(env.bridge())),
                     ),
                 )
@@ -349,9 +371,14 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     ConsoleResult(lines + more)
                 }
             },
-            ConsoleCommand(labels.bridge.name, labels.bridge.summary, labels.bridge.usage, complete = { args ->
-                if (args.isEmpty()) listOf(labels.on, labels.off) else emptyList()
-            }) { args ->
+            ConsoleCommand(
+                labels.bridge.name,
+                labels.bridge.summary,
+                labels.bridge.usage,
+                complete = { args ->
+                    if (args.isEmpty()) listOf(labels.on, labels.off) else emptyList()
+                },
+            ) { args ->
                 val state = env.bridge()
                 val word = args.firstOrNull()?.let { ConsoleText.fold(it) }
                 val change =

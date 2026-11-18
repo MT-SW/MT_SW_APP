@@ -53,13 +53,13 @@ import kotlin.concurrent.Volatile
  * the computer or phone that speaks the same stream protocol as the device's own TCP port, so other programs can
  * connect to that device through the app while the app keeps its single connection. Several devices can be shared at
  * the same time, each on its own port. What clients may see and send is decided by one [BridgeRouter] per device. The
- * frames of the device shown in the app come from the app's own session ([onFromRadio]); the frames of a device kept
- * in the background come from its quiet link ([onDeviceFrame]). Errors only go to the log. A server moves when its
- * port, the local-network access or its device changes, stops when its bridge is switched off, and takes the
- * restrictions and the number of clients live, without dropping anyone.
+ * frames of the device shown in the app come from the app's own session ([onFromRadio]); the frames of a device kept in
+ * the background come from its quiet link ([onDeviceFrame]). Errors only go to the log. A server moves when its port,
+ * the local-network access or its device changes, stops when its bridge is switched off, and takes the restrictions and
+ * the number of clients live, without dropping anyone.
  *
- * The routers and the client lists are shared by the receive loops and the sockets, so every access goes through
- * [lock] (never held while suspending).
+ * The routers and the client lists are shared by the receive loops and the sockets, so every access goes through [lock]
+ * (never held while suspending).
  */
 @Single
 class RadioBridgeServer(
@@ -125,17 +125,16 @@ class RadioBridgeServer(
             running?.job?.cancel()
             val instance = Instance(slot, listen).also { it.router.config = config }
             synchronized(lock) { instances[slot.id] = instance }
-            instance.job =
-                scope.launch {
-                    try {
-                        previous?.join()
-                        serve(instance)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                        Logger.w(e) { "Radio bridge stopped: ${e.message}" }
-                    }
+            instance.job = scope.launch {
+                try {
+                    previous?.join()
+                    serve(instance)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                    Logger.w(e) { "Radio bridge stopped: ${e.message}" }
                 }
+            }
         }
     }
 
@@ -244,7 +243,7 @@ class RadioBridgeServer(
             try {
                 for (bytes in outbox) output.writeFully(bytes)
                 // The outbox was closed (the client said goodbye, or was too slow): end the connection.
-                runCatching { socket.close() }
+                closeQuietly(socket)
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 if (e is CancellationException) throw e
                 Logger.d { "Radio bridge ($label): client $id write ended: ${e.message}" }
@@ -272,7 +271,7 @@ class RadioBridgeServer(
             }
             outbox.close()
             writer.cancel()
-            runCatching { socket.close() }
+            closeQuietly(socket)
             Logger.i { "Radio bridge ($label): client $id gone" }
         }
     }
@@ -292,13 +291,22 @@ class RadioBridgeServer(
         val out = ByteArray(StreamFrameCodec.HEADER_SIZE + payload.size)
         out[0] = StreamFrameCodec.START1
         out[1] = StreamFrameCodec.START2
-        out[2] = (payload.size shr 8).toByte()
-        out[3] = payload.size.toByte()
+        out[2] = (payload.size shr Byte.SIZE_BITS).toByte()
+        out[LENGTH_LOW_INDEX] = payload.size.toByte()
         payload.copyInto(out, StreamFrameCodec.HEADER_SIZE)
         return out
     }
 
+    private fun closeQuietly(socket: Socket) {
+        try {
+            socket.close()
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            Logger.d { "Radio bridge: closing a client socket failed: ${e.message}" }
+        }
+    }
+
     private companion object {
+        const val LENGTH_LOW_INDEX = 3
         const val OUTBOX_CAPACITY = 256
         const val READ_BUFFER = 1024
     }

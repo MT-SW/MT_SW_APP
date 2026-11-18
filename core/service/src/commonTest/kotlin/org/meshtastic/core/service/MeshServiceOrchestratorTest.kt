@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.service
 
-import kotlinx.coroutines.CoroutineScope
-import org.meshtastic.core.repository.RadioBridgeMonitor
 import co.touchlab.kermit.Severity
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
@@ -30,23 +28,28 @@ import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode.Companion.atLeast
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.DeviceBadge
 import org.meshtastic.core.repository.MeshConfigHandler
 import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.RadioBackgroundMonitor
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.ReceivedRadioFrame
@@ -180,7 +183,7 @@ class MeshServiceOrchestratorTest {
 
                 override fun onFromRadio(payload: ByteString) = Unit
             },
-            radioBackground = {},
+            radioBackground = NoRadioBackground,
         )
     }
 
@@ -601,4 +604,14 @@ class MeshServiceOrchestratorTest {
 
         orchestrator.stop()
     }
+}
+
+private object NoRadioBackground : RadioBackgroundMonitor {
+    override val badges = MutableStateFlow<Map<String, DeviceBadge>>(emptyMap())
+    override val connectedAddresses = MutableStateFlow<Set<String>>(emptySet())
+    override val unreadByAddress = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    override fun clearUnread(address: String) = Unit
+
+    override fun start(scope: CoroutineScope) = Unit
 }

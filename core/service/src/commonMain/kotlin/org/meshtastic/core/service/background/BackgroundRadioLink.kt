@@ -51,6 +51,7 @@ class BackgroundPacket(val myNodeNum: Int, val packet: org.meshtastic.proto.Mesh
  * app, but nothing here reaches the rest of the app: the link only asks the radio for its packets and turns each packet
  * it hears into a log entry for that radio's own database ([logs]). The radio in use is handled by the real service.
  */
+@Suppress("TooManyFunctions")
 @OptIn(ExperimentalUuidApi::class)
 class BackgroundRadioLink(
     private val address: String,

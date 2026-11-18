@@ -149,7 +149,9 @@ fun NeighborInfoLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit,
                     val text =
                         when {
                             entry is NeighborInfoEntry.Received -> stringResource(Res.string.neighbor_info_received)
+
                             report != null -> stringResource(Res.string.neighbor_info_requested)
+
                             else ->
                                 "${stringResource(Res.string.neighbor_info_requested)} - " +
                                     stringResource(Res.string.routing_error_no_response)

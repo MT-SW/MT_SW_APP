@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.prefs.backup
 
 import androidx.datastore.core.DataStore
@@ -49,8 +48,8 @@ import kotlinx.serialization.json.putJsonObject
 import okio.BufferedSink
 import okio.BufferedSource
 import org.koin.core.annotation.Single
-import org.meshtastic.core.datastore.di.CorePreferencesDataStore
 import org.meshtastic.core.common.util.safeCatching
+import org.meshtastic.core.datastore.di.CorePreferencesDataStore
 import org.meshtastic.core.prefs.di.AppDataStore
 import org.meshtastic.core.prefs.di.CustomEmojiDataStore
 import org.meshtastic.core.prefs.di.FilterDataStore
@@ -68,6 +67,7 @@ import org.meshtastic.core.repository.SettingsBackupScope
  * included, and a few one-time marks and the AI model choices are skipped, because they only make sense on the
  * installation that wrote them.
  */
+@Suppress("LongParameterList")
 @Single
 class AppSettingsBackupImpl(
     ui: UiDataStore,
@@ -136,7 +136,8 @@ class AppSettingsBackupImpl(
     private fun readStores(source: BufferedSource): JsonObject? = safeCatching {
         val root = Json.parseToJsonElement(source.readUtf8()).jsonObject
         if (root["format"]?.jsonPrimitive?.contentOrNull == FORMAT) root["stores"]?.jsonObject else null
-    }.getOrNull()
+    }
+        .getOrNull()
 
     private fun decodeStores(scope: SettingsBackupScope, fileStores: JsonObject): Map<String, List<Pair<String, Any>>> {
         val decoded = linkedMapOf<String, List<Pair<String, Any>>>()
@@ -162,13 +163,20 @@ class AppSettingsBackupImpl(
         val (type, json) =
             when (value) {
                 is Boolean -> TYPE_BOOLEAN to JsonPrimitive(value)
+
                 is Int -> TYPE_INT to JsonPrimitive(value)
+
                 is Long -> TYPE_LONG to JsonPrimitive(value)
+
                 is Float -> TYPE_FLOAT to JsonPrimitive(value)
+
                 is Double -> TYPE_DOUBLE to JsonPrimitive(value)
+
                 is String -> TYPE_STRING to JsonPrimitive(value)
+
                 is Set<*> ->
                     TYPE_STRING_SET to JsonArray(value.filterIsInstance<String>().sorted().map { JsonPrimitive(it) })
+
                 else -> return null
             }
         return buildJsonObject {
@@ -190,7 +198,8 @@ class AppSettingsBackupImpl(
             TYPE_STRING_SET -> value.jsonArray.map { it.jsonPrimitive.content }.toSet()
             else -> null
         }
-    }.getOrNull()
+    }
+        .getOrNull()
 
     @Suppress("UNCHECKED_CAST")
     private fun MutablePreferences.putAny(name: String, value: Any) {

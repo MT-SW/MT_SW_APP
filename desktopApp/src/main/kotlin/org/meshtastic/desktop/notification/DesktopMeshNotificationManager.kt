@@ -45,7 +45,7 @@ private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
 
 /** The same link Android uses: a tap opens the conversation the notification came from. */
 private fun openMessageLink(contactKey: String, deviceAddress: String? = null) =
-    "$DEEP_LINK_BASE_URI/messages/$contactKey" + (deviceAddress?.let { "?device=$it" } ?: "")
+    "$DEEP_LINK_BASE_URI/messages/$contactKey" + deviceAddress?.let { "?device=$it" }.orEmpty()
 
 /**
  * Desktop implementation of [MeshNotificationManager]: turns each mesh event into a [Notification] record and hands it

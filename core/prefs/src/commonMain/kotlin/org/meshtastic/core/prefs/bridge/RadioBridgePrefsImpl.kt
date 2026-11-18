@@ -84,21 +84,26 @@ class RadioBridgePrefsImpl(private val dataStore: UiDataStore, dispatchers: Coro
         internal fun decode(text: String?): Map<Int, RadioBridgeConfig> {
             if (text.isNullOrBlank()) return emptyMap()
             return runCatching {
-                Json.parseToJsonElement(text).jsonObject.mapNotNull { (key, value) ->
-                    val id = key.toIntOrNull()?.takeIf { it in 1..RadioSlotsPrefs.MAX_SLOTS } ?: return@mapNotNull null
-                    val o = value.jsonObject
-                    val defaults = RadioBridgeConfig()
-                    id to
-                        RadioBridgeConfig(
-                            enabled = o["enabled"]?.jsonPrimitive?.boolean ?: defaults.enabled,
-                            port = o["port"]?.jsonPrimitive?.int ?: defaults.port,
-                            lanAccess = o["lan"]?.jsonPrimitive?.boolean ?: defaults.lanAccess,
-                            readOnly = o["readOnly"]?.jsonPrimitive?.boolean ?: defaults.readOnly,
-                            blockAdmin = o["blockAdmin"]?.jsonPrimitive?.boolean ?: defaults.blockAdmin,
-                            blockMessages = o["blockMessages"]?.jsonPrimitive?.boolean ?: defaults.blockMessages,
-                            maxClients = o["maxClients"]?.jsonPrimitive?.int ?: defaults.maxClients,
-                        )
-                }
+                Json.parseToJsonElement(text)
+                    .jsonObject
+                    .mapNotNull { (key, value) ->
+                        val id =
+                            key.toIntOrNull()?.takeIf { it in 1..RadioSlotsPrefs.MAX_SLOTS }
+                                ?: return@mapNotNull null
+                        val o = value.jsonObject
+                        val defaults = RadioBridgeConfig()
+                        id to
+                            RadioBridgeConfig(
+                                enabled = o["enabled"]?.jsonPrimitive?.boolean ?: defaults.enabled,
+                                port = o["port"]?.jsonPrimitive?.int ?: defaults.port,
+                                lanAccess = o["lan"]?.jsonPrimitive?.boolean ?: defaults.lanAccess,
+                                readOnly = o["readOnly"]?.jsonPrimitive?.boolean ?: defaults.readOnly,
+                                blockAdmin = o["blockAdmin"]?.jsonPrimitive?.boolean ?: defaults.blockAdmin,
+                                blockMessages =
+                                o["blockMessages"]?.jsonPrimitive?.boolean ?: defaults.blockMessages,
+                                maxClients = o["maxClients"]?.jsonPrimitive?.int ?: defaults.maxClients,
+                            )
+                    }
                     .toMap()
             }
                 .getOrDefault(emptyMap())

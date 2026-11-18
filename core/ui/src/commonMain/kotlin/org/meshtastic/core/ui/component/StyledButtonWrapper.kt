@@ -163,12 +163,12 @@ private fun isDangerColor(color: Color, scheme: ColorScheme): Boolean = color ==
 
 /**
  * MT_SW: the look of a filled button. With the default "outline and glass" style it is a thin outline on a clear glass
- * pane, with a soft glow in the colour of the theme while the button works and grey when it is switched off. "Look"
- * can choose filled glass or the plain Material buttons instead.
+ * pane, with a soft glow in the colour of the theme while the button works and grey when it is switched off. "Look" can
+ * choose filled glass or the plain Material buttons instead.
  */
 @Composable
-private fun rememberFilledDecor(colors: ButtonColors, enabled: Boolean, tonal: Boolean): FilledDecor =
-    rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled, tonal)
+private fun rememberFilledDecor(colors: ButtonColors, enabled: Boolean): FilledDecor =
+    rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled)
 
 /** The same for any filled control (a floating button, a filled icon button) from its [container] colours. */
 @Composable
@@ -176,7 +176,6 @@ internal fun rememberDecorFor(
     container: Color,
     disabledContainer: Color,
     enabled: Boolean,
-    tonal: Boolean,
 ): FilledDecor {
     val options = rememberUiOptions()
     val scheme = MaterialTheme.colorScheme
@@ -225,7 +224,7 @@ private fun rememberOutlinedDecor(colors: ButtonColors, enabled: Boolean): Fille
     val content = colors.contentColor
     val danger = content.isSpecified && content.alpha > 0f && isDangerColor(content, scheme)
     val accent = if (danger) content else scheme.primary
-    return rememberDecorFor(container = accent, disabledContainer = scheme.onSurface, enabled = enabled, tonal = false)
+    return rememberDecorFor(container = accent, disabledContainer = scheme.onSurface, enabled = enabled)
 }
 
 /** An outlined button that draws its own outline and glass: clear container, text in the colour of the outline. */
@@ -265,7 +264,7 @@ private fun Modifier.filledLook(decor: FilledDecor, group: String, shape: Shape)
 @Composable
 fun Modifier.styledIndicator(shape: Shape, active: Boolean): Modifier {
     val scheme = MaterialTheme.colorScheme
-    val decor = rememberDecorFor(scheme.primary, scheme.outlineVariant, active, tonal = false)
+    val decor = rememberDecorFor(scheme.primary, scheme.outlineVariant, active)
     return when {
         decor.outline != null -> outlineGlassSurface(shape, decor)
         decor.glass != null -> glassSurface(shape, decor.glass)
@@ -405,7 +404,7 @@ fun Button(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val decor = rememberFilledDecor(colors, enabled, tonal = false)
+    val decor = rememberFilledDecor(colors, enabled)
     val styled = buttonLook(group, colors.containerColor)
     WithoutTouchBox(!flat || decor.custom) {
         MaterialButton(
@@ -439,7 +438,7 @@ fun FilledTonalButton(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val decor = rememberFilledDecor(colors, enabled, tonal = true)
+    val decor = rememberFilledDecor(colors, enabled)
     val styled = buttonLook(group, colors.containerColor)
     WithoutTouchBox(!flat || decor.custom) {
         MaterialFilledTonalButton(
@@ -522,7 +521,7 @@ fun Button(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val decor = rememberFilledDecor(colors, enabled, tonal = false)
+    val decor = rememberFilledDecor(colors, enabled)
     val styled = buttonLook(group, colors.containerColor)
     WithoutTouchBox(!flat || decor.custom) {
         MaterialButton(
@@ -557,7 +556,7 @@ fun FilledTonalButton(
 ) {
     val group = LocalCardGroup.current
     val flat = rememberUiOptions().element(group).look == ElementLook.FLAT
-    val decor = rememberFilledDecor(colors, enabled, tonal = true)
+    val decor = rememberFilledDecor(colors, enabled)
     val styled = buttonLook(group, colors.containerColor)
     WithoutTouchBox(!flat || decor.custom) {
         MaterialFilledTonalButton(

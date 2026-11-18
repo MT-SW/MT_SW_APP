@@ -39,8 +39,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.ExtendedFloatingActionButton
-import org.meshtastic.core.ui.component.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -113,6 +111,8 @@ import org.meshtastic.core.resources.translation_download_title
 import org.meshtastic.core.resources.translation_downloading
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.ExtendedFloatingActionButton
+import org.meshtastic.core.ui.component.FloatingActionButton
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.NodeKeyStatusIcon

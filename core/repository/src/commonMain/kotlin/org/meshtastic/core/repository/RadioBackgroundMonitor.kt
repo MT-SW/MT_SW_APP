@@ -20,12 +20,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 /**
+ * What a device is called on its plate (MT_SW): the node number of the device (it gives the colour) and its short name.
+ */
+data class DeviceBadge(val nodeNum: Int, val shortName: String)
+
+/**
  * Starts the background collection (MT_SW) from the saved radios that are not in use: while the mesh service runs, each
  * of them is connected quietly and the packets it hears are kept in its own database.
  */
-/** What a device is called on its plate (MT_SW): the node number of the device (it gives the colour) and its short name. */
-data class DeviceBadge(val nodeNum: Int, val shortName: String)
-
 interface RadioBackgroundMonitor {
     /** The plate of each saved device by address, read from the database of that device. */
     val badges: StateFlow<Map<String, DeviceBadge>>

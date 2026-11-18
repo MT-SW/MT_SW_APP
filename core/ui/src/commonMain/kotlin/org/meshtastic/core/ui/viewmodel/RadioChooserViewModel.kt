@@ -33,7 +33,6 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
-import org.meshtastic.core.repository.RadioSlot
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.ServiceRepository
 
@@ -45,8 +44,8 @@ enum class RadioStatus {
 }
 
 /**
- * One saved radio and its state. [active] is the radio the screens show (the one in use); a radio that is connected
- * but not [active] is kept connected in the background. [off] is true after the user disconnected it.
+ * One saved radio and its state. [active] is the radio the screens show (the one in use); a radio that is connected but
+ * not [active] is kept connected in the background. [off] is true after the user disconnected it.
  */
 data class RadioChoice(
     val id: Int,
@@ -120,28 +119,27 @@ class RadioChooserViewModel(
         ) { (slots, selectedId, off), address, connection, quiet, (droppedByItself, plate) ->
             val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
-            val choices =
-                slots.map { slot ->
-                    val active = slot.id == activeId && isValidDeviceAddress(address)
-                    RadioChoice(
-                        id = slot.id,
-                        name = slot.name,
-                        address = slot.address,
-                        selected = slot.id == selectedId,
-                        status =
-                        when {
-                            active -> connection.toStatus()
-                            slot.address in quiet -> RadioStatus.Connected
-                            else -> RadioStatus.Disconnected
-                        },
-                        active = active,
-                        off = slot.id in off,
-                        shortName =
-                        if (active && ours != null) ours.user.short_name else badges[slot.address]?.shortName,
-                        nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
-                        unread = if (active) 0 else unread[slot.address] ?: 0,
-                    )
-                }
+            val choices = slots.map { slot ->
+                val active = slot.id == activeId && isValidDeviceAddress(address)
+                RadioChoice(
+                    id = slot.id,
+                    name = slot.name,
+                    address = slot.address,
+                    selected = slot.id == selectedId,
+                    status =
+                    when {
+                        active -> connection.toStatus()
+                        slot.address in quiet -> RadioStatus.Connected
+                        else -> RadioStatus.Disconnected
+                    },
+                    active = active,
+                    off = slot.id in off,
+                    shortName =
+                    if (active && ours != null) ours.user.short_name else badges[slot.address]?.shortName,
+                    nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
+                    unread = if (active) 0 else unread[slot.address] ?: 0,
+                )
+            }
             RadioChooserState(
                 radios = choices,
                 connectedCount = choices.count { it.status == RadioStatus.Connected },
@@ -162,10 +160,11 @@ class RadioChooserViewModel(
             val slots = slotsPrefs.slots.first()
             val seen = mutableSetOf<String>()
             for (slot in slots) {
-                val name = slot.name?.takeIf { it.isNotBlank() } ?: continue
-                if (seen.add(name)) continue
-                val fixed = if (slot.address.startsWith(NETWORK_PREFIX)) slot.address.drop(1) else null
-                slotsPrefs.put(slot.address, fixed, slot.id)
+                val name = slot.name?.takeIf { it.isNotBlank() }
+                if (name != null && !seen.add(name)) {
+                    val fixed = if (slot.address.startsWith(NETWORK_PREFIX)) slot.address.drop(1) else null
+                    slotsPrefs.put(slot.address, fixed, slot.id)
+                }
             }
         }
         viewModelScope.launch {
@@ -177,10 +176,11 @@ class RadioChooserViewModel(
                     // the radio that was in use: it must not rename that radio.
                     val changed = address != lastAddress
                     lastAddress = address
-                    // The device is shown now: its count of new messages starts again.
-                    if (changed && isValidDeviceAddress(address)) background.clearUnread(address!!)
-                    if (!changed || !isValidDeviceAddress(address)) return@collect
-                    remember(address!!, name)
+                    if (changed && address != null && isValidDeviceAddress(address)) {
+                        // The device is shown now: its count of new messages starts again.
+                        background.clearUnread(address)
+                        remember(address, name)
+                    }
                 }
         }
         // A radio that was connected and then went away by itself is a dropped one. One that was never connected (the
@@ -196,12 +196,14 @@ class RadioChooserViewModel(
                         expectedChange = false
                         dropped.value = false
                     }
+
                     is ConnectionState.Disconnected -> {
                         // A switch to another device (also from a notification) is not a drop.
                         val switched = radioPrefs.devAddr.value != connectedAddress
                         if (wasConnected && !expectedChange && !switched) dropped.value = true
                         wasConnected = false
                     }
+
                     else -> Unit
                 }
             }
@@ -218,7 +220,9 @@ class RadioChooserViewModel(
                 // A saved device keeps its name: when the app only switches to it, the stored name is still the one of
                 // the device that was shown before.
                 known != null -> slotsPrefs.put(address, known.name?.takeIf { it.isNotBlank() } ?: name, known.id)
+
                 target != null -> slotsPrefs.put(address, name, target)
+
                 else ->
                     slotsPrefs.put(address, name)
                         ?: slotsPrefs.selectedId.value?.let { slotsPrefs.put(address, name, it) }

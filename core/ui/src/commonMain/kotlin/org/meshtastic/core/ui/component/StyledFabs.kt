@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 @file:Suppress("LongParameterList")
 
 package org.meshtastic.core.ui.component
@@ -28,6 +27,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -38,8 +38,8 @@ import androidx.compose.material3.FilledTonalIconButton as MaterialFilledTonalIc
 import androidx.compose.material3.FloatingActionButton as MaterialFloatingActionButton
 
 /**
- * MT_SW: the floating buttons and the filled icon buttons of the app. They follow the choice of "Buttons" in "Look"
- * the same way [Button] does: a thin outline on clear glass (the default), filled glass or the plain Material look.
+ * MT_SW: the floating buttons and the filled icon buttons of the app. They follow the choice of "Buttons" in "Look" the
+ * same way [Button] does: a thin outline on clear glass (the default), filled glass or the plain Material look.
  */
 private fun Modifier.decorated(decor: FilledDecor, shape: Shape): Modifier = when {
     decor.outline != null -> outlineGlassSurface(shape, decor)
@@ -49,17 +49,22 @@ private fun Modifier.decorated(decor: FilledDecor, shape: Shape): Modifier = whe
 
 /** The strong colour that goes with a "container" colour of the theme, so a floating button has a clear outline. */
 @Composable
+@ReadOnlyComposable
 private fun accentOf(container: Color): Color {
     val scheme = MaterialTheme.colorScheme
     return when (container) {
         scheme.primaryContainer -> scheme.primary
+
         scheme.secondaryContainer -> scheme.secondary
+
         scheme.tertiaryContainer -> scheme.tertiary
+
         scheme.surfaceContainerHigh,
         scheme.surfaceContainer,
         scheme.surfaceContainerHighest,
         scheme.surface,
         -> scheme.outline
+
         else -> container
     }
 }
@@ -84,7 +89,7 @@ fun FloatingActionButton(
     content: @Composable () -> Unit,
 ) {
     val accent = accentOf(containerColor)
-    val decor = rememberDecorFor(accent, accent, enabled = true, tonal = false)
+    val decor = rememberDecorFor(accent, accent, enabled = true)
     MaterialFloatingActionButton(
         onClick = onClick,
         modifier = modifier.decorated(decor, shape),
@@ -110,7 +115,7 @@ fun ExtendedFloatingActionButton(
     interactionSource: MutableInteractionSource? = null,
 ) {
     val accent = accentOf(containerColor)
-    val decor = rememberDecorFor(accent, accent, enabled = true, tonal = false)
+    val decor = rememberDecorFor(accent, accent, enabled = true)
     MaterialExtendedFloatingActionButton(
         text = text,
         icon = icon,
@@ -150,7 +155,7 @@ fun FilledIconButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
 ) {
-    val decor = rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled, tonal = false)
+    val decor = rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled)
     MaterialFilledIconButton(
         onClick = onClick,
         modifier = modifier.decorated(decor, shape),
@@ -173,7 +178,7 @@ fun FilledTonalIconButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
 ) {
-    val decor = rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled, tonal = true)
+    val decor = rememberDecorFor(colors.containerColor, colors.disabledContainerColor, enabled)
     MaterialFilledTonalIconButton(
         onClick = onClick,
         modifier = modifier.decorated(decor, shape),

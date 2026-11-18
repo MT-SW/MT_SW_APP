@@ -57,9 +57,10 @@ import org.meshtastic.proto.ToRadio
  * switched off is kept connected through the [RadioTransportPool]; there is exactly one connection per device. While a
  * device is not the one shown in the app, the packets it hears are written through [BackgroundRadioLink] to the
  * database of that device, so its history, charts and statistics keep growing. When the app shows a device, the pool
- * hands the already open connection over, and back again afterwards, without any disconnect. A link that drops is
- * tried again after a pause. Errors only go to the log.
+ * hands the already open connection over, and back again afterwards, without any disconnect. A link that drops is tried
+ * again after a pause. Errors only go to the log.
  */
+@Suppress("LongParameterList")
 @Single
 class BackgroundRadioCollector(
     private val slotsPrefs: RadioSlotsPrefs,
@@ -124,14 +125,18 @@ class BackgroundRadioCollector(
 
     private suspend fun readBadge(address: String) {
         val badge =
-            runCatching {
+            try {
                 databaseManager.withDeviceDb(address, includeActive = true) { db ->
                     val mine = db.nodeInfoDao().getMyNodeEntity() ?: return@withDeviceDb null
                     val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(mine.myNodeNum)).firstOrNull()
                     DeviceBadge(mine.myNodeNum, node?.user?.short_name.orEmpty())
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.d { "Background device: the plate could not be read: ${e.message}" }
+                null
             }
-                .getOrNull()
         if (badge != null) badgeMap.update { it + (address to badge) }
     }
 

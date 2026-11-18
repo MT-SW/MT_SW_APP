@@ -43,13 +43,16 @@ data class RadioBridgeConfig(
     fun portFor(slotId: Int): Int = if (port in MIN_PORT..MAX_PORT) port else defaultPort(slotId)
 
     companion object {
+        /** The port of the radio itself. */
+        private const val RADIO_PORT = 4403
+
         const val MIN_PORT = 1024
         const val MAX_PORT = 65535
         const val DEFAULT_MAX_CLIENTS = 4
         val MAX_CLIENTS_CHOICES = listOf(1, 2, 4, 8)
 
         /** 4404 for radio 1, 4405 for radio 2, 4406 for radio 3 (4403 is the port of the radio itself). */
-        fun defaultPort(slotId: Int): Int = 4403 + slotId.coerceAtLeast(1)
+        fun defaultPort(slotId: Int): Int = RADIO_PORT + slotId.coerceAtLeast(1)
     }
 }
 

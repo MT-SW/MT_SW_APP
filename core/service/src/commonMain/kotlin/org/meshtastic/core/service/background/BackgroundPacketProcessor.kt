@@ -21,7 +21,6 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.NodeEntity
 import org.meshtastic.core.database.entity.Packet
-import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.textMentionsNode
@@ -40,8 +39,8 @@ import org.meshtastic.proto.User
 
 /**
  * What a device that is kept connected in the background does with the packets it hears (MT_SW), next to the log entry:
- * a text message or alert goes to the database of that device and raises a notification that carries the device
- * name; node names, positions and telemetry update the node list of that device. When the app shows the device later,
+ * a text message or alert goes to the database of that device and raises a notification that carries the device name;
+ * node names, positions and telemetry update the node list of that device. When the app shows the device later,
  * everything is already there. [deviceName] and [onMessage] are asked fresh each time, so a renamed device and the
  * unread counter stay current. Errors only go to the log.
  */
@@ -57,12 +56,11 @@ class BackgroundPacketProcessor(
     private val mapper =
         MeshDataMapper(
             object : NodeIdLookup {
-                override fun toNodeID(nodeNum: Int): String =
-                    if (nodeNum == NodeAddress.NODENUM_BROADCAST) {
-                        NodeAddress.ID_BROADCAST
-                    } else {
-                        NodeAddress.numToDefaultId(nodeNum)
-                    }
+                override fun toNodeID(nodeNum: Int): String = if (nodeNum == NodeAddress.NODENUM_BROADCAST) {
+                    NodeAddress.ID_BROADCAST
+                } else {
+                    NodeAddress.numToDefaultId(nodeNum)
+                }
             },
         )
 
@@ -72,10 +70,16 @@ class BackgroundPacketProcessor(
         val decoded = packet.decoded ?: return
         try {
             when (decoded.portnum) {
-                PortNum.TEXT_MESSAGE_APP, PortNum.ALERT_APP -> text(myNodeNum, packet)
+                PortNum.TEXT_MESSAGE_APP,
+                PortNum.ALERT_APP,
+                -> text(myNodeNum, packet)
+
                 PortNum.NODEINFO_APP -> user(packet)
+
                 PortNum.POSITION_APP -> position(packet)
+
                 PortNum.TELEMETRY_APP -> telemetry(packet)
+
                 else -> Unit
             }
         } catch (e: kotlinx.coroutines.CancellationException) {
@@ -85,6 +89,7 @@ class BackgroundPacketProcessor(
         }
     }
 
+    @Suppress("ReturnCount")
     private suspend fun text(myNodeNum: Int, packet: MeshPacket) {
         val decoded = packet.decoded ?: return
         // Our own messages and reactions (a reply with an emoji) are not new messages for this list.
@@ -137,7 +142,11 @@ class BackgroundPacketProcessor(
         if (muted) return
         if (isAlert) {
             // A critical alert breaks through like on the device in use: its own notification, with the sender's name.
-            notifier.showAlertNotification(contactKey, deviceNotificationTitle(deviceName(), sender ?: data.from.orEmpty()), body)
+            notifier.showAlertNotification(
+                contactKey,
+                deviceNotificationTitle(deviceName(), sender ?: data.from.orEmpty()),
+                body,
+            )
             return
         }
         notifier.showBackgroundMessageNotification(

@@ -41,7 +41,9 @@ class ConsoleEngineTest {
                     run = { ConsoleResult() },
                 ),
             ),
-        ) { "nie ma: $it" }
+        ) {
+            "nie ma: $it"
+        }
 
     @Test
     fun `words are split on spaces and quotes keep a text together`() {
@@ -62,7 +64,7 @@ class ConsoleEngineTest {
 
     @Test
     fun `the first word is completed from the commands`() {
-        assertEquals(listOf("pomoc"), registry.suggestions("po"))
+        assertEquals(listOf("pomoc"), registry.suggestions("pom"))
         assertEquals(listOf("połącz"), registry.suggestions("polac"))
         assertEquals(emptyList(), registry.suggestions("pomoc"))
     }

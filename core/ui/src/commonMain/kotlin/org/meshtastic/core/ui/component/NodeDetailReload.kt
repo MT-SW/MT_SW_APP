@@ -18,6 +18,7 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -25,7 +26,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
-import org.koin.compose.koinInject
+import org.koin.mp.KoinPlatform
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
@@ -47,8 +48,10 @@ private const val NODE_LIST_SETTLE_MS = 700L
 @OptIn(FlowPreview::class)
 @Composable
 fun ReloadNodeDetailsOnDeviceChange(multiBackstack: MultiBackstack) {
-    val radio: RadioInterfaceService = koinInject()
-    val nodes: NodeRepository = koinInject()
+    // Without Koin (previews, tests) there is nothing to follow.
+    val koin = remember { KoinPlatform.getKoinOrNull() } ?: return
+    val radio: RadioInterfaceService = remember(koin) { koin.get() }
+    val nodes: NodeRepository = remember(koin) { koin.get() }
     LaunchedEffect(multiBackstack) {
         var shown = radio.currentDeviceAddressFlow.value
         radio.currentDeviceAddressFlow.filterNotNull().debounce(DEVICE_SETTLE_MS).collect { address ->

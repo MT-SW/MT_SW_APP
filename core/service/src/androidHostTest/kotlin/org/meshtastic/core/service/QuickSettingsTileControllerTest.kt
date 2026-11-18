@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.service
 
-import okio.ByteString
-import org.meshtastic.core.repository.RadioBridgeMonitor
 import androidx.test.core.app.ApplicationProvider
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
@@ -29,10 +27,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import okio.ByteString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.meshtastic.core.common.di.ApplicationCoroutineScope
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.RadioBackgroundMonitor
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.takserver.MeshToCotBroadcaster
@@ -111,7 +113,17 @@ class QuickSettingsTileControllerTest {
 
                 override fun onFromRadio(payload: ByteString) = Unit
             },
-            radioBackground = {},
+            radioBackground = NoRadioBackground,
         )
     }
+}
+
+private object NoRadioBackground : RadioBackgroundMonitor {
+    override val badges = MutableStateFlow<Map<String, DeviceBadge>>(emptyMap())
+    override val connectedAddresses = MutableStateFlow<Set<String>>(emptySet())
+    override val unreadByAddress = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    override fun clearUnread(address: String) = Unit
+
+    override fun start(scope: CoroutineScope) = Unit
 }

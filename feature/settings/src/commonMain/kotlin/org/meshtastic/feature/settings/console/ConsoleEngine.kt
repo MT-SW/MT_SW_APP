@@ -45,11 +45,13 @@ object ConsoleText {
                     quoted = !quoted
                     started = true
                 }
+
                 ch.isWhitespace() && !quoted -> {
                     if (started) words.add(current.toString())
                     current.clear()
                     started = false
                 }
+
                 else -> {
                     current.append(ch)
                     started = true
@@ -89,6 +91,7 @@ class ConsoleRegistry(val commands: List<ConsoleCommand>, private val unknown: s
         return commands.firstOrNull { ConsoleText.fold(it.name) == key }
     }
 
+    @Suppress("ReturnCount")
     suspend fun execute(line: String): ConsoleResult {
         val words = ConsoleText.split(line)
         if (words.isEmpty()) return ConsoleResult()
@@ -97,6 +100,7 @@ class ConsoleRegistry(val commands: List<ConsoleCommand>, private val unknown: s
     }
 
     /** Whole lines that the typed [input] can be completed to (the first word, or the next argument). */
+    @Suppress("ReturnCount")
     fun suggestions(input: String): List<String> {
         val words = ConsoleText.split(input)
         val endsWithSpace = input.isNotEmpty() && input.last().isWhitespace()
@@ -110,9 +114,7 @@ class ConsoleRegistry(val commands: List<ConsoleCommand>, private val unknown: s
         val partial = if (endsWithSpace) "" else words.last()
         val head = (listOf(words.first()) + typed).joinToString(" ")
         val key = ConsoleText.fold(partial)
-        return command.complete(typed)
-            .filter { completes(it, key) }
-            .map { "$head $it" }
+        return command.complete(typed).filter { completes(it, key) }.map { "$head $it" }
     }
 }
 

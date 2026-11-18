@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.repository
 
 import okio.BufferedSink
@@ -24,8 +23,8 @@ import okio.IOException
 
 /**
  * MT_SW: the file of "Kopia danych aplikacji". It holds all the app settings (the same JSON as the settings backup)
- * followed by the radio's database, so one file brings back everything. A plain database file from an older version
- * has no header and is still accepted everywhere a backup is read.
+ * followed by the radio's database, so one file brings back everything. A plain database file from an older version has
+ * no header and is still accepted everywhere a backup is read.
  */
 object AppDataBundle {
     private val MAGIC = "MTSWBK01\n".encodeUtf8()
@@ -39,8 +38,8 @@ object AppDataBundle {
     }
 
     /**
-     * Reads and removes the header from [source], leaving the database as the rest of it. Returns the settings, or
-     * null when [source] is a plain database without a header (nothing is consumed then).
+     * Reads and removes the header from [source], leaving the database as the rest of it. Returns the settings, or null
+     * when [source] is a plain database without a header (nothing is consumed then).
      */
     fun readHeader(source: BufferedSource): ByteArray? {
         if (!source.rangeEquals(0, MAGIC)) return null

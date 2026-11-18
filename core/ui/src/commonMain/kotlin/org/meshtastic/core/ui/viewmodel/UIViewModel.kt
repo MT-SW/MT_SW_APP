@@ -302,7 +302,9 @@ class UIViewModel(
         _scrollToTopEventFlow.tryEmit(event)
     }
 
-    /** The button of the already open tab was pressed again; [delayed] when its first screen has to be rebuilt first. */
+    /**
+     * The button of the already open tab was pressed again; [delayed] when its first screen has to be rebuilt first.
+     */
     fun emitTabRepress(destination: TopLevelDestination, delayed: Boolean) {
         if (!delayed) {
             TabRepress.events.tryEmit(destination)

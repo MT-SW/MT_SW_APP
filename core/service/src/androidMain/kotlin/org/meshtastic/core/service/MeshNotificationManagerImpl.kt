@@ -684,8 +684,7 @@ class MeshNotificationManagerImpl(
         ensureChannels()
         val type = if (isBroadcast) NotificationChannelSpec.Broadcasts else NotificationChannelSpec.DirectMessages
         val id = (deviceAddress + contactKey).hashCode()
-        val intent =
-            createDeepLinkIntent("messages/$contactKey?device=${android.net.Uri.encode(deviceAddress)}", id)
+        val intent = createDeepLinkIntent("messages/$contactKey?device=${android.net.Uri.encode(deviceAddress)}", id)
         val title = deviceNotificationTitle(deviceName, channelName?.takeIf { isBroadcast } ?: sender)
         val body = if (isBroadcast) "$sender: $text" else text
         val builder =

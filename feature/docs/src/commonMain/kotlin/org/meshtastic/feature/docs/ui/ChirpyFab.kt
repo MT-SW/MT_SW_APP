@@ -27,7 +27,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,6 +41,7 @@ import org.meshtastic.core.resources.chirpy_checking
 import org.meshtastic.core.resources.chirpy_downloading_progress
 import org.meshtastic.core.resources.chirpy_ready
 import org.meshtastic.core.resources.img_chirpy
+import org.meshtastic.core.ui.component.FloatingActionButton
 import org.meshtastic.core.ui.component.ProgressRing
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.feature.docs.model.ModelReadiness

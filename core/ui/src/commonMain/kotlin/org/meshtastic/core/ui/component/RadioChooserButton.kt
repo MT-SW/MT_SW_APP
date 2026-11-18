@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MatchingDeclarationName")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.core.LinearEasing
@@ -36,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,9 +86,9 @@ private const val UNREAD_MAX = 99
 
 /**
  * The radio chooser: one grey radio icon with the number of connected radios, next to the plate of our node. When the
- * radio in use drops, a soft glow behind the icon pulses (no sound, no window) until it is back or the list is
- * opened. The list only chooses which saved radio is in use; connecting, disconnecting and adding radios is done on
- * the connection card.
+ * radio in use drops, a soft glow behind the icon pulses (no sound, no window) until it is back or the list is opened.
+ * The list only chooses which saved radio is in use; connecting, disconnecting and adding radios is done on the
+ * connection card.
  */
 @Composable
 fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifier) {
@@ -95,25 +98,8 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
     val options = rememberUiOptions()
     val mode = options[UiOptions.RADIO_ALERT]
     val pulsing = state.dropped && mode == UiOptions.RADIO_ALERT_PULSE && !expanded
-    val colorIndex = options[UiOptions.RADIO_ALERT_COLOR].coerceIn(UiOptions.RADIO_ALERT_COLORS.indices)
-    val themed = UiOptions.RADIO_ALERT_COLORS[colorIndex] == 0L
-    val pulseColor =
-        if (themed) MaterialTheme.colorScheme.primary else Color(UiOptions.RADIO_ALERT_COLORS[colorIndex])
-    val periods = UiOptions.RADIO_ALERT_PERIOD_MS
-    val period = periods[options[UiOptions.RADIO_ALERT_SPEED].coerceIn(periods.indices)]
-    val alpha =
-        if (pulsing) {
-            rememberInfiniteTransition(label = "radio-pulse")
-                .animateFloat(
-                    initialValue = PULSE_MIN_ALPHA,
-                    targetValue = PULSE_MAX_ALPHA,
-                    animationSpec = infiniteRepeatable(tween(period / 2, easing = LinearEasing), RepeatMode.Reverse),
-                    label = "radio-pulse-alpha",
-                )
-                .value
-        } else {
-            0f
-        }
+    val pulseColor = radioPulseColor(options)
+    val alpha = if (pulsing) rememberRadioPulseAlpha(options) else 0f
     val description =
         stringResource(if (state.dropped) Res.string.radio_chooser_dropped else Res.string.radio_chooser_title)
     Box(modifier = modifier) {
@@ -123,61 +109,105 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
                 actions.onSeen()
             },
         ) {
-            Box(
-                modifier =
-                Modifier.size(32.dp).drawBehind { if (alpha > 0f) drawCircle(pulseColor.copy(alpha = alpha)) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(MeshtasticIcons.MeshRadio, contentDescription = description, modifier = Modifier.size(22.dp))
-                // The circle with the number of new messages on the devices that are not shown (nothing when zero).
-                if (state.unreadTotal > 0) {
-                    Box(
-                        modifier =
-                        Modifier.align(Alignment.TopEnd)
-                            .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
-                            .background(MaterialTheme.colorScheme.error, CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (state.unreadTotal > UNREAD_MAX) "$UNREAD_MAX+" else state.unreadTotal.toString(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onError,
-                            modifier = Modifier.padding(horizontal = 3.dp),
-                        )
-                    }
-                }
-                if (options[UiOptions.RADIO_COUNT] == 1 || mode == UiOptions.RADIO_ALERT_DIGIT) {
-                    Text(
-                        text = state.connectedCount.toString(),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                    )
-                }
-            }
+            RadioChooserIcon(
+                state = state,
+                description = description,
+                pulseAlpha = alpha,
+                pulseColor = pulseColor,
+                showCount = options[UiOptions.RADIO_COUNT] == 1 || mode == UiOptions.RADIO_ALERT_DIGIT,
+            )
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            // Only the devices that are really connected, side by side, as small as their plates: connecting and
-            // disconnecting is done on the Connect tab.
-            Row(
-                modifier = Modifier.padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                state.radios.filter { it.status == RadioStatus.Connected }.forEach { radio ->
-                    RadioItem(
-                        radio = radio,
-                        onChoose = {
-                            expanded = false
-                            actions.onChoose(radio.id)
-                        },
-                    )
-                }
+            RadioChooserList(state) { radio ->
+                expanded = false
+                actions.onChoose(radio.id)
             }
         }
     }
+}
+
+/** The grey radio icon: the glow of a dropped radio behind it, the new-messages circle and the connected count. */
+@Composable
+private fun RadioChooserIcon(
+    state: RadioChooserState,
+    description: String,
+    pulseAlpha: Float,
+    pulseColor: Color,
+    showCount: Boolean,
+) {
+    Box(
+        modifier =
+        Modifier.size(32.dp).drawBehind { if (pulseAlpha > 0f) drawCircle(pulseColor.copy(alpha = pulseAlpha)) },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(MeshtasticIcons.MeshRadio, contentDescription = description, modifier = Modifier.size(22.dp))
+        // The circle with the number of new messages on the devices that are not shown (nothing when zero).
+        if (state.unreadTotal > 0) {
+            Box(
+                modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
+                    .background(MaterialTheme.colorScheme.error, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = if (state.unreadTotal > UNREAD_MAX) "$UNREAD_MAX+" else state.unreadTotal.toString(),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onError,
+                    modifier = Modifier.padding(horizontal = 3.dp),
+                )
+            }
+        }
+        if (showCount) {
+            Text(
+                text = state.connectedCount.toString(),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.align(Alignment.BottomEnd),
+            )
+        }
+    }
+}
+
+/**
+ * Only the devices that are really connected, side by side, as small as their plates: connecting and disconnecting is
+ * done on the Connect tab.
+ */
+@Composable
+private fun RadioChooserList(state: RadioChooserState, onChoose: (RadioChoice) -> Unit) {
+    Row(
+        modifier = Modifier.padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        state.radios
+            .filter { it.status == RadioStatus.Connected }
+            .forEach { radio -> RadioItem(radio = radio, onChoose = { onChoose(radio) }) }
+    }
+}
+
+@Composable
+@ReadOnlyComposable
+private fun radioPulseColor(options: UiOptions): Color {
+    val colorIndex = options[UiOptions.RADIO_ALERT_COLOR].coerceIn(UiOptions.RADIO_ALERT_COLORS.indices)
+    val themed = UiOptions.RADIO_ALERT_COLORS[colorIndex] == 0L
+    return if (themed) MaterialTheme.colorScheme.primary else Color(UiOptions.RADIO_ALERT_COLORS[colorIndex])
+}
+
+@Composable
+private fun rememberRadioPulseAlpha(options: UiOptions): Float {
+    val periods = UiOptions.RADIO_ALERT_PERIOD_MS
+    val period = periods[options[UiOptions.RADIO_ALERT_SPEED].coerceIn(periods.indices)]
+    return rememberInfiniteTransition(label = "radio-pulse")
+        .animateFloat(
+            initialValue = PULSE_MIN_ALPHA,
+            targetValue = PULSE_MAX_ALPHA,
+            animationSpec = infiniteRepeatable(tween(period / 2, easing = LinearEasing), RepeatMode.Reverse),
+            label = "radio-pulse-alpha",
+        )
+        .value
 }
 
 @Composable
@@ -201,8 +231,8 @@ private fun RadioItem(radio: RadioChoice, onChoose: () -> Unit) {
 }
 
 /**
- * The device by its plate only: the short name in the colour of its node, with no other name. A device whose node
- * is not known yet shows its saved name.
+ * The device by its plate only: the short name in the colour of its node, with no other name. A device whose node is
+ * not known yet shows its saved name.
  */
 @Composable
 fun RadioPlate(radio: RadioChoice, modifier: Modifier = Modifier) {

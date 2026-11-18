@@ -175,20 +175,19 @@ val LocalDeviceBarSlots = compositionLocalOf<SosBarSlots?> { null }
 @Composable
 fun DeviceBarSlot(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     val slots = LocalDeviceBarSlots.current
-    if (slots == null) {
-        Row(modifier, verticalAlignment = Alignment.CenterVertically) { content() }
-        return
-    }
     val id = remember { Any() }
-    DisposableEffect(slots, id) { onDispose { slots.release(id) } }
-    Row(
-        modifier.onGloballyPositioned {
-            val bounds = it.boundsInWindow()
-            slots.report(id, bounds.right, bounds.top)
-        },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (slots.shows(id)) content()
+    if (slots != null) DisposableEffect(slots, id) { onDispose { slots.release(id) } }
+    val position =
+        if (slots == null) {
+            Modifier
+        } else {
+            Modifier.onGloballyPositioned {
+                val bounds = it.boundsInWindow()
+                slots.report(id, bounds.right, bounds.top)
+            }
+        }
+    Row(modifier.then(position), verticalAlignment = Alignment.CenterVertically) {
+        if (slots == null || slots.shows(id)) content()
     }
 }
 

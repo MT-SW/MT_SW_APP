@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.core.ui.util
 
 import kotlinx.coroutines.channels.BufferOverflow
@@ -22,8 +21,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import org.meshtastic.core.navigation.TopLevelDestination
 
 /**
- * Fired when the bottom button of the tab that is already open is pressed again. Every screen with a search field or
- * an own scroll position listens for its tab and goes back to how it first looked: no search text, top of the list.
+ * Fired when the bottom button of the tab that is already open is pressed again. Every screen with a search field or an
+ * own scroll position listens for its tab and goes back to how it first looked: no search text, top of the list.
  */
 object TabRepress {
     val events =

@@ -36,13 +36,15 @@ class DeviceSwitcherImpl(
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
     override fun switchTo(address: String): Boolean {
-        val slot = slotsPrefs.slots.value.firstOrNull { it.address == address } ?: return false
-        if (address == radioPrefs.devAddr.value) return true
-        scope.launch {
-            slotsPrefs.setOff(slot.id, false)
-            slotsPrefs.select(slot.id)
-            radioController.setDeviceAddress(slot.address)
+        val slot = slotsPrefs.slots.value.firstOrNull { it.address == address }
+        // A device that is already in use stays as it is.
+        if (slot != null && address != radioPrefs.devAddr.value) {
+            scope.launch {
+                slotsPrefs.setOff(slot.id, false)
+                slotsPrefs.select(slot.id)
+                radioController.setDeviceAddress(slot.address)
+            }
         }
-        return true
+        return slot != null
     }
 }

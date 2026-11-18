@@ -34,7 +34,7 @@ class RadioBridgePrefsImplTest {
     }
 
     @Test
-    fun `damaged text reads as no settings, so the bridge stays off`() {
+    fun `damaged text reads as no settings and the bridge stays off`() {
         assertEquals(emptyMap(), RadioBridgePrefsImpl.decode("{not json"))
         assertEquals(emptyMap(), RadioBridgePrefsImpl.decode(null))
     }

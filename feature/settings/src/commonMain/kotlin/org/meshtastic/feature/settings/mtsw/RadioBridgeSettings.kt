@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ModifierMissing", "MultipleEmitters")
+
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.padding
@@ -53,9 +55,9 @@ import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.proto.User
 
 /**
- * The settings of the TCP bridges: one block for every saved device, so several devices can be shared at the same
- * time, each on its own port. Everything is off by default; the restrictions only limit what the connected programs
- * may send. The name of a device that is not connected is not shown.
+ * The settings of the TCP bridges: one block for every saved device, so several devices can be shared at the same time,
+ * each on its own port. Everything is off by default; the restrictions only limit what the connected programs may send.
+ * The name of a device that is not connected is not shown.
  */
 @Composable
 fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {

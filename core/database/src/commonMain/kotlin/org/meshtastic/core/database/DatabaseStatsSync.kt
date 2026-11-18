@@ -26,11 +26,11 @@ import org.meshtastic.proto.Telemetry
  * same node (heard by two radios) has its own telemetry history in each. Only nodes present in BOTH databases are
  * touched: a node known to one database only is never copied to the other.
  *
- * For such a node each telemetry kind and the position come from the database that has the later report, the names
- * and key from the one that heard the node last, while the reception data of each radio (signal, hops, channel,
- * route, last heard) and what the user wrote (notes, favourite, ignore, mute) stay as they were in each database. The
- * history of telemetry, position, neighbours, traceroute and map reports of the node is completed in both directions,
- * without duplicates (a packet heard by both radios counts once).
+ * For such a node each telemetry kind and the position come from the database that has the later report, the names and
+ * key from the one that heard the node last, while the reception data of each radio (signal, hops, channel, route, last
+ * heard) and what the user wrote (notes, favourite, ignore, mute) stay as they were in each database. The history of
+ * telemetry, position, neighbours, traceroute and map reports of the node is completed in both directions, without
+ * duplicates (a packet heard by both radios counts once).
  */
 object DatabaseStatsSync {
     // Position, paxcounter, telemetry, traceroute, neighbour info and map report (PortNum values): everything the
@@ -79,11 +79,11 @@ object DatabaseStatsSync {
     }
 
     /**
-     * [own] with whatever [other] knows newer. Each telemetry kind and the position are taken from the row that has
-     * the later report time (a node heard more recently is not necessarily the one with the newer telemetry); the
-     * identity (names, model, key, status) comes from the row that heard the node last. What belongs to how THIS radio
-     * heard the node (signal, hops, channel, route, when it was heard) and what the user wrote in this database stays
-     * as it was, so a radio keeps its own reception data exactly as the original app records it.
+     * [own] with whatever [other] knows newer. Each telemetry kind and the position are taken from the row that has the
+     * later report time (a node heard more recently is not necessarily the one with the newer telemetry); the identity
+     * (names, model, key, status) comes from the row that heard the node last. What belongs to how THIS radio heard the
+     * node (signal, hops, channel, route, when it was heard) and what the user wrote in this database stays as it was,
+     * so a radio keeps its own reception data exactly as the original app records it.
      */
     private fun merged(own: NodeEntity, other: NodeEntity): NodeEntity {
         val otherHeardLater = other.lastHeard > own.lastHeard

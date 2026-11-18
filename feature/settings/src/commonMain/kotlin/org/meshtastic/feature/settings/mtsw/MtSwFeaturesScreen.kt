@@ -47,8 +47,6 @@ import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.connection_center_summary
-import org.meshtastic.core.resources.connection_center_title
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
@@ -61,6 +59,8 @@ import org.meshtastic.core.resources.background_section_title
 import org.meshtastic.core.resources.backup_app_database
 import org.meshtastic.core.resources.backup_app_settings
 import org.meshtastic.core.resources.clean_node_database_title
+import org.meshtastic.core.resources.connection_center_summary
+import org.meshtastic.core.resources.connection_center_title
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.data_logs_summary
 import org.meshtastic.core.resources.data_logs_title

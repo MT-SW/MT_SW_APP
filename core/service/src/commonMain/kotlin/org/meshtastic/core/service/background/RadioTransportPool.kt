@@ -19,6 +19,7 @@ package org.meshtastic.core.service.background
 import co.touchlab.kermit.Logger
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
@@ -76,6 +77,7 @@ class RadioTransportPool(
     }
 
     /** What the transport talks to: it forwards every event to the consumer that is attached at that moment. */
+    @Suppress("TooManyFunctions")
     private inner class Link(private val entry: Entry) : RadioInterfaceService {
         private fun target(): RadioInterfaceService? = synchronized(lock) { entry.foreground ?: entry.background }
 
@@ -138,8 +140,7 @@ class RadioTransportPool(
 
         override fun setDeviceAddress(deviceAddr: String?): Boolean = false
 
-        override fun toInterfaceAddress(interfaceId: InterfaceId, rest: String): String =
-            "${interfaceId.id}$rest"
+        override fun toInterfaceAddress(interfaceId: InterfaceId, rest: String): String = "${interfaceId.id}$rest"
     }
 
     private fun publish() {
@@ -170,10 +171,11 @@ class RadioTransportPool(
     /** The background collector listens to [address] while the device is not in use. */
     fun attachBackground(address: String, consumer: RadioInterfaceService): Boolean {
         val entry = entryFor(address)
-        val connected = synchronized(lock) {
-            entry.background = consumer
-            entry.connected && entry.foreground == null
-        }
+        val connected =
+            synchronized(lock) {
+                entry.background = consumer
+                entry.connected && entry.foreground == null
+            }
         if (connected) consumer.onConnect()
         return true
     }
@@ -182,8 +184,8 @@ class RadioTransportPool(
     fun hasBackground(address: String): Boolean = synchronized(lock) { entries[address]?.background != null }
 
     /** Sends [bytes] through the transport of [address]. */
-    fun send(address: String, bytes: ByteArray): Boolean = synchronized(lock) { entries[address] }
-        ?.transport?.handleSendToRadio(bytes) ?: false
+    fun send(address: String, bytes: ByteArray): Boolean =
+        synchronized(lock) { entries[address] }?.transport?.handleSendToRadio(bytes) ?: false
 
     /** The background collector no longer wants [address]. The transport is closed unless the app view uses it. */
     suspend fun detachBackground(address: String, consumer: RadioInterfaceService) {
@@ -214,7 +216,13 @@ class RadioTransportPool(
 
     private suspend fun closeEntry(entry: Entry) {
         withContext(NonCancellable) {
-            runCatching { entry.transport.close() }.onFailure { Logger.w(it) { "Closing a transport failed" } }
+            try {
+                entry.transport.close()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.w(e) { "Closing a transport failed" }
+            }
             entry.scope.cancel()
             publish()
         }
@@ -241,8 +249,8 @@ class RadioTransportPool(
         override suspend fun close() = release(handOver = false)
 
         /**
-         * Gives the transport up. With [handOver] the background consumer (if any) keeps the open transport; without
-         * it the transport is closed and the background consumer is told that the device went away.
+         * Gives the transport up. With [handOver] the background consumer (if any) keeps the open transport; without it
+         * the transport is closed and the background consumer is told that the device went away.
          */
         suspend fun release(handOver: Boolean) {
             var background: RadioInterfaceService? = null

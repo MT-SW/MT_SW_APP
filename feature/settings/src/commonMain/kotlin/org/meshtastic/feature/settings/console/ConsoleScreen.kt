@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "ModifierMissing")
+
 package org.meshtastic.feature.settings.console
 
 import androidx.compose.foundation.layout.Arrangement
@@ -48,12 +50,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.console_info_body
 import org.meshtastic.core.resources.console_input
 import org.meshtastic.core.resources.console_intro
 import org.meshtastic.core.resources.console_next
 import org.meshtastic.core.resources.console_prev
 import org.meshtastic.core.resources.console_send
-import org.meshtastic.core.resources.console_info_body
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FloatingBarUnderlap

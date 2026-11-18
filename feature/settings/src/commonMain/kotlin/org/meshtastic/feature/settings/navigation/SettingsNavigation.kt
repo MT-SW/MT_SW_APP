@@ -54,11 +54,11 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.antenna.AntennaCalculatorScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsViewModel
+import org.meshtastic.feature.settings.console.ConsoleScreen
 import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
-import org.meshtastic.feature.settings.console.ConsoleScreen
 import org.meshtastic.feature.settings.mtsw.ConnectionCenterScreen
 import org.meshtastic.feature.settings.mtsw.DataAndLogsScreen
 import org.meshtastic.feature.settings.mtsw.ElementLookScreen

@@ -72,6 +72,7 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     }
 
     /** A frame from the radio. [clients] are the connected clients. */
+    @Suppress("ReturnCount")
     fun onFromRadio(payload: ByteArray, clients: Set<Int>): List<BridgeOut> {
         val frame = runCatching { FromRadio.ADAPTER.decode(payload) }.getOrNull() ?: return emptyList()
         if (frame.my_info != null) {
@@ -82,7 +83,10 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
         if (!configComplete) {
             if ((frame.config_complete_id ?: 0) != 0) {
                 configComplete = true
-                return waiting.keys.toList().filter { it in clients }.flatMap { replay(it, waiting.getValue(it)) }
+                return waiting.keys
+                    .toList()
+                    .filter { it in clients }
+                    .flatMap { replay(it, waiting.getValue(it)) }
                     .also { waiting.clear() }
             }
             if (configFrames.size < MAX_CONFIG_FRAMES) configFrames.add(payload)
@@ -100,6 +104,7 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     }
 
     /** A frame from the client [clientId]. */
+    @Suppress("ReturnCount")
     fun onClientFrame(clientId: Int, payload: ByteArray): BridgeClientResult {
         val frame = runCatching { ToRadio.ADAPTER.decode(payload) }.getOrNull() ?: return BridgeClientResult()
         if (frame.disconnect == true) return BridgeClientResult(close = true)

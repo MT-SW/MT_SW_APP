@@ -19,7 +19,6 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.FilledIconButton
 import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
 import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.component.glassContentColor

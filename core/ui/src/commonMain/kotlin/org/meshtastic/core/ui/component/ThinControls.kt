@@ -284,7 +284,6 @@ private fun DrawScope.capsuleOutline(left: Float, right: Float, color: Color) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ThinSliderTrack(state: SliderState, enabled: Boolean) {
-    val scheme = MaterialTheme.colorScheme
     val span = state.valueRange.endInclusive - state.valueRange.start
     val fraction = if (span > 0f) ((state.value - state.valueRange.start) / span).coerceIn(0f, 1f) else 0f
     val alpha = if (enabled) 1f else DISABLED_ALPHA

@@ -65,9 +65,8 @@ internal object RadioSlotsCodec {
      * The radios to use given what is stored. When nothing is stored yet, the single address saved before the
      * connection center existed becomes radio 1 (the migration), so an update never loses the connection.
      */
-    fun effective(stored: List<RadioSlot>, legacyAddress: String?, legacyName: String?): List<RadioSlot> = when {
-        stored.isNotEmpty() -> stored
-        isValidDeviceAddress(legacyAddress) -> listOf(RadioSlot(1, legacyAddress!!, legacyName))
-        else -> emptyList()
-    }
+    fun effective(stored: List<RadioSlot>, legacyAddress: String?, legacyName: String?): List<RadioSlot> =
+        stored.ifEmpty {
+            listOfNotNull(legacyAddress?.takeIf { isValidDeviceAddress(it) }?.let { RadioSlot(1, it, legacyName) })
+        }
 }
