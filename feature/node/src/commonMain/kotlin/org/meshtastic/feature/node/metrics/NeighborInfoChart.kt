@@ -38,7 +38,8 @@ import org.meshtastic.core.ui.theme.GraphColors
 import org.meshtastic.feature.node.model.NeighborInfoEntry
 
 private val NEIGHBOR_COUNT_COLOR = GraphColors.Blue
-private val NEIGHBOR_SNR_COLOR = GraphColors.Teal
+// The same green as the SNR line in the signal charts.
+private val NEIGHBOR_SNR_COLOR = GraphColors.Green
 
 internal val NEIGHBOR_INFO_LEGEND_DATA =
     listOf(

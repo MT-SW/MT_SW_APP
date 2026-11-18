@@ -80,6 +80,9 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 
 ##### Naprawione błędy
+* Szczegóły węzła: wybór zakresu czasu znowu ma wszystkie opcje (1 godz., 24 godz., 2 dni, 7 dni, 2 tyg., 30 dni, wszystko), jak w zdrowiu sieci, a nie tylko te, na które starcza danych.
+* Informacje o sąsiadach: z powrotem nasze kolory jakości sygnału na liście, a linia średniego SNR na wykresie ma ten sam zielony co w wykresach sygnału.
+* Przełączanie między urządzeniami nie rozłącza już urządzenia, które było w użyciu: jego połączenie przechodzi do tła.
 * iPhone/iPad: ekran „Informacje o sąsiadach” zamykał aplikację przy otwarciu (wykres nie przyjmował czasów z ułamkami sekund); czasy są teraz w pełnych sekundach.
 * Arkusz warstw mapy na iPhonie/iPadzie nie ma już nakładających się napisów: lista zaimportowanych warstw ma własne ograniczenie wysokości, a części pod nią (w tym badanie sygnału) zawsze zostają na swoim miejscu.
 * Link „meshtastic://meshtastic/sos” (widżet, kafelek, skrót, menu przy zegarze) nigdy nie otwierał ekranu SOS; teraz otwiera.

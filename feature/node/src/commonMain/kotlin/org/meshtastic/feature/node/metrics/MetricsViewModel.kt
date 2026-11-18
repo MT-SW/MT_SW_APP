@@ -51,7 +51,6 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.NumberFormatter
-import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.LikelyRelay
 import org.meshtastic.core.model.MeshLog
@@ -173,16 +172,8 @@ open class MetricsViewModel(
     /** The active time window for filtering graphed data. */
     val timeFrame: StateFlow<TimeFrame> = _timeFrame
 
-    /** Returns the list of time frames that are actually available based on the oldest data point. */
-    val availableTimeFrames: StateFlow<List<TimeFrame>> =
-        combine(state, environmentState) { currentState, envState ->
-            val stateOldest = currentState.oldestTimestampSeconds()
-            val envOldest =
-                envState.environmentMetrics.minOfOrNull { it.time.toLong() }?.takeIf { it > 0 } ?: nowSeconds
-            val oldest = listOfNotNull(stateOldest, envOldest).minOrNull() ?: nowSeconds
-            TimeFrame.entries.filter { it.isAvailable(oldest) }
-        }
-            .stateInWhileSubscribed(TimeFrame.entries)
+    /** Every time frame is always offered (as in the network health details), whatever the age of the data. */
+    val availableTimeFrames: StateFlow<List<TimeFrame>> = MutableStateFlow(TimeFrame.entries)
 
     fun setTimeFrame(timeFrame: TimeFrame) {
         _timeFrame.value = timeFrame

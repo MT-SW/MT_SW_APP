@@ -136,64 +136,11 @@ class MetricsViewModelTest {
     }
 
     @Test
-    fun `availableTimeFrames filters based on oldest data`() = runTest(testDispatcher) {
-        val now = org.meshtastic.core.common.util.nowSeconds
-
-        val nodeDetailFlow = MutableStateFlow(NodeDetailUiState())
-        every { getNodeDetailsUseCase(1234) } returns nodeDetailFlow.asStateFlow()
+    fun `availableTimeFrames always offers every time frame`() = runTest(testDispatcher) {
+        every { getNodeDetailsUseCase(1234) } returns MutableStateFlow(NodeDetailUiState()).asStateFlow()
 
         val vm = createViewModel()
-        vm.availableTimeFrames.test {
-            // Skip initial values
-            var current = awaitItem()
-
-            // Provide data from 2 hours ago (7200 seconds)
-            // This should make ONE_HOUR available, but not TWENTY_FOUR_HOURS
-            val twoHoursAgo = now - 7200
-            nodeDetailFlow.value =
-                NodeDetailUiState(
-                    node =
-                    org.meshtastic.core.model.Node(
-                        num = 1234,
-                        user = org.meshtastic.proto.User.Builder().also { wb -> wb.id = "!1234" }.build(),
-                    ),
-                    environmentState =
-                    EnvironmentMetricsState(
-                        environmentMetrics =
-                        listOf(Telemetry.Builder().also { wb -> wb.time = twoHoursAgo.toInt() }.build()),
-                    ),
-                )
-
-            // We might get multiple emissions as flows propagate
-            current = awaitItem()
-            while (current.size == TimeFrame.entries.size) { // Skip the initial "all" if it's still there
-                current = awaitItem()
-            }
-
-            assertTrue(current.contains(TimeFrame.ONE_HOUR))
-            assertTrue(!current.contains(TimeFrame.TWENTY_FOUR_HOURS), "Should not contain 24h for 2h old data")
-
-            // Provide data from 8 days ago
-            val eightDaysAgo = now - (8 * 24 * 3600)
-            nodeDetailFlow.value =
-                NodeDetailUiState(
-                    node =
-                    org.meshtastic.core.model.Node(
-                        num = 1234,
-                        user = org.meshtastic.proto.User.Builder().also { wb -> wb.id = "!1234" }.build(),
-                    ),
-                    environmentState =
-                    EnvironmentMetricsState(
-                        environmentMetrics =
-                        listOf(Telemetry.Builder().also { wb -> wb.time = eightDaysAgo.toInt() }.build()),
-                    ),
-                )
-
-            current = awaitItem()
-            assertTrue(current.contains(TimeFrame.SEVEN_DAYS))
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertEquals(TimeFrame.entries, vm.availableTimeFrames.value)
     }
 
     @Test
