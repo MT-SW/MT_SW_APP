@@ -121,3 +121,4 @@ iosApp/MTSWApp/Info.plist
 xcuserdata/
 native/ios/
 *.hprof
+iosApp/Signing.local.xcconfig

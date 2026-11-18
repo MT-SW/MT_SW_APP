@@ -11,13 +11,15 @@ options:
 # Release only: there is no Debug configuration (a fast app; Debug Compose is very slow).
 configs:
   Release: release
+configFiles:
+  Release: Signing.xcconfig
 # Ustawienia polecane przez Xcode (okienko „Update to recommended settings” już się nie pokazuje).
 # Settings recommended by Xcode (so its "Update to recommended settings" prompt no longer appears).
 settings:
   base:
-    CLANG_ANALYZER_LOCALIZABILITY_NON_LOCALIZED: YES
+    CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
     STRING_CATALOG_GENERATE_SYMBOLS: YES
-    ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOL_EXTENSIONS: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
 schemes:
   MTSWApp:
     build:

@@ -1,0 +1,4 @@
+// Podpisywanie: identyfikator zespołu Apple bierzemy z lokalnego pliku Signing.local.xcconfig (nie jest w repo).
+// Signing: the Apple team ID comes from the local file Signing.local.xcconfig (not kept in the repo).
+// Przykład / example (Signing.local.xcconfig):  DEVELOPMENT_TEAM = ABCDE12345
+#include? "Signing.local.xcconfig"
