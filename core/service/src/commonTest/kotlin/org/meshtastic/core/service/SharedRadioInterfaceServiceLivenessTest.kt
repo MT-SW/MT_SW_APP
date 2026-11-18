@@ -52,13 +52,13 @@ import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.network.radio.BaseRadioTransportFactory
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.network.repository.SerialDevicePresence
-import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.TransportDisconnectReason
+import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.core.testing.CapturingLogWriter
 import org.meshtastic.core.testing.FakeBluetoothRepository
 import org.meshtastic.core.testing.FakeRadioPrefs

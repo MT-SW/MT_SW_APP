@@ -72,8 +72,8 @@ import org.meshtastic.core.model.util.isOtaStatusNotification
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.DeepLinkRouter
 import org.meshtastic.core.navigation.TopLevelDestination
-import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.repository.DeviceSwitcher
+import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.repository.FirmwareReleaseRepository
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LocationService
@@ -97,13 +97,13 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.import_pending_channels_connect
 import org.meshtastic.core.resources.import_pending_contact_connect
 import org.meshtastic.core.ui.component.ScrollToTopEvent
-import org.meshtastic.core.ui.util.TabRepress
 import org.meshtastic.core.ui.theme.AppFontSettings
 import org.meshtastic.core.ui.theme.AppUiOptions
 import org.meshtastic.core.ui.theme.FontSettings
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.ComposableContent
 import org.meshtastic.core.ui.util.SnackbarManager
+import org.meshtastic.core.ui.util.TabRepress
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.LocalConfig
