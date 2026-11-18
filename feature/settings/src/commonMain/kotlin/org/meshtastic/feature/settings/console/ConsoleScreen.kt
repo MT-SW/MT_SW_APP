@@ -54,8 +54,10 @@ import org.meshtastic.core.resources.console_intro
 import org.meshtastic.core.resources.console_next
 import org.meshtastic.core.resources.console_prev
 import org.meshtastic.core.resources.console_send
+import org.meshtastic.core.resources.console_info_body
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
@@ -109,7 +111,7 @@ fun ConsoleScreen(
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,
-                actions = {},
+                actions = { InfoButton(Res.string.console_title, Res.string.console_info_body) },
                 onClickChip = {},
             )
         },

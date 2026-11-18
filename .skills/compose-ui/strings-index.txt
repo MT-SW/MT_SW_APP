@@ -958,6 +958,7 @@ console_cmd_remove_usage
 console_cmd_status_name
 console_cmd_status_summary
 console_cmd_status_usage
+console_info_body
 console_input
 console_intro
 console_next
