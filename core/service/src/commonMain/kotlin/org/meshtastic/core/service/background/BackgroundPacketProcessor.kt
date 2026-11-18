@@ -196,7 +196,7 @@ class BackgroundPacketProcessor(
             change(node)
             packet.rxTimeOrNull()?.let { node.lastHeard = it }
             packet.snrOrNull()?.let { node.snr = it }
-            if (packet.rx_rssi != 0) node.rssi = packet.rx_rssi
+            packet.rx_rssi?.let { node.rssi = it }
             node.channel = packet.channel
             dao.upsert(node)
         }

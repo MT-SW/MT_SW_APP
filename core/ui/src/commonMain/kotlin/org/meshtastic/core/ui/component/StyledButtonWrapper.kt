@@ -154,6 +154,12 @@ internal data class OutlineGlassLook(val accent: Color, val active: Boolean, val
 private const val OUTLINE_TEXT_MIX = 0.25f
 private const val OUTLINE_DISABLED_ALPHA = 0.38f
 
+/** True for the red colours of the theme: only a button that disconnects or deletes may keep them. */
+private fun isDangerColor(color: Color, scheme: ColorScheme): Boolean = color == scheme.error ||
+    color == scheme.errorContainer ||
+    color == scheme.onErrorContainer ||
+    color == scheme.onError
+
 /**
  * MT_SW: the look of a filled button. With the default "outline and glass" style it is a thin outline on a clear glass
  * pane, with a soft glow in the colour of the theme while the button works and grey when it is switched off. "Look"
