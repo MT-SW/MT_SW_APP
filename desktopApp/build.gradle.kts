@@ -109,7 +109,7 @@ val generateBuildConfig =
 sourceSets.main {
     kotlin.srcDir(generateBuildConfig.map { buildConfigOutputDir })
     // The bundled JSON assets (firmware releases, device list ...) come from the folder the Android app reads.
-    resources.srcDir(rootProject.file("androidApp/src/main/assets"))
+    resources.srcDir(isolated.rootProject.projectDirectory.dir("androidApp/src/main/assets").asFile)
 }
 
 // ── ProGuard configuration ───────────────────────────────────────────────────
