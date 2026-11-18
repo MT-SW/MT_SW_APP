@@ -314,7 +314,8 @@ class RadioControllerImpl(
                 // Revoke the old transport session before publishing a different database. Otherwise the old transport
                 // can deliver one last frame after switchDevice() has moved currentDb, writing stale-session data into
                 // the new device's database.
-                radioInterfaceService.disconnect()
+                // The device in use stays connected: its open connection goes to the background.
+                radioInterfaceService.disconnectForSwitch()
                 try {
                     switchDevice(address)
                     check(radioInterfaceService.setDeviceAddress(address)) {

@@ -191,6 +191,12 @@ interface RadioInterfaceService :
     suspend fun disconnect()
 
     /**
+     * Like [disconnect], for switching to another device: the open connection is not closed and no goodbye is sent, it
+     * is passed on to the background collection of that device. Implementations without that keep [disconnect].
+     */
+    suspend fun disconnectForSwitch() = disconnect()
+
+    /**
      * Silent in-place transport restart for handshake stalls: tears down the active transport and re-establishes it in
      * place, without touching the connection-request gate or the selected device address.
      *

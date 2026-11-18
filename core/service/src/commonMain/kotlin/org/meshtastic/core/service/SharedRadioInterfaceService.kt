@@ -728,6 +728,19 @@ class SharedRadioInterfaceService(
         }
     }
 
+    override suspend fun disconnectForSwitch() {
+        transportMutex.withLock {
+            connectionRequested = false
+            gattCacheInvalidationRequested.value = false
+            handOverOnNextStop = true
+            try {
+                ignoreExceptionSuspend { stopTransportLocked() }
+            } finally {
+                handOverOnNextStop = false
+            }
+        }
+    }
+
     override suspend fun restartTransport() {
         // CAS BEFORE the mutex, mirroring checkLiveness()'s coordination structure: both
         // restart paths CAS synchronously, one wins, one loses immediately. Performing the
@@ -998,6 +1011,7 @@ class SharedRadioInterfaceService(
         // (it may only start listening a moment later, the pool keeps the connection open for that).
         val handOverTo = pooled.takeIf { handOverOnNextStop }
         val handOver = handOverTo != null
+        if (handOver) Logger.i { "Switching device: the connection stays open and goes to the background" }
         try {
             if (
                 sendPoliteDisconnect &&

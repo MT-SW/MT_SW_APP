@@ -26,13 +26,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.IconButton
@@ -54,7 +51,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.radio_chooser_count
 import org.meshtastic.core.resources.radio_chooser_dropped
 import org.meshtastic.core.resources.radio_chooser_title
 import org.meshtastic.core.resources.radio_chooser_unnamed
@@ -163,15 +159,15 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
             }
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            Column(modifier = Modifier.width(300.dp)) {
-                Text(
-                    text = stringResource(Res.string.radio_chooser_count, state.connectedCount),
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                )
-                // Only the devices that are really connected: connecting and disconnecting is done on the Connect tab.
+            // Only the devices that are really connected, side by side, as small as their plates: connecting and
+            // disconnecting is done on the Connect tab.
+            Row(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 state.radios.filter { it.status == RadioStatus.Connected }.forEach { radio ->
-                    RadioRow(
+                    RadioItem(
                         radio = radio,
                         onChoose = {
                             expanded = false
@@ -185,24 +181,20 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
 }
 
 @Composable
-private fun RadioRow(radio: RadioChoice, onChoose: () -> Unit) {
-    Row(
-        modifier =
-        Modifier.fillMaxWidth().clickable(onClick = onChoose).padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(modifier = Modifier.weight(1f)) { RadioPlate(radio) }
+private fun RadioItem(radio: RadioChoice, onChoose: () -> Unit) {
+    Box(modifier = Modifier.clickable(onClick = onChoose).padding(horizontal = 4.dp, vertical = 6.dp)) {
+        RadioPlate(radio)
         if (radio.unread > 0) {
             Text(
                 text = radio.unread.toString(),
-                style = MaterialTheme.typography.labelMedium,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onError,
                 modifier =
-                Modifier.background(MaterialTheme.colorScheme.error, CircleShape)
-                    .defaultMinSize(minWidth = 20.dp)
-                    .padding(horizontal = 6.dp, vertical = 1.dp),
+                Modifier.align(Alignment.TopEnd)
+                    .background(MaterialTheme.colorScheme.error, CircleShape)
+                    .defaultMinSize(minWidth = 16.dp)
+                    .padding(horizontal = 4.dp),
             )
         }
     }
