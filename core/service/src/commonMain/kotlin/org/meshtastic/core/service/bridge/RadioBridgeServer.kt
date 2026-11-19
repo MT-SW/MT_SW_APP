@@ -61,6 +61,7 @@ import kotlin.concurrent.Volatile
  * The routers and the client lists are shared by the receive loops and the sockets, so every access goes through [lock]
  * (never held while suspending).
  */
+@Suppress("TooManyFunctions")
 @Single
 class RadioBridgeServer(
     private val radioInterfaceService: RadioInterfaceService,
@@ -79,6 +80,7 @@ class RadioBridgeServer(
 
     private fun routerFor(address: String): BridgeRouter =
         synchronized(lock) { routers.getOrPut(address) { BridgeRouter() } }
+
     private var nextClientId = 1
 
     /** Where a server listens; a change of this moves the server, a change of anything else does not. */

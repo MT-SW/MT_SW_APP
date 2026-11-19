@@ -18,18 +18,12 @@
 
 package org.meshtastic.core.ui.component
 
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,12 +35,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -131,8 +131,7 @@ fun MainAppBar(
             if (plain) {
                 reported.monochromeLayer()
             } else {
-                Modifier.monochromeLayer()
-                    .onSizeChanged { slots?.reportBarHeight(barId, it.height.toFloat()) }
+                Modifier.monochromeLayer().onSizeChanged { slots?.reportBarHeight(barId, it.height.toFloat()) }
             },
         ) {
             TopAppBar(
@@ -198,7 +197,8 @@ fun MainAppBar(
         // falls only below it. On a phone the bar stays as it was, with rounded bottom corners.
         val wide = isAdaptiveTwoPaneSplit()
         // A single flat colour all over the bar (no light edge, no sheen, nothing lighter behind the texts or icons),
-        // whatever look is chosen; only the shadow under it. Wide windows (desktop, tablet): a straight bar to the edges
+        // whatever look is chosen; only the shadow under it. Wide windows (desktop, tablet): a straight bar to the
+        // edges
         // of the window, side by side equally tall, the shadow only below. A phone keeps the rounded bottom corners.
         Surface(
             modifier =

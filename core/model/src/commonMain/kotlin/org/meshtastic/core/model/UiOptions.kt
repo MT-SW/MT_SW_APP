@@ -136,7 +136,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val BRIGHTNESS = "look.brightness"
         val BRIGHTNESS_SHARE = floatArrayOf(0.4f, 0.7f, 1f, 1.25f, 1.5f)
 
-        /** The brightness of the buttons alone: 0 = as the general setting, 1..5 = an own level of [BRIGHTNESS_SHARE]. */
+        /**
+         * The brightness of the buttons alone: 0 = as the general setting, 1..5 = an own level of [BRIGHTNESS_SHARE].
+         */
         const val BUTTON_BRIGHTNESS = "buttons.brightness"
 
         /** The saturation share of the small elements (sliders, switches, progress bars): the general level. */

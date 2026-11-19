@@ -80,6 +80,7 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
     }
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun RadioBridgeDeviceSettings(
     device: RadioBridgeDevice,
@@ -137,7 +138,10 @@ private fun RadioBridgeDeviceSettings(
             minutes to
                 when (minutes) {
                     0 -> stringResource(Res.string.radio_bridge_config_age_connection)
-                    in 1..MINUTES_IN_HOUR_LESS -> stringResource(Res.string.radio_bridge_config_age_minutes, minutes)
+
+                    in 1..MINUTES_IN_HOUR_LESS ->
+                        stringResource(Res.string.radio_bridge_config_age_minutes, minutes)
+
                     else -> stringResource(Res.string.radio_bridge_config_age_hours, minutes / MINUTES_IN_HOUR)
                 }
         },

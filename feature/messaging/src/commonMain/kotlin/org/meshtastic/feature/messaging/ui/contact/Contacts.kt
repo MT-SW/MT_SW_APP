@@ -18,8 +18,6 @@
 
 package org.meshtastic.feature.messaging.ui.contact
 
-import org.meshtastic.core.ui.component.withShadowInset
-import org.meshtastic.core.ui.component.rememberShadowInset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -146,7 +144,9 @@ import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.smartScrollToTop
+import org.meshtastic.core.ui.component.withShadowInset
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.ExpandLess
@@ -648,7 +648,9 @@ private fun ContactListView(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
-                contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
+                contentPadding =
+                    PaddingValues(bottom = LocalFloatingBarInset.current)
+                        .withShadowInset(rememberShadowInset()),
             ) {
                 contactSection(
                     section = ContactSection.CHANNELS,

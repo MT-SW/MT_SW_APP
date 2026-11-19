@@ -152,8 +152,7 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                 MtSwLogging.writeReportZip(
                     out,
                     since,
-                    extras =
-                    listOf("opis_zgloszenia.txt" to note.toByteArray()) + windowExtras(withLogs) + extras,
+                    extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + windowExtras(withLogs) + extras,
                     extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
                 )
             }

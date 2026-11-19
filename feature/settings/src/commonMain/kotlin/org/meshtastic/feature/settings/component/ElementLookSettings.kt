@@ -708,7 +708,8 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
     SliderPreference(
         title = stringResource(Res.string.brightness_buttons),
         enabled = true,
-        items = listOf(0 to stringResource(Res.string.brightness_as_general)) +
+        items =
+        listOf(0 to stringResource(Res.string.brightness_as_general)) +
             levels.mapIndexed { index, label -> index + 1 to label },
         selectedValue = options[UiOptions.BUTTON_BRIGHTNESS],
         onValueChange = { onChange(UiOptions.BUTTON_BRIGHTNESS, it) },

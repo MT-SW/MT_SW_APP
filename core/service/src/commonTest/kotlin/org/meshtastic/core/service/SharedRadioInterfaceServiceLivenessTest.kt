@@ -313,7 +313,7 @@ class SharedRadioInterfaceServiceLivenessTest {
                 processLifecycle = processLifecycleOwner.lifecycle,
                 radioPrefs = radioPrefs,
                 transportFactory = transportFactory,
-                pool = RadioTransportPool(transportFactory, dispatchers),
+                pool = RadioTransportPool(transportFactory, dispatchers).apply { reopenGapMs = 0L },
                 analytics = analytics,
                 radioOperationLock = radioOperationLock,
             )
@@ -441,7 +441,7 @@ class SharedRadioInterfaceServiceLivenessTest {
                     processLifecycle = processLifecycleOwner.lifecycle,
                     radioPrefs = radioPrefs,
                     transportFactory = realFactory,
-                    pool = RadioTransportPool(realFactory, dispatchers),
+                    pool = RadioTransportPool(realFactory, dispatchers).apply { reopenGapMs = 0L },
                     analytics = analytics,
                     radioOperationLock = radioOperationLock,
                 )

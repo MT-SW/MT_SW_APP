@@ -42,8 +42,8 @@ import androidx.glance.LocalContext
  * Two consequences worth knowing before changing this:
  * - The bridge is a workaround, not a documented Glance pattern. If Compose Multiplatform starts reading another
  *   composition local when resolving resources, every string in the widget begins throwing at runtime. That failure is
- *   caught by the widget's `onCompositionError` rather than crashing the app, and the widget tests fail
- *   in CI if resolution breaks.
+ *   caught by the widget's `onCompositionError` rather than crashing the app, and the widget tests fail in CI if
+ *   resolution breaks.
  * - [LocalDensity] is derived from the display metrics rather than from Glance's `LocalSize`. Glance sizing is
  *   expressed in `dp` and converted during translation, so density only affects which resource qualifier is chosen here
  *   — it must not be used to compute widget layout.

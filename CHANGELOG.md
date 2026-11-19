@@ -120,6 +120,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Lista rozmów i kanałów: wybrana rozmowa ma delikatny żółtawy odcień motywu zamiast ciemnoszarego, a niewybrana jest prawie biała.
 * Komputer i tablet: górny pasek ma jeden jednolity kolor w całości (bez jaśniejszych pól pod napisami i ikonami), cień tylko pod spodem; na telefonie ten sam jednolity kolor, a kształt (zaokrąglone dolne rogi) bez zmian.
 * Lista rozmów i kanałów: niewybrane są prawie białe i pełne (nic nie prześwieca z tyłu), wybrane mają żółtawy odcień; ciemnoszary kolor usunięty.
+* Poprawki po pełnych testach: testy ponownego uruchamiania połączenia nie czekają już 3 s przerwy (przerwa jest do ustawienia w teście), uwagi detekt, formatowanie.
 
 ##### Zmiany względem oryginału
 
@@ -1024,6 +1025,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Conversation and channel list: the chosen conversation has a soft yellowish tint of the theme instead of dark grey, and an unchosen one is nearly white.
 * Computer and tablet: the top bar has one flat colour all over (no lighter fields behind texts and icons), the shadow only below it; on a phone the same flat colour, and the shape (rounded bottom corners) is unchanged.
 * Conversation and channel list: unchosen ones are nearly white and solid (nothing shows through from behind), chosen ones have a yellowish tint; the dark grey is gone.
+* Fixes after the full tests: the connection-restart tests no longer wait for the 3 s pause (the pause can be set in a test), detekt notes, formatting.
 
 ##### Changes against the original
 

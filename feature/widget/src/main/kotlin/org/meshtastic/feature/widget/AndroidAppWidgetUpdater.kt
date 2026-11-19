@@ -33,10 +33,8 @@ import org.meshtastic.core.repository.AppWidgetUpdater
 private const val MESH_STATUS_ROTATION_MS = 60_000L
 
 @Single
-class AndroidAppWidgetUpdater(
-    private val context: Context,
-    meshStatusProvider: MeshStatusWidgetStateProvider,
-) : AppWidgetUpdater {
+class AndroidAppWidgetUpdater(private val context: Context, meshStatusProvider: MeshStatusWidgetStateProvider) :
+    AppWidgetUpdater {
     @Suppress("InjectDispatcher") // feature:widget does not depend on core:di, where CoroutineDispatchers lives
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 

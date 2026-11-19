@@ -187,7 +187,11 @@ private fun isDangerColor(color: Color, scheme: ColorScheme): Boolean = color ==
  * light background the colour is moved most of the way to that pink, so the button looks the same there.
  */
 private fun Color.softenedOnLight(scheme: ColorScheme): Color =
-    if (scheme.surface.luminance() > LIGHT_SURFACE_LUMINANCE) lerp(this, SOFT_DANGER_PINK, DANGER_LIGHT_SOFTEN) else this
+    if (scheme.surface.luminance() > LIGHT_SURFACE_LUMINANCE) {
+        lerp(this, SOFT_DANGER_PINK, DANGER_LIGHT_SOFTEN)
+    } else {
+        this
+    }
 
 private const val LIGHT_SURFACE_LUMINANCE = 0.5f
 private const val DANGER_LIGHT_SOFTEN = 0.6f
@@ -219,8 +223,10 @@ internal fun rememberDecorFor(container: Color, disabledContainer: Color, enable
             val accent =
                 when {
                     !enabled -> scheme.onSurface
+
                     container.isSpecified && container.alpha > 0f && isDangerColor(container, scheme) ->
                         container.softenedOnLight(scheme)
+
                     else -> scheme.primary.withBrightness(brightness)
                 }
             val steps = UiOptions.BUTTON_GLOW_SHARE

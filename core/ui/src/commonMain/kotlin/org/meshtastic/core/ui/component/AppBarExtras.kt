@@ -156,14 +156,16 @@ class SosBarSlots {
     /** The gap in px between the bar [id] and the nearest bar at its left; null when there is none. */
     fun gapToLeft(id: Any): Float? {
         val mine = barEdges[id] ?: return null
-        return barEdges.filter { it.key != id && it.value.second <= mine.first + 1f }
+        return barEdges
+            .filter { it.key != id && it.value.second <= mine.first + 1f }
             .minOfOrNull { mine.first - it.value.second }
     }
 
     /** The gap in px between the bar [id] and the nearest bar at its right; null when there is none. */
     fun gapToRight(id: Any): Float? {
         val mine = barEdges[id] ?: return null
-        return barEdges.filter { it.key != id && it.value.first >= mine.second - 1f }
+        return barEdges
+            .filter { it.key != id && it.value.first >= mine.second - 1f }
             .minOfOrNull { it.value.first - mine.second }
     }
 

@@ -17,10 +17,10 @@
 package org.meshtastic.core.service.bridge
 
 import org.meshtastic.core.repository.RadioBridgeConfig
-import kotlin.time.TimeSource
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.ToRadio
+import kotlin.time.TimeSource
 
 /** A frame (without the stream header) for one client of the bridge. */
 class BridgeOut(val clientId: Int, val payload: ByteArray)
@@ -65,7 +65,9 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     val waitingWithoutHandshake: Boolean
         get() = waiting.isNotEmpty() && !configComplete && configFrames.isEmpty()
 
-    /** Drops the copy of the configuration (it is built again at the next handshake); clients then wait for a new one. */
+    /**
+     * Drops the copy of the configuration (it is built again at the next handshake); clients then wait for a new one.
+     */
     fun invalidate() {
         configFrames.clear()
         configComplete = false

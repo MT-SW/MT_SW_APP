@@ -415,4 +415,3 @@ private fun connectionTooltipLabel(
     connectionState == ConnectionState.DeviceSleep -> stringResource(Res.string.device_sleeping)
     else -> stringResource(Res.string.disconnected)
 }
-

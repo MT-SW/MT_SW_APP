@@ -17,7 +17,6 @@
 package org.meshtastic.core.service.background
 
 import co.touchlab.kermit.Logger
-import kotlin.time.TimeSource
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CancellationException
@@ -46,6 +45,7 @@ import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ReceivedRadioFrame
 import org.meshtastic.core.repository.TransportDisconnectReason
 import org.meshtastic.proto.ToRadio
+import kotlin.time.TimeSource
 
 /**
  * The pool of connections (MT_SW): exactly one transport per device address. The app view (the foreground, one device
@@ -56,17 +56,23 @@ import org.meshtastic.proto.ToRadio
  *
  * Packets go to the foreground consumer when there is one, otherwise to the background consumer.
  */
+@Suppress("TooManyFunctions")
 @Single
 class RadioTransportPool(
     private val transportFactory: RadioTransportFactory,
     private val dispatchers: CoroutineDispatchers,
 ) {
+    /** How long a just-closed device waits before it is opened again; tests set it to 0 (their clock is virtual). */
+    internal var reopenGapMs: Long = REOPEN_GAP_MS
+
     private val lock = SynchronizedObject()
     private val orphanScope = CoroutineScope(SupervisorJob() + dispatchers.io)
     private val entries = mutableMapOf<String, Entry>()
     private val live = MutableStateFlow<Set<String>>(emptySet())
 
-    /** When (monotonic, ms) the transport of an address was closed last; a reopen waits for [REOPEN_GAP_MS] after it. */
+    /**
+     * When (monotonic, ms) the transport of an address was closed last; a reopen waits for [REOPEN_GAP_MS] after it.
+     */
     private val closedAt = mutableMapOf<String, Long>()
 
     /** Addresses of devices whose transport is connected right now (shown or in the background). */
@@ -157,19 +163,19 @@ class RadioTransportPool(
 
     /**
      * Gives the radio a moment after its connection was closed before the same device is opened again. A radio serves
-     * one client at a time: closing and reopening right away (restart of a broken connection, quick switching back
-     * and forth) can leave it still holding the old socket, so it stops answering. Nothing waits when the device was
-     * not closed recently or when its transport is still open (it is then reused as it is).
+     * one client at a time: closing and reopening right away (restart of a broken connection, quick switching back and
+     * forth) can leave it still holding the old socket, so it stops answering. Nothing waits when the device was not
+     * closed recently or when its transport is still open (it is then reused as it is).
      */
     suspend fun awaitReopenGap(address: String) {
         val wait =
             synchronized(lock) {
                 if (entries.containsKey(address)) return
                 val closed = closedAt[address] ?: return
-                REOPEN_GAP_MS - (monotonicMillis() - closed)
+                reopenGapMs - (monotonicMillis() - closed)
             }
         if (wait > 0) {
-            Logger.i { "Waiting ${wait} ms before opening the same device again" }
+            Logger.i { "Waiting $wait ms before opening the same device again" }
             delay(wait)
         }
     }
@@ -217,8 +223,8 @@ class RadioTransportPool(
      */
     fun sendFromBackground(address: String, bytes: ByteArray): Boolean {
         val entry = synchronized(lock) { entries[address] } ?: return false
-        if (entry.mirror.isComplete && wantedConfiguration(bytes) != 0) return true
-        return entry.transport.handleSendToRadio(bytes)
+        val answeredByTheCopy = entry.mirror.isComplete && wantedConfiguration(bytes) != 0
+        return answeredByTheCopy || entry.transport.handleSendToRadio(bytes)
     }
 
     /** Sends [bytes] through the transport of [address]. */
@@ -278,13 +284,14 @@ class RadioTransportPool(
             // from the live copy, so switching between devices never negotiates with the radio.
             val nonce = wantedConfiguration(p)
             val frames = if (nonce != 0) entry.mirror.replay(nonce) else null
-            if (frames == null) return entry.transport.handleSendToRadio(p)
-            entry.scope.launch {
-                // The radio itself answers after a moment; the asker has already noted what it waits for.
-                delay(REPLAY_DELAY_MS)
-                frames.forEach { consumer.handleFromRadio(it) }
+            if (frames != null) {
+                entry.scope.launch {
+                    // The radio itself answers after a moment; the asker has already noted what it waits for.
+                    delay(REPLAY_DELAY_MS)
+                    frames.forEach { consumer.handleFromRadio(it) }
+                }
             }
-            return true
+            return frames != null || entry.transport.handleSendToRadio(p)
         }
 
         override fun keepAlive() {

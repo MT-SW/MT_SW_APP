@@ -1016,8 +1016,7 @@ fun ConnectionsScreen(
                         Column(
                             // The pane is wider by the room for shadows (taken from the margin and the gap), and the
                             // content is inset by the same amount, so the buttons keep their width and place.
-                            modifier =
-                            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = room),
+                            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = room),
                             verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
                         ) {
                             header(this)

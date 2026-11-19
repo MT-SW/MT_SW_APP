@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 
 /**
  * MT_SW: shows [count] unread messages on the icon of the app (the red number on the iPhone's home screen, the badge in
- * the dock or taskbar of the computer). 0 removes it. On Android the launcher builds its own badge from the notifications.
+ * the dock or taskbar of the computer). 0 removes it. On Android the launcher builds its own badge from the
+ * notifications.
  */
 @Composable expect fun AppIconBadge(count: Int)

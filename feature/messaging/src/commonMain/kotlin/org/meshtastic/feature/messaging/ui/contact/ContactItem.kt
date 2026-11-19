@@ -117,7 +117,8 @@ fun ContactItem(
     val seeThrough = cardStyle.look == ElementLook.TRANSPARENT || cardStyle.look == ElementLook.GLASS
     val fade = if (seeThrough) (1f - cardStyle.strength / PERCENT).coerceIn(MIN_CARD_ALPHA, 1f) else 1f
 
-    // MT_SW: an unchosen conversation is nearly white (solid, so nothing shows through from behind it) and is set off
+    // MT_SW: an unchosen conversation is nearly white (solid, so nothing shows through from behind it) and is set
+    // off
     // only by a gentle shadow; the chosen one (open or selected) has a soft yellowish tint of the theme.
     val surface = MaterialTheme.colorScheme.surface
     val nearlyWhite =
@@ -130,8 +131,7 @@ fun ContactItem(
         if (isOutlined) {
             CardDefaults.cardColors(containerColor = nearlyWhite)
         } else {
-            val tinted =
-                MaterialTheme.colorScheme.primary.copy(alpha = SELECTED_TINT_ALPHA).compositeOver(surface)
+            val tinted = MaterialTheme.colorScheme.primary.copy(alpha = SELECTED_TINT_ALPHA).compositeOver(surface)
             CardDefaults.cardColors(containerColor = tinted.copy(alpha = fade))
         }
 
