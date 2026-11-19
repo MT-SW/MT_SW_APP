@@ -117,6 +117,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Górny pasek na komputerze i tablecie dochodzi do samych brzegów okna, a przy kilku kolumnach kolumny stykają się ze sobą (uchwyt do zmiany szerokości jest nałożony na szew), więc paski łączą się w środku w jeden (wewnętrzne dolne rogi są proste), więc jego cień nie jest już ucinany po bokach. Usunięty został 8 dp margines przy brzegu okna, który odsuwał pasek.
 * Komputer i tablet: uchwyty do zmiany szerokości kolumn są na wierzchu (nie chowają się pod kartami) i mają dawny rozmiar; górne paski kolumn mają tę samą wysokość, więc razem wyglądają jak jedna belka, a cienie pasują; miejsce na cień wokół elementów jest większe (14 dp).
 * Przyciski wyboru (chipy, np. kanały): wybrany ma delikatny żółtawy odcień motywu, a niewybrany jest prawie biały, zamiast ciemnoszarego wybranego.
+* Lista rozmów i kanałów (ekran wiadomości): wybrana rozmowa ma delikatny żółtawy odcień motywu zamiast ciemnoszarego, a niewybrana jest prawie biała.
 
 ##### Zmiany względem oryginału
 
@@ -1018,6 +1019,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * The top bar on a computer and a tablet reaches the very edges of the window, and with several columns the columns touch each other (the handle for changing the width is laid over the seam), so the bars join into one in the middle (the inner bottom corners are straight), so its shadow is no longer cut off at the sides. The 8 dp margin at the window edge that kept the bar away is removed.
 * Computer and tablet: the handles for changing the width of the columns are on top (they no longer hide under the cards) and have their old size; the top bars of the columns are equally tall, so together they look like one bar and the shadows match; the room around elements for shadows is larger (14 dp).
 * Choice chips (for example channels): the chosen one has a soft yellowish tint of the theme, and an unchosen one is nearly white, instead of a dark grey chosen chip.
+* Conversation and channel list (messages screen): the chosen conversation has a soft yellowish tint of the theme instead of dark grey, and an unchosen one is nearly white.
 
 ##### Changes against the original
 
