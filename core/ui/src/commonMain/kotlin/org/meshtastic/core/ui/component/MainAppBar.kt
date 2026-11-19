@@ -197,11 +197,12 @@ fun MainAppBar(
         // window; side by side the bars have the same height and touch, so they read as a single bar, and the shadow
         // falls only below it. On a phone the bar stays as it was, with rounded bottom corners.
         val wide = isAdaptiveTwoPaneSplit()
-        if (wide) {
-            // A single flat colour all over the bar (no light edge, no sheen, nothing lighter behind the texts or
-            // icons), whatever look is chosen; only the shadow under it.
-            Surface(
-                modifier =
+        // A single flat colour all over the bar (no light edge, no sheen, nothing lighter behind the texts or icons),
+        // whatever look is chosen; only the shadow under it. Wide windows (desktop, tablet): a straight bar to the edges
+        // of the window, side by side equally tall, the shadow only below. A phone keeps the rounded bottom corners.
+        Surface(
+            modifier =
+            if (wide) {
                 reported.heightIn(min = tallestDp).drawWithContent {
                     clipRect(
                         left = 0f,
@@ -211,23 +212,20 @@ fun MainAppBar(
                     ) {
                         this@drawWithContent.drawContent()
                     }
-                },
-                shape = RectangleShape,
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = BAR_SHADOW_DP.dp,
-            ) {
-                barContent()
-            }
-        } else {
-            StyledSurface(
-                style = barStyle,
-                shape = RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
-                modifier = reported,
-                baseColor = MaterialTheme.colorScheme.surface,
-                floating = true,
-            ) {
-                barContent()
-            }
+                }
+            } else {
+                reported
+            },
+            shape =
+            if (wide) {
+                RectangleShape
+            } else {
+                RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp)
+            },
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = BAR_SHADOW_DP.dp,
+        ) {
+            barContent()
         }
     }
 }

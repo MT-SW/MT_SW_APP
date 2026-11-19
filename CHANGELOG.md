@@ -118,7 +118,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Komputer i tablet: uchwyty do zmiany szerokości kolumn są na wierzchu (nie chowają się pod kartami) i mają dawny rozmiar; górne paski kolumn mają tę samą wysokość, więc razem wyglądają jak jedna belka, a cienie pasują; miejsce na cień wokół elementów jest większe (14 dp).
 * Komputer i tablet: górny pasek to jeden prosty, prostokątny pasek na całą szerokość kolumny, do samych krawędzi okna (bez zaokrągleń); obok siebie paski mają tę samą wysokość i łączą się w jedną belkę, a cień pada tylko pod spodem.
 * Lista rozmów i kanałów: wybrana rozmowa ma delikatny żółtawy odcień motywu zamiast ciemnoszarego, a niewybrana jest prawie biała.
-* Komputer i tablet: górny pasek ma jeden jednolity kolor w całości (bez jaśniejszych pól pod napisami i ikonami), cień tylko pod spodem; na telefonie pasek bez zmian.
+* Komputer i tablet: górny pasek ma jeden jednolity kolor w całości (bez jaśniejszych pól pod napisami i ikonami), cień tylko pod spodem; na telefonie ten sam jednolity kolor, a kształt (zaokrąglone dolne rogi) bez zmian.
 * Lista rozmów i kanałów: niewybrane są prawie białe i pełne (nic nie prześwieca z tyłu), wybrane mają żółtawy odcień; ciemnoszary kolor usunięty.
 
 ##### Zmiany względem oryginału
@@ -1022,7 +1022,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Computer and tablet: the handles for changing the width of the columns are on top (they no longer hide under the cards) and have their old size; the top bars of the columns are equally tall, so together they look like one bar and the shadows match; the room around elements for shadows is larger (14 dp).
 * Computer and tablet: the top bar is one straight, rectangular bar over the whole width of the column, right to the window edges (no rounded corners); side by side the bars are equally tall and join into one bar, and the shadow falls only below it.
 * Conversation and channel list: the chosen conversation has a soft yellowish tint of the theme instead of dark grey, and an unchosen one is nearly white.
-* Computer and tablet: the top bar has one flat colour all over (no lighter fields behind texts and icons), the shadow only below it; on a phone the bar is unchanged.
+* Computer and tablet: the top bar has one flat colour all over (no lighter fields behind texts and icons), the shadow only below it; on a phone the same flat colour, and the shape (rounded bottom corners) is unchanged.
 * Conversation and channel list: unchosen ones are nearly white and solid (nothing shows through from behind), chosen ones have a yellowish tint; the dark grey is gone.
 
 ##### Changes against the original
