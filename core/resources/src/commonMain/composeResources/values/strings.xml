@@ -726,6 +726,15 @@
     <string name="boot_reconnect_blocked_message">Nearby devices permission is off, so your radio cannot be reached over Bluetooth. Tap to turn it back on.</string>
     <string name="boot_reconnect_blocked_title">Meshtastic can't reconnect</string>
     <string name="bottom_nav_settings">Settings</string>
+    <!-- BRIGHTNESS -->
+    <string name="brightness_1">Very soft</string>
+    <string name="brightness_2">Soft</string>
+    <string name="brightness_3">Normal</string>
+    <string name="brightness_4">Vivid</string>
+    <string name="brightness_5">Very vivid</string>
+    <string name="brightness_as_general">As the general setting</string>
+    <string name="brightness_buttons">Brightness of the buttons</string>
+    <string name="brightness_general">Brightness of the theme colours</string>
     <string name="busy_noise_floor">Busy floor</string>
     <!-- BUTTON -->
     <string name="button_glow">Glow of working buttons</string>

@@ -149,6 +149,21 @@ internal data class FilledDecor(
         get() = glass != null || outline != null
 }
 
+/**
+ * MT_SW: the same colour with its saturation scaled by [share] (1 = unchanged, below 1 greyer, above 1 more vivid).
+ * Lets the user choose how bright the buttons and small elements are without touching the main theme.
+ */
+internal fun Color.withBrightness(share: Float): Color {
+    if (!isSpecified || share == 1f) return this
+    val grey = red * GREY_RED + green * GREY_GREEN + blue * GREY_BLUE
+    fun channel(value: Float) = (grey + (value - grey) * share).coerceIn(0f, 1f)
+    return Color(channel(red), channel(green), channel(blue), alpha)
+}
+
+private const val GREY_RED = 0.299f
+private const val GREY_GREEN = 0.587f
+private const val GREY_BLUE = 0.114f
+
 /** The colours of an outline-glass button: the accent of a working one, or the grey of a switched-off one. */
 internal data class OutlineGlassLook(val accent: Color, val active: Boolean, val text: Color, val disabledText: Color)
 
@@ -175,9 +190,10 @@ private fun rememberFilledDecor(colors: ButtonColors, enabled: Boolean): FilledD
 internal fun rememberDecorFor(container: Color, disabledContainer: Color, enabled: Boolean): FilledDecor {
     val options = rememberUiOptions()
     val scheme = MaterialTheme.colorScheme
+    val brightness = UiOptions.buttonBrightness(options)
     return when (options[UiOptions.BUTTON_STYLE]) {
         UiOptions.BUTTON_STYLE_GLASS -> {
-            val base = if (enabled) container else disabledContainer
+            val base = (if (enabled) container else disabledContainer).withBrightness(brightness)
             FilledDecor(glass = base.takeIf { it.isSpecified && it.alpha > 0f })
         }
 
@@ -187,7 +203,7 @@ internal fun rememberDecorFor(container: Color, disabledContainer: Color, enable
                 when {
                     !enabled -> scheme.onSurface
                     container.isSpecified && container.alpha > 0f && isDangerColor(container, scheme) -> container
-                    else -> scheme.primary
+                    else -> scheme.primary.withBrightness(brightness)
                 }
             val steps = UiOptions.BUTTON_GLOW_SHARE
             val widths = UiOptions.BUTTON_OUTLINE_DP

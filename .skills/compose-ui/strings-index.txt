@@ -702,6 +702,15 @@ bonding_failed_retry
 boot_reconnect_blocked_message
 boot_reconnect_blocked_title
 bottom_nav_settings
+### BRIGHTNESS ###
+brightness_1
+brightness_2
+brightness_3
+brightness_4
+brightness_5
+brightness_as_general
+brightness_buttons
+brightness_general
 busy_noise_floor
 ### BUTTON ###
 button_glow

@@ -43,6 +43,8 @@ import org.meshtastic.core.resources.availability_title
 import org.meshtastic.core.resources.background_keepalive_title
 import org.meshtastic.core.resources.backup_app_settings
 import org.meshtastic.core.resources.backup_look
+import org.meshtastic.core.resources.brightness_buttons
+import org.meshtastic.core.resources.brightness_general
 import org.meshtastic.core.resources.button_glow
 import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_outline
@@ -329,6 +331,8 @@ object SettingsSearchCatalog {
             Res.string.ring_style_thin to SettingsRoute.ElementLook,
             Res.string.control_style_thin to SettingsRoute.ElementLook,
             Res.string.button_style to SettingsRoute.ElementLook,
+            Res.string.brightness_general to SettingsRoute.ElementLook,
+            Res.string.brightness_buttons to SettingsRoute.ElementLook,
             Res.string.button_glow to SettingsRoute.ElementLook,
             Res.string.button_outline to SettingsRoute.ElementLook,
             Res.string.radio_alert to SettingsRoute.ConnectionCenter,

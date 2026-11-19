@@ -36,6 +36,14 @@ import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.backup_look
+import org.meshtastic.core.resources.brightness_1
+import org.meshtastic.core.resources.brightness_2
+import org.meshtastic.core.resources.brightness_3
+import org.meshtastic.core.resources.brightness_4
+import org.meshtastic.core.resources.brightness_5
+import org.meshtastic.core.resources.brightness_as_general
+import org.meshtastic.core.resources.brightness_buttons
+import org.meshtastic.core.resources.brightness_general
 import org.meshtastic.core.resources.button_glow
 import org.meshtastic.core.resources.button_gradient
 import org.meshtastic.core.resources.button_gradient_normal
@@ -681,6 +689,29 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.RIM],
         onValueChange = { onChange(UiOptions.RIM, it) },
+    )
+    val levels =
+        listOf(
+            stringResource(Res.string.brightness_1),
+            stringResource(Res.string.brightness_2),
+            stringResource(Res.string.brightness_3),
+            stringResource(Res.string.brightness_4),
+            stringResource(Res.string.brightness_5),
+        )
+    SliderPreference(
+        title = stringResource(Res.string.brightness_general),
+        enabled = true,
+        items = levels.mapIndexed { index, label -> index to label },
+        selectedValue = options[UiOptions.BRIGHTNESS],
+        onValueChange = { onChange(UiOptions.BRIGHTNESS, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.brightness_buttons),
+        enabled = true,
+        items = listOf(0 to stringResource(Res.string.brightness_as_general)) +
+            levels.mapIndexed { index, label -> index + 1 to label },
+        selectedValue = options[UiOptions.BUTTON_BRIGHTNESS],
+        onValueChange = { onChange(UiOptions.BUTTON_BRIGHTNESS, it) },
     )
     SliderPreference(
         title = stringResource(Res.string.button_glow),

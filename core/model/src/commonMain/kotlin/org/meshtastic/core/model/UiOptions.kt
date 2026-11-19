@@ -129,6 +129,23 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val BUTTON_STYLE_GLASS = 1
         const val BUTTON_STYLE_OUTLINE_GLASS = 2
 
+        /**
+         * The brightness (colour saturation) of the accent of the buttons and small elements: an index into
+         * [BRIGHTNESS_SHARE]. One general setting; the main themes themselves are not changed by it.
+         */
+        const val BRIGHTNESS = "look.brightness"
+        val BRIGHTNESS_SHARE = floatArrayOf(0.4f, 0.7f, 1f, 1.25f, 1.5f)
+
+        /** The brightness of the buttons alone: 0 = as the general setting, 1..5 = an own level of [BRIGHTNESS_SHARE]. */
+        const val BUTTON_BRIGHTNESS = "buttons.brightness"
+
+        /** The saturation share of the buttons: their own level, or the general one. */
+        fun buttonBrightness(options: UiOptions): Float {
+            val own = options[BUTTON_BRIGHTNESS]
+            val index = if (own in 1..BRIGHTNESS_SHARE.size) own - 1 else options[BRIGHTNESS]
+            return BRIGHTNESS_SHARE[index.coerceIn(0, BRIGHTNESS_SHARE.lastIndex)]
+        }
+
         /** The strength of the glow of a working outline-glass button: an index into [BUTTON_GLOW_SHARE] (0 = none). */
         const val BUTTON_GLOW = "buttons.glow"
         val BUTTON_GLOW_SHARE = floatArrayOf(0f, 0.5f, 1f, 1.6f)
@@ -253,6 +270,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(CONTROL_STYLE, CONTROL_STYLE_THIN)
             put(BUTTON_STYLE, BUTTON_STYLE_OUTLINE_GLASS)
             put(BUTTON_GLOW, 2)
+            put(BRIGHTNESS, 2)
+            put(BUTTON_BRIGHTNESS, 0)
             put(BUTTON_OUTLINE, 1)
             put(RADIO_ALERT, RADIO_ALERT_PULSE)
             put(RADIO_ALERT_COLOR, 0)

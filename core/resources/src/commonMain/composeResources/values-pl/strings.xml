@@ -4381,4 +4381,12 @@
     <string name="ringtone_play_on_node">Odtwórz na węźle</string>
     <string name="ringtone_play_on_node_summary">Raz odtwarza zapisany dzwonek na węźle. Wymaga buzzera.</string>
     <string name="ringtone_play_on_node_unsaved">Najpierw zapisz dzwonek, aby odtworzyć go na węźle.</string>
+    <string name="brightness_general">Jaskrawość kolorów motywu</string>
+    <string name="brightness_buttons">Jaskrawość przycisków</string>
+    <string name="brightness_as_general">Jak ogólna</string>
+    <string name="brightness_1">Bardzo łagodna</string>
+    <string name="brightness_2">Łagodna</string>
+    <string name="brightness_3">Normalna</string>
+    <string name="brightness_4">Mocna</string>
+    <string name="brightness_5">Bardzo mocna</string>
 </resources>
