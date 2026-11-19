@@ -36,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,6 +69,7 @@ import androidx.compose.material3.Icon as StandardIcon
 private const val EVENT_ACCENT_ALPHA = 0.12f
 private const val BAR_CORNER_DP = 20
 private const val BAR_SHADOW_ROOM_DP = 24
+private const val BAR_SHADOW_DP = 8
 
 /** Height of the event brand rule under the app bar. A hairline: brand presence without stealing vertical space. */
 private val EVENT_BRAND_RULE_HEIGHT = 3.dp
@@ -195,11 +197,11 @@ fun MainAppBar(
         // window; side by side the bars have the same height and touch, so they read as a single bar, and the shadow
         // falls only below it. On a phone the bar stays as it was, with rounded bottom corners.
         val wide = isAdaptiveTwoPaneSplit()
-        StyledSurface(
-            style = barStyle,
-            shape = if (wide) RectangleShape else RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
-            modifier =
-            if (wide) {
+        if (wide) {
+            // A single flat colour all over the bar (no light edge, no sheen, nothing lighter behind the texts or
+            // icons), whatever look is chosen; only the shadow under it.
+            Surface(
+                modifier =
                 reported.heightIn(min = tallestDp).drawWithContent {
                     clipRect(
                         left = 0f,
@@ -209,14 +211,23 @@ fun MainAppBar(
                     ) {
                         this@drawWithContent.drawContent()
                     }
-                }
-            } else {
-                reported
-            },
-            baseColor = MaterialTheme.colorScheme.surface,
-            floating = true,
-        ) {
-            barContent()
+                },
+                shape = RectangleShape,
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = BAR_SHADOW_DP.dp,
+            ) {
+                barContent()
+            }
+        } else {
+            StyledSurface(
+                style = barStyle,
+                shape = RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
+                modifier = reported,
+                baseColor = MaterialTheme.colorScheme.surface,
+                floating = true,
+            ) {
+                barContent()
+            }
         }
     }
 }

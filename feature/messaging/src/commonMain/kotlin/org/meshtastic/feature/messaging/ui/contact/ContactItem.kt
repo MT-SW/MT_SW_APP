@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.isSensitiveData
 import androidx.compose.ui.semantics.semantics
@@ -116,21 +117,22 @@ fun ContactItem(
     val seeThrough = cardStyle.look == ElementLook.TRANSPARENT || cardStyle.look == ElementLook.GLASS
     val fade = if (seeThrough) (1f - cardStyle.strength / PERCENT).coerceIn(MIN_CARD_ALPHA, 1f) else 1f
 
+    // MT_SW: an unchosen conversation is nearly white (solid, so nothing shows through from behind it) and is set off
+    // only by a gentle shadow; the chosen one (open or selected) has a soft yellowish tint of the theme.
+    val surface = MaterialTheme.colorScheme.surface
+    val nearlyWhite =
+        if (surface.luminance() > LIGHT_SURFACE_LUMINANCE) {
+            Color.White.copy(alpha = NEARLY_WHITE_ALPHA).compositeOver(surface)
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        }
     val cardColors =
-        when {
-            isOutlined && withDepth ->
-                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
-
-            isOutlined -> CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
-
-            else -> {
-                // MT_SW: a chosen conversation has a soft yellowish tint of the theme; an unchosen one is nearly white.
-                val containerColor =
-                    MaterialTheme.colorScheme.primary
-                        .copy(alpha = SELECTED_TINT_ALPHA)
-                        .compositeOver(MaterialTheme.colorScheme.surface)
-                CardDefaults.cardColors(containerColor = containerColor.copy(alpha = fade))
-            }
+        if (isOutlined) {
+            CardDefaults.cardColors(containerColor = nearlyWhite)
+        } else {
+            val tinted =
+                MaterialTheme.colorScheme.primary.copy(alpha = SELECTED_TINT_ALPHA).compositeOver(surface)
+            CardDefaults.cardColors(containerColor = tinted.copy(alpha = fade))
         }
 
     val border =
@@ -361,3 +363,5 @@ fun ContactItemArchivedPreview() {
 }
 
 private const val SELECTED_TINT_ALPHA = 0.3f
+private const val NEARLY_WHITE_ALPHA = 0.9f
+private const val LIGHT_SURFACE_LUMINANCE = 0.5f
