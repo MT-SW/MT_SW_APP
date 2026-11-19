@@ -131,11 +131,10 @@ private fun ThinSwitch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinSwitch")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
-    val tint = scheme.primary.copy(alpha = ON_TINT_ALPHA * progress * alpha)
+    val edge = lerp(thinTrackColor(), themeAccent(), progress).copy(alpha = alpha)
+    val tint = themeAccent().copy(alpha = ON_TINT_ALPHA * progress * alpha)
     val toggle =
         if (onCheckedChange != null) {
             Modifier.toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
@@ -198,11 +197,10 @@ private fun ThinCheckbox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (checked) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinCheckbox")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
-    val mark = scheme.primary.copy(alpha = progress * alpha)
+    val edge = lerp(thinTrackColor(), themeAccent(), progress).copy(alpha = alpha)
+    val mark = themeAccent().copy(alpha = progress * alpha)
     val touch =
         if (onCheckedChange != null) {
             Modifier.minimumInteractiveComponentSize()
@@ -301,7 +299,7 @@ private fun ThinSliderTrack(state: SliderState, enabled: Boolean) {
 @Composable
 private fun ThinSliderThumb(enabled: Boolean) {
     val scheme = MaterialTheme.colorScheme
-    val ring = scheme.primary.copy(alpha = if (enabled) 1f else DISABLED_ALPHA)
+    val ring = themeAccent().copy(alpha = if (enabled) 1f else DISABLED_ALPHA)
     val fill = scheme.surface
     Box(
         modifier =
@@ -355,11 +353,10 @@ private fun ThinRadioButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val scheme = MaterialTheme.colorScheme
     val progress by animateFloatAsState(if (selected) 1f else 0f, tween(SWITCH_ANIMATION_MILLIS), label = "thinRadio")
     val alpha = if (enabled) 1f else DISABLED_ALPHA
-    val edge = lerp(thinTrackColor(), scheme.primary, progress).copy(alpha = alpha)
-    val mark = scheme.primary.copy(alpha = progress * alpha)
+    val edge = lerp(thinTrackColor(), themeAccent(), progress).copy(alpha = alpha)
+    val mark = themeAccent().copy(alpha = progress * alpha)
     val touch =
         if (onClick != null) {
             Modifier.minimumInteractiveComponentSize()
@@ -378,12 +375,10 @@ private fun ThinRadioButton(
 
 /** The thin outline of a chip or a segment: grey when off, in the theme colour when chosen. */
 @Composable
-@ReadOnlyComposable
 private fun thinChoiceBorder(selected: Boolean, enabled: Boolean): BorderStroke {
-    val scheme = MaterialTheme.colorScheme
     val alpha = if (enabled) 1f else DISABLED_ALPHA
     val track = thinTrackColor()
-    val color = if (selected) scheme.primary.copy(alpha = alpha) else track.copy(alpha = track.alpha * alpha)
+    val color = if (selected) themeAccent().copy(alpha = alpha) else track.copy(alpha = track.alpha * alpha)
     return BorderStroke(STROKE_DP.dp, color)
 }
 
@@ -403,7 +398,6 @@ fun FilterChip(
     interactionSource: MutableInteractionSource? = null,
 ) {
     if (rememberThinControls()) {
-        val scheme = MaterialTheme.colorScheme
         MaterialFilterChip(
             selected = selected,
             onClick = onClick,
@@ -417,8 +411,8 @@ fun FilterChip(
             FilterChipDefaults.filterChipColors(
                 containerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
-                selectedContainerColor = scheme.primary.copy(alpha = ON_TINT_ALPHA),
-                selectedLabelColor = scheme.primary,
+                selectedContainerColor = themeAccent().copy(alpha = ON_TINT_ALPHA),
+                selectedLabelColor = themeAccent(),
             ),
             elevation = null,
             border = thinChoiceBorder(selected, enabled),
@@ -464,8 +458,8 @@ fun SingleChoiceSegmentedButtonRowScope.SegmentedButton(
             enabled = enabled,
             colors =
             SegmentedButtonDefaults.colors(
-                activeContainerColor = scheme.primary.copy(alpha = ON_TINT_ALPHA),
-                activeContentColor = scheme.primary,
+                activeContainerColor = themeAccent().copy(alpha = ON_TINT_ALPHA),
+                activeContentColor = themeAccent(),
                 inactiveContainerColor = Color.Transparent,
                 inactiveContentColor = scheme.onSurface,
             ),

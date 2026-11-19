@@ -98,12 +98,11 @@ internal fun thinTrackColor(): Color = if (MaterialTheme.colorScheme.surface.lum
  * otherwise it grows from grey to the colour of the theme (yellow in the default theme) as [progress] goes from 0 to 1.
  */
 @Composable
-@ReadOnlyComposable
 internal fun thinFillColor(progress: Float, color: Color = Color.Unspecified): Color {
     if (color != Color.Unspecified) return color
     val dark = MaterialTheme.colorScheme.surface.luminance() < DARK_THEME_LUMINANCE
     val start = if (dark) DARK_THEME_START else LIGHT_THEME_START
-    return lerp(start, MaterialTheme.colorScheme.primary, progress.coerceIn(0f, 1f))
+    return lerp(start, themeAccent(), progress.coerceIn(0f, 1f))
 }
 
 /** True when the progress indicators are drawn as thin iPhone-style outlines (the "Look" setting). */
@@ -261,7 +260,7 @@ fun ProgressSpinner(modifier: Modifier = Modifier, size: Dp = 48.dp, color: Colo
 @Composable
 private fun ThinProgressSpinner(size: Dp, color: Color, modifier: Modifier = Modifier) {
     val track = thinTrackColor()
-    val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
+    val edge = if (color == Color.Unspecified) themeAccent() else color
     val turn by
         rememberInfiniteTransition(label = "spinner")
             .animateFloat(
@@ -333,7 +332,7 @@ fun IndeterminateProgressLine(modifier: Modifier = Modifier, color: Color = Colo
         return
     }
     val track = thinTrackColor()
-    val edge = if (color == Color.Unspecified) MaterialTheme.colorScheme.primary else color
+    val edge = if (color == Color.Unspecified) themeAccent() else color
     val slide by
         rememberInfiniteTransition(label = "line")
             .animateFloat(

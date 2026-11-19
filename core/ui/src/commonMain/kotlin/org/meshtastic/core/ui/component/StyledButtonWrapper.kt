@@ -164,6 +164,11 @@ private const val GREY_RED = 0.299f
 private const val GREY_GREEN = 0.587f
 private const val GREY_BLUE = 0.114f
 
+/** The accent colour of the theme for small elements (sliders, switches, progress bars), at the chosen brightness. */
+@Composable
+internal fun themeAccent(): Color =
+    MaterialTheme.colorScheme.primary.withBrightness(UiOptions.elementBrightness(rememberUiOptions()))
+
 /** The colours of an outline-glass button: the accent of a working one, or the grey of a switched-off one. */
 internal data class OutlineGlassLook(val accent: Color, val active: Boolean, val text: Color, val disabledText: Color)
 
