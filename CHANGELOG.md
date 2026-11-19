@@ -112,6 +112,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 * Scalone zmiany oryginału (wersja 2.8.5 i późniejsze): m.in. kreator konfiguracji radia, kody połączenia QR/NFC, aktualizacja bootloadera nRF52 przez Bluetooth i nowsze biblioteki.
 * Usunięte widżety „Statystyki lokalne” i „Śledzenie węzła”: został jeden widżet MT_SW.
+* Z kodu usunięte także widżety „Telemetria” i „Śledzenie węzła” z oryginału (po migracji wrócił kod widżetu telemetrii): zostają tylko nasze widżety, Statystyki MT_SW i SOS.
 * iPhone/iPad: najstarszy obsługiwany system to iOS 17, a identyfikator aplikacji to pl.sw.mt, jak na Androidzie.
 * Budowanie dostosowane do nowego Gradle.
 * Metryki środowiskowe: wszystkie wartości (temperatura, wilgotność, ciśnienie i inne) są na jednym wspólnym wykresie, jak dawniej; oryginał rozdzielił je na osobne wykresy. Zasilanie zostaje w osobnej zakładce.
@@ -1000,6 +1001,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Changes against the original
 
+* The original's “Telemetry” and “Node Tracker” widgets are removed from the code as well (the telemetry widget code came back with the migration): only our own widgets remain, MT_SW statistics and SOS.
 * Merged changes of the original (version 2.8.5 and later): among others the radio setup wizard, QR/NFC connection codes, an nRF52 bootloader update over Bluetooth and newer libraries.
 * The "Local statistics" and "Node tracker" widgets were removed: one MT_SW widget is left.
 * iPhone/iPad: the oldest supported system is iOS 17, and the app identifier is pl.sw.mt, like on Android.

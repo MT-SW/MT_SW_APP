@@ -17,35 +17,25 @@
 package org.meshtastic.feature.widget
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.updateAll
-import androidx.glance.state.PreferencesGlanceStateDefinition
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.AppWidgetUpdater
 
-private const val TRACKER_UPDATE_SAMPLE_MS = 1_000L
 private const val MESH_STATUS_ROTATION_MS = 60_000L
 
 @Single
 class AndroidAppWidgetUpdater(
     private val context: Context,
-    trackerDataSource: NodeTrackerWidgetDataSource,
     meshStatusProvider: MeshStatusWidgetStateProvider,
-    telemetryDataSource: TelemetryWidgetDataSource,
 ) : AppWidgetUpdater {
     @Suppress("InjectDispatcher") // feature:widget does not depend on core:di, where CoroutineDispatchers lives
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -64,50 +54,13 @@ class AndroidAppWidgetUpdater(
                 if (hasInstances(MeshStatusWidget::class.java)) update(MeshStatusWidget())
             }
         }
-
-        // Sampled rather than debounced: on a busy mesh the node DB changes faster than any debounce window, which
-        // would starve the trackers. Only the rendered state of the tracked nodes counts as a change.
-        @OptIn(FlowPreview::class)
-        scope.launch {
-            trackerDataSource.checkedInputs
-                .sample(TRACKER_UPDATE_SAMPLE_MS)
-                .map { inputs -> trackedNodeNums().map { nodeTrackerState(it, inputs) } }
-                .distinctUntilChanged()
-                .collect { states -> if (states.isNotEmpty()) update(NodeTrackerWidget()) }
-        }
-
-        // Each telemetry packet replaces its group on the node, so a change to a shown node's metrics is a new
-        // reading. The instance reads the reading's time from the log when it renders.
-        @OptIn(FlowPreview::class)
-        scope.launch {
-            telemetryDataSource.checkedInputs
-                .sample(TRACKER_UPDATE_SAMPLE_MS)
-                .map { inputs ->
-                    val units = listOf(inputs.units, inputs.temperatureUnit)
-                    units + telemetryNodeNums().map { num -> num?.let { inputs.nodes[it]?.telemetryKey() } }
-                }
-                .distinctUntilChanged()
-                .collect { keys -> if (keys.isNotEmpty()) update(TelemetryWidget()) }
-        }
     }
-
-    private suspend fun telemetryNodeNums(): List<Int?> =
-        GlanceAppWidgetManager(context).getGlanceIds(TelemetryWidget::class.java).map { id ->
-            getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, id)[TELEMETRY_NODE_NUM_KEY]
-        }
 
     private suspend fun hasInstances(widget: Class<out GlanceAppWidget>): Boolean =
         GlanceAppWidgetManager(context).getGlanceIds(widget).isNotEmpty()
 
-    private suspend fun trackedNodeNums(): List<Int?> =
-        GlanceAppWidgetManager(context).getGlanceIds(NodeTrackerWidget::class.java).map { id ->
-            getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, id)[TRACKED_NODE_NUM_KEY]
-        }
-
     override suspend fun updateAll() {
-        update(NodeTrackerWidget())
         update(MeshStatusWidget())
-        update(TelemetryWidget())
     }
 
     private suspend fun update(widget: GlanceAppWidget) {

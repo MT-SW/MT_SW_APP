@@ -4,15 +4,14 @@
 
 The `:feature:widget` module holds the **Android-only Jetpack Glance home-screen widgets** (API 26+):
 
-- `NodeTrackerWidget` follows one node the user picks: battery, signal, last heard, hops away and distance from our node.
-- `TelemetryWidget` shows one node's environment, air quality and power readings as tiles (meshtastic/design#179).
+- `MeshStatusWidget` (MT_SW statistics) shows the same statistics as the permanent notification.
+- `SosWidget` sends the alarm after several quick taps.
 
 **Target: Android only** (not KMP — uses `meshtastic.android.library` + `meshtastic.android.library.compose` convention plugins)
 
 ## Key Responsibilities
 
-- Display live mesh statistics and a tracked node on the Android home screen via Jetpack Glance
-- Pick the tracked node in `NodeTrackerConfigActivity`, the widget's configuration activity, and store it per instance in Glance state
+- Display live mesh statistics and the SOS button on the Android home screen via Jetpack Glance
 - Fulfill the `AppWidgetUpdater` interface from `:core:repository` so the mesh service can trigger widget refreshes without depending on Android widget APIs
 
 ## Source Structure
@@ -21,61 +20,11 @@ The `:feature:widget` module holds the **Android-only Jetpack Glance home-screen
 src/main/kotlin/org/meshtastic/feature/widget/
 ├── WidgetSizes.kt                   ← size thresholds, line budget and type scale shared by both widgets
 ├── WidgetComponents.kt              ← brand header, identity row, stat and bar rows, status body
-├── NodeTrackerWidget.kt             ← GlanceAppWidget, readings, not-found state
-├── NodeTrackerLayouts.kt            ← one layout per breakpoint
-├── NodeTrackerWidgetReceiver.kt     ← GlanceAppWidgetReceiver
-├── NodeTrackerWidgetState.kt        ← NodeTrackerWidgetState, nodeTrackerState(), DataSource
-├── NodeTrackerConfigActivity.kt     ← APPWIDGET_CONFIGURE node picker (Compose, Material 3)
-├── NodeTrackerCandidates.kt         ← picker filter and order
-├── TelemetryWidget.kt               ← GlanceAppWidget, per-instance state, tap target
-├── TelemetryLayouts.kt              ← one tile, four in a row, paged 2x2 grid, footer
-├── TelemetryTiles.kt                ← each reading's icon, label, value, band line
-├── TelemetryReadings.kt             ← the readings in design order, the newest snapshot and its time
-├── TelemetryWidgetState.kt          ← TelemetryWidgetState, telemetryWidgetState(), DataSource, last-known keys
-├── TelemetryWidgetReceiver.kt       ← GlanceAppWidgetReceiver
-├── TelemetryConfigActivity.kt       ← APPWIDGET_CONFIGURE node and hidden-readings setup
-├── TelemetryPageAction.kt           ← ActionCallback (page button)
-├── WidgetNodeChip.kt                ← node chip shared by both widgets
 ├── AndroidAppWidgetUpdater.kt       ← implements AppWidgetUpdater (core:repository)
 ├── WidgetResourceEnvironment.kt     ← bridges Compose resources into Glance
 └── di/
     └── FeatureWidgetModule.kt
 ```
-
-## Node Tracker
-
-Each instance stores its node number under `TRACKED_NODE_NUM_KEY` in its Glance Preferences state, and the last reading it rendered from a node DB under the `last_known_*` keys, which it shows dimmed while no node DB is open. `NodeTrackerConfigActivity` writes it, from the launcher's `APPWIDGET_CONFIGURE` on placement or reconfiguration (`widgetFeatures="reconfigurable"`), or from the widget's own "Node not found" state. The activity is exported for the launcher, so it honors only widget ids bound to `NodeTrackerWidgetReceiver`, and it returns `RESULT_CANCELED` unless a node is picked.
-
-| Size | Data shown |
-|---|---|
-| Under 90 dp tall (one landscape row) | Mark, node chip, battery, long name, last heard; wide adds hops |
-| 90 to 180 dp tall (2x1 portrait on a Pixel) | Compact header, chip and battery, long name beside last heard; wide adds hops |
-| Two rows and up | Header, chip and battery, long name (two lines when the readings leave a line over), then the first four of last heard, hops, distance (only while connected), SNR and RSSI (direct, non-MQTT nodes only); three rows show all five at the default font scale (a larger font drops lines, and from four cells wide columns), and four cells wide lays them out two to a line |
-
-`nodeTrackerState()` maps the node DB to what one instance renders. A node not heard within the app's online window keeps its chip colors and greys its values; the provider's 30-minute `updatePeriodMillis` re-renders a node that has gone quiet. Tapping opens the node's details through the `nodes/<num>` deep link. The picker lists favorites first, then the most recently heard, leaving out our own node and ignored nodes.
-
-The widget holds no lazy collection, which the `ActionTrampolineActivity` removal in `androidApp/src/main/AndroidManifest.xml` relies on.
-
-## Telemetry
-
-Each instance stores its node under `TELEMETRY_NODE_NUM_KEY`, the readings to hide under `TELEMETRY_HIDDEN_KEY`, and the page under `TELEMETRY_PAGE_KEY`. `TelemetryConfigActivity` writes the first two: it starts on our own node when that node reports any of these readings, lists only nodes that have, filtered by the search field against name and node id as the Node Tracker picker is, and shows every reading the chosen node has reported with a switch to hide it.
-
-The tiles are every reading the node has reported, in the design#179 order, less the hidden ones. The values come from the node DB, which holds each group's latest packet; the stored log (`MeshLogRepository.getTelemetryFrom`) adds the readings the node used to send and the time of the newest one, which it gives only when its newest row of a group holds the node DB's values. The instance also remembers every reading it has seen (`TELEMETRY_SEEN_KEY`), so a reading the node stops sending keeps its tile with a dash even with logging off; a reported zero is a value. With no time from the log, the reading counts as over two hours old once the node itself has not been heard for two hours.
-
-| Size | Data shown |
-|---|---|
-| Narrower than 130 dp (under two columns) | The first reading, with the chip above it from 90 dp tall; the age line drops its "Updated" prefix |
-| 130 dp and wider, under 180 dp tall | The first two in a row, four from 320 dp (four cells), with the chip in the footer from 90 dp tall; under 90 dp each tile keeps its icon and value. Four tiles in a two-cell row show only their icons |
-| 130 by 180 dp and up | Chip, a 2x2 grid of four, and a footer with the age and, with more than four readings, a page button |
-
-The page button runs `TelemetryPageAction`, which moves the stored page on and wraps it, and the layout wraps a stored page past the last, so hiding readings never strands it. A short last page keeps the grid's empty cells. Once the newest reading is over two hours old the footer says so in the error color; the tiles stay at full strength. The layouts fill their cell by weight, so they read no cell size beyond the three breakpoints. The last rendered snapshot sits under the `telemetry_last_*` keys, protos as base64, for when no node DB is open. Tapping opens the node's environment metrics, or power metrics when only power readings show. Nothing is sent over the mesh.
-
-## Key Types
-
-### `WidgetSizes`
-
-Both widgets compose under `SizeMode.Responsive`: the launcher picks the breakpoint that fits the cell (three widths, 130, 200 and 320 dp, at five heights, 48, 90, 180, 260 and 350 dp, every combination, since a missing one would route a 4x3 cell to a two-row tier), and `WidgetSizes.cell` reads the cell's real bounds from the widget options as `AppWidgetManager` holds them now (Glance's own copy refreshes only on the launcher's options broadcast, which a resize does not always send) (min width by max height is the portrait cell, max width by min height the landscape one), taking the current orientation's cell when the breakpoint fits in it and the other's when it fits there, so the tall layouts count their reading lines from the height they really have. `SizeMode.Exact` would hand the real bounds over directly, but it composes only for the sizes the launcher reports, and a Pixel launcher that reported stale sizes after a resize showed the compact layout in a four-row cell. A stale option under `Responsive` costs slack, never the wrong layout, and the cell is capped at the next breakpoint in each direction, so the layout the launcher shows between a resize and the recomposition it triggers was counted for a cell of its own tier. Each threshold sits just under the smallest cell span it catches. On a Pixel 6a a 2x2 widget measures 179x202 dp in portrait and 394x107 dp in landscape; on the API 36 emulator's Pixel launcher 2x2 is 172x234 dp and a row is 117 dp. The picker preview has no cell to read, so `previewSizeMode` is a smaller `Responsive` set with two measured 2x2 cells added. Both providers set `targetCellWidth`/`targetCellHeight` to 2x2 and `minResizeHeight` to one row.
-
 
 Glance doesn't provide the Compose UI locals that Compose Multiplatform's `stringResource` reads, so `WidgetResourceEnvironment` bridges them into the widget's composition; every translated string in the widget depends on it. A composition failure shows the `widget_composition_error` layout through `onCompositionError` instead of crashing the app.
 
@@ -88,20 +37,17 @@ The mesh service holds a reference to `AppWidgetUpdater` (defined in `:core:repo
 @Single
 class AndroidAppWidgetUpdater(
     private val context: Context,
-    trackerDataSource: NodeTrackerWidgetDataSource,
-    telemetryDataSource: TelemetryWidgetDataSource,
+    meshStatusProvider: MeshStatusWidgetStateProvider,
 ) : AppWidgetUpdater {
     override suspend fun updateAll() {
-        NodeTrackerWidget().updateAll(context)
-        TelemetryWidget().updateAll(context)
+        MeshStatusWidget().updateAll(context)
     }
 }
 ```
 
 It also drives re-renders itself, because Glance compositions are ephemeral:
 
-- Node Tracker: samples `trackerDataSource.inputs` once a second, maps it to each instance's rendered state, and updates only when one of those changes. Sampling rather than debouncing keeps a busy mesh from starving the update.
-- Telemetry: samples `telemetryDataSource.checkedInputs` the same way and updates when a shown node's metrics, channel labels or identity change.
+- MT_SW statistics: redrawn when `meshStatusProvider.state` changes and every minute, because it rotates between nodes.
 
 This keeps the service layer platform-agnostic while still enabling widget refresh on data changes.
 
@@ -113,7 +59,7 @@ This keeps the service layer platform-agnostic while still enabling widget refre
 feature:widget (Android only)
   ├── core:common, core:model, core:navigation, core:resources, core:repository, core:ui
   ├── androidx.glance.appwidget, glance.material3, glance.preview, glance.appwidget.preview
-  ├── androidx.activity.compose, compose.multiplatform.material3 (NodeTrackerConfigActivity)
+  ├── androidx.activity.compose, compose.multiplatform.material3
   ├── compose.multiplatform.ui (LocalConfiguration, LocalDensity), compose.multiplatform.resources
   └── kermit
 ```

@@ -526,8 +526,8 @@
             and actionRunCallback() a direct PendingIntent.getBroadcast() to ActionCallbackBroadcastReceiver.
 
             So this is dead-but-launchable library code: an exported=false activity that crashes the process on every
-            launch and that our widgets can never legitimately reach (none of NodeTrackerWidget or TelemetryWidget has a
-            lazy collection, and a tap on either dispatches its own PendingIntent directly). Same defect class as the ATAK marker below. Removing the
+            launch and that our widgets can never legitimately reach (neither MeshStatusWidget nor SosWidget has a
+            lazy collection, and a tap on either one dispatches its own PendingIntent directly). Same defect class as the ATAK marker below. Removing the
             node is the whole fix - it takes the component out of the merged manifest so it cannot be started.
 
             If glance is ever bumped, re-verify that ActionTrampolineType.ACTIVITY still has no producer before

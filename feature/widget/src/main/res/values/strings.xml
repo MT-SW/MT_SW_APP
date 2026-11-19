@@ -18,13 +18,9 @@
 <resources>
     <string name="widget_local_stats_label">MT_SW_APP</string>
     <!-- Not in Crowdin: picker text must be an Android resource, and crowdin.yml sources composeResources only. -->
-    <string name="widget_node_tracker_label">Node Tracker</string>
-    <string name="widget_node_tracker_description">Battery, signal and last heard for one node you pick</string>
     <string name="widget_mesh_status_label">MT_SW statistics</string>
     <string name="widget_mesh_status_description">The same statistics as the permanent notification: mesh status or one tracked node</string>
     <string name="widget_sos_label">SOS</string>
     <string name="widget_sos_description">Tap it quickly several times in a row to send the alarm (the number is set in SOS)</string>
-    <string name="widget_telemetry_label">Telemetry</string>
-    <string name="widget_telemetry_description">Environment, air quality and power readings from one node</string>
     <string name="widget_sos_sent">Sent</string>
 </resources>
