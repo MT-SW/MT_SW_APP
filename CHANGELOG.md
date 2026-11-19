@@ -108,6 +108,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Zasięgi z trasy rozpoznają pozycje usłyszane bezpośrednio także wtedy, gdy radio nie podaje rodzaju transportu.
 * Okno sąsiadów miało dwa przyciski robiące to samo; teraz jest jeden „Zamknij”.
 * Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
+* Przyciski z obrysem (np. „Wymuś zatrzymanie aplikacji”): poświata nie jest już ucinana po bokach i na dole przez listę lub kolumnę wokół; teraz zostaje wewnątrz przycisku.
 
 ##### Zmiany względem oryginału
 
@@ -1000,6 +1001,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Ranges from a route recognise positions heard directly also when the radio gives no kind of transport.
 * The neighbours window had two buttons that did the same; now there is one "Close".
 * The download of buildings goes on after leaving the screen instead of being cut off silently.
+* Outlined buttons (for example “Force stop the app”): the glow is no longer cut off at the sides and at the bottom by the list or column around them; it now stays inside the button.
 
 ##### Changes against the original
 

@@ -351,12 +351,16 @@ internal fun Modifier.outlineGlassSurface(shape: Shape, decor: FilledDecor): Mod
     val outline = shape.createOutline(size, layoutDirection, this)
     val edge = decor.outlineWidthDp.dp.toPx()
     if (look.active && decor.glow > 0f) {
-        for (layer in OUTLINE_GLOW_LAYERS downTo 1) {
-            drawOutline(
-                outline = outline,
-                color = accent.copy(alpha = (OUTLINE_GLOW_LAYER_ALPHA * decor.glow).coerceAtMost(1f)),
-                style = Stroke(width = edge + layer * OUTLINE_GLOW_STEP_DP.dp.toPx()),
-            )
+        // The glow stays inside the button: drawn outside its bounds it was cut off by the list or column around it
+        // (a flat edge on the sides and at the bottom). The strokes are twice as wide, so the visible half is inside.
+        clipPath(outlinePath(outline)) {
+            for (layer in OUTLINE_GLOW_LAYERS downTo 1) {
+                drawOutline(
+                    outline = outline,
+                    color = accent.copy(alpha = (OUTLINE_GLOW_LAYER_ALPHA * decor.glow).coerceAtMost(1f)),
+                    style = Stroke(width = 2 * (edge + layer * OUTLINE_GLOW_STEP_DP.dp.toPx())),
+                )
+            }
         }
     }
     drawOutline(
