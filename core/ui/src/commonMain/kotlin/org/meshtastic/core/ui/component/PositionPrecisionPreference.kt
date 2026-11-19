@@ -54,11 +54,7 @@ fun PositionPrecisionPreference(
     enabled: Boolean,
     onValueChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    maxPrecision: Int = POSITION_ENABLED,
 ) {
-    // Kanał z publicznym kluczem nie może mieć dokładnej pozycji: wartość i suwak są ograniczone do maxPrecision.
-    val capped = maxPrecision < POSITION_ENABLED
-    val shown = if (capped) value.coerceAtMost(maxPrecision) else value
     val unit =
         if (LocalInspectionMode.current) {
             // Previews and screenshot tests render with no Koin application; the value itself is arbitrary there.
@@ -70,18 +66,18 @@ fun PositionPrecisionPreference(
     Column(modifier = modifier) {
         SwitchPreference(
             title = stringResource(Res.string.position_enabled),
-            checked = shown != POSITION_DISABLED,
+            checked = value != POSITION_DISABLED,
             enabled = enabled,
             onCheckedChange = { enabled ->
-                val newValue = if (enabled) maxPrecision else POSITION_DISABLED
+                val newValue = if (enabled) POSITION_ENABLED else POSITION_DISABLED
                 onValueChanged(newValue)
             },
             padding = PaddingValues(0.dp),
         )
-        if (shown != POSITION_DISABLED && !capped) {
+        if (value != POSITION_DISABLED) {
             SwitchPreference(
                 title = stringResource(Res.string.precise_location),
-                checked = shown == POSITION_ENABLED,
+                checked = value == POSITION_ENABLED,
                 enabled = enabled,
                 onCheckedChange = { enabled ->
                     val newValue = if (enabled) POSITION_ENABLED else POSITION_PRECISION_DEFAULT
@@ -90,18 +86,17 @@ fun PositionPrecisionPreference(
                 padding = PaddingValues(0.dp),
             )
         }
-        if (shown in (POSITION_DISABLED + 1)..maxPrecision && shown < POSITION_ENABLED) {
-            val sliderMax = if (capped) maxPrecision else POSITION_PRECISION_MAX
+        if (value in (POSITION_DISABLED + 1) until POSITION_ENABLED) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Slider(
-                    value = shown.toFloat(),
+                    value = value.toFloat(),
                     onValueChange = { onValueChanged(it.roundToInt()) },
                     enabled = enabled,
-                    valueRange = POSITION_PRECISION_MIN.toFloat()..sliderMax.toFloat(),
-                    steps = sliderMax - POSITION_PRECISION_MIN - 1,
+                    valueRange = POSITION_PRECISION_MIN.toFloat()..POSITION_PRECISION_MAX.toFloat(),
+                    steps = POSITION_PRECISION_MAX - POSITION_PRECISION_MIN - 1,
                 )
 
-                val precisionMeters = precisionRadiusMetersOrNull(shown)?.toInt()
+                val precisionMeters = precisionRadiusMetersOrNull(value)?.toInt()
                 Text(
                     text = "± ${precisionMeters?.toDistanceString(unit).orEmpty()}",
                     modifier = Modifier.padding(bottom = 16.dp),

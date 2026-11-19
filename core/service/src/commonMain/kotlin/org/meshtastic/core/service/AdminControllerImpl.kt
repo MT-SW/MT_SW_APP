@@ -32,7 +32,6 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.HamName
 import org.meshtastic.core.model.Position
-import org.meshtastic.core.model.util.withSafePositionPrecision
 import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.AdminEditScope
 import org.meshtastic.core.repository.AwaitedSendStatus
@@ -216,24 +215,22 @@ internal class AdminControllerImpl(
     // ── Channels ────────────────────────────────────────────────────────────
 
     override suspend fun setLocalChannel(channel: Channel) {
-        val safe = channel.withSafePositionPrecision()
         val packetId = commandSender.generatePacketId()
-        heardOnCurrentLoraRefresher.beforeLocalWrite(safe, packetId)
+        heardOnCurrentLoraRefresher.beforeLocalWrite(channel, packetId)
         commandSender.sendAdmin(myNodeNum, packetId) {
-            AdminMessage.Builder().also { wb -> wb.set_channel = safe }.build()
+            AdminMessage.Builder().also { wb -> wb.set_channel = channel }.build()
         }
-        scope.handledLaunch { radioConfigRepository.updateChannelSettings(safe) }
+        scope.handledLaunch { radioConfigRepository.updateChannelSettings(channel) }
     }
 
     override suspend fun setRemoteChannel(destNum: Int, channel: Channel, packetId: Int) {
-        val safe = channel.withSafePositionPrecision()
         val isLocal = destNum == nodeManager.myNodeNum.value
-        if (isLocal) heardOnCurrentLoraRefresher.beforeLocalWrite(safe, packetId)
+        if (isLocal) heardOnCurrentLoraRefresher.beforeLocalWrite(channel, packetId)
         commandSender.sendAdmin(destNum, packetId) {
-            AdminMessage.Builder().also { wb -> wb.set_channel = safe }.build()
+            AdminMessage.Builder().also { wb -> wb.set_channel = channel }.build()
         }
         if (isLocal) {
-            scope.handledLaunch { radioConfigRepository.updateChannelSettings(safe) }
+            scope.handledLaunch { radioConfigRepository.updateChannelSettings(channel) }
         }
     }
 
@@ -438,7 +435,7 @@ internal class AdminControllerImpl(
         // here could expose a partial cache if a later write or commit fails.
         override suspend fun setChannel(channel: Channel) =
             commandSender.sendAdminForConnection(destNum, connectionVersion) {
-                AdminMessage.Builder().also { wb -> wb.set_channel = channel.withSafePositionPrecision() }.build()
+                AdminMessage.Builder().also { wb -> wb.set_channel = channel }.build()
             }
 
         override suspend fun setFixedPosition(position: Position) {

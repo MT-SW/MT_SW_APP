@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.util.CHANNEL_DESCRIPTION_MAX_LENGTH
-import org.meshtastic.core.model.util.PUBLIC_CHANNEL_MAX_POSITION_PRECISION
-import org.meshtastic.core.model.util.hasPublicKey
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.channel_description
@@ -53,8 +51,6 @@ import org.meshtastic.core.ui.component.PositionPrecisionPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.ModuleSettings
-
-private const val PRECISION_UNLIMITED = 32
 
 @Suppress("LongMethod")
 @Composable
@@ -165,8 +161,6 @@ fun EditChannelDialog(
                 PositionPrecisionPreference(
                     enabled = true,
                     value = moduleSettings.position_precision,
-                    maxPrecision =
-                    if (channelInput.hasPublicKey) PUBLIC_CHANNEL_MAX_POSITION_PRECISION else PRECISION_UNLIMITED,
                     onValueChanged = {
                         val updatedModule =
                             moduleSettings.newBuilder().also { wb -> wb.position_precision = it }.build()
