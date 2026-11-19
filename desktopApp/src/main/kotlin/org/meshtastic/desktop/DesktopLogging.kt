@@ -152,7 +152,8 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                 MtSwLogging.writeReportZip(
                     out,
                     since,
-                    extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
+                    extras =
+                    listOf("opis_zgloszenia.txt" to note.toByteArray()) + windowExtras(withLogs) + extras,
                     extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
                 )
             }
@@ -200,3 +201,33 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
     }
         .getOrDefault(false)
 }
+
+/**
+ * What the window looks like, for a report about the layout: its size, place and screen (always) and a picture of it
+ * (only together with the logs, because the picture can show messages). Best effort: when the system refuses the
+ * picture (macOS without the screen recording permission), the report still gets the sizes.
+ */
+private fun windowExtras(withPicture: Boolean): List<Pair<String, ByteArray>> = runCatching {
+    val windows = java.awt.Window.getWindows().filter { it.isShowing && it is java.awt.Frame }
+    val window = windows.firstOrNull() ?: return@runCatching emptyList()
+    val screens = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
+    val info = buildString {
+        appendLine("Okno: ${window.width} x ${window.height} px (położenie ${window.x}, ${window.y})")
+        appendLine("Okno widoczne w całości: ${window.isShowing}")
+        screens.forEachIndexed { index, device ->
+            val mode = device.displayMode
+            val scale = device.defaultConfiguration.defaultTransform.scaleX
+            val bounds = device.defaultConfiguration.bounds
+            appendLine("Ekran ${index + 1}: ${mode.width} x ${mode.height}, skala $scale, $bounds")
+        }
+    }
+    val result = mutableListOf("okno.txt" to info.toByteArray())
+    if (withPicture) {
+        val image = java.awt.Robot().createScreenCapture(java.awt.Rectangle(window.locationOnScreen, window.size))
+        val bytes = java.io.ByteArrayOutputStream()
+        javax.imageio.ImageIO.write(image, "png", bytes)
+        result += "okno.png" to bytes.toByteArray()
+    }
+    result
+}
+    .getOrDefault(emptyList())
