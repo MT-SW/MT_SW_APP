@@ -110,6 +110,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
 * Przyciski z obrysem (np. „Wymuś zatrzymanie aplikacji”): poświata nie jest już ucinana po bokach i na dole przez listę lub kolumnę wokół; teraz zostaje wewnątrz przycisku.
 * Lista węzłów i lista urządzeń na ekranie Połączenie (komputer, iPad): cienie kart przy stylu z głębią nie są już ucinane po bokach, bo lista zostawia po bokach miejsce na cień (po przeniesieniu paska na dół karty dotykały brzegu okna).
+* Komputer i tablet z pływającym paskiem na dole: zawartość ma 8 dp marginesu po lewej i prawej, tak jak miała ją przy pasku z boku, bo bez niego karty i górne belki dotykały brzegu okna i ich krawędzie wyglądały na ucięte.
 
 ##### Zmiany względem oryginału
 
@@ -1004,6 +1005,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * The download of buildings goes on after leaving the screen instead of being cut off silently.
 * Outlined buttons (for example “Force stop the app”): the glow is no longer cut off at the sides and at the bottom by the list or column around them; it now stays inside the button.
 * Node list and device list on the Connections screen (computer, iPad): the shadows of the cards in the depth look are no longer cut off at the sides, because the list now leaves room for the shadow at its sides (after the bar moved to the bottom the cards touched the edge of the window).
+* Computer and tablet with the floating bar at the bottom: the content has an 8 dp margin at the left and the right, as it had with the bar at the side, because without it the cards and the top bars touched the edge of the window and their edges looked cut off.
 
 ##### Changes against the original
 

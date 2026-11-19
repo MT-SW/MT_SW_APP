@@ -198,6 +198,7 @@ fun MeshtasticNavigationSuite(
             barHeight = barHeight,
             barBottomGap = barBottomGap,
             modifier = modifier,
+            edgeMargin = if (layoutType == NavigationSuiteType.NavigationRail) WIDE_EDGE_MARGIN_DP.dp else 0.dp,
             content = tabContent,
         )
     } else if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
@@ -415,3 +416,6 @@ private fun connectionTooltipLabel(
     connectionState == ConnectionState.DeviceSleep -> stringResource(Res.string.device_sleeping)
     else -> stringResource(Res.string.disconnected)
 }
+
+/** The margin at the left and the right of the content on a wide window with the floating bar. */
+private const val WIDE_EDGE_MARGIN_DP = 8

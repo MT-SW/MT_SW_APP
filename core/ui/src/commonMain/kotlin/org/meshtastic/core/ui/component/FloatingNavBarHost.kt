@@ -179,6 +179,7 @@ internal fun FloatingNavBarHost(
     barHeight: Dp?,
     barBottomGap: Dp,
     modifier: Modifier = Modifier,
+    edgeMargin: Dp = 0.dp,
     content: @Composable () -> Unit,
 ) {
     val options = rememberUiOptions()
@@ -248,6 +249,9 @@ internal fun FloatingNavBarHost(
                     // Only the glass look blurs the content, so only then is it recorded as a source (saves the work).
                     .then(if (style.look == ElementLook.GLASS) Modifier.hazeSource(hazeState) else Modifier)
                     .nestedScroll(scrollConnection)
+                    // On a wide window the side bar used to stand at the left and keep the content off the edge of the
+                    // window; with the bar at the bottom the cards and bars touched it and their edges were cut off.
+                    .padding(horizontal = edgeMargin)
                     .padding(bottom = if (state.underlapCount > 0 || sideWidth != null) 0.dp else inset)
                     .then(if (visible) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier),
             ) {
