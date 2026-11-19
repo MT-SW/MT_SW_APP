@@ -88,6 +88,7 @@ import org.meshtastic.core.ui.navigation.icon
 import org.meshtastic.core.ui.navigation.newIcon
 import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.util.AppIconBadge
 import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
 import org.meshtastic.core.ui.viewmodel.UIViewModel
@@ -114,6 +115,7 @@ fun MeshtasticNavigationSuite(
     val nodeRestartExpected by uiViewModel.nodeRestartExpected.collectAsStateWithLifecycle()
     val watchdogReconnectInFlight by uiViewModel.watchdogReconnectInFlight.collectAsStateWithLifecycle()
     val unreadMessageCount by uiViewModel.unreadMessageCount.collectAsStateWithLifecycle()
+    AppIconBadge(unreadMessageCount)
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
     val floatingNavBar by uiViewModel.floatingNavBar.collectAsStateWithLifecycle()
