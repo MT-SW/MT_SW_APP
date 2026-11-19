@@ -114,6 +114,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Czerwone przyciski (np. „Wymuś zatrzymanie aplikacji”, „Rozłącz”) na jasnych motywach: zamiast jaskrawej czerwieni mają delikatny, nieco nasycony róż, jak na ciemnych motywach.
 * Komputer i tablet: lista urządzeń (prawa część ekranu Połączenie), lista rozmów i lista Zdrowia sieci zostawiają po bokach miejsce na cień i poświatę elementów (co najmniej 8 dp), więc ich krawędzie nie są już ucinane. Na ekranie Połączenie miejsce to pochodzi z pustych marginesów.
 * Górny pasek na komputerze i tablecie dochodzi do samych brzegów okna, a przy kilku kolumnach kolumny stykają się ze sobą (uchwyt do zmiany szerokości jest nałożony na szew), więc paski łączą się w środku w jeden (wewnętrzne dolne rogi są proste), więc jego cień nie jest już ucinany po bokach. Usunięty został 8 dp margines przy brzegu okna, który odsuwał pasek.
+* Przełączanie urządzeń: połączenie TCP (Wi-Fi) wracające z tła jest otwierane od nowa, bo radio nie odpowiadało na ponowne uzgadnianie na starym gnieździe i połączenie „rozpinało się” po ok. 12 s.
 
 ##### Zmiany względem oryginału
 
@@ -1012,6 +1013,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Red buttons (for example “Force stop the app”, “Disconnect”) on light themes: a soft, slightly saturated pink instead of a harsh bright red, as on the dark themes.
 * Computer and tablet: the device list (right part of the Connections screen), the conversation list and the Network health list leave room at their sides for the shadows and glow of the elements (at least 8 dp), so their edges are no longer cut off. On the Connections screen this room comes from the empty margins.
 * The top bar on a computer and a tablet reaches the very edges of the window, and with several columns the columns touch each other (the handle for changing the width is laid over the seam), so the bars join into one in the middle (the inner bottom corners are straight), so its shadow is no longer cut off at the sides. The 8 dp margin at the window edge that kept the bar away is removed.
+* Switching devices: a TCP (Wi-Fi) link coming back from the background is opened again on a new socket, because the radio did not answer a new handshake on the old socket and the connection dropped after about 12 s.
 
 ##### Changes against the original
 
