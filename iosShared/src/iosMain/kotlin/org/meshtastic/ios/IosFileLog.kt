@@ -58,6 +58,7 @@ internal object IosFileLog : LogWriter() {
     const val PART_BYTES = 400L * 1024
     const val RECENT_WINDOW_MS = 24L * 60 * 60 * 1000
     private const val MAX_TOTAL_BYTES = 300L * 1024 * 1024
+    private const val FULL_WINDOW_MS = 7L * 24 * 60 * 60 * 1000
     private const val RECENT_MAX_BYTES = 40L * 1024 * 1024
     private const val MAX_CRASH_FILES = 20
     private const val PART_NUMBER_WIDTH = 3
@@ -257,7 +258,10 @@ internal object IosFileLog : LogWriter() {
 
     /** Drops the parts older than a day while only the automatic log runs; also called every few minutes. */
     fun pruneRecent() {
-        if (levelFlow.value != AppLogLevel.OFF) return
+        if (levelFlow.value != AppLogLevel.OFF) {
+            pruneFullByRecordedTime()
+            return
+        }
         val cutoff = nowMillis() - RECENT_WINDOW_MS
         val all = parts()
         var total = all.sumOf { size(it) }
@@ -267,6 +271,25 @@ internal object IosFileLog : LogWriter() {
                 total -= size(f)
                 runCatching { FileSystem.SYSTEM.delete(f) }
             }
+        }
+    }
+
+    /**
+     * A log switched on by hand keeps seven days of RECORDED time, not calendar time: how long a part took is the time
+     * between its creation and its last line, so a pause of days between two sessions costs nothing and recording goes
+     * on until seven days are filled. Then the oldest parts go.
+     */
+    private fun pruneFullByRecordedTime() {
+        val all = parts()
+        var kept = 0L
+        var drop = false
+        for (f in all.reversed()) {
+            if (drop && f.name != currentName) runCatching { FileSystem.SYSTEM.delete(f) }
+            val meta = FileSystem.SYSTEM.metadataOrNull(f)
+            val end = meta?.lastModifiedAtMillis ?: 0L
+            val start = meta?.createdAtMillis ?: end
+            kept += (end - start).coerceAtLeast(0L)
+            if (kept > FULL_WINDOW_MS) drop = true
         }
     }
 

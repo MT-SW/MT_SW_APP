@@ -42,7 +42,8 @@ import java.util.zip.ZipOutputStream
  *   modules.
  * - A log is a series of parts of about [PART_BYTES] each (`mt_sw_log_<session>_<nnn>.txt`). Every part opens with its
  *   own header, so it can be read alone.
- * - The oldest parts are deleted once all of them together pass [MAX_TOTAL_BYTES].
+ * - The oldest parts are deleted once all of them together pass [MAX_TOTAL_BYTES] or hold more than [FULL_WINDOW_MS]
+ *   (seven days) of recorded time.
  * - The cause of a crash is written to its own small file in `crash/` always, whatever the level: the stack trace and
  *   the memory state, nothing else (no messages, no positions, no keys).
  */
@@ -62,6 +63,9 @@ object MtSwLogging {
     const val RECENT_WINDOW_MS: Long = 24L * 60 * 60 * 1000
     private const val RECENT_MAX_BYTES: Long = 40L * 1024 * 1024
     private const val PRUNE_EVERY_MS = 5L * 60 * 1000
+
+    /** How much recorded time a log the person switched on by hand keeps (a pause in recording is not counted). */
+    const val FULL_WINDOW_MS: Long = 7L * 24 * 60 * 60 * 1000
     private const val PART_NUMBER_WIDTH = 3
     private const val BYTES_IN_MB = 1024 * 1024
 
@@ -308,7 +312,10 @@ object MtSwLogging {
      * under a size limit. Parts of a log the person switched on by hand are never trimmed by age.
      */
     private fun pruneRecent() {
-        if (levelFlow.value != AppLogLevel.OFF) return
+        if (levelFlow.value != AppLogLevel.OFF) {
+            pruneFullByRecordedTime()
+            return
+        }
         val cutoff = System.currentTimeMillis() - RECENT_WINDOW_MS
         val all = parts()
         var total = all.sumOf { it.length() }
@@ -318,6 +325,37 @@ object MtSwLogging {
                 total -= f.length()
                 runCatching { f.delete() }
             }
+        }
+    }
+
+    /**
+     * A log switched on by hand keeps the last [FULL_WINDOW_MS] of RECORDED time, not of calendar time: how long a part
+     * took is the time between its start and its last line, so a pause of days between two sessions costs nothing and
+     * recording simply goes on until seven days are filled. Then the oldest parts go as new lines come.
+     */
+    private fun pruneFullByRecordedTime() {
+        val all = parts()
+        if (all.isEmpty()) return
+        val sessionFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
+        val spans = ArrayList<Long>(all.size)
+        var previous: File? = null
+        for (f in all) {
+            val sessionOf = f.name.removePrefix("mt_sw_log_").substringBefore('_')
+            val start =
+                if (previous != null && previous.name.removePrefix("mt_sw_log_").substringBefore('_') == sessionOf) {
+                    previous.lastModified()
+                } else {
+                    runCatching { sessionFormat.parse(sessionOf)?.time }.getOrNull() ?: f.lastModified()
+                }
+            spans += (f.lastModified() - start).coerceAtLeast(0L)
+            previous = f
+        }
+        var kept = 0L
+        var drop = false
+        for (i in all.indices.reversed()) {
+            if (drop && all[i].name != currentName) runCatching { all[i].delete() }
+            kept += spans[i]
+            if (kept > FULL_WINDOW_MS) drop = true
         }
     }
 
