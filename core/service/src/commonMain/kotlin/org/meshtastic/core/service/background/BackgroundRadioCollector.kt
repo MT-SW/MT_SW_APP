@@ -163,6 +163,7 @@ class BackgroundRadioCollector(
                 bridge.onDeviceFrame(address, bytes.toByteString())
             }
         link.attach { bytes -> pool.send(address, bytes) }
+        pool.awaitReopenGap(address)
         pool.attachBackground(address, link)
         try {
             supervisorScope {

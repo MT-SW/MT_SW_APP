@@ -931,6 +931,7 @@ class SharedRadioInterfaceService(
         Logger.i { "Starting radio transport for ${address.anonymize} (generation=$generation)" }
         val newTransport =
             try {
+                pool.awaitReopenGap(address)
                 pool.attachForeground(address, sessionBoundService)
             } catch (failure: Throwable) {
                 // A failed factory call consumed a generation that may already have reached observers. Keep the

@@ -155,6 +155,9 @@ class MeshConnectionManagerImpl(
      */
     private val consecutiveRecoveryFailures = atomic(0)
 
+    /** Device of the last handshake. Every device has its own failure streak, so a new device starts from zero. */
+    private val lastHandshakeAddress = atomic<String?>(null)
+
     private var connectTimeMsec = 0L
     private var connectionRestored = false
 
@@ -303,6 +306,9 @@ class MeshConnectionManagerImpl(
             serviceRepository.setConnectionState(ConnectionState.Connecting)
         }
         connectTimeMsec = nowMillis
+        // Another device than before: failures of the previous one must not count against this one.
+        val address = radioInterfaceService.getDeviceAddress()
+        if (lastHandshakeAddress.getAndSet(address) != address) consecutiveRecoveryFailures.value = 0
         // A fresh handshake is starting — clear the completion latch so progress signals during
         // this handshake can re-arm the fast watchdog. The latch is set by onHandshakeComplete()
         // and only matters in the window between Stage 2 completion and the subsequent Connected

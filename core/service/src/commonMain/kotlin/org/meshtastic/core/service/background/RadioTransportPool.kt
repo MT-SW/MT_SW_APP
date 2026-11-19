@@ -17,6 +17,7 @@
 package org.meshtastic.core.service.background
 
 import co.touchlab.kermit.Logger
+import kotlin.time.TimeSource
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CancellationException
@@ -63,6 +64,9 @@ class RadioTransportPool(
     private val orphanScope = CoroutineScope(SupervisorJob() + dispatchers.io)
     private val entries = mutableMapOf<String, Entry>()
     private val live = MutableStateFlow<Set<String>>(emptySet())
+
+    /** When (monotonic, ms) the transport of an address was closed last; a reopen waits for [REOPEN_GAP_MS] after it. */
+    private val closedAt = mutableMapOf<String, Long>()
 
     /** Addresses of devices whose transport is connected right now (shown or in the background). */
     val connectedAddresses: StateFlow<Set<String>> = live
@@ -147,6 +151,25 @@ class RadioTransportPool(
         live.value = synchronized(lock) { entries.values.filter { it.connected }.map { it.address }.toSet() }
     }
 
+    /**
+     * Gives the radio a moment after its connection was closed before the same device is opened again. A radio serves
+     * one client at a time: closing and reopening right away (restart of a broken connection, quick switching back
+     * and forth) can leave it still holding the old socket, so it stops answering. Nothing waits when the device was
+     * not closed recently or when its transport is still open (it is then reused as it is).
+     */
+    suspend fun awaitReopenGap(address: String) {
+        val wait =
+            synchronized(lock) {
+                if (entries.containsKey(address)) return
+                val closed = closedAt[address] ?: return
+                REOPEN_GAP_MS - (monotonicMillis() - closed)
+            }
+        if (wait > 0) {
+            Logger.i { "Waiting ${wait} ms before opening the same device again" }
+            delay(wait)
+        }
+    }
+
     /** Opens the transport of [address] or takes the one that is already open. Never opens a second one. */
     private fun entryFor(address: String): Entry = synchronized(lock) {
         entries[address]
@@ -224,6 +247,7 @@ class RadioTransportPool(
                 Logger.w(e) { "Closing a transport failed" }
             }
             entry.scope.cancel()
+            synchronized(lock) { closedAt[entry.address] = monotonicMillis() }
             publish()
         }
     }
@@ -283,3 +307,10 @@ class RadioTransportPool(
 }
 
 private const val ORPHAN_GRACE_MS = 60_000L
+
+/** Pause between closing a connection and opening the same device again. */
+private const val REOPEN_GAP_MS = 3_000L
+
+private val monotonicStart = TimeSource.Monotonic.markNow()
+
+private fun monotonicMillis(): Long = monotonicStart.elapsedNow().inWholeMilliseconds
