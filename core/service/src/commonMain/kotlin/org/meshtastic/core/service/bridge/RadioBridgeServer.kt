@@ -71,6 +71,14 @@ class RadioBridgeServer(
 ) : RadioBridgeMonitor {
     private val lock = SynchronizedObject()
     private val instances = LinkedHashMap<Int, Instance>()
+
+    // The copy of the configuration of each device lives here, not in the server: it is recorded all the time (also
+    // while no server listens), so a bridge that is switched on later hands out the copy at once and never has to
+    // ask the radio (which would disturb the connection of the app).
+    private val routers = HashMap<String, BridgeRouter>()
+
+    private fun routerFor(address: String): BridgeRouter =
+        synchronized(lock) { routers.getOrPut(address) { BridgeRouter() } }
     private var nextClientId = 1
 
     /** Where a server listens; a change of this moves the server, a change of anything else does not. */
@@ -78,7 +86,7 @@ class RadioBridgeServer(
 
     /** The bridge of one saved device. */
     private inner class Instance(val slot: RadioSlot, var listen: Listen) {
-        val router = BridgeRouter()
+        val router = routerFor(slot.address)
         val clients = LinkedHashMap<Int, Channel<ByteArray>>()
 
         @Volatile var serving = false
@@ -144,9 +152,14 @@ class RadioBridgeServer(
     }
 
     override fun onDeviceFrame(address: String, payload: ByteString) {
-        val instance = synchronized(lock) { instances.values.firstOrNull { it.slot.address == address } } ?: return
-        if (!instance.serving) return
         val bytes = payload.toByteArray()
+        val instance = synchronized(lock) { instances.values.firstOrNull { it.slot.address == address } }
+        if (instance == null || !instance.serving) {
+            // Nobody listens yet: only keep the configuration for later.
+            val router = routerFor(address)
+            synchronized(lock) { router.onFromRadio(bytes, emptySet()) }
+            return
+        }
         val outs =
             synchronized(lock) {
                 val result = instance.router.onFromRadio(bytes, instance.clients.keys.toSet())
@@ -193,7 +206,6 @@ class RadioBridgeServer(
         val scopeText = if (listen.lanAccess) "local network" else "this device only"
         val label = instance.slot.name?.takeIf { it.isNotBlank() } ?: "device ${instance.slot.id}"
         Logger.i { "Radio bridge ($label) listening on port ${listen.port} ($scopeText)" }
-        synchronized(lock) { instance.router.reset() }
         instance.handshakeAsked = false
         instance.serving = true
         launch {
