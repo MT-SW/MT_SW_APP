@@ -4389,4 +4389,9 @@
     <string name="brightness_3">Normalna</string>
     <string name="brightness_4">Mocna</string>
     <string name="brightness_5">Bardzo mocna</string>
+    <string name="radio_bridge_config_age">Jak długo trzymać kopię konfiguracji</string>
+    <string name="radio_bridge_config_age_connection">Do następnego połączenia</string>
+    <string name="radio_bridge_config_age_minutes">%1$d min</string>
+    <string name="radio_bridge_config_age_hours">%1$d godz.</string>
+    <string name="radio_bridge_refresh_now">Odśwież teraz</string>
 </resources>

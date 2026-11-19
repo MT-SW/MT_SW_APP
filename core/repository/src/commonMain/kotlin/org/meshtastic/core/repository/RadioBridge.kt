@@ -38,6 +38,11 @@ data class RadioBridgeConfig(
     val blockMessages: Boolean = false,
     /** The most clients connected at the same time. */
     val maxClients: Int = DEFAULT_MAX_CLIENTS,
+    /**
+     * How long the app's copy of the configuration (settings, channels, device info, node list) is handed to clients
+     * without asking the radio again, in minutes. 0 = until the app connects to the radio again.
+     */
+    val configMaxAgeMinutes: Int = 0,
 ) {
     /** The port to listen on for the saved radio [slotId]: the chosen one, or the default of that radio. */
     fun portFor(slotId: Int): Int = if (port in MIN_PORT..MAX_PORT) port else defaultPort(slotId)
@@ -50,6 +55,9 @@ data class RadioBridgeConfig(
         const val MAX_PORT = 65535
         const val DEFAULT_MAX_CLIENTS = 4
         val MAX_CLIENTS_CHOICES = listOf(1, 2, 4, 8)
+
+        /** The choices for [configMaxAgeMinutes]: 0 = until the next connection. */
+        val CONFIG_MAX_AGE_CHOICES = listOf(0, 15, 60, 360, 1440)
 
         /** 4404 for radio 1, 4405 for radio 2, 4406 for radio 3 (4403 is the port of the radio itself). */
         fun defaultPort(slotId: Int): Int = RADIO_PORT + slotId.coerceAtLeast(1)
@@ -75,4 +83,7 @@ interface RadioBridgeMonitor {
 
     /** One frame (a FromRadio message) sent by a device kept in the background, identified by its [address]. */
     fun onDeviceFrame(address: String, payload: ByteString) = Unit
+
+    /** Asks the device at [address] for its configuration again, so the copy handed to clients is renewed. */
+    fun refreshConfiguration(address: String) = Unit
 }

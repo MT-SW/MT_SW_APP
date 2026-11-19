@@ -119,7 +119,9 @@ import org.meshtastic.core.resources.radio_bridge_block_admin
 import org.meshtastic.core.resources.radio_bridge_block_messages
 import org.meshtastic.core.resources.radio_bridge_enabled
 import org.meshtastic.core.resources.radio_bridge_lan
+import org.meshtastic.core.resources.radio_bridge_config_age
 import org.meshtastic.core.resources.radio_bridge_max_clients
+import org.meshtastic.core.resources.radio_bridge_refresh_now
 import org.meshtastic.core.resources.radio_bridge_port
 import org.meshtastic.core.resources.radio_bridge_read_only
 import org.meshtastic.core.resources.radio_bridge_title
@@ -283,6 +285,8 @@ object SettingsSearchCatalog {
             Res.string.radio_bridge_port to SettingsRoute.ConnectionCenter,
             Res.string.radio_bridge_lan to SettingsRoute.ConnectionCenter,
             Res.string.radio_bridge_max_clients to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_config_age to SettingsRoute.ConnectionCenter,
+            Res.string.radio_bridge_refresh_now to SettingsRoute.ConnectionCenter,
             Res.string.radio_bridge_read_only to SettingsRoute.ConnectionCenter,
             Res.string.radio_bridge_block_admin to SettingsRoute.ConnectionCenter,
             Res.string.radio_bridge_block_messages to SettingsRoute.ConnectionCenter,

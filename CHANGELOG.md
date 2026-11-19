@@ -24,6 +24,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Nowe funkcje
 
+* **Mostek: czas trzymania kopii konfiguracji i „Odśwież teraz” (wszystkie wersje).** Mostek trzyma kopię konfiguracji cały czas i nie pyta radia ani nie rozłącza aplikacji; czas ważności kopii wybierzesz w „Centrum połączeń”, a przycisk odnawia ją od razu.
 * **Plakietka z liczbą nieprzeczytanych na ikonie aplikacji (iPhone/iPad i komputer).** Liczba nieprzeczytanych wiadomości pokazuje się na ikonie aplikacji (ekran główny iPhone’a, Dock lub pasek zadań komputera, jeśli system to obsługuje); na Androidzie plakietkę rysuje sam launcher z powiadomień.
 * **Jaskrawość kolorów (wszystkie wersje).** W „Wygląd” → „Ustawienia zaawansowane” ogólna jaskrawość kolorów motywu (pięć poziomów) i osobna jaskrawość przycisków („Jak ogólna” albo własny poziom). Głównych motywów nie zmienia.
 * **Konsola (wszystkie wersje).** W „Funkcje MT_SW” → „Centrum połączeń” ekran z prostymi poleceniami po polsku (pomoc, wyczyść, urządzenia, urządzenie, rozłącz [numer], usuń, stan, węzły, most), z podpowiedziami w trakcie pisania i historią wpisanych linii. Wszystkie polecenia pochodzą z jednej listy; rozłączenie z konsoli nie wywołuje pulsowania ikony urządzenia.
@@ -920,6 +921,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### New features
 
+* **Bridge: how long the copy of the configuration is kept and "Renew the copy now" (all versions).** The bridge keeps the copy of the configuration all the time and neither asks the radio nor disconnects the app; the time the copy stays valid is chosen in "Connection center", and the button renews it at once.
 * **Unread badge on the app icon (iPhone/iPad and computer).** The number of unread messages is shown on the icon of the app (the iPhone home screen, the dock or taskbar of the computer where the system supports it); on Android the launcher draws the badge from the notifications itself.
 * **Colour brightness (all versions).** In "Look" → "Advanced settings" a general brightness of the theme colours (five levels) and a separate brightness of the buttons ("As the general setting" or an own level). It does not change the main themes.
 * **Console (all versions).** In "MT_SW features" → "Connection center" a screen with simple commands (help, clear, radios, radio, disconnect, remove, status, nodes, bridge), with hints while typing and the history of typed lines. All commands come from one list; disconnecting from the console does not make the radio icon pulse.

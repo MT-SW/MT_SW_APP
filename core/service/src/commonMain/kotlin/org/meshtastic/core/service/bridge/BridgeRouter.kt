@@ -17,6 +17,7 @@
 package org.meshtastic.core.service.bridge
 
 import org.meshtastic.core.repository.RadioBridgeConfig
+import kotlin.time.TimeSource
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.ToRadio
@@ -48,6 +49,7 @@ class BridgeClientResult(
 class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     private val configFrames = ArrayList<ByteArray>()
     private var configComplete = false
+    private var completedAtMs = 0L
 
     // Packet id -> the client that sent it; the oldest are forgotten first.
     private val owners = LinkedHashMap<Int, Int>()
@@ -62,6 +64,19 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     /** True when a client waits for a configuration and no handshake of the app with the radio has been seen. */
     val waitingWithoutHandshake: Boolean
         get() = waiting.isNotEmpty() && !configComplete && configFrames.isEmpty()
+
+    /** Drops the copy of the configuration (it is built again at the next handshake); clients then wait for a new one. */
+    fun invalidate() {
+        configFrames.clear()
+        configComplete = false
+    }
+
+    /** Drops the copy when it is older than [maxAgeMs] (0 = never). True when it was dropped. */
+    fun expireIfOlderThan(maxAgeMs: Long, nowMs: Long): Boolean {
+        if (maxAgeMs <= 0 || !configComplete || nowMs - completedAtMs <= maxAgeMs) return false
+        invalidate()
+        return true
+    }
 
     /** Forgets everything kept so far (the bridge starts again). */
     fun reset() {
@@ -83,6 +98,7 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
         if (!configComplete) {
             if ((frame.config_complete_id ?: 0) != 0) {
                 configComplete = true
+                completedAtMs = monotonicNowMs()
                 return waiting.keys
                     .toList()
                     .filter { it in clients }
@@ -142,7 +158,10 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
         return configFrames.map { BridgeOut(clientId, it) } + BridgeOut(clientId, done)
     }
 
+    internal fun monotonicNowMs(): Long = clockStart.elapsedNow().inWholeMilliseconds
+
     private companion object {
+        val clockStart = TimeSource.Monotonic.markNow()
         const val MAX_CONFIG_FRAMES = 5_000
         const val MAX_OWNERS = 512
     }

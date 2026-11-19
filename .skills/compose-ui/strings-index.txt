@@ -3181,6 +3181,10 @@ radio_background_on
 radio_bridge_address
 radio_bridge_block_admin
 radio_bridge_block_messages
+radio_bridge_config_age
+radio_bridge_config_age_connection
+radio_bridge_config_age_hours
+radio_bridge_config_age_minutes
 radio_bridge_device_number
 radio_bridge_enabled
 radio_bridge_lan
@@ -3189,6 +3193,7 @@ radio_bridge_no_radio
 radio_bridge_port
 radio_bridge_port_summary
 radio_bridge_read_only
+radio_bridge_refresh_now
 radio_bridge_title
 radio_chooser_connect
 radio_chooser_count

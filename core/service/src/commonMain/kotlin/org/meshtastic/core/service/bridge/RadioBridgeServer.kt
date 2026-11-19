@@ -187,15 +187,23 @@ class RadioBridgeServer(
         }
     }
 
-    /** Makes the device send its configuration once more, so that one passes by and is kept for the clients. */
-    private suspend fun askConfiguration(instance: Instance) {
-        if (instance.slot.address == radioInterfaceService.getDeviceAddress()) {
-            // The device shown in the app: connecting again makes the app itself receive the configuration.
-            radioInterfaceService.restartTransport()
-        } else {
-            val request = ToRadio.Builder().also { it.want_config_id = (1..Int.MAX_VALUE).random() }.build()
-            pool.send(instance.slot.address, request.encode())
+    /**
+     * Makes the device send its configuration once more, so that one passes by and is kept for the clients. The app
+     * stays connected: the answer reaches the copy of the bridge first, and the app itself ignores it (it is not in a
+     * handshake).
+     */
+    private fun askConfiguration(address: String) {
+        val request = ToRadio.Builder().also { it.want_config_id = (1..Int.MAX_VALUE).random() }.build().encode()
+        if (address == radioInterfaceService.getDeviceAddress()) {
+            radioInterfaceService.sendToRadio(request)
+        } else if (!pool.send(address, request)) {
+            Logger.d { "Radio bridge: the device is not connected, its configuration was not asked for" }
         }
+    }
+
+    override fun refreshConfiguration(address: String) {
+        Logger.i { "Radio bridge: renewing the copy of the configuration on request" }
+        askConfiguration(address)
     }
 
     private suspend fun serve(instance: Instance) = coroutineScope {
@@ -214,7 +222,7 @@ class RadioBridgeServer(
                 if (instance.handshakeAsked) continue
                 instance.handshakeAsked = true
                 Logger.i { "Radio bridge ($label): asking the device for its configuration for clients" }
-                askConfiguration(instance)
+                askConfiguration(instance.slot.address)
             }
         }
         try {
@@ -293,6 +301,9 @@ class RadioBridgeServer(
     private fun onClientFrame(instance: Instance, id: Int, payload: ByteArray, outbox: Channel<ByteArray>) {
         val (result, needsHandshake) =
             synchronized(lock) {
+                // A copy older than the chosen time is dropped, so this client waits for a fresh one.
+                val maxAgeMs = instance.router.config.configMaxAgeMinutes * MINUTE_MS
+                instance.router.expireIfOlderThan(maxAgeMs, instance.router.monotonicNowMs())
                 instance.router.onClientFrame(id, payload) to instance.router.waitingWithoutHandshake
             }
         for (reply in result.replies) send(instance, reply)
@@ -313,6 +324,7 @@ class RadioBridgeServer(
 
     private companion object {
         const val LENGTH_LOW_INDEX = 3
+        const val MINUTE_MS = 60_000L
         const val OUTBOX_CAPACITY = 256
         const val READ_BUFFER = 1024
     }

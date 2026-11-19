@@ -25,7 +25,9 @@ import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeConfig
+import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioBridgePrefs
+import org.meshtastic.core.repository.RadioSlot
 import org.meshtastic.core.repository.RadioSlotsPrefs
 
 /** The bridge settings of the radio chosen in the top bar. [slotId] is null while no radio is saved. */
@@ -46,7 +48,10 @@ class RadioBridgeViewModel(
     slotsPrefs: RadioSlotsPrefs,
     private val bridgePrefs: RadioBridgePrefs,
     background: RadioBackgroundMonitor,
+    private val bridge: RadioBridgeMonitor,
 ) : ViewModel() {
+    private var savedSlots: List<RadioSlot> = emptyList()
+
     val devices: StateFlow<List<RadioBridgeDevice>> =
         combine(slotsPrefs.slots, bridgePrefs.configs, background.connectedAddresses, background.badges) {
                 slots,
@@ -54,6 +59,7 @@ class RadioBridgeViewModel(
                 connected,
                 badges,
             ->
+            savedSlots = slots
             slots.map { slot ->
                 // Only the short name of the device's node is shown.
                 val name = badges[slot.address]?.shortName?.takeIf { it.isNotBlank() }
@@ -79,6 +85,11 @@ class RadioBridgeViewModel(
     fun update(slotId: Int, change: (RadioBridgeConfig) -> RadioBridgeConfig) {
         val current = devices.value.firstOrNull { it.slotId == slotId }?.config ?: RadioBridgeConfig()
         bridgePrefs.setConfig(slotId, change(current))
+    }
+
+    /** Asks the device with the saved id [slotId] for its configuration again (the copy for clients is renewed). */
+    fun refreshConfiguration(slotId: Int) {
+        savedSlots.firstOrNull { it.id == slotId }?.let { bridge.refreshConfiguration(it.address) }
     }
 
     /** Changes the bridge settings of the device shown in the app (used by the console). */

@@ -74,6 +74,7 @@ class RadioBridgePrefsImpl(private val dataStore: UiDataStore, dispatchers: Coro
                             "blockAdmin" to JsonPrimitive(c.blockAdmin),
                             "blockMessages" to JsonPrimitive(c.blockMessages),
                             "maxClients" to JsonPrimitive(c.maxClients),
+                            "configMaxAge" to JsonPrimitive(c.configMaxAgeMinutes),
                         ),
                     )
                 },
@@ -102,6 +103,8 @@ class RadioBridgePrefsImpl(private val dataStore: UiDataStore, dispatchers: Coro
                                 blockMessages =
                                 o["blockMessages"]?.jsonPrimitive?.boolean ?: defaults.blockMessages,
                                 maxClients = o["maxClients"]?.jsonPrimitive?.int ?: defaults.maxClients,
+                                configMaxAgeMinutes =
+                                o["configMaxAge"]?.jsonPrimitive?.int ?: defaults.configMaxAgeMinutes,
                             )
                     }
                     .toMap()

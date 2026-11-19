@@ -34,6 +34,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.radio_bridge_address
 import org.meshtastic.core.resources.radio_bridge_block_admin
 import org.meshtastic.core.resources.radio_bridge_block_messages
+import org.meshtastic.core.resources.radio_bridge_config_age
+import org.meshtastic.core.resources.radio_bridge_config_age_connection
+import org.meshtastic.core.resources.radio_bridge_config_age_hours
+import org.meshtastic.core.resources.radio_bridge_config_age_minutes
 import org.meshtastic.core.resources.radio_bridge_device_number
 import org.meshtastic.core.resources.radio_bridge_enabled
 import org.meshtastic.core.resources.radio_bridge_lan
@@ -42,13 +46,16 @@ import org.meshtastic.core.resources.radio_bridge_no_radio
 import org.meshtastic.core.resources.radio_bridge_port
 import org.meshtastic.core.resources.radio_bridge_port_summary
 import org.meshtastic.core.resources.radio_bridge_read_only
+import org.meshtastic.core.resources.radio_bridge_refresh_now
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.EditTextPreference
+import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.AdminPanelSettings
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
+import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.icon.Udp
 import org.meshtastic.core.ui.icon.Visibility
@@ -67,13 +74,16 @@ fun RadioBridgeSettings(viewModel: RadioBridgeViewModel = koinViewModel()) {
         return
     }
     devices.forEach { device ->
-        RadioBridgeDeviceSettings(device) { change -> viewModel.update(device.slotId, change) }
+        RadioBridgeDeviceSettings(device, onRefresh = { viewModel.refreshConfiguration(device.slotId) }) { change ->
+            viewModel.update(device.slotId, change)
+        }
     }
 }
 
 @Composable
 private fun RadioBridgeDeviceSettings(
     device: RadioBridgeDevice,
+    onRefresh: () -> Unit,
     update: ((RadioBridgeConfig) -> RadioBridgeConfig) -> Unit,
 ) {
     val slotId = device.slotId
@@ -119,6 +129,26 @@ private fun RadioBridgeDeviceSettings(
         selectedItem = config.maxClients,
         onItemSelected = { value -> update { it.copy(maxClients = value) } },
     )
+    DropDownPreference(
+        title = stringResource(Res.string.radio_bridge_config_age),
+        enabled = true,
+        items =
+        RadioBridgeConfig.CONFIG_MAX_AGE_CHOICES.map { minutes ->
+            minutes to
+                when (minutes) {
+                    0 -> stringResource(Res.string.radio_bridge_config_age_connection)
+                    in 1..MINUTES_IN_HOUR_LESS -> stringResource(Res.string.radio_bridge_config_age_minutes, minutes)
+                    else -> stringResource(Res.string.radio_bridge_config_age_hours, minutes / MINUTES_IN_HOUR)
+                }
+        },
+        selectedItem = config.configMaxAgeMinutes,
+        onItemSelected = { value -> update { it.copy(configMaxAgeMinutes = value) } },
+    )
+    ListItem(
+        text = stringResource(Res.string.radio_bridge_refresh_now),
+        leadingIcon = MeshtasticIcons.Refresh,
+        onClick = onRefresh,
+    )
     SwitchListItem(
         text = stringResource(Res.string.radio_bridge_read_only),
         leadingIcon = MeshtasticIcons.Visibility,
@@ -138,3 +168,6 @@ private fun RadioBridgeDeviceSettings(
         onClick = { update { it.copy(blockMessages = !it.blockMessages) } },
     )
 }
+
+private const val MINUTES_IN_HOUR = 60
+private const val MINUTES_IN_HOUR_LESS = 59
