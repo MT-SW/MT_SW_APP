@@ -107,6 +107,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Zasięgi z trasy rozpoznają pozycje usłyszane bezpośrednio także wtedy, gdy radio nie podaje rodzaju transportu.
 * Okno sąsiadów miało dwa przyciski robiące to samo; teraz jest jeden „Zamknij”.
 * Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
+* **Kanały z publicznym kluczem: pozycja tylko przybliżona (wszystkie wersje).** Na kanale bez klucza, z kluczem jednobajtowym albo z rodziny klucza domyślnego aplikacja nie wyśle już dokładnej pozycji: dokładność jest ograniczona do 15 przy zapisie kanału do radia (także po zaimportowaniu kanału z linku lub kodu QR). W oknie edycji takiego kanału nie ma przełącznika „Dokładna lokalizacja”, a suwak kończy się na 15. Zgodne z aplikacją na iPhone'a.
 
 ##### Zmiany względem oryginału
 
@@ -997,6 +998,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Ranges from a route recognise positions heard directly also when the radio gives no kind of transport.
 * The neighbours window had two buttons that did the same; now there is one "Close".
 * The download of buildings goes on after leaving the screen instead of being cut off silently.
+* **Public-key channels: approximate position only (all versions).** On a channel with no key, a one-byte key or a key from the default-key family the app no longer sends an exact position: precision is capped at 15 when the channel is written to the radio (also after importing a channel from a link or QR code). The edit window of such a channel has no “Precise location” switch and the slider ends at 15. Matches the iPhone app.
 
 ##### Changes against the original
 
