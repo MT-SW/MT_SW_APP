@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.ConnectionState
-import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.MeshActivity
@@ -169,29 +168,6 @@ class RadioTransportPool(
             Logger.i { "Waiting ${wait} ms before opening the same device again" }
             delay(wait)
         }
-    }
-
-    /**
-     * A TCP radio that was left open in the background does not answer a new handshake on the same socket: the app view
-     * then waits for it until the stall watchdog restarts the connection. So a TCP transport that waits in the
-     * background is closed here, and the device is opened again on a fresh socket (after the pause of
-     * [awaitReopenGap], which the caller runs next). Other kinds of links are reused as they are.
-     */
-    suspend fun recycleBackgroundTcp(address: String) {
-        if (DeviceAddress.parse(address)?.interfaceId != InterfaceId.TCP) return
-        var background: RadioInterfaceService? = null
-        val toClose =
-            synchronized(lock) {
-                val entry = entries[address]?.takeIf { it.foreground == null && it.connected } ?: return
-                background = entry.background
-                entry.background = null
-                entries.remove(address)
-                entry
-            }
-        Logger.i { "A TCP link from the background is opened again on a new socket" }
-        closeEntry(toClose)
-        // The background collector hears that the link went away and reconnects by itself later.
-        background?.onDisconnect(isPermanent = false, errorMessage = null, reason = null)
     }
 
     /** Opens the transport of [address] or takes the one that is already open. Never opens a second one. */

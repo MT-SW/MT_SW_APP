@@ -931,7 +931,6 @@ class SharedRadioInterfaceService(
         Logger.i { "Starting radio transport for ${address.anonymize} (generation=$generation)" }
         val newTransport =
             try {
-                pool.recycleBackgroundTcp(address)
                 pool.awaitReopenGap(address)
                 pool.attachForeground(address, sessionBoundService)
             } catch (failure: Throwable) {
