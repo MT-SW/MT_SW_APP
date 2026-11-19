@@ -18,6 +18,14 @@
 
 package org.meshtastic.core.ui.component
 
+import kotlin.math.roundToInt
+import androidx.compose.ui.unit.offset
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -96,8 +104,34 @@ fun MainAppBar(
     val barStyle = rememberUiOptions().element(UiOptions.GROUP_TOPBAR)
     val plain = barStyle.look == ElementLook.FLAT
     val barColors = if (plain) colors else TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+    // With several bars side by side (desktop, tablet) each one reports where it stands: the bars reach the edges of
+    // the window and join in the middle, each one growing over half of the gap to its neighbour (the content of the
+    // bar keeps its place).
+    val slots = LocalDeviceBarSlots.current
+    val barId = remember { Any() }
+    if (slots != null) DisposableEffect(slots, barId) { onDispose { slots.releaseBar(barId) } }
+    val reported =
+        if (slots == null) {
+            modifier
+        } else {
+            modifier.onGloballyPositioned {
+                val bounds = it.boundsInWindow()
+                slots.reportBar(barId, bounds.left, bounds.right)
+            }
+        }
+    val joinStart = if (plain) 0f else (slots?.gapToLeft(barId) ?: 0f) / 2f
+    val joinEnd = if (plain) 0f else (slots?.gapToRight(barId) ?: 0f) / 2f
+    val joinStartDp = with(LocalDensity.current) { joinStart.toDp() }
+    val joinEndDp = with(LocalDensity.current) { joinEnd.toDp() }
     val barContent: @Composable () -> Unit = {
-        Column(modifier = if (plain) modifier.monochromeLayer() else Modifier.monochromeLayer()) {
+        Column(
+            modifier =
+            if (plain) {
+                reported.monochromeLayer()
+            } else {
+                Modifier.monochromeLayer().padding(start = joinStartDp, end = joinEndDp)
+            },
+        ) {
             TopAppBar(
                 colors = barColors,
                 title = {
@@ -158,13 +192,32 @@ fun MainAppBar(
     } else {
         StyledSurface(
             style = barStyle,
-            shape = RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
-            modifier = modifier,
+            shape =
+            RoundedCornerShape(
+                bottomStart = if (joinStart > 0f) 0.dp else BAR_CORNER_DP.dp,
+                bottomEnd = if (joinEnd > 0f) 0.dp else BAR_CORNER_DP.dp,
+            ),
+            modifier = reported.growSideways(joinStart, joinEnd),
             baseColor = MaterialTheme.colorScheme.surface,
             floating = true,
         ) {
             barContent()
         }
+    }
+}
+
+/**
+ * The bar is drawn wider by [startPx] at the left and [endPx] at the right, but still reports its own width: it grows
+ * over the gap next to it, so its neighbour's bar and this one meet in the middle.
+ */
+private fun Modifier.growSideways(startPx: Float, endPx: Float): Modifier = if (startPx <= 0f && endPx <= 0f) {
+    this
+} else {
+    layout { measurable, constraints ->
+        val start = startPx.roundToInt()
+        val extra = start + endPx.roundToInt()
+        val placeable = measurable.measure(constraints.offset(horizontal = extra))
+        layout((placeable.width - extra).coerceAtLeast(0), placeable.height) { placeable.placeRelative(-start, 0) }
     }
 }
 

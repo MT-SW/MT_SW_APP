@@ -129,6 +129,32 @@ class SosBarSlots {
         places.remove(id)
     }
 
+    private val barEdges = mutableStateMapOf<Any, Pair<Float, Float>>()
+
+    /** A top bar reports where it stands (left and right edge in the window), so neighbours can join up. */
+    fun reportBar(id: Any, left: Float, right: Float) {
+        val old = barEdges[id]
+        if (old == null || old.first != left || old.second != right) barEdges[id] = left to right
+    }
+
+    fun releaseBar(id: Any) {
+        barEdges.remove(id)
+    }
+
+    /** The gap in px between the bar [id] and the nearest bar at its left; null when there is none. */
+    fun gapToLeft(id: Any): Float? {
+        val mine = barEdges[id] ?: return null
+        return barEdges.filter { it.key != id && it.value.second <= mine.first + 1f }
+            .minOfOrNull { mine.first - it.value.second }
+    }
+
+    /** The gap in px between the bar [id] and the nearest bar at its right; null when there is none. */
+    fun gapToRight(id: Any): Float? {
+        val mine = barEdges[id] ?: return null
+        return barEdges.filter { it.key != id && it.value.first >= mine.second - 1f }
+            .minOfOrNull { it.value.first - mine.second }
+    }
+
     /** How many bars are on screen now (more than one: the window shows several cards side by side). */
     val barCount: Int
         get() = places.size
