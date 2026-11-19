@@ -45,6 +45,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.isSensitiveData
 import androidx.compose.ui.semantics.semantics
@@ -118,12 +119,16 @@ fun ContactItem(
     val cardColors =
         when {
             isOutlined && withDepth ->
-                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
 
             isOutlined -> CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
 
             else -> {
-                val containerColor = if (selected) Color.Gray else MaterialTheme.colorScheme.surfaceVariant
+                // MT_SW: a chosen conversation has a soft yellowish tint of the theme; an unchosen one is nearly white.
+                val containerColor =
+                    MaterialTheme.colorScheme.primary
+                        .copy(alpha = SELECTED_TINT_ALPHA)
+                        .compositeOver(MaterialTheme.colorScheme.surface)
                 CardDefaults.cardColors(containerColor = containerColor.copy(alpha = fade))
             }
         }
@@ -354,3 +359,5 @@ fun ContactItemArchivedPreview() {
         }
     }
 }
+
+private const val SELECTED_TINT_ALPHA = 0.3f

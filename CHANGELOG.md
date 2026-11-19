@@ -116,6 +116,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Komputer i tablet: lista urządzeń (prawa część ekranu Połączenie), lista rozmów i lista Zdrowia sieci zostawiają po bokach miejsce na cień i poświatę elementów (co najmniej 8 dp), więc ich krawędzie nie są już ucinane. Na ekranie Połączenie miejsce to pochodzi z pustych marginesów.
 * Górny pasek na komputerze i tablecie dochodzi do samych brzegów okna, a przy kilku kolumnach kolumny stykają się ze sobą (uchwyt do zmiany szerokości jest nałożony na szew), więc paski łączą się w środku w jeden (wewnętrzne dolne rogi są proste), więc jego cień nie jest już ucinany po bokach. Usunięty został 8 dp margines przy brzegu okna, który odsuwał pasek.
 * Komputer i tablet: uchwyty do zmiany szerokości kolumn są na wierzchu (nie chowają się pod kartami) i mają dawny rozmiar; górne paski kolumn mają tę samą wysokość, więc razem wyglądają jak jedna belka, a cienie pasują; miejsce na cień wokół elementów jest większe (14 dp).
+* Komputer i tablet: górny pasek to jeden prosty, prostokątny pasek na całą szerokość kolumny, do samych krawędzi okna (bez zaokrągleń); obok siebie paski mają tę samą wysokość i łączą się w jedną belkę, a cień pada tylko pod spodem.
+* Lista rozmów i kanałów: wybrana rozmowa ma delikatny żółtawy odcień motywu zamiast ciemnoszarego, a niewybrana jest prawie biała.
 
 ##### Zmiany względem oryginału
 
@@ -1016,6 +1018,8 @@ The main things of every version, split by kind of change (the "What's new in th
 * Computer and tablet: the device list (right part of the Connections screen), the conversation list and the Network health list leave room at their sides for the shadows and glow of the elements (at least 8 dp), so their edges are no longer cut off. On the Connections screen this room comes from the empty margins.
 * The top bar on a computer and a tablet reaches the very edges of the window, and with several columns the columns touch each other (the handle for changing the width is laid over the seam), so the bars join into one in the middle (the inner bottom corners are straight), so its shadow is no longer cut off at the sides. The 8 dp margin at the window edge that kept the bar away is removed.
 * Computer and tablet: the handles for changing the width of the columns are on top (they no longer hide under the cards) and have their old size; the top bars of the columns are equally tall, so together they look like one bar and the shadows match; the room around elements for shadows is larger (14 dp).
+* Computer and tablet: the top bar is one straight, rectangular bar over the whole width of the column, right to the window edges (no rounded corners); side by side the bars are equally tall and join into one bar, and the shadow falls only below it.
+* Conversation and channel list: the chosen conversation has a soft yellowish tint of the theme instead of dark grey, and an unchosen one is nearly white.
 
 ##### Changes against the original
 

@@ -20,11 +20,8 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.foundation.layout.heightIn
-import kotlin.math.roundToInt
-import androidx.compose.ui.unit.offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.DisposableEffect
@@ -34,7 +31,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButton
@@ -44,6 +40,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,7 +65,7 @@ import androidx.compose.material3.Icon as StandardIcon
 
 /** Alpha for the ambient event accent wash over the app bar — subtle enough to keep title text legible. */
 private const val EVENT_ACCENT_ALPHA = 0.12f
-private const val BAR_CORNER_DP = 20
+private const val BAR_SHADOW_ROOM_DP = 24
 
 /** Height of the event brand rule under the app bar. A hairline: brand presence without stealing vertical space. */
 private val EVENT_BRAND_RULE_HEIGHT = 3.dp
@@ -121,13 +120,7 @@ fun MainAppBar(
                 slots.reportBar(barId, bounds.left, bounds.right)
             }
         }
-    val gapLeft = if (plain) null else slots?.gapToLeft(barId)
-    val gapRight = if (plain) null else slots?.gapToRight(barId)
-    val joinStart = (gapLeft ?: 0f) / 2f
-    val joinEnd = (gapRight ?: 0f) / 2f
     val tallestDp = with(LocalDensity.current) { (slots?.tallestBar ?: 0f).toDp() }
-    val joinStartDp = with(LocalDensity.current) { joinStart.toDp() }
-    val joinEndDp = with(LocalDensity.current) { joinEnd.toDp() }
     val barContent: @Composable () -> Unit = {
         Column(
             modifier =
@@ -135,7 +128,6 @@ fun MainAppBar(
                 reported.monochromeLayer()
             } else {
                 Modifier.monochromeLayer()
-                    .padding(start = joinStartDp, end = joinEndDp)
                     .onSizeChanged { slots?.reportBarHeight(barId, it.height.toFloat()) }
             },
         ) {
@@ -197,34 +189,22 @@ fun MainAppBar(
     if (plain) {
         barContent()
     } else {
+        // One straight bar over the whole width of its card, right to the edges of the window; side by side the bars
+        // have the same height and touch, so they read as a single bar. The shadow falls only below it.
         StyledSurface(
             style = barStyle,
-            shape =
-            RoundedCornerShape(
-                bottomStart = if (gapLeft != null) 0.dp else BAR_CORNER_DP.dp,
-                bottomEnd = if (gapRight != null) 0.dp else BAR_CORNER_DP.dp,
-            ),
-            modifier = reported.growSideways(joinStart, joinEnd).heightIn(min = tallestDp),
+            shape = RectangleShape,
+            modifier =
+            reported.heightIn(min = tallestDp).drawWithContent {
+                clipRect(left = 0f, top = 0f, right = size.width, bottom = size.height + BAR_SHADOW_ROOM_DP.dp.toPx()) {
+                    this@drawWithContent.drawContent()
+                }
+            },
             baseColor = MaterialTheme.colorScheme.surface,
             floating = true,
         ) {
             barContent()
         }
-    }
-}
-
-/**
- * The bar is drawn wider by [startPx] at the left and [endPx] at the right, but still reports its own width: it grows
- * over the gap next to it, so its neighbour's bar and this one meet in the middle.
- */
-private fun Modifier.growSideways(startPx: Float, endPx: Float): Modifier = if (startPx <= 0f && endPx <= 0f) {
-    this
-} else {
-    layout { measurable, constraints ->
-        val start = startPx.roundToInt()
-        val extra = start + endPx.roundToInt()
-        val placeable = measurable.measure(constraints.offset(horizontal = extra))
-        layout((placeable.width - extra).coerceAtLeast(0), placeable.height) { placeable.placeRelative(-start, 0) }
     }
 }
 
