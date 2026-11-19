@@ -19,6 +19,7 @@
 package org.meshtastic.feature.widget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -141,6 +142,11 @@ internal fun IdentityRow(
         }
     }
 }
+
+@Composable
+@ReadOnlyComposable
+internal fun valueColor(isStale: Boolean): ColorProvider =
+    if (isStale) GlanceTheme.colors.outline else GlanceTheme.colors.onSurface
 
 @Composable
 private fun HeroText(text: String, isWord: Boolean, description: String?, isStale: Boolean) {
