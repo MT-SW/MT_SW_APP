@@ -61,6 +61,7 @@ internal fun installDesktopLogging(isDebug: Boolean) {
     MtSwLogging.init(logDir, headerText = ::desktopHeader) { level ->
         Logger.setMinSeverity(MtSwLogging.minSeverityFor(Severity.Info, level))
     }
+    MtSwLogging.screenProvider = { windowExtras(withPicture = true) }
     val control = DesktopLogControl(logDir)
     AppLogControls.current = control
     // Like the Downloads folder of a phone: two zips kept fresh in the logs folder, the log of the last 24 hours and,

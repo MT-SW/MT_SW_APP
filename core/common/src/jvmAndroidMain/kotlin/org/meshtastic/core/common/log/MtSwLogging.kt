@@ -66,6 +66,9 @@ object MtSwLogging {
 
     /** How much recorded time a log the person switched on by hand keeps (a pause in recording is not counted). */
     const val FULL_WINDOW_MS: Long = 7L * 24 * 60 * 60 * 1000
+    private const val SCREEN_DIR = "screenshots"
+    private const val MAX_SCREEN_FILES = 60
+    private const val SCREEN_MIN_GAP_MS = 30_000L
     private const val PART_NUMBER_WIDTH = 3
     private const val BYTES_IN_MB = 1024 * 1024
 
@@ -175,6 +178,45 @@ object MtSwLogging {
         }
     }
 
+    /**
+     * Set by each platform: what to save when the interface goes wrong (name to bytes: the size of the window and of
+     * the screen, a picture of the window). Empty when nothing can be taken. Used only while the full log is on.
+     */
+    @Volatile var screenProvider: (() -> List<Pair<String, ByteArray>>)? = null
+
+    @Volatile private var lastScreenAt = 0L
+
+    /** The saved window pictures and sizes, oldest first. */
+    fun screenFiles(): List<File> =
+        dir?.let { File(it, SCREEN_DIR) }?.listFiles { f -> f.isFile }?.sortedBy { it.name }.orEmpty()
+
+    /**
+     * Saves the size of the window and a picture of it when the interface went wrong ([reason]). Only while the full
+     * log (switched on by hand) is on, never for the automatic log of the last day, and at most once in
+     * [SCREEN_MIN_GAP_MS]. The files follow the same seven recorded days as the log and are never more than
+     * [MAX_SCREEN_FILES].
+     */
+    fun captureScreen(reason: String) {
+        val folder = dir ?: return
+        if (levelFlow.value == AppLogLevel.OFF) return
+        val now = System.currentTimeMillis()
+        val tooSoon =
+            synchronized(lock) {
+                (now - lastScreenAt < SCREEN_MIN_GAP_MS).also { if (!it) lastScreenAt = now }
+            }
+        val items = if (tooSoon) emptyList() else runCatching { screenProvider?.invoke() }.getOrNull().orEmpty()
+        if (items.isNotEmpty()) {
+            val target = File(folder, SCREEN_DIR).also { it.mkdirs() }
+            val name = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date(now))
+            runCatching {
+                File(target, "${name}_powod.txt").writeText("Reason: $reason\nTime: ${stamp()}\n${header()}\n")
+                for ((suffix, bytes) in items) File(target, "${name}_$suffix").writeBytes(bytes)
+                Logger.i(tag = TAG) { "Window picture saved ($reason)" }
+                screenFiles().dropLast(MAX_SCREEN_FILES).forEach { runCatching { it.delete() } }
+            }
+        }
+    }
+
     /** All log parts, oldest first. */
     fun parts(): List<File> =
         dir?.listFiles { f -> f.isFile && f.name.startsWith("mt_sw_log_") && f.name.endsWith(".txt") }
@@ -228,6 +270,14 @@ object MtSwLogging {
                 zip.putNextEntry(ZipEntry((if (f.parentFile?.name == CRASH_DIR) "crash/" else "") + f.name))
                 f.inputStream().use { it.copyTo(zip) }
                 zip.closeEntry()
+            }
+            // Window pictures exist only from a full log, so the package of the automatic log never has them.
+            if (levelFlow.value != AppLogLevel.OFF) {
+                for (f in screenFiles().filter { it.lastModified() >= sinceMillis }) {
+                    zip.putNextEntry(ZipEntry("zrzuty/" + f.name))
+                    runCatching { f.inputStream().use { it.copyTo(zip) } }
+                    zip.closeEntry()
+                }
             }
         }
     }
@@ -338,6 +388,7 @@ object MtSwLogging {
         if (all.isEmpty()) return
         val sessionFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
         val spans = ArrayList<Long>(all.size)
+        val starts = ArrayList<Long>(all.size)
         var previous: File? = null
         for (f in all) {
             val sessionOf = f.name.removePrefix("mt_sw_log_").substringBefore('_')
@@ -347,16 +398,21 @@ object MtSwLogging {
                 } else {
                     runCatching { sessionFormat.parse(sessionOf)?.time }.getOrNull() ?: f.lastModified()
                 }
+            starts += start
             spans += (f.lastModified() - start).coerceAtLeast(0L)
             previous = f
         }
         var kept = 0L
         var drop = false
+        var oldestKeptStart = 0L
         for (i in all.indices.reversed()) {
             if (drop && all[i].name != currentName) runCatching { all[i].delete() }
+            if (!drop) oldestKeptStart = starts[i]
             kept += spans[i]
             if (kept > FULL_WINDOW_MS) drop = true
         }
+        // The window pictures go with the parts they belong to.
+        if (drop) screenFiles().filter { it.lastModified() < oldestKeptStart }.forEach { runCatching { it.delete() } }
     }
 
     private fun pruneOld(folder: File) {
@@ -393,6 +449,7 @@ object MtSwLogging {
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, error ->
             runCatching { Logger.e(error, tag = TAG) { "Uncaught exception in thread ${thread.name}" } }
+            runCatching { captureScreen("Uncaught exception: ${error.javaClass.simpleName}") }
             runCatching { writeCrashRecord(thread, error) }
             flush()
             previous?.uncaughtException(thread, error)

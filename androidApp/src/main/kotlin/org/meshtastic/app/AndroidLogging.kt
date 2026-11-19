@@ -28,6 +28,13 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.os.Looper
+import java.io.ByteArrayOutputStream
+import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
@@ -71,6 +78,8 @@ internal object AndroidLogging {
     private const val FINGERPRINT_24H = "last_export_24h.txt"
     private const val FINGERPRINT_FULL = "last_export_full.txt"
     private const val MB = 1024 * 1024
+    private const val PNG_QUALITY = 100
+    private const val PICTURE_WAIT_SECONDS = 1L
     private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
 
     /** Kermit's lowest severity for this build when the file log is off. */
@@ -84,6 +93,7 @@ internal object AndroidLogging {
         MtSwLogging.init(dir, headerText = { header() }, sample = { sampleExtras(app) }) { level ->
             Logger.setMinSeverity(MtSwLogging.minSeverityFor(baseSeverity, level))
         }
+        MtSwLogging.screenProvider = { screenInfo() }
         val control = AndroidLogControl(app, dir)
         AppLogControls.current = control
         Logger.i(tag = TAG) { "App start: ${header()}; log level ${MtSwLogging.level.value.key}" }
@@ -96,6 +106,51 @@ internal object AndroidLogging {
                 delay(AUTO_EXPORT_EVERY_MS)
             }
         }
+    }
+
+    @Volatile private var resumedActivity: WeakReference<Activity>? = null
+
+    /**
+     * What is saved when the interface goes wrong (only while the full log is on): the size of the screen and window,
+     * and a picture of the window. Best effort: a picture is taken only while an activity is on screen.
+     */
+    private fun screenInfo(): List<Pair<String, ByteArray>> {
+        val activity = resumedActivity?.get() ?: return emptyList()
+        val metrics = activity.resources.displayMetrics
+        val config = activity.resources.configuration
+        val info =
+            "Ekran: ${metrics.widthPixels} x ${metrics.heightPixels} px, ${metrics.densityDpi} dpi, " +
+                "okno ${config.screenWidthDp} x ${config.screenHeightDp} dp, orientacja ${config.orientation}\n"
+        val result = mutableListOf("ekran.txt" to info.toByteArray())
+        val draw: () -> ByteArray? = {
+            runCatching {
+                val view = activity.window.decorView
+                if (view.width <= 0 || view.height <= 0) {
+                    null
+                } else {
+                    val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+                    view.draw(Canvas(bitmap))
+                    ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, PNG_QUALITY, it) }
+                        .toByteArray()
+                }
+            }
+                .getOrNull()
+        }
+        val png =
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                draw()
+            } else {
+                val latch = CountDownLatch(1)
+                var taken: ByteArray? = null
+                activity.runOnUiThread {
+                    taken = draw()
+                    latch.countDown()
+                }
+                latch.await(PICTURE_WAIT_SECONDS, TimeUnit.SECONDS)
+                taken
+            }
+        png?.let { result += "ekran.png" to it }
+        return result
     }
 
     fun header(): String = "MT_SW ${org.meshtastic.core.model.MtswRelease.displayName(
@@ -129,7 +184,10 @@ internal object AndroidLogging {
 
                 override fun onActivityStarted(activity: Activity) = log(activity, "started")
 
-                override fun onActivityResumed(activity: Activity) = log(activity, "resumed")
+                override fun onActivityResumed(activity: Activity) {
+                    resumedActivity = WeakReference(activity)
+                    log(activity, "resumed")
+                }
 
                 override fun onActivityPaused(activity: Activity) = log(activity, "paused")
 
