@@ -109,6 +109,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Okno sąsiadów miało dwa przyciski robiące to samo; teraz jest jeden „Zamknij”.
 * Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
 * Przyciski z obrysem (np. „Wymuś zatrzymanie aplikacji”): poświata nie jest już ucinana po bokach i na dole przez listę lub kolumnę wokół; teraz zostaje wewnątrz przycisku.
+* Lista węzłów i lista urządzeń na ekranie Połączenie (komputer, iPad): cienie kart przy stylu z głębią nie są już ucinane po bokach, bo lista zostawia po bokach miejsce na cień (po przeniesieniu paska na dół karty dotykały brzegu okna).
 
 ##### Zmiany względem oryginału
 
@@ -1002,6 +1003,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * The neighbours window had two buttons that did the same; now there is one "Close".
 * The download of buildings goes on after leaving the screen instead of being cut off silently.
 * Outlined buttons (for example “Force stop the app”): the glow is no longer cut off at the sides and at the bottom by the list or column around them; it now stays inside the button.
+* Node list and device list on the Connections screen (computer, iPad): the shadows of the cards in the depth look are no longer cut off at the sides, because the list now leaves room for the shadow at its sides (after the bar moved to the bottom the cards touched the edge of the window).
 
 ##### Changes against the original
 

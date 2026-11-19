@@ -21,6 +21,9 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +45,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeInput
 import dev.chrisbanes.haze.HazeState
@@ -114,6 +119,33 @@ fun glassContentColor(group: String, base: Color = MaterialTheme.colorScheme.sur
     val tinted = options.glassBase(base)
     return if (tinted.luminance() > READABLE_LUMINANCE) READABLE_DARK else Color.White
 }
+
+/**
+ * The room a list must leave at its sides so the shadow of the depth look is not cut off: a shadow is drawn outside its
+ * card, and a list clips everything that leaves it, so cards touching the edge of a list showed a flat, cut-off side.
+ * Zero for the other looks (they draw nothing outside the card).
+ */
+@Composable
+fun rememberShadowInset(group: String = LocalCardGroup.current): Dp {
+    val style = rememberUiOptions().element(group)
+    if (style.look != ElementLook.DEPTH) return 0.dp
+    val s = style.strength.coerceIn(0, PERCENT.toInt()) / PERCENT
+    return ((DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s) * SHADOW_REACH).dp
+}
+
+/** [this] with [inset] added at the left and the right, so a list keeps the shadow of its cards inside its bounds. */
+@Composable
+fun PaddingValues.withShadowInset(inset: Dp): PaddingValues {
+    val direction = LocalLayoutDirection.current
+    return PaddingValues(
+        start = calculateStartPadding(direction) + inset,
+        top = calculateTopPadding(),
+        end = calculateEndPadding(direction) + inset,
+        bottom = calculateBottomPadding(),
+    )
+}
+
+private const val SHADOW_REACH = 0.8f
 
 /** The depth look of [elementLook], with its strength 0-100. */
 fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier {

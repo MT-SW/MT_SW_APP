@@ -69,6 +69,8 @@ import org.meshtastic.core.resources.usb
 import org.meshtastic.core.resources.usb_blocked_hint
 import org.meshtastic.core.resources.usb_blocked_title
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.rememberShadowInset
+import org.meshtastic.core.ui.component.withShadowInset
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Close
@@ -140,7 +142,7 @@ fun DeviceList(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = contentPadding,
+        contentPadding = contentPadding.withShadowInset(rememberShadowInset()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         header?.let { item(key = "header:connection", contentType = "connection") { it() } }
