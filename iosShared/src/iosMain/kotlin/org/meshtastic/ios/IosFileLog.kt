@@ -43,6 +43,7 @@ import platform.Foundation.NSLock
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSThread
 import platform.Foundation.timeIntervalSince1970
+import platform.Foundation.writeToFile
 import platform.UIKit.UIDevice
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.Platform
