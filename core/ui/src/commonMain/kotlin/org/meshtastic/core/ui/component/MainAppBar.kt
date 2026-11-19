@@ -31,6 +31,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButton
@@ -65,6 +66,7 @@ import androidx.compose.material3.Icon as StandardIcon
 
 /** Alpha for the ambient event accent wash over the app bar — subtle enough to keep title text legible. */
 private const val EVENT_ACCENT_ALPHA = 0.12f
+private const val BAR_CORNER_DP = 20
 private const val BAR_SHADOW_ROOM_DP = 24
 
 /** Height of the event brand rule under the app bar. A hairline: brand presence without stealing vertical space. */
@@ -189,16 +191,27 @@ fun MainAppBar(
     if (plain) {
         barContent()
     } else {
-        // One straight bar over the whole width of its card, right to the edges of the window; side by side the bars
-        // have the same height and touch, so they read as a single bar. The shadow falls only below it.
+        // Wide windows (desktop, tablet): one straight bar over the whole width of its card, right to the edges of the
+        // window; side by side the bars have the same height and touch, so they read as a single bar, and the shadow
+        // falls only below it. On a phone the bar stays as it was, with rounded bottom corners.
+        val wide = isAdaptiveTwoPaneSplit()
         StyledSurface(
             style = barStyle,
-            shape = RectangleShape,
+            shape = if (wide) RectangleShape else RoundedCornerShape(bottomStart = BAR_CORNER_DP.dp, bottomEnd = BAR_CORNER_DP.dp),
             modifier =
-            reported.heightIn(min = tallestDp).drawWithContent {
-                clipRect(left = 0f, top = 0f, right = size.width, bottom = size.height + BAR_SHADOW_ROOM_DP.dp.toPx()) {
-                    this@drawWithContent.drawContent()
+            if (wide) {
+                reported.heightIn(min = tallestDp).drawWithContent {
+                    clipRect(
+                        left = 0f,
+                        top = 0f,
+                        right = size.width,
+                        bottom = size.height + BAR_SHADOW_ROOM_DP.dp.toPx(),
+                    ) {
+                        this@drawWithContent.drawContent()
+                    }
                 }
+            } else {
+                reported
             },
             baseColor = MaterialTheme.colorScheme.surface,
             floating = true,
