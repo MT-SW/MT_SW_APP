@@ -900,7 +900,7 @@ class SharedRadioInterfaceService(
      * revoke the admitted session and every transport-lifecycle field before rethrowing the original failure. A later
      * retry will receive a strictly newer generation.
      */
-    @Suppress("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught", "SuspendFunSwallowedCancellation")
     private suspend fun attachOrRevoke(
         address: String,
         session: RadioTransportSession,
@@ -917,10 +917,8 @@ class SharedRadioInterfaceService(
         try {
             pool.awaitReopenGap(address)
             return pool.attachForeground(address, service)
-        } catch (cancelled: CancellationException) {
-            abandonAdmission()
-            throw cancelled
         } catch (failure: Throwable) {
+            // Every failure, a cancellation included, is rethrown as it is after the admission is given back.
             abandonAdmission()
             throw failure
         }
