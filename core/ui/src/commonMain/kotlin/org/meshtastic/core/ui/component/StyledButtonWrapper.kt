@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.ElementLook
@@ -182,6 +183,17 @@ private fun isDangerColor(color: Color, scheme: ColorScheme): Boolean = color ==
     color == scheme.onError
 
 /**
+ * The red of a dangerous button on a light theme is a harsh, bright red, while the dark themes use a soft pink. On a
+ * light background the colour is moved most of the way to that pink, so the button looks the same there.
+ */
+private fun Color.softenedOnLight(scheme: ColorScheme): Color =
+    if (scheme.surface.luminance() > LIGHT_SURFACE_LUMINANCE) lerp(this, SOFT_DANGER_PINK, DANGER_LIGHT_SOFTEN) else this
+
+private const val LIGHT_SURFACE_LUMINANCE = 0.5f
+private const val DANGER_LIGHT_SOFTEN = 0.6f
+private val SOFT_DANGER_PINK = Color(0xFFFFB4AB)
+
+/**
  * MT_SW: the look of a filled button. With the default "outline and glass" style it is a thin outline on a clear glass
  * pane, with a soft glow in the colour of the theme while the button works and grey when it is switched off. "Look" can
  * choose filled glass or the plain Material buttons instead.
@@ -207,7 +219,8 @@ internal fun rememberDecorFor(container: Color, disabledContainer: Color, enable
             val accent =
                 when {
                     !enabled -> scheme.onSurface
-                    container.isSpecified && container.alpha > 0f && isDangerColor(container, scheme) -> container
+                    container.isSpecified && container.alpha > 0f && isDangerColor(container, scheme) ->
+                        container.softenedOnLight(scheme)
                     else -> scheme.primary.withBrightness(brightness)
                 }
             val steps = UiOptions.BUTTON_GLOW_SHARE
@@ -339,6 +352,7 @@ private const val OUTLINE_GLOSS_ALPHA = 0.16f
 private const val OUTLINE_EDGE_BOTTOM_ALPHA = 0.65f
 private const val OUTLINE_GLOW_LAYERS = 5
 private const val OUTLINE_GLOW_STEP_DP = 2f
+
 private const val OUTLINE_GLOW_LAYER_ALPHA = 0.055f
 
 /**

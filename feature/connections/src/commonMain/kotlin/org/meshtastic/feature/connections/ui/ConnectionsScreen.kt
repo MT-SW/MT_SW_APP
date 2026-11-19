@@ -135,7 +135,9 @@ import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
+import org.meshtastic.core.ui.component.SHADOW_ROOM_DP
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.expandForShadows
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.component.styledIndicator
@@ -1003,7 +1005,12 @@ fun ConnectionsScreen(
                 AdaptiveTwoPane(
                     first = {
                         Column(
-                            modifier = Modifier.verticalScroll(rememberScrollState()),
+                            // The scroll clips at its sides: it is wider by the room for the shadows and glow of the
+                            // buttons, and the content keeps its place and width.
+                            modifier =
+                            Modifier.expandForShadows(SHADOW_ROOM_DP.dp)
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = SHADOW_ROOM_DP.dp),
                             verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
                         ) {
                             header(this)
