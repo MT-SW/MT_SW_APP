@@ -255,16 +255,16 @@ private fun Columns(
 ) {
     val density = LocalDensity.current
     var totalPx by remember { mutableIntStateOf(0) }
-    val dividerPx = with(density) { DIVIDER_WIDTH.roundToPx() }
+    val handlePx = with(density) { HANDLE_WIDTH.roundToPx() }
     val minPanePx = with(density) { ThreeColumnWidths.MIN_PANE_DP.dp.roundToPx() }
-    val dividerCount = columns.size - 1
     val narrowList = layout == ColumnsLayout.LIST_DETAIL && MeshtasticPanes.isNarrowList(columns.first())
-    // The usable width (without the dividers) in dp, for the dividers' drag maths.
-    val usableDp = ((totalPx - dividerPx * dividerCount).coerceAtLeast(0)) / density.density
+    // The columns touch each other (the top bars join in the middle); the dividers are only handles drawn over the
+    // seam. The usable width in dp, for the dividers' drag maths.
+    val usableDp = totalPx.coerceAtLeast(0) / density.density
     val minShare = if (usableDp > 0f) ThreeColumnWidths.MIN_PANE_DP / usableDp else 0f
     // The conversations list beside an open conversation: the floating bar moves under it (see FloatingBarState).
     val bar = LocalFloatingBar.current
-    val usablePx = (totalPx - dividerPx * dividerCount).coerceAtLeast(0)
+    val usablePx = totalPx.coerceAtLeast(0)
     val barSidePx =
         if (narrowList && usablePx > 0) (usablePx * widths.chatListDetailShare).toInt().coerceIn(0, usablePx) else 0
     SideEffect { bar?.sideWidthPx = barSidePx }
@@ -275,7 +275,11 @@ private fun Columns(
     Layout(
         modifier = Modifier.fillMaxSize().onSizeChanged { totalPx = it.width },
         content = {
-            columns.forEachIndexed { index, entry ->
+            columns.forEach { entry ->
+                Box(Modifier.fillMaxHeight()) { movables.contents[entry.contentKey]?.invoke() ?: entry.Content() }
+            }
+            // The handles come after the columns, so they are drawn over the seam and take the touches there.
+            columns.forEachIndexed { index, _ ->
                 if (index > 0) {
                     ColumnDivider { deltaPx ->
                         val deltaDp = deltaPx / density.density
@@ -306,13 +310,12 @@ private fun Columns(
                         }
                     }
                 }
-                Box(Modifier.fillMaxHeight()) { movables.contents[entry.contentKey]?.invoke() ?: entry.Content() }
             }
         },
     ) { measurables, constraints ->
         val width = constraints.maxWidth
         val height = constraints.maxHeight
-        val usable = (width - dividerPx * dividerCount).coerceAtLeast(0)
+        val usable = width.coerceAtLeast(0)
         val columnWidths =
             when (layout) {
                 ColumnsLayout.THREE -> {
@@ -336,22 +339,27 @@ private fun Columns(
                     listOf(usable - extraW, extraW)
                 }
             }
-        // Measurables alternate: column, divider, column, ...
+        // Measurables: the columns first, then the handles between them (one fewer than the columns).
         val placeables = measurables.mapIndexed { index, measurable ->
-            val w = if (index % 2 == 1) dividerPx else columnWidths[index / 2]
+            val w = if (index < columnWidths.size) columnWidths[index] else handlePx
             measurable.measure(Constraints(minWidth = w, maxWidth = w, minHeight = height, maxHeight = height))
         }
         layout(width, height) {
             var x = 0
-            placeables.forEach {
-                it.placeRelative(x, 0)
-                x += it.width
+            placeables.forEachIndexed { index, placeable ->
+                if (index < columnWidths.size) {
+                    placeable.placeRelative(x, 0)
+                    x += placeable.width
+                    // The handle after this column stands over the seam, half on each side.
+                    placeables.getOrNull(columnWidths.size + index)?.placeRelative(x - handlePx / 2, 0)
+                }
             }
         }
     }
 }
 
-private val DIVIDER_WIDTH: Dp = 24.dp
+/** The width of the handle over the seam between two columns; the columns themselves touch. */
+private val HANDLE_WIDTH: Dp = 16.dp
 
 /** A draggable divider between two columns; [onDrag] gets the horizontal movement in pixels. */
 @Composable
@@ -359,7 +367,7 @@ private fun ColumnDivider(onDrag: (Float) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier =
-        Modifier.width(DIVIDER_WIDTH)
+        Modifier.width(HANDLE_WIDTH)
             .fillMaxHeight()
             .draggable(
                 state = rememberDraggableState { delta -> onDrag(delta) },

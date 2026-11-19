@@ -113,7 +113,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Ekran Połączenie (komputer, iPad): cień i poświata przycisków w lewej kolumnie (np. „Wymuś zatrzymanie aplikacji”) nie są już ucinane po bokach. Kolumna dostała miejsce na nie kosztem pustego marginesu i odstępu między kolumnami, więc przyciski mają tę samą szerokość i to samo miejsce, a lista po prawej się nie przesuwa.
 * Czerwone przyciski (np. „Wymuś zatrzymanie aplikacji”, „Rozłącz”) na jasnych motywach: zamiast jaskrawej czerwieni mają delikatny, nieco nasycony róż, jak na ciemnych motywach.
 * Komputer i tablet: lista urządzeń (prawa część ekranu Połączenie), lista rozmów i lista Zdrowia sieci zostawiają po bokach miejsce na cień i poświatę elementów (co najmniej 8 dp), więc ich krawędzie nie są już ucinane. Na ekranie Połączenie miejsce to pochodzi z pustych marginesów.
-* Górny pasek na komputerze i tablecie dochodzi do samych brzegów okna, a przy kilku kolumnach paski łączą się w środku w jeden (wewnętrzne dolne rogi są proste), więc jego cień nie jest już ucinany po bokach. Usunięty został 8 dp margines przy brzegu okna, który odsuwał pasek.
+* Górny pasek na komputerze i tablecie dochodzi do samych brzegów okna, a przy kilku kolumnach kolumny stykają się ze sobą (uchwyt do zmiany szerokości jest nałożony na szew), więc paski łączą się w środku w jeden (wewnętrzne dolne rogi są proste), więc jego cień nie jest już ucinany po bokach. Usunięty został 8 dp margines przy brzegu okna, który odsuwał pasek.
 
 ##### Zmiany względem oryginału
 
@@ -1011,7 +1011,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Connections screen (computer, iPad): the shadow and glow of the buttons in the left column (for example “Force stop the app”) are no longer cut off at the sides. The column got room for them out of the empty margin and the gap between the columns, so the buttons keep their width and place and the list on the right does not move.
 * Red buttons (for example “Force stop the app”, “Disconnect”) on light themes: a soft, slightly saturated pink instead of a harsh bright red, as on the dark themes.
 * Computer and tablet: the device list (right part of the Connections screen), the conversation list and the Network health list leave room at their sides for the shadows and glow of the elements (at least 8 dp), so their edges are no longer cut off. On the Connections screen this room comes from the empty margins.
-* The top bar on a computer and a tablet reaches the very edges of the window, and with several columns the bars join into one in the middle (the inner bottom corners are straight), so its shadow is no longer cut off at the sides. The 8 dp margin at the window edge that kept the bar away is removed.
+* The top bar on a computer and a tablet reaches the very edges of the window, and with several columns the columns touch each other (the handle for changing the width is laid over the seam), so the bars join into one in the middle (the inner bottom corners are straight), so its shadow is no longer cut off at the sides. The 8 dp margin at the window edge that kept the bar away is removed.
 
 ##### Changes against the original
 

@@ -104,9 +104,9 @@ fun MainAppBar(
     val barStyle = rememberUiOptions().element(UiOptions.GROUP_TOPBAR)
     val plain = barStyle.look == ElementLook.FLAT
     val barColors = if (plain) colors else TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-    // With several bars side by side (desktop, tablet) each one reports where it stands: the bars reach the edges of
-    // the window and join in the middle, each one growing over half of the gap to its neighbour (the content of the
-    // bar keeps its place).
+    // With several bars side by side (desktop, tablet) each one reports where it stands: the columns touch, so the bars
+    // reach the edges of the window and join in the middle (their inner bottom corners are straight). Should a gap
+    // remain between two bars, each one grows over half of it (the content of the bar keeps its place).
     val slots = LocalDeviceBarSlots.current
     val barId = remember { Any() }
     if (slots != null) DisposableEffect(slots, barId) { onDispose { slots.releaseBar(barId) } }
@@ -119,8 +119,10 @@ fun MainAppBar(
                 slots.reportBar(barId, bounds.left, bounds.right)
             }
         }
-    val joinStart = if (plain) 0f else (slots?.gapToLeft(barId) ?: 0f) / 2f
-    val joinEnd = if (plain) 0f else (slots?.gapToRight(barId) ?: 0f) / 2f
+    val gapLeft = if (plain) null else slots?.gapToLeft(barId)
+    val gapRight = if (plain) null else slots?.gapToRight(barId)
+    val joinStart = (gapLeft ?: 0f) / 2f
+    val joinEnd = (gapRight ?: 0f) / 2f
     val joinStartDp = with(LocalDensity.current) { joinStart.toDp() }
     val joinEndDp = with(LocalDensity.current) { joinEnd.toDp() }
     val barContent: @Composable () -> Unit = {
@@ -194,8 +196,8 @@ fun MainAppBar(
             style = barStyle,
             shape =
             RoundedCornerShape(
-                bottomStart = if (joinStart > 0f) 0.dp else BAR_CORNER_DP.dp,
-                bottomEnd = if (joinEnd > 0f) 0.dp else BAR_CORNER_DP.dp,
+                bottomStart = if (gapLeft != null) 0.dp else BAR_CORNER_DP.dp,
+                bottomEnd = if (gapRight != null) 0.dp else BAR_CORNER_DP.dp,
             ),
             modifier = reported.growSideways(joinStart, joinEnd),
             baseColor = MaterialTheme.colorScheme.surface,
