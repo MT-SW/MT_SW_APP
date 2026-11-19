@@ -150,7 +150,7 @@ fun PaddingValues.withShadowInset(inset: Dp): PaddingValues {
 private const val SHADOW_REACH = 0.8f
 
 /** The room, in dp, that [expandForShadows] gives the shadows and glows of the elements of a scrolling column. */
-const val SHADOW_ROOM_DP = 12
+const val SHADOW_ROOM_DP = 8
 
 /**
  * Makes a container [room] wider at both sides without moving or resizing what is inside: the container reports its
