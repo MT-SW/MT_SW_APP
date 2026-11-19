@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
@@ -59,6 +60,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
@@ -127,6 +129,10 @@ class SosBarSlots {
         places.remove(id)
     }
 
+    /** How many bars are on screen now (more than one: the window shows several cards side by side). */
+    val barCount: Int
+        get() = places.size
+
     fun shows(id: Any): Boolean {
         if (id !in places) return places.isEmpty()
         val mine = places.getValue(id)
@@ -164,6 +170,9 @@ private fun SosBarSlot(modifier: Modifier = Modifier, content: @Composable () ->
     Box(placed) { if (slots == null || slots.shows(id)) content() }
 }
 
+/** The part of a bar's width the plate and the radio chooser may take when several bars are side by side. */
+private const val SIDE_BY_SIDE_SHARE = 0.4f
+
 /** Same as [LocalSosBarSlots] for the plate of our node and the device list: they too appear once for the window. */
 @Suppress("CompositionLocalAllowlist")
 val LocalDeviceBarSlots = compositionLocalOf<SosBarSlots?> { null }
@@ -186,7 +195,21 @@ fun DeviceBarSlot(modifier: Modifier = Modifier, content: @Composable RowScope.(
                 slots.report(id, bounds.right, bounds.top)
             }
         }
-    Row(modifier.then(position), verticalAlignment = Alignment.CenterVertically) {
+    // With several bars side by side each one is only a column wide: the plate and the radio chooser may take at most a
+    // part of the bar, so the title and the buttons of the screen are never pushed out of the window.
+    val share = if (slots != null && slots.barCount > 1) SIDE_BY_SIDE_SHARE else 1f
+    Row(
+        modifier
+            .then(position)
+            .layout { measurable, constraints ->
+                val capped = share < 1f && constraints.hasBoundedWidth
+                val cap = if (capped) (constraints.maxWidth * share).toInt() else constraints.maxWidth
+                val placeable = measurable.measure(constraints.copy(minWidth = 0, maxWidth = cap))
+                layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+            }
+            .clipToBounds(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         if (slots == null || slots.shows(id)) content()
     }
 }

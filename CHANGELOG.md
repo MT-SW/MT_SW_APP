@@ -150,6 +150,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Naprawione błędy
 
+* **Górny pasek w kilku kolumnach (komputer, tablet).** Plakietka węzła i wybór radia zajmują najwyżej część paska, więc przy dwóch kolumnach tytuł i przyciski ekranu nie wychodzą poza okno.
 * Ponowne łączenie Bluetooth z już sparowanym urządzeniem (Xiaomi/MIUI).
 * Puste listy rozwijane i nieprawidłowo działająca mapa w spakowanej wersji na komputer.
 * Odzyskiwanie urządzenia zablokowanego w trybie DFU oraz aktualizacja własnym plikiem dla nieznanych urządzeń.
@@ -1039,6 +1040,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 
+* **Top bar with several columns (computer, tablet).** The node plate and the radio chooser take at most a part of the bar, so with two columns the title and the buttons of the screen are not pushed out of the window.
 * Reconnecting Bluetooth to an already paired device (Xiaomi/MIUI).
 * Empty drop-down lists and a map that did not work in the packaged computer version.
 * Recovering a device locked in DFU mode and updating with an own file for unknown devices.
