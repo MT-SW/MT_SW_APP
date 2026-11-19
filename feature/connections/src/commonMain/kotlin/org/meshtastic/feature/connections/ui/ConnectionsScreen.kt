@@ -135,10 +135,10 @@ import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
-import org.meshtastic.core.ui.component.SHADOW_ROOM_DP
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
+import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.styledIndicator
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
@@ -994,24 +994,30 @@ fun ConnectionsScreen(
         // The connect-code button floats over the list (above the bar) unless the MT_SW top-bar menu option is on.
         val fabClearance = if (onConnectCode != null && !importInTopBar) FabClearance else 0.dp
         if (isAdaptiveTwoPaneSplit()) {
+            // The room the shadows and the glow of the elements need at the sides of each pane; it is taken from the
+            // empty margins, so the elements keep their width and place.
+            val room = rememberShadowInset()
             Column(
                 modifier =
                 Modifier.fillMaxSize()
                     .padding(paddingValues)
-                    .padding(start = 16.dp - SHADOW_ROOM_DP.dp, end = 16.dp),
+                    .padding(
+                        start = (16.dp - room).coerceAtLeast(0.dp),
+                        end = (16.dp - room).coerceAtLeast(0.dp),
+                    ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
                 // Each pane scrolls on its own, so a tall header (large font scale) can't push its own actions
                 // off screen.
                 AdaptiveTwoPane(
-                    firstPaneSideRoom = SHADOW_ROOM_DP.dp,
+                    firstPaneSideRoom = room,
                     first = {
                         Column(
                             // The pane is wider by the room for shadows (taken from the margin and the gap), and the
                             // content is inset by the same amount, so the buttons keep their width and place.
                             modifier =
-                            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = SHADOW_ROOM_DP.dp),
+                            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = room),
                             verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
                         ) {
                             header(this)

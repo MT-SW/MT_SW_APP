@@ -128,9 +128,17 @@ fun glassContentColor(group: String, base: Color = MaterialTheme.colorScheme.sur
 @Composable
 fun rememberShadowInset(group: String = LocalCardGroup.current): Dp {
     val style = rememberUiOptions().element(group)
-    if (style.look != ElementLook.DEPTH) return 0.dp
-    val s = style.strength.coerceIn(0, PERCENT.toInt()) / PERCENT
-    return ((DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s) * SHADOW_REACH).dp
+    val depth =
+        if (style.look == ElementLook.DEPTH) {
+            val s = style.strength.coerceIn(0, PERCENT.toInt()) / PERCENT
+            ((DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s) * SHADOW_REACH).dp
+        } else {
+            0.dp
+        }
+    // On a computer or a tablet every look keeps at least [SHADOW_ROOM_DP]: the glow of the outlined buttons and the
+    // soft shadows of the other looks are drawn outside their element too.
+    val floor = if (isAdaptiveTwoPaneSplit()) SHADOW_ROOM_DP.dp else 0.dp
+    return maxOf(depth, floor)
 }
 
 /** [this] with [inset] added at the left and the right, so a list keeps the shadow of its cards inside its bounds. */

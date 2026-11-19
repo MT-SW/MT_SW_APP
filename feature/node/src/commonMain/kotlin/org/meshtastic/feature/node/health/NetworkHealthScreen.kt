@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.health
 
+import org.meshtastic.core.ui.component.withShadowInset
+import org.meshtastic.core.ui.component.rememberShadowInset
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
@@ -261,7 +263,7 @@ fun NetworkHealthScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
-                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
                 ) {
                     items(uiState.nodes, key = { it.num }) { node ->
                         NodeHealthRow(
