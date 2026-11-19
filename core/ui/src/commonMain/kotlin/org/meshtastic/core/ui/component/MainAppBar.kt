@@ -18,6 +18,8 @@
 
 package org.meshtastic.core.ui.component
 
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.layout.heightIn
 import kotlin.math.roundToInt
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.platform.LocalDensity
@@ -123,6 +125,7 @@ fun MainAppBar(
     val gapRight = if (plain) null else slots?.gapToRight(barId)
     val joinStart = (gapLeft ?: 0f) / 2f
     val joinEnd = (gapRight ?: 0f) / 2f
+    val tallestDp = with(LocalDensity.current) { (slots?.tallestBar ?: 0f).toDp() }
     val joinStartDp = with(LocalDensity.current) { joinStart.toDp() }
     val joinEndDp = with(LocalDensity.current) { joinEnd.toDp() }
     val barContent: @Composable () -> Unit = {
@@ -131,7 +134,9 @@ fun MainAppBar(
             if (plain) {
                 reported.monochromeLayer()
             } else {
-                Modifier.monochromeLayer().padding(start = joinStartDp, end = joinEndDp)
+                Modifier.monochromeLayer()
+                    .padding(start = joinStartDp, end = joinEndDp)
+                    .onSizeChanged { slots?.reportBarHeight(barId, it.height.toFloat()) }
             },
         ) {
             TopAppBar(
@@ -199,7 +204,7 @@ fun MainAppBar(
                 bottomStart = if (gapLeft != null) 0.dp else BAR_CORNER_DP.dp,
                 bottomEnd = if (gapRight != null) 0.dp else BAR_CORNER_DP.dp,
             ),
-            modifier = reported.growSideways(joinStart, joinEnd),
+            modifier = reported.growSideways(joinStart, joinEnd).heightIn(min = tallestDp),
             baseColor = MaterialTheme.colorScheme.surface,
             floating = true,
         ) {

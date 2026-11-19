@@ -58,6 +58,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
@@ -382,6 +383,16 @@ private fun thinChoiceBorder(selected: Boolean, enabled: Boolean): BorderStroke 
     return BorderStroke(STROKE_DP.dp, color)
 }
 
+/** The usual colours of a chip: nearly white when off, a yellowish tint of the theme colour when chosen. */
+@Composable
+private fun chipColors(): SelectableChipColors = FilterChipDefaults.filterChipColors(
+    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+    selectedContainerColor = themeAccent().copy(alpha = CHIP_SELECTED_ALPHA).compositeOver(MaterialTheme.colorScheme.surface),
+    selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+)
+
+private const val CHIP_SELECTED_ALPHA = 0.3f
+
 @Composable
 fun FilterChip(
     selected: Boolean,
@@ -392,7 +403,7 @@ fun FilterChip(
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     shape: Shape = FilterChipDefaults.shape,
-    colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
+    colors: SelectableChipColors = chipColors(),
     elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
     border: BorderStroke? = FilterChipDefaults.filterChipBorder(enabled, selected),
     interactionSource: MutableInteractionSource? = null,

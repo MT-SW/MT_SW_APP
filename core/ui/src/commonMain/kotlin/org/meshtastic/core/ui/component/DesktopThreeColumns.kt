@@ -346,20 +346,22 @@ private fun Columns(
         }
         layout(width, height) {
             var x = 0
-            placeables.forEachIndexed { index, placeable ->
-                if (index < columnWidths.size) {
-                    placeable.placeRelative(x, 0)
-                    x += placeable.width
-                    // The handle after this column stands over the seam, half on each side.
-                    placeables.getOrNull(columnWidths.size + index)?.placeRelative(x - handlePx / 2, 0)
-                }
+            val seams = ArrayList<Int>()
+            // The columns first, the handles after them, so the handles are on top of everything.
+            placeables.take(columnWidths.size).forEachIndexed { index, placeable ->
+                placeable.placeRelative(x, 0)
+                x += placeable.width
+                if (index < columnWidths.size - 1) seams += x
+            }
+            placeables.drop(columnWidths.size).forEachIndexed { index, handle ->
+                handle.placeRelative(seams[index] - handlePx / 2, 0)
             }
         }
     }
 }
 
 /** The width of the handle over the seam between two columns; the columns themselves touch. */
-private val HANDLE_WIDTH: Dp = 16.dp
+private val HANDLE_WIDTH: Dp = 24.dp
 
 /** A draggable divider between two columns; [onDrag] gets the horizontal movement in pixels. */
 @Composable

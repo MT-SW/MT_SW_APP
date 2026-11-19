@@ -160,7 +160,7 @@ private const val SHADOW_REACH = 0.8f
  * much at each side out of the empty margin and gap around it, and its content is inset by the same amount, so the
  * elements keep their size and place while their shadows have room to be drawn inside the pane.
  */
-const val SHADOW_ROOM_DP = 8
+const val SHADOW_ROOM_DP = 14
 
 /** The depth look of [elementLook], with its strength 0-100. */
 fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier {

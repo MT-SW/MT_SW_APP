@@ -139,7 +139,19 @@ class SosBarSlots {
 
     fun releaseBar(id: Any) {
         barEdges.remove(id)
+        barHeights.remove(id)
     }
+
+    private val barHeights = mutableStateMapOf<Any, Float>()
+
+    /** A top bar reports how tall it is on its own; side by side, all bars are made as tall as the tallest. */
+    fun reportBarHeight(id: Any, height: Float) {
+        if (barHeights[id] != height) barHeights[id] = height
+    }
+
+    /** The height in px of the tallest bar on screen (0 when none is known). */
+    val tallestBar: Float
+        get() = barHeights.values.maxOrNull() ?: 0f
 
     /** The gap in px between the bar [id] and the nearest bar at its left; null when there is none. */
     fun gapToLeft(id: Any): Float? {
