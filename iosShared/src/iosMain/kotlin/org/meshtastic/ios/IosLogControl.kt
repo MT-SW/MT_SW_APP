@@ -334,7 +334,17 @@ internal object IosLogControl : AppLogControl {
                     .getOrDefault(emptyList())
             }
         for ((name, bytes) in engine) toc.append("$name: ${bytes.size / KB} KB\n")
-        return listOf("spis_tresci.txt" to toc.toString().encodeToByteArray()) + all + engine + logs
+        // Window pictures exist only from a full log, so a package of the automatic log never has them.
+        val pictures =
+            if (withLogs && IosFileLog.level.value != AppLogLevel.OFF) {
+                IosFileLog.screenFiles()
+                    .filter { IosFileLog.modified(it) >= since }
+                    .map { "zrzuty/${it.name}" to read(it) }
+            } else {
+                emptyList()
+            }
+        for ((name, bytes) in pictures) toc.append("$name: ${bytes.size / KB} KB\n")
+        return listOf("spis_tresci.txt" to toc.toString().encodeToByteArray()) + all + engine + logs + pictures
     }
 
     override suspend fun buildReport(

@@ -22,6 +22,12 @@ import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
+import platform.UIKit.UIApplication
+import platform.UIKit.UIGraphicsImageRenderer
+import platform.UIKit.UIImagePNGRepresentation
+import platform.UIKit.UIScreen
 import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
@@ -58,6 +64,8 @@ internal object IosFileLog : LogWriter() {
     const val PART_BYTES = 400L * 1024
     const val RECENT_WINDOW_MS = 24L * 60 * 60 * 1000
     private const val MAX_TOTAL_BYTES = 300L * 1024 * 1024
+    private const val MAX_SCREEN_FILES = 60
+    private const val SCREEN_MIN_GAP_MS = 30_000L
     private const val FULL_WINDOW_MS = 7L * 24 * 60 * 60 * 1000
     private const val RECENT_MAX_BYTES = 40L * 1024 * 1024
     private const val MAX_CRASH_FILES = 20
@@ -70,6 +78,8 @@ internal object IosFileLog : LogWriter() {
 
     private val dir: Path by lazy { (iosDataDir() + "/logs").toPath() }
     private val crashDir: Path by lazy { dir / "crash" }
+    private val screenDir: Path by lazy { dir / "screenshots" }
+    private var lastScreenAt = 0L
     private val lock = NSLock()
     private var part = 0
     private var partBytes = 0L
@@ -141,6 +151,7 @@ internal object IosFileLog : LogWriter() {
         @OptIn(ExperimentalNativeApi::class)
         setUnhandledExceptionHook { error ->
             runCatching { Logger.e(error, tag = "Log") { "Uncaught exception in thread ${threadName()}" } }
+            captureScreen("Unhandled exception: ${error::class.simpleName}")
             writeCrash(error.stackTraceToString())
         }
     }
@@ -283,13 +294,60 @@ internal object IosFileLog : LogWriter() {
         val all = parts()
         var kept = 0L
         var drop = false
+        var oldestKeptStart = 0L
         for (f in all.reversed()) {
             if (drop && f.name != currentName) runCatching { FileSystem.SYSTEM.delete(f) }
             val meta = FileSystem.SYSTEM.metadataOrNull(f)
             val end = meta?.lastModifiedAtMillis ?: 0L
             val start = meta?.createdAtMillis ?: end
+            if (!drop) oldestKeptStart = start
             kept += (end - start).coerceAtLeast(0L)
             if (kept > FULL_WINDOW_MS) drop = true
+        }
+        // The window pictures go with the parts they belong to.
+        if (drop) screenFiles().filter { modified(it) < oldestKeptStart }.forEach { delete(it) }
+    }
+
+    private fun delete(path: Path) {
+        runCatching { FileSystem.SYSTEM.delete(path) }
+    }
+
+    /** The saved window pictures and sizes, oldest first. */
+    fun screenFiles(): List<Path> = runCatching { FileSystem.SYSTEM.list(screenDir).sortedBy { it.name } }
+        .getOrDefault(emptyList())
+
+    /**
+     * Saves the size of the window and a picture of it when the interface goes wrong ([reason]). Only while the full
+     * log (switched on by hand) is on, never for the automatic log of the last day, at most once in
+     * [SCREEN_MIN_GAP_MS] and never more than [MAX_SCREEN_FILES] files. The picture is taken only on the main thread.
+     */
+    @OptIn(ExperimentalForeignApi::class)
+    @Suppress("DEPRECATION")
+    fun captureScreen(reason: String) {
+        if (levelFlow.value == AppLogLevel.OFF) return
+        val now = nowMillis()
+        if (now - lastScreenAt < SCREEN_MIN_GAP_MS) return
+        lastScreenAt = now
+        runCatching {
+            FileSystem.SYSTEM.createDirectories(screenDir)
+            val name = format("yyyyMMdd-HHmmss")
+            val window = UIApplication.sharedApplication.keyWindow
+            val size = window?.bounds?.useContents { size.width to size.height }
+            FileSystem.SYSTEM.write(screenDir / "${name}_powod.txt") {
+                writeUtf8(
+                    "Reason: $reason\nTime: ${stamp()}\n${header()}\n" +
+                        "Window: ${size?.first} x ${size?.second} pt, scale ${UIScreen.mainScreen.scale}\n",
+                )
+            }
+            if (window != null && NSThread.isMainThread) {
+                val image =
+                    UIGraphicsImageRenderer(bounds = window.bounds).imageWithActions { _ ->
+                        window.drawViewHierarchyInRect(window.bounds, afterScreenUpdates = false)
+                    }
+                UIImagePNGRepresentation(image)?.writeToFile((screenDir / "${name}_okno.png").toString(), true)
+            }
+            screenFiles().dropLast(MAX_SCREEN_FILES).forEach { delete(it) }
+            Logger.i { "Window picture saved ($reason)" }
         }
     }
 
