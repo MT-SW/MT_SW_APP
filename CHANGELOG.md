@@ -82,6 +82,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Panorama: gładsze grzbiety, nowe tekstury gór i lasów, szybsze rysowanie budynków; budynki pobierają się od małych kawałków i każdy zapisuje się od razu.
 * Aktualizacja oprogramowania przez Bluetooth na iPhonie/iPadzie szuka urządzenia w trybie aktualizacji bez adresu MAC.
 * **Zgłaszanie błędów na komputerze: rozmiar okna i zrzut okna.** Paczka zgłoszenia zawiera plik `okno.txt` (rozmiar i położenie okna, ekrany, skala), a razem z logami także `okno.png`, zrzut okna (jeśli system pozwala), żeby przy błędach układu nie trzeba było prosić o zrzuty.
+* Przełączanie urządzeń: połączenie z radiem zostaje otwarte cały czas, a aplikacja trzyma bieżącą kopię jego konfiguracji i listy węzłów. Po przełączeniu widok dostaje dane z tej kopii, bez uzgadniania z radiem, więc przełączenie jest natychmiastowe, a radio Wi-Fi nie „rozpina się” po powrocie z tła. Zbieranie w tle nie pyta już radia o konfigurację, gdy to jest już skonfigurowane.
 
 ##### Naprawione błędy
 * Komputer: karty urządzeń w „Połącz” przełączają się teraz także strzałkami po bokach kropek (w kolorze kropek, takie same na wszystkich systemach), bo myszą nie da się ich przesunąć palcem. Kropki i strzałki mają wygląd wybrany w „Wygląd elementów”: domyślnie cienki obrys na szkle (pokazywana karta świeci kolorem motywu, pozostałe są szare), a po wybraniu starego stylu przycisków i ikon wracają zwykłe kropki i strzałki.
@@ -987,6 +988,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Panorama: smoother ridges, new textures of mountains and forests, faster drawing of buildings; the buildings download in small pieces and each is saved at once.
 * Firmware update over Bluetooth on iPhone/iPad finds the device in update mode without a MAC address.
 * **Bug reports on the computer: window size and a picture of the window.** The report package holds `okno.txt` (size and place of the window, screens, scale) and, together with the logs, `okno.png`, a picture of the window (where the system allows), so a layout problem does not need extra screenshots.
+* Switching devices: the connection to the radio stays open all the time and the app keeps a live copy of its configuration and node list. After a switch the view is given the data from this copy, with no handshake with the radio, so switching is instant and a Wi-Fi radio no longer drops after coming back from the background. The background collection no longer asks an already configured radio for its configuration.
 
 ##### Fixed bugs
 * The map layers sheet on the iPhone and iPad no longer has overlapping text: the imported-layers list is limited in height on its own and the parts below it (including the signal survey) always keep their place.

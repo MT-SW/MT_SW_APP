@@ -162,7 +162,7 @@ class BackgroundRadioCollector(
             BackgroundRadioLink(address, linkScope, transportFactory.supportedDeviceTypes) { bytes ->
                 bridge.onDeviceFrame(address, bytes.toByteString())
             }
-        link.attach { bytes -> pool.send(address, bytes) }
+        link.attach { bytes -> pool.sendFromBackground(address, bytes) }
         pool.awaitReopenGap(address)
         pool.attachBackground(address, link)
         try {

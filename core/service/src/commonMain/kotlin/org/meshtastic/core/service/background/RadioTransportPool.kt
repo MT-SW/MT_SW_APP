@@ -45,6 +45,7 @@ import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ReceivedRadioFrame
 import org.meshtastic.core.repository.TransportDisconnectReason
+import org.meshtastic.proto.ToRadio
 
 /**
  * The pool of connections (MT_SW): exactly one transport per device address. The app view (the foreground, one device
@@ -76,6 +77,7 @@ class RadioTransportPool(
         var foreground: RadioInterfaceService? = null
         var background: RadioInterfaceService? = null
         var connected = false
+        val mirror = RadioStateMirror()
         lateinit var transport: RadioTransport
         val link = Link(this)
     }
@@ -96,11 +98,13 @@ class RadioTransportPool(
 
         override fun onDisconnect(isPermanent: Boolean, errorMessage: String?, reason: TransportDisconnectReason?) {
             synchronized(lock) { entry.connected = false }
+            entry.mirror.reset()
             publish()
             target()?.onDisconnect(isPermanent, errorMessage, reason)
         }
 
         override fun handleFromRadio(bytes: ByteArray) {
+            entry.mirror.onFromRadio(bytes)
             target()?.handleFromRadio(bytes)
         }
 
@@ -206,6 +210,17 @@ class RadioTransportPool(
     /** True when a background consumer waits for [address], so a transport released by the app view is taken over. */
     fun hasBackground(address: String): Boolean = synchronized(lock) { entries[address]?.background != null }
 
+    /**
+     * The quiet background collector sends through here. Its request for the configuration is not passed to a radio
+     * that is already configured: the radio keeps sending what it hears on its own, and asking again is only a
+     * disturbance (a Wi-Fi radio does not answer a second request on the same connection).
+     */
+    fun sendFromBackground(address: String, bytes: ByteArray): Boolean {
+        val entry = synchronized(lock) { entries[address] } ?: return false
+        if (entry.mirror.isComplete && wantedConfiguration(bytes) != 0) return true
+        return entry.transport.handleSendToRadio(bytes)
+    }
+
     /** Sends [bytes] through the transport of [address]. */
     fun send(address: String, bytes: ByteArray): Boolean =
         synchronized(lock) { entries[address] }?.transport?.handleSendToRadio(bytes) ?: false
@@ -257,7 +272,20 @@ class RadioTransportPool(
         RadioTransport {
         private fun current(): Entry? = synchronized(lock) { entries[address] }
 
-        override fun handleSendToRadio(p: ByteArray): Boolean = current()?.transport?.handleSendToRadio(p) ?: false
+        override fun handleSendToRadio(p: ByteArray): Boolean {
+            val entry = current() ?: return false
+            // A radio that is already open and known is not asked for its configuration again: the request is answered
+            // from the live copy, so switching between devices never negotiates with the radio.
+            val nonce = wantedConfiguration(p)
+            val frames = if (nonce != 0) entry.mirror.replay(nonce) else null
+            if (frames == null) return entry.transport.handleSendToRadio(p)
+            entry.scope.launch {
+                // The radio itself answers after a moment; the asker has already noted what it waits for.
+                delay(REPLAY_DELAY_MS)
+                frames.forEach { consumer.handleFromRadio(it) }
+            }
+            return true
+        }
 
         override fun keepAlive() {
             current()?.transport?.keepAlive()
@@ -306,7 +334,14 @@ class RadioTransportPool(
     }
 }
 
+/** The number in a request for the configuration (`want_config_id`), 0 for any other message to the radio. */
+private fun wantedConfiguration(bytes: ByteArray): Int =
+    runCatching { ToRadio.ADAPTER.decode(bytes).want_config_id }.getOrNull() ?: 0
+
 private const val ORPHAN_GRACE_MS = 60_000L
+
+/** The pause before a request for the configuration is answered from the copy, like a radio's answer takes. */
+private const val REPLAY_DELAY_MS = 30L
 
 /** Pause between closing a connection and opening the same device again. */
 private const val REOPEN_GAP_MS = 3_000L
