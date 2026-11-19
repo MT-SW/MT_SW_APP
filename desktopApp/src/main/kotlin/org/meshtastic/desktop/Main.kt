@@ -138,6 +138,7 @@ import org.meshtastic.desktop.data.DesktopPreferencesDataSource
 import org.meshtastic.desktop.di.DesktopKoinApp
 import org.meshtastic.desktop.map.DesktopTracerouteMap
 import org.meshtastic.desktop.map.desktopMapViewProvider
+import org.meshtastic.desktop.mcp.DesktopMcpLifecycle
 import org.meshtastic.desktop.notification.DesktopOS
 import org.meshtastic.desktop.notification.DesktopSosAlarmSound
 import org.meshtastic.desktop.notification.NativeNotificationSender
@@ -235,6 +236,7 @@ fun main(args: Array<String>) {
         MeshServiceLifecycle()
         NodeCleanupLifecycle()
         AppUpdateLifecycle()
+        DesktopMcpLifecycle()
         // Desktop has no WorkManager, so the hourly mesh log cleanup lives as long as the application composition.
         LaunchedEffect(Unit) { withContext(ioDispatcher) { koinApp.koin.get<MeshLogCleanup>().runHourly() } }
         ThemeAndLocaleProvider(uiViewModel)

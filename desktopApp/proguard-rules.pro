@@ -187,3 +187,11 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# ---- Debug-only MCP server (mcp/DesktopMcpServer.kt) --------------------------
+# A release build never starts it. kotlin-sdk's kotlin-logging ships optional logback
+# and GraalVM bridges, and Ktor's OpenAPI routing references the JWT auth plugin;
+# none of those are on the classpath.
+-dontwarn io.github.oshai.kotlinlogging.logback.**
+-dontwarn io.github.oshai.kotlinlogging.internal.Target_*
+-dontwarn io.ktor.server.routing.openapi.**
