@@ -894,6 +894,38 @@ class SharedRadioInterfaceService(
         return true
     }
 
+    /**
+     * Waits out the pause before the same device is opened again and attaches the app view to its transport. A failed
+     * factory call consumed a generation that may already have reached observers. Keep the generation monotonic, but
+     * revoke the admitted session and every transport-lifecycle field before rethrowing the original failure. A later
+     * retry will receive a strictly newer generation.
+     */
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun attachOrRevoke(
+        address: String,
+        session: RadioTransportSession,
+        service: RadioInterfaceService,
+        stateBeforeStart: ConnectionState,
+    ): RadioTransportPool.PooledRadioTransport {
+        suspend fun abandonAdmission() {
+            revokeTransportSession(session)
+            radioTransport = null
+            runningTransportId = null
+            isStarted = false
+            _connectionState.value = stateBeforeStart
+        }
+        try {
+            pool.awaitReopenGap(address)
+            return pool.attachForeground(address, service)
+        } catch (cancelled: CancellationException) {
+            abandonAdmission()
+            throw cancelled
+        } catch (failure: Throwable) {
+            abandonAdmission()
+            throw failure
+        }
+    }
+
     /** Must be called under [transportMutex]. */
     @Suppress("TooGenericExceptionCaught")
     private suspend fun startTransportLocked() {
@@ -929,26 +961,7 @@ class SharedRadioInterfaceService(
         val connectionStateBeforeStart = _connectionState.value
 
         Logger.i { "Starting radio transport for ${address.anonymize} (generation=$generation)" }
-        // A failed factory call consumed a generation that may already have reached observers. Keep the generation
-        // monotonic, but revoke the admitted session and every transport-lifecycle field before rethrowing the original
-        // failure. A later retry will receive a strictly newer generation.
-        suspend fun abandonAdmission() {
-            revokeTransportSession(session)
-            radioTransport = null
-            runningTransportId = null
-            isStarted = false
-            _connectionState.value = connectionStateBeforeStart
-        }
-        val newTransport =
-            try {
-                pool.awaitReopenGap(address)
-                pool.attachForeground(address, sessionBoundService)
-            } catch (failure: Throwable) {
-                abandonAdmission()
-                // A cancellation is passed on as it is; any other failure is rethrown below.
-                currentCoroutineContext().ensureActive()
-                throw failure
-            }
+        val newTransport = attachOrRevoke(address, session, sessionBoundService, connectionStateBeforeStart)
         val published =
             synchronized(sessionCallbackLock) {
                 if (activeTransportSession !== session || !sessionAdmissionOpen) {
