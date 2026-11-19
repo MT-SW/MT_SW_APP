@@ -932,7 +932,7 @@ class SharedRadioInterfaceService(
         // A failed factory call consumed a generation that may already have reached observers. Keep the generation
         // monotonic, but revoke the admitted session and every transport-lifecycle field before rethrowing the original
         // failure. A later retry will receive a strictly newer generation.
-        val abandonAdmission = {
+        suspend fun abandonAdmission() {
             revokeTransportSession(session)
             radioTransport = null
             runningTransportId = null
@@ -943,11 +943,10 @@ class SharedRadioInterfaceService(
             try {
                 pool.awaitReopenGap(address)
                 pool.attachForeground(address, sessionBoundService)
-            } catch (cancelled: CancellationException) {
-                abandonAdmission()
-                throw cancelled
             } catch (failure: Throwable) {
                 abandonAdmission()
+                // A cancellation is passed on as it is; any other failure is rethrown below.
+                currentCoroutineContext().ensureActive()
                 throw failure
             }
         val published =
