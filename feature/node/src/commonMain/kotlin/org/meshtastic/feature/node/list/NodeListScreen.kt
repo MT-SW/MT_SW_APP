@@ -422,8 +422,7 @@ fun NodeListScreen(
                     state = listState,
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     contentPadding =
-                        PaddingValues(bottom = LocalFloatingBarInset.current)
-                            .withShadowInset(rememberShadowInset()),
+                    PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
                 ) {
                     stickyHeader {
                         val animatedAlpha by

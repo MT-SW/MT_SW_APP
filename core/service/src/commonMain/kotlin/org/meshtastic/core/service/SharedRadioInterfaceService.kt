@@ -929,19 +929,25 @@ class SharedRadioInterfaceService(
         val connectionStateBeforeStart = _connectionState.value
 
         Logger.i { "Starting radio transport for ${address.anonymize} (generation=$generation)" }
+        // A failed factory call consumed a generation that may already have reached observers. Keep the generation
+        // monotonic, but revoke the admitted session and every transport-lifecycle field before rethrowing the original
+        // failure. A later retry will receive a strictly newer generation.
+        val abandonAdmission = {
+            revokeTransportSession(session)
+            radioTransport = null
+            runningTransportId = null
+            isStarted = false
+            _connectionState.value = connectionStateBeforeStart
+        }
         val newTransport =
             try {
                 pool.awaitReopenGap(address)
                 pool.attachForeground(address, sessionBoundService)
+            } catch (cancelled: CancellationException) {
+                abandonAdmission()
+                throw cancelled
             } catch (failure: Throwable) {
-                // A failed factory call consumed a generation that may already have reached observers. Keep the
-                // generation monotonic, but revoke the admitted session and every transport-lifecycle field before
-                // rethrowing the original failure. A later retry will receive a strictly newer generation.
-                revokeTransportSession(session)
-                radioTransport = null
-                runningTransportId = null
-                isStarted = false
-                _connectionState.value = connectionStateBeforeStart
+                abandonAdmission()
                 throw failure
             }
         val published =

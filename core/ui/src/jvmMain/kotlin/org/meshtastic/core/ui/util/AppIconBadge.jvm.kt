@@ -17,13 +17,13 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import co.touchlab.kermit.Logger
 import java.awt.Taskbar
 
 @Composable
 actual fun AppIconBadge(count: Int) {
-    LaunchedEffect(count) {
+    DisposableEffect(count) {
         try {
             if (Taskbar.isTaskbarSupported()) {
                 val taskbar = Taskbar.getTaskbar()
@@ -34,5 +34,6 @@ actual fun AppIconBadge(count: Int) {
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Logger.d { "App icon badge not set: ${e.message}" }
         }
+        onDispose {}
     }
 }

@@ -20,14 +20,10 @@ import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
-import platform.UIKit.UIApplication
-import platform.UIKit.UIGraphicsImageRenderer
-import platform.UIKit.UIImagePNGRepresentation
-import platform.UIKit.UIScreen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
@@ -44,7 +40,11 @@ import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSThread
 import platform.Foundation.timeIntervalSince1970
 import platform.Foundation.writeToFile
+import platform.UIKit.UIApplication
 import platform.UIKit.UIDevice
+import platform.UIKit.UIGraphicsImageRenderer
+import platform.UIKit.UIImagePNGRepresentation
+import platform.UIKit.UIScreen
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.Platform
 import kotlin.native.setUnhandledExceptionHook
@@ -314,13 +314,15 @@ internal object IosFileLog : LogWriter() {
     }
 
     /** The saved window pictures and sizes, oldest first. */
-    fun screenFiles(): List<Path> = runCatching { FileSystem.SYSTEM.list(screenDir).sortedBy { it.name } }
+    fun screenFiles(): List<Path> = runCatching {
+        FileSystem.SYSTEM.list(screenDir).sortedBy { it.name }
+    }
         .getOrDefault(emptyList())
 
     /**
      * Saves the size of the window and a picture of it when the interface goes wrong ([reason]). Only while the full
-     * log (switched on by hand) is on, never for the automatic log of the last day, at most once in
-     * [SCREEN_MIN_GAP_MS] and never more than [MAX_SCREEN_FILES] files. The picture is taken only on the main thread.
+     * log (switched on by hand) is on, never for the automatic log of the last day, at most once in [SCREEN_MIN_GAP_MS]
+     * and never more than [MAX_SCREEN_FILES] files. The picture is taken only on the main thread.
      */
     @OptIn(ExperimentalForeignApi::class)
     @Suppress("DEPRECATION")

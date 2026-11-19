@@ -30,15 +30,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.os.Looper
-import java.io.ByteArrayOutputStream
-import java.lang.ref.WeakReference
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Looper
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
@@ -60,8 +56,12 @@ import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.core.common.log.ReportFile
 import org.meshtastic.core.common.log.ReportTarget
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.lang.ref.WeakReference
 import java.util.Date
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * The phone side of the log switch. Logs live in the app's private folder; because a crashed app cannot be asked for
@@ -130,7 +130,8 @@ internal object AndroidLogging {
                 } else {
                     val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
                     view.draw(Canvas(bitmap))
-                    ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, PNG_QUALITY, it) }
+                    ByteArrayOutputStream()
+                        .also { bitmap.compress(Bitmap.CompressFormat.PNG, PNG_QUALITY, it) }
                         .toByteArray()
                 }
             }

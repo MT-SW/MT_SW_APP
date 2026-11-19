@@ -264,8 +264,7 @@ fun NetworkHealthScreen(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
                     contentPadding =
-                        PaddingValues(bottom = LocalFloatingBarInset.current)
-                            .withShadowInset(rememberShadowInset()),
+                    PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
                 ) {
                     items(uiState.nodes, key = { it.num }) { node ->
                         NodeHealthRow(
