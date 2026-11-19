@@ -137,7 +137,6 @@ import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
 import org.meshtastic.core.ui.component.SHADOW_ROOM_DP
 import org.meshtastic.core.ui.component.SosBarScreen
-import org.meshtastic.core.ui.component.expandForShadows
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.component.styledIndicator
@@ -996,21 +995,23 @@ fun ConnectionsScreen(
         val fabClearance = if (onConnectCode != null && !importInTopBar) FabClearance else 0.dp
         if (isAdaptiveTwoPaneSplit()) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
+                modifier =
+                Modifier.fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(start = 16.dp - SHADOW_ROOM_DP.dp, end = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
                 // Each pane scrolls on its own, so a tall header (large font scale) can't push its own actions
                 // off screen.
                 AdaptiveTwoPane(
+                    firstPaneSideRoom = SHADOW_ROOM_DP.dp,
                     first = {
                         Column(
-                            // The scroll clips at its sides: it is wider by the room for the shadows and glow of the
-                            // buttons, and the content keeps its place and width.
+                            // The pane is wider by the room for shadows (taken from the margin and the gap), and the
+                            // content is inset by the same amount, so the buttons keep their width and place.
                             modifier =
-                            Modifier.expandForShadows(SHADOW_ROOM_DP.dp)
-                                .verticalScroll(rememberScrollState())
-                                .padding(horizontal = SHADOW_ROOM_DP.dp),
+                            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = SHADOW_ROOM_DP.dp),
                             verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
                         ) {
                             header(this)

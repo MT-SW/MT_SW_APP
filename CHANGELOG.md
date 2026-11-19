@@ -110,7 +110,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
 * Lista węzłów i lista urządzeń na ekranie Połączenie (komputer, iPad): cienie kart przy stylu z głębią nie są już ucinane po bokach, bo lista zostawia po bokach miejsce na cień (po przeniesieniu paska na dół karty dotykały brzegu okna).
 * Komputer i tablet z pływającym paskiem na dole: zawartość ma 8 dp marginesu po lewej i prawej, tak jak miała ją przy pasku z boku, bo bez niego karty i górne belki dotykały brzegu okna i ich krawędzie wyglądały na ucięte.
-* Ekran Połączenie (komputer, iPad): cień i poświata przycisków w lewej kolumnie (np. „Wymuś zatrzymanie aplikacji”) nie są już ucinane po bokach, bo kolumna ma miejsce na nie, a przyciski zostały tej samej szerokości i w tym samym miejscu.
+* Ekran Połączenie (komputer, iPad): cień i poświata przycisków w lewej kolumnie (np. „Wymuś zatrzymanie aplikacji”) nie są już ucinane po bokach. Kolumna dostała miejsce na nie kosztem pustego marginesu i odstępu między kolumnami, więc przyciski mają tę samą szerokość i to samo miejsce, a lista po prawej się nie przesuwa.
 * Czerwone przyciski (np. „Wymuś zatrzymanie aplikacji”, „Rozłącz”) na jasnych motywach: zamiast jaskrawej czerwieni mają delikatny, nieco nasycony róż, jak na ciemnych motywach.
 
 ##### Zmiany względem oryginału
@@ -1006,7 +1006,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * The download of buildings goes on after leaving the screen instead of being cut off silently.
 * Node list and device list on the Connections screen (computer, iPad): the shadows of the cards in the depth look are no longer cut off at the sides, because the list now leaves room for the shadow at its sides (after the bar moved to the bottom the cards touched the edge of the window).
 * Computer and tablet with the floating bar at the bottom: the content has an 8 dp margin at the left and the right, as it had with the bar at the side, because without it the cards and the top bars touched the edge of the window and their edges looked cut off.
-* Connections screen (computer, iPad): the shadow and glow of the buttons in the left column (for example “Force stop the app”) are no longer cut off at the sides, because the column has room for them while the buttons keep their width and place.
+* Connections screen (computer, iPad): the shadow and glow of the buttons in the left column (for example “Force stop the app”) are no longer cut off at the sides. The column got room for them out of the empty margin and the gap between the columns, so the buttons keep their width and place and the list on the right does not move.
 * Red buttons (for example “Force stop the app”, “Disconnect”) on light themes: a soft, slightly saturated pink instead of a harsh bright red, as on the dark themes.
 
 ##### Changes against the original

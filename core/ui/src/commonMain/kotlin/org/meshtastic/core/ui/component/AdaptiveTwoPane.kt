@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.theme.AppTheme
 
@@ -71,8 +72,20 @@ fun AdaptiveTwoPane(
     first: @Composable ColumnScope.() -> Unit,
     second: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    firstPaneSideRoom: Dp = 0.dp,
 ) {
-    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe())
+    val baseDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe())
+    // The first pane is wider by [firstPaneSideRoom] at its inner side: it is taken from the gap between the panes, so
+    // the second pane stays where it was. The caller insets the content by the same amount.
+    val directive =
+        if (firstPaneSideRoom > 0.dp) {
+            baseDirective.copy(
+                horizontalPartitionSpacerSize =
+                (baseDirective.horizontalPartitionSpacerSize - firstPaneSideRoom).coerceAtLeast(0.dp),
+            )
+        } else {
+            baseDirective
+        }
 
     // Wrap the slots in movable content so their internal state survives when the layout flips between the stacked
     // column and the two-pane scaffold (e.g. on resize / fold), and so neither slot is emitted directly from two

@@ -45,11 +45,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.offset
 import dev.chrisbanes.haze.HazeInput
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.blur.HazeBlurStyle
@@ -149,21 +147,12 @@ fun PaddingValues.withShadowInset(inset: Dp): PaddingValues {
 
 private const val SHADOW_REACH = 0.8f
 
-/** The room, in dp, that [expandForShadows] gives the shadows and glows of the elements of a scrolling column. */
-const val SHADOW_ROOM_DP = 8
-
 /**
- * Makes a container [room] wider at both sides without moving or resizing what is inside: the container reports its
- * own width but is measured wider, and its content (put [room] of horizontal padding inside it) stays where it was. A
- * scrolling column clips everything at its sides, so the shadows and the glow of the buttons at its edge were cut off;
- * this gives them room to be drawn. Use it in front of the scroll: `expandForShadows(r).verticalScroll(s).padding(h = r)`.
+ * The room, in dp, that a pane gives the shadows and glow of the elements at its sides. The pane is made wider by this
+ * much at each side out of the empty margin and gap around it, and its content is inset by the same amount, so the
+ * elements keep their size and place while their shadows have room to be drawn inside the pane.
  */
-fun Modifier.expandForShadows(room: Dp): Modifier = layout { measurable, constraints ->
-    val extra = room.roundToPx()
-    val placeable = measurable.measure(constraints.offset(horizontal = 2 * extra))
-    val width = (placeable.width - 2 * extra).coerceAtLeast(0)
-    layout(width, placeable.height) { placeable.placeRelative(-extra, 0) }
-}
+const val SHADOW_ROOM_DP = 8
 
 /** The depth look of [elementLook], with its strength 0-100. */
 fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier {
