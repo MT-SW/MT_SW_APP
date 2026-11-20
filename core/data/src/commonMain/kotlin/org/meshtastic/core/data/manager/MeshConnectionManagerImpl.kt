@@ -36,7 +36,6 @@ import org.meshtastic.core.common.util.handledLaunch
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.common.util.safeCatching
-import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
@@ -68,8 +67,6 @@ import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.SessionManager
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.error_recovery_exhausted
-import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.LocalStats
@@ -445,36 +442,21 @@ class MeshConnectionManagerImpl(
         // observes a unique priorFailures value, so the give-up decision is race-free.
         val priorFailures = consecutiveRecoveryFailures.getAndIncrement()
         scope.handledLaunch {
-            // After MAX_CONSECUTIVE_RECOVERY_FAILURES consecutive failed recoveries, stop retrying
-            // and surface a sticky error. A node that keeps failing the handshake is likely
-            // crashing firmware under re-entry (reproduced on T-Beam v2.7.25.104df5f), and
-            // re-driving it indefinitely only makes things worse. Reset the counter here so a
-            // manual retry from the user starts a fresh streak.
-            if (priorFailures >= MAX_CONSECUTIVE_RECOVERY_FAILURES) {
-                Logger.e {
-                    "Handshake recovery exhausted after $MAX_CONSECUTIVE_RECOVERY_FAILURES consecutive " +
-                        "failures; surfacing sticky error"
-                }
-                consecutiveRecoveryFailures.value = 0
-                serviceRepository.setConnectionProgress("")
-                onConnectionChanged(ConnectionState.Disconnected, fromState = ConnectionState.Connecting)
-                // safeCatchingAll swallows Skiko ExceptionInInitializerError on headless JVM tests
-                // where compose-resources can't load native libs. Production resolves the localized
-                // string normally; tests fall back to empty and setErrorMessage is still called.
-                val errorMessage = safeCatchingAll {
-                    getStringSuspend(Res.string.error_recovery_exhausted)
-                }
-                    .getOrDefault("")
-                serviceRepository.setErrorMessage(errorMessage, Severity.Error)
-                return@handledLaunch
-            }
             // Exponential backoff before the next attempt: 2 s base, doubling for each prior
             // failure, hard-capped at 30 s. Skipped on the first attempt (no prior failures).
             // The delay is parented to `scope`, so it is cancelled cleanly if the user
             // disconnects, navigates away, or the service shuts down (structured concurrency).
             if (priorFailures > 0) {
+                // MT_SW: after MAX_CONSECUTIVE_RECOVERY_FAILURES failures the app does not give up with an error that
+                // needs a manual retry: it keeps trying on its own, every RECOVERY_BACKOFF_CAP_SECONDS.
                 val backoffSeconds =
-                    (RECOVERY_BACKOFF_BASE_SECONDS shl (priorFailures - 1)).coerceAtMost(RECOVERY_BACKOFF_CAP_SECONDS)
+                    if (priorFailures >= MAX_CONSECUTIVE_RECOVERY_FAILURES) {
+                        RECOVERY_BACKOFF_CAP_SECONDS
+                    } else {
+                        (RECOVERY_BACKOFF_BASE_SECONDS shl (priorFailures - 1)).coerceAtMost(
+                            RECOVERY_BACKOFF_CAP_SECONDS,
+                        )
+                    }
                 Logger.w {
                     "Handshake recovery backoff: waiting ${backoffSeconds}s before retry (attempt ${priorFailures + 1})"
                 }

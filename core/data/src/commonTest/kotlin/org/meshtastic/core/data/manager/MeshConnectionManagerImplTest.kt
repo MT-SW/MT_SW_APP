@@ -1459,7 +1459,7 @@ class MeshConnectionManagerImplTest {
     }
 
     @Test
-    fun `Recovery exhaustion after three consecutive failures surfaces sticky error and stops recovery`() =
+    fun `Recovery after three consecutive failures keeps retrying every 30 s without an error`() =
         runTest(testDispatcher) {
             every { radioInterfaceService.getDeviceAddress() } returns "t192.168.1.42"
 
@@ -1506,31 +1506,19 @@ class MeshConnectionManagerImplTest {
             advanceTimeBy(200)
             advanceUntilIdle()
 
-            // Stall #4 (priorFailures=3 = MAX_CONSECUTIVE_RECOVERY_FAILURES): sticky error path.
-            // The sibling must NOT call restartTransport; instead it resets the counter, clears the
-            // progress text, transitions to Disconnected, and surfaces the sticky error.
+            // Stall #4 (priorFailures=3 = MAX_CONSECUTIVE_RECOVERY_FAILURES): no error that needs a manual retry; the
+            // sibling waits 30 s and then restarts the transport by itself.
             advanceTimeBy(13_000L)
             advanceUntilIdle()
-
             assertEquals(3, restartTransportCalls())
-            assertEquals(
-                ConnectionState.Disconnected,
-                serviceRepository.connectionState.value,
-                "Recovery exhaustion must leave the manager in Disconnected",
-            )
-            // The sticky error is surfaced via setConnectionProgress("") (cleared because the user
-            // must manually retry) plus setErrorMessage(..., Severity.Error). We assert at least one
-            // setErrorMessage call landed with Severity.Error — this is the user-visible signal that
-            // recovery gave up. (Exact text comes from Res.string.error_recovery_exhausted and is
-            // resolved by the production code via getStringSuspend.)
+            advanceTimeBy(30_000L)
+            advanceUntilIdle()
+
+            assertEquals(4, restartTransportCalls())
             assertTrue(
-                errorMessages.any { (_, severity) -> severity == Severity.Error },
-                "Recovery exhaustion must surface a sticky ERROR-severity message; got: $errorMessages",
+                errorMessages.none { (_, severity) -> severity == Severity.Error },
+                "Recovery must keep retrying without an error message; got: $errorMessages",
             )
-            // Counter is reset to 0 by the sticky-error branch so a manual user retry starts fresh.
-            // We can't read the private atomic directly, but the reset is exercised by the next-stall
-            // behavior; its correctness is locked in by `onHandshakeComplete resets counter` and by
-            // the symmetric reset-on-exhaust code path in runSiblingHandshakeRecovery().
         }
 
     @Test
