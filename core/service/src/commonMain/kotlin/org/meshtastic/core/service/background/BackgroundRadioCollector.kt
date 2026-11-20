@@ -249,7 +249,7 @@ class BackgroundRadioCollector(
         const val BADGE_MS = 60_000L
         const val START_DELAY_MS = 2_000L
         const val RETRY_MS = 10_000L
-        const val HEARTBEAT_MS = 5 * 60 * 1_000L
+        const val HEARTBEAT_MS = 30 * 1_000L
         const val BATCH_SIZE = 100
         const val FLUSH_MS = 5_000L
         const val POLL_MS = 250L
