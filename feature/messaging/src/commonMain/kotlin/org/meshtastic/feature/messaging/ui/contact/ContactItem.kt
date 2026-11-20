@@ -144,7 +144,6 @@ fun ContactItem(
     Card(
         modifier =
         modifier
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .pressSpring()
@@ -153,7 +152,12 @@ fun ContactItem(
         colors = cardColors,
         border = border,
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        // The click sits inside the card, so the hover and press highlight has the card's own rounded shape and does not
+        // spill into the margin around it.
+        Column(
+            modifier =
+            Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick).fillMaxWidth().padding(8.dp),
+        ) {
             ContactHeader(contact = contact, channels = channels, onNodeChipClick = onNodeChipClick)
 
             val descriptions = LocalChannelDescriptions.current
