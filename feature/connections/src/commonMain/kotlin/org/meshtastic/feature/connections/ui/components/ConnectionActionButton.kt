@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.connections.ui.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FilledTonalButton
@@ -47,14 +49,15 @@ fun ConnectionActionButton(
     enabled: Boolean = true,
     iconContentDescription: String? = null,
 ) {
-    val content: @Composable () -> Unit = {
+    val content: @Composable RowScope.() -> Unit = {
         Icon(
             imageVector = icon,
             contentDescription = iconContentDescription,
             modifier = Modifier.size(ButtonDefaults.IconSize),
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        Text(text)
+        // A long name never makes the button wider than the room it has: it is cut with dots.
+        Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
     }
     when (style) {
         ConnectionActionButtonStyle.Filled ->

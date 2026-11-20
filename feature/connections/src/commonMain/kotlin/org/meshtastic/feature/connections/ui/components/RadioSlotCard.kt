@@ -29,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -104,9 +105,17 @@ fun RadioSlotCard(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = onUse) {
+        // The buttons share the width of the card (never wider than it), whatever the size of the window.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Button(onClick = onUse, modifier = Modifier.weight(1f)) {
                 Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    text =
                     stringResource(
                         if (radio.status == RadioStatus.Connected) {
                             Res.string.radio_slot_use
@@ -117,7 +126,13 @@ fun RadioSlotCard(
                 )
             }
             if (radio.status != RadioStatus.Disconnected) {
-                OutlinedButton(onClick = onDisconnect) { Text(stringResource(Res.string.radio_chooser_disconnect)) }
+                OutlinedButton(onClick = onDisconnect, modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(Res.string.radio_chooser_disconnect),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
         TextButton(onClick = onRemove) { Text(stringResource(Res.string.radio_chooser_remove)) }
