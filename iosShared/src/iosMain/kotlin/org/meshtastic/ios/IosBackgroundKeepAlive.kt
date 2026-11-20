@@ -55,7 +55,9 @@ internal object IosBackgroundKeepAlive : AppBackgroundControl {
             }
 
             override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {
-                Logger.w { "iOS background: location error ${didFailWithError.localizedDescription}" }
+                // "Location unknown" (code 0) is normal while the phone has no fix yet; the system keeps trying itself.
+                val message = "iOS background: location error ${didFailWithError.localizedDescription}"
+                if (didFailWithError.code == 0L) Logger.d { message } else Logger.w { message }
             }
         }
 
