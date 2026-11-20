@@ -222,7 +222,8 @@ fun NetworkHealthScreen(
                 NetworkHealthHero(
                     uiState = uiState,
                     onLevelClick = viewModel::toggleLevelFilter,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    // Room around the card, so its shadow is not cut off by the folding box.
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                 )
             }
 

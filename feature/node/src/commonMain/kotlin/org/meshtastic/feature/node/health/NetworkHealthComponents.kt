@@ -113,6 +113,9 @@ private const val FULL_CIRCLE = 360f
 private const val RING_START_ANGLE = -90f
 private const val PERCENT = 100
 private const val ROW_TINT_ALPHA = 0.10f
+
+// MT_SW: a faint tint, so the hero card does not stand out sharply from the screen.
+private const val HERO_TINT = 0.07f
 private const val SPARKLINE_FILL_ALPHA = 0.35f
 private const val SPARKLINE_STROKE_PX = 3f
 private const val SPARKLINE_DOT_RADIUS_PX = 5f
@@ -187,7 +190,10 @@ internal fun NetworkHealthHero(
     val good = counts[HealthLevel.GOOD] ?: 0
     val brush =
         Brush.verticalGradient(
-            listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f), MaterialTheme.colorScheme.surfaceContainer),
+            listOf(
+                MaterialTheme.colorScheme.primary.copy(alpha = HERO_TINT),
+                MaterialTheme.colorScheme.surfaceContainerLow,
+            ),
         )
 
     Card(
