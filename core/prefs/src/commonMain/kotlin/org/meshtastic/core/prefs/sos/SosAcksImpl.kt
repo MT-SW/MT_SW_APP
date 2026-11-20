@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.prefs.sos
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +29,7 @@ import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.SosAckCodec
 import org.meshtastic.core.repository.SosAckEntry
 import org.meshtastic.core.repository.SosAcks
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /** The answers of recipients to the SOS we sent last, kept in the same store as the other SOS settings. */
 @Single
@@ -54,6 +53,6 @@ class SosAcksImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     private companion object {
-        val KEY_ACKS = stringPreferencesKey("sos_acks")
+        val KEY_ACKS = stringPrefsKey("sos_acks")
     }
 }

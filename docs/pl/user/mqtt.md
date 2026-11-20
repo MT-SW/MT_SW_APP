@@ -2,7 +2,7 @@
 title: MQTT
 parent: Przewodnik użytkownika
 nav_order: 11
-last_updated: 2026-11-16
+last_updated: 2026-11-20
 description: Połącz swoją sieć mesh z internetem — konfiguracja brokera MQTT, warstwy szyfrowania i raportowanie na mapę.
 aliases:
   - mqtt

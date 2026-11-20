@@ -31,6 +31,13 @@
   },
   "packageRules": [
     {
+      "description": "setup-java pins stay at the major (25): setup-java resolves the newest build per arch, and a JDK major moves with the toolchain, JBR and the Flatpak openjdk extension, by hand",
+      "matchDatasources": [
+        "java-version"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Automerge non-major updates for stable versions",
       "matchUpdateTypes": [
         "minor",

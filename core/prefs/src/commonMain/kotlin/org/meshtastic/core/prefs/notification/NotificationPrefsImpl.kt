@@ -16,9 +16,6 @@
  */
 package org.meshtastic.core.prefs.notification
 
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +27,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.prefs.store.booleanPrefsKey
+import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.QuietHours
 
@@ -278,23 +277,23 @@ class NotificationPrefsImpl(private val dataStore: UiDataStore, dispatchers: Cor
             return QuietHours(startHour, endHour)
         }
 
-        private val KEY_NODE_SILENCE_QUIET = stringPreferencesKey("notif_node_silence_quiet")
-        private val KEY_NODE_SILENCE_ALERTS = stringPreferencesKey("notif_node_silence_alerts")
-        private val KEY_NODE_SILENCE_RELAYED = stringPreferencesKey("notif_node_silence_relayed")
-        private val KEY_NODE_ACTIVE_ALERTS = stringPreferencesKey("notif_node_active_alerts")
-        private val KEY_NODE_AWAY_ALERTS = stringPreferencesKey("notif_node_away_alerts")
-        private val KEY_MESSAGES_ENABLED = booleanPreferencesKey("notif_messages_enabled")
-        private val KEY_NODE_EVENTS_ENABLED = booleanPreferencesKey("notif_node_events_enabled")
-        private val KEY_NODE_EVENTS_AUTO_DISABLED = booleanPreferencesKey("notif_node_events_auto_disabled_event")
-        private val KEY_LOW_BATTERY_ENABLED = booleanPreferencesKey("notif_low_battery_enabled")
-        private val KEY_REACTIONS_ENABLED = booleanPreferencesKey("notif_reactions_enabled")
-        private val KEY_NEW_WAYPOINTS_ENABLED = booleanPreferencesKey("notif_new_waypoints_enabled")
-        private val KEY_ALERTS_ENABLED = booleanPreferencesKey("notif_alerts_enabled")
-        private val KEY_RADIO_NOTICES_ENABLED = booleanPreferencesKey("notif_radio_notices_enabled")
-        private val KEY_UPDATES_ENABLED = booleanPreferencesKey("notif_updates_enabled")
-        private val KEY_NODE_SILENCE_ENABLED = booleanPreferencesKey("notif_node_silence_enabled")
-        private val KEY_NODE_ACTIVE_ENABLED = booleanPreferencesKey("notif_node_active_enabled")
-        private val KEY_SOUND_WHILE_OPEN = booleanPreferencesKey("notif_sound_while_open")
-        private val KEY_GEOFENCE_ALERT_OPT_INS = stringPreferencesKey("notif_geofence_alert_opt_ins")
+        private val KEY_NODE_SILENCE_QUIET = stringPrefsKey("notif_node_silence_quiet")
+        private val KEY_NODE_SILENCE_ALERTS = stringPrefsKey("notif_node_silence_alerts")
+        private val KEY_NODE_SILENCE_RELAYED = stringPrefsKey("notif_node_silence_relayed")
+        private val KEY_NODE_ACTIVE_ALERTS = stringPrefsKey("notif_node_active_alerts")
+        private val KEY_NODE_AWAY_ALERTS = stringPrefsKey("notif_node_away_alerts")
+        private val KEY_MESSAGES_ENABLED = booleanPrefsKey("notif_messages_enabled")
+        private val KEY_NODE_EVENTS_ENABLED = booleanPrefsKey("notif_node_events_enabled")
+        private val KEY_NODE_EVENTS_AUTO_DISABLED = booleanPrefsKey("notif_node_events_auto_disabled_event")
+        private val KEY_LOW_BATTERY_ENABLED = booleanPrefsKey("notif_low_battery_enabled")
+        private val KEY_REACTIONS_ENABLED = booleanPrefsKey("notif_reactions_enabled")
+        private val KEY_NEW_WAYPOINTS_ENABLED = booleanPrefsKey("notif_new_waypoints_enabled")
+        private val KEY_ALERTS_ENABLED = booleanPrefsKey("notif_alerts_enabled")
+        private val KEY_RADIO_NOTICES_ENABLED = booleanPrefsKey("notif_radio_notices_enabled")
+        private val KEY_UPDATES_ENABLED = booleanPrefsKey("notif_updates_enabled")
+        private val KEY_NODE_SILENCE_ENABLED = booleanPrefsKey("notif_node_silence_enabled")
+        private val KEY_NODE_ACTIVE_ENABLED = booleanPrefsKey("notif_node_active_enabled")
+        private val KEY_SOUND_WHILE_OPEN = booleanPrefsKey("notif_sound_while_open")
+        private val KEY_GEOFENCE_ALERT_OPT_INS = stringPrefsKey("notif_geofence_alert_opt_ins")
     }
 }

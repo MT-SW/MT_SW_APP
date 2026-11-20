@@ -24,77 +24,116 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
-import androidx.compose.ui.text.withStyle
+
+private val NamedEntities =
+    mapOf("amp" to "&", "lt" to "<", "gt" to ">", "quot" to "\"", "apos" to "'", "nbsp" to "\u00A0")
+
+private val HrefPattern = Regex("""href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))""", RegexOption.IGNORE_CASE)
+
+private const val HEX_RADIX = 16
 
 /**
- * Small HTML to [AnnotatedString] converter for the computer and iPhone/iPad apps (Android has its own). Understands
- * the tags the app's texts use: `b`, `strong`, `i`, `em`, `u`, `br`, `p` and `a href`, plus the common entities. Any
- * other tag is dropped and its text kept.
+ * Renders the markup the app's own strings use, `<a href>`, `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<br>` and `<p>`,
+ * for platforms without Android's `Html.fromHtml`. Any other tag is dropped and its text kept, and whitespace collapses
+ * as in HTML.
  */
-fun simpleAnnotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString = buildAnnotatedString {
-    val tag = Regex("<(/?)([a-zA-Z0-9]+)([^>]*)>")
-    val styles = ArrayList<SpanStyle>()
-    var position = 0
-    var linkUrl: String? = null
+internal fun annotatedStringFromSimpleHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString =
+    buildAnnotatedString {
+        val open = ArrayList<String>()
+        var lastWasSpace = true
+        var i = 0
+        while (i < html.length) {
+            val c = html[i]
+            when {
+                c == '<' && html.indexOf('>', i) > i -> {
+                    val end = html.indexOf('>', i)
+                    val tag = html.substring(i + 1, end).trim()
+                    val closing = tag.startsWith("/")
+                    val name = tag.removePrefix("/").takeWhile { it.isLetterOrDigit() }.lowercase()
+                    when {
+                        name == "br" -> {
+                            append('\n')
+                            lastWasSpace = true
+                        }
 
-    fun appendText(raw: String) {
-        if (raw.isEmpty()) return
-        val text = decodeEntities(raw)
-        val url = linkUrl
-        val style = styles.fold(SpanStyle()) { acc, s -> acc.merge(s) }
-        withStyle(style) {
-            if (url != null) withLink(LinkAnnotation.Url(url, linkStyles)) { append(text) } else append(text)
+                        name == "p" -> {
+                            if (!closing && length > 0) append("\n\n")
+                            lastWasSpace = true
+                        }
+
+                        closing -> {
+                            val at = open.lastIndexOf(name)
+                            if (at >= 0) {
+                                repeat(open.size - at) { pop() }
+                                while (open.size > at) open.removeAt(open.size - 1)
+                            }
+                        }
+
+                        else -> if (pushTag(name, tag, linkStyles)) open.add(name)
+                    }
+                    i = end + 1
+                }
+
+                c == '&' -> {
+                    val end = html.indexOf(';', i)
+                    val decoded = if (end > i) decodeEntity(html.substring(i + 1, end)) else null
+                    if (decoded != null) {
+                        append(decoded)
+                        lastWasSpace = false
+                        i = end + 1
+                    } else {
+                        append(c)
+                        lastWasSpace = false
+                        i++
+                    }
+                }
+
+                c.isWhitespace() -> {
+                    if (!lastWasSpace) append(' ')
+                    lastWasSpace = true
+                    i++
+                }
+
+                else -> {
+                    append(c)
+                    lastWasSpace = false
+                    i++
+                }
+            }
         }
+        repeat(open.size) { pop() }
     }
 
-    for (match in tag.findAll(html)) {
-        appendText(html.substring(position, match.range.first))
-        position = match.range.last + 1
-        val closing = match.groupValues[1] == "/"
-        val name = match.groupValues[2].lowercase()
+/** Pushes the style or link [name] opens and returns true, or returns false for a tag that carries none. */
+private fun AnnotatedString.Builder.pushTag(name: String, tag: String, linkStyles: TextLinkStyles?): Boolean {
+    val style =
         when (name) {
             "b",
             "strong",
-            -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontWeight = FontWeight.Bold)
+            -> SpanStyle(fontWeight = FontWeight.Bold)
 
             "i",
             "em",
-            -> if (closing) styles.removeLastOrNull() else styles += SpanStyle(fontStyle = FontStyle.Italic)
+            -> SpanStyle(fontStyle = FontStyle.Italic)
 
-            "u" ->
-                if (closing) {
-                    styles.removeLastOrNull()
-                } else {
-                    styles += SpanStyle(textDecoration = TextDecoration.Underline)
-                }
+            "u" -> SpanStyle(textDecoration = TextDecoration.Underline)
 
-            "br" -> append("\n")
-
-            "p" -> if (closing) append("\n\n")
-
-            "a" ->
-                linkUrl =
-                    if (closing) {
-                        null
-                    } else {
-                        Regex("href\\s*=\\s*[\"']([^\"']*)[\"']")
-                            .find(match.groupValues[ATTRIBUTES_GROUP])
-                            ?.groupValues
-                            ?.get(1)
-                    }
+            else -> null
         }
+    val href = if (name == "a") HrefPattern.find(tag)?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() } else null
+    when {
+        style != null -> pushStyle(style)
+        href != null -> pushLink(LinkAnnotation.Url(href, linkStyles))
     }
-    appendText(html.substring(position))
+    return style != null || href != null
 }
 
-private fun decodeEntities(text: String): String = text
-    .replace("&nbsp;", " ")
-    .replace("&lt;", "<")
-    .replace("&gt;", ">")
-    .replace("&quot;", "\"")
-    .replace("&#39;", "'")
-    .replace("&apos;", "'")
-    .replace("&amp;", "&")
+private fun decodeEntity(entity: String): String? = when {
+    entity.startsWith("#x", ignoreCase = true) -> entity.drop(2).toIntOrNull(HEX_RADIX)?.let(::codePointString)
+    entity.startsWith("#") -> entity.drop(1).toIntOrNull()?.let(::codePointString)
+    else -> NamedEntities[entity.lowercase()]
+}
 
-private const val ATTRIBUTES_GROUP = 3
+// Only the Basic Multilingual Plane: the app's strings carry nothing beyond it.
+private fun codePointString(codePoint: Int): String? =
+    codePoint.takeIf { it in 0..Char.MAX_VALUE.code }?.toChar()?.toString()

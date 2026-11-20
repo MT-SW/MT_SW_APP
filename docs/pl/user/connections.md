@@ -2,12 +2,13 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-11-16
-description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
+last_updated: 2026-11-20
+description: Połącz telefon lub komputer z radiem przez Bluetooth, USB, TCP/IP lub WebSocket.
 aliases:
   - bluetooth
   - usb
   - tcp
+  - websocket
   - pairing
 ---
 
@@ -73,6 +74,20 @@ Podczas łączenia wskaźnik stanu pokazuje bieżący stan połączenia — dotk
 
 ![Stan łączenia](../../assets/screenshots/connections_connecting.png)
 
+Przez Bluetooth wiersz stanu podaje, co aplikacja robi w danej chwili: szuka radia, paruje, łączy się z radiem, sprawdza radio, przygotowuje połączenie, a potem wczytuje ustawienia i listę węzłów. Krok, który trwa krócej niż pół sekundy, jest pomijany, żeby napis nie migał. Gdy próba się nie uda, linijka pod spodem mówi dlaczego, a wiersz stanu odlicza czas do następnej próby:
+
+| Komunikat | Co zrobić |
+|---|---|
+| Nie znaleziono radia | Włącz radio i podejdź bliżej. |
+| Nie udało się połączyć | Odłącz radio od innej aplikacji lub urządzenia. Jeśli to nie pomaga, podejdź bliżej albo usuń radio w ustawieniach Bluetooth i sparuj je od nowa. |
+| Radio wymaga sparowania | Sparuj, gdy system o to poprosi, kodem PIN z ekranu radia albo jego stałym PIN-em, jeśli jest ustawiony. |
+| Radio odrzuciło połączenie | Zwykle brakuje sparowania: spróbuj jeszcze raz i wpisz PIN, gdy zostaniesz o to poproszony. |
+| Parowanie nie powiodło się | Sprawdź PIN i sparuj ponownie. |
+| Połączenie zostało przerwane | Podejdź bliżej. Aplikacja próbuje dalej. |
+| Bluetooth jest wyłączony | Włącz go. Na Androidzie 11 i starszym komunikat wspomina też o lokalizacji, której skanowanie tam potrzebuje. |
+
+Systemowy tekst błędu trafia tylko do dziennika aplikacji, a nie na kartę.
+
 Gdy radio jest połączone, karta połączenia pokazuje jego nazwę i wersję oprogramowania, siłę sygnału przez Bluetooth oraz ustawienie modemu LoRa i region, na przykład „Long Range - Fast · United States”. Radio z własnymi ustawieniami modemu pokazuje **Własne** zamiast ustawienia. Dotknij wiersza z ustawieniem, aby otworzyć ekran LoRa.
 
 Gdy nie wybrano jeszcze radia, karta połączenia pokazuje **Nie wybrano urządzenia**. Panel, w którym nie ma czego wyświetlić, mówi o tym pod swoim nagłówkiem, z podpowiedzią:
@@ -119,8 +134,16 @@ Niektóre radia MT_SW obsługują łączność Wi-Fi/Ethernet, co pozwala na po�
 2. W zakładce **Połącz** wybierz **Sieć** w selektorze transportu.
 3. Wybierz radio na jeden z dwóch sposobów:
    - **Skanuj w poszukiwaniu urządzeń sieciowych** — włącz to, aby automatycznie wykrywać radia, które ogłaszają się w sieci lokalnej (mDNS / `_meshtastic._tcp`). Wykryte urządzenia pojawiają się na liście; dotknij jednego, aby się połączyć.
-   - **Dodaj urządzenie ręcznie…** — wpisz adres IP radia (lub nazwę hosta) i port (domyślnie: `4403`).
+   - **Dodaj urządzenie ręcznie…** — wpisz adres IP radia (lub nazwę hosta) i port (domyślnie: `4403`) albo adres `ws://` lub `wss://`, aby połączyć się przez WebSocket (niżej).
 4. Wcześniej używane adresy sieciowe są zapamiętywane w **Ostatnie urządzenia sieciowe** dla szybkiego ponownego połączenia (dotknij i przytrzymaj, aby usunąć).
+
+### WebSocket
+
+Radio, którego oprogramowanie udostępnia interfejs telefonu przez WebSocket, odpowiada pod adresem `/api/v1/ws`. Wydane oprogramowanie jeszcze go nie udostępnia. Wpisz adres jako link, na przykład `ws://192.168.1.50` albo `wss://meshtastic.local:9443`. Ścieżka domyślnie to `/api/v1/ws`, a port wpisuje się w linku, więc pole portu nie jest używane. Radia używają własnego certyfikatu, któremu aplikacja nie ufa, dlatego na Androidzie i komputerze łącz się przez `ws://`.
+
+Jeśli radio odrzuci połączenie, aplikacja podpowiada, żeby sprawdzić, czy ścieżka to `/api/v1/ws` i czy oprogramowanie radia ma interfejs WebSocket.
+
+Radio obsługuje jedno połączenie WebSocket naraz. Gdy zajmie je inna aplikacja albo radio zamknie je z powodu zbyt dużej wiadomości, aplikacja nie łączy się sama ponownie, nawet gdy wróci sieć. Połącz się znowu w zakładce **Połącz**, żeby odzyskać połączenie.
 
 Wykrywanie w sieci używa mDNS, które działa tylko wtedy, gdy telefon i radio są w tej samej podsieci. Jeśli telefon w ogóle nie jest w sieci Wi-Fi, aplikacja ostrzega, że skanowanie sieci może nic nie znaleźć. W Androidzie 17 i nowszych aplikacja potrzebuje uprawnienia do sieci lokalnej (**Uprawnienie do sieci lokalnej**), aby w ogóle dotrzeć do radia w Twojej własnej sieci Wi-Fi — nie tylko je wykryć — więc ręczne wpisanie adresu nie omija odmówionego uprawnienia. Przyznaj je z karty w panelu Sieć lub z sekcji **Uprawnienia** w **Ustawienia**. Radio pod adresem publicznym lub osiągane przez VPN nie wymaga uprawnienia.
 

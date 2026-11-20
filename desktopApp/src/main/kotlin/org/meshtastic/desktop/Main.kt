@@ -91,7 +91,6 @@ import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.database.desktopDataDir
-import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.SettingsRoute
@@ -119,6 +118,7 @@ import org.meshtastic.core.ui.theme.isVividDark
 import org.meshtastic.core.ui.theme.isVividLight
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.theme.saturationFor
+import org.meshtastic.core.ui.navigation.startDestination
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
@@ -620,15 +620,7 @@ private fun ApplicationScope.MeshtasticWindow(
     visible: Boolean,
     onCloseRequest: () -> Unit,
 ) {
-    val multiBackstack =
-        rememberMultiBackstack(
-            // Land on Connections for first-run / no-device-selected; otherwise on Nodes.
-            if (DeviceAddress.parse(uiViewModel.currentDeviceAddressFlow.value) == null) {
-                TopLevelDestination.Connect.route
-            } else {
-                TopLevelDestination.Nodes.route
-            },
-        )
+    val multiBackstack = rememberMultiBackstack(startDestination(uiViewModel.currentDeviceAddressFlow.value))
 
     Window(
         onCloseRequest = onCloseRequest,

@@ -514,9 +514,6 @@ private fun languageOptions(): List<Pair<String, String>> {
     return (listOf("") + supportedLocaleTags).map { tag -> tag to (overrides[tag] ?: nativeLanguageName(tag)) }
 }
 
-/** The name of a language written in that language itself. */
-internal expect fun nativeLanguageName(tag: String): String
-
 @Composable
 private fun LanguagePickerDialog(onSelectLanguage: (String) -> Unit, onDismiss: () -> Unit) {
     MeshtasticDialog(

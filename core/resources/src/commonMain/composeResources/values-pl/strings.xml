@@ -352,6 +352,7 @@
     <string name="connected_device">Połączone urządzenia</string>
     <string name="connected_sleeping">Połączono z urządzeniem, ale jest ono w stanie uśpienia</string>
     <string name="connecting">Łączenie</string>
+    <!-- CONNECTION -->
     <string name="connection_status">Bieżące połączenia:</string>
     <string name="connections">Połączenie</string>
     <string name="contact_draft_prefix">Szkic: %1$s</string>
@@ -2008,6 +2009,7 @@
         <item quantity="many">Usłyszano %1$d przekaźników</item>
         <item quantity="other">Usłyszano %1$d przekaźnika</item>
     </plurals>
+    <string name="reload">Wczytaj ponownie</string>
     <!-- REMOTE -->
     <string name="remote">Zdalny</string>
     <string name="remote_command_no_response">Brak odpowiedzi ze zdalnego radia — może jeszcze dotrzeć.</string>
@@ -4395,4 +4397,66 @@
     <string name="radio_bridge_config_age_minutes">%1$d min</string>
     <string name="radio_bridge_config_age_hours">%1$d godz.</string>
     <string name="radio_bridge_refresh_now">Odśwież teraz</string>
+    <string name="add_usb_device">Dodaj urządzenie szeregowe…</string>
+    <string name="app_database_restore_confirmation_all_radios">Przywrócenie zastępuje wiadomości i węzły wszystkich urządzeń zapisanych w tej przeglądarce zawartością kopii. Zmiana zadziała po ponownym wczytaniu MT_SW.</string>
+    <string name="app_database_restore_staged_reload">Kopia przyjęta. Wczytaj MT_SW ponownie, aby dokończyć przywracanie. Jeśli jest otwarte w innych kartach, najpierw je zamknij.</string>
+    <string name="bluetooth_permission_browser">Przeglądarka za każdym razem pyta, którego urządzenia użyć przy łączeniu przez Bluetooth lub USB, więc teraz nic nie trzeba zezwalać. Bluetooth działa w Chrome, Edge i Operze.</string>
+    <string name="camera_blocked_in_browser">Dostęp do aparatu jest zablokowany dla tej strony. Zezwól na niego w ustawieniach strony w przeglądarce albo zeskanuj kod QR z obrazu.</string>
+    <string name="connection_failure_bluetooth_or_location_unavailable">Bluetooth lub lokalizacja są wyłączone.</string>
+    <string name="connection_failure_bluetooth_unavailable">Bluetooth jest wyłączony.</string>
+    <string name="connection_failure_connect_failed">Nie udało się połączyć. Urządzenie może być używane przez inną aplikację, być za daleko albo mieć stare parowanie.</string>
+    <string name="connection_failure_connection_rejected">Urządzenie odrzuciło połączenie. Może wymagać sparowania: spróbuj jeszcze raz i wpisz PIN, gdy zostaniesz poproszony.</string>
+    <string name="connection_failure_link_lost">Połączenie zostało przerwane.</string>
+    <string name="connection_failure_out_of_range">Nie znaleziono urządzenia. Upewnij się, że jest włączone i w zasięgu.</string>
+    <string name="connection_failure_pairing_failed">Parowanie nie powiodło się. PIN jest na ekranie urządzenia albo jest to stały PIN ustawiony w jego konfiguracji Bluetooth.</string>
+    <string name="connection_failure_pairing_required">Urządzenie wymaga sparowania. Gdy system poprosi o PIN, wpisz ten z ekranu urządzenia albo jego stały PIN, jeśli jest ustawiony.</string>
+    <string name="connection_failure_unknown">Połączenie nie powiodło się.</string>
+    <string name="connection_phase_connecting">Łączenie z urządzeniem</string>
+    <string name="connection_phase_discovering_services">Sprawdzanie urządzenia</string>
+    <string name="connection_phase_finding_device">Szukanie urządzenia</string>
+    <string name="connection_phase_handshake_config">Wczytywanie ustawień urządzenia</string>
+    <string name="connection_phase_handshake_nodes">Wczytywanie listy węzłów</string>
+    <string name="connection_phase_pairing">Parowanie</string>
+    <string name="connection_phase_subscribing">Przygotowanie połączenia</string>
+    <string name="connection_retry_now">Ponawianie teraz (próba %1$d)</string>
+    <string name="copied_to_clipboard">Skopiowano do schowka</string>
+    <string name="firmware_update_unsupported_in_browser">W przeglądarce aktualizacja oprogramowania działa przez USB dla urządzeń nRF52 i RP2040. Aktualizuj przez Bluetooth w aplikacji na Androida lub komputer, a urządzenia ESP32 wgrywaj przez USB na flasher.meshtastic.org.</string>
+    <string name="mqtt_needs_websocket_url">Przeglądarka łączy się z MQTT tylko przez WebSocket. Ustaw adres brokera na jego adres wss://.</string>
+    <string name="network_scan_unavailable">Przeglądarka nie może skanować sieci. Dodaj urządzenie po adresie.</string>
+    <string name="no_network_devices_saved">Brak zapisanych urządzeń sieciowych</string>
+    <string name="no_serial_ports_allowed">Nie dodano urządzeń szeregowych</string>
+    <string name="no_serial_ports_allowed_hint">Przeglądarka pokazuje tylko porty, na które zezwoliłeś. Podłącz urządzenie, a potem wybierz je przyciskiem Dodaj urządzenie szeregowe.</string>
+    <string name="permission_blocked_in_browser_notice">Przeglądarka zablokowała to dla tej strony. Zezwól w ustawieniach strony obok paska adresu, a potem wczytaj stronę ponownie.</string>
+    <string name="position_location_blocked">Lokalizacja jest zablokowana dla tej strony. Zezwól na nią w ustawieniach strony w przeglądarce.</string>
+    <string name="position_location_unavailable">Przeglądarka nie mogła ustalić lokalizacji.</string>
+    <string name="qr_code_not_found">Nie znaleziono kodu QR na tym obrazie.</string>
+    <string name="scan_qr_from_image">Skanuj z obrazu</string>
+    <string name="serial_port_chip">%1$s – USB szeregowo</string>
+    <string name="serial_port_unknown">Urządzenie szeregowe</string>
+    <string name="serial_port_usb_ids">Urządzenie szeregowe USB %1$s</string>
+    <string name="show_all_serial_ports">Pokaż wszystkie porty szeregowe…</string>
+    <string name="web_bluetooth_unsupported">Ta przeglądarka nie ma dostępu do Bluetooth. Bluetooth działa w Chrome, Edge i Operze w Windows, macOS, ChromeOS i Androidzie oraz w Linuksie z włączoną w Chrome flagą funkcji eksperymentalnych.</string>
+    <string name="web_database_asking_other_tab">Proszę drugą kartę o zwolnienie…</string>
+    <string name="web_database_busy">MT_SW jest otwarte w innej karcie. Zamknij tamtą kartę, a ta będzie działać dalej sama.</string>
+    <string name="web_database_moved">MT_SW jest teraz otwarte w innej karcie.</string>
+    <string name="web_database_other_tab_silent">Druga karta nie odpowiedziała. Zamknij ją albo wszystkie inne karty MT_SW, a ta będzie działać dalej sama.</string>
+    <string name="web_database_unavailable">Ta przeglądarka nie pozwala MT_SW zapisywać tu danych. Okna prywatne często to blokują; spróbuj w zwykłym oknie.</string>
+    <string name="web_database_use_here">Użyj tutaj</string>
+    <string name="web_serial_unsupported">Ta przeglądarka nie ma dostępu do USB szeregowego. USB działa w Chrome, Edge i Operze na komputerze.</string>
+    <string name="web_transports_unsupported">Ta przeglądarka nie ma Bluetooth ani USB szeregowego, więc łączy się z urządzeniem tylko przez sieć. Bluetooth i USB działają w Chrome, Edge i Operze na komputerze, a Bluetooth także w Chrome na Androidzie.</string>
+    <string name="websocket_connect_failed">Nie udało się połączyć z WebSocket urządzenia. Sprawdź adres i czy urządzenie jest w tej sieci.</string>
+    <string name="websocket_handshake_rejected">Urządzenie odrzuciło WebSocket pod tym adresem. Sprawdź, czy ścieżka to /api/v1/ws i czy jego oprogramowanie ma interfejs WebSocket.</string>
+    <string name="websocket_message_too_big">Urządzenie zamknęło WebSocket, bo wiadomość była za duża.</string>
+    <string name="websocket_port_in_url">Nieużywane dla adresu ws:// lub wss://. Wpisz port w adresie.</string>
+    <string name="websocket_replaced_by_another_client">Inna aplikacja przejęła połączenie WebSocket tego urządzenia. Połącz się ponownie, aby je odzyskać.</string>
+    <string name="websocket_slot_contested">Urządzenie ciągle zrywa to połączenie WebSocket. Może używać go inna aplikacja. Połącz się ponownie, aby spróbować jeszcze raz.</string>
+    <string name="websocket_tls_failed">Nie udało się otworzyć bezpiecznego połączenia z urządzeniem. Urządzenia używają własnego certyfikatu, któremu aplikacja nie ufa, więc połącz się przez ws:// zamiast wss://.</string>
+    <string name="wifi_provision_choose_device">Wybierz urządzenie</string>
+    <string name="wifi_provision_choose_device_detail">Przeglądarka pokaże pobliskie urządzenia z konfiguracją Wi-Fi. Wybierz swoje, aby przejść dalej.</string>
+    <plurals name="connection_retry_in">
+        <item quantity="one">Ponowienie za %1$d sekundę (próba %2$d)</item>
+        <item quantity="few">Ponowienie za %1$d sekundy (próba %2$d)</item>
+        <item quantity="many">Ponowienie za %1$d sekund (próba %2$d)</item>
+        <item quantity="other">Ponowienie za %1$d sekundy (próba %2$d)</item>
+    </plurals>
 </resources>

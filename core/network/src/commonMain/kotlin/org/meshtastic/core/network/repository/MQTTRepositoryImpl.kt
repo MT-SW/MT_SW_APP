@@ -66,9 +66,6 @@ import org.meshtastic.mqtt.MqttProtocolVersion
 import org.meshtastic.mqtt.QoS
 import org.meshtastic.mqtt.ReasonCode
 import org.meshtastic.mqtt.packet.Subscription
-import org.meshtastic.mqtt.plus
-import org.meshtastic.mqtt.transport.tcp.TcpTransportFactory
-import org.meshtastic.mqtt.transport.ws.WebSocketTransportFactory
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.MqttClientProxyMessage
 import org.meshtastic.proto.ServiceEnvelope
@@ -161,6 +158,13 @@ class MQTTRepositoryImpl(
                     logLevel = if (buildConfigProvider.isDebug) MqttLogLevel.DEBUG else MqttLogLevel.WARN,
                 ),
             )
+        // Retrying cannot help a broker the client has no transport for, so it ends here, as a rejection does.
+        if (!newClient.opens(endpoint)) {
+            Logger.w { "MQTT broker address needs a ws:// or wss:// URL on this platform, stopping" }
+            newClient.close()
+            close(MqttEndpointUnsupportedException())
+            return@callbackFlow
+        }
         val session = ActiveMqttSession(newClient)
         closeSession(replaceActiveSession(session))
 
@@ -539,6 +543,9 @@ internal interface MqttClientSession {
     /** The version the broker accepted, valid only after [connect] returns. */
     val negotiatedProtocolVersion: MqttProtocolVersion
 
+    /** Whether this client has a transport for [endpoint]; a browser's has none for TCP. */
+    fun opens(endpoint: MqttEndpoint): Boolean = true
+
     suspend fun connect(endpoint: MqttEndpoint)
 
     suspend fun subscribe(subscriptions: List<Subscription>)
@@ -555,6 +562,8 @@ private class DefaultMqttClientSession(private val delegate: MqttClient) : MqttC
     // Read through on every access: the client resets it on connect and preserves it across auto-reconnects.
     override val negotiatedProtocolVersion: MqttProtocolVersion
         get() = delegate.negotiatedProtocolVersion
+
+    override fun opens(endpoint: MqttEndpoint): Boolean = endpoint.isOpenableHere()
 
     override suspend fun connect(endpoint: MqttEndpoint) {
         delegate.connect(endpoint)
@@ -576,10 +585,10 @@ private class DefaultMqttClientSession(private val delegate: MqttClient) : MqttC
 private fun defaultMqttClientFactory(setup: MqttClientSetup): MqttClientSession = DefaultMqttClientSession(
     MqttClient(setup.ownerId) {
         // mqtt-client 0.4.0 makes transport a required SPI: the client throws at connect if unset.
-        // Register TCP/TLS (the default) + WebSocket (for user-entered ws://-/wss:// brokers).
-        // Both get the same private-CA trust hook so the grant stays scoped to this socket — see [mqttTlsConfig].
+        // TCP/TLS (the default) + WebSocket off web, WebSocket only on web; all get the same private-CA trust
+        // hook so the grant stays scoped to this socket — see [mqttTlsConfig].
         val tls = mqttTlsConfig()
-        transportFactory = TcpTransportFactory(tls) + WebSocketTransportFactory(tls)
+        transportFactory = mqttTransportFactory(tls)
         keepAliveSeconds = MQTT_KEEPALIVE_SECONDS
         // Some brokers send topic aliases even when the client allows none, a protocol error that drops the
         // connection; accepting a few keeps them working. A 3.1.1 fallback drops the offer.

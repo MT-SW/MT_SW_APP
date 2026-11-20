@@ -151,6 +151,7 @@ import org.meshtastic.core.resources.firmware_update_title
 import org.meshtastic.core.resources.firmware_update_unidentified_summary
 import org.meshtastic.core.resources.firmware_update_unidentified_title
 import org.meshtastic.core.resources.firmware_update_unknown_release
+import org.meshtastic.core.resources.firmware_update_unsupported_in_browser
 import org.meshtastic.core.resources.firmware_update_unsupported_transport
 import org.meshtastic.core.resources.firmware_update_usb_bootloader_warning
 import org.meshtastic.core.resources.firmware_update_usb_instruction_text
@@ -801,7 +802,13 @@ private fun UnsupportedTransportState() {
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            stringResource(Res.string.firmware_update_unsupported_transport),
+            stringResource(
+                if (bluetoothFirmwareUpdateSupported) {
+                    Res.string.firmware_update_unsupported_transport
+                } else {
+                    Res.string.firmware_update_unsupported_in_browser
+                },
+            ),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

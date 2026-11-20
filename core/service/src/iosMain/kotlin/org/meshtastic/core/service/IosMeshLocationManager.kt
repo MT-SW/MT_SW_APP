@@ -30,10 +30,10 @@ import org.meshtastic.proto.Position as ProtoPosition
 @Single
 class IosMeshLocationManager(private val provider: PhoneLocationProvider) : MeshLocationManager {
     private var scope: CoroutineScope? = null
-    private var sendPositionFn: (suspend (ProtoPosition) -> Unit)? = null
+    private var sendPositionFn: (suspend (ProtoPosition) -> Boolean)? = null
     private var job: Job? = null
 
-    override fun start(scope: CoroutineScope, sendPositionFn: suspend (ProtoPosition) -> Unit) {
+    override fun start(scope: CoroutineScope, sendPositionFn: suspend (ProtoPosition) -> Boolean) {
         this.scope = scope
         this.sendPositionFn = sendPositionFn
         if (job?.isActive == true) return

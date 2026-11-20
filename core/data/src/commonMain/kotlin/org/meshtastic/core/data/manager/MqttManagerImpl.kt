@@ -35,8 +35,11 @@ import org.meshtastic.core.model.MqttConnectionState
 import org.meshtastic.core.model.MqttProbeStatus
 import org.meshtastic.core.network.repository.MQTTRepository
 import org.meshtastic.core.network.repository.MQTT_KEEPALIVE_SECONDS
+import org.meshtastic.core.network.repository.MqttEndpointUnsupportedException
 import org.meshtastic.core.network.repository.isCredentialRejection
+import org.meshtastic.core.network.repository.isOpenableHere
 import org.meshtastic.core.network.repository.mqttTlsConfig
+import org.meshtastic.core.network.repository.mqttTransportFactory
 import org.meshtastic.core.network.repository.resolveEndpoint
 import org.meshtastic.core.repository.MqttManager
 import org.meshtastic.core.repository.NodeRepository
@@ -48,15 +51,13 @@ import org.meshtastic.core.resources.mqtt_error_connection_lost
 import org.meshtastic.core.resources.mqtt_error_credentials_rejected
 import org.meshtastic.core.resources.mqtt_error_proxy_failed
 import org.meshtastic.core.resources.mqtt_error_rejected
+import org.meshtastic.core.resources.mqtt_needs_websocket_url
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.mqtt.ConnectionState
 import org.meshtastic.mqtt.MqttClient
 import org.meshtastic.mqtt.MqttException
 import org.meshtastic.mqtt.ProbeResult
-import org.meshtastic.mqtt.plus
 import org.meshtastic.mqtt.probe
-import org.meshtastic.mqtt.transport.tcp.TcpTransportFactory
-import org.meshtastic.mqtt.transport.ws.WebSocketTransportFactory
 import org.meshtastic.proto.MqttClientProxyMessage
 import org.meshtastic.proto.ToRadio
 import kotlin.uuid.Uuid
@@ -113,6 +114,9 @@ class MqttManagerImpl(
                         // localized string and the error is still surfaced either way.
                         val message = safeCatchingAll {
                             when {
+                                throwable is MqttEndpointUnsupportedException ->
+                                    getStringSuspend(Res.string.mqtt_needs_websocket_url)
+
                                 throwable is MqttException.ConnectionRejected && throwable.isCredentialRejection() ->
                                     getStringSuspend(Res.string.mqtt_error_credentials_rejected)
 
@@ -169,12 +173,13 @@ class MqttManagerImpl(
         password: String?,
     ): MqttProbeStatus {
         val endpoint = resolveEndpoint(address, tlsEnabled)
+        if (!endpoint.isOpenableHere()) return MqttProbeStatus.NeedsWebSocketUrl
         val result =
             MqttClient.probe(endpoint = endpoint) {
                 // probe() requires a transportFactory in 0.4.0 (errors otherwise); mirror the live client,
                 // including its scoped private-CA trust hook — otherwise a probe would fail where a connect succeeds.
                 val tls = mqttTlsConfig()
-                transportFactory = TcpTransportFactory(tls) + WebSocketTransportFactory(tls)
+                transportFactory = mqttTransportFactory(tls)
                 // Mirror the live client's keepalive too: the library default is 0 (no keepalive),
                 // which some brokers reject — misleadingly, as CLIENT_IDENTIFIER_NOT_VALID.
                 keepAliveSeconds = MQTT_KEEPALIVE_SECONDS

@@ -70,6 +70,8 @@ import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.MODE_VIVID_DARK
 import org.meshtastic.core.ui.theme.MODE_VIVID_LIGHT
 import org.meshtastic.core.ui.theme.themePreviewColors
+import org.meshtastic.core.ui.theme.MODE_DARK
+import org.meshtastic.core.ui.theme.MODE_LIGHT
 
 /** Theme modes that match AppCompatDelegate constants for cross-platform use. */
 enum class ThemeOption(val label: StringResource, val mode: Int) {
@@ -80,8 +82,8 @@ enum class ThemeOption(val label: StringResource, val mode: Int) {
     VERY_VIVID(label = Res.string.theme_very_vivid, mode = MODE_VERY_VIVID),
     VERY_VIVID_LIGHT(label = Res.string.theme_very_vivid_light, mode = MODE_VERY_VIVID_LIGHT),
     VERY_VIVID_DARK(label = Res.string.theme_very_vivid_dark, mode = MODE_VERY_VIVID_DARK),
-    LIGHT(label = Res.string.theme_light, mode = 1), // AppCompatDelegate.MODE_NIGHT_NO
-    DARK(label = Res.string.theme_dark, mode = 2), // AppCompatDelegate.MODE_NIGHT_YES
+    LIGHT(label = Res.string.theme_light, mode = MODE_LIGHT),
+    DARK(label = Res.string.theme_dark, mode = MODE_DARK),
     SYSTEM(label = Res.string.theme_system, mode = -1), // AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     MONO_LIGHT(label = Res.string.theme_mono_light, mode = MODE_MONO_LIGHT),
     MONO_DARK(label = Res.string.theme_mono_dark, mode = MODE_MONO_DARK),

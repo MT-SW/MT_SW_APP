@@ -21,6 +21,7 @@ import org.meshtastic.core.repository.Notification
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import org.meshtastic.core.navigation.NotificationDeepLinks
 
 private const val PROCESS_TIMEOUT_SECONDS = 5L
 
@@ -42,7 +43,7 @@ class WindowsNotificationSender(private val appName: String = "Meshtastic") : Na
     private val clickWaiters = AtomicInteger(0)
 
     override fun send(notification: Notification): Boolean {
-        val link = notification.deepLink
+        val link = notification.deepLink?.let(NotificationDeepLinks::toUri)
         // Every waiting toast is a PowerShell process kept alive, so only a few at once; the rest are shown plainly.
         if (link != null && clickWaiters.get() < MAX_CLICK_WAITERS) {
             return runCommandWithClick(buildCommand(notification, waitForClick = true), link)

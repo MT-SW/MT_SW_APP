@@ -2,7 +2,7 @@
 title: Aktualizacje firmware
 parent: Przewodnik użytkownika
 nav_order: 13
-last_updated: 2026-11-16
+last_updated: 2026-11-20
 description: Aktualizuj firmware radia przez Bluetooth, Wi-Fi lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
@@ -156,6 +156,8 @@ Aplikacja wybiera ścieżkę na podstawie tego, co zgłasza dysk; nie wybierasz 
 Do odzyskiwania lub gdy nie jest dostępne ani OTA, ani USB w aplikacji:
 - Użyj [Meshtastic Web Flasher](https://flasher.meshtastic.org)
 - Albo [narzędzia CLI Meshtastic](https://meshtastic.org/docs/getting-started/flashing-firmware) na komputerze
+
+Plik bootloadera dostarczony przez producenta jako `.zip` (na przykład RAK WisBlock RAK4631) nie da się skopiować na dysk radia. Użyj aktualizacji bootloadera w aplikacji albo wgraj plik `.zip` narzędziem szeregowym DFU, takim jak `adafruit-nrfutil`. Bootloader dostarczony jako `update-....uf2` **da się** zainstalować, kopiując go na dysk radia; tak działa aktualizacja bootloadera w samej aplikacji. Gdy dotyczy to tylko drogi przez port szeregowy, aplikacja pokazuje podpowiedź.
 
 ## Kanały wersji
 

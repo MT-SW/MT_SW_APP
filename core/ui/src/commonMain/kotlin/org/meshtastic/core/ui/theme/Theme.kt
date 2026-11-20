@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -496,3 +497,19 @@ fun isVividDark(mode: Int): Boolean = mode == MODE_VIVID_DARK || mode == MODE_VE
 
 /** True when [mode] is one of the black-and-white themes. */
 fun isMonochromeMode(mode: Int): Boolean = mode == MODE_MONO_LIGHT || mode == MODE_MONO_DARK
+
+/** The stored theme preference's light and dark values, which equal AppCompatDelegate's MODE_NIGHT_NO and _YES. */
+const val MODE_LIGHT = 1
+const val MODE_DARK = 2
+
+/**
+ * Whether the stored theme preference [themePref] means dark; any other value follows the system. MT_SW: the
+ * black-and-white and the saturated themes that are always light or always dark answer for themselves too.
+ */
+@Composable
+@ReadOnlyComposable
+fun isDarkTheme(themePref: Int): Boolean = when {
+    themePref == MODE_LIGHT || themePref == MODE_MONO_LIGHT || isVividLight(themePref) -> false
+    themePref == MODE_DARK || themePref == MODE_MONO_DARK || isVividDark(themePref) -> true
+    else -> isSystemInDarkTheme()
+}

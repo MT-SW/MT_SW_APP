@@ -67,6 +67,7 @@ import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
+import org.meshtastic.core.navigation.NotificationDeepLinks
 
 private const val BADGE_START_DELAY_MS = 3_000L
 private const val USER_INFO_DEEP_LINK = "deepLink"
@@ -235,7 +236,9 @@ class IosNotificationManager(
             UNMutableNotificationContent().apply {
                 setTitle(notification.title)
                 setBody(notification.message)
-                notification.deepLink?.let { setUserInfo(mapOf<Any?, Any?>(USER_INFO_DEEP_LINK to it)) }
+                notification.deepLink?.let {
+                    setUserInfo(mapOf<Any?, Any?>(USER_INFO_DEEP_LINK to NotificationDeepLinks.toUri(it)))
+                }
                 if (sosButtons) setCategoryIdentifier(SOS_CATEGORY)
                 // Notifications of one conversation (or kind) are stacked together in the list.
                 notification.id?.let { setThreadIdentifier(it.toString()) }

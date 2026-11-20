@@ -57,6 +57,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import okio.ByteString.Companion.toByteString
+import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import org.meshtastic.core.ble.BluetoothRepository
@@ -65,12 +66,15 @@ import org.meshtastic.core.common.state.RadioOperationLock
 import org.meshtastic.core.common.util.ignoreExceptionSuspend
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.safeCatching
+import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.MeshActivity
+import org.meshtastic.core.model.TransportPhase
+import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.util.anonymize
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.network.repository.SerialDevicePresence
@@ -84,10 +88,17 @@ import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ReceivedRadioFrame
 import org.meshtastic.core.repository.TransportDisconnectReason
 import org.meshtastic.core.service.background.RadioTransportPool
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.usb_permission_denied
+import org.meshtastic.core.resources.websocket_connect_failed
+import org.meshtastic.core.resources.websocket_handshake_rejected
+import org.meshtastic.core.resources.websocket_message_too_big
+import org.meshtastic.core.resources.websocket_replaced_by_another_client
+import org.meshtastic.core.resources.websocket_slot_contested
+import org.meshtastic.core.resources.websocket_tls_failed
 import org.meshtastic.proto.ToRadio
 import kotlin.concurrent.Volatile
-
-private const val USB_PERMISSION_DENIED_ERROR = "USB permission denied. Reconnect the device to try again."
 
 /**
  * Immutable per-start transport identity. [generation] is bumped on every transport start (including same-address
@@ -157,9 +168,32 @@ private fun UsbRecoveryTriggerState.next(snapshot: UsbRecoverySnapshot): UsbReco
     }
 }
 
-private fun TransportDisconnectReason.toConnectionErrorMessage(): String = when (this) {
-    TransportDisconnectReason.UsbPermissionDenied -> USB_PERMISSION_DENIED_ERROR
+/** The user-facing text for [reason]. Lookup fails only outside a full resource runtime; the name beats silence. */
+internal suspend fun connectionErrorText(reason: TransportDisconnectReason): String = safeCatchingAll {
+    getStringSuspend(reason.toConnectionErrorMessage())
 }
+    .getOrDefault(reason.name)
+
+private fun TransportDisconnectReason.toConnectionErrorMessage(): StringResource = when (this) {
+    TransportDisconnectReason.UsbPermissionDenied -> Res.string.usb_permission_denied
+    TransportDisconnectReason.ReplacedByAnotherClient -> Res.string.websocket_replaced_by_another_client
+    TransportDisconnectReason.WebSocketConnectFailed -> Res.string.websocket_connect_failed
+    TransportDisconnectReason.WebSocketHandshakeRejected -> Res.string.websocket_handshake_rejected
+    TransportDisconnectReason.WebSocketTlsFailed -> Res.string.websocket_tls_failed
+    TransportDisconnectReason.WebSocketMessageTooBig -> Res.string.websocket_message_too_big
+    TransportDisconnectReason.WebSocketSlotContested -> Res.string.websocket_slot_contested
+}
+
+private val LINK_UP_PHASES =
+    setOf(TransportPhase.HandshakeConfig, TransportPhase.HandshakeNodes, TransportPhase.Connected)
+
+/** Permanent closes that only the user's next connect may undo. */
+private val USER_CONNECT_REASONS =
+    setOf(
+        TransportDisconnectReason.ReplacedByAnotherClient,
+        TransportDisconnectReason.WebSocketMessageTooBig,
+        TransportDisconnectReason.WebSocketSlotContested,
+    )
 
 /**
  * Shared multiplatform connection orchestrator for Meshtastic radios.
@@ -228,6 +262,9 @@ class SharedRadioInterfaceService(
 
     /** Guarded by [sessionCallbackLock]. New work is rejected immediately when teardown closes this gate. */
     private var sessionAdmissionOpen = false
+
+    /** The generation whose link is up: set by its transport's connect, cleared on any disconnect. Lock-guarded. */
+    private var linkedGeneration: Long? = null
 
     /** Per-generation operation ownership, guarded by [sessionCallbackLock]. */
     private val sessionOperationStates = mutableMapOf<Long, SessionOperationState>()
@@ -458,6 +495,9 @@ class SharedRadioInterfaceService(
     private val _connectionError = MutableSharedFlow<String>(extraBufferCapacity = 64)
     override val connectionError: Flow<String> = _connectionError.asFlow()
 
+    private val _transportStatus = MutableStateFlow<TransportStatus?>(null)
+    override val transportStatus: StateFlow<TransportStatus?> = _transportStatus.asStateFlow()
+
     override val serviceScope: CoroutineScope
         get() = _serviceScope
 
@@ -480,6 +520,10 @@ class SharedRadioInterfaceService(
      * Guarded by [transportMutex]; every read/write site holds the lock. The @Volatile keeps diagnostic reads honest.
      */
     @Volatile private var connectionRequested = false
+
+    // A link that gave the radio's one client slot away, or that the radio refused, stays down until the user connects
+    // again: a recovery restart would take the slot back from the client that now holds it.
+    @Volatile private var awaitingUserConnect = false
 
     private val gattCacheInvalidationRequested = atomic(false)
 
@@ -610,7 +654,11 @@ class SharedRadioInterfaceService(
                                 // explicitly disconnected from. stopTransportLocked() below still fires on
                                 // BLE-disabled to tear down a running BLE link, but we deliberately do NOT
                                 // clear connectionRequested here — that is disconnect()'s job.
-                                if (connectionRequested && !radioOperationLock.suppressesTransport) {
+                                if (
+                                    connectionRequested &&
+                                    !awaitingUserConnect &&
+                                    !radioOperationLock.suppressesTransport
+                                ) {
                                     startTransportLocked()
                                 }
                             } else if (runningTransportId == InterfaceId.BLUETOOTH) {
@@ -626,10 +674,14 @@ class SharedRadioInterfaceService(
                         transportMutex.withLock {
                             if (state) {
                                 // Environmental recovery only — see the BLE listener above for rationale.
-                                if (connectionRequested && !radioOperationLock.suppressesTransport) {
+                                if (
+                                    connectionRequested &&
+                                    !awaitingUserConnect &&
+                                    !radioOperationLock.suppressesTransport
+                                ) {
                                     startTransportLocked()
                                 }
-                            } else if (runningTransportId == InterfaceId.TCP) {
+                            } else if (runningTransportId?.isNetwork == true) {
                                 stopTransportLocked()
                             }
                         }
@@ -709,6 +761,13 @@ class SharedRadioInterfaceService(
                 // Mark the connection lifecycle as active BEFORE starting so concurrent
                 // hardware/network listeners observe the gate as open.
                 connectionRequested = true
+                // A link that stopped for good still holds its transport, which would make the start below a no-op.
+                if (awaitingUserConnect) {
+                    awaitingUserConnect = false
+                    ignoreExceptionSuspend {
+                        stopTransportLocked(notifyPermanent = false, sendPoliteDisconnect = false)
+                    }
+                }
                 // connect() is fire-and-forget, so a recoverable factory failure has no caller to receive it. The
                 // start path already rolls back partial session state; contain the failure here so it does not become
                 // an uncaught lifecycle-scope exception, while CancellationException and fatal Errors still propagate.
@@ -876,6 +935,7 @@ class SharedRadioInterfaceService(
                 // transport for a device the user explicitly tore down. Only start a fresh
                 // transport when an address was actually selected.
                 connectionRequested = sanitized != null
+                awaitingUserConnect = false
                 if (sanitized != null && previousAddress != null && sanitized != previousAddress) {
                     gattCacheInvalidationRequested.value = false
                 }
@@ -1047,6 +1107,8 @@ class SharedRadioInterfaceService(
             isStarted = false
             radioTransport = null
             runningTransportId = null
+            // Admission is already revoked, so no late status from the stopped transport can land after this.
+            _transportStatus.value = null
             try {
                 if (handOverTo != null) handOverTo.release(handOver = true) else currentTransport?.close()
             } finally {
@@ -1281,6 +1343,7 @@ class SharedRadioInterfaceService(
         // onDisconnect launch could execute AFTER an onConnect launch, leaving the service stuck
         // in Connected while the transport was actually disconnected.
         lastDataReceivedMillis = now()
+        linkedGeneration = activeTransportSession?.generation
         if (_connectionState.value != ConnectionState.Connected) {
             Logger.d { "Broadcasting connection state change to Connected" }
             _connectionState.value = ConnectionState.Connected
@@ -1291,12 +1354,29 @@ class SharedRadioInterfaceService(
         synchronized(sessionCallbackLock) { publishDisconnected(isPermanent, errorMessage, reason) }
     }
 
+    /**
+     * Handshake-level phases arrive here directly. They apply only while the admitted session's own link is up, so a
+     * phase a superseded session's handshake reports late never lands on its replacement.
+     */
+    override fun onStatus(status: TransportStatus) {
+        synchronized(sessionCallbackLock) {
+            val session = activeTransportSession
+            if (session != null && session.generation == linkedGeneration) _transportStatus.value = status
+        }
+    }
+
     /** Applies a callback already admitted under [sessionCallbackLock]. */
     private fun publishDisconnected(isPermanent: Boolean, errorMessage: String?, reason: TransportDisconnectReason?) {
-        val resolvedErrorMessage = errorMessage ?: reason?.toConnectionErrorMessage()
-        if (resolvedErrorMessage != null) {
-            processLifecycle.coroutineScope.launch(dispatchers.default) { _connectionError.emit(resolvedErrorMessage) }
+        if (errorMessage != null || reason != null) {
+            processLifecycle.coroutineScope.launch(dispatchers.default) {
+                val message = errorMessage ?: reason?.let { connectionErrorText(it) }
+                if (message != null) _connectionError.emit(message)
+            }
         }
+        if (isPermanent && reason in USER_CONNECT_REASONS) awaitingUserConnect = true
+        linkedGeneration = null
+        // A handshake phase outlives its link otherwise: transports without phases of their own never replace it.
+        if (_transportStatus.value?.phase in LINK_UP_PHASES) _transportStatus.value = null
         val newTargetState = if (isPermanent) ConnectionState.Disconnected else ConnectionState.DeviceSleep
         if (_connectionState.value != newTargetState) {
             Logger.d { "Broadcasting connection state change to $newTargetState" }
@@ -1326,6 +1406,13 @@ class SharedRadioInterfaceService(
                 runIfTransportSessionActive(session) { publishDisconnected(isPermanent, errorMessage, reason) }
             if (!admitted) {
                 Logger.d { "Dropping stale onDisconnect gen=${session.generation} addr=${session.address.anonymize}" }
+            }
+        }
+
+        override fun onStatus(status: TransportStatus) {
+            val admitted = runIfTransportSessionActive(session) { _transportStatus.value = status }
+            if (!admitted) {
+                Logger.d { "Dropping stale onStatus gen=${session.generation} addr=${session.address.anonymize}" }
             }
         }
 

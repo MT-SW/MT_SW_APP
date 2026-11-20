@@ -45,6 +45,7 @@ add_local_mbtiles_file
 add_network_device
 add_network_device_manually
 add_network_layer
+add_usb_device
 address
 admin_keys
 administration
@@ -471,10 +472,12 @@ app_database_backup_saved
 app_database_merge_done
 app_database_merge_failed
 app_database_restore_confirmation
+app_database_restore_confirmation_all_radios
 app_database_restore_corrupt
 app_database_restore_failed
 app_database_restore_not_backup
 app_database_restore_staged
+app_database_restore_staged_reload
 app_database_restore_wrong_version
 app_functions_get_channel_info
 app_functions_get_device_status
@@ -689,6 +692,7 @@ bluetooth_permission_blocked_notice
 bluetooth_permission_blocked_notice_pre31
 bluetooth_permission_blocked_rationale
 bluetooth_permission_blocked_rationale_pre31
+bluetooth_permission_browser
 bluetooth_permission_denied_notice
 bluetooth_permission_denied_notice_pre31
 bluetooth_permission_rationale
@@ -729,6 +733,7 @@ cache_limit_eviction_warning
 calculating
 call_sign
 call_sign_summary
+camera_blocked_in_browser
 camera_permission
 camera_permission_rationale
 camera_unavailable
@@ -931,9 +936,28 @@ connected
 connected_device
 connected_sleeping
 connecting
+### CONNECTION ###
 connection_center_intro
 connection_center_summary
 connection_center_title
+connection_failure_bluetooth_or_location_unavailable
+connection_failure_bluetooth_unavailable
+connection_failure_connect_failed
+connection_failure_connection_rejected
+connection_failure_link_lost
+connection_failure_out_of_range
+connection_failure_pairing_failed
+connection_failure_pairing_required
+connection_failure_unknown
+connection_phase_connecting
+connection_phase_discovering_services
+connection_phase_finding_device
+connection_phase_handshake_config
+connection_phase_handshake_nodes
+connection_phase_pairing
+connection_phase_subscribing
+connection_retry_in
+connection_retry_now
 connection_status
 connections
 ### CONSOLE ###
@@ -1011,6 +1035,7 @@ contrast_standard
 control_style_thin
 control_style_thin_summary
 conversations
+copied_to_clipboard
 copy
 copyright_notice
 ### COVERAGE ###
@@ -1626,6 +1651,7 @@ firmware_update_unidentified_title
 firmware_update_unknown_error
 firmware_update_unknown_hardware
 firmware_update_unknown_release
+firmware_update_unsupported_in_browser
 firmware_update_unsupported_transport
 firmware_update_unsupported_update_method
 firmware_update_uploading
@@ -2389,6 +2415,7 @@ mqtt_error_connection_lost
 mqtt_error_credentials_rejected
 mqtt_error_proxy_failed
 mqtt_error_rejected
+mqtt_needs_websocket_url
 mqtt_probe_dns_failure
 mqtt_probe_other_failure
 mqtt_probe_rejected
@@ -2591,6 +2618,7 @@ network_health_level_unknown
 network_health_online
 network_health_problems_only
 network_layer_url_hint
+network_scan_unavailable
 new_channel_rcvd
 new_messages_below
 new_node_seen
@@ -2609,10 +2637,13 @@ no_local_stats
 no_map_layers_loaded
 no_network_devices_found
 no_network_devices_hint
+no_network_devices_saved
 no_network_devices_seen
 no_pax_metrics_logs
 no_public_key
 no_public_key_text
+no_serial_ports_allowed
+no_serial_ports_allowed_hint
 no_usb_devices_found
 no_usb_devices_hint
 no_usb_devices_seen
@@ -2762,6 +2793,7 @@ notification_test_summary
 notification_test_title
 ### NOTIFICATIONS ###
 notifications_alerts
+notifications_blocked_by_browser
 notifications_for_channel_and_direct_messages
 notifications_for_low_battery_alerts
 notifications_for_newly_discovered_nodes
@@ -2770,6 +2802,8 @@ notifications_node_silence
 notifications_on_alert_bell_receipt
 notifications_on_message_receipt
 notifications_radio_notices
+notifications_turn_on
+notifications_turn_on_summary
 notifications_updates
 now
 ### OFFLINE ###
@@ -2912,6 +2946,7 @@ paxcounter
 paxcounter_config
 periodic_position_broadcast
 ### PERMISSION ###
+permission_blocked_in_browser_notice
 permission_camera_summary
 permission_local_network_summary
 permission_location_summary
@@ -3039,6 +3074,8 @@ port_name_zps
 position
 position_config_set_fixed_from_phone
 position_enabled
+position_location_blocked
+position_location_unavailable
 position_log
 position_packet
 potassium
@@ -3145,6 +3182,7 @@ ptt_pin
 public_key
 public_key_changed
 qr_code
+qr_code_not_found
 ### QUICK ###
 quick_chat
 quick_chat_append
@@ -3255,6 +3293,7 @@ regenerate_keys_confirmation
 regenerate_private_key
 relayed_by
 relays
+reload
 ### REMOTE ###
 remote
 remote_add_to_list
@@ -3438,6 +3477,7 @@ scan_connect_code_qr
 scan_network_devices
 scan_nfc
 scan_nfc_text
+scan_qr_from_image
 scan_shared_contact_nfc
 scan_shared_contact_qr
 scanning_bluetooth
@@ -3491,8 +3531,12 @@ select_all
 selected
 selected_map_type
 send
+### SERIAL ###
 serial
 serial_config
+serial_port_chip
+serial_port_unknown
+serial_port_usb_ids
 session_active
 session_refresh_required
 set_display_name
@@ -3522,6 +3566,7 @@ shared_contact_no_public_key
 short_name
 ### SHOW ###
 show_all_key_title
+show_all_serial_ports
 show_full_message_timestamps
 show_full_message_timestamps_summary
 show_iaq_legend
@@ -4145,7 +4190,25 @@ waypoint_delete
 waypoint_edit
 waypoint_new
 waypoint_received
+### WEB ###
+web_bluetooth_unsupported
+web_database_asking_other_tab
+web_database_busy
+web_database_moved
+web_database_other_tab_silent
+web_database_unavailable
+web_database_use_here
+web_serial_unsupported
+web_transports_unsupported
 website
+### WEBSOCKET ###
+websocket_connect_failed
+websocket_handshake_rejected
+websocket_message_too_big
+websocket_port_in_url
+websocket_replaced_by_another_client
+websocket_slot_contested
+websocket_tls_failed
 weight
 what_is_meshtastic
 what_is_meshtastic_description
@@ -4232,6 +4295,8 @@ wifi_drops_label
 wifi_export
 wifi_ip
 wifi_provision_available_networks
+wifi_provision_choose_device
+wifi_provision_choose_device_detail
 wifi_provision_connect_failed
 wifi_provision_description
 wifi_provision_device_found

@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.prefs.bridge
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,6 +36,7 @@ import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgePrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /**
  * The bridge settings, one entry per saved radio, in the settings store of the app (so they are part of the settings
@@ -60,7 +59,7 @@ class RadioBridgePrefsImpl(private val dataStore: UiDataStore, dispatchers: Coro
     }
 
     companion object {
-        val KEY_BRIDGES = stringPreferencesKey("radio-bridge-configs")
+        val KEY_BRIDGES = stringPrefsKey("radio-bridge-configs")
 
         internal fun encode(all: Map<Int, RadioBridgeConfig>): String = JsonObject(
             all.mapKeys { it.key.toString() }

@@ -26,6 +26,7 @@ import org.meshtastic.core.repository.Notification
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import org.meshtastic.core.navigation.NotificationDeepLinks
 
 /**
  * JNA bindings for libnotify (libnotify.so / libnotify-4.so).
@@ -147,7 +148,9 @@ class LinuxNotificationSender(
         val libnotify = lib ?: return false
 
         // A notification with a link (a message) goes through notify-send, which can report a tap on it.
-        notification.deepLink?.let { link -> if (sendWithTapAction(notification, link)) return true }
+        notification.deepLink?.let(NotificationDeepLinks::toUri)?.let { link ->
+            if (sendWithTapAction(notification, link)) return true
+        }
 
         val ptr =
             libnotify.notify_notification_new(

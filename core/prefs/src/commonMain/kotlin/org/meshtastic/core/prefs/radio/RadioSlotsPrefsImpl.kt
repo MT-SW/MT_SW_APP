@@ -16,10 +16,6 @@
  */
 package org.meshtastic.core.prefs.radio
 
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +27,9 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.RadioDataStore
 import org.meshtastic.core.repository.RadioSlot
 import org.meshtastic.core.repository.RadioSlotsPrefs
+import org.meshtastic.core.prefs.store.PrefsSnapshot
+import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /**
  * Saved radios of the connection center. They are not part of the settings backup: an address is tied to the device
@@ -99,7 +98,7 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
         }
     }
 
-    private fun current(prefs: Preferences): List<RadioSlot> {
+    private fun current(prefs: PrefsSnapshot): List<RadioSlot> {
         val stored = prefs[KEY_SLOTS]
         return if (stored != null) {
             RadioSlotsCodec.decode(stored)
@@ -123,8 +122,8 @@ class RadioSlotsPrefsImpl(private val dataStore: RadioDataStore, dispatchers: Co
         (1..RadioSlotsPrefs.MAX_SLOTS).firstOrNull { id -> slots.none { it.id == id } }
 
     companion object {
-        val KEY_SLOTS = stringPreferencesKey("radio-slots")
-        val KEY_SELECTED = intPreferencesKey("radio-slot-selected")
-        val KEY_OFF = stringPreferencesKey("radio-slots-off")
+        val KEY_SLOTS = stringPrefsKey("radio-slots")
+        val KEY_SELECTED = intPrefsKey("radio-slot-selected")
+        val KEY_OFF = stringPrefsKey("radio-slots-off")
     }
 }

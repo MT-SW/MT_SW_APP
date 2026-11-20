@@ -23,6 +23,7 @@ import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
 import org.meshtastic.core.repository.Notification
 import kotlin.uuid.Uuid
+import org.meshtastic.core.navigation.NotificationDeepLinks
 
 /**
  * Sends notifications through macOS UserNotifications (`UNUserNotificationCenter`) via JNA + Objective-C runtime. This
@@ -61,7 +62,7 @@ class MacOSNotificationSender private constructor(private val bridge: MacNotific
             message = notification.message,
             subtitle = categorySubtitle(notification.category),
             playSound = !notification.isSilent,
-            deepLink = notification.deepLink,
+            deepLink = notification.deepLink?.let(NotificationDeepLinks::toUri),
         )
     }
 

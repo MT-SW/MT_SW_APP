@@ -17,6 +17,7 @@
 
 plugins {
     alias(libs.plugins.meshtastic.kmp.library)
+    alias(libs.plugins.meshtastic.kmp.web)
     alias(libs.plugins.meshtastic.koin)
 }
 
@@ -30,11 +31,15 @@ kotlin {
             implementation(projects.core.datastore)
             implementation(projects.core.di)
 
-            implementation(libs.androidx.datastore.preferences)
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
         }
+
+        // No wasmJs variant, so DataStorePrefsStore lives here and every *PrefsImpl uses the PrefsStore abstraction.
+        getByName("nonWebMain").dependencies { implementation(libs.androidx.datastore.preferences) }
+
+        meshtasticWeb.wasmJsMain { dependencies { implementation(libs.kotlinx.browser) } }
     }
 }

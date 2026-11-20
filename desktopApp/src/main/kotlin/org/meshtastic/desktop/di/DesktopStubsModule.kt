@@ -23,7 +23,6 @@ import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MagneticFieldProvider
 import org.meshtastic.core.repository.MeshLocationManager
-import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.UiPrefs
@@ -33,7 +32,6 @@ import org.meshtastic.desktop.stub.NoopCompassHeadingProvider
 import org.meshtastic.desktop.stub.NoopLocationRepository
 import org.meshtastic.desktop.stub.NoopMagneticFieldProvider
 import org.meshtastic.desktop.stub.NoopMeshLocationManager
-import org.meshtastic.desktop.stub.NoopMeshWorkerManager
 import org.meshtastic.desktop.stub.NoopPhoneLocationProvider
 import org.meshtastic.desktop.stub.NoopPhonePressureProvider
 import org.meshtastic.desktop.stub.NoopPlatformAnalytics
@@ -52,8 +50,6 @@ class DesktopStubsModule {
     @Single fun platformAnalytics(): PlatformAnalytics = NoopPlatformAnalytics()
 
     @Single fun appWidgetUpdater(): AppWidgetUpdater = NoopAppWidgetUpdater()
-
-    @Single fun meshWorkerManager(): MeshWorkerManager = NoopMeshWorkerManager()
 
     @Single
     fun desktopNodeCleanupScheduler(

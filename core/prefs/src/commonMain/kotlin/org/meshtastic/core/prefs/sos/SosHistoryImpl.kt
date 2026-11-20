@@ -16,10 +16,6 @@
  */
 package org.meshtastic.core.prefs.sos
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,6 +30,9 @@ import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.SosHistory
 import org.meshtastic.core.repository.SosHistoryCodec
 import org.meshtastic.core.repository.SosHistoryEntry
+import org.meshtastic.core.prefs.store.PrefsSnapshot
+import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /**
  * The history of received SOS, kept in the same store as the other SOS settings. With [keepDays] set, entries older
@@ -78,14 +77,14 @@ class SosHistoryImpl(private val dataStore: UiDataStore, dispatchers: CoroutineD
         }
     }
 
-    private fun writePruned(prefs: MutablePreferences) {
+    private fun writePruned(prefs: PrefsSnapshot.Editor) {
         val text = prefs[KEY_HISTORY] ?: return
         val kept = SosHistoryCodec.prune(SosHistoryCodec.decode(text), prefs[KEY_KEEP] ?: 0, nowMillis)
         prefs[KEY_HISTORY] = SosHistoryCodec.encode(kept)
     }
 
     private companion object {
-        val KEY_HISTORY = stringPreferencesKey("sos_history")
-        val KEY_KEEP = intPreferencesKey("sos_history_keep_days")
+        val KEY_HISTORY = stringPrefsKey("sos_history")
+        val KEY_KEEP = intPrefsKey("sos_history_keep_days")
     }
 }

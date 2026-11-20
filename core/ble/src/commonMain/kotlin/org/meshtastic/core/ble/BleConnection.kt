@@ -112,6 +112,13 @@ interface BleConnection {
      * sequenced relative to [invalidateServiceCache] — see [BleRadioTransport]'s connect sequence for why.
      */
     suspend fun negotiateMtu(mtu: Int): Int? = null
+
+    /**
+     * The latest failure this connection absorbed instead of throwing since the last [connect] began: a rejected
+     * connect inside [connectAndAwait], or a notification subscription the platform reported out of band.
+     */
+    val lastFailureCause: Throwable?
+        get() = null
 }
 
 /** Represents a BLE service for commonMain. */

@@ -16,14 +16,6 @@
  */
 package org.meshtastic.core.prefs.map
 
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +28,12 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.MapDataStore
 import org.meshtastic.core.repository.HorizonPrefs
+import org.meshtastic.core.prefs.store.PrefsSnapshot
+import org.meshtastic.core.prefs.store.booleanPrefsKey
+import org.meshtastic.core.prefs.store.doublePrefsKey
+import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.longPrefsKey
+import org.meshtastic.core.prefs.store.stringSetPrefsKey
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapFilterPrefs
 import org.meshtastic.core.repository.MapPrefs
@@ -64,7 +62,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         scope.launch { dataStore.edit { it.writeMapFilterPrefs(transform(it.toMapFilterPrefs())) } }
     }
 
-    private fun Preferences.toMapFilterPrefs(): MapFilterPrefs {
+    private fun PrefsSnapshot.toMapFilterPrefs(): MapFilterPrefs {
         val defaults = MapFilterPrefs()
         return MapFilterPrefs(
             onlyFavorites = this[KEY_SHOW_ONLY_FAVORITES_PREF] ?: defaults.onlyFavorites,
@@ -87,7 +85,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         )
     }
 
-    private fun MutablePreferences.writeMapFilterPrefs(prefs: MapFilterPrefs) {
+    private fun PrefsSnapshot.Editor.writeMapFilterPrefs(prefs: MapFilterPrefs) {
         this[KEY_SHOW_ONLY_FAVORITES_PREF] = prefs.onlyFavorites
         this[KEY_SHOW_WAYPOINTS_PREF] = prefs.showWaypoints
         this[KEY_SHOW_PRECISION_CIRCLE_PREF] = prefs.showPrecisionCircle
@@ -269,49 +267,49 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
     companion object {
         private const val DEFAULT_COVERAGE_RANGE_KM = 20
 
-        val KEY_MESH_HUD_COACH_SEEN_PREF = booleanPreferencesKey("mesh_hud_coach_seen")
-        val KEY_MAP_STYLE_PREF = intPreferencesKey("map_style_id")
-        val KEY_SHOW_ONLY_FAVORITES_PREF = booleanPreferencesKey("show_only_favorites")
-        val KEY_SHOW_WAYPOINTS_PREF = booleanPreferencesKey("show_waypoints")
-        val KEY_SHOW_PRECISION_CIRCLE_PREF = booleanPreferencesKey("show_precision_circle")
-        val KEY_SHOW_LINKS_PREF = booleanPreferencesKey("show_node_links")
-        val KEY_LAST_HEARD_FILTER_PREF = longPreferencesKey("last_heard_filter")
-        val KEY_LAST_HEARD_TRACK_FILTER_PREF = longPreferencesKey("last_heard_track_filter")
-        val KEY_HIDDEN_LAYER_URLS_PREF = stringSetPreferencesKey("hidden_layer_urls")
-        val KEY_NETWORK_MAP_LAYERS_PREF = stringSetPreferencesKey("network_map_layers")
-        val KEY_LAYER_OPACITY_PREF = stringSetPreferencesKey("layer_opacity")
-        val KEY_ONLY_ONLINE_PREF = booleanPreferencesKey("map_only_online")
-        val KEY_ONLY_DIRECT_PREF = booleanPreferencesKey("map_only_direct")
-        val KEY_MAX_HOPS_PREF = intPreferencesKey("map_max_hops")
-        val KEY_MAX_DISTANCE_PREF = intPreferencesKey("map_max_distance_m")
-        val KEY_ONLY_SIGNED_PREF = booleanPreferencesKey("map_only_signed")
-        val KEY_ONLY_ACTIVE_PREF = booleanPreferencesKey("map_only_active")
-        val KEY_ONLY_ENCRYPTED_PREF = booleanPreferencesKey("map_only_encrypted")
-        val KEY_EXCLUDE_MQTT_PREF = booleanPreferencesKey("map_exclude_mqtt")
-        val KEY_SHOW_IGNORED_PREF = booleanPreferencesKey("map_show_ignored")
-        val KEY_INCLUDE_UNKNOWN_PREF = booleanPreferencesKey("map_include_unknown")
-        val KEY_EXCLUDED_ROLES_PREF = stringSetPreferencesKey("map_excluded_roles")
-        val KEY_HORIZON_RADIUS_KM = intPreferencesKey("horizon_radius_km")
-        val KEY_HORIZON_NODE_RANGE_KM = intPreferencesKey("horizon_node_range_km")
-        val KEY_HORIZON_ONLY_FAVORITES = booleanPreferencesKey("horizon_only_favorites")
-        val KEY_HORIZON_PRECISION_CIRCLES = booleanPreferencesKey("horizon_precision_circles")
-        val KEY_HORIZON_ANTENNA_AUTO = booleanPreferencesKey("horizon_antenna_auto")
-        val KEY_HORIZON_ANTENNA_M = intPreferencesKey("horizon_antenna_m")
-        val KEY_HORIZON_TARGET_ANTENNA_M = intPreferencesKey("horizon_target_antenna_m")
-        val KEY_HORIZON_REFRACTION = doublePreferencesKey("horizon_refraction")
-        val KEY_HORIZON_BUILDINGS = booleanPreferencesKey("horizon_buildings")
-        val KEY_HORIZON_BUILDINGS_RADIUS_KM = intPreferencesKey("horizon_buildings_radius_km")
-        val KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS = intPreferencesKey("horizon_buildings_max_age_days")
-        val KEY_HORIZON_TERRAIN_MAX_AGE_DAYS = intPreferencesKey("horizon_terrain_max_age_days")
-        val KEY_COVERAGE_ENABLED = booleanPreferencesKey("coverage_enabled")
-        val KEY_COVERAGE_DAYS = intPreferencesKey("coverage_days")
-        val KEY_COVERAGE_NODE = intPreferencesKey("coverage_node")
-        val KEY_COVERAGE_RANGE_KM = intPreferencesKey("coverage_range_km")
-        val KEY_PROPAGATION_ENABLED = booleanPreferencesKey("propagation_enabled")
-        val KEY_PROPAGATION_KIND = intPreferencesKey("propagation_kind")
-        val KEY_PROPAGATION_AUTO_REFRESH = booleanPreferencesKey("propagation_auto_refresh")
-        val KEY_CAMERA_LATITUDE = doublePreferencesKey("camera_latitude")
-        val KEY_CAMERA_LONGITUDE = doublePreferencesKey("camera_longitude")
-        val KEY_CAMERA_ZOOM = doublePreferencesKey("camera_zoom")
+        val KEY_MESH_HUD_COACH_SEEN_PREF = booleanPrefsKey("mesh_hud_coach_seen")
+        val KEY_MAP_STYLE_PREF = intPrefsKey("map_style_id")
+        val KEY_SHOW_ONLY_FAVORITES_PREF = booleanPrefsKey("show_only_favorites")
+        val KEY_SHOW_WAYPOINTS_PREF = booleanPrefsKey("show_waypoints")
+        val KEY_SHOW_PRECISION_CIRCLE_PREF = booleanPrefsKey("show_precision_circle")
+        val KEY_SHOW_LINKS_PREF = booleanPrefsKey("show_node_links")
+        val KEY_LAST_HEARD_FILTER_PREF = longPrefsKey("last_heard_filter")
+        val KEY_LAST_HEARD_TRACK_FILTER_PREF = longPrefsKey("last_heard_track_filter")
+        val KEY_HIDDEN_LAYER_URLS_PREF = stringSetPrefsKey("hidden_layer_urls")
+        val KEY_NETWORK_MAP_LAYERS_PREF = stringSetPrefsKey("network_map_layers")
+        val KEY_LAYER_OPACITY_PREF = stringSetPrefsKey("layer_opacity")
+        val KEY_ONLY_ONLINE_PREF = booleanPrefsKey("map_only_online")
+        val KEY_ONLY_DIRECT_PREF = booleanPrefsKey("map_only_direct")
+        val KEY_MAX_HOPS_PREF = intPrefsKey("map_max_hops")
+        val KEY_MAX_DISTANCE_PREF = intPrefsKey("map_max_distance_m")
+        val KEY_ONLY_SIGNED_PREF = booleanPrefsKey("map_only_signed")
+        val KEY_ONLY_ACTIVE_PREF = booleanPrefsKey("map_only_active")
+        val KEY_ONLY_ENCRYPTED_PREF = booleanPrefsKey("map_only_encrypted")
+        val KEY_EXCLUDE_MQTT_PREF = booleanPrefsKey("map_exclude_mqtt")
+        val KEY_SHOW_IGNORED_PREF = booleanPrefsKey("map_show_ignored")
+        val KEY_INCLUDE_UNKNOWN_PREF = booleanPrefsKey("map_include_unknown")
+        val KEY_EXCLUDED_ROLES_PREF = stringSetPrefsKey("map_excluded_roles")
+        val KEY_HORIZON_RADIUS_KM = intPrefsKey("horizon_radius_km")
+        val KEY_HORIZON_NODE_RANGE_KM = intPrefsKey("horizon_node_range_km")
+        val KEY_HORIZON_ONLY_FAVORITES = booleanPrefsKey("horizon_only_favorites")
+        val KEY_HORIZON_PRECISION_CIRCLES = booleanPrefsKey("horizon_precision_circles")
+        val KEY_HORIZON_ANTENNA_AUTO = booleanPrefsKey("horizon_antenna_auto")
+        val KEY_HORIZON_ANTENNA_M = intPrefsKey("horizon_antenna_m")
+        val KEY_HORIZON_TARGET_ANTENNA_M = intPrefsKey("horizon_target_antenna_m")
+        val KEY_HORIZON_REFRACTION = doublePrefsKey("horizon_refraction")
+        val KEY_HORIZON_BUILDINGS = booleanPrefsKey("horizon_buildings")
+        val KEY_HORIZON_BUILDINGS_RADIUS_KM = intPrefsKey("horizon_buildings_radius_km")
+        val KEY_HORIZON_BUILDINGS_MAX_AGE_DAYS = intPrefsKey("horizon_buildings_max_age_days")
+        val KEY_HORIZON_TERRAIN_MAX_AGE_DAYS = intPrefsKey("horizon_terrain_max_age_days")
+        val KEY_COVERAGE_ENABLED = booleanPrefsKey("coverage_enabled")
+        val KEY_COVERAGE_DAYS = intPrefsKey("coverage_days")
+        val KEY_COVERAGE_NODE = intPrefsKey("coverage_node")
+        val KEY_COVERAGE_RANGE_KM = intPrefsKey("coverage_range_km")
+        val KEY_PROPAGATION_ENABLED = booleanPrefsKey("propagation_enabled")
+        val KEY_PROPAGATION_KIND = intPrefsKey("propagation_kind")
+        val KEY_PROPAGATION_AUTO_REFRESH = booleanPrefsKey("propagation_auto_refresh")
+        val KEY_CAMERA_LATITUDE = doublePrefsKey("camera_latitude")
+        val KEY_CAMERA_LONGITUDE = doublePrefsKey("camera_longitude")
+        val KEY_CAMERA_ZOOM = doublePrefsKey("camera_zoom")
     }
 }

@@ -33,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,13 +52,18 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add_network_device_manually
+import org.meshtastic.core.resources.add_usb_device
 import org.meshtastic.core.resources.bluetooth
 import org.meshtastic.core.resources.demo_mode
 import org.meshtastic.core.resources.network
+import org.meshtastic.core.resources.network_scan_unavailable
 import org.meshtastic.core.resources.no_bluetooth_devices_hint
 import org.meshtastic.core.resources.no_bluetooth_devices_seen
 import org.meshtastic.core.resources.no_network_devices_hint
+import org.meshtastic.core.resources.no_network_devices_saved
 import org.meshtastic.core.resources.no_network_devices_seen
+import org.meshtastic.core.resources.no_serial_ports_allowed
+import org.meshtastic.core.resources.no_serial_ports_allowed_hint
 import org.meshtastic.core.resources.no_usb_devices_hint
 import org.meshtastic.core.resources.no_usb_devices_seen
 import org.meshtastic.core.resources.recent_network_devices
@@ -65,6 +71,7 @@ import org.meshtastic.core.resources.scan_bluetooth_devices
 import org.meshtastic.core.resources.scan_network_devices
 import org.meshtastic.core.resources.scanning_bluetooth
 import org.meshtastic.core.resources.scanning_network
+import org.meshtastic.core.resources.show_all_serial_ports
 import org.meshtastic.core.resources.usb
 import org.meshtastic.core.resources.usb_blocked_hint
 import org.meshtastic.core.resources.usb_blocked_title
@@ -80,6 +87,10 @@ import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.feature.connections.model.DeviceListEntry
+
+// The add-device sheet opens full height and has no partial stop.
+@OptIn(ExperimentalMaterial3Api::class)
+private val ADD_SHEET_VALUES = setOf(SheetValue.Hidden, SheetValue.Expanded)
 
 /**
  * Unified device list: one selected BLE / Network / USB pane rendered as a scrollable [LazyColumn].
@@ -116,13 +127,12 @@ fun DeviceList(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     header: (@Composable () -> Unit)? = null,
     usbBlockedBySystem: Boolean = false,
+    onRequestUsbDevice: ((showAll: Boolean) -> Unit)? = null,
+    showTransportPane: Boolean = true,
+    networkScanSupported: Boolean = true,
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
-    val sheetState =
-        rememberBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
-        )
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden, enabledValues = ADD_SHEET_VALUES)
     val scope = rememberCoroutineScope()
 
     val hideAndDismiss: () -> Unit = {
@@ -146,38 +156,43 @@ fun DeviceList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         header?.let { item(key = "header:connection", contentType = "connection") { it() } }
-        when (activeTransport) {
-            DeviceType.BLE ->
-                bluetoothSection(
-                    bleDevices = bleDevices,
-                    connectionState = connectionState,
-                    selectedDevice = selectedDevice,
-                    isBleScanning = isBleScanning,
-                    onSelectDevice = onSelectDevice,
-                    onToggleBleScan = onToggleBleScan,
-                )
+        // With no transport this platform can use, an empty pane would only offer actions that cannot work.
+        if (showTransportPane) {
+            when (activeTransport) {
+                DeviceType.BLE ->
+                    bluetoothSection(
+                        bleDevices = bleDevices,
+                        connectionState = connectionState,
+                        selectedDevice = selectedDevice,
+                        isBleScanning = isBleScanning,
+                        onSelectDevice = onSelectDevice,
+                        onToggleBleScan = onToggleBleScan,
+                    )
 
-            DeviceType.TCP ->
-                networkSection(
-                    discoveredTcpDevices = discoveredTcpDevices,
-                    recentTcpDevices = recentTcpDevices,
-                    connectionState = connectionState,
-                    selectedDevice = selectedDevice,
-                    isNetworkScanning = isNetworkScanning,
-                    onSelectDevice = onSelectDevice,
-                    onToggleNetworkScan = onToggleNetworkScan,
-                    onAddManually = { showAddDialog = true },
-                    onRemoveRecentAddress = onRemoveRecentAddress,
-                )
+                DeviceType.TCP ->
+                    networkSection(
+                        discoveredTcpDevices = discoveredTcpDevices,
+                        recentTcpDevices = recentTcpDevices,
+                        connectionState = connectionState,
+                        selectedDevice = selectedDevice,
+                        isNetworkScanning = isNetworkScanning,
+                        networkScanSupported = networkScanSupported,
+                        onSelectDevice = onSelectDevice,
+                        onToggleNetworkScan = onToggleNetworkScan,
+                        onAddManually = { showAddDialog = true },
+                        onRemoveRecentAddress = onRemoveRecentAddress,
+                    )
 
-            DeviceType.USB ->
-                usbSection(
-                    usbDevices = usbDevices,
-                    connectionState = connectionState,
-                    selectedDevice = selectedDevice,
-                    onSelectDevice = onSelectDevice,
-                    blockedBySystem = usbBlockedBySystem,
-                )
+                DeviceType.USB ->
+                    usbSection(
+                        usbDevices = usbDevices,
+                        connectionState = connectionState,
+                        selectedDevice = selectedDevice,
+                        onSelectDevice = onSelectDevice,
+                        onRequestUsbDevice = onRequestUsbDevice,
+                        blockedBySystem = usbBlockedBySystem,
+                    )
+            }
         }
         if (virtualDevices.isNotEmpty()) {
             virtualSection(
@@ -258,6 +273,7 @@ private fun LazyListScope.usbSection(
     selectedDevice: String,
     onSelectDevice: (DeviceListEntry) -> Unit,
     blockedBySystem: Boolean = false,
+    onRequestUsbDevice: ((showAll: Boolean) -> Unit)?,
 ) {
     item(key = "header:usb", contentType = "header") { DeviceSectionHeader(title = stringResource(Res.string.usb)) }
     items(usbDevices, key = { device -> "usb:${device.fullAddress}" }, contentType = { "device" }) { device ->
@@ -270,17 +286,33 @@ private fun LazyListScope.usbSection(
     }
     if (usbDevices.isEmpty()) {
         item(key = "empty:usb", contentType = "empty") {
+            // Where ports need an explicit grant, a plugged-in radio is not listed until it is picked once.
+            val needsGrant = onRequestUsbDevice != null
+            val title = if (needsGrant) Res.string.no_serial_ports_allowed else Res.string.no_usb_devices_seen
+            val hint = if (needsGrant) Res.string.no_serial_ports_allowed_hint else Res.string.no_usb_devices_hint
             SectionEmptyState(
-                text =
-                stringResource(
-                    if (blockedBySystem) Res.string.usb_blocked_title else Res.string.no_usb_devices_seen,
-                ),
-                supportingText =
-                stringResource(
-                    if (blockedBySystem) Res.string.usb_blocked_hint else Res.string.no_usb_devices_hint,
-                ),
+                text = stringResource(if (blockedBySystem) Res.string.usb_blocked_title else title),
+                supportingText = stringResource(if (blockedBySystem) Res.string.usb_blocked_hint else hint),
                 imageVector = MeshtasticIcons.Usb,
             )
+        }
+    }
+    // Only present on platforms whose USB discovery needs an explicit grant step (web's Web Serial picker) rather
+    // than passive enumeration (JVM/Android already list every attached serial device without prompting).
+    if (onRequestUsbDevice != null) {
+        item(key = "action:add-usb", contentType = "action") {
+            ConnectionActionButton(
+                onClick = { onRequestUsbDevice(false) },
+                icon = MeshtasticIcons.Add,
+                text = stringResource(Res.string.add_usb_device),
+                modifier = Modifier.fillMaxWidth(),
+                style = ConnectionActionButtonStyle.Tonal,
+            )
+        }
+        item(key = "action:add-usb-any", contentType = "action") {
+            TextButton(onClick = { onRequestUsbDevice(true) }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.show_all_serial_ports))
+            }
         }
     }
 }
@@ -292,6 +324,7 @@ private fun LazyListScope.networkSection(
     connectionState: ConnectionState,
     selectedDevice: String,
     isNetworkScanning: Boolean,
+    networkScanSupported: Boolean,
     onSelectDevice: (DeviceListEntry) -> Unit,
     onToggleNetworkScan: () -> Unit,
     onAddManually: () -> Unit,
@@ -302,12 +335,14 @@ private fun LazyListScope.networkSection(
             title = stringResource(Res.string.network),
             showProgress = isNetworkScanning,
             trailing = {
-                ScanToggleAction(
-                    isScanning = isNetworkScanning,
-                    scanLabel = stringResource(Res.string.scan_network_devices),
-                    scanningLabel = stringResource(Res.string.scanning_network),
-                    onToggle = onToggleNetworkScan,
-                )
+                if (networkScanSupported) {
+                    ScanToggleAction(
+                        isScanning = isNetworkScanning,
+                        scanLabel = stringResource(Res.string.scan_network_devices),
+                        scanningLabel = stringResource(Res.string.scanning_network),
+                        onToggle = onToggleNetworkScan,
+                    )
+                }
             },
         )
     }
@@ -326,9 +361,16 @@ private fun LazyListScope.networkSection(
 
     if (discoveredTcpDevices.isEmpty() && recentTcpDevices.isEmpty()) {
         item(key = "empty:tcp", contentType = "empty") {
+            // Without a scan, nothing appears here until the user adds an address.
+            val (title, hint) =
+                if (networkScanSupported) {
+                    Res.string.no_network_devices_seen to Res.string.no_network_devices_hint
+                } else {
+                    Res.string.no_network_devices_saved to Res.string.network_scan_unavailable
+                }
             SectionEmptyState(
-                text = stringResource(Res.string.no_network_devices_seen),
-                supportingText = stringResource(Res.string.no_network_devices_hint),
+                text = stringResource(title),
+                supportingText = stringResource(hint),
                 imageVector = MeshtasticIcons.Wifi,
             )
         }

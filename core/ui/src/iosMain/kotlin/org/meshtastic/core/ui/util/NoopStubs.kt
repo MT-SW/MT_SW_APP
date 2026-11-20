@@ -20,16 +20,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLinkStyles
 
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun createClipEntry(text: String, label: String, sensitive: Boolean): ClipEntry = ClipEntry.withPlainText(text)
 
-actual fun ClipEntry.plainText(): String? = platform.UIKit.UIPasteboard.generalPasteboard.string
+// MT_SW: iPhone/iPad reads the text the person copied from the system pasteboard.
+actual suspend fun Clipboard.readPlainText(): String? = platform.UIKit.UIPasteboard.generalPasteboard.string
 
 actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): AnnotatedString =
-    simpleAnnotatedStringFromHtml(html, linkStyles)
+    annotatedStringFromSimpleHtml(html, linkStyles)
 
 @Composable actual fun rememberOpenNfcSettings(): () -> Unit = {}
 

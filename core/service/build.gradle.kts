@@ -17,6 +17,7 @@
 
 plugins {
     alias(libs.plugins.meshtastic.kmp.library)
+    alias(libs.plugins.meshtastic.kmp.web)
     alias(libs.plugins.meshtastic.koin)
 }
 
@@ -37,6 +38,7 @@ kotlin {
             implementation(projects.core.ble)
             implementation(projects.core.resources)
             implementation(projects.core.takserver)
+            implementation(libs.meshtastic.protobufs)
 
             implementation(libs.jetbrains.lifecycle.runtime)
             implementation(libs.kotlinx.atomicfu)
@@ -63,6 +65,16 @@ kotlin {
             }
         }
 
-        commonTest.dependencies { implementation(projects.core.testing) }
+        commonTest.dependencies {
+            implementation(projects.core.testing)
+            // A mock of PacketRepository needs PagingData, which core:repository takes as implementation, on the wasmJs
+            // test classpath; the Kotlin/Wasm IR serializer crashes on the unresolved type rather than reporting it.
+            implementation(libs.androidx.paging.common)
+        }
     }
 }
+
+// The expected message is a string resource, which the browser loads asynchronously; the assertion runs first.
+meshtasticWeb.browserTestExclusions.add(
+    "*MeshServiceOrchestratorTest.tcpReconnectWarnsAndStillConnectsWhenLocalNetworkAccessIsMissing",
+)

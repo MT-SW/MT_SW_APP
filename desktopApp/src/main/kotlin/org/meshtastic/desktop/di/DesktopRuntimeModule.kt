@@ -43,6 +43,7 @@ import org.meshtastic.core.network.service.ApiService
 import org.meshtastic.core.network.service.ApiServiceImpl
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.MeshNotificationManager
+import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.MessageQueue
 import org.meshtastic.core.repository.NeighborInfoResponseProvider
 import org.meshtastic.core.repository.NotificationManager
@@ -53,16 +54,16 @@ import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.TracerouteResponseProvider
+import org.meshtastic.core.service.DispatchingMeshNotificationManager
+import org.meshtastic.core.service.InProcessMessageQueue
 import org.meshtastic.core.service.ServiceRepositoryImpl
 import org.meshtastic.desktop.DesktopBuildConfig
 import org.meshtastic.desktop.DesktopNotificationManager
-import org.meshtastic.desktop.notification.DesktopMeshNotificationManager
 import org.meshtastic.desktop.notification.DesktopOS
 import org.meshtastic.desktop.notification.LinuxNotificationSender
 import org.meshtastic.desktop.notification.MacOSNotificationSender
 import org.meshtastic.desktop.notification.NativeNotificationSender
 import org.meshtastic.desktop.notification.WindowsNotificationSender
-import org.meshtastic.desktop.radio.DesktopMessageQueue
 import org.meshtastic.desktop.radio.DesktopRadioTransportFactory
 
 /**
@@ -117,14 +118,14 @@ class DesktopRuntimeModule {
 
     @Single
     fun meshNotificationManager(notificationManager: NotificationManager): MeshNotificationManager =
-        DesktopMeshNotificationManager(notificationManager = notificationManager)
+        DispatchingMeshNotificationManager(notificationManager = notificationManager)
 
-    @Single
+    @Single(binds = [MessageQueue::class, MeshWorkerManager::class])
     fun messageQueue(
         packetRepository: PacketRepository,
         radioController: RadioController,
         dispatchers: CoroutineDispatchers,
-    ): MessageQueue = DesktopMessageQueue(
+    ): InProcessMessageQueue = InProcessMessageQueue(
         packetRepository = packetRepository,
         radioController = radioController,
         dispatchers = dispatchers,

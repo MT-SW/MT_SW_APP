@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.prefs.archive
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +28,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
 import org.meshtastic.core.repository.MessageArchiveConfig
 import org.meshtastic.core.repository.MessageArchivePrefs
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 @Single
 class MessageArchivePrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) :
@@ -46,6 +45,6 @@ class MessageArchivePrefsImpl(private val dataStore: UiDataStore, dispatchers: C
     }
 
     private companion object {
-        val KEY_ARCHIVE = stringPreferencesKey("message_archive_config")
+        val KEY_ARCHIVE = stringPrefsKey("message_archive_config")
     }
 }

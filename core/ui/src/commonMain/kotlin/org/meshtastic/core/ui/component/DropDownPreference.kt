@@ -53,9 +53,9 @@ import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.enums.enumEntries
 import kotlin.jvm.JvmName
 
-/**
- * A list of all values of an enum. The values are read where the enum type is known, so this works on every platform.
- */
+// Reified so the entries come from enumEntries, which every target has; reading them off an instance takes JVM
+// reflection, which Kotlin/Wasm and Kotlin/Native lack.
+@Suppress("ParameterNaming") // onItemSelected is the name every call site and the other overloads use
 @Composable
 inline fun <reified T : Enum<T>> DropDownPreference(
     title: String,
@@ -70,9 +70,9 @@ inline fun <reified T : Enum<T>> DropDownPreference(
     excludedItems: Set<T> = emptySet(),
 ) {
     EnumDropDownPreference(
-        allEntries = enumEntries<T>(),
         title = title,
         enabled = enabled,
+        entries = enumEntries<T>(),
         selectedItem = selectedItem,
         onItemSelected = onItemSelected,
         modifier = modifier,
@@ -86,10 +86,11 @@ inline fun <reified T : Enum<T>> DropDownPreference(
 
 @PublishedApi
 @Composable
+@Suppress("LongParameterList")
 internal fun <T : Enum<T>> EnumDropDownPreference(
-    allEntries: List<T>,
     title: String,
     enabled: Boolean,
+    entries: List<T>,
     selectedItem: T,
     onItemSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,8 +103,8 @@ internal fun <T : Enum<T>> EnumDropDownPreference(
     // A deprecated value the radio currently holds stays on the list: dropping it leaves the field showing nothing and
     // writes a different value on the next save.
     val enumConstants =
-        remember(allEntries, selectedItem, excludedItems) {
-            allEntries.filter {
+        remember(entries, selectedItem, excludedItems) {
+            entries.filter {
                 it.name != "UNRECOGNIZED" &&
                     (it == selectedItem || (!it.isDeprecatedEnumEntry() && it !in excludedItems))
             }

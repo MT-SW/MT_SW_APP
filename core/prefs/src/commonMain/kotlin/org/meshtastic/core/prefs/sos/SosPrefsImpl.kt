@@ -16,10 +16,6 @@
  */
 package org.meshtastic.core.prefs.sos
 
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +32,9 @@ import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosQuietHours
 import org.meshtastic.core.repository.SosTargets
+import org.meshtastic.core.prefs.store.booleanPrefsKey
+import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.stringPrefsKey
 
 @Suppress("TooManyFunctions")
 @Single
@@ -179,23 +178,23 @@ class SosPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDis
     }
 
     private companion object {
-        val KEY_STOP_ANSWER = booleanPreferencesKey("sos_stop_on_answer")
-        val KEY_NOTIFY_ANSWER = booleanPreferencesKey("sos_notify_on_answer")
+        val KEY_STOP_ANSWER = booleanPrefsKey("sos_stop_on_answer")
+        val KEY_NOTIFY_ANSWER = booleanPrefsKey("sos_notify_on_answer")
         const val DEFAULT_GATE_MINUTES = 10
         const val MAX_GATE_MINUTES = 120
-        val KEY_TARGETS = stringPreferencesKey("sos_target_messages")
-        val KEY_GATE = booleanPreferencesKey("sos_repeat_gate")
-        val KEY_GATE_MINUTES = intPreferencesKey("sos_repeat_gate_minutes")
-        val KEY_QUIET_NODES = stringPreferencesKey("sos_quiet_exceptions")
-        val KEY_STYLES = stringPreferencesKey("sos_alarm_styles")
-        val KEY_ALARM_NODES = stringPreferencesKey("sos_alarm_nodes")
-        val KEY_ONLY_CHOSEN = booleanPreferencesKey("sos_alarm_only_chosen")
-        val KEY_QUIET = stringPreferencesKey("sos_quiet_hours")
-        val KEY_FLASH = booleanPreferencesKey("sos_alarm_flash")
-        val KEY_WIDGET_TAPS = intPreferencesKey("sos_widget_taps")
-        val KEY_CONFIRM = booleanPreferencesKey("sos_confirm_to_sender")
-        val KEY_RECEIVE = booleanPreferencesKey("sos_receive_alarm")
-        val KEY_SOS = stringPreferencesKey("sos_config")
-        val KEY_BAR = stringPreferencesKey("sos_bar_screens")
+        val KEY_TARGETS = stringPrefsKey("sos_target_messages")
+        val KEY_GATE = booleanPrefsKey("sos_repeat_gate")
+        val KEY_GATE_MINUTES = intPrefsKey("sos_repeat_gate_minutes")
+        val KEY_QUIET_NODES = stringPrefsKey("sos_quiet_exceptions")
+        val KEY_STYLES = stringPrefsKey("sos_alarm_styles")
+        val KEY_ALARM_NODES = stringPrefsKey("sos_alarm_nodes")
+        val KEY_ONLY_CHOSEN = booleanPrefsKey("sos_alarm_only_chosen")
+        val KEY_QUIET = stringPrefsKey("sos_quiet_hours")
+        val KEY_FLASH = booleanPrefsKey("sos_alarm_flash")
+        val KEY_WIDGET_TAPS = intPrefsKey("sos_widget_taps")
+        val KEY_CONFIRM = booleanPrefsKey("sos_confirm_to_sender")
+        val KEY_RECEIVE = booleanPrefsKey("sos_receive_alarm")
+        val KEY_SOS = stringPrefsKey("sos_config")
+        val KEY_BAR = stringPrefsKey("sos_bar_screens")
     }
 }

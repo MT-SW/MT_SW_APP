@@ -22,6 +22,7 @@ plugins {
     alias(libs.plugins.meshtastic.kmp.feature)
     alias(libs.plugins.meshtastic.kotlinx.serialization)
     alias(libs.plugins.meshtastic.kmp.jvm.android)
+    alias(libs.plugins.meshtastic.kmp.web)
 }
 
 kotlin {
@@ -104,3 +105,9 @@ if (llamaXcframework.isDirectory) {
         }
     }
 }
+// Compose UI tests that find no displayed node, or cannot inject input, in headless Chrome.
+meshtasticWeb.browserTestExclusions.addAll(
+    "*MessageItemTest.*",
+    "*ContactsSelectionToolbarTest.selectingAPinnedConversationOffersUnpin",
+    "*ContactsSelectionToolbarTest.selectingAnUnmutedConversationOffersMute",
+)

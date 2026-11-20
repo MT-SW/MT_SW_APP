@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.prefs.filter
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +28,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.FilterDataStore
 import org.meshtastic.core.repository.SenderMutePrefs
+import org.meshtastic.core.prefs.store.stringSetPrefsKey
 
 /** Stores sender mutes as "key=until" strings next to the other message-filter settings. */
 @Single
@@ -62,6 +61,6 @@ class SenderMutePrefsImpl(private val dataStore: FilterDataStore, dispatchers: C
         .toMap()
 
     companion object {
-        val KEY_SENDER_MUTES = stringSetPreferencesKey("sender_mutes")
+        val KEY_SENDER_MUTES = stringSetPrefsKey("sender_mutes")
     }
 }

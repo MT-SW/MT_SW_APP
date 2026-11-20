@@ -75,7 +75,7 @@ import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.toDistanceString
-import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
+import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
@@ -902,7 +902,10 @@ class MeshNotificationManagerImpl(
         val title = getStringSuspend(Res.string.mesh_beacon_notification_title)
         val message = offer.message.ifBlank { getStringSuspend(Res.string.mesh_beacon_notification_body) }
         val notification =
-            commonBuilder(NotificationChannelSpec.MeshBeacon, createDeepLinkIntent("discovery", offer.fromNodeNum))
+            commonBuilder(
+                NotificationChannelSpec.MeshBeacon,
+                createDeepLinkIntent(NotificationDeepLinks.MESH_BEACON, offer.fromNodeNum),
+            )
                 .setCategory(Notification.CATEGORY_RECOMMENDATION)
                 .setAutoCancel(true)
                 .setContentTitle(title)
@@ -1009,7 +1012,10 @@ class MeshNotificationManagerImpl(
             )
         val id = notice.notificationKey.hashCode()
         val notification =
-            commonBuilder(NotificationChannelSpec.DeviceStatus, createDeepLinkIntent("firmware/update", id))
+            commonBuilder(
+                NotificationChannelSpec.DeviceStatus,
+                createDeepLinkIntent(NotificationDeepLinks.FIRMWARE_UPDATE, id),
+            )
                 .setCategory(Notification.CATEGORY_RECOMMENDATION)
                 .setAutoCancel(true)
                 .setContentTitle(getStringSuspend(Res.string.firmware_update_available))
@@ -1053,7 +1059,7 @@ class MeshNotificationManagerImpl(
         val notification =
             commonBuilder(
                 NotificationChannelSpec.DeviceStatus,
-                createDeepLinkIntent("connections", RECONNECT_BLOCKED_ID),
+                createDeepLinkIntent(NotificationDeepLinks.CONNECTIONS, RECONNECT_BLOCKED_ID),
             )
                 .setCategory(Notification.CATEGORY_ERROR)
                 .setAutoCancel(true)
@@ -1182,7 +1188,7 @@ class MeshNotificationManagerImpl(
             subText = null,
             lines = lines,
             chip = chip,
-            contentIntent = createDeepLinkIntent("connections", CONNECTIONS_REQUEST_CODE),
+            contentIntent = createDeepLinkIntent(NotificationDeepLinks.CONNECTIONS, CONNECTIONS_REQUEST_CODE),
         )
     }
 
@@ -1545,7 +1551,7 @@ class MeshNotificationManagerImpl(
         val builder =
             commonBuilder(
                 NotificationChannelSpec.Waypoints,
-                createDeepLinkIntent("map?waypointId=$waypointId", waypointId),
+                createDeepLinkIntent(NotificationDeepLinks.waypoint(waypointId), waypointId),
             )
                 .setCategory(Notification.CATEGORY_STATUS)
                 .setAutoCancel(true)
@@ -1626,7 +1632,12 @@ class MeshNotificationManagerImpl(
      */
     private fun createDeepLinkIntent(path: String, requestCode: Int): PendingIntent {
         val deepLinkIntent =
-            Intent(Intent.ACTION_VIEW, "$DEEP_LINK_BASE_URI/$path".toUri(), context, Class.forName(MAIN_ACTIVITY_CLASS))
+            Intent(
+                Intent.ACTION_VIEW,
+                NotificationDeepLinks.uri(path).toUri(),
+                context,
+                Class.forName(MAIN_ACTIVITY_CLASS),
+            )
                 .apply { flags = Intent.FLAG_ACTIVITY_SINGLE_TOP }
         return TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(deepLinkIntent)
@@ -1637,9 +1648,10 @@ class MeshNotificationManagerImpl(
     }
 
     private fun createOpenMessageIntent(contactKey: String) =
-        createDeepLinkIntent("messages/$contactKey", contactKey.hashCode())
+        createDeepLinkIntent(NotificationDeepLinks.conversation(contactKey), contactKey.hashCode())
 
-    private fun createOpenNodeDetailIntent(nodeNum: Int) = createDeepLinkIntent("nodes/$nodeNum", nodeNum)
+    private fun createOpenNodeDetailIntent(nodeNum: Int) =
+        createDeepLinkIntent(NotificationDeepLinks.nodeDetail(nodeNum), nodeNum)
 
     /**
      * Bubble target: [org.meshtastic.app.BubbleActivity], not the launcher activity. A bubble's activity must be
@@ -1650,7 +1662,7 @@ class MeshNotificationManagerImpl(
      * that conversation rather than as the app.
      */
     private fun createBubbleMetadata(contactKey: String, icon: IconCompat): NotificationCompat.BubbleMetadata {
-        val deepLinkUri = "$DEEP_LINK_BASE_URI/messages/$contactKey".toUri()
+        val deepLinkUri = NotificationDeepLinks.uri(NotificationDeepLinks.conversation(contactKey)).toUri()
         // Two halves of one rule. The intent carries no task flags, because the platform is the thing that applies
         // FLAG_ACTIVITY_NEW_DOCUMENT and FLAG_ACTIVITY_MULTIPLE_TASK for a bubble — setting them here instead
         // launches outside the bubble and collapses it. And the PendingIntent must be MUTABLE precisely so the
@@ -1678,7 +1690,7 @@ class MeshNotificationManagerImpl(
      */
     private fun conversationActionIntent(action: String, contactKey: String, packetId: Int? = null): Intent {
         val data =
-            "$DEEP_LINK_BASE_URI/messages/$contactKey".toUri().buildUpon().apply {
+            NotificationDeepLinks.uri(NotificationDeepLinks.conversation(contactKey)).toUri().buildUpon().apply {
                 packetId?.let { appendQueryParameter("packet", it.toString()) }
             }
         return Intent(action, data.build(), context, ConversationActionService::class.java)

@@ -1,12 +1,13 @@
 ---
 title: Připojení
 nav_order: 2
-last_updated: 2026-11-15
-description: Connect your phone or desktop to a Meshtastic node over Bluetooth, USB, or TCP/IP.
+last_updated: 2026-11-20
+description: Connect your phone, desktop or browser to a Meshtastic node over Bluetooth, USB, TCP/IP or WebSocket.
 aliases:
   - bluetooth
   - usb
   - tcp
+  - websocket
   - pairing
 ---
 
@@ -72,6 +73,20 @@ When connecting, a status indicator shows the current connection state — tap *
 
 ![Connecting status](../../assets/screenshots/connections_connecting.png)
 
+Over Bluetooth, the status line names the step in progress: looking for the radio, pairing, connecting to the radio, checking the radio, setting up the connection, then loading its config and node list. A step that finishes in under half a second is skipped rather than flashed. When an attempt fails, a line under it says why, and the status line counts down to the next attempt:
+
+| Zpráva                               | What to do                                                                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Radio not found                      | Turn the node on and move closer.                                                                                                                      |
+| Could not connect                    | Disconnect the node from any other app or device. Otherwise move closer, or forget the node in your Bluetooth settings and pair again. |
+| The radio needs pairing              | Pair when the system asks, with the PIN on the node's screen, or its fixed PIN if one is set.                                                          |
+| The radio turned the connection down | Usually a missing pairing: try again and enter the PIN when asked.                                                                     |
+| Pairing failed                       | Check the PIN and pair again.                                                                                                                          |
+| The connection dropped               | Move closer. The app keeps retrying.                                                                                                   |
+| Bluetooth is off                     | Turn it on. On Android 11 and older the message also names location services, which scanning needs there.                              |
+
+The platform's own error text goes to the app log, not the card.
+
 Once connected, the connection card shows the node's name and firmware version, its signal strength over Bluetooth, and its LoRa modem preset and region, for example "Long Range - Fast · United States". A node on custom modem settings shows **Custom** in place of the preset. Tap the preset row to open the LoRa screen.
 
 With no node chosen yet, the connection card reads **No device selected**. A pane with nothing to list says so under its header, with a hint:
@@ -80,7 +95,7 @@ With no node chosen yet, the connection card reads **No device selected**. A pan
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Bluetooth | **No Bluetooth devices seen**, and "Ensure you're within range of the device." Start a scan from the header.                                                                                                                                 |
 | Síť       | **No network devices seen**, and "Ensure you're connected to the same network as the device." Shown only while nothing has been discovered and **Recent Network Devices** is empty. **Add device manually…** stays below it. |
-| USB       | **No USB devices detected**, and "Connect a device with a USB data cable to use serial."                                                                                                                                                                     |
+| USB       | **No USB devices detected**, and "Connect a device with a USB data cable to use serial." In a browser, **No serial devices added**, pointing at **Add serial device…**.                                                                      |
 
 ### Troubleshooting Bluetooth
 
@@ -118,8 +133,14 @@ Some Meshtastic nodes support Wi-Fi/Ethernet connectivity, allowing TCP-based co
 2. On the **Connect** tab, select **Network** in the transport selector.
 3. Choose the node one of two ways:
    - **Scan for network devices**: toggle this on to auto-discover nodes that advertise themselves on the local network (mDNS / `_meshtastic._tcp`). Discovered devices appear in the list; tap one to connect.
-   - **Add device manually…**: enter the node's IP address (or hostname) and port (default: `4403`).
+   - **Add device manually…**: enter the node's IP address (or hostname) and port (default: `4403`), or a `ws://` or `wss://` URL to reach it over WebSocket (below).
 4. Previously used network addresses are remembered under **Recent Network Devices** for reconnection (touch & hold to remove one).
+
+### WebSocket
+
+A node whose firmware serves the WebSocket phone API answers at `/api/v1/ws`. Released firmware does not serve it yet. Enter its address as a URL, such as `ws://192.168.1.50` or `wss://meshtastic.local:9443`. The path defaults to `/api/v1/ws`, and the port goes in the URL, so the port field is not used. Nodes use a self-signed certificate that the app doesn't trust, so on Android and desktop connect with `ws://`.
+
+If the node refuses the connection, the app says to check that the path is `/api/v1/ws` and that the node's firmware has the WebSocket API.
 
 Network discovery uses mDNS, which only works when both your phone and the node are on the same subnet. If the phone is not on Wi-Fi at all, the app warns that a network scan may find nothing. On Android 17 and newer, the app needs the **Local network permission** to reach a node on your own Wi-Fi at all, not only to discover it, so typing the address by hand does not work around a denied permission. Grant it from the card on the Network pane, or from the **Permissions** section of **Settings**. A node on a public address, or one reached over a VPN, needs no permission.
 
@@ -131,7 +152,7 @@ Network discovery uses mDNS, which only works when both your phone and the node 
 
 ### Nastavení Wi-Fi pro mPWRD-OS
 
-**Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It sends Wi-Fi credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol. It does not configure Wi-Fi on an ordinary Meshtastic node. It is available on both Android and desktop.
+**Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It sends Wi-Fi credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol. It does not configure Wi-Fi on an ordinary Meshtastic node. It is available on Android, desktop and web.
 
 1. Open the screen and wait while the app finds the device over Bluetooth.
 2. Tap **Scan for Networks**, then pick a network from **Available Networks**, or turn on **Hidden network** and type the name into **Network Name (SSID)**.
@@ -177,6 +198,8 @@ A dropped link keeps it running and shows the connection state until the node is
 
 The app reconnects to the last selected node on startup. You can switch transports from the **Connect** tab at any time.
 
+A node serves one WebSocket connection at a time. When another app takes it ("Another app took this radio's WebSocket connection"), or the node closes it over a message that was too large, the app does not reconnect on its own, even when the network comes back. Connect again from the **Connect** tab to take it back.
+
 To disconnect, tap the disconnect button on the **Connect** tab:
 
 ![Disconnect from the node](../../assets/screenshots/connections_disconnect.png)
@@ -198,9 +221,25 @@ On Desktop (Linux/macOS/Windows), the app supports:
 
 - **Bluetooth (BLE)** — via the Kable library; works on macOS, Linux, and Windows
 - **USB Serial** — primary wired connection method
-- **TCP/IP** — for network-connected nodes
+- **TCP/IP** — for network-connected nodes, or [WebSocket](#websocket) with a `ws://` URL
 
 See [Desktop App](desktop) for platform-specific details and keyboard shortcuts.
+
+## Web Connections
+
+The web app reaches a radio through the browser's own Bluetooth and serial APIs, and over [WebSocket](#websocket) on the network, so what it offers depends on the browser:
+
+| Přenos     | Works in                                                                                                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bluetooth  | Chrome, Edge and Opera on Windows, macOS, ChromeOS and Android. Chrome on Linux needs `chrome://flags/#enable-experimental-web-platform-features`. |
+| USB serial | Chrome, Edge and Opera on a computer.                                                                                                                              |
+| Síť        | Every browser, to a node that serves the WebSocket phone API. A browser cannot open the TCP connection on port `4403`.                             |
+
+The selector shows only the transports this browser has, and a card names what is missing and which browsers have it. Firefox and Safari have neither Bluetooth nor serial, so they offer only **Network**.
+
+- **Bluetooth:** **Scan for Bluetooth devices** opens the browser's device chooser. Picking a node there is the selection, and the app connects at once. A node that needs pairing makes the system ask for its PIN, the one on the node's screen or its fixed PIN.
+- **USB serial:** the browser lists only the ports you have allowed this site to use, so a plugged-in node does not appear on its own. **Add serial device…** opens the browser's port chooser, filtered to the USB serial chips and boards Meshtastic nodes use, and connects to the port you pick. **Show all serial ports…** opens it unfiltered. A known board shows by name, such as RAK4631, and other ports by their chip or USB ID.
+- **Network:** **Add device manually…** takes a `ws://` or `wss://` URL, or a bare host. A bare host on port `443` or `9443`, the ports firmware serves TLS on, connects with `wss://`; on any other port it uses `wss://` when the page itself was opened over `https://` and `ws://` otherwise. An IPv6 address goes in brackets, such as `[fd00::1]`. There is no network scan in a browser. When the web app itself was opened over `https://`, the browser blocks a `ws://` address, so use `wss://`. A `wss://` address needs the node's certificate accepted first: open `https://` and the node's address in a tab and accept the warning.
 
 ## Related Topics
 

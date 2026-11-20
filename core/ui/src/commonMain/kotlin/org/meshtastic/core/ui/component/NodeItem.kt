@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -126,6 +127,7 @@ internal fun rememberRefreshIcon(): ImageVector = remember {
         }
         .build()
 }
+const val NODE_ITEM_ELEVATION_TAG = "NodeItemElevation"
 
 @Composable
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -338,9 +340,11 @@ private fun NodeBatteryPositionRow(
                     tint = contentColor,
                 )
             }
-            thatNode.validPosition?.let { position ->
+            // An unset altitude is no reading, not sea level.
+            thatNode.validPosition?.altitude?.let { altitude ->
                 ElevationInfo(
-                    altitude = position.altitude ?: 0,
+                    modifier = Modifier.testTag(NODE_ITEM_ELEVATION_TAG),
+                    altitude = altitude,
                     system = system,
                     suffix = stringResource(Res.string.elevation_suffix),
                     contentColor = contentColor,
