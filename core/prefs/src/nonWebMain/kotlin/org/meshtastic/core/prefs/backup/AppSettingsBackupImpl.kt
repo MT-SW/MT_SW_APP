@@ -123,7 +123,8 @@ class AppSettingsBackupImpl(
         val decoded = decodeStores(scope, fileStores)
         for ((name, values) in decoded) {
             // A look restore brings back the whole look: values the file does not have return to the default.
-            stores.getValue(name).write(removeWhen = if (scope == SettingsBackupScope.Look) ::isLookKey else null, values)
+            val removeWhen = if (scope == SettingsBackupScope.Look) ::isLookKey else null
+            stores.getValue(name).write(removeWhen = removeWhen, values = values.toMap())
         }
         return decoded.values.sumOf { it.size }
     }

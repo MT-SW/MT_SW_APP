@@ -922,7 +922,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         )
     }
 
-    private fun Preferences.toNodeFilterPrefs() = NodeFilterPrefs(
+    private fun PrefsSnapshot.toNodeFilterPrefs() = NodeFilterPrefs(
         includeUnknown = this[KEY_INCLUDE_UNKNOWN] ?: NodeFilterPrefs().includeUnknown,
         excludeInfrastructure = this[KEY_EXCLUDE_INFRASTRUCTURE] ?: false,
         onlyOnline = this[KEY_ONLY_ONLINE] ?: false,

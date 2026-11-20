@@ -237,7 +237,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         }
     }
 
-    private fun Preferences.toPropagationPrefs(): PropagationPrefs {
+    private fun PrefsSnapshot.toPropagationPrefs(): PropagationPrefs {
         val defaults = PropagationPrefs()
         return PropagationPrefs(
             enabled = this[KEY_PROPAGATION_ENABLED] ?: defaults.enabled,
@@ -246,7 +246,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         )
     }
 
-    private fun Preferences.toHorizonPrefs(): HorizonPrefs {
+    private fun PrefsSnapshot.toHorizonPrefs(): HorizonPrefs {
         val defaults = HorizonPrefs()
         return HorizonPrefs(
             radiusKm = this[KEY_HORIZON_RADIUS_KM] ?: defaults.radiusKm,
