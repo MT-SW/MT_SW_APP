@@ -92,7 +92,7 @@ class TcpTransport(
          */
         const val MAX_RECONNECT_RETRIES = Int.MAX_VALUE
         const val MIN_BACKOFF_MILLIS = 1_000L
-        const val MAX_BACKOFF_MILLIS = 5 * 60 * 1_000L
+        const val MAX_BACKOFF_MILLIS = 15 * 1_000L
 
         /** Per-read inactivity timeout. Combined with [SOCKET_RETRIES] this gives the 90s idle-disconnect window. */
         const val SOCKET_TIMEOUT_MS = 5_000L
