@@ -455,7 +455,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         OutlinedTextField(
             value = state.input,
             onValueChange = viewModel::setInput,
-            label = { Text(stringResource(Res.string.assistant_input_hint)) },
+            placeholder = { Text(stringResource(Res.string.assistant_input_hint)) },
             minLines = 1,
             maxLines = 4,
             shape = BubbleShape,

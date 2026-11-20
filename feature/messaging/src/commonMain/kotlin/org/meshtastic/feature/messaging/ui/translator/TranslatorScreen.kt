@@ -155,7 +155,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
         OutlinedTextField(
             value = state.input,
             onValueChange = viewModel::setInput,
-            label = { Text(stringResource(Res.string.translator_input_hint)) },
+            placeholder = { Text(stringResource(Res.string.translator_input_hint)) },
             minLines = 3,
             shape = TranslatorInputShape,
             colors = inputFieldColors(),

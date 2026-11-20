@@ -170,6 +170,9 @@ import org.meshtastic.feature.messaging.component.TranslationModelDownloadDialog
 private const val ROUNDED_CORNER_PERCENT = 100
 private const val MAX_LINES = 3
 
+/** Room left under the message field, so it does not sit on the bottom edge. */
+private val INPUT_BOTTOM_GAP = 20.dp
+
 // Minimum draft length before the markdown formatting toolbar appears (matches the iOS client).
 private const val FORMATTING_TOOLBAR_MIN_CHARS = 3
 
@@ -1110,7 +1113,7 @@ internal fun MessageInput(
             ),
             modifier =
             Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = INPUT_BOTTOM_GAP)
                 .elementLook(UiOptions.GROUP_INPUT, RoundedCornerShape(ROUNDED_CORNER_PERCENT.toFloat()))
                 .onFocusChanged { isFocused = it.isFocused }
                 // Tunnel phase, not bubble: a multi-line field consumes Enter to insert its newline, so an

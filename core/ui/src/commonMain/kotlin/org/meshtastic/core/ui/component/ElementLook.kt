@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.inset
@@ -185,12 +186,7 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     is Outline.Generic -> RoundRect(outline.path.getBounds())
                 }
             val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
-            // On a dark theme the glow is lighter than the background, so it is pushed down: it reads as a shadow under
-            // the element (a light ring all around would look like a second outline).
-            val shift = reach * (if (dark) DARK_DROP else SHADOW_DROP)
-            val topGrow = if (dark) DARK_TOP_SHARE else 1f
             val tint = if (dark) Color.White else Color.Black
-            val strength = if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA
             val hole =
                 Path().apply {
                     when (outline) {
@@ -199,9 +195,13 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                         is Outline.Generic -> addPath(outline.path)
                     }
                 }
-            clipPath(hole, ClipOp.Difference) {
+            // Two shadows make it look three-dimensional: a wide soft one, and a tight one right at the edge.
+            // On a dark theme the glow is lighter than the background, so it is pushed down: it reads as a shadow
+            // under the element (a light ring all around would look like a second outline).
+            fun DrawScope.layers(grownBy: Float, drop: Float, topShare: Float, strength: Float) {
                 for (i in SHADOW_LAYERS downTo 1) {
-                    val grow = reach * i / SHADOW_LAYERS
+                    val grow = grownBy * i / SHADOW_LAYERS
+                    val shift = grownBy * drop
                     // The layers add up to a shadow that fades out smoothly (quadratically) away from the edge.
                     val inner = 1f - (i - 1f) / SHADOW_LAYERS
                     val outer = 1f - i.toFloat() / SHADOW_LAYERS
@@ -211,7 +211,7 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     val layer =
                         RoundRect(
                             left = box.left - grow,
-                            top = box.top - grow * topGrow + shift,
+                            top = box.top - grow * topShare + shift,
                             right = box.right + grow,
                             bottom = box.bottom + grow + shift,
                             topLeftCornerRadius = widen(box.topLeftCornerRadius),
@@ -222,10 +222,24 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     drawPath(Path().apply { addRoundRect(layer) }, color = tint.copy(alpha = alpha))
                 }
             }
+            clipPath(hole, ClipOp.Difference) {
+                if (dark) {
+                    layers(reach, DARK_DROP, DARK_TOP_SHARE, DARK_GLOW_ALPHA)
+                    layers(reach * CONTACT_REACH, CONTACT_DROP, DARK_TOP_SHARE, DARK_CONTACT_ALPHA)
+                } else {
+                    layers(reach, SHADOW_DROP, 1f, SHADOW_ALPHA)
+                    layers(reach * CONTACT_REACH, CONTACT_DROP, CONTACT_TOP_SHARE, SHADOW_CONTACT_ALPHA)
+                }
+            }
         }
     }
 
 private const val SHADOW_LAYERS = 24
+private const val CONTACT_REACH = 0.3f
+private const val CONTACT_DROP = 0.4f
+private const val CONTACT_TOP_SHARE = 0.3f
+private const val SHADOW_CONTACT_ALPHA = 0.28f
+private const val DARK_CONTACT_ALPHA = 0.14f
 private const val CARD_SHADOW_REACH = 0.5f
 private const val BAR_GLOW_SHARE = 0.6f
 private const val BUBBLE_SHADOW_SHARE = 0.8f
