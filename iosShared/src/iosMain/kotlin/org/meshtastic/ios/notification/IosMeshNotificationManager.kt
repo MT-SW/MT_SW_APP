@@ -334,5 +334,6 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
 
     override suspend fun cancelMessageNotification(contactKey: String) {
         notificationManager.cancel(Notification.Category.Message, contactKey.hashCode())
+        notificationManager.cancel(Notification.Category.Reaction, contactKey.hashCode())
     }
 }
