@@ -18,6 +18,7 @@
 
 package org.meshtastic.core.ui.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -33,6 +34,7 @@ import androidx.compose.material3.ExpandedDockedSearchBar
 import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarScrollBehavior
@@ -53,6 +55,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -208,35 +211,60 @@ private fun InlineSearchField(
     trailingActions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TextField(
-        state = textFieldState,
-        lineLimits = TextFieldLineLimits.SingleLine,
-        placeholder = { Text(placeholder) },
-        leadingIcon = { Icon(imageVector = MeshtasticIcons.Search, contentDescription = null) },
-        trailingIcon = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (textFieldState.text.isNotEmpty()) {
-                    IconButton(onClick = { textFieldState.clearText() }) {
-                        Icon(imageVector = MeshtasticIcons.Close, contentDescription = clearDescription)
+    // MT_SW: the field follows the glass look of the search group: grey while empty, tinted in the colour of the buttons
+    // (the theme's gold) as soon as something is typed, so it is visible that the list below is being filtered.
+    val scheme = MaterialTheme.colorScheme
+    val filtering = textFieldState.text.isNotEmpty()
+    val base by
+        animateColorAsState(
+            targetValue =
+            if (filtering) {
+                lerp(scheme.surfaceContainerHigh, scheme.primary, SEARCH_ACTIVE_MIX)
+            } else {
+                scheme.surfaceContainerHigh
+            },
+        )
+    val shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp)
+    StyledSurface(
+        group = UiOptions.GROUP_SEARCH,
+        shape = shape,
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        baseColor = base,
+    ) {
+        TextField(
+            state = textFieldState,
+            lineLimits = TextFieldLineLimits.SingleLine,
+            placeholder = { Text(placeholder) },
+            leadingIcon = { Icon(imageVector = MeshtasticIcons.Search, contentDescription = null) },
+            trailingIcon = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (filtering) {
+                        IconButton(onClick = { textFieldState.clearText() }) {
+                            Icon(imageVector = MeshtasticIcons.Close, contentDescription = clearDescription)
+                        }
                     }
+                    trailingActions()
                 }
-                trailingActions()
-            }
-        },
-        shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp),
-        colors =
-        TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            errorIndicatorColor = Color.Transparent,
-        ),
-        modifier =
-        modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag(testTag).semantics {
-            contentDescription = placeholder
-        },
-    )
+            },
+            shape = shape,
+            colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent,
+            ),
+            modifier = Modifier.fillMaxWidth().testTag(testTag).semantics { contentDescription = placeholder },
+        )
+    }
 }
+
+/** How much of the theme colour the field takes on while something is typed in it. */
+private const val SEARCH_ACTIVE_MIX = 0.35f
 
 private const val SEARCH_FIELD_CORNER_DP = 12
 
