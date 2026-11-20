@@ -46,7 +46,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -126,6 +125,7 @@ import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.inputFieldColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isDesktopPlatform
@@ -456,12 +456,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             minLines = 1,
             maxLines = 4,
             shape = BubbleShape,
-            colors =
-                OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                ),
+            colors = inputFieldColors(),
             modifier =
             Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, BubbleShape).onPreviewKeyEvent { event ->
                 // Computers: Enter sends, Shift+Enter makes a new line. The phone keeps its normal behaviour.

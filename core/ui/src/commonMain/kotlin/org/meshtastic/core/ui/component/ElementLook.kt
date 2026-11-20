@@ -34,7 +34,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -555,3 +557,32 @@ internal fun Modifier.glassEdge(
         }
     }
 }
+
+/**
+ * The colours of a text field in the look of the message field of the chats: the background follows the look chosen for
+ * the input group (plain, see-through or glass), so every input field of the app matches.
+ */
+@Composable
+fun inputFieldColors(): TextFieldColors {
+    val look = rememberUiOptions().element(UiOptions.GROUP_INPUT)
+    val fade =
+        if (look.look == ElementLook.TRANSPARENT || look.look == ElementLook.GLASS) {
+            (1f - look.strength / INPUT_PERCENT).coerceIn(INPUT_MIN_ALPHA, 1f)
+        } else {
+            1f
+        }
+    val container =
+        if (look.look == ElementLook.FLAT) {
+            Color.Transparent
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = fade)
+        }
+    return OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = container,
+        unfocusedContainerColor = container,
+        disabledContainerColor = container,
+    )
+}
+
+private const val INPUT_PERCENT = 100f
+private const val INPUT_MIN_ALPHA = 0.12f

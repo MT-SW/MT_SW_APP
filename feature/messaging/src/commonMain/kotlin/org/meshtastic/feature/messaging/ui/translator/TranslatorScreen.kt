@@ -31,7 +31,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -91,6 +90,7 @@ import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.inputFieldColors
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation
@@ -158,12 +158,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             label = { Text(stringResource(Res.string.translator_input_hint)) },
             minLines = 3,
             shape = TranslatorInputShape,
-            colors =
-                OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                ),
+            colors = inputFieldColors(),
             modifier = Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, TranslatorInputShape),
         )
         // Buttons from the right edge: the main action is last, right under the thumb.
