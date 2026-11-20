@@ -145,7 +145,11 @@ fun GenericMetricChart(
                 // x-step, Vico computes the GCD of consecutive x-value differences which can
                 // be as small as 1 second, making the chart logically enormous. A 60-second
                 // floor keeps the internal slot count reasonable for any practical interval.
-                getXStep = { model, _, _ -> maxOf(model.getXDeltaGcd(), MIN_X_STEP_SECONDS) },
+                // MT_SW: Vico throws when the x-values are more precise than four decimals (seen on iPhone), which
+                // closed the app; such a chart simply gets the floor step instead.
+                getXStep = { model, _, _ ->
+                    maxOf(runCatching { model.getXDeltaGcd() }.getOrDefault(MIN_X_STEP_SECONDS), MIN_X_STEP_SECONDS)
+                },
             ),
             modelProducer = modelProducer,
             modifier = modifier,
