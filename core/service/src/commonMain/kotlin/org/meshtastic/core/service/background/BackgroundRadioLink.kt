@@ -32,6 +32,7 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.MeshActivity
+import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.util.effectivePortNum
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
@@ -113,6 +114,9 @@ class BackgroundRadioLink(
     override val receivedData: Flow<ReceivedRadioFrame> = emptyFlow()
     override val meshActivity: Flow<MeshActivity> = emptyFlow()
     override val connectionError: Flow<String> = emptyFlow()
+
+    // MT_SW: nobody follows the status of a quiet link, so it stays empty.
+    override val transportStatus: StateFlow<TransportStatus?> = MutableStateFlow(null)
     override val activeSession: StateFlow<RadioSessionContext?> = MutableStateFlow(null)
 
     override fun onConnect() {

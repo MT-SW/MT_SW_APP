@@ -209,7 +209,7 @@ class DispatchingMeshNotificationManager(private val notificationManager: Notifi
     }
 
     override fun cancelNodeSilenceNotification(nodeNum: Int) {
-        notificationManager.cancel(nodeNum)
+        notificationManager.cancel(Notification.Category.Silence, nodeNum)
     }
 
     override suspend fun showNodeActiveNotification(node: Node, title: String) {

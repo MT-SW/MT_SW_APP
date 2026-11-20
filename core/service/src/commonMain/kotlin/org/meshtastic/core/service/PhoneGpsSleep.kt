@@ -24,9 +24,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.selects.select
-import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.Position
-import org.meshtastic.core.model.util.onWirePrecisionBits
 import org.meshtastic.core.repository.Location
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.Config
@@ -50,9 +48,10 @@ internal fun stillnessCellBits(channels: List<ChannelSettings>, role: Config.Dev
         if (role == Config.DeviceConfig.Role.LOST_AND_FOUND || primary?.module_settings == null) {
             0
         } else {
-            channels.withIndex().firstNotNullOfOrNull { (index, settings) ->
+            channels.firstNotNullOfOrNull { settings ->
                 val own = settings.module_settings?.position_precision ?: 0
-                val onWire = onWirePrecisionBits(own, Channel.usesPublicKey(settings, primary.takeIf { index > 0 }))
+                // MT_SW: the channel key never caps precision, so the position goes out at the channel's own.
+                val onWire = own
                 val tracker = role == Config.DeviceConfig.Role.TRACKER || role == Config.DeviceConfig.Role.TAK_TRACKER
                 (if (tracker) own else onWire).takeIf { onWire != 0 }
             } ?: 0
