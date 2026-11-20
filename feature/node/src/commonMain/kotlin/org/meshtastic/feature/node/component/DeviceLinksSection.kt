@@ -26,8 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -54,6 +52,7 @@ import org.meshtastic.core.resources.device_links_affiliate_disclosure
 import org.meshtastic.core.resources.device_links_i_want_one
 import org.meshtastic.core.resources.device_links_open_in_browser
 import org.meshtastic.core.resources.expanded
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.icon.Icon
@@ -72,9 +71,9 @@ fun DeviceLinksSection(links: List<DeviceLink>, modifier: Modifier = Modifier) {
     val title = stringResource(Res.string.device_links_i_want_one)
     val expandStateDescription = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed)
 
-    ElevatedCard(
+    StyledCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = colorScheme.surfaceContainerHigh),
+        baseColor = colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(vertical = 16.dp).animateContentSize()) {

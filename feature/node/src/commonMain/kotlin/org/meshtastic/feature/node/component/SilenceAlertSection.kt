@@ -29,8 +29,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -49,6 +47,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -74,13 +73,13 @@ import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
 import org.meshtastic.core.ui.icon.Save
-import kotlin.time.DurationUnit
 
 /** Ready choices, in minutes: from an hour up to a month. Any other time can be typed in hours. */
 private val SILENCE_CHOICES_MINUTES = listOf(60, 120, 180, 360, 720, 1_440, 2_880, 4_320, 7_200, 10_080, 20_160, 43_200)
@@ -103,9 +102,9 @@ fun SilenceAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val current = alerts[nodeNum]
     val relayed by prefs.nodeSilenceCountRelayed.collectAsStateWithLifecycle()
     val quiet by prefs.nodeSilenceQuietHours.collectAsStateWithLifecycle()
-    ElevatedCard(
+    StyledCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {

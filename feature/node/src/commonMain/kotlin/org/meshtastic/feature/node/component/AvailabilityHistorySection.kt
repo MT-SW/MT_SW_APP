@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +43,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.time.DurationUnit
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowMillis
@@ -61,9 +60,9 @@ import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.mt_sw_other_availability_body
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle
-import kotlin.time.DurationUnit
 
 /**
  * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it and
@@ -87,9 +86,9 @@ fun AvailabilityHistorySection(nodeNum: Int, modifier: Modifier = Modifier) {
     val heardBars = counts.count { it > 0 }
     val maxCount = counts.maxOrNull() ?: 0
 
-    ElevatedCard(
+    StyledCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {

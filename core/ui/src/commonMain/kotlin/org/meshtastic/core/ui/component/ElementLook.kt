@@ -212,11 +212,11 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
         }
     }
 
-private const val SHADOW_LAYERS = 10
-private const val CARD_SHADOW_REACH = 0.7f
-private const val BUBBLE_SHADOW_SHARE = 0.5f
-private const val SHADOW_ALPHA = 0.4f
-private const val DARK_GLOW_ALPHA = 0.26f
+private const val SHADOW_LAYERS = 14
+private const val CARD_SHADOW_REACH = 0.55f
+private const val BUBBLE_SHADOW_SHARE = 0.4f
+private const val SHADOW_ALPHA = 0.26f
+private const val DARK_GLOW_ALPHA = 0.2f
 private const val SHADOW_DROP = 0.35f
 
 /** The thickness of the rim chosen in the settings, in dp. */

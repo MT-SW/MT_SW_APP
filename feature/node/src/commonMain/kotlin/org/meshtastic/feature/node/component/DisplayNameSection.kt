@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -47,6 +45,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.display_name
 import org.meshtastic.core.resources.display_name_hint
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
@@ -54,9 +53,9 @@ import org.meshtastic.core.ui.icon.Save
 /** Edits the local-only display name. The broadcast long name is the placeholder, so the user sees what is replaced. */
 @Composable
 fun DisplayNameSection(node: Node, onSaveDisplayName: (Int, String) -> Unit, modifier: Modifier = Modifier) {
-    ElevatedCard(
+    StyledCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {

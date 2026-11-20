@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -45,6 +43,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add_a_note
 import org.meshtastic.core.resources.notes
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
@@ -52,9 +51,9 @@ import org.meshtastic.core.ui.icon.Save
 @Composable
 fun NotesSection(node: Node, onSaveNotes: (Int, String) -> Unit, modifier: Modifier = Modifier) {
     if (node.isFavorite) {
-        ElevatedCard(
+        StyledCard(
             modifier = modifier.fillMaxWidth(),
-            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+            baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             shape = MaterialTheme.shapes.extraLarge,
         ) {
             Column(modifier = Modifier.padding(20.dp)) {

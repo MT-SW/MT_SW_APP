@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +38,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_active_alert
 import org.meshtastic.core.resources.node_active_alert_hint
 import org.meshtastic.core.resources.node_away_alert
+import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.component.Switch
 
 /**
@@ -51,9 +50,9 @@ fun ActiveAlertSection(nodeNum: Int, modifier: Modifier = Modifier) {
     val prefs = koinInject<NotificationPrefs>()
     val alerts by prefs.nodeActiveAlerts.collectAsStateWithLifecycle()
     val away by prefs.nodeAwayAlerts.collectAsStateWithLifecycle()
-    ElevatedCard(
+    StyledCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        baseColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.extraLarge,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
