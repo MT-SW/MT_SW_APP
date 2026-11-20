@@ -58,9 +58,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -227,7 +230,11 @@ private fun InlineSearchField(
         animateColorAsState(
             targetValue =
             if (filtering) {
-                lerp(scheme.surfaceContainerHigh, scheme.primary, SEARCH_ACTIVE_MIX)
+                lerp(
+                    scheme.surfaceContainerHigh,
+                    scheme.primary,
+                    if (isDarkSurface()) SEARCH_ACTIVE_MIX_DARK else SEARCH_ACTIVE_MIX,
+                )
             } else {
                 scheme.surfaceContainerHigh
             },
@@ -242,6 +249,8 @@ private fun InlineSearchField(
             ),
         )
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
+    val rimTop = if (dark) SEARCH_RIM_TOP_DARK else SEARCH_RIM_TOP
+    val rimBottom = Color.Black.copy(alpha = if (dark) SEARCH_RIM_BOTTOM_DARK else SEARCH_RIM_BOTTOM)
     StyledSurface(
         group = UiOptions.GROUP_SEARCH,
         shape = shape,
@@ -257,6 +266,16 @@ private fun InlineSearchField(
             modifier =
             Modifier.fillMaxWidth()
                 .background(gradient)
+                .drawWithContent {
+                    drawContent()
+                    // A thin bright edge that is strongest along the top and fades out downwards: the pane looks raised.
+                    val outline = shape.createOutline(size, layoutDirection, this)
+                    drawOutline(
+                        outline = outline,
+                        brush = Brush.verticalGradient(listOf(Color.White.copy(alpha = rimTop), rimBottom)),
+                        style = Stroke(width = SEARCH_RIM_DP.dp.toPx()),
+                    )
+                }
                 .testTag(testTag)
                 .semantics { contentDescription = placeholder },
             decorator = { innerTextField ->
@@ -295,10 +314,16 @@ private fun InlineSearchField(
 
 /** How much of the theme colour the field takes on while something is typed in it. */
 private const val SEARCH_ACTIVE_MIX = 0.55f
+private const val SEARCH_ACTIVE_MIX_DARK = 0.7f
+private const val SEARCH_RIM_DP = 1.5f
+private const val SEARCH_RIM_TOP = 0.9f
+private const val SEARCH_RIM_TOP_DARK = 0.55f
+private const val SEARCH_RIM_BOTTOM = 0.18f
+private const val SEARCH_RIM_BOTTOM_DARK = 0.45f
 
 private const val SEARCH_GRADIENT_LIGHT = 0.35f
-private const val SEARCH_GRADIENT_LIGHT_DARK = 0.12f
-private const val SEARCH_GRADIENT_SHADE = 0.10f
+private const val SEARCH_GRADIENT_LIGHT_DARK = 0.22f
+private const val SEARCH_GRADIENT_SHADE = 0.16f
 private const val SEARCH_HINT_ALPHA = 0.6f
 private const val SEARCH_FIELD_HEIGHT_DP = 52
 

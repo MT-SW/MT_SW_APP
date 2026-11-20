@@ -40,14 +40,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
@@ -118,21 +125,48 @@ private const val DARK_SHEEN_BOOST = 1.8f
 private const val LIGHT_SHEEN_BOOST = 1.3f
 private const val DARK_GLOW_REACH = 1.3f
 
-/** A soft shadow of [dp] under [shape]: black on a light theme, a light glow on a dark one. No shadow for 0. */
-internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier = when {
-    dp <= 0f -> this
+/**
+ * A soft shadow of [dp] under [shape]: black on a light theme, a light glow on a dark one (a black shadow cannot be seen
+ * there). No shadow for 0.
+ *
+ * It is drawn by hand as a stack of fading outlines, not with [shadow]: the platform shadow is very faint on desktop
+ * and on translucent panes, which made glass look flat. Nothing is drawn inside the shape itself, so see-through glass
+ * stays clean.
+ */
+internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier =
+    if (dp <= 0f) {
+        this
+    } else {
+        drawBehind {
+            val outline = shape.createOutline(size, layoutDirection, this)
+            val radius =
+                when (outline) {
+                    is Outline.Rounded -> outline.roundRect.topLeftCornerRadius.x
+                    else -> 0f
+                }
+            val reach = dp.dp.toPx() * (if (dark) DARK_GLOW_REACH else 1f)
+            val shift = reach * SHADOW_DROP
+            val tint = if (dark) Color.White else Color.Black
+            val layerAlpha = (if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA) / SHADOW_LAYERS
+            val hole = Path().apply { addOutline(outline) }
+            clipPath(hole, ClipOp.Difference) {
+                for (i in SHADOW_LAYERS downTo 1) {
+                    val grow = reach * i / SHADOW_LAYERS
+                    drawRoundRect(
+                        color = tint.copy(alpha = layerAlpha),
+                        topLeft = Offset(-grow, -grow + shift),
+                        size = Size(size.width + 2 * grow, size.height + 2 * grow),
+                        cornerRadius = CornerRadius(radius + grow, radius + grow),
+                    )
+                }
+            }
+        }
+    }
 
-    dark ->
-        shadow(
-            elevation = (dp * DARK_GLOW_REACH).dp,
-            shape = shape,
-            clip = false,
-            ambientColor = Color.White,
-            spotColor = Color.White,
-        )
-
-    else -> shadow(elevation = dp.dp, shape = shape, clip = false)
-}
+private const val SHADOW_LAYERS = 10
+private const val SHADOW_ALPHA = 0.42f
+private const val DARK_GLOW_ALPHA = 0.26f
+private const val SHADOW_DROP = 0.35f
 
 /** The thickness of the rim chosen in the settings, in dp. */
 internal fun UiOptions.rimDp(): Float =

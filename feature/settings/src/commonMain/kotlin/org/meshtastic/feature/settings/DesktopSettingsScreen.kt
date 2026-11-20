@@ -117,6 +117,7 @@ import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
 import org.meshtastic.feature.settings.radio.rememberDatabaseBackupActions
 import org.meshtastic.feature.settings.search.SettingsSearchBar
+import org.meshtastic.feature.settings.search.SettingsSearchResultsInline
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.proto.DeviceProfile
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
@@ -266,13 +267,18 @@ fun DesktopSettingsScreen(
                 modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                val searchViewModel = koinViewModel<SettingsSearchViewModel>()
                 SettingsSearchBar(
-                    viewModel = koinViewModel<SettingsSearchViewModel>(),
+                    viewModel = searchViewModel,
                     onNavigate = onNavigate,
                     // This phone's own settings are hidden below while administering another node; search hides them
                     // too.
                     includeAppLocal = state.isLocal,
                 )
+                val searching = searchViewModel.query.collectAsStateWithLifecycle().value.isNotBlank()
+                if (searching) {
+                    SettingsSearchResultsInline(viewModel = searchViewModel, onNavigate = onNavigate)
+                } else {
 
                 RadioConfigItemList(
                     state = state,
@@ -454,6 +460,7 @@ fun DesktopSettingsScreen(
                         onNavigateToAbout = { onNavigate(SettingsRoute.About) },
                         onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
                     )
+                }
                 }
             }
             FastScrollSidebar(

@@ -99,6 +99,8 @@ fun NodeFilterSearchBar(
                 NodeSortButton(currentSortOption = currentSortOption, onSortSelect = onSortSelect, toggles = toggles)
             },
             inline = true,
+            // The same inset as the cards of the list below.
+            modifier = Modifier.padding(horizontal = 8.dp),
         )
         if (toggles.showIgnored) {
             Box(

@@ -98,6 +98,7 @@ import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
 import org.meshtastic.feature.settings.radio.rememberDatabaseBackupActions
 import org.meshtastic.feature.settings.search.SettingsSearchBar
+import org.meshtastic.feature.settings.search.SettingsSearchResultsInline
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.feature.settings.util.LanguageUtils
 import org.meshtastic.feature.settings.util.LanguageUtils.languageMap
@@ -252,12 +253,17 @@ fun SettingsScreen(
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            val searchViewModel = koinViewModel<SettingsSearchViewModel>()
             SettingsSearchBar(
-                viewModel = koinViewModel<SettingsSearchViewModel>(),
+                viewModel = searchViewModel,
                 onNavigate = onNavigate,
                 // This phone's own settings are hidden below while administering another node; search hides them too.
                 includeAppLocal = state.isLocal,
             )
+            val searching = searchViewModel.query.collectAsStateWithLifecycle().value.isNotBlank()
+            if (searching) {
+                SettingsSearchResultsInline(viewModel = searchViewModel, onNavigate = onNavigate)
+            } else {
 
             RadioConfigItemList(
                 state = state,
@@ -388,6 +394,7 @@ fun SettingsScreen(
                         onNavigate(SettingsRoute.DeviceLinks)
                     }
                 }
+            }
             }
         }
     }

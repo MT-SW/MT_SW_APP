@@ -31,6 +31,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,29 +66,60 @@ fun SettingsSearchBar(
     includeAppLocal: Boolean = true,
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
-    val results by viewModel.results.collectAsStateWithLifecycle()
+    var resetKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(includeAppLocal) { viewModel.setIncludeAppLocal(includeAppLocal) }
 
     // The bottom button of the Settings tab, pressed again, clears the search.
     LaunchedEffect(Unit) {
-        TabRepress.events.collect { tab -> if (tab == TopLevelDestination.Settings) viewModel.setQuery("") }
+        TabRepress.events.collect { tab ->
+            if (tab == TopLevelDestination.Settings) {
+                viewModel.setQuery("")
+                resetKey++
+            }
+        }
     }
 
+    // MT_SW: the field is the same always-visible one as in the node list; the matches replace the settings below it
+    // (see SettingsSearchResultsInline) instead of opening a small panel next to it.
     MeshtasticSearchBar(
         query = query,
         onQueryChange = viewModel::setQuery,
         placeholder = stringResource(Res.string.settings_search_placeholder),
         modifier = modifier,
+        resetKey = resetKey,
         inputFieldTag = SETTINGS_SEARCH_BAR_INPUT_FIELD_TAG,
-        expandedContent = {
-            SettingsSearchResults(
-                results = results,
-                query = query,
-                onSelect = { entry -> onNavigate(viewModel.select(entry)) },
-            )
-        },
+        inline = true,
     )
+}
+
+/** The matches of the settings search, drawn over the whole width in place of the settings list while typing. */
+@Composable
+fun SettingsSearchResultsInline(
+    viewModel: SettingsSearchViewModel,
+    onNavigate: (Route) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val results by viewModel.results.collectAsStateWithLifecycle()
+    if (results.isEmpty()) {
+        Column(
+            modifier = modifier.fillMaxWidth().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(Res.string.settings_search_no_results),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    } else {
+        Column(modifier = modifier.fillMaxWidth()) {
+            results.forEach { entry ->
+                SettingsSearchResult(entry = entry, onClick = { onNavigate(viewModel.select(entry)) })
+                HorizontalDivider()
+            }
+        }
+    }
 }
 
 /** The results shown under the expanded field: the matches, or a line saying there were none. */

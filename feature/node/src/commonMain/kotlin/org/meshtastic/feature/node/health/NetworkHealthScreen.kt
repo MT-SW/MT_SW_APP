@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +54,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -65,6 +65,7 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.MeshtasticSearchBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.withShadowInset
@@ -192,15 +193,14 @@ fun NetworkHealthScreen(
         Column(modifier = Modifier.fillMaxWidth().padding(contentPadding).nestedScroll(foldConnection)) {
             // The text is kept here and only reported to the view model: the list behind it recomputes slowly, and
             // taking the text back from that result moved the cursor in front of the letter just typed.
-            var searchField by
-                rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                    mutableStateOf(TextFieldValue(uiState.searchText))
-                }
+            var searchText by rememberSaveable { mutableStateOf(uiState.searchText) }
+            var searchReset by remember { mutableIntStateOf(0) }
             // The bottom button of this tab, pressed again, brings the screen back to how it first looked.
             LaunchedEffect(Unit) {
                 TabRepress.events.collect { tab ->
                     if (tab == TopLevelDestination.NetworkHealth) {
-                        searchField = TextFieldValue("")
+                        searchText = ""
+                        searchReset++
                         viewModel.setSearchText("")
                         viewModel.setActiveMetric(NetworkHealthMetric.entries.first())
                         foldToNow(false)
@@ -208,17 +208,6 @@ fun NetworkHealthScreen(
                     }
                 }
             }
-            androidx.compose.material3.OutlinedTextField(
-                value = searchField,
-                onValueChange = {
-                    searchField = it
-                    viewModel.setSearchText(it.text)
-                },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Szukaj węzła…") },
-                singleLine = true,
-            )
-
             Box(
                 modifier =
                 foldDrag.fillMaxWidth().clipToBounds().layout { measurable, constraints ->
@@ -258,6 +247,19 @@ fun NetworkHealthScreen(
                 onToggleHideWithoutData = viewModel::toggleHideWithoutData,
                 onToggleProblemsOnly = viewModel::toggleProblemsOnly,
                 modifier = foldDrag.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+
+            // MT_SW: the same search field as in the node list, above the list it filters.
+            MeshtasticSearchBar(
+                query = searchText,
+                onQueryChange = {
+                    searchText = it
+                    viewModel.setSearchText(it)
+                },
+                placeholder = "Szukaj węzła…",
+                resetKey = searchReset,
+                inline = true,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             )
 
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
