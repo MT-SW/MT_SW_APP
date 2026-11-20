@@ -109,7 +109,16 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
 
         // MT_SW: glass casts a soft shadow of its own ("Shadow under glass"); on a dark theme a black shadow cannot
         // be seen, so there it is a soft light glow that lifts the element off the background.
-        ElementLook.GLASS -> softShadow(options.glassShadowDp(), shape, isDarkSurface())
+        ElementLook.GLASS ->
+            if (group in CARD_GROUPS) {
+                cardShadow(options.glassShadowDp(), shape, isDarkSurface())
+            } else {
+                softShadow(options.glassShadowDp(), shape, isDarkSurface())
+            }
+
+        // The cards are see-through ("transparent") by default, and glass-looking as well: they cast the same shadow.
+        ElementLook.TRANSPARENT ->
+            if (group in CARD_GROUPS) cardShadow(options.glassShadowDp(), shape, isDarkSurface()) else this
 
         else -> this
     }
@@ -125,15 +134,41 @@ private const val DARK_SHEEN_BOOST = 1.8f
 private const val LIGHT_SHEEN_BOOST = 1.3f
 private const val DARK_GLOW_REACH = 1.3f
 
+/** The groups of cards: they cast the stronger hand-drawn [cardShadow]. */
+internal val CARD_GROUPS =
+    setOf(
+        UiOptions.GROUP_CARDS,
+        UiOptions.GROUP_DETAILS,
+        UiOptions.GROUP_SETTINGS,
+        UiOptions.GROUP_HEALTH,
+        UiOptions.GROUP_ASSISTANT,
+    )
+
+/** A soft shadow of [dp] under [shape]: black on a light theme, a light glow on a dark one. No shadow for 0. */
+internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier = when {
+    dp <= 0f -> this
+
+    dark ->
+        shadow(
+            elevation = (dp * DARK_GLOW_REACH).dp,
+            shape = shape,
+            clip = false,
+            ambientColor = Color.White,
+            spotColor = Color.White,
+        )
+
+    else -> shadow(elevation = dp.dp, shape = shape, clip = false)
+}
+
 /**
- * A soft shadow of [dp] under [shape]: black on a light theme, a light glow on a dark one (a black shadow cannot be seen
- * there). No shadow for 0.
+ * The shadow of a card: [dp] under [shape], black on a light theme, a light glow on a dark one (a black shadow cannot
+ * be seen there). No shadow for 0.
  *
  * It is drawn by hand as a stack of fading outlines, not with [shadow]: the platform shadow is very faint on desktop
  * and on translucent panes, which made glass look flat. Nothing is drawn inside the shape itself, so see-through glass
  * stays clean.
  */
-internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier =
+internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifier =
     if (dp <= 0f) {
         this
     } else {
@@ -144,7 +179,7 @@ internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     is Outline.Rounded -> outline.roundRect.topLeftCornerRadius.x
                     else -> 0f
                 }
-            val reach = dp.dp.toPx() * (if (dark) DARK_GLOW_REACH else 1f)
+            val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
             val shift = reach * SHADOW_DROP
             val tint = if (dark) Color.White else Color.Black
             val layerAlpha = (if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA) / SHADOW_LAYERS
@@ -171,7 +206,8 @@ internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
     }
 
 private const val SHADOW_LAYERS = 10
-private const val SHADOW_ALPHA = 0.42f
+private const val CARD_SHADOW_REACH = 0.7f
+private const val SHADOW_ALPHA = 0.4f
 private const val DARK_GLOW_ALPHA = 0.26f
 private const val SHADOW_DROP = 0.35f
 
@@ -223,6 +259,13 @@ fun rememberShadowInset(group: String = LocalCardGroup.current): Dp {
 
             // MT_SW: glass has its own soft shadow, so its lists keep room for it as well.
             ElementLook.GLASS -> (options.glassShadowDp() * DARK_GLOW_REACH * SHADOW_REACH).dp
+
+            ElementLook.TRANSPARENT ->
+                if (group in CARD_GROUPS) {
+                    (options.glassShadowDp() * CARD_SHADOW_REACH * DARK_GLOW_REACH * SHADOW_REACH).dp
+                } else {
+                    0.dp
+                }
 
             else -> 0.dp
         }

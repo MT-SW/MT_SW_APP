@@ -68,7 +68,6 @@ import org.meshtastic.core.resources.contact_draft_prefix
 import org.meshtastic.core.resources.contact_pinned
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.SecurityIcon
-import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
@@ -149,7 +148,6 @@ fun ContactItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .pressSpring()
-            .elementLook(UiOptions.GROUP_CARDS, RoundedCornerShape(12.dp))
             .semantics { contentDescription = shortName },
         shape = RoundedCornerShape(12.dp),
         colors = cardColors,

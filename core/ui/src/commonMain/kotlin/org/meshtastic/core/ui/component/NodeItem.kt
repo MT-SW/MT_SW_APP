@@ -214,7 +214,6 @@ fun NodeItem(
             .nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor)
             .fillMaxWidth()
             .pressSpring()
-            .elementLook(UiOptions.GROUP_CARDS, MaterialTheme.shapes.medium)
             .semantics(mergeDescendants = true) {
                 contentDescription = nodeDescription
                 role = Role.Button
