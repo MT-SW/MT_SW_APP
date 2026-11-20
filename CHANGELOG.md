@@ -195,6 +195,8 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Budowanie na GitHubie: wszystkie zbudowane pliki (Android, Windows, Linux, macOS, iPhone/iPad) trafiają do jednego wspólnego pliku do pobrania „MT_SW_APP-wszystko”, zamiast osobnych folderów dla każdego systemu.
+* iPhone/iPad: poprawka uruchamiania — aplikacja nie wstawała po instalacji, bo w module iOS brakowało magazynu ustawień bazy danych.
 * Plakietka z liczbą na ikonie aplikacji (iPhone/iPad, komputer): pokazuje wszystkie nieprzeczytane wiadomości, także z urządzeń w tle; na iPhonie jest ustawiana poza ekranem, więc zmienia się także gdy aplikacja jest w tle. Na Androidzie liczbę buduje sam launcher z powiadomień.
 * Pływający pasek nawigacji (wszystkie wersje): szkło paska nie ma już ciemniejszego pasma w dolnej części, które wyglądało jak dziwny biały pasek wokół podpisów.
 * Okno „Połącz” (wszystkie wersje): przyciski karty urządzenia dzielą szerokość karty i nie są szersze od niej, długi napis kończy się wielokropkiem (na komputerze i iPadzie nie wypychają już kolumn poza okno).
@@ -1116,6 +1118,8 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Building on GitHub: all the built files (Android, Windows, Linux, macOS, iPhone/iPad) go into one common download, "MT_SW_APP-wszystko", instead of a separate folder for each system.
+* iPhone/iPad: start-up fix — the app did not start after installing, because the iOS module lacked the database settings store.
 * Badge with a number on the app icon (iPhone/iPad, computer): it shows all unread messages, also from devices kept in the background; on iPhone it is set outside the screen, so it also changes while the app is in the background. On Android the launcher builds the number from the notifications.
 * Floating navigation bar (all versions): the glass of the bar no longer has a darker band in its lower part, which looked like an odd white strip around the names.
 * "Connect" window (all versions): the buttons of a device card share the width of the card and are never wider than it, a long name ends with dots (on a computer and iPad they no longer push the columns out of the window).
