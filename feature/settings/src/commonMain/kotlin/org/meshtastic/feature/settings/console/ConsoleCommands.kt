@@ -58,6 +58,7 @@ import org.meshtastic.core.resources.console_cmd_status_summary
 import org.meshtastic.core.resources.console_cmd_status_usage
 import org.meshtastic.core.resources.console_out_bridge_changed
 import org.meshtastic.core.resources.console_out_bridge_none
+import org.meshtastic.core.resources.console_out_bridge_unselected
 import org.meshtastic.core.resources.console_out_bridge_off
 import org.meshtastic.core.resources.console_out_bridge_on
 import org.meshtastic.core.resources.console_out_disconnecting
@@ -207,8 +208,15 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
         },
     )
 
+    /** The real reason there is no bridge to show: no saved device at all, or none of them chosen yet. */
+    private fun noDeviceText(state: RadioBridgeState) = if (state.hasSavedDevices) {
+        Res.string.console_out_bridge_unselected
+    } else {
+        Res.string.console_out_bridge_none
+    }
+
     suspend fun bridgeText(state: RadioBridgeState): String {
-        val slotId = state.slotId ?: return getStringSuspend(Res.string.console_out_bridge_none)
+        val slotId = state.slotId ?: return getStringSuspend(noDeviceText(state))
         return if (state.config.enabled) {
             getStringSuspend(Res.string.console_out_bridge_on, state.config.portFor(slotId))
         } else {
@@ -392,7 +400,7 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                         else -> null
                     }
                 if (state.slotId == null) {
-                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_bridge_none)))
+                    ConsoleResult(listOf(getStringSuspend(noDeviceText(state))))
                 } else if (change == null) {
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_status_bridge, bridgeText(state))))
                 } else {

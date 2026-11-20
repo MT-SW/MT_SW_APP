@@ -35,6 +35,7 @@ data class RadioBridgeState(
     val slotId: Int? = null,
     val name: String? = null,
     val config: RadioBridgeConfig = RadioBridgeConfig(),
+    val hasSavedDevices: Boolean = false,
 )
 
 /**
@@ -75,9 +76,10 @@ class RadioBridgeViewModel(
 
     val state: StateFlow<RadioBridgeState> =
         combine(slotsPrefs.slots, slotsPrefs.selectedId, bridgePrefs.configs) { slots, selected, configs ->
-            val slot = slots.firstOrNull { it.id == selected }
+            // With one saved device there is nothing to choose: it is the one shown.
+            val slot = slots.firstOrNull { it.id == selected } ?: slots.singleOrNull()
             val name = slot?.name?.takeIf { it.isNotBlank() } ?: slot?.address
-            RadioBridgeState(slot?.id, name, configs[slot?.id] ?: RadioBridgeConfig())
+            RadioBridgeState(slot?.id, name, configs[slot?.id] ?: RadioBridgeConfig(), hasSavedDevices = slots.isNotEmpty())
         }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RadioBridgeState())
 

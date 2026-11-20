@@ -1007,6 +1007,7 @@
     <string name="console_out_bridge_none">Save a device in the Connect window first.</string>
     <string name="console_out_bridge_off">off</string>
     <string name="console_out_bridge_on">on, port %1$d</string>
+    <string name="console_out_bridge_unselected">Choose a device in the top bar to see its bridge.</string>
     <string name="console_out_disconnecting">Disconnecting the device.</string>
     <string name="console_out_help_header">Available commands:</string>
     <string name="console_out_help_usage">Usage: %1$s</string>

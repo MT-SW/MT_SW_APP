@@ -4356,6 +4356,7 @@
     <string name="console_out_bridge_on">włączony, port %1$d</string>
     <string name="console_out_bridge_off">wyłączony</string>
     <string name="console_out_bridge_none">Najpierw zapisz urządzenie w oknie „Połącz”.</string>
+    <string name="console_out_bridge_unselected">Wybierz urządzenie na górnym pasku, aby zobaczyć jego mostek.</string>
     <string name="console_out_bridge_changed">Mostek TCP: %1$s.</string>
     <string name="console_out_nodes_none">Brak pasujących węzłów.</string>
     <string name="console_out_nodes_more">…i jeszcze %1$d.</string>

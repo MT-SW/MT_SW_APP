@@ -974,6 +974,7 @@ console_out_bridge_changed
 console_out_bridge_none
 console_out_bridge_off
 console_out_bridge_on
+console_out_bridge_unselected
 console_out_disconnecting
 console_out_help_header
 console_out_help_usage
