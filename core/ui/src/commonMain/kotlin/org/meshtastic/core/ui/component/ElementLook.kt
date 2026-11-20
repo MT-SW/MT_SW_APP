@@ -185,7 +185,10 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     is Outline.Generic -> RoundRect(outline.path.getBounds())
                 }
             val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
-            val shift = reach * SHADOW_DROP
+            // On a dark theme the glow is lighter than the background, so it is pushed down: it reads as a shadow under
+            // the element (a light ring all around would look like a second outline).
+            val shift = reach * (if (dark) DARK_DROP else SHADOW_DROP)
+            val topGrow = if (dark) DARK_TOP_SHARE else 1f
             val tint = if (dark) Color.White else Color.Black
             val strength = if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA
             val hole =
@@ -208,7 +211,7 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     val layer =
                         RoundRect(
                             left = box.left - grow,
-                            top = box.top - grow + shift,
+                            top = box.top - grow * topGrow + shift,
                             right = box.right + grow,
                             bottom = box.bottom + grow + shift,
                             topLeftCornerRadius = widen(box.topLeftCornerRadius),
@@ -227,7 +230,9 @@ private const val CARD_SHADOW_REACH = 0.5f
 private const val BAR_GLOW_SHARE = 0.6f
 private const val BUBBLE_SHADOW_SHARE = 0.4f
 private const val SHADOW_ALPHA = 0.3f
-private const val DARK_GLOW_ALPHA = 0.22f
+private const val DARK_GLOW_ALPHA = 0.1f
+private const val DARK_DROP = 0.7f
+private const val DARK_TOP_SHARE = 0.1f
 private const val SHADOW_DROP = 0.25f
 
 /** The thickness of the rim chosen in the settings, in dp. */
