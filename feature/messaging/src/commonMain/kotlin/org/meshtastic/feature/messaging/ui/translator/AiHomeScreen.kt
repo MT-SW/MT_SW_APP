@@ -82,6 +82,7 @@ fun AiHomeScreen(
     assistantViewModel: AssistantViewModel,
     onBack: () -> Unit,
     canNavigateUp: Boolean,
+    onClickNodeChip: (Int) -> Unit = {},
 ) {
     val uiPrefs = koinInject<UiPrefs>()
     val translatorOn by uiPrefs.translatorEnabled.collectAsStateWithLifecycle()
@@ -254,7 +255,7 @@ fun AiHomeScreen(
                         }
                     }
                 },
-                onClickChip = {},
+                onClickChip = { onClickNodeChip(it.num) },
             )
         },
     ) { padding ->

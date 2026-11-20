@@ -96,6 +96,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             // As the root of its own bottom-bar tab there is nothing to go back to.
             canNavigateUp = backStack.size > 1,
+            onClickNodeChip = { backStack.add(NodesRoute.NodeDetail(it)) },
         )
     }
 

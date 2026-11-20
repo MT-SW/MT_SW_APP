@@ -111,6 +111,7 @@ fun EntryProviderScope<NavKey>.networkHealthGraph(backStack: NavBackStack<NavKey
             },
             onNeighborInfoNodeClick = { num -> backStack.add(NodeDetailRoute.NeighborInfoLog(num)) },
             onSummaryClick = { backStack.add(NetworkHealthRoute.Summary) },
+            onClickNodeChip = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
         )
     }
 

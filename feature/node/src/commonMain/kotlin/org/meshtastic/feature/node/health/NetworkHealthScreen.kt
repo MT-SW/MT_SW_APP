@@ -86,6 +86,7 @@ fun NetworkHealthScreen(
     onNeighborInfoNodeClick: (Int) -> Unit,
     onSummaryClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClickNodeChip: (Int) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -168,7 +169,7 @@ fun NetworkHealthScreen(
                 showNodeChip = true,
                 canNavigateUp = false,
                 onNavigateUp = {},
-                onClickChip = {},
+                onClickChip = { onClickNodeChip(it.num) },
                 actions = {
                     IconButton(onClick = { showInfo = true }) {
                         Icon(
