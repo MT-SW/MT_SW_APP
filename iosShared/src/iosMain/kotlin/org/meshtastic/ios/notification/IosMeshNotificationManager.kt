@@ -192,7 +192,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
         )
     }
 
-    override fun cancelSosAlarmNotification() = notificationManager.cancel(SOS_ALARM_ID)
+    override fun cancelSosAlarmNotification() = notificationManager.cancel(Notification.Category.Alert, SOS_ALARM_ID)
 
     override suspend fun showMeshBeaconNotification(offer: MeshBeaconOffer) {
         notificationManager.dispatch(
@@ -216,7 +216,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     }
 
     override fun cancelNewNodeNotification(nodeNum: Int) {
-        notificationManager.cancel(nodeNum)
+        notificationManager.cancel(Notification.Category.NodeEvent, nodeNum)
     }
 
     override suspend fun showNodeSilenceNotification(node: Node, title: String) {
@@ -231,7 +231,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     }
 
     override fun cancelNodeSilenceNotification(nodeNum: Int) {
-        notificationManager.cancel(nodeNum)
+        notificationManager.cancel(Notification.Category.Silence, nodeNum)
     }
 
     override suspend fun showNodeActiveNotification(node: Node, title: String) {
@@ -276,7 +276,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
 
     override fun cancelLowBatteryNotification(nodeNum: Int) {
         lowBatteryEpisodes.remove(nodeNum)
-        notificationManager.cancel(nodeNum)
+        notificationManager.cancel(Notification.Category.Battery, nodeNum)
     }
 
     override suspend fun showClientNotification(
@@ -296,7 +296,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     }
 
     override fun clearClientNotification(clientNotification: ClientNotification) {
-        notificationManager.cancel(clientNotification.notificationId())
+        notificationManager.cancel(Notification.Category.Client, clientNotification.notificationId())
     }
 
     override suspend fun showFirmwareUpdateNotification(notice: FirmwareUpdateNotice): Boolean =
@@ -333,6 +333,6 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     override suspend fun showReconnectBlockedNotification(title: String, message: String): Boolean = false
 
     override suspend fun cancelMessageNotification(contactKey: String) {
-        notificationManager.cancel(contactKey.hashCode())
+        notificationManager.cancel(Notification.Category.Message, contactKey.hashCode())
     }
 }

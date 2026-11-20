@@ -295,7 +295,7 @@ class IosNotificationManager(
 
     private fun repeatIdentifier(id: Int, n: Int) = "$id-r$n"
 
-    override fun cancel(id: Int) {
+    override fun cancel(category: Notification.Category, id: Int) {
         center.removeDeliveredNotificationsWithIdentifiers(listOf(id.toString()))
         center.removePendingNotificationRequestsWithIdentifiers(
             listOf(id.toString()) + (0 until MAX_REPEATS).map { repeatIdentifier(id, it) },
