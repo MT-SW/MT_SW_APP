@@ -142,7 +142,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
 
 private const val DARK_SHEEN_BOOST = 1.8f
 private const val LIGHT_SHEEN_BOOST = 1.3f
-private const val DARK_GLOW_REACH = 2.0f
+private const val DARK_GLOW_REACH = 2.8f
 
 /** The groups of cards: they cast the stronger hand-drawn [cardShadow]. */
 internal val CARD_GROUPS =
@@ -244,7 +244,7 @@ private const val CARD_SHADOW_REACH = 0.5f
 private const val BAR_GLOW_SHARE = 0.9f
 private const val BUBBLE_SHADOW_SHARE = 0.8f
 private const val SHADOW_ALPHA = 0.3f
-private const val DARK_GLOW_ALPHA = 0.22f
+private const val DARK_GLOW_ALPHA = 0.24f
 private const val DARK_DROP = 0.25f
 private const val DARK_TOP_SHARE = 0.1f
 private const val SHADOW_DROP = 0.25f
