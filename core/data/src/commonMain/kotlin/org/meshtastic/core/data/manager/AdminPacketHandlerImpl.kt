@@ -49,7 +49,7 @@ class AdminPacketHandlerImpl(
         // The firmware forwards every decoded ADMIN_APP packet addressed to it, so a response is authoritative
         // only when it answers a request we sent.
         if (!adminRequestRegistry.consume(data.request_id)) {
-            Logger.w { "Ignoring admin message from=${packet.from} with no outstanding request id=${data.request_id}" }
+            Logger.d { "Ignoring admin message from=${packet.from} with no outstanding request id=${data.request_id}" }
             return
         }
         // Firmware embeds the session_passkey in every admin response. A missing (default-empty)
