@@ -25,7 +25,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.model.ConnectionState
@@ -87,7 +90,7 @@ class RadioChooserViewModel(
     private val slotsPrefs: RadioSlotsPrefs,
     private val radioPrefs: RadioPrefs,
     private val radioController: RadioController,
-    serviceRepository: ServiceRepository,
+    private val serviceRepository: ServiceRepository,
     private val background: RadioBackgroundMonitor,
     nodeRepository: NodeRepository,
 ) : ViewModel() {
@@ -151,7 +154,36 @@ class RadioChooserViewModel(
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RadioChooserState())
 
+    private val switchingState = MutableStateFlow(false)
+
+    /**
+     * True while the app changes to showing another device (all screens): the waiting screen covers the content until
+     * the new device is connected and its data is shown, at least for a moment so that it never flickers.
+     */
+    val switching: StateFlow<Boolean> = switchingState.asStateFlow()
+
+    private fun watchSwitching() {
+        viewModelScope.launch {
+            var previous: String? = null
+            radioPrefs.devAddr.collect { address ->
+                val before = previous
+                previous = address
+                if (before != null && before != address && isValidDeviceAddress(before) && isValidDeviceAddress(address)) {
+                    switchingState.value = true
+                    launch {
+                        delay(SWITCH_MIN_MS)
+                        withTimeoutOrNull(SWITCH_MAX_MS) {
+                            serviceRepository.connectionState.first { it is ConnectionState.Connected }
+                        }
+                        switchingState.value = false
+                    }
+                }
+            }
+        }
+    }
+
     init {
+        watchSwitching()
         // Every radio the app connects to is remembered; the one in use is the selected one. A radio that is already
         // saved only gets its name refreshed; when all places are taken, the selected radio's place is reused.
         // Devices saved earlier with the same name (the old switch wrote the name of the device shown before): a
@@ -299,5 +331,7 @@ class RadioChooserViewModel(
         const val NO_DEVICE = "n"
         const val NETWORK_PREFIX = "t"
         const val STOP_TIMEOUT_MS = 5_000L
+        const val SWITCH_MIN_MS = 700L
+        const val SWITCH_MAX_MS = 20_000L
     }
 }

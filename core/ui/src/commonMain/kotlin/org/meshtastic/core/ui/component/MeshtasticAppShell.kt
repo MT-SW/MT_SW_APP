@@ -17,7 +17,11 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -195,8 +199,20 @@ fun MeshtasticAppShell(
             // The alarm of a received SOS covers everything, so it sits over the content in one box.
             Box(modifier = Modifier.fillMaxSize()) {
                 content()
+                // The waiting screen while another device is being shown: a big loading circle over everything.
+                val switching by radioChooser.switching.collectAsStateWithLifecycle()
+                if (switching) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures {} },
+                        color = MaterialTheme.colorScheme.background.copy(alpha = SWITCH_SCRIM_ALPHA),
+                    ) {
+                        FullScreenLoading()
+                    }
+                }
                 SosAlarmOverlay(uiViewModel)
             }
         }
     }
 }
+
+private const val SWITCH_SCRIM_ALPHA = 0.94f
