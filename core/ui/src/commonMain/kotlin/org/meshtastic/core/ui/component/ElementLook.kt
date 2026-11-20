@@ -110,15 +110,22 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         // MT_SW: glass casts a soft shadow of its own ("Shadow under glass"); on a dark theme a black shadow cannot
         // be seen, so there it is a soft light glow that lifts the element off the background.
         ElementLook.GLASS ->
-            if (group in CARD_GROUPS) {
-                cardShadow(options.glassShadowDp(), shape, isDarkSurface())
-            } else {
-                softShadow(options.glassShadowDp(), shape, isDarkSurface())
+            when (group) {
+                in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
+                UiOptions.GROUP_BUBBLES ->
+                    cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
+                else -> softShadow(options.glassShadowDp(), shape, isDarkSurface())
             }
 
         // The cards are see-through ("transparent") by default, and glass-looking as well: they cast the same shadow.
+        // The message bubbles cast a lighter one.
         ElementLook.TRANSPARENT ->
-            if (group in CARD_GROUPS) cardShadow(options.glassShadowDp(), shape, isDarkSurface()) else this
+            when (group) {
+                in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
+                UiOptions.GROUP_BUBBLES ->
+                    cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
+                else -> this
+            }
 
         else -> this
     }
@@ -207,6 +214,7 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
 
 private const val SHADOW_LAYERS = 10
 private const val CARD_SHADOW_REACH = 0.7f
+private const val BUBBLE_SHADOW_SHARE = 0.5f
 private const val SHADOW_ALPHA = 0.4f
 private const val DARK_GLOW_ALPHA = 0.26f
 private const val SHADOW_DROP = 0.35f
