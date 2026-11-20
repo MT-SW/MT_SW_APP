@@ -209,7 +209,7 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
     )
 
     /** The real reason there is no bridge to show: no saved device at all, or none of them chosen yet. */
-    private fun noDeviceText(state: RadioBridgeState) = if (state.hasSavedDevices) {
+    fun noDeviceText(state: RadioBridgeState) = if (state.hasSavedDevices) {
         Res.string.console_out_bridge_unselected
     } else {
         Res.string.console_out_bridge_none

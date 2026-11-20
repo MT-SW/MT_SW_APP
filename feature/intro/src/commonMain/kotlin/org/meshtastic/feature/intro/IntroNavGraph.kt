@@ -66,7 +66,7 @@ internal fun EntryProviderScope<NavKey>.introGraph(
     entry<MtSwFeatures> {
         val permissions = LocalIntroPermissions.current
         MtSwFeaturesScreen(
-            onContinue = { navigateToNext(MtSwFeatures, bluetoothSupported = permissions.bluetoothSupported) },
+            onContinue = { navigateToNext(MtSwFeatures, permissions) },
         )
     }
 
