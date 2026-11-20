@@ -104,7 +104,7 @@ class BackgroundPacketProcessor(
         var muted = false
         var stored = false
         var filtered = false
-        databaseManager.withDeviceDb(address, includeActive = true) { db ->
+        databaseManager.withDeviceDb(address, includeActive = true, createIfMissing = true) { db ->
             val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(packet.from)).firstOrNull()
             if (node?.isIgnored == true) return@withDeviceDb
             if (db.packetDao().findPacketsWithId(data.id).any { it.data.from == data.from }) return@withDeviceDb
@@ -198,7 +198,7 @@ class BackgroundPacketProcessor(
 
     /** Applies [change] to the node that sent [packet] in the database of this device and refreshes its reception. */
     private suspend fun updateNode(packet: MeshPacket, create: Boolean, change: (NodeEntity) -> Unit) {
-        databaseManager.withDeviceDb(address, includeActive = true) { db ->
+        databaseManager.withDeviceDb(address, includeActive = true, createIfMissing = true) { db ->
             val dao = db.nodeInfoDao()
             val existing = dao.getNodeEntitiesByNums(listOf(packet.from)).firstOrNull()
             if (existing == null && !create) return@withDeviceDb

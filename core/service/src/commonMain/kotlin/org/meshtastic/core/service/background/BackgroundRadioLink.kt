@@ -65,6 +65,12 @@ class BackgroundRadioLink(
     /** Packets that need more than a log entry (messages, node names, positions, telemetry), for the processor. */
     val packets = Channel<BackgroundPacket>(PACKET_QUEUE)
 
+    /**
+     * What the radio says about itself at the start (its own info, its nodes, the end of the list), for the store that
+     * keeps it in the radio's own database, so the device has a name plate and a node list like any other.
+     */
+    val setup = Channel<FromRadio>(SETUP_QUEUE)
+
     /** Completes when the radio went away (or the link was closed). */
     val ended = CompletableDeferred<Unit>()
 
@@ -131,6 +137,14 @@ class BackgroundRadioLink(
         onFrame(bytes)
         val frame = runCatching { FromRadio.ADAPTER.decode(bytes) }.getOrNull() ?: return
         frame.my_info?.let { myNodeNum = it.my_node_num }
+        val forStore =
+            frame.my_info != null ||
+                frame.metadata != null ||
+                frame.node_info != null ||
+                (frame.config_complete_id ?: 0) != 0
+        if (forStore && !setup.trySend(frame).isSuccess) {
+            Logger.w { "Background radio link: setup queue is full, a frame was dropped" }
+        }
         val packet = frame.packet ?: return
         val decoded = packet.decoded
         val log =
@@ -180,5 +194,6 @@ class BackgroundRadioLink(
     private companion object {
         const val LOG_QUEUE = 2_000
         const val PACKET_QUEUE = 500
+        const val SETUP_QUEUE = 5_000
     }
 }

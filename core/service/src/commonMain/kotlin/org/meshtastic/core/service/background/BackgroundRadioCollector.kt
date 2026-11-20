@@ -169,6 +169,10 @@ class BackgroundRadioCollector(
             supervisorScope {
                 val writer = launch { writeLogs(address, link) }
                 val processor = launch { processPackets(address, link) }
+                val store = launch {
+                    BackgroundDeviceStore(address, databaseManager).run(link.setup)
+                    readBadge(address)
+                }
                 val beat = launch {
                     val heartbeat = ToRadio.Builder().also { it.heartbeat = Heartbeat.Builder().build() }.build()
                     while (true) {
@@ -180,8 +184,10 @@ class BackgroundRadioCollector(
                 beat.cancel()
                 link.logs.close()
                 link.packets.close()
+                link.setup.close()
                 writer.join()
                 processor.join()
+                store.join()
             }
         } finally {
             withContext(NonCancellable) {
@@ -215,7 +221,9 @@ class BackgroundRadioCollector(
             val toWrite = batch.toList()
             batch.clear()
             val written =
-                databaseManager.withDeviceDb(address, includeActive = true) { it.meshLogDao().insertIgnore(toWrite) }
+                databaseManager.withDeviceDb(address, includeActive = true, createIfMissing = true) {
+                    it.meshLogDao().insertIgnore(toWrite)
+                }
             if (written == null) Logger.d { "Background collection: this device has no database yet, packets dropped" }
         }
         while (true) {

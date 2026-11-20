@@ -336,17 +336,20 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * created when the radio is used first) or when its database is the active one (the app writes that itself). With
      * [includeActive] the active database is used too: the background collector sets it, because every packet goes to
      * exactly one consumer (the app or the collector), so no packet is written twice, and packets heard while the app
-     * switches between devices are not lost. The manager lock is held while [block] runs, so keep it short.
+     * switches between devices are not lost. The manager lock is held while [block] runs, so keep it short. With
+     * [createIfMissing] a radio that has no database yet gets one (the background collection of a radio that was never
+     * shown in the app), exactly the database the app would create for it when it is selected.
      */
     suspend fun <T> withDeviceDb(
         address: String,
         includeActive: Boolean = false,
+        createIfMissing: Boolean = false,
         block: suspend (MeshtasticDatabase) -> T,
     ): T? = withManagerOperation {
         withContext(dispatchers.io) {
             mutex.withLock {
                 checkOpen()
-                if (!hasDatabaseFor(address)) {
+                if (!hasDatabaseFor(address) && !(createIfMissing && isRealDeviceAddress(address))) {
                     null
                 } else {
                     val dbName = resolveDbName(address, canReclaimRecoveredSource = false)
@@ -2052,6 +2055,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         val dbName = buildDbName(address)
         return dbFileExists(dbName)
     }
+
+    private fun isRealDeviceAddress(address: String?): Boolean = !address.isNullOrBlank() && address != "n"
 
     private fun dbFileExists(dbName: String): Boolean {
         val dir = getDatabaseDirectory()
