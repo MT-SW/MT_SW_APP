@@ -228,7 +228,7 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
 private const val SHADOW_LAYERS = 16
 private const val CARD_SHADOW_REACH = 0.5f
 private const val BAR_GLOW_SHARE = 0.6f
-private const val BUBBLE_SHADOW_SHARE = 0.4f
+private const val BUBBLE_SHADOW_SHARE = 0.8f
 private const val SHADOW_ALPHA = 0.3f
 private const val DARK_GLOW_ALPHA = 0.1f
 private const val DARK_DROP = 0.7f

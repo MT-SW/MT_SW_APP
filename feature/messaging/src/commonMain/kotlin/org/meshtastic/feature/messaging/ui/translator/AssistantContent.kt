@@ -47,6 +47,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -348,6 +349,8 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                     viewModel.send()
                                 },
                                 label = { Text(text) },
+                                modifier =
+                                Modifier.elementLook(UiOptions.GROUP_ASSISTANT, SuggestionChipDefaults.shape),
                             )
                         }
                     }
