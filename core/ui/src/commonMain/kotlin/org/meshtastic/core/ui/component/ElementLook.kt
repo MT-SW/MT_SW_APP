@@ -112,7 +112,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         ElementLook.GLASS ->
             when (group) {
                 in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
-                UiOptions.GROUP_BUBBLES ->
+                UiOptions.GROUP_BUBBLES, UiOptions.GROUP_INPUT ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
                 else -> softShadow(options.glassShadowDp(), shape, isDarkSurface())
             }
@@ -122,7 +122,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         ElementLook.TRANSPARENT ->
             when (group) {
                 in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
-                UiOptions.GROUP_BUBBLES ->
+                UiOptions.GROUP_BUBBLES, UiOptions.GROUP_INPUT ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
                 else -> this
             }

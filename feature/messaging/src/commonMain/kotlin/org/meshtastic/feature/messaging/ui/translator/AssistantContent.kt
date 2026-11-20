@@ -46,6 +46,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -455,6 +456,12 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             minLines = 1,
             maxLines = 4,
             shape = BubbleShape,
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
             modifier =
             Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, BubbleShape).onPreviewKeyEvent { event ->
                 // Computers: Enter sends, Shift+Enter makes a new line. The phone keeps its normal behaviour.

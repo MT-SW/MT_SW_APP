@@ -31,6 +31,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -157,6 +158,12 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             label = { Text(stringResource(Res.string.translator_input_hint)) },
             minLines = 3,
             shape = TranslatorInputShape,
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
             modifier = Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, TranslatorInputShape),
         )
         // Buttons from the right edge: the main action is last, right under the thumb.
