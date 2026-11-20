@@ -64,6 +64,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.ui.viewmodel.RadioChooserViewModel
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -115,7 +117,9 @@ fun MeshtasticNavigationSuite(
     val nodeRestartExpected by uiViewModel.nodeRestartExpected.collectAsStateWithLifecycle()
     val watchdogReconnectInFlight by uiViewModel.watchdogReconnectInFlight.collectAsStateWithLifecycle()
     val unreadMessageCount by uiViewModel.unreadMessageCount.collectAsStateWithLifecycle()
-    AppIconBadge(unreadMessageCount)
+    // All unread messages: of the device shown and of the devices kept in the background.
+    val chooserState by koinViewModel<RadioChooserViewModel>().state.collectAsStateWithLifecycle()
+    AppIconBadge(unreadMessageCount + chooserState.unreadTotal)
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
     val floatingNavBar by uiViewModel.floatingNavBar.collectAsStateWithLifecycle()

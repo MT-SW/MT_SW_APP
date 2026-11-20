@@ -17,12 +17,7 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import platform.UserNotifications.UNUserNotificationCenter
 
+/** On iPhone the number is kept by the notification manager (it also changes while no screen is shown). */
 @Composable
-actual fun AppIconBadge(count: Int) {
-    LaunchedEffect(count) {
-        UNUserNotificationCenter.currentNotificationCenter().setBadgeCount(count.coerceAtLeast(0).toLong()) { _ -> }
-    }
-}
+actual fun AppIconBadge(count: Int) = Unit

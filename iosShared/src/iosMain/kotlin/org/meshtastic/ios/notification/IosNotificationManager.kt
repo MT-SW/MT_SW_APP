@@ -57,7 +57,18 @@ import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
+import org.koin.mp.KoinPlatform
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioBackgroundMonitor
 
+private const val BADGE_START_DELAY_MS = 3_000L
 private const val USER_INFO_DEEP_LINK = "deepLink"
 
 /** The category of the SOS alarm: its buttons confirm the alarm and answer the sender without opening the app. */
@@ -134,10 +145,30 @@ class IosNotificationManager(
         observe(UIApplicationDidBecomeActiveNotification) { conversationTracker.setAppForeground(true) }
         observe(UIApplicationWillResignActiveNotification) { conversationTracker.setAppForeground(false) }
         center.delegate = delegate
+        keepIconBadge()
         center.requestAuthorizationWithOptions(
             UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge,
         ) { granted, error ->
             Logger.i { "Notification permission: granted=$granted error=${error?.localizedDescription}" }
+        }
+    }
+
+    /**
+     * The red number on the icon of the app (MT_SW): all unread messages, of the device shown and of the devices kept in
+     * the background. It is kept here, not in a screen, so it also changes while the app is not on the screen. The
+     * sources are taken later from Koin (they need this manager themselves).
+     */
+    private fun keepIconBadge() {
+        CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
+            delay(BADGE_START_DELAY_MS)
+            val koin = KoinPlatform.getKoin()
+            val packets = koin.get<PacketRepository>()
+            val background = koin.get<RadioBackgroundMonitor>()
+            combine(packets.getUnreadCountTotal(), background.unreadByAddress) { shown, quiet ->
+                (shown.coerceAtLeast(0) + quiet.values.sum()).toLong()
+            }
+                .distinctUntilChanged()
+                .collect { total -> center.setBadgeCount(total) { _ -> } }
         }
     }
 
