@@ -122,6 +122,7 @@ import org.meshtastic.core.resources.nav_bar_hide_off
 import org.meshtastic.core.resources.nav_bar_hide_small
 import org.meshtastic.core.resources.nav_bar_new_icons
 import org.meshtastic.core.resources.nav_bar_rim
+import org.meshtastic.core.resources.nav_bar_shadow
 import org.meshtastic.core.resources.nav_bar_select
 import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.nav_bar_show_at_top
@@ -536,6 +537,12 @@ fun NavBarBehaviourSettings(options: UiOptions, onChange: (String, Int) -> Unit)
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.NAV_RIM],
         onValueChange = { onChange(UiOptions.NAV_RIM, it) },
+    )
+    SwitchListItem(
+        text = stringResource(Res.string.nav_bar_shadow),
+        leadingIcon = MeshtasticIcons.DisplaySettings,
+        checked = options.flag(UiOptions.NAV_SHADOW),
+        onClick = { onChange(UiOptions.NAV_SHADOW, if (options.flag(UiOptions.NAV_SHADOW)) 0 else 1) },
     )
     SwitchListItem(
         text = stringResource(Res.string.input_hold_buzz),

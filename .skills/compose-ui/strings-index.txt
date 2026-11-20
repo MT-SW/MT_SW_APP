@@ -2568,6 +2568,7 @@ nav_bar_hide_small
 nav_bar_new_icons
 nav_bar_rim
 nav_bar_select
+nav_bar_shadow
 nav_bar_show
 nav_bar_show_at_top
 nav_bar_show_far

@@ -89,6 +89,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** The thickness of the edge line of the floating bar alone: a step of [RIM_STEPS_DP] (0 = no line). */
         const val NAV_RIM = "navbar.rim"
 
+        /** 1 = the floating bar casts a shadow (off by default). */
+        const val NAV_SHADOW = "navbar.shadow"
+
         /** How the open card is marked on the bar: [NAV_SELECT_BUBBLE], [NAV_SELECT_LINE] or [NAV_SELECT_BOTH]. */
         const val NAV_SELECT = "navbar.select"
         const val NAV_SELECT_BUBBLE = 0
@@ -261,6 +264,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(NAV_ICONS, 1)
             put(NAV_HAPTICS, 1)
             put(NAV_RIM, 0)
+            put(NAV_SHADOW, 0)
             put(BUTTON_GRADIENT, 2)
             put(NAV_SELECT, NAV_SELECT_BUBBLE)
             put(PRESENCE_SHOW, 1)

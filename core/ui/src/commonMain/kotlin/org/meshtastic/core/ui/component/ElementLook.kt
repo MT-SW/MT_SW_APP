@@ -387,6 +387,8 @@ fun StyledSurface(
     hazeState: HazeState? = null,
     baseColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     floating: Boolean = false,
+    /** False: no shadow at all under this surface (the floating bar has none unless the person turns it on). */
+    castShadow: Boolean = true,
     rimDp: Float? = null,
     fallbackMinAlpha: Float = GLASS_FALLBACK_MIN_ALPHA,
     /** No darker shade at the bottom of the glass: the sheen just fades out (a small, low pane such as the bar). */
@@ -398,7 +400,7 @@ fun StyledSurface(
     // MT_SW: glass casts a soft shadow of its own (the "Shadow under glass" option); a floating surface keeps at least
     // the shadow it has in the plain look.
     val glassShadow = if (style.look == ElementLook.GLASS) options.glassShadowDp() else 0f
-    val shadowDp = maxOf(glassShadow, if (floating) FLAT_SHADOW_DP else 0f)
+    val shadowDp = if (castShadow) maxOf(glassShadow, if (floating) FLAT_SHADOW_DP else 0f) else 0f
     val dark = isDarkSurface()
     val boost = glassSheenBoost()
     when {
@@ -438,7 +440,7 @@ fun StyledSurface(
                         seeThroughAlpha(style.strength)
                     },
                 ),
-                shadowElevation = if (style.look != ElementLook.GLASS && floating) FLAT_SHADOW_DP.dp else 0.dp,
+                shadowElevation = if (style.look != ElementLook.GLASS && floating && castShadow) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
 
@@ -450,7 +452,7 @@ fun StyledSurface(
                 modifier = modifier,
                 shape = shape,
                 color = baseColor,
-                shadowElevation = if (floating) FLAT_SHADOW_DP.dp else 0.dp,
+                shadowElevation = if (floating && castShadow) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
     }

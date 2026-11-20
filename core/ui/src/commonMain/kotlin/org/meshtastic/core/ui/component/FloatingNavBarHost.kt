@@ -270,6 +270,7 @@ internal fun FloatingNavBarHost(
                     // On the iPhone the home indicator lives below the bar, so it floats a little higher there.
                     darker = state.darkerCount > 0,
                     selectStyle = options[UiOptions.NAV_SELECT],
+                    shadow = options.flag(UiOptions.NAV_SHADOW),
                     rimDp =
                     UiOptions.RIM_STEPS_DP[
                         options[UiOptions.NAV_RIM].coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex),
@@ -295,6 +296,7 @@ private fun FloatingNavBar(
     hazeState: HazeState,
     darker: Boolean,
     rimDp: Float,
+    shadow: Boolean,
     selectStyle: Int,
     sideWidth: Dp?,
     bottomMargin: Dp,
@@ -316,6 +318,7 @@ private fun FloatingNavBar(
             modifier = Modifier.widthIn(max = BAR_MAX_WIDTH_DP.dp).fillMaxWidth(),
             hazeState = hazeState,
             floating = true,
+            castShadow = shadow,
             baseColor =
             if (darker) {
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)

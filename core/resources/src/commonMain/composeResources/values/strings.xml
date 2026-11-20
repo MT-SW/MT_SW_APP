@@ -2622,6 +2622,7 @@
     <string name="nav_bar_new_icons">New bar icons (off = the old icons)</string>
     <string name="nav_bar_rim">Edge line of the bar</string>
     <string name="nav_bar_select">Marking of the open tab</string>
+    <string name="nav_bar_shadow">Shadow under the bar</string>
     <string name="nav_bar_show">Bringing the bar back</string>
     <string name="nav_bar_show_at_top">Only at the very top of the page</string>
     <string name="nav_bar_show_far">After a longer scroll up</string>
