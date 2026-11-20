@@ -1098,9 +1098,9 @@ internal fun MessageInput(
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = inputFade)
             }
-        val showSupportingText =
-            isEnabled &&
-                (currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES || splitChunkCount > 1)
+        // MT_SW: the counter / split hint lives inside the field (next to the buttons), not in a strip under it.
+        val showCounter = isEnabled && currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES
+        val showSplitHint = isEnabled && splitChunkCount > 1
         OutlinedTextField(
             colors =
             OutlinedTextFieldDefaults.colors(
@@ -1138,41 +1138,6 @@ internal fun MessageInput(
             // ImeAction.Default, and without it an IME may swap Enter for the action, leaving no way to type a newline.
             keyboardOptions =
             KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Default),
-            supportingText =
-            if (showSupportingText) {
-                {
-                // The counter is only useful as the limit approaches. Showing 0/200 before a character is typed is
-                // chrome that every chat client has learned to hide. A message that will be split is worth a hint
-                // regardless of how close to maxByteSize it is, since MESSAGE_CHARACTER_LIMIT_BYTES (the real,
-                // per-packet threshold) sits far below it.
-                val showCounter = isEnabled && currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES
-                val showSplitHint = isEnabled && splitChunkCount > 1
-                if (showCounter || showSplitHint) {
-                    Text(
-                        text =
-                        buildString {
-                            if (showCounter) append("$currentByteLength/$maxByteSize")
-                            if (showSplitHint) {
-                                if (isNotEmpty()) append("  •  ")
-                                append(stringResource(Res.string.message_split_pending, splitChunkCount))
-                            }
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color =
-                        if (isOverLimit) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.End,
-                    )
-                }
-                }
-            } else {
-                // MT_SW: no empty space under the field, so its shadow hugs the field itself.
-                null
-            },
             // Direct byte limiting via inputTransformation in TextFieldState is complex.
             // The current approach (show error, disable send) is generally preferred for UX.
             // If strict real-time byte trimming is required, it needs careful handling of
@@ -1187,6 +1152,25 @@ internal fun MessageInput(
                 // than as waiting for input.
                 val sendEnabled = isEnabled && (canSend || mentionActive)
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (showCounter || showSplitHint) {
+                        Text(
+                            text =
+                            buildString {
+                                if (showCounter) append("$currentByteLength/$maxByteSize")
+                                if (showSplitHint) {
+                                    if (isNotEmpty()) append("  •  ")
+                                    append(stringResource(Res.string.message_split_pending, splitChunkCount))
+                                }
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color =
+                            if (isOverLimit) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        )
+                    }
                     if (dictation.available) DictationButton(dictation = dictation, enabled = isEnabled)
                     IconButton(
                         onClick = onSendAction,
