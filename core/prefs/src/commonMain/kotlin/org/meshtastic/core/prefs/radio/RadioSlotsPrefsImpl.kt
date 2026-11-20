@@ -25,11 +25,11 @@ import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.RadioDataStore
-import org.meshtastic.core.repository.RadioSlot
-import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.prefs.store.PrefsSnapshot
 import org.meshtastic.core.prefs.store.intPrefsKey
 import org.meshtastic.core.prefs.store.stringPrefsKey
+import org.meshtastic.core.repository.RadioSlot
+import org.meshtastic.core.repository.RadioSlotsPrefs
 
 /**
  * Saved radios of the connection center. They are not part of the settings backup: an address is tied to the device

@@ -21,9 +21,9 @@ import com.sun.jna.Callback
 import com.sun.jna.Function
 import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
+import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.Notification
 import kotlin.uuid.Uuid
-import org.meshtastic.core.navigation.NotificationDeepLinks
 
 /**
  * Sends notifications through macOS UserNotifications (`UNUserNotificationCenter`) via JNA + Objective-C runtime. This

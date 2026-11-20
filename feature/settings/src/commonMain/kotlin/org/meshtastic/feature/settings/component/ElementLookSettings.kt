@@ -122,8 +122,8 @@ import org.meshtastic.core.resources.nav_bar_hide_off
 import org.meshtastic.core.resources.nav_bar_hide_small
 import org.meshtastic.core.resources.nav_bar_new_icons
 import org.meshtastic.core.resources.nav_bar_rim
-import org.meshtastic.core.resources.nav_bar_shadow
 import org.meshtastic.core.resources.nav_bar_select
+import org.meshtastic.core.resources.nav_bar_shadow
 import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.nav_bar_show_at_top
 import org.meshtastic.core.resources.nav_bar_show_far

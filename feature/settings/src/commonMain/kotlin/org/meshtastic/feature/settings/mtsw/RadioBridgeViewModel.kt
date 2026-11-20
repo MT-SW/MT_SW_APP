@@ -79,7 +79,12 @@ class RadioBridgeViewModel(
             // With one saved device there is nothing to choose: it is the one shown.
             val slot = slots.firstOrNull { it.id == selected } ?: slots.singleOrNull()
             val name = slot?.name?.takeIf { it.isNotBlank() } ?: slot?.address
-            RadioBridgeState(slot?.id, name, configs[slot?.id] ?: RadioBridgeConfig(), hasSavedDevices = slots.isNotEmpty())
+            RadioBridgeState(
+                slot?.id,
+                name,
+                configs[slot?.id] ?: RadioBridgeConfig(),
+                hasSavedDevices = slots.isNotEmpty(),
+            )
         }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RadioBridgeState())
 

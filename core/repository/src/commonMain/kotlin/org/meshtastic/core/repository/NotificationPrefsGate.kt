@@ -19,15 +19,25 @@ package org.meshtastic.core.repository
 /** Whether the user's preferences let a notification of [category] show, on every platform that dispatches records. */
 suspend fun NotificationPrefs.allows(category: Notification.Category): Boolean = when (category) {
     Notification.Category.Message -> messagesEnabled.value
+
     Notification.Category.Reaction -> loadReactionsEnabled()
+
     Notification.Category.Waypoint -> loadNewWaypointsEnabled()
+
     Notification.Category.NodeEvent -> nodeEventsEnabled.value
+
     Notification.Category.MeshBeacon -> nodeEventsEnabled.value
+
     Notification.Category.Battery -> lowBatteryEnabled.value
+
     // MT_SW: every notice has a switch of its own.
     Notification.Category.Silence -> nodeSilenceEnabled.value
+
     Notification.Category.Active -> nodeActiveEnabled.value
+
     Notification.Category.Alert -> alertsEnabled.value
+
     Notification.Category.Client -> radioNoticesEnabled.value
+
     Notification.Category.Service -> updatesEnabled.value
 }

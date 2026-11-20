@@ -19,11 +19,22 @@ package org.meshtastic.ios.notification
 import co.touchlab.kermit.Logger
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.koin.mp.KoinPlatform
+import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.SosNotificationActions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
@@ -57,17 +68,6 @@ import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
-import org.koin.mp.KoinPlatform
-import org.meshtastic.core.repository.PacketRepository
-import org.meshtastic.core.repository.RadioBackgroundMonitor
-import org.meshtastic.core.navigation.NotificationDeepLinks
 
 private const val BADGE_START_DELAY_MS = 3_000L
 private const val USER_INFO_DEEP_LINK = "deepLink"
@@ -155,8 +155,8 @@ class IosNotificationManager(
     }
 
     /**
-     * The red number on the icon of the app (MT_SW): all unread messages, of the device shown and of the devices kept in
-     * the background. It is kept here, not in a screen, so it also changes while the app is not on the screen. The
+     * The red number on the icon of the app (MT_SW): all unread messages, of the device shown and of the devices kept
+     * in the background. It is kept here, not in a screen, so it also changes while the app is not on the screen. The
      * sources are taken later from Koin (they need this manager themselves).
      */
     private fun keepIconBadge() {

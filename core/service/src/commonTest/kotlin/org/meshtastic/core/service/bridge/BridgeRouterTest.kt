@@ -177,8 +177,10 @@ class BridgeRouterTest {
         assertTrue(!router.waitingWithoutHandshake)
     }
 
-    private fun nodeFrame(num: Int) =
-        FromRadio.Builder().also { it.node_info = NodeInfo.Builder().also { n -> n.num = num }.build() }.build().encode()
+    private fun nodeFrame(num: Int) = FromRadio.Builder()
+        .also { it.node_info = NodeInfo.Builder().also { n -> n.num = num }.build() }
+        .build()
+        .encode()
 
     private fun stagedReady(router: BridgeRouter) {
         router.onFromRadio(myInfo(), emptySet())

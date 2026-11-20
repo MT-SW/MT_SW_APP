@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -184,14 +185,15 @@ private fun rememberSettledPhase(phase: StringResource?): StringResource? {
 
 /**
  * The steps the connection attempt has gone through so far, in the order they happened: finished ones carry a tick, the
- * one in progress a small spinner. Only steps the transport really reports are listed, so a network connection shows its
- * own, shorter list. The list starts again with each new attempt.
+ * one in progress a small spinner. Only steps the transport really reports are listed, so a network connection shows
+ * its own, shorter list. The list starts again with each new attempt.
  */
 @Composable
 private fun ConnectionSteps(transportStatus: TransportStatus?) {
     val phase = transportStatus?.phase
     var steps by remember { mutableStateOf(emptyList<TransportPhase>()) }
-    LaunchedEffect(phase) {
+    // The body does not suspend, so it is a plain side effect (it gives the same list again when nothing changed).
+    SideEffect {
         steps =
             when {
                 phase == null || phase == TransportPhase.WaitingToRetry -> emptyList()

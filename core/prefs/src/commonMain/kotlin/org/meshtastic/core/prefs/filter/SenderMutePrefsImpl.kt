@@ -27,8 +27,8 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.FilterDataStore
-import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.prefs.store.stringSetPrefsKey
+import org.meshtastic.core.repository.SenderMutePrefs
 
 /** Stores sender mutes as "key=until" strings next to the other message-filter settings. */
 @Single

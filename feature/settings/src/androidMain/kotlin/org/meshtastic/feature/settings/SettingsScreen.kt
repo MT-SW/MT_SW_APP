@@ -256,7 +256,6 @@ fun SettingsScreen(
             val searchViewModel = koinViewModel<SettingsSearchViewModel>()
             SettingsSearchBar(
                 viewModel = searchViewModel,
-                onNavigate = onNavigate,
                 // This phone's own settings are hidden below while administering another node; search hides them too.
                 includeAppLocal = state.isLocal,
             )
@@ -264,137 +263,141 @@ fun SettingsScreen(
             if (searching) {
                 SettingsSearchResultsInline(viewModel = searchViewModel, onNavigate = onNavigate)
             } else {
-
-            RadioConfigItemList(
-                state = state,
-                isManaged = localConfig.security?.is_managed ?: false,
-                isOtaCapable = isOtaCapable,
-                onClearResponse = viewModel::clearPacketResponse,
-                onRouteClick = { route ->
-                    val navRoute =
-                        when (route) {
-                            is ConfigRoute -> route.route
-                            is ModuleRoute -> route.route
-                            else -> null
-                        }
-                    navRoute?.let { onNavigate(it) }
-                },
-                onImport = {
-                    viewModel.clearPacketResponse()
-                    deviceProfile = null
-                    val intent =
-                        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                            addCategory(Intent.CATEGORY_OPENABLE)
-                            type = "application/*"
-                        }
-                    importConfigLauncher.launch(intent)
-                },
-                onExport = {
-                    viewModel.clearPacketResponse()
-                    deviceProfile = null
-                    showEditDeviceProfileDialog = true
-                },
-                databaseBackupAvailable = databaseBackup.available,
-                onBackupDatabase = databaseBackup.onBackup,
-                onRestoreDatabase = databaseBackup.onRestore,
-                onMergeDatabase = databaseBackup.onMerge,
-                onNavigate = onNavigate,
-                onSetSnifferEnabled = { viewModel.setSnifferEnabled(it) },
-            )
-
-            // App-local settings are only relevant when configuring the local node
-            if (state.isLocal) {
-                val provideLocation = settingsViewModel.provideLocation.collectAsStateWithLifecycle().value
-                // Ahead of the app settings block: onboarding runs once, so this is the only place a user who skipped
-                // or declined a permission can find their way back to it.
-                PermissionsSettingsContent(needsPreciseLocation = provideLocation)
-
-                ExpressiveSection(title = stringResource(Res.string.app_settings)) {
-                    PrivacySettingsContent(
-                        analyticsAvailable = appFunctionsAvailable,
-                        analyticsEnabled = viewModel.analyticsAllowedFlow.collectAsStateWithLifecycle(true).value,
-                        onToggleAnalytics = { viewModel.toggleAnalyticsAllowed() },
-                        provideLocation = provideLocation,
-                        onToggleLocation = { settingsViewModel.setProvideLocation(it) },
-                        homoglyphEnabled =
-                        viewModel.homoglyphEncodingEnabledFlow.collectAsStateWithLifecycle(false).value,
-                        onToggleHomoglyph = { viewModel.toggleHomoglyphCharactersEncodingEnabled() },
-                        startProvideLocation = { settingsViewModel.startProvidingLocation() },
-                        stopProvideLocation = { settingsViewModel.stopProvidingLocation() },
-                    )
-                    AppearanceSettingsContent(
-                        showFullMessageTimestamps = showFullMessageTimestamps,
-                        onShowFullMessageTimestampsChange = settingsViewModel::setShowFullMessageTimestamps,
-                        onShowLanguagePicker = { showLanguagePickerDialog = true },
-                        onShowThemePicker = { showThemePickerDialog = true },
-                        themeSummary = themeSummary(currentTheme),
-                        unitsSummary = stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
-                        onShowUnitsPicker = { showUnitsPickerDialog = true },
-                        uiScaleSummary = uiScaleLabel(uiScale),
-                        onShowUiScalePicker = { showUiScalePickerDialog = true },
-                    )
-                    PersistenceSettingsContent(
-                        cacheLimit = settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle().value,
-                        onCheckCacheLimitEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
-                        onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
-                        retentionDays = settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle().value,
-                        onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
-                        nodeShortName = ourNode?.user?.short_name ?: "",
-                        onExportData = { settingsViewModel.saveDataCsv(it.toKmpUri()) },
-                        onExportNodeDb = { settingsViewModel.saveNodeDbJson(it) },
-                    )
-                    // Wi-Fi provisioning reaches the device over BLE.
-                    if (isBluetoothSupported()) {
-                        ListItem(text = stringResource(Res.string.wifi_devices), leadingIcon = MeshtasticIcons.Wifi) {
-                            onNavigate(WifiProvisionRoute.WifiProvision())
-                        }
-                    }
-                    ListItem(
-                        text = stringResource(Res.string.filter_settings),
-                        leadingIcon = MeshtasticIcons.FilterList,
-                    ) {
-                        onNavigate(SettingsRoute.FilterSettings)
-                    }
-                    if (appFunctionsAvailable) {
-                        ListItem(
-                            text = stringResource(Res.string.app_functions_settings),
-                            supportingText = stringResource(Res.string.app_functions_settings_summary),
-                            leadingIcon = MeshtasticIcons.SettingsRemote,
-                        ) {
-                            onNavigate(SettingsRoute.AppFunctionsSettings)
-                        }
-                    }
-                }
-
-                NotificationLinkSection()
-
-                NotificationTestSection()
-
-                LiveUpdateSection()
-
-                AppInfoSection(
-                    appVersionName = settingsViewModel.appVersionName,
-                    hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
-                    onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
-                    onShowAppIntro = { settingsViewModel.showAppIntro() },
-                    onNavigateToAbout = { onNavigate(SettingsRoute.About) },
-                    onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
+                RadioConfigItemList(
+                    state = state,
+                    isManaged = localConfig.security?.is_managed ?: false,
+                    isOtaCapable = isOtaCapable,
+                    onClearResponse = viewModel::clearPacketResponse,
+                    onRouteClick = { route ->
+                        val navRoute =
+                            when (route) {
+                                is ConfigRoute -> route.route
+                                is ModuleRoute -> route.route
+                                else -> null
+                            }
+                        navRoute?.let { onNavigate(it) }
+                    },
+                    onImport = {
+                        viewModel.clearPacketResponse()
+                        deviceProfile = null
+                        val intent =
+                            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "application/*"
+                            }
+                        importConfigLauncher.launch(intent)
+                    },
+                    onExport = {
+                        viewModel.clearPacketResponse()
+                        deviceProfile = null
+                        showEditDeviceProfileDialog = true
+                    },
+                    databaseBackupAvailable = databaseBackup.available,
+                    onBackupDatabase = databaseBackup.onBackup,
+                    onRestoreDatabase = databaseBackup.onRestore,
+                    onMergeDatabase = databaseBackup.onMerge,
+                    onNavigate = onNavigate,
+                    onSetSnifferEnabled = { viewModel.setSnifferEnabled(it) },
                 )
-            }
 
-            ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
-                ListItem(
-                    text = stringResource(Res.string.help_and_documentation),
-                    leadingIcon = MeshtasticIcons.HelpOutline,
-                ) {
-                    onNavigate(SettingsRoute.HelpDocs)
-                }
+                // App-local settings are only relevant when configuring the local node
                 if (state.isLocal) {
-                    ListItem(text = stringResource(Res.string.device_links), leadingIcon = MeshtasticIcons.Device) {
-                        onNavigate(SettingsRoute.DeviceLinks)
+                    val provideLocation = settingsViewModel.provideLocation.collectAsStateWithLifecycle().value
+                    // Ahead of the app settings block: onboarding runs once, so this is the only place a user who
+                    // skipped
+                    // or declined a permission can find their way back to it.
+                    PermissionsSettingsContent(needsPreciseLocation = provideLocation)
+
+                    ExpressiveSection(title = stringResource(Res.string.app_settings)) {
+                        PrivacySettingsContent(
+                            analyticsAvailable = appFunctionsAvailable,
+                            analyticsEnabled = viewModel.analyticsAllowedFlow.collectAsStateWithLifecycle(true).value,
+                            onToggleAnalytics = { viewModel.toggleAnalyticsAllowed() },
+                            provideLocation = provideLocation,
+                            onToggleLocation = { settingsViewModel.setProvideLocation(it) },
+                            homoglyphEnabled =
+                            viewModel.homoglyphEncodingEnabledFlow.collectAsStateWithLifecycle(false).value,
+                            onToggleHomoglyph = { viewModel.toggleHomoglyphCharactersEncodingEnabled() },
+                            startProvideLocation = { settingsViewModel.startProvidingLocation() },
+                            stopProvideLocation = { settingsViewModel.stopProvidingLocation() },
+                        )
+                        AppearanceSettingsContent(
+                            showFullMessageTimestamps = showFullMessageTimestamps,
+                            onShowFullMessageTimestampsChange = settingsViewModel::setShowFullMessageTimestamps,
+                            onShowLanguagePicker = { showLanguagePickerDialog = true },
+                            onShowThemePicker = { showThemePickerDialog = true },
+                            themeSummary = themeSummary(currentTheme),
+                            unitsSummary =
+                            stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
+                            onShowUnitsPicker = { showUnitsPickerDialog = true },
+                            uiScaleSummary = uiScaleLabel(uiScale),
+                            onShowUiScalePicker = { showUiScalePickerDialog = true },
+                        )
+                        PersistenceSettingsContent(
+                            cacheLimit = settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle().value,
+                            onCheckCacheLimitEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
+                            onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
+                            retentionDays = settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle().value,
+                            onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
+                            nodeShortName = ourNode?.user?.short_name ?: "",
+                            onExportData = { settingsViewModel.saveDataCsv(it.toKmpUri()) },
+                            onExportNodeDb = { settingsViewModel.saveNodeDbJson(it) },
+                        )
+                        // Wi-Fi provisioning reaches the device over BLE.
+                        if (isBluetoothSupported()) {
+                            ListItem(
+                                text = stringResource(Res.string.wifi_devices),
+                                leadingIcon = MeshtasticIcons.Wifi,
+                            ) {
+                                onNavigate(WifiProvisionRoute.WifiProvision())
+                            }
+                        }
+                        ListItem(
+                            text = stringResource(Res.string.filter_settings),
+                            leadingIcon = MeshtasticIcons.FilterList,
+                        ) {
+                            onNavigate(SettingsRoute.FilterSettings)
+                        }
+                        if (appFunctionsAvailable) {
+                            ListItem(
+                                text = stringResource(Res.string.app_functions_settings),
+                                supportingText = stringResource(Res.string.app_functions_settings_summary),
+                                leadingIcon = MeshtasticIcons.SettingsRemote,
+                            ) {
+                                onNavigate(SettingsRoute.AppFunctionsSettings)
+                            }
+                        }
+                    }
+
+                    NotificationLinkSection()
+
+                    NotificationTestSection()
+
+                    LiveUpdateSection()
+
+                    AppInfoSection(
+                        appVersionName = settingsViewModel.appVersionName,
+                        hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+                        onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
+                        onShowAppIntro = { settingsViewModel.showAppIntro() },
+                        onNavigateToAbout = { onNavigate(SettingsRoute.About) },
+                        onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
+                    )
+                }
+
+                ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
+                    ListItem(
+                        text = stringResource(Res.string.help_and_documentation),
+                        leadingIcon = MeshtasticIcons.HelpOutline,
+                    ) {
+                        onNavigate(SettingsRoute.HelpDocs)
+                    }
+                    if (state.isLocal) {
+                        ListItem(text = stringResource(Res.string.device_links), leadingIcon = MeshtasticIcons.Device) {
+                            onNavigate(SettingsRoute.DeviceLinks)
+                        }
                     }
                 }
-            }
             }
         }
     }

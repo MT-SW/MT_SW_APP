@@ -31,17 +31,17 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.prefs.cachedFlow
 import org.meshtastic.core.prefs.di.UiDataStore
-import org.meshtastic.core.repository.AppUpdatePrefs
-import org.meshtastic.core.repository.AutoCleanNodesPolicy
-import org.meshtastic.core.repository.DATA_NOTICE_VERSION
 import org.meshtastic.core.prefs.store.PrefsSnapshot
 import org.meshtastic.core.prefs.store.booleanPrefsKey
 import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.longPrefsKey
 import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.prefs.store.stringSetPrefsKey
+import org.meshtastic.core.repository.AppUpdatePrefs
+import org.meshtastic.core.repository.AutoCleanNodesPolicy
+import org.meshtastic.core.repository.DATA_NOTICE_VERSION
 import org.meshtastic.core.repository.NodeFilterPrefs
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.prefs.store.longPrefsKey
 
 @Single
 @Suppress("TooManyFunctions")

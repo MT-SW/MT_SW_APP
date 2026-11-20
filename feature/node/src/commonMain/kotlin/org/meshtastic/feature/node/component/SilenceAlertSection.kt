@@ -47,7 +47,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlin.time.DurationUnit
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -80,6 +79,7 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
 import org.meshtastic.core.ui.icon.Save
+import kotlin.time.DurationUnit
 
 /** Ready choices, in minutes: from an hour up to a month. Any other time can be typed in hours. */
 private val SILENCE_CHOICES_MINUTES = listOf(60, 120, 180, 360, 720, 1_440, 2_880, 4_320, 7_200, 10_080, 20_160, 43_200)

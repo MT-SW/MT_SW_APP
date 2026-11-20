@@ -54,7 +54,9 @@ class InProcessMessageQueue(
     }
 
     // MT_SW: the computer cleans the node list itself (DesktopNodeCleanupScheduler), so there is nothing to schedule.
-    override fun scheduleNodeCleanup(intervalDays: Int) {}
+    override fun scheduleNodeCleanup(intervalDays: Int) {
+        // Nothing to schedule.
+    }
 
     // A failed or cancelled send rolls its claim back (NonCancellable in the repository); cancellation is rethrown.
     @Suppress("SuspendFunSwallowedCancellation")

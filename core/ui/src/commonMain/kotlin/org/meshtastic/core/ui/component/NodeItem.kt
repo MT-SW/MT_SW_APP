@@ -127,6 +127,7 @@ internal fun rememberRefreshIcon(): ImageVector = remember {
         }
         .build()
 }
+
 const val NODE_ITEM_ELEVATION_TAG = "NodeItemElevation"
 
 @Composable

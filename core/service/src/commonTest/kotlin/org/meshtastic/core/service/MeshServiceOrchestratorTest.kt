@@ -40,14 +40,11 @@ import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.ConnectionState
-import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.DeviceBadge
-import org.meshtastic.core.repository.MeshConfigHandler
 import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeManager
-import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioInterfaceService

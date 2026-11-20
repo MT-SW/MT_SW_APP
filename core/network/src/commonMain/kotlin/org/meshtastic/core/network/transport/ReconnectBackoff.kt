@@ -64,6 +64,7 @@ internal class ReconnectBackoff(
 
     companion object {
         const val MIN_BACKOFF_MILLIS = 1_000L
+
         // MT_SW: a device must come back quickly once it is reachable again, so the wait grows only up to 15 s.
         const val MAX_BACKOFF_MILLIS = 15 * 1_000L
 

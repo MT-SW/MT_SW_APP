@@ -95,5 +95,6 @@ wire {
     sourcePath { srcDir("src/commonMain/proto") }
     kotlin { boxOneOfsMinSize = 5000 }
 }
+
 // Kotlin/Wasm prints 1.0 as "1", so the formatter shows "1 km" where the JVM shows "1.0 km".
 meshtasticWeb.browserTestExclusions.add("*DistanceExtensionsTest.metres switch to kilometres at the threshold")

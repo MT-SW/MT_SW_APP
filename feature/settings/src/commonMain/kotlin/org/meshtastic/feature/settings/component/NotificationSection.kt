@@ -31,13 +31,13 @@ import org.meshtastic.core.resources.meshtastic_reactions_notifications
 import org.meshtastic.core.resources.meshtastic_waypoints_notifications
 import org.meshtastic.core.resources.notification_sound_while_open
 import org.meshtastic.core.resources.notifications_alerts
+import org.meshtastic.core.resources.notifications_blocked_by_browser
 import org.meshtastic.core.resources.notifications_node_active
 import org.meshtastic.core.resources.notifications_node_silence
 import org.meshtastic.core.resources.notifications_radio_notices
-import org.meshtastic.core.resources.notifications_updates
-import org.meshtastic.core.resources.notifications_blocked_by_browser
 import org.meshtastic.core.resources.notifications_turn_on
 import org.meshtastic.core.resources.notifications_turn_on_summary
+import org.meshtastic.core.resources.notifications_updates
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.AddReaction
@@ -46,13 +46,13 @@ import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
+import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.core.ui.icon.SystemUpdate
 import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.core.ui.icon.Warning
-import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.util.PermissionStatus
 import org.meshtastic.core.ui.util.PermissionUiState
 
@@ -74,6 +74,7 @@ fun NotificationSection(
     onToggleReactions: (Boolean) -> Unit,
     newWaypointsEnabled: Boolean,
     onToggleNewWaypoints: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     alertsEnabled: Boolean = true,
     onToggleAlerts: (Boolean) -> Unit = {},
     radioNoticesEnabled: Boolean = true,
@@ -87,7 +88,6 @@ fun NotificationSection(
     showSoundWhileOpen: Boolean = false,
     soundWhileOpen: Boolean = false,
     onToggleSoundWhileOpen: (Boolean) -> Unit = {},
-    modifier: Modifier = Modifier,
     permission: PermissionUiState? = null,
 ) {
     ExpressiveSection(title = stringResource(Res.string.app_notifications), modifier = modifier) {

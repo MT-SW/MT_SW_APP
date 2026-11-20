@@ -60,7 +60,9 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.theme.MODE_DARK
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
+import org.meshtastic.core.ui.theme.MODE_LIGHT
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.MODE_VERY_VIVID
@@ -70,8 +72,6 @@ import org.meshtastic.core.ui.theme.MODE_VIVID
 import org.meshtastic.core.ui.theme.MODE_VIVID_DARK
 import org.meshtastic.core.ui.theme.MODE_VIVID_LIGHT
 import org.meshtastic.core.ui.theme.themePreviewColors
-import org.meshtastic.core.ui.theme.MODE_DARK
-import org.meshtastic.core.ui.theme.MODE_LIGHT
 
 /** Theme modes that match AppCompatDelegate constants for cross-platform use. */
 enum class ThemeOption(val label: StringResource, val mode: Int) {

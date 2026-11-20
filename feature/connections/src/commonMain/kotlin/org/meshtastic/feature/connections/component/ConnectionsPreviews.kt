@@ -38,7 +38,6 @@ import org.meshtastic.core.model.TransportFailure
 import org.meshtastic.core.model.TransportFailureKind
 import org.meshtastic.core.model.TransportPhase
 import org.meshtastic.core.model.TransportStatus
-import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 import org.meshtastic.feature.connections.model.DeviceListEntry

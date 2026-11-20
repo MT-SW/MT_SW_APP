@@ -58,9 +58,9 @@ import org.meshtastic.core.resources.console_cmd_status_summary
 import org.meshtastic.core.resources.console_cmd_status_usage
 import org.meshtastic.core.resources.console_out_bridge_changed
 import org.meshtastic.core.resources.console_out_bridge_none
-import org.meshtastic.core.resources.console_out_bridge_unselected
 import org.meshtastic.core.resources.console_out_bridge_off
 import org.meshtastic.core.resources.console_out_bridge_on
+import org.meshtastic.core.resources.console_out_bridge_unselected
 import org.meshtastic.core.resources.console_out_disconnecting
 import org.meshtastic.core.resources.console_out_help_header
 import org.meshtastic.core.resources.console_out_help_usage

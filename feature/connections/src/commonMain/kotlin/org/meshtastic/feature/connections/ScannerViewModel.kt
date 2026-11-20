@@ -189,6 +189,7 @@ open class ScannerViewModel(
      * starts by itself whenever the pane is opened, also while a radio is connected (to add another one).
      */
     open val scansBluetoothOnEntry: Boolean = false
+
     /** A card naming which transports this platform lacks and where to find them, or null when it needs none. */
     open val unsupportedTransportNotice: StringResource? = null
 

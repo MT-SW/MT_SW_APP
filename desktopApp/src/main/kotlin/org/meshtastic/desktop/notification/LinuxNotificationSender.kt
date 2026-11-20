@@ -22,11 +22,11 @@ import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.Structure
 import com.sun.jna.ptr.PointerByReference
+import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.Notification
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.meshtastic.core.navigation.NotificationDeepLinks
 
 /**
  * JNA bindings for libnotify (libnotify.so / libnotify-4.so).

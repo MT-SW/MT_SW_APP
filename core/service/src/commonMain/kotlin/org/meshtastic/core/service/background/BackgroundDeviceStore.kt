@@ -77,7 +77,11 @@ internal class BackgroundDeviceStore(private val address: String, private val da
                 // the same settings.
                 if (loraNow != null) {
                     val old = db.channelSetDao().get()
-                    val set = (old?.channelSet ?: ChannelSet.Builder().build()).newBuilder().also { it.lora_config = loraNow }.build()
+                    val set =
+                        (old?.channelSet ?: ChannelSet.Builder().build())
+                            .newBuilder()
+                            .also { it.lora_config = loraNow }
+                            .build()
                     db.channelSetDao().upsert(old?.copy(channelSet = set) ?: ChannelSetEntity(channelSet = set))
                 }
                 val dao = db.nodeInfoDao()
@@ -91,11 +95,15 @@ internal class BackgroundDeviceStore(private val address: String, private val da
                     else -> {
                         dao.setMyNodeInfo(mine.toEntity(metadata, existing.currentPacketId))
                         val known = dao.getNodeEntitiesByNums(nodes.keys.toList()).associateBy { it.num }
-                        dao.putAll(nodes.values.map { info -> known[info.num]?.also { info.mergeInto(it) } ?: info.toNew() })
+                        dao.putAll(
+                            nodes.values.map { info -> known[info.num]?.also { info.mergeInto(it) } ?: info.toNew() },
+                        )
                     }
                 }
             }
-        if (written == null) Logger.d { "Background device: its own data was not written (the device is shown in the app)" }
+        if (written == null) {
+            Logger.d { "Background device: its own data was not written (the device is shown in the app)" }
+        }
     }
 
     private fun MyNodeInfo.toEntity(metadata: DeviceMetadata?, packetId: Long) = MyNodeEntity(

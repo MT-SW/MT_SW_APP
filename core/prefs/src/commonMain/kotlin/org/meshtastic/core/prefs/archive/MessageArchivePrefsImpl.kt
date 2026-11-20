@@ -26,9 +26,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.repository.MessageArchiveConfig
 import org.meshtastic.core.repository.MessageArchivePrefs
-import org.meshtastic.core.prefs.store.stringPrefsKey
 
 @Single
 class MessageArchivePrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDispatchers) :

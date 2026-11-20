@@ -48,10 +48,16 @@ object DatabaseStatsSync {
             Logger.d { "Statistics sync paused: the two devices are not (known to be) on the same radio settings" }
             return 0
         }
+        val written = syncCommonNodes(a, b)
+        if (written > 0) Logger.i { "Statistics sync between two device databases: $written entries" }
+        return written
+    }
+
+    /** Copies what is missing between the nodes both databases know, and their history. Returns the rows written. */
+    private suspend fun syncCommonNodes(a: MeshtasticDatabase, b: MeshtasticDatabase): Int {
         val nodesA = a.nodeInfoDao().getAllNodesSnapshot().associateBy { it.num }
         val nodesB = b.nodeInfoDao().getAllNodesSnapshot().associateBy { it.num }
         val common = nodesA.keys.intersect(nodesB.keys).toList()
-        if (common.isEmpty()) return 0
         var written = 0
         val toA = ArrayList<NodeEntity>()
         val toB = ArrayList<NodeEntity>()
@@ -76,14 +82,15 @@ object DatabaseStatsSync {
             if (missingInB.isNotEmpty()) b.meshLogDao().insertIgnore(missingInB.map(::withoutReception))
             written += missingInA.size + missingInB.size
         }
-        if (written > 0) Logger.i { "Statistics sync between two device databases: $written entries" }
         return written
     }
 
     private suspend fun sameRadioSettings(a: MeshtasticDatabase, b: MeshtasticDatabase): Boolean {
-        val loraA = a.channelSetDao().get()?.channelSet?.lora_config ?: return false
-        val loraB = b.channelSetDao().get()?.channelSet?.lora_config ?: return false
-        return loraA.region == loraB.region &&
+        val loraA = a.channelSetDao().get()?.channelSet?.lora_config
+        val loraB = b.channelSetDao().get()?.channelSet?.lora_config
+        return loraA != null &&
+            loraB != null &&
+            loraA.region == loraB.region &&
             loraA.use_preset == loraB.use_preset &&
             loraA.modem_preset == loraB.modem_preset &&
             loraA.bandwidth == loraB.bandwidth &&
@@ -97,10 +104,14 @@ object DatabaseStatsSync {
     /** What one radio heard (signal strength and SNR) is never copied to another radio: it would falsify its charts. */
     private fun withoutReception(log: MeshLog): MeshLog {
         val packet = log.fromRadio.packet ?: return log
-        val cleaned = packet.newBuilder().also {
-            it.rx_rssi = null
-            it.rx_snr = Float.NaN
-        }.build()
+        val cleaned =
+            packet
+                .newBuilder()
+                .also {
+                    it.rx_rssi = null
+                    it.rx_snr = Float.NaN
+                }
+                .build()
         return log.copy(fromRadio = log.fromRadio.newBuilder().also { it.packet = cleaned }.build())
     }
 

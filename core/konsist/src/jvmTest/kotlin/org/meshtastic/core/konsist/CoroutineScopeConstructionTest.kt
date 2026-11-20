@@ -83,7 +83,6 @@ class CoroutineScopeConstructionTest {
             "core/service/commonMain/SharedRadioInterfaceService.kt",
             "core/takserver/jvmAndroidMain/TAKClientConnection.kt",
             "desktopApp/main/DesktopLogging.kt",
-            "desktopApp/main/DesktopMessageQueue.kt",
             "desktopApp/main/DesktopPreferencesDataSource.kt",
             "desktopApp/main/NoopStubs.kt",
             "feature/discovery/commonMain/DiscoveryScanEngine.kt",
@@ -109,6 +108,7 @@ class CoroutineScopeConstructionTest {
             "feature/wifi-provision/commonMain/NymeaWifiService.kt",
             "iosShared/iosMain/IosLogControl.kt",
             "iosShared/iosMain/IosMessageQueue.kt",
+            "iosShared/iosMain/IosNotificationManager.kt",
             "iosShared/iosMain/IosSosAlarmSound.kt",
         )
 

@@ -43,7 +43,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlin.time.DurationUnit
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.nowMillis
@@ -63,6 +62,7 @@ import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.StyledCard
 import org.meshtastic.core.ui.component.drawChartBar
 import org.meshtastic.core.ui.component.rememberChartStyle
+import kotlin.time.DurationUnit
 
 /**
  * The availability history of one node: a bar per time slot, filled when a packet from the node was recorded in it and

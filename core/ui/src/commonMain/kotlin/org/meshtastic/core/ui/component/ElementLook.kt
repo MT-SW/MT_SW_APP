@@ -115,8 +115,12 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         ElementLook.GLASS ->
             when (group) {
                 in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
-                UiOptions.GROUP_BUBBLES, UiOptions.GROUP_INPUT ->
+
+                UiOptions.GROUP_BUBBLES,
+                UiOptions.GROUP_INPUT,
+                ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
+
                 else -> softShadow(options.glassShadowDp(), shape, isDarkSurface())
             }
 
@@ -125,8 +129,12 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         ElementLook.TRANSPARENT ->
             when (group) {
                 in CARD_GROUPS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
-                UiOptions.GROUP_BUBBLES, UiOptions.GROUP_INPUT ->
+
+                UiOptions.GROUP_BUBBLES,
+                UiOptions.GROUP_INPUT,
+                ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
+
                 else -> this
             }
 
@@ -172,67 +180,67 @@ internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
  * and on translucent panes, which made glass look flat. Nothing is drawn inside the shape itself, so see-through glass
  * stays clean.
  */
-internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifier =
-    if (dp <= 0f) {
-        this
-    } else {
-        drawBehind {
-            val outline = shape.createOutline(size, layoutDirection, this)
-            // The shadow follows every corner of the shape (a message bubble has corners of different sizes).
-            val box =
+internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifier = if (dp <= 0f) {
+    this
+} else {
+    drawBehind {
+        val outline = shape.createOutline(size, layoutDirection, this)
+        // The shadow follows every corner of the shape (a message bubble has corners of different sizes).
+        val box =
+            when (outline) {
+                is Outline.Rounded -> outline.roundRect
+                is Outline.Rectangle -> RoundRect(outline.rect)
+                is Outline.Generic -> RoundRect(outline.path.getBounds())
+            }
+        val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
+        val tint = if (dark) Color.White else Color.Black
+        val hole =
+            Path().apply {
                 when (outline) {
-                    is Outline.Rounded -> outline.roundRect
-                    is Outline.Rectangle -> RoundRect(outline.rect)
-                    is Outline.Generic -> RoundRect(outline.path.getBounds())
-                }
-            val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
-            val tint = if (dark) Color.White else Color.Black
-            val hole =
-                Path().apply {
-                    when (outline) {
-                        is Outline.Rectangle -> addRect(outline.rect)
-                        is Outline.Rounded -> addRoundRect(outline.roundRect)
-                        is Outline.Generic -> addPath(outline.path)
-                    }
-                }
-            // Two shadows make it look three-dimensional: a wide soft one, and a tight one right at the edge.
-            // On a dark theme the glow is lighter than the background, so it is pushed down: it reads as a shadow
-            // under the element (a light ring all around would look like a second outline).
-            fun DrawScope.layers(grownBy: Float, drop: Float, topShare: Float, strength: Float) {
-                for (i in SHADOW_LAYERS downTo 1) {
-                    val grow = grownBy * i / SHADOW_LAYERS
-                    val shift = grownBy * drop
-                    // The layers add up to a shadow that fades out smoothly (quadratically) away from the edge.
-                    val inner = 1f - (i - 1f) / SHADOW_LAYERS
-                    val outer = 1f - i.toFloat() / SHADOW_LAYERS
-                    val alpha = strength * (inner * inner - outer * outer)
-                    fun widen(r: CornerRadius) =
-                        if (r.x > 0f || r.y > 0f) CornerRadius(r.x + grow, r.y + grow) else CornerRadius.Zero
-                    val layer =
-                        RoundRect(
-                            left = box.left - grow,
-                            top = box.top - grow * topShare + shift,
-                            right = box.right + grow,
-                            bottom = box.bottom + grow + shift,
-                            topLeftCornerRadius = widen(box.topLeftCornerRadius),
-                            topRightCornerRadius = widen(box.topRightCornerRadius),
-                            bottomRightCornerRadius = widen(box.bottomRightCornerRadius),
-                            bottomLeftCornerRadius = widen(box.bottomLeftCornerRadius),
-                        )
-                    drawPath(Path().apply { addRoundRect(layer) }, color = tint.copy(alpha = alpha))
+                    is Outline.Rectangle -> addRect(outline.rect)
+                    is Outline.Rounded -> addRoundRect(outline.roundRect)
+                    is Outline.Generic -> addPath(outline.path)
                 }
             }
-            clipPath(hole, ClipOp.Difference) {
-                if (dark) {
-                    layers(reach, DARK_DROP, DARK_TOP_SHARE, DARK_GLOW_ALPHA)
-                    layers(reach * CONTACT_REACH, CONTACT_DROP, DARK_TOP_SHARE, DARK_CONTACT_ALPHA)
-                } else {
-                    layers(reach, SHADOW_DROP, 1f, SHADOW_ALPHA)
-                    layers(reach * CONTACT_REACH, CONTACT_DROP, CONTACT_TOP_SHARE, SHADOW_CONTACT_ALPHA)
-                }
+
+        // Two shadows make it look three-dimensional: a wide soft one, and a tight one right at the edge.
+        // On a dark theme the glow is lighter than the background, so it is pushed down: it reads as a shadow
+        // under the element (a light ring all around would look like a second outline).
+        fun DrawScope.layers(grownBy: Float, drop: Float, topShare: Float, strength: Float) {
+            for (i in SHADOW_LAYERS downTo 1) {
+                val grow = grownBy * i / SHADOW_LAYERS
+                val shift = grownBy * drop
+                // The layers add up to a shadow that fades out smoothly (quadratically) away from the edge.
+                val inner = 1f - (i - 1f) / SHADOW_LAYERS
+                val outer = 1f - i.toFloat() / SHADOW_LAYERS
+                val alpha = strength * (inner * inner - outer * outer)
+                fun widen(r: CornerRadius) =
+                    if (r.x > 0f || r.y > 0f) CornerRadius(r.x + grow, r.y + grow) else CornerRadius.Zero
+                val layer =
+                    RoundRect(
+                        left = box.left - grow,
+                        top = box.top - grow * topShare + shift,
+                        right = box.right + grow,
+                        bottom = box.bottom + grow + shift,
+                        topLeftCornerRadius = widen(box.topLeftCornerRadius),
+                        topRightCornerRadius = widen(box.topRightCornerRadius),
+                        bottomRightCornerRadius = widen(box.bottomRightCornerRadius),
+                        bottomLeftCornerRadius = widen(box.bottomLeftCornerRadius),
+                    )
+                drawPath(Path().apply { addRoundRect(layer) }, color = tint.copy(alpha = alpha))
+            }
+        }
+        clipPath(hole, ClipOp.Difference) {
+            if (dark) {
+                layers(reach, DARK_DROP, DARK_TOP_SHARE, DARK_GLOW_ALPHA)
+                layers(reach * CONTACT_REACH, CONTACT_DROP, DARK_TOP_SHARE, DARK_CONTACT_ALPHA)
+            } else {
+                layers(reach, SHADOW_DROP, 1f, SHADOW_ALPHA)
+                layers(reach * CONTACT_REACH, CONTACT_DROP, CONTACT_TOP_SHARE, SHADOW_CONTACT_ALPHA)
             }
         }
     }
+}
 
 private const val SHADOW_LAYERS = 24
 private const val CONTACT_REACH = 0.3f
@@ -454,7 +462,8 @@ fun StyledSurface(
                         seeThroughAlpha(style.strength)
                     },
                 ),
-                shadowElevation = if (style.look != ElementLook.GLASS && floating && castShadow) FLAT_SHADOW_DP.dp else 0.dp,
+                shadowElevation =
+                if (style.look != ElementLook.GLASS && floating && castShadow) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
 

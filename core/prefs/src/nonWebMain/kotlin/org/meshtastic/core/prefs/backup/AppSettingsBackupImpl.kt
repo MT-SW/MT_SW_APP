@@ -107,8 +107,7 @@ class AppSettingsBackupImpl(
             put("scope", scope.name.lowercase())
             putJsonObject("stores") {
                 for ((name, store) in stores) {
-                    val entries =
-                        store.read().entries.filter { included(scope, name, it.key) }.sortedBy { it.key }
+                    val entries = store.read().entries.filter { included(scope, name, it.key) }.sortedBy { it.key }
                     if (entries.isEmpty()) continue
                     putJsonObject(name) { entries.forEach { (key, value) -> encode(value)?.let { put(key, it) } } }
                 }
@@ -198,7 +197,9 @@ class AppSettingsBackupImpl(
     }
         .getOrNull()
 
-    /** One preference store as a flat map of key to value, so the PrefsStore ones and the DataStore one export alike. */
+    /**
+     * One preference store as a flat map of key to value, so the PrefsStore ones and the DataStore one export alike.
+     */
     private interface BackupStore {
         suspend fun read(): Map<String, Any>
 

@@ -46,8 +46,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
@@ -65,12 +65,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.ui.viewmodel.RadioChooserViewModel
 import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshActivity
@@ -95,6 +94,7 @@ import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.AppIconBadge
 import org.meshtastic.core.ui.util.MapViewReset
 import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
+import org.meshtastic.core.ui.viewmodel.RadioChooserViewModel
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 
 /**

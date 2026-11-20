@@ -18,15 +18,15 @@ package org.meshtastic.core.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
@@ -168,7 +168,9 @@ class RadioChooserViewModel(
             radioPrefs.devAddr.collect { address ->
                 val before = previous
                 previous = address
-                if (before != null && before != address && isValidDeviceAddress(before) && isValidDeviceAddress(address)) {
+                if (
+                    before != null && before != address && isValidDeviceAddress(before) && isValidDeviceAddress(address)
+                ) {
                     switchingState.value = true
                     launch {
                         delay(SWITCH_MIN_MS)

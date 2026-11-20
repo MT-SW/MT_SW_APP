@@ -33,10 +33,10 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgePrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
-import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /**
  * The bridge settings, one entry per saved radio, in the settings store of the app (so they are part of the settings

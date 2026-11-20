@@ -26,15 +26,15 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.prefs.store.booleanPrefsKey
+import org.meshtastic.core.prefs.store.intPrefsKey
+import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.repository.SosAlarmStyle
 import org.meshtastic.core.repository.SosBarScreens
 import org.meshtastic.core.repository.SosConfig
 import org.meshtastic.core.repository.SosPrefs
 import org.meshtastic.core.repository.SosQuietHours
 import org.meshtastic.core.repository.SosTargets
-import org.meshtastic.core.prefs.store.booleanPrefsKey
-import org.meshtastic.core.prefs.store.intPrefsKey
-import org.meshtastic.core.prefs.store.stringPrefsKey
 
 @Suppress("TooManyFunctions")
 @Single

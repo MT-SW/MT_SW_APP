@@ -52,52 +52,51 @@ class IosMeshLocationManager(
         this.scope = scope
         this.sendPositionFn = sendPositionFn
         if (job?.isActive == true) return
-        job =
-            scope.launch {
-                launch {
-                    combine(radioConfigRepository.channelSetFlow, radioConfigRepository.localConfigFlow) {
-                            channels,
-                            config,
-                        ->
-                        stillnessCellBits(channels.settings, config.device?.role)
-                    }
-                        .collect { cellBits.value = it }
+        job = scope.launch {
+            launch {
+                combine(radioConfigRepository.channelSetFlow, radioConfigRepository.localConfigFlow) {
+                        channels,
+                        config,
+                    ->
+                    stillnessCellBits(channels.settings, config.device?.role)
                 }
-                feedWhileMoving(
-                    fixes = {
-                        provider
-                            .locationUpdates()
-                            .mapNotNull { if (it.permissionGranted) it.location else null }
-                            .distinctUntilChanged { a, b -> a.timeMillis == b.timeMillis }
-                            .mapNotNull { loc ->
-                                Location(
-                                    latitude = loc.latitude,
-                                    longitude = loc.longitude,
-                                    altitudeMeters = loc.altitude,
-                                    mslAltitudeMeters = loc.mslAltitude,
-                                    accuracyMeters = loc.accuracyM,
-                                    speedMetersPerSecond = loc.speedMps,
-                                    timeMillis = loc.timeMillis,
-                                )
-                            }
-                    },
-                    cellBits = cellBits,
-                    awaitMotion = { awaitSignificantMotion() },
-                ) { loc ->
-                    sendPositionFn(
-                        phonePosition(
-                            latitude = loc.latitude,
-                            longitude = loc.longitude,
-                            timeMillis = loc.timeMillis,
-                            mslAltitudeMeters = loc.mslAltitudeMeters,
-                            haeAltitudeMeters = loc.altitudeMeters,
-                            speedMetersPerSecond = loc.speedMetersPerSecond,
-                            bearingDegrees = null,
-                        ),
-                    )
-                }
-                coroutineContext.cancelChildren()
+                    .collect { cellBits.value = it }
             }
+            feedWhileMoving(
+                fixes = {
+                    provider
+                        .locationUpdates()
+                        .mapNotNull { if (it.permissionGranted) it.location else null }
+                        .distinctUntilChanged { a, b -> a.timeMillis == b.timeMillis }
+                        .mapNotNull { loc ->
+                            Location(
+                                latitude = loc.latitude,
+                                longitude = loc.longitude,
+                                altitudeMeters = loc.altitude,
+                                mslAltitudeMeters = loc.mslAltitude,
+                                accuracyMeters = loc.accuracyM,
+                                speedMetersPerSecond = loc.speedMps,
+                                timeMillis = loc.timeMillis,
+                            )
+                        }
+                },
+                cellBits = cellBits,
+                awaitMotion = { awaitSignificantMotion() },
+            ) { loc ->
+                sendPositionFn(
+                    phonePosition(
+                        latitude = loc.latitude,
+                        longitude = loc.longitude,
+                        timeMillis = loc.timeMillis,
+                        mslAltitudeMeters = loc.mslAltitudeMeters,
+                        haeAltitudeMeters = loc.altitudeMeters,
+                        speedMetersPerSecond = loc.speedMetersPerSecond,
+                        bearingDegrees = null,
+                    ),
+                )
+            }
+            coroutineContext.cancelChildren()
+        }
     }
 
     override fun restart() {

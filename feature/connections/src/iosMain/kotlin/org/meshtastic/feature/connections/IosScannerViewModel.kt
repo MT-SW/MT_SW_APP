@@ -17,14 +17,14 @@
 package org.meshtastic.feature.connections
 
 import org.koin.core.annotation.KoinViewModel
-import org.meshtastic.feature.connections.data.PendingFirmwareRecoverySource
-import org.meshtastic.feature.connections.data.RecentAddressesSource
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.feature.connections.data.PendingFirmwareRecoverySource
+import org.meshtastic.feature.connections.data.RecentAddressesSource
 import org.meshtastic.feature.connections.model.GetDiscoveredDevicesUseCase
 
 /**

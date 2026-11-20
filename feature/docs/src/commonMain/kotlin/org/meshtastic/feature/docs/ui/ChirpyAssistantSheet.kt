@@ -68,7 +68,6 @@ import com.mikepenz.markdown.m3.Markdown
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.resources.Res as CoreRes
 import org.meshtastic.core.resources.chirpy
 import org.meshtastic.core.resources.chirpy_assistant_title
 import org.meshtastic.core.resources.chirpy_checking
@@ -91,6 +90,7 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.ChirpyMessage
 import org.meshtastic.feature.docs.model.ChirpyRole
 import org.meshtastic.feature.docs.model.ModelReadiness
+import org.meshtastic.core.resources.Res as CoreRes
 
 /** Chirpy AI Assistant bottom sheet with chat UI. Hidden entirely when the assistant reports unsupported. */
 @OptIn(ExperimentalMaterial3Api::class)

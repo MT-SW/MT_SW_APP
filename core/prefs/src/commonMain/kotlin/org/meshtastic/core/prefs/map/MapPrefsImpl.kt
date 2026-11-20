@@ -27,13 +27,13 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.MapDataStore
-import org.meshtastic.core.repository.HorizonPrefs
 import org.meshtastic.core.prefs.store.PrefsSnapshot
 import org.meshtastic.core.prefs.store.booleanPrefsKey
 import org.meshtastic.core.prefs.store.doublePrefsKey
 import org.meshtastic.core.prefs.store.intPrefsKey
 import org.meshtastic.core.prefs.store.longPrefsKey
 import org.meshtastic.core.prefs.store.stringSetPrefsKey
+import org.meshtastic.core.repository.HorizonPrefs
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapFilterPrefs
 import org.meshtastic.core.repository.MapPrefs

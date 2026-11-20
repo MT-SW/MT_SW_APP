@@ -27,12 +27,12 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
-import org.meshtastic.core.repository.SosHistory
-import org.meshtastic.core.repository.SosHistoryCodec
-import org.meshtastic.core.repository.SosHistoryEntry
 import org.meshtastic.core.prefs.store.PrefsSnapshot
 import org.meshtastic.core.prefs.store.intPrefsKey
 import org.meshtastic.core.prefs.store.stringPrefsKey
+import org.meshtastic.core.repository.SosHistory
+import org.meshtastic.core.repository.SosHistoryCodec
+import org.meshtastic.core.repository.SosHistoryEntry
 
 /**
  * The history of received SOS, kept in the same store as the other SOS settings. With [keepDays] set, entries older

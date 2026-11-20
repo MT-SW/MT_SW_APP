@@ -19,5 +19,4 @@ package org.meshtastic.core.ui.util
 import androidx.compose.runtime.Composable
 
 /** On iPhone the number is kept by the notification manager (it also changes while no screen is shown). */
-@Composable
-actual fun AppIconBadge(count: Int) = Unit
+@Composable actual fun AppIconBadge(count: Int) = Unit

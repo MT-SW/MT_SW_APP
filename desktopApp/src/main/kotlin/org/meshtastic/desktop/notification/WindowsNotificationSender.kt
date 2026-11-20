@@ -17,11 +17,11 @@
 package org.meshtastic.desktop.notification
 
 import co.touchlab.kermit.Logger
+import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.Notification
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.meshtastic.core.navigation.NotificationDeepLinks
 
 private const val PROCESS_TIMEOUT_SECONDS = 5L
 

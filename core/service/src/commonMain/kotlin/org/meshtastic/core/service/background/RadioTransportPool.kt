@@ -110,6 +110,11 @@ class RadioTransportPool(
             target()?.onDisconnect(isPermanent, errorMessage, reason)
         }
 
+        // MT_SW: the progress of the connection (waiting to retry, pairing needed, ...) goes on to whoever holds the link.
+        override fun onStatus(status: TransportStatus) {
+            target()?.onStatus(status)
+        }
+
         override fun handleFromRadio(bytes: ByteArray) {
             entry.mirror.onFromRadio(bytes)
             target()?.handleFromRadio(bytes)

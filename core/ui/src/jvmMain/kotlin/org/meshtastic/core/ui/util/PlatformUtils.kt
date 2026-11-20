@@ -22,9 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
-import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
-import org.meshtastic.core.resources.getStringSuspend
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame

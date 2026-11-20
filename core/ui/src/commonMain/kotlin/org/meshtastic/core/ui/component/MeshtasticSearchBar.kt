@@ -220,7 +220,8 @@ private fun InlineSearchField(
     trailingActions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // MT_SW: the field follows the glass look of the search group: grey while empty, tinted in the colour of the buttons
+    // MT_SW: the field follows the glass look of the search group: grey while empty, tinted in the colour of the
+    // buttons
     // (the theme's gold) as soon as something is typed, so it is visible that the list below is being filtered. Its
     // colour has a gentle gradient (lighter at the top, darker at the bottom) like the buttons, for a 3D feel. The
     // field is drawn by hand, so its inside has exactly the colour of the whole bar.
@@ -268,7 +269,8 @@ private fun InlineSearchField(
                 .background(gradient)
                 .drawWithContent {
                     drawContent()
-                    // A thin bright edge that is strongest along the top and fades out downwards: the pane looks raised.
+                    // A thin bright edge that is strongest along the top and fades out downwards: the pane looks
+                    // raised.
                     val outline = shape.createOutline(size, layoutDirection, this)
                     drawOutline(
                         outline = outline,

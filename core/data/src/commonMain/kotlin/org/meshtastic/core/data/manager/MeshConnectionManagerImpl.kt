@@ -39,9 +39,9 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.TelemetryType
-import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.TransportPhase
 import org.meshtastic.core.model.TransportStatus
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.repository.AdminRequestRegistry
 import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.CommandSender

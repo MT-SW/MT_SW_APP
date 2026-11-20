@@ -26,10 +26,10 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.prefs.store.stringPrefsKey
 import org.meshtastic.core.repository.SosAckCodec
 import org.meshtastic.core.repository.SosAckEntry
 import org.meshtastic.core.repository.SosAcks
-import org.meshtastic.core.prefs.store.stringPrefsKey
 
 /** The answers of recipients to the SOS we sent last, kept in the same store as the other SOS settings. */
 @Single

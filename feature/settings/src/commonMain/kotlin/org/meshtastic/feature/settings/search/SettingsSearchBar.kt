@@ -31,10 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,7 +61,6 @@ const val SETTINGS_SEARCH_BAR_INPUT_FIELD_TAG = "SettingsSearchBarInputField"
 @Composable
 fun SettingsSearchBar(
     viewModel: SettingsSearchViewModel,
-    onNavigate: (Route) -> Unit,
     modifier: Modifier = Modifier,
     includeAppLocal: Boolean = true,
 ) {

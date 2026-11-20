@@ -143,20 +143,21 @@ fun ContactItem(
 
     Card(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .pressSpring()
-            .semantics { contentDescription = shortName },
+        modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).pressSpring().semantics {
+            contentDescription = shortName
+        },
         shape = RoundedCornerShape(12.dp),
         colors = cardColors,
         border = border,
     ) {
-        // The click sits inside the card, so the hover and press highlight has the card's own rounded shape and does not
+        // The click sits inside the card, so the hover and press highlight has the card's own rounded shape and
+        // does not
         // spill into the margin around it.
         Column(
             modifier =
-            Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick).fillMaxWidth().padding(8.dp),
+            Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+                .fillMaxWidth()
+                .padding(8.dp),
         ) {
             ContactHeader(contact = contact, channels = channels, onNodeChipClick = onNodeChipClick)
 

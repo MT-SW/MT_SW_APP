@@ -87,7 +87,6 @@ import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.ReceivedRadioFrame
 import org.meshtastic.core.repository.TransportDisconnectReason
-import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.usb_permission_denied
@@ -97,6 +96,7 @@ import org.meshtastic.core.resources.websocket_message_too_big
 import org.meshtastic.core.resources.websocket_replaced_by_another_client
 import org.meshtastic.core.resources.websocket_slot_contested
 import org.meshtastic.core.resources.websocket_tls_failed
+import org.meshtastic.core.service.background.RadioTransportPool
 import org.meshtastic.proto.ToRadio
 import kotlin.concurrent.Volatile
 

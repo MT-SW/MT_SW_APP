@@ -48,8 +48,8 @@ import org.meshtastic.core.resources.add_network_device
 import org.meshtastic.core.resources.address
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.ip_port
-import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.resources.websocket_port_in_url
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.feature.connections.TCP_DEVICE_PREFIX
 import org.meshtastic.feature.connections.WEBSOCKET_DEVICE_PREFIX
 

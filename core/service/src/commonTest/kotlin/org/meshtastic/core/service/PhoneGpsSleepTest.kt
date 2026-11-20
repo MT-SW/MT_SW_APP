@@ -47,8 +47,9 @@ class PhoneGpsSleepTest {
     }
 
     @Test
-    fun aPublicKeyChannelIsJudgedAtTheFifteenBitsItGoesOutAt() {
-        assertEquals(15, stillnessCellBits(listOf(channel(18, privateKey = false)), Role.CLIENT))
+    fun aPublicKeyChannelIsJudgedAtItsOwnPrecision() {
+        // MT_SW: the channel key never caps the precision, so a public-key channel goes out (and is judged) at its own.
+        assertEquals(18, stillnessCellBits(listOf(channel(18, privateKey = false)), Role.CLIENT))
     }
 
     @Test

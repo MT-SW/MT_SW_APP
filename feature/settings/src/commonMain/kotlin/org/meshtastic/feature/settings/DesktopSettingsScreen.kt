@@ -270,7 +270,6 @@ fun DesktopSettingsScreen(
                 val searchViewModel = koinViewModel<SettingsSearchViewModel>()
                 SettingsSearchBar(
                     viewModel = searchViewModel,
-                    onNavigate = onNavigate,
                     // This phone's own settings are hidden below while administering another node; search hides them
                     // too.
                     includeAppLocal = state.isLocal,
@@ -279,188 +278,197 @@ fun DesktopSettingsScreen(
                 if (searching) {
                     SettingsSearchResultsInline(viewModel = searchViewModel, onNavigate = onNavigate)
                 } else {
+                    RadioConfigItemList(
+                        state = state,
+                        isManaged = localConfig.security?.is_managed ?: false,
+                        isOtaCapable = isOtaCapable,
+                        onClearResponse = radioConfigViewModel::clearPacketResponse,
+                        onRouteClick = { route ->
+                            val navRoute =
+                                when (route) {
+                                    is ConfigRoute -> route.route
+                                    is ModuleRoute -> route.route
+                                    else -> null
+                                }
+                            navRoute?.let { onNavigate(it) }
+                        },
+                        databaseBackupAvailable = databaseBackup.available,
+                        onBackupDatabase = databaseBackup.onBackup,
+                        onRestoreDatabase = databaseBackup.onRestore,
+                        onMergeDatabase = databaseBackup.onMerge,
+                        onNavigate = onNavigate,
+                        onImport = {
+                            radioConfigViewModel.clearPacketResponse()
+                            deviceProfile = null
+                            openConfigLauncher("application/octet-stream")
+                        },
+                        onExport = {
+                            radioConfigViewModel.clearPacketResponse()
+                            deviceProfile = null
+                            showEditDeviceProfileDialog = true
+                        },
+                        onSetSnifferEnabled = { radioConfigViewModel.setSnifferEnabled(it) },
+                    )
 
-                RadioConfigItemList(
-                    state = state,
-                    isManaged = localConfig.security?.is_managed ?: false,
-                    isOtaCapable = isOtaCapable,
-                    onClearResponse = radioConfigViewModel::clearPacketResponse,
-                    onRouteClick = { route ->
-                        val navRoute =
-                            when (route) {
-                                is ConfigRoute -> route.route
-                                is ModuleRoute -> route.route
-                                else -> null
+                    // App-local settings are only relevant when configuring the local node
+                    if (state.isLocal) {
+                        ExpressiveSection(title = stringResource(Res.string.app_settings)) {
+                            ListItem(
+                                text = stringResource(Res.string.theme),
+                                supportingText = themeSummary(currentTheme),
+                                leadingIcon = MeshtasticIcons.FormatPaint,
+                                trailingIcon = null,
+                            ) {
+                                showThemePickerDialog = true
                             }
-                        navRoute?.let { onNavigate(it) }
-                    },
-                    databaseBackupAvailable = databaseBackup.available,
-                    onBackupDatabase = databaseBackup.onBackup,
-                    onRestoreDatabase = databaseBackup.onRestore,
-                    onMergeDatabase = databaseBackup.onMerge,
-                    onNavigate = onNavigate,
-                    onImport = {
-                        radioConfigViewModel.clearPacketResponse()
-                        deviceProfile = null
-                        openConfigLauncher("application/octet-stream")
-                    },
-                    onExport = {
-                        radioConfigViewModel.clearPacketResponse()
-                        deviceProfile = null
-                        showEditDeviceProfileDialog = true
-                    },
-                    onSetSnifferEnabled = { radioConfigViewModel.setSnifferEnabled(it) },
-                )
 
-                // App-local settings are only relevant when configuring the local node
-                if (state.isLocal) {
-                    ExpressiveSection(title = stringResource(Res.string.app_settings)) {
-                        ListItem(
-                            text = stringResource(Res.string.theme),
-                            supportingText = themeSummary(currentTheme),
-                            leadingIcon = MeshtasticIcons.FormatPaint,
-                            trailingIcon = null,
-                        ) {
-                            showThemePickerDialog = true
-                        }
+                            ListItem(
+                                text = stringResource(Res.string.preferences_language),
+                                leadingIcon = MeshtasticIcons.Language,
+                                trailingIcon = null,
+                            ) {
+                                showLanguagePickerDialog = true
+                            }
 
-                        ListItem(
-                            text = stringResource(Res.string.preferences_language),
-                            leadingIcon = MeshtasticIcons.Language,
-                            trailingIcon = null,
-                        ) {
-                            showLanguagePickerDialog = true
-                        }
+                            ListItem(
+                                text = stringResource(Res.string.ui_scale),
+                                supportingText = uiScaleLabel(uiScale),
+                                leadingIcon = MeshtasticIcons.FormatPaint,
+                                trailingIcon = null,
+                            ) {
+                                showUiScalePickerDialog = true
+                            }
 
-                        ListItem(
-                            text = stringResource(Res.string.ui_scale),
-                            supportingText = uiScaleLabel(uiScale),
-                            leadingIcon = MeshtasticIcons.FormatPaint,
-                            trailingIcon = null,
-                        ) {
-                            showUiScalePickerDialog = true
-                        }
+                            ListItem(
+                                text = stringResource(Res.string.units),
+                                supportingText =
+                                stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
+                                leadingIcon = MeshtasticIcons.Distance,
+                                trailingIcon = null,
+                            ) {
+                                showUnitsPickerDialog = true
+                            }
 
-                        ListItem(
-                            text = stringResource(Res.string.units),
-                            supportingText =
-                            stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
-                            leadingIcon = MeshtasticIcons.Distance,
-                            trailingIcon = null,
-                        ) {
-                            showUnitsPickerDialog = true
-                        }
+                            if (showProvideLocation) {
+                                SwitchListItem(
+                                    text = stringResource(Res.string.provide_location_to_mesh),
+                                    leadingIcon = MeshtasticIcons.LocationOn,
+                                    checked = provideLocation,
+                                    onClick = { settingsViewModel.setProvideLocation(!provideLocation) },
+                                )
+                            }
 
-                        if (showProvideLocation) {
-                            SwitchListItem(
-                                text = stringResource(Res.string.provide_location_to_mesh),
-                                leadingIcon = MeshtasticIcons.LocationOn,
-                                checked = provideLocation,
-                                onClick = { settingsViewModel.setProvideLocation(!provideLocation) },
+                            FullMessageTimestampsSetting(
+                                checked = showFullMessageTimestamps,
+                                onCheckedChange = settingsViewModel::setShowFullMessageTimestamps,
+                            )
+
+                            HomoglyphSetting(
+                                homoglyphEncodingEnabled = homoglyphEnabled,
+                                onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
+                            )
+
+                            CacheLimitPreference(
+                                cacheLimit = cacheLimit,
+                                onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
+                                onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
+                                retentionDays = retentionDays,
+                                onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
                             )
                         }
 
-                        FullMessageTimestampsSetting(
-                            checked = showFullMessageTimestamps,
-                            onCheckedChange = settingsViewModel::setShowFullMessageTimestamps,
-                        )
-
-                        HomoglyphSetting(
-                            homoglyphEncodingEnabled = homoglyphEnabled,
-                            onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
-                        )
-
-                        CacheLimitPreference(
-                            cacheLimit = cacheLimit,
-                            onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
-                            onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
-                            retentionDays = retentionDays,
-                            onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
-                        )
-                    }
-
-                    ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {
-                        ListItem(
-                            text = stringResource(Res.string.discovery_local_mesh),
-                            leadingIcon = MeshtasticIcons.PermScanWifi,
-                        ) {
-                            onNavigate(DiscoveryRoute.DiscoveryGraph)
-                        }
-                    }
-
-                    ExpressiveSection(title = stringResource(Res.string.device_links)) {
-                        ListItem(text = stringResource(Res.string.device_links), leadingIcon = MeshtasticIcons.Device) {
-                            onNavigate(SettingsRoute.DeviceLinks)
-                        }
-                    }
-
-                    ExpressiveSection(title = stringResource(Res.string.wifi_devices)) {
-                        ListItem(text = stringResource(Res.string.wifi_devices), leadingIcon = MeshtasticIcons.Wifi) {
-                            onNavigate(WifiProvisionRoute.WifiProvision())
-                        }
-                    }
-
-                    if (onOpenSystemNotificationSettings != null) {
-                        ExpressiveSection(title = stringResource(Res.string.app_notifications)) {
+                        ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {
                             ListItem(
-                                text = stringResource(Res.string.notification_settings_in_system),
-                                leadingIcon = MeshtasticIcons.Notifications,
+                                text = stringResource(Res.string.discovery_local_mesh),
+                                leadingIcon = MeshtasticIcons.PermScanWifi,
                             ) {
-                                onOpenSystemNotificationSettings()
+                                onNavigate(DiscoveryRoute.DiscoveryGraph)
                             }
                         }
-                    } else {
-                        NotificationSection(
-                            messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
-                            onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
-                            nodeEventsEnabled = settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
-                            onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
-                            lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
-                            onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
-                            reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
-                            onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
-                            newWaypointsEnabled =
-                            settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
-                            onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
-                            alertsEnabled = settingsViewModel.alertsEnabled.collectAsStateWithLifecycle().value,
-                            onToggleAlerts = { settingsViewModel.setAlertsEnabled(it) },
-                            radioNoticesEnabled =
-                            settingsViewModel.radioNoticesEnabled.collectAsStateWithLifecycle().value,
-                            onToggleRadioNotices = { settingsViewModel.setRadioNoticesEnabled(it) },
-                            updatesEnabled = settingsViewModel.updatesEnabled.collectAsStateWithLifecycle().value,
-                            onToggleUpdates = { settingsViewModel.setUpdatesEnabled(it) },
-                            nodeSilenceEnabled =
-                            settingsViewModel.nodeSilenceEnabled.collectAsStateWithLifecycle().value,
-                            onToggleNodeSilence = { settingsViewModel.setNodeSilenceEnabled(it) },
-                            nodeActiveEnabled = settingsViewModel.nodeActiveEnabled.collectAsStateWithLifecycle().value,
-                            onToggleNodeActive = { settingsViewModel.setNodeActiveEnabled(it) },
-                            showSoundWhileOpen = showNotificationSound,
-                            soundWhileOpen =
-                            settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,
-                            onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
+
+                        ExpressiveSection(title = stringResource(Res.string.device_links)) {
+                            ListItem(
+                                text = stringResource(Res.string.device_links),
+                                leadingIcon = MeshtasticIcons.Device,
+                            ) {
+                                onNavigate(SettingsRoute.DeviceLinks)
+                            }
+                        }
+
+                        ExpressiveSection(title = stringResource(Res.string.wifi_devices)) {
+                            ListItem(
+                                text = stringResource(Res.string.wifi_devices),
+                                leadingIcon = MeshtasticIcons.Wifi,
+                            ) {
+                                onNavigate(WifiProvisionRoute.WifiProvision())
+                            }
+                        }
+
+                        if (onOpenSystemNotificationSettings != null) {
+                            ExpressiveSection(title = stringResource(Res.string.app_notifications)) {
+                                ListItem(
+                                    text = stringResource(Res.string.notification_settings_in_system),
+                                    leadingIcon = MeshtasticIcons.Notifications,
+                                ) {
+                                    onOpenSystemNotificationSettings()
+                                }
+                            }
+                        } else {
+                            NotificationSection(
+                                messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
+                                onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
+                                nodeEventsEnabled =
+                                settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
+                                onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
+                                lowBatteryEnabled =
+                                settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
+                                onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
+                                reactionsEnabled =
+                                settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
+                                onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
+                                newWaypointsEnabled =
+                                settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
+                                onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
+                                alertsEnabled = settingsViewModel.alertsEnabled.collectAsStateWithLifecycle().value,
+                                onToggleAlerts = { settingsViewModel.setAlertsEnabled(it) },
+                                radioNoticesEnabled =
+                                settingsViewModel.radioNoticesEnabled.collectAsStateWithLifecycle().value,
+                                onToggleRadioNotices = { settingsViewModel.setRadioNoticesEnabled(it) },
+                                updatesEnabled = settingsViewModel.updatesEnabled.collectAsStateWithLifecycle().value,
+                                onToggleUpdates = { settingsViewModel.setUpdatesEnabled(it) },
+                                nodeSilenceEnabled =
+                                settingsViewModel.nodeSilenceEnabled.collectAsStateWithLifecycle().value,
+                                onToggleNodeSilence = { settingsViewModel.setNodeSilenceEnabled(it) },
+                                nodeActiveEnabled =
+                                settingsViewModel.nodeActiveEnabled.collectAsStateWithLifecycle().value,
+                                onToggleNodeActive = { settingsViewModel.setNodeActiveEnabled(it) },
+                                showSoundWhileOpen = showNotificationSound,
+                                soundWhileOpen =
+                                settingsViewModel.notificationSoundWhileOpen.collectAsStateWithLifecycle().value,
+                                onToggleSoundWhileOpen = { settingsViewModel.setNotificationSoundWhileOpen(it) },
+                            )
+                        }
+
+                        NotificationTestSection()
+
+                        ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
+                            ListItem(
+                                text = stringResource(Res.string.help_and_documentation),
+                                leadingIcon = MeshtasticIcons.HelpOutline,
+                            ) {
+                                onNavigate(SettingsRoute.HelpDocs)
+                            }
+                        }
+
+                        DesktopAppInfoSection(
+                            appVersionName = settingsViewModel.appVersionName,
+                            hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+                            onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
+                            onShowAppIntro = { settingsViewModel.showAppIntro() },
+                            onNavigateToAbout = { onNavigate(SettingsRoute.About) },
+                            onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
                         )
                     }
-
-                    NotificationTestSection()
-
-                    ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
-                        ListItem(
-                            text = stringResource(Res.string.help_and_documentation),
-                            leadingIcon = MeshtasticIcons.HelpOutline,
-                        ) {
-                            onNavigate(SettingsRoute.HelpDocs)
-                        }
-                    }
-
-                    DesktopAppInfoSection(
-                        appVersionName = settingsViewModel.appVersionName,
-                        hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
-                        onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
-                        onShowAppIntro = { settingsViewModel.showAppIntro() },
-                        onNavigateToAbout = { onNavigate(SettingsRoute.About) },
-                        onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
-                    )
-                }
                 }
             }
             FastScrollSidebar(

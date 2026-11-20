@@ -328,7 +328,9 @@ abstract class MeshtasticDatabase : RoomDatabase() {
                         }
                     }
                     if ("via_mqtt" !in columns) {
-                        connection.executeSQL("ALTER TABLE `reactions` ADD COLUMN `via_mqtt` INTEGER NOT NULL DEFAULT 0")
+                        connection.executeSQL(
+                            "ALTER TABLE `reactions` ADD COLUMN `via_mqtt` INTEGER NOT NULL DEFAULT 0",
+                        )
                     }
                     if ("transport_mechanism" !in columns) {
                         connection.executeSQL("ALTER TABLE `reactions` ADD COLUMN `transport_mechanism` INTEGER")

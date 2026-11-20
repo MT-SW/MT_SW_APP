@@ -68,13 +68,15 @@ class IosPreferencesDataStoreModule {
     fun homoglyphEncodingDataStore(scope: DataStoreScope): HomoglyphEncodingDataStore =
         prefsStore("homoglyph_encoding", scope).asPrefsStore().asHomoglyphEncodingDataStore()
 
-    @Single fun appDataStore(scope: DataStoreScope): AppDataStore = prefsStore("app", scope).asPrefsStore().asAppDataStore()
+    @Single
+    fun appDataStore(scope: DataStoreScope): AppDataStore = prefsStore("app", scope).asPrefsStore().asAppDataStore()
 
     @Single
     fun customEmojiDataStore(scope: DataStoreScope): CustomEmojiDataStore =
         prefsStore("custom_emoji", scope).asPrefsStore().asCustomEmojiDataStore()
 
-    @Single fun mapDataStore(scope: DataStoreScope): MapDataStore = prefsStore("map", scope).asPrefsStore().asMapDataStore()
+    @Single
+    fun mapDataStore(scope: DataStoreScope): MapDataStore = prefsStore("map", scope).asPrefsStore().asMapDataStore()
 
     @Single
     fun mapConsentDataStore(scope: DataStoreScope): MapConsentDataStore =
@@ -84,17 +86,22 @@ class IosPreferencesDataStoreModule {
     fun mapTileProviderDataStore(scope: DataStoreScope): MapTileProviderDataStore =
         prefsStore("map_tile_provider", scope).asPrefsStore().asMapTileProviderDataStore()
 
-    @Single fun meshDataStore(scope: DataStoreScope): MeshDataStore = prefsStore("mesh", scope).asPrefsStore().asMeshDataStore()
+    @Single
+    fun meshDataStore(scope: DataStoreScope): MeshDataStore = prefsStore("mesh", scope).asPrefsStore().asMeshDataStore()
 
-    @Single fun radioDataStore(scope: DataStoreScope): RadioDataStore = prefsStore("radio", scope).asPrefsStore().asRadioDataStore()
+    @Single
+    fun radioDataStore(scope: DataStoreScope): RadioDataStore =
+        prefsStore("radio", scope).asPrefsStore().asRadioDataStore()
 
     @Single fun uiDataStore(scope: DataStoreScope): UiDataStore = prefsStore("ui", scope).asPrefsStore().asUiDataStore()
 
     @Single
-    fun meshLogDataStore(scope: DataStoreScope): MeshLogDataStore = prefsStore("meshlog", scope).asPrefsStore().asMeshLogDataStore()
+    fun meshLogDataStore(scope: DataStoreScope): MeshLogDataStore =
+        prefsStore("meshlog", scope).asPrefsStore().asMeshLogDataStore()
 
     @Single
-    fun filterDataStore(scope: DataStoreScope): FilterDataStore = prefsStore("filter", scope).asPrefsStore().asFilterDataStore()
+    fun filterDataStore(scope: DataStoreScope): FilterDataStore =
+        prefsStore("filter", scope).asPrefsStore().asFilterDataStore()
 
     @Single
     fun corePreferencesDataStore(scope: DataStoreScope): CorePreferencesDataStore =

@@ -90,7 +90,6 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
-import kotlin.time.Clock
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -160,6 +159,7 @@ import org.meshtastic.feature.messaging.isOwnImageHost
 import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
+import kotlin.time.Clock
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 
