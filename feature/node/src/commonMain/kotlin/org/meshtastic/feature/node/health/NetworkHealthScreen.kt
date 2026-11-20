@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
@@ -81,6 +82,7 @@ private const val FOLD_DRAG_SLOP_PX = 1f
 
 @Suppress("LongMethod")
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun NetworkHealthScreen(
     viewModel: NetworkHealthViewModel,
     onNodeClick: (Int, NetworkHealthMetric) -> Unit,
