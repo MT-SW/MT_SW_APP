@@ -17,7 +17,6 @@
 package org.meshtastic.core.data.manager
 
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -66,7 +65,6 @@ import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.SessionManager
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.resources.Res
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.LocalStats
