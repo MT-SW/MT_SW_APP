@@ -18,43 +18,86 @@ package org.meshtastic.core.service
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
+import org.meshtastic.core.repository.Location
 import org.meshtastic.core.repository.MeshLocationManager
 import org.meshtastic.core.repository.PhoneLocationProvider
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.proto.Position as ProtoPosition
 
-/** iPhone: sends the phone's GPS position to the radio while location sharing is on. */
+/**
+ * iPhone: sends the phone's GPS position to the radio while location sharing is on. Like on Android, once the phone
+ * stays in the radio's stillness cell the phone's GPS rests (saving battery) and wakes when the accelerometer shows
+ * movement or the cell changes; firmware keeps broadcasting the last position it was given.
+ */
 @Single
-class IosMeshLocationManager(private val provider: PhoneLocationProvider) : MeshLocationManager {
+class IosMeshLocationManager(
+    private val provider: PhoneLocationProvider,
+    private val radioConfigRepository: RadioConfigRepository,
+) : MeshLocationManager {
     private var scope: CoroutineScope? = null
     private var sendPositionFn: (suspend (ProtoPosition) -> Boolean)? = null
     private var job: Job? = null
+
+    /** The bits of the radio's stillness cell, followed while the flow runs. */
+    private val cellBits = MutableStateFlow(0)
 
     override fun start(scope: CoroutineScope, sendPositionFn: suspend (ProtoPosition) -> Boolean) {
         this.scope = scope
         this.sendPositionFn = sendPositionFn
         if (job?.isActive == true) return
         job =
-            provider
-                .locationUpdates()
-                .mapNotNull { if (it.permissionGranted) it.location else null }
-                .onEach { loc ->
+            scope.launch {
+                launch {
+                    combine(radioConfigRepository.channelSetFlow, radioConfigRepository.localConfigFlow) {
+                            channels,
+                            config,
+                        ->
+                        stillnessCellBits(channels.settings, config.device?.role)
+                    }
+                        .collect { cellBits.value = it }
+                }
+                feedWhileMoving(
+                    fixes = {
+                        provider
+                            .locationUpdates()
+                            .mapNotNull { if (it.permissionGranted) it.location else null }
+                            .distinctUntilChanged { a, b -> a.timeMillis == b.timeMillis }
+                            .mapNotNull { loc ->
+                                Location(
+                                    latitude = loc.latitude,
+                                    longitude = loc.longitude,
+                                    altitudeMeters = loc.altitude,
+                                    mslAltitudeMeters = loc.mslAltitude,
+                                    accuracyMeters = loc.accuracyM,
+                                    speedMetersPerSecond = loc.speedMps,
+                                    timeMillis = loc.timeMillis,
+                                )
+                            }
+                    },
+                    cellBits = cellBits,
+                    awaitMotion = { awaitSignificantMotion() },
+                ) { loc ->
                     sendPositionFn(
                         phonePosition(
                             latitude = loc.latitude,
                             longitude = loc.longitude,
                             timeMillis = loc.timeMillis,
-                            mslAltitudeMeters = loc.mslAltitude,
-                            haeAltitudeMeters = loc.altitude,
-                            speedMetersPerSecond = loc.speedMps,
+                            mslAltitudeMeters = loc.mslAltitudeMeters,
+                            haeAltitudeMeters = loc.altitudeMeters,
+                            speedMetersPerSecond = loc.speedMetersPerSecond,
                             bearingDegrees = null,
                         ),
                     )
                 }
-                .launchIn(scope)
+                coroutineContext.cancelChildren()
+            }
     }
 
     override fun restart() {
