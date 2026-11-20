@@ -432,7 +432,7 @@ fun NodeListScreen(
                             Modifier.fillMaxWidth()
                                 .graphicsLayer(alpha = animatedAlpha)
                                 .background(MaterialTheme.colorScheme.background)
-                                .padding(8.dp),
+                                .padding(vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             NodeCountSummary(
@@ -440,13 +440,13 @@ fun NodeListScreen(
                                 activeCount = activeNodeCount,
                                 shownCount = nodes.size,
                                 totalCount = totalNodeCount,
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                             )
                             UnheardNodesBanner(
                                 unheardNodes = unheardNodes,
                                 onKeep = { viewModel.keepUnheardNodes(unheardNodes) },
                                 onRemoveAll = { viewModel.removeNodes(unheardNodes) },
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                             )
                             val filterPrefs = viewModel.nodeFilterPreferences
                             NodeFilterSearchBar(

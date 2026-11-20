@@ -97,7 +97,41 @@ private fun seeThroughAlpha(strength: Int): Float = (1f - strength / PERCENT).co
 fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)): Modifier {
     val options = rememberUiOptions()
     val style = options.element(group)
-    return if (style.look == ElementLook.DEPTH) depthLook(style.strength, shape, options.rimDp()) else this
+    return when (style.look) {
+        ElementLook.DEPTH -> depthLook(style.strength, shape, options.rimDp())
+
+        // MT_SW: glass casts a soft shadow of its own ("Shadow under glass"); on a dark theme a black shadow cannot
+        // be seen, so there it is a soft light glow that lifts the element off the background.
+        ElementLook.GLASS -> softShadow(options.glassShadowDp(), shape, isDarkSurface())
+
+        else -> this
+    }
+}
+
+/** Whether the current theme is dark, judged by its surface colour. */
+@Composable internal fun isDarkSurface(): Boolean = MaterialTheme.colorScheme.surface.luminance() < READABLE_LUMINANCE
+
+/** How much stronger the sheen of glass is drawn: a dark theme needs more of it to show any depth. */
+@Composable internal fun glassSheenBoost(): Float = if (isDarkSurface()) DARK_SHEEN_BOOST else LIGHT_SHEEN_BOOST
+
+private const val DARK_SHEEN_BOOST = 1.8f
+private const val LIGHT_SHEEN_BOOST = 1.3f
+private const val DARK_GLOW_REACH = 1.3f
+
+/** A soft shadow of [dp] under [shape]: black on a light theme, a light glow on a dark one. No shadow for 0. */
+internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier = when {
+    dp <= 0f -> this
+
+    dark ->
+        shadow(
+            elevation = (dp * DARK_GLOW_REACH).dp,
+            shape = shape,
+            clip = false,
+            ambientColor = Color.White,
+            spotColor = Color.White,
+        )
+
+    else -> shadow(elevation = dp.dp, shape = shape, clip = false)
 }
 
 /** The thickness of the rim chosen in the settings, in dp. */
@@ -147,7 +181,7 @@ fun rememberShadowInset(group: String = LocalCardGroup.current): Dp {
             }
 
             // MT_SW: glass has its own soft shadow, so its lists keep room for it as well.
-            ElementLook.GLASS -> (options.glassShadowDp() * SHADOW_REACH).dp
+            ElementLook.GLASS -> (options.glassShadowDp() * DARK_GLOW_REACH * SHADOW_REACH).dp
 
             else -> 0.dp
         }
@@ -256,7 +290,9 @@ fun StyledSurface(
     // MT_SW: glass casts a soft shadow of its own (the "Shadow under glass" option); a floating surface keeps at least
     // the shadow it has in the plain look.
     val glassShadow = if (style.look == ElementLook.GLASS) options.glassShadowDp() else 0f
-    val shadowDp = maxOf(glassShadow, if (floating) FLAT_SHADOW_DP else 0f).dp
+    val shadowDp = maxOf(glassShadow, if (floating) FLAT_SHADOW_DP else 0f)
+    val dark = isDarkSurface()
+    val boost = glassSheenBoost()
     when {
         style.look == ElementLook.GLASS && hazeState != null -> {
             val tint = baseColor.copy(alpha = seeThroughAlpha(style.strength) * GLASS_TINT_SHARE)
@@ -267,10 +303,10 @@ fun StyledSurface(
             Box(
                 modifier =
                 modifier
-                    .shadow(shadowDp, shape, clip = false)
+                    .softShadow(shadowDp, shape, dark)
                     .clip(shape)
                     .hazeBlur(input = HazeInput.Sources(hazeState), style = blur)
-                    .glassEdge(shape, rimWidth, flatBottom),
+                    .glassEdge(shape, rimWidth, flatBottom, boost),
             ) {
                 content()
             }
@@ -278,7 +314,10 @@ fun StyledSurface(
 
         style.look == ElementLook.GLASS || style.look == ElementLook.TRANSPARENT ->
             Surface(
-                modifier = modifier.glassEdge(shape, rimWidth, flatBottom),
+                modifier =
+                modifier
+                    .let { if (style.look == ElementLook.GLASS) it.softShadow(shadowDp, shape, dark) else it }
+                    .glassEdge(shape, rimWidth, flatBottom, boost),
                 shape = shape,
                 // Glass that cannot blur (over a map, on an old Android) imitates a frosted pane: it stays dense enough
                 // to read what is on it.
@@ -291,12 +330,7 @@ fun StyledSurface(
                         seeThroughAlpha(style.strength)
                     },
                 ),
-                shadowElevation =
-                when {
-                    style.look == ElementLook.GLASS -> shadowDp
-                    floating -> FLAT_SHADOW_DP.dp
-                    else -> 0.dp
-                },
+                shadowElevation = if (style.look != ElementLook.GLASS && floating) FLAT_SHADOW_DP.dp else 0.dp,
                 content = content,
             )
 
@@ -352,15 +386,8 @@ fun StyledCard(
     val style = options.element(group)
     val seeThrough = style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS
     val look = modifier.elementLook(group, shape)
-    // MT_SW: a glass card casts the soft shadow chosen in "Shadow under glass".
-    val shadowed =
-        if (style.look == ElementLook.GLASS && options.glassShadowDp() > 0f) {
-            look.shadow(options.glassShadowDp().dp, shape, clip = false)
-        } else {
-            look
-        }
     Card(
-        modifier = if (seeThrough) shadowed.glassEdge(shape, options.rimDp()) else look,
+        modifier = if (seeThrough) look.glassEdge(shape, options.rimDp(), sheenBoost = glassSheenBoost()) else look,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = cardContainerColor(baseColor, group)),
         content = content,
@@ -380,15 +407,25 @@ private const val EDGE_INNER_SHARE = 0.5f
  * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right, with a
  * second finer line just inside it, so the glass seems to have thickness.
  */
-internal fun Modifier.glassEdge(shape: Shape, rimDp: Float, flatBottom: Boolean = false): Modifier = drawWithContent {
+internal fun Modifier.glassEdge(
+    shape: Shape,
+    rimDp: Float,
+    flatBottom: Boolean = false,
+    sheenBoost: Float = 1f,
+): Modifier = drawWithContent {
     val outline = shape.createOutline(size, layoutDirection, this)
     drawOutline(
         outline = outline,
         brush =
         Brush.verticalGradient(
-            0f to Color.White.copy(alpha = SHEEN_TOP_ALPHA),
+            0f to Color.White.copy(alpha = (SHEEN_TOP_ALPHA * sheenBoost).coerceAtMost(1f)),
             SHEEN_MID_STOP to Color.Transparent,
-            1f to if (flatBottom) Color.Transparent else Color.Black.copy(alpha = SHEEN_BOTTOM_ALPHA),
+            1f to
+                if (flatBottom) {
+                    Color.Transparent
+                } else {
+                    Color.Black.copy(alpha = (SHEEN_BOTTOM_ALPHA * sheenBoost).coerceAtMost(1f))
+                },
         ),
     )
     drawContent()

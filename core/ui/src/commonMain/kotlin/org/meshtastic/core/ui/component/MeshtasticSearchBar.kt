@@ -19,6 +19,14 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.text.input.BasicTextField
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -41,8 +49,6 @@ import androidx.compose.material3.SearchBarScrollBehavior
 import androidx.compose.material3.SearchBarState
 import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.rememberSearchBarState
@@ -212,7 +218,9 @@ private fun InlineSearchField(
     modifier: Modifier = Modifier,
 ) {
     // MT_SW: the field follows the glass look of the search group: grey while empty, tinted in the colour of the buttons
-    // (the theme's gold) as soon as something is typed, so it is visible that the list below is being filtered.
+    // (the theme's gold) as soon as something is typed, so it is visible that the list below is being filtered. Its
+    // colour has a gentle gradient (lighter at the top, darker at the bottom) like the buttons, for a 3D feel. The
+    // field is drawn by hand, so its inside has exactly the colour of the whole bar.
     val scheme = MaterialTheme.colorScheme
     val filtering = textFieldState.text.isNotEmpty()
     val base by
@@ -225,46 +233,74 @@ private fun InlineSearchField(
             },
         )
     val shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp)
+    val dark = isDarkSurface()
+    val gradient =
+        Brush.verticalGradient(
+            listOf(
+                lerp(base, Color.White, if (dark) SEARCH_GRADIENT_LIGHT_DARK else SEARCH_GRADIENT_LIGHT),
+                lerp(base, Color.Black, SEARCH_GRADIENT_SHADE),
+            ),
+        )
+    val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
     StyledSurface(
         group = UiOptions.GROUP_SEARCH,
         shape = shape,
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        // The same width as the cards of the list below.
+        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
         baseColor = base,
     ) {
-        TextField(
+        BasicTextField(
             state = textFieldState,
             lineLimits = TextFieldLineLimits.SingleLine,
-            placeholder = { Text(placeholder) },
-            leadingIcon = { Icon(imageVector = MeshtasticIcons.Search, contentDescription = null) },
-            trailingIcon = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (filtering) {
-                        IconButton(onClick = { textFieldState.clearText() }) {
-                            Icon(imageVector = MeshtasticIcons.Close, contentDescription = clearDescription)
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColor),
+            cursorBrush = SolidColor(contentColor),
+            modifier =
+            Modifier.fillMaxWidth()
+                .background(gradient)
+                .testTag(testTag)
+                .semantics { contentDescription = placeholder },
+            decorator = { innerTextField ->
+                CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    Row(
+                        modifier =
+                        Modifier.fillMaxWidth().heightIn(min = SEARCH_FIELD_HEIGHT_DP.dp).padding(start = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(imageVector = MeshtasticIcons.Search, contentDescription = null)
+                        Box(
+                            modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
+                            if (!filtering) {
+                                Text(
+                                    text = placeholder,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = contentColor.copy(alpha = SEARCH_HINT_ALPHA),
+                                )
+                            }
+                            innerTextField()
                         }
+                        if (filtering) {
+                            IconButton(onClick = { textFieldState.clearText() }) {
+                                Icon(imageVector = MeshtasticIcons.Close, contentDescription = clearDescription)
+                            }
+                        }
+                        trailingActions()
                     }
-                    trailingActions()
                 }
             },
-            shape = shape,
-            colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                errorContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent,
-            ),
-            modifier = Modifier.fillMaxWidth().testTag(testTag).semantics { contentDescription = placeholder },
         )
     }
 }
 
 /** How much of the theme colour the field takes on while something is typed in it. */
-private const val SEARCH_ACTIVE_MIX = 0.35f
+private const val SEARCH_ACTIVE_MIX = 0.55f
+
+private const val SEARCH_GRADIENT_LIGHT = 0.35f
+private const val SEARCH_GRADIENT_LIGHT_DARK = 0.12f
+private const val SEARCH_GRADIENT_SHADE = 0.10f
+private const val SEARCH_HINT_ALPHA = 0.6f
+private const val SEARCH_FIELD_HEIGHT_DP = 52
 
 private const val SEARCH_FIELD_CORNER_DP = 12
 

@@ -94,5 +94,5 @@ fun Card(
 internal fun Modifier.styledLook(group: String, shape: Shape, look: Int, rimDp: Float): Modifier {
     val withDepth = elementLook(group, shape)
     val seeThrough = look == ElementLook.TRANSPARENT || look == ElementLook.GLASS
-    return if (seeThrough) withDepth.glassEdge(shape, rimDp) else withDepth
+    return if (seeThrough) withDepth.glassEdge(shape, rimDp, sheenBoost = glassSheenBoost()) else withDepth
 }

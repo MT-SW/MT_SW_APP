@@ -275,7 +275,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(ICON_STYLE, ICON_STYLE_OUTLINE)
             put(GLASS_TINT, 0)
             put(RIM, 0)
-            put(GLASS_SHADOW, 2)
+            put(GLASS_SHADOW, 3)
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
             put(CONTROL_STYLE, CONTROL_STYLE_THIN)
