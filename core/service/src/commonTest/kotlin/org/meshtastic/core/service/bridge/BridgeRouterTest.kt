@@ -16,11 +16,13 @@
  */
 package org.meshtastic.core.service.bridge
 
+import org.meshtastic.core.repository.HandshakeConstants
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.proto.Data
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.MyNodeInfo
+import org.meshtastic.proto.NodeInfo
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.ToRadio
 import kotlin.test.Test
@@ -173,5 +175,44 @@ class BridgeRouterTest {
 
         assertTrue(!router.hasConfiguration)
         assertTrue(!router.waitingWithoutHandshake)
+    }
+
+    private fun nodeFrame(num: Int) =
+        FromRadio.Builder().also { it.node_info = NodeInfo.Builder().also { n -> n.num = num }.build() }.build().encode()
+
+    private fun stagedReady(router: BridgeRouter) {
+        router.onFromRadio(myInfo(), emptySet())
+        router.onFromRadio(complete(HandshakeConstants.CONFIG_NONCE), emptySet())
+        router.onFromRadio(nodeFrame(10), emptySet())
+        router.onFromRadio(nodeFrame(11), emptySet())
+        router.onFromRadio(complete(HandshakeConstants.NODE_INFO_NONCE), emptySet())
+    }
+
+    @Test
+    fun `the first stage gets the configuration without nodes and the second stage the nodes without configuration`() {
+        val router = BridgeRouter()
+        stagedReady(router)
+        assertTrue(router.hasConfiguration)
+
+        val first = router.onClientFrame(1, wantConfig(HandshakeConstants.CONFIG_NONCE)).replies
+        assertEquals(2, first.size)
+        assertNotNull(FromRadio.ADAPTER.decode(first.first().payload).my_info)
+
+        val second = router.onClientFrame(1, wantConfig(HandshakeConstants.NODE_INFO_NONCE)).replies
+        assertEquals(3, second.size)
+        assertTrue(second.dropLast(1).all { FromRadio.ADAPTER.decode(it.payload).node_info != null })
+        assertEquals(
+            HandshakeConstants.NODE_INFO_NONCE,
+            FromRadio.ADAPTER.decode(second.last().payload).config_complete_id,
+        )
+    }
+
+    @Test
+    fun `the end of the first stage alone does not make the copy whole`() {
+        val router = BridgeRouter()
+        router.onFromRadio(myInfo(), emptySet())
+        router.onFromRadio(complete(HandshakeConstants.CONFIG_NONCE), emptySet())
+
+        assertTrue(!router.hasConfiguration)
     }
 }

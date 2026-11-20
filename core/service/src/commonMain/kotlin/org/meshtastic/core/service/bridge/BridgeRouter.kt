@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.service.bridge
 
+import org.meshtastic.core.repository.HandshakeConstants
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.PortNum
@@ -47,7 +48,9 @@ class BridgeClientResult(
  * - **Restrictions** of [config] (all off by default) limit what clients may send.
  */
 class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
+    // The configuration without the nodes (as the radio sends it for the first stage) and the nodes (the second stage).
     private val configFrames = ArrayList<ByteArray>()
+    private val nodeFrames = LinkedHashMap<Int, ByteArray>()
     private var configComplete = false
     private var completedAtMs = 0L
 
@@ -63,13 +66,14 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
 
     /** True when a client waits for a configuration and no handshake of the app with the radio has been seen. */
     val waitingWithoutHandshake: Boolean
-        get() = waiting.isNotEmpty() && !configComplete && configFrames.isEmpty()
+        get() = waiting.isNotEmpty() && !configComplete && configFrames.isEmpty() && nodeFrames.isEmpty()
 
     /**
      * Drops the copy of the configuration (it is built again at the next handshake); clients then wait for a new one.
      */
     fun invalidate() {
         configFrames.clear()
+        nodeFrames.clear()
         configComplete = false
     }
 
@@ -83,6 +87,7 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
     /** Forgets everything kept so far (the bridge starts again). */
     fun reset() {
         configFrames.clear()
+        nodeFrames.clear()
         configComplete = false
         owners.clear()
         waiting.clear()
@@ -95,10 +100,20 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
         if (frame.my_info != null) {
             // A new handshake of the app with the radio: the copy starts again.
             configFrames.clear()
+            nodeFrames.clear()
             configComplete = false
         }
+        val node = frame.node_info
+        if (node != null && (!configComplete || nodeFrames.containsKey(node.num))) {
+            // The list of nodes: kept (and kept fresh) for the second stage; before the copy is whole nothing is shown.
+            if (nodeFrames.size < MAX_CONFIG_FRAMES) nodeFrames[node.num] = payload
+            if (!configComplete) return emptyList()
+        }
         if (!configComplete) {
-            if ((frame.config_complete_id ?: 0) != 0) {
+            val done = frame.config_complete_id ?: 0
+            // The end of the first stage (configuration without nodes) does not make the copy whole: the nodes follow.
+            if (done == HandshakeConstants.CONFIG_NONCE) return emptyList()
+            if (done != 0) {
                 configComplete = true
                 completedAtMs = monotonicNowMs()
                 return waiting.keys
@@ -157,7 +172,16 @@ class BridgeRouter(var config: RadioBridgeConfig = RadioBridgeConfig()) {
 
     private fun replay(clientId: Int, nonce: Int): List<BridgeOut> {
         val done = FromRadio.Builder().also { it.config_complete_id = nonce }.build().encode()
-        return configFrames.map { BridgeOut(clientId, it) } + BridgeOut(clientId, done)
+        // Like the radio: the first stage is the configuration only, the second stage the nodes only, any other
+        // number gets both. A client in the first stage must never be given the nodes, nor one in the second stage the
+        // configuration (it would start its handshake again and never finish).
+        val frames =
+            when (nonce) {
+                HandshakeConstants.CONFIG_NONCE -> configFrames.toList()
+                HandshakeConstants.NODE_INFO_NONCE -> nodeFrames.values.toList()
+                else -> configFrames + nodeFrames.values
+            }
+        return frames.map { BridgeOut(clientId, it) } + BridgeOut(clientId, done)
     }
 
     internal fun monotonicNowMs(): Long = clockStart.elapsedNow().inWholeMilliseconds
