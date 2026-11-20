@@ -1717,6 +1717,7 @@ get_started
 github_repository
 ### GLASS ###
 glass_rim
+glass_shadow
 glass_tint
 glass_tint_accent
 glass_tint_dark

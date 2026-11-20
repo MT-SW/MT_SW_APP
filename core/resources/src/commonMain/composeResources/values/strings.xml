@@ -1762,6 +1762,7 @@
     <string name="github_repository">GitHub Repository</string>
     <!-- GLASS -->
     <string name="glass_rim">Thickness of the bright rim</string>
+    <string name="glass_shadow">Shadow under glass</string>
     <string name="glass_tint">Colour of the glass</string>
     <string name="glass_tint_accent">Accent colour</string>
     <string name="glass_tint_dark">Dark</string>

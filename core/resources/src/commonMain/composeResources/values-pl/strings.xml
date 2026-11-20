@@ -4054,6 +4054,7 @@
     <string name="glass_tint_dark">Ciemny</string>
     <string name="glass_tint_accent">Kolor akcentu</string>
     <string name="glass_rim">Grubość jasnej krawędzi</string>
+    <string name="glass_shadow">Cień pod szkłem</string>
     <string name="nav_bar_rim">Obrys paska (grubość krawędzi)</string>
     <string name="button_gradient">Gradient na przyciskach</string>
     <string name="button_gradient_off">Wyłączony</string>

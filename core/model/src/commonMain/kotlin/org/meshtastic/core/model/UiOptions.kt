@@ -102,6 +102,10 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val RIM = "glass.rim"
         val RIM_STEPS_DP = floatArrayOf(0f, 0.5f, 1f, 1.5f, 2f)
 
+        /** The shadow under glass cards and glass surfaces: a step of [GLASS_SHADOW_STEPS_DP] (0 = no shadow). */
+        const val GLASS_SHADOW = "glass.shadow"
+        val GLASS_SHADOW_STEPS_DP = floatArrayOf(0f, 4f, 8f, 14f, 22f)
+
         /** The strength of the soft gradient on the buttons: an index into [BUTTON_GRADIENT_SHARE] (0 = none). */
         const val BUTTON_GRADIENT = "buttons.gradient"
         val BUTTON_GRADIENT_SHARE = floatArrayOf(0f, 0.5f, 1f, 1.6f)
@@ -271,6 +275,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(ICON_STYLE, ICON_STYLE_OUTLINE)
             put(GLASS_TINT, 0)
             put(RIM, 0)
+            put(GLASS_SHADOW, 2)
             put(PRESS_SPRING, 1)
             put(RING_STYLE, RING_STYLE_THIN)
             put(CONTROL_STYLE, CONTROL_STYLE_THIN)

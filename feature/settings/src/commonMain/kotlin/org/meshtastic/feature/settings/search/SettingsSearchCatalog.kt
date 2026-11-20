@@ -78,6 +78,7 @@ import org.meshtastic.core.resources.font_family
 import org.meshtastic.core.resources.font_size
 import org.meshtastic.core.resources.font_weight
 import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.glass_shadow
 import org.meshtastic.core.resources.glass_tint
 import org.meshtastic.core.resources.icon_style
 import org.meshtastic.core.resources.import_menu_in_top_bar
@@ -358,6 +359,7 @@ object SettingsSearchCatalog {
             Res.string.element_group_dialogs to SettingsRoute.ElementLook,
             Res.string.glass_tint to SettingsRoute.ElementLook,
             Res.string.glass_rim to SettingsRoute.ElementLook,
+            Res.string.glass_shadow to SettingsRoute.ElementLook,
             Res.string.button_gradient to SettingsRoute.ElementLook,
             Res.string.press_spring to SettingsRoute.ElementLook,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,

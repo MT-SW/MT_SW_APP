@@ -82,6 +82,7 @@ import org.meshtastic.core.resources.element_look_strength
 import org.meshtastic.core.resources.element_look_summary
 import org.meshtastic.core.resources.element_look_transparent
 import org.meshtastic.core.resources.glass_rim
+import org.meshtastic.core.resources.glass_shadow
 import org.meshtastic.core.resources.glass_tint
 import org.meshtastic.core.resources.glass_tint_accent
 import org.meshtastic.core.resources.glass_tint_dark
@@ -689,6 +690,14 @@ private fun GlassDetailSettings(options: UiOptions, onChange: (String, Int) -> U
         items = UiOptions.RIM_STEPS_DP.indices.map { it to "${UiOptions.RIM_STEPS_DP[it]} dp" },
         selectedValue = options[UiOptions.RIM],
         onValueChange = { onChange(UiOptions.RIM, it) },
+    )
+    SliderPreference(
+        title = stringResource(Res.string.glass_shadow),
+        enabled = true,
+        items =
+        UiOptions.GLASS_SHADOW_STEPS_DP.indices.map { it to "${UiOptions.GLASS_SHADOW_STEPS_DP[it].toInt()} dp" },
+        selectedValue = options[UiOptions.GLASS_SHADOW],
+        onValueChange = { onChange(UiOptions.GLASS_SHADOW, it) },
     )
     val levels =
         listOf(

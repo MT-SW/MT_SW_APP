@@ -104,6 +104,10 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
 internal fun UiOptions.rimDp(): Float =
     UiOptions.RIM_STEPS_DP[get(UiOptions.RIM).coerceIn(0, UiOptions.RIM_STEPS_DP.lastIndex)]
 
+/** The depth of the shadow under glass chosen in the settings, in dp. */
+internal fun UiOptions.glassShadowDp(): Float =
+    UiOptions.GLASS_SHADOW_STEPS_DP[get(UiOptions.GLASS_SHADOW).coerceIn(0, UiOptions.GLASS_SHADOW_STEPS_DP.lastIndex)]
+
 /** The colour of the glass: the given [base] colour changed by the "colour of the glass" option. */
 @Composable
 internal fun UiOptions.glassBase(base: Color): Color = when (get(UiOptions.GLASS_TINT)) {
@@ -133,13 +137,19 @@ fun glassContentColor(group: String, base: Color = MaterialTheme.colorScheme.sur
  */
 @Composable
 fun rememberShadowInset(group: String = LocalCardGroup.current): Dp {
-    val style = rememberUiOptions().element(group)
+    val options = rememberUiOptions()
+    val style = options.element(group)
     val depth =
-        if (style.look == ElementLook.DEPTH) {
-            val s = style.strength.coerceIn(0, PERCENT.toInt()) / PERCENT
-            ((DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s) * SHADOW_REACH).dp
-        } else {
-            0.dp
+        when (style.look) {
+            ElementLook.DEPTH -> {
+                val s = style.strength.coerceIn(0, PERCENT.toInt()) / PERCENT
+                ((DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s) * SHADOW_REACH).dp
+            }
+
+            // MT_SW: glass has its own soft shadow, so its lists keep room for it as well.
+            ElementLook.GLASS -> (options.glassShadowDp() * SHADOW_REACH).dp
+
+            else -> 0.dp
         }
     // On a computer or a tablet every look keeps at least [SHADOW_ROOM_DP]: the glow of the outlined buttons and the
     // soft shadows of the other looks are drawn outside their element too.
@@ -241,7 +251,12 @@ fun StyledSurface(
     flatBottom: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val rimWidth = rimDp ?: rememberUiOptions().rimDp()
+    val options = rememberUiOptions()
+    val rimWidth = rimDp ?: options.rimDp()
+    // MT_SW: glass casts a soft shadow of its own (the "Shadow under glass" option); a floating surface keeps at least
+    // the shadow it has in the plain look.
+    val glassShadow = if (style.look == ElementLook.GLASS) options.glassShadowDp() else 0f
+    val shadowDp = maxOf(glassShadow, if (floating) FLAT_SHADOW_DP else 0f).dp
     when {
         style.look == ElementLook.GLASS && hazeState != null -> {
             val tint = baseColor.copy(alpha = seeThroughAlpha(style.strength) * GLASS_TINT_SHARE)
@@ -252,7 +267,7 @@ fun StyledSurface(
             Box(
                 modifier =
                 modifier
-                    .shadow(if (floating) FLAT_SHADOW_DP.dp else 0.dp, shape, clip = false)
+                    .shadow(shadowDp, shape, clip = false)
                     .clip(shape)
                     .hazeBlur(input = HazeInput.Sources(hazeState), style = blur)
                     .glassEdge(shape, rimWidth, flatBottom),
@@ -276,7 +291,12 @@ fun StyledSurface(
                         seeThroughAlpha(style.strength)
                     },
                 ),
-                shadowElevation = if (floating) FLAT_SHADOW_DP.dp else 0.dp,
+                shadowElevation =
+                when {
+                    style.look == ElementLook.GLASS -> shadowDp
+                    floating -> FLAT_SHADOW_DP.dp
+                    else -> 0.dp
+                },
                 content = content,
             )
 
@@ -332,8 +352,15 @@ fun StyledCard(
     val style = options.element(group)
     val seeThrough = style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS
     val look = modifier.elementLook(group, shape)
+    // MT_SW: a glass card casts the soft shadow chosen in "Shadow under glass".
+    val shadowed =
+        if (style.look == ElementLook.GLASS && options.glassShadowDp() > 0f) {
+            look.shadow(options.glassShadowDp().dp, shape, clip = false)
+        } else {
+            look
+        }
     Card(
-        modifier = if (seeThrough) look.glassEdge(shape, options.rimDp()) else look,
+        modifier = if (seeThrough) shadowed.glassEdge(shape, options.rimDp()) else look,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = cardContainerColor(baseColor, group)),
         content = content,
