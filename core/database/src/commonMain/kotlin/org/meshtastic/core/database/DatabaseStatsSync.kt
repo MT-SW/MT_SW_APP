@@ -38,8 +38,16 @@ object DatabaseStatsSync {
     private val PORTS = listOf(3, 34, 67, 70, 71, 73)
     private const val CHUNK = 400
 
-    /** Synchronizes [a] and [b] both ways; returns how many rows were written (nodes + history entries). */
-    suspend fun sync(a: MeshtasticDatabase, b: MeshtasticDatabase): Int {
+    /**
+     * Synchronizes [a] and [b] both ways; returns how many rows were written (nodes + history entries). With
+     * [requireSameRadioSettings] it only runs when both radios are known to be on the same radio settings (region,
+     * preset, frequency): radios on different settings hear different things, so their data must not be mixed.
+     */
+    suspend fun sync(a: MeshtasticDatabase, b: MeshtasticDatabase, requireSameRadioSettings: Boolean = false): Int {
+        if (requireSameRadioSettings && !sameRadioSettings(a, b)) {
+            Logger.d { "Statistics sync paused: the two devices are not (known to be) on the same radio settings" }
+            return 0
+        }
         val nodesA = a.nodeInfoDao().getAllNodesSnapshot().associateBy { it.num }
         val nodesB = b.nodeInfoDao().getAllNodesSnapshot().associateBy { it.num }
         val common = nodesA.keys.intersect(nodesB.keys).toList()
@@ -64,12 +72,36 @@ object DatabaseStatsSync {
             val keysB = logsB.mapTo(HashSet()) { key(it) }
             val missingInA = logsB.filter { key(it) !in keysA }
             val missingInB = logsA.filter { key(it) !in keysB }
-            if (missingInA.isNotEmpty()) a.meshLogDao().insertIgnore(missingInA)
-            if (missingInB.isNotEmpty()) b.meshLogDao().insertIgnore(missingInB)
+            if (missingInA.isNotEmpty()) a.meshLogDao().insertIgnore(missingInA.map(::withoutReception))
+            if (missingInB.isNotEmpty()) b.meshLogDao().insertIgnore(missingInB.map(::withoutReception))
             written += missingInA.size + missingInB.size
         }
         if (written > 0) Logger.i { "Statistics sync between two device databases: $written entries" }
         return written
+    }
+
+    private suspend fun sameRadioSettings(a: MeshtasticDatabase, b: MeshtasticDatabase): Boolean {
+        val loraA = a.channelSetDao().get()?.channelSet?.lora_config ?: return false
+        val loraB = b.channelSetDao().get()?.channelSet?.lora_config ?: return false
+        return loraA.region == loraB.region &&
+            loraA.use_preset == loraB.use_preset &&
+            loraA.modem_preset == loraB.modem_preset &&
+            loraA.bandwidth == loraB.bandwidth &&
+            loraA.spread_factor == loraB.spread_factor &&
+            loraA.coding_rate == loraB.coding_rate &&
+            loraA.frequency_offset == loraB.frequency_offset &&
+            loraA.override_frequency == loraB.override_frequency &&
+            loraA.channel_num == loraB.channel_num
+    }
+
+    /** What one radio heard (signal strength and SNR) is never copied to another radio: it would falsify its charts. */
+    private fun withoutReception(log: MeshLog): MeshLog {
+        val packet = log.fromRadio.packet ?: return log
+        val cleaned = packet.newBuilder().also {
+            it.rx_rssi = null
+            it.rx_snr = Float.NaN
+        }.build()
+        return log.copy(fromRadio = log.fromRadio.newBuilder().also { it.packet = cleaned }.build())
     }
 
     /** One packet is the same packet in both databases when sender, port and packet id agree. */

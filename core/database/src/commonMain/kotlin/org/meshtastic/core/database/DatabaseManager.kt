@@ -315,7 +315,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
                 val databases = deviceDbNamesLocked().map { getOrOpenDatabase(it) }
                 var written = 0
                 for (i in databases.indices) {
-                    for (j in i + 1 until databases.size) written += DatabaseStatsSync.sync(databases[i], databases[j])
+                    for (j in i + 1 until databases.size) written +=
+                            DatabaseStatsSync.sync(databases[i], databases[j], requireSameRadioSettings = true)
                 }
                 written
             }

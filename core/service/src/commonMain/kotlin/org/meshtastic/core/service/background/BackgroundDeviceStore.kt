@@ -20,8 +20,11 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.channels.ReceiveChannel
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.database.DatabaseManager
+import org.meshtastic.core.database.entity.ChannelSetEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
 import org.meshtastic.core.database.entity.NodeEntity
+import org.meshtastic.proto.ChannelSet
+import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.HardwareModel
@@ -38,6 +41,7 @@ import org.meshtastic.proto.Telemetry
 internal class BackgroundDeviceStore(private val address: String, private val databaseManager: DatabaseManager) {
     private var myInfo: MyNodeInfo? = null
     private var metadata: DeviceMetadata? = null
+    private var lora: Config.LoRaConfig? = null
     private val nodes = LinkedHashMap<Int, NodeInfo>()
 
     /** Reads the frames of the radio until the channel is closed; writes after every complete list. */
@@ -54,6 +58,8 @@ internal class BackgroundDeviceStore(private val address: String, private val da
 
                 frame.metadata != null -> metadata = frame.metadata
 
+                frame.config?.lora != null -> lora = frame.config?.lora
+
                 node != null -> nodes[node.num] = node
 
                 (frame.config_complete_id ?: 0) != 0 -> if (nodes.isNotEmpty()) write()
@@ -64,8 +70,16 @@ internal class BackgroundDeviceStore(private val address: String, private val da
     private suspend fun write() {
         val mine = myInfo ?: return
         val entityNodes = nodes.values.map { it.toNew() }
+        val loraNow = lora
         val written =
             databaseManager.withDeviceDb(address, createIfMissing = true) { db ->
+                // The radio settings (region, preset) are kept too: the statistics sync only runs between devices on
+                // the same settings.
+                if (loraNow != null) {
+                    val old = db.channelSetDao().get()
+                    val set = (old?.channelSet ?: ChannelSet.Builder().build()).newBuilder().also { it.lora_config = loraNow }.build()
+                    db.channelSetDao().upsert(old?.copy(channelSet = set) ?: ChannelSetEntity(channelSet = set))
+                }
                 val dao = db.nodeInfoDao()
                 val existing = dao.getMyNodeEntity()
                 when {

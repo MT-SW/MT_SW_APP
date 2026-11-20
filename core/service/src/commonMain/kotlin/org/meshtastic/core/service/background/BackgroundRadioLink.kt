@@ -141,6 +141,7 @@ class BackgroundRadioLink(
             frame.my_info != null ||
                 frame.metadata != null ||
                 frame.node_info != null ||
+                frame.config?.lora != null ||
                 (frame.config_complete_id ?: 0) != 0
         if (forStore && !setup.trySend(frame).isSuccess) {
             Logger.w { "Background radio link: setup queue is full, a frame was dropped" }
