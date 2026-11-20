@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +54,8 @@ import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.reconnecting
 import org.meshtastic.core.resources.stop_connecting
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.icon.Check
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.bleScanRequiresLocationServices
 import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 import kotlin.time.Duration.Companion.milliseconds
@@ -154,6 +157,9 @@ fun ConnectingDeviceInfo(
             }
         }
 
+        // MT_SW: the steps of this attempt as a short list, finished ones ticked.
+        ConnectionSteps(transportStatus)
+
         DisconnectButton(onClick = onClickDisconnect, label = disconnectLabel)
     }
 }
@@ -174,4 +180,44 @@ private fun rememberSettledPhase(phase: StringResource?): StringResource? {
         shown = phase
     }
     return shown
+}
+
+/**
+ * The steps the connection attempt has gone through so far, in the order they happened: finished ones carry a tick, the
+ * one in progress a small spinner. Only steps the transport really reports are listed, so a network connection shows its
+ * own, shorter list. The list starts again with each new attempt.
+ */
+@Composable
+private fun ConnectionSteps(transportStatus: TransportStatus?) {
+    val phase = transportStatus?.phase
+    var steps by remember { mutableStateOf(emptyList<TransportPhase>()) }
+    LaunchedEffect(phase) {
+        steps =
+            when {
+                phase == null || phase == TransportPhase.WaitingToRetry -> emptyList()
+                phase == TransportPhase.Connected -> steps
+                phase in steps -> steps
+                else -> steps + phase
+            }
+    }
+    if (steps.isEmpty()) return
+    val inProgress = steps.last().takeIf { phase != TransportPhase.Connected }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        steps.forEach { step ->
+            val label = step.label() ?: return@forEach
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (step == inProgress) {
+                    ProgressSpinner(size = 16.dp)
+                } else {
+                    Icon(
+                        imageVector = MeshtasticIcons.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+                Text(text = stringResource(label), style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
 }

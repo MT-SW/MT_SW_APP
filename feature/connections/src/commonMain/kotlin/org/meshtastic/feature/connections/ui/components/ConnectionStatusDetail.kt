@@ -80,7 +80,7 @@ fun TransportStatus?.toConnectionStatusDetail(
     )
 }
 
-private fun TransportPhase.label(): StringResource? = when (this) {
+internal fun TransportPhase.label(): StringResource? = when (this) {
     TransportPhase.FindingDevice -> Res.string.connection_phase_finding_device
 
     TransportPhase.Pairing -> Res.string.connection_phase_pairing
