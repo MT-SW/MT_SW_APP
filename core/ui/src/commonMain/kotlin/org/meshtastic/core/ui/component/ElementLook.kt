@@ -237,6 +237,8 @@ fun StyledSurface(
     floating: Boolean = false,
     rimDp: Float? = null,
     fallbackMinAlpha: Float = GLASS_FALLBACK_MIN_ALPHA,
+    /** No darker shade at the bottom of the glass: the sheen just fades out (a small, low pane such as the bar). */
+    flatBottom: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val rimWidth = rimDp ?: rememberUiOptions().rimDp()
@@ -253,7 +255,7 @@ fun StyledSurface(
                     .shadow(if (floating) FLAT_SHADOW_DP.dp else 0.dp, shape, clip = false)
                     .clip(shape)
                     .hazeBlur(input = HazeInput.Sources(hazeState), style = blur)
-                    .glassEdge(shape, rimWidth),
+                    .glassEdge(shape, rimWidth, flatBottom),
             ) {
                 content()
             }
@@ -261,7 +263,7 @@ fun StyledSurface(
 
         style.look == ElementLook.GLASS || style.look == ElementLook.TRANSPARENT ->
             Surface(
-                modifier = modifier.glassEdge(shape, rimWidth),
+                modifier = modifier.glassEdge(shape, rimWidth, flatBottom),
                 shape = shape,
                 // Glass that cannot blur (over a map, on an old Android) imitates a frosted pane: it stays dense enough
                 // to read what is on it.
@@ -351,7 +353,7 @@ private const val EDGE_INNER_SHARE = 0.5f
  * top), a faint shade at the bottom, and a thin bright edge that is strongest on the upper left and lower right, with a
  * second finer line just inside it, so the glass seems to have thickness.
  */
-internal fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWithContent {
+internal fun Modifier.glassEdge(shape: Shape, rimDp: Float, flatBottom: Boolean = false): Modifier = drawWithContent {
     val outline = shape.createOutline(size, layoutDirection, this)
     drawOutline(
         outline = outline,
@@ -359,7 +361,7 @@ internal fun Modifier.glassEdge(shape: Shape, rimDp: Float): Modifier = drawWith
         Brush.verticalGradient(
             0f to Color.White.copy(alpha = SHEEN_TOP_ALPHA),
             SHEEN_MID_STOP to Color.Transparent,
-            1f to Color.Black.copy(alpha = SHEEN_BOTTOM_ALPHA),
+            1f to if (flatBottom) Color.Transparent else Color.Black.copy(alpha = SHEEN_BOTTOM_ALPHA),
         ),
     )
     drawContent()

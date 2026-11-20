@@ -323,6 +323,8 @@ private fun FloatingNavBar(
                 colorScheme.surfaceContainerHigh
             },
             rimDp = rimDp,
+            // A low bar: a darker band under the middle of it showed as an odd strip around the names.
+            flatBottom = true,
         ) {
             Row(
                 modifier = Modifier.padding(BAR_PADDING_DP.dp),
