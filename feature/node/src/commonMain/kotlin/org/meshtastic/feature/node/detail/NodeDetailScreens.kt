@@ -40,6 +40,7 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.navigation.MapRoute
+import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.resources.Res
@@ -157,7 +158,8 @@ private fun NodeDetailScaffold(
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,
                 actions = {},
-                onClickChip = {},
+                // The plate of our node opens our node when another node is shown.
+                onClickChip = { ours -> if (ours.num != node?.num) onNavigate(NodesRoute.NodeDetail(ours.num)) },
             )
         },
     ) { paddingValues ->
