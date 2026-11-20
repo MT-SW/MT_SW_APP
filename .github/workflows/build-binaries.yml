@@ -370,3 +370,18 @@ jobs:
           path: build/MT_SW_APP-iOS.ipa
           if-no-files-found: error
           retention-days: 30
+
+  # Wszystkie zbudowane pliki (Android, Windows, Linux, macOS, iPhone/iPad) w jednym miejscu: jedno pobranie zamiast kilku.
+  all-in-one:
+    name: Wszystko w jednym folderze
+    needs: [android, desktop-windows, desktop-linux, desktop-macos, ios]
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/upload-artifact/merge@v4
+        continue-on-error: true
+        with:
+          name: MT_SW_APP-wszystko
+          pattern: '*'
+          delete-merged: true
+          retention-days: 30
