@@ -81,6 +81,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
@@ -123,6 +124,7 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isDesktopPlatform
@@ -454,7 +456,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             maxLines = 4,
             shape = BubbleShape,
             modifier =
-            Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
+            Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, BubbleShape).onPreviewKeyEvent { event ->
                 // Computers: Enter sends, Shift+Enter makes a new line. The phone keeps its normal behaviour.
                 if (isDesktopPlatform && event.key == Key.Enter && !event.isShiftPressed) {
                     if (event.type == KeyEventType.KeyUp && !state.busy && state.input.isNotBlank()) {

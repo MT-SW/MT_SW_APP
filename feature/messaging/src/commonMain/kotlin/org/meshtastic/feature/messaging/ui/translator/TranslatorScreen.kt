@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,6 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.resources.Res
@@ -87,6 +89,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation
@@ -153,7 +156,8 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             onValueChange = viewModel::setInput,
             label = { Text(stringResource(Res.string.translator_input_hint)) },
             minLines = 3,
-            modifier = Modifier.fillMaxWidth(),
+            shape = TranslatorInputShape,
+            modifier = Modifier.fillMaxWidth().elementLook(UiOptions.GROUP_INPUT, TranslatorInputShape),
         )
         // Buttons from the right edge: the main action is last, right under the thumb.
         Row(
@@ -447,3 +451,6 @@ private fun LanguagePicker(
         }
     }
 }
+
+/** The softly rounded input field, like the message field of the chats. */
+private val TranslatorInputShape = RoundedCornerShape(20.dp)

@@ -59,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -89,6 +90,7 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import kotlin.time.Clock
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -158,7 +160,6 @@ import org.meshtastic.feature.messaging.isOwnImageHost
 import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
-import kotlin.time.Clock
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 
@@ -556,6 +557,11 @@ fun MessageItem(
                     end = if (message.fromLocal) 0.dp else 36.dp,
                 )
                 .widthIn(max = 480.dp)
+                .then(messageModifier)
+                .pressSpring()
+                .elementLook(UiOptions.GROUP_BUBBLES, messageShape)
+                // The click (and its hover highlight) sits inside the shadow and has the bubble's own shape.
+                .clip(messageShape)
                 .combinedClickable(
                     onClick = { if (quickReactionsOpen) onQuickReactionsOpenChange(false) else onClick() },
                     onLongClick = {
@@ -569,9 +575,6 @@ fun MessageItem(
                         if (!inSelectionMode) onQuickReactionsOpenChange(!quickReactionsOpen)
                     },
                 )
-                .then(messageModifier)
-                .pressSpring()
-                .elementLook(UiOptions.GROUP_BUBBLES, messageShape)
                 .semantics(mergeDescendants = true) {
                     contentDescription = messageA11yText
                     role = Role.Button

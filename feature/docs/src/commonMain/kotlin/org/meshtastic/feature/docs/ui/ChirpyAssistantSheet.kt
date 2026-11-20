@@ -67,6 +67,8 @@ import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.resources.Res as CoreRes
 import org.meshtastic.core.resources.chirpy
 import org.meshtastic.core.resources.chirpy_assistant_title
 import org.meshtastic.core.resources.chirpy_checking
@@ -80,6 +82,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Send
@@ -87,7 +90,6 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.ChirpyMessage
 import org.meshtastic.feature.docs.model.ChirpyRole
 import org.meshtastic.feature.docs.model.ModelReadiness
-import org.meshtastic.core.resources.Res as CoreRes
 
 /** Chirpy AI Assistant bottom sheet with chat UI. Hidden entirely when the assistant reports unsupported. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -187,7 +189,10 @@ private fun ChirpyChatSheet(
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                modifier =
+                Modifier.fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .elementLook(UiOptions.GROUP_INPUT, RoundedCornerShape(INPUT_CORNER_PERCENT)),
             )
         }
     }

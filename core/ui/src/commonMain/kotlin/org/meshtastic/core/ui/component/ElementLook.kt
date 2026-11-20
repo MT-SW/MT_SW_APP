@@ -45,7 +45,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
@@ -155,14 +155,8 @@ internal val CARD_GROUPS =
 internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifier = when {
     dp <= 0f -> this
 
-    dark ->
-        shadow(
-            elevation = (dp * DARK_GLOW_REACH).dp,
-            shape = shape,
-            clip = false,
-            ambientColor = Color.White,
-            spotColor = Color.White,
-        )
+    // A black shadow cannot be seen on a dark theme: a light glow close to the edge, drawn by hand.
+    dark -> cardShadow(dp * BAR_GLOW_SHARE, shape, true)
 
     else -> shadow(elevation = dp.dp, shape = shape, clip = false)
 }
@@ -181,15 +175,17 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
     } else {
         drawBehind {
             val outline = shape.createOutline(size, layoutDirection, this)
-            val radius =
+            // The shadow follows every corner of the shape (a message bubble has corners of different sizes).
+            val box =
                 when (outline) {
-                    is Outline.Rounded -> outline.roundRect.topLeftCornerRadius.x
-                    else -> 0f
+                    is Outline.Rounded -> outline.roundRect
+                    is Outline.Rectangle -> RoundRect(outline.rect)
+                    is Outline.Generic -> RoundRect(outline.path.getBounds())
                 }
             val reach = dp.dp.toPx() * CARD_SHADOW_REACH * (if (dark) DARK_GLOW_REACH else 1f)
             val shift = reach * SHADOW_DROP
             val tint = if (dark) Color.White else Color.Black
-            val layerAlpha = (if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA) / SHADOW_LAYERS
+            val strength = if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA
             val hole =
                 Path().apply {
                     when (outline) {
@@ -201,23 +197,36 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
             clipPath(hole, ClipOp.Difference) {
                 for (i in SHADOW_LAYERS downTo 1) {
                     val grow = reach * i / SHADOW_LAYERS
-                    drawRoundRect(
-                        color = tint.copy(alpha = layerAlpha),
-                        topLeft = Offset(-grow, -grow + shift),
-                        size = Size(size.width + 2 * grow, size.height + 2 * grow),
-                        cornerRadius = CornerRadius(radius + grow, radius + grow),
-                    )
+                    // The layers add up to a shadow that fades out smoothly (quadratically) away from the edge.
+                    val inner = 1f - (i - 1f) / SHADOW_LAYERS
+                    val outer = 1f - i.toFloat() / SHADOW_LAYERS
+                    val alpha = strength * (inner * inner - outer * outer)
+                    fun widen(r: CornerRadius) =
+                        if (r.x > 0f || r.y > 0f) CornerRadius(r.x + grow, r.y + grow) else CornerRadius.Zero
+                    val layer =
+                        RoundRect(
+                            left = box.left - grow,
+                            top = box.top - grow + shift,
+                            right = box.right + grow,
+                            bottom = box.bottom + grow + shift,
+                            topLeftCornerRadius = widen(box.topLeftCornerRadius),
+                            topRightCornerRadius = widen(box.topRightCornerRadius),
+                            bottomRightCornerRadius = widen(box.bottomRightCornerRadius),
+                            bottomLeftCornerRadius = widen(box.bottomLeftCornerRadius),
+                        )
+                    drawPath(Path().apply { addRoundRect(layer) }, color = tint.copy(alpha = alpha))
                 }
             }
         }
     }
 
-private const val SHADOW_LAYERS = 14
-private const val CARD_SHADOW_REACH = 0.55f
+private const val SHADOW_LAYERS = 16
+private const val CARD_SHADOW_REACH = 0.5f
+private const val BAR_GLOW_SHARE = 0.6f
 private const val BUBBLE_SHADOW_SHARE = 0.4f
-private const val SHADOW_ALPHA = 0.26f
-private const val DARK_GLOW_ALPHA = 0.2f
-private const val SHADOW_DROP = 0.35f
+private const val SHADOW_ALPHA = 0.3f
+private const val DARK_GLOW_ALPHA = 0.22f
+private const val SHADOW_DROP = 0.25f
 
 /** The thickness of the rim chosen in the settings, in dp. */
 internal fun UiOptions.rimDp(): Float =
