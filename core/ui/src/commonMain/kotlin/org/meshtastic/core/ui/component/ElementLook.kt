@@ -148,7 +148,14 @@ internal fun Modifier.softShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
             val shift = reach * SHADOW_DROP
             val tint = if (dark) Color.White else Color.Black
             val layerAlpha = (if (dark) DARK_GLOW_ALPHA else SHADOW_ALPHA) / SHADOW_LAYERS
-            val hole = Path().apply { addOutline(outline) }
+            val hole =
+                Path().apply {
+                    when (outline) {
+                        is Outline.Rectangle -> addRect(outline.rect)
+                        is Outline.Rounded -> addRoundRect(outline.roundRect)
+                        is Outline.Generic -> addPath(outline.path)
+                    }
+                }
             clipPath(hole, ClipOp.Difference) {
                 for (i in SHADOW_LAYERS downTo 1) {
                     val grow = reach * i / SHADOW_LAYERS
