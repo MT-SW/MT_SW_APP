@@ -1098,6 +1098,9 @@ internal fun MessageInput(
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = inputFade)
             }
+        val showSupportingText =
+            isEnabled &&
+                (currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES || splitChunkCount > 1)
         OutlinedTextField(
             colors =
             OutlinedTextFieldDefaults.colors(
@@ -1135,7 +1138,9 @@ internal fun MessageInput(
             // ImeAction.Default, and without it an IME may swap Enter for the action, leaving no way to type a newline.
             keyboardOptions =
             KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Default),
-            supportingText = {
+            supportingText =
+            if (showSupportingText) {
+                {
                 // The counter is only useful as the limit approaches. Showing 0/200 before a character is typed is
                 // chrome that every chat client has learned to hide. A message that will be split is worth a hint
                 // regardless of how close to maxByteSize it is, since MESSAGE_CHARACTER_LIMIT_BYTES (the real,
@@ -1163,6 +1168,10 @@ internal fun MessageInput(
                         textAlign = TextAlign.End,
                     )
                 }
+                }
+            } else {
+                // MT_SW: no empty space under the field, so its shadow hugs the field itself.
+                null
             },
             // Direct byte limiting via inputTransformation in TextFieldState is complex.
             // The current approach (show error, disable send) is generally preferred for UX.
