@@ -18,7 +18,7 @@ package org.meshtastic.feature.connections.domain.usecase
 
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.database.DatabaseManager
-import org.meshtastic.core.datastore.RecentAddressesDataSource
+import org.meshtastic.feature.connections.data.RecentAddressesSource
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.feature.connections.model.GetDiscoveredDevicesUseCase
 
@@ -35,7 +35,7 @@ import org.meshtastic.feature.connections.model.GetDiscoveredDevicesUseCase
  */
 @Single(binds = [GetDiscoveredDevicesUseCase::class])
 class IosGetDiscoveredDevicesUseCase(
-    recentAddressesDataSource: RecentAddressesDataSource,
+    recentAddressesDataSource: RecentAddressesSource,
     nodeRepository: NodeRepository,
     databaseManager: DatabaseManager,
     usbScanner: UsbScanner? = null,
