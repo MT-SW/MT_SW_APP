@@ -1081,7 +1081,18 @@ internal fun MessageInput(
                 isEnabled = isEnabled,
                 onSendMessage = onSendMessage,
             )
-            Spacer(modifier = Modifier.weight(1f))
+            // MT_SW: the hint that the message will go out as several packets sits between the two.
+            if (isEnabled && splitChunkCount > 1) {
+                Text(
+                    text = stringResource(Res.string.message_split_pending, splitChunkCount),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             // Markdown formatting toolbar — shown once the field is focused and holds enough text to format.
             if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
                 FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
@@ -1101,9 +1112,8 @@ internal fun MessageInput(
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = inputFade)
             }
-        // MT_SW: the counter / split hint lives inside the field (next to the buttons), not in a strip under it.
+        // MT_SW: the counter lives inside the field (next to the buttons), not in a strip under it.
         val showCounter = isEnabled && currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES
-        val showSplitHint = isEnabled && splitChunkCount > 1
         OutlinedTextField(
             colors =
             OutlinedTextFieldDefaults.colors(
@@ -1155,16 +1165,9 @@ internal fun MessageInput(
                 // than as waiting for input.
                 val sendEnabled = isEnabled && (canSend || mentionActive)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (showCounter || showSplitHint) {
+                    if (showCounter) {
                         Text(
-                            text =
-                            buildString {
-                                if (showCounter) append("$currentByteLength/$maxByteSize")
-                                if (showSplitHint) {
-                                    if (isNotEmpty()) append("  •  ")
-                                    append(stringResource(Res.string.message_split_pending, splitChunkCount))
-                                }
-                            },
+                            text = "$currentByteLength/$maxByteSize",
                             style = MaterialTheme.typography.bodySmall,
                             color =
                             if (isOverLimit) {
