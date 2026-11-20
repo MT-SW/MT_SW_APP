@@ -141,7 +141,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
 
 private const val DARK_SHEEN_BOOST = 1.8f
 private const val LIGHT_SHEEN_BOOST = 1.3f
-private const val DARK_GLOW_REACH = 1.3f
+private const val DARK_GLOW_REACH = 2.2f
 
 /** The groups of cards: they cast the stronger hand-drawn [cardShadow]. */
 internal val CARD_GROUPS =
@@ -205,7 +205,10 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
                     // The layers add up to a shadow that fades out smoothly (quadratically) away from the edge.
                     val inner = 1f - (i - 1f) / SHADOW_LAYERS
                     val outer = 1f - i.toFloat() / SHADOW_LAYERS
-                    val alpha = strength * (inner * inner - outer * outer)
+                    // On a dark theme the glow fades with a smooth S-curve (soft at both ends), so it melts away
+                    // instead of ending abruptly.
+                    fun fade(x: Float) = if (dark) x * x * (3f - 2f * x) else x * x
+                    val alpha = strength * (fade(inner) - fade(outer))
                     fun widen(r: CornerRadius) =
                         if (r.x > 0f || r.y > 0f) CornerRadius(r.x + grow, r.y + grow) else CornerRadius.Zero
                     val layer =
@@ -225,12 +228,12 @@ internal fun Modifier.cardShadow(dp: Float, shape: Shape, dark: Boolean): Modifi
         }
     }
 
-private const val SHADOW_LAYERS = 16
+private const val SHADOW_LAYERS = 24
 private const val CARD_SHADOW_REACH = 0.5f
 private const val BAR_GLOW_SHARE = 0.6f
 private const val BUBBLE_SHADOW_SHARE = 0.8f
 private const val SHADOW_ALPHA = 0.3f
-private const val DARK_GLOW_ALPHA = 0.1f
+private const val DARK_GLOW_ALPHA = 0.13f
 private const val DARK_DROP = 0.7f
 private const val DARK_TOP_SHARE = 0.1f
 private const val SHADOW_DROP = 0.25f
