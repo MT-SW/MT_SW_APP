@@ -160,7 +160,7 @@ fun ConsoleScreen(
                     shape = InputShape,
                     colors = inputFieldColors(),
                     singleLine = true,
-                    label = { Text(stringResource(Res.string.console_input)) },
+                    placeholder = { Text(stringResource(Res.string.console_input)) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = { viewModel.run(registry) }),
                 )

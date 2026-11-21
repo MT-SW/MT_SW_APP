@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -224,7 +225,7 @@ fun NodeItem(
     ) {
         Column(
             modifier =
-            Modifier.combinedClickable(
+            Modifier.clip(CardDefaults.shape).combinedClickable(
                 onClickLabel = stringResource(Res.string.node_list_click_label),
                 onClick = onClick,
                 onLongClickLabel = stringResource(Res.string.node_list_long_click_label),

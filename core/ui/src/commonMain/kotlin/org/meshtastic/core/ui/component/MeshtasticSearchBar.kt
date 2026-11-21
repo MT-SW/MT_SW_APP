@@ -304,8 +304,8 @@ private fun InlineSearchField(
 private const val SEARCH_RIM_DP = 1.2f
 private const val SEARCH_FILL_TOP = 0.26f
 private const val SEARCH_FILL_BOTTOM = 0.08f
-private const val SEARCH_FILL_TOP_IDLE = 0.12f
-private const val SEARCH_FILL_BOTTOM_IDLE = 0.04f
+private const val SEARCH_FILL_TOP_IDLE = 0f
+private const val SEARCH_FILL_BOTTOM_IDLE = 0f
 private const val SEARCH_EDGE_BOTTOM_ALPHA = 0.55f
 private const val SEARCH_HINT_ALPHA = 0.6f
 private const val SEARCH_FIELD_HEIGHT_DP = 52
