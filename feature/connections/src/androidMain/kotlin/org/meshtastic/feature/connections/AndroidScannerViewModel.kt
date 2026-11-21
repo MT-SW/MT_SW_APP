@@ -59,6 +59,7 @@ class AndroidScannerViewModel(
     uiPrefs: UiPrefs,
     firmwareRecoveryDataSource: PendingFirmwareRecoverySource,
     bleScanner: org.meshtastic.core.ble.BleScanner? = null,
+    slotsPrefs: org.meshtastic.core.repository.RadioSlotsPrefs? = null,
 ) : ScannerViewModel(
     serviceRepository,
     radioController,
@@ -73,6 +74,7 @@ class AndroidScannerViewModel(
     bleScanner,
     bluetoothSupported = bluetoothRepository.isSupported,
     usbSupported = usbRepository.isSupported,
+    slotsPrefs = slotsPrefs,
 ) {
     override fun requestBonding(entry: DeviceListEntry.Ble, pin: String?) {
         Logger.i { "Starting bonding for ${entry.device.address.anonymize}" }

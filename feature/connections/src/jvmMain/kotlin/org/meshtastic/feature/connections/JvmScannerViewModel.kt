@@ -47,6 +47,7 @@ class JvmScannerViewModel(
     uiPrefs: UiPrefs,
     firmwareRecoveryDataSource: PendingFirmwareRecoverySource,
     bleScanner: org.meshtastic.core.ble.BleScanner? = null,
+    slotsPrefs: org.meshtastic.core.repository.RadioSlotsPrefs? = null,
 ) : ScannerViewModel(
     serviceRepository,
     radioController,
@@ -59,4 +60,5 @@ class JvmScannerViewModel(
     uiPrefs,
     firmwareRecoveryDataSource,
     bleScanner,
+    slotsPrefs = slotsPrefs,
 )

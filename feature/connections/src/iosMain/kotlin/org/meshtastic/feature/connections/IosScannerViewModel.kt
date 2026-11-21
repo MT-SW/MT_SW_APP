@@ -47,6 +47,7 @@ class IosScannerViewModel(
     uiPrefs: UiPrefs,
     firmwareRecoveryDataSource: PendingFirmwareRecoverySource,
     bleScanner: org.meshtastic.core.ble.BleScanner? = null,
+    slotsPrefs: org.meshtastic.core.repository.RadioSlotsPrefs? = null,
 ) : ScannerViewModel(
     serviceRepository,
     radioController,
@@ -59,6 +60,7 @@ class IosScannerViewModel(
     uiPrefs,
     firmwareRecoveryDataSource,
     bleScanner,
+    slotsPrefs = slotsPrefs,
 ) {
     // iOS gives apps no access to a USB serial port (it would need Apple's special accessory chip), so the USB pane
     // stays visible but says so instead of searching.

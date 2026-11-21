@@ -47,6 +47,7 @@ import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.ble.MeshtasticBleConstants
 import org.meshtastic.core.ble.NordicDfu
 import org.meshtastic.core.ble.addressOnlyBleDevice
+import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.datastore.model.PendingFirmwareRecovery
 import org.meshtastic.core.datastore.model.RecentAddress
@@ -55,11 +56,13 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.TransportStatus
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.util.anonymize
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioPrefs
+import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
@@ -176,6 +179,8 @@ open class ScannerViewModel(
     val networkScanSupported: Boolean = true,
     /** Set where a USB device must be requested explicitly, as with Web Serial. */
     private val usbScanner: UsbScanner? = null,
+    /** The saved devices; with it a second device can be connected in the background (see [changeDeviceAddress]). */
+    private val slotsPrefs: RadioSlotsPrefs? = null,
 ) : ViewModel() {
 
     /**
@@ -747,10 +752,33 @@ open class ScannerViewModel(
 
     // ── Device selection / disconnect ───────────────────────────────────────────────────────
 
-    /** Asynchronously tells the radio controller to connect to [address]. */
+    /**
+     * Asynchronously tells the radio controller to connect to [address]. While another device is shown and connected, a
+     * new device is only saved and connected in the background; what the app shows changes when the user switches
+     * devices in the top bar.
+     */
     fun changeDeviceAddress(address: String) {
         Logger.i { "Attempting to change device address to ${address.anonymize()}" }
-        safeLaunch(tag = "changeDeviceAddress") { radioController.setDeviceAddress(address) }
+        safeLaunch(tag = "changeDeviceAddress") {
+            if (!connectInBackground(address)) radioController.setDeviceAddress(address)
+        }
+    }
+
+    /** True when [address] was saved (or switched on) and is left to the background connections of the app. */
+    private suspend fun connectInBackground(address: String): Boolean {
+        val prefs = slotsPrefs ?: return false
+        val shown = radioPrefs.devAddr.value
+        val possible =
+            isValidDeviceAddress(shown) &&
+                isValidDeviceAddress(address) &&
+                shown != address &&
+                serviceRepository.connectionState.value is ConnectionState.Connected &&
+                UiOptions(uiPrefs.uiOptions.value)[UiOptions.RADIO_BACKGROUND] == 1
+        if (!possible) return false
+        val id = prefs.slots.value.firstOrNull { it.address == address }?.id ?: prefs.put(address, null) ?: return false
+        prefs.setOff(id, false)
+        Logger.i { "Device ${address.anonymize()} is connected in the background" }
+        return true
     }
 
     /**
