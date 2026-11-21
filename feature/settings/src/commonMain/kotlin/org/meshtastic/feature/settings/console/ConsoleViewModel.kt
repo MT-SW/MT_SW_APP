@@ -17,9 +17,9 @@
 package org.meshtastic.feature.settings.console
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CancellationException
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

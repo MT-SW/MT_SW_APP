@@ -767,20 +767,25 @@ open class ScannerViewModel(
     /** True when [address] was saved (or switched on) and is left to the background connections of the app. */
     private suspend fun connectInBackground(address: String): Boolean {
         val prefs = slotsPrefs
-        val shown = radioPrefs.devAddr.value
-        val possible =
-            prefs != null &&
-                isValidDeviceAddress(shown) &&
-                isValidDeviceAddress(address) &&
-                shown != address &&
-                UiOptions(uiPrefs.uiOptions.value)[UiOptions.RADIO_BACKGROUND] == 1
-        val saved = prefs?.takeIf { possible }?.slots?.value?.firstOrNull { it.address == address }?.id
-        val id = saved ?: if (possible) prefs?.put(address, null) else null
+        val id =
+            if (prefs != null && canConnectInBackground(address)) {
+                prefs.slots.value.firstOrNull { it.address == address }?.id ?: prefs.put(address, null)
+            } else {
+                null
+            }
         if (id != null) {
             prefs?.setOff(id, false)
             Logger.i { "Device ${address.anonymize()} is connected in the background" }
         }
         return id != null
+    }
+
+    private fun canConnectInBackground(address: String): Boolean {
+        val shown = radioPrefs.devAddr.value
+        return isValidDeviceAddress(shown) &&
+            isValidDeviceAddress(address) &&
+            shown != address &&
+            UiOptions(uiPrefs.uiOptions.value)[UiOptions.RADIO_BACKGROUND] == 1
     }
 
     /**

@@ -50,8 +50,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -109,7 +109,7 @@ fun MenuFAB(
             }
             val itemModifier = if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier
             if (decor.custom) {
-                GlassMenuItem(item, expanded, decor, textColor, itemModifier, select)
+                GlassMenuItem(item, expanded, decor, textColor, select, itemModifier)
             } else {
                 FloatingActionButtonMenuItem(
                     modifier = itemModifier,
@@ -123,8 +123,8 @@ fun MenuFAB(
 }
 
 /**
- * The glass button is drawn here and not by the Material toggle button: that one adds its own shadow, which showed as
- * a different coloured square in the middle of a see-through button.
+ * The glass button is drawn here and not by the Material toggle button: that one adds its own shadow, which showed as a
+ * different coloured square in the middle of a see-through button.
  */
 @Composable
 private fun GlassMenuButton(
@@ -158,8 +158,8 @@ private fun GlassMenuItem(
     expanded: Boolean,
     decor: FilledDecor,
     textColor: Color,
-    modifier: Modifier,
     onSelect: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val shape = CircleShape
     AnimatedVisibility(visible = expanded, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
@@ -181,7 +181,6 @@ private fun GlassMenuItem(
         }
     }
 }
-
 
 @Composable
 private fun Modifier.glassLook(shape: Shape, decor: FilledDecor): Modifier = floatingBacking(shape, decor)

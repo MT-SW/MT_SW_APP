@@ -546,6 +546,7 @@ internal fun findNode(nodes: List<Node>, text: String): Node? {
 
 private const val UNSIGNED_INT_MASK = 0xFFFFFFFFL
 private const val HEX_RADIX = 16
+private const val GPIO_WRITE_ARGS = 3
 
 /** The commands that act on the connected device; the same set as the commands of the Meshtastic command line. */
 fun buildDeviceCommands(
@@ -743,7 +744,7 @@ fun buildDeviceCommands(
                     }
                 }
 
-                isWord(args.firstOrNull(), labels.argWrite) && args.size == 3 && mask != null -> {
+                isWord(args.firstOrNull(), labels.argWrite) && args.size == GPIO_WRITE_ARGS && mask != null -> {
                     val value = parseNumber(args[2])
                     if (value == null) bad(labels.gpio) else done(device.gpioWrite(mask, value))
                 }
@@ -832,8 +833,8 @@ fun buildDeviceCommands(
             if (settings == null) {
                 done(false)
             } else {
-                val setLines = consoleSettings.map {
-                    "${labels.set.name} ${it.name} ${quote(it.read(settings.first, settings.second))}"
+                val setLines = consoleSettings.map { setting ->
+                    "${labels.set.name} ${setting.name} ${quote(setting.read(settings.first, settings.second))}"
                 }
                 val channelLines =
                     device.channels().flatMapIndexed { position, channel ->
