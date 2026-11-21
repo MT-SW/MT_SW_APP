@@ -669,7 +669,7 @@
     <string name="availability_hint">When the radio recorded packets from this node. Taller bars mean more packets. It reaches back only as far as the log retention allows.</string>
     <string name="availability_longest_silence">Longest silence: %1$s</string>
     <string name="availability_now">now</string>
-    <string name="availability_summary">Heard in %1$d of %2$d time slots (%3$d%%)</string>
+    <string name="availability_summary">Heard in %1$d of %2$d time slots (%3$d%)</string>
     <string name="availability_title">Node availability</string>
     <string name="available_pins">Available pins</string>
     <string name="back">Back</string>
@@ -1142,7 +1142,7 @@
     <string name="console_input">Command</string>
     <string name="console_intro">Type a command and press Enter. The "help" command shows all of them.</string>
     <string name="console_next">Next</string>
-    <string name="console_out_battery_line">%1$s: battery %2$s%%, %3$s V</string>
+    <string name="console_out_battery_line">%1$s: battery %2$s%, %3$s V</string>
     <string name="console_out_bridge_changed">TCP bridge: %1$s.</string>
     <string name="console_out_bridge_none">Save a device in the Connect window first.</string>
     <string name="console_out_bridge_off">off</string>

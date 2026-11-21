@@ -19,7 +19,7 @@
     <!-- A11Y -->
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Wiadomość od %1$s: %2$s</string>
-    <string name="a11y_node_battery">bateria %1$d%%</string>
+    <string name="a11y_node_battery">bateria %1$d%</string>
     <string name="a11y_node_channel">Kanał %1$d</string>
     <string name="a11y_node_distance_away">%1$s stąd</string>
     <string name="a11y_node_favorite">ulubiony</string>
@@ -255,7 +255,7 @@
     <string name="chirpy_assistant_title">Asystent Chirpy</string>
     <string name="chirpy_checking">Sprawdzanie dostępności Chirpy…</string>
     <string name="chirpy_downloading">Chirpy jest pobierany…</string>
-    <string name="chirpy_downloading_progress">Pobieranie modelu Chirpy: %1$d%%</string>
+    <string name="chirpy_downloading_progress">Pobieranie modelu Chirpy: %1$d%</string>
     <string name="chirpy_downloading_subtitle">To wydarzy się tylko raz. Chirpy będzie gotowy już wkrótce!</string>
     <string name="chirpy_error_busy">Ojej! Kanał jest teraz mocno zatłoczony! 📶 Poczekajmy na wolne okno i spróbujmy ponownie.</string>
     <string name="chirpy_error_model_unavailable">Ładuję baterię albo wciąż pobieram firmware! 🔋 Daj mi chwilę na synchronizację i rozruch!</string>
@@ -3770,7 +3770,7 @@
     <string name="availability_hint">Kiedy radio zapisało pakiety od tego węzła. Wyższy słupek to więcej pakietów. Sięga tylko tak daleko, jak pozwala czas przechowywania logów.</string>
     <string name="availability_empty">Brak zapisanych pakietów od tego węzła w tym okresie.</string>
     <string name="availability_now">teraz</string>
-    <string name="availability_summary">Słyszany w %1$d z %2$d przedziałów czasu (%3$d%%)</string>
+    <string name="availability_summary">Słyszany w %1$d z %2$d przedziałów czasu (%3$d%)</string>
     <string name="availability_longest_silence">Najdłuższa cisza: %1$s</string>
     <string name="mt_sw_other_availability_title">Dostępność węzła</string>
     <string name="mt_sw_other_availability_body">W szczegółach węzła (pod strażnikiem węzła) wykres słupkowy pokazuje, kiedy radio zapisało pakiety od tego węzła: z ostatniej doby, 3, 7, 14 albo 30 dni. Wyższy słupek to więcej pakietów w danym przedziale czasu; pod wykresem widzisz, w ilu przedziałach węzeł był słyszany, i jego najdłuższą ciszę. Wykres powstaje z zapisanych pakietów, więc sięga tylko tak daleko, jak pozwala czas przechowywania logów (Funkcje MT_SW → Logi).</string>
@@ -4587,7 +4587,7 @@
     <string name="console_out_message_line">%1$s %2$s: %3$s</string>
     <string name="console_out_signal_line">%1$s: SNR %2$s dB, RSSI %3$s dBm, przeskoki %4$s</string>
     <string name="console_out_nearby_line">%1$s (%2$s) – %3$d m</string>
-    <string name="console_out_battery_line">%1$s: bateria %2$s%%, %3$s V</string>
+    <string name="console_out_battery_line">%1$s: bateria %2$s%, %3$s V</string>
     <string name="console_out_loop_started">Powtarzam „%1$s” co %2$d s. Zakończysz: pętla stop</string>
     <string name="console_out_loop_stopped">Powtarzanie zatrzymane.</string>
     <string name="console_out_loop_bad">Podaj sekundy (co najmniej %2$d) i polecenie (nie pętlę ani polecenie wymagające potwierdzenia). Użycie: %1$s</string>
