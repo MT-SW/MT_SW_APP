@@ -67,6 +67,8 @@ data class RadioChoice(
     val unread: Int = 0,
     /** What the device is doing while it connects in the background (config, channels, node list); null when done. */
     val progress: String? = null,
+    /** The steps and retry countdown while it connects in the background (the same the main card shows). */
+    val transportStatus: org.meshtastic.core.model.TransportStatus? = null,
 )
 
 /**
@@ -122,9 +124,11 @@ class RadioChooserViewModel(
             },
             radioPrefs.devAddr,
             serviceRepository.connectionState,
-            combine(background.connectedAddresses, background.progressByAddress) { q, g -> q to g },
+            combine(background.connectedAddresses, background.progressByAddress, background.statusByAddress) { q, g, t ->
+                Triple(q, g, t)
+            },
             combine(dropped, plates, uiPrefs.uiOptions) { d, p, o -> Triple(d, p, o) },
-        ) { (slots, selectedId, off), address, connection, (quiet, steps), (droppedByItself, plate, options) ->
+        ) { (slots, selectedId, off), address, connection, (quiet, steps, statuses), (droppedByItself, plate, options) ->
             val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
             val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
@@ -150,6 +154,7 @@ class RadioChooserViewModel(
                     nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
                     unread = if (active) 0 else unread[slot.address] ?: 0,
                     progress = if (active) null else steps[slot.address],
+                    transportStatus = if (active) null else statuses[slot.address],
                 )
             }
             RadioChooserState(

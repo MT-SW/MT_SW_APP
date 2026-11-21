@@ -38,6 +38,9 @@ interface RadioBackgroundMonitor {
     /** What each background device is doing while it connects (config, channels, node list), by address; empty when done. */
     val progressByAddress: StateFlow<Map<String, String>>
 
+    /** The steps and the retry countdown of each background device that is connecting (as the main card shows them). */
+    val statusByAddress: StateFlow<Map<String, org.meshtastic.core.model.TransportStatus>>
+
     /** How many messages reached each background device (by address) since the device was last shown; empty at 0. */
     val unreadByAddress: StateFlow<Map<String, Int>>
 

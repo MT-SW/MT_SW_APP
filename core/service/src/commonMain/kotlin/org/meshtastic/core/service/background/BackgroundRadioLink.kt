@@ -119,6 +119,13 @@ class BackgroundRadioLink(
     override val transportStatus: StateFlow<TransportStatus?> = MutableStateFlow(null)
     override val activeSession: StateFlow<RadioSessionContext?> = MutableStateFlow(null)
 
+    /** What the transport reports while it connects (steps, retry countdown, last failure); shown on the card. */
+    val lastStatus = MutableStateFlow<TransportStatus?>(null)
+
+    override fun onStatus(status: TransportStatus) {
+        lastStatus.value = status
+    }
+
     override fun onConnect() {
         state.value = ConnectionState.Connected
         Logger.i { "Background radio link connected" }

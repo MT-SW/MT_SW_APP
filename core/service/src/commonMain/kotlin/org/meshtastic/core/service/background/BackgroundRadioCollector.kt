@@ -88,6 +88,10 @@ class BackgroundRadioCollector(
 
     override val progressByAddress: StateFlow<Map<String, String>> = progress
 
+    private val statuses = MutableStateFlow<Map<String, org.meshtastic.core.model.TransportStatus>>(emptyMap())
+
+    override val statusByAddress: StateFlow<Map<String, org.meshtastic.core.model.TransportStatus>> = statuses
+
     override fun clearUnread(address: String) {
         unread.update { it - address }
     }
@@ -172,10 +176,16 @@ class BackgroundRadioCollector(
         try {
             supervisorScope {
                 val writer = launch { writeLogs(address, link) }
+                launch {
+                    link.lastStatus.collect { status ->
+                        statuses.update { if (status == null) it - address else it + (address to status) }
+                    }
+                }
                 val processor = launch { processPackets(address, link) }
                 val store = launch {
                     BackgroundDeviceStore(address, databaseManager) { text ->
                         progress.update { if (text == null) it - address else it + (address to text) }
+                        if (text == null) statuses.update { it - address }
                     }
                         .run(link.setup)
                     readBadge(address)
@@ -199,6 +209,7 @@ class BackgroundRadioCollector(
         } finally {
             withContext(NonCancellable) {
                 progress.update { it - address }
+                statuses.update { it - address }
                 pool.detachBackground(address, link)
                 linkScope.cancel()
             }

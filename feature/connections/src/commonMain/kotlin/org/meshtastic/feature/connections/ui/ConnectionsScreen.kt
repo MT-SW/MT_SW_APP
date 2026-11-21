@@ -687,7 +687,7 @@ fun ConnectionsScreen(
                                 deviceAddress = radio.address.drop(1),
                                 connectionStatus = ConnectionStatus.CONNECTING,
                                 connectionProgress = radio.progress,
-                                transportStatus = null,
+                                transportStatus = radio.transportStatus,
                                 onClickDisconnect = { radios.onDisconnect(slotId) },
                                 modifier = Modifier.heightIn(min = CardMinHeight),
                             )
