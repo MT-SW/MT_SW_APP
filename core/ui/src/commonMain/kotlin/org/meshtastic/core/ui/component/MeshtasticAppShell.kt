@@ -144,6 +144,7 @@ fun MeshtasticAppShell(
             RadioChooserActions(
                 state = radioChooserState,
                 onChoose = radioChooser::choose,
+                onConnect = radioChooser::connect,
                 onDisconnect = radioChooser::disconnect,
                 onRemove = radioChooser::remove,
                 onTargetNextPick = radioChooser::targetForNextPick,

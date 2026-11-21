@@ -168,6 +168,7 @@ import org.meshtastic.core.ui.util.rememberOpenWifiSettings
 import org.meshtastic.core.ui.util.shouldShowWifiUnavailableBanner
 import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 import org.meshtastic.core.ui.viewmodel.ConnectionsViewModel
+import org.meshtastic.core.ui.viewmodel.RadioStatus
 import org.meshtastic.feature.connections.NO_DEVICE_SELECTED
 import org.meshtastic.feature.connections.ScannerViewModel
 import org.meshtastic.feature.connections.model.DeviceListEntry
@@ -682,7 +683,13 @@ fun ConnectionsScreen(
                             slotId = slotId,
                             slotCount = SLOT_COUNT,
                             radio = radio,
-                            onUse = { radios.onChoose(slotId) },
+                            onUse = {
+                                if (radio?.status == RadioStatus.Connected) {
+                                    radios.onChoose(slotId)
+                                } else {
+                                    radios.onConnect(slotId)
+                                }
+                            },
                             onDisconnect = { radios.onDisconnect(slotId) },
                             onRemove = { radios.onRemove(slotId) },
                             minHeight = CardMinHeight,

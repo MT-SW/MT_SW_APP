@@ -74,6 +74,7 @@ import org.meshtastic.proto.User
 data class RadioChooserActions(
     val state: RadioChooserState = RadioChooserState(),
     val onChoose: (Int) -> Unit = {},
+    val onConnect: (Int) -> Unit = {},
     val onDisconnect: (Int) -> Unit = {},
     val onRemove: (Int) -> Unit = {},
     val onTargetNextPick: (Int) -> Unit = {},

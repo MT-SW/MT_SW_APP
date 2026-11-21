@@ -288,6 +288,20 @@ class RadioChooserViewModel(
         }
     }
 
+    /**
+     * Connects the saved radio [id] in the background: it is switched on and the background connections take it up,
+     * while the device that is shown stays as it is (no waiting screen, no change of the data). Only when no device is
+     * shown at all does it become the shown one. Showing it is done by the user with [choose].
+     */
+    fun connect(id: Int) {
+        val slot = slotsPrefs.slots.value.firstOrNull { it.id == id } ?: return
+        if (!isValidDeviceAddress(radioPrefs.devAddr.value)) {
+            choose(id)
+            return
+        }
+        viewModelScope.launch { slotsPrefs.setOff(slot.id, false) }
+    }
+
     /** Disconnects the saved radio [id] (in use or in the background); it stays saved and stays off until connected. */
     fun disconnect(id: Int) {
         val slot = slotsPrefs.slots.value.firstOrNull { it.id == id } ?: return
