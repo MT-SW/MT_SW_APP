@@ -235,7 +235,13 @@ private fun ChannelConfigScreen(
                         }
                     },
                     // Above the floating bar, which lies over the bottom of the screen.
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
+                    modifier =
+                    Modifier.padding(
+                        start = 16.dp,
+                        top = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp + LocalFloatingBarInset.current,
+                    ),
                 ) {
                     Icon(MeshtasticIcons.Add, stringResource(Res.string.add))
                 }
