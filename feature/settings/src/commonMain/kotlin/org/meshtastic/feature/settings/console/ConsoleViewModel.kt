@@ -18,6 +18,7 @@ package org.meshtastic.feature.settings.console
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,18 +27,22 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
-import org.meshtastic.core.repository.AdminController
+import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.usecase.SendMessageUseCase
 
 /** What the console screen shows and remembers: the printed lines, the typed line and the earlier lines. */
 @KoinViewModel
 class ConsoleViewModel(
     private val nodeRepository: NodeRepository,
     private val serviceRepository: ServiceRepository,
-    private val adminController: AdminController,
-) : ViewModel() {
+    private val radioController: RadioController,
+    private val sendMessageUseCase: SendMessageUseCase,
+) : ViewModel(), ConsoleDevice {
     private val history = ConsoleHistory()
     private val _lines = MutableStateFlow<List<String>>(emptyList())
     val lines: StateFlow<List<String>> = _lines.asStateFlow()
@@ -50,11 +55,75 @@ class ConsoleViewModel(
     fun connection(): ConnectionState = serviceRepository.connectionState.value
 
     /** Sets the fixed position of the connected device; false when no device is connected yet. */
-    suspend fun setPosition(latitude: Double, longitude: Double, altitude: Int?): Boolean {
+    suspend fun setPosition(latitude: Double, longitude: Double, altitude: Int?): Boolean =
+        onDevice { num -> radioController.setFixedPosition(num, Position(latitude, longitude, altitude)) }
+
+    /** Runs [block] with the number of the connected device; false when none is connected or the call failed. */
+    private suspend fun onDevice(block: suspend (Int) -> Unit): Boolean {
         val num = nodeRepository.myNodeInfo.value?.myNodeNum ?: return false
-        adminController.setFixedPosition(num, Position(latitude, longitude, altitude))
-        return true
+        return try {
+            block(num)
+            true
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            Logger.w(e) { "Console command failed" }
+            false
+        }
     }
+
+    private fun packetId() = radioController.generatePacketId()
+
+    override fun ownNode(): Node? = nodeRepository.ourNodeInfo.value
+
+    override suspend fun send(text: String, channel: Int, destination: Node?): Boolean = onDevice {
+        sendMessageUseCase(text, "$channel${destination?.user?.id ?: NodeAddress.ID_BROADCAST}")
+    }
+
+    override suspend fun reboot() = onDevice { radioController.reboot(it, packetId()) }
+
+    override suspend fun shutdown() = onDevice { radioController.shutdown(it, packetId()) }
+
+    override suspend fun factoryReset() = onDevice { radioController.factoryReset(it, packetId()) }
+
+    override suspend fun resetNodes(keepFavorites: Boolean) = onDevice {
+        radioController.nodedbReset(it, packetId(), keepFavorites)
+    }
+
+    override suspend fun removeNode(node: Node) = onDevice { radioController.removeByNodenum(packetId(), node.num) }
+
+    override suspend fun setFavorite(node: Node, on: Boolean) = onDevice { radioController.setFavorite(node.num, on) }
+
+    override suspend fun setIgnored(node: Node, on: Boolean) = onDevice { radioController.setIgnored(node.num, on) }
+
+    override suspend fun traceroute(node: Node) = onDevice { radioController.requestTraceroute(packetId(), node.num) }
+
+    override suspend fun requestPosition(node: Node) = onDevice {
+        radioController.requestPosition(node.num, Position(0.0, 0.0, 0), packetId())
+    }
+
+    override suspend fun telemetry(node: Node, type: TelemetryType) = onDevice {
+        radioController.requestTelemetry(packetId(), node.num, type.ordinal)
+    }
+
+    override suspend fun setOwner(longName: String, shortName: String?): Boolean {
+        val own = nodeRepository.ourNodeInfo.value ?: return false
+        val user =
+            own.user.copy(long_name = longName, short_name = shortName ?: own.user.short_name)
+        return onDevice { radioController.setOwner(it, user, packetId()) }
+    }
+
+    override suspend fun setTime() = onDevice { radioController.setTime(it, packetId()) }
+
+    override suspend fun ringtone(rtttl: String?) = onDevice {
+        if (rtttl == null) radioController.playRingtone(it) else radioController.setRingtone(it, rtttl)
+    }
+
+    override suspend fun canned(messages: String) = onDevice { radioController.setCannedMessages(it, messages) }
+
+    override suspend fun gpioRead(mask: Long): Long? =
+        nodeRepository.myNodeInfo.value?.myNodeNum?.let { radioController.readGpio(it, mask) }
+
+    override suspend fun gpioWrite(mask: Long, value: Long): Boolean =
+        nodeRepository.myNodeInfo.value?.myNodeNum?.let { radioController.writeGpio(it, mask, value) } ?: false
 
     fun setInput(text: String) {
         _input.value = text

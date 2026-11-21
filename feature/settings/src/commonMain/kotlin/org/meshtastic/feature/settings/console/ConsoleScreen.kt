@@ -98,6 +98,7 @@ fun ConsoleScreen(
                     bridge = { bridge.state.value },
                     updateBridge = bridge::update,
                     setPosition = viewModel::setPosition,
+                    device = viewModel,
                 ),
                 labels,
             )

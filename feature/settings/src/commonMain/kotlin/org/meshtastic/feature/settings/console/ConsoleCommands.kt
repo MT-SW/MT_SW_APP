@@ -108,6 +108,7 @@ class ConsoleEnvironment(
     val bridge: () -> RadioBridgeState,
     val updateBridge: ((RadioBridgeConfig) -> RadioBridgeConfig) -> Unit,
     val setPosition: suspend (latitude: Double, longitude: Double, altitude: Int?) -> Boolean,
+    val device: ConsoleDevice,
 )
 
 /** The name, the description and the way of writing one command, in the language of the app. */
@@ -125,6 +126,7 @@ class ConsoleLabels(
     val nodes: ConsoleLabel,
     val bridge: ConsoleLabel,
     val position: ConsoleLabel,
+    val device: ConsoleDeviceLabels,
     val on: String,
     val off: String,
 )
@@ -195,10 +197,11 @@ fun rememberConsoleLabels(): ConsoleLabels {
             Res.string.console_cmd_position_summary,
             Res.string.console_cmd_position_usage,
         )
+    val device = rememberConsoleDeviceLabels()
     val on = stringResource(Res.string.console_arg_on)
     val off = stringResource(Res.string.console_arg_off)
-    return remember(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, on, off) {
-        ConsoleLabels(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, on, off)
+    return remember(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, device, on, off) {
+        ConsoleLabels(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, device, on, off)
     }
 }
 
@@ -460,6 +463,6 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                 }
             },
         )
-    registry = ConsoleRegistry(commands) { getStringSuspend(Res.string.console_out_unknown, it) }
+    registry = ConsoleRegistry(commands + buildDeviceCommands(env, labels.device, labels.on, labels.off)) { getStringSuspend(Res.string.console_out_unknown, it) }
     return registry
 }
