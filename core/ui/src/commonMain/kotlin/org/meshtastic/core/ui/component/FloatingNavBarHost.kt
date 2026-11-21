@@ -73,6 +73,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -322,6 +323,9 @@ private fun FloatingNavBar(
             baseColor =
             if (darker) {
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
+            } else if (colorScheme.surface.luminance() > LIGHT_THEME_LUMINANCE) {
+                // Light theme off the map: a touch of grey, as on the map, but the bar stays see-through.
+                lerp(colorScheme.surfaceContainerHigh, Color.Black, LIGHT_GREY_SHARE)
             } else {
                 colorScheme.surfaceContainerHigh
             },
@@ -402,6 +406,12 @@ private const val SELECTED_ALPHA = 0.12f
 
 /** How much darker the bar is on the map card. */
 private const val DARKER_SHARE = 0.22f
+
+/** How much grey the bar gets on a light theme away from the map (the map card uses [DARKER_SHARE]). */
+private const val LIGHT_GREY_SHARE = 0.08f
+
+/** A surface brighter than this counts as a light theme. */
+private const val LIGHT_THEME_LUMINANCE = 0.5f
 
 /** How much denser (less see-through, in strength points) the bar is on the map card. */
 private const val MAP_BAR_DENSER = 30
