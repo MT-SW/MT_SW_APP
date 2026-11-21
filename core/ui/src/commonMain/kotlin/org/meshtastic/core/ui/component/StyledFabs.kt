@@ -19,6 +19,20 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
+import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.FloatingActionButtonElevation
@@ -204,3 +218,58 @@ fun FilledTonalIconButton(
         content = content,
     )
 }
+
+/**
+ * The short message bar at the bottom of the screens. With the glass or outline look of "Buttons" it is drawn like the
+ * floating buttons: clear glass with an outline in the colour of the theme (dark with a light text in the dark theme,
+ * light with a dark text in the light theme); with the plain Material look it stays the plain bar.
+ */
+@Composable
+fun StyledSnackbar(data: SnackbarData, modifier: Modifier = Modifier) {
+    val accent = MaterialTheme.colorScheme.primary
+    val decor = rememberDecorFor(accent, accent, enabled = true)
+    if (!decor.custom) {
+        Snackbar(snackbarData = data, modifier = modifier)
+        return
+    }
+    val shape = RoundedCornerShape(SNACKBAR_CORNER_DP.dp)
+    val textColor = decor.outline?.text ?: MaterialTheme.colorScheme.onSurface
+    val visuals = data.visuals
+    Row(
+        modifier =
+        modifier
+            .padding(SNACKBAR_MARGIN_DP.dp)
+            .fillMaxWidth()
+            .floatingBacking(shape, decor)
+            .decorated(decor, shape)
+            .padding(start = SNACKBAR_PADDING_DP.dp, top = SNACKBAR_VERTICAL_DP.dp, bottom = SNACKBAR_VERTICAL_DP.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(SNACKBAR_GAP_DP.dp),
+    ) {
+        Text(
+            text = visuals.message,
+            color = textColor,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
+        )
+        visuals.actionLabel?.let { label ->
+            TextButton(onClick = data::performAction) { Text(text = label, color = accent) }
+        }
+        if (visuals.withDismissAction) {
+            MaterialIconButtonDismiss(onClick = data::dismiss, tint = textColor)
+        }
+    }
+}
+
+@Composable
+private fun MaterialIconButtonDismiss(onClick: () -> Unit, tint: Color) {
+    IconButton(onClick = onClick) {
+        Icon(imageVector = MeshtasticIcons.Close, contentDescription = null, tint = tint)
+    }
+}
+
+private const val SNACKBAR_CORNER_DP = 16
+private const val SNACKBAR_MARGIN_DP = 12
+private const val SNACKBAR_PADDING_DP = 16
+private const val SNACKBAR_VERTICAL_DP = 8
+private const val SNACKBAR_GAP_DP = 8

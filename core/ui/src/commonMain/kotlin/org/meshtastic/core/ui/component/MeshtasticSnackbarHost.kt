@@ -65,6 +65,7 @@ fun MeshtasticSnackbarProvider(
         CompositionLocalProvider(LocalSnackbarManager provides snackbarManager, content = content)
         SnackbarHost(
             hostState = snackbarHostState,
+            snackbar = { StyledSnackbar(it) },
             modifier = Modifier.align(Alignment.BottomCenter).safeDrawingPadding().then(hostModifier),
         )
     }

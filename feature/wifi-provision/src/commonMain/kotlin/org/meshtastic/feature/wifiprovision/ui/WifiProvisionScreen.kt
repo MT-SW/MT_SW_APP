@@ -132,6 +132,7 @@ import org.meshtastic.core.resources.wifi_provision_success_ssh_unavailable
 import org.meshtastic.core.resources.wifi_provision_success_username
 import org.meshtastic.core.resources.wifi_provision_success_username_value
 import org.meshtastic.core.resources.wifi_provisioning
+import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
@@ -207,7 +208,7 @@ fun WifiProvisionScreen(
                 actions = { SosBarAction() },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) { StyledSnackbar(it) } },
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().animateContentSize()) {
             // Indeterminate progress bar for active operations

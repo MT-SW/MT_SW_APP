@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.sniffer_warning_cancel
 import org.meshtastic.core.resources.sniffer_warning_compatibility
 import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
+import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
@@ -276,7 +277,7 @@ fun SnifferSettingsScreen(
                 onClickChip = {},
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) { StyledSnackbar(it) } },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             loadedLog?.let { log ->
