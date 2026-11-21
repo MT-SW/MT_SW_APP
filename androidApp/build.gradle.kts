@@ -236,6 +236,7 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.barcode)
     implementation(projects.core.takserver)
+    implementation(projects.appShell)
     implementation(projects.feature.intro)
     implementation(projects.feature.messaging)
     implementation(projects.feature.connections)

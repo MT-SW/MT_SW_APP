@@ -167,8 +167,8 @@ fun EntryProviderScope<NavKey>.docsEntries(backStack: NavBackStack<NavKey>) {
 }
 ```
 
-Aplikacje wywołują funkcje wpisów wszystkich modułów funkcji z jednego miejsca: z bloku `entryProvider<NavKey> { }` w
-`Main.kt` aplikacji `androidApp` oraz z `desktopNavGraph` w `DesktopNavigation.kt` aplikacji `desktopApp`.
+Aplikacje wywołują funkcje wpisów wszystkich modułów funkcji z jednego miejsca: z `sharedNavGraph` w
+`MeshtasticMainScreen.kt` modułu `appShell`, które `MeshtasticMainScreen` przekazuje do `MeshtasticNavDisplay` na Androidzie, komputerze i w przeglądarce.
 
 ## Testowanie
 

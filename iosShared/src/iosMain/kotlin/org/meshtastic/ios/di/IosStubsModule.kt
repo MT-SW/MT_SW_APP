@@ -23,16 +23,16 @@ import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MagneticFieldProvider
 import org.meshtastic.core.repository.MeshWorkerManager
+import org.meshtastic.core.repository.NoopAppWidgetUpdater
+import org.meshtastic.core.repository.NoopMagneticFieldProvider
+import org.meshtastic.core.repository.NoopPlatformAnalytics
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.map.hud.CameraPoseProvider
 import org.meshtastic.feature.map.hud.PhonePressureProvider
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
-import org.meshtastic.ios.stub.NoopAppWidgetUpdater
-import org.meshtastic.ios.stub.NoopMagneticFieldProvider
 import org.meshtastic.ios.stub.NoopMeshWorkerManager
-import org.meshtastic.ios.stub.NoopPlatformAnalytics
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 
 /** Things the iPhone does not do yet (location, compass, barometer, widgets): the app works without them. */

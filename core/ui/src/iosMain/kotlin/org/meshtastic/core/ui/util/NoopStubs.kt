@@ -18,7 +18,6 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.text.AnnotatedString
@@ -39,11 +38,7 @@ actual val isDesktopPlatform: Boolean = false
 
 actual val bleScanRequiresLocationServices: Boolean = false
 
-@Composable actual fun isGpsDisabled(): Boolean = false
-
 @Composable actual fun isBluetoothSupported(): Boolean = true
-
-@Composable actual fun isWifiUnavailable(): Boolean = false
 
 @Composable actual fun rememberBluetoothPermissionState(): PermissionUiState = grantedPermissionUiState()
 
@@ -51,4 +46,3 @@ actual val bleScanRequiresLocationServices: Boolean = false
 
 @Composable actual fun rememberCameraPermissionState(): PermissionUiState = grantedPermissionUiState()
 
-actual fun KeyEvent.isFromSoftKeyboard(): Boolean = false

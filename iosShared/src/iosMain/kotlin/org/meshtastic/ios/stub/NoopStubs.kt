@@ -23,14 +23,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import org.meshtastic.core.repository.AppWidgetUpdater
-import org.meshtastic.core.repository.DataPair
 import org.meshtastic.core.repository.Location
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MeshLocationManager
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PersistedPacketId
-import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.proto.Position as ProtoPosition
 
 /**
@@ -50,18 +47,6 @@ private fun logWarn(message: String) {
 }
 
 // region Notification / Platform Stubs (Android-only)
-
-class NoopPlatformAnalytics : PlatformAnalytics {
-    override fun track(event: String, vararg properties: DataPair) {}
-
-    override fun setDeviceAttributes(firmwareVersion: String, model: String) {}
-
-    override val isPlatformServicesAvailable: Boolean = false
-}
-
-class NoopAppWidgetUpdater : AppWidgetUpdater {
-    override suspend fun updateAll() {}
-}
 
 // endregion
 

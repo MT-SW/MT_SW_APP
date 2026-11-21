@@ -146,6 +146,7 @@ private val ALL_MODULES_FULL =
         ":feature:firmware",
         ":feature:wifi-provision",
         ":feature:widget",
+        ":appShell",
         ":desktopApp",
         ":iosShared",
     )

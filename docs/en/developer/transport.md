@@ -116,14 +116,14 @@ mid-session, and the device list has to notice. Every consumer must read that on
 admission path have to agree, or the demo entry appears and then refuses to connect.
 
 `BaseRadioTransportFactory` (`core:network`, `commonMain`) holds the shared half: it creates
-`BleRadioTransport` for BLE addresses and `WebSocketRadioTransport` for WebSocket ones, admits each address type in `isAddressValid`, and hands every other
-address to the platform's `createPlatformTransport`. On hardware without Bluetooth LE it refuses BLE
+`BleRadioTransport` for BLE addresses and `WebSocketRadioTransport` for WebSocket ones, admits each address type in `isAddressValid`, and dispatches every other
+address in `createPlatformTransport`: mock and no-device itself, and replay, TCP and serial through hooks a platform overrides. `NonWebRadioTransportFactory` (`nonWebMain`) supplies raw TCP for Android and Desktop. On hardware without Bluetooth LE it refuses BLE
 addresses, and the Android factory refuses serial addresses on hardware with no USB host, so a saved
 address restored onto such a device is kept but never armed.
 
 Platform-specific implementations:
 - **Android:** `AndroidRadioTransportFactory` (`core:network`, `androidMain`) supports BLE + USB + TCP; Demo Mode is on in debug builds and Firebase Test Lab
-- **Desktop:** `DesktopRadioTransportFactory` (`desktopApp`) supports BLE (Kable) + USB + TCP; Demo Mode is a debug-build feature, and the replay transport isn't wired
+- **Desktop:** `DesktopRadioTransportFactory` (`desktopApp`) supports BLE (Kable) + USB + TCP; Demo Mode is a debug-build feature, and an `r` address opens the plain mock, and an `n` or unknown prefix opens the no-op transport like every other platform
 - **Web:** `WasmJsRadioTransportFactory` (`core:network`, `wasmJsMain`) supports BLE (Kable over Web Bluetooth) + USB (Web Serial) + WebSocket. It refuses raw TCP addresses (`isRawTcpSupported = false`), since a browser opens no sockets, so its Network pane takes WebSocket addresses only
 - **iOS:** Code compiles for BLE and TCP, but no `RadioTransportFactory` implementation exists and no iOS app ships
 

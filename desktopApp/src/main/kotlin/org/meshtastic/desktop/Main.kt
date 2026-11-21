@@ -22,7 +22,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,6 +82,7 @@ import org.koin.core.context.stopKoin
 import org.koin.plugin.module.dsl.startKoin
 import org.maplibre.compose.desktop.ProvideMapPresentationHost
 import org.maplibre.compose.desktop.rememberAwtComposeMapPresentationHost
+import org.meshtastic.appshell.MeshServiceLifecycle
 import org.meshtastic.core.common.BuildConfigProvider
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.background.SingleInstanceControls
@@ -106,7 +106,6 @@ import org.meshtastic.core.resources.desktop_tray_quit
 import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
-import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.navigation.startDestination
@@ -136,7 +135,6 @@ import org.meshtastic.core.ui.util.TracerouteMapOverlayInsets
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.desktop.data.DesktopPreferencesDataSource
 import org.meshtastic.desktop.di.DesktopKoinApp
-import org.meshtastic.desktop.map.DesktopTracerouteMap
 import org.meshtastic.desktop.map.desktopMapViewProvider
 import org.meshtastic.desktop.mcp.DesktopMcpLifecycle
 import org.meshtastic.desktop.notification.DesktopOS
@@ -158,6 +156,7 @@ import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNeighborMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
+import org.meshtastic.feature.map.maplibre.MapLibreTracerouteMapSlot
 import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
 import java.awt.Desktop
 import java.io.File
@@ -339,16 +338,6 @@ private fun bringWindowToFront() {
 }
 
 // ----- Mesh service lifecycle -----
-
-/** Starts [MeshServiceOrchestrator] on composition and stops it on disposal. */
-@Composable
-private fun MeshServiceLifecycle() {
-    val meshServiceController = koinInject<MeshServiceOrchestrator>()
-    DisposableEffect(Unit) {
-        meshServiceController.start()
-        onDispose { meshServiceController.stop() }
-    }
-}
 
 private val NODE_CLEANUP_CHECK_INTERVAL = 1.hours
 private val NODE_CLEANUP_START_DELAY = 1.minutes
@@ -685,7 +674,7 @@ private fun ApplicationScope.MeshtasticWindow(
                     },
                 LocalTracerouteMapProvider provides
                     { overlay, nodePositions, onMappableCountChanged, modifier ->
-                        DesktopTracerouteMap(overlay, nodePositions, onMappableCountChanged, modifier)
+                        MapLibreTracerouteMapSlot(overlay, nodePositions, onMappableCountChanged, modifier)
                     },
                 // Clear of the MapLibre logo and attribution row along the bottom edge.
                 LocalTracerouteMapOverlayInsetsProvider provides

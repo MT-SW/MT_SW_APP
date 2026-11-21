@@ -125,15 +125,17 @@ actual val bleScanRequiresLocationServices: Boolean = false
 
 actual val isDesktopPlatform: Boolean = true
 
-@Composable actual fun isGpsDisabled(): Boolean = false
+/** No platform primitive sets the display brightness on desktop. */
+@Composable
+actual fun SetScreenBrightness(brightness: Float) {
+    // No-op
+}
 
 /** JVM — Bluetooth adapter state is not surfaced on Desktop. */
 @Composable actual fun isBluetoothDisabled(): Boolean = false
 
 @Composable actual fun isBluetoothSupported(): Boolean = true
 
-/** JVM — local-network availability is not gated on Desktop. */
-@Composable actual fun isWifiUnavailable(): Boolean = false
 
 /** JVM stub — app settings are not available on Desktop. */
 @Composable

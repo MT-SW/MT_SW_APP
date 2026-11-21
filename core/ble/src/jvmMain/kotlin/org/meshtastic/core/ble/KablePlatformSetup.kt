@@ -37,24 +37,11 @@ internal actual val supportsNativeAddressScanFilter: Boolean = false
 // KableBleScanner.scan narrows client-side using Advertisement.uuids instead.
 internal actual val supportsNativeServiceScanFilter: Boolean = false
 
-internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean) {
-    // Desktop Kable uses direct connections without needing autoConnect.
-}
-
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =
     com.juul.kable.Peripheral(address.toIdentifier(), builderAction)
 
 // JVM/desktop Kable does not expose an MTU StateFlow; return a reasonable default (512)
 // so callers can size their writes without falling back to an overly conservative minimum.
 internal actual fun Peripheral.negotiatedMaxWriteLength(): Int? = DEFAULT_JVM_MTU
-
-internal actual fun Peripheral.requestHighConnectionPriority(): Boolean = false
-
-internal actual fun Peripheral.requestBalancedConnectionPriority(): Boolean = false
-
-internal actual fun Peripheral.refreshGattCache(): Boolean = false
-
-// JVM/desktop Kable does not expose MTU negotiation control.
-internal actual suspend fun Peripheral.negotiateMtu(mtu: Int): Int? = null
 
 private const val DEFAULT_JVM_MTU = 512

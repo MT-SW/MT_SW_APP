@@ -134,9 +134,9 @@ Zarówno wartownik grafu (`MyFeatureRoute.MyFeatureGraph`), jak i główny ekran
 prowadzą do tego samego kompozytu, więc funkcja jest osiągalna zarówno przez wypchnięcie na najwyższym poziomie, jak i przez
 wypchnięcie grafu deep linka — według tego samego wzorca, którego używają `feature:wifi-provision` i `feature:firmware`.
 
-Następnie podepnij ją: wywołaj `myFeatureGraph(backStack)` z bloku `entryProvider<NavKey> { }` w
-`Main.kt` aplikacji `androidApp` oraz z `desktopNavGraph` w `DesktopNavigation.kt` aplikacji `desktopApp`, obok funkcji wpisów
-innych modułów funkcji. Zobacz [Rejestracja wpisów nawigacji](navigation-and-deep-links#navigation-entry-registration).
+Następnie podepnij ją: dodaj moduł do `appShell/build.gradle.kts` i wywołaj `myFeatureGraph(backStack)` z
+`sharedNavGraph` w `MeshtasticMainScreen.kt` modułu `appShell`, obok funkcji wpisów innych modułów funkcji, tak aby
+widziały ją hosty Androida, komputera i przeglądarki. Moduł bez celu webowego wywołuje się z `nonWebMain` modułu `appShell` przez `expect`, tak jak `mapGraph`. Zobacz [Rejestracja wpisów nawigacji](navigation-and-deep-links#navigation-entry-registration).
 
 ## Wytyczne dotyczące zestawów źródeł
 

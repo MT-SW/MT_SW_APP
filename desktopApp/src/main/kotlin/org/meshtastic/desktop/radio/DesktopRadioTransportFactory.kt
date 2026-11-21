@@ -23,12 +23,8 @@ import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.ble.BluetoothRepository
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DeviceType
-import org.meshtastic.core.model.InterfaceId
-import org.meshtastic.core.model.util.anonymize
 import org.meshtastic.core.network.SerialTransport
-import org.meshtastic.core.network.radio.BaseRadioTransportFactory
-import org.meshtastic.core.network.radio.MockRadioTransport
-import org.meshtastic.core.network.radio.TcpRadioTransport
+import org.meshtastic.core.network.radio.NonWebRadioTransportFactory
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
@@ -46,7 +42,7 @@ class DesktopRadioTransportFactory(
     bluetoothRepository: BluetoothRepository,
     connectionFactory: BleConnectionFactory,
     dispatchers: CoroutineDispatchers,
-) : BaseRadioTransportFactory(scanner, bluetoothRepository, connectionFactory, dispatchers) {
+) : NonWebRadioTransportFactory(scanner, bluetoothRepository, connectionFactory, dispatchers) {
 
     override val supportedDeviceTypes: List<DeviceType> = listOf(DeviceType.TCP, DeviceType.BLE, DeviceType.USB)
 
@@ -54,36 +50,16 @@ class DesktopRadioTransportFactory(
     // the hidden showcase, and offers the demo entry in the picker.
     override val mockTransportEnabled: StateFlow<Boolean> = MutableStateFlow(DesktopBuildConfig.IS_DEBUG)
 
-    /** Desktop bundles no capture asset, and [createPlatformTransport] does not wire a replay address. */
+    /**
+     * Desktop bundles no capture asset, so an `r` address opens the plain mock and the picker offers no replay entry.
+     */
     override val isReplayTransportAvailable: Boolean = false
 
-    override fun createPlatformTransport(address: String, service: RadioInterfaceService): RadioTransport = when {
-        address.startsWith(InterfaceId.MOCK.id) -> {
-            MockRadioTransport(
-                callback = service,
-                scope = service.serviceScope,
-                address = address.removePrefix(InterfaceId.MOCK.id.toString()),
-            )
-        }
-
-        address.startsWith(InterfaceId.TCP.id) -> {
-            TcpRadioTransport(
-                callback = service,
-                scope = service.serviceScope,
-                dispatchers = dispatchers,
-                address = address.removePrefix(InterfaceId.TCP.id.toString()),
-            )
-        }
-
-        address.startsWith(InterfaceId.SERIAL.id) -> {
-            SerialTransport.create(
-                portName = address.removePrefix(InterfaceId.SERIAL.id.toString()),
-                callback = service,
-                scope = service.serviceScope,
-                dispatchers = dispatchers,
-            )
-        }
-
-        else -> error("Unsupported transport for address: ${address.anonymize()}")
-    }
+    override fun createSerialTransport(service: RadioInterfaceService, rest: String): RadioTransport =
+        SerialTransport.create(
+            portName = rest,
+            callback = service,
+            scope = service.serviceScope,
+            dispatchers = dispatchers,
+        )
 }

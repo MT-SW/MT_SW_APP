@@ -76,9 +76,9 @@ Aby usunąć zarchiwizowaną rozmowę na stałe, przesuń ją w lewo na liście 
 
 ## Wiadomości bezpośrednie
 
-Wiadomości bezpośrednie (DM) trafiają do jednego, konkretnego węzła. Gdy oba węzły mają nawzajem swoje klucze publiczne, Twój węzeł szyfruje wiadomość kluczem publicznym drugiego węzła, więc nikt inny w sieci mesh nie może jej przeczytać — nawet węzły, które dzielą z Tobą kanał.
+Wiadomości bezpośrednie (DM) trafiają do jednego, konkretnego węzła. Gdy oba węzły mają nawzajem swoje klucze publiczne, Twój węzeł szyfruje wiadomość kluczem publicznym drugiego węzła, więc nikt inny w sieci mesh nie może jej przeczytać — nawet węzły, które dzielą z Tobą kanał. Węzeł z licencją (Ham) nigdy nie szyfruje: jego wiadomości bezpośrednie wychodzą bez szyfrowania, może je odczytać każdy w zasięgu, a przyjmuje je tylko węzeł z licencją.
 
-Twój węzeł musi już mieć klucz publiczny drugiego węzła, zanim będzie mogło wysłać wiadomość bezpośrednią. Klucze podróżują wewnątrz informacji o węźle, które węzły okresowo rozgłaszają, więc zwykle klucz pojawia się sam, gdy tylko usłyszysz dany węzeł. Dopóki to nie nastąpi, węzeł mający własną parę kluczy — czyli domyślnie — odmawia wysłania zamiast przechodzić na szyfrowanie kanału, a przy wiadomości widać **Klucz odbiorcy niedostępny**.
+Jeśli Twój węzeł nie ma licencji, musi już mieć klucz publiczny drugiego węzła, zanim będzie mogło wysłać wiadomość bezpośrednią. Klucze podróżują wewnątrz informacji o węźle, które węzły okresowo rozgłaszają, więc zwykle klucz pojawia się sam, gdy tylko usłyszysz dany węzeł. Dopóki to nie nastąpi, węzeł mający własną parę kluczy — czyli domyślnie — odmawia wysłania zamiast przechodzić na szyfrowanie kanału, a przy wiadomości widać **Klucz odbiorcy niedostępny**.
 
 Rozmowa z kluczem publicznym ma na górnym pasku ikonę szyfrowania. Zielona zamknięta kłódka oznacza, że wiadomość bezpośrednia jest chroniona szyfrowaniem kluczem publicznym; czerwona ikona przekreślonego klucza oznacza, że klucz publiczny węzła zmienił się i nie zgadza się już z tym, który zapamiętał Twój węzeł. Dotknij ikony, aby zobaczyć szczegóły. Ta ikona opisuje szyfrowanie rozmowy, więc przy każdej wersji firmware zostają kłódki, a nie odznaki podpisu i weryfikacji z listy węzłów.
 
