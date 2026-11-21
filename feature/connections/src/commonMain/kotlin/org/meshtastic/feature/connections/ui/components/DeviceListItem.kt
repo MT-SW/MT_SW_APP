@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.rememberResourceEnvironment
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.action_select_device
@@ -57,6 +58,7 @@ import org.meshtastic.core.resources.network
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.serial
+import org.meshtastic.core.ui.component.LocalAppBarExtras
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
@@ -70,6 +72,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.feature.connections.model.DeviceListEntry
+import org.meshtastic.proto.User
 
 private const val RSSI_UPDATE_RATE_MS = 2000L
 
@@ -201,7 +204,20 @@ fun DeviceListItem(
  */
 @Composable
 private fun DeviceHeadline(device: DeviceListEntry) {
-    val node = device.node
+    // A node found in the database of the device in use, else the plate read from the device's own saved database
+    // (the other saved devices are not in the node list of the one in use).
+    val saved =
+        LocalAppBarExtras.current.radios.state.radios.firstOrNull {
+            it.address == device.fullAddress && it.nodeNum != null && !it.shortName.isNullOrBlank()
+        }
+    val node =
+        device.node
+            ?: saved?.let { radio ->
+                Node(
+                    num = radio.nodeNum ?: 0,
+                    user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build(),
+                )
+            }
     if (node != null) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             NodeChip(node = node)
