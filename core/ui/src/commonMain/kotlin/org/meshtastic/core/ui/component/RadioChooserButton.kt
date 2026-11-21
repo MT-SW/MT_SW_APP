@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
@@ -119,7 +121,7 @@ fun RadioChooserButton(actions: RadioChooserActions, modifier: Modifier = Modifi
                 showCount = options[UiOptions.RADIO_COUNT] == 1 || mode == UiOptions.RADIO_ALERT_DIGIT,
             )
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        RadioChooserBubble(expanded = expanded, onDismiss = { expanded = false }) {
             RadioChooserList(state) { radio ->
                 expanded = false
                 actions.onChoose(radio.id)
@@ -268,3 +270,40 @@ private fun defaultShortName(num: Int): String =
 private const val SHORT_NAME_MASK = 0xFFFF
 private const val SHORT_NAME_LENGTH = 4
 private const val HEX_RADIX = 16
+
+/**
+ * The list of devices as a rounded bubble under the radio icon, in the look of the buttons: clear glass with an outline
+ * in the colour of the theme (the plain menu stays as it was with the plain Material look of "Buttons").
+ */
+@Composable
+private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content: @Composable () -> Unit) {
+    val accent = MaterialTheme.colorScheme.primary
+    val decor = rememberDecorFor(accent, accent, enabled = true)
+    if (!decor.custom) {
+        DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) { content() }
+        return
+    }
+    val shape = RoundedCornerShape(BUBBLE_CORNER_DP.dp)
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+        offset = DpOffset(0.dp, BUBBLE_GAP_DP.dp),
+        shape = shape,
+        containerColor = Color.Transparent,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+    ) {
+        Box(
+            modifier =
+            Modifier.floatingBacking(shape, decor)
+                .decorated(decor, shape)
+                .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),
+        ) {
+            content()
+        }
+    }
+}
+
+private const val BUBBLE_CORNER_DP = 22
+private const val BUBBLE_GAP_DP = 4
+private const val BUBBLE_PADDING_DP = 8

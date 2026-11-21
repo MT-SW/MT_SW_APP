@@ -57,7 +57,7 @@ import androidx.compose.material3.FloatingActionButton as MaterialFloatingAction
  * MT_SW: the floating buttons and the filled icon buttons of the app. They follow the choice of "Buttons" in "Look" the
  * same way [Button] does: a thin outline on clear glass (the default), filled glass or the plain Material look.
  */
-private fun Modifier.decorated(decor: FilledDecor, shape: Shape): Modifier = when {
+internal fun Modifier.decorated(decor: FilledDecor, shape: Shape): Modifier = when {
     decor.outline != null -> outlineGlassSurface(shape, decor)
     decor.glass != null -> glassSurface(shape, decor.glass)
     else -> this
