@@ -165,7 +165,7 @@ private fun TileCard(
         if (hovered && enabled) {
             MaterialTheme.colorScheme.onSurface.copy(alpha = TILE_HOVER_ALPHA).compositeOver(container)
         } else {
-            container
+            container.dimmed(enabled)
         }
     // The card keeps its own look (depth, glass edge); only what is inside it is tappable, so the shadow outside is not
     // cut off.
@@ -177,7 +177,8 @@ private fun TileCard(
     ) {
         Column(
             modifier =
-            Modifier.clip(shape)
+            Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA)
+                .clip(shape)
                 .hoverable(hoverSource)
                 .clickable(
                     interactionSource = hoverSource,
@@ -193,6 +194,9 @@ private fun TileCard(
 
 private const val TILE_HOVER_ALPHA = 0.08f
 
+/** A greyed out look is made by fading the colour itself, not the whole card, so the card's depth stays as it is. */
+private fun Color.dimmed(enabled: Boolean): Color = if (enabled) this else copy(alpha = alpha * DISABLED_ALPHA)
+
 /** A big tappable tile: icon in a coloured circle over a label. Greyed out and inert when [enabled] is false. */
 @Composable
 private fun ActionTile(
@@ -207,9 +211,9 @@ private fun ActionTile(
     TileCard(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
+        modifier = modifier,
         container = color.copy(alpha = TINT_ALPHA).compositeOver(base),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.5f)),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.5f).dimmed(enabled)),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 8.dp),
@@ -343,7 +347,7 @@ private fun CommandRow(command: String, description: String, icon: ImageVector, 
     TileCard(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.fillMaxWidth().alpha(if (enabled) 1f else DISABLED_ALPHA),
+        modifier = Modifier.fillMaxWidth(),
         container = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Row(
@@ -392,7 +396,7 @@ private fun ChoiceTile(
         enabled = enabled,
         modifier = modifier,
         container = if (selected) color.copy(alpha = TINT_ALPHA * 2).compositeOver(base) else base,
-        border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) color else color.copy(alpha = 0.25f)),
+        border = BorderStroke(if (selected) 2.dp else 1.dp, (if (selected) color else color.copy(alpha = 0.25f)).dimmed(enabled)),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
