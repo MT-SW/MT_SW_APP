@@ -25,6 +25,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -288,18 +290,23 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
         expanded = expanded,
         onDismissRequest = onDismiss,
         offset = DpOffset(0.dp, BUBBLE_GAP_DP.dp),
-        shape = shape,
+        shape = RectangleShape,
         containerColor = Color.Transparent,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
     ) {
-        Box(
-            modifier =
-            Modifier.floatingBacking(shape, decor)
-                .decorated(decor, shape)
-                .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),
-        ) {
-            content()
+        // The margin gives the shadow room, so the menu window does not cut the edges of the bubble.
+        Box(modifier = Modifier.padding(BUBBLE_MARGIN_DP.dp)) {
+            val backing = MaterialTheme.colorScheme.surface.copy(alpha = BUBBLE_BACKING_ALPHA)
+            Box(
+                modifier =
+                Modifier.shadow(BUBBLE_SHADOW_DP.dp, shape)
+                    .background(backing, shape)
+                    .decorated(decor, shape)
+                    .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),
+            ) {
+                content()
+            }
         }
     }
 }
@@ -307,3 +314,6 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
 private const val BUBBLE_CORNER_DP = 22
 private const val BUBBLE_GAP_DP = 4
 private const val BUBBLE_PADDING_DP = 8
+private const val BUBBLE_MARGIN_DP = 14
+private const val BUBBLE_SHADOW_DP = 8
+private const val BUBBLE_BACKING_ALPHA = 0.94f

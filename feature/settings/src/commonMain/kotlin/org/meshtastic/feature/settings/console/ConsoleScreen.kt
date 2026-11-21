@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -57,12 +58,15 @@ import org.meshtastic.core.resources.console_next
 import org.meshtastic.core.resources.console_prev
 import org.meshtastic.core.resources.console_send
 import org.meshtastic.core.resources.console_title
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.inputFieldColors
 import org.meshtastic.core.ui.viewmodel.RadioChooserViewModel
 import org.meshtastic.feature.settings.mtsw.RadioBridgeViewModel
 
@@ -83,6 +87,8 @@ fun ConsoleScreen(
     val lines by viewModel.lines.collectAsStateWithLifecycle()
     val input by viewModel.input.collectAsStateWithLifecycle()
     val labels = rememberConsoleLabels()
+    // The bridge state only runs while somebody collects it, so the console keeps it collected.
+    val bridgeState = bridge.state.collectAsStateWithLifecycle()
     val registryRef = remember { arrayOfNulls<ConsoleRegistry>(1) }
     val registry =
         remember(labels, viewModel, chooser, bridge) {
@@ -96,7 +102,7 @@ fun ConsoleScreen(
                     remove = chooser::remove,
                     connection = viewModel::connection,
                     nodes = viewModel::nodes,
-                    bridge = { bridge.state.value },
+                    bridge = { bridgeState.value },
                     updateBridge = bridge::update,
                     setPosition = viewModel::setPosition,
                     device = viewModel,
@@ -139,6 +145,9 @@ fun ConsoleScreen(
                 suggestions.forEach { suggestion ->
                     AssistChip(
                         onClick = { viewModel.setInput("$suggestion ") },
+                        shape = ChipShape,
+                        border = null,
+                        modifier = Modifier.elementLook(UiOptions.GROUP_INPUT, ChipShape),
                         label = { Text(suggestion, fontFamily = FontFamily.Monospace) },
                     )
                 }
@@ -147,7 +156,9 @@ fun ConsoleScreen(
                 OutlinedTextField(
                     value = input,
                     onValueChange = viewModel::setInput,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).elementLook(UiOptions.GROUP_INPUT, InputShape),
+                    shape = InputShape,
+                    colors = inputFieldColors(),
                     singleLine = true,
                     label = { Text(stringResource(Res.string.console_input)) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -162,3 +173,6 @@ fun ConsoleScreen(
         }
     }
 }
+
+private val ChipShape = RoundedCornerShape(12.dp)
+private val InputShape = RoundedCornerShape(16.dp)
