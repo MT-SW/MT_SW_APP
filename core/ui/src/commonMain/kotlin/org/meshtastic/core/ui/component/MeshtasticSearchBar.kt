@@ -19,7 +19,6 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -58,13 +57,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -220,38 +218,18 @@ private fun InlineSearchField(
     trailingActions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // MT_SW: the field follows the glass look of the search group: grey while empty, tinted in the colour of the
-    // buttons
-    // (the theme's gold) as soon as something is typed, so it is visible that the list below is being filtered. Its
-    // colour has a gentle gradient (lighter at the top, darker at the bottom) like the buttons, for a 3D feel. The
-    // field is drawn by hand, so its inside has exactly the colour of the whole bar.
+    // MT_SW: the field is a clear glass pane like the outlined buttons: a thin outline and a soft gradient in the
+    // colour of the theme (grey while empty, the theme's gold as soon as something is typed, so it is visible that the
+    // list below is being filtered). Nothing inside is filled solid. The field is drawn by hand, so its inside has
+    // exactly the colour of the whole bar.
     val scheme = MaterialTheme.colorScheme
     val filtering = textFieldState.text.isNotEmpty()
-    val base by
-        animateColorAsState(
-            targetValue =
-            if (filtering) {
-                lerp(
-                    scheme.surfaceContainerHigh,
-                    scheme.primary,
-                    if (isDarkSurface()) SEARCH_ACTIVE_MIX_DARK else SEARCH_ACTIVE_MIX,
-                )
-            } else {
-                scheme.surfaceContainerHigh
-            },
-        )
+    val base = scheme.surfaceContainerHigh
+    val accent by animateColorAsState(targetValue = if (filtering) scheme.primary else scheme.outline)
     val shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp)
-    val dark = isDarkSurface()
-    val gradient =
-        Brush.verticalGradient(
-            listOf(
-                lerp(base, Color.White, if (dark) SEARCH_GRADIENT_LIGHT_DARK else SEARCH_GRADIENT_LIGHT),
-                lerp(base, Color.Black, SEARCH_GRADIENT_SHADE),
-            ),
-        )
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
-    val rimTop = if (dark) SEARCH_RIM_TOP_DARK else SEARCH_RIM_TOP
-    val rimBottom = Color.Black.copy(alpha = if (dark) SEARCH_RIM_BOTTOM_DARK else SEARCH_RIM_BOTTOM)
+    val fillTop = if (filtering) SEARCH_FILL_TOP else SEARCH_FILL_TOP_IDLE
+    val fillBottom = if (filtering) SEARCH_FILL_BOTTOM else SEARCH_FILL_BOTTOM_IDLE
     StyledSurface(
         group = UiOptions.GROUP_SEARCH,
         shape = shape,
@@ -266,15 +244,26 @@ private fun InlineSearchField(
             cursorBrush = SolidColor(contentColor),
             modifier =
             Modifier.fillMaxWidth()
-                .background(gradient)
-                .drawWithContent {
-                    drawContent()
-                    // A thin bright edge that is strongest along the top and fades out downwards: the pane looks
-                    // raised.
+                .drawBehind {
                     val outline = shape.createOutline(size, layoutDirection, this)
                     drawOutline(
                         outline = outline,
-                        brush = Brush.verticalGradient(listOf(Color.White.copy(alpha = rimTop), rimBottom)),
+                        brush =
+                        Brush.verticalGradient(
+                            listOf(accent.copy(alpha = fillTop), accent.copy(alpha = fillBottom)),
+                        ),
+                    )
+                }
+                .drawWithContent {
+                    drawContent()
+                    // A thin outline, strongest along the top, fading downwards: a pane of glass.
+                    val outline = shape.createOutline(size, layoutDirection, this)
+                    drawOutline(
+                        outline = outline,
+                        brush =
+                        Brush.verticalGradient(
+                            listOf(accent, accent.copy(alpha = SEARCH_EDGE_BOTTOM_ALPHA)),
+                        ),
                         style = Stroke(width = SEARCH_RIM_DP.dp.toPx()),
                     )
                 }
@@ -314,18 +303,12 @@ private fun InlineSearchField(
     }
 }
 
-/** How much of the theme colour the field takes on while something is typed in it. */
-private const val SEARCH_ACTIVE_MIX = 0.55f
-private const val SEARCH_ACTIVE_MIX_DARK = 0.7f
-private const val SEARCH_RIM_DP = 1.5f
-private const val SEARCH_RIM_TOP = 0.9f
-private const val SEARCH_RIM_TOP_DARK = 0.55f
-private const val SEARCH_RIM_BOTTOM = 0.18f
-private const val SEARCH_RIM_BOTTOM_DARK = 0.45f
-
-private const val SEARCH_GRADIENT_LIGHT = 0.35f
-private const val SEARCH_GRADIENT_LIGHT_DARK = 0.22f
-private const val SEARCH_GRADIENT_SHADE = 0.16f
+private const val SEARCH_RIM_DP = 1.2f
+private const val SEARCH_FILL_TOP = 0.26f
+private const val SEARCH_FILL_BOTTOM = 0.08f
+private const val SEARCH_FILL_TOP_IDLE = 0.12f
+private const val SEARCH_FILL_BOTTOM_IDLE = 0.04f
+private const val SEARCH_EDGE_BOTTOM_ALPHA = 0.55f
 private const val SEARCH_HINT_ALPHA = 0.6f
 private const val SEARCH_FIELD_HEIGHT_DP = 52
 
