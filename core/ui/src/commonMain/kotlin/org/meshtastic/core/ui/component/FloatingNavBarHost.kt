@@ -330,7 +330,8 @@ private fun FloatingNavBar(
             if (darker) {
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
             } else if (lightTheme) {
-                // Light theme off the map: the same grey as on the map, but the glass keeps its normal, more see-through strength.
+                // Light theme off the map: the same grey as on the map, but the glass keeps its normal, more
+                // see-through strength.
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
             } else {
                 colorScheme.surfaceContainerHigh

@@ -225,12 +225,13 @@ fun NodeItem(
     ) {
         Column(
             modifier =
-            Modifier.clip(CardDefaults.shape).combinedClickable(
-                onClickLabel = stringResource(Res.string.node_list_click_label),
-                onClick = onClick,
-                onLongClickLabel = stringResource(Res.string.node_list_long_click_label),
-                onLongClick = onLongClick,
-            )
+            Modifier.clip(CardDefaults.shape)
+                .combinedClickable(
+                    onClickLabel = stringResource(Res.string.node_list_click_label),
+                    onClick = onClick,
+                    onLongClickLabel = stringResource(Res.string.node_list_long_click_label),
+                    onLongClick = onLongClick,
+                )
                 .fillMaxWidth()
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),

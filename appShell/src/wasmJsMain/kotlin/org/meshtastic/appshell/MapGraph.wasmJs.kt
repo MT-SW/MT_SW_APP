@@ -22,6 +22,9 @@ import androidx.navigation3.runtime.NavKey
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.MultiBackstack
 
-internal actual fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>, multiBackstack: MultiBackstack) {
+internal actual fun EntryProviderScope<NavKey>.mapGraph(
+    backStack: NavBackStack<NavKey>,
+    multiBackstack: MultiBackstack,
+) {
     entry<MapRoute.Map> {}
 }

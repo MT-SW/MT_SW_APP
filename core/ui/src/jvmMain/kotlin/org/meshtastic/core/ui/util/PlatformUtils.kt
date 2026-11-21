@@ -136,7 +136,6 @@ actual fun SetScreenBrightness(brightness: Float) {
 
 @Composable actual fun isBluetoothSupported(): Boolean = true
 
-
 /** JVM stub — app settings are not available on Desktop. */
 @Composable
 actual fun rememberOpenAppSettings(): () -> Unit = { Logger.w { "App settings not available on JVM/Desktop" } }

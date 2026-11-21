@@ -28,7 +28,10 @@ import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.map.navigation.meshHudEntry
 import org.meshtastic.feature.map.navigation.mapGraph as featureMapGraph
 
-internal actual fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>, multiBackstack: MultiBackstack) {
+internal actual fun EntryProviderScope<NavKey>.mapGraph(
+    backStack: NavBackStack<NavKey>,
+    multiBackstack: MultiBackstack,
+) {
     if (!isDesktopPlatform) {
         featureMapGraph(backStack)
         return

@@ -263,6 +263,8 @@ class ContactsViewModelTest {
         val dm = DataPacket(to = "!00000001", from = "!00000002", bytes = "hi".encodeUtf8(), dataType = 1)
         every { packetRepository.getContacts() } returns MutableStateFlow(mapOf("0!00000002" to dm))
         every { packetRepository.getContactSettings() } returns MutableStateFlow(emptyMap())
+        everySuspend { packetRepository.getUnreadCounts() } returns emptyMap()
+        everySuspend { packetRepository.getMessageCounts() } returns emptyMap()
         viewModel =
             ContactsViewModel(
                 SavedStateHandle(),

@@ -187,12 +187,13 @@ fun NodeItemCompact(
     ) {
         Row(
             modifier =
-            Modifier.clip(CardDefaults.shape).combinedClickable(
-                onClickLabel = stringResource(Res.string.node_list_click_label),
-                onClick = onClick,
-                onLongClickLabel = stringResource(Res.string.node_list_long_click_label),
-                onLongClick = onLongClick,
-            )
+            Modifier.clip(CardDefaults.shape)
+                .combinedClickable(
+                    onClickLabel = stringResource(Res.string.node_list_click_label),
+                    onClick = onClick,
+                    onLongClickLabel = stringResource(Res.string.node_list_long_click_label),
+                    onLongClick = onLongClick,
+                )
                 .fillMaxWidth()
                 .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
