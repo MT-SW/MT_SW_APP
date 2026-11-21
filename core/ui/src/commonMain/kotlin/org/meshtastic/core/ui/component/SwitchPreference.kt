@@ -60,26 +60,7 @@ fun SwitchPreference(
             containerColor = containerColor ?: Color.Unspecified,
             selectedContainerColor = Color.Transparent,
         )
-    val accent = MaterialTheme.colorScheme.primary
-    val tintAlpha by animateFloatAsState(if (checked && enabled && containerColor == null) 1f else 0f)
-    val tinted =
-        Modifier.drawBehind {
-            if (tintAlpha > 0f) {
-                drawRect(
-                    brush =
-                    Brush.verticalGradient(
-                        listOf(
-                            accent.copy(alpha = SWITCH_TINT_TOP * tintAlpha),
-                            accent.copy(alpha = SWITCH_TINT_BOTTOM * tintAlpha),
-                        ),
-                    ),
-                )
-                drawRect(
-                    color = accent.copy(alpha = SWITCH_BAR_ALPHA * tintAlpha),
-                    size = Size(SWITCH_BAR_DP.dp.toPx(), size.height),
-                )
-            }
-        }
+    val tinted = Modifier.switchOnGlass(checked && enabled && containerColor == null)
 
     ListItem(
         checked = checked,
@@ -110,6 +91,30 @@ fun SwitchPreference(
 @Composable
 fun SwitchPreferencePreview() {
     AppTheme { SwitchPreference(title = "Setting", checked = true, enabled = true, onCheckedChange = {}) }
+}
+
+/** MT_SW: the glass tint and the accent bar of a row whose switch is on; shared by every row with a switch. */
+@Composable
+internal fun Modifier.switchOnGlass(on: Boolean): Modifier {
+    val accent = MaterialTheme.colorScheme.primary
+    val tintAlpha by animateFloatAsState(if (on) 1f else 0f)
+    return this.drawBehind {
+        if (tintAlpha > 0f) {
+            drawRect(
+                brush =
+                Brush.verticalGradient(
+                    listOf(
+                        accent.copy(alpha = SWITCH_TINT_TOP * tintAlpha),
+                        accent.copy(alpha = SWITCH_TINT_BOTTOM * tintAlpha),
+                    ),
+                ),
+            )
+            drawRect(
+                color = accent.copy(alpha = SWITCH_BAR_ALPHA * tintAlpha),
+                size = Size(SWITCH_BAR_DP.dp.toPx(), size.height),
+            )
+        }
+    }
 }
 
 private const val SWITCH_TINT_TOP = 0.16f

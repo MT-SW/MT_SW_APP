@@ -99,7 +99,7 @@ fun SwitchListItem(
 ) {
     BasicListItem(
         text = text,
-        modifier = modifier,
+        modifier = Modifier.switchOnGlass(checked && enabled).then(modifier),
         textColor = textColor,
         supportingText = supportingText,
         enabled = enabled,
