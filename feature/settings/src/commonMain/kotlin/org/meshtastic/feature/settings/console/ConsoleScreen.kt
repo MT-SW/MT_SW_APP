@@ -32,7 +32,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.AssistChip
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -147,7 +149,13 @@ fun ConsoleScreen(
                     AssistChip(
                         onClick = { viewModel.setInput("$suggestion ") },
                         shape = ChipShape,
-                        border = null,
+                        // On a dark theme the glow only falls below the chip, so a thin rim keeps its upper edge visible.
+                        border =
+                        if (MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE) {
+                            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        } else {
+                            null
+                        },
                         // The chip needs its own fill: its default one is see-through, so the shadow drawn
                         // behind it showed through the middle (a dark smear around a small light box on Windows).
                         colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -178,5 +186,6 @@ fun ConsoleScreen(
     }
 }
 
+private const val DARK_SURFACE_LUMINANCE = 0.5f
 private val ChipShape = RoundedCornerShape(12.dp)
 private val InputShape = RoundedCornerShape(16.dp)
