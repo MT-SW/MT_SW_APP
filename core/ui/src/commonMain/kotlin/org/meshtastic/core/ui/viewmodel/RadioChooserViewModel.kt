@@ -32,12 +32,14 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.UiPrefs
 
 /** What a saved radio is doing in the chooser of the top bar. */
 enum class RadioStatus {
@@ -92,6 +94,7 @@ class RadioChooserViewModel(
     private val radioController: RadioController,
     private val serviceRepository: ServiceRepository,
     private val background: RadioBackgroundMonitor,
+    private val uiPrefs: UiPrefs,
     nodeRepository: NodeRepository,
 ) : ViewModel() {
 
@@ -118,8 +121,9 @@ class RadioChooserViewModel(
             radioPrefs.devAddr,
             serviceRepository.connectionState,
             background.connectedAddresses,
-            combine(dropped, plates) { d, p -> d to p },
-        ) { (slots, selectedId, off), address, connection, quiet, (droppedByItself, plate) ->
+            combine(dropped, plates, uiPrefs.uiOptions) { d, p, o -> Triple(d, p, o) },
+        ) { (slots, selectedId, off), address, connection, quiet, (droppedByItself, plate, options) ->
+            val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
             val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices = slots.map { slot ->
@@ -133,6 +137,8 @@ class RadioChooserViewModel(
                     when {
                         active -> connection.toStatus()
                         slot.address in quiet -> RadioStatus.Connected
+                        // Switched on and being connected in the background (retries until it answers).
+                        backgroundOn && slot.id !in off -> RadioStatus.Connecting
                         else -> RadioStatus.Disconnected
                     },
                     active = active,
@@ -295,7 +301,8 @@ class RadioChooserViewModel(
      */
     fun connect(id: Int) {
         val slot = slotsPrefs.slots.value.firstOrNull { it.id == id } ?: return
-        if (!isValidDeviceAddress(radioPrefs.devAddr.value)) {
+        val backgroundOn = UiOptions(uiPrefs.uiOptions.value)[UiOptions.RADIO_BACKGROUND] == 1
+        if (!backgroundOn || !isValidDeviceAddress(radioPrefs.devAddr.value)) {
             choose(id)
             return
         }
