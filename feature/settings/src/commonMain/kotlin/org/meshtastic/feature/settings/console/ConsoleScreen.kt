@@ -144,7 +144,11 @@ fun ConsoleScreen(
                     Text(text = line, style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Monospace)
                 }
             }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The vertical gap keeps the shadows of two rows from running into each other.
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 suggestions.forEach { suggestion ->
                     AssistChip(
                         onClick = { viewModel.setInput("$suggestion ") },
