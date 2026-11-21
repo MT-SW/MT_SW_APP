@@ -167,24 +167,28 @@ private fun TileCard(
         } else {
             container
         }
+    // The card keeps its own look (depth, glass edge); only what is inside it is tappable, so the shadow outside is not
+    // cut off.
     Card(
-        modifier =
-        modifier
-            .then(if (enabled) Modifier.pressSpring() else Modifier)
-            .clip(shape)
-            .hoverable(hoverSource)
-            .clickable(
-                interactionSource = hoverSource,
-                indication = null,
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick,
-            ),
+        modifier = modifier.then(if (enabled) Modifier.pressSpring() else Modifier),
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = shown, disabledContainerColor = shown),
         border = border,
-        content = content,
-    )
+    ) {
+        Column(
+            modifier =
+            Modifier.clip(shape)
+                .hoverable(hoverSource)
+                .clickable(
+                    interactionSource = hoverSource,
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick,
+                ),
+            content = content,
+        )
+    }
 }
 
 private const val TILE_HOVER_ALPHA = 0.08f
