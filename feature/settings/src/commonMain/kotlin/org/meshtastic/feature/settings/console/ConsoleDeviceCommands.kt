@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
@@ -119,7 +120,38 @@ import org.meshtastic.core.resources.console_out_setting_bad
 import org.meshtastic.core.resources.console_out_setting_line
 import org.meshtastic.core.resources.console_out_set_done
 import org.meshtastic.core.resources.console_out_get_names
+import org.meshtastic.core.resources.console_cmd_connect_name
+import org.meshtastic.core.resources.console_cmd_connect_summary
+import org.meshtastic.core.resources.console_cmd_connect_usage
+import org.meshtastic.core.resources.console_cmd_messages_name
+import org.meshtastic.core.resources.console_cmd_messages_summary
+import org.meshtastic.core.resources.console_cmd_messages_usage
+import org.meshtastic.core.resources.console_cmd_signal_name
+import org.meshtastic.core.resources.console_cmd_signal_summary
+import org.meshtastic.core.resources.console_cmd_signal_usage
+import org.meshtastic.core.resources.console_cmd_nearby_name
+import org.meshtastic.core.resources.console_cmd_nearby_summary
+import org.meshtastic.core.resources.console_cmd_nearby_usage
+import org.meshtastic.core.resources.console_cmd_battery_name
+import org.meshtastic.core.resources.console_cmd_battery_summary
+import org.meshtastic.core.resources.console_cmd_battery_usage
+import org.meshtastic.core.resources.console_cmd_loop_name
+import org.meshtastic.core.resources.console_cmd_loop_summary
+import org.meshtastic.core.resources.console_cmd_loop_usage
+import org.meshtastic.core.resources.console_out_connect_done
+import org.meshtastic.core.resources.console_out_connect_bad
+import org.meshtastic.core.resources.console_out_messages_none
+import org.meshtastic.core.resources.console_out_message_line
+import org.meshtastic.core.resources.console_out_signal_line
+import org.meshtastic.core.resources.console_out_nearby_line
+import org.meshtastic.core.resources.console_out_battery_line
+import org.meshtastic.core.resources.console_out_loop_started
+import org.meshtastic.core.resources.console_out_loop_stopped
+import org.meshtastic.core.resources.console_out_loop_bad
+import org.meshtastic.core.resources.console_out_no_data
+import org.meshtastic.core.resources.console_arg_stop
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.model.Message
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
@@ -179,6 +211,12 @@ interface ConsoleDevice {
     suspend fun setChannel(index: Int, settings: ChannelSettings, enabled: Boolean): Boolean
 
     suspend fun setHam(callSign: String, longName: String?): Boolean
+
+    /** The last [limit] messages of the conversation [contactKey], oldest first. */
+    suspend fun recentMessages(contactKey: String, limit: Int): List<Message>
+
+    /** Saves [address] and connects it in the background; false when it could not be saved. */
+    suspend fun connectInBackground(address: String): Boolean
 }
 
 /** The labels of the commands that act on the device, and of the words they take. */
@@ -206,6 +244,13 @@ class ConsoleDeviceLabels(
     val channels: ConsoleLabel,
     val channelSet: ConsoleLabel,
     val ham: ConsoleLabel,
+    val connect: ConsoleLabel,
+    val messages: ConsoleLabel,
+    val signal: ConsoleLabel,
+    val nearby: ConsoleLabel,
+    val battery: ConsoleLabel,
+    val loop: ConsoleLabel,
+    val argStop: String,
     val channelFields: List<String>,
     val argChannel: String,
     val argTo: String,
@@ -313,6 +358,19 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
             Res.string.console_cmd_channel_set_usage,
         )
     val ham = label(Res.string.console_cmd_ham_name, Res.string.console_cmd_ham_summary, Res.string.console_cmd_ham_usage)
+    val connectL =
+        label(Res.string.console_cmd_connect_name, Res.string.console_cmd_connect_summary, Res.string.console_cmd_connect_usage)
+    val messagesL =
+        label(Res.string.console_cmd_messages_name, Res.string.console_cmd_messages_summary, Res.string.console_cmd_messages_usage)
+    val signalL =
+        label(Res.string.console_cmd_signal_name, Res.string.console_cmd_signal_summary, Res.string.console_cmd_signal_usage)
+    val nearbyL =
+        label(Res.string.console_cmd_nearby_name, Res.string.console_cmd_nearby_summary, Res.string.console_cmd_nearby_usage)
+    val batteryL =
+        label(Res.string.console_cmd_battery_name, Res.string.console_cmd_battery_summary, Res.string.console_cmd_battery_usage)
+    val loopL =
+        label(Res.string.console_cmd_loop_name, Res.string.console_cmd_loop_summary, Res.string.console_cmd_loop_usage)
+    val argStop = stringResource(Res.string.console_arg_stop)
     val channelFields = stringResource(Res.string.console_arg_channel_fields)
     val argChannel = stringResource(Res.string.console_arg_channel)
     val argTo = stringResource(Res.string.console_arg_to)
@@ -323,13 +381,13 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
     val types = stringResource(Res.string.console_arg_telemetry_types)
     return remember(
         info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute, requestPosition,
-        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, channelFields,
-        argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
+        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, argStop,
+        channelFields, argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
     ) {
         ConsoleDeviceLabels(
             info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute,
             requestPosition, telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet,
-            ham, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
+            ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, argStop, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
             types.split(',').map { it.trim() },
         )
     }
@@ -664,9 +722,142 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             val call = args.firstOrNull()
             if (call == null) bad(labels.ham) else done(device.setHam(call, args.drop(1).joinToString(" ").ifBlank { null }))
         },
+    ConsoleCommand(labels.connect.name, labels.connect.summary, labels.connect.usage) { args ->
+            val address = args.firstOrNull()?.trim()
+            if (address.isNullOrEmpty()) {
+                bad(labels.connect)
+            } else if (device.connectInBackground(address)) {
+                ConsoleResult(listOf(getStringSuspend(Res.string.console_out_connect_done, address)))
+            } else {
+                ConsoleResult(listOf(getStringSuspend(Res.string.console_out_connect_bad, labels.connect.usage)))
+            }
+        },
+        ConsoleCommand(
+            labels.messages.name,
+            labels.messages.summary,
+            labels.messages.usage,
+            complete = { args -> if (args.size == 1) nodeNames() else emptyList() },
+        ) { args ->
+            val limit = args.firstOrNull()?.toIntOrNull()?.coerceIn(1, MAX_MESSAGES) ?: DEFAULT_MESSAGES
+            val nodeText = args.getOrNull(1)
+            val node = nodeText?.let { findNode(env.nodes(), it) }
+            if (nodeText != null && node == null) {
+                missing(nodeText)
+            } else {
+                val key = "0${node?.user?.id ?: NodeAddress.ID_BROADCAST}"
+                val found = device.recentMessages(key, limit)
+                if (found.isEmpty()) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_messages_none)))
+                } else {
+                    ConsoleResult(
+                        found.map {
+                            getStringSuspend(Res.string.console_out_message_line, it.time, it.node.effectiveLongName, it.text)
+                        },
+                    )
+                }
+            }
+        },
+        ConsoleCommand(
+            labels.signal.name,
+            labels.signal.summary,
+            labels.signal.usage,
+            complete = { args -> if (args.isEmpty()) nodeNames() else emptyList() },
+        ) { args ->
+            val text = args.firstOrNull()
+            val node = text?.let { findNode(env.nodes(), it) }
+            when {
+                text == null -> bad(labels.signal)
+                node == null -> missing(text)
+                else ->
+                    ConsoleResult(
+                        listOf(
+                            getStringSuspend(
+                                Res.string.console_out_signal_line,
+                                node.effectiveLongName,
+                                node.snrOrNull?.toString() ?: "?",
+                                node.rssiOrNull?.toString() ?: "?",
+                                if (node.hopsAway >= 0) node.hopsAway.toString() else "?",
+                            ),
+                        ),
+                    )
+            }
+        },
+        ConsoleCommand(labels.nearby.name, labels.nearby.summary, labels.nearby.usage) { args ->
+            val own = device.ownNode()
+            val limit = args.firstOrNull()?.toIntOrNull()?.coerceIn(1, MAX_NEARBY) ?: DEFAULT_NEARBY
+            if (own == null) {
+                done(false)
+            } else {
+                val sorted =
+                    env.nodes()
+                        .filter { it.num != own.num }
+                        .mapNotNull { node -> own.distance(node)?.let { node to it } }
+                        .sortedBy { it.second }
+                        .take(limit)
+                if (sorted.isEmpty()) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_no_data)))
+                } else {
+                    ConsoleResult(
+                        sorted.map { (node, meters) ->
+                            getStringSuspend(Res.string.console_out_nearby_line, node.effectiveLongName, node.user.short_name, meters)
+                        },
+                    )
+                }
+            }
+        },
+        ConsoleCommand(
+            labels.battery.name,
+            labels.battery.summary,
+            labels.battery.usage,
+            complete = { args -> if (args.isEmpty()) nodeNames() else emptyList() },
+        ) { args ->
+            val text = args.firstOrNull()
+            val chosen = if (text == null) device.ownNode() else findNode(env.nodes(), text)
+            if (chosen == null) {
+                if (text == null) done(false) else missing(text)
+            } else {
+                ConsoleResult(
+                    listOf(
+                        getStringSuspend(
+                            Res.string.console_out_battery_line,
+                            chosen.effectiveLongName,
+                            chosen.batteryLevel?.toString() ?: "?",
+                            chosen.voltage?.toString() ?: "?",
+                        ),
+                    ),
+                )
+            }
+        },
+        ConsoleCommand(
+            labels.loop.name,
+            labels.loop.summary,
+            labels.loop.usage,
+            complete = { args -> if (args.isEmpty()) listOf(labels.argStop) else emptyList() },
+        ) { args ->
+            val first = args.firstOrNull()
+            val seconds = first?.toIntOrNull()
+            val line = args.drop(1).joinToString(" ")
+            when {
+                isWord(first, labels.argStop) ->
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_stopped)))
+                    .also { env.loop(0, "") }
+                seconds == null || seconds < MIN_LOOP_SECONDS || line.isBlank() || isWord(args.getOrNull(1), labels.loop.name) ||
+                    args.any { isWord(it, labels.argConfirm) } ->
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_bad, labels.loop.usage, MIN_LOOP_SECONDS)))
+                else -> {
+                    env.loop(seconds, line)
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_started, line, seconds)))
+                }
+            }
+        },
     )
 }
 
+private const val MAX_MESSAGES = 20
+private const val DEFAULT_MESSAGES = 5
+private const val MAX_NEARBY = 20
+private const val DEFAULT_NEARBY = 5
+private const val MIN_LOOP_SECONDS = 5
 private const val CHANNEL_FIELD_NAME = 0
 private const val CHANNEL_FIELD_PSK = 1
 private const val CHANNEL_FIELD_UPLINK = 2

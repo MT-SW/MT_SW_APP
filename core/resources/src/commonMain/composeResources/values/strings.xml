@@ -1004,9 +1004,13 @@
     <string name="console_arg_off">off</string>
     <string name="console_arg_on">on</string>
     <string name="console_arg_read">read</string>
+    <string name="console_arg_stop">stop</string>
     <string name="console_arg_telemetry_types">device,environment,air,power,stats,host,pax</string>
     <string name="console_arg_to">to</string>
     <string name="console_arg_write">write</string>
+    <string name="console_cmd_battery_name">battery</string>
+    <string name="console_cmd_battery_summary">Shows the battery of a node (of the connected device without a name)</string>
+    <string name="console_cmd_battery_usage">battery [node]</string>
     <string name="console_cmd_bridge_name">bridge</string>
     <string name="console_cmd_bridge_summary">Shows, turns on or turns off the TCP bridge of the chosen device</string>
     <string name="console_cmd_bridge_usage">bridge [on|off]</string>
@@ -1022,6 +1026,9 @@
     <string name="console_cmd_clear_name">clear</string>
     <string name="console_cmd_clear_summary">Clears the screen</string>
     <string name="console_cmd_clear_usage">clear</string>
+    <string name="console_cmd_connect_name">connect</string>
+    <string name="console_cmd_connect_summary">Saves a network device and connects it in the background</string>
+    <string name="console_cmd_connect_usage">connect &lt;address&gt;  (e.g. connect 192.168.2.224)</string>
     <string name="console_cmd_disconnect_name">disconnect</string>
     <string name="console_cmd_disconnect_summary">Disconnects the shown device or the one with the given number (it stays saved)</string>
     <string name="console_cmd_disconnect_usage">disconnect [number]</string>
@@ -1052,6 +1059,15 @@
     <string name="console_cmd_info_name">info</string>
     <string name="console_cmd_info_summary">Shows the connected device and the number of nodes</string>
     <string name="console_cmd_info_usage">info</string>
+    <string name="console_cmd_loop_name">loop</string>
+    <string name="console_cmd_loop_summary">Repeats a command every given number of seconds; "loop stop" ends it</string>
+    <string name="console_cmd_loop_usage">loop &lt;seconds&gt; &lt;command&gt;  |  loop stop</string>
+    <string name="console_cmd_messages_name">messages</string>
+    <string name="console_cmd_messages_summary">Shows the last messages of a channel (or of a talk with a node)</string>
+    <string name="console_cmd_messages_usage">messages [count] [node]</string>
+    <string name="console_cmd_nearby_name">nearby</string>
+    <string name="console_cmd_nearby_summary">Lists the nodes nearest to the connected device</string>
+    <string name="console_cmd_nearby_usage">nearby [count]</string>
     <string name="console_cmd_nodes_name">nodes</string>
     <string name="console_cmd_nodes_summary">Finds nodes by name or number</string>
     <string name="console_cmd_nodes_usage">nodes [text]</string>
@@ -1094,6 +1110,9 @@
     <string name="console_cmd_shutdown_name">shutdown</string>
     <string name="console_cmd_shutdown_summary">Turns off the connected device</string>
     <string name="console_cmd_shutdown_usage">shutdown confirm</string>
+    <string name="console_cmd_signal_name">signal</string>
+    <string name="console_cmd_signal_summary">Shows the last signal of a node: SNR, RSSI and hops</string>
+    <string name="console_cmd_signal_usage">signal &lt;node&gt;</string>
     <string name="console_cmd_status_name">status</string>
     <string name="console_cmd_status_summary">Shows the state of the connection, the nodes and the bridge</string>
     <string name="console_cmd_status_usage">status</string>
@@ -1106,10 +1125,11 @@
     <string name="console_cmd_traceroute_name">traceroute</string>
     <string name="console_cmd_traceroute_summary">Traces the route to a node</string>
     <string name="console_cmd_traceroute_usage">traceroute &lt;node&gt;</string>
-    <string name="console_info_body">Console: simple commands for the devices, the connections and the bridge. Type a command and tap Send (or press Enter). While you type, hints appear under the field; a tap completes the command or its argument. The buttons "Earlier" and "Next" bring back lines typed before.\n\nCommands:\nhelp – the list of commands, or the description of one (help &lt;command&gt;)\nclear – clears the screen\ndevices – the saved devices, their numbers and their state\ndevice &lt;number&gt; – switches what the app shows to that device (nothing is disconnected)\ndisconnect [number] – disconnects the shown device or the one with the given number (it stays saved and stays off, also in the background, until you connect it on the Connect tab)\nremove &lt;number&gt; – removes a device from the saved list\nstatus – the connection, the number of nodes and the TCP bridge\nnodes [text] – finds nodes by name, short name or number\nbridge [on|off] – shows, turns on or turns off the TCP bridge of the chosen device\nposition &lt;latitude&gt; &lt;longitude&gt; [altitude] – sets a fixed position on the connected device (e.g. position 50.87 20.63 260)\ninfo – the connected device and the number of nodes\nsend [channel &lt;0-7&gt;] [to &lt;node&gt;] &lt;text&gt; – sends a message (a node is given as !id, number or short name)\nreboot confirm, shutdown confirm, factory-reset confirm – restart, turn off or restore the factory settings of the connected device\nreset-nodes confirm [keep] – clears the list of nodes (keep = keeps the favourites)\nremove-node &lt;node&gt; – removes a node from the list\nfavorite &lt;node&gt; [on|off], ignored &lt;node&gt; [on|off] – marks a node as a favourite or ignored\ntraceroute &lt;node&gt;, request-position &lt;node&gt;, telemetry &lt;node&gt; [type] – ask a node for the route, the position or telemetry\nowner &lt;long name&gt;[; &lt;short&gt;] – sets the name of the device\ntime – sets the time of the device\nringtone [text] – plays or sets the ringtone\ncanned &lt;text|text|…&gt; – sets the canned messages\ngpio read &lt;mask&gt; | gpio write &lt;mask&gt; &lt;value&gt; – reads or writes the GPIO pins\nset &lt;name&gt; &lt;value&gt; […], get [name] – changes or shows settings of the device named like in the Meshtastic command line (e.g. set lora.region EU_868, get lora)\nexport – prints all settings and channels as commands to type again\nchannels, channel-set &lt;0-7&gt; &lt;name|psk|uplink|downlink|enabled&gt; &lt;value&gt; – shows or changes channels\nham &lt;call sign&gt; [long name] – turns on the licensed mode\n\nThe commands can be typed without Polish letters. Connecting a device is done on the Connect tab.</string>
+    <string name="console_info_body">Console: simple commands for the devices, the connections and the bridge. Type a command and tap Send (or press Enter). While you type, hints appear under the field; a tap completes the command or its argument. The buttons "Earlier" and "Next" bring back lines typed before.\n\nCommands:\nhelp – the list of commands, or the description of one (help &lt;command&gt;)\nclear – clears the screen\ndevices – the saved devices, their numbers and their state\ndevice &lt;number&gt; – switches what the app shows to that device (nothing is disconnected)\ndisconnect [number] – disconnects the shown device or the one with the given number (it stays saved and stays off, also in the background, until you connect it on the Connect tab)\nremove &lt;number&gt; – removes a device from the saved list\nstatus – the connection, the number of nodes and the TCP bridge\nnodes [text] – finds nodes by name, short name or number\nbridge [on|off] – shows, turns on or turns off the TCP bridge of the chosen device\nposition &lt;latitude&gt; &lt;longitude&gt; [altitude] – sets a fixed position on the connected device (e.g. position 50.87 20.63 260)\ninfo – the connected device and the number of nodes\nsend [channel &lt;0-7&gt;] [to &lt;node&gt;] &lt;text&gt; – sends a message (a node is given as !id, number or short name)\nreboot confirm, shutdown confirm, factory-reset confirm – restart, turn off or restore the factory settings of the connected device\nreset-nodes confirm [keep] – clears the list of nodes (keep = keeps the favourites)\nremove-node &lt;node&gt; – removes a node from the list\nfavorite &lt;node&gt; [on|off], ignored &lt;node&gt; [on|off] – marks a node as a favourite or ignored\ntraceroute &lt;node&gt;, request-position &lt;node&gt;, telemetry &lt;node&gt; [type] – ask a node for the route, the position or telemetry\nowner &lt;long name&gt;[; &lt;short&gt;] – sets the name of the device\ntime – sets the time of the device\nringtone [text] – plays or sets the ringtone\ncanned &lt;text|text|…&gt; – sets the canned messages\ngpio read &lt;mask&gt; | gpio write &lt;mask&gt; &lt;value&gt; – reads or writes the GPIO pins\nset &lt;name&gt; &lt;value&gt; […], get [name] – changes or shows settings of the device named like in the Meshtastic command line (e.g. set lora.region EU_868, get lora)\nexport – prints all settings and channels as commands to type again\nchannels, channel-set &lt;0-7&gt; &lt;name|psk|uplink|downlink|enabled&gt; &lt;value&gt; – shows or changes channels\nham &lt;call sign&gt; [long name] – turns on the licensed mode\nconnect &lt;address&gt; – saves a network device and connects it in the background\nmessages [count] [node] – the last messages\nsignal &lt;node&gt;, battery [node], nearby [count] – the signal, the battery and the nearest nodes\nloop &lt;seconds&gt; &lt;command&gt; – repeats a command (loop stop ends it)\n\nThe commands can be typed without Polish letters. Connecting a device is done on the Connect tab.</string>
     <string name="console_input">Command</string>
     <string name="console_intro">Type a command and press Enter. The "help" command shows all of them.</string>
     <string name="console_next">Next</string>
+    <string name="console_out_battery_line">%1$s: battery %2$s%%, %3$s V</string>
     <string name="console_out_bridge_changed">TCP bridge: %1$s.</string>
     <string name="console_out_bridge_none">Save a device in the Connect window first.</string>
     <string name="console_out_bridge_off">off</string>
@@ -1118,6 +1138,8 @@
     <string name="console_out_channel_bad">Check the channel number, the field and the value. Usage: %1$s</string>
     <string name="console_out_channel_line">%1$d: %2$s – key %3$d bytes, uplink %4$s, downlink %5$s</string>
     <string name="console_out_confirm">This cannot be undone. To confirm, add the word "%1$s". Usage: %2$s</string>
+    <string name="console_out_connect_bad">Could not save the device (all places are taken?). Usage: %1$s</string>
+    <string name="console_out_connect_done">Saved and connected in the background: %1$s</string>
     <string name="console_out_disconnecting">Disconnecting the device.</string>
     <string name="console_out_done">Done.</string>
     <string name="console_out_get_names">Settings: %1$s</string>
@@ -1126,7 +1148,14 @@
     <string name="console_out_help_usage">Usage: %1$s</string>
     <string name="console_out_info_node">Device: %1$s (%2$s), %3$s, number %4$d</string>
     <string name="console_out_info_nodes">Nodes known: %1$d</string>
+    <string name="console_out_loop_bad">Give the seconds (at least %2$d) and a command (not another loop, not one that needs confirming). Usage: %1$s</string>
+    <string name="console_out_loop_started">Repeating "%1$s" every %2$d s. End it with: loop stop</string>
+    <string name="console_out_loop_stopped">The repeating is stopped.</string>
+    <string name="console_out_message_line">%1$s %2$s: %3$s</string>
+    <string name="console_out_messages_none">No messages.</string>
+    <string name="console_out_nearby_line">%1$s (%2$s) – %3$d m</string>
     <string name="console_out_no_answer">No answer from the device.</string>
+    <string name="console_out_no_data">No data.</string>
     <string name="console_out_no_radios">No saved devices. Add a device in the Connect window.</string>
     <string name="console_out_node_not_found">Node not found: %1$s</string>
     <string name="console_out_node_offline">offline</string>
@@ -1145,6 +1174,7 @@
     <string name="console_out_setting_bad">Wrong value for %1$s: %2$s</string>
     <string name="console_out_setting_line">%1$s = %2$s</string>
     <string name="console_out_setting_unknown">Unknown setting: %1$s</string>
+    <string name="console_out_signal_line">%1$s: SNR %2$s dB, RSSI %3$s dBm, hops %4$s</string>
     <string name="console_out_state_connected">connected</string>
     <string name="console_out_state_connecting">connecting</string>
     <string name="console_out_state_disconnected">disconnected</string>

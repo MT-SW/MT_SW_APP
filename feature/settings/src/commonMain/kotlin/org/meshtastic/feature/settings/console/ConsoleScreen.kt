@@ -83,6 +83,7 @@ fun ConsoleScreen(
     val lines by viewModel.lines.collectAsStateWithLifecycle()
     val input by viewModel.input.collectAsStateWithLifecycle()
     val labels = rememberConsoleLabels()
+    val registryRef = remember { arrayOfNulls<ConsoleRegistry>(1) }
     val registry =
         remember(labels, viewModel, chooser, bridge) {
             buildConsoleRegistry(
@@ -99,10 +100,12 @@ fun ConsoleScreen(
                     updateBridge = bridge::update,
                     setPosition = viewModel::setPosition,
                     device = viewModel,
+                    loop = { seconds, line -> viewModel.loop(seconds, line, registryRef[0]) },
                 ),
                 labels,
             )
         }
+    registryRef[0] = registry
     val listState = rememberLazyListState()
     LaunchedEffect(lines.size) { if (lines.isNotEmpty()) listState.animateScrollToItem(lines.size - 1) }
     val suggestions = registry.suggestions(input).take(MAX_SUGGESTIONS)

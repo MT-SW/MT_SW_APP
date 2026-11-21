@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -28,12 +30,16 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.HamName
+import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
+import org.meshtastic.core.repository.RadioPrefs
+import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
@@ -51,6 +57,9 @@ class ConsoleViewModel(
     private val radioController: RadioController,
     private val sendMessageUseCase: SendMessageUseCase,
     private val radioConfigRepository: RadioConfigRepository,
+    private val packetRepository: PacketRepository,
+    private val radioPrefs: RadioPrefs,
+    private val slotsPrefs: RadioSlotsPrefs,
 ) : ViewModel(), ConsoleDevice {
     private val history = ConsoleHistory()
     private val _lines = MutableStateFlow<List<String>>(emptyList())
@@ -171,6 +180,47 @@ class ConsoleViewModel(
         return onDevice { radioController.setHamMode(it, params, packetId()) }
     }
 
+    override suspend fun recentMessages(contactKey: String, limit: Int): List<Message> =
+        packetRepository.getMessagesFrom(contactKey, limit) { id -> nodeRepository.getNode(id.orEmpty()) }
+            .first()
+            .sortedBy { it.receivedTime }
+            .takeLast(limit)
+
+    override suspend fun connectInBackground(address: String): Boolean {
+        val full =
+            when {
+                address.length == MAC_LENGTH && address.count { it == ':' } == MAC_COLONS -> "x$address"
+                address.length > 1 && address[0] == 't' && address[1].isDigit() -> address
+                else -> "t$address"
+            }
+        val shown = radioPrefs.devAddr.value
+        val id =
+            slotsPrefs.slots.value.firstOrNull { it.address == full }?.id ?: slotsPrefs.put(full, null) ?: return false
+        slotsPrefs.setOff(id, false)
+        if (shown.isNullOrBlank() || shown == NO_DEVICE) {
+            slotsPrefs.select(id)
+            radioController.setDeviceAddress(full)
+        }
+        return true
+    }
+
+    private var loopJob: Job? = null
+
+    /** Repeats [line] with [registry] every [seconds]; 0 seconds stops it. */
+    fun loop(seconds: Int, line: String, registry: ConsoleRegistry?) {
+        loopJob?.cancel()
+        loopJob = null
+        if (seconds <= 0 || registry == null) return
+        loopJob =
+            viewModelScope.launch {
+                while (true) {
+                    val result = registry.execute(line)
+                    _lines.update { old -> (old + "> $line" + result.lines).takeLast(MAX_LINES) }
+                    delay(seconds * MILLIS_PER_SECOND)
+                }
+            }
+    }
+
     override suspend fun gpioWrite(mask: Long, value: Long): Boolean =
         nodeRepository.myNodeInfo.value?.myNodeNum?.let { radioController.writeGpio(it, mask, value) } ?: false
 
@@ -203,5 +253,9 @@ class ConsoleViewModel(
 
     private companion object {
         const val MAX_LINES = 500
+        const val MAC_LENGTH = 17
+        const val MAC_COLONS = 5
+        const val NO_DEVICE = "n"
+        const val MILLIS_PER_SECOND = 1000L
     }
 }

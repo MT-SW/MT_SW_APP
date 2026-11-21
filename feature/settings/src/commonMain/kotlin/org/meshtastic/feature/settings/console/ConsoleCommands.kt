@@ -109,6 +109,8 @@ class ConsoleEnvironment(
     val updateBridge: ((RadioBridgeConfig) -> RadioBridgeConfig) -> Unit,
     val setPosition: suspend (latitude: Double, longitude: Double, altitude: Int?) -> Boolean,
     val device: ConsoleDevice,
+    /** Repeats a typed line every given number of seconds; 0 seconds stops it. */
+    val loop: (seconds: Int, line: String) -> Unit,
 )
 
 /** The name, the description and the way of writing one command, in the language of the app. */
