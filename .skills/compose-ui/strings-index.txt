@@ -1035,6 +1035,9 @@ console_cmd_nearby_usage
 console_cmd_nodes_name
 console_cmd_nodes_summary
 console_cmd_nodes_usage
+console_cmd_notify_name
+console_cmd_notify_summary
+console_cmd_notify_usage
 console_cmd_owner_name
 console_cmd_owner_summary
 console_cmd_owner_usage
@@ -1065,6 +1068,9 @@ console_cmd_reset_nodes_usage
 console_cmd_ringtone_name
 console_cmd_ringtone_summary
 console_cmd_ringtone_usage
+console_cmd_search_name
+console_cmd_search_summary
+console_cmd_search_usage
 console_cmd_send_name
 console_cmd_send_summary
 console_cmd_send_usage

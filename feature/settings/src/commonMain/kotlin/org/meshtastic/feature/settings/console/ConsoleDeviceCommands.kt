@@ -150,6 +150,12 @@ import org.meshtastic.core.resources.console_out_loop_stopped
 import org.meshtastic.core.resources.console_out_loop_bad
 import org.meshtastic.core.resources.console_out_no_data
 import org.meshtastic.core.resources.console_arg_stop
+import org.meshtastic.core.resources.console_cmd_search_name
+import org.meshtastic.core.resources.console_cmd_search_summary
+import org.meshtastic.core.resources.console_cmd_search_usage
+import org.meshtastic.core.resources.console_cmd_notify_name
+import org.meshtastic.core.resources.console_cmd_notify_summary
+import org.meshtastic.core.resources.console_cmd_notify_usage
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.model.Message
 import org.meshtastic.proto.ChannelSettings
@@ -217,6 +223,12 @@ interface ConsoleDevice {
 
     /** Saves [address] and connects it in the background; false when it could not be saved. */
     suspend fun connectInBackground(address: String): Boolean
+
+    /** The messages that hold [text], newest first. */
+    suspend fun search(text: String): List<Message>
+
+    /** Mutes the notifications of [node] or turns them on again. */
+    suspend fun setMuted(node: Node, muted: Boolean): Boolean
 }
 
 /** The labels of the commands that act on the device, and of the words they take. */
@@ -250,6 +262,8 @@ class ConsoleDeviceLabels(
     val nearby: ConsoleLabel,
     val battery: ConsoleLabel,
     val loop: ConsoleLabel,
+    val search: ConsoleLabel,
+    val notify: ConsoleLabel,
     val argStop: String,
     val channelFields: List<String>,
     val argChannel: String,
@@ -370,6 +384,10 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
         label(Res.string.console_cmd_battery_name, Res.string.console_cmd_battery_summary, Res.string.console_cmd_battery_usage)
     val loopL =
         label(Res.string.console_cmd_loop_name, Res.string.console_cmd_loop_summary, Res.string.console_cmd_loop_usage)
+    val searchL =
+        label(Res.string.console_cmd_search_name, Res.string.console_cmd_search_summary, Res.string.console_cmd_search_usage)
+    val notifyL =
+        label(Res.string.console_cmd_notify_name, Res.string.console_cmd_notify_summary, Res.string.console_cmd_notify_usage)
     val argStop = stringResource(Res.string.console_arg_stop)
     val channelFields = stringResource(Res.string.console_arg_channel_fields)
     val argChannel = stringResource(Res.string.console_arg_channel)
@@ -381,13 +399,13 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
     val types = stringResource(Res.string.console_arg_telemetry_types)
     return remember(
         info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute, requestPosition,
-        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, argStop,
+        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, searchL, notifyL, argStop,
         channelFields, argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
     ) {
         ConsoleDeviceLabels(
             info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute,
             requestPosition, telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet,
-            ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, argStop, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
+            ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, searchL, notifyL, argStop, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
             types.split(',').map { it.trim() },
         )
     }
@@ -850,9 +868,28 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 }
             }
         },
+    ConsoleCommand(labels.search.name, labels.search.summary, labels.search.usage) { args ->
+            val text = args.joinToString(" ").trim()
+            if (text.isEmpty()) {
+                bad(labels.search)
+            } else {
+                val found = device.search(text).take(MAX_SEARCH)
+                if (found.isEmpty()) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_messages_none)))
+                } else {
+                    ConsoleResult(
+                        found.map {
+                            getStringSuspend(Res.string.console_out_message_line, it.time, it.node.effectiveLongName, it.text)
+                        },
+                    )
+                }
+            }
+        },
+        switchCommand(labels.notify) { node, enabled -> device.setMuted(node, !enabled) },
     )
 }
 
+private const val MAX_SEARCH = 10
 private const val MAX_MESSAGES = 20
 private const val DEFAULT_MESSAGES = 5
 private const val MAX_NEARBY = 20

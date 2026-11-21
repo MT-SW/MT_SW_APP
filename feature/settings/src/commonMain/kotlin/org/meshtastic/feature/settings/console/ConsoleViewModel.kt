@@ -186,6 +186,13 @@ class ConsoleViewModel(
             .sortedBy { it.receivedTime }
             .takeLast(limit)
 
+    override suspend fun search(text: String): List<Message> =
+        packetRepository.searchMessages(text) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+
+    override suspend fun setMuted(node: Node, muted: Boolean) = onDevice {
+        if (node.isMuted != muted) radioController.toggleMuted(node.num)
+    }
+
     override suspend fun connectInBackground(address: String): Boolean {
         val full =
             when {
