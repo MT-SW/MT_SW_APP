@@ -48,12 +48,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.JsonObject
 import org.koin.compose.koinInject
 import org.maplibre.compose.camera.CameraAnimation
@@ -554,6 +557,9 @@ private fun MeshMapNodeLayers(
     )
 }
 
+/** How long, after the first framing, the view keeps following the nodes as more of them arrive. */
+private const val FRAME_SETTLE_MS = 5_000L
+
 /**
  * Frames the mesh once, the first time positions arrive.
  *
@@ -591,6 +597,16 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
                 bottom = MeshMapFitPadding.calculateBottomPadding() + barInset,
             )
         mapState.frameBounds(box, padding = fitPadding.toDpPadding(direction))
+        // MT_SW: the first node set can be only part of the mesh (the list fills in while the map opens), which framed
+        // too tightly and cut nodes off. For a few seconds the view follows the box as nodes arrive; later it is left
+        // to the user.
+        withTimeoutOrNull(FRAME_SETTLE_MS) {
+            snapshotFlow { nodesBoundingBox(currentNodes) }
+                .filterNotNull()
+                .distinctUntilChanged()
+                .drop(1)
+                .collect { grown -> mapState.frameBounds(grown, padding = fitPadding.toDpPadding(direction)) }
+        }
     }
 }
 
