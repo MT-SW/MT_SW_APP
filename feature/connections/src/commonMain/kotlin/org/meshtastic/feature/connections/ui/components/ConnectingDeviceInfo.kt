@@ -50,6 +50,13 @@ import org.meshtastic.core.resources.connecting
 import org.meshtastic.core.resources.connection_retry_in
 import org.meshtastic.core.resources.connection_retry_now
 import org.meshtastic.core.resources.disconnect
+import org.meshtastic.core.resources.connection_progress_requesting_config
+import org.meshtastic.core.resources.connection_progress_device_config
+import org.meshtastic.core.resources.connection_progress_module_config
+import org.meshtastic.core.resources.connection_progress_channels
+import org.meshtastic.core.resources.connection_progress_channels_of
+import org.meshtastic.core.resources.connection_progress_nodes
+import org.meshtastic.core.resources.connection_progress_loading_nodes
 import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.reconnecting
@@ -86,11 +93,13 @@ fun ConnectingDeviceInfo(
             }
         }
     val detail = transportStatus.toConnectionStatusDetail(now, bleScanRequiresLocationServices)
+    // The handshake texts are written in English by the service; the card shows them in the app's language.
+    val progress = localizedProgress(connectionProgress)
 
     val statusLabel =
         when (connectionStatus) {
             ConnectionStatus.CONNECTED -> stringResource(Res.string.connected)
-            ConnectionStatus.CONNECTING -> connectionProgress ?: stringResource(Res.string.connecting)
+            ConnectionStatus.CONNECTING -> progress ?: stringResource(Res.string.connecting)
             ConnectionStatus.RECONNECTING -> stringResource(Res.string.reconnecting)
             ConnectionStatus.RESTARTING -> stringResource(Res.string.node_restarting)
             ConnectionStatus.CONNECTED_SLEEPING -> stringResource(Res.string.connected_sleeping)
@@ -145,7 +154,7 @@ fun ConnectingDeviceInfo(
                     color = MaterialTheme.colorScheme.primary,
                 )
                 // The handshake's own counters ("Channels (3 / 8)") say more than its phase name does.
-                connectionProgress
+                progress
                     ?.takeIf { phaseLabel != null && it.isNotBlank() && it != phaseLabel }
                     ?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
                 detail?.failure?.let { failure ->
@@ -162,6 +171,38 @@ fun ConnectingDeviceInfo(
         ConnectionSteps(transportStatus)
 
         DisconnectButton(onClick = onClickDisconnect, label = disconnectLabel)
+    }
+}
+
+/** The handshake text the service wrote ("Nodes (3)"), in the app's language; any other text is shown as it is. */
+@Composable
+private fun localizedProgress(text: String?): String? {
+    if (text == null) return null
+    fun number(pattern: String) = Regex(pattern).matchEntire(text)?.groupValues?.drop(1)?.map { it.toInt() }
+    return when {
+        text == "Requesting config\u2026" || text == "Requesting config..." ->
+            stringResource(Res.string.connection_progress_requesting_config)
+
+        text == "Device config received" -> stringResource(Res.string.connection_progress_device_config)
+
+        text == "Module config received" -> stringResource(Res.string.connection_progress_module_config)
+
+        text == "Loading node list" -> stringResource(Res.string.connection_progress_loading_nodes)
+
+        text == "Reconnecting\u2026" -> stringResource(Res.string.reconnecting)
+
+        number("Channels \\((\\d+) / (\\d+)\\)") != null ->
+            number("Channels \\((\\d+) / (\\d+)\\)")!!.let {
+                stringResource(Res.string.connection_progress_channels_of, it[0], it[1])
+            }
+
+        number("Channels \\((\\d+)\\)") != null ->
+            stringResource(Res.string.connection_progress_channels, number("Channels \\((\\d+)\\)")!![0])
+
+        number("Nodes \\((\\d+)\\)") != null ->
+            stringResource(Res.string.connection_progress_nodes, number("Nodes \\((\\d+)\\)")!![0])
+
+        else -> text
     }
 }
 

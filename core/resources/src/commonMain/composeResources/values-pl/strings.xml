@@ -4598,4 +4598,11 @@
     <string name="console_cmd_notify_name">powiadom</string>
     <string name="console_cmd_notify_summary">Włącza albo wyłącza powiadomienia od węzła (wyciszenie)</string>
     <string name="console_cmd_notify_usage">powiadom &lt;węzeł&gt; [włącz|wyłącz]</string>
+    <string name="connection_progress_requesting_config">Pobieranie konfiguracji…</string>
+    <string name="connection_progress_device_config">Odebrano konfigurację urządzenia</string>
+    <string name="connection_progress_module_config">Odebrano konfigurację modułów</string>
+    <string name="connection_progress_channels">Kanały (%1$d)</string>
+    <string name="connection_progress_channels_of">Kanały (%1$d / %2$d)</string>
+    <string name="connection_progress_nodes">Węzły (%1$d)</string>
+    <string name="connection_progress_loading_nodes">Wczytywanie listy węzłów</string>
 </resources>

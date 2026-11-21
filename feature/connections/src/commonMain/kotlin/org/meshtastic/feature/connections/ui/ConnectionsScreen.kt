@@ -680,17 +680,26 @@ fun ConnectionsScreen(
                 } else {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         if (radio != null && (radio.status == RadioStatus.Connecting || radio.progress != null)) {
-                            // A device that is being connected in the background looks the same as the main connection card
-                            // (spinner, name, address, step); the device shown in the app does not change.
-                            ConnectingDeviceInfo(
-                                deviceName = radio.name?.takeIf { it.isNotBlank() } ?: radio.address.drop(1),
-                                deviceAddress = radio.address.drop(1),
-                                connectionStatus = ConnectionStatus.CONNECTING,
-                                connectionProgress = radio.progress,
-                                transportStatus = radio.transportStatus,
-                                onClickDisconnect = { radios.onDisconnect(slotId) },
-                                modifier = Modifier.heightIn(min = CardMinHeight),
-                            )
+                            // A device that is being connected in the background is drawn by the very same code as the main
+                            // connection card; only the device shown in the app stays unchanged.
+                            Box(
+                                modifier = Modifier.fillMaxWidth().heightIn(min = CardMinHeight),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                ConnectingDeviceContent(
+                                    selectedDevice = radio.address,
+                                    persistedDeviceName = radio.name?.takeIf { it.isNotBlank() },
+                                    bleDevices = bleDevices,
+                                    discoveredTcpDevices = discoveredTcpDevices,
+                                    recentTcpDevices = recentTcpDevices,
+                                    usbDevices = usbDevices,
+                                    virtualDevices = virtualDevices,
+                                    connectionStatus = ConnectionStatus.CONNECTING,
+                                    connectionProgress = radio.progress,
+                                    transportStatus = radio.transportStatus,
+                                    onClickDisconnect = { radios.onDisconnect(slotId) },
+                                )
+                            }
                         } else {
                         RadioSlotCard(
                             slotId = slotId,
