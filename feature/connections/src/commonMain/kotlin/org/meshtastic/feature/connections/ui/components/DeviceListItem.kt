@@ -221,7 +221,10 @@ private fun DeviceHeadline(device: DeviceListEntry) {
     if (node != null) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             NodeChip(node = node)
-            DeviceName(text = node.effectiveLongName.ifBlank { device.name }, modifier = Modifier.weight(1f))
+            DeviceName(
+                text = node.effectiveLongName.ifBlank { device.name.removeIdSuffix() },
+                modifier = Modifier.weight(1f),
+            )
         }
     } else {
         DeviceName(text = device.name)
@@ -238,3 +241,9 @@ private fun DeviceName(text: String, modifier: Modifier = Modifier) {
         overflow = TextOverflow.Ellipsis,
     )
 }
+
+// A device with no long name yet is listed by its address; the "_" and id that discovery adds are left off, the plate
+// already stands for the device.
+private val ID_SUFFIX = Regex("_[0-9a-fA-F]{8}$")
+
+private fun String.removeIdSuffix(): String = replace(ID_SUFFIX, "")
