@@ -58,6 +58,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawOutline
@@ -217,9 +222,9 @@ private fun InlineSearchField(
     trailingActions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // MT_SW: the field is a clear glass pane like the outlined buttons: a thin outline and a soft gradient in the
-    // colour of the theme (grey while empty, the theme's gold as soon as something is typed, so it is visible that the
-    // list below is being filtered). Nothing inside is filled solid. The field is drawn by hand, so its inside has
+    // MT_SW: the field is a glass pane like the outlined buttons: a thin outline in the colour of the theme (grey
+    // while empty, the theme's gold as soon as something is typed, so it is visible that the
+    // list below is being filtered). The field is drawn by hand, so its inside has
     // exactly the colour of the whole bar.
     val scheme = MaterialTheme.colorScheme
     val filtering = textFieldState.text.isNotEmpty()
@@ -227,15 +232,17 @@ private fun InlineSearchField(
     val accent by animateColorAsState(targetValue = if (filtering) scheme.primary else scheme.outline)
     val shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp)
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
-    val options = rememberUiOptions()
-    StyledSurface(
-        style = options.element(UiOptions.GROUP_SEARCH),
-        shape = shape,
-        // The same width as the cards of the list below.
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
-        baseColor = options.glassBase(base),
-        // A low pane: the sheen only fades out, with no lighter and darker band across the field.
-        flatBottom = true,
+    // MT_SW: one even pane of glass with a soft gradient from the light top to the plain bottom (so it looks raised),
+    // on a solid base: the shadow under a see-through pane shows through it as a band, so the base is not see-through.
+    val sheenTop = if (scheme.surface.luminance() < DARK_LUMINANCE) SEARCH_SHEEN_DARK else SEARCH_SHEEN_LIGHT
+    Box(
+        modifier =
+        modifier.fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .shadow(SEARCH_SHADOW_DP.dp, shape, clip = false)
+            .clip(shape)
+            .background(base)
+            .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = sheenTop), Color.Transparent))),
     ) {
         BasicTextField(
             state = textFieldState,
@@ -292,6 +299,10 @@ private fun InlineSearchField(
 }
 
 private const val SEARCH_RIM_DP = 1.2f
+private const val SEARCH_SHADOW_DP = 3
+private const val SEARCH_SHEEN_LIGHT = 0.45f
+private const val SEARCH_SHEEN_DARK = 0.12f
+private const val DARK_LUMINANCE = 0.5f
 private const val SEARCH_EDGE_BOTTOM_ALPHA = 0.55f
 private const val SEARCH_HINT_ALPHA = 0.6f
 private const val SEARCH_FIELD_HEIGHT_DP = 52
