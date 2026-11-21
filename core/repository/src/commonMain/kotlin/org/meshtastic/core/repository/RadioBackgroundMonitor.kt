@@ -35,6 +35,9 @@ interface RadioBackgroundMonitor {
     /** The addresses of the radios that are connected quietly right now (the radio in use is not among them). */
     val connectedAddresses: StateFlow<Set<String>>
 
+    /** What each background device is doing while it connects (config, channels, node list), by address; empty when done. */
+    val progressByAddress: StateFlow<Map<String, String>>
+
     /** How many messages reached each background device (by address) since the device was last shown; empty at 0. */
     val unreadByAddress: StateFlow<Map<String, Int>>
 

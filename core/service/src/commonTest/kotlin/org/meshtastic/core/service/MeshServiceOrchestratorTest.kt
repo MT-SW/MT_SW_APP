@@ -610,6 +610,7 @@ internal object NoRadioBackground : RadioBackgroundMonitor {
     override val badges = MutableStateFlow<Map<String, DeviceBadge>>(emptyMap())
     override val connectedAddresses = MutableStateFlow<Set<String>>(emptySet())
     override val unreadByAddress = MutableStateFlow<Map<String, Int>>(emptyMap())
+    override val progressByAddress = MutableStateFlow<Map<String, String>>(emptyMap())
 
     override fun clearUnread(address: String) = Unit
 

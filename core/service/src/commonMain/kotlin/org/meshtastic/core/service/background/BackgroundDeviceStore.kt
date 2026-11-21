@@ -38,7 +38,12 @@ import org.meshtastic.proto.Telemetry
  * as one that was: its name plate, its node list, and a place for its packets. The radio shown in the app is not
  * touched here (the app writes it itself).
  */
-internal class BackgroundDeviceStore(private val address: String, private val databaseManager: DatabaseManager) {
+internal class BackgroundDeviceStore(
+    private val address: String,
+    private val databaseManager: DatabaseManager,
+    private val onProgress: (String?) -> Unit = {},
+) {
+    private var channelCount = 0
     private var myInfo: MyNodeInfo? = null
     private var metadata: DeviceMetadata? = null
     private var lora: Config.LoRaConfig? = null
@@ -54,15 +59,30 @@ internal class BackgroundDeviceStore(private val address: String, private val da
                     myInfo = info
                     metadata = null
                     nodes.clear()
+                    channelCount = 0
+                    onProgress("Requesting config…")
                 }
 
                 frame.metadata != null -> metadata = frame.metadata
 
-                frame.config?.lora != null -> lora = frame.config?.lora
+                frame.config?.lora != null -> {
+                    lora = frame.config?.lora
+                    onProgress("Device config received")
+                }
 
-                node != null -> nodes[node.num] = node
+                frame.moduleConfig != null -> onProgress("Module config received")
 
-                (frame.config_complete_id ?: 0) != 0 -> if (nodes.isNotEmpty()) write()
+                frame.channel != null -> onProgress("Channels (${++channelCount})")
+
+                node != null -> {
+                    nodes[node.num] = node
+                    onProgress("Nodes (${nodes.size})")
+                }
+
+                (frame.config_complete_id ?: 0) != 0 -> {
+                    if (nodes.isNotEmpty()) write()
+                    onProgress(null)
+                }
             }
         }
     }

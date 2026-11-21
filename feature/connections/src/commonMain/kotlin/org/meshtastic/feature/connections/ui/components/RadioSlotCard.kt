@@ -97,7 +97,7 @@ fun RadioSlotCard(
         RadioPlate(radio)
         Text(
             text =
-            when (radio.status) {
+            radio.progress ?: when (radio.status) {
                 RadioStatus.Connected -> stringResource(Res.string.radio_slot_background)
                 RadioStatus.Connecting -> stringResource(Res.string.radio_status_connecting)
                 RadioStatus.Disconnected -> stringResource(Res.string.radio_status_disconnected)

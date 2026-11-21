@@ -84,6 +84,10 @@ class BackgroundRadioCollector(
 
     override val unreadByAddress: StateFlow<Map<String, Int>> = unread
 
+    private val progress = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    override val progressByAddress: StateFlow<Map<String, String>> = progress
+
     override fun clearUnread(address: String) {
         unread.update { it - address }
     }
@@ -170,7 +174,10 @@ class BackgroundRadioCollector(
                 val writer = launch { writeLogs(address, link) }
                 val processor = launch { processPackets(address, link) }
                 val store = launch {
-                    BackgroundDeviceStore(address, databaseManager).run(link.setup)
+                    BackgroundDeviceStore(address, databaseManager) { text ->
+                        progress.update { if (text == null) it - address else it + (address to text) }
+                    }
+                        .run(link.setup)
                     readBadge(address)
                 }
                 val beat = launch {
@@ -191,6 +198,7 @@ class BackgroundRadioCollector(
             }
         } finally {
             withContext(NonCancellable) {
+                progress.update { it - address }
                 pool.detachBackground(address, link)
                 linkScope.cancel()
             }

@@ -65,6 +65,8 @@ data class RadioChoice(
     val nodeNum: Int? = null,
     /** New messages that reached this device in the background since it was last shown. */
     val unread: Int = 0,
+    /** What the device is doing while it connects in the background (config, channels, node list); null when done. */
+    val progress: String? = null,
 )
 
 /**
@@ -120,9 +122,9 @@ class RadioChooserViewModel(
             },
             radioPrefs.devAddr,
             serviceRepository.connectionState,
-            background.connectedAddresses,
+            combine(background.connectedAddresses, background.progressByAddress) { q, g -> q to g },
             combine(dropped, plates, uiPrefs.uiOptions) { d, p, o -> Triple(d, p, o) },
-        ) { (slots, selectedId, off), address, connection, quiet, (droppedByItself, plate, options) ->
+        ) { (slots, selectedId, off), address, connection, (quiet, steps), (droppedByItself, plate, options) ->
             val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
             val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
@@ -147,6 +149,7 @@ class RadioChooserViewModel(
                     if (active && ours != null) ours.user.short_name else badges[slot.address]?.shortName,
                     nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
                     unread = if (active) 0 else unread[slot.address] ?: 0,
+                    progress = if (active) null else steps[slot.address],
                 )
             }
             RadioChooserState(
