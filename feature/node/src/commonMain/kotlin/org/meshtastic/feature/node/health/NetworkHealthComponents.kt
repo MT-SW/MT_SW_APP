@@ -22,8 +22,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.IndicationNodeFactory
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +52,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -64,7 +68,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -84,6 +91,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.SegmentedProgressRing
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.rememberThinRings
@@ -445,9 +453,12 @@ internal fun NodeHealthRow(
     // The history already holds the noise floor after the LNA correction.
     val shownValue = node.valueFor(metric)
 
+    // The standard touch/hover layer of a clickable card drew a lighter rectangle inside this see-through card (seen
+    // when the pointer rests on a row); the row gives way under the touch instead (see pressSpring).
+    CompositionLocalProvider(LocalIndication provides NoIndicationFactory) {
     Card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressSpring(),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = container),
     ) {
@@ -528,6 +539,19 @@ internal fun NodeHealthRow(
             }
         }
     }
+    }
+}
+
+/** No touch or hover layer at all; the element draws only itself. */
+private object NoIndicationFactory : IndicationNodeFactory {
+    override fun create(interactionSource: InteractionSource): DelegatableNode =
+        object : Modifier.Node(), DrawModifierNode {
+            override fun ContentDrawScope.draw() = drawContent()
+        }
+
+    override fun hashCode(): Int = -1
+
+    override fun equals(other: Any?): Boolean = other === this
 }
 
 private const val NAME_BADGE_CHARS = 4
