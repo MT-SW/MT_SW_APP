@@ -548,7 +548,10 @@ private const val UNSIGNED_INT_MASK = 0xFFFFFFFFL
 private const val HEX_RADIX = 16
 private const val GPIO_WRITE_ARGS = 3
 
-/** The commands that act on the connected device; the same set as the commands of the Meshtastic command line. */
+/**
+ * The commands that act on the connected device; the same set as the commands of the Meshtastic command line.
+ * Built once, when the console opens.
+ */
 fun buildDeviceCommands(
     env: ConsoleEnvironment,
     labels: ConsoleDeviceLabels,
