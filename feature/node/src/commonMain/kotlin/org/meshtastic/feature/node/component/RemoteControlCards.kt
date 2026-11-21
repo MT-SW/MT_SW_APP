@@ -20,6 +20,11 @@ package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +37,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -90,6 +97,7 @@ import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.DoDisturb
 import org.meshtastic.core.ui.icon.ErrorOutline
@@ -137,6 +145,51 @@ private fun PanelHeader(icon: ImageVector, title: String, hint: String, accent: 
     }
 }
 
+/**
+ * A plain card made tappable by hand. The built-in tappable card draws its own touch and hover layer (a lighter
+ * rectangle with square corners inside the rounded card, seen when the pointer rests on it and on a greyed out tile);
+ * here the whole tile changes colour evenly instead, and gives way under the touch.
+ */
+@Composable
+private fun TileCard(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    container: Color,
+    modifier: Modifier = Modifier,
+    border: BorderStroke? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val shape = MaterialTheme.shapes.large
+    val hoverSource = remember { MutableInteractionSource() }
+    val hovered by hoverSource.collectIsHoveredAsState()
+    val shown =
+        if (hovered && enabled) {
+            MaterialTheme.colorScheme.onSurface.copy(alpha = TILE_HOVER_ALPHA).compositeOver(container)
+        } else {
+            container
+        }
+    Card(
+        modifier =
+        modifier
+            .then(if (enabled) Modifier.pressSpring() else Modifier)
+            .clip(shape)
+            .hoverable(hoverSource)
+            .clickable(
+                interactionSource = hoverSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = shown, disabledContainerColor = shown),
+        border = border,
+        content = content,
+    )
+}
+
+private const val TILE_HOVER_ALPHA = 0.08f
+
 /** A big tappable tile: icon in a coloured circle over a label. Greyed out and inert when [enabled] is false. */
 @Composable
 private fun ActionTile(
@@ -148,12 +201,11 @@ private fun ActionTile(
     modifier: Modifier = Modifier,
 ) {
     val base = MaterialTheme.colorScheme.surfaceContainerHighest
-    Card(
+    TileCard(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = TINT_ALPHA).compositeOver(base)),
+        container = color.copy(alpha = TINT_ALPHA).compositeOver(base),
         border = BorderStroke(1.dp, color.copy(alpha = 0.5f)),
     ) {
         Column(
@@ -285,12 +337,11 @@ internal fun QuickCommandsPanel(node: Node, onAction: (NodeDetailAction) -> Unit
 @Composable
 private fun CommandRow(command: String, description: String, icon: ImageVector, enabled: Boolean, onClick: () -> Unit) {
     val accent = MaterialTheme.colorScheme.primary
-    Card(
+    TileCard(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth().alpha(if (enabled) 1f else DISABLED_ALPHA),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest),
+        container = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
@@ -333,15 +384,11 @@ private fun ChoiceTile(
     modifier: Modifier = Modifier,
 ) {
     val base = MaterialTheme.colorScheme.surfaceContainerHighest
-    Card(
+    TileCard(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        colors =
-        CardDefaults.cardColors(
-            containerColor = if (selected) color.copy(alpha = TINT_ALPHA * 2).compositeOver(base) else base,
-        ),
+        container = if (selected) color.copy(alpha = TINT_ALPHA * 2).compositeOver(base) else base,
         border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) color else color.copy(alpha = 0.25f)),
     ) {
         Row(
