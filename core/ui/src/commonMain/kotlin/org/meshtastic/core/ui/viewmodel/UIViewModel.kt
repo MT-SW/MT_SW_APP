@@ -67,6 +67,7 @@ import org.meshtastic.core.model.evaluateTracerouteMapAvailability
 import org.meshtastic.core.model.geofence.GeofencePolygon
 import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
 import org.meshtastic.core.model.service.TracerouteResponse
+import org.meshtastic.core.model.util.MESHTASTIC_HOST
 import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
@@ -928,10 +929,14 @@ class UIViewModel(
 internal fun CommonUri.toSanitizedImportSummary(): String {
     val fragmentLength = fragment?.length ?: 0
     val hasFragment = !fragment.isNullOrBlank()
-    val queryParameterCount = getQueryParameterNames().size
+    // getQueryParameterNames throws on opaque URIs such as mailto:x
+    val queryParameterCount = if (isOpaque) 0 else getQueryParameterNames().size
     // pathSegments values are not logged: a malformed channel URL can still leak structure (e.g.
     // a malformed "/e/" path). pathSegmentCount is enough to diagnose routing without exposing it.
-    return "rawLength=${toString().length} scheme=$scheme host=$host " +
+    val schemeLength = scheme?.length ?: 0
+    val meshtasticHost = host?.removePrefix("www.").equals(MESHTASTIC_HOST, ignoreCase = true)
+    return "rawLength=${toString().length} schemeLength=$schemeLength " +
+        "meshtasticHost=$meshtasticHost hostLength=${host?.length ?: 0} " +
         "pathSegmentCount=${pathSegments.size} hasFragment=$hasFragment " +
         "fragmentLength=$fragmentLength queryParameterCount=$queryParameterCount"
 }

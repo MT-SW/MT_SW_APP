@@ -2,7 +2,7 @@
 title: Odkrywanie lokalnej sieci mesh
 parent: Przewodnik użytkownika
 nav_order: 12
-last_updated: 2026-11-12
+last_updated: 2026-11-21
 description: Poznaj swoją sieć mesh — skaner Odkrywania lokalnej sieci mesh, trasy traceroute, mapy sąsiadów i narzędzia do odkrywania węzłów.
 aliases:
   - discovery
@@ -178,7 +178,7 @@ Po włączeniu i nadawaniu przez LoRa Twój węzeł okresowo rozgłasza listę s
 
 #### Przeglądanie danych o sąsiadach
 
-- Otwórz ekran szczegółów węzła i znajdź **Informacje o sąsiadach** w sekcji **Telemetria**. Wiersz pojawia się, gdy aplikacja odbierze listę sąsiadów tego węzła. Jego przycisk dziennika otwiera wszystko, co ten węzeł zgłosił, a przycisk żądania prosi węzeł o nową listę.
+- Otwórz ekran szczegółów węzła i znajdź **Informacje o sąsiadach** w sekcji **Telemetria**. Wiersz pojawia się, gdy aplikacja odbierze listę sąsiadów tego węzła, albo gdy moduł Informacji o sąsiadach jest włączony w połączonym węźle. Jego przycisk żądania prosi węzeł o nową listę i pojawia się tylko wtedy, gdy Twój połączony węzeł ma ten moduł włączony, bo firmware odrzuca informacje o sąsiadach w węźle, który ma go wyłączony. Jego przycisk dziennika otwiera [dziennik Informacji o sąsiadach](node-metrics#neighbor-info) tego węzła.
 - Każdy wpis sąsiada pokazuje węzeł, który został usłyszany bezpośrednio, i jakość jego sygnału.
 - Połącz dane o sąsiadach z wielu węzłów, aby zrozumieć pełną topologię sieci mesh.
 

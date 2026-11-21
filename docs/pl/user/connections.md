@@ -141,7 +141,7 @@ Niektóre radia MT_SW obsługują łączność Wi-Fi/Ethernet, co pozwala na po�
 
 Radio, którego oprogramowanie udostępnia interfejs telefonu przez WebSocket, odpowiada pod adresem `/api/v1/ws`. Wydane oprogramowanie jeszcze go nie udostępnia. Wpisz adres jako link, na przykład `ws://192.168.1.50` albo `wss://meshtastic.local:9443`. Ścieżka domyślnie to `/api/v1/ws`, a port wpisuje się w linku, więc pole portu nie jest używane. Radia używają własnego certyfikatu, któremu aplikacja nie ufa, dlatego na Androidzie i komputerze łącz się przez `ws://`.
 
-Jeśli radio odrzuci połączenie, aplikacja podpowiada, żeby sprawdzić, czy ścieżka to `/api/v1/ws` i czy oprogramowanie radia ma interfejs WebSocket.
+Jeśli węzeł nie ma nic pod `/api/v1/ws`, aplikacja podpowiada, że jego oprogramowanie nie obsługuje jeszcze połączeń WebSocket, i radzi je zaktualizować albo połączyć się przez TCP. Jeśli połączenie zostanie odrzucone z innego powodu albo adres ma inną ścieżkę, aplikacja podpowiada, żeby sprawdzić, czy ścieżka to `/api/v1/ws` i czy oprogramowanie węzła ma interfejs WebSocket. Adresy różniące się tylko wielkością liter w schemacie lub nazwie hosta albo domyślnym portem (`80` dla `ws://`, `443` dla `wss://`) to to samo urządzenie.
 
 Radio obsługuje jedno połączenie WebSocket naraz. Gdy zajmie je inna aplikacja albo radio zamknie je z powodu zbyt dużej wiadomości, aplikacja nie łączy się sama ponownie, nawet gdy wróci sieć. Połącz się znowu w zakładce **Połącz**, żeby odzyskać połączenie.
 

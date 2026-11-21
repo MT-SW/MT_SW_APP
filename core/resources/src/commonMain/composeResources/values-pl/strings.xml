@@ -493,8 +493,8 @@
     <string name="mqtt_root_problem_empty">Wpisz temat.</string>
     <string name="mqtt_root_problem_empty_segment">Temat nie może zawierać dwóch ukośników z rzędu.</string>
     <string name="mqtt_root_problem_ends_with_version">Temat nie może kończyć się na /2.</string>
-    <string name="mqtt_root_problem_leading_slash">Temat nie może zaczynać się od ukośnika.</string>
     <string name="mqtt_root_problem_too_long">Temat może mieć najwyżej 31 znaków.</string>
+    <string name="mqtt_root_has_wildcard">MQTT zatrzymany: główny temat zawiera + lub #. Usuń je w ustawieniach MQTT.</string>
     <string name="mqtt_root_problem_trailing_slash">Temat nie może kończyć się ukośnikiem.</string>
     <string name="mqtt_root_problem_whitespace">Temat nie może zawierać spacji ani znaków sterujących.</string>
     <string name="mqtt_root_problem_wildcard">Temat nie może zawierać + ani #.</string>
@@ -504,7 +504,7 @@
     <string name="mqtt_topic_finder_counts">Liczby to węzły usłyszane podczas próbki. Ruchliwe tematy wypełniają się w kilka sekund; ciche mogą zostać na zerze.</string>
     <string name="mqtt_topic_finder_custom">Własny temat</string>
     <string name="mqtt_topic_finder_custom_example">msh/US/WA/seattle</string>
-    <string name="mqtt_topic_finder_custom_hint">Do 31 znaków ASCII, bez ukośnika na początku i na końcu, bez + i #.</string>
+    <string name="mqtt_topic_finder_custom_hint">Do 31 bajtów, bez ukośnika na końcu, bez + i #.</string>
     <string name="mqtt_topic_finder_failed_closed">Broker zamknął połączenie.</string>
     <string name="mqtt_topic_finder_failed_connect">Nie udało się połączyć z brokerem.</string>
     <string name="mqtt_topic_finder_failed_error">Próbka zatrzymała się z powodu nieoczekiwanego błędu.</string>
@@ -4447,6 +4447,7 @@
     <string name="web_serial_unsupported">Ta przeglądarka nie ma dostępu do USB szeregowego. USB działa w Chrome, Edge i Operze na komputerze.</string>
     <string name="web_transports_unsupported">Ta przeglądarka nie ma Bluetooth ani USB szeregowego, więc łączy się z urządzeniem tylko przez sieć. Bluetooth i USB działają w Chrome, Edge i Operze na komputerze, a Bluetooth także w Chrome na Androidzie.</string>
     <string name="websocket_connect_failed">Nie udało się połączyć z WebSocket urządzenia. Sprawdź adres i czy urządzenie jest w tej sieci.</string>
+    <string name="websocket_not_supported">Oprogramowanie tego urządzenia nie obsługuje jeszcze połączeń WebSocket. Zaktualizuj oprogramowanie albo połącz się przez TCP.</string>
     <string name="websocket_handshake_rejected">Urządzenie odrzuciło WebSocket pod tym adresem. Sprawdź, czy ścieżka to /api/v1/ws i czy jego oprogramowanie ma interfejs WebSocket.</string>
     <string name="websocket_message_too_big">Urządzenie zamknęło WebSocket, bo wiadomość była za duża.</string>
     <string name="websocket_port_in_url">Nieużywane dla adresu ws:// lub wss://. Wpisz port w adresie.</string>

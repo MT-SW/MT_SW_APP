@@ -2,7 +2,7 @@
 title: Węzły
 parent: Przewodnik użytkownika
 nav_order: 4
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
@@ -25,6 +25,7 @@ Lista węzłów pokazuje każdy węzeł, który Twój węzeł usłyszał, w tym:
 - **Jakość sygnału** — SNR, RSSI i określenie jakości, pokazywane tylko dla węzłów, które Twój węzeł usłyszał bezpośrednio. W układzie Pełnym węzeł osiągany przez przekaźnik pokazuje tutaj zamiast tego liczbę skoków; węzeł słyszany wyłącznie przez MQTT nie pokazuje żadnej z tych informacji
 - **Ostatnio słyszany** — czas od ostatniej komunikacji
 - **Odległość** — szacowana odległość (jeśli pozycje są udostępniane)
+- **Wysokość** — wysokość z ostatniej pozycji węzła, pokazywana tylko wtedy, gdy ta pozycja ją zawiera
 - **Bateria** — poziom baterii zdalnego węzła (jeśli telemetria jest włączona)
 
 ### Wybór tego, co pokazuje lista

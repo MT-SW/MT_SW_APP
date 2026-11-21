@@ -18,7 +18,7 @@ The `:feature:widget` module holds the **Android-only Jetpack Glance home-screen
 
 ```text
 src/main/kotlin/org/meshtastic/feature/widget/
-├── WidgetSizes.kt                   ← size thresholds, line budget and type scale shared by both widgets
+├── WidgetSizes.kt                   ← size thresholds, line budget and type scale shared by all three widgets
 ├── WidgetComponents.kt              ← brand header, identity row, stat and bar rows, status body
 ├── AndroidAppWidgetUpdater.kt       ← implements AppWidgetUpdater (core:repository)
 ├── WidgetResourceEnvironment.kt     ← bridges Compose resources into Glance

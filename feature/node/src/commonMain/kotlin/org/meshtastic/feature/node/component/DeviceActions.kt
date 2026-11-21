@@ -64,6 +64,7 @@ import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
 import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.NodeDetailAction
+import org.meshtastic.feature.node.model.isLicensedLocal
 import org.meshtastic.feature.node.model.showsDirectMessageAction
 import org.meshtastic.proto.Telemetry
 
@@ -86,7 +87,13 @@ fun DeviceActions(
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         SectionCard(title = Res.string.actions) {
-            PrimaryActionsRow(node = node, isLocal = isLocal, hasConversation = hasConversation, onAction = onAction)
+            PrimaryActionsRow(
+                node = node,
+                ourNode = ourNode,
+                isLocal = isLocal,
+                hasConversation = hasConversation,
+                onAction = onAction,
+            )
 
             if (!isLocal) {
                 SectionDivider(Modifier.padding(vertical = 8.dp))
@@ -118,13 +125,16 @@ fun DeviceActions(
 @Composable
 private fun PrimaryActionsRow(
     node: Node,
+    ourNode: Node?,
     isLocal: Boolean,
     hasConversation: Boolean,
     onAction: (NodeDetailAction) -> Unit,
 ) {
-    // Hidden for a node the radio would refuse to send to: unmessagable, or no public key on file. An existing
-    // thread keeps it visible so a conversation is never stranded.
-    val showMessageAction = !isLocal && node.showsDirectMessageAction(hasConversation)
+    // Hidden for a node our radio would refuse to send to: unmessagable, or no public key on file unless we are
+    // licensed. An existing thread keeps it visible so a conversation is never stranded.
+    val showMessageAction =
+        !isLocal &&
+            node.showsDirectMessageAction(hasConversation = hasConversation, localIsLicensed = ourNode.isLicensedLocal)
     Row(
         modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

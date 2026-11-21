@@ -2,7 +2,7 @@
 title: Ustawienia — Radio i użytkownik
 parent: Przewodnik użytkownika
 nav_order: 7
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 description: Konfiguracja sprzętu węzła, presetów LoRa, profilu użytkownika, udostępniania pozycji, zarządzania energią i bezpieczeństwa.
 aliases:
   - settings
@@ -157,6 +157,8 @@ W **Ustawienia → Konfiguracja urządzenia → Wyświetlacz**. Te ustawienia do
 | Tryb wyświetlania | Układ ekranu: **Default 128x64 screen layout**, **Optimized for 2 color displays**, **Inverted top bar for 2 color displays** lub **TFT Full Color Displays** | Domyślny, a w węzłach z kolorowym ekranem kolorowy |
 | Wyświetlana jednostka | **Metryczne** lub **imperialne** na ekranie węzła | Metryczne |
 | Odwróć ekran | Odwraca wyświetlacz przy odwróconym montażu | Wyłączone |
+| Długie nazwy węzłów | Pokazuje na ekranie węzła pełne nazwy węzłów zamiast krótkich. Dostępne w firmware 2.7.13 i nowszym | Wyłączone |
+| Dymki wiadomości | Rysuje wiadomości na ekranie węzła jako dymki. Dostępne w firmware 2.7.19 i nowszym | Włączone przy kolorowym ekranie 200 pikseli lub większym, w pozostałych przypadkach wyłączone |
 | Typ ekranu OLED | Zastępuje automatyczne wykrywanie OLED: **Detect Automatically**, **SSD1306**, **SH1106**, **SH1107**, **SH1107 128x128** lub **SH1107 Rotated** | Detect Automatically |
 | Ekran włączony na | Jak długo wyświetlacz pozostaje podświetlony po naciśnięciu przycisku lub odebraniu wiadomości: od 15 sekund do 1 godziny albo **Zawsze włączony** | 10 minut |
 | Wybudź przy dotknięciu lub ruchu | Zapala ekran, gdy węzeł zostanie dotknięty lub poruszony. Wymaga akcelerometru | Wyłączone |

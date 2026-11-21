@@ -2,7 +2,7 @@
 title: Ustawienia — Moduły i administracja
 parent: Przewodnik użytkownika
 nav_order: 8
-last_updated: 2026-10-21
+last_updated: 2026-11-21
 description: Konfiguracja opcjonalnych modułów funkcji (MQTT, telemetria, wiadomości predefiniowane, TAK i inne) oraz administrowanie urządzeniem.
 aliases:
   - modules
@@ -138,7 +138,8 @@ Każda z czterech grup metryk ma własny przełącznik włączenia i własny int
 | Włącz moduł metryk zasilania | Raportuje odczyty napięcia i prądu dla poszczególnych kanałów | Wyłączone |
 | Czas aktualizacji metryk zasilania | Jak często je raportować | — |
 | Wyświetlaj metryki zasilania na ekranie | Pokazuje odczyty zasilania także na wyświetlaczu urządzenia | Wyłączone |
-| Pokaż na ekranie urządzenia | Pokazuje odczyty środowiskowe także na wyświetlaczu urządzenia | Wyłączone |
+| Pokaż jakość powietrza na ekranie urządzenia | Pokazuje odczyty jakości powietrza także na wyświetlaczu urządzenia. Dostępne w firmware 2.7.18 i nowszym | Wyłączone |
+| Pokaż środowisko na ekranie urządzenia | Pokazuje odczyty środowiskowe także na wyświetlaczu urządzenia | Wyłączone |
 
 Obsługiwane czujniki i zalecenia konfiguracyjne znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
 
@@ -317,7 +318,7 @@ Otwiera karty **Pakiety** i **Dzienniki aplikacji** do przeglądania, filtrowani
 Sekcja **Aplikacja** na ekranie **Ustawienia** konfiguruje aplikację, a nie węzeł, i pojawia się tylko wtedy, gdy wybrany jest Twój własny węzeł. Zawiera, po kolei:
 
 - **Zezwalaj na analizę i raportowanie awarii.** — zgoda lub rezygnacja z diagnostyki. Tylko w wersji z Google Play.
-- **Podaj lokalizację telefonu do sieci** — udostępnia pozycję tego telefonu, gdy węzeł nie ma ustalonej pozycji GPS. Wymaga dokładnej lokalizacji: jeśli dozwolona jest tylko przybliżona, jej włączenie poprosi o dokładną.
+- **Podaj lokalizację telefonu do sieci** — udostępnia pozycję tego telefonu, gdy węzeł nie ma ustalonej pozycji GPS. Wymaga dokładnej lokalizacji: jeśli dozwolona jest tylko przybliżona, jej włączenie poprosi o dokładną. Gdy telefon leży w miejscu, jego GPS odpoczywa: po trzech kolejnych pozycjach w tym samym obszarze, z dokładnością, z jaką Twój węzeł udostępnia pozycję, aplikacja przestaje pytać o lokalizację, dopóki telefon się nie poruszy, a węzeł dalej rozsyła ostatnią pozycję. GPS zostaje włączony, gdy żaden kanał nie udostępnia pozycji, przy pełnej dokładności, w roli Lost and Found albo w telefonie bez czujnika ruchu.
 - **Kompaktowe kodowanie cyrylicy** — jak traktowane są podobnie wyglądające znaki w nazwach.
 - **Język**, **Motyw** i **Jednostki**. **Motyw** poza jasnym, ciemnym i dynamicznym ma dwa motywy **czarno-białe** (jasny: białe tło i ciemne napisy, ciemny: czarne tło i jasne napisy). W nich całe wnętrze aplikacji jest w odcieniach szarości, także sygnał, wykresy, kolory węzłów i mapa. Okienka i menu mogą pokazać pojedyncze kolory. **Jednostki** to metryczne, imperialne lub zgodne z systemem; to pozycja, do której odsyła [Jednostki i lokalizacja](units-and-locale).
 - **Wyświetlaj pełne znaczniki czasu**.

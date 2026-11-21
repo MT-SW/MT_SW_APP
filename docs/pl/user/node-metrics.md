@@ -2,7 +2,7 @@
 title: Metryki węzła
 parent: Przewodnik użytkownika
 nav_order: 5
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 description: Panele telemetrii każdego węzła sieci mesh — stan urządzenia, czujniki środowiskowe, jakość powietrza, jakość sygnału, zasilanie, traceroute i historia pozycji.
 aliases:
   - metrics
@@ -71,6 +71,8 @@ Indeks **IAQ (Indoor Air Quality — jakość powietrza w pomieszczeniach)** z B
 | 201–250 | Mocno zanieczyszczone |
 | 251–350 | Poważnie zanieczyszczone |
 | 351 i więcej | Ekstremalnie zanieczyszczone |
+
+Na ekranie szczegółów węzła kafelek **IAQ** pokazuje wartość z nazwą przedziału, na przykład **120 (Lekko zanieczyszczone)**, w kolorze tego przedziału.
 
 ![Legenda IAQ z siedmioma stopniami i ich kolorami](../../assets/screenshots/node-metrics_iaq_scale.png)
 
@@ -163,7 +165,7 @@ Pierścień na przycisku traceroute pokazuje sekundy pozostałe do chwili, gdy m
 
 ### Odczytywanie wyników traceroute
 
-Traceroute to podróż w obie strony, więc każdy zapisany wynik zawiera liczbę skoków w każdym kierunku, **Skoki w przód** i **Skoki powrotne**, oraz czas **Trasa w obie strony** w sekundach. Wynik oznaczony **Bezpośrednio** dotarł do celu bez żadnego przekaźnika po drodze. Dotknij wyniku, aby zobaczyć trasę wyznaczoną do celu i trasę wyznaczoną z powrotem do Ciebie, wraz z SNR każdego skoku. Ten widok oferuje **Pokaż na mapie**, który rysuje tę samą ścieżkę, o ile węzeł początkowy i docelowy udostępniły pozycję.
+Traceroute to podróż w obie strony, więc każdy zapisany wynik zawiera liczbę skoków w każdym kierunku, **Skoki w przód** i **Skoki powrotne**, oraz czas **Trasa w obie strony** w sekundach. Wynik oznaczony **Bezpośrednio** dotarł do celu bez żadnego przekaźnika po drodze. Dotknij wyniku, aby zobaczyć trasę wyznaczoną do celu i trasę wyznaczoną z powrotem do Ciebie, wraz z SNR każdego skoku. Ten widok oferuje **Pokaż na mapie**, który rysuje tę samą ścieżkę — trasa do celu jest ciągła, a trasa powrotna do Ciebie przerywana — o ile węzeł początkowy i docelowy udostępniły pozycję.
 
 Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**, a przekaźnik, którego Twój węzeł nie zna, jako jego identyfikator węzła, na przykład `!a1b2c3d4`. Skok, którego węzeł ostatnio usłyszano przez MQTT, jest oznaczony `(MQTT)`.
 
@@ -187,7 +189,7 @@ Przycisk wykresu w wierszu **Pozycja** otwiera historię pozycji węzła: jego �
 
 ## Informacje o sąsiadach
 
-Pokazuje, które węzły dany węzeł słyszy bezpośrednio — przydatne do zrozumienia topologii sieci mesh. Wiersz **Informacje o sąsiadach** pojawia się, gdy lista sąsiadów tego węzła dotrze do aplikacji. Jak włączyć moduł, opisuje [Lokalne wykrywanie sieci mesh](discovery#neighbor-info).
+Pokazuje, które węzły dany węzeł słyszy bezpośrednio — przydatne do zrozumienia topologii sieci mesh. Wiersz **Informacje o sąsiadach** pojawia się, gdy lista sąsiadów tego węzła dotrze do aplikacji. Jego dziennik pokazuje na wykresie liczbę sąsiadów i średni SNR każdego raportu oraz wypisuje każdy raport i każde żądanie, na które nie przyszła odpowiedź. Jak włączyć moduł, opisuje [Lokalne wykrywanie sieci mesh](discovery#neighbor-info).
 
 ## Statystyki hosta
 

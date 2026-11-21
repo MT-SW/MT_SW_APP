@@ -2,7 +2,7 @@
 title: Wiadomości i kanały
 parent: Przewodnik użytkownika
 nav_order: 3
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
@@ -133,7 +133,9 @@ Etykieta statusu pojawia się wyłącznie pod **Twoimi własnymi** wiadomościam
 | Potwierdzone w łańcuchu SF++ | Potwierdzone jako dostarczone przez łańcuch SF++ |
 | Błąd | Dostarczenie nie powiodło się — dotknij statusu, aby poznać konkretny powód (zobacz [Błędy dostarczania](#delivery-errors)) |
 
-Dotknij statusu pod nieudaną wiadomością albo pod wiadomością bezpośrednią oznaczoną **Przekazane, niepotwierdzone przez odbiorcę** i wybierz **Wyślij ponownie**, aby wysłać ją jeszcze raz. Wiadomość zostaje na swoim miejscu w rozmowie, a jej status zaczyna się od nowa. **Wyślij ponownie** nie jest dostępne przy **Niezgodność kanału/klucza** ani **Wiadomość jest za duża, by ją wysłać**, bo druga próba tego nie naprawi, ani w zarchiwizowanej rozmowie.
+Dotknij statusu pod dowolną wysłaną przez Ciebie wiadomością, aby otworzyć szczegóły jej doręczenia. Przy nieudanej wiadomości albo wiadomości bezpośredniej oznaczonej **Przekazane, niepotwierdzone przez odbiorcę** wybierz **Wyślij ponownie**, aby wysłać ją jeszcze raz. Wiadomość zostaje na swoim miejscu w rozmowie, a jej status zaczyna się od nowa. **Wyślij ponownie** nie jest dostępne przy **Niezgodność kanału/klucza** ani **Wiadomość jest za duża, by ją wysłać**, bo druga próba tego nie naprawi, ani w zarchiwizowanej rozmowie.
+
+To samo okno podaje węzeł przekazujący: przy wiadomości kanałowej węzeł, który ją przekazał, a przy wiadomości bezpośredniej węzeł, który przekazał potwierdzenie z powrotem, na przykład **Potwierdzenie przekazane przez Ridge (0x5A)**. Pakiet niesie tylko ostatni bajt identyfikatora przekaźnika, więc nazwa to najlepsze dopasowanie wśród znanych aplikacji węzłów i może być błędna. Gdy nie zapisano żadnego przekaźnika, wiersz się nie pojawia.
 
 ### Błędy dostarczania
 
@@ -143,7 +145,7 @@ Gdy wiadomości nie uda się dostarczyć, wskaźnik błędu pokazuje, co poszło
 |-------|---------|------------|
 | Brak trasy | Nie istnieje ścieżka do węzła docelowego | Odbiorca może być offline lub poza zasięgiem sieci mesh. Spróbuj później albo podejdź bliżej. |
 | Brak interfejsu radiowego | Brak dostępnego interfejsu radiowego do wysyłania | Sprawdź, czy Twój węzeł jest połączony i dostępny. |
-| Nie udało się dostarczyć do sieci mesh | Wyczerpano ponowienia. Ta sama etykieta obejmuje trzy przyczyny — odmowę przekaźnika (NAK), zwykłe przekroczenie czasu i wyczerpanie retransmisji | Podejdź bliżej, popraw sygnał albo poczekaj na poprawę warunków. Dotknij błędu, aby poznać konkretną przyczynę. |
+| Nie udało się dostarczyć do sieci mesh | Wyczerpano ponowienia. Ta sama etykieta obejmuje trzy przyczyny — odmowę przekaźnika (NAK), zwykłe przekroczenie czasu i wyczerpanie retransmisji. Wiadomość, którą przekaźnik już potwierdził, zachowuje status **Dostarczone do sieci mesh** albo **Przekazane, niepotwierdzone przez odbiorcę**, gdy skończą się jej retransmisje | Podejdź bliżej, popraw sygnał albo poczekaj na poprawę warunków. Dotknij błędu, aby poznać konkretną przyczynę. |
 | Przekroczono limit wysyłania | Sieć mesh ogranicza Cię za zbyt szybkie wysyłanie | Poczekaj przed ponownym wysłaniem. |
 | Brak autoryzacji | Cel odrzucił żądanie | Sprawdź, czy masz właściwy kanał i klucze dla tego węzła. |
 | Odbiorca potrzebuje Twojego klucza | Szyfrowanie wiadomości bezpośredniej nie mogło zostać dokończone, bo drugi węzeł nie ma jeszcze Twojego klucza publicznego | Wymieńcie się informacjami o węźle — klucz podróżuje razem z nimi. Częste przy pierwszej wiadomości bezpośredniej do nowego kontaktu. |
