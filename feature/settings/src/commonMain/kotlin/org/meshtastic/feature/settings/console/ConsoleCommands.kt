@@ -456,7 +456,7 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                         latitude in -MAX_LATITUDE..MAX_LATITUDE &&
                         longitude != null &&
                         longitude in -MAX_LONGITUDE..MAX_LONGITUDE
-                if (!valid || latitude == null || longitude == null) {
+                if (!valid) {
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_bad, labels.position.usage)))
                 } else if (env.setPosition(latitude, longitude, altitude?.roundToInt())) {
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_set, args[0], args[1])))
