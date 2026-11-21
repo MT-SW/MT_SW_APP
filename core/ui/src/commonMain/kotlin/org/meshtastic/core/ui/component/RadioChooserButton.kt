@@ -25,6 +25,11 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.hoverable
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.foundation.clickable
@@ -218,7 +223,28 @@ private fun rememberRadioPulseAlpha(options: UiOptions): Float {
 
 @Composable
 private fun RadioItem(radio: RadioChoice, onChoose: () -> Unit) {
-    Box(modifier = Modifier.clickable(onClick = onChoose).padding(horizontal = 4.dp, vertical = 6.dp)) {
+    // The highlight under the pointer is a soft rounded pane, not the square of the standard menu item.
+    val source = remember { MutableInteractionSource() }
+    val hovered by source.collectIsHoveredAsState()
+    val pressed by source.collectIsPressedAsState()
+    val shape = RoundedCornerShape(ITEM_CORNER_DP.dp)
+    val tint =
+        MaterialTheme.colorScheme.primary.copy(
+            alpha =
+            when {
+                pressed -> ITEM_PRESSED_ALPHA
+                hovered -> ITEM_HOVER_ALPHA
+                else -> 0f
+            },
+        )
+    Box(
+        modifier =
+        Modifier.clip(shape)
+            .background(tint)
+            .hoverable(source)
+            .clickable(interactionSource = source, indication = null, onClick = onChoose)
+            .padding(horizontal = 6.dp, vertical = 6.dp),
+    ) {
         RadioPlate(radio)
         if (radio.unread > 0) {
             Text(
@@ -312,6 +338,9 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
 }
 
 private const val BUBBLE_CORNER_DP = 22
+private const val ITEM_CORNER_DP = 14
+private const val ITEM_HOVER_ALPHA = 0.12f
+private const val ITEM_PRESSED_ALPHA = 0.2f
 private const val BUBBLE_GAP_DP = 4
 private const val BUBBLE_PADDING_DP = 8
 private const val BUBBLE_MARGIN_DP = 14

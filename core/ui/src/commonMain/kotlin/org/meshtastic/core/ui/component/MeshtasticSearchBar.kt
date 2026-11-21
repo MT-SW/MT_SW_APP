@@ -230,12 +230,15 @@ private fun InlineSearchField(
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
     val fillTop = if (filtering) SEARCH_FILL_TOP else SEARCH_FILL_TOP_IDLE
     val fillBottom = if (filtering) SEARCH_FILL_BOTTOM else SEARCH_FILL_BOTTOM_IDLE
+    val options = rememberUiOptions()
     StyledSurface(
-        group = UiOptions.GROUP_SEARCH,
+        style = options.element(UiOptions.GROUP_SEARCH),
         shape = shape,
         // The same width as the cards of the list below.
         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
-        baseColor = base,
+        baseColor = options.glassBase(base),
+        // A low pane: the sheen only fades out, with no lighter and darker band across the field.
+        flatBottom = true,
     ) {
         BasicTextField(
             state = textFieldState,
