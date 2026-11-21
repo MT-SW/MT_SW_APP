@@ -35,7 +35,8 @@ class MeasurementSystemSourceTest {
      * The one legitimate reference: the schema label map behind the radio settings picker that *configures* the
      * device's own display units. It names the proto enum's values; it does not format app UI with them.
      */
-    private val deviceConfigAllowlist = listOf("core/model/", "SchemaEnumLabels.kt")
+    // The radio-settings console lists every field of the radio's own configuration, the units of its display too.
+    private val deviceConfigAllowlist = listOf("SchemaEnumLabels.kt", "feature/settings/console/ConsoleSettings.kt")
 
     // The rule enforcer itself names the forbidden symbol in its strings, so it is excluded from its own scan.
     private fun scannedFiles() = Konsist.scopeFromProject()
@@ -56,7 +57,7 @@ class MeasurementSystemSourceTest {
 
     @Test
     fun `the device-config allowlist still matches its one legitimate use`() {
-        val allowlisted = scannedFiles().filter { file -> deviceConfigAllowlist.all { it in file.scanPath } }
+        val allowlisted = scannedFiles().filter { file -> deviceConfigAllowlist.any { it in file.scanPath } }
 
         assertTrue(
             allowlisted.any { "DisplayConfig.DisplayUnits" in it.text },
@@ -69,7 +70,7 @@ class MeasurementSystemSourceTest {
     fun `DisplayConfig DisplayUnits never reaches display code`() {
         val offenders =
             scannedFiles()
-                .filterNot { file -> deviceConfigAllowlist.all { it in file.scanPath } }
+                .filterNot { file -> deviceConfigAllowlist.any { it in file.scanPath } }
                 .filter { "DisplayConfig.DisplayUnits" in it.text }
                 .map { it.scanPath }
 

@@ -47,16 +47,16 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.connected
 import org.meshtastic.core.resources.connected_sleeping
 import org.meshtastic.core.resources.connecting
+import org.meshtastic.core.resources.connection_progress_channels
+import org.meshtastic.core.resources.connection_progress_channels_of
+import org.meshtastic.core.resources.connection_progress_device_config
+import org.meshtastic.core.resources.connection_progress_loading_nodes
+import org.meshtastic.core.resources.connection_progress_module_config
+import org.meshtastic.core.resources.connection_progress_nodes
+import org.meshtastic.core.resources.connection_progress_requesting_config
 import org.meshtastic.core.resources.connection_retry_in
 import org.meshtastic.core.resources.connection_retry_now
 import org.meshtastic.core.resources.disconnect
-import org.meshtastic.core.resources.connection_progress_requesting_config
-import org.meshtastic.core.resources.connection_progress_device_config
-import org.meshtastic.core.resources.connection_progress_module_config
-import org.meshtastic.core.resources.connection_progress_channels
-import org.meshtastic.core.resources.connection_progress_channels_of
-import org.meshtastic.core.resources.connection_progress_nodes
-import org.meshtastic.core.resources.connection_progress_loading_nodes
 import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.reconnecting
@@ -178,7 +178,10 @@ fun ConnectingDeviceInfo(
 @Composable
 private fun localizedProgress(text: String?): String? {
     if (text == null) return null
-    fun number(pattern: String) = Regex(pattern).matchEntire(text)?.groupValues?.drop(1)?.map { it.toInt() }
+    fun numbers(pattern: Regex) = pattern.matchEntire(text)?.groupValues?.drop(1)?.map { it.toInt() }
+    val channelsOf = numbers(CHANNELS_OF_PATTERN)
+    val channels = numbers(CHANNELS_PATTERN)
+    val nodes = numbers(NODES_PATTERN)
     return when {
         text == "Requesting config\u2026" || text == "Requesting config..." ->
             stringResource(Res.string.connection_progress_requesting_config)
@@ -191,20 +194,19 @@ private fun localizedProgress(text: String?): String? {
 
         text == "Reconnecting\u2026" -> stringResource(Res.string.reconnecting)
 
-        number("Channels \\((\\d+) / (\\d+)\\)") != null ->
-            number("Channels \\((\\d+) / (\\d+)\\)")!!.let {
-                stringResource(Res.string.connection_progress_channels_of, it[0], it[1])
-            }
+        channelsOf != null -> stringResource(Res.string.connection_progress_channels_of, channelsOf[0], channelsOf[1])
 
-        number("Channels \\((\\d+)\\)") != null ->
-            stringResource(Res.string.connection_progress_channels, number("Channels \\((\\d+)\\)")!![0])
+        channels != null -> stringResource(Res.string.connection_progress_channels, channels[0])
 
-        number("Nodes \\((\\d+)\\)") != null ->
-            stringResource(Res.string.connection_progress_nodes, number("Nodes \\((\\d+)\\)")!![0])
+        nodes != null -> stringResource(Res.string.connection_progress_nodes, nodes[0])
 
         else -> text
     }
 }
+
+private val CHANNELS_OF_PATTERN = Regex("Channels \\((\\d+) / (\\d+)\\)")
+private val CHANNELS_PATTERN = Regex("Channels \\((\\d+)\\)")
+private val NODES_PATTERN = Regex("Nodes \\((\\d+)\\)")
 
 /** How long a phase must last before the card names it, so a fast connect does not flicker through every step. */
 private val PHASE_SETTLE_TIME = 400.milliseconds

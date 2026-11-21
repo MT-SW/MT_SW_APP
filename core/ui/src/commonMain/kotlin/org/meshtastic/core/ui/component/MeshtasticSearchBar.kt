@@ -261,9 +261,7 @@ private fun InlineSearchField(
                     drawOutline(
                         outline = outline,
                         brush =
-                        Brush.verticalGradient(
-                            listOf(accent, accent.copy(alpha = SEARCH_EDGE_BOTTOM_ALPHA)),
-                        ),
+                        Brush.verticalGradient(listOf(accent, accent.copy(alpha = SEARCH_EDGE_BOTTOM_ALPHA))),
                         style = Stroke(width = SEARCH_RIM_DP.dp.toPx()),
                     )
                 }

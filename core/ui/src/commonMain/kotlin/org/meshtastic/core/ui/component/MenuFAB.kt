@@ -33,10 +33,10 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
@@ -51,10 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
@@ -89,22 +90,7 @@ fun MenuFAB(
             ) {
                 val imageVector = if (expanded) MeshtasticIcons.Close else MeshtasticIcons.OfflineShare
                 if (decor.custom) {
-                    // The glass button is drawn here and not by the Material toggle button: that one adds its own
-                    // shadow, which showed as a different coloured square in the middle of a see-through button.
-                    val corner by animateDpAsState(if (expanded) MENU_FAB_ROUND_DP.dp else MENU_FAB_CORNER_DP.dp)
-                    val shape = RoundedCornerShape(corner)
-                    Box(
-                        modifier =
-                        Modifier.size(MENU_FAB_SIZE_DP.dp)
-                            .glassLook(shape, decor)
-                            .clip(shape)
-                            .toggleable(value = expanded, role = Role.Switch, onValueChange = onExpandedChange),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides textColor) {
-                            Icon(imageVector = imageVector, contentDescription = stateAwareDescription)
-                        }
-                    }
+                    GlassMenuButton(expanded, onExpandedChange, imageVector, stateAwareDescription, decor, textColor)
                 } else {
                     ToggleFloatingActionButton(
                         checked = expanded,
@@ -123,26 +109,7 @@ fun MenuFAB(
             }
             val itemModifier = if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier
             if (decor.custom) {
-                val shape = CircleShape
-                // Shown only while the menu is open (the Material items hide themselves, these have to be told).
-                AnimatedVisibility(visible = expanded, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
-                Row(
-                    modifier =
-                    itemModifier
-                        .height(MENU_FAB_SIZE_DP.dp)
-                        .glassLook(shape, decor)
-                        .clip(shape)
-                        .clickable(role = Role.Button, onClick = select)
-                        .padding(horizontal = MENU_ITEM_PADDING_DP.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MENU_ITEM_GAP_DP.dp),
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides textColor) {
-                        Icon(item.icon, contentDescription = null)
-                        Text(item.label)
-                    }
-                }
-                }
+                GlassMenuItem(item, expanded, decor, textColor, itemModifier, select)
             } else {
                 FloatingActionButtonMenuItem(
                     modifier = itemModifier,
@@ -155,14 +122,76 @@ fun MenuFAB(
     }
 }
 
+/**
+ * The glass button is drawn here and not by the Material toggle button: that one adds its own shadow, which showed as
+ * a different coloured square in the middle of a see-through button.
+ */
 @Composable
-private fun Modifier.glassLook(shape: Shape, decor: FilledDecor): Modifier = floatingBacking(shape, decor).then(
-    when {
-        decor.outline != null -> Modifier.outlineGlassSurface(shape, decor)
-        decor.glass != null -> Modifier.glassSurface(shape, decor.glass)
-        else -> Modifier
-    },
-)
+private fun GlassMenuButton(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    imageVector: ImageVector,
+    description: String?,
+    decor: FilledDecor,
+    textColor: Color,
+) {
+    val corner by animateDpAsState(if (expanded) MENU_FAB_ROUND_DP.dp else MENU_FAB_CORNER_DP.dp)
+    val shape = RoundedCornerShape(corner)
+    Box(
+        modifier =
+        Modifier.size(MENU_FAB_SIZE_DP.dp)
+            .glassLook(shape, decor)
+            .clip(shape)
+            .toggleable(value = expanded, role = Role.Switch, onValueChange = onExpandedChange),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(LocalContentColor provides textColor) {
+            Icon(imageVector = imageVector, contentDescription = description)
+        }
+    }
+}
+
+/** A glass menu item, shown only while the menu is open (the Material items hide themselves, these have to be told). */
+@Composable
+private fun GlassMenuItem(
+    item: MenuFABItem,
+    expanded: Boolean,
+    decor: FilledDecor,
+    textColor: Color,
+    modifier: Modifier,
+    onSelect: () -> Unit,
+) {
+    val shape = CircleShape
+    AnimatedVisibility(visible = expanded, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
+        Row(
+            modifier =
+            modifier
+                .height(MENU_FAB_SIZE_DP.dp)
+                .glassLook(shape, decor)
+                .clip(shape)
+                .clickable(role = Role.Button, onClick = onSelect)
+                .padding(horizontal = MENU_ITEM_PADDING_DP.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MENU_ITEM_GAP_DP.dp),
+        ) {
+            CompositionLocalProvider(LocalContentColor provides textColor) {
+                Icon(item.icon, contentDescription = null)
+                Text(item.label)
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun Modifier.glassLook(shape: Shape, decor: FilledDecor): Modifier = floatingBacking(shape, decor)
+    .then(
+        when {
+            decor.outline != null -> Modifier.outlineGlassSurface(shape, decor)
+            decor.glass != null -> Modifier.glassSurface(shape, decor.glass)
+            else -> Modifier
+        },
+    )
 
 data class MenuFABItem(val label: String, val icon: ImageVector, val onClick: () -> Unit, val testTag: String? = null)
 

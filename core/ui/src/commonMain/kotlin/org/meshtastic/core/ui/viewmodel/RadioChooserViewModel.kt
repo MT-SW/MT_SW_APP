@@ -124,11 +124,21 @@ class RadioChooserViewModel(
             },
             radioPrefs.devAddr,
             serviceRepository.connectionState,
-            combine(background.connectedAddresses, background.progressByAddress, background.statusByAddress) { q, g, t ->
+            combine(background.connectedAddresses, background.progressByAddress, background.statusByAddress) {
+                    q,
+                    g,
+                    t,
+                ->
                 Triple(q, g, t)
             },
             combine(dropped, plates, uiPrefs.uiOptions) { d, p, o -> Triple(d, p, o) },
-        ) { (slots, selectedId, off), address, connection, (quiet, steps, statuses), (droppedByItself, plate, options) ->
+        ) {
+                (slots, selectedId, off),
+                address,
+                connection,
+                (quiet, steps, statuses),
+                (droppedByItself, plate, options),
+            ->
             val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
             val (badges, unread, ours) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
@@ -142,9 +152,12 @@ class RadioChooserViewModel(
                     status =
                     when {
                         active -> connection.toStatus()
+
                         slot.address in quiet -> RadioStatus.Connected
+
                         // Switched on and being connected in the background (retries until it answers).
                         backgroundOn && slot.id !in off -> RadioStatus.Connecting
+
                         else -> RadioStatus.Disconnected
                     },
                     active = active,

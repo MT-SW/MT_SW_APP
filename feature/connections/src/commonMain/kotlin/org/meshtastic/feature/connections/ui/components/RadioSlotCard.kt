@@ -97,11 +97,12 @@ fun RadioSlotCard(
         RadioPlate(radio)
         Text(
             text =
-            radio.progress ?: when (radio.status) {
-                RadioStatus.Connected -> stringResource(Res.string.radio_slot_background)
-                RadioStatus.Connecting -> stringResource(Res.string.radio_status_connecting)
-                RadioStatus.Disconnected -> stringResource(Res.string.radio_status_disconnected)
-            },
+            radio.progress
+                ?: when (radio.status) {
+                    RadioStatus.Connected -> stringResource(Res.string.radio_slot_background)
+                    RadioStatus.Connecting -> stringResource(Res.string.radio_status_connecting)
+                    RadioStatus.Disconnected -> stringResource(Res.string.radio_status_disconnected)
+                },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

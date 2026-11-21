@@ -23,11 +23,11 @@ import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.ChannelSetEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
 import org.meshtastic.core.database.entity.NodeEntity
+import org.meshtastic.core.model.TransportPhase
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.FromRadio
-import org.meshtastic.core.model.TransportPhase
 import org.meshtastic.proto.HardwareModel
 import org.meshtastic.proto.MyNodeInfo
 import org.meshtastic.proto.NodeInfo

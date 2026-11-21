@@ -19,26 +19,26 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.runtime.getValue
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.assistant.assistantHighlight
@@ -56,7 +56,8 @@ fun SwitchPreference(
     containerColor: Color? = null,
     loading: Boolean = false,
 ) {
-    // MT_SW: a switched-on row no longer gets Material's flat blue-grey fill. It gets a soft glass tint in the colour of
+    // MT_SW: a switched-on row no longer gets Material's flat blue-grey fill. It gets a soft glass tint in the colour
+    // of
     // the theme (lighter at the top) and a thin outline on the left, which fits the dark and the light look.
     val currentColors =
         ListItemDefaults.colors(

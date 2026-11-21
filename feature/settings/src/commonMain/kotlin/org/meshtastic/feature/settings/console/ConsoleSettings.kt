@@ -61,8 +61,22 @@ private fun <T, E : Enum<E>> enumField(name: String, values: List<E>, get: (T) -
 private fun enumKey(text: String) = ConsoleText.fold(text).replace("_", "").replace("-", "")
 
 private fun parseBool(text: String): Boolean? = when (ConsoleText.fold(text)) {
-    "true", "1", "on", "yes", "wlacz", "tak" -> true
-    "false", "0", "off", "no", "wylacz", "nie" -> false
+    "true",
+    "1",
+    "on",
+    "yes",
+    "wlacz",
+    "tak",
+    -> true
+
+    "false",
+    "0",
+    "off",
+    "no",
+    "wylacz",
+    "nie",
+    -> false
+
     else -> null
 }
 
@@ -90,21 +104,63 @@ val consoleSettings: List<ConsoleSetting> =
         { c, _ -> c.lora ?: Config.LoRaConfig.Builder().build() },
         { cfg(Config.Builder().also { b -> b.lora = it }.build()) },
         listOf(
-            enumField<Config.LoRaConfig, Config.LoRaConfig.RegionCode>("region", Config.LoRaConfig.RegionCode.entries, { it.region }, { s, v -> s.newBuilder().also { b -> b.region = v }.build() }),
-            enumField<Config.LoRaConfig, Config.LoRaConfig.ModemPreset>("modem_preset",
+            enumField<Config.LoRaConfig, Config.LoRaConfig.RegionCode>(
+                "region",
+                Config.LoRaConfig.RegionCode.entries,
+                { it.region },
+                { s, v -> s.newBuilder().also { b -> b.region = v }.build() },
+            ),
+            enumField<Config.LoRaConfig, Config.LoRaConfig.ModemPreset>(
+                "modem_preset",
                 Config.LoRaConfig.ModemPreset.entries,
                 { it.modem_preset },
                 { s, v -> s.newBuilder().also { b -> b.modem_preset = v }.build() },
             ),
-            boolField<Config.LoRaConfig>("use_preset", { it.use_preset }, { s, v -> s.newBuilder().also { b -> b.use_preset = v }.build() }),
-            intField<Config.LoRaConfig>("hop_limit", { it.hop_limit }, { s, v -> s.newBuilder().also { b -> b.hop_limit = v }.build() }),
-            boolField<Config.LoRaConfig>("tx_enabled", { it.tx_enabled }, { s, v -> s.newBuilder().also { b -> b.tx_enabled = v }.build() }),
-            intField<Config.LoRaConfig>("tx_power", { it.tx_power }, { s, v -> s.newBuilder().also { b -> b.tx_power = v }.build() }),
-            intField<Config.LoRaConfig>("channel_num", { it.channel_num }, { s, v -> s.newBuilder().also { b -> b.channel_num = v }.build() }),
-            intField<Config.LoRaConfig>("bandwidth", { it.bandwidth }, { s, v -> s.newBuilder().also { b -> b.bandwidth = v }.build() }),
-            boolField<Config.LoRaConfig>("override_duty_cycle", { it.override_duty_cycle }, { s, v -> s.newBuilder().also { b -> b.override_duty_cycle = v }.build() }),
-            boolField<Config.LoRaConfig>("ignore_mqtt", { it.ignore_mqtt }, { s, v -> s.newBuilder().also { b -> b.ignore_mqtt = v }.build() }),
-            boolField<Config.LoRaConfig>("config_ok_to_mqtt", { it.config_ok_to_mqtt }, { s, v -> s.newBuilder().also { b -> b.config_ok_to_mqtt = v }.build() }),
+            boolField<Config.LoRaConfig>(
+                "use_preset",
+                { it.use_preset },
+                { s, v -> s.newBuilder().also { b -> b.use_preset = v }.build() },
+            ),
+            intField<Config.LoRaConfig>(
+                "hop_limit",
+                { it.hop_limit },
+                { s, v -> s.newBuilder().also { b -> b.hop_limit = v }.build() },
+            ),
+            boolField<Config.LoRaConfig>(
+                "tx_enabled",
+                { it.tx_enabled },
+                { s, v -> s.newBuilder().also { b -> b.tx_enabled = v }.build() },
+            ),
+            intField<Config.LoRaConfig>(
+                "tx_power",
+                { it.tx_power },
+                { s, v -> s.newBuilder().also { b -> b.tx_power = v }.build() },
+            ),
+            intField<Config.LoRaConfig>(
+                "channel_num",
+                { it.channel_num },
+                { s, v -> s.newBuilder().also { b -> b.channel_num = v }.build() },
+            ),
+            intField<Config.LoRaConfig>(
+                "bandwidth",
+                { it.bandwidth },
+                { s, v -> s.newBuilder().also { b -> b.bandwidth = v }.build() },
+            ),
+            boolField<Config.LoRaConfig>(
+                "override_duty_cycle",
+                { it.override_duty_cycle },
+                { s, v -> s.newBuilder().also { b -> b.override_duty_cycle = v }.build() },
+            ),
+            boolField<Config.LoRaConfig>(
+                "ignore_mqtt",
+                { it.ignore_mqtt },
+                { s, v -> s.newBuilder().also { b -> b.ignore_mqtt = v }.build() },
+            ),
+            boolField<Config.LoRaConfig>(
+                "config_ok_to_mqtt",
+                { it.config_ok_to_mqtt },
+                { s, v -> s.newBuilder().also { b -> b.config_ok_to_mqtt = v }.build() },
+            ),
         ),
     ) +
         section<Config.DeviceConfig>(
@@ -112,8 +168,14 @@ val consoleSettings: List<ConsoleSetting> =
             { c, _ -> c.device ?: Config.DeviceConfig.Builder().build() },
             { cfg(Config.Builder().also { b -> b.device = it }.build()) },
             listOf(
-                enumField<Config.DeviceConfig, Config.DeviceConfig.Role>("role", Config.DeviceConfig.Role.entries, { it.role }, { s, v -> s.newBuilder().also { b -> b.role = v }.build() }),
-                enumField<Config.DeviceConfig, Config.DeviceConfig.RebroadcastMode>("rebroadcast_mode",
+                enumField<Config.DeviceConfig, Config.DeviceConfig.Role>(
+                    "role",
+                    Config.DeviceConfig.Role.entries,
+                    { it.role },
+                    { s, v -> s.newBuilder().also { b -> b.role = v }.build() },
+                ),
+                enumField<Config.DeviceConfig, Config.DeviceConfig.RebroadcastMode>(
+                    "rebroadcast_mode",
                     Config.DeviceConfig.RebroadcastMode.entries,
                     { it.rebroadcast_mode },
                     { s, v -> s.newBuilder().also { b -> b.rebroadcast_mode = v }.build() },
@@ -123,8 +185,16 @@ val consoleSettings: List<ConsoleSetting> =
                     { it.node_info_broadcast_secs },
                     { s, v -> s.newBuilder().also { b -> b.node_info_broadcast_secs = v }.build() },
                 ),
-                intField<Config.DeviceConfig>("button_gpio", { it.button_gpio }, { s, v -> s.newBuilder().also { b -> b.button_gpio = v }.build() }),
-                intField<Config.DeviceConfig>("buzzer_gpio", { it.buzzer_gpio }, { s, v -> s.newBuilder().also { b -> b.buzzer_gpio = v }.build() }),
+                intField<Config.DeviceConfig>(
+                    "button_gpio",
+                    { it.button_gpio },
+                    { s, v -> s.newBuilder().also { b -> b.button_gpio = v }.build() },
+                ),
+                intField<Config.DeviceConfig>(
+                    "buzzer_gpio",
+                    { it.buzzer_gpio },
+                    { s, v -> s.newBuilder().also { b -> b.buzzer_gpio = v }.build() },
+                ),
                 boolField<Config.DeviceConfig>(
                     "disable_triple_click",
                     { it.disable_triple_click },
@@ -140,7 +210,11 @@ val consoleSettings: List<ConsoleSetting> =
                     { it.double_tap_as_button_press },
                     { s, v -> s.newBuilder().also { b -> b.double_tap_as_button_press = v }.build() },
                 ),
-                textField<Config.DeviceConfig>("tzdef", { it.tzdef }, { s, v -> s.newBuilder().also { b -> b.tzdef = v }.build() }),
+                textField<Config.DeviceConfig>(
+                    "tzdef",
+                    { it.tzdef },
+                    { s, v -> s.newBuilder().also { b -> b.tzdef = v }.build() },
+                ),
             ),
         ) +
         section<Config.PositionConfig>(
@@ -158,13 +232,22 @@ val consoleSettings: List<ConsoleSetting> =
                     { it.position_broadcast_smart_enabled },
                     { s, v -> s.newBuilder().also { b -> b.position_broadcast_smart_enabled = v }.build() },
                 ),
-                enumField<Config.PositionConfig, Config.PositionConfig.GpsMode>("gps_mode",
+                enumField<Config.PositionConfig, Config.PositionConfig.GpsMode>(
+                    "gps_mode",
                     Config.PositionConfig.GpsMode.entries,
                     { it.gps_mode },
                     { s, v -> s.newBuilder().also { b -> b.gps_mode = v }.build() },
                 ),
-                boolField<Config.PositionConfig>("fixed_position", { it.fixed_position }, { s, v -> s.newBuilder().also { b -> b.fixed_position = v }.build() }),
-                intField<Config.PositionConfig>("gps_update_interval", { it.gps_update_interval }, { s, v -> s.newBuilder().also { b -> b.gps_update_interval = v }.build() }),
+                boolField<Config.PositionConfig>(
+                    "fixed_position",
+                    { it.fixed_position },
+                    { s, v -> s.newBuilder().also { b -> b.fixed_position = v }.build() },
+                ),
+                intField<Config.PositionConfig>(
+                    "gps_update_interval",
+                    { it.gps_update_interval },
+                    { s, v -> s.newBuilder().also { b -> b.gps_update_interval = v }.build() },
+                ),
                 intField<Config.PositionConfig>(
                     "broadcast_smart_minimum_distance",
                     { it.broadcast_smart_minimum_distance },
@@ -182,15 +265,31 @@ val consoleSettings: List<ConsoleSetting> =
             { c, _ -> c.power ?: Config.PowerConfig.Builder().build() },
             { cfg(Config.Builder().also { b -> b.power = it }.build()) },
             listOf(
-                boolField<Config.PowerConfig>("is_power_saving", { it.is_power_saving }, { s, v -> s.newBuilder().also { b -> b.is_power_saving = v }.build() }),
+                boolField<Config.PowerConfig>(
+                    "is_power_saving",
+                    { it.is_power_saving },
+                    { s, v -> s.newBuilder().also { b -> b.is_power_saving = v }.build() },
+                ),
                 intField<Config.PowerConfig>(
                     "on_battery_shutdown_after_secs",
                     { it.on_battery_shutdown_after_secs },
                     { s, v -> s.newBuilder().also { b -> b.on_battery_shutdown_after_secs = v }.build() },
                 ),
-                intField<Config.PowerConfig>("wait_bluetooth_secs", { it.wait_bluetooth_secs }, { s, v -> s.newBuilder().also { b -> b.wait_bluetooth_secs = v }.build() }),
-                intField<Config.PowerConfig>("sds_secs", { it.sds_secs }, { s, v -> s.newBuilder().also { b -> b.sds_secs = v }.build() }),
-                intField<Config.PowerConfig>("min_wake_secs", { it.min_wake_secs }, { s, v -> s.newBuilder().also { b -> b.min_wake_secs = v }.build() }),
+                intField<Config.PowerConfig>(
+                    "wait_bluetooth_secs",
+                    { it.wait_bluetooth_secs },
+                    { s, v -> s.newBuilder().also { b -> b.wait_bluetooth_secs = v }.build() },
+                ),
+                intField<Config.PowerConfig>(
+                    "sds_secs",
+                    { it.sds_secs },
+                    { s, v -> s.newBuilder().also { b -> b.sds_secs = v }.build() },
+                ),
+                intField<Config.PowerConfig>(
+                    "min_wake_secs",
+                    { it.min_wake_secs },
+                    { s, v -> s.newBuilder().also { b -> b.min_wake_secs = v }.build() },
+                ),
             ),
         ) +
         section<Config.NetworkConfig>(
@@ -198,12 +297,36 @@ val consoleSettings: List<ConsoleSetting> =
             { c, _ -> c.network ?: Config.NetworkConfig.Builder().build() },
             { cfg(Config.Builder().also { b -> b.network = it }.build()) },
             listOf(
-                boolField<Config.NetworkConfig>("wifi_enabled", { it.wifi_enabled }, { s, v -> s.newBuilder().also { b -> b.wifi_enabled = v }.build() }),
-                textField<Config.NetworkConfig>("wifi_ssid", { it.wifi_ssid }, { s, v -> s.newBuilder().also { b -> b.wifi_ssid = v }.build() }),
-                textField<Config.NetworkConfig>("wifi_psk", { it.wifi_psk }, { s, v -> s.newBuilder().also { b -> b.wifi_psk = v }.build() }),
-                textField<Config.NetworkConfig>("ntp_server", { it.ntp_server }, { s, v -> s.newBuilder().also { b -> b.ntp_server = v }.build() }),
-                boolField<Config.NetworkConfig>("eth_enabled", { it.eth_enabled }, { s, v -> s.newBuilder().also { b -> b.eth_enabled = v }.build() }),
-                textField<Config.NetworkConfig>("rsyslog_server", { it.rsyslog_server }, { s, v -> s.newBuilder().also { b -> b.rsyslog_server = v }.build() }),
+                boolField<Config.NetworkConfig>(
+                    "wifi_enabled",
+                    { it.wifi_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.wifi_enabled = v }.build() },
+                ),
+                textField<Config.NetworkConfig>(
+                    "wifi_ssid",
+                    { it.wifi_ssid },
+                    { s, v -> s.newBuilder().also { b -> b.wifi_ssid = v }.build() },
+                ),
+                textField<Config.NetworkConfig>(
+                    "wifi_psk",
+                    { it.wifi_psk },
+                    { s, v -> s.newBuilder().also { b -> b.wifi_psk = v }.build() },
+                ),
+                textField<Config.NetworkConfig>(
+                    "ntp_server",
+                    { it.ntp_server },
+                    { s, v -> s.newBuilder().also { b -> b.ntp_server = v }.build() },
+                ),
+                boolField<Config.NetworkConfig>(
+                    "eth_enabled",
+                    { it.eth_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.eth_enabled = v }.build() },
+                ),
+                textField<Config.NetworkConfig>(
+                    "rsyslog_server",
+                    { it.rsyslog_server },
+                    { s, v -> s.newBuilder().also { b -> b.rsyslog_server = v }.build() },
+                ),
             ),
         ) +
         section<Config.DisplayConfig>(
@@ -211,31 +334,53 @@ val consoleSettings: List<ConsoleSetting> =
             { c, _ -> c.display ?: Config.DisplayConfig.Builder().build() },
             { cfg(Config.Builder().also { b -> b.display = it }.build()) },
             listOf(
-                intField<Config.DisplayConfig>("screen_on_secs", { it.screen_on_secs }, { s, v -> s.newBuilder().also { b -> b.screen_on_secs = v }.build() }),
+                intField<Config.DisplayConfig>(
+                    "screen_on_secs",
+                    { it.screen_on_secs },
+                    { s, v -> s.newBuilder().also { b -> b.screen_on_secs = v }.build() },
+                ),
                 intField<Config.DisplayConfig>(
                     "auto_screen_carousel_secs",
                     { it.auto_screen_carousel_secs },
                     { s, v -> s.newBuilder().also { b -> b.auto_screen_carousel_secs = v }.build() },
                 ),
-                boolField<Config.DisplayConfig>("flip_screen", { it.flip_screen }, { s, v -> s.newBuilder().also { b -> b.flip_screen = v }.build() }),
-                enumField<Config.DisplayConfig, Config.DisplayConfig.DisplayUnits>("units",
+                boolField<Config.DisplayConfig>(
+                    "flip_screen",
+                    { it.flip_screen },
+                    { s, v -> s.newBuilder().also { b -> b.flip_screen = v }.build() },
+                ),
+                enumField<Config.DisplayConfig, Config.DisplayConfig.DisplayUnits>(
+                    "units",
                     Config.DisplayConfig.DisplayUnits.entries,
                     { it.units },
                     { s, v -> s.newBuilder().also { b -> b.units = v }.build() },
                 ),
-                enumField<Config.DisplayConfig, Config.DisplayConfig.DisplayMode>("displaymode",
+                enumField<Config.DisplayConfig, Config.DisplayConfig.DisplayMode>(
+                    "displaymode",
                     Config.DisplayConfig.DisplayMode.entries,
                     { it.displaymode },
                     { s, v -> s.newBuilder().also { b -> b.displaymode = v }.build() },
                 ),
-                boolField<Config.DisplayConfig>("heading_bold", { it.heading_bold }, { s, v -> s.newBuilder().also { b -> b.heading_bold = v }.build() }),
+                boolField<Config.DisplayConfig>(
+                    "heading_bold",
+                    { it.heading_bold },
+                    { s, v -> s.newBuilder().also { b -> b.heading_bold = v }.build() },
+                ),
                 boolField<Config.DisplayConfig>(
                     "wake_on_tap_or_motion",
                     { it.wake_on_tap_or_motion },
                     { s, v -> s.newBuilder().also { b -> b.wake_on_tap_or_motion = v }.build() },
                 ),
-                boolField<Config.DisplayConfig>("compass_north_top", { it.compass_north_top }, { s, v -> s.newBuilder().also { b -> b.compass_north_top = v }.build() }),
-                boolField<Config.DisplayConfig>("use_long_node_name", { it.use_long_node_name }, { s, v -> s.newBuilder().also { b -> b.use_long_node_name = v }.build() }),
+                boolField<Config.DisplayConfig>(
+                    "compass_north_top",
+                    { it.compass_north_top },
+                    { s, v -> s.newBuilder().also { b -> b.compass_north_top = v }.build() },
+                ),
+                boolField<Config.DisplayConfig>(
+                    "use_long_node_name",
+                    { it.use_long_node_name },
+                    { s, v -> s.newBuilder().also { b -> b.use_long_node_name = v }.build() },
+                ),
                 boolField<Config.DisplayConfig>(
                     "enable_message_bubbles",
                     { it.enable_message_bubbles },
@@ -248,8 +393,13 @@ val consoleSettings: List<ConsoleSetting> =
             { c, _ -> c.bluetooth ?: Config.BluetoothConfig.Builder().build() },
             { cfg(Config.Builder().also { b -> b.bluetooth = it }.build()) },
             listOf(
-                boolField<Config.BluetoothConfig>("enabled", { it.enabled }, { s, v -> s.newBuilder().also { b -> b.enabled = v }.build() }),
-                enumField<Config.BluetoothConfig, Config.BluetoothConfig.PairingMode>("mode",
+                boolField<Config.BluetoothConfig>(
+                    "enabled",
+                    { it.enabled },
+                    { s, v -> s.newBuilder().also { b -> b.enabled = v }.build() },
+                ),
+                enumField<Config.BluetoothConfig, Config.BluetoothConfig.PairingMode>(
+                    "mode",
                     Config.BluetoothConfig.PairingMode.entries,
                     { it.mode },
                     { s, v -> s.newBuilder().also { b -> b.mode = v }.build() },
@@ -261,14 +411,46 @@ val consoleSettings: List<ConsoleSetting> =
             { _, m -> m.mqtt ?: ModuleConfig.MQTTConfig.Builder().build() },
             { module(ModuleConfig.Builder().also { b -> b.mqtt = it }.build()) },
             listOf(
-                boolField<ModuleConfig.MQTTConfig>("enabled", { it.enabled }, { s, v -> s.newBuilder().also { b -> b.enabled = v }.build() }),
-                textField<ModuleConfig.MQTTConfig>("address", { it.address }, { s, v -> s.newBuilder().also { b -> b.address = v }.build() }),
-                textField<ModuleConfig.MQTTConfig>("username", { it.username }, { s, v -> s.newBuilder().also { b -> b.username = v }.build() }),
-                textField<ModuleConfig.MQTTConfig>("password", { it.password }, { s, v -> s.newBuilder().also { b -> b.password = v }.build() }),
-                textField<ModuleConfig.MQTTConfig>("root", { it.root }, { s, v -> s.newBuilder().also { b -> b.root = v }.build() }),
-                boolField<ModuleConfig.MQTTConfig>("encryption_enabled", { it.encryption_enabled }, { s, v -> s.newBuilder().also { b -> b.encryption_enabled = v }.build() }),
-                boolField<ModuleConfig.MQTTConfig>("json_enabled", { it.json_enabled }, { s, v -> s.newBuilder().also { b -> b.json_enabled = v }.build() }),
-                boolField<ModuleConfig.MQTTConfig>("tls_enabled", { it.tls_enabled }, { s, v -> s.newBuilder().also { b -> b.tls_enabled = v }.build() }),
+                boolField<ModuleConfig.MQTTConfig>(
+                    "enabled",
+                    { it.enabled },
+                    { s, v -> s.newBuilder().also { b -> b.enabled = v }.build() },
+                ),
+                textField<ModuleConfig.MQTTConfig>(
+                    "address",
+                    { it.address },
+                    { s, v -> s.newBuilder().also { b -> b.address = v }.build() },
+                ),
+                textField<ModuleConfig.MQTTConfig>(
+                    "username",
+                    { it.username },
+                    { s, v -> s.newBuilder().also { b -> b.username = v }.build() },
+                ),
+                textField<ModuleConfig.MQTTConfig>(
+                    "password",
+                    { it.password },
+                    { s, v -> s.newBuilder().also { b -> b.password = v }.build() },
+                ),
+                textField<ModuleConfig.MQTTConfig>(
+                    "root",
+                    { it.root },
+                    { s, v -> s.newBuilder().also { b -> b.root = v }.build() },
+                ),
+                boolField<ModuleConfig.MQTTConfig>(
+                    "encryption_enabled",
+                    { it.encryption_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.encryption_enabled = v }.build() },
+                ),
+                boolField<ModuleConfig.MQTTConfig>(
+                    "json_enabled",
+                    { it.json_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.json_enabled = v }.build() },
+                ),
+                boolField<ModuleConfig.MQTTConfig>(
+                    "tls_enabled",
+                    { it.tls_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.tls_enabled = v }.build() },
+                ),
                 boolField<ModuleConfig.MQTTConfig>(
                     "proxy_to_client_enabled",
                     { it.proxy_to_client_enabled },
@@ -281,7 +463,11 @@ val consoleSettings: List<ConsoleSetting> =
             { _, m -> m.telemetry ?: ModuleConfig.TelemetryConfig.Builder().build() },
             { module(ModuleConfig.Builder().also { b -> b.telemetry = it }.build()) },
             listOf(
-                intField<ModuleConfig.TelemetryConfig>("device_update_interval", { it.device_update_interval }, { s, v -> s.newBuilder().also { b -> b.device_update_interval = v }.build() }),
+                intField<ModuleConfig.TelemetryConfig>(
+                    "device_update_interval",
+                    { it.device_update_interval },
+                    { s, v -> s.newBuilder().also { b -> b.device_update_interval = v }.build() },
+                ),
                 intField<ModuleConfig.TelemetryConfig>(
                     "environment_update_interval",
                     { it.environment_update_interval },
@@ -302,17 +488,30 @@ val consoleSettings: List<ConsoleSetting> =
                     { it.environment_display_fahrenheit },
                     { s, v -> s.newBuilder().also { b -> b.environment_display_fahrenheit = v }.build() },
                 ),
-                boolField<ModuleConfig.TelemetryConfig>("air_quality_enabled", { it.air_quality_enabled }, { s, v -> s.newBuilder().also { b -> b.air_quality_enabled = v }.build() }),
-                intField<ModuleConfig.TelemetryConfig>("air_quality_interval", { it.air_quality_interval }, { s, v -> s.newBuilder().also { b -> b.air_quality_interval = v }.build() }),
+                boolField<ModuleConfig.TelemetryConfig>(
+                    "air_quality_enabled",
+                    { it.air_quality_enabled },
+                    { s, v -> s.newBuilder().also { b -> b.air_quality_enabled = v }.build() },
+                ),
+                intField<ModuleConfig.TelemetryConfig>(
+                    "air_quality_interval",
+                    { it.air_quality_interval },
+                    { s, v -> s.newBuilder().also { b -> b.air_quality_interval = v }.build() },
+                ),
                 boolField<ModuleConfig.TelemetryConfig>(
                     "power_measurement_enabled",
                     { it.power_measurement_enabled },
                     { s, v -> s.newBuilder().also { b -> b.power_measurement_enabled = v }.build() },
                 ),
-                intField<ModuleConfig.TelemetryConfig>("power_update_interval", { it.power_update_interval }, { s, v -> s.newBuilder().also { b -> b.power_update_interval = v }.build() }),
+                intField<ModuleConfig.TelemetryConfig>(
+                    "power_update_interval",
+                    { it.power_update_interval },
+                    { s, v -> s.newBuilder().also { b -> b.power_update_interval = v }.build() },
+                ),
             ),
         )
 
 /** Finds a setting by name; the name may be written without the dots' case, e.g. `LoRa.Region`. */
-fun findSetting(name: String): ConsoleSetting? =
-    consoleSettings.firstOrNull { it.name.equals(name.trim(), ignoreCase = true) }
+fun findSetting(name: String): ConsoleSetting? = consoleSettings.firstOrNull {
+    it.name.equals(name.trim(), ignoreCase = true)
+}

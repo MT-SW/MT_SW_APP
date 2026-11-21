@@ -21,16 +21,16 @@ package org.meshtastic.feature.node.health
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.IndicationNodeFactory
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -70,8 +70,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DrawModifierNode
@@ -94,9 +94,9 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ProgressLine
-import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.SegmentedProgressRing
 import org.meshtastic.core.ui.component.Switch
+import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.rememberThinRings
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
@@ -456,7 +456,11 @@ internal fun NodeHealthRow(
     val hoverSource = remember { MutableInteractionSource() }
     val hovered by hoverSource.collectIsHoveredAsState()
     val container =
-        if (hovered) MaterialTheme.colorScheme.onSurface.copy(alpha = ROW_HOVER_ALPHA).compositeOver(resting) else resting
+        if (hovered) {
+            MaterialTheme.colorScheme.onSurface.copy(alpha = ROW_HOVER_ALPHA).compositeOver(resting)
+        } else {
+            resting
+        }
     val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
     // The history already holds the noise floor after the LNA correction.
     val shownValue = node.valueFor(metric)
@@ -464,95 +468,96 @@ internal fun NodeHealthRow(
     // The standard touch/hover layer of a clickable card drew a lighter rectangle inside this see-through card (seen
     // when the pointer rests on a row); the row gives way under the touch instead (see pressSpring).
     CompositionLocalProvider(LocalIndication provides NoIndicationFactory) {
-    // A plain card made clickable by hand: the built-in clickable card draws its own touch/hover layer, which showed
-    // as a lighter square inside this see-through card.
-    Card(
-        modifier =
-        modifier
-            .pressSpring()
-            .clip(MaterialTheme.shapes.large)
-            .hoverable(hoverSource)
-            .clickable(interactionSource = hoverSource, indication = null, onClick = onClick),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = container),
-    ) {
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-            Box(modifier = Modifier.width(5.dp).fillMaxHeight().background(accent))
-            Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+        // A plain card made clickable by hand: the built-in clickable card draws its own touch/hover layer, which
+        // showed
+        // as a lighter square inside this see-through card.
+        Card(
+            modifier =
+            modifier
+                .pressSpring()
+                .clip(MaterialTheme.shapes.large)
+                .hoverable(hoverSource)
+                .clickable(interactionSource = hoverSource, indication = null, onClick = onClick),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(containerColor = container),
+        ) {
+            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                Box(modifier = Modifier.width(5.dp).fillMaxHeight().background(accent))
+                Column(
+                    modifier = Modifier.weight(1f).padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    NameBadge(text = node.shortName.ifBlank { "?" }.take(NAME_BADGE_CHARS), color = accent)
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (node.isFavorite) {
-                                Icon(
-                                    imageVector = MeshtasticIcons.Favorite,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
-                                    tint = MaterialTheme.colorScheme.StatusOnline,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        NameBadge(text = node.shortName.ifBlank { "?" }.take(NAME_BADGE_CHARS), color = accent)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (node.isFavorite) {
+                                    Icon(
+                                        imageVector = MeshtasticIcons.Favorite,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = MaterialTheme.colorScheme.StatusOnline,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                }
+                                Text(
+                                    text = node.longName.ifBlank { node.shortName },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
                             }
-                            Text(
-                                text = node.longName.ifBlank { node.shortName },
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                HealthDot(
+                                    color =
+                                    if (node.isOnline) {
+                                        MaterialTheme.colorScheme.StatusOnline
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                    },
+                                )
+                                Text(
+                                    text =
+                                    buildString {
+                                        append(if (node.isOnline) "Online" else "Offline")
+                                        if (metric == NetworkHealthMetric.SIGNAL && node.snr != null) {
+                                            append(" · SNR ${MetricFormatter.snr(node.snr)}")
+                                        }
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            HealthDot(
-                                color =
-                                if (node.isOnline) {
-                                    MaterialTheme.colorScheme.StatusOnline
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                },
-                            )
-                            Text(
-                                text =
-                                buildString {
-                                    append(if (node.isOnline) "Online" else "Offline")
-                                    if (metric == NetworkHealthMetric.SIGNAL && node.snr != null) {
-                                        append(" · SNR ${MetricFormatter.snr(node.snr)}")
-                                    }
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    MetricSparkline(
-                        values = node.metricHistory,
-                        color = accent,
-                        modifier = Modifier.size(width = 72.dp, height = 28.dp),
-                    )
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = formatMetricValue(metric, shownValue),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = valueColor,
-                        )
-                        Text(
-                            text = level.labelFor(metric),
-                            style = MaterialTheme.typography.labelSmall,
+                        MetricSparkline(
+                            values = node.metricHistory,
                             color = accent,
+                            modifier = Modifier.size(width = 72.dp, height = 28.dp),
                         )
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = formatMetricValue(metric, shownValue),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = valueColor,
+                            )
+                            Text(
+                                text = level.labelFor(metric),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = accent,
+                            )
+                        }
                     }
+                    metric.barFraction(node)?.let { LevelBar(fraction = it, color = accent) }
                 }
-                metric.barFraction(node)?.let { LevelBar(fraction = it, color = accent) }
             }
         }
-    }
     }
 }
 

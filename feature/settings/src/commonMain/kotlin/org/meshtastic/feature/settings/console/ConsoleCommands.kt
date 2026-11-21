@@ -44,15 +44,15 @@ import org.meshtastic.core.resources.console_cmd_help_usage
 import org.meshtastic.core.resources.console_cmd_nodes_name
 import org.meshtastic.core.resources.console_cmd_nodes_summary
 import org.meshtastic.core.resources.console_cmd_nodes_usage
+import org.meshtastic.core.resources.console_cmd_position_name
+import org.meshtastic.core.resources.console_cmd_position_summary
+import org.meshtastic.core.resources.console_cmd_position_usage
 import org.meshtastic.core.resources.console_cmd_radio_name
 import org.meshtastic.core.resources.console_cmd_radio_summary
 import org.meshtastic.core.resources.console_cmd_radio_usage
 import org.meshtastic.core.resources.console_cmd_radios_name
 import org.meshtastic.core.resources.console_cmd_radios_summary
 import org.meshtastic.core.resources.console_cmd_radios_usage
-import org.meshtastic.core.resources.console_cmd_position_name
-import org.meshtastic.core.resources.console_cmd_position_summary
-import org.meshtastic.core.resources.console_cmd_position_usage
 import org.meshtastic.core.resources.console_cmd_remove_name
 import org.meshtastic.core.resources.console_cmd_remove_summary
 import org.meshtastic.core.resources.console_cmd_remove_usage
@@ -68,13 +68,13 @@ import org.meshtastic.core.resources.console_out_disconnecting
 import org.meshtastic.core.resources.console_out_help_header
 import org.meshtastic.core.resources.console_out_help_usage
 import org.meshtastic.core.resources.console_out_no_radios
-import org.meshtastic.core.resources.console_out_position_bad
-import org.meshtastic.core.resources.console_out_position_no_device
-import org.meshtastic.core.resources.console_out_position_set
 import org.meshtastic.core.resources.console_out_node_offline
 import org.meshtastic.core.resources.console_out_node_online
 import org.meshtastic.core.resources.console_out_nodes_more
 import org.meshtastic.core.resources.console_out_nodes_none
+import org.meshtastic.core.resources.console_out_position_bad
+import org.meshtastic.core.resources.console_out_position_no_device
+import org.meshtastic.core.resources.console_out_position_set
 import org.meshtastic.core.resources.console_out_radio_line
 import org.meshtastic.core.resources.console_out_radio_missing
 import org.meshtastic.core.resources.console_out_radio_switching
@@ -452,19 +452,22 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                 val valid =
                     args.size in POSITION_MIN_ARGS..POSITION_MAX_ARGS &&
                         numbers.none { it == null } &&
-                        latitude != null && latitude in -MAX_LATITUDE..MAX_LATITUDE &&
-                        longitude != null && longitude in -MAX_LONGITUDE..MAX_LONGITUDE
+                        latitude != null &&
+                        latitude in -MAX_LATITUDE..MAX_LATITUDE &&
+                        longitude != null &&
+                        longitude in -MAX_LONGITUDE..MAX_LONGITUDE
                 if (!valid || latitude == null || longitude == null) {
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_bad, labels.position.usage)))
                 } else if (env.setPosition(latitude, longitude, altitude?.roundToInt())) {
-                    ConsoleResult(
-                        listOf(getStringSuspend(Res.string.console_out_position_set, args[0], args[1])),
-                    )
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_set, args[0], args[1])))
                 } else {
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_no_device)))
                 }
             },
         )
-    registry = ConsoleRegistry(commands + buildDeviceCommands(env, labels.device, labels.on, labels.off)) { getStringSuspend(Res.string.console_out_unknown, it) }
+    registry =
+        ConsoleRegistry(commands + buildDeviceCommands(env, labels.device, labels.on, labels.off)) {
+            getStringSuspend(Res.string.console_out_unknown, it)
+        }
     return registry
 }

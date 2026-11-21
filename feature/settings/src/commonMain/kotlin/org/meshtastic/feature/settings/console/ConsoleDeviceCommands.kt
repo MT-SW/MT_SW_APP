@@ -20,38 +20,77 @@ package org.meshtastic.feature.settings.console
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import okio.ByteString
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.toByteString
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.console_arg_channel
+import org.meshtastic.core.resources.console_arg_channel_fields
 import org.meshtastic.core.resources.console_arg_confirm
 import org.meshtastic.core.resources.console_arg_keep
 import org.meshtastic.core.resources.console_arg_read
+import org.meshtastic.core.resources.console_arg_stop
 import org.meshtastic.core.resources.console_arg_telemetry_types
 import org.meshtastic.core.resources.console_arg_to
 import org.meshtastic.core.resources.console_arg_write
+import org.meshtastic.core.resources.console_cmd_battery_name
+import org.meshtastic.core.resources.console_cmd_battery_summary
+import org.meshtastic.core.resources.console_cmd_battery_usage
 import org.meshtastic.core.resources.console_cmd_canned_name
 import org.meshtastic.core.resources.console_cmd_canned_summary
 import org.meshtastic.core.resources.console_cmd_canned_usage
+import org.meshtastic.core.resources.console_cmd_channel_set_name
+import org.meshtastic.core.resources.console_cmd_channel_set_summary
+import org.meshtastic.core.resources.console_cmd_channel_set_usage
+import org.meshtastic.core.resources.console_cmd_channels_name
+import org.meshtastic.core.resources.console_cmd_channels_summary
+import org.meshtastic.core.resources.console_cmd_channels_usage
+import org.meshtastic.core.resources.console_cmd_connect_name
+import org.meshtastic.core.resources.console_cmd_connect_summary
+import org.meshtastic.core.resources.console_cmd_connect_usage
+import org.meshtastic.core.resources.console_cmd_export_name
+import org.meshtastic.core.resources.console_cmd_export_summary
+import org.meshtastic.core.resources.console_cmd_export_usage
 import org.meshtastic.core.resources.console_cmd_factory_name
 import org.meshtastic.core.resources.console_cmd_factory_summary
 import org.meshtastic.core.resources.console_cmd_factory_usage
 import org.meshtastic.core.resources.console_cmd_favorite_name
 import org.meshtastic.core.resources.console_cmd_favorite_summary
 import org.meshtastic.core.resources.console_cmd_favorite_usage
+import org.meshtastic.core.resources.console_cmd_get_name
+import org.meshtastic.core.resources.console_cmd_get_summary
+import org.meshtastic.core.resources.console_cmd_get_usage
 import org.meshtastic.core.resources.console_cmd_gpio_name
 import org.meshtastic.core.resources.console_cmd_gpio_summary
 import org.meshtastic.core.resources.console_cmd_gpio_usage
+import org.meshtastic.core.resources.console_cmd_ham_name
+import org.meshtastic.core.resources.console_cmd_ham_summary
+import org.meshtastic.core.resources.console_cmd_ham_usage
 import org.meshtastic.core.resources.console_cmd_ignored_name
 import org.meshtastic.core.resources.console_cmd_ignored_summary
 import org.meshtastic.core.resources.console_cmd_ignored_usage
 import org.meshtastic.core.resources.console_cmd_info_name
 import org.meshtastic.core.resources.console_cmd_info_summary
 import org.meshtastic.core.resources.console_cmd_info_usage
+import org.meshtastic.core.resources.console_cmd_loop_name
+import org.meshtastic.core.resources.console_cmd_loop_summary
+import org.meshtastic.core.resources.console_cmd_loop_usage
+import org.meshtastic.core.resources.console_cmd_messages_name
+import org.meshtastic.core.resources.console_cmd_messages_summary
+import org.meshtastic.core.resources.console_cmd_messages_usage
+import org.meshtastic.core.resources.console_cmd_nearby_name
+import org.meshtastic.core.resources.console_cmd_nearby_summary
+import org.meshtastic.core.resources.console_cmd_nearby_usage
+import org.meshtastic.core.resources.console_cmd_notify_name
+import org.meshtastic.core.resources.console_cmd_notify_summary
+import org.meshtastic.core.resources.console_cmd_notify_usage
 import org.meshtastic.core.resources.console_cmd_owner_name
 import org.meshtastic.core.resources.console_cmd_owner_summary
 import org.meshtastic.core.resources.console_cmd_owner_usage
@@ -70,12 +109,21 @@ import org.meshtastic.core.resources.console_cmd_reset_nodes_usage
 import org.meshtastic.core.resources.console_cmd_ringtone_name
 import org.meshtastic.core.resources.console_cmd_ringtone_summary
 import org.meshtastic.core.resources.console_cmd_ringtone_usage
+import org.meshtastic.core.resources.console_cmd_search_name
+import org.meshtastic.core.resources.console_cmd_search_summary
+import org.meshtastic.core.resources.console_cmd_search_usage
 import org.meshtastic.core.resources.console_cmd_send_name
 import org.meshtastic.core.resources.console_cmd_send_summary
 import org.meshtastic.core.resources.console_cmd_send_usage
+import org.meshtastic.core.resources.console_cmd_set_name
+import org.meshtastic.core.resources.console_cmd_set_summary
+import org.meshtastic.core.resources.console_cmd_set_usage
 import org.meshtastic.core.resources.console_cmd_shutdown_name
 import org.meshtastic.core.resources.console_cmd_shutdown_summary
 import org.meshtastic.core.resources.console_cmd_shutdown_usage
+import org.meshtastic.core.resources.console_cmd_signal_name
+import org.meshtastic.core.resources.console_cmd_signal_summary
+import org.meshtastic.core.resources.console_cmd_signal_usage
 import org.meshtastic.core.resources.console_cmd_telemetry_name
 import org.meshtastic.core.resources.console_cmd_telemetry_summary
 import org.meshtastic.core.resources.console_cmd_telemetry_usage
@@ -85,85 +133,37 @@ import org.meshtastic.core.resources.console_cmd_time_usage
 import org.meshtastic.core.resources.console_cmd_traceroute_name
 import org.meshtastic.core.resources.console_cmd_traceroute_summary
 import org.meshtastic.core.resources.console_cmd_traceroute_usage
+import org.meshtastic.core.resources.console_out_battery_line
+import org.meshtastic.core.resources.console_out_channel_bad
+import org.meshtastic.core.resources.console_out_channel_line
 import org.meshtastic.core.resources.console_out_confirm
+import org.meshtastic.core.resources.console_out_connect_bad
+import org.meshtastic.core.resources.console_out_connect_done
 import org.meshtastic.core.resources.console_out_done
+import org.meshtastic.core.resources.console_out_get_names
 import org.meshtastic.core.resources.console_out_gpio_value
 import org.meshtastic.core.resources.console_out_info_node
 import org.meshtastic.core.resources.console_out_info_nodes
-import org.meshtastic.core.resources.console_out_no_answer
-import org.meshtastic.core.resources.console_out_node_not_found
-import org.meshtastic.core.resources.console_out_position_no_device
-import org.meshtastic.core.resources.console_out_usage_bad
-import org.meshtastic.core.resources.console_arg_channel_fields
-import org.meshtastic.core.resources.console_cmd_set_name
-import org.meshtastic.core.resources.console_cmd_set_summary
-import org.meshtastic.core.resources.console_cmd_set_usage
-import org.meshtastic.core.resources.console_cmd_get_name
-import org.meshtastic.core.resources.console_cmd_get_summary
-import org.meshtastic.core.resources.console_cmd_get_usage
-import org.meshtastic.core.resources.console_cmd_export_name
-import org.meshtastic.core.resources.console_cmd_export_summary
-import org.meshtastic.core.resources.console_cmd_export_usage
-import org.meshtastic.core.resources.console_cmd_channels_name
-import org.meshtastic.core.resources.console_cmd_channels_summary
-import org.meshtastic.core.resources.console_cmd_channels_usage
-import org.meshtastic.core.resources.console_cmd_channel_set_name
-import org.meshtastic.core.resources.console_cmd_channel_set_summary
-import org.meshtastic.core.resources.console_cmd_channel_set_usage
-import org.meshtastic.core.resources.console_cmd_ham_name
-import org.meshtastic.core.resources.console_cmd_ham_summary
-import org.meshtastic.core.resources.console_cmd_ham_usage
-import org.meshtastic.core.resources.console_out_channel_line
-import org.meshtastic.core.resources.console_out_channel_bad
-import org.meshtastic.core.resources.console_out_setting_unknown
-import org.meshtastic.core.resources.console_out_setting_bad
-import org.meshtastic.core.resources.console_out_setting_line
-import org.meshtastic.core.resources.console_out_set_done
-import org.meshtastic.core.resources.console_out_get_names
-import org.meshtastic.core.resources.console_cmd_connect_name
-import org.meshtastic.core.resources.console_cmd_connect_summary
-import org.meshtastic.core.resources.console_cmd_connect_usage
-import org.meshtastic.core.resources.console_cmd_messages_name
-import org.meshtastic.core.resources.console_cmd_messages_summary
-import org.meshtastic.core.resources.console_cmd_messages_usage
-import org.meshtastic.core.resources.console_cmd_signal_name
-import org.meshtastic.core.resources.console_cmd_signal_summary
-import org.meshtastic.core.resources.console_cmd_signal_usage
-import org.meshtastic.core.resources.console_cmd_nearby_name
-import org.meshtastic.core.resources.console_cmd_nearby_summary
-import org.meshtastic.core.resources.console_cmd_nearby_usage
-import org.meshtastic.core.resources.console_cmd_battery_name
-import org.meshtastic.core.resources.console_cmd_battery_summary
-import org.meshtastic.core.resources.console_cmd_battery_usage
-import org.meshtastic.core.resources.console_cmd_loop_name
-import org.meshtastic.core.resources.console_cmd_loop_summary
-import org.meshtastic.core.resources.console_cmd_loop_usage
-import org.meshtastic.core.resources.console_out_connect_done
-import org.meshtastic.core.resources.console_out_connect_bad
-import org.meshtastic.core.resources.console_out_messages_none
-import org.meshtastic.core.resources.console_out_message_line
-import org.meshtastic.core.resources.console_out_signal_line
-import org.meshtastic.core.resources.console_out_nearby_line
-import org.meshtastic.core.resources.console_out_battery_line
+import org.meshtastic.core.resources.console_out_loop_bad
 import org.meshtastic.core.resources.console_out_loop_started
 import org.meshtastic.core.resources.console_out_loop_stopped
-import org.meshtastic.core.resources.console_out_loop_bad
+import org.meshtastic.core.resources.console_out_message_line
+import org.meshtastic.core.resources.console_out_messages_none
+import org.meshtastic.core.resources.console_out_nearby_line
+import org.meshtastic.core.resources.console_out_no_answer
 import org.meshtastic.core.resources.console_out_no_data
-import org.meshtastic.core.resources.console_arg_stop
-import org.meshtastic.core.resources.console_cmd_search_name
-import org.meshtastic.core.resources.console_cmd_search_summary
-import org.meshtastic.core.resources.console_cmd_search_usage
-import org.meshtastic.core.resources.console_cmd_notify_name
-import org.meshtastic.core.resources.console_cmd_notify_summary
-import org.meshtastic.core.resources.console_cmd_notify_usage
+import org.meshtastic.core.resources.console_out_node_not_found
+import org.meshtastic.core.resources.console_out_position_no_device
+import org.meshtastic.core.resources.console_out_set_done
+import org.meshtastic.core.resources.console_out_setting_bad
+import org.meshtastic.core.resources.console_out_setting_line
+import org.meshtastic.core.resources.console_out_setting_unknown
+import org.meshtastic.core.resources.console_out_signal_line
+import org.meshtastic.core.resources.console_out_usage_bad
 import org.meshtastic.core.resources.getStringSuspend
-import org.meshtastic.core.model.Message
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
-import okio.ByteString
-import okio.ByteString.Companion.decodeBase64
-import okio.ByteString.Companion.toByteString
 import kotlin.random.Random
 
 /** What the console may do on the connected device; every call answers false when there is no connected device. */
@@ -281,10 +281,16 @@ private fun label(name: StringResource, summary: StringResource, usage: StringRe
 
 @Composable
 fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
-    val info = label(Res.string.console_cmd_info_name, Res.string.console_cmd_info_summary, Res.string.console_cmd_info_usage)
-    val send = label(Res.string.console_cmd_send_name, Res.string.console_cmd_send_summary, Res.string.console_cmd_send_usage)
+    val info =
+        label(Res.string.console_cmd_info_name, Res.string.console_cmd_info_summary, Res.string.console_cmd_info_usage)
+    val send =
+        label(Res.string.console_cmd_send_name, Res.string.console_cmd_send_summary, Res.string.console_cmd_send_usage)
     val reboot =
-        label(Res.string.console_cmd_reboot_name, Res.string.console_cmd_reboot_summary, Res.string.console_cmd_reboot_usage)
+        label(
+            Res.string.console_cmd_reboot_name,
+            Res.string.console_cmd_reboot_summary,
+            Res.string.console_cmd_reboot_usage,
+        )
     val shutdown =
         label(
             Res.string.console_cmd_shutdown_name,
@@ -340,8 +346,13 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
             Res.string.console_cmd_telemetry_usage,
         )
     val owner =
-        label(Res.string.console_cmd_owner_name, Res.string.console_cmd_owner_summary, Res.string.console_cmd_owner_usage)
-    val time = label(Res.string.console_cmd_time_name, Res.string.console_cmd_time_summary, Res.string.console_cmd_time_usage)
+        label(
+            Res.string.console_cmd_owner_name,
+            Res.string.console_cmd_owner_summary,
+            Res.string.console_cmd_owner_usage,
+        )
+    val time =
+        label(Res.string.console_cmd_time_name, Res.string.console_cmd_time_summary, Res.string.console_cmd_time_usage)
     val ringtone =
         label(
             Res.string.console_cmd_ringtone_name,
@@ -354,11 +365,18 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
             Res.string.console_cmd_canned_summary,
             Res.string.console_cmd_canned_usage,
         )
-    val gpio = label(Res.string.console_cmd_gpio_name, Res.string.console_cmd_gpio_summary, Res.string.console_cmd_gpio_usage)
-    val set = label(Res.string.console_cmd_set_name, Res.string.console_cmd_set_summary, Res.string.console_cmd_set_usage)
-    val get = label(Res.string.console_cmd_get_name, Res.string.console_cmd_get_summary, Res.string.console_cmd_get_usage)
+    val gpio =
+        label(Res.string.console_cmd_gpio_name, Res.string.console_cmd_gpio_summary, Res.string.console_cmd_gpio_usage)
+    val set =
+        label(Res.string.console_cmd_set_name, Res.string.console_cmd_set_summary, Res.string.console_cmd_set_usage)
+    val get =
+        label(Res.string.console_cmd_get_name, Res.string.console_cmd_get_summary, Res.string.console_cmd_get_usage)
     val export =
-        label(Res.string.console_cmd_export_name, Res.string.console_cmd_export_summary, Res.string.console_cmd_export_usage)
+        label(
+            Res.string.console_cmd_export_name,
+            Res.string.console_cmd_export_summary,
+            Res.string.console_cmd_export_usage,
+        )
     val channels =
         label(
             Res.string.console_cmd_channels_name,
@@ -371,23 +389,52 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
             Res.string.console_cmd_channel_set_summary,
             Res.string.console_cmd_channel_set_usage,
         )
-    val ham = label(Res.string.console_cmd_ham_name, Res.string.console_cmd_ham_summary, Res.string.console_cmd_ham_usage)
+    val ham =
+        label(Res.string.console_cmd_ham_name, Res.string.console_cmd_ham_summary, Res.string.console_cmd_ham_usage)
     val connectL =
-        label(Res.string.console_cmd_connect_name, Res.string.console_cmd_connect_summary, Res.string.console_cmd_connect_usage)
+        label(
+            Res.string.console_cmd_connect_name,
+            Res.string.console_cmd_connect_summary,
+            Res.string.console_cmd_connect_usage,
+        )
     val messagesL =
-        label(Res.string.console_cmd_messages_name, Res.string.console_cmd_messages_summary, Res.string.console_cmd_messages_usage)
+        label(
+            Res.string.console_cmd_messages_name,
+            Res.string.console_cmd_messages_summary,
+            Res.string.console_cmd_messages_usage,
+        )
     val signalL =
-        label(Res.string.console_cmd_signal_name, Res.string.console_cmd_signal_summary, Res.string.console_cmd_signal_usage)
+        label(
+            Res.string.console_cmd_signal_name,
+            Res.string.console_cmd_signal_summary,
+            Res.string.console_cmd_signal_usage,
+        )
     val nearbyL =
-        label(Res.string.console_cmd_nearby_name, Res.string.console_cmd_nearby_summary, Res.string.console_cmd_nearby_usage)
+        label(
+            Res.string.console_cmd_nearby_name,
+            Res.string.console_cmd_nearby_summary,
+            Res.string.console_cmd_nearby_usage,
+        )
     val batteryL =
-        label(Res.string.console_cmd_battery_name, Res.string.console_cmd_battery_summary, Res.string.console_cmd_battery_usage)
+        label(
+            Res.string.console_cmd_battery_name,
+            Res.string.console_cmd_battery_summary,
+            Res.string.console_cmd_battery_usage,
+        )
     val loopL =
         label(Res.string.console_cmd_loop_name, Res.string.console_cmd_loop_summary, Res.string.console_cmd_loop_usage)
     val searchL =
-        label(Res.string.console_cmd_search_name, Res.string.console_cmd_search_summary, Res.string.console_cmd_search_usage)
+        label(
+            Res.string.console_cmd_search_name,
+            Res.string.console_cmd_search_summary,
+            Res.string.console_cmd_search_usage,
+        )
     val notifyL =
-        label(Res.string.console_cmd_notify_name, Res.string.console_cmd_notify_summary, Res.string.console_cmd_notify_usage)
+        label(
+            Res.string.console_cmd_notify_name,
+            Res.string.console_cmd_notify_summary,
+            Res.string.console_cmd_notify_usage,
+        )
     val argStop = stringResource(Res.string.console_arg_stop)
     val channelFields = stringResource(Res.string.console_arg_channel_fields)
     val argChannel = stringResource(Res.string.console_arg_channel)
@@ -398,14 +445,87 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
     val argWrite = stringResource(Res.string.console_arg_write)
     val types = stringResource(Res.string.console_arg_telemetry_types)
     return remember(
-        info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute, requestPosition,
-        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, searchL, notifyL, argStop,
-        channelFields, argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
+        info,
+        send,
+        reboot,
+        shutdown,
+        factory,
+        resetNodes,
+        removeNode,
+        favorite,
+        ignored,
+        traceroute,
+        requestPosition,
+        telemetry,
+        owner,
+        time,
+        ringtone,
+        canned,
+        gpio,
+        set,
+        get,
+        export,
+        channels,
+        channelSet,
+        ham,
+        connectL,
+        messagesL,
+        signalL,
+        nearbyL,
+        batteryL,
+        loopL,
+        searchL,
+        notifyL,
+        argStop,
+        channelFields,
+        argChannel,
+        argTo,
+        argConfirm,
+        argKeep,
+        argRead,
+        argWrite,
+        types,
     ) {
         ConsoleDeviceLabels(
-            info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute,
-            requestPosition, telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet,
-            ham, connectL, messagesL, signalL, nearbyL, batteryL, loopL, searchL, notifyL, argStop, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
+            info,
+            send,
+            reboot,
+            shutdown,
+            factory,
+            resetNodes,
+            removeNode,
+            favorite,
+            ignored,
+            traceroute,
+            requestPosition,
+            telemetry,
+            owner,
+            time,
+            ringtone,
+            canned,
+            gpio,
+            set,
+            get,
+            export,
+            channels,
+            channelSet,
+            ham,
+            connectL,
+            messagesL,
+            signalL,
+            nearbyL,
+            batteryL,
+            loopL,
+            searchL,
+            notifyL,
+            argStop,
+            channelFields.split(',').map { it.trim() },
+            argChannel,
+            argTo,
+            argConfirm,
+            argKeep,
+            argRead,
+            argWrite,
             types.split(',').map { it.trim() },
         )
     }
@@ -417,23 +537,49 @@ private const val MAX_CHANNEL = 7
 internal fun findNode(nodes: List<Node>, text: String): Node? {
     val key = ConsoleText.fold(text)
     if (key.isEmpty()) return null
-    nodes.firstOrNull { ConsoleText.fold(it.user.id) == key }?.let { return it }
-    key.toLongOrNull()?.let { number -> nodes.firstOrNull { it.num.toLong() and 0xFFFFFFFFL == number }?.let { return it } }
-    nodes.firstOrNull { ConsoleText.fold(it.user.short_name) == key }?.let { return it }
-    nodes.firstOrNull { ConsoleText.fold(it.effectiveLongName) == key }?.let { return it }
+    nodes
+        .firstOrNull { ConsoleText.fold(it.user.id) == key }
+        ?.let {
+            return it
+        }
+    key.toLongOrNull()?.let { number ->
+        nodes
+            .firstOrNull { it.num.toLong() and 0xFFFFFFFFL == number }
+            ?.let {
+                return it
+            }
+    }
+    nodes
+        .firstOrNull { ConsoleText.fold(it.user.short_name) == key }
+        ?.let {
+            return it
+        }
+    nodes
+        .firstOrNull { ConsoleText.fold(it.effectiveLongName) == key }
+        ?.let {
+            return it
+        }
     return nodes.filter { ConsoleText.fold(it.effectiveLongName).contains(key) }.singleOrNull()
 }
 
 /** The commands that act on the connected device; the same set as the commands of the Meshtastic command line. */
-fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on: String, off: String): List<ConsoleCommand> {
+fun buildDeviceCommands(
+    env: ConsoleEnvironment,
+    labels: ConsoleDeviceLabels,
+    on: String,
+    off: String,
+): List<ConsoleCommand> {
     val device = env.device
 
-    suspend fun bad(label: ConsoleLabel) = ConsoleResult(listOf(getStringSuspend(Res.string.console_out_usage_bad, label.usage)))
+    suspend fun bad(label: ConsoleLabel) =
+        ConsoleResult(listOf(getStringSuspend(Res.string.console_out_usage_bad, label.usage)))
 
-    suspend fun done(ok: Boolean) =
-        ConsoleResult(listOf(getStringSuspend(if (ok) Res.string.console_out_done else Res.string.console_out_position_no_device)))
+    suspend fun done(ok: Boolean) = ConsoleResult(
+        listOf(getStringSuspend(if (ok) Res.string.console_out_done else Res.string.console_out_position_no_device)),
+    )
 
-    suspend fun missing(text: String) = ConsoleResult(listOf(getStringSuspend(Res.string.console_out_node_not_found, text)))
+    suspend fun missing(text: String) =
+        ConsoleResult(listOf(getStringSuspend(Res.string.console_out_node_not_found, text)))
 
     suspend fun confirmNeeded(label: ConsoleLabel) =
         ConsoleResult(listOf(getStringSuspend(Res.string.console_out_confirm, labels.argConfirm, label.usage)))
@@ -443,46 +589,53 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
     fun nodeNames() = env.nodes().map { it.user.short_name.ifBlank { it.user.id } }
 
     /** A command that takes one node and does one thing to it. */
-    fun nodeCommand(label: ConsoleLabel, action: suspend (Node) -> Boolean) =
-        ConsoleCommand(label.name, label.summary, label.usage, complete = { args -> if (args.isEmpty()) nodeNames() else emptyList() }) { args ->
-            val text = args.firstOrNull()
-            val node = text?.let { findNode(env.nodes(), it) }
-            when {
-                text == null -> bad(label)
-                node == null -> missing(text)
-                else -> done(action(node))
-            }
+    fun nodeCommand(label: ConsoleLabel, action: suspend (Node) -> Boolean) = ConsoleCommand(
+        label.name,
+        label.summary,
+        label.usage,
+        complete = { args -> if (args.isEmpty()) nodeNames() else emptyList() },
+    ) { args ->
+        val text = args.firstOrNull()
+        val node = text?.let { findNode(env.nodes(), it) }
+        when {
+            text == null -> bad(label)
+            node == null -> missing(text)
+            else -> done(action(node))
         }
+    }
 
     /** A command that takes one node and a word for on or off. */
-    fun switchCommand(label: ConsoleLabel, action: suspend (Node, Boolean) -> Boolean) =
-        ConsoleCommand(
-            label.name,
-            label.summary,
-            label.usage,
-            complete = { args ->
-                when (args.size) {
-                    0 -> nodeNames()
-                    1 -> listOf(on, off)
-                    else -> emptyList()
-                }
-            },
-        ) { args ->
-            val text = args.firstOrNull()
-            val node = text?.let { findNode(env.nodes(), it) }
-            val enable = !isWord(args.getOrNull(1), off)
-            when {
-                text == null -> bad(label)
-                node == null -> missing(text)
-                else -> done(action(node, enable))
+    fun switchCommand(label: ConsoleLabel, action: suspend (Node, Boolean) -> Boolean) = ConsoleCommand(
+        label.name,
+        label.summary,
+        label.usage,
+        complete = { args ->
+            when (args.size) {
+                0 -> nodeNames()
+                1 -> listOf(on, off)
+                else -> emptyList()
             }
+        },
+    ) { args ->
+        val text = args.firstOrNull()
+        val node = text?.let { findNode(env.nodes(), it) }
+        val enable = !isWord(args.getOrNull(1), off)
+        when {
+            text == null -> bad(label)
+            node == null -> missing(text)
+            else -> done(action(node, enable))
         }
+    }
 
     /** A command that needs the confirming word, because it cannot be undone. */
-    fun guarded(label: ConsoleLabel, action: suspend () -> Boolean) =
-        ConsoleCommand(label.name, label.summary, label.usage, complete = { args -> if (args.isEmpty()) listOf(labels.argConfirm) else emptyList() }) { args ->
-            if (isWord(args.firstOrNull(), labels.argConfirm)) done(action()) else confirmNeeded(label)
-        }
+    fun guarded(label: ConsoleLabel, action: suspend () -> Boolean) = ConsoleCommand(
+        label.name,
+        label.summary,
+        label.usage,
+        complete = { args -> if (args.isEmpty()) listOf(labels.argConfirm) else emptyList() },
+    ) { args ->
+        if (isWord(args.firstOrNull(), labels.argConfirm)) done(action()) else confirmNeeded(label)
+    }
 
     return listOf(
         ConsoleCommand(labels.info.name, labels.info.summary, labels.info.usage) {
@@ -599,17 +752,21 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                     if (value == null) {
                         ConsoleResult(listOf(getStringSuspend(Res.string.console_out_no_answer)))
                     } else {
-                        ConsoleResult(listOf(getStringSuspend(Res.string.console_out_gpio_value, args[1], value.toString())))
+                        ConsoleResult(
+                            listOf(getStringSuspend(Res.string.console_out_gpio_value, args[1], value.toString())),
+                        )
                     }
                 }
+
                 isWord(args.firstOrNull(), labels.argWrite) && args.size == 3 && mask != null -> {
                     val value = parseNumber(args[2])
                     if (value == null) bad(labels.gpio) else done(device.gpioWrite(mask, value))
                 }
+
                 else -> bad(labels.gpio)
             }
         },
-    ConsoleCommand(
+        ConsoleCommand(
             labels.set.name,
             labels.set.summary,
             labels.set.usage,
@@ -634,7 +791,15 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 }
                 if (lines.isEmpty()) {
                     ConsoleResult(
-                        listOf(getStringSuspend(if (device.apply(changes)) Res.string.console_out_set_done else Res.string.console_out_position_no_device)),
+                        listOf(
+                            getStringSuspend(
+                                if (device.apply(changes)) {
+                                    Res.string.console_out_set_done
+                                } else {
+                                    Res.string.console_out_position_no_device
+                                },
+                            ),
+                        ),
                     )
                 } else {
                     ConsoleResult(lines)
@@ -652,15 +817,27 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             val found = consoleSettings.filter { key.isNotEmpty() && it.name.lowercase().startsWith(key) }
             when {
                 settings == null -> done(false)
+
                 key.isEmpty() ->
                     ConsoleResult(
-                        listOf(getStringSuspend(Res.string.console_out_get_names, consoleSettings.joinToString(", ") { it.name })),
+                        listOf(
+                            getStringSuspend(
+                                Res.string.console_out_get_names,
+                                consoleSettings.joinToString(", ") { it.name },
+                            ),
+                        ),
                     )
+
                 found.isEmpty() -> ConsoleResult(listOf(getStringSuspend(Res.string.console_out_setting_unknown, key)))
+
                 else ->
                     ConsoleResult(
                         found.map {
-                            getStringSuspend(Res.string.console_out_setting_line, it.name, it.read(settings.first, settings.second))
+                            getStringSuspend(
+                                Res.string.console_out_setting_line,
+                                it.name,
+                                it.read(settings.first, settings.second),
+                            )
                         },
                     )
             }
@@ -670,12 +847,15 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             if (settings == null) {
                 done(false)
             } else {
-                val setLines =
-                    consoleSettings.map { "${labels.set.name} ${it.name} ${quote(it.read(settings.first, settings.second))}" }
+                val setLines = consoleSettings.map {
+                    "${labels.set.name} ${it.name} ${quote(it.read(settings.first, settings.second))}"
+                }
                 val channelLines =
                     device.channels().flatMapIndexed { index, channel ->
                         listOf(
-                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_NAME]} ${quote(channel.name)}",
+                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_NAME]} ${quote(
+                                channel.name,
+                            )}",
                             "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_PSK]} base64:${channel.psk.base64()}",
                             "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_UPLINK]} ${channel.uplink_enabled}",
                             "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_DOWNLINK]} ${channel.downlink_enabled}",
@@ -723,9 +903,16 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 val updated: ChannelSettings? =
                     when (field) {
                         CHANNEL_FIELD_NAME -> current.newBuilder().also { b -> b.name = value }.build()
-                        CHANNEL_FIELD_PSK -> parsePsk(value)?.let { current.newBuilder().also { b -> b.psk = it }.build() }
-                        CHANNEL_FIELD_UPLINK -> flag?.let { current.newBuilder().also { b -> b.uplink_enabled = it }.build() }
-                        CHANNEL_FIELD_DOWNLINK -> flag?.let { current.newBuilder().also { b -> b.downlink_enabled = it }.build() }
+
+                        CHANNEL_FIELD_PSK ->
+                            parsePsk(value)?.let { current.newBuilder().also { b -> b.psk = it }.build() }
+
+                        CHANNEL_FIELD_UPLINK ->
+                            flag?.let { current.newBuilder().also { b -> b.uplink_enabled = it }.build() }
+
+                        CHANNEL_FIELD_DOWNLINK ->
+                            flag?.let { current.newBuilder().also { b -> b.downlink_enabled = it }.build() }
+
                         else -> flag?.let { current }
                     }
                 val enabled = if (field == CHANNEL_FIELD_ENABLED) flag == true else true
@@ -738,9 +925,13 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
         },
         ConsoleCommand(labels.ham.name, labels.ham.summary, labels.ham.usage) { args ->
             val call = args.firstOrNull()
-            if (call == null) bad(labels.ham) else done(device.setHam(call, args.drop(1).joinToString(" ").ifBlank { null }))
+            if (call == null) {
+                bad(labels.ham)
+            } else {
+                done(device.setHam(call, args.drop(1).joinToString(" ").ifBlank { null }))
+            }
         },
-    ConsoleCommand(labels.connect.name, labels.connect.summary, labels.connect.usage) { args ->
+        ConsoleCommand(labels.connect.name, labels.connect.summary, labels.connect.usage) { args ->
             val address = args.firstOrNull()?.trim()
             if (address.isNullOrEmpty()) {
                 bad(labels.connect)
@@ -769,7 +960,12 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 } else {
                     ConsoleResult(
                         found.map {
-                            getStringSuspend(Res.string.console_out_message_line, it.time, it.node.effectiveLongName, it.text)
+                            getStringSuspend(
+                                Res.string.console_out_message_line,
+                                it.time,
+                                it.node.effectiveLongName,
+                                it.text,
+                            )
                         },
                     )
                 }
@@ -785,7 +981,9 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             val node = text?.let { findNode(env.nodes(), it) }
             when {
                 text == null -> bad(labels.signal)
+
                 node == null -> missing(text)
+
                 else ->
                     ConsoleResult(
                         listOf(
@@ -817,7 +1015,12 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 } else {
                     ConsoleResult(
                         sorted.map { (node, meters) ->
-                            getStringSuspend(Res.string.console_out_nearby_line, node.effectiveLongName, node.user.short_name, meters)
+                            getStringSuspend(
+                                Res.string.console_out_nearby_line,
+                                node.effectiveLongName,
+                                node.user.short_name,
+                                meters,
+                            )
                         },
                     )
                 }
@@ -857,18 +1060,26 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             val line = args.drop(1).joinToString(" ")
             when {
                 isWord(first, labels.argStop) ->
-                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_stopped)))
-                    .also { env.loop(0, "") }
-                seconds == null || seconds < MIN_LOOP_SECONDS || line.isBlank() || isWord(args.getOrNull(1), labels.loop.name) ||
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_stopped))).also {
+                        env.loop(0, "")
+                    }
+
+                seconds == null ||
+                    seconds < MIN_LOOP_SECONDS ||
+                    line.isBlank() ||
+                    isWord(args.getOrNull(1), labels.loop.name) ||
                     args.any { isWord(it, labels.argConfirm) } ->
-                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_bad, labels.loop.usage, MIN_LOOP_SECONDS)))
+                    ConsoleResult(
+                        listOf(getStringSuspend(Res.string.console_out_loop_bad, labels.loop.usage, MIN_LOOP_SECONDS)),
+                    )
+
                 else -> {
                     env.loop(seconds, line)
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_loop_started, line, seconds)))
                 }
             }
         },
-    ConsoleCommand(labels.search.name, labels.search.summary, labels.search.usage) { args ->
+        ConsoleCommand(labels.search.name, labels.search.summary, labels.search.usage) { args ->
             val text = args.joinToString(" ").trim()
             if (text.isEmpty()) {
                 bad(labels.search)
@@ -879,7 +1090,12 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 } else {
                     ConsoleResult(
                         found.map {
-                            getStringSuspend(Res.string.console_out_message_line, it.time, it.node.effectiveLongName, it.text)
+                            getStringSuspend(
+                                Res.string.console_out_message_line,
+                                it.time,
+                                it.node.effectiveLongName,
+                                it.text,
+                            )
                         },
                     )
                 }
@@ -905,8 +1121,22 @@ private const val PSK_RANDOM_BYTES = 32
 private fun quote(text: String) = if (text.isEmpty() || text.any { it.isWhitespace() }) "\"$text\"" else text
 
 private fun parseOnOff(text: String, on: String, off: String): Boolean? = when (ConsoleText.fold(text)) {
-    ConsoleText.fold(on), "true", "1", "on", "yes", "tak" -> true
-    ConsoleText.fold(off), "false", "0", "off", "no", "nie" -> false
+    ConsoleText.fold(on),
+    "true",
+    "1",
+    "on",
+    "yes",
+    "tak",
+    -> true
+
+    ConsoleText.fold(off),
+    "false",
+    "0",
+    "off",
+    "no",
+    "nie",
+    -> false
+
     else -> null
 }
 

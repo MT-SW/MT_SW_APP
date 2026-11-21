@@ -19,10 +19,10 @@ package org.meshtastic.feature.settings.console
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -35,12 +35,12 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
-import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 import org.meshtastic.proto.Channel
@@ -60,7 +60,8 @@ class ConsoleViewModel(
     private val packetRepository: PacketRepository,
     private val radioPrefs: RadioPrefs,
     private val slotsPrefs: RadioSlotsPrefs,
-) : ViewModel(), ConsoleDevice {
+) : ViewModel(),
+    ConsoleDevice {
     private val history = ConsoleHistory()
     private val _lines = MutableStateFlow<List<String>>(emptyList())
     val lines: StateFlow<List<String>> = _lines.asStateFlow()
@@ -73,8 +74,9 @@ class ConsoleViewModel(
     fun connection(): ConnectionState = serviceRepository.connectionState.value
 
     /** Sets the fixed position of the connected device; false when no device is connected yet. */
-    suspend fun setPosition(latitude: Double, longitude: Double, altitude: Int?): Boolean =
-        onDevice { num -> radioController.setFixedPosition(num, Position(latitude, longitude, altitude)) }
+    suspend fun setPosition(latitude: Double, longitude: Double, altitude: Int?): Boolean = onDevice { num ->
+        radioController.setFixedPosition(num, Position(latitude, longitude, altitude))
+    }
 
     /** Runs [block] with the number of the connected device; false when none is connected or the call failed. */
     private suspend fun onDevice(block: suspend (Int) -> Unit): Boolean {
@@ -162,8 +164,11 @@ class ConsoleViewModel(
         }
     }
 
-    override suspend fun channels(): List<ChannelSettings> =
-        if (nodeRepository.myNodeInfo.value == null) emptyList() else radioConfigRepository.channelSetFlow.first().settings
+    override suspend fun channels(): List<ChannelSettings> = if (nodeRepository.myNodeInfo.value == null) {
+        emptyList()
+    } else {
+        radioConfigRepository.channelSetFlow.first().settings
+    }
 
     override suspend fun setChannel(index: Int, settings: ChannelSettings, enabled: Boolean) = onDevice {
         val role =
@@ -196,11 +201,11 @@ class ConsoleViewModel(
         return onDevice { radioController.setHamMode(it, params, packetId()) }
     }
 
-    override suspend fun recentMessages(contactKey: String, limit: Int): List<Message> =
-        packetRepository.getMessagesFrom(contactKey, limit) { id -> nodeRepository.getNode(id.orEmpty()) }
-            .first()
-            .sortedBy { it.receivedTime }
-            .takeLast(limit)
+    override suspend fun recentMessages(contactKey: String, limit: Int): List<Message> = packetRepository
+        .getMessagesFrom(contactKey, limit) { id -> nodeRepository.getNode(id.orEmpty()) }
+        .first()
+        .sortedBy { it.receivedTime }
+        .takeLast(limit)
 
     override suspend fun search(text: String): List<Message> =
         packetRepository.searchMessages(text) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
@@ -234,14 +239,13 @@ class ConsoleViewModel(
         loopJob?.cancel()
         loopJob = null
         if (seconds <= 0 || registry == null) return
-        loopJob =
-            viewModelScope.launch {
-                while (true) {
-                    val result = registry.execute(line)
-                    _lines.update { old -> (old + "> $line" + result.lines).takeLast(MAX_LINES) }
-                    delay(seconds * MILLIS_PER_SECOND)
-                }
+        loopJob = viewModelScope.launch {
+            while (true) {
+                val result = registry.execute(line)
+                _lines.update { old -> (old + "> $line" + result.lines).takeLast(MAX_LINES) }
+                delay(seconds * MILLIS_PER_SECOND)
             }
+        }
     }
 
     override suspend fun gpioWrite(mask: Long, value: Long): Boolean =

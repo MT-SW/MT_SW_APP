@@ -680,7 +680,8 @@ fun ConnectionsScreen(
                 } else {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         if (radio != null && (radio.status == RadioStatus.Connecting || radio.progress != null)) {
-                            // A device that is being connected in the background is drawn by the very same code as the main
+                            // A device that is being connected in the background is drawn by the very same code as the
+                            // main
                             // connection card; only the device shown in the app stays unchanged.
                             Box(
                                 modifier = Modifier.fillMaxWidth().heightIn(min = CardMinHeight),
@@ -701,21 +702,21 @@ fun ConnectionsScreen(
                                 )
                             }
                         } else {
-                        RadioSlotCard(
-                            slotId = slotId,
-                            slotCount = SLOT_COUNT,
-                            radio = radio,
-                            onUse = {
-                                if (radio?.status == RadioStatus.Connected) {
-                                    radios.onChoose(slotId)
-                                } else {
-                                    radios.onConnect(slotId)
-                                }
-                            },
-                            onDisconnect = { radios.onDisconnect(slotId) },
-                            onRemove = { radios.onRemove(slotId) },
-                            minHeight = CardMinHeight,
-                        )
+                            RadioSlotCard(
+                                slotId = slotId,
+                                slotCount = SLOT_COUNT,
+                                radio = radio,
+                                onUse = {
+                                    if (radio?.status == RadioStatus.Connected) {
+                                        radios.onChoose(slotId)
+                                    } else {
+                                        radios.onConnect(slotId)
+                                    }
+                                },
+                                onDisconnect = { radios.onDisconnect(slotId) },
+                                onRemove = { radios.onRemove(slotId) },
+                                minHeight = CardMinHeight,
+                            )
                         }
                     }
                 }

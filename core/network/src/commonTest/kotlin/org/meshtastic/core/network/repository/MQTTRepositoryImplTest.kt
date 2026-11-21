@@ -487,7 +487,7 @@ class MQTTRepositoryImplTest {
     fun `a wildcard root ends the proxy without creating a client or connecting`() = runTest {
         val harness = createHarness(radioConfigRepository = radioConfigWithRoot("msh/#"))
 
-        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow.collect {} } }
+        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow().collect {} } }
         runCurrent()
         advanceTimeBy(60_000)
         runCurrent()
@@ -501,7 +501,7 @@ class MQTTRepositoryImplTest {
     fun `a plus wildcard in the root ends the proxy without connecting`() = runTest {
         val harness = createHarness(radioConfigRepository = radioConfigWithRoot("msh/+/US"))
 
-        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow.collect {} } }
+        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow().collect {} } }
         runCurrent()
 
         assertEquals(0, harness.client.connectCalls.size)
