@@ -46,12 +46,14 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +76,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
@@ -342,16 +345,19 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                         verticalArrangement = Arrangement.spacedBy(0.dp),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        suggestions.forEach { text ->
-                            SuggestionChip(
-                                onClick = {
-                                    viewModel.setInput(text)
-                                    viewModel.send()
-                                },
-                                label = { Text(text) },
-                                modifier =
-                                Modifier.elementLook(UiOptions.GROUP_ASSISTANT, SuggestionChipDefaults.shape),
-                            )
+                        // Without the invisible 48 dp touch box the shadow is drawn right around the visible chip.
+                        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                            suggestions.forEach { text ->
+                                SuggestionChip(
+                                    onClick = {
+                                        viewModel.setInput(text)
+                                        viewModel.send()
+                                    },
+                                    label = { Text(text) },
+                                    modifier =
+                                    Modifier.elementLook(UiOptions.GROUP_ASSISTANT, SuggestionChipDefaults.shape),
+                                )
+                            }
                         }
                     }
                 }
