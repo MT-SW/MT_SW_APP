@@ -18,7 +18,11 @@
 
 package org.meshtastic.feature.settings.console
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -32,12 +36,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.graphics.luminance
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.draw.clip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -49,6 +47,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -155,7 +155,12 @@ fun ConsoleScreen(
                     // Drawn by hand instead of AssistChip: that one has an invisible touch area around it, and the
                     // shadow was drawn around the whole area, so it stood off the visible button.
                     val dark = MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE
-                    val rim = if (dark) Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, ChipShape) else Modifier
+                    val rim =
+                        if (dark) {
+                            Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, ChipShape)
+                        } else {
+                            Modifier
+                        }
                     Box(
                         modifier =
                         Modifier.elementLook(UiOptions.GROUP_INPUT, ChipShape)
