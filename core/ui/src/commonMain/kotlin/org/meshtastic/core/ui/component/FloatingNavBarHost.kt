@@ -304,6 +304,7 @@ private fun FloatingNavBar(
     onSelect: (NavEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lightTheme = colorScheme.surface.luminance() > LIGHT_THEME_LUMINANCE
     Box(
         modifier =
         modifier
@@ -314,7 +315,12 @@ private fun FloatingNavBar(
     ) {
         // On the map the bar is denser (it has a moving picture under it that cannot be blurred).
         StyledSurface(
-            style = if (darker) style.copy(strength = (style.strength - MAP_BAR_DENSER).coerceAtLeast(0)) else style,
+            style =
+            when {
+                darker -> style.copy(strength = (style.strength - MAP_BAR_DENSER).coerceAtLeast(0))
+                lightTheme -> style.copy(strength = (style.strength + LIGHT_BAR_AIRIER).coerceAtMost(MAX_STRENGTH))
+                else -> style
+            },
             shape = RoundedCornerShape(BAR_CORNER_DP.dp),
             modifier = Modifier.widthIn(max = BAR_MAX_WIDTH_DP.dp).fillMaxWidth(),
             hazeState = hazeState,
@@ -323,7 +329,7 @@ private fun FloatingNavBar(
             baseColor =
             if (darker) {
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
-            } else if (colorScheme.surface.luminance() > LIGHT_THEME_LUMINANCE) {
+            } else if (lightTheme) {
                 // Light theme off the map: the same grey as on the map, but the glass keeps its normal, more see-through strength.
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
             } else {
@@ -406,6 +412,11 @@ private const val SELECTED_ALPHA = 0.12f
 
 /** How much darker the bar is on the map card. */
 private const val DARKER_SHARE = 0.22f
+
+/** How much more see-through (in strength points) the bar is on a light theme away from the map. */
+private const val LIGHT_BAR_AIRIER = 10
+
+private const val MAX_STRENGTH = 100
 
 /** A surface brighter than this counts as a light theme. */
 private const val LIGHT_THEME_LUMINANCE = 0.5f
