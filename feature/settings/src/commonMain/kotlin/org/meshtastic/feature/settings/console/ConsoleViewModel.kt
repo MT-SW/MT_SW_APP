@@ -22,18 +22,26 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.HamName
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
+import org.meshtastic.proto.Channel
+import org.meshtastic.proto.ChannelSettings
+import org.meshtastic.proto.HamParameters
+import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.LocalModuleConfig
 
 /** What the console screen shows and remembers: the printed lines, the typed line and the earlier lines. */
 @KoinViewModel
@@ -42,6 +50,7 @@ class ConsoleViewModel(
     private val serviceRepository: ServiceRepository,
     private val radioController: RadioController,
     private val sendMessageUseCase: SendMessageUseCase,
+    private val radioConfigRepository: RadioConfigRepository,
 ) : ViewModel(), ConsoleDevice {
     private val history = ConsoleHistory()
     private val _lines = MutableStateFlow<List<String>>(emptyList())
@@ -121,6 +130,46 @@ class ConsoleViewModel(
 
     override suspend fun gpioRead(mask: Long): Long? =
         nodeRepository.myNodeInfo.value?.myNodeNum?.let { radioController.readGpio(it, mask) }
+
+    override suspend fun settings(): Pair<LocalConfig, LocalModuleConfig>? {
+        if (nodeRepository.myNodeInfo.value == null) return null
+        return radioConfigRepository.localConfigFlow.first() to radioConfigRepository.moduleConfigFlow.first()
+    }
+
+    override suspend fun apply(changes: List<ConsoleChange>) = onDevice { num ->
+        radioController.editSettings(num) {
+            changes.forEach { change ->
+                when (change) {
+                    is ConsoleChange.Cfg -> setConfig(change.config)
+                    is ConsoleChange.Module -> setModuleConfig(change.config)
+                }
+            }
+        }
+    }
+
+    override suspend fun channels(): List<ChannelSettings> =
+        if (nodeRepository.myNodeInfo.value == null) emptyList() else radioConfigRepository.channelSetFlow.first().settings
+
+    override suspend fun setChannel(index: Int, settings: ChannelSettings, enabled: Boolean) = onDevice {
+        val role =
+            when {
+                index == 0 -> Channel.Role.PRIMARY
+                enabled -> Channel.Role.SECONDARY
+                else -> Channel.Role.DISABLED
+            }
+        radioController.setLocalChannel(Channel(index = index, role = role, settings = settings))
+    }
+
+    override suspend fun setHam(callSign: String, longName: String?): Boolean {
+        val own = nodeRepository.ourNodeInfo.value ?: return false
+        val params =
+            HamParameters(
+                call_sign = callSign,
+                short_name = own.user.short_name,
+                long_name = longName ?: HamName.split(own.user.long_name).second,
+            )
+        return onDevice { radioController.setHamMode(it, params, packetId()) }
+    }
 
     override suspend fun gpioWrite(mask: Long, value: Long): Boolean =
         nodeRepository.myNodeInfo.value?.myNodeNum?.let { radioController.writeGpio(it, mask, value) } ?: false

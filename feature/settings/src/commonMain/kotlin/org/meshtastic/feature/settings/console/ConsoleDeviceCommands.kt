@@ -93,7 +93,40 @@ import org.meshtastic.core.resources.console_out_no_answer
 import org.meshtastic.core.resources.console_out_node_not_found
 import org.meshtastic.core.resources.console_out_position_no_device
 import org.meshtastic.core.resources.console_out_usage_bad
+import org.meshtastic.core.resources.console_arg_channel_fields
+import org.meshtastic.core.resources.console_cmd_set_name
+import org.meshtastic.core.resources.console_cmd_set_summary
+import org.meshtastic.core.resources.console_cmd_set_usage
+import org.meshtastic.core.resources.console_cmd_get_name
+import org.meshtastic.core.resources.console_cmd_get_summary
+import org.meshtastic.core.resources.console_cmd_get_usage
+import org.meshtastic.core.resources.console_cmd_export_name
+import org.meshtastic.core.resources.console_cmd_export_summary
+import org.meshtastic.core.resources.console_cmd_export_usage
+import org.meshtastic.core.resources.console_cmd_channels_name
+import org.meshtastic.core.resources.console_cmd_channels_summary
+import org.meshtastic.core.resources.console_cmd_channels_usage
+import org.meshtastic.core.resources.console_cmd_channel_set_name
+import org.meshtastic.core.resources.console_cmd_channel_set_summary
+import org.meshtastic.core.resources.console_cmd_channel_set_usage
+import org.meshtastic.core.resources.console_cmd_ham_name
+import org.meshtastic.core.resources.console_cmd_ham_summary
+import org.meshtastic.core.resources.console_cmd_ham_usage
+import org.meshtastic.core.resources.console_out_channel_line
+import org.meshtastic.core.resources.console_out_channel_bad
+import org.meshtastic.core.resources.console_out_setting_unknown
+import org.meshtastic.core.resources.console_out_setting_bad
+import org.meshtastic.core.resources.console_out_setting_line
+import org.meshtastic.core.resources.console_out_set_done
+import org.meshtastic.core.resources.console_out_get_names
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.proto.ChannelSettings
+import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.LocalModuleConfig
+import okio.ByteString
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.toByteString
+import kotlin.random.Random
 
 /** What the console may do on the connected device; every call answers false when there is no connected device. */
 interface ConsoleDevice {
@@ -133,6 +166,19 @@ interface ConsoleDevice {
     suspend fun gpioRead(mask: Long): Long?
 
     suspend fun gpioWrite(mask: Long, value: Long): Boolean
+
+    /** The configuration of the connected device; null when none is connected. */
+    suspend fun settings(): Pair<LocalConfig, LocalModuleConfig>?
+
+    /** Sends the changed sections to the device as one transaction. */
+    suspend fun apply(changes: List<ConsoleChange>): Boolean
+
+    /** The channels of the connected device in the order of their numbers. */
+    suspend fun channels(): List<ChannelSettings>
+
+    suspend fun setChannel(index: Int, settings: ChannelSettings, enabled: Boolean): Boolean
+
+    suspend fun setHam(callSign: String, longName: String?): Boolean
 }
 
 /** The labels of the commands that act on the device, and of the words they take. */
@@ -154,6 +200,13 @@ class ConsoleDeviceLabels(
     val ringtone: ConsoleLabel,
     val canned: ConsoleLabel,
     val gpio: ConsoleLabel,
+    val set: ConsoleLabel,
+    val get: ConsoleLabel,
+    val export: ConsoleLabel,
+    val channels: ConsoleLabel,
+    val channelSet: ConsoleLabel,
+    val ham: ConsoleLabel,
+    val channelFields: List<String>,
     val argChannel: String,
     val argTo: String,
     val argConfirm: String,
@@ -243,6 +296,24 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
             Res.string.console_cmd_canned_usage,
         )
     val gpio = label(Res.string.console_cmd_gpio_name, Res.string.console_cmd_gpio_summary, Res.string.console_cmd_gpio_usage)
+    val set = label(Res.string.console_cmd_set_name, Res.string.console_cmd_set_summary, Res.string.console_cmd_set_usage)
+    val get = label(Res.string.console_cmd_get_name, Res.string.console_cmd_get_summary, Res.string.console_cmd_get_usage)
+    val export =
+        label(Res.string.console_cmd_export_name, Res.string.console_cmd_export_summary, Res.string.console_cmd_export_usage)
+    val channels =
+        label(
+            Res.string.console_cmd_channels_name,
+            Res.string.console_cmd_channels_summary,
+            Res.string.console_cmd_channels_usage,
+        )
+    val channelSet =
+        label(
+            Res.string.console_cmd_channel_set_name,
+            Res.string.console_cmd_channel_set_summary,
+            Res.string.console_cmd_channel_set_usage,
+        )
+    val ham = label(Res.string.console_cmd_ham_name, Res.string.console_cmd_ham_summary, Res.string.console_cmd_ham_usage)
+    val channelFields = stringResource(Res.string.console_arg_channel_fields)
     val argChannel = stringResource(Res.string.console_arg_channel)
     val argTo = stringResource(Res.string.console_arg_to)
     val argConfirm = stringResource(Res.string.console_arg_confirm)
@@ -252,12 +323,14 @@ fun rememberConsoleDeviceLabels(): ConsoleDeviceLabels {
     val types = stringResource(Res.string.console_arg_telemetry_types)
     return remember(
         info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute, requestPosition,
-        telemetry, owner, time, ringtone, canned, gpio, argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
+        telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet, ham, channelFields,
+        argChannel, argTo, argConfirm, argKeep, argRead, argWrite, types,
     ) {
         ConsoleDeviceLabels(
             info, send, reboot, shutdown, factory, resetNodes, removeNode, favorite, ignored, traceroute,
-            requestPosition, telemetry, owner, time, ringtone, canned, gpio, argChannel, argTo, argConfirm, argKeep,
-            argRead, argWrite, types.split(',').map { it.trim() },
+            requestPosition, telemetry, owner, time, ringtone, canned, gpio, set, get, export, channels, channelSet,
+            ham, channelFields.split(',').map { it.trim() }, argChannel, argTo, argConfirm, argKeep, argRead, argWrite,
+            types.split(',').map { it.trim() },
         )
     }
 }
@@ -460,7 +533,162 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
                 else -> bad(labels.gpio)
             }
         },
+    ConsoleCommand(
+            labels.set.name,
+            labels.set.summary,
+            labels.set.usage,
+            complete = { args -> if (args.size % 2 == 0) consoleSettings.map { it.name } else emptyList() },
+        ) { args ->
+            val settings = device.settings()
+            if (settings == null) {
+                done(false)
+            } else if (args.size < 2 || args.size % 2 != 0) {
+                bad(labels.set)
+            } else {
+                val lines = mutableListOf<String>()
+                val changes = mutableListOf<ConsoleChange>()
+                args.chunked(2).forEach { (name, value) ->
+                    val setting = findSetting(name)
+                    val change = setting?.write(settings.first, settings.second, value)
+                    when {
+                        setting == null -> lines += getStringSuspend(Res.string.console_out_setting_unknown, name)
+                        change == null -> lines += getStringSuspend(Res.string.console_out_setting_bad, name, value)
+                        else -> changes += change
+                    }
+                }
+                if (lines.isEmpty()) {
+                    ConsoleResult(
+                        listOf(getStringSuspend(if (device.apply(changes)) Res.string.console_out_set_done else Res.string.console_out_position_no_device)),
+                    )
+                } else {
+                    ConsoleResult(lines)
+                }
+            }
+        },
+        ConsoleCommand(
+            labels.get.name,
+            labels.get.summary,
+            labels.get.usage,
+            complete = { args -> if (args.isEmpty()) consoleSettings.map { it.name } else emptyList() },
+        ) { args ->
+            val settings = device.settings()
+            val key = args.firstOrNull()?.trim()?.lowercase().orEmpty()
+            val found = consoleSettings.filter { key.isNotEmpty() && it.name.lowercase().startsWith(key) }
+            when {
+                settings == null -> done(false)
+                key.isEmpty() ->
+                    ConsoleResult(
+                        listOf(getStringSuspend(Res.string.console_out_get_names, consoleSettings.joinToString(", ") { it.name })),
+                    )
+                found.isEmpty() -> ConsoleResult(listOf(getStringSuspend(Res.string.console_out_setting_unknown, key)))
+                else ->
+                    ConsoleResult(
+                        found.map {
+                            getStringSuspend(Res.string.console_out_setting_line, it.name, it.read(settings.first, settings.second))
+                        },
+                    )
+            }
+        },
+        ConsoleCommand(labels.export.name, labels.export.summary, labels.export.usage) {
+            val settings = device.settings()
+            if (settings == null) {
+                done(false)
+            } else {
+                val setLines =
+                    consoleSettings.map { "${labels.set.name} ${it.name} ${quote(it.read(settings.first, settings.second))}" }
+                val channelLines =
+                    device.channels().flatMapIndexed { index, channel ->
+                        listOf(
+                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_NAME]} ${quote(channel.name)}",
+                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_PSK]} base64:${channel.psk.base64()}",
+                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_UPLINK]} ${channel.uplink_enabled}",
+                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_DOWNLINK]} ${channel.downlink_enabled}",
+                        )
+                    }
+                ConsoleResult(setLines + channelLines)
+            }
+        },
+        ConsoleCommand(labels.channels.name, labels.channels.summary, labels.channels.usage) {
+            val channels = device.channels()
+            if (channels.isEmpty()) {
+                done(false)
+            } else {
+                ConsoleResult(
+                    channels.mapIndexed { index, channel ->
+                        getStringSuspend(
+                            Res.string.console_out_channel_line,
+                            index,
+                            channel.name.ifBlank { "-" },
+                            channel.psk.size,
+                            channel.uplink_enabled.toString(),
+                            channel.downlink_enabled.toString(),
+                        )
+                    },
+                )
+            }
+        },
+        ConsoleCommand(
+            labels.channelSet.name,
+            labels.channelSet.summary,
+            labels.channelSet.usage,
+            complete = { args -> if (args.size == 1) labels.channelFields else emptyList() },
+        ) { args ->
+            val index = args.firstOrNull()?.toIntOrNull()
+            val field = args.getOrNull(1)?.let { word -> labels.channelFields.indexOfFirst { isWord(word, it) } } ?: -1
+            val value = args.drop(2).joinToString(" ")
+            val channels = device.channels()
+            if (index == null || index !in 0..MAX_CHANNEL || field < 0 || value.isEmpty()) {
+                bad(labels.channelSet)
+            } else if (channels.isEmpty()) {
+                done(false)
+            } else {
+                val current = channels.getOrNull(index) ?: ChannelSettings()
+                val flag = parseOnOff(value, on, off)
+                val updated: ChannelSettings? =
+                    when (field) {
+                        CHANNEL_FIELD_NAME -> current.copy(name = value)
+                        CHANNEL_FIELD_PSK -> parsePsk(value)?.let { current.copy(psk = it) }
+                        CHANNEL_FIELD_UPLINK -> flag?.let { current.copy(uplink_enabled = it) }
+                        CHANNEL_FIELD_DOWNLINK -> flag?.let { current.copy(downlink_enabled = it) }
+                        else -> flag?.let { current }
+                    }
+                val enabled = if (field == CHANNEL_FIELD_ENABLED) flag == true else true
+                if (updated == null || (index == 0 && !enabled)) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_channel_bad, labels.channelSet.usage)))
+                } else {
+                    done(device.setChannel(index, updated, enabled))
+                }
+            }
+        },
+        ConsoleCommand(labels.ham.name, labels.ham.summary, labels.ham.usage) { args ->
+            val call = args.firstOrNull()
+            if (call == null) bad(labels.ham) else done(device.setHam(call, args.drop(1).joinToString(" ").ifBlank { null }))
+        },
     )
+}
+
+private const val CHANNEL_FIELD_NAME = 0
+private const val CHANNEL_FIELD_PSK = 1
+private const val CHANNEL_FIELD_UPLINK = 2
+private const val CHANNEL_FIELD_DOWNLINK = 3
+private const val CHANNEL_FIELD_ENABLED = 4
+private const val PSK_RANDOM_BYTES = 32
+
+private fun quote(text: String) = if (text.isEmpty() || text.any { it.isWhitespace() }) "\"$text\"" else text
+
+private fun parseOnOff(text: String, on: String, off: String): Boolean? = when (ConsoleText.fold(text)) {
+    ConsoleText.fold(on), "true", "1", "on", "yes", "tak" -> true
+    ConsoleText.fold(off), "false", "0", "off", "no", "nie" -> false
+    else -> null
+}
+
+/** A key written as `random`, `none`, `default` or `base64:…`. */
+private fun parsePsk(text: String): ByteString? = when {
+    text.equals("random", ignoreCase = true) -> Random.Default.nextBytes(PSK_RANDOM_BYTES).toByteString()
+    text.equals("none", ignoreCase = true) -> ByteString.EMPTY
+    text.equals("default", ignoreCase = true) -> byteArrayOf(1).toByteString()
+    text.startsWith("base64:", ignoreCase = true) -> text.drop("base64:".length).decodeBase64()
+    else -> null
 }
 
 /** A number written in decimal or as `0x…`. */
