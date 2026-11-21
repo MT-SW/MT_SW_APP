@@ -154,8 +154,7 @@ targets:
           case "$SDK_NAME" in iphonesimulator*) export ARCHS=arm64 ;; esac
           # MTSW_GRADLE_ARGS: dodatkowe ustawienia (np. więcej pamięci dla kompilatora) przekazywane przez scripts/build-ios-ipa.sh.
           # Gdy ich nie ma (zwykłe Uruchom w Xcode), kompilator iOS dostaje tyle samo pamięci co w skrypcie .ipa (Release jej potrzebuje), a kompilacja ma zwykły priorytet (w gradle.properties jest „niski”, co zwalnia budowanie z Xcode).
-          # Zwykłe Uruchom w Xcode używa też pamięci podręcznej kompilatora w wersji Release (enableReleaseBinaryCache): budowanie jest dużo krótsze i zużywa mniej pamięci kosztem części optymalizacji. Skrypt .ipa jej nie włącza, więc plik .ipa zostaje w pełni zoptymalizowany.
-          ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode ${MTSW_GRADLE_ARGS:--Dorg.gradle.jvmargs=-Xmx12g -Pkotlin.native.jvmArgs=-Xmx12g -Dorg.gradle.priority=normal -Pkotlin.native.binary.enableReleaseBinaryCache=true -Pkotlin.internal.native.enableReleaseBinaryCache=true}
+          ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode ${MTSW_GRADLE_ARGS:--Dorg.gradle.jvmargs=-Xmx12g -Pkotlin.native.jvmArgs=-Xmx12g -Dorg.gradle.priority=normal}
   MTSWWidget:
     type: app-extension
     platform: iOS
