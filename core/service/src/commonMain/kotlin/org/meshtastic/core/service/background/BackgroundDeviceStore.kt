@@ -27,6 +27,7 @@ import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.FromRadio
+import org.meshtastic.core.model.TransportPhase
 import org.meshtastic.proto.HardwareModel
 import org.meshtastic.proto.MyNodeInfo
 import org.meshtastic.proto.NodeInfo
@@ -42,6 +43,7 @@ internal class BackgroundDeviceStore(
     private val address: String,
     private val databaseManager: DatabaseManager,
     private val onProgress: (String?) -> Unit = {},
+    private val onPhase: (TransportPhase) -> Unit = {},
 ) {
     private var channelCount = 0
     private var myInfo: MyNodeInfo? = null
@@ -51,6 +53,8 @@ internal class BackgroundDeviceStore(
 
     /** Reads the frames of the radio until the channel is closed; writes after every complete list. */
     suspend fun run(frames: ReceiveChannel<FromRadio>) {
+        // The same steps the main connection card lists: the configuration, then the nodes, then done.
+        onPhase(TransportPhase.HandshakeConfig)
         for (frame in frames) {
             val info = frame.my_info
             val node = frame.node_info
@@ -75,12 +79,14 @@ internal class BackgroundDeviceStore(
                 frame.channel != null -> onProgress("Channels (${++channelCount})")
 
                 node != null -> {
+                    if (nodes.isEmpty()) onPhase(TransportPhase.HandshakeNodes)
                     nodes[node.num] = node
                     onProgress("Nodes (${nodes.size})")
                 }
 
                 (frame.config_complete_id ?: 0) != 0 -> {
                     if (nodes.isNotEmpty()) write()
+                    onPhase(TransportPhase.Connected)
                     onProgress(null)
                 }
             }

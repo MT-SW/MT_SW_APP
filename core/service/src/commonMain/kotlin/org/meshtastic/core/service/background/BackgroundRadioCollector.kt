@@ -39,6 +39,7 @@ import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
 import org.meshtastic.core.repository.MeshNotificationManager
@@ -183,10 +184,15 @@ class BackgroundRadioCollector(
                 }
                 val processor = launch { processPackets(address, link) }
                 val store = launch {
-                    BackgroundDeviceStore(address, databaseManager) { text ->
-                        progress.update { if (text == null) it - address else it + (address to text) }
-                        if (text == null) statuses.update { it - address }
-                    }
+                    BackgroundDeviceStore(
+                        address,
+                        databaseManager,
+                        onProgress = { text ->
+                            progress.update { if (text == null) it - address else it + (address to text) }
+                            if (text == null) statuses.update { it - address }
+                        },
+                        onPhase = { phase -> link.lastStatus.value = TransportStatus(phase) },
+                    )
                         .run(link.setup)
                     readBadge(address)
                 }
