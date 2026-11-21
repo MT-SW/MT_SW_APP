@@ -240,7 +240,7 @@ fun RadioPlate(radio: RadioChoice, modifier: Modifier = Modifier) {
     val num = radio.nodeNum
     if (num != null) {
         NodeChip(
-            node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build()),
+            node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty().ifBlank { defaultShortName(num) } }.build()),
             modifier = modifier,
         )
     } else {
@@ -252,3 +252,11 @@ fun RadioPlate(radio: RadioChoice, modifier: Modifier = Modifier) {
         )
     }
 }
+
+/** The short name a node has until one is set: the last four characters of its id. */
+private fun defaultShortName(num: Int): String =
+    (num and SHORT_NAME_MASK).toString(HEX_RADIX).padStart(SHORT_NAME_LENGTH, '0')
+
+private const val SHORT_NAME_MASK = 0xFFFF
+private const val SHORT_NAME_LENGTH = 4
+private const val HEX_RADIX = 16
