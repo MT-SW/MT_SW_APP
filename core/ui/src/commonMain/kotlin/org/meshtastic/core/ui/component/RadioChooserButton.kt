@@ -303,6 +303,8 @@ private const val HEX_RADIX = 16
  * The list of devices as a rounded bubble under the radio icon, in the look of the buttons: clear glass with an outline
  * in the colour of the theme (the plain menu stays as it was with the plain Material look of "Buttons").
  */
+// The look is chosen in the settings, so the content is never in both branches at once.
+@Suppress("ContentSlotReused")
 @Composable
 private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content: @Composable () -> Unit) {
     val accent = MaterialTheme.colorScheme.primary
