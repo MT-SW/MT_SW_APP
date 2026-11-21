@@ -28,7 +28,10 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +57,7 @@ fun SwitchPreference(
     loading: Boolean = false,
 ) {
     // MT_SW: a switched-on row no longer gets Material's flat blue-grey fill. It gets a soft glass tint in the colour of
-    // the theme (lighter at the top) and a thin accent bar on the left, which fits the dark and the light look.
+    // the theme (lighter at the top) and a thin outline on the left, which fits the dark and the light look.
     val currentColors =
         ListItemDefaults.colors(
             containerColor = containerColor ?: Color.Unspecified,
@@ -100,7 +103,12 @@ internal fun Modifier.switchOnGlass(on: Boolean): Modifier {
     val tintAlpha by animateFloatAsState(if (on) 1f else 0f)
     return this.drawBehind {
         if (tintAlpha > 0f) {
-            drawRect(
+            // The whole row is one glass pane: a soft tint inside and a thin outline all the way around it.
+            val inset = SWITCH_INSET_DP.dp.toPx()
+            val topLeft = Offset(inset, inset)
+            val paneSize = Size(size.width - 2 * inset, size.height - 2 * inset)
+            val corner = CornerRadius(SWITCH_CORNER_DP.dp.toPx())
+            drawRoundRect(
                 brush =
                 Brush.verticalGradient(
                     listOf(
@@ -108,10 +116,22 @@ internal fun Modifier.switchOnGlass(on: Boolean): Modifier {
                         accent.copy(alpha = SWITCH_TINT_BOTTOM * tintAlpha),
                     ),
                 ),
+                topLeft = topLeft,
+                size = paneSize,
+                cornerRadius = corner,
             )
-            drawRect(
-                color = accent.copy(alpha = SWITCH_BAR_ALPHA * tintAlpha),
-                size = Size(SWITCH_BAR_DP.dp.toPx(), size.height),
+            drawRoundRect(
+                brush =
+                Brush.verticalGradient(
+                    listOf(
+                        accent.copy(alpha = SWITCH_EDGE_TOP * tintAlpha),
+                        accent.copy(alpha = SWITCH_EDGE_BOTTOM * tintAlpha),
+                    ),
+                ),
+                topLeft = topLeft,
+                size = paneSize,
+                cornerRadius = corner,
+                style = Stroke(width = SWITCH_EDGE_DP.dp.toPx()),
             )
         }
     }
@@ -119,5 +139,8 @@ internal fun Modifier.switchOnGlass(on: Boolean): Modifier {
 
 private const val SWITCH_TINT_TOP = 0.16f
 private const val SWITCH_TINT_BOTTOM = 0.04f
-private const val SWITCH_BAR_ALPHA = 0.9f
-private const val SWITCH_BAR_DP = 3f
+private const val SWITCH_EDGE_TOP = 0.95f
+private const val SWITCH_EDGE_BOTTOM = 0.55f
+private const val SWITCH_EDGE_DP = 1.2f
+private const val SWITCH_INSET_DP = 2f
+private const val SWITCH_CORNER_DP = 12f
