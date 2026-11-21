@@ -32,10 +32,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material3.AssistChip
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -150,22 +152,21 @@ fun ConsoleScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 suggestions.forEach { suggestion ->
-                    AssistChip(
-                        onClick = { viewModel.setInput("$suggestion ") },
-                        shape = ChipShape,
-                        // On a dark theme the glow only falls below the chip, so a thin rim keeps its upper edge visible.
-                        border =
-                        if (MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE) {
-                            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                        } else {
-                            null
-                        },
-                        // The chip needs its own fill: its default one is see-through, so the shadow drawn
-                        // behind it showed through the middle (a dark smear around a small light box on Windows).
-                        colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surface),
-                        modifier = Modifier.elementLook(UiOptions.GROUP_INPUT, ChipShape),
-                        label = { Text(suggestion, fontFamily = FontFamily.Monospace) },
-                    )
+                    // Drawn by hand instead of AssistChip: that one has an invisible touch area around it, and the
+                    // shadow was drawn around the whole area, so it stood off the visible button.
+                    val dark = MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE
+                    val rim = if (dark) Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, ChipShape) else Modifier
+                    Box(
+                        modifier =
+                        Modifier.elementLook(UiOptions.GROUP_INPUT, ChipShape)
+                            .clip(ChipShape)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .then(rim)
+                            .clickable { viewModel.setInput("$suggestion ") }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Text(suggestion, style = MaterialTheme.typography.labelLarge, fontFamily = FontFamily.Monospace)
+                    }
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
