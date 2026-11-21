@@ -60,7 +60,7 @@ internal fun Modifier.floatingBacking(shape: Shape, decor: FilledDecor): Modifie
     return drawBehind { drawOutline(outline = shape.createOutline(size, layoutDirection, this), color = color) }
 }
 
-private const val FLOATING_BACKING_ALPHA = 0.45f
+private const val FLOATING_BACKING_ALPHA = 0.65f
 
 /** The strong colour that goes with a "container" colour of the theme, so a floating button has a clear outline. */
 @Composable
