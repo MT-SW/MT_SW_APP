@@ -50,6 +50,9 @@ import org.meshtastic.core.resources.console_cmd_radio_usage
 import org.meshtastic.core.resources.console_cmd_radios_name
 import org.meshtastic.core.resources.console_cmd_radios_summary
 import org.meshtastic.core.resources.console_cmd_radios_usage
+import org.meshtastic.core.resources.console_cmd_position_name
+import org.meshtastic.core.resources.console_cmd_position_summary
+import org.meshtastic.core.resources.console_cmd_position_usage
 import org.meshtastic.core.resources.console_cmd_remove_name
 import org.meshtastic.core.resources.console_cmd_remove_summary
 import org.meshtastic.core.resources.console_cmd_remove_usage
@@ -65,6 +68,9 @@ import org.meshtastic.core.resources.console_out_disconnecting
 import org.meshtastic.core.resources.console_out_help_header
 import org.meshtastic.core.resources.console_out_help_usage
 import org.meshtastic.core.resources.console_out_no_radios
+import org.meshtastic.core.resources.console_out_position_bad
+import org.meshtastic.core.resources.console_out_position_no_device
+import org.meshtastic.core.resources.console_out_position_set
 import org.meshtastic.core.resources.console_out_node_offline
 import org.meshtastic.core.resources.console_out_node_online
 import org.meshtastic.core.resources.console_out_nodes_more
@@ -79,6 +85,8 @@ import org.meshtastic.core.resources.console_out_state_connecting
 import org.meshtastic.core.resources.console_out_state_disconnected
 import org.meshtastic.core.resources.console_out_state_sleep
 import org.meshtastic.core.resources.console_out_status_bridge
+import org.meshtastic.core.resources.console_out_status_bridge_none
+import org.meshtastic.core.resources.console_out_status_bridge_unselected
 import org.meshtastic.core.resources.console_out_status_connection
 import org.meshtastic.core.resources.console_out_status_nodes
 import org.meshtastic.core.resources.console_out_status_radio
@@ -87,6 +95,7 @@ import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.ui.viewmodel.RadioChoice
 import org.meshtastic.core.ui.viewmodel.RadioStatus
 import org.meshtastic.feature.settings.mtsw.RadioBridgeState
+import kotlin.math.roundToInt
 
 /** What the console can look at and do; the screen fills it with the live state and the actions of the app. */
 class ConsoleEnvironment(
@@ -98,6 +107,7 @@ class ConsoleEnvironment(
     val nodes: () -> List<Node>,
     val bridge: () -> RadioBridgeState,
     val updateBridge: ((RadioBridgeConfig) -> RadioBridgeConfig) -> Unit,
+    val setPosition: suspend (latitude: Double, longitude: Double, altitude: Int?) -> Boolean,
 )
 
 /** The name, the description and the way of writing one command, in the language of the app. */
@@ -114,6 +124,7 @@ class ConsoleLabels(
     val status: ConsoleLabel,
     val nodes: ConsoleLabel,
     val bridge: ConsoleLabel,
+    val position: ConsoleLabel,
     val on: String,
     val off: String,
 )
@@ -178,14 +189,24 @@ fun rememberConsoleLabels(): ConsoleLabels {
             Res.string.console_cmd_bridge_summary,
             Res.string.console_cmd_bridge_usage,
         )
+    val position =
+        label(
+            Res.string.console_cmd_position_name,
+            Res.string.console_cmd_position_summary,
+            Res.string.console_cmd_position_usage,
+        )
     val on = stringResource(Res.string.console_arg_on)
     val off = stringResource(Res.string.console_arg_off)
-    return remember(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, on, off) {
-        ConsoleLabels(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, on, off)
+    return remember(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, on, off) {
+        ConsoleLabels(help, clear, radios, radio, disconnect, remove, status, nodes, bridge, position, on, off)
     }
 }
 
 private const val MAX_NODE_LINES = 20
+private const val POSITION_MIN_ARGS = 2
+private const val POSITION_MAX_ARGS = 3
+private const val MAX_LATITUDE = 90.0
+private const val MAX_LONGITUDE = 180.0
 
 /** Builds the one registry of commands; every text comes from the string resources, so it follows the app language. */
 fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): ConsoleRegistry {
@@ -215,8 +236,17 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
         Res.string.console_out_bridge_none
     }
 
+    /** A short state for the status line; the full sentence of [noDeviceText] belongs only to the bridge command. */
     suspend fun bridgeText(state: RadioBridgeState): String {
-        val slotId = state.slotId ?: return getStringSuspend(noDeviceText(state))
+        val slotId =
+            state.slotId
+                ?: return getStringSuspend(
+                    if (state.hasSavedDevices) {
+                        Res.string.console_out_status_bridge_unselected
+                    } else {
+                        Res.string.console_out_status_bridge_none
+                    },
+                )
         return if (state.config.enabled) {
             getStringSuspend(Res.string.console_out_bridge_on, state.config.portFor(slotId))
         } else {
@@ -407,6 +437,26 @@ fun buildConsoleRegistry(env: ConsoleEnvironment, labels: ConsoleLabels): Consol
                     env.updateBridge { it.copy(enabled = change) }
                     val text = bridgeText(state.copy(config = state.config.copy(enabled = change)))
                     ConsoleResult(listOf(getStringSuspend(Res.string.console_out_bridge_changed, text)))
+                }
+            },
+            ConsoleCommand(labels.position.name, labels.position.summary, labels.position.usage) { args ->
+                val numbers = args.map { it.replace(',', '.').toDoubleOrNull() }
+                val latitude = numbers.getOrNull(0)
+                val longitude = numbers.getOrNull(1)
+                val altitude = numbers.getOrNull(2)
+                val valid =
+                    args.size in POSITION_MIN_ARGS..POSITION_MAX_ARGS &&
+                        numbers.none { it == null } &&
+                        latitude != null && latitude in -MAX_LATITUDE..MAX_LATITUDE &&
+                        longitude != null && longitude in -MAX_LONGITUDE..MAX_LONGITUDE
+                if (!valid || latitude == null || longitude == null) {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_bad, labels.position.usage)))
+                } else if (env.setPosition(latitude, longitude, altitude?.roundToInt())) {
+                    ConsoleResult(
+                        listOf(getStringSuspend(Res.string.console_out_position_set, args[0], args[1])),
+                    )
+                } else {
+                    ConsoleResult(listOf(getStringSuspend(Res.string.console_out_position_no_device)))
                 }
             },
         )

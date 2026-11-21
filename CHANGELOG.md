@@ -195,6 +195,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Konsola (wszystkie wersje): wiersz „Mostek TCP” w poleceniu „stan” pokazuje krótki stan („niedostępny” z powodem) zamiast zdania z prośbą o zapisanie urządzenia; nowe polecenie „pozycja <szerokość> <długość> [wysokość]” ustawia stałą pozycję połączonego urządzenia, tak jak --setlat, --setlon i --setalt w poleceniach Meshtastic.
 * Asystent AI (wszystkie wersje): cień podpowiedzi przylega do przycisków, bo znikło niewidoczne pole dotyku, które odsuwało go od przycisku.
 * Zdrowie sieci (wszystkie wersje): karty węzłów mają takie same boczne marginesy jak karta „Kondycja sieci” i pasek wyszukiwania, więc nie są już węższe od reszty ekranu.
 * Przycisk menu nad dolnym paskiem, np. dodawanie kontaktu (wszystkie wersje): ma ten sam szklany wygląd co pozostałe przyciski i podąża za stylem wybranym w „Wygląd”.
@@ -1122,6 +1123,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Console (all versions): the "TCP bridge" line of the "status" command shows a short state ("not available" with the reason) instead of a sentence asking to save a device; the new command "position <latitude> <longitude> [altitude]" sets a fixed position on the connected device, like --setlat, --setlon and --setalt of the Meshtastic command line.
 * AI assistant (all versions): the shadow of the suggestions sits right against the buttons, because the invisible touch box that pushed it away from the button is gone.
 * Network health (all versions): the node cards have the same side margins as the "Network condition" card and the search bar, so they are no longer narrower than the rest of the screen.
 * Menu button above the bottom bar, e.g. adding a contact (all versions): it has the same glass look as the other buttons and follows the style chosen in "Look".

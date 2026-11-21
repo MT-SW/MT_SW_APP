@@ -26,13 +26,18 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.Position
+import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.ServiceRepository
 
 /** What the console screen shows and remembers: the printed lines, the typed line and the earlier lines. */
 @KoinViewModel
-class ConsoleViewModel(private val nodeRepository: NodeRepository, private val serviceRepository: ServiceRepository) :
-    ViewModel() {
+class ConsoleViewModel(
+    private val nodeRepository: NodeRepository,
+    private val serviceRepository: ServiceRepository,
+    private val adminController: AdminController,
+) : ViewModel() {
     private val history = ConsoleHistory()
     private val _lines = MutableStateFlow<List<String>>(emptyList())
     val lines: StateFlow<List<String>> = _lines.asStateFlow()
@@ -43,6 +48,13 @@ class ConsoleViewModel(private val nodeRepository: NodeRepository, private val s
     fun nodes(): List<Node> = nodeRepository.nodeDBbyNum.value.values.toList()
 
     fun connection(): ConnectionState = serviceRepository.connectionState.value
+
+    /** Sets the fixed position of the connected device; false when no device is connected yet. */
+    suspend fun setPosition(latitude: Double, longitude: Double, altitude: Int?): Boolean {
+        val num = nodeRepository.myNodeInfo.value?.myNodeNum ?: return false
+        adminController.setFixedPosition(num, Position(latitude, longitude, altitude))
+        return true
+    }
 
     fun setInput(text: String) {
         _input.value = text

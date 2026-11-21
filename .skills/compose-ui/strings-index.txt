@@ -978,6 +978,9 @@ console_cmd_help_usage
 console_cmd_nodes_name
 console_cmd_nodes_summary
 console_cmd_nodes_usage
+console_cmd_position_name
+console_cmd_position_summary
+console_cmd_position_usage
 console_cmd_radio_name
 console_cmd_radio_summary
 console_cmd_radio_usage
@@ -1007,6 +1010,9 @@ console_out_node_offline
 console_out_node_online
 console_out_nodes_more
 console_out_nodes_none
+console_out_position_bad
+console_out_position_no_device
+console_out_position_set
 console_out_radio_line
 console_out_radio_missing
 console_out_radio_switching
@@ -1017,6 +1023,8 @@ console_out_state_connecting
 console_out_state_disconnected
 console_out_state_sleep
 console_out_status_bridge
+console_out_status_bridge_none
+console_out_status_bridge_unselected
 console_out_status_connection
 console_out_status_nodes
 console_out_status_radio
