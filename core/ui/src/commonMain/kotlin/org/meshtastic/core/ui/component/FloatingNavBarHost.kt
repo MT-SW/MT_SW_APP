@@ -324,8 +324,8 @@ private fun FloatingNavBar(
             if (darker) {
                 lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
             } else if (colorScheme.surface.luminance() > LIGHT_THEME_LUMINANCE) {
-                // Light theme off the map: a touch of grey, as on the map, but the bar stays see-through.
-                lerp(colorScheme.surfaceContainerHigh, Color.Black, LIGHT_GREY_SHARE)
+                // Light theme off the map: the same grey as on the map, but the glass keeps its normal, more see-through strength.
+                lerp(colorScheme.surfaceContainerHigh, Color.Black, DARKER_SHARE)
             } else {
                 colorScheme.surfaceContainerHigh
             },
@@ -406,9 +406,6 @@ private const val SELECTED_ALPHA = 0.12f
 
 /** How much darker the bar is on the map card. */
 private const val DARKER_SHARE = 0.22f
-
-/** How much grey the bar gets on a light theme away from the map (the map card uses [DARKER_SHARE]). */
-private const val LIGHT_GREY_SHARE = 0.08f
 
 /** A surface brighter than this counts as a light theme. */
 private const val LIGHT_THEME_LUMINANCE = 0.5f
