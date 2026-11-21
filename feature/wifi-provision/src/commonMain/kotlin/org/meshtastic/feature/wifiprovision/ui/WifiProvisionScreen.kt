@@ -132,7 +132,6 @@ import org.meshtastic.core.resources.wifi_provision_success_ssh_unavailable
 import org.meshtastic.core.resources.wifi_provision_success_username
 import org.meshtastic.core.resources.wifi_provision_success_username_value
 import org.meshtastic.core.resources.wifi_provisioning
-import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
@@ -142,6 +141,7 @@ import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction
+import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Bluetooth

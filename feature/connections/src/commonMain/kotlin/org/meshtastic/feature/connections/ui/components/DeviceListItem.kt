@@ -202,6 +202,7 @@ fun DeviceListItem(
  * distinguish devices that share a similar short/advertised name (see #5808). Otherwise fall back to the raw advertised
  * name. The name is allowed to wrap to two lines so long names are legible rather than truncated at a single line.
  */
+@Suppress("UnnecessaryLaunchedEffect")
 @Composable
 private fun DeviceHeadline(device: DeviceListEntry) {
     // A node found in the database of the device in use, else the plate read from the device's own saved database

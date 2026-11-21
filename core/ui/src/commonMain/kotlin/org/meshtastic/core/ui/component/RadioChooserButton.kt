@@ -241,7 +241,14 @@ fun RadioPlate(radio: RadioChoice, modifier: Modifier = Modifier) {
     val num = radio.nodeNum
     if (num != null) {
         NodeChip(
-            node = Node(num = num, user = User.Builder().also { it.short_name = radio.shortName.orEmpty().ifBlank { defaultShortName(num) } }.build()),
+            node =
+            Node(
+                num = num,
+                user =
+                User.Builder()
+                    .also { it.short_name = radio.shortName.orEmpty().ifBlank { defaultShortName(num) } }
+                    .build(),
+            ),
             modifier = modifier,
         )
     } else {

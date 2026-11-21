@@ -24,30 +24,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.FloatingActionButtonElevation
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.ui.Alignment
-import org.meshtastic.core.ui.icon.Close
-import org.meshtastic.core.ui.icon.Icon
-import org.meshtastic.core.ui.icon.MeshtasticIcons
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.FloatingActionButtonElevation
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import androidx.compose.material3.ExtendedFloatingActionButton as MaterialExtendedFloatingActionButton
 import androidx.compose.material3.FilledIconButton as MaterialFilledIconButton
 import androidx.compose.material3.FilledTonalIconButton as MaterialFilledTonalIconButton
@@ -242,7 +242,11 @@ fun StyledSnackbar(data: SnackbarData, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .floatingBacking(shape, decor)
             .decorated(decor, shape)
-            .padding(start = SNACKBAR_PADDING_DP.dp, top = SNACKBAR_VERTICAL_DP.dp, bottom = SNACKBAR_VERTICAL_DP.dp),
+            .padding(
+                start = SNACKBAR_PADDING_DP.dp,
+                top = SNACKBAR_VERTICAL_DP.dp,
+                bottom = SNACKBAR_VERTICAL_DP.dp,
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(SNACKBAR_GAP_DP.dp),
     ) {

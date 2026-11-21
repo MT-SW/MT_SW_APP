@@ -24,10 +24,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,11 +37,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
@@ -197,7 +197,7 @@ private fun TileCard(
         )
     } else {
         // Greyed out: flat, with no shadow.
-        MaterialCard(modifier = modifier, shape = shape, colors = colors, border = border, content = inside)
+        Surface(modifier = modifier, shape = shape, color = shown, border = border) { Column(content = inside) }
     }
 }
 
@@ -405,7 +405,11 @@ private fun ChoiceTile(
         enabled = enabled,
         modifier = modifier,
         container = if (selected) color.copy(alpha = TINT_ALPHA * 2).compositeOver(base) else base,
-        border = BorderStroke(if (selected) 2.dp else 1.dp, (if (selected) color else color.copy(alpha = 0.25f)).dimmed(enabled)),
+        border =
+        BorderStroke(
+            if (selected) 2.dp else 1.dp,
+            (if (selected) color else color.copy(alpha = 0.25f)).dimmed(enabled),
+        ),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
