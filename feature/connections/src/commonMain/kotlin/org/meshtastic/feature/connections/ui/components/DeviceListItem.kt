@@ -205,18 +205,16 @@ fun DeviceListItem(
 @Composable
 private fun DeviceHeadline(device: DeviceListEntry) {
     // A node found in the database of the device in use, else the plate read from the device's own saved database
-    // (the other saved devices are not in the node list of the one in use).
-    val saved =
-        LocalAppBarExtras.current.radios.state.radios.firstOrNull {
-            it.address == device.fullAddress && it.nodeNum != null && !it.shortName.isNullOrBlank()
-        }
+    // (the other devices are not in the node list of the one in use).
+    val radios = LocalAppBarExtras.current.radios
+    LaunchedEffect(device.fullAddress, device.node == null) {
+        if (device.node == null) radios.onReadBadge(device.fullAddress)
+    }
+    val badge = radios.state.badges[device.fullAddress]?.takeIf { it.shortName.isNotBlank() }
     val node =
         device.node
-            ?: saved?.let { radio ->
-                Node(
-                    num = radio.nodeNum ?: 0,
-                    user = User.Builder().also { it.short_name = radio.shortName.orEmpty() }.build(),
-                )
+            ?: badge?.let {
+                Node(num = it.nodeNum, user = User.Builder().also { user -> user.short_name = it.shortName }.build())
             }
     if (node != null) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {

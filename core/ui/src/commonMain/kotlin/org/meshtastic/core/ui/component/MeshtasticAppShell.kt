@@ -149,6 +149,7 @@ fun MeshtasticAppShell(
                 onRemove = radioChooser::remove,
                 onTargetNextPick = radioChooser::targetForNextPick,
                 onSeen = radioChooser::acknowledgeDrop,
+                onReadBadge = radioChooser::readBadge,
             )
         }
     val appBarExtras =

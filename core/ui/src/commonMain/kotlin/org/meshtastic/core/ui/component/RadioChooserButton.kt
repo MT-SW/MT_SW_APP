@@ -79,6 +79,7 @@ data class RadioChooserActions(
     val onRemove: (Int) -> Unit = {},
     val onTargetNextPick: (Int) -> Unit = {},
     val onSeen: () -> Unit = {},
+    val onReadBadge: (String) -> Unit = {},
 )
 
 private const val PULSE_MAX_ALPHA = 0.55f

@@ -132,7 +132,7 @@ class BackgroundRadioCollector(
 
     private val workers = mutableMapOf<String, Job>()
 
-    private suspend fun readBadge(address: String) {
+    override suspend fun readBadge(address: String) {
         val badge =
             try {
                 databaseManager.withDeviceDb(address, includeActive = true) { db ->

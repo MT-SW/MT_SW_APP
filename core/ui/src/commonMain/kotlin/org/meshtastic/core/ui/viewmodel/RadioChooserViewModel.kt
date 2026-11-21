@@ -83,6 +83,8 @@ data class RadioChooserState(
     val canAdd: Boolean = true,
     /** New messages on the devices that are not shown; the circle near the icon of the top bar. */
     val unreadTotal: Int = 0,
+    /** The plate of every device whose own database could be read, by address (also the unsaved ones). */
+    val badges: Map<String, org.meshtastic.core.repository.DeviceBadge> = emptyMap(),
 )
 
 /**
@@ -176,6 +178,7 @@ class RadioChooserViewModel(
                 dropped = droppedByItself && isValidDeviceAddress(address),
                 canAdd = slots.size < RadioSlotsPrefs.MAX_SLOTS,
                 unreadTotal = choices.sumOf { it.unread },
+                badges = badges,
             )
         }
             .distinctUntilChanged()
@@ -302,6 +305,11 @@ class RadioChooserViewModel(
         val slots = slotsPrefs.slots.value
         val taken = slots.any { it.id == id }
         targetSlot = if (!taken || slots.size >= RadioSlotsPrefs.MAX_SLOTS) id else null
+    }
+
+    /** Reads the plate of the device at [address] from its own database, for a device that is not saved. */
+    fun readBadge(address: String) {
+        viewModelScope.launch { background.readBadge(address) }
     }
 
     /** Makes the saved radio [id] the one in use. The radio that was in use stays connected in the background. */

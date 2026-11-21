@@ -50,5 +50,8 @@ interface RadioBackgroundMonitor {
     /** The device is shown now: its count of new messages starts again. */
     fun clearUnread(address: String)
 
+    /** Reads the plate of the device at [address] from its own database (when it has one) and keeps it in [badges]. */
+    suspend fun readBadge(address: String) {}
+
     fun start(scope: CoroutineScope)
 }
