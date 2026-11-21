@@ -19,6 +19,7 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -235,6 +236,9 @@ private fun InlineSearchField(
     // MT_SW: one even pane of glass with a soft gradient from the light top to the plain bottom (so it looks raised),
     // on a solid base: the shadow under a see-through pane shows through it as a band, so the base is not see-through.
     val sheenTop = if (scheme.surface.luminance() < DARK_LUMINANCE) SEARCH_SHEEN_DARK else SEARCH_SHEEN_LIGHT
+    // As soon as something is typed the whole pane takes the gold of the theme, so it is visible that the list is
+    // filtered. It is drawn over the whole pane, not only over the field, so there is no band.
+    val tint by animateFloatAsState(targetValue = if (filtering) 1f else 0f)
     Box(
         modifier =
         modifier.fillMaxWidth()
@@ -242,7 +246,15 @@ private fun InlineSearchField(
             .shadow(SEARCH_SHADOW_DP.dp, shape, clip = false)
             .clip(shape)
             .background(base)
-            .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = sheenTop), Color.Transparent))),
+            .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = sheenTop), Color.Transparent)))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        scheme.primary.copy(alpha = SEARCH_FILL_TOP * tint),
+                        scheme.primary.copy(alpha = SEARCH_FILL_BOTTOM * tint),
+                    ),
+                ),
+            ),
     ) {
         BasicTextField(
             state = textFieldState,
@@ -300,6 +312,8 @@ private fun InlineSearchField(
 
 private const val SEARCH_RIM_DP = 1.2f
 private const val SEARCH_SHADOW_DP = 3
+private const val SEARCH_FILL_TOP = 0.26f
+private const val SEARCH_FILL_BOTTOM = 0.08f
 private const val SEARCH_SHEEN_LIGHT = 0.45f
 private const val SEARCH_SHEEN_DARK = 0.12f
 private const val DARK_LUMINANCE = 0.5f
