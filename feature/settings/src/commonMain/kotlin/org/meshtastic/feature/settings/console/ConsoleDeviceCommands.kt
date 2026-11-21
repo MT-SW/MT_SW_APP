@@ -718,14 +718,14 @@ fun buildDeviceCommands(env: ConsoleEnvironment, labels: ConsoleDeviceLabels, on
             } else if (channels.isEmpty()) {
                 done(false)
             } else {
-                val current = channels.getOrNull(index) ?: ChannelSettings()
+                val current = channels.getOrNull(index) ?: ChannelSettings.Builder().build()
                 val flag = parseOnOff(value, on, off)
                 val updated: ChannelSettings? =
                     when (field) {
-                        CHANNEL_FIELD_NAME -> current.copy(name = value)
-                        CHANNEL_FIELD_PSK -> parsePsk(value)?.let { current.copy(psk = it) }
-                        CHANNEL_FIELD_UPLINK -> flag?.let { current.copy(uplink_enabled = it) }
-                        CHANNEL_FIELD_DOWNLINK -> flag?.let { current.copy(downlink_enabled = it) }
+                        CHANNEL_FIELD_NAME -> current.newBuilder().also { b -> b.name = value }.build()
+                        CHANNEL_FIELD_PSK -> parsePsk(value)?.let { current.newBuilder().also { b -> b.psk = it }.build() }
+                        CHANNEL_FIELD_UPLINK -> flag?.let { current.newBuilder().also { b -> b.uplink_enabled = it }.build() }
+                        CHANNEL_FIELD_DOWNLINK -> flag?.let { current.newBuilder().also { b -> b.downlink_enabled = it }.build() }
                         else -> flag?.let { current }
                     }
                 val enabled = if (field == CHANNEL_FIELD_ENABLED) flag == true else true

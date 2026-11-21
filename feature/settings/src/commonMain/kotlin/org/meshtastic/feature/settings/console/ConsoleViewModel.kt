@@ -125,7 +125,13 @@ class ConsoleViewModel(
     override suspend fun setOwner(longName: String, shortName: String?): Boolean {
         val own = nodeRepository.ourNodeInfo.value ?: return false
         val user =
-            own.user.copy(long_name = longName, short_name = shortName ?: own.user.short_name)
+            own.user
+                .newBuilder()
+                .also { b ->
+                    b.long_name = longName
+                    b.short_name = shortName ?: own.user.short_name
+                }
+                .build()
         return onDevice { radioController.setOwner(it, user, packetId()) }
     }
 
@@ -166,17 +172,27 @@ class ConsoleViewModel(
                 enabled -> Channel.Role.SECONDARY
                 else -> Channel.Role.DISABLED
             }
-        radioController.setLocalChannel(Channel(index = index, role = role, settings = settings))
+        radioController.setLocalChannel(
+            Channel.Builder()
+                .also { b ->
+                    b.index = index
+                    b.role = role
+                    b.settings = settings
+                }
+                .build(),
+        )
     }
 
     override suspend fun setHam(callSign: String, longName: String?): Boolean {
         val own = nodeRepository.ourNodeInfo.value ?: return false
         val params =
-            HamParameters(
-                call_sign = callSign,
-                short_name = own.user.short_name,
-                long_name = longName ?: HamName.split(own.user.long_name).second,
-            )
+            HamParameters.Builder()
+                .also { b ->
+                    b.call_sign = callSign
+                    b.short_name = own.user.short_name
+                    b.long_name = longName ?: HamName.split(own.user.long_name).second
+                }
+                .build()
         return onDevice { radioController.setHamMode(it, params, packetId()) }
     }
 
