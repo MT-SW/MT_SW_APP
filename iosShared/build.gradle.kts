@@ -90,6 +90,10 @@ kotlin {
             // Names the framework bundle explicitly (otherwise Kotlin warns that it cannot infer one).
             binaryOption("bundleId", "pl.sw.mt.shared")
             isStatic = true
+            // The release link spent about 34 of its 52 minutes in this one optimisation. It only removes redundant
+            // file-initialiser calls, so skipping it costs a few extra "already initialised" checks and nothing else;
+            // the rest of the release optimisation stays on.
+            freeCompilerArgs += "-Xdisable-phases=RemoveRedundantCallsToStaticInitializersPhase"
             // The AI engine (see scripts/build-llama-ios.sh) is a separate framework that Xcode embeds in the app.
             val llama = rootDir.resolve("native/ios/llama.xcframework")
             if (llama.isDirectory) {
