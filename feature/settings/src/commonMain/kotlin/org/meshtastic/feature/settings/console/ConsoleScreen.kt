@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -147,6 +148,9 @@ fun ConsoleScreen(
                         onClick = { viewModel.setInput("$suggestion ") },
                         shape = ChipShape,
                         border = null,
+                        // The chip needs its own fill: its default one is see-through, so the shadow drawn
+                        // behind it showed through the middle (a dark smear around a small light box on Windows).
+                        colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surface),
                         modifier = Modifier.elementLook(UiOptions.GROUP_INPUT, ChipShape),
                         label = { Text(suggestion, fontFamily = FontFamily.Monospace) },
                     )
