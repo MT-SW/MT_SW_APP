@@ -57,7 +57,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
@@ -228,8 +227,6 @@ private fun InlineSearchField(
     val accent by animateColorAsState(targetValue = if (filtering) scheme.primary else scheme.outline)
     val shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp)
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
-    val fillTop = if (filtering) SEARCH_FILL_TOP else SEARCH_FILL_TOP_IDLE
-    val fillBottom = if (filtering) SEARCH_FILL_BOTTOM else SEARCH_FILL_BOTTOM_IDLE
     val options = rememberUiOptions()
     StyledSurface(
         style = options.element(UiOptions.GROUP_SEARCH),
@@ -247,16 +244,6 @@ private fun InlineSearchField(
             cursorBrush = SolidColor(contentColor),
             modifier =
             Modifier.fillMaxWidth()
-                .drawBehind {
-                    val outline = shape.createOutline(size, layoutDirection, this)
-                    drawOutline(
-                        outline = outline,
-                        brush =
-                        Brush.verticalGradient(
-                            listOf(accent.copy(alpha = fillTop), accent.copy(alpha = fillBottom)),
-                        ),
-                    )
-                }
                 .drawWithContent {
                     drawContent()
                     // A thin outline, strongest along the top, fading downwards: a pane of glass.
@@ -305,10 +292,6 @@ private fun InlineSearchField(
 }
 
 private const val SEARCH_RIM_DP = 1.2f
-private const val SEARCH_FILL_TOP = 0.26f
-private const val SEARCH_FILL_BOTTOM = 0.08f
-private const val SEARCH_FILL_TOP_IDLE = 0f
-private const val SEARCH_FILL_BOTTOM_IDLE = 0f
 private const val SEARCH_EDGE_BOTTOM_ALPHA = 0.55f
 private const val SEARCH_HINT_ALPHA = 0.6f
 private const val SEARCH_FIELD_HEIGHT_DP = 52
