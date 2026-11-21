@@ -37,6 +37,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -167,14 +168,7 @@ private fun TileCard(
         } else {
             container.dimmed(enabled)
         }
-    // The card keeps its own look (depth, glass edge); only what is inside it is tappable, so the shadow outside is not
-    // cut off.
-    Card(
-        modifier = modifier.then(if (enabled) Modifier.pressSpring() else Modifier),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = shown, disabledContainerColor = shown),
-        border = border,
-    ) {
+    val inside: @Composable ColumnScope.() -> Unit = {
         Column(
             modifier =
             Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA)
@@ -189,6 +183,21 @@ private fun TileCard(
                 ),
             content = content,
         )
+    }
+    val colors = CardDefaults.cardColors(containerColor = shown, disabledContainerColor = shown)
+    if (enabled) {
+        // Active: the card keeps its own look (depth, glass edge); only what is inside it is tappable, so the shadow
+        // outside is not cut off.
+        Card(
+            modifier = modifier.pressSpring(),
+            shape = shape,
+            colors = colors,
+            border = border,
+            content = inside,
+        )
+    } else {
+        // Greyed out: flat, with no shadow.
+        MaterialCard(modifier = modifier, shape = shape, colors = colors, border = border, content = inside)
     }
 }
 
