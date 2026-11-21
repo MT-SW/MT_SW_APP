@@ -27,6 +27,12 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.runtime.getValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -47,12 +53,38 @@ fun SwitchPreference(
     containerColor: Color? = null,
     loading: Boolean = false,
 ) {
-    val currentColors = ListItemDefaults.colors(containerColor = containerColor ?: Color.Unspecified)
+    // MT_SW: a switched-on row no longer gets Material's flat blue-grey fill. It gets a soft glass tint in the colour of
+    // the theme (lighter at the top) and a thin accent bar on the left, which fits the dark and the light look.
+    val currentColors =
+        ListItemDefaults.colors(
+            containerColor = containerColor ?: Color.Unspecified,
+            selectedContainerColor = Color.Transparent,
+        )
+    val accent = MaterialTheme.colorScheme.primary
+    val tintAlpha by animateFloatAsState(if (checked && enabled && containerColor == null) 1f else 0f)
+    val tinted =
+        Modifier.drawBehind {
+            if (tintAlpha > 0f) {
+                drawRect(
+                    brush =
+                    Brush.verticalGradient(
+                        listOf(
+                            accent.copy(alpha = SWITCH_TINT_TOP * tintAlpha),
+                            accent.copy(alpha = SWITCH_TINT_BOTTOM * tintAlpha),
+                        ),
+                    ),
+                )
+                drawRect(
+                    color = accent.copy(alpha = SWITCH_BAR_ALPHA * tintAlpha),
+                    size = Size(SWITCH_BAR_DP.dp.toPx(), size.height),
+                )
+            }
+        }
 
     ListItem(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = (padding?.let { Modifier.padding(it) } ?: modifier).assistantHighlight(title),
+        modifier = tinted.then(padding?.let { Modifier.padding(it) } ?: modifier).assistantHighlight(title),
         enabled = enabled,
         shapes = ListItemDefaults.shapes(shape = RectangleShape),
         colors = currentColors,
@@ -79,3 +111,8 @@ fun SwitchPreference(
 fun SwitchPreferencePreview() {
     AppTheme { SwitchPreference(title = "Setting", checked = true, enabled = true, onCheckedChange = {}) }
 }
+
+private const val SWITCH_TINT_TOP = 0.16f
+private const val SWITCH_TINT_BOTTOM = 0.04f
+private const val SWITCH_BAR_ALPHA = 0.9f
+private const val SWITCH_BAR_DP = 3f
