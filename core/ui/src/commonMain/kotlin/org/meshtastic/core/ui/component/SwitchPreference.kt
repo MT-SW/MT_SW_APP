@@ -27,6 +27,10 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -96,46 +100,65 @@ fun SwitchPreferencePreview() {
     AppTheme { SwitchPreference(title = "Setting", checked = true, enabled = true, onCheckedChange = {}) }
 }
 
-/** MT_SW: the glass tint and the accent bar of a row whose switch is on; shared by every row with a switch. */
+/**
+ * MT_SW: the glass tint of a row whose switch is on; shared by every row with a switch. In the middle of a list it is a
+ * soft gradient with a narrow accent bar on the left, which lets the rows run into each other. A row at the bottom of
+ * its list, or the only one, gets a thin outline all around instead, so its edges are closed like the pane it sits in.
+ */
 @Composable
 internal fun Modifier.switchOnGlass(on: Boolean): Modifier {
     val accent = MaterialTheme.colorScheme.primary
     val tintAlpha by animateFloatAsState(if (on) 1f else 0f)
-    return this.drawBehind {
-        if (tintAlpha > 0f) {
-            // The whole row is one glass pane: a soft tint inside and a thin outline all the way around it.
-            val inset = SWITCH_INSET_DP.dp.toPx()
-            val topLeft = Offset(inset, inset)
-            val paneSize = Size(size.width - 2 * inset, size.height - 2 * inset)
-            val corner = CornerRadius(SWITCH_CORNER_DP.dp.toPx())
-            drawRoundRect(
-                brush =
+    var closesList by remember { mutableStateOf(false) }
+    return this.onGloballyPositioned { coordinates ->
+            val parent = coordinates.parentLayoutCoordinates
+            closesList =
+                parent != null &&
+                parent.size.height > 0 &&
+                parent.localPositionOf(coordinates, Offset.Zero).y + coordinates.size.height >=
+                parent.size.height - EDGE_TOLERANCE_PX
+        }
+        .drawBehind {
+            if (tintAlpha <= 0f) return@drawBehind
+            val fill =
                 Brush.verticalGradient(
                     listOf(
                         accent.copy(alpha = SWITCH_TINT_TOP * tintAlpha),
                         accent.copy(alpha = SWITCH_TINT_BOTTOM * tintAlpha),
                     ),
-                ),
-                topLeft = topLeft,
-                size = paneSize,
-                cornerRadius = corner,
-            )
-            drawRoundRect(
-                brush =
-                Brush.verticalGradient(
-                    listOf(
-                        accent.copy(alpha = SWITCH_EDGE_TOP * tintAlpha),
-                        accent.copy(alpha = SWITCH_EDGE_BOTTOM * tintAlpha),
+                )
+            if (closesList) {
+                val inset = SWITCH_INSET_DP.dp.toPx()
+                val topLeft = Offset(inset, inset)
+                val paneSize = Size(size.width - 2 * inset, size.height - 2 * inset)
+                val corner = CornerRadius(SWITCH_CORNER_DP.dp.toPx())
+                drawRoundRect(brush = fill, topLeft = topLeft, size = paneSize, cornerRadius = corner)
+                drawRoundRect(
+                    brush =
+                    Brush.verticalGradient(
+                        listOf(
+                            accent.copy(alpha = SWITCH_EDGE_TOP * tintAlpha),
+                            accent.copy(alpha = SWITCH_EDGE_BOTTOM * tintAlpha),
+                        ),
                     ),
-                ),
-                topLeft = topLeft,
-                size = paneSize,
-                cornerRadius = corner,
-                style = Stroke(width = SWITCH_EDGE_DP.dp.toPx()),
-            )
+                    topLeft = topLeft,
+                    size = paneSize,
+                    cornerRadius = corner,
+                    style = Stroke(width = SWITCH_EDGE_DP.dp.toPx()),
+                )
+            } else {
+                drawRect(brush = fill)
+                drawRect(
+                    color = accent.copy(alpha = SWITCH_BAR_ALPHA * tintAlpha),
+                    size = Size(SWITCH_BAR_DP.dp.toPx(), size.height),
+                )
+            }
         }
-    }
 }
+
+private const val EDGE_TOLERANCE_PX = 6f
+private const val SWITCH_BAR_ALPHA = 0.9f
+private const val SWITCH_BAR_DP = 3f
 
 private const val SWITCH_TINT_TOP = 0.16f
 private const val SWITCH_TINT_BOTTOM = 0.04f
