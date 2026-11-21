@@ -267,9 +267,7 @@ fun NetworkHealthScreen(
                     modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
                     state = listState,
                     // The rows keep the same 16 dp sides as the summary card and the search field above them.
-                    // The first row starts below the shadow of the search field, which showed through the see-through card as a
-                    // dark band with a lighter square inside it.
-                    contentPadding = PaddingValues(top = 20.dp, bottom = LocalFloatingBarInset.current),
+                    contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
                 ) {
                     items(uiState.nodes, key = { it.num }) { node ->
                         NodeHealthRow(

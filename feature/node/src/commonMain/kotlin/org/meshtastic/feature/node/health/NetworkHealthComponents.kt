@@ -28,6 +28,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -448,7 +451,12 @@ internal fun NodeHealthRow(
     val level = metric.levelFor(node)
     val accent = level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
-    val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
+    val resting = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
+    // The pointer resting on a row changes the colour of the whole row evenly (no lighter square inside it).
+    val hoverSource = remember { MutableInteractionSource() }
+    val hovered by hoverSource.collectIsHoveredAsState()
+    val container =
+        if (hovered) MaterialTheme.colorScheme.onSurface.copy(alpha = ROW_HOVER_ALPHA).compositeOver(resting) else resting
     val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
     // The history already holds the noise floor after the LNA correction.
     val shownValue = node.valueFor(metric)
@@ -458,7 +466,7 @@ internal fun NodeHealthRow(
     CompositionLocalProvider(LocalIndication provides NoIndicationFactory) {
     Card(
         onClick = onClick,
-        modifier = modifier.pressSpring(),
+        modifier = modifier.pressSpring().hoverable(hoverSource),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = container),
     ) {
@@ -555,6 +563,7 @@ private object NoIndicationFactory : IndicationNodeFactory {
 }
 
 private const val NAME_BADGE_CHARS = 4
+private const val ROW_HOVER_ALPHA = 0.08f
 
 /** Round badge with the node's short name, ringed in the verdict colour. */
 @Composable
