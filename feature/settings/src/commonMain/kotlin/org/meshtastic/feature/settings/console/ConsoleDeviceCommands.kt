@@ -537,30 +537,15 @@ private const val MAX_CHANNEL = 7
 internal fun findNode(nodes: List<Node>, text: String): Node? {
     val key = ConsoleText.fold(text)
     if (key.isEmpty()) return null
-    nodes
-        .firstOrNull { ConsoleText.fold(it.user.id) == key }
-        ?.let {
-            return it
-        }
-    key.toLongOrNull()?.let { number ->
-        nodes
-            .firstOrNull { it.num.toLong() and 0xFFFFFFFFL == number }
-            ?.let {
-                return it
-            }
-    }
-    nodes
-        .firstOrNull { ConsoleText.fold(it.user.short_name) == key }
-        ?.let {
-            return it
-        }
-    nodes
-        .firstOrNull { ConsoleText.fold(it.effectiveLongName) == key }
-        ?.let {
-            return it
-        }
-    return nodes.filter { ConsoleText.fold(it.effectiveLongName).contains(key) }.singleOrNull()
+    return nodes.firstOrNull { ConsoleText.fold(it.user.id) == key }
+        ?: key.toLongOrNull()?.let { number -> nodes.firstOrNull { it.num.toLong() and UNSIGNED_INT_MASK == number } }
+        ?: nodes.firstOrNull { ConsoleText.fold(it.user.short_name) == key }
+        ?: nodes.firstOrNull { ConsoleText.fold(it.effectiveLongName) == key }
+        ?: nodes.singleOrNull { ConsoleText.fold(it.effectiveLongName).contains(key) }
 }
+
+private const val UNSIGNED_INT_MASK = 0xFFFFFFFFL
+private const val HEX_RADIX = 16
 
 /** The commands that act on the connected device; the same set as the commands of the Meshtastic command line. */
 fun buildDeviceCommands(
@@ -650,7 +635,7 @@ fun buildDeviceCommands(
                             own.effectiveLongName,
                             own.user.short_name,
                             own.user.id,
-                            own.num.toLong() and 0xFFFFFFFFL,
+                            own.num.toLong() and UNSIGNED_INT_MASK,
                         ),
                         getStringSuspend(Res.string.console_out_info_nodes, env.nodes().size),
                     ),
@@ -851,14 +836,14 @@ fun buildDeviceCommands(
                     "${labels.set.name} ${it.name} ${quote(it.read(settings.first, settings.second))}"
                 }
                 val channelLines =
-                    device.channels().flatMapIndexed { index, channel ->
+                    device.channels().flatMapIndexed { position, channel ->
+                        fun line(field: Int, value: String) =
+                            "${labels.channelSet.name} $position ${labels.channelFields[field]} $value"
                         listOf(
-                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_NAME]} ${quote(
-                                channel.name,
-                            )}",
-                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_PSK]} base64:${channel.psk.base64()}",
-                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_UPLINK]} ${channel.uplink_enabled}",
-                            "${labels.channelSet.name} $index ${labels.channelFields[CHANNEL_FIELD_DOWNLINK]} ${channel.downlink_enabled}",
+                            line(CHANNEL_FIELD_NAME, quote(channel.name)),
+                            line(CHANNEL_FIELD_PSK, "base64:${channel.psk.base64()}"),
+                            line(CHANNEL_FIELD_UPLINK, "${channel.uplink_enabled}"),
+                            line(CHANNEL_FIELD_DOWNLINK, "${channel.downlink_enabled}"),
                         )
                     }
                 ConsoleResult(setLines + channelLines)
@@ -1151,7 +1136,7 @@ private fun parsePsk(text: String): ByteString? = when {
 
 /** A number written in decimal or as `0x…`. */
 private fun parseNumber(text: String): Long? = if (text.startsWith("0x", ignoreCase = true)) {
-    text.drop(2).toLongOrNull(16)
+    text.drop(2).toLongOrNull(HEX_RADIX)
 } else {
     text.toLongOrNull()
 }

@@ -17,6 +17,7 @@
 package org.meshtastic.feature.settings.console
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CancellationException
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Job
@@ -50,6 +51,7 @@ import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
 
 /** What the console screen shows and remembers: the printed lines, the typed line and the earlier lines. */
+@Suppress("LongParameterList", "TooManyFunctions")
 @KoinViewModel
 class ConsoleViewModel(
     private val nodeRepository: NodeRepository,
@@ -84,6 +86,8 @@ class ConsoleViewModel(
         return try {
             block(num)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Logger.w(e) { "Console command failed" }
             false
