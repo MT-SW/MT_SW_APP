@@ -155,11 +155,14 @@ fun MenuFAB(
     }
 }
 
-private fun Modifier.glassLook(shape: Shape, decor: FilledDecor): Modifier = when {
-    decor.outline != null -> outlineGlassSurface(shape, decor)
-    decor.glass != null -> glassSurface(shape, decor.glass)
-    else -> this
-}
+@Composable
+private fun Modifier.glassLook(shape: Shape, decor: FilledDecor): Modifier = floatingBacking(shape, decor).then(
+    when {
+        decor.outline != null -> Modifier.outlineGlassSurface(shape, decor)
+        decor.glass != null -> Modifier.glassSurface(shape, decor.glass)
+        else -> Modifier
+    },
+)
 
 data class MenuFABItem(val label: String, val icon: ImageVector, val onClick: () -> Unit, val testTag: String? = null)
 

@@ -29,6 +29,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,19 @@ private fun Modifier.decorated(decor: FilledDecor, shape: Shape): Modifier = whe
     decor.glass != null -> glassSurface(shape, decor.glass)
     else -> this
 }
+
+/**
+ * A floating button sits over lists and maps, so its clear glass lets the content behind it show through too much. A
+ * little of the surface colour behind the glass keeps it readable; the glass itself and its outline are drawn on top.
+ */
+@Composable
+internal fun Modifier.floatingBacking(shape: Shape, decor: FilledDecor): Modifier {
+    if (!decor.custom) return this
+    val color = MaterialTheme.colorScheme.surface.copy(alpha = FLOATING_BACKING_ALPHA)
+    return drawBehind { drawOutline(outline = shape.createOutline(size, layoutDirection, this), color = color) }
+}
+
+private const val FLOATING_BACKING_ALPHA = 0.45f
 
 /** The strong colour that goes with a "container" colour of the theme, so a floating button has a clear outline. */
 @Composable
@@ -92,7 +106,7 @@ fun FloatingActionButton(
     val decor = rememberDecorFor(accent, accent, enabled = true)
     MaterialFloatingActionButton(
         onClick = onClick,
-        modifier = modifier.decorated(decor, shape),
+        modifier = modifier.floatingBacking(shape, decor).decorated(decor, shape),
         shape = shape,
         containerColor = if (decor.custom) Color.Transparent else containerColor,
         contentColor = decor.outline?.text ?: contentColor,
@@ -120,7 +134,7 @@ fun ExtendedFloatingActionButton(
         text = text,
         icon = icon,
         onClick = onClick,
-        modifier = modifier.decorated(decor, shape),
+        modifier = modifier.floatingBacking(shape, decor).decorated(decor, shape),
         shape = shape,
         containerColor = if (decor.custom) Color.Transparent else containerColor,
         contentColor = decor.outline?.text ?: contentColor,
