@@ -92,12 +92,25 @@ jobs:
         if: ${{ env.KEYSTORE != '' }}
         run: ./gradlew :androidApp:assembleFdroidRelease
 
+      # Gołe pliki w jednym folderze: bez tego upload-artifact odtwarza podfoldery z katalogu budowania
+      # (np. msi/, exe/, jars/) i każdy plik ląduje w osobnym folderze w archiwum.
+      - name: Collect the built files into one folder
+        shell: bash
+        run: |
+          shopt -s nullglob
+          mkdir -p flat
+          for f in \
+            androidApp/build/outputs/apk/fdroid/debug/*.apk \
+            androidApp/build/outputs/apk/fdroid/release/*.apk; do
+            cp "$f" flat/
+          done
+          ls -la flat
+
       - uses: actions/upload-artifact@v4
         with:
           name: android-apks
           path: |
-            androidApp/build/outputs/apk/fdroid/debug/*.apk
-            androidApp/build/outputs/apk/fdroid/release/*.apk
+            flat/*
           if-no-files-found: ignore
           retention-days: 30
 
@@ -170,13 +183,26 @@ jobs:
             echo "$NEW"
           done
 
+      # Gołe pliki w jednym folderze: bez tego upload-artifact odtwarza podfoldery z katalogu budowania
+      # (np. msi/, exe/, jars/) i każdy plik ląduje w osobnym folderze w archiwum.
+      - name: Collect the built files into one folder
+        shell: bash
+        run: |
+          shopt -s nullglob
+          mkdir -p flat
+          for f in \
+            desktopApp/build/compose/binaries/main/msi/*.msi \
+            desktopApp/build/compose/binaries/main/exe/*.exe \
+            desktopApp/build/compose/jars/*.jar; do
+            cp "$f" flat/
+          done
+          ls -la flat
+
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-windows
           path: |
-            desktopApp/build/compose/binaries/main/msi/*.msi
-            desktopApp/build/compose/binaries/main/exe/*.exe
-            desktopApp/build/compose/jars/*.jar
+            flat/*
           if-no-files-found: ignore
           retention-days: 30
 
@@ -245,14 +271,27 @@ jobs:
           BINARIES_DIR: desktopApp/build/compose/binaries/main
         run: scripts/build-appimage.sh
 
+      # Gołe pliki w jednym folderze: bez tego upload-artifact odtwarza podfoldery z katalogu budowania
+      # (np. msi/, exe/, jars/) i każdy plik ląduje w osobnym folderze w archiwum.
+      - name: Collect the built files into one folder
+        shell: bash
+        run: |
+          shopt -s nullglob
+          mkdir -p flat
+          for f in \
+            desktopApp/build/compose/binaries/main/deb/*.deb \
+            desktopApp/build/compose/binaries/main/rpm/*.rpm \
+            desktopApp/build/compose/binaries/main/appimage/*.AppImage \
+            desktopApp/build/compose/jars/*.jar; do
+            cp "$f" flat/
+          done
+          ls -la flat
+
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-linux
           path: |
-            desktopApp/build/compose/binaries/main/deb/*.deb
-            desktopApp/build/compose/binaries/main/rpm/*.rpm
-            desktopApp/build/compose/binaries/main/appimage/*.AppImage
-            desktopApp/build/compose/jars/*.jar
+            flat/*
           if-no-files-found: ignore
           retention-days: 30
 
@@ -304,12 +343,25 @@ jobs:
           echo "Gradle tasks:$TASKS"
           ./gradlew $TASKS -Pdesktop.release=true --no-daemon
 
+      # Gołe pliki w jednym folderze: bez tego upload-artifact odtwarza podfoldery z katalogu budowania
+      # (np. msi/, exe/, jars/) i każdy plik ląduje w osobnym folderze w archiwum.
+      - name: Collect the built files into one folder
+        shell: bash
+        run: |
+          shopt -s nullglob
+          mkdir -p flat
+          for f in \
+            desktopApp/build/compose/binaries/main/dmg/*.dmg \
+            desktopApp/build/compose/jars/*.jar; do
+            cp "$f" flat/
+          done
+          ls -la flat
+
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-macos
           path: |
-            desktopApp/build/compose/binaries/main/dmg/*.dmg
-            desktopApp/build/compose/jars/*.jar
+            flat/*
           if-no-files-found: ignore
           retention-days: 30
 
