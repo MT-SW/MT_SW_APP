@@ -1721,7 +1721,7 @@
     <string name="firmware_maintenance_upgrade_confirm_text">Installs a faster bootloader on %1$s, then reinstalls the firmware. Keep the device connected until it finishes.</string>
     <string name="firmware_maintenance_upgrade_confirm_title">Upgrade bootloader?</string>
     <string name="firmware_maintenance_wrong_destination">That location isn't the device's update drive, so nothing was written to the device. Select the removable drive that appears when the device is in update mode.</string>
-    <string name="firmware_old">The radio firmware is too old to talk to this application. For more information on this see <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">our Firmware Installation guide</a>.</string>
+    <string name="firmware_old">The radio firmware is too old to talk to this application. For more information on this see &lt;a href="https://meshtastic.org/docs/getting-started/flashing-firmware"&gt;our Firmware Installation guide&lt;/a&gt;.</string>
     <string name="firmware_recovery_banner">Finish updating %1$s</string>
     <string name="firmware_recovery_ble_failed">Couldn't finish over Bluetooth. This stock bootloader can't resume an interrupted update. Connect it over USB and reflash it with a serial DFU tool such as adafruit-nrfutil.</string>
     <string name="firmware_recovery_button">Resume firmware update</string>
@@ -2724,7 +2724,7 @@
     <string name="mt_sw_planner_open_summary">Simulates the radio link between two points with terrain and link budget. Also under the map's buttons and on a node's page</string>
     <string name="mt_sw_terrain_open_summary">The skyline all round with the nodes placed against it, green in sight and red hidden; the camera view is an addition. Also under the mesh view button next to the planner on the map</string>
     <string name="must_set_region">You must set a region!</string>
-    <string name="must_update">You must update this application on the app store (or Github). It is too old to talk to this radio firmware.  Please read our <a href="https://meshtastic.org/docs/software/android/installation">docs</a> on this topic.</string>
+    <string name="must_update">You must update this application on the app store (or Github). It is too old to talk to this radio firmware.  Please read our &lt;a href="https://meshtastic.org/docs/software/android/installation"&gt;docs&lt;/a&gt; on this topic.</string>
     <!-- MUTE -->
     <string name="mute_1_hour">1 hour</string>
     <string name="mute_1_month">1 month</string>
