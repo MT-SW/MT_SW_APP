@@ -81,6 +81,7 @@ class ConsoleViewModel(
     }
 
     /** Runs [block] with the number of the connected device; false when none is connected or the call failed. */
+    @Suppress("TooGenericExceptionCaught")
     private suspend fun onDevice(block: suspend (Int) -> Unit): Boolean {
         val num = nodeRepository.myNodeInfo.value?.myNodeNum ?: return false
         return try {
@@ -88,7 +89,7 @@ class ConsoleViewModel(
             true
         } catch (e: CancellationException) {
             throw e
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+        } catch (e: Exception) {
             Logger.w(e) { "Console command failed" }
             false
         }
