@@ -772,7 +772,6 @@ open class ScannerViewModel(
             isValidDeviceAddress(shown) &&
                 isValidDeviceAddress(address) &&
                 shown != address &&
-                serviceRepository.connectionState.value is ConnectionState.Connected &&
                 UiOptions(uiPrefs.uiOptions.value)[UiOptions.RADIO_BACKGROUND] == 1
         if (!possible) return false
         val id = prefs.slots.value.firstOrNull { it.address == address }?.id ?: prefs.put(address, null) ?: return false
