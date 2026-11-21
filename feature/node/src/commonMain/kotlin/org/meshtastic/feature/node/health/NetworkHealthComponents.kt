@@ -464,9 +464,15 @@ internal fun NodeHealthRow(
     // The standard touch/hover layer of a clickable card drew a lighter rectangle inside this see-through card (seen
     // when the pointer rests on a row); the row gives way under the touch instead (see pressSpring).
     CompositionLocalProvider(LocalIndication provides NoIndicationFactory) {
+    // A plain card made clickable by hand: the built-in clickable card draws its own touch/hover layer, which showed
+    // as a lighter square inside this see-through card.
     Card(
-        onClick = onClick,
-        modifier = modifier.pressSpring().hoverable(hoverSource),
+        modifier =
+        modifier
+            .pressSpring()
+            .clip(MaterialTheme.shapes.large)
+            .hoverable(hoverSource)
+            .clickable(interactionSource = hoverSource, indication = null, onClick = onClick),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = container),
     ) {
