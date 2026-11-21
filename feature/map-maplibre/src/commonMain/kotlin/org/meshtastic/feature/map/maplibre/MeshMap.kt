@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.maplibre
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -571,7 +572,9 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
     // packet re-frames over them) one of the two failure modes was always reachable. Nothing here restarts on
     // node changes now, so the latch and the fit cannot come apart.
     val currentNodes by rememberUpdatedState(nodes)
-    val fitPadding = MeshMapFitPadding.toDpPadding(LocalLayoutDirection.current)
+    // MT_SW: the floating bar lies over the map, so the nodes are kept clear of it too (the zoom buttons already are).
+    val direction = LocalLayoutDirection.current
+    val barInset by rememberUpdatedState(LocalFloatingBarInset.current)
     // An effect, not composition-body work: a launch from composition fires even if the composition is
     // abandoned, while its state write is rolled back — a camera jump with no framing recorded. Fitting before
     // the map reports a viewport silently lands on a default, hence the gate.
@@ -580,7 +583,14 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
         // Waits for the first node set that has anything to frame; a mesh still filling in reports none.
         val box = snapshotFlow { nodesBoundingBox(currentNodes) }.filterNotNull().first()
         hasFramed = true
-        mapState.frameBounds(box, padding = fitPadding)
+        val fitPadding =
+            PaddingValues(
+                start = MeshMapFitPadding.calculateStartPadding(direction),
+                top = MeshMapFitPadding.calculateTopPadding(),
+                end = MeshMapFitPadding.calculateEndPadding(direction),
+                bottom = MeshMapFitPadding.calculateBottomPadding() + barInset,
+            )
+        mapState.frameBounds(box, padding = fitPadding.toDpPadding(direction))
     }
 }
 
