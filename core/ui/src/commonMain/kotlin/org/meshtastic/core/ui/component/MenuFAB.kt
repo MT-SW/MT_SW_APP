@@ -16,7 +16,12 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -119,6 +124,8 @@ fun MenuFAB(
             val itemModifier = if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier
             if (decor.custom) {
                 val shape = CircleShape
+                // Shown only while the menu is open (the Material items hide themselves, these have to be told).
+                AnimatedVisibility(visible = expanded, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
                 Row(
                     modifier =
                     itemModifier
@@ -134,6 +141,7 @@ fun MenuFAB(
                         Icon(item.icon, contentDescription = null)
                         Text(item.label)
                     }
+                }
                 }
             } else {
                 FloatingActionButtonMenuItem(

@@ -679,6 +679,19 @@ fun ConnectionsScreen(
                     activeCard()
                 } else {
                     Card(modifier = Modifier.fillMaxWidth()) {
+                        if (radio != null && (radio.status == RadioStatus.Connecting || radio.progress != null)) {
+                            // A device that is being connected in the background looks the same as the main connection card
+                            // (spinner, name, address, step); the device shown in the app does not change.
+                            ConnectingDeviceInfo(
+                                deviceName = radio.name?.takeIf { it.isNotBlank() } ?: radio.address.drop(1),
+                                deviceAddress = radio.address.drop(1),
+                                connectionStatus = ConnectionStatus.CONNECTING,
+                                connectionProgress = radio.progress,
+                                transportStatus = null,
+                                onClickDisconnect = { radios.onDisconnect(slotId) },
+                                modifier = Modifier.heightIn(min = CardMinHeight),
+                            )
+                        } else {
                         RadioSlotCard(
                             slotId = slotId,
                             slotCount = SLOT_COUNT,
@@ -694,6 +707,7 @@ fun ConnectionsScreen(
                             onRemove = { radios.onRemove(slotId) },
                             minHeight = CardMinHeight,
                         )
+                        }
                     }
                 }
             }
