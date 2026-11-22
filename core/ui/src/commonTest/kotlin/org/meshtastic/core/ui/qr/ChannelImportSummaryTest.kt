@@ -418,35 +418,23 @@ class ChannelImportSummaryTest {
     }
 
     @Test
-    fun a_channel_on_a_public_key_is_not_described_as_sharing_precise_position() {
-        // The import caps position precision on a publicly decryptable key, so the summary must describe the capped
-        // value that is written, not the 32 bits the link asked for.
+    fun a_channel_on_a_public_key_is_described_by_the_precision_it_was_shared_with() {
+        // Nothing caps the position precision on import, so the summary describes the value in the link.
         val publicKey = sharingSettings(precisionBits = 32, psk = 1)
 
-        assertEquals(PositionSharing.Approximate, importedChannelSharing(listOf(publicKey)).single().position)
+        assertEquals(PositionSharing.Precise, importedChannelSharing(listOf(publicKey)).single().position)
     }
 
     @Test
-    fun deselecting_the_primary_describes_the_rows_after_it_by_the_key_they_then_inherit() {
-        // A channel with no key of its own takes the first written channel's key, and precision is capped only on a
-        // publicly decryptable key (Channel.usesPublicKey).
+    fun deselecting_the_primary_does_not_change_the_other_rows() {
         val publicPrimary = sharingSettings(precisionBits = 32, psk = 1)
-        val privateChannel =
-            sharingSettings(precisionBits = 32)
-                .newBuilder()
-                .also { it.psk = ByteArray(32) { 3 }.toByteString() }
-                .build()
         val inheriting =
             sharingSettings(precisionBits = 32).newBuilder().also { it.psk = ByteArray(0).toByteString() }.build()
-        val settings = listOf(publicPrimary, privateChannel, inheriting)
+        val settings = listOf(publicPrimary, inheriting)
 
         assertEquals(
-            PositionSharing.Approximate,
-            importedChannelSharing(settings, listOf(true, true, true))[2].position,
-        )
-        assertEquals(
-            PositionSharing.Precise,
-            importedChannelSharing(settings, listOf(false, true, true))[2].position,
+            importedChannelSharing(settings, listOf(true, true))[1],
+            importedChannelSharing(settings, listOf(false, true))[1],
         )
     }
 

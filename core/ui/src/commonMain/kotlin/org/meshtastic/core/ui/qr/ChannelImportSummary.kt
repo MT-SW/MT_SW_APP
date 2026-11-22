@@ -21,7 +21,6 @@ import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.loraBandwidthMegahertz
 import org.meshtastic.core.model.schemaLabelRes
-import org.meshtastic.core.model.util.withOnWirePrecision
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.disabled
 import org.meshtastic.core.resources.enabled
@@ -312,20 +311,17 @@ internal data class ChannelSharing(val uplink: Boolean, val downlink: Boolean, v
         get() = uplink || downlink || position != PositionSharing.None
 }
 
-/** The sharing each imported channel is written with, after the position precision cap the import applies. */
+/** The sharing each imported channel is written with (the position precision is never capped here). */
 internal fun importedChannelSharing(settings: List<ChannelSettings>): List<ChannelSharing> =
-    settings.withOnWirePrecision().map(::channelSharing)
+    settings.map(::channelSharing)
 
 /**
- * The sharing each row is written with given which rows are [selected]. The precision cap depends on the first channel
- * written, so deselecting the primary changes the rows after it. An unselected row shows what selecting it would write.
+ * The sharing each row is written with. Every channel keeps the position precision it was shared with, so the rows do
+ * not depend on each other and [selected] changes nothing; an unselected row shows what selecting it would write.
  */
+@Suppress("UNUSED_PARAMETER", "UnusedParameter")
 internal fun importedChannelSharing(settings: List<ChannelSettings>, selected: List<Boolean>): List<ChannelSharing> =
-    settings.indices.map { row ->
-        val written = settings.filterIndexed { index, _ -> index == row || selected.getOrNull(index) == true }
-        val position = (0 until row).count { selected.getOrNull(it) == true }
-        channelSharing(written.withOnWirePrecision()[position])
-    }
+    importedChannelSharing(settings)
 
 private fun channelSharing(onWire: ChannelSettings): ChannelSharing {
     val bits = onWire.module_settings?.position_precision ?: 0
