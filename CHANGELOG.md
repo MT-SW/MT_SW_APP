@@ -195,6 +195,9 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Plakietki węzłów (wszystkie wersje): szklany wygląd z lekkim gradientem (jaśniejsza góra) i cienkim obrysem — w listach, na pasku górnym, na mapie i w panoramie terenu wyglądają tak samo. Na mapie ogonek plakietki jest osobnym trójkącikiem z obrysem, z niewielką przerwą pod plakietką, a pod nim kropka w dokładnym miejscu węzła.
+* Mapa (wszystkie wersje): linie łączące węzły mają cienki jasny obrys po obu stronach koloru linii.
+* Panorama terenu (wszystkie wersje): przyciski wyboru (zasięg, węzły do, antena, kompas) są szklane, z gradientem, obrysem i cieniem wybranego wyglądu; wybrany ma żółty obrys. Plakietki węzłów w panoramie mają ten sam wygląd co na mapie, a kolor obrysu dalej mówi, czy węzeł stoi nad grzbietem.
 * Zdrowie sieci (wszystkie wersje): karty węzłów znów rzucają cień (zaokrąglenie przycinało tylko ich wnętrze, a nie całą kartę).
 * Procenty (wszystkie wersje): w „Dostępność węzła”, w poleceniu konsoli „bateria” i w kilku opisach pokazywało się „72%%” zamiast „72%”.
 * Konsola (wszystkie wersje): przyciski podpowiedzi komend mają własne tło i nie prześwituje przez nie cień (na Windowsie wyglądały jak szary placek); na ciemnym motywie mają cienką obwódkę, żeby było widać górną krawędź.
@@ -1129,6 +1132,9 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Node chips (all versions): a glass look with a light gradient (lighter top) and a thin outline — the same in the lists, the top bar, on the map and in the terrain panorama. On the map the chip's tail is a separate outlined triangle with a small gap below the chip, and below it a dot at the node's exact spot.
+* Map (all versions): the lines between nodes have a thin light outline on both sides of the line's colour.
+* Terrain panorama (all versions): the choice buttons (range, nodes up to, antenna, compass) are glass, with a gradient, an outline and the shadow of the chosen look; the chosen one has a yellow outline. The node chips in the panorama look like those on the map, and the colour of the outline still tells whether the node stands above the ridge.
 * Network health (all versions): node cards cast their shadow again (the rounding only clipped their inside, not the whole card).
 * Percent signs (all versions): "Node availability", the console command "battery" and a few descriptions showed "72%%" instead of "72%".
 * Console (all versions): the command suggestion buttons have their own fill and the shadow no longer shows through them (on Windows they looked like a grey smear); on a dark theme they have a thin rim so the upper edge is visible.
