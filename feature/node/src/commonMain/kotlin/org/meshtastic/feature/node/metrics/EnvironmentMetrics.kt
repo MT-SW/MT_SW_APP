@@ -168,6 +168,7 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
                     modifier = modifier,
                     telemetries = filteredTelemetries.reversed(),
                     chartKey = "environment-power",
+                    breakAtGaps = false,
                     currentOf = { it.environment_metrics?.current ?: Float.NaN },
                     voltageOf = { it.environment_metrics?.voltage ?: Float.NaN },
                     vicoScrollState = vicoScrollState,

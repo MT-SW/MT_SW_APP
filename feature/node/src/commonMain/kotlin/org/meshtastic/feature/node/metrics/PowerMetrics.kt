@@ -317,10 +317,15 @@ private fun PowerMetricsChart(
     )
 }
 
+private fun runsOf(data: List<Telemetry>, breakAtGaps: Boolean): List<List<Telemetry>> =
+    if (breakAtGaps) splitAtGaps(data) { it.time } else listOf(data)
+
 /**
  * The current (left axis) and voltage (right axis) line chart of the power metrics log. [currentOf] and [voltageOf]
  * pick the readings out of a telemetry (NaN when absent), so the same chart also draws the voltage and current an
- * environment sensor reports. [chartKey] restarts the data when the picked source changes.
+ * environment sensor reports. [chartKey] restarts the data when the picked source changes. With [breakAtGaps] false
+ * the readings are one continuous line (the environment sensor reports in bursts, so cutting the line at every pause
+ * left only short stubs).
  */
 @Suppress("LongMethod")
 @Composable
@@ -333,6 +338,7 @@ internal fun PowerLineChart(
     vicoScrollState: VicoScrollState,
     selectedX: Double?,
     onPointSelected: (Double) -> Unit,
+    breakAtGaps: Boolean = true,
 ) {
     MetricChartScaffold(isEmpty = telemetries.isEmpty(), legendData = LEGEND_DATA, modifier = modifier) {
             modelProducer,
@@ -368,7 +374,7 @@ internal fun PowerLineChart(
             modelProducer.runTransaction {
                 if (currentData.isNotEmpty()) {
                     lineModel {
-                        splitAtGaps(currentData) { it.time }
+                        runsOf(currentData, breakAtGaps)
                             .forEach { run ->
                                 series(x = run.map { it.time }, y = run.map { currentOf(it) })
                             }
@@ -376,7 +382,7 @@ internal fun PowerLineChart(
                 }
                 if (voltageData.isNotEmpty()) {
                     lineModel {
-                        splitAtGaps(voltageData) { it.time }
+                        runsOf(voltageData, breakAtGaps)
                             .forEach { run ->
                                 series(x = run.map { it.time }, y = run.map { voltageOf(it) })
                             }
