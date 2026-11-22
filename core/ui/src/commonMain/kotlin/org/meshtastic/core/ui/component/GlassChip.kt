@@ -59,13 +59,13 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
 
-private const val STANDARD_TOP_LIGHTEN = 0.45f
+private const val STANDARD_TOP_LIGHTEN = 0.40f
 private const val STANDARD_BOTTOM_DARKEN = 0.22f
-private const val STANDARD_TOP_ALPHA = 0.85f
-private const val STANDARD_BOTTOM_ALPHA = 0.55f
-private const val STANDARD_RIM_LIGHTEN = 0.60f
-private const val STANDARD_RIM_ALPHA = 1f
-private const val STANDARD_RIM_DP = 2f
+private const val STANDARD_TOP_ALPHA = 0.72f
+private const val STANDARD_BOTTOM_ALPHA = 0.45f
+private const val STANDARD_RIM_LIGHTEN = 0.45f
+private const val STANDARD_RIM_ALPHA = 0.7f
+private const val STANDARD_RIM_DP = 1.5f
 
 /**
  * The fill of a node chip from top to bottom for the chosen [style] (one of `UiOptions.NODE_CHIP_*`): flat is the plain

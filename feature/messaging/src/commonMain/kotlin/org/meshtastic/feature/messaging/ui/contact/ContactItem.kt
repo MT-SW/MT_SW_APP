@@ -269,8 +269,8 @@ private fun ContactHeader(
 }
 
 private const val UNREAD_MESSAGE_LIMIT = 99
-private const val NODE_CHIP_MIN_WIDTH_DP = 80
-private const val NODE_CHIP_MIN_HEIGHT_DP = 34
+private const val NODE_CHIP_MIN_WIDTH_DP = 68
+private const val NODE_CHIP_MIN_HEIGHT_DP = 32
 private const val DESCRIPTION_MAX_LINES = 4
 
 @Composable
