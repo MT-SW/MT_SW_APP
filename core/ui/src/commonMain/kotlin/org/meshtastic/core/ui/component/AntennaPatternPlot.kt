@@ -63,8 +63,8 @@ fun AntennaPatternPlot(beamwidthDeg: Double, frontToBackDb: Double, modifier: Mo
             if (deg == 0) path.moveTo(p.x, p.y) else path.lineTo(p.x, p.y)
         }
         path.close()
-        // MT_SW: the glass look inside the outline: a soft gradient that gets stronger towards the main direction, a pale
-        // sheen along the top, the outline itself and a thin light line just inside it. No shadow.
+        // MT_SW: the glass look inside the outline: a soft gradient, stronger towards the main direction, a pale sheen
+        // along the top, the outline itself and a thin light line just inside it. No shadow.
         drawPath(
             path,
             Brush.radialGradient(
