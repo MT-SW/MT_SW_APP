@@ -109,7 +109,7 @@ private fun DirectionLayers(
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.White)),
         width = const((if (hollow) HOLLOW_EDGE_DP else LINE_WIDTH_DP.toFloat()).dp),
-        gapWidth = const((if (hollow) LINE_WIDTH_DP else 0).dp),
+        gapWidth = const((if (hollow) HOLLOW_GAP_DP else 0f).dp),
         // Positive offsets are to the right of the line's own direction, so the opposite direction lands on the far
         // side.
         offset = const(SEPARATION_DP.dp),
@@ -230,6 +230,9 @@ private const val LINE_WIDTH_DP = 3
 
 /** The thickness of each edge of a line drawn as an outline only. */
 private const val HOLLOW_EDGE_DP = 1.5f
+
+/** The empty space between the two edges of such a line. */
+private const val HOLLOW_GAP_DP = 0.75f
 private const val SEPARATION_DP = 3
 private const val SEPARATION_EM = 0.125f
 private const val ARROW_BACK_EM = 0.45f

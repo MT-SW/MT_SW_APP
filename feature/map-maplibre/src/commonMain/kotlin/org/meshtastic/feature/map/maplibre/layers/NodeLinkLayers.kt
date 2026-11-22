@@ -75,8 +75,8 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
     // MT_SW: in the glass look a link is only an outline in the colour of the link, with nothing inside (a thin edge on
     // both sides of an empty gap). The other looks keep the filled line with a light outline under it.
     if (rememberViewStyle() == UiOptions.VIEW_STYLE_GLASS) {
-        HollowLinkLayer("node-links-direct", heardSource, HEARD_WIDTH_DP, HEARD_OPACITY)
-        HollowLinkLayer("node-links-reported", reportedSource, REPORTED_WIDTH_DP, REPORTED_OPACITY)
+        HollowLinkLayer("node-links-direct", heardSource, HEARD_OPACITY)
+        HollowLinkLayer("node-links-reported", reportedSource, REPORTED_OPACITY)
         return
     }
     LineLayer(
@@ -117,9 +117,9 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
     )
 }
 
-/** A link drawn as an outline only: two thin edges in the colour of the link round a gap [innerDp] wide. */
+/** A link drawn as an outline only: two thin edges in the colour of the link round a narrow empty gap. */
 @Composable
-private fun HollowLinkLayer(id: String, source: GeoJsonSource, innerDp: Int, opacity: Float) {
+private fun HollowLinkLayer(id: String, source: GeoJsonSource, opacity: Float) {
     LineLayer(
         id = id,
         source = source,
@@ -127,7 +127,7 @@ private fun HollowLinkLayer(id: String, source: GeoJsonSource, innerDp: Int, opa
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.Gray)),
         width = const(HOLLOW_EDGE_DP.dp),
-        gapWidth = const(innerDp.dp),
+        gapWidth = const(HOLLOW_GAP_DP.dp),
         opacity = const(opacity),
     )
 }
@@ -168,6 +168,9 @@ private const val HEARD_OPACITY = 0.5f
 
 /** The thickness of each edge of a link drawn as an outline only. */
 private const val HOLLOW_EDGE_DP = 1.5f
+
+/** The empty space between the two edges of such a link. */
+private const val HOLLOW_GAP_DP = 0.75f
 
 /** Together the two edges add this much to the width of a line (one dp on each side). */
 private const val OUTLINE_EXTRA_DP = 2
