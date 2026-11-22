@@ -64,6 +64,8 @@ private const val DROP_LIGHTEN = 0.35f
 private const val DROP_RIM_ALPHA = 0.85f
 private val DROP_SIZE = 7.dp
 private val DROP_RIM = 1.dp
+private val SELECTED_DROP_SIZE = 14.dp
+private val SELECTED_DROP_RIM = 2.dp
 
 /** The look of a line of the node's statistics, taken from the chart style chosen in "Look". */
 private class LineLook(
@@ -319,6 +321,7 @@ object ChartStyling {
             DefaultCartesianMarker.ValueFormatter.default(colorCode = true),
         showIndicator: Boolean = true,
     ): CartesianMarker {
+        val glassIndicator = rememberChartStyle(UiOptions.CHART_STYLE_NODE) != UiOptions.CHART_STYLE_FLAT
         val labelBackground =
             rememberShapeComponent(
                 fill = Fill(MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -347,17 +350,39 @@ object ChartStyling {
         val indicator =
             if (showIndicator) {
                 // Force alpha to 1f so the indicator is visible even for "invisible" lines
-                { color: Color -> ShapeComponent(fill = Fill(color.copy(alpha = 1f)), shape = CircleShape) }
+                if (glassIndicator) {
+                    { color: Color ->
+                        // A glass drop like the ones on the line, a little bigger: a lighter fill with a bright rim.
+                        ShapeComponent(
+                            fill = Fill(lerp(color.copy(alpha = 1f), Color.White, DROP_LIGHTEN)),
+                            shape = CircleShape,
+                            strokeFill = Fill(Color.White.copy(alpha = DROP_RIM_ALPHA)),
+                            strokeThickness = SELECTED_DROP_RIM,
+                        )
+                    }
+                } else {
+                    { color: Color -> ShapeComponent(fill = Fill(color.copy(alpha = 1f)), shape = CircleShape) }
+                }
             } else {
                 null
             }
 
-        return rememberDefaultCartesianMarker(
-            label = label,
-            valueFormatter = valueFormatter,
-            guideline = guideline,
-            indicator = indicator,
-        )
+        return if (glassIndicator) {
+            rememberDefaultCartesianMarker(
+                label = label,
+                valueFormatter = valueFormatter,
+                guideline = guideline,
+                indicator = indicator,
+                indicatorSize = SELECTED_DROP_SIZE,
+            )
+        } else {
+            rememberDefaultCartesianMarker(
+                label = label,
+                valueFormatter = valueFormatter,
+                guideline = guideline,
+                indicator = indicator,
+            )
+        }
     }
 
     /**

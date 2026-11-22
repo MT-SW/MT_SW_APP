@@ -96,6 +96,9 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Pełny log (włączany ręcznie) zapisuje rozmiar okna i ekranu oraz zrzut okna, gdy interfejs się wysypie (nieobsłużony wyjątek), najwyżej raz na 30 s, do 60 plików; zrzuty znikają razem z najstarszymi częściami logu (siedem dni zapisanego czasu) i trafiają do paczki z logiem w folderze „zrzuty”. Automatyczny log z 24 godzin ich nie zapisuje (Android, komputer, iPhone/iPad).
 
 ##### Naprawione błędy
+
+* Cofanie w szczegółach węzła na komputerze: strzałka na karcie szczegółów zamyka od razu wszystkie otwarte obok statystyki i pokazuje listę (dopiero kolejne cofnięcie zamyka szczegóły), zamiast przechodzić przez każdą statystykę po kolei. Strzałka w samej statystyce cofa o jedną.
+* Zaznaczenie punktu na wykresie liniowym w statystykach węzła (wszystkie wersje): w stylach innych niż Płaski zaznaczony pomiar to mniejsza szklana kropla z jasnym obrysem, a nie duże płaskie kółko.
 * Komputer: karty urządzeń w „Połącz” przełączają się teraz także strzałkami po bokach kropek (w kolorze kropek, takie same na wszystkich systemach), bo myszą nie da się ich przesunąć palcem. Kropki i strzałki mają wygląd wybrany w „Wygląd elementów”: domyślnie cienki obrys na szkle (pokazywana karta świeci kolorem motywu, pozostałe są szare), a po wybraniu starego stylu przycisków i ikon wracają zwykłe kropki i strzałki.
 * Komputer i tablet: plakietka naszego węzła i ikona listy urządzeń na górnym pasku pokazują się raz, przy skrajnej prawej kolumnie, a nie w każdej kolumnie z osobna (tak samo jak przycisk SOS).
 * Szczegóły węzła: po przełączeniu na inne radio otwarta karta szczegółów przeładowuje się na ten sam węzeł z listy nowego radia, a jeśli nowe radio go nie zna, wraca do listy (Android, komputer, iPhone/iPad, także przy kilku kolumnach).
@@ -1049,6 +1052,9 @@ The main things of every version, split by kind of change (the "What's new in th
 * The full log (switched on by hand) saves the size of the window and screen and a picture of the window when the interface crashes (an unhandled exception), at most once in 30 s, up to 60 files; the pictures go together with the oldest log parts (seven recorded days) and are put into the log package in a "zrzuty" folder. The automatic 24-hour log does not save them (Android, desktop, iPhone/iPad).
 
 ##### Fixed bugs
+
+* Going back in node details on the desktop: the arrow on the details card closes all the statistics opened beside it at once and shows the list (only the next press closes the details), instead of going through each statistic in turn. The arrow in a statistic itself goes back by one.
+* The selected point on a line chart in node statistics (all versions): in the styles other than Flat the selected measurement is a smaller glass drop with a bright rim instead of a big flat circle.
 * The map layers sheet on the iPhone and iPad no longer has overlapping text: the imported-layers list is limited in height on its own and the parts below it (including the signal survey) always keep their place.
 * The "meshtastic://meshtastic/sos" link (widget, tile, shortcut, tray menu) never opened the SOS screen; now it does.
 * Network health, node details: series names in English ("Noise Floor", "Ch. Util", "Air Util", "WiFi RSSI", "BLE RSSI") are now in Polish ("Szum tła", "Zajęcie kanału", "Czas nadawania", "RSSI Wi-Fi", "RSSI Bluetooth"), and the noise level has the unit dBm instead of dB.
