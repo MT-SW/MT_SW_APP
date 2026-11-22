@@ -59,10 +59,13 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
 
-private const val STANDARD_TOP_LIGHTEN = 0.22f
+private const val STANDARD_TOP_LIGHTEN = 0.30f
+private const val STANDARD_BOTTOM_DARKEN = 0.10f
 private const val STANDARD_TOP_ALPHA = 0.95f
-private const val STANDARD_BOTTOM_ALPHA = 0.68f
-private const val STANDARD_RIM_ALPHA = 0.50f
+private const val STANDARD_BOTTOM_ALPHA = 0.72f
+private const val STANDARD_RIM_LIGHTEN = 0.50f
+private const val STANDARD_RIM_ALPHA = 0.85f
+private const val STANDARD_RIM_DP = 1.5f
 
 /**
  * The fill of a node chip from top to bottom for the chosen [style] (one of `UiOptions.NODE_CHIP_*`): flat is the plain
@@ -74,15 +77,18 @@ fun nodeChipFillColors(style: Int, base: Color): List<Color> = when (style) {
     else ->
         listOf(
             lerp(base, Color.White, STANDARD_TOP_LIGHTEN).copy(alpha = STANDARD_TOP_ALPHA),
-            base.copy(alpha = STANDARD_BOTTOM_ALPHA),
+            lerp(base, Color.Black, STANDARD_BOTTOM_DARKEN).copy(alpha = STANDARD_BOTTOM_ALPHA),
         )
 }
 
-/** The outline of a node chip for [style]: none for flat, a thin one in the text colour otherwise; null = none. */
-fun nodeChipRim(style: Int, foreground: Color): Color? = when (style) {
+/**
+ * The outline of a node chip for [style]: none for flat, the glass one in the text colour for 3D glass and, for the
+ * standard style, a light edge of the node's own colour (as on the cards of the node list); null = none.
+ */
+fun nodeChipRim(style: Int, foreground: Color, base: Color): Color? = when (style) {
     UiOptions.NODE_CHIP_FLAT -> null
     UiOptions.NODE_CHIP_GLASS_3D -> glassChipRim(foreground)
-    else -> foreground.copy(alpha = STANDARD_RIM_ALPHA)
+    else -> lerp(base, Color.White, STANDARD_RIM_LIGHTEN).copy(alpha = STANDARD_RIM_ALPHA)
 }
 
 /**
@@ -91,10 +97,12 @@ fun nodeChipRim(style: Int, foreground: Color): Color? = when (style) {
  */
 @Composable
 fun nodeChipLook(base: Color, foreground: Color, shape: Shape, style: Int = rememberNodeChipStyle()): Modifier {
-    val rim = nodeChipRim(style, foreground)
-    val shadow =
-        if (style != UiOptions.NODE_CHIP_FLAT) Modifier.elementLook(UiOptions.GROUP_INPUT, shape) else Modifier
-    val border = if (rim != null) Modifier.border(1.dp, rim, shape) else Modifier
+    val rim = nodeChipRim(style, foreground, base)
+    // The standard style casts the shadow of the cards of the node list, the 3D glass the one of the glass inputs.
+    val shadowGroup = if (style == UiOptions.NODE_CHIP_GLASS_3D) UiOptions.GROUP_INPUT else UiOptions.GROUP_CARDS
+    val shadow = if (style != UiOptions.NODE_CHIP_FLAT) Modifier.elementLook(shadowGroup, shape) else Modifier
+    val rimWidth = if (style == UiOptions.NODE_CHIP_STANDARD) STANDARD_RIM_DP.dp else 1.dp
+    val border = if (rim != null) Modifier.border(rimWidth, rim, shape) else Modifier
     return shadow.background(Brush.verticalGradient(nodeChipFillColors(style, base)), shape).then(border)
 }
 

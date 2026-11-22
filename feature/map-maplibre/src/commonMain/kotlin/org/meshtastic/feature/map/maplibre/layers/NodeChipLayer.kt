@@ -360,7 +360,7 @@ private class ChipPainter(
 
     private fun DrawScope.drawChip(innerWidth: Float, bodyHeightPx: Float) {
         val base = Color(chip.background)
-        val styleRim = nodeChipRim(chipStyle, Color(chip.foreground))
+        val styleRim = nodeChipRim(chipStyle, Color(chip.foreground), base)
         val rim = if (chip.outlined) Color.White else styleRim ?: Color.Transparent
         val fillColors = nodeChipFillColors(chipStyle, base)
         val fill = Brush.verticalGradient(fillColors, startY = 0f, endY = bodyHeightPx)
