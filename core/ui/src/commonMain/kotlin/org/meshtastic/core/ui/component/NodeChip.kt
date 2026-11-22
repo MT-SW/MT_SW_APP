@@ -18,6 +18,7 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.defaultMinSize
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
@@ -76,17 +78,12 @@ fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit
         }
     }
 
-    if (onClick == null) {
-        Card(modifier = modifier.then(glass), shape = MaterialTheme.shapes.small, colors = colors) { content() }
-    } else {
-        Card(
-            modifier = modifier.then(glass),
-            shape = MaterialTheme.shapes.small,
-            colors = colors,
-            onClick = { onClick(node) },
-        ) {
-            content()
-        }
+    // A Card with onClick pads itself out to the 48dp touch size, and the glass drawn on its modifier would cover that
+    // whole area (big squares); so the card is not clickable itself and the click is added after the glass.
+    val clickable =
+        if (onClick == null) Modifier else Modifier.clip(MaterialTheme.shapes.small).clickable { onClick(node) }
+    Card(modifier = modifier.then(glass).then(clickable), shape = MaterialTheme.shapes.small, colors = colors) {
+        content()
     }
 }
 
