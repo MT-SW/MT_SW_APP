@@ -16,8 +16,25 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import org.meshtastic.core.model.UiOptions
 
 /**
  * MT_SW: the glass look of a node chip, shared by the chip in the lists and the top bar ([NodeChip]) and the chip the
@@ -39,3 +56,48 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
+
+private const val CHOICE_CHIP_CORNER_DP = 12
+private const val CHOICE_CHIP_SELECTED_TINT = 0.18f
+private const val CHOICE_CHIP_SELECTED_RIM_DP = 2
+
+/**
+ * MT_SW: a choice button in the glass look (gradient fill, thin outline, the soft shadow of the chosen look). The
+ * chosen one has the yellow outline and a faint yellow tint; [outline] gives an unchosen one a colour of its own.
+ * Drawn by hand, without the invisible touch area of the Material chip, so the shadow hugs the visible button.
+ */
+@Composable
+fun GlassChoiceChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+    outline: Color? = null,
+    label: @Composable () -> Unit,
+) {
+    val shape = RoundedCornerShape(CHOICE_CHIP_CORNER_DP.dp)
+    val primary = MaterialTheme.colorScheme.primary
+    val surface = MaterialTheme.colorScheme.surface
+    val base = if (selected) lerp(surface, primary, CHOICE_CHIP_SELECTED_TINT) else surface
+    val rim =
+        when {
+            selected -> primary
+            outline != null -> outline
+            else -> MaterialTheme.colorScheme.outlineVariant
+        }
+    val rimWidth = if (selected) CHOICE_CHIP_SELECTED_RIM_DP.dp else 1.dp
+    Box(
+        modifier =
+        modifier
+            .elementLook(UiOptions.GROUP_INPUT, shape)
+            .clip(shape)
+            .background(Brush.verticalGradient(glassChipColors(base)))
+            .border(rimWidth, rim, shape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        val content = if (selected) primary else MaterialTheme.colorScheme.onSurface
+        CompositionLocalProvider(LocalContentColor provides content) {
+            ProvideTextStyle(MaterialTheme.typography.labelLarge) { label() }
+        }
+    }
+}

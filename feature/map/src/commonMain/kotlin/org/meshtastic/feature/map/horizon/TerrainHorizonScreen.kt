@@ -26,7 +26,6 @@
 
 package org.meshtastic.feature.map.horizon
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,8 +49,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -176,7 +173,8 @@ import org.meshtastic.core.resources.terrain_horizon_target_antenna
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.GlassChoiceChip
+import org.meshtastic.core.ui.component.glassChipColors
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
@@ -388,9 +386,9 @@ fun TerrainHorizonScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            AssistChip(
+            GlassChoiceChip(
                 onClick = { picking = true },
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                outline = MaterialTheme.colorScheme.primary,
                 label = { Text(observerLabel(state)) },
                 modifier = Modifier.weight(1f, fill = false),
             )
@@ -1609,29 +1607,12 @@ private const val HALF_TURN_DEG = 180.0
 private const val MIN_COS_LAT = 0.01
 private const val MAX_LAT = 89.9
 
-/** A choice chip in the app's own colours: the chosen one has the yellow outline and a faint yellow fill. */
+/** A choice chip in the app's glass look: the chosen one has the yellow outline and a faint yellow tint. */
 @Composable
 private fun BrandChip(selected: Boolean, onClick: () -> Unit, label: @Composable () -> Unit) {
-    val primary = MaterialTheme.colorScheme.primary
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = label,
-        colors =
-        FilterChipDefaults.filterChipColors(
-            selectedContainerColor = primary.copy(alpha = SELECTED_FILL),
-            selectedLabelColor = primary,
-        ),
-        border =
-        BorderStroke(
-            if (selected) SELECTED_BORDER_DP.dp else 1.dp,
-            if (selected) primary else MaterialTheme.colorScheme.outlineVariant,
-        ),
-    )
+    GlassChoiceChip(onClick = onClick, selected = selected, label = label)
 }
 
-private const val SELECTED_FILL = 0.18f
-private const val SELECTED_BORDER_DP = 2
 
 /**
  * A node exactly as the main map draws it: its dot (the node's colour, white ring) on the node's point, and above it,
@@ -1662,10 +1643,14 @@ private fun DrawScope.drawNodeMarker(
     val bodyH = CHIP_HEIGHT_DP.dp.toPx()
     val tailH = CHIP_TAIL_HEIGHT_DP.dp.toPx()
     val tailHalf = CHIP_TAIL_WIDTH_DP.dp.toPx() / 2f
-    val bodyBottom = at.y - CHIP_GAP_DP.dp.toPx() - tailH
+    val detach = CHIP_TAIL_DETACH_DP.dp.toPx()
+    val bodyBottom = at.y - CHIP_GAP_DP.dp.toPx() - tailH - detach
     val top = Offset(at.x - width / 2f, max(0f, bodyBottom - bodyH))
     val corner = CornerRadius(CHIP_CORNER_DP.dp.toPx())
-    drawRoundRect(background, top, Size(width, bodyH), corner)
+    // MT_SW: glass look, the same as the chip on the main map: a gradient fill, the ring as the outline, and the tail
+    // a separate outlined triangle a little below the body.
+    val fill = Brush.verticalGradient(glassChipColors(background), startY = top.y, endY = top.y + bodyH)
+    drawRoundRect(fill, top, Size(width, bodyH), corner)
     val border = (if (focus) CHIP_FOCUS_RING_DP else CHIP_RING_DP).dp.toPx()
     drawRoundRect(
         ring,
@@ -1674,19 +1659,16 @@ private fun DrawScope.drawNodeMarker(
         corner,
         style = Stroke(border),
     )
+    val tailTop = top.y + bodyH + detach
     val tail =
         Path().apply {
-            moveTo(at.x - tailHalf, top.y + bodyH)
-            lineTo(at.x + tailHalf, top.y + bodyH)
-            lineTo(at.x, top.y + bodyH + tailH)
+            moveTo(at.x - tailHalf, tailTop)
+            lineTo(at.x + tailHalf, tailTop)
+            lineTo(at.x, tailTop + tailH)
             close()
         }
-    drawPath(tail, background)
-    drawPath(
-        tail,
-        background,
-        style = Stroke(CHIP_TAIL_ROUND_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
-    )
+    drawPath(tail, Brush.verticalGradient(glassChipColors(background), startY = tailTop, endY = tailTop + tailH))
+    drawPath(tail, ring, style = Stroke(CHIP_RING_DP.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     drawText(
         layout,
         topLeft = Offset(top.x + (width - layout.size.width) / 2f, top.y + (bodyH - layout.size.height) / 2f),
@@ -1705,7 +1687,7 @@ private const val CHIP_CORNER_DP = 6
 private const val CHIP_TAIL_HEIGHT_DP = 6
 private const val CHIP_TAIL_WIDTH_DP = 8
 private const val CHIP_GAP_DP = 8
-private const val CHIP_TAIL_ROUND_DP = 2
+private const val CHIP_TAIL_DETACH_DP = 3
 private const val CHIP_RING_DP = 1.5f
 private const val PRECISION_MIN_PX = 3f
 private const val PRECISION_FILL_ALPHA = 0.18f
