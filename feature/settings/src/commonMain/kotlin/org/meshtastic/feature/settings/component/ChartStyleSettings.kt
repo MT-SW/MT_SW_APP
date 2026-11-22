@@ -60,8 +60,8 @@ import org.meshtastic.core.ui.component.drawChartBar
 
 private val CHART_STYLES =
     listOf(
-        UiOptions.CHART_STYLE_GLASS,
         UiOptions.CHART_STYLE_RIBBON,
+        UiOptions.CHART_STYLE_GLASS,
         UiOptions.CHART_STYLE_GRADIENT,
         UiOptions.CHART_STYLE_OUTLINE,
         UiOptions.CHART_STYLE_GLOW,

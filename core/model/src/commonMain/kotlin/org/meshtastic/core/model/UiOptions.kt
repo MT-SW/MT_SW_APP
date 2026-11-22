@@ -191,7 +191,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
 
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
-         * [CHART_STYLE_GLASS] (default: glossy 3D glass with a gradient), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
+         * [CHART_STYLE_GLASS] (glossy 3D glass with a gradient), [CHART_STYLE_RIBBON] (default: glass, with thick glass lines), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
          * or [CHART_STYLE_GLOW].
          */
         const val CHART_STYLE = "charts.style"
@@ -317,7 +317,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_ALERT_SPEED, 1)
             put(RADIO_COUNT, 1)
             put(RADIO_BACKGROUND, 1)
-            put(CHART_STYLE, CHART_STYLE_GLASS)
+            put(CHART_STYLE, CHART_STYLE_RIBBON)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)
             put(NODE_CHIP_STYLE, NODE_CHIP_STANDARD)

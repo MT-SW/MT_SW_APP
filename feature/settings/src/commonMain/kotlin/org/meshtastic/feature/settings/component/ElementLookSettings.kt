@@ -597,7 +597,7 @@ private val LOOK_PRESETS =
                 UiOptions.RING_STYLE to UiOptions.RING_STYLE_THIN,
                 UiOptions.CONTROL_STYLE to UiOptions.CONTROL_STYLE_THIN,
                 UiOptions.BUTTON_STYLE to UiOptions.BUTTON_STYLE_OUTLINE_GLASS,
-                UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS,
+                UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_RIBBON,
                 UiOptions.PRESS_SPRING to 1,
             ) +
                 look(BARS, ElementLook.GLASS, 45, PRESET_BLUR) +
@@ -610,7 +610,7 @@ private val LOOK_PRESETS =
         ),
         LookPreset(
             Res.string.look_preset_glass,
-            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_GLASS) +
+            mapOf(UiOptions.PRESS_SPRING to 1, UiOptions.CHART_STYLE to UiOptions.CHART_STYLE_RIBBON) +
                 look(BARS, ElementLook.GLASS, 55, PRESET_BLUR) +
                 look(CARDS, ElementLook.TRANSPARENT, 45) +
                 look(BUBBLES, ElementLook.TRANSPARENT, 35) +
