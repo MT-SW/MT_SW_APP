@@ -93,7 +93,7 @@ fun nodeChipRim(style: Int, foreground: Color): Color? = when (style) {
 fun nodeChipLook(base: Color, foreground: Color, shape: Shape, style: Int = rememberNodeChipStyle()): Modifier {
     val rim = nodeChipRim(style, foreground)
     val shadow =
-        if (style == UiOptions.NODE_CHIP_GLASS_3D) Modifier.elementLook(UiOptions.GROUP_INPUT, shape) else Modifier
+        if (style != UiOptions.NODE_CHIP_FLAT) Modifier.elementLook(UiOptions.GROUP_INPUT, shape) else Modifier
     val border = if (rim != null) Modifier.border(1.dp, rim, shape) else Modifier
     return shadow.background(Brush.verticalGradient(nodeChipFillColors(style, base)), shape).then(border)
 }

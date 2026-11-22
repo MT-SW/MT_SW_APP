@@ -203,9 +203,8 @@ private fun ContactHeader(
         modifier = modifier.heightIn(min = 48.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // MT_SW: the same chip as NodeChip (gradient, outline); built by hand so it covers only the visible chip and not the
-        // 48dp touch area.
-        // visible chip and not the 48dp touch area.
+        // MT_SW: the same chip as NodeChip (gradient, outline, shadow); built by hand so it covers only the visible
+        // chip and not the 48dp touch area.
         val chipShape = MaterialTheme.shapes.small
         Box(
             modifier =

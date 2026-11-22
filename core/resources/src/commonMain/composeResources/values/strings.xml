@@ -2880,7 +2880,7 @@
     <string name="node_chip_style_flat">Flat (as before)</string>
     <string name="node_chip_style_glass_3d">3D glass (gradient, outline and shadow)</string>
     <string name="node_chip_style_preview_hint">All node chip styles side by side. Tap one to choose it.</string>
-    <string name="node_chip_style_standard">Standard (our style: the node colour with a thin outline)</string>
+    <string name="node_chip_style_standard">Standard (our style: gradient, a little transparency, thin outline and shadow)</string>
     <string name="node_chip_style_summary">How the node chips look in the lists, the top bar, on the map and in the terrain panorama.</string>
     <string name="node_color_pick">Pick colour</string>
     <string name="node_color_summary">Pick the colour of your node (its key) in the security settings.</string>

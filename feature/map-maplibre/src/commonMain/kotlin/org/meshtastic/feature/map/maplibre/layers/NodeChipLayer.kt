@@ -339,9 +339,9 @@ private class ChipPainter(
         // outlined triangle, and below that the blank gap where the node's own dot shows through.
         val innerWidth = size.width - shadowPx * 2f
         val bodyHeightPx = size.height - shadowPx - tailHeightPx - detachPx - gapPx
-        // The room for the shadow is always kept (so the chip sits the same in every style); only the glass 3D style
-        // draws it.
-        if (chipStyle == UiOptions.NODE_CHIP_GLASS_3D) drawChipShadow(innerWidth, bodyHeightPx)
+        // The room for the shadow is always kept (so the chip sits the same in every style); only the flat style
+        // leaves it out.
+        if (chipStyle != UiOptions.NODE_CHIP_FLAT) drawChipShadow(innerWidth, bodyHeightPx)
         translate(left = shadowPx, top = shadowPx) { drawChip(innerWidth, bodyHeightPx) }
     }
 
