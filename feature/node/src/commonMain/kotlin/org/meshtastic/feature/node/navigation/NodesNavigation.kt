@@ -151,7 +151,16 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
             liveUpdateViewModel = koinViewModel(),
             navigateToMessages = { key -> backStack.add(ContactsRoute.Messages(key)) },
             onNavigate = { route -> backStack.navigateFromNodeDetail(route) },
-            onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+            // The back arrow of the details closes all the statistics opened beside them at once (they show again
+            // the list); only when none is open it closes the details.
+            onNavigateUp =
+            dropUnlessResumed {
+                if (backStack.lastOrNull() is NodeDetailRoute) {
+                    while (backStack.lastOrNull() is NodeDetailRoute) backStack.removeLastOrNull()
+                } else {
+                    backStack.removeLastOrNull()
+                }
+            },
         )
     }
 
