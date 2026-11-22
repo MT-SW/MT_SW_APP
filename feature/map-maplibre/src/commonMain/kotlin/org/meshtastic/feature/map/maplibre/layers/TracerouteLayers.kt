@@ -41,8 +41,10 @@ import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.LineString
 import org.maplibre.spatialk.geojson.Point
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.determineSignalQuality
+import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.theme.monoSafe
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -98,13 +100,16 @@ private fun DirectionLayers(
     val lines = rememberFeatureSource(edges, preset, palette) { edgesToLines(edges, preset, palette) }
     val arrows = rememberFeatureSource(edges, preset, palette) { edgesToArrows(edges, preset, palette) }
 
+    // MT_SW: in the glass look a route is only an outline in the colour of the link, with nothing inside.
+    val hollow = rememberViewStyle() == UiOptions.VIEW_STYLE_GLASS
     LineLayer(
         id = "$id-line",
         source = lines,
         cap = const(LineCap.Butt),
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.White)),
-        width = const(LINE_WIDTH_DP.dp),
+        width = const((if (hollow) HOLLOW_EDGE_DP else LINE_WIDTH_DP.toFloat()).dp),
+        gapWidth = const((if (hollow) LINE_WIDTH_DP else 0).dp),
         // Positive offsets are to the right of the line's own direction, so the opposite direction lands on the far
         // side.
         offset = const(SEPARATION_DP.dp),
@@ -222,6 +227,9 @@ private const val ROTATION = "rotation"
 private const val ARROW_GLYPH = "→"
 private const val UNKNOWN_COLOR = "#9E9E9E"
 private const val LINE_WIDTH_DP = 3
+
+/** The thickness of each edge of a line drawn as an outline only. */
+private const val HOLLOW_EDGE_DP = 1.5f
 private const val SEPARATION_DP = 3
 private const val SEPARATION_EM = 0.125f
 private const val ARROW_BACK_EM = 0.45f

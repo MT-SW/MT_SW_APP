@@ -30,13 +30,16 @@ import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.expressions.value.LineCap
 import org.maplibre.compose.expressions.value.LineJoin
 import org.maplibre.compose.layers.LineLayer
+import org.maplibre.compose.sources.GeoJsonSource
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.LineString
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.determineSignalQuality
+import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapLinkKind
@@ -69,8 +72,13 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
             linksToLines(heard, nodes, preset, palette)
         }
 
-    // MT_SW: an outline under each line (all of them first, so no outline covers another link's colour): a thin
-    // light edge on both sides of the coloured line, the same look as the outlined chips.
+    // MT_SW: in the glass look a link is only an outline in the colour of the link, with nothing inside (a thin edge on
+    // both sides of an empty gap). The other looks keep the filled line with a light outline under it.
+    if (rememberViewStyle() == UiOptions.VIEW_STYLE_GLASS) {
+        HollowLinkLayer("node-links-direct", heardSource, HEARD_WIDTH_DP, HEARD_OPACITY)
+        HollowLinkLayer("node-links-reported", reportedSource, REPORTED_WIDTH_DP, REPORTED_OPACITY)
+        return
+    }
     LineLayer(
         id = "node-links-direct-outline",
         source = heardSource,
@@ -109,6 +117,21 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
     )
 }
 
+/** A link drawn as an outline only: two thin edges in the colour of the link round a gap [innerDp] wide. */
+@Composable
+private fun HollowLinkLayer(id: String, source: GeoJsonSource, innerDp: Int, opacity: Float) {
+    LineLayer(
+        id = id,
+        source = source,
+        cap = const(LineCap.Round),
+        join = const(LineJoin.Round),
+        color = feature[COLOR].convertToColor(const(Color.Gray)),
+        width = const(HOLLOW_EDGE_DP.dp),
+        gapWidth = const(innerDp.dp),
+        opacity = const(opacity),
+    )
+}
+
 /** One line per link whose two nodes both have a position; the others cannot be placed on the map. */
 private fun linksToLines(
     links: List<MapLink>,
@@ -142,6 +165,9 @@ private const val REPORTED_WIDTH_DP = 3
 private const val REPORTED_OPACITY = 0.8f
 private const val HEARD_WIDTH_DP = 2
 private const val HEARD_OPACITY = 0.5f
+
+/** The thickness of each edge of a link drawn as an outline only. */
+private const val HOLLOW_EDGE_DP = 1.5f
 
 /** Together the two edges add this much to the width of a line (one dp on each side). */
 private const val OUTLINE_EXTRA_DP = 2
