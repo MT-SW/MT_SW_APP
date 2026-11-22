@@ -330,6 +330,15 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
                 put("$group.strength", if (group in GLASS_GROUPS) GLASS_STRENGTH else DEFAULT_STRENGTH)
                 put("$group.blur", DEFAULT_BLUR)
             }
+            // Own defaults of some groups (the author's settings): strength and blur of the glass.
+            put("$GROUP_TOPBAR.strength", 50)
+            put("$GROUP_ASSISTANT.strength", 40)
+            put("$GROUP_HEALTH.strength", 40)
+            put("$GROUP_NAV.blur", 5)
+            put("$GROUP_TOPBAR.blur", 15)
+            put("$GROUP_INPUT.blur", 0)
+            put("$GROUP_SEARCH.blur", 0)
+            put("$GROUP_MAP.blur", 0)
         }
     }
 }
