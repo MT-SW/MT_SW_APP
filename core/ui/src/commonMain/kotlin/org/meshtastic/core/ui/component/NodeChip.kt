@@ -16,6 +16,8 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.defaultMinSize
@@ -29,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -45,7 +48,11 @@ import org.meshtastic.proto.User
 @Composable
 fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit)? = null) {
     val (textColor, nodeColor) = node.colors
-    val colors = CardDefaults.cardColors(containerColor = Color(nodeColor), contentColor = Color(textColor))
+    // MT_SW: glass look with an outline, the same as the chip on the map (see GlassChip.kt).
+    val colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color(textColor))
+    val glass =
+        Modifier.background(Brush.verticalGradient(glassChipColors(Color(nodeColor))), MaterialTheme.shapes.small)
+            .border(1.dp, glassChipRim(Color(textColor)), MaterialTheme.shapes.small)
 
     val content: @Composable () -> Unit = {
         Box(
@@ -68,9 +75,14 @@ fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit
     }
 
     if (onClick == null) {
-        Card(modifier = modifier, shape = MaterialTheme.shapes.small, colors = colors) { content() }
+        Card(modifier = modifier.then(glass), shape = MaterialTheme.shapes.small, colors = colors) { content() }
     } else {
-        Card(modifier = modifier, shape = MaterialTheme.shapes.small, colors = colors, onClick = { onClick(node) }) {
+        Card(
+            modifier = modifier.then(glass),
+            shape = MaterialTheme.shapes.small,
+            colors = colors,
+            onClick = { onClick(node) },
+        ) {
             content()
         }
     }

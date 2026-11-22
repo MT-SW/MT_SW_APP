@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
@@ -70,6 +71,8 @@ import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.ui.component.glassChipColors
+import org.meshtastic.core.ui.component.glassChipRim
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Temperature
@@ -282,7 +285,6 @@ private fun MapChipKey.rasterize(
             layout?.let { maxOf(MIN_WIDTH_DP.dp, it.size.width.toDp() + HORIZONTAL_PADDING_DP.dp * 2) } ?: HEIGHT_DP.dp
         }
     val cornerRadiusPx = with(density) { CORNER_RADIUS_DP.dp.toPx() }
-    val borderPx = if (outlined) with(density) { BORDER_DP.dp.toPx() } else 0f
 
     return ChipImage(
         painter =
@@ -290,16 +292,17 @@ private fun MapChipKey.rasterize(
             chip = this,
             layout = layout,
             cornerRadiusPx = cornerRadiusPx,
-            borderPx = borderPx,
             glyphPainter = glyph?.let(glyphs::get),
             glyphSizePx = with(density) { GLYPH_DP.dp.toPx() },
             tailHeightPx = with(density) { TAIL_HEIGHT_DP.dp.toPx() },
             tailWidthPx = with(density) { TAIL_WIDTH_DP.dp.toPx() },
             gapPx = with(density) { GAP_DP.dp.toPx() },
+            detachPx = with(density) { TAIL_DETACH_DP.dp.toPx() },
+            rimPx = with(density) { BORDER_DP.dp.toPx() },
         ),
         // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
         // left blank) by ChipPainter.
-        size = DpSize(width, HEIGHT_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp),
+        size = DpSize(width, HEIGHT_DP.dp + TAIL_DETACH_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp),
     )
 }
 
@@ -308,58 +311,52 @@ private class ChipPainter(
     private val chip: MapChipKey,
     private val layout: TextLayoutResult?,
     private val cornerRadiusPx: Float,
-    private val borderPx: Float,
     private val glyphPainter: Painter?,
     private val glyphSizePx: Float,
     private val tailHeightPx: Float,
     private val tailWidthPx: Float,
     private val gapPx: Float,
+    private val detachPx: Float,
+    private val rimPx: Float,
 ) : Painter() {
     // Never read: the caller always names an explicit size, which is what makes the chip's width follow its text.
     override val intrinsicSize: Size = Size.Unspecified
 
     override fun DrawScope.onDraw() {
-        // The body is the chip proper, then the tail, then a blank gap at the very bottom — the anchor point
-        // stays there so the dot drawn separately at the node's exact coordinate shows through beneath the
-        // tail's tip instead of touching it.
-        val bodyHeightPx = size.height - tailHeightPx - gapPx
+        // MT_SW: glass look. The body is the chip proper; below it, after a small gap, the tail is a separate
+        // outlined triangle, and below that the blank gap where the node's own dot shows through.
+        val bodyHeightPx = size.height - tailHeightPx - detachPx - gapPx
+        val base = Color(chip.background)
+        val rim = if (chip.outlined) Color.White else glassChipRim(Color(chip.foreground))
+        val fill = Brush.verticalGradient(glassChipColors(base), startY = 0f, endY = bodyHeightPx)
 
+        drawRoundRect(brush = fill, size = Size(size.width, bodyHeightPx), cornerRadius = CornerRadius(cornerRadiusPx))
+        // Inset by half the stroke: a centred stroke on the sprite's own edge would be clipped to half width.
         drawRoundRect(
-            color = Color(chip.background),
-            size = Size(size.width, bodyHeightPx),
+            color = rim,
+            topLeft = Offset(rimPx / 2f, rimPx / 2f),
+            size = Size(size.width - rimPx, bodyHeightPx - rimPx),
             cornerRadius = CornerRadius(cornerRadiusPx),
+            style = Stroke(width = rimPx),
         )
-        if (borderPx > 0f) {
-            // Inset by half the stroke: a centred stroke on the sprite's own edge would be clipped to half width.
-            drawRoundRect(
-                color = Color.White,
-                topLeft = Offset(borderPx / 2f, borderPx / 2f),
-                size = Size(size.width - borderPx, bodyHeightPx - borderPx),
-                cornerRadius = CornerRadius(cornerRadiusPx),
-                style = Stroke(width = borderPx),
-            )
-        }
         if (tailHeightPx > 0f) {
-            // The tail ends at bodyHeightPx + tailHeightPx, not at size.height — the remaining strip down to
-            // size.height is the blank gap that keeps the tip clear of the dot at the node's exact coordinate.
             val centerX = size.width / 2f
             val halfTail = tailWidthPx / 2f
-            val tailTipY = bodyHeightPx + tailHeightPx
+            val tailTopY = bodyHeightPx + detachPx
+            val tailTipY = tailTopY + tailHeightPx
             val tailPath =
                 Path().apply {
-                    moveTo(centerX - halfTail, bodyHeightPx)
-                    lineTo(centerX + halfTail, bodyHeightPx)
-                    lineTo(centerX, tailTipY)
+                    moveTo(centerX - halfTail, tailTopY + rimPx / 2f)
+                    lineTo(centerX + halfTail, tailTopY + rimPx / 2f)
+                    lineTo(centerX, tailTipY - rimPx / 2f)
                     close()
                 }
-            // A sharp fill of the triangle, then the same outline stroked with round joins on top — the
-            // rounded stroke smooths every corner (the tip and both where it meets the chip body) into one
-            // continuous curve instead of a sharp point or a separate circle stuck on top of one.
-            drawPath(path = tailPath, color = Color(chip.background))
+            val tailFill = Brush.verticalGradient(glassChipColors(base), startY = tailTopY, endY = tailTipY)
+            drawPath(path = tailPath, brush = tailFill)
             drawPath(
                 path = tailPath,
-                color = Color(chip.background),
-                style = Stroke(width = TAIL_ROUNDING_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+                color = rim,
+                style = Stroke(width = rimPx, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
         }
         if (glyphPainter != null) {
@@ -400,14 +397,15 @@ private const val BORDER_DP = 1
 private const val GLYPH_DP = 12
 
 /** The little triangular tail under the chip, pointing at the node's exact coordinate. */
-private const val TAIL_HEIGHT_DP = 6
-private const val TAIL_WIDTH_DP = 8
+private const val TAIL_HEIGHT_DP = 7
+private const val TAIL_WIDTH_DP = 10
+
+/** MT_SW: the small clear space between the chip and its tail, so the tail is its own outlined triangle. */
+private const val TAIL_DETACH_DP = 3
 
 /** Blank space between the tail's tip and the node's exact coordinate, so the tail does not touch the dot. */
 private const val GAP_DP = 8
 
-/** Fillet radius rounding every corner of the tail — the tip and both where it meets the chip body. */
-private const val TAIL_ROUNDING_DP = 2
 
 /**
  * A ceiling on how many chip images one layer will hold.
@@ -425,7 +423,7 @@ private const val TAP_TOP_MARGIN_DP = 8f
 private const val TAP_HEIGHT_DP = 38f
 
 /** How far above the node's spot the middle of the bubble sits: gap + tail + half the body (8 + 6 + 20/2). */
-private const val CHIP_CENTRE_DP = (GAP_DP + TAIL_HEIGHT_DP + HEIGHT_DP / 2).toFloat()
+private const val CHIP_CENTRE_DP = (GAP_DP + TAIL_HEIGHT_DP + TAIL_DETACH_DP + HEIGHT_DP / 2).toFloat()
 private const val STACK_TOLERANCE_DP = 2f
 
 /** Larger than any distance on screen, so the rank decides first and the distance only between equal ranks. */
