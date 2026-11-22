@@ -101,6 +101,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -177,7 +178,8 @@ import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
-import org.meshtastic.core.ui.component.glassChipColors
+import org.meshtastic.core.ui.component.nodeChipFillColors
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
@@ -751,6 +753,7 @@ private fun Panorama(
     onManualTurn: () -> Unit,
     onOpenNode: (Int) -> Unit,
 ) {
+    val chipStyle = rememberNodeChipStyle()
     var centre by rememberSaveable { mutableFloatStateOf(0f) }
     // Opened for one node: the view starts turned to it.
     LaunchedEffect(focusNodeNum, targets) {
@@ -865,7 +868,7 @@ private fun Panorama(
             val shown = fitRange(range, size.height, perDeg)
             drawBands(profile, groundProfile, shapesByBand, light, bands, buildingBands, centre, perDeg, shown)
             drawGuides(measurer, centre, perDeg, fieldOfView, shown, cardinals)
-            drawTargets(measurer, targets, markers, precisions, centre, perDeg, shown, focusNodeNum, names)
+            drawTargets(measurer, targets, markers, precisions, centre, perDeg, shown, focusNodeNum, names, chipStyle)
         }
         crest?.let {
             Text(
@@ -1505,6 +1508,7 @@ private fun DrawScope.drawTargets(
     range: ClosedFloatingPointRange<Double>,
     focusNodeNum: Int?,
     names: Boolean,
+    chipStyle: Int,
 ) {
     val w = size.width
     // The hidden ones first, so a node in sight is never covered by one that is not.
@@ -1535,6 +1539,7 @@ private fun DrawScope.drawTargets(
             text,
             ring,
             focus,
+            chipStyle,
         )
     }
 }
@@ -1549,6 +1554,7 @@ private const val NODE_DOT_PX = 5f
  */
 @Composable
 private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Unit, onReset: () -> Unit) {
+    val chipStyle = rememberNodeChipStyle()
     val lat0 = state.observerLat ?: return
     val lon0 = state.observerLon ?: return
     val pickMap = LocalHorizonPickMapProvider.current
@@ -1660,6 +1666,7 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
                         Color(node.textColor),
                         Color.White,
                         false,
+                        chipStyle,
                     )
                 }
             }
@@ -1696,6 +1703,7 @@ private fun DrawScope.drawNodeMarker(
     text: Color,
     ring: Color,
     focus: Boolean,
+    chipStyle: Int,
 ) {
     val dot = CHIP_DOT_DP.dp.toPx()
     drawCircle(background, radius = dot, center = at)
@@ -1712,13 +1720,15 @@ private fun DrawScope.drawNodeMarker(
     val bodyH = CHIP_HEIGHT_DP.dp.toPx()
     val tailH = CHIP_TAIL_HEIGHT_DP.dp.toPx()
     val tailHalf = CHIP_TAIL_WIDTH_DP.dp.toPx() / 2f
-    val detach = CHIP_TAIL_DETACH_DP.dp.toPx()
+    // MT_SW: the plain (flat) style keeps the tail attached to the chip, the others set it apart.
+    val detach = if (chipStyle == UiOptions.NODE_CHIP_FLAT) 0f else CHIP_TAIL_DETACH_DP.dp.toPx()
     val bodyBottom = at.y - CHIP_GAP_DP.dp.toPx() - tailH - detach
     val top = Offset(at.x - width / 2f, max(0f, bodyBottom - bodyH))
     val corner = CornerRadius(CHIP_CORNER_DP.dp.toPx())
     // MT_SW: glass look, the same as the chip on the main map: a gradient fill, the ring as the outline, and the tail
     // a separate outlined triangle a little below the body.
-    val fill = Brush.verticalGradient(glassChipColors(background), startY = top.y, endY = top.y + bodyH)
+    val fillColors = nodeChipFillColors(chipStyle, background)
+    val fill = Brush.verticalGradient(fillColors, startY = top.y, endY = top.y + bodyH)
     drawRoundRect(fill, top, Size(width, bodyH), corner)
     val border = (if (focus) CHIP_FOCUS_RING_DP else CHIP_RING_DP).dp.toPx()
     drawRoundRect(
@@ -1736,7 +1746,7 @@ private fun DrawScope.drawNodeMarker(
             lineTo(at.x, tailTop + tailH)
             close()
         }
-    drawPath(tail, Brush.verticalGradient(glassChipColors(background), startY = tailTop, endY = tailTop + tailH))
+    drawPath(tail, Brush.verticalGradient(fillColors, startY = tailTop, endY = tailTop + tailH))
     drawPath(tail, ring, style = Stroke(CHIP_RING_DP.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     drawText(
         layout,

@@ -4644,4 +4644,10 @@
     <string name="wifi_provision_pick_device">Wybierz urządzenie do skonfigurowania. Hasło Wi-Fi zostanie wysłane do wybranego urządzenia.</string>
     <string name="wifi_provision_rescan">Wyszukaj ponownie</string>
     <string name="wifi_provision_signal_dbm">Siła sygnału %1$d dBm</string>
+    <string name="node_chip_style">Styl plakietek węzłów</string>
+    <string name="node_chip_style_standard">Standardowy (nasz styl: kolor węzła z cienkim obrysem)</string>
+    <string name="node_chip_style_glass_3d">Szkło 3D (gradient, obrys i cień)</string>
+    <string name="node_chip_style_flat">Płaski (jak dawniej)</string>
+    <string name="node_chip_style_summary">Wygląd plakietek węzłów na listach, na pasku górnym, na mapie i w panoramie terenu.</string>
+    <string name="node_chip_style_preview_hint">Wszystkie style plakietek obok siebie. Dotknij jednego, aby go wybrać.</string>
 </resources>

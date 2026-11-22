@@ -31,10 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /**
  * MT_SW: the glass look of a node chip, shared by the chip in the lists and the top bar ([NodeChip]) and the chip the
@@ -56,6 +58,42 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
+
+private const val STANDARD_TOP_LIGHTEN = 0.10f
+private const val STANDARD_RIM_ALPHA = 0.40f
+
+/**
+ * The fill of a node chip from top to bottom for the chosen [style] (one of `UiOptions.NODE_CHIP_*`): flat is the plain
+ * colour, standard has only a faint lighter top, glass 3D the full glass gradient.
+ */
+fun nodeChipFillColors(style: Int, base: Color): List<Color> = when (style) {
+    UiOptions.NODE_CHIP_FLAT -> listOf(base, base)
+    UiOptions.NODE_CHIP_GLASS_3D -> glassChipColors(base)
+    else -> listOf(lerp(base, Color.White, STANDARD_TOP_LIGHTEN), base)
+}
+
+/** The outline of a node chip for [style]: none for flat, a thin one in the text colour otherwise; null = none. */
+fun nodeChipRim(style: Int, foreground: Color): Color? = when (style) {
+    UiOptions.NODE_CHIP_FLAT -> null
+    UiOptions.NODE_CHIP_GLASS_3D -> glassChipRim(foreground)
+    else -> foreground.copy(alpha = STANDARD_RIM_ALPHA)
+}
+
+/**
+ * The look of a node chip in the lists, the top bar and the chat headers, for the style chosen in "Look". Applied to
+ * the visible chip only (never to an area with invisible touch padding).
+ */
+@Composable
+fun nodeChipLook(base: Color, foreground: Color, shape: Shape, style: Int = rememberNodeChipStyle()): Modifier {
+    val rim = nodeChipRim(style, foreground)
+    val shadow =
+        if (style == UiOptions.NODE_CHIP_GLASS_3D) Modifier.elementLook(UiOptions.GROUP_INPUT, shape) else Modifier
+    val border = if (rim != null) Modifier.border(1.dp, rim, shape) else Modifier
+    return shadow.background(Brush.verticalGradient(nodeChipFillColors(style, base)), shape).then(border)
+}
+
+/** The node chip style chosen in "Look" (one of `UiOptions.NODE_CHIP_*`). */
+@Composable fun rememberNodeChipStyle(): Int = rememberUiOptions()[UiOptions.NODE_CHIP_STYLE]
 
 private const val CHOICE_CHIP_CORNER_DP = 12
 private const val CHOICE_CHIP_SELECTED_TINT = 0.18f

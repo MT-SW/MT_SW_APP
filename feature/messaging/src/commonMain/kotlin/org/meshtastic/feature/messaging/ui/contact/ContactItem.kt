@@ -20,7 +20,6 @@ package org.meshtastic.feature.messaging.ui.contact
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
@@ -79,9 +77,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
-import org.meshtastic.core.ui.component.elementLook
-import org.meshtastic.core.ui.component.glassChipColors
-import org.meshtastic.core.ui.component.glassChipRim
+import org.meshtastic.core.ui.component.nodeChipLook
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.proto.ChannelSet
 
@@ -209,9 +205,7 @@ private fun ContactHeader(
             modifier =
             Modifier.width(IntrinsicSize.Min)
                 .heightIn(min = 32.dp)
-                .elementLook(UiOptions.GROUP_INPUT, chipShape)
-                .background(Brush.verticalGradient(glassChipColors(chipColor)), chipShape)
-                .border(1.dp, glassChipRim(chipLabelColor), chipShape)
+                .then(nodeChipLook(chipColor, chipLabelColor, chipShape))
                 .clip(chipShape)
                 .clickable(onClick = onNodeChipClick)
                 .semantics { contentDescription = contact.shortName },

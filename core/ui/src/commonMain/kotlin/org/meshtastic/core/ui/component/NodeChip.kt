@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -33,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -42,7 +39,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.proto.EnvironmentMetrics
 import org.meshtastic.proto.Paxcount
@@ -51,12 +47,9 @@ import org.meshtastic.proto.User
 @Composable
 fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit)? = null) {
     val (textColor, nodeColor) = node.colors
-    // MT_SW: glass look with an outline, the same as the chip on the map (see GlassChip.kt).
+    // MT_SW: the look of the chip follows the style chosen in "Look" (see GlassChip.kt).
     val colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color(textColor))
-    val glass =
-        Modifier.elementLook(UiOptions.GROUP_INPUT, MaterialTheme.shapes.small)
-            .background(Brush.verticalGradient(glassChipColors(Color(nodeColor))), MaterialTheme.shapes.small)
-            .border(1.dp, glassChipRim(Color(textColor)), MaterialTheme.shapes.small)
+    val glass = nodeChipLook(Color(nodeColor), Color(textColor), MaterialTheme.shapes.small)
 
     val content: @Composable () -> Unit = {
         Box(

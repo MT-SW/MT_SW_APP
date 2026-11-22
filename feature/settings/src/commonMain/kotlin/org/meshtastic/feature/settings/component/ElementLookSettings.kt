@@ -283,6 +283,7 @@ fun ElementBasicSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
         summary = stringResource(Res.string.button_style_summary),
     )
     ChartStyleSettings(options, onChange)
+    NodeChipStyleSettings(options, onChange)
 }
 
 /** One look for all the groups of a part of the app. */

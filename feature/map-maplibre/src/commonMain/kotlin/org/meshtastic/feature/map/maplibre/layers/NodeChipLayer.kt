@@ -70,9 +70,11 @@ import org.maplibre.compose.sources.VectorSource
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.ui.component.glassChipColors
-import org.meshtastic.core.ui.component.glassChipRim
+import org.meshtastic.core.ui.component.nodeChipFillColors
+import org.meshtastic.core.ui.component.nodeChipRim
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Temperature
@@ -257,11 +259,12 @@ private fun rememberChipImages(chips: List<MapChipKey>): Map<String, ChipImage> 
 
     // One painter per chip for as long as its inputs hold: a painter's identity is what the map keys its image by, so
     // rebuilding every chip because one more was added would re-upload them all.
-    val cache = remember(measurer, density, textStyle, glyphs) { HashMap<String, ChipImage>() }
+    val chipStyle = rememberNodeChipStyle()
+    val cache = remember(measurer, density, textStyle, glyphs, chipStyle) { HashMap<String, ChipImage>() }
     return remember(chips, cache) {
         chips.associate { chip ->
             val key = chip.featureValue()
-            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs) }
+            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs, chipStyle) }
         }
     }
 }
@@ -271,6 +274,7 @@ private fun MapChipKey.rasterize(
     textStyle: TextStyle,
     density: Density,
     glyphs: Map<MapChipGlyph, Painter>,
+    chipStyle: Int,
 ): ChipImage {
     val style =
         textStyle.copy(textDecoration = TextDecoration.LineThrough.takeIf { struckThrough }, color = Color(foreground))
@@ -300,6 +304,7 @@ private fun MapChipKey.rasterize(
             detachPx = with(density) { TAIL_DETACH_DP.dp.toPx() },
             rimPx = with(density) { BORDER_DP.dp.toPx() },
             shadowPx = with(density) { SHADOW_DP.dp.toPx() },
+            chipStyle = chipStyle,
         ),
         // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
         // left blank) by ChipPainter.
@@ -324,6 +329,7 @@ private class ChipPainter(
     private val detachPx: Float,
     private val rimPx: Float,
     private val shadowPx: Float,
+    private val chipStyle: Int,
 ) : Painter() {
     // Never read: the caller always names an explicit size, which is what makes the chip's width follow its text.
     override val intrinsicSize: Size = Size.Unspecified
@@ -333,7 +339,9 @@ private class ChipPainter(
         // outlined triangle, and below that the blank gap where the node's own dot shows through.
         val innerWidth = size.width - shadowPx * 2f
         val bodyHeightPx = size.height - shadowPx - tailHeightPx - detachPx - gapPx
-        drawChipShadow(innerWidth, bodyHeightPx)
+        // The room for the shadow is always kept (so the chip sits the same in every style); only the glass 3D style
+        // draws it.
+        if (chipStyle == UiOptions.NODE_CHIP_GLASS_3D) drawChipShadow(innerWidth, bodyHeightPx)
         translate(left = shadowPx, top = shadowPx) { drawChip(innerWidth, bodyHeightPx) }
     }
 
@@ -352,8 +360,10 @@ private class ChipPainter(
 
     private fun DrawScope.drawChip(innerWidth: Float, bodyHeightPx: Float) {
         val base = Color(chip.background)
-        val rim = if (chip.outlined) Color.White else glassChipRim(Color(chip.foreground))
-        val fill = Brush.verticalGradient(glassChipColors(base), startY = 0f, endY = bodyHeightPx)
+        val styleRim = nodeChipRim(chipStyle, Color(chip.foreground))
+        val rim = if (chip.outlined) Color.White else styleRim ?: Color.Transparent
+        val fillColors = nodeChipFillColors(chipStyle, base)
+        val fill = Brush.verticalGradient(fillColors, startY = 0f, endY = bodyHeightPx)
 
         drawRoundRect(brush = fill, size = Size(innerWidth, bodyHeightPx), cornerRadius = CornerRadius(cornerRadiusPx))
         // Inset by half the stroke: a centred stroke on the sprite's own edge would be clipped to half width.
@@ -367,7 +377,8 @@ private class ChipPainter(
         if (tailHeightPx > 0f) {
             val centerX = innerWidth / 2f
             val halfTail = tailWidthPx / 2f
-            val tailTopY = bodyHeightPx + detachPx
+            // The plain (flat) style keeps the tail attached to the chip, the others set it apart.
+            val tailTopY = if (chipStyle == UiOptions.NODE_CHIP_FLAT) bodyHeightPx else bodyHeightPx + detachPx
             val tailTipY = tailTopY + tailHeightPx
             val tailPath =
                 Path().apply {
@@ -376,7 +387,7 @@ private class ChipPainter(
                     lineTo(centerX, tailTipY - rimPx / 2f)
                     close()
                 }
-            val tailFill = Brush.verticalGradient(glassChipColors(base), startY = tailTopY, endY = tailTipY)
+            val tailFill = Brush.verticalGradient(fillColors, startY = tailTopY, endY = tailTipY)
             drawPath(path = tailPath, brush = tailFill)
             drawPath(
                 path = tailPath,

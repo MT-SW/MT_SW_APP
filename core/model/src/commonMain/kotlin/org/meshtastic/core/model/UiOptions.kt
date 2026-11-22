@@ -209,6 +209,17 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CHART_STYLE_NODE = "charts.style.node"
         const val CHART_STYLE_SAME = -1
 
+        /**
+         * How the node chips (the coloured plates with a short name, in the lists, on the map and in the panorama)
+         * look: [NODE_CHIP_FLAT] (the plain colour, as before), [NODE_CHIP_STANDARD] (the default: the node's colour
+         * with a thin outline and no shadow, in the style of the rest of the app) or [NODE_CHIP_GLASS_3D] (a glass
+         * gradient with an outline and a soft shadow).
+         */
+        const val NODE_CHIP_STYLE = "chips.style"
+        const val NODE_CHIP_FLAT = 0
+        const val NODE_CHIP_STANDARD = 1
+        const val NODE_CHIP_GLASS_3D = 2
+
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
         const val ICON_STYLE_STANDARD = 0
@@ -296,6 +307,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(CHART_STYLE, CHART_STYLE_GLASS)
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)
+            put(NODE_CHIP_STYLE, NODE_CHIP_STANDARD)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
                 put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)

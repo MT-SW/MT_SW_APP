@@ -2822,6 +2822,12 @@ node_active_notifications
 node_active_notifications_description
 node_away_alert
 node_away_alert_notification
+node_chip_style
+node_chip_style_flat
+node_chip_style_glass_3d
+node_chip_style_preview_hint
+node_chip_style_standard
+node_chip_style_summary
 node_color_pick
 node_color_summary
 node_color_title
