@@ -74,7 +74,8 @@ fun AntennaPatternPlot(beamwidthDeg: Double, frontToBackDb: Double, modifier: Mo
             ),
         )
         clipPath(path) {
-            drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.28f), Color.Transparent), c.y - r, c.y))
+            val sheen = listOf(Color.White.copy(alpha = 0.28f), Color.Transparent)
+            drawRect(Brush.verticalGradient(sheen, startY = c.y - r, endY = c.y))
         }
         drawPath(path, line, style = Stroke(width = 4f))
         clipPath(path) { drawPath(path, Color.White.copy(alpha = 0.55f), style = Stroke(width = 3f)) }
