@@ -320,8 +320,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_COUNT, 1)
             put(RADIO_BACKGROUND, 1)
             put(CHART_STYLE, CHART_STYLE_RIBBON)
-            put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
-            put(CHART_STYLE_NODE, CHART_STYLE_SAME)
+            put(CHART_STYLE_HEALTH, CHART_STYLE_RIBBON)
+            put(CHART_STYLE_NODE, CHART_STYLE_RIBBON)
             put(NODE_CHIP_STYLE, NODE_CHIP_STANDARD)
             put(VIEW_STYLE, VIEW_STYLE_GLASS)
             for (group in ALL_GROUPS) {
