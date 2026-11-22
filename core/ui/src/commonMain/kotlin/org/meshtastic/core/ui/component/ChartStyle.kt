@@ -80,7 +80,7 @@ private fun fade(c: Color, alpha: Float) = c.copy(alpha = alpha)
  */
 fun DrawScope.drawChartBar(style: Int, color: Color, topLeft: Offset, size: Size, corner: Float) {
     when (style) {
-        UiOptions.CHART_STYLE_GLASS -> glassBar(color, topLeft, size, corner)
+        UiOptions.CHART_STYLE_GLASS, UiOptions.CHART_STYLE_RIBBON -> glassBar(color, topLeft, size, corner)
 
         UiOptions.CHART_STYLE_GRADIENT -> gradientBar(color, topLeft, size, corner)
 
@@ -275,7 +275,7 @@ fun DrawScope.drawChartArc(
     val band = ArcBand(color.alpha, startAngle, sweep, center, radius, stroke)
     val base = color.copy(alpha = 1f)
     when (style) {
-        UiOptions.CHART_STYLE_GLASS -> glassArc(band, base)
+        UiOptions.CHART_STYLE_GLASS, UiOptions.CHART_STYLE_RIBBON -> glassArc(band, base)
         UiOptions.CHART_STYLE_GRADIENT -> piece(band, brush = band.brush(0f to fade(base, HALF), 1f to base))
         UiOptions.CHART_STYLE_OUTLINE -> outlineArc(band, base)
         UiOptions.CHART_STYLE_GLOW -> glowArc(band, base)

@@ -46,6 +46,7 @@ import org.meshtastic.core.resources.chart_style
 import org.meshtastic.core.resources.chart_style_flat
 import org.meshtastic.core.resources.chart_style_glass
 import org.meshtastic.core.resources.chart_style_glow
+import org.meshtastic.core.resources.chart_style_ribbon
 import org.meshtastic.core.resources.chart_style_gradient
 import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
@@ -60,6 +61,7 @@ import org.meshtastic.core.ui.component.drawChartBar
 private val CHART_STYLES =
     listOf(
         UiOptions.CHART_STYLE_GLASS,
+        UiOptions.CHART_STYLE_RIBBON,
         UiOptions.CHART_STYLE_GRADIENT,
         UiOptions.CHART_STYLE_OUTLINE,
         UiOptions.CHART_STYLE_GLOW,
@@ -130,6 +132,7 @@ private fun chartStyleName(style: Int): String = when (style) {
     UiOptions.CHART_STYLE_GRADIENT -> stringResource(Res.string.chart_style_gradient)
     UiOptions.CHART_STYLE_OUTLINE -> stringResource(Res.string.chart_style_outline)
     UiOptions.CHART_STYLE_GLOW -> stringResource(Res.string.chart_style_glow)
+    UiOptions.CHART_STYLE_RIBBON -> stringResource(Res.string.chart_style_ribbon)
     else -> stringResource(Res.string.chart_style_flat)
 }
 

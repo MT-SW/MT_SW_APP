@@ -794,6 +794,7 @@ chart_style_health
 chart_style_node
 chart_style_outline
 chart_style_preview_hint
+chart_style_ribbon
 chart_style_same
 chart_style_summary
 chat_info_body

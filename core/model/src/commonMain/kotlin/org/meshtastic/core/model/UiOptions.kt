@@ -201,6 +201,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CHART_STYLE_OUTLINE = 3
         const val CHART_STYLE_GLOW = 4
 
+        /** Like [CHART_STYLE_GLASS], and the lines of the node statistics are a thick glass ribbon. */
+        const val CHART_STYLE_RIBBON = 5
+
         /**
          * Own chart style of "Network health" and of the node details; [CHART_STYLE_SAME] (the default) means the
          * general [CHART_STYLE].

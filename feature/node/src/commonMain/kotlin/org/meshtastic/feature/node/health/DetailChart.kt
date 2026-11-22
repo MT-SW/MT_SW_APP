@@ -287,7 +287,7 @@ private fun DrawScope.drawLineChartBody(style: Int, color: Color, line: Path, ar
     fun fill(top: Float) =
         drawPath(area, Brush.verticalGradient(listOf(color.copy(alpha = top), Color.Transparent), endY = height))
     when (style) {
-        UiOptions.CHART_STYLE_GLASS -> {
+        UiOptions.CHART_STYLE_GLASS, UiOptions.CHART_STYLE_RIBBON -> {
             fill(GLASS_FILL_ALPHA)
             glow(GLASS_HALO_WIDTH, GLASS_HALO_ALPHA)
             drawPath(line, color, style = round)

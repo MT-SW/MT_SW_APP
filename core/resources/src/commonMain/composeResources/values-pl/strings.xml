@@ -4070,6 +4070,7 @@
     <string name="chart_style_gradient">Gradient</string>
     <string name="chart_style_outline">Obrys (cienkie linie)</string>
     <string name="chart_style_glow">Poświata</string>
+    <string name="chart_style_ribbon">Szklana wstęga</string>
     <string name="chart_style_flat">Płaski (jak dawniej)</string>
     <string name="chart_style_summary">Wygląd słupków, mapy cieplnej i półokrągłego miernika w „Zdrowie sieci” i metrykach węzła. „Płaski” przywraca stary wygląd.</string>
     <string name="ring_style_thin">Cienkie paski postępu (jak w iPhonie)</string>

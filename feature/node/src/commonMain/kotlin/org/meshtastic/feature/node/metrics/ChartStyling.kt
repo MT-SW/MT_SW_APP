@@ -60,6 +60,10 @@ private const val AREA_BOTTOM_ALPHA = 0.05f
 private const val GLOW_AREA_TOP_ALPHA = 0.45f
 private const val STYLE_EXTRA_WIDTH_DP = 0.5f
 private const val GLOW_EXTRA_WIDTH_DP = 1f
+private const val RIBBON_LIGHTEN = 0.55f
+private const val RIBBON_DARKEN = 0.4f
+private const val RIBBON_AREA_TOP_ALPHA = 0.5f
+private const val RIBBON_EXTRA_WIDTH_DP = 2.5f
 
 /** The look of a line of the node's statistics, taken from the chart style chosen in "Look". */
 private class LineLook(val fill: Fill, val areaFill: LineCartesianLayer.AreaFill?, val extraWidthDp: Float)
@@ -92,6 +96,22 @@ private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook
                 ),
                 areaFill = area(AREA_TOP_ALPHA),
                 extraWidthDp = STYLE_EXTRA_WIDTH_DP,
+            )
+
+        UiOptions.CHART_STYLE_RIBBON ->
+            LineLook(
+                fill =
+                Fill(
+                    Brush.verticalGradient(
+                        listOf(
+                            lerp(base, Color.White, RIBBON_LIGHTEN).copy(alpha = alpha),
+                            color,
+                            lerp(base, Color.Black, RIBBON_DARKEN).copy(alpha = alpha),
+                        ),
+                    ),
+                ),
+                areaFill = area(RIBBON_AREA_TOP_ALPHA),
+                extraWidthDp = RIBBON_EXTRA_WIDTH_DP,
             )
 
         UiOptions.CHART_STYLE_GRADIENT -> LineLook(Fill(color), area(AREA_TOP_ALPHA), 0f)
