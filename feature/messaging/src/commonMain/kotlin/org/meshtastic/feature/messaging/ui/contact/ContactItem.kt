@@ -209,23 +209,18 @@ private fun ContactHeader(
         Box(
             modifier =
             Modifier.width(IntrinsicSize.Min)
-                .then(if (isChannel) Modifier.heightIn(min = 32.dp) else Modifier.defaultMinSize(minHeight = 28.dp))
+                .defaultMinSize(minHeight = 28.dp)
                 .then(nodeChipLook(chipColor, chipLabelColor, chipShape))
                 .clip(chipShape)
                 .clickable(onClick = onNodeChipClick)
                 .semantics { contentDescription = contact.shortName },
             contentAlignment = Alignment.Center,
         ) {
-            // A conversation with a node has a chip laid out exactly like NodeChip (the one in the messages and in
-            // the node list): at least 64dp wide, 8dp at the sides, no extra height.
+            // Every chip of the list (channels and conversations with a node) is laid out exactly like NodeChip (the
+            // one in the messages and in the node list): at least 64dp wide, 8dp at the sides, no extra height.
             Text(
                 text = contact.shortName,
-                modifier =
-                if (isChannel) {
-                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
-                } else {
-                    Modifier.defaultMinSize(minWidth = NODE_CHIP_MIN_WIDTH_DP.dp).padding(horizontal = 8.dp)
-                },
+                modifier = Modifier.defaultMinSize(minWidth = NODE_CHIP_MIN_WIDTH_DP.dp).padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 color = chipLabelColor,
