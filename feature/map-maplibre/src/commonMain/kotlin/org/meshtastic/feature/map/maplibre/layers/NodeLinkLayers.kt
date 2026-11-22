@@ -69,6 +69,26 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
             linksToLines(heard, nodes, preset, palette)
         }
 
+    // MT_SW: an outline under each line (all of them first, so no outline covers another link's colour): a thin
+    // light edge on both sides of the coloured line, the same look as the outlined chips.
+    LineLayer(
+        id = "node-links-direct-outline",
+        source = heardSource,
+        cap = const(LineCap.Round),
+        join = const(LineJoin.Round),
+        color = const(Color.White),
+        width = const((HEARD_WIDTH_DP + OUTLINE_EXTRA_DP).dp),
+        opacity = const(HEARD_OUTLINE_OPACITY),
+    )
+    LineLayer(
+        id = "node-links-reported-outline",
+        source = reportedSource,
+        cap = const(LineCap.Round),
+        join = const(LineJoin.Round),
+        color = const(Color.White),
+        width = const((REPORTED_WIDTH_DP + OUTLINE_EXTRA_DP).dp),
+        opacity = const(REPORTED_OUTLINE_OPACITY),
+    )
     LineLayer(
         id = "node-links-direct",
         source = heardSource,
@@ -122,3 +142,8 @@ private const val REPORTED_WIDTH_DP = 3
 private const val REPORTED_OPACITY = 0.8f
 private const val HEARD_WIDTH_DP = 2
 private const val HEARD_OPACITY = 0.5f
+
+/** Together the two edges add this much to the width of a line (one dp on each side). */
+private const val OUTLINE_EXTRA_DP = 2
+private const val REPORTED_OUTLINE_OPACITY = 0.85f
+private const val HEARD_OUTLINE_OPACITY = 0.55f
