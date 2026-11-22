@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.proto.EnvironmentMetrics
 import org.meshtastic.proto.Paxcount
@@ -51,7 +52,8 @@ fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit
     // MT_SW: glass look with an outline, the same as the chip on the map (see GlassChip.kt).
     val colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color(textColor))
     val glass =
-        Modifier.background(Brush.verticalGradient(glassChipColors(Color(nodeColor))), MaterialTheme.shapes.small)
+        Modifier.elementLook(UiOptions.GROUP_INPUT, MaterialTheme.shapes.small)
+            .background(Brush.verticalGradient(glassChipColors(Color(nodeColor))), MaterialTheme.shapes.small)
             .border(1.dp, glassChipRim(Color(textColor)), MaterialTheme.shapes.small)
 
     val content: @Composable () -> Unit = {

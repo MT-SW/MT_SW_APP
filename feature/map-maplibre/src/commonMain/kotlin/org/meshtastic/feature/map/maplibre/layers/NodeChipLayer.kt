@@ -299,10 +299,15 @@ private fun MapChipKey.rasterize(
             gapPx = with(density) { GAP_DP.dp.toPx() },
             detachPx = with(density) { TAIL_DETACH_DP.dp.toPx() },
             rimPx = with(density) { BORDER_DP.dp.toPx() },
+            shadowPx = with(density) { SHADOW_DP.dp.toPx() },
         ),
         // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
         // left blank) by ChipPainter.
-        size = DpSize(width, HEIGHT_DP.dp + TAIL_DETACH_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp),
+        size =
+        DpSize(
+            width + SHADOW_DP.dp * 2,
+            SHADOW_DP.dp + HEIGHT_DP.dp + TAIL_DETACH_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp,
+        ),
     )
 }
 
@@ -318,6 +323,7 @@ private class ChipPainter(
     private val gapPx: Float,
     private val detachPx: Float,
     private val rimPx: Float,
+    private val shadowPx: Float,
 ) : Painter() {
     // Never read: the caller always names an explicit size, which is what makes the chip's width follow its text.
     override val intrinsicSize: Size = Size.Unspecified
@@ -325,22 +331,41 @@ private class ChipPainter(
     override fun DrawScope.onDraw() {
         // MT_SW: glass look. The body is the chip proper; below it, after a small gap, the tail is a separate
         // outlined triangle, and below that the blank gap where the node's own dot shows through.
-        val bodyHeightPx = size.height - tailHeightPx - detachPx - gapPx
+        val innerWidth = size.width - shadowPx * 2f
+        val bodyHeightPx = size.height - shadowPx - tailHeightPx - detachPx - gapPx
+        drawChipShadow(innerWidth, bodyHeightPx)
+        translate(left = shadowPx, top = shadowPx) { drawChip(innerWidth, bodyHeightPx) }
+    }
+
+    private fun DrawScope.drawChipShadow(innerWidth: Float, bodyHeightPx: Float) {
+        // A soft shadow made of a few see-through layers growing outwards, a little lower than the chip.
+        for (i in SHADOW_LAYERS downTo 1) {
+            val grow = shadowPx * i / SHADOW_LAYERS
+            drawRoundRect(
+                color = Color.Black.copy(alpha = SHADOW_LAYER_ALPHA),
+                topLeft = Offset(shadowPx - grow, shadowPx - grow + shadowPx / 2f),
+                size = Size(innerWidth + grow * 2f, bodyHeightPx + grow * 2f),
+                cornerRadius = CornerRadius(cornerRadiusPx + grow),
+            )
+        }
+    }
+
+    private fun DrawScope.drawChip(innerWidth: Float, bodyHeightPx: Float) {
         val base = Color(chip.background)
         val rim = if (chip.outlined) Color.White else glassChipRim(Color(chip.foreground))
         val fill = Brush.verticalGradient(glassChipColors(base), startY = 0f, endY = bodyHeightPx)
 
-        drawRoundRect(brush = fill, size = Size(size.width, bodyHeightPx), cornerRadius = CornerRadius(cornerRadiusPx))
+        drawRoundRect(brush = fill, size = Size(innerWidth, bodyHeightPx), cornerRadius = CornerRadius(cornerRadiusPx))
         // Inset by half the stroke: a centred stroke on the sprite's own edge would be clipped to half width.
         drawRoundRect(
             color = rim,
             topLeft = Offset(rimPx / 2f, rimPx / 2f),
-            size = Size(size.width - rimPx, bodyHeightPx - rimPx),
+            size = Size(innerWidth - rimPx, bodyHeightPx - rimPx),
             cornerRadius = CornerRadius(cornerRadiusPx),
             style = Stroke(width = rimPx),
         )
         if (tailHeightPx > 0f) {
-            val centerX = size.width / 2f
+            val centerX = innerWidth / 2f
             val halfTail = tailWidthPx / 2f
             val tailTopY = bodyHeightPx + detachPx
             val tailTipY = tailTopY + tailHeightPx
@@ -361,14 +386,14 @@ private class ChipPainter(
         }
         if (glyphPainter != null) {
             val glyph = Size(glyphSizePx, glyphSizePx)
-            translate(left = (size.width - glyphSizePx) / 2f, top = (bodyHeightPx - glyphSizePx) / 2f) {
+            translate(left = (innerWidth - glyphSizePx) / 2f, top = (bodyHeightPx - glyphSizePx) / 2f) {
                 with(glyphPainter) { draw(glyph, colorFilter = ColorFilter.tint(Color(chip.foreground))) }
             }
         } else if (layout != null) {
             drawText(
                 textLayoutResult = layout,
                 topLeft =
-                Offset(x = (size.width - layout.size.width) / 2f, y = (bodyHeightPx - layout.size.height) / 2f),
+                Offset(x = (innerWidth - layout.size.width) / 2f, y = (bodyHeightPx - layout.size.height) / 2f),
             )
         }
     }
@@ -402,6 +427,11 @@ private const val TAIL_WIDTH_DP = 10
 
 /** MT_SW: the small clear space between the chip and its tail, so the tail is its own outlined triangle. */
 private const val TAIL_DETACH_DP = 3
+
+/** MT_SW: room around the chip (sides and top) for its soft shadow, and how it is drawn. */
+private const val SHADOW_DP = 4
+private const val SHADOW_LAYERS = 4
+private const val SHADOW_LAYER_ALPHA = 0.06f
 
 /** Blank space between the tail's tip and the node's exact coordinate, so the tail does not touch the dot. */
 private const val GAP_DP = 8
