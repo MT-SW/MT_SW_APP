@@ -153,6 +153,7 @@ import org.meshtastic.core.resources.track_compare
 import org.meshtastic.core.resources.track_export_kml
 import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.view_style
 import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
@@ -349,6 +350,7 @@ object SettingsSearchCatalog {
             Res.string.radio_count to SettingsRoute.ConnectionCenter,
             Res.string.radio_chooser_settings to SettingsRoute.ConnectionCenter,
             Res.string.node_chip_style to SettingsRoute.ElementLook,
+            Res.string.view_style to SettingsRoute.ElementLook,
             Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.chart_style_health to SettingsRoute.ElementLook,
             Res.string.chart_style_node to SettingsRoute.ElementLook,

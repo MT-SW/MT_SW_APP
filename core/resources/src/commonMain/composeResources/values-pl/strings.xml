@@ -4650,4 +4650,9 @@
     <string name="node_chip_style_flat">Płaski (jak dawniej)</string>
     <string name="node_chip_style_summary">Wygląd plakietek węzłów na listach, na pasku górnym, na mapie i w panoramie terenu.</string>
     <string name="node_chip_style_preview_hint">Wszystkie style plakietek obok siebie. Dotknij jednego, aby go wybrać.</string>
+    <string name="view_style">Styl panoramy, wykresu anteny i przycisków wyboru</string>
+    <string name="view_style_glass">Szkło (gradient, połysk i obrys)</string>
+    <string name="view_style_standard">Standardowy (jednolite kolory z cienkim obrysem)</string>
+    <string name="view_style_flat">Płaski (jednolite kolory, bez obrysu)</string>
+    <string name="view_style_summary">Wygląd panoramy terenu (grzbiety i budynki), wykresu anteny i przycisków wyboru.</string>
 </resources>

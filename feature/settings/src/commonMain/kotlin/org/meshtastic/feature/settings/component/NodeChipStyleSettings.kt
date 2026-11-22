@@ -46,6 +46,11 @@ import org.meshtastic.core.resources.node_chip_style_glass_3d
 import org.meshtastic.core.resources.node_chip_style_preview_hint
 import org.meshtastic.core.resources.node_chip_style_standard
 import org.meshtastic.core.resources.node_chip_style_summary
+import org.meshtastic.core.resources.view_style
+import org.meshtastic.core.resources.view_style_flat
+import org.meshtastic.core.resources.view_style_glass
+import org.meshtastic.core.resources.view_style_standard
+import org.meshtastic.core.resources.view_style_summary
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.nodeChipLook
 
@@ -89,6 +94,19 @@ fun NodeChipStyleSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
             selectedItem = current,
             onItemSelected = { onChange(UiOptions.NODE_CHIP_STYLE, it) },
             summary = stringResource(Res.string.node_chip_style_summary),
+        )
+        DropDownPreference(
+            title = stringResource(Res.string.view_style),
+            enabled = true,
+            items =
+            listOf(
+                UiOptions.VIEW_STYLE_GLASS to stringResource(Res.string.view_style_glass),
+                UiOptions.VIEW_STYLE_STANDARD to stringResource(Res.string.view_style_standard),
+                UiOptions.VIEW_STYLE_FLAT to stringResource(Res.string.view_style_flat),
+            ),
+            selectedItem = options[UiOptions.VIEW_STYLE],
+            onItemSelected = { onChange(UiOptions.VIEW_STYLE, it) },
+            summary = stringResource(Res.string.view_style_summary),
         )
     }
 }

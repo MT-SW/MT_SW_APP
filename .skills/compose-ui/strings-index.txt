@@ -4356,8 +4356,14 @@ uv_lux
 via_api
 via_mqtt
 via_udp
+### VIEW ###
 view_on_map
 view_release
+view_style
+view_style_flat
+view_style_glass
+view_style_standard
+view_style_summary
 voltage
 warning
 water_ph

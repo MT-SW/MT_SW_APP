@@ -95,6 +95,9 @@ fun nodeChipLook(base: Color, foreground: Color, shape: Shape, style: Int = reme
 /** The node chip style chosen in "Look" (one of `UiOptions.NODE_CHIP_*`). */
 @Composable fun rememberNodeChipStyle(): Int = rememberUiOptions()[UiOptions.NODE_CHIP_STYLE]
 
+/** The panorama, antenna plot and choice button look chosen in "Look" (one of `UiOptions.VIEW_STYLE_*`). */
+@Composable fun rememberViewStyle(): Int = rememberUiOptions()[UiOptions.VIEW_STYLE]
+
 private const val CHOICE_CHIP_CORNER_DP = 12
 private const val CHOICE_CHIP_SELECTED_TINT = 0.18f
 private const val CHOICE_CHIP_SELECTED_RIM_DP = 2
@@ -112,6 +115,7 @@ fun GlassChoiceChip(
     outline: Color? = null,
     label: @Composable () -> Unit,
 ) {
+    val glass = rememberViewStyle() == UiOptions.VIEW_STYLE_GLASS
     val shape = RoundedCornerShape(CHOICE_CHIP_CORNER_DP.dp)
     val primary = MaterialTheme.colorScheme.primary
     val surface = MaterialTheme.colorScheme.surface
@@ -126,9 +130,9 @@ fun GlassChoiceChip(
     Box(
         modifier =
         modifier
-            .elementLook(UiOptions.GROUP_INPUT, shape)
+            .then(if (glass) Modifier.elementLook(UiOptions.GROUP_INPUT, shape) else Modifier)
             .clip(shape)
-            .background(Brush.verticalGradient(glassChipColors(base)))
+            .background(Brush.verticalGradient(if (glass) glassChipColors(base) else listOf(base, base)))
             .border(rimWidth, rim, shape)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),

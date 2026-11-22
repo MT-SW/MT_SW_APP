@@ -220,6 +220,16 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val NODE_CHIP_STANDARD = 1
         const val NODE_CHIP_GLASS_3D = 2
 
+        /**
+         * The look of the terrain panorama (ridges and buildings), the antenna pattern plot and the choice buttons:
+         * [VIEW_STYLE_GLASS] (the default: gradient, sheen, outline), [VIEW_STYLE_STANDARD] (plain colours with a thin
+         * outline) or [VIEW_STYLE_FLAT] (plain colours, no sheen or outline).
+         */
+        const val VIEW_STYLE = "views.style"
+        const val VIEW_STYLE_GLASS = 0
+        const val VIEW_STYLE_STANDARD = 1
+        const val VIEW_STYLE_FLAT = 2
+
         /** The style of all icons: [ICON_STYLE_STANDARD], [ICON_STYLE_BOLD] or [ICON_STYLE_OUTLINE]. */
         const val ICON_STYLE = "icons.style"
         const val ICON_STYLE_STANDARD = 0
@@ -308,6 +318,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(CHART_STYLE_HEALTH, CHART_STYLE_SAME)
             put(CHART_STYLE_NODE, CHART_STYLE_SAME)
             put(NODE_CHIP_STYLE, NODE_CHIP_STANDARD)
+            put(VIEW_STYLE, VIEW_STYLE_GLASS)
             for (group in ALL_GROUPS) {
                 // Glass where the element floats above the content (and can be blurred), see-through elsewhere.
                 put("$group.look", if (group in GLASS_GROUPS) ElementLook.GLASS else ElementLook.TRANSPARENT)

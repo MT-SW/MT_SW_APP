@@ -4446,8 +4446,14 @@
     <string name="via_api">via API</string>
     <string name="via_mqtt">via MQTT</string>
     <string name="via_udp">via UDP</string>
+    <!-- VIEW -->
     <string name="view_on_map">View on map</string>
     <string name="view_release">View Release</string>
+    <string name="view_style">Style of panorama, antenna plot and choice buttons</string>
+    <string name="view_style_flat">Flat (plain colours, no outline)</string>
+    <string name="view_style_glass">Glass (gradient, sheen and outline)</string>
+    <string name="view_style_standard">Standard (plain colours with a thin outline)</string>
+    <string name="view_style_summary">How the terrain panorama (ridges and buildings), the antenna plot and the choice buttons look.</string>
     <string name="voltage">Voltage</string>
     <string name="warning">Warning</string>
     <string name="water_ph">Water pH</string>

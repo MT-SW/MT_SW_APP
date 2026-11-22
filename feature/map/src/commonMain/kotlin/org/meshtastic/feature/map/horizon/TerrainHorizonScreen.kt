@@ -180,6 +180,7 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
 import org.meshtastic.core.ui.component.nodeChipFillColors
 import org.meshtastic.core.ui.component.rememberNodeChipStyle
+import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
@@ -792,9 +793,10 @@ private fun Panorama(
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
     // Very good (0) has the rock texture and forests; good keeps the shapes and the light but not the textures.
     val grain = remember(level, texture) { if (texture && level < LEVEL_GOOD) rockGrain() else null }
+    val viewStyle = rememberViewStyle()
     val light =
-        remember(sky, sun, grain, level, texture) {
-            ReliefLight(sky, HazeShares, sun, grain, texture && level == LEVEL_BEST)
+        remember(sky, sun, grain, level, texture, viewStyle) {
+            ReliefLight(sky, HazeShares, sun, grain, texture && level == LEVEL_BEST, viewStyle)
         }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
@@ -974,7 +976,8 @@ private fun DrawScope.drawBands(
                 drawBuildingSolids(profile, ground, index, buildingBands[index], centre, perDeg, range)
             } else {
                 val grain = light.grain.takeIf { index < 2 && light.extras }
-                drawBuildingShapes(shapesByBand[index], buildingBands[index], grain, centre, perDeg, range)
+                val shapes = shapesByBand[index]
+                drawBuildingShapes(shapes, buildingBands[index], grain, centre, perDeg, range, light.viewStyle)
             }
         } else {
             drawRelief(profile, index, bands[index], light, centre, perDeg, range)
@@ -1018,21 +1021,31 @@ private fun DrawScope.drawRelief(
     // MT_SW: the glass look. A pale sheen across the upper part of the ridge, then its outline: a thin dark edge with a
     // bright rim line on it. Near ridges get them stronger, far ones fainter.
     val glass = (1f - band * GLASS_FADE_PER_BAND).coerceAtLeast(GLASS_MIN_SHARE)
-    clipPath(path) {
-        drawRect(
-            Brush.verticalGradient(
-                listOf(Color.White.copy(alpha = GLASS_SHEEN_ALPHA * glass), Color.Transparent),
-                startY = top,
-                endY = top + (h - top) * GLASS_SHEEN_SHARE,
-            ),
+    val glassLook = light.viewStyle == UiOptions.VIEW_STYLE_GLASS
+    if (glassLook) {
+        clipPath(path) {
+            drawRect(
+                Brush.verticalGradient(
+                    listOf(Color.White.copy(alpha = GLASS_SHEEN_ALPHA * glass), Color.Transparent),
+                    startY = top,
+                    endY = top + (h - top) * GLASS_SHEEN_SHARE,
+                ),
+            )
+        }
+        drawPath(
+            ridge,
+            Color.Black.copy(alpha = GLASS_EDGE_ALPHA * glass),
+            style = Stroke(width = GLASS_EDGE_WIDTH_PX),
         )
     }
-    drawPath(ridge, Color.Black.copy(alpha = GLASS_EDGE_ALPHA * glass), style = Stroke(width = GLASS_EDGE_WIDTH_PX))
-    drawPath(
-        ridge,
-        Color.White.copy(alpha = GLASS_RIM_ALPHA * glass),
-        style = Stroke(width = RIDGE_WIDTH_PX, cap = StrokeCap.Round, join = StrokeJoin.Round),
-    )
+    // Standard: only the thin light outline of the ridge; flat: none.
+    if (light.viewStyle != UiOptions.VIEW_STYLE_FLAT) {
+        drawPath(
+            ridge,
+            Color.White.copy(alpha = GLASS_RIM_ALPHA * glass),
+            style = Stroke(width = RIDGE_WIDTH_PX, cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+    }
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
     val haze = light.haze[band.coerceIn(0, light.haze.lastIndex)]
     if (haze > 0f) {
@@ -1240,6 +1253,8 @@ private class ReliefLight(
     val grain: Brush? = null,
     /** Forests and the texture of buildings: only at the best level. */
     val extras: Boolean = true,
+    /** One of `UiOptions.VIEW_STYLE_*`: the glass look is the default, the others are plainer. */
+    val viewStyle: Int = UiOptions.VIEW_STYLE_GLASS,
 ) {
     /** How low the sun is, from 0 (high or unknown) to 1 (on the horizon): sunrise and sunset light. */
     private fun lowSun(): Float {
@@ -1326,7 +1341,10 @@ private fun DrawScope.drawBuildingShapes(
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
+    viewStyle: Int,
 ) {
+    val glassLook = viewStyle == UiOptions.VIEW_STYLE_GLASS
+    val rimLook = viewStyle != UiOptions.VIEW_STYLE_FLAT
     val w = size.width
     val h = size.height
     val path = Path()
@@ -1370,7 +1388,7 @@ private fun DrawScope.drawBuildingShapes(
             val wallColour = lerp(darkWall, base, facing)
             val wallTop = min(yOf(b.roofOf(k, scale), range, h), yOf(b.roofOf(m, scale), range, h))
             val wallBottom = max(yOf(b.footDeg[k], range, h), yOf(b.footDeg[m], range, h))
-            if (wallBottom > wallTop) {
+            if (glassLook && wallBottom > wallTop) {
                 val glass =
                     Brush.verticalGradient(
                         listOf(
@@ -1385,7 +1403,10 @@ private fun DrawScope.drawBuildingShapes(
                 drawPath(path, wallColour)
             }
             texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
-            drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA), style = Stroke(BUILDING_GLASS_RIM_PX))
+            if (rimLook) {
+                val rim = Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA)
+                drawPath(path, rim, style = Stroke(BUILDING_GLASS_RIM_PX))
+            }
         }
         path.reset()
         path.moveTo(xs[0], yOf(b.roofOf(0, scale), range, h))
@@ -1393,9 +1414,12 @@ private fun DrawScope.drawBuildingShapes(
         path.close()
         drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
         // The glass sheen over the roof and a lighter outline round the whole building.
-        drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_SHEEN_ALPHA))
+        if (glassLook) drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_SHEEN_ALPHA))
         texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
-        drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA * 1.4f), style = Stroke(BUILDING_GLASS_RIM_PX))
+        if (rimLook) {
+            val rim = Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA * 1.4f)
+            drawPath(path, rim, style = Stroke(BUILDING_GLASS_RIM_PX))
+        }
     }
 }
 
