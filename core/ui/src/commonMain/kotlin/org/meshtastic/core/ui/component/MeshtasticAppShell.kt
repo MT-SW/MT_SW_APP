@@ -191,6 +191,9 @@ fun MeshtasticAppShell(
                     multiBackstack.handleDeepLink(
                         listOf(
                             NodesRoute.Nodes,
+                            // The node's details stay in the middle column, so the map has the same place and size
+                            // as when it is opened from the list of traces.
+                            NodesRoute.NodeDetail(destNum),
                             NodeDetailRoute.TracerouteMap(destNum = destNum, requestId = requestId, logUuid = logUuid),
                         ),
                     )
