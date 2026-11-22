@@ -310,11 +310,21 @@ fun SosChip(
     }
     val corner = if (large) LARGE_CORNER else SMALL_CORNER
     val stroke = if (large) LARGE_STROKE else SMALL_STROKE
+    val shape = RoundedCornerShape(corner)
+    val base = if (enabled) SosRed else SosGrey
+    // The button of the bars looks like the chips with the short names of the nodes (gradient from the colour to a
+    // darker bottom, light edge, the shadow of the cards), only in red with a strong gold border, so it is clearly
+    // visible. The big button of the SOS screen stays plain.
+    val look =
+        if (large) {
+            Modifier.clip(shape).background(base)
+        } else {
+            nodeChipLook(base, Color.White, shape).clip(shape)
+        }
     Box(
         modifier =
         modifier
-            .clip(RoundedCornerShape(corner))
-            .background(if (enabled) SosRed else SosGrey)
+            .then(look)
             .then(
                 if (large) {
                     Modifier.defaultMinSize(minWidth = LARGE_MIN_WIDTH, minHeight = LARGE_MIN_HEIGHT)
