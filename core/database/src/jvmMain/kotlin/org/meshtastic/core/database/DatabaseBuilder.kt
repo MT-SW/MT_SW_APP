@@ -38,12 +38,40 @@ import java.io.File
  *
  * Shared between `core:database` and `desktop` module to ensure all persistent data is co-located.
  */
-fun desktopDataDir(): String = AppDataRoot.dir.path
+fun desktopDataDir(): String = resolvedDataDir
+
+/**
+ * The default `~/.meshtastic/` is restricted to the current user the first time it is resolved, including when it
+ * already exists. An explicit `MESHTASTIC_DATA_DIR` is left as the user set it; the app restricts its own
+ * subdirectories and files inside it.
+ */
+private val resolvedDataDir: String by lazy {
+    // MT_SW: the person may have chosen another folder (see AppDataRoot); the default one is restricted as upstream.
+    val dir = AppDataRoot.dir
+    if (dir == AppDataRoot.defaultDir) {
+        prepareDataDir(System.getenv("MESHTASTIC_DATA_DIR"), System.getProperty("user.home"))
+    } else {
+        dir.path
+    }
+}
+
+internal fun prepareDataDir(override: String?, home: String): String {
+    if (!override.isNullOrBlank()) return override
+    return "$home/.meshtastic".also { createOwnerOnlyDirectories(File(it)) }
+}
+
+/** The database file for [dbName] in [dataDir], created owner-only. A data directory that exists is left as it is. */
+internal fun prepareDatabaseFile(dataDir: String, dbName: String): File {
+    val dbFile = File(dataDir, "$dbName.db")
+    dbFile.parentFile?.let(::createMissingOwnerOnlyDirectories)
+    // SQLite gives the -wal and -shm files the main file's permissions.
+    ensureOwnerOnlyFile(dbFile)
+    return dbFile
+}
 
 /** Returns a [RoomDatabase.Builder] configured for JVM/Desktop with the given [dbName]. */
 actual fun getDatabaseBuilder(dbName: String): RoomDatabase.Builder<MeshtasticDatabase> {
-    val dbFile = File(desktopDataDir(), "$dbName.db")
-    dbFile.parentFile?.mkdirs()
+    val dbFile = prepareDatabaseFile(desktopDataDir(), dbName)
     return Room.databaseBuilder<MeshtasticDatabase>(
         name = dbFile.absolutePath,
         factory = { MeshtasticDatabaseConstructor.initialize() },
@@ -78,7 +106,7 @@ actual fun getFileSystem(): FileSystem = FileSystem.SYSTEM
 /** Creates a JVM DataStore for database preferences in the data directory. */
 actual fun createDatabaseDataStore(name: String): DataStore<Preferences> {
     val dir = desktopDataDir() + "/datastore"
-    File(dir).mkdirs()
+    createOwnerOnlyDirectories(File(dir))
     return PreferenceDataStoreFactory.create(
         corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
         produceFile = { File(dir, "$name.preferences_pb") },

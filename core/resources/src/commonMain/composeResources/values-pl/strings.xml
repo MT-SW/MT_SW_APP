@@ -58,7 +58,6 @@
     <!-- ADD -->
     <string name="add">Dodaj</string>
     <string name="add_a_note">Dodaj prywatną notatkę</string>
-    <string name="add_channels_description">W kodzie QR znaleziono następujące kanały. Wybierz te, które chcesz dodać do urządzenia. Istniejące kanały zostaną zachowane.</string>
     <string name="add_custom_tile_source">Dodaj sieciowe źródło kafelków</string>
     <string name="add_contact">Dodaj kontakt</string>
     <string name="add_favorite">Dodaj do ulubionych</string>
@@ -1290,8 +1289,6 @@
     <!-- LORA -->
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
-    <string name="lora_config_change_value">%1$s: %2$s → %3$s</string>
-    <string name="lora_config_changes">Zmiany konfiguracji LoRa:</string>
     <string name="low_battery">Słaba bateria</string>
     <string name="low_battery_message">Węzeł %1$s ma niski poziom baterii (%2$d%)</string>
     <string name="low_battery_title">Niski poziom baterii: %1$s</string>
@@ -1682,7 +1679,6 @@
     <string name="on_demand_received_at">Odebrano: %1$s</string>
     <string name="network">Sieć</string>
     <string name="network_layer_url_hint" translatable="false">https://example.com/map.kml lub .geojson</string>
-    <string name="new_channel_rcvd">Otrzymano nowy URL kanału</string>
     <string name="new_messages_below">Nowe wiadomości poniżej</string>
     <string name="new_node_seen">Wykryto nowy węzeł: %1$s</string>
     <string name="new_nodes">Nowe węzły</string>
@@ -2072,7 +2068,6 @@
         <item quantity="other">%1$d węzła zostanie usuniętych z listy, dopóki Twój węzeł nie otrzyma od nich ponownie danych.</item>
     </plurals>
     <string name="replace">Zastąp</string>
-    <string name="replace_channels_and_settings_description">Ten kod QR zawiera pełną konfigurację. To ZASTĄPI Twoje obecne kanały i ustawienia radia. Wszystkie istniejące kanały zostaną usunięte.</string>
     <string name="reply">Odpowiedz</string>
     <string name="replying_to">Odpowiadanie do %1$s</string>
     <string name="report">Zgłoś</string>
@@ -4608,4 +4603,45 @@
     <string name="connection_progress_channels_of">Kanały (%1$d / %2$d)</string>
     <string name="connection_progress_nodes">Węzły (%1$d)</string>
     <string name="connection_progress_loading_nodes">Wczytywanie listy węzłów</string>
+    <string name="channel_import_add_description">Dodaje wybrane kanały do Twojego urządzenia. Kanały, które już na nim są, zostają bez zmian.</string>
+    <string name="channel_import_confirm_add">Dodaj kanały</string>
+    <string name="channel_import_confirm_replace">Zastąp kanały</string>
+    <string name="channel_import_downlink">Przyjmuje wiadomości z MQTT na tym kanale</string>
+    <string name="channel_import_mode_label">Tryb importu</string>
+    <string name="channel_import_position_approximate">Udostępnia Twoją przybliżoną lokalizację</string>
+    <string name="channel_import_position_precise">Udostępnia Twoją dokładną lokalizację</string>
+    <string name="channel_import_replace_description">Usuwa kanały z Twojego urządzenia i stosuje kanały oraz ustawienia LoRa podane niżej.</string>
+    <string name="channel_import_title">Importuj kanały</string>
+    <string name="channel_import_uplink">Przekazuje wiadomości tego kanału do MQTT</string>
+    <string name="frequency_value_mhz">%1$s MHz</string>
+    <string name="lora_change_spoken">%1$s, z %2$s na %3$s</string>
+    <string name="lora_change_values">%1$s → %2$s</string>
+    <string name="lora_changes_alert_description">Mogą one uniemożliwić urządzeniu nadawanie, zdjąć limit czasu nadawania (duty cycle) albo sprawić, że urządzenie będzie pomijać węzły.</string>
+    <string name="lora_changes_alert_heading">Zmiany w wysyłaniu i odbieraniu</string>
+    <string name="lora_changes_heading">Ustawienia LoRa, które się zmienią</string>
+    <string name="lora_fem_lna_auto">Automatyczny</string>
+    <string name="lora_fem_lna_not_present">Brak</string>
+    <string name="lora_field_fem_lna_mode">Tryb FEM LNA</string>
+    <string name="lora_field_frequency_offset">Przesunięcie częstotliwości</string>
+    <string name="lora_field_modem_preset">Ustawienie modemu</string>
+    <string name="lora_field_serial_hal_only">Tylko szeregowy HAL</string>
+    <string name="lora_field_transparent_mode">Tryb przezroczysty</string>
+    <string name="lora_field_unrecognized">Zmieniają się też inne ustawienia LoRa</string>
+    <string name="lora_value_none">Brak</string>
+    <string name="lora_value_not_used">Nieużywane</string>
+    <string name="notifications_blocked_by_browser">Przeglądarka blokuje powiadomienia z MT_SW. Zezwól na nie w ustawieniach witryny w przeglądarce.</string>
+    <string name="notifications_turn_on">Włącz powiadomienia</string>
+    <string name="notifications_turn_on_summary">Przeglądarka zapyta tylko raz. Bez zgody nic z poniższych nie da Ci znać.</string>
+    <string name="wifi_provision_confirm_compare">Porównaj adres z adresem Bluetooth wydrukowanym na urządzeniu albo pokazanym w jego ustawieniach Bluetooth.</string>
+    <string name="wifi_provision_confirm_consequence">Sieć Wi-Fi, którą wybierzesz w następnym kroku, razem z jej hasłem zostanie wysłana do tego urządzenia.</string>
+    <string name="wifi_provision_confirm_title">Skonfigurować Wi-Fi na tym urządzeniu?</string>
+    <string name="wifi_provision_confirm_title_named">Skonfigurować Wi-Fi na %1$s?</string>
+    <string name="wifi_provision_device_not_found">Nie znaleziono urządzenia. Upewnij się, że jest włączone i w zasięgu, i spróbuj ponownie.</string>
+    <string name="wifi_provision_link_unsupported">Ten link wskazuje urządzenie po adresie sprzętowym, którego ta aplikacja tu nie wyszuka. Wybierz urządzenie z listy.</string>
+    <string name="wifi_provision_no_devices">Nie znaleziono urządzeń</string>
+    <string name="wifi_provision_no_devices_detail">Upewnij się, że urządzenie jest włączone i w zasięgu, a potem wyszukaj ponownie.</string>
+    <string name="wifi_provision_no_response">Urządzenie nie odpowiedziało. Zbliż się do niego i spróbuj ponownie.</string>
+    <string name="wifi_provision_pick_device">Wybierz urządzenie do skonfigurowania. Hasło Wi-Fi zostanie wysłane do wybranego urządzenia.</string>
+    <string name="wifi_provision_rescan">Wyszukaj ponownie</string>
+    <string name="wifi_provision_signal_dbm">Siła sygnału %1$d dBm</string>
 </resources>

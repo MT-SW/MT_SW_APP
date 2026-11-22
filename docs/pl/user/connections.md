@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-11-20
+last_updated: 2026-11-21
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB, TCP/IP lub WebSocket.
 aliases:
   - bluetooth
@@ -155,11 +155,12 @@ Wykrywanie w sieci używa mDNS, które działa tylko wtedy, gdy telefon i radio 
 
 ### Konfiguracja Wi-Fi dla mPWRD-OS
 
-**Ustawienia → Konfiguracja Wi-Fi dla mPWRD-OS** (Wi-Fi Provisioning for mPWRD-OS) to osobne, węższe narzędzie. Wysyła dane logowania do Wi-Fi przez Bluetooth wyłącznie do urządzeń **mPWRD-OS**, używając ich własnego protokołu — nie konfiguruje Wi-Fi w zwykłym radiu MT_SW. Jest dostępne zarówno na Androidzie, jak i na desktopie.
+**Ustawienia → Konfiguracja Wi-Fi dla mPWRD-OS** (Wi-Fi Provisioning for mPWRD-OS) to osobne, węższe narzędzie. Wysyła dane logowania do Wi-Fi przez Bluetooth wyłącznie do urządzeń **mPWRD-OS**, używając ich własnego protokołu — nie konfiguruje Wi-Fi w zwykłym radiu MT_SW. Jest dostępne na Androidzie, komputerze i iPhonie/iPadzie.
 
-1. Otwórz ekran i poczekaj, aż aplikacja znajdzie urządzenie przez Bluetooth.
-2. Dotknij **Skanuj sieci**, a następnie wybierz sieć z **Dostępne sieci** — albo włącz **Sieć ukryta** i wpisz nazwę w **Nazwa sieci (SSID)**.
-3. Wpisz **Hasło** i dotknij **Zastosuj**.
+1. Otwórz ekran i poczekaj, aż aplikacja poszuka urządzeń przez Bluetooth, a potem dotknij swojego urządzenia na liście. Każdy wiersz pokazuje nazwę urządzenia i siłę sygnału oraz jego adres Bluetooth, jeśli system go podaje (Android i komputer z Linuksem). Na macOS i iPhonie/iPadzie system ukrywa adres, więc wybierasz po nazwie. Dotknij **Skanuj ponownie**, jeśli urządzenia nie ma na liście.
+2. Link, który wskazuje urządzenie po adresie, najpierw pokazuje ten adres oraz przyciski **Połącz** i **Anuluj**. Porównaj adres z tym na urządzeniu, a potem dotknij **Połącz**. Tam, gdzie system nie podaje adresów, linku nie da się użyć: ekran to mówi, a urządzenie wybierasz sam.
+3. Dotknij **Skanuj sieci**, a następnie wybierz sieć z **Dostępne sieci** — albo włącz **Sieć ukryta** i wpisz nazwę w **Nazwa sieci (SSID)**.
+4. Wpisz **Hasło** i dotknij **Zastosuj**.
 
 Gdy urządzenie dołączy do sieci, ekran pokazuje **Urządzenie połączone** z jego **Adresem IP** (**IP niedostępne**, gdy go nie podało) oraz kartę **Dokończ konfigurację urządzenia** z domyślnym logowaniem i przyciskiem **Otwórz klienta SSH**. Zaloguj się przez SSH, aby zmienić domyślną nazwę użytkownika i hasło.
 

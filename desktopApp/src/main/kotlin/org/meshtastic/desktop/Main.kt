@@ -90,6 +90,7 @@ import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
+import org.meshtastic.core.database.createOwnerOnlyDirectories
 import org.meshtastic.core.database.desktopDataDir
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.MultiBackstack
@@ -206,6 +207,8 @@ fun main(args: Array<String>) {
     SingleInstanceControls.current = DesktopSingleInstanceControl
     // Before anything is opened: a requested move of the data folder is made now (with a progress window).
     prepareDataFolder()
+    // Resolving the data directory restricts the default location before any store writes into it.
+    desktopDataDir()
     installQuitHandler()
     AutostartControls.current = DesktopAutostart.create()
     SosAlarmSounds.current = DesktopSosAlarmSound()
@@ -713,6 +716,7 @@ private fun CoilImageLoaderSetup() {
 
     setSingletonImageLoaderFactory { context ->
         val cacheDir = desktopDataDir() + "/image_cache_v3"
+        createOwnerOnlyDirectories(File(cacheDir))
         ImageLoader.Builder(context)
             .components {
                 add(

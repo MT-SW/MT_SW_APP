@@ -38,6 +38,8 @@ internal actual val supportsNativeAddressScanFilter: Boolean = true
 /** Android's scanner filters on service UUID in hardware, so Kable's `Filter.Service` works natively here. */
 internal actual val supportsNativeServiceScanFilter: Boolean = true
 
+internal actual val bleAddressIsHardware: Boolean = true
+
 /**
  * Shared thread pool for Kable BLE connections.
  *

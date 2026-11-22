@@ -2,7 +2,7 @@
 title: Nawigacja i deep linki
 parent: Przewodnik dewelopera
 nav_order: 4
-last_updated: 2026-11-16
+last_updated: 2026-11-21
 description: Jak współpracują typowane trasy Navigation 3 i DeepLinkRouter, obsługiwane URI deep linków oraz jak dodać nowy.
 aliases:
   - deeplinks
@@ -97,7 +97,7 @@ null, a wywołujący przekazuje je do swojego mechanizmu importu.
 | `/connections?address={prefixedAddress}` | `ConnectionsRoute.Connections(address)` | Łączy z węzłem po potwierdzeniu przez użytkownika okna „Connect to this device?” — adres używa wewnętrznego formatu aplikacji z prefiksem transportu: `t192.168.1.1:4403` (TCP), `xAA:BB:CC:DD:EE:FF` (BLE), `s/dev/ttyUSB0` (port szeregowy). Przeznaczone dla skryptów/narzędzi AI sterujących aplikacją; kompilacja debug uruchomiona przez swój dostępny tylko z powłoki alias `org.meshtastic.app.AutomationLauncher` z dodatkiem intencji `skip_connect_confirm` lub z argumentem `--skip-connect-confirm` na desktopie stosuje adres, z którym została uruchomiona, bez okna dialogowego; linki, które przychodzą później, nadal pytają. |
 | `/connections?address=n` | `ConnectionsRoute.Connections("n")` | Rozłącza bieżący węzeł zamiast się łączyć (`n` = wewnętrzny wartownik „nie wybrano urządzenia”), po tym samym potwierdzeniu. |
 | `/wifi-provision` | `WifiProvisionRoute.WifiProvision(null)` | Ekran provisioningu Wi-Fi |
-| `/wifi-provision?address={mac}` | `WifiProvisionRoute.WifiProvision(mac)` | Provisioning dla konkretnego MAC węzła |
+| `/wifi-provision?address={mac}` | `WifiProvisionRoute.WifiProvision(mac)` | Pokazuje adres tego urządzenia do potwierdzenia, a potem je konfiguruje. Platforma, której skaner nie podaje adresów sprzętowych (`BleScanner.addressIsHardware` równe false: macOS, iOS, przeglądarka), ignoruje `mac` i wraca do listy urządzeń lub wyboru |
 | `/settings` | `SettingsRoute.Settings(null)` | Korzeń ustawień |
 | `/settings/{page}` | np. `SettingsRoute.LoRa` | Ekran ustawień według sluga (`lora`, `mqtt`, `security`, `about`, ...); pełna lista to `settingsSubRoutes` |
 | `/settings/{destNum}` | `SettingsRoute.Settings(destNum)` | Ustawienia zdalnego węzła. Ścieżka ustawień może zaczynać się od `{destNum}`, aby wskazać zdalny węzeł, jak w `/settings/{destNum}/{page}`; bez niego ścieżka otwiera ustawienia podłączonego węzła |

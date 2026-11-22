@@ -392,6 +392,10 @@ open class RadioConfigViewModel(
     // recovery merely because the user saved from a screen whose route name is still selected.
     private val readRequestRoutes = mutableMapOf<Int, String>()
     private val deferredRemoteReadErrors = mutableMapOf<Int, UiText>()
+
+    // The admin channel index each tracked request was sent under; its response is judged against that index, not
+    // the channel set at reply time.
+    private val requestAdminChannelIndexes = mutableMapOf<Int, Int?>()
     private val lateRemoteReads = mutableMapOf<Int, LateRemoteRead>()
     private val _radioConfigState = MutableStateFlow(RadioConfigState())
     val radioConfigState: StateFlow<RadioConfigState> = _radioConfigState
@@ -1477,6 +1481,7 @@ open class RadioConfigViewModel(
         removeLateRemoteRead(packetId)
         readRequestRoutes.remove(packetId)
         deferredRemoteReadErrors.remove(packetId)
+        requestAdminChannelIndexes[packetId] = adminChannelIndex.value
         requestIds.update { it.withPacketId(packetId) }
         _radioConfigState.update { state ->
             if (state.responseState is ResponseState.Loading) {
@@ -1500,9 +1505,10 @@ open class RadioConfigViewModel(
                     val timedOutDfuRequest = packetId in dfuRequestIds
                     val requestRoute = readRequestRoutes[packetId].orEmpty()
                     val deferredRemoteReadError = deferredRemoteReadErrors[packetId]
+                    val sentAdminChannelIndex = requestAdminChannelIndexes[packetId]
                     removeRequestId(packetId)
                     if (isSingleResponseRemoteReadRoute(requestRoute)) {
-                        retainLateRemoteRead(packetId, requestRoute)
+                        retainLateRemoteRead(packetId, requestRoute, sentAdminChannelIndex)
                     }
                     if (!hasPendingRequestsForRoute(requestRoute) && radioConfigState.value.route == requestRoute) {
                         // A save that reboots the node races the reboot against its ACK; a timeout here during an
@@ -1558,6 +1564,7 @@ open class RadioConfigViewModel(
         requestTimeoutJobs.values.forEach { it.cancel() }
         requestTimeoutJobs.clear()
         readRequestRoutes.clear()
+        requestAdminChannelIndexes.clear()
         deferredRemoteReadErrors.clear()
         lateRemoteReads.values.forEach { it.expiryJob.cancel() }
         lateRemoteReads.clear()
@@ -1568,6 +1575,7 @@ open class RadioConfigViewModel(
     private fun removeRequestId(packetId: Int) {
         requestTimeoutJobs.remove(packetId)?.cancel()
         readRequestRoutes.remove(packetId)
+        requestAdminChannelIndexes.remove(packetId)
         deferredRemoteReadErrors.remove(packetId)
         manualChannelBatchRequestIds.remove(packetId)
         dfuRequestIds.remove(packetId)
@@ -1578,6 +1586,7 @@ open class RadioConfigViewModel(
         packetIds.forEach { requestTimeoutJobs.remove(it)?.cancel() }
         packetIds.forEach {
             readRequestRoutes.remove(it)
+            requestAdminChannelIndexes.remove(it)
             deferredRemoteReadErrors.remove(it)
             removeLateRemoteRead(it)
         }
@@ -1610,9 +1619,11 @@ open class RadioConfigViewModel(
         val requestId = packet.decoded?.request_id
         val lateRemoteReadRoute = requestId?.let { lateRemoteReads[it]?.route }
         val pendingRequestIds = requestIds.value + lateRemoteReads.keys
+        val sentAdminChannelIndex = requestId?.let {
+            requestAdminChannelIndexes[it] ?: lateRemoteReads[it]?.adminChannelIndex
+        }
         val result =
-            processRadioResponseUseCase(packet, destNum, pendingRequestIds, myNodeNum, adminChannelIndex.value)
-                ?: return
+            processRadioResponseUseCase(packet, destNum, pendingRequestIds, myNodeNum, sentAdminChannelIndex) ?: return
         val route = radioConfigState.value.route
         val isLateRemoteRead = requestId != null && lateRemoteReadRoute != null
 
@@ -1831,14 +1842,14 @@ open class RadioConfigViewModel(
         return hasReadFanOut == false
     }
 
-    private fun retainLateRemoteRead(packetId: Int, route: String) {
+    private fun retainLateRemoteRead(packetId: Int, route: String, adminChannelIndex: Int?) {
         removeLateRemoteRead(packetId)
         val expiryJob =
             safeLaunch(tag = "expireLateRemoteRead") {
                 delay(REMOTE_READ_LATE_RESPONSE_GRACE)
                 lateRemoteReads.remove(packetId)
             }
-        lateRemoteReads[packetId] = LateRemoteRead(route, expiryJob)
+        lateRemoteReads[packetId] = LateRemoteRead(route, expiryJob, adminChannelIndex)
     }
 
     private fun removeLateRemoteRead(packetId: Int) {
@@ -1846,7 +1857,7 @@ open class RadioConfigViewModel(
     }
 }
 
-private data class LateRemoteRead(val route: String, val expiryJob: Job)
+private data class LateRemoteRead(val route: String, val expiryJob: Job, val adminChannelIndex: Int?)
 
 internal data class ManualChannelUpdateResult(val packetIds: List<Int>, val finalSettings: List<ChannelSettings>)
 

@@ -57,7 +57,12 @@ Na ekranie **Kanały** dotknij **Udostępnij kanały**, aby zobaczyć kod QR i l
 - **Zastąp** nadpisuje wszystkie kanały na jej węźle Twoimi i stosuje Twoje ustawienia LoRa.
 - **Dodaj** zachowuje jej kanały i ustawienia LoRa, a Twoje dopisuje na końcu.
 
-Aby przyjąć czyjeś kanały, użyj przycisku importu na tym samym ekranie: **Skanuj kod QR udostępnionych kanałów**, **Wpisz URL udostępnionych kanałów** albo, na telefonie z NFC, **Skanuj udostępnione kanały (NFC)**. Przy kodzie „Dodaj” aplikacja wypisuje przychodzące kanały, żebyś zaznaczył te, które chcesz, i pokazuje, ile miejsc na kanały w Twoim węźle jest zajętych. Jeśli wybór się nie mieści, wiersz podpowiada, ile kanałów odznaczyć. Odznaczenie kanału, który już jest na Twoim węźle, usuwa go.
+Aby przyjąć czyjeś kanały, użyj przycisku importu na tym samym ekranie: **Skanuj kod QR udostępnionych kanałów**, **Wpisz URL udostępnionych kanałów** albo, na telefonie z NFC, **Skanuj udostępnione kanały (NFC)**. Okno **Importuj kanały** wypisuje przychodzące kanały. Kod zrobiony z opcją **Zastąp** otwiera się z zaznaczonym **Zastąp**, kod zrobiony z opcją **Dodaj** oferuje tylko **Dodaj**, a przełącznik **Zastąp** / **Dodaj** wybiera tylko tryb: na Twoim węźle nic się nie zmieni, dopóki nie dotkniesz **Zastąp kanały** albo **Dodaj kanały**. Kanał, który przekazuje wiadomości do MQTT lub z MQTT albo udostępnia Twoją lokalizację, mówi o tym w swoim wierszu.
+
+- **Zastąp** usuwa kanały z Twojego węzła, a potem wypisuje każde ustawienie LoRa, które się zmieni. Zmiany w wysyłaniu i odbieraniu, na przykład wyłączenie nadawania, są na początku, w osobnej grupie.
+- **Dodaj** pozwala zaznaczyć przychodzące kanały, które chcesz, i pokazuje, ile miejsc na kanały w Twoim węźle jest zajętych. Jeśli wybór się nie mieści, wiersz podpowiada, ile kanałów odznaczyć. Odznaczenie kanału, który już jest na Twoim węźle, usuwa go.
+
+Tytuł oraz przyciski **Anuluj** i potwierdzenia zostają widoczne, gdy lista się przewija.
 
 ### Zarchiwizowane kanały
 
@@ -135,7 +140,7 @@ Etykieta statusu pojawia się wyłącznie pod **Twoimi własnymi** wiadomościam
 
 Dotknij statusu pod dowolną wysłaną przez Ciebie wiadomością, aby otworzyć szczegóły jej doręczenia. Przy nieudanej wiadomości albo wiadomości bezpośredniej oznaczonej **Przekazane, niepotwierdzone przez odbiorcę** wybierz **Wyślij ponownie**, aby wysłać ją jeszcze raz. Wiadomość zostaje na swoim miejscu w rozmowie, a jej status zaczyna się od nowa. **Wyślij ponownie** nie jest dostępne przy **Niezgodność kanału/klucza** ani **Wiadomość jest za duża, by ją wysłać**, bo druga próba tego nie naprawi, ani w zarchiwizowanej rozmowie.
 
-To samo okno podaje węzeł przekazujący: przy wiadomości kanałowej węzeł, który ją przekazał, a przy wiadomości bezpośredniej węzeł, który przekazał potwierdzenie z powrotem, na przykład **Potwierdzenie przekazane przez Ridge (0x5A)**. Pakiet niesie tylko ostatni bajt identyfikatora przekaźnika, więc nazwa to najlepsze dopasowanie wśród znanych aplikacji węzłów i może być błędna. Gdy nie zapisano żadnego przekaźnika, wiersz się nie pojawia.
+To samo okno podaje węzeł przekazujący: przy wiadomości kanałowej węzeł, który ją przekazał, a przy wiadomości bezpośredniej węzeł, który przekazał potwierdzenie z powrotem, na przykład **Potwierdzenie przekazane przez Ridge (0x5A)**. Pakiet niesie tylko ostatni bajt identyfikatora przekaźnika, więc nazwa to najlepsze dopasowanie wśród znanych aplikacji węzłów i może być błędna. Wiersz się nie pojawia, gdy nie zapisano żadnego przekaźnika, gdy potwierdzenie wróciło prosto od odbiorcy albo gdy dotarło przez MQTT.
 
 ### Błędy dostarczania
 
@@ -230,6 +235,8 @@ Reaguj na wiadomości za pomocą emoji:
 - Wielu użytkowników może reagować na tę samą wiadomość
 - Możesz reagować na własne wiadomości lub cudze
 
+- Dotknij plakietki reakcji, aby zobaczyć, kto zareagował. Odebrana reakcja podaje węzeł, który ją przekazał, a szczegóły dostarczenia Twojej własnej reakcji podają przekaźnik tak samo jak przy wysłanej wiadomości
+
 ![Plakietki reakcji emoji wyświetlane pod wiadomością](../../assets/screenshots/messages_reaction.png)
 
 Reakcje zużywają mniej przepustowości sieci mesh niż pełne wiadomości tekstowe.
@@ -259,7 +266,7 @@ Dotknij i przytrzymaj albo dotknij dwukrotnie wiadomość, aby otworzyć pasek s
 arkusza — tam są reakcje. Pod nim pojawia się **Podpisano · zweryfikowano** przy wiadomości, której
 podpis Twój węzeł sprawdził kluczem nadawcy, oraz **Dostarczenie potwierdzone**, **Dowód dostarczenia nieudany**
 albo **Dowód dostarczenia niesprawdzony**, gdy potwierdzenie Twojej wiadomości zawierało dowód dostarczenia.
-Dalej idą czas wiadomości i status dostarczenia, a potem te działania:
+Dalej idą czas wiadomości i status dostarczenia, a przy odebranej wiadomości węzeł, który ją do Ciebie przekazał, na przykład **Przekazane przez Ridge (0x5A)**. Przy wiadomości usłyszanej bezpośrednio od nadawcy albo takiej, która przyszła przez MQTT, przekaźnika nie ma. Potem te działania:
 
 - **Odpowiedz** — zacytuj wiadomość w swojej odpowiedzi
 - **Kopiuj** — skopiuj tekst wiadomości do schowka

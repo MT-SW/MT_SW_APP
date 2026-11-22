@@ -55,6 +55,7 @@ import org.meshtastic.core.model.util.allChannelIds
 import org.meshtastic.core.model.util.decodeOrNull
 import org.meshtastic.core.model.util.subscribeList
 import org.meshtastic.core.network.mqtt.MqttRootTopic
+import org.meshtastic.core.network.transport.StreamFrameCodec
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.mqtt.ConnectionState
@@ -70,6 +71,7 @@ import org.meshtastic.mqtt.packet.Subscription
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.MqttClientProxyMessage
 import org.meshtastic.proto.ServiceEnvelope
+import org.meshtastic.proto.ToRadio
 import kotlin.uuid.Uuid
 
 @Single(binds = [MQTTRepository::class])
@@ -173,7 +175,7 @@ class MQTTRepositoryImpl(
             close(MqttEndpointUnsupportedException())
             return@callbackFlow
         }
-        val session = ActiveMqttSession(newClient)
+        val session = ActiveMqttSession(newClient, rootTopic)
         closeSession(replaceActiveSession(session))
 
         // The Client Proxy only wants channels the device asked for downlink on (subscribeList); the Sniffer
@@ -363,6 +365,11 @@ class MQTTRepositoryImpl(
         val noLocal = version == MqttProtocolVersion.V5_0
         return buildList {
             globalIds.forEach { globalId ->
+                // A name holding a wildcard or level separator would subscribe outside its own channel topic.
+                if (!MqttRootTopic.isSubscribableChannelName(globalId)) {
+                    Logger.w { "MQTT channel skipped: its name holds a wildcard or '/'" }
+                    return@forEach
+                }
                 add(
                     Subscription(
                         "$rootTopic$DEFAULT_TOPIC_LEVEL$globalId/+",
@@ -403,7 +410,7 @@ class MQTTRepositoryImpl(
                 if (selfTraffic != MqttSelfTraffic.FORWARD) {
                     Logger.d { "MQTT json dropped ($selfTraffic)" }
                 } else {
-                    trySend(
+                    forwardIfFits(
                         MqttClientProxyMessage.Builder()
                             .also { wb ->
                                 wb.topic = topic
@@ -448,7 +455,7 @@ class MQTTRepositoryImpl(
                     }
 
                 else ->
-                    trySend(
+                    forwardIfFits(
                         MqttClientProxyMessage.Builder()
                             .also { wb ->
                                 wb.topic = topic
@@ -458,6 +465,17 @@ class MQTTRepositoryImpl(
                             .build(),
                     )
             }
+        }
+    }
+
+    /** Forwards [message] only when the `ToRadio` that wraps it fits one phone API frame. */
+    private fun ProducerScope<MqttClientProxyMessage>.forwardIfFits(message: MqttClientProxyMessage) {
+        val toRadio = ToRadio.Builder().also { wb -> wb.mqttClientProxyMessage = message }.build()
+        val encodedSize = ToRadio.ADAPTER.encodedSize(toRadio)
+        if (encodedSize > StreamFrameCodec.MAX_TO_FROM_RADIO_SIZE) {
+            Logger.w { "MQTT downlink dropped: $encodedSize-byte ToRadio over the phone API frame limit" }
+        } else {
+            trySend(message)
         }
     }
 
@@ -473,6 +491,10 @@ class MQTTRepositoryImpl(
                             "MQTT publish dropped: client not connected"
                         }
                     }
+                    return@withPermit
+                }
+                if (!MqttRootTopic.isUnder(session.rootTopic, topic)) {
+                    Logger.w { "MQTT publish dropped: topic is outside the root" }
                     return@withPermit
                 }
                 safeCatching {
@@ -494,7 +516,8 @@ class MQTTRepositoryImpl(
     }
 }
 
-private class ActiveMqttSession(val client: MqttClientSession) {
+/** [rootTopic] is the root the subscriptions were built under, fixed for the life of the session. */
+private class ActiveMqttSession(val client: MqttClientSession, val rootTopic: String) {
     val closeStarted = atomic(false)
     val connectJob = atomic<Job?>(null)
     val subscriptionRefusal = MutableStateFlow<MqttException.SubscriptionRefused?>(null)

@@ -27,6 +27,9 @@ internal actual val supportsNativeAddressScanFilter: Boolean = false
 // CoreBluetooth's scanForPeripherals(withServices:) is the canonical, reliable way to scan on Apple platforms.
 internal actual val supportsNativeServiceScanFilter: Boolean = true
 
+// CoreBluetooth identifies a peripheral by a per-host UUID, never its MAC.
+internal actual val bleAddressIsHardware: Boolean = false
+
 internal actual fun ScannerBuilder.platformScanConfig() {
     // No-op: preConflate is Android-only.
 }

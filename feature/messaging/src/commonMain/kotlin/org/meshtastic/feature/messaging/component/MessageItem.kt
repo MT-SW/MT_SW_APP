@@ -160,6 +160,7 @@ import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
 import kotlin.time.Clock
+import org.meshtastic.feature.messaging.receivedRelayNode
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 
@@ -229,6 +230,8 @@ fun MessageItem(
     searchQuery: String = "",
     translationAvailable: Boolean = false,
     isDirectMessage: Boolean = false,
+    /** Names the node behind a relay byte; called only when the actions sheet opens. */
+    resolveRelay: (Int?) -> String? = { null },
     onTranslate: () -> Unit = {},
     onToggleTranslation: () -> Unit = {},
     /** Null when muting this sender makes no sense (own messages, private chats). */
@@ -307,6 +310,15 @@ fun MessageItem(
                         // Mesh time (rx_time), matching the bubble header. receivedTime is when this phone
                         // pulled the packet off the node, which is misleading after an offline backlog sync.
                         timestamp = timestamp,
+                        // A sent message's relay is the ack's, shown in its status dialog instead.
+                        relay =
+                        if (message.fromLocal) {
+                            null
+                        } else {
+                            resolveRelay(
+                                receivedRelayNode(message.relayNode, message.hopsAway, message.viaMqtt),
+                            )
+                        },
                         xeddsaSigned = message.xeddsaSigned,
                         ackProofStatus = message.ackProofStatus,
                         onStatus = onStatusClick,
