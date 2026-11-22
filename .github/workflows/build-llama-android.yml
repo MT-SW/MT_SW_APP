@@ -95,7 +95,8 @@ jobs:
             -DBUILD_SHARED_LIBS=OFF $BACKEND \
             -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
             -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod $EXTRA_CXX" \
-            -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF
+            -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_USE_PREBUILT_UI=OFF -DLLAMA_BUILD_UI=OFF
           cmake --build build --target llama-server
 
       - name: Pack
