@@ -180,10 +180,6 @@ private fun ContactHeader(
     modifier: Modifier = Modifier,
     onNodeChipClick: () -> Unit = {},
 ) {
-    val chipLabelColor =
-        contact.nodeColors?.let { Color(it.first) } ?: MaterialTheme.colorScheme.onSecondaryContainer
-    val chipColor = contact.nodeColors?.let { Color(it.second) } ?: MaterialTheme.colorScheme.surfaceContainerHigh
-
     // The name text carries the colour: main channel in the theme colour, other channels red, direct messages the
     // node's colour.
     val isChannel = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
@@ -199,6 +195,20 @@ private fun ContactHeader(
 
     // The row is as tall as it was with the 48dp touch area of the Material chip, so the rows of conversations with and
     // without a lock icon line up.
+    // A channel's chip has the colour of its name (main channel in the theme colour, the others red), with a dark or
+    // light label, whichever reads better on it.
+    val channelChipColor = nameColor.takeIf { isChannel && it != Color.Unspecified }
+    val chipColor =
+        channelChipColor
+            ?: contact.nodeColors?.let { Color(it.second) }
+            ?: MaterialTheme.colorScheme.surfaceContainerHigh
+    val chipLabelColor =
+        when {
+            channelChipColor != null ->
+                if (channelChipColor.luminance() > CHIP_LIGHT_LUMINANCE) Color.Black else Color.White
+            else -> contact.nodeColors?.let { Color(it.first) } ?: MaterialTheme.colorScheme.onSecondaryContainer
+        }
+
     Row(
         modifier = modifier.heightIn(min = 48.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -262,6 +272,7 @@ private fun ContactHeader(
 
 private const val UNREAD_MESSAGE_LIMIT = 99
 private const val NODE_CHIP_MIN_WIDTH_DP = 64
+private const val CHIP_LIGHT_LUMINANCE = 0.5f
 private const val DESCRIPTION_MAX_LINES = 4
 
 @Composable
