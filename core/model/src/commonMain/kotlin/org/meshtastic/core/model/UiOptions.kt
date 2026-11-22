@@ -207,8 +207,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CHART_STYLE_RIBBON = 5
 
         /**
-         * Own chart style of "Network health" and of the node details; [CHART_STYLE_SAME] (the default) means the
-         * general [CHART_STYLE].
+         * Own chart style of "Network health" and of the node details; the default is [CHART_STYLE_RIBBON];
+         * [CHART_STYLE_SAME] means the general [CHART_STYLE].
          */
         const val CHART_STYLE_HEALTH = "charts.style.health"
         const val CHART_STYLE_NODE = "charts.style.node"
