@@ -53,8 +53,6 @@ import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 
-private const val LINE_LIGHTEN = 0.3f
-private const val LINE_DARKEN = 0.25f
 private const val AREA_TOP_ALPHA = 0.3f
 private const val AREA_BOTTOM_ALPHA = 0.05f
 private const val GLOW_AREA_TOP_ALPHA = 0.45f
@@ -106,34 +104,15 @@ private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook
             ),
         )
     return when (style) {
+        // The line itself keeps one colour: a gradient brush has no height on a perfectly level line (a sensor that
+        // reports the same voltage for hours) and the line would not be drawn at all. The depth comes from the
+        // gradient fill under the line, the drops and the card.
         UiOptions.CHART_STYLE_GLASS ->
-            LineLook(
-                fill =
-                Fill(
-                    Brush.verticalGradient(
-                        listOf(
-                            lerp(base, Color.White, LINE_LIGHTEN).copy(alpha = alpha),
-                            color,
-                            lerp(base, Color.Black, LINE_DARKEN).copy(alpha = alpha),
-                        ),
-                    ),
-                ),
-                areaFill = area(AREA_TOP_ALPHA),
-                extraWidthDp = STYLE_EXTRA_WIDTH_DP,
-            )
+            LineLook(fill = Fill(color), areaFill = area(AREA_TOP_ALPHA), extraWidthDp = STYLE_EXTRA_WIDTH_DP)
 
         UiOptions.CHART_STYLE_RIBBON ->
             LineLook(
-                fill =
-                Fill(
-                    Brush.verticalGradient(
-                        listOf(
-                            lerp(base, Color.White, LINE_LIGHTEN).copy(alpha = alpha),
-                            color,
-                            lerp(base, Color.Black, LINE_DARKEN).copy(alpha = alpha),
-                        ),
-                    ),
-                ),
+                fill = Fill(color),
                 areaFill = area(AREA_TOP_ALPHA),
                 extraWidthDp = 0f,
                 points = rememberGlassDrop(base),
