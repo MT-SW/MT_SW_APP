@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -29,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.rememberChartStyle
 import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.decoration.Decoration
@@ -49,6 +52,55 @@ import com.patrykandpatrick.vico.compose.common.component.TextComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+
+private const val LINE_LIGHTEN = 0.3f
+private const val LINE_DARKEN = 0.25f
+private const val AREA_TOP_ALPHA = 0.3f
+private const val AREA_BOTTOM_ALPHA = 0.05f
+private const val GLOW_AREA_TOP_ALPHA = 0.45f
+private const val STYLE_EXTRA_WIDTH_DP = 0.5f
+private const val GLOW_EXTRA_WIDTH_DP = 1f
+
+/** The look of a line of the node's statistics, taken from the chart style chosen in "Look". */
+private class LineLook(val fill: Fill, val areaFill: LineCartesianLayer.AreaFill?, val extraWidthDp: Float)
+
+@Composable
+private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook {
+    val style = rememberChartStyle(UiOptions.CHART_STYLE_NODE)
+    val base = color.copy(alpha = 1f)
+    val alpha = color.alpha
+    fun area(top: Float) =
+        LineCartesianLayer.AreaFill.single(
+            Fill(
+                Brush.verticalGradient(
+                    listOf(base.copy(alpha = top * alpha), base.copy(alpha = AREA_BOTTOM_ALPHA * alpha)),
+                ),
+            ),
+        )
+    return when (style) {
+        UiOptions.CHART_STYLE_GLASS ->
+            LineLook(
+                fill =
+                Fill(
+                    Brush.verticalGradient(
+                        listOf(
+                            lerp(base, Color.White, LINE_LIGHTEN).copy(alpha = alpha),
+                            color,
+                            lerp(base, Color.Black, LINE_DARKEN).copy(alpha = alpha),
+                        ),
+                    ),
+                ),
+                areaFill = area(AREA_TOP_ALPHA),
+                extraWidthDp = STYLE_EXTRA_WIDTH_DP,
+            )
+
+        UiOptions.CHART_STYLE_GRADIENT -> LineLook(Fill(color), area(AREA_TOP_ALPHA), 0f)
+
+        UiOptions.CHART_STYLE_GLOW -> LineLook(Fill(color), area(GLOW_AREA_TOP_ALPHA), GLOW_EXTRA_WIDTH_DP)
+
+        else -> LineLook(Fill(color), if (forceArea) area(AREA_TOP_ALPHA) else null, 0f)
+    }
+}
 
 /**
  * Utility object for chart styling and component creation. Provides reusable styled lines, points, and axes for Vico
@@ -84,12 +136,16 @@ object ChartStyling {
         lineWidth: Float = MEDIUM_LINE_WIDTH_DP,
         interpolator: LineCartesianLayer.Interpolator = LineCartesianLayer.Interpolator.cubic(),
         pointProvider: LineCartesianLayer.PointProvider? = null,
-    ): LineCartesianLayer.Line = LineCartesianLayer.rememberLine(
-        fill = LineCartesianLayer.LineFill.single(Fill(lineColor)),
-        stroke = LineCartesianLayer.LineStroke.Continuous(lineWidth.dp),
-        pointProvider = pointProvider,
-        interpolator = interpolator,
-    )
+    ): LineCartesianLayer.Line {
+        val look = rememberLineLook(lineColor)
+        return LineCartesianLayer.rememberLine(
+            fill = LineCartesianLayer.LineFill.single(look.fill),
+            areaFill = look.areaFill,
+            stroke = LineCartesianLayer.LineStroke.Continuous((lineWidth + look.extraWidthDp).dp),
+            pointProvider = pointProvider,
+            interpolator = interpolator,
+        )
+    }
 
     /**
      * Creates a line with a gradient area fill effect. Ideal for emphasising a single series or showing magnitude. The
@@ -105,12 +161,11 @@ object ChartStyling {
         lineWidth: Float = MEDIUM_LINE_WIDTH_DP,
         interpolator: LineCartesianLayer.Interpolator = LineCartesianLayer.Interpolator.cubic(),
     ): LineCartesianLayer.Line {
-        val gradientBrush =
-            Brush.verticalGradient(colors = listOf(lineColor.copy(alpha = 0.3f), lineColor.copy(alpha = 0.05f)))
+        val look = rememberLineLook(lineColor, forceArea = true)
         return LineCartesianLayer.rememberLine(
-            fill = LineCartesianLayer.LineFill.single(Fill(lineColor)),
-            areaFill = LineCartesianLayer.AreaFill.single(Fill(gradientBrush)),
-            stroke = LineCartesianLayer.LineStroke.Continuous(lineWidth.dp),
+            fill = LineCartesianLayer.LineFill.single(look.fill),
+            areaFill = look.areaFill,
+            stroke = LineCartesianLayer.LineStroke.Continuous((lineWidth + look.extraWidthDp).dp),
             interpolator = interpolator,
         )
     }
@@ -150,17 +205,20 @@ object ChartStyling {
         lineColor: Color,
         interpolator: LineCartesianLayer.Interpolator = LineCartesianLayer.Interpolator.cubic(),
         pointProvider: LineCartesianLayer.PointProvider? = null,
-    ): LineCartesianLayer.Line = LineCartesianLayer.rememberLine(
-        fill = LineCartesianLayer.LineFill.single(Fill(lineColor)),
-        stroke =
-        LineCartesianLayer.LineStroke.Dashed(
-            thickness = THIN_LINE_WIDTH_DP.dp,
-            dashLength = 6.dp,
-            gapLength = 3.dp,
-        ),
-        pointProvider = pointProvider,
-        interpolator = interpolator,
-    )
+    ): LineCartesianLayer.Line {
+        val look = rememberLineLook(lineColor)
+        return LineCartesianLayer.rememberLine(
+            fill = LineCartesianLayer.LineFill.single(look.fill),
+            stroke =
+            LineCartesianLayer.LineStroke.Dashed(
+                thickness = (THIN_LINE_WIDTH_DP + look.extraWidthDp).dp,
+                dashLength = 6.dp,
+                gapLength = 3.dp,
+            ),
+            pointProvider = pointProvider,
+            interpolator = interpolator,
+        )
+    }
 
     /**
      * Gets Material 3 theme-aware colors with opacity. Useful for creating color variants while respecting the current
