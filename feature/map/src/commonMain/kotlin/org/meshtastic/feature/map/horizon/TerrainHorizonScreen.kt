@@ -179,6 +179,7 @@ import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
 import org.meshtastic.core.ui.component.nodeChipFillColors
+import org.meshtastic.core.ui.component.nodeChipTextColor
 import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
@@ -1739,7 +1740,7 @@ private fun DrawScope.drawNodeMarker(
         style = Stroke(CHIP_DOT_RING_DP.dp.toPx()),
     )
     if (label == null) return
-    val layout = measurer.measure(label, TextStyle(color = text, fontSize = 11.sp))
+    val layout = measurer.measure(label, TextStyle(color = nodeChipTextColor(chipStyle, text), fontSize = 11.sp))
     val width = max(CHIP_MIN_WIDTH_DP.dp.toPx(), layout.size.width + 2 * CHIP_PAD_DP.dp.toPx())
     val bodyH = CHIP_HEIGHT_DP.dp.toPx()
     val tailH = CHIP_TAIL_HEIGHT_DP.dp.toPx()

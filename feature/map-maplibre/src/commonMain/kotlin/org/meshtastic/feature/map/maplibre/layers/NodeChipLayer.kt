@@ -74,7 +74,7 @@ import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.component.nodeChipFillColors
 import org.meshtastic.core.ui.component.nodeChipRim
-import org.meshtastic.core.ui.component.rememberDarkTheme
+import org.meshtastic.core.ui.component.nodeChipTextColor
 import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Person
@@ -261,12 +261,11 @@ private fun rememberChipImages(chips: List<MapChipKey>): Map<String, ChipImage> 
     // One painter per chip for as long as its inputs hold: a painter's identity is what the map keys its image by, so
     // rebuilding every chip because one more was added would re-upload them all.
     val chipStyle = rememberNodeChipStyle()
-    val darkTheme = rememberDarkTheme()
-    val cache = remember(measurer, density, textStyle, glyphs, chipStyle, darkTheme) { HashMap<String, ChipImage>() }
+    val cache = remember(measurer, density, textStyle, glyphs, chipStyle) { HashMap<String, ChipImage>() }
     return remember(chips, cache) {
         chips.associate { chip ->
             val key = chip.featureValue()
-            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs, chipStyle, darkTheme) }
+            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs, chipStyle) }
         }
     }
 }
@@ -277,10 +276,10 @@ private fun MapChipKey.rasterize(
     density: Density,
     glyphs: Map<MapChipGlyph, Painter>,
     chipStyle: Int,
-    darkTheme: Boolean,
 ): ChipImage {
+    val labelColor = nodeChipTextColor(chipStyle, Color(foreground))
     val style =
-        textStyle.copy(textDecoration = TextDecoration.LineThrough.takeIf { struckThrough }, color = Color(foreground))
+        textStyle.copy(textDecoration = TextDecoration.LineThrough.takeIf { struckThrough }, color = labelColor)
     // A chip carrying a glyph shows the icon instead of the name, so it measures no text.
     val layout = if (glyph == null) measurer.measure(AnnotatedString(label), style, density = density) else null
 
@@ -308,7 +307,6 @@ private fun MapChipKey.rasterize(
             rimPx = with(density) { BORDER_DP.dp.toPx() },
             shadowPx = with(density) { SHADOW_DP.dp.toPx() },
             chipStyle = chipStyle,
-            darkTheme = darkTheme,
         ),
         // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
         // left blank) by ChipPainter.
@@ -334,7 +332,6 @@ private class ChipPainter(
     private val rimPx: Float,
     private val shadowPx: Float,
     private val chipStyle: Int,
-    private val darkTheme: Boolean,
 ) : Painter() {
     // Never read: the caller always names an explicit size, which is what makes the chip's width follow its text.
     override val intrinsicSize: Size = Size.Unspecified
@@ -367,7 +364,7 @@ private class ChipPainter(
         val base = Color(chip.background)
         val styleRim = nodeChipRim(chipStyle, Color(chip.foreground), base)
         val rim = if (chip.outlined) Color.White else styleRim ?: Color.Transparent
-        val fillColors = nodeChipFillColors(chipStyle, base, darkTheme)
+        val fillColors = nodeChipFillColors(chipStyle, base)
         val fill = Brush.verticalGradient(fillColors, startY = 0f, endY = bodyHeightPx)
 
         drawRoundRect(brush = fill, size = Size(innerWidth, bodyHeightPx), cornerRadius = CornerRadius(cornerRadiusPx))
@@ -403,7 +400,8 @@ private class ChipPainter(
         if (glyphPainter != null) {
             val glyph = Size(glyphSizePx, glyphSizePx)
             translate(left = (innerWidth - glyphSizePx) / 2f, top = (bodyHeightPx - glyphSizePx) / 2f) {
-                with(glyphPainter) { draw(glyph, colorFilter = ColorFilter.tint(Color(chip.foreground))) }
+                val tint = ColorFilter.tint(nodeChipTextColor(chipStyle, Color(chip.foreground)))
+                with(glyphPainter) { draw(glyph, colorFilter = tint) }
             }
         } else if (layout != null) {
             drawText(

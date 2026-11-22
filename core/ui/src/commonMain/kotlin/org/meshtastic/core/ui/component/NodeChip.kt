@@ -48,7 +48,8 @@ import org.meshtastic.proto.User
 fun NodeChip(modifier: Modifier = Modifier, node: Node, onClick: ((Node) -> Unit)? = null) {
     val (textColor, nodeColor) = node.colors
     // MT_SW: the look of the chip follows the style chosen in "Look" (see GlassChip.kt).
-    val colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color(textColor))
+    val labelColor = nodeChipTextColor(rememberNodeChipStyle(), Color(textColor))
+    val colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = labelColor)
     val glass = nodeChipLook(Color(nodeColor), Color(textColor), MaterialTheme.shapes.small)
 
     val content: @Composable () -> Unit = {

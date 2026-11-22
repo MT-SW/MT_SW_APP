@@ -53,6 +53,7 @@ import org.meshtastic.core.resources.view_style_standard
 import org.meshtastic.core.resources.view_style_summary
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.nodeChipLook
+import org.meshtastic.core.ui.component.nodeChipTextColor
 
 private val NODE_CHIP_STYLES =
     listOf(UiOptions.NODE_CHIP_STANDARD, UiOptions.NODE_CHIP_GLASS_3D, UiOptions.NODE_CHIP_FLAT)
@@ -138,7 +139,11 @@ private fun NodeChipStyleSample(label: String, style: Int, selected: Boolean, on
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = "MT_SW", style = MaterialTheme.typography.labelLarge, color = SAMPLE_TEXT)
+            Text(
+                text = "MT_SW",
+                style = MaterialTheme.typography.labelLarge,
+                color = nodeChipTextColor(style, SAMPLE_TEXT),
+            )
         }
     }
 }

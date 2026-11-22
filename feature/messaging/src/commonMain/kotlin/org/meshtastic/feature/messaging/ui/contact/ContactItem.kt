@@ -78,6 +78,8 @@ import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.component.nodeChipLook
+import org.meshtastic.core.ui.component.nodeChipTextColor
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.proto.ChannelSet
 
@@ -202,12 +204,14 @@ private fun ContactHeader(
         channelChipColor
             ?: contact.nodeColors?.let { Color(it.second) }
             ?: MaterialTheme.colorScheme.surfaceContainerHigh
-    val chipLabelColor =
+    val chipStyle = rememberNodeChipStyle()
+    val ownLabelColor =
         when {
             channelChipColor != null ->
                 if (channelChipColor.luminance() > CHIP_LIGHT_LUMINANCE) Color.Black else Color.White
             else -> contact.nodeColors?.let { Color(it.first) } ?: MaterialTheme.colorScheme.onSecondaryContainer
         }
+    val chipLabelColor = nodeChipTextColor(chipStyle, ownLabelColor)
 
     Row(
         modifier = modifier.heightIn(min = 48.dp),

@@ -59,7 +59,7 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
 
-private const val STANDARD_BOTTOM_SHIFT = 0.65f
+private const val STANDARD_BOTTOM_SHIFT = 0.7f
 private const val STANDARD_TOP_ALPHA = 1f
 private const val STANDARD_BOTTOM_ALPHA = 0.85f
 private const val STANDARD_RIM_LIGHTEN = 0.45f
@@ -70,15 +70,15 @@ private const val STANDARD_RIM_DP = 1.5f
  * The fill of a node chip from top to bottom for the chosen [style] (one of `UiOptions.NODE_CHIP_*`): flat is the plain
  * colour, standard a visible light-to-colour gradient that is a little see-through, glass 3D the full glass gradient.
  */
-fun nodeChipFillColors(style: Int, base: Color, darkTheme: Boolean = true): List<Color> = when (style) {
+fun nodeChipFillColors(style: Int, base: Color): List<Color> = when (style) {
     UiOptions.NODE_CHIP_FLAT -> listOf(base, base)
     UiOptions.NODE_CHIP_GLASS_3D -> glassChipColors(base)
     else ->
         listOf(
-            // The top keeps the node's own colour; the bottom goes darker on a dark theme, lighter on a light one.
+            // The top is the node's own, clearly visible colour; the bottom is much darker, so the white name stays
+            // readable on every colour.
             base.copy(alpha = STANDARD_TOP_ALPHA),
-            lerp(base, if (darkTheme) Color.Black else Color.White, STANDARD_BOTTOM_SHIFT)
-                .copy(alpha = STANDARD_BOTTOM_ALPHA),
+            lerp(base, Color.Black, STANDARD_BOTTOM_SHIFT).copy(alpha = STANDARD_BOTTOM_ALPHA),
         )
 }
 
@@ -104,12 +104,13 @@ fun nodeChipLook(base: Color, foreground: Color, shape: Shape, style: Int = reme
     val shadow = if (style != UiOptions.NODE_CHIP_FLAT) Modifier.elementLook(shadowGroup, shape) else Modifier
     val rimWidth = if (style == UiOptions.NODE_CHIP_STANDARD) STANDARD_RIM_DP.dp else 1.dp
     val border = if (rim != null) Modifier.border(rimWidth, rim, shape) else Modifier
-    val fill = Brush.verticalGradient(nodeChipFillColors(style, base, isDarkSurface()))
+    val fill = Brush.verticalGradient(nodeChipFillColors(style, base))
     return shadow.background(fill, shape).then(border)
 }
 
-/** Whether the theme is dark, for chips drawn outside the compose tree (the map sprites). */
-@Composable fun rememberDarkTheme(): Boolean = isDarkSurface()
+/** The colour of the name on a node chip: white on the standard style (its fill is dark enough), else [foreground]. */
+fun nodeChipTextColor(style: Int, foreground: Color): Color =
+    if (style == UiOptions.NODE_CHIP_STANDARD) Color.White else foreground
 
 /** The node chip style chosen in "Look" (one of `UiOptions.NODE_CHIP_*`). */
 @Composable fun rememberNodeChipStyle(): Int = rememberUiOptions()[UiOptions.NODE_CHIP_STYLE]
