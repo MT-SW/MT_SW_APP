@@ -212,8 +212,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /**
          * How the node chips (the coloured plates with a short name, in the lists, on the map and in the panorama)
          * look: [NODE_CHIP_FLAT] (the plain colour, as before), [NODE_CHIP_STANDARD] (the default: the node's colour
-         * with a gradient, a little transparency, a thin outline and a soft shadow, in the style of the rest of the app) or [NODE_CHIP_GLASS_3D] (a glass
-         * gradient with an outline and a soft shadow).
+         * with a gradient, a little transparency, a thin outline and a soft shadow, in the style of the rest of the
+         * app) or [NODE_CHIP_GLASS_3D] (a stronger glass gradient with sheen, an outline and a soft shadow).
          */
         const val NODE_CHIP_STYLE = "chips.style"
         const val NODE_CHIP_FLAT = 0
