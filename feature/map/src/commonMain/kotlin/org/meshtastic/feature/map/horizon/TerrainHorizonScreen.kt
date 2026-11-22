@@ -207,6 +207,13 @@ private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
 private val BandShares = listOf(0.5f, 0.38f, 0.26f, 0.15f)
 private val BuildingColor = Color(0xFF9AA5B1)
+
+// MT_SW: glass look of the buildings (wall gradient, outline, sheen on the roof).
+private const val BUILDING_GLASS_TOP = 0.22f
+private const val BUILDING_GLASS_FOOT = 0.18f
+private const val BUILDING_GLASS_RIM_ALPHA = 0.45f
+private const val BUILDING_GLASS_RIM_PX = 1f
+private const val BUILDING_GLASS_SHEEN_ALPHA = 0.18f
 private const val BUILDING_BAND_BOOST = 0.2f
 
 /** The vertical scale may be at most this many times the horizontal one, so mountains look like mountains. */
@@ -1357,15 +1364,36 @@ private fun DrawScope.drawBuildingShapes(
             path.lineTo(xs[m], yOf(b.roofOf(m, scale), range, h))
             path.lineTo(xs[k], yOf(b.roofOf(k, scale), range, h))
             path.close()
-            drawPath(path, lerp(darkWall, base, facing))
+            // MT_SW: glass wall, lighter at the roof and darker at the foot, with a thin light outline.
+            val wallColour = lerp(darkWall, base, facing)
+            val wallTop = min(yOf(b.roofOf(k, scale), range, h), yOf(b.roofOf(m, scale), range, h))
+            val wallBottom = max(yOf(b.footDeg[k], range, h), yOf(b.footDeg[m], range, h))
+            if (wallBottom > wallTop) {
+                val glass =
+                    Brush.verticalGradient(
+                        listOf(
+                            lerp(wallColour, Color.White, BUILDING_GLASS_TOP),
+                            lerp(wallColour, Color.Black, BUILDING_GLASS_FOOT),
+                        ),
+                        startY = wallTop,
+                        endY = wallBottom,
+                    )
+                drawPath(path, glass)
+            } else {
+                drawPath(path, wallColour)
+            }
             texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
+            drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA), style = Stroke(BUILDING_GLASS_RIM_PX))
         }
         path.reset()
         path.moveTo(xs[0], yOf(b.roofOf(0, scale), range, h))
         for (k in 1 until n) path.lineTo(xs[k], yOf(b.roofOf(k, scale), range, h))
         path.close()
         drawPath(path, lerp(base, Color.Black, ROOF_DARKEN))
+        // The glass sheen over the roof and a lighter outline round the whole building.
+        drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_SHEEN_ALPHA))
         texture?.let { drawPath(path, it, alpha = BUILDING_GRAIN_ALPHA) }
+        drawPath(path, Color.White.copy(alpha = BUILDING_GLASS_RIM_ALPHA * 1.4f), style = Stroke(BUILDING_GLASS_RIM_PX))
     }
 }
 

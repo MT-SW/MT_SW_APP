@@ -20,8 +20,11 @@ package org.meshtastic.feature.messaging.ui.contact
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -33,8 +36,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -44,6 +45,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
@@ -76,6 +79,9 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.glassChipColors
+import org.meshtastic.core.ui.component.glassChipRim
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.proto.ChannelSet
 
@@ -178,10 +184,9 @@ private fun ContactHeader(
     modifier: Modifier = Modifier,
     onNodeChipClick: () -> Unit = {},
 ) {
-    val colors =
-        contact.nodeColors?.let {
-            AssistChipDefaults.assistChipColors(labelColor = Color(it.first), containerColor = Color(it.second))
-        } ?: AssistChipDefaults.assistChipColors()
+    val chipLabelColor =
+        contact.nodeColors?.let { Color(it.first) } ?: MaterialTheme.colorScheme.onSecondaryContainer
+    val chipColor = contact.nodeColors?.let { Color(it.second) } ?: MaterialTheme.colorScheme.surfaceContainerHigh
 
     // The name text carries the colour: main channel in the theme colour, other channels red, direct messages the
     // node's colour.
@@ -197,22 +202,29 @@ private fun ContactHeader(
         }
 
     Row(modifier = modifier.padding(0.dp), verticalAlignment = Alignment.CenterVertically) {
-        AssistChip(
-            onClick = onNodeChipClick,
+        // MT_SW: the same glass chip as NodeChip (gradient, outline, shadow); built by hand so the glass covers only the
+        // visible chip and not the 48dp touch area.
+        val chipShape = MaterialTheme.shapes.small
+        Box(
             modifier =
-            Modifier.width(IntrinsicSize.Min).heightIn(min = 32.dp).semantics {
-                contentDescription = contact.shortName
-            },
-            label = {
-                Text(
-                    text = contact.shortName,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                )
-            },
-            colors = colors,
-        )
+            Modifier.width(IntrinsicSize.Min)
+                .heightIn(min = 32.dp)
+                .elementLook(UiOptions.GROUP_INPUT, chipShape)
+                .background(Brush.verticalGradient(glassChipColors(chipColor)), chipShape)
+                .border(1.dp, glassChipRim(chipLabelColor), chipShape)
+                .clip(chipShape)
+                .clickable(onClick = onNodeChipClick)
+                .semantics { contentDescription = contact.shortName },
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = contact.shortName,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center,
+                color = chipLabelColor,
+            )
+        }
 
         // Show unlock icon for broadcast with default PSK
         val isBroadcast = isChannel
