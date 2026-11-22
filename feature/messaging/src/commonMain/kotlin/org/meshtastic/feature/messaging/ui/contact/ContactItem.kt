@@ -209,26 +209,23 @@ private fun ContactHeader(
         Box(
             modifier =
             Modifier.width(IntrinsicSize.Min)
-                .then(
-                    // A conversation with a node has a chip as big as the node's chip in the node list.
-                    if (isChannel) {
-                        Modifier.heightIn(min = 32.dp)
-                    } else {
-                        Modifier.defaultMinSize(
-                            minWidth = NODE_CHIP_MIN_WIDTH_DP.dp,
-                            minHeight = NODE_CHIP_MIN_HEIGHT_DP.dp,
-                        )
-                    },
-                )
+                .then(if (isChannel) Modifier.heightIn(min = 32.dp) else Modifier.defaultMinSize(minHeight = 28.dp))
                 .then(nodeChipLook(chipColor, chipLabelColor, chipShape))
                 .clip(chipShape)
                 .clickable(onClick = onNodeChipClick)
                 .semantics { contentDescription = contact.shortName },
             contentAlignment = Alignment.Center,
         ) {
+            // A conversation with a node has a chip laid out exactly like NodeChip (the one in the messages and in
+            // the node list): at least 64dp wide, 8dp at the sides, no extra height.
             Text(
                 text = contact.shortName,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+                modifier =
+                if (isChannel) {
+                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
+                } else {
+                    Modifier.defaultMinSize(minWidth = NODE_CHIP_MIN_WIDTH_DP.dp).padding(horizontal = 8.dp)
+                },
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 color = chipLabelColor,
@@ -269,8 +266,7 @@ private fun ContactHeader(
 }
 
 private const val UNREAD_MESSAGE_LIMIT = 99
-private const val NODE_CHIP_MIN_WIDTH_DP = 68
-private const val NODE_CHIP_MIN_HEIGHT_DP = 32
+private const val NODE_CHIP_MIN_WIDTH_DP = 64
 private const val DESCRIPTION_MAX_LINES = 4
 
 @Composable
