@@ -302,7 +302,6 @@ private const val MIN_ANGLE_FLOOR = -15.0
 private const val MAX_ANGLE_CEIL = 30.0
 private const val TAP_RADIUS_PX = 48f
 private const val COLUMN_STEP_PX = 3
-private const val MAX_LABELS = 40
 private const val LIST_HEIGHT_DP = 220
 
 /** The options above the panorama scroll when they are taller than this. */
@@ -1508,7 +1507,6 @@ private fun DrawScope.drawTargets(
     names: Boolean,
 ) {
     val w = size.width
-    val labelled = targets.sortedBy { it.distanceM }.take(MAX_LABELS).toSet()
     // The hidden ones first, so a node in sight is never covered by one that is not.
     for (target in targets.sortedBy { it.visible }) {
         val x = xOf(target.bearingDeg, centre, perDeg, w)
@@ -1531,7 +1529,7 @@ private fun DrawScope.drawTargets(
         }
         drawNodeMarker(
             measurer,
-            if (names && (target in labelled || focus)) target.name else null,
+            if (names || focus) target.name else null,
             Offset(x, y),
             background,
             text,
