@@ -59,17 +59,23 @@ fun glassChipColors(base: Color): List<Color> = listOf(
 /** The thin outline of a glass chip: the colour of its text, half see-through, so it shows on pale and dark chips. */
 fun glassChipRim(foreground: Color): Color = foreground.copy(alpha = RIM_ALPHA)
 
-private const val STANDARD_TOP_LIGHTEN = 0.10f
-private const val STANDARD_RIM_ALPHA = 0.40f
+private const val STANDARD_TOP_LIGHTEN = 0.22f
+private const val STANDARD_TOP_ALPHA = 0.95f
+private const val STANDARD_BOTTOM_ALPHA = 0.68f
+private const val STANDARD_RIM_ALPHA = 0.50f
 
 /**
  * The fill of a node chip from top to bottom for the chosen [style] (one of `UiOptions.NODE_CHIP_*`): flat is the plain
- * colour, standard has only a faint lighter top, glass 3D the full glass gradient.
+ * colour, standard a visible light-to-colour gradient that is a little see-through, glass 3D the full glass gradient.
  */
 fun nodeChipFillColors(style: Int, base: Color): List<Color> = when (style) {
     UiOptions.NODE_CHIP_FLAT -> listOf(base, base)
     UiOptions.NODE_CHIP_GLASS_3D -> glassChipColors(base)
-    else -> listOf(lerp(base, Color.White, STANDARD_TOP_LIGHTEN), base)
+    else ->
+        listOf(
+            lerp(base, Color.White, STANDARD_TOP_LIGHTEN).copy(alpha = STANDARD_TOP_ALPHA),
+            base.copy(alpha = STANDARD_BOTTOM_ALPHA),
+        )
 }
 
 /** The outline of a node chip for [style]: none for flat, a thin one in the text colour otherwise; null = none. */

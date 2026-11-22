@@ -197,8 +197,14 @@ private fun ContactHeader(
             else -> Color.Unspecified
         }
 
-    Row(modifier = modifier.padding(0.dp), verticalAlignment = Alignment.CenterVertically) {
-        // MT_SW: the same glass chip as NodeChip (gradient, outline, shadow); built by hand so the glass covers only the
+    // The row is as tall as it was with the 48dp touch area of the Material chip, so the rows of conversations with and
+    // without a lock icon line up.
+    Row(
+        modifier = modifier.heightIn(min = 48.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // MT_SW: the same chip as NodeChip (gradient, outline); built by hand so it covers only the visible chip and not the
+        // 48dp touch area.
         // visible chip and not the 48dp touch area.
         val chipShape = MaterialTheme.shapes.small
         Box(
