@@ -195,6 +195,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Wykres promieniowania anteny (kalkulator anten i planer, wszystkie wersje): wnętrze obrysu ma szklany gradient, mocniejszy w kierunku głównym, z jasnym połyskiem u góry i cienką jasną linią przy obrysie.
 * Panorama terenu (wszystkie wersje): teren ma szklany gradient z jasnym obrysem wzdłuż grzbietu; tekstura skał i lasu jest domyślnie wyłączona i włączasz ją w „Opcjach” ustawieniem „Tekstura skał i lasu”.
 * Plakietki węzłów (wszystkie wersje): szklany wygląd z lekkim gradientem (jaśniejsza góra), cienkim obrysem i miękkim cieniem — w listach, na pasku górnym, na mapie i w panoramie terenu wyglądają tak samo. Na mapie ogonek plakietki jest osobnym trójkącikiem z obrysem, z niewielką przerwą pod plakietką, a pod nim kropka w dokładnym miejscu węzła.
 * Mapa (wszystkie wersje): linie łączące węzły mają cienki jasny obrys po obu stronach koloru linii.
@@ -1133,6 +1134,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Antenna radiation plot (antenna calculator and planner, all versions): the inside of the outline has a glass gradient, stronger towards the main direction, with a pale sheen at the top and a thin light line along the outline.
 * Terrain panorama (all versions): the terrain has a glass gradient with a light outline along the ridge; the rock and forest texture is off by default and is turned on in the "Options" with the "Rock and forest texture" setting.
 * Node chips (all versions): a glass look with a light gradient (lighter top), a thin outline and a soft shadow — the same in the lists, the top bar, on the map and in the terrain panorama. On the map the chip's tail is a separate outlined triangle with a small gap below the chip, and below it a dot at the node's exact spot.
 * Map (all versions): the lines between nodes have a thin light outline on both sides of the line's colour.

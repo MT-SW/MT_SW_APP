@@ -25,8 +25,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import org.meshtastic.core.model.antenna.AntennaPatterns
 import kotlin.math.PI
 import kotlin.math.cos
@@ -60,6 +63,20 @@ fun AntennaPatternPlot(beamwidthDeg: Double, frontToBackDb: Double, modifier: Mo
             if (deg == 0) path.moveTo(p.x, p.y) else path.lineTo(p.x, p.y)
         }
         path.close()
+        // MT_SW: the glass look inside the outline: a soft gradient that gets stronger towards the main direction, a pale
+        // sheen along the top, the outline itself and a thin light line just inside it. No shadow.
+        drawPath(
+            path,
+            Brush.radialGradient(
+                listOf(line.copy(alpha = 0.08f), line.copy(alpha = 0.28f), line.copy(alpha = 0.5f)),
+                center = c,
+                radius = r,
+            ),
+        )
+        clipPath(path) {
+            drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.28f), Color.Transparent), c.y - r, c.y))
+        }
         drawPath(path, line, style = Stroke(width = 4f))
+        clipPath(path) { drawPath(path, Color.White.copy(alpha = 0.55f), style = Stroke(width = 3f)) }
     }
 }
