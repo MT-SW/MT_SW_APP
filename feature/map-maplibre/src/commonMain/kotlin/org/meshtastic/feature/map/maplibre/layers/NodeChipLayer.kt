@@ -70,8 +70,8 @@ import org.maplibre.compose.sources.VectorSource
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
-import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.ui.component.nodeChipFillColors
 import org.meshtastic.core.ui.component.nodeChipRim
 import org.meshtastic.core.ui.component.nodeChipTextColor
@@ -278,8 +278,7 @@ private fun MapChipKey.rasterize(
     chipStyle: Int,
 ): ChipImage {
     val labelColor = nodeChipTextColor(chipStyle, Color(foreground))
-    val style =
-        textStyle.copy(textDecoration = TextDecoration.LineThrough.takeIf { struckThrough }, color = labelColor)
+    val style = textStyle.copy(textDecoration = TextDecoration.LineThrough.takeIf { struckThrough }, color = labelColor)
     // A chip carrying a glyph shows the icon instead of the name, so it measures no text.
     val layout = if (glyph == null) measurer.measure(AnnotatedString(label), style, density = density) else null
 
@@ -449,7 +448,6 @@ private const val SHADOW_LAYER_ALPHA = 0.06f
 
 /** Blank space between the tail's tip and the node's exact coordinate, so the tail does not touch the dot. */
 private const val GAP_DP = 8
-
 
 /**
  * A ceiling on how many chip images one layer will hold.

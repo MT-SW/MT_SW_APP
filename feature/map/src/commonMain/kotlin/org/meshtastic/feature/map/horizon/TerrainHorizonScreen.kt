@@ -55,6 +55,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -100,8 +101,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
@@ -162,9 +163,6 @@ import org.meshtastic.core.resources.terrain_horizon_quality_best
 import org.meshtastic.core.resources.terrain_horizon_quality_good
 import org.meshtastic.core.resources.terrain_horizon_quality_lowered
 import org.meshtastic.core.resources.terrain_horizon_quality_very_good
-import org.meshtastic.core.resources.terrain_horizon_texture
-import org.meshtastic.core.resources.terrain_horizon_texture_off
-import org.meshtastic.core.resources.terrain_horizon_texture_on
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
 import org.meshtastic.core.resources.terrain_horizon_save
@@ -174,19 +172,22 @@ import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
 import org.meshtastic.core.resources.terrain_horizon_saving
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
+import org.meshtastic.core.resources.terrain_horizon_texture
+import org.meshtastic.core.resources.terrain_horizon_texture_off
+import org.meshtastic.core.resources.terrain_horizon_texture_on
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
-import org.meshtastic.core.ui.component.nodeChipFillColors
-import org.meshtastic.core.ui.component.nodeChipTextColor
-import org.meshtastic.core.ui.component.rememberNodeChipStyle
-import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.Switch
+import org.meshtastic.core.ui.component.nodeChipFillColors
+import org.meshtastic.core.ui.component.nodeChipTextColor
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
+import org.meshtastic.core.ui.component.rememberViewStyle
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
@@ -1710,10 +1711,10 @@ private const val MAX_LAT = 89.9
 
 /** A choice chip in the app's glass look: the chosen one has the yellow outline and a faint yellow tint. */
 @Composable
+@NonRestartableComposable
 private fun BrandChip(selected: Boolean, onClick: () -> Unit, label: @Composable () -> Unit) {
     GlassChoiceChip(onClick = onClick, selected = selected, label = label)
 }
-
 
 /**
  * A node exactly as the main map draws it: its dot (the node's colour, white ring) on the node's point, and above it,

@@ -72,7 +72,9 @@ private const val STANDARD_RIM_DP = 1.5f
  */
 fun nodeChipFillColors(style: Int, base: Color): List<Color> = when (style) {
     UiOptions.NODE_CHIP_FLAT -> listOf(base, base)
+
     UiOptions.NODE_CHIP_GLASS_3D -> glassChipColors(base)
+
     else ->
         listOf(
             // The top is the node's own, clearly visible colour; the bottom is much darker, so the white name stays
@@ -124,8 +126,8 @@ private const val CHOICE_CHIP_SELECTED_RIM_DP = 2
 
 /**
  * MT_SW: a choice button in the glass look (gradient fill, thin outline, the soft shadow of the chosen look). The
- * chosen one has the yellow outline and a faint yellow tint; [outline] gives an unchosen one a colour of its own.
- * Drawn by hand, without the invisible touch area of the Material chip, so the shadow hugs the visible button.
+ * chosen one has the yellow outline and a faint yellow tint; [outline] gives an unchosen one a colour of its own. Drawn
+ * by hand, without the invisible touch area of the Material chip, so the shadow hugs the visible button.
  */
 @Composable
 fun GlassChoiceChip(

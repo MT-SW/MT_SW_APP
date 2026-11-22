@@ -156,11 +156,11 @@ import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes
 import org.meshtastic.feature.messaging.isOwnImageHost
+import org.meshtastic.feature.messaging.receivedRelayNode
 import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
 import kotlin.time.Clock
-import org.meshtastic.feature.messaging.receivedRelayNode
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 

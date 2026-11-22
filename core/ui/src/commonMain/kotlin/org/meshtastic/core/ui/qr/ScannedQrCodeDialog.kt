@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import org.meshtastic.core.ui.icon.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -100,9 +99,9 @@ import org.meshtastic.core.resources.lora_value_not_used
 import org.meshtastic.core.resources.replace
 import org.meshtastic.core.resources.slot_auto
 import org.meshtastic.core.ui.component.ChannelSelection
-import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.icon.CloudDownload
 import org.meshtastic.core.ui.icon.CloudUpload
+import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LocationOn
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.MyLocation

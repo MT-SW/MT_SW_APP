@@ -46,12 +46,12 @@ import org.meshtastic.core.resources.chart_style
 import org.meshtastic.core.resources.chart_style_flat
 import org.meshtastic.core.resources.chart_style_glass
 import org.meshtastic.core.resources.chart_style_glow
-import org.meshtastic.core.resources.chart_style_ribbon
 import org.meshtastic.core.resources.chart_style_gradient
 import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
 import org.meshtastic.core.resources.chart_style_outline
 import org.meshtastic.core.resources.chart_style_preview_hint
+import org.meshtastic.core.resources.chart_style_ribbon
 import org.meshtastic.core.resources.chart_style_same
 import org.meshtastic.core.resources.chart_style_summary
 import org.meshtastic.core.ui.component.DropDownPreference

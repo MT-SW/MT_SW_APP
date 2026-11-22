@@ -69,7 +69,10 @@ import org.meshtastic.core.resources.contact_draft_prefix
 import org.meshtastic.core.resources.contact_pinned
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.SecurityIcon
+import org.meshtastic.core.ui.component.nodeChipLook
+import org.meshtastic.core.ui.component.nodeChipTextColor
 import org.meshtastic.core.ui.component.pressSpring
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Keep
@@ -77,9 +80,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
-import org.meshtastic.core.ui.component.nodeChipLook
-import org.meshtastic.core.ui.component.nodeChipTextColor
-import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.proto.ChannelSet
 
@@ -175,6 +175,35 @@ fun ContactItem(
     }
 }
 
+/**
+ * MT_SW: the same chip as NodeChip (gradient, outline, shadow); built by hand so it covers only the visible chip and
+ * not the 48dp touch area.
+ */
+@Composable
+private fun ContactChip(shortName: String, chipColor: Color, labelColor: Color, onClick: () -> Unit) {
+    val chipShape = MaterialTheme.shapes.small
+    Box(
+        modifier =
+        Modifier.width(IntrinsicSize.Min)
+            .defaultMinSize(minHeight = 28.dp)
+            .then(nodeChipLook(chipColor, labelColor, chipShape))
+            .clip(chipShape)
+            .clickable(onClick = onClick)
+            .semantics { contentDescription = shortName },
+        contentAlignment = Alignment.Center,
+    ) {
+        // Every chip of the list (channels and conversations with a node) is laid out exactly like NodeChip (the one
+        // in the messages and in the node list): at least 64dp wide, 8dp at the sides, no extra height.
+        Text(
+            text = shortName,
+            modifier = Modifier.defaultMinSize(minWidth = NODE_CHIP_MIN_WIDTH_DP.dp).padding(horizontal = 8.dp),
+            style = MaterialTheme.typography.labelLarge,
+            textAlign = TextAlign.Center,
+            color = labelColor,
+        )
+    }
+}
+
 @Composable
 private fun ContactHeader(
     contact: Contact,
@@ -209,6 +238,7 @@ private fun ContactHeader(
         when {
             channelChipColor != null ->
                 if (channelChipColor.luminance() > CHIP_LIGHT_LUMINANCE) Color.Black else Color.White
+
             else -> contact.nodeColors?.let { Color(it.first) } ?: MaterialTheme.colorScheme.onSecondaryContainer
         }
     val chipLabelColor = nodeChipTextColor(chipStyle, ownLabelColor)
@@ -217,29 +247,12 @@ private fun ContactHeader(
         modifier = modifier.heightIn(min = 48.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // MT_SW: the same chip as NodeChip (gradient, outline, shadow); built by hand so it covers only the visible
-        // chip and not the 48dp touch area.
-        val chipShape = MaterialTheme.shapes.small
-        Box(
-            modifier =
-            Modifier.width(IntrinsicSize.Min)
-                .defaultMinSize(minHeight = 28.dp)
-                .then(nodeChipLook(chipColor, chipLabelColor, chipShape))
-                .clip(chipShape)
-                .clickable(onClick = onNodeChipClick)
-                .semantics { contentDescription = contact.shortName },
-            contentAlignment = Alignment.Center,
-        ) {
-            // Every chip of the list (channels and conversations with a node) is laid out exactly like NodeChip (the
-            // one in the messages and in the node list): at least 64dp wide, 8dp at the sides, no extra height.
-            Text(
-                text = contact.shortName,
-                modifier = Modifier.defaultMinSize(minWidth = NODE_CHIP_MIN_WIDTH_DP.dp).padding(horizontal = 8.dp),
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-                color = chipLabelColor,
-            )
-        }
+        ContactChip(
+            shortName = contact.shortName,
+            chipColor = chipColor,
+            labelColor = chipLabelColor,
+            onClick = onNodeChipClick,
+        )
 
         // Show unlock icon for broadcast with default PSK
         val isBroadcast = isChannel

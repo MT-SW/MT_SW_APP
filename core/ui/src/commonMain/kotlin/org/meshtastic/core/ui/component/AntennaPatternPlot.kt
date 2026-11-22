@@ -26,9 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import org.meshtastic.core.model.UiOptions
@@ -81,9 +81,11 @@ fun AntennaPatternPlot(beamwidthDeg: Double, frontToBackDb: Double, modifier: Mo
                 SolidColor(line.copy(alpha = 0.2f))
             },
         )
-        if (glass) clipPath(path) {
-            val sheen = listOf(Color.White.copy(alpha = 0.28f), Color.Transparent)
-            drawRect(Brush.verticalGradient(sheen, startY = c.y - r, endY = c.y))
+        if (glass) {
+            clipPath(path) {
+                val sheen = listOf(Color.White.copy(alpha = 0.28f), Color.Transparent)
+                drawRect(Brush.verticalGradient(sheen, startY = c.y - r, endY = c.y))
+            }
         }
         drawPath(path, line, style = Stroke(width = 4f))
         if (glass) clipPath(path) { drawPath(path, Color.White.copy(alpha = 0.55f), style = Stroke(width = 3f)) }

@@ -164,9 +164,9 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.EmptyState
-import org.meshtastic.core.ui.component.MaterialBluetoothSignalInfo
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.MaterialBluetoothSignalInfo
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.SosBarAction

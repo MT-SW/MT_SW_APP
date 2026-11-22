@@ -19,16 +19,9 @@ package org.meshtastic.feature.node.metrics
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Box
-import org.meshtastic.core.ui.component.rememberChartStyle
-import org.meshtastic.core.ui.component.elementLook
-import org.meshtastic.core.model.UiOptions
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.draw.clip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.border
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -37,8 +30,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +45,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
@@ -74,6 +71,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.collapse_chart
 import org.meshtastic.core.resources.expand_chart
@@ -85,6 +83,8 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.rememberChartStyle
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
@@ -180,10 +180,14 @@ fun GenericMetricChart(
                     // x-step, Vico computes the GCD of consecutive x-value differences which can
                     // be as small as 1 second, making the chart logically enormous. A 60-second
                     // floor keeps the internal slot count reasonable for any practical interval.
-                    // MT_SW: Vico throws when the x-values are more precise than four decimals (seen on iPhone), which
+                    // MT_SW: Vico throws when the x-values are more precise than four decimals (seen on iPhone),
+                    // which
                     // closed the app; such a chart simply gets the floor step instead.
                     getXStep = { model, _, _ ->
-                        maxOf(runCatching { model.getXDeltaGcd() }.getOrDefault(MIN_X_STEP_SECONDS), MIN_X_STEP_SECONDS)
+                        maxOf(
+                            runCatching { model.getXDeltaGcd() }.getOrDefault(MIN_X_STEP_SECONDS),
+                            MIN_X_STEP_SECONDS,
+                        )
                     },
                 ),
                 modelProducer = modelProducer,

@@ -30,8 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.rememberChartStyle
 import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.decoration.Decoration
@@ -52,6 +50,8 @@ import com.patrykandpatrick.vico.compose.common.component.TextComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.rememberChartStyle
 
 private const val AREA_TOP_ALPHA = 0.3f
 private const val AREA_BOTTOM_ALPHA = 0.05f
@@ -95,14 +95,13 @@ private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook
     val style = rememberChartStyle(UiOptions.CHART_STYLE_NODE)
     val base = color.copy(alpha = 1f)
     val alpha = color.alpha
-    fun area(top: Float) =
-        LineCartesianLayer.AreaFill.single(
-            Fill(
-                Brush.verticalGradient(
-                    listOf(base.copy(alpha = top * alpha), base.copy(alpha = AREA_BOTTOM_ALPHA * alpha)),
-                ),
+    fun area(top: Float) = LineCartesianLayer.AreaFill.single(
+        Fill(
+            Brush.verticalGradient(
+                listOf(base.copy(alpha = top * alpha), base.copy(alpha = AREA_BOTTOM_ALPHA * alpha)),
             ),
-        )
+        ),
+    )
     return when (style) {
         // The line itself keeps one colour: a gradient brush has no height on a perfectly level line (a sensor that
         // reports the same voltage for hours) and the line would not be drawn at all. The depth comes from the
