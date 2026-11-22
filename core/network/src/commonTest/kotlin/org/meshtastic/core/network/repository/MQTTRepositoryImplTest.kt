@@ -1008,7 +1008,7 @@ class MQTTRepositoryImplTest {
         val largestFitting = largestFittingProxyPayload(PROXY_TEST_TOPIC)
         val small = byteArrayOf(0x01, 0x23, 0x45)
 
-        val next = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val next = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(
             MqttMessage(
@@ -1027,7 +1027,7 @@ class MQTTRepositoryImplTest {
         val harness = createHarness()
         val largestFitting = largestFittingProxyPayload(PROXY_TEST_TOPIC)
 
-        val next = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val next = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(
             MqttMessage(
@@ -1078,7 +1078,7 @@ class MQTTRepositoryImplTest {
         val oversize = json("x".repeat(StreamFrameCodec.MAX_TO_FROM_RADIO_SIZE))
         val small = json("hello")
 
-        val next = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val next = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(
             MqttMessage(topic = "msh/2/json/alpha/node", payload = oversize.encodeToByteArray(), retain = false),

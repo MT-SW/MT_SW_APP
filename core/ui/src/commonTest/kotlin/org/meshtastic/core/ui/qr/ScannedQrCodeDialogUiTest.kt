@@ -249,9 +249,9 @@ class ScannedQrCodeDialogUiTest {
     }
 
     @Test
-    fun deselecting_the_primary_updates_the_location_sharing_of_a_channel_that_inherits_its_key() = runComposeUiTest {
-        // "Guest" has no key of its own: it takes the first written channel's key, and precision is capped only on a
-        // publicly decryptable one.
+    fun deselecting_the_primary_keeps_the_location_sharing_of_a_channel_that_inherits_its_key() = runComposeUiTest {
+        // MT_SW: the position precision is never capped, so "Guest" (no key of its own) keeps the precision it was
+        // shared with whichever channel is chosen as the primary.
         val team = channel("Team", 0).newBuilder().also { it.psk = ByteArray(32) { 3 }.toByteString() }.build()
         val guest =
             channel("Guest", 0)
@@ -264,8 +264,8 @@ class ScannedQrCodeDialogUiTest {
         val incoming = link.newBuilder().also { it.settings = listOf(channel("Plaza", 1), team, guest) }.build()
         show(incoming = incoming, calls = Calls())
 
-        onNode(hasText("Shares your approximate location")).assertExists()
-        onNode(hasText("Shares your precise location")).assertDoesNotExist()
+        onNode(hasText("Shares your precise location")).assertExists()
+        onNode(hasText("Shares your approximate location")).assertDoesNotExist()
 
         onNode(hasText("Plaza")).performClick()
 

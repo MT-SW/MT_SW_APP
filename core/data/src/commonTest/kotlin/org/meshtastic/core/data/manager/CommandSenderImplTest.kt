@@ -332,6 +332,7 @@ class CommandSenderImplTest {
                     tracerouteHandler = tracerouteHandler,
                     neighborInfoHandler = neighborInfoHandler,
                     sessionManager = sessionManager,
+                    meshLogRepository = meshLogRepository,
                     adminRequestRegistry = adminRequestRegistry,
                     connectionStateProvider = connectionStateProvider,
                     scope = senderScope.asServiceScope(),
