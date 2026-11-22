@@ -34,8 +34,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -62,7 +64,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -895,47 +896,54 @@ private fun OriginalMessageSnippet(
         val replyContainerColor =
             nodeTintedContainer(Color(originalMessageNode.colors.second), fraction = NODE_TINT_EMPHASIZED)
         val replyContentColor = MaterialTheme.colorScheme.onSurface
-        // Rectangle shape — the outer message bubble's Surface clips to its
-        // rounded corners, so the reply header inherits the correct top radii
-        // automatically and stays square on the bottom where body text follows.
-        Surface(
-            modifier =
-            modifier
-                .fillMaxWidth()
-                .clickable { onNavigateToOriginalMessage(originalMessage.packetId) }
-                // clickable makes this its own a11y node, so the bubble's isSensitiveData doesn't reach it
-                .semantics { isSensitiveData = true },
-            contentColor = replyContentColor,
-            color = replyContainerColor,
-            shape = RectangleShape,
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+        // The quote is a small rounded block set inside the bubble (not a flat strip glued to its top edge): a soft
+        // tint of the quoted node's colour with a thin bar of that colour on the left.
+        val accentColor = Color(originalMessageNode.colors.second)
+        Box(modifier = modifier.fillMaxWidth().padding(start = 6.dp, top = 6.dp, end = 6.dp)) {
+            Surface(
+                modifier =
+                Modifier.fillMaxWidth()
+                    .clickable { onNavigateToOriginalMessage(originalMessage.packetId) }
+                    // clickable makes this its own a11y node, so the bubble's isSensitiveData doesn't reach it
+                    .semantics { isSensitiveData = true },
+                contentColor = replyContentColor,
+                color = replyContainerColor.copy(alpha = REPLY_QUOTE_ALPHA),
+                shape = RoundedCornerShape(REPLY_QUOTE_CORNER_DP.dp),
             ) {
-                Icon(
-                    MeshtasticIcons.FormatQuote,
-                    contentDescription = stringResource(Res.string.reply),
-                    modifier = Modifier.size(16.dp),
-                )
-                Text(
-                    text = originalMessageNode.user.short_name,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = originalMessage.text,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                    Box(modifier = Modifier.width(3.dp).fillMaxHeight().background(accentColor))
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            MeshtasticIcons.FormatQuote,
+                            contentDescription = stringResource(Res.string.reply),
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Text(
+                            text = originalMessageNode.user.short_name,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = originalMessage.text,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
             }
         }
     }
 }
+
+private const val REPLY_QUOTE_ALPHA = 0.55f
+private const val REPLY_QUOTE_CORNER_DP = 10
 
 /** Full-screen, dark-backdrop viewer for a chat image — tap the image, the close button, or outside to dismiss. */
 @Composable
