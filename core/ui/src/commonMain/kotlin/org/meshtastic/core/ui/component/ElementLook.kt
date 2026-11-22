@@ -118,6 +118,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
 
                 UiOptions.GROUP_BUBBLES,
                 UiOptions.GROUP_INPUT,
+                UiOptions.GROUP_SEARCH,
                 ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
 
@@ -141,6 +142,11 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
         else -> this
     }
 }
+
+/** The shadow of the search field: the same one the message box has (a light glow on a dark theme). */
+@Composable
+internal fun Modifier.searchShadow(shape: Shape): Modifier =
+    cardShadow(rememberUiOptions().glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
 
 /** Whether the current theme is dark, judged by its surface colour. */
 @Composable internal fun isDarkSurface(): Boolean = MaterialTheme.colorScheme.surface.luminance() < READABLE_LUMINANCE

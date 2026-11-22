@@ -61,7 +61,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -244,7 +243,7 @@ private fun InlineSearchField(
         modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .shadow(SEARCH_SHADOW_DP.dp, shape, clip = false)
+            .searchShadow(shape)
             .clip(shape)
             .background(base)
             .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = sheenTop), Color.Transparent)))
@@ -312,7 +311,6 @@ private fun InlineSearchField(
 }
 
 private const val SEARCH_RIM_DP = 1.2f
-private const val SEARCH_SHADOW_DP = 3
 private const val SEARCH_FILL_TOP = 0.26f
 private const val SEARCH_FILL_BOTTOM = 0.08f
 private const val SEARCH_SHEEN_LIGHT = 0.45f
