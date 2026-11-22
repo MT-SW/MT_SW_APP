@@ -20,6 +20,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
+import org.meshtastic.core.ui.component.rememberChartStyle
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.model.UiOptions
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -85,6 +94,30 @@ import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.util.isDesktopPlatform
 
+private val CARD_PADDING = 6.dp
+private val CARD_CORNER = 16.dp
+private const val CARD_TOP_ALPHA = 0.9f
+private const val CARD_BOTTOM_ALPHA = 0.55f
+private const val CARD_RIM_ALPHA = 0.6f
+
+/** The glass card under a chart: the gradient, the thin rim and the shadow of the cards in the node list. */
+@Composable
+private fun Modifier.glassChartCard(): Modifier {
+    val shape = RoundedCornerShape(CARD_CORNER)
+    val colors = MaterialTheme.colorScheme
+    return this.elementLook(UiOptions.GROUP_CARDS, shape)
+        .clip(shape)
+        .background(
+            Brush.verticalGradient(
+                listOf(
+                    colors.surfaceContainerHighest.copy(alpha = CARD_TOP_ALPHA),
+                    colors.surfaceContainerLow.copy(alpha = CARD_BOTTOM_ALPHA),
+                ),
+            ),
+        )
+        .border(1.dp, colors.outlineVariant.copy(alpha = CARD_RIM_ALPHA), shape)
+}
+
 /** Minimum x-step (in seconds) to prevent the default GCD from producing a value of 1 with irregular timestamps. */
 private const val MIN_X_STEP_SECONDS = 60.0
 
@@ -128,34 +161,37 @@ fun GenericMetricChart(
                 }
             }
 
-        CartesianChartHost(
-            chart =
-            @Suppress("SpreadOperator")
-            rememberCartesianChart(
-                *layers.toTypedArray(),
-                startAxis = startAxis,
-                endAxis = endAxis,
-                bottomAxis = bottomAxis,
-                marker = marker,
-                markerVisibilityListener = markerVisibilityListener,
-                persistentMarkers = { _ -> if (selectedX != null && marker != null) marker at selectedX },
-                fadingEdges = rememberFadingEdges(),
-                decorations = decorations,
-                // Telemetry timestamps arrive at irregular intervals. Without an explicit
-                // x-step, Vico computes the GCD of consecutive x-value differences which can
-                // be as small as 1 second, making the chart logically enormous. A 60-second
-                // floor keeps the internal slot count reasonable for any practical interval.
-                // MT_SW: Vico throws when the x-values are more precise than four decimals (seen on iPhone), which
-                // closed the app; such a chart simply gets the floor step instead.
-                getXStep = { model, _, _ ->
-                    maxOf(runCatching { model.getXDeltaGcd() }.getOrDefault(MIN_X_STEP_SECONDS), MIN_X_STEP_SECONDS)
-                },
-            ),
-            modelProducer = modelProducer,
-            modifier = modifier,
-            scrollState = vicoScrollState,
-            zoomState = zoomState,
-        )
+        val glassCard = rememberChartStyle(UiOptions.CHART_STYLE_NODE) == UiOptions.CHART_STYLE_RIBBON
+        Box(modifier = if (glassCard) modifier.glassChartCard() else modifier) {
+            CartesianChartHost(
+                chart =
+                @Suppress("SpreadOperator")
+                rememberCartesianChart(
+                    *layers.toTypedArray(),
+                    startAxis = startAxis,
+                    endAxis = endAxis,
+                    bottomAxis = bottomAxis,
+                    marker = marker,
+                    markerVisibilityListener = markerVisibilityListener,
+                    persistentMarkers = { _ -> if (selectedX != null && marker != null) marker at selectedX },
+                    fadingEdges = rememberFadingEdges(),
+                    decorations = decorations,
+                    // Telemetry timestamps arrive at irregular intervals. Without an explicit
+                    // x-step, Vico computes the GCD of consecutive x-value differences which can
+                    // be as small as 1 second, making the chart logically enormous. A 60-second
+                    // floor keeps the internal slot count reasonable for any practical interval.
+                    // MT_SW: Vico throws when the x-values are more precise than four decimals (seen on iPhone), which
+                    // closed the app; such a chart simply gets the floor step instead.
+                    getXStep = { model, _, _ ->
+                        maxOf(runCatching { model.getXDeltaGcd() }.getOrDefault(MIN_X_STEP_SECONDS), MIN_X_STEP_SECONDS)
+                    },
+                ),
+                modelProducer = modelProducer,
+                modifier = Modifier.fillMaxSize().then(if (glassCard) Modifier.padding(CARD_PADDING) else Modifier),
+                scrollState = vicoScrollState,
+                zoomState = zoomState,
+            )
+        }
     }
 }
 

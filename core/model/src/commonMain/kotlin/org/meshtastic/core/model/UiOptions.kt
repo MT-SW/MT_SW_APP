@@ -191,7 +191,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
 
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
-         * [CHART_STYLE_GLASS] (glossy 3D glass with a gradient), [CHART_STYLE_RIBBON] (default: glass, with thick glass lines), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
+         * [CHART_STYLE_GLASS] (glossy 3D glass with a gradient), [CHART_STYLE_RIBBON] (default: glass, with a glass card and drops under line charts), [CHART_STYLE_GRADIENT], [CHART_STYLE_OUTLINE]
          * or [CHART_STYLE_GLOW].
          */
         const val CHART_STYLE = "charts.style"
@@ -201,7 +201,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val CHART_STYLE_OUTLINE = 3
         const val CHART_STYLE_GLOW = 4
 
-        /** Like [CHART_STYLE_GLASS], and the lines of the node statistics are a thick glass ribbon. */
+        /** Like [CHART_STYLE_GLASS]; the line charts of the node statistics lie on a glass card and have glass drops. */
         const val CHART_STYLE_RIBBON = 5
 
         /**

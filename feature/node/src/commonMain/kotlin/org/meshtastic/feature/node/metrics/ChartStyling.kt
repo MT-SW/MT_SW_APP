@@ -60,13 +60,35 @@ private const val AREA_BOTTOM_ALPHA = 0.05f
 private const val GLOW_AREA_TOP_ALPHA = 0.45f
 private const val STYLE_EXTRA_WIDTH_DP = 0.5f
 private const val GLOW_EXTRA_WIDTH_DP = 1f
-private const val RIBBON_LIGHTEN = 0.55f
-private const val RIBBON_DARKEN = 0.4f
-private const val RIBBON_AREA_TOP_ALPHA = 0.5f
-private const val RIBBON_EXTRA_WIDTH_DP = 2.5f
+private const val DROP_LIGHTEN = 0.35f
+private const val DROP_RIM_ALPHA = 0.85f
+private val DROP_SIZE = 7.dp
+private val DROP_RIM = 1.dp
 
 /** The look of a line of the node's statistics, taken from the chart style chosen in "Look". */
-private class LineLook(val fill: Fill, val areaFill: LineCartesianLayer.AreaFill?, val extraWidthDp: Float)
+private class LineLook(
+    val fill: Fill,
+    val areaFill: LineCartesianLayer.AreaFill?,
+    val extraWidthDp: Float,
+    val points: LineCartesianLayer.PointProvider? = null,
+)
+
+/** A small glass drop for each measurement: a lighter fill of the line's colour with a bright rim. */
+@Composable
+private fun rememberGlassDrop(base: Color): LineCartesianLayer.PointProvider = remember(base) {
+    LineCartesianLayer.PointProvider.single(
+        LineCartesianLayer.Point(
+            component =
+            ShapeComponent(
+                fill = Fill(lerp(base, Color.White, DROP_LIGHTEN)),
+                shape = CircleShape,
+                strokeFill = Fill(Color.White.copy(alpha = DROP_RIM_ALPHA)),
+                strokeThickness = DROP_RIM,
+            ),
+            size = DROP_SIZE,
+        ),
+    )
+}
 
 @Composable
 private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook {
@@ -104,14 +126,15 @@ private fun rememberLineLook(color: Color, forceArea: Boolean = false): LineLook
                 Fill(
                     Brush.verticalGradient(
                         listOf(
-                            lerp(base, Color.White, RIBBON_LIGHTEN).copy(alpha = alpha),
+                            lerp(base, Color.White, LINE_LIGHTEN).copy(alpha = alpha),
                             color,
-                            lerp(base, Color.Black, RIBBON_DARKEN).copy(alpha = alpha),
+                            lerp(base, Color.Black, LINE_DARKEN).copy(alpha = alpha),
                         ),
                     ),
                 ),
-                areaFill = area(RIBBON_AREA_TOP_ALPHA),
-                extraWidthDp = RIBBON_EXTRA_WIDTH_DP,
+                areaFill = area(AREA_TOP_ALPHA),
+                extraWidthDp = 0f,
+                points = rememberGlassDrop(base),
             )
 
         UiOptions.CHART_STYLE_GRADIENT -> LineLook(Fill(color), area(AREA_TOP_ALPHA), 0f)
@@ -162,7 +185,7 @@ object ChartStyling {
             fill = LineCartesianLayer.LineFill.single(look.fill),
             areaFill = look.areaFill,
             stroke = LineCartesianLayer.LineStroke.Continuous((lineWidth + look.extraWidthDp).dp),
-            pointProvider = pointProvider,
+            pointProvider = pointProvider ?: look.points,
             interpolator = interpolator,
         )
     }
@@ -186,6 +209,7 @@ object ChartStyling {
             fill = LineCartesianLayer.LineFill.single(look.fill),
             areaFill = look.areaFill,
             stroke = LineCartesianLayer.LineStroke.Continuous((lineWidth + look.extraWidthDp).dp),
+            pointProvider = look.points,
             interpolator = interpolator,
         )
     }
@@ -235,7 +259,7 @@ object ChartStyling {
                 dashLength = 6.dp,
                 gapLength = 3.dp,
             ),
-            pointProvider = pointProvider,
+            pointProvider = pointProvider ?: look.points,
             interpolator = interpolator,
         )
     }
