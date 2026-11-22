@@ -237,6 +237,14 @@ interface UiPrefs {
 
     fun setPanoramaQuality(quality: Int)
 
+    /**
+     * MT_SW: whether the terrain panorama draws the rock grain and the forest on the slopes (off by default; the ridges
+     * keep their glass gradient and outline either way).
+     */
+    val panoramaTexture: StateFlow<Boolean>
+
+    fun setPanoramaTexture(enabled: Boolean)
+
     /** MT_SW: when not empty, the widgets show only these other nodes (chosen by hand) and ignore the limit. */
     val widgetOthersPicked: StateFlow<Set<Int>>
 

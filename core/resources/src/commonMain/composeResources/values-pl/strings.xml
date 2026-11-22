@@ -3474,6 +3474,9 @@
     <string name="terrain_horizon_quality_auto">Automatycznie</string>
     <string name="terrain_horizon_quality_best">Najlepsza</string>
     <string name="terrain_horizon_quality_lowered">Jakość panoramy obniżona automatycznie</string>
+    <string name="terrain_horizon_texture">Tekstura skał i lasu</string>
+    <string name="terrain_horizon_texture_off">Wyłączona</string>
+    <string name="terrain_horizon_texture_on">Włączona</string>
     <string name="terrain_horizon_quality_very_good">Bardzo dobra</string>
     <string name="terrain_horizon_quality_good">Dobra</string>
     <string name="terrain_horizon_buildings_age">Odświeżaj kawałki starsze niż</string>

@@ -248,6 +248,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_PANORAMA_QUALITY] = quality } }
     }
 
+    override val panoramaTexture: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_PANORAMA_TEXTURE] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setPanoramaTexture(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_PANORAMA_TEXTURE] = enabled } }
+    }
+
     override val widgetOthersPicked: StateFlow<Set<Int>> =
         dataStore.data
             .map { prefs ->
@@ -998,6 +1005,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ANDROID_WIDGET_SECOND = intPrefsKey("android-widget-second")
         val KEY_WIDGET_OTHERS_LIMIT = intPrefsKey("widget-others-limit")
         val KEY_PANORAMA_QUALITY = intPrefsKey("panorama-level")
+        val KEY_PANORAMA_TEXTURE = booleanPrefsKey("panorama-texture")
         val KEY_WIDGET_OTHERS_PICKED = stringPrefsKey("widget-others-picked")
         val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPrefsKey("import-menu-in-top-bar")
         val KEY_FLOATING_NAV_BAR = booleanPrefsKey("floating-nav-bar")

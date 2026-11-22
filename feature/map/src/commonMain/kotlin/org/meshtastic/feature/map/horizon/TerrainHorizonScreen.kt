@@ -161,6 +161,9 @@ import org.meshtastic.core.resources.terrain_horizon_quality_best
 import org.meshtastic.core.resources.terrain_horizon_quality_good
 import org.meshtastic.core.resources.terrain_horizon_quality_lowered
 import org.meshtastic.core.resources.terrain_horizon_quality_very_good
+import org.meshtastic.core.resources.terrain_horizon_texture
+import org.meshtastic.core.resources.terrain_horizon_texture_off
+import org.meshtastic.core.resources.terrain_horizon_texture_on
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
 import org.meshtastic.core.resources.terrain_horizon_save
@@ -227,8 +230,14 @@ private const val SUN_FULL_DEG = 30.0
 private val HazeShares = listOf(0.0f, 0.1f, 0.25f, 0.45f)
 private const val RELIEF_LIGHT = 0.12f
 private const val RELIEF_DARK = 0.28f
-private const val RIDGE_LIGHT = 0.3f
 private const val RIDGE_WIDTH_PX = 1.5f
+private const val GLASS_EDGE_WIDTH_PX = 3.5f
+private const val GLASS_EDGE_ALPHA = 0.3f
+private const val GLASS_RIM_ALPHA = 0.8f
+private const val GLASS_SHEEN_ALPHA = 0.22f
+private const val GLASS_SHEEN_SHARE = 0.35f
+private const val GLASS_FADE_PER_BAND = 0.09f
+private const val GLASS_MIN_SHARE = 0.35f
 private const val SHADE_DEPTH_PX = 64f
 private const val SHADE_MAX = 0.5f
 private const val SMOOTH_PASSES = 2
@@ -311,6 +320,7 @@ fun TerrainHorizonScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uiPrefs: UiPrefs = koinInject()
     val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
+    val textureOn by uiPrefs.panoramaTexture.collectAsStateWithLifecycle()
     var fieldOfView by rememberSaveable { mutableStateOf(DEFAULT_FIELD_OF_VIEW) }
     var onlyVisible by rememberSaveable { mutableStateOf(false) }
     var names by rememberSaveable { mutableStateOf(true) }
@@ -474,6 +484,18 @@ fun TerrainHorizonScreen(
                             label = { Text(stringResource(label)) },
                         )
                     }
+                }
+                ChipRow(stringResource(Res.string.terrain_horizon_texture)) {
+                    BrandChip(
+                        selected = !textureOn,
+                        onClick = { uiPrefs.setPanoramaTexture(false) },
+                        label = { Text(stringResource(Res.string.terrain_horizon_texture_off)) },
+                    )
+                    BrandChip(
+                        selected = textureOn,
+                        onClick = { uiPrefs.setPanoramaTexture(true) },
+                        label = { Text(stringResource(Res.string.terrain_horizon_texture_on)) },
+                    )
                 }
                 OfflineTerrain(
                     state = state,
@@ -739,6 +761,7 @@ private fun Panorama(
     val bands = remember(sky, primary) { BandShares.map { lerp(sky, primary, it) } }
     val uiPrefs: UiPrefs = koinInject()
     val quality by uiPrefs.panoramaQuality.collectAsStateWithLifecycle()
+    val texture by uiPrefs.panoramaTexture.collectAsStateWithLifecycle()
     // Automatic starts at the best level and only steps down, when the picture stutters while it is being turned.
     val auto = rememberAutoLevel(quality) { centre }
     val level = if (quality < 0) auto.level else quality
@@ -759,8 +782,11 @@ private fun Panorama(
     val sun =
         remember(profile) { HorizonSun.at(profile.centre.lat, profile.centre.lon, Clock.System.now().epochSeconds) }
     // Very good (0) has the rock texture and forests; good keeps the shapes and the light but not the textures.
-    val grain = remember(level) { if (level < LEVEL_GOOD) rockGrain() else null }
-    val light = remember(sky, sun, grain, level) { ReliefLight(sky, HazeShares, sun, grain, level == LEVEL_BEST) }
+    val grain = remember(level, texture) { if (texture && level < LEVEL_GOOD) rockGrain() else null }
+    val light =
+        remember(sky, sun, grain, level, texture) {
+            ReliefLight(sky, HazeShares, sun, grain, texture && level == LEVEL_BEST)
+        }
     var crest by remember(profile) { mutableStateOf<CrestInfo?>(null) }
     val currentProfile by rememberUpdatedState(profile)
     val measurer = rememberTextMeasurer()
@@ -980,7 +1006,24 @@ private fun DrawScope.drawRelief(
         clipPath(path) { drawRect(texture, alpha = (GRAIN_ALPHA * (1f - band * GRAIN_FADE)).coerceAtLeast(0f)) }
     }
     if (band < FOREST_BANDS && light.extras) drawForest(path, outline, band, colour, light.grain)
-    drawPath(ridge, lerp(colour, Color.White, RIDGE_LIGHT), style = Stroke(width = RIDGE_WIDTH_PX))
+    // MT_SW: the glass look. A pale sheen across the upper part of the ridge, then its outline: a thin dark edge with a
+    // bright rim line on it. Near ridges get them stronger, far ones fainter.
+    val glass = (1f - band * GLASS_FADE_PER_BAND).coerceAtLeast(GLASS_MIN_SHARE)
+    clipPath(path) {
+        drawRect(
+            Brush.verticalGradient(
+                listOf(Color.White.copy(alpha = GLASS_SHEEN_ALPHA * glass), Color.Transparent),
+                startY = top,
+                endY = top + (h - top) * GLASS_SHEEN_SHARE,
+            ),
+        )
+    }
+    drawPath(ridge, Color.Black.copy(alpha = GLASS_EDGE_ALPHA * glass), style = Stroke(width = GLASS_EDGE_WIDTH_PX))
+    drawPath(
+        ridge,
+        Color.White.copy(alpha = GLASS_RIM_ALPHA * glass),
+        style = Stroke(width = RIDGE_WIDTH_PX, cap = StrokeCap.Round, join = StrokeJoin.Round),
+    )
     // Haze: the farther the band, the more its lower part dissolves into the colour of the sky near the horizon.
     val haze = light.haze[band.coerceIn(0, light.haze.lastIndex)]
     if (haze > 0f) {

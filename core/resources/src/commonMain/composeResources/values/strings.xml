@@ -4190,6 +4190,9 @@
     <string name="terrain_horizon_saved">Saved on the device: %1$s MB</string>
     <string name="terrain_horizon_saving">Saving… %1$d of %2$d</string>
     <string name="terrain_horizon_target_antenna">Node antennas</string>
+    <string name="terrain_horizon_texture">Rock and forest texture</string>
+    <string name="terrain_horizon_texture_off">Off</string>
+    <string name="terrain_horizon_texture_on">On</string>
     <string name="terrain_horizon_title">Terrain panorama</string>
     <string name="terrain_horizon_update">Update terrain (up to %1$d km)</string>
     <!-- THEME -->

@@ -450,6 +450,12 @@ class FakeUiPrefs : UiPrefs {
         panoramaQuality.value = quality
     }
 
+    override val panoramaTexture = MutableStateFlow(false)
+
+    override fun setPanoramaTexture(enabled: Boolean) {
+        panoramaTexture.value = enabled
+    }
+
     override val widgetOthersPicked = MutableStateFlow(emptySet<Int>())
 
     override fun setWidgetOthersPicked(nodeNums: Set<Int>) {

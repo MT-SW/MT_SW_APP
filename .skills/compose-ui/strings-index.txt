@@ -4103,6 +4103,9 @@ terrain_horizon_save_range
 terrain_horizon_saved
 terrain_horizon_saving
 terrain_horizon_target_antenna
+terrain_horizon_texture
+terrain_horizon_texture_off
+terrain_horizon_texture_on
 terrain_horizon_title
 terrain_horizon_update
 ### THEME ###
