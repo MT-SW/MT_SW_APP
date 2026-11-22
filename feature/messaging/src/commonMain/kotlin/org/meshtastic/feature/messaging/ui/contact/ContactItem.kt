@@ -209,7 +209,17 @@ private fun ContactHeader(
         Box(
             modifier =
             Modifier.width(IntrinsicSize.Min)
-                .heightIn(min = 32.dp)
+                .then(
+                    // A conversation with a node has a chip as big as the node's chip in the node list.
+                    if (isChannel) {
+                        Modifier.heightIn(min = 32.dp)
+                    } else {
+                        Modifier.defaultMinSize(
+                            minWidth = NODE_CHIP_MIN_WIDTH_DP.dp,
+                            minHeight = NODE_CHIP_MIN_HEIGHT_DP.dp,
+                        )
+                    },
+                )
                 .then(nodeChipLook(chipColor, chipLabelColor, chipShape))
                 .clip(chipShape)
                 .clickable(onClick = onNodeChipClick)
@@ -259,6 +269,8 @@ private fun ContactHeader(
 }
 
 private const val UNREAD_MESSAGE_LIMIT = 99
+private const val NODE_CHIP_MIN_WIDTH_DP = 80
+private const val NODE_CHIP_MIN_HEIGHT_DP = 34
 private const val DESCRIPTION_MAX_LINES = 4
 
 @Composable
