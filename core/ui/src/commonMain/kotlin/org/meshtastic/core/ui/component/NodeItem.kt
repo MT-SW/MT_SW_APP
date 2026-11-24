@@ -226,6 +226,7 @@ fun NodeItem(
         Column(
             modifier =
             Modifier.clip(CardDefaults.shape)
+                .onRightClick(onLongClick)
                 .combinedClickable(
                     onClickLabel = stringResource(Res.string.node_list_click_label),
                     onClick = onClick,
