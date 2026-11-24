@@ -16,10 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -51,13 +48,15 @@ fun DropdownMenu(
     androidx.compose.material3.DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        modifier = modifier,
+        // The rim goes on the outer modifier, i.e. around the whole surface including the Material inner padding,
+        // so no inset strip is left between the rim and the content.
+        modifier = modifier.popupRim(shape),
         offset = offset,
         shape = shape,
         containerColor = backing,
         tonalElevation = 0.dp,
         shadowElevation = MENU_SHADOW_DP.dp,
     ) {
-        Column(modifier = Modifier.popupRim(shape).width(IntrinsicSize.Max)) { content() }
+        content()
     }
 }
