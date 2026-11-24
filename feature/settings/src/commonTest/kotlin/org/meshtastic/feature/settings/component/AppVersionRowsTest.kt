@@ -16,6 +16,13 @@
  */
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -64,22 +71,24 @@ class AppVersionRowsTest {
 
     @Test
     fun `five taps on the version row still unlock the hidden features`() = runComposeUiTest {
-        var unlocked = false
+        var unlocked by mutableStateOf(false)
         setContent {
             AppTheme {
-                AppVersionRows(
-                    hiddenFeaturesUnlocked = unlocked,
-                    appVersionName = "2.8.0",
-                    onUnlockHiddenFeatures = { unlocked = true },
-                    onPlayChirpyHop = {},
-                )
+                Column {
+                    AppVersionRows(
+                        hiddenFeaturesUnlocked = unlocked,
+                        appVersionName = "2.8.0",
+                        onUnlockHiddenFeatures = { unlocked = true },
+                        onPlayChirpyHop = {},
+                    )
+                    if (unlocked) Text("odblokowane")
+                }
             }
         }
+        onNodeWithText("odblokowane").assertDoesNotExist()
 
-        // The tap counter resets after a second, so the clock must not run on between the quick taps.
-        mainClock.autoAdvance = false
         repeat(5) { onNodeWithText("2.8.0").performClick() }
 
-        assertTrue(unlocked)
+        onNodeWithText("odblokowane").assertExists()
     }
 }
