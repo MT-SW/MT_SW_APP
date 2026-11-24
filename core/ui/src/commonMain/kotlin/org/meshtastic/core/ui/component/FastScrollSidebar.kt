@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -83,7 +82,7 @@ fun FastScrollSidebar(
     reverseLayout: Boolean = false,
 ) {
     if (!isDesktopPlatform) return
-    val thumbColor = scrollbarColor()
+    val thumbColor = scrollbarColor(MaterialTheme.colorScheme.onSurface)
     val coroutineScope = rememberCoroutineScope()
     val sizeCache = remember(listState) { LazyItemSizeCache() }
     // Everything that changes while scrolling is read inside the draw / pointer lambdas below (never in composition),
@@ -225,7 +224,7 @@ private fun lazyScrollMetrics(
 @Composable
 fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
     if (!isDesktopPlatform) return
-    val thumbColor = scrollbarColor()
+    val thumbColor = scrollbarColor(MaterialTheme.colorScheme.onSurface)
     val coroutineScope = rememberCoroutineScope()
     val canScroll by remember(scrollState) { derivedStateOf { scrollState.maxValue > 0 } }
     if (!canScroll) return
@@ -292,12 +291,7 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
  * White on a dark theme, the text colour on a light one: the solid thumb has to stand out from the track. Judged by the
  * text colour, not the surface: inside our windows the surface is made transparent, which would always read as dark.
  */
-@Composable
-@ReadOnlyComposable
-private fun scrollbarColor(): Color {
-    val text = MaterialTheme.colorScheme.onSurface
-    return if (text.luminance() > LIGHT_TEXT_LUMINANCE) Color.White else text
-}
+private fun scrollbarColor(text: Color): Color = if (text.luminance() > LIGHT_TEXT_LUMINANCE) Color.White else text
 
 private const val LIGHT_TEXT_LUMINANCE = 0.5f
 private const val TRACK_WIDTH_DP = 8
