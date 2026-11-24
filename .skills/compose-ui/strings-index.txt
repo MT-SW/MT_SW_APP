@@ -2831,9 +2831,6 @@ node_away_alert_notification
 node_chip_blink
 node_chip_blink_off
 node_chip_blink_on
-node_chip_blink_receive
-node_chip_blink_receive_green
-node_chip_blink_receive_theme
 node_chip_blink_summary
 node_chip_style
 node_chip_style_flat

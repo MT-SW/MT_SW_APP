@@ -35,7 +35,7 @@ import org.meshtastic.core.ui.theme.rememberUiOptions
 /**
  * MT_SW: the blinking shadow of a node-list card. Off by default (the card shadow stays still); with the option
  * "blinking shadow" on, the card of our own node blinks together with the connection icon (blue when sending, green
- * or the theme colour when receiving), and the cards of other nodes blink in the colour of the theme when a packet
+ * when receiving), and the cards of other nodes blink in the colour of the theme when a packet
  * from them arrives ([lastHeard] changes).
  */
 @Composable

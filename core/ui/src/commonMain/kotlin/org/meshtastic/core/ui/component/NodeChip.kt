@@ -118,7 +118,7 @@ private const val BLINK_DEFAULT_RADIUS_DP = 8f
 
 /**
  * MT_SW: a coloured glow behind the chip that blinks like the connection icon (blue when the app sends, green when it
- * receives, or the colour of the theme for received packets when chosen); off unless the option in "Look" is on. It
+ * receives); off unless the option in "Look" is on. It
  * is drawn in the draw phase from the activity flow, so a packet never recomposes the bar.
  */
 @Composable
@@ -128,7 +128,7 @@ internal fun Modifier.activityBlink(shape: Shape): Modifier {
     if (flow == null || options[UiOptions.NODE_CHIP_BLINK] != 1) return this
     val colors = MaterialTheme.colorScheme
     val sendColor = colors.StatusTransmit
-    val receiveColor = if (options[UiOptions.NODE_CHIP_BLINK_THEME] == 1) colors.primary else colors.StatusReceive
+    val receiveColor = colors.StatusReceive
     var glow by remember { mutableStateOf(Color.Transparent) }
     val alpha = remember { Animatable(0f) }
     LaunchedEffect(flow, sendColor, receiveColor) {

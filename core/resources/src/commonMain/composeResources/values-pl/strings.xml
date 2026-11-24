@@ -4664,9 +4664,6 @@
     <string name="node_chip_blink_off">Wyłączone</string>
     <string name="node_chip_blink_on">Jak ikona połączenia (niebieski przy wysyłaniu, zielony przy odbiorze)</string>
     <string name="node_chip_blink_summary">Cień pod plakietką i kartą Twojego węzła (górny pasek i lista węzłów) mruga razem z ikoną połączenia, a cień kart innych węzłów mruga w kolorze motywu, gdy coś od nich odbierzesz. Domyślnie wyłączone.</string>
-    <string name="node_chip_blink_receive">Kolor mrugnięcia przy odbiorze</string>
-    <string name="node_chip_blink_receive_green">Zielony (jak ikona)</string>
-    <string name="node_chip_blink_receive_theme">Kolor motywu</string>
     <string name="node_chip_style">Styl plakietek węzłów</string>
     <string name="node_chip_style_standard">Standardowy (nasz styl: kolor węzła przechodzący w ciemniejszy, biały napis, obrys i cień)</string>
     <string name="node_chip_style_glass_3d">Szkło 3D (gradient, obrys i cień)</string>
