@@ -4604,7 +4604,22 @@
     <string name="connection_progress_channels_of">Kanały (%1$d / %2$d)</string>
     <string name="connection_progress_nodes">Węzły (%1$d)</string>
     <string name="connection_progress_loading_nodes">Wczytywanie listy węzłów</string>
-    <string name="channel_import_add_description">Dodaje wybrane kanały do Twojego urządzenia. Kanały, które już na nim są, zostają bez zmian.</string>
+    <string name="channel_import_add_description">Dodaje wybrane kanały do Twojego urządzenia i zachowuje jego ustawienia LoRa. Kanały, które już na nim są, zostają, chyba że urządzenie jest pełne i odznaczysz któryś.</string>
+    <string name="channel_import_name_conflict">Twoje urządzenie ma kanał o tej nazwie, ale z innym kluczem</string>
+    <plurals name="channel_import_removes_existing">
+        <item quantity="one">%1$d kanał, który już jest w Twoim urządzeniu, zostanie usunięty.</item>
+        <item quantity="few">%1$d kanały, które już są w Twoim urządzeniu, zostaną usunięte.</item>
+        <item quantity="many">%1$d kanałów, które już są w Twoim urządzeniu, zostanie usuniętych.</item>
+        <item quantity="other">%1$d kanału, które już jest w Twoim urządzeniu, zostanie usuniętego.</item>
+    </plurals>
+    <string name="channel_import_waiting_for_radio">Kanały Twojego urządzenia jeszcze się nie wczytały. Zaimportujesz je, gdy się wczytają.</string>
+    <plurals name="channel_slots_uncheck_new">
+        <item quantity="one">Twoje urządzenie mieści %2$d kanałów. Odznacz %1$d nowy kanał, aby zrobić miejsce.</item>
+        <item quantity="few">Twoje urządzenie mieści %2$d kanałów. Odznacz %1$d nowe kanały, aby zrobić miejsce.</item>
+        <item quantity="many">Twoje urządzenie mieści %2$d kanałów. Odznacz %1$d nowych kanałów, aby zrobić miejsce.</item>
+        <item quantity="other">Twoje urządzenie mieści %2$d kanałów. Odznacz %1$d nowego kanału, aby zrobić miejsce.</item>
+    </plurals>
+    <string name="channel_update_failed">Nie udało się zaktualizować kanałów w Twoim urządzeniu.</string>
     <string name="channel_import_confirm_add">Dodaj kanały</string>
     <string name="channel_import_confirm_replace">Zastąp kanały</string>
     <string name="channel_import_downlink">Przyjmuje wiadomości z MQTT na tym kanale</string>

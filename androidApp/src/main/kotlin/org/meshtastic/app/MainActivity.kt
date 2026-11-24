@@ -67,8 +67,10 @@ import org.meshtastic.app.ui.MainScreen
 import org.meshtastic.app.xr.AppSpatialShell
 import org.meshtastic.core.barcode.rememberBarcodeScanner
 import org.meshtastic.core.common.state.LaunchOptions
+import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DeviceAddress
+import org.meshtastic.core.model.util.toChannelSet
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.network.repository.UsbRepository
 import org.meshtastic.core.nfc.NfcEmulatorEffect
@@ -456,7 +458,7 @@ class MainActivity : AppCompatActivity() {
             stream != null -> importMapFile(stream)
 
             // shared .geojson/.kml file (e.g. from an external planner)
-            text != null -> createShareIntent(text).send()
+            text != null -> sharedChannelUrl(text)?.let(::handleMeshtasticUri) ?: createShareIntent(text).send()
         }
     }
 
@@ -538,6 +540,18 @@ class MainActivity : AppCompatActivity() {
         /** The DUMP-guarded alias in the debug manifest. */
         const val AUTOMATION_LAUNCHER = "org.meshtastic.app.AutomationLauncher"
     }
+}
+
+/**
+ * Shared text that is a channel link, and nothing else, goes to the channel import like a tapped link; any other text,
+ * including a channel link inside a sentence, stays a message to send.
+ */
+internal fun sharedChannelUrl(text: String): Uri? {
+    val candidate = text.trim()
+    // The URI parser accepts leading words before a channel link, so whitespace is checked here.
+    val isChannelLink =
+        candidate.none { it.isWhitespace() } && runCatching { CommonUri.parse(candidate).toChannelSet() }.isSuccess
+    return if (isChannelLink) candidate.toUri() else null
 }
 
 internal fun createShareMessageDeepLink(message: String): Uri =

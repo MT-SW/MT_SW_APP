@@ -2,7 +2,7 @@
 title: Wiadomości i kanały
 parent: Przewodnik użytkownika
 nav_order: 3
-last_updated: 2026-11-21
+last_updated: 2026-11-23
 description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
@@ -60,9 +60,11 @@ Na ekranie **Kanały** dotknij **Udostępnij kanały**, aby zobaczyć kod QR i l
 Aby przyjąć czyjeś kanały, użyj przycisku importu na tym samym ekranie: **Skanuj kod QR udostępnionych kanałów**, **Wpisz URL udostępnionych kanałów** albo, na telefonie z NFC, **Skanuj udostępnione kanały (NFC)**. Okno **Importuj kanały** wypisuje przychodzące kanały. Kod zrobiony z opcją **Zastąp** otwiera się z zaznaczonym **Zastąp**, kod zrobiony z opcją **Dodaj** oferuje tylko **Dodaj**, a przełącznik **Zastąp** / **Dodaj** wybiera tylko tryb: na Twoim węźle nic się nie zmieni, dopóki nie dotkniesz **Zastąp kanały** albo **Dodaj kanały**. Kanał, który przekazuje wiadomości do MQTT lub z MQTT albo udostępnia Twoją lokalizację, mówi o tym w swoim wierszu.
 
 - **Zastąp** usuwa kanały z Twojego węzła, a potem wypisuje każde ustawienie LoRa, które się zmieni. Zmiany w wysyłaniu i odbieraniu, na przykład wyłączenie nadawania, są na początku, w osobnej grupie.
-- **Dodaj** pozwala zaznaczyć przychodzące kanały, które chcesz, i pokazuje, ile miejsc na kanały w Twoim węźle jest zajętych. Jeśli wybór się nie mieści, wiersz podpowiada, ile kanałów odznaczyć. Odznaczenie kanału, który już jest na Twoim węźle, usuwa go.
+- **Dodaj** zachowuje kanały i ustawienia LoRa Twojego węzła, pozwala zaznaczyć przychodzące kanały, które chcesz, i pokazuje, ile miejsc na kanały jest zajętych. Jeśli wybór się nie mieści, wiersz podpowiada, ile nowych kanałów odznaczyć. Dopiero gdy Twój węzeł jest pełny, możesz odznaczyć kanał, który już na nim jest, aby zrobić miejsce, a czerwony wiersz podaje wtedy, ile Twoich kanałów zostanie usuniętych. Przychodzący kanał o tej samej nazwie co Twój, ale z innym kluczem, jest oznaczony w swoim wierszu.
 
-Tytuł oraz przyciski **Anuluj** i potwierdzenia zostają widoczne, gdy lista się przewija.
+Tytuł oraz przyciski **Anuluj** i potwierdzenia zostają widoczne, gdy lista się przewija. Jeśli import się nie uda, na przykład gdy węzeł się rozłączył, komunikat mówi o tym i pokazuje przycisk **Ponów próbę**. Dopóki aplikacja nie odczyta kanałów Twojego węzła, okno to mówi i żaden z przycisków potwierdzenia nie działa.
+
+Link do kanału udostępniony do aplikacji z innej aplikacji, sam w sobie, otwiera to samo okno **Importuj kanały**. Każdy inny udostępniony tekst otwiera się jako wiadomość do wysłania.
 
 ### Zarchiwizowane kanały
 

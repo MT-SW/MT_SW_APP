@@ -105,7 +105,7 @@ okio = "3.18.2"
 bouncycastle = "1.87"
 uri-kmp = "0.0.21"
 spotless = "8.12.0"
-sceneview = "4.70.0"
+sceneview = "4.72.0"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
