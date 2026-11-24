@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.test.runTest
 import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.model.Channel
-import org.meshtastic.core.model.util.withOnWirePrecision
 import org.meshtastic.core.testing.FakeRadioConfigRepository
 import org.meshtastic.core.testing.FakeRadioController
 import org.meshtastic.core.ui.theme.AppTheme
@@ -252,7 +251,7 @@ class ScannedQrCodeDialogUiTest {
 
         assertTrue(radioController.localConfigs.isEmpty())
         assertEquals(
-            (onRadio.settings + link.settings).withOnWirePrecision(),
+            onRadio.settings + link.settings,
             radioConfigRepository.currentChannelSet.settings,
         )
     }

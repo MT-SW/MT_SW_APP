@@ -16,6 +16,9 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -28,44 +31,41 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.addOutline
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.model.Node
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Shape
 import kotlinx.coroutines.flow.conflate
 import org.meshtastic.core.model.MeshActivity
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusReceive
 import org.meshtastic.core.ui.theme.StatusColors.StatusTransmit
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.LocalMeshActivity
-import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.proto.EnvironmentMetrics
 import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.User
@@ -109,7 +109,11 @@ fun NodeChip(
     val clickable =
         if (onClick == null) Modifier else Modifier.clip(MaterialTheme.shapes.small).clickable { onClick(node) }
     val blink = if (blinkWithActivity) Modifier.activityBlink(MaterialTheme.shapes.small) else Modifier
-    Card(modifier = modifier.then(blink).then(glass).then(clickable), shape = MaterialTheme.shapes.small, colors = colors) {
+    Card(
+        modifier = modifier.then(blink).then(glass).then(clickable),
+        shape = MaterialTheme.shapes.small,
+        colors = colors,
+    ) {
         content()
     }
 }
@@ -122,8 +126,8 @@ private const val BLINK_DEFAULT_RADIUS_DP = 8f
 
 /**
  * MT_SW: a coloured glow behind the chip that blinks like the connection icon (blue when the app sends, green when it
- * receives); off unless the option in "Look" is on. It
- * is drawn in the draw phase from the activity flow, so a packet never recomposes the bar.
+ * receives); off unless the option in "Look" is on. It is drawn in the draw phase from the activity flow, so a packet
+ * never recomposes the bar.
  */
 @Composable
 internal fun Modifier.activityBlink(shape: Shape, outsideOnly: Boolean = false): Modifier {

@@ -148,7 +148,7 @@ class RadioChooserViewModel(
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices = slots.map { slot ->
                 val active = slot.id == activeId && isValidDeviceAddress(address)
-                val plate = plateOf(slot.address, active, ours, badges)
+                val plate = plateOf(slot.address, active, ours, badges, knownPlates)
                 RadioChoice(
                     id = slot.id,
                     name = slot.name,
@@ -188,30 +188,6 @@ class RadioChooserViewModel(
 
     // The last plate seen for each device, so that a device keeps its plate while the one of its own database is read.
     private val knownPlates = mutableMapOf<String, DeviceBadge>()
-
-    /**
-     * The plate of the device at [address], always taken from the database of that device: the live node of the device
-     * in use only when it really is that device's node (right after a switch it can still be the previous device's
-     * node), otherwise the plate read from its own database, otherwise the last one seen.
-     */
-    private fun plateOf(address: String, active: Boolean, ours: Node?, badges: Map<String, DeviceBadge>): DeviceBadge? {
-        val badge = badges[address]
-        val live =
-            ours?.takeIf { node ->
-                active &&
-                    node.user.short_name.isNotBlank() &&
-                    (badge == null || badge.nodeNum == node.num) &&
-                    badges.none { (other, b) -> other != address && b.nodeNum == node.num }
-            }
-        val found =
-            when {
-                live != null -> DeviceBadge(live.num, live.user.short_name)
-                badge != null && badge.shortName.isNotBlank() -> badge
-                else -> knownPlates[address] ?: badge
-            }
-        if (found != null && found.shortName.isNotBlank()) knownPlates[address] = found
-        return found
-    }
 
     private val switchingState = MutableStateFlow(false)
 
@@ -430,4 +406,33 @@ class RadioChooserViewModel(
         const val BADGE_READ_DELAY_MS = 800L
         const val SWITCH_MAX_MS = 20_000L
     }
+}
+
+/**
+ * The plate of the device at [address], always taken from the database of that device: the live node of the device
+ * in use only when it really is that device's node (right after a switch it can still be the previous device's
+ * node), otherwise the plate read from its own database, otherwise the last one seen.
+ */
+private fun plateOf(
+    address: String,
+    active: Boolean,
+    ours: Node?,
+    badges: Map<String, DeviceBadge>,
+    knownPlates: MutableMap<String, DeviceBadge>,
+): DeviceBadge? {
+    val badge = badges[address]
+    val live = ours?.takeIf { node ->
+        active &&
+            node.user.short_name.isNotBlank() &&
+            (badge == null || badge.nodeNum == node.num) &&
+            badges.none { (other, b) -> other != address && b.nodeNum == node.num }
+    }
+    val found =
+        when {
+            live != null -> DeviceBadge(live.num, live.user.short_name)
+            badge != null && badge.shortName.isNotBlank() -> badge
+            else -> knownPlates[address] ?: badge
+        }
+    if (found != null && found.shortName.isNotBlank()) knownPlates[address] = found
+    return found
 }

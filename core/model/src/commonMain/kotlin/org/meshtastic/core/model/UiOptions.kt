@@ -181,9 +181,10 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val RADIO_ALERT_SPEED = "radios.alert.speed"
         val RADIO_ALERT_PERIOD_MS = intArrayOf(2400, 1600, 1000)
 
-        /** 1 = the shadow of the plate of our node blinks blue and green together with the connection icon (0 = off). */
+        /**
+         * 1 = the shadow of the plate of our node blinks blue and green together with the connection icon (0 = off).
+         */
         const val NODE_CHIP_BLINK = "nodeChip.blink"
-
 
         /** Whether the radio chooser shows the number of connected radios (1 = yes). */
         const val RADIO_COUNT = "radios.count"

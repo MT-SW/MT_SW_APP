@@ -65,7 +65,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_chip_style_flat
+import org.meshtastic.core.resources.node_chip_style_glass_3d
+import org.meshtastic.core.resources.node_chip_style_standard
 import org.meshtastic.core.resources.theme_very_vivid
 import org.meshtastic.core.resources.theme_vivid
 import org.meshtastic.core.resources.vanity_chip_preview
@@ -77,10 +81,6 @@ import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.core.ui.component.nodeChipLook
 import org.meshtastic.core.ui.component.nodeChipTextColor
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.resources.node_chip_style_standard
-import org.meshtastic.core.resources.node_chip_style_glass_3d
-import org.meshtastic.core.resources.node_chip_style_flat
 import org.meshtastic.core.ui.theme.SATURATION_VERY_VIVID
 import org.meshtastic.core.ui.theme.SATURATION_VIVID
 import org.meshtastic.core.ui.theme.saturated
@@ -178,57 +178,59 @@ private fun ThemeChipSamples(rgb: Int) {
             stringResource(Res.string.node_chip_style_glass_3d) to UiOptions.NODE_CHIP_GLASS_3D,
             stringResource(Res.string.node_chip_style_flat) to UiOptions.NODE_CHIP_FLAT,
         )
-    Text(
-        text = stringResource(Res.string.vanity_chip_preview),
-        modifier = Modifier.padding(top = 16.dp),
-        style = MaterialTheme.typography.titleSmall,
-    )
-    // One row per chip style, one column per kind of theme.
-    Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        samples.forEach { (name, _) ->
-            Text(
-                text = name,
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f),
-            )
-        }
-    }
-    styles.forEach { (styleName, style) ->
+    Column {
         Text(
-            text = styleName,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+            text = stringResource(Res.string.vanity_chip_preview),
+            modifier = Modifier.padding(top = 16.dp),
+            style = MaterialTheme.typography.titleSmall,
         )
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            samples.forEach { (_, color) ->
-                val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Box(
-                        modifier =
-                        Modifier.width(64.dp)
-                            .then(nodeChipLook(color, textColor, MaterialTheme.shapes.small, style))
-                            .clip(MaterialTheme.shapes.small)
-                            .padding(horizontal = 8.dp, vertical = 5.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "SW01",
-                            color = nodeChipTextColor(style, textColor),
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                        )
+        // One row per chip style, one column per kind of theme.
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            samples.forEach { (name, _) ->
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        styles.forEach { (styleName, style) ->
+            Text(
+                text = styleName,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                samples.forEach { (_, color) ->
+                    val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier =
+                            Modifier.width(64.dp)
+                                .then(nodeChipLook(color, textColor, MaterialTheme.shapes.small, style))
+                                .clip(MaterialTheme.shapes.small)
+                                .padding(horizontal = 8.dp, vertical = 5.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "SW01",
+                                color = nodeChipTextColor(style, textColor),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
             }
         }
+        Text(
+            text = stringResource(Res.string.vanity_chip_preview_hint),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 4.dp),
+        )
     }
-    Text(
-        text = stringResource(Res.string.vanity_chip_preview_hint),
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(top = 4.dp),
-    )
 }
 
 @Composable

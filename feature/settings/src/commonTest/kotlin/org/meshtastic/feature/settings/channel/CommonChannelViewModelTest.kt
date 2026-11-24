@@ -33,7 +33,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.meshtastic.core.model.util.withOnWirePrecision
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.testing.FakeRadioConfigRepository
@@ -142,7 +141,7 @@ abstract class CommonChannelViewModelTest {
 
             // The retry finishes once this test suspends: the failure resumed it from inside its own unconfined frame.
             val written = repository.channelSetFlow.first { it != onRadio }
-            assertEquals(reset.settings.withOnWirePrecision(), written.settings)
+            assertEquals(reset.settings, written.settings)
             snackbarManager.events.test { expectNoEvents() }
         }
 }

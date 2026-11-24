@@ -35,15 +35,23 @@ import org.meshtastic.core.ui.theme.rememberUiOptions
 /**
  * MT_SW: the blinking shadow of a node-list card. Off by default (the card shadow stays still); with the option
  * "blinking shadow" on, the card of our own node blinks together with the connection icon (blue when sending, green
- * when receiving), and the cards of other nodes blink in the colour of the theme when a packet
- * from them arrives ([lastHeard] changes).
+ * when receiving), and the cards of other nodes blink in the colour of the theme when a packet from them arrives
+ * ([lastHeard] changes).
  */
 @Composable
 fun Modifier.nodeCardGlow(lastHeard: Int, isThisNode: Boolean): Modifier {
     val options = rememberUiOptions()
-    if (options[UiOptions.NODE_CHIP_BLINK] != 1) return this
+    return when {
+        options[UiOptions.NODE_CHIP_BLINK] != 1 -> this
+        isThisNode -> this.activityBlink(CardDefaults.shape, outsideOnly = true)
+        else -> this.heardBlink(lastHeard)
+    }
+}
+
+/** MT_SW: blink of the shadow of another node's card in the colour of the theme when a packet from it arrives. */
+@Composable
+private fun Modifier.heardBlink(lastHeard: Int): Modifier {
     val cardShape = CardDefaults.shape
-    if (isThisNode) return this.activityBlink(cardShape, outsideOnly = true)
     val color = MaterialTheme.colorScheme.primary
     val alpha = remember { Animatable(0f) }
     val previous = remember { mutableIntStateOf(lastHeard) }
