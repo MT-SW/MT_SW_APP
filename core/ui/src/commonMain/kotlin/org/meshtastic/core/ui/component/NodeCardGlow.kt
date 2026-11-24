@@ -43,7 +43,7 @@ fun Modifier.nodeCardGlow(lastHeard: Int, isThisNode: Boolean): Modifier {
     val options = rememberUiOptions()
     if (options[UiOptions.NODE_CHIP_BLINK] != 1) return this
     val cardShape = CardDefaults.shape
-    if (isThisNode) return this.activityBlink(cardShape)
+    if (isThisNode) return this.activityBlink(cardShape, outsideOnly = true)
     val color = MaterialTheme.colorScheme.primary
     val alpha = remember { Animatable(0f) }
     val previous = remember { mutableIntStateOf(lastHeard) }
@@ -54,5 +54,5 @@ fun Modifier.nodeCardGlow(lastHeard: Int, isThisNode: Boolean): Modifier {
         }
         previous.intValue = lastHeard
     }
-    return this.drawBehind { drawBlinkGlow(cardShape, color, alpha.value) }
+    return this.drawBehind { drawBlinkGlow(cardShape, color, alpha.value, outsideOnly = true) }
 }

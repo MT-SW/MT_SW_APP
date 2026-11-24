@@ -32,6 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.addOutline
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -122,7 +126,7 @@ private const val BLINK_DEFAULT_RADIUS_DP = 8f
  * is drawn in the draw phase from the activity flow, so a packet never recomposes the bar.
  */
 @Composable
-internal fun Modifier.activityBlink(shape: Shape): Modifier {
+internal fun Modifier.activityBlink(shape: Shape, outsideOnly: Boolean = false): Modifier {
     val options = rememberUiOptions()
     val flow = LocalMeshActivity.current
     if (flow == null || options[UiOptions.NODE_CHIP_BLINK] != 1) return this
@@ -139,12 +143,18 @@ internal fun Modifier.activityBlink(shape: Shape): Modifier {
             alpha.animateTo(0f, tween(durationMillis = BLINK_MILLIS, easing = LinearEasing))
         }
     }
-    return drawBehind { drawBlinkGlow(shape, glow, alpha.value) }
+    return drawBehind { drawBlinkGlow(shape, glow, alpha.value, outsideOnly = outsideOnly) }
 }
 
 /** MT_SW: the layered soft glow around a rounded shape used by every blinking shadow (top-bar chip and node list). */
-internal fun DrawScope.drawBlinkGlow(shape: Shape, glow: Color, a: Float) {
+internal fun DrawScope.drawBlinkGlow(shape: Shape, glow: Color, a: Float, outsideOnly: Boolean = false) {
     if (a <= 0f) return
+    if (outsideOnly) {
+        // Only the shadow around the card blinks: the card itself (which is translucent) must not be tinted.
+        val hole = Path().apply { addOutline(shape.createOutline(size, layoutDirection, this@drawBlinkGlow)) }
+        clipPath(hole, ClipOp.Difference) { drawBlinkGlow(shape, glow, a, outsideOnly = false) }
+        return
+    }
     val corner =
         (shape.createOutline(size, layoutDirection, this) as? Outline.Rounded)?.roundRect?.topLeftCornerRadius?.x
             ?: BLINK_DEFAULT_RADIUS_DP.dp.toPx()

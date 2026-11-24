@@ -77,7 +77,10 @@ import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.core.ui.component.nodeChipLook
 import org.meshtastic.core.ui.component.nodeChipTextColor
-import org.meshtastic.core.ui.component.rememberNodeChipStyle
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.resources.node_chip_style_standard
+import org.meshtastic.core.resources.node_chip_style_glass_3d
+import org.meshtastic.core.resources.node_chip_style_flat
 import org.meshtastic.core.ui.theme.SATURATION_VERY_VIVID
 import org.meshtastic.core.ui.theme.SATURATION_VIVID
 import org.meshtastic.core.ui.theme.saturated
@@ -163,47 +166,61 @@ private sealed interface VanityGrindStatus {
 @Composable
 private fun ThemeChipSamples(rgb: Int) {
     val base = Color(0xFF000000.toInt() or rgb)
-    val style = rememberNodeChipStyle()
     val samples =
         listOf(
             stringResource(Res.string.vanity_theme_standard) to base,
             stringResource(Res.string.theme_vivid) to base.saturated(SATURATION_VIVID / 100.0),
             stringResource(Res.string.theme_very_vivid) to base.saturated(SATURATION_VERY_VIVID / 100.0),
         )
+    val styles =
+        listOf(
+            stringResource(Res.string.node_chip_style_standard) to UiOptions.NODE_CHIP_STANDARD,
+            stringResource(Res.string.node_chip_style_glass_3d) to UiOptions.NODE_CHIP_GLASS_3D,
+            stringResource(Res.string.node_chip_style_flat) to UiOptions.NODE_CHIP_FLAT,
+        )
     Text(
         text = stringResource(Res.string.vanity_chip_preview),
         modifier = Modifier.padding(top = 16.dp),
         style = MaterialTheme.typography.titleSmall,
     )
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        samples.forEach { (name, color) ->
-            val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
-            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier =
-                    Modifier.width(64.dp)
-                        .then(nodeChipLook(color, textColor, MaterialTheme.shapes.small))
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(horizontal = 8.dp, vertical = 5.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "SW01",
-                        color = nodeChipTextColor(style, textColor),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                    )
+    // One row per chip style, one column per kind of theme.
+    Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        samples.forEach { (name, _) ->
+            Text(
+                text = name,
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+    styles.forEach { (styleName, style) ->
+        Text(
+            text = styleName,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            samples.forEach { (_, color) ->
+                val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier =
+                        Modifier.width(64.dp)
+                            .then(nodeChipLook(color, textColor, MaterialTheme.shapes.small, style))
+                            .clip(MaterialTheme.shapes.small)
+                            .padding(horizontal = 8.dp, vertical = 5.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "SW01",
+                            color = nodeChipTextColor(style, textColor),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                        )
+                    }
                 }
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.labelSmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 6.dp),
-                )
             }
         }
     }
