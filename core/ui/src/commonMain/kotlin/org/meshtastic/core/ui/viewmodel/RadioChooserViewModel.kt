@@ -253,7 +253,7 @@ class RadioChooserViewModel(
             }
                 .distinctUntilChanged()
                 .collect { (address, _) ->
-                    if (isValidDeviceAddress(address)) {
+                    if (address != null && isValidDeviceAddress(address)) {
                         delay(BADGE_READ_DELAY_MS)
                         background.readBadge(address)
                     }
