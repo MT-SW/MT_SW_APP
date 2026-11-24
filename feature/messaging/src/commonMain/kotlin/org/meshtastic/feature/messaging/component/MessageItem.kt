@@ -46,6 +46,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.onRightClick
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -574,6 +575,13 @@ fun MessageItem(
                 .elementLook(UiOptions.GROUP_BUBBLES, messageShape)
                 // The click (and its hover highlight) sits inside the shadow and has the bubble's own shape.
                 .clip(messageShape)
+                // MT_SW: on the computer the right mouse button does the same as a long press.
+                .onRightClick {
+                    onLongClick()
+                    if (!inSelectionMode) {
+                        onQuickReactionsOpenChange(true)
+                    }
+                }
                 .combinedClickable(
                     onClick = { if (quickReactionsOpen) onQuickReactionsOpenChange(false) else onClick() },
                     onLongClick = {
