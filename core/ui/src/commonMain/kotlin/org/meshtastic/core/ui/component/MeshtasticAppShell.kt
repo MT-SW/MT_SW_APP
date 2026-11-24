@@ -134,7 +134,20 @@ fun MeshtasticAppShell(
     val sosScreens by sosPrefs.barScreens.collectAsStateWithLifecycle()
     val sosConfig by sosPrefs.config.collectAsStateWithLifecycle()
     val sosController = koinInject<SosController>()
-    val ourNode by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
+    val ourNodeLive by nodeRepository.ourNodeInfo.collectAsStateWithLifecycle()
+    // The top bars only draw the number, the short name, the colour and the "ignored" mark of our node. Our node is
+    // updated with every packet it sends or hears (last heard, signal, telemetry), so the bars would be given a new
+    // value and drawn again each time, and the plate with its shadow flickered. The value is replaced only when
+    // something that is drawn really changes.
+    val ourNode =
+        remember(
+            ourNodeLive?.num,
+            ourNodeLive?.user?.short_name,
+            ourNodeLive?.user?.long_name,
+            ourNodeLive?.isIgnored,
+        ) {
+            ourNodeLive
+        }
     val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
     // The saved radios (up to three) and what the chooser of the top bar can do with them.
     val radioChooser = koinViewModel<RadioChooserViewModel>()

@@ -101,6 +101,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Naprawione błędy
 
+* Plakietka Twojego węzła na górnym pasku i jej cień nie migają już przy nadawaniu i odbiorze pakietów (pasek dostawał nową wartość węzła przy każdym pakiecie i rysował plakietkę od nowa; teraz zmienia się tylko, gdy zmieni się to, co widać: numer, krótka nazwa, nazwa lub oznaczenie „ignorowany”).
 * Cofanie w szczegółach węzła na komputerze: strzałka na karcie szczegółów zamyka od razu wszystkie otwarte obok statystyki i pokazuje listę (dopiero kolejne cofnięcie zamyka szczegóły), zamiast przechodzić przez każdą statystykę po kolei. Strzałka w samej statystyce cofa o jedną.
 * Wykres prądu i napięcia w statystykach środowiska (wszystkie wersje): linia jest znów ciągła. Wykres ciął ją na krótkie kawałki przy każdej przerwie w odczytach, więc przy czujniku zgłaszającym dane seriami nie było widać żadnej linii.
 * Zaznaczenie punktu na wykresie liniowym w statystykach węzła (wszystkie wersje): w stylach innych niż Płaski zaznaczony pomiar to mniejsza szklana kropla z jasnym obrysem, a nie duże płaskie kółko.
@@ -1062,6 +1063,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 
+* The plate of your node on the top bar and its shadow no longer flicker while packets are sent and received (the bar was given a new value of the node with every packet and drew the plate again; now it changes only when what is shown changes: the number, short name, long name or the "ignored" mark).
 * Going back in node details on the desktop: the arrow on the details card closes all the statistics opened beside it at once and shows the list (only the next press closes the details), instead of going through each statistic in turn. The arrow in a statistic itself goes back by one.
 * The current and voltage chart in the environment statistics (all versions): the line is continuous again. The chart cut it into short pieces at every pause in the readings, so for a sensor that reports in bursts no line could be seen.
 * The selected point on a line chart in node statistics (all versions): in the styles other than Flat the selected measurement is a smaller glass drop with a bright rim instead of a big flat circle.
