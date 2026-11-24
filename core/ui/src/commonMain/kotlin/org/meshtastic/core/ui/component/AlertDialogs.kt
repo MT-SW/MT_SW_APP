@@ -345,7 +345,7 @@ internal fun popupFade(): Float {
 
 /** MT_SW: the thin rim with the sheen of a pop-up window, except for the look with depth, which draws its own. */
 @Composable
-internal fun Modifier.popupRim(shape: Shape): Modifier {
+fun Modifier.popupRim(shape: Shape): Modifier {
     val options = rememberUiOptions()
     return if (options.element(UiOptions.GROUP_DIALOGS).look == ElementLook.DEPTH) {
         this

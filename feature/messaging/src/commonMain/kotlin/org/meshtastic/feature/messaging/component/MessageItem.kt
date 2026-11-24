@@ -46,7 +46,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.onRightClick
+import org.meshtastic.core.ui.component.popupRim
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -488,11 +490,16 @@ fun MessageItem(
         visible = quickReactionsOpen && !inSelectionMode,
         modifier = Modifier.align(if (message.fromLocal) Alignment.End else Alignment.Start),
     ) {
+        // MT_SW: the bar is in the look of our app (shadow, sheen and rim only on the bar itself).
+        val barShape = RoundedCornerShape(QUICK_REACTION_BAR_CORNER)
         Surface(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
-            shape = RoundedCornerShape(QUICK_REACTION_BAR_CORNER),
+            modifier =
+            Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
+                .elementLook(UiOptions.GROUP_DIALOGS, barShape)
+                .popupRim(barShape),
+            shape = barShape,
             tonalElevation = 3.dp,
-            shadowElevation = 2.dp,
+            shadowElevation = 0.dp,
         ) {
             QuickEmojiRow(
                 quickEmojis = quickEmojis,
