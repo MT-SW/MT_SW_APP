@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -284,10 +285,17 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
     )
 }
 
-/** White on a dark surface, the text colour on a light one: the solid thumb has to stand out from the track. */
+/**
+ * White on a dark theme, the text colour on a light one: the solid thumb has to stand out from the track. Judged by the
+ * text colour, not the surface: inside our windows the surface is made transparent, which would always read as dark.
+ */
 @Composable
-private fun scrollbarColor(): Color = if (isDarkSurface()) Color.White else MaterialTheme.colorScheme.onSurface
+private fun scrollbarColor(): Color {
+    val text = MaterialTheme.colorScheme.onSurface
+    return if (text.luminance() > LIGHT_TEXT_LUMINANCE) Color.White else text
+}
 
+private const val LIGHT_TEXT_LUMINANCE = 0.5f
 private const val TRACK_WIDTH_DP = 8
 private const val TRACK_EDGE_DP = 1.5f
 private const val THUMB_WIDTH_DP = 4
