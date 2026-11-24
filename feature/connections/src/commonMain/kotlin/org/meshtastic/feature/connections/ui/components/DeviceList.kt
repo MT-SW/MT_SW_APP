@@ -133,10 +133,9 @@ fun DeviceList(
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden, enabledValues = ADD_SHEET_VALUES)
-    val scope = rememberCoroutineScope()
 
     val hideAndDismiss: () -> Unit = {
-        scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) showAddDialog = false }
+        showAddDialog = false
     }
 
     if (showAddDialog) {
