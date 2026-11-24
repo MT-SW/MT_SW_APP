@@ -17,6 +17,7 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -26,12 +27,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.ui.theme.rememberUiOptions
-import androidx.compose.material3.Card as MaterialCard
+
+/** MT_SW: the look chosen for the group of cards of the current screen, put on a card with its own colours. */
+@Composable
+private fun Modifier.cardGroupLook(shape: Shape): Modifier {
+    val options = rememberUiOptions()
+    val group = LocalCardGroup.current
+    val style = options.element(group)
+    val look = elementLook(group, shape)
+    val seeThrough = style.look == ElementLook.TRANSPARENT || style.look == ElementLook.GLASS
+    return if (seeThrough) look.glassEdge(shape, options.rimDp(), sheenBoost = glassSheenBoost()) else look
+}
+
+@Composable
+private fun CardColors.inCardGroup(): CardColors = copy(containerColor = cardContainerColor(containerColor))
 
 /**
- * MT_SW: the app's `Card`. Every card of the app (connections, details, settings, lists...) follows the look chosen for
- * the group of the current screen (see [LocalCardGroup]): plain as before, with depth, see-through or glass. With the
- * plain look it is exactly the standard card.
+ * MT_SW: the same as the Material `Card`, but in the look chosen in "Look" for the group of cards of the screen
+ * (plain, with depth, see-through or glass, with the shadow and the thin rim). Use this instead of the Material one so
+ * that every card can be adjusted by the person.
  */
 @Composable
 fun Card(
@@ -41,25 +55,16 @@ fun Card(
     elevation: CardElevation = CardDefaults.cardElevation(),
     border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit,
-) {
-    val group = LocalCardGroup.current
-    val options = rememberUiOptions()
-    val look = options.element(group).look
-    if (look == ElementLook.FLAT) {
-        MaterialCard(modifier, shape, colors, elevation, border, content)
-    } else {
-        MaterialCard(
-            modifier = modifier.styledLook(group, shape, look, options.rimDp()),
-            shape = shape,
-            colors = colors.copy(containerColor = cardContainerColor(colors.containerColor, group)),
-            elevation = elevation,
-            border = border,
-            content = content,
-        )
-    }
-}
+) = androidx.compose.material3.Card(
+    modifier = modifier.cardGroupLook(shape),
+    shape = shape,
+    colors = colors.inCardGroup(),
+    elevation = elevation,
+    border = border,
+    content = content,
+)
 
-/** The clickable card, in the same look as [Card]. */
+/** The clickable card, see the other [Card]. */
 @Composable
 fun Card(
     onClick: () -> Unit,
@@ -69,30 +74,54 @@ fun Card(
     colors: CardColors = CardDefaults.cardColors(),
     elevation: CardElevation = CardDefaults.cardElevation(),
     border: BorderStroke? = null,
+    interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
-) {
-    val group = LocalCardGroup.current
-    val options = rememberUiOptions()
-    val look = options.element(group).look
-    if (look == ElementLook.FLAT) {
-        MaterialCard(onClick, modifier, enabled, shape, colors, elevation, border, content = content)
-    } else {
-        MaterialCard(
-            onClick = onClick,
-            modifier = modifier.styledLook(group, shape, look, options.rimDp()),
-            enabled = enabled,
-            shape = shape,
-            colors = colors.copy(containerColor = cardContainerColor(colors.containerColor, group)),
-            elevation = elevation,
-            border = border,
-            content = content,
-        )
-    }
-}
+) = androidx.compose.material3.Card(
+    onClick = onClick,
+    modifier = modifier.cardGroupLook(shape),
+    enabled = enabled,
+    shape = shape,
+    colors = colors.inCardGroup(),
+    elevation = elevation,
+    border = border,
+    interactionSource = interactionSource,
+    content = content,
+)
 
+/** The raised card, see [Card]. */
 @Composable
-internal fun Modifier.styledLook(group: String, shape: Shape, look: Int, rimDp: Float): Modifier {
-    val withDepth = elementLook(group, shape)
-    val seeThrough = look == ElementLook.TRANSPARENT || look == ElementLook.GLASS
-    return if (seeThrough) withDepth.glassEdge(shape, rimDp, sheenBoost = glassSheenBoost()) else withDepth
-}
+fun ElevatedCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = CardDefaults.elevatedShape,
+    colors: CardColors = CardDefaults.elevatedCardColors(),
+    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
+    content: @Composable ColumnScope.() -> Unit,
+) = androidx.compose.material3.ElevatedCard(
+    modifier = modifier.cardGroupLook(shape),
+    shape = shape,
+    colors = colors.inCardGroup(),
+    elevation = elevation,
+    content = content,
+)
+
+/** The clickable raised card, see [Card]. */
+@Composable
+fun ElevatedCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = CardDefaults.elevatedShape,
+    colors: CardColors = CardDefaults.elevatedCardColors(),
+    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
+    interactionSource: MutableInteractionSource? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) = androidx.compose.material3.ElevatedCard(
+    onClick = onClick,
+    modifier = modifier.cardGroupLook(shape),
+    enabled = enabled,
+    shape = shape,
+    colors = colors.inCardGroup(),
+    elevation = elevation,
+    interactionSource = interactionSource,
+    content = content,
+)

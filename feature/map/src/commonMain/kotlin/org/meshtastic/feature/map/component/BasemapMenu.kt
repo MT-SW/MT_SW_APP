@@ -16,7 +16,7 @@
  */
 package org.meshtastic.feature.map.component
 
-import androidx.compose.material3.DropdownMenu
+import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MenuDefaults

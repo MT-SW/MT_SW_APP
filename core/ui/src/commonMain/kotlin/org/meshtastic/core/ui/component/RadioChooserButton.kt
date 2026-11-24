@@ -52,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
@@ -310,7 +309,7 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
     val accent = MaterialTheme.colorScheme.primary
     val decor = rememberDecorFor(accent, accent, enabled = true)
     if (!decor.custom) {
-        DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) { content() }
+        org.meshtastic.core.ui.component.DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) { content() }
         return
     }
     val shape = RoundedCornerShape(BUBBLE_CORNER_DP.dp)
@@ -328,7 +327,7 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
             val backing = MaterialTheme.colorScheme.surface.copy(alpha = BUBBLE_BACKING_ALPHA)
             Box(
                 modifier =
-                Modifier.shadow(BUBBLE_SHADOW_DP.dp, shape)
+                Modifier.cardShadow(BUBBLE_SHADOW_DP.toFloat(), shape, isDarkSurface())
                     .background(backing, shape)
                     .decorated(decor, shape)
                     .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),

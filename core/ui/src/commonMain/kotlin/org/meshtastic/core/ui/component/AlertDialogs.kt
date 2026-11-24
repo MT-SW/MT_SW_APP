@@ -147,7 +147,7 @@ fun MeshtasticDialog(
                 Modifier.widthIn(min = 280.dp, max = 560.dp)
                     .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp))
                     // MT_SW: every dialog has the gradient sheen and a thin rim (at least 1 dp) like the other elements.
-                    .glassEdge(RoundedCornerShape(28.dp), maxOf(rememberUiOptions().rimDp(), 1f)),
+                    .popupRim(RoundedCornerShape(28.dp)),
                 shape = RoundedCornerShape(28.dp),
                 color = AlertDialogDefaults.containerColor.copy(alpha = dialogFade),
                 tonalElevation = AlertDialogDefaults.TonalElevation,
@@ -314,7 +314,7 @@ fun AlertDialog(
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = confirmButton,
-        modifier = modifier.elementLook(UiOptions.GROUP_DIALOGS, shape).glassEdge(shape, maxOf(options.rimDp(), 1f)),
+        modifier = modifier.elementLook(UiOptions.GROUP_DIALOGS, shape).popupRim(shape),
         dismissButton = dismissButton,
         icon = icon,
         title = title,
@@ -327,4 +327,29 @@ fun AlertDialog(
         tonalElevation = tonalElevation,
         properties = properties,
     )
+}
+
+/**
+ * MT_SW: how much of the fill of a pop-up window (dialog, menu, sheet) is left for the look chosen for the "dialogs"
+ * group: 1 for the plain look and the look with depth, less for the see-through and glass ones.
+ */
+@Composable
+internal fun popupFade(): Float {
+    val look = rememberUiOptions().element(UiOptions.GROUP_DIALOGS)
+    return if (look.look == ElementLook.TRANSPARENT || look.look == ElementLook.GLASS) {
+        (1f - look.strength / DIALOG_PERCENT * (1f - DIALOG_MIN_ALPHA)).coerceIn(DIALOG_MIN_ALPHA, 1f)
+    } else {
+        1f
+    }
+}
+
+/** MT_SW: the thin rim with the sheen of a pop-up window, except for the look with depth, which draws its own. */
+@Composable
+internal fun Modifier.popupRim(shape: Shape): Modifier {
+    val options = rememberUiOptions()
+    return if (options.element(UiOptions.GROUP_DIALOGS).look == ElementLook.DEPTH) {
+        this
+    } else {
+        glassEdge(shape, maxOf(options.rimDp(), 1f))
+    }
 }

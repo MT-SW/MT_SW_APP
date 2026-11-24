@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.DropdownMenu
+import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -171,7 +171,6 @@ private fun NodeSortButton(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        modifier = Modifier.background(MaterialTheme.colorScheme.background.copy(alpha = 1f)),
     ) {
         DropdownMenuGroup(shapes = MenuDefaults.groupShapes()) {
             DropdownMenuTitle(text = stringResource(Res.string.node_sort_title))
