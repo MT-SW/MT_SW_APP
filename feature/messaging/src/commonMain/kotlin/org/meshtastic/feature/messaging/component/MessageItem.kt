@@ -47,6 +47,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.onRightClick
@@ -279,7 +280,9 @@ fun MessageItem(
         ModalBottomSheet(onDismissRequest = { activeSheet = null }, sheetState = sheetState) {
             when (activeSheet) {
                 ActiveSheet.Actions -> {
-                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    val actionsScroll = rememberScrollState()
+                    Box {
+                    Column(modifier = Modifier.verticalScroll(actionsScroll)) {
 MessageActionsContent(
                         quickEmojis = if (canReact) quickEmojis else emptyList(),
                         canReply = canReply,
@@ -354,6 +357,8 @@ MessageActionsContent(
                             }
                         },
                     )
+}
+FastScrollSidebar(actionsScroll, Modifier.align(Alignment.CenterEnd))
 }
                 }
 
