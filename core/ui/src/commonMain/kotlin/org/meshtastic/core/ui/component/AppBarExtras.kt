@@ -21,7 +21,6 @@ package org.meshtastic.core.ui.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -314,13 +313,8 @@ fun SosChip(
     val base = if (enabled) SosRed else SosGrey
     // The button of the bars looks like the chips with the short names of the nodes (gradient from the colour to a
     // darker bottom, light edge, the shadow of the cards), only in red with a strong gold border, so it is clearly
-    // visible. The big button of the SOS screen stays plain.
-    val look =
-        if (large) {
-            Modifier.clip(shape).background(base)
-        } else {
-            nodeChipLook(base, Color.White, shape).clip(shape)
-        }
+    // visible. The big button of the SOS screen has the same look, only larger, so it follows our look settings.
+    val look = nodeChipLook(base, Color.White, shape).clip(shape)
     Box(
         modifier =
         modifier
