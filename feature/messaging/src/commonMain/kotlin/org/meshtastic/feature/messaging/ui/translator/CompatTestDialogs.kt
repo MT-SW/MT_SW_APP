@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -66,6 +65,7 @@ import org.meshtastic.core.resources.compat_tip_7
 import org.meshtastic.core.resources.compat_tip_8
 import org.meshtastic.core.resources.compat_tip_9
 import org.meshtastic.core.resources.compat_tips_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.util.KeepScreenOn

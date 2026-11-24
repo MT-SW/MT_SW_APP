@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -96,6 +95,7 @@ import org.meshtastic.core.resources.planner_info_tx_power_title
 import org.meshtastic.core.resources.planner_info_weather_body
 import org.meshtastic.core.resources.planner_info_weather_title
 import org.meshtastic.core.resources.planner_open_tropo_reference
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons

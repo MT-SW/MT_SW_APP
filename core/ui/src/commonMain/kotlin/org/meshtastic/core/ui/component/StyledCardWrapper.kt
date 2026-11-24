@@ -39,13 +39,12 @@ private fun Modifier.cardGroupLook(shape: Shape): Modifier {
     return if (seeThrough) look.glassEdge(shape, options.rimDp(), sheenBoost = glassSheenBoost()) else look
 }
 
-@Composable
-private fun CardColors.inCardGroup(): CardColors = copy(containerColor = cardContainerColor(containerColor))
+@Composable private fun CardColors.inCardGroup(): CardColors = copy(containerColor = cardContainerColor(containerColor))
 
 /**
- * MT_SW: the same as the Material `Card`, but in the look chosen in "Look" for the group of cards of the screen
- * (plain, with depth, see-through or glass, with the shadow and the thin rim). Use this instead of the Material one so
- * that every card can be adjusted by the person.
+ * MT_SW: the same as the Material `Card`, but in the look chosen in "Look" for the group of cards of the screen (plain,
+ * with depth, see-through or glass, with the shadow and the thin rim). Use this instead of the Material one so that
+ * every card can be adjusted by the person.
  */
 @Composable
 fun Card(

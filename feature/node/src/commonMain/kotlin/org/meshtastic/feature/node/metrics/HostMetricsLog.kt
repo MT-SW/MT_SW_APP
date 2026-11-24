@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,6 +70,7 @@ import org.meshtastic.core.resources.local_stats_psram
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_string
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.theme.GraphColors

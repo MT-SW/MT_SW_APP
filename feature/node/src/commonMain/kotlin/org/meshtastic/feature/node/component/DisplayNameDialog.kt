@@ -18,7 +18,6 @@ package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,6 +36,7 @@ import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.display_name_hint
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.resources.set_display_name
+import org.meshtastic.core.ui.component.AlertDialog
 
 /** Node-list entry point for the local display name. Saving an empty name clears it. */
 @Composable

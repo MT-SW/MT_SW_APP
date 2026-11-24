@@ -19,7 +19,6 @@
 
 package org.meshtastic.feature.map.planner.ui
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -67,6 +65,8 @@ import org.meshtastic.core.resources.planner_disclaimer
 import org.meshtastic.core.resources.planner_pick_banner
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.planner_title_by
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

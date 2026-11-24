@@ -18,7 +18,6 @@ package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.last_heard_filter_label
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.feature.map.LastHeardFilter
 import kotlin.math.roundToInt

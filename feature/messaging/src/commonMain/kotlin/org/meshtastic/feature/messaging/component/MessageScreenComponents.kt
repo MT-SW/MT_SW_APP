@@ -35,8 +35,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import org.meshtastic.core.ui.component.DropdownMenu
-import org.meshtastic.core.ui.component.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -109,6 +107,8 @@ import org.meshtastic.core.resources.translation_download_title
 import org.meshtastic.core.resources.translation_downloading
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.DropdownMenu
+import org.meshtastic.core.ui.component.DropdownMenuGroup
 import org.meshtastic.core.ui.component.ExtendedFloatingActionButton
 import org.meshtastic.core.ui.component.FloatingActionButton
 import org.meshtastic.core.ui.component.MeshtasticDialog

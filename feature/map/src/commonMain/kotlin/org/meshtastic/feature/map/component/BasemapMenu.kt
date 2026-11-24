@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.map.component
 
-import org.meshtastic.core.ui.component.DropdownMenu
-import org.meshtastic.core.ui.component.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
@@ -26,6 +24,8 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.selected_map_type
+import org.meshtastic.core.ui.component.DropdownMenu
+import org.meshtastic.core.ui.component.DropdownMenuGroup
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

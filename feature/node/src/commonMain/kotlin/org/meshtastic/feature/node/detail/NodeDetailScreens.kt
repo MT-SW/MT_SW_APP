@@ -19,7 +19,6 @@ package org.meshtastic.feature.node.detail
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
@@ -46,6 +45,7 @@ import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.details
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.RemoteAdminRegionDialog
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.SosBarScreen

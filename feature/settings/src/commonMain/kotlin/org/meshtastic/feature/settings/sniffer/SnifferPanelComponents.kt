@@ -19,8 +19,6 @@
 
 package org.meshtastic.feature.settings.sniffer
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,13 +31,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -79,6 +77,8 @@ import org.meshtastic.core.resources.sniffer_source_mqtt_unavailable_summary
 import org.meshtastic.core.resources.sniffer_source_off
 import org.meshtastic.core.resources.sniffer_source_title
 import org.meshtastic.core.ui.component.BasicListItem
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.SegmentedButton
@@ -169,51 +169,51 @@ internal fun SnifferGearSheet(
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         val barScroll = rememberScrollState()
         Box {
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 16.dp)) {
-            SnifferSourceSelector(
-                activeSource = activeSource,
-                onSelectSource = onSelectSource,
-                radioSelectable = radioSelectable,
-                radioLoading = radioLoading,
-                mqttConfigured = mqttConfigured,
-            )
+            Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 16.dp)) {
+                SnifferSourceSelector(
+                    activeSource = activeSource,
+                    onSelectSource = onSelectSource,
+                    radioSelectable = radioSelectable,
+                    radioLoading = radioLoading,
+                    mqttConfigured = mqttConfigured,
+                )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SnifferPreferencesSection(
-                groupByGateway = groupByGateway,
-                onGroupByGatewayChange = onGroupByGatewayChange,
-                autoScroll = autoScroll,
-                onAutoScrollChange = onAutoScrollChange,
-                decryptPayloads = decryptPayloads,
-                onDecryptPayloadsChange = onDecryptPayloadsChange,
-                hideOnDemandChannel0 = hideOnDemandChannel0,
-                onHideOnDemandChannel0Change = onHideOnDemandChannel0Change,
-                hideOwnFrames = hideOwnFrames,
-                onHideOwnFramesChange = onHideOwnFramesChange,
-            )
+                SnifferPreferencesSection(
+                    groupByGateway = groupByGateway,
+                    onGroupByGatewayChange = onGroupByGatewayChange,
+                    autoScroll = autoScroll,
+                    onAutoScrollChange = onAutoScrollChange,
+                    decryptPayloads = decryptPayloads,
+                    onDecryptPayloadsChange = onDecryptPayloadsChange,
+                    hideOnDemandChannel0 = hideOnDemandChannel0,
+                    onHideOnDemandChannel0Change = onHideOnDemandChannel0Change,
+                    hideOwnFrames = hideOwnFrames,
+                    onHideOwnFramesChange = onHideOwnFramesChange,
+                )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SnifferExportFormatSelector(exportFormat = exportFormat, onExportFormatChange = onExportFormatChange)
+                SnifferExportFormatSelector(exportFormat = exportFormat, onExportFormatChange = onExportFormatChange)
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SnifferBufferOverflowSelector(
-                bufferOverflowPolicy = bufferOverflowPolicy,
-                onBufferOverflowPolicyChange = onBufferOverflowPolicyChange,
-            )
+                SnifferBufferOverflowSelector(
+                    bufferOverflowPolicy = bufferOverflowPolicy,
+                    onBufferOverflowPolicyChange = onBufferOverflowPolicyChange,
+                )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            BasicListItem(
-                text = stringResource(Res.string.sniffer_load_log_title),
-                supportingText = stringResource(Res.string.sniffer_load_log_summary),
-                leadingIcon = MeshtasticIcons.FolderOpen,
-                onClick = onLoadLogClick,
-            )
-        }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+                BasicListItem(
+                    text = stringResource(Res.string.sniffer_load_log_title),
+                    supportingText = stringResource(Res.string.sniffer_load_log_summary),
+                    leadingIcon = MeshtasticIcons.FolderOpen,
+                    onClick = onLoadLogClick,
+                )
+            }
+            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

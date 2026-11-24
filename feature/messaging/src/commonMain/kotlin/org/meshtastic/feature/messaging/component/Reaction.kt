@@ -16,15 +16,13 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -35,11 +33,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -72,6 +70,8 @@ import org.meshtastic.core.resources.react
 import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.resources.you
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.TransportIcon
@@ -261,148 +261,157 @@ internal fun ReactionDialog(
         )
     }
 
-
     val barList = rememberLazyListState()
     Box(modifier = Modifier.fillMaxWidth()) {
-    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        // The emoji filter row scrolls with the list, so the window keeps one smooth background.
-        item {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        items(groupedEmojis.entries.toList(), key = { it.key }) { entry ->
-            val emoji = entry.key
-            val reactions = entry.value
-            val localReaction = reactions.find { it.user.id == NodeAddress.ID_LOCAL || it.user.id == myId }
-            val isSending =
-                localReaction?.status == MessageStatus.QUEUED || localReaction?.status == MessageStatus.ENROUTE
-            Text(
-                text = "$emoji${reactions.size}",
-                modifier =
-                Modifier.clip(CircleShape)
-                    .background(
-                        if (selectedEmoji == emoji) {
-                            MaterialTheme.colorScheme.surfaceContainerHigh
-                        } else {
-                            Color.Transparent
-                        },
-                    )
-                    .then(if (isSending) Modifier.graphicsLayer(alpha = 0.5f) else Modifier)
-                    .padding(8.dp)
-                    .clickable { selectedEmoji = if (selectedEmoji == emoji) null else emoji },
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-    }
-
-    HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        }
-        items(filteredReactions, key = { reaction -> "${reaction.user.id}:${reaction.emoji}" }) { reaction ->
-            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val isLocal = reaction.user.id == myId || reaction.user.id == NodeAddress.ID_LOCAL
-                    val name = reactorNames[reaction.user.id] ?: reaction.user.long_name
-                    val displayName =
-                        if (isLocal) {
-                            "$name (${stringResource(Res.string.you)})"
-                        } else {
-                            name
+        LazyColumn(
+            state = barList,
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            // The emoji filter row scrolls with the list, so the window keeps one smooth background.
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    items(groupedEmojis.entries.toList(), key = { it.key }) { entry ->
+                        val emoji = entry.key
+                        val reactions = entry.value
+                        val localReaction = reactions.find {
+                            it.user.id == NodeAddress.ID_LOCAL || it.user.id == myId
                         }
-                    Row(
-                        modifier = Modifier.weight(1f, fill = false),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
+                        val isSending =
+                            localReaction?.status == MessageStatus.QUEUED ||
+                                localReaction?.status == MessageStatus.ENROUTE
                         Text(
-                            text = displayName,
+                            text = "$emoji${reactions.size}",
+                            modifier =
+                            Modifier.clip(CircleShape)
+                                .background(
+                                    if (selectedEmoji == emoji) {
+                                        MaterialTheme.colorScheme.surfaceContainerHigh
+                                    } else {
+                                        Color.Transparent
+                                    },
+                                )
+                                .then(if (isSending) Modifier.graphicsLayer(alpha = 0.5f) else Modifier)
+                                .padding(8.dp)
+                                .clickable { selectedEmoji = if (selectedEmoji == emoji) null else emoji },
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+
+                HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            }
+            items(filteredReactions, key = { reaction -> "${reaction.user.id}:${reaction.emoji}" }) { reaction ->
+                Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        val isLocal = reaction.user.id == myId || reaction.user.id == NodeAddress.ID_LOCAL
+                        val name = reactorNames[reaction.user.id] ?: reaction.user.long_name
+                        val displayName =
+                            if (isLocal) {
+                                "$name (${stringResource(Res.string.you)})"
+                            } else {
+                                name
+                            }
+                        Row(
                             modifier = Modifier.weight(1f, fill = false),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        // Set only on verified broadcasts, so a DM reaction never shows it.
-                        if (!isLocal && reaction.xeddsaSigned) {
-                            Icon(
-                                imageVector = MeshtasticIcons.ShieldCheck,
-                                contentDescription = stringResource(Res.string.security_signed_verified),
-                                modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.StatusOnline,
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                text = displayName,
+                                modifier = Modifier.weight(1f, fill = false),
+                                style = MaterialTheme.typography.titleMedium,
                             )
-                        }
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (isLocal) {
-                            MessageStatusButton(
-                                status = reaction.status,
-                                fromLocal = true,
-                                isWarning = isAckProofForged(reaction.ackProofStatus),
-                                onStatusClick = { showStatusDialog = reaction },
-                            )
-                        }
-                        Text(text = reaction.emoji, style = MaterialTheme.typography.titleLarge)
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 0.dp, bottom = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // Local reactions now carry a null rssi; pre-schema-51 rows stored 0, so a legacy
-                    // 0 dBm reading stays indistinguishable from "no reading" and remains hidden.
-                    val isLocalOrPreDbUpdateReaction = reaction.rssi == null || reaction.rssi == 0
-                    reaction.transportMechanism?.let { transport ->
-                        TransportIcon(
-                            transport = transport,
-                            viaMqtt = reaction.viaMqtt,
-                            modifier = Modifier.padding(end = 6.dp).size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    if (!isLocalOrPreDbUpdateReaction) {
-                        if (reaction.hopsAway == 0 && !reaction.viaMqtt) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Snr(reaction.snr)
-                                Rssi(reaction.rssi, displayOffset = LocalLnaCorrection.current.localGain)
-                            }
-                        } else {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            ) {
+                            // Set only on verified broadcasts, so a DM reaction never shows it.
+                            if (!isLocal && reaction.xeddsaSigned) {
                                 Icon(
-                                    imageVector = MeshtasticIcons.HopCount,
-                                    contentDescription = null,
+                                    imageVector = MeshtasticIcons.ShieldCheck,
+                                    contentDescription = stringResource(Res.string.security_signed_verified),
                                     modifier = Modifier.size(14.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                )
-                                Text(
-                                    text = reaction.hopsAway.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
+                                    tint = MaterialTheme.colorScheme.StatusOnline,
                                 )
                             }
                         }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (isLocal) {
+                                MessageStatusButton(
+                                    status = reaction.status,
+                                    fromLocal = true,
+                                    isWarning = isAckProofForged(reaction.ackProofStatus),
+                                    onStatusClick = { showStatusDialog = reaction },
+                                )
+                            }
+                            Text(text = reaction.emoji, style = MaterialTheme.typography.titleLarge)
+                        }
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(text = getShortDateTime(reaction.timestamp), style = MaterialTheme.typography.labelSmall)
-                }
-                // A sent reaction's relay is the ack's, shown in its status dialog instead.
-                val receivedRelay =
-                    if (reaction.user.id == myId || reaction.user.id == NodeAddress.ID_LOCAL) {
-                        null
-                    } else {
-                        resolveRelay(receivedRelayNode(reaction.relayNode, reaction.hopsAway, reaction.viaMqtt))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 0.dp, bottom = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Local reactions now carry a null rssi; pre-schema-51 rows stored 0, so a legacy
+                        // 0 dBm reading stays indistinguishable from "no reading" and remains hidden.
+                        val isLocalOrPreDbUpdateReaction = reaction.rssi == null || reaction.rssi == 0
+                        reaction.transportMechanism?.let { transport ->
+                            TransportIcon(
+                                transport = transport,
+                                viaMqtt = reaction.viaMqtt,
+                                modifier = Modifier.padding(end = 6.dp).size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (!isLocalOrPreDbUpdateReaction) {
+                            if (reaction.hopsAway == 0 && !reaction.viaMqtt) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Snr(reaction.snr)
+                                    Rssi(reaction.rssi, displayOffset = LocalLnaCorrection.current.localGain)
+                                }
+                            } else {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = MeshtasticIcons.HopCount,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    )
+                                    Text(
+                                        text = reaction.hopsAway.toString(),
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = getShortDateTime(reaction.timestamp),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
                     }
-                receivedRelay?.let {
-                    Text(
-                        text = stringResource(Res.string.relayed_by, it),
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // A sent reaction's relay is the ack's, shown in its status dialog instead.
+                    val receivedRelay =
+                        if (reaction.user.id == myId || reaction.user.id == NodeAddress.ID_LOCAL) {
+                            null
+                        } else {
+                            resolveRelay(receivedRelayNode(reaction.relayNode, reaction.hopsAway, reaction.viaMqtt))
+                        }
+                    receivedRelay?.let {
+                        Text(
+                            text = stringResource(Res.string.relayed_by, it),
+                            modifier = Modifier.padding(bottom = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
-    }
-    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }

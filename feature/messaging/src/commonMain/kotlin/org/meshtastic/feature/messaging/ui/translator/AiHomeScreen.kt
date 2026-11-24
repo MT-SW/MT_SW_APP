@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
@@ -65,6 +64,7 @@ import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.resources.translator_sessions_empty
 import org.meshtastic.core.resources.translator_sessions_new
 import org.meshtastic.core.resources.translator_sessions_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.Switch

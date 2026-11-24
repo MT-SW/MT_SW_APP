@@ -45,7 +45,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -271,6 +270,7 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.component.AntennaPatternPlot
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MainAppBar

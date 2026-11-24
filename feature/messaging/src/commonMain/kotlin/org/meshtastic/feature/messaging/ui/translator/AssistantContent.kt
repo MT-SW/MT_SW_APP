@@ -42,7 +42,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
@@ -127,6 +126,7 @@ import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.inputFieldColors

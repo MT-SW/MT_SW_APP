@@ -19,6 +19,7 @@
 package org.meshtastic.feature.map.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -30,12 +31,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.Alignment
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -68,7 +66,9 @@ import org.meshtastic.core.resources.show_node_links_summary
 import org.meshtastic.core.resources.show_precision_circle
 import org.meshtastic.core.resources.show_waypoints
 import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Favorite
@@ -108,78 +108,78 @@ fun MapFilterSheet(
 internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState, actions: MapFilterActions) {
     val scroll = rememberScrollState()
     Box {
-    Column(modifier = Modifier.fillMaxWidth().verticalScroll(scroll)) {
-        Text(
-            text = stringResource(Res.string.map_filter_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        )
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(scroll)) {
+            Text(
+                text = stringResource(Res.string.map_filter_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
 
-        SectionTitle(stringResource(Res.string.map_filter_display_title))
-        FilterToggle(
-            label = stringResource(Res.string.only_favorites),
-            icon = MeshtasticIcons.Favorite,
-            checked = filterState.onlyFavorites,
-            onToggle = actions.onToggleOnlyFavorites,
-        )
-        FilterToggle(
-            label = stringResource(Res.string.show_waypoints),
-            icon = MeshtasticIcons.PinDrop,
-            checked = filterState.showWaypoints,
-            onToggle = actions.onToggleShowWaypoints,
-        )
-        FilterToggle(
-            label = stringResource(Res.string.show_precision_circle),
-            icon = MeshtasticIcons.Lens,
-            checked = filterState.showPrecisionCircle,
-            onToggle = actions.onToggleShowPrecisionCircle,
-        )
-        FilterToggle(
-            label = stringResource(Res.string.show_node_links),
-            icon = MeshtasticIcons.Distance,
-            checked = filterState.showLinks,
-            onToggle = actions.onToggleShowLinks,
-            supporting = stringResource(Res.string.show_node_links_summary),
-        )
-        LastHeardSlider(selected = filterState.lastHeardFilter, onSelect = actions.onSelectLastHeard)
+            SectionTitle(stringResource(Res.string.map_filter_display_title))
+            FilterToggle(
+                label = stringResource(Res.string.only_favorites),
+                icon = MeshtasticIcons.Favorite,
+                checked = filterState.onlyFavorites,
+                onToggle = actions.onToggleOnlyFavorites,
+            )
+            FilterToggle(
+                label = stringResource(Res.string.show_waypoints),
+                icon = MeshtasticIcons.PinDrop,
+                checked = filterState.showWaypoints,
+                onToggle = actions.onToggleShowWaypoints,
+            )
+            FilterToggle(
+                label = stringResource(Res.string.show_precision_circle),
+                icon = MeshtasticIcons.Lens,
+                checked = filterState.showPrecisionCircle,
+                onToggle = actions.onToggleShowPrecisionCircle,
+            )
+            FilterToggle(
+                label = stringResource(Res.string.show_node_links),
+                icon = MeshtasticIcons.Distance,
+                checked = filterState.showLinks,
+                onToggle = actions.onToggleShowLinks,
+                supporting = stringResource(Res.string.show_node_links_summary),
+            )
+            LastHeardSlider(selected = filterState.lastHeardFilter, onSelect = actions.onSelectLastHeard)
 
-        HorizontalDivider()
+            HorizontalDivider()
 
-        SectionTitle(stringResource(Res.string.map_filter_roles_title))
-        RoleFilterChips(
-            excluded = filterState.excludedRoles,
-            onToggle = actions.onToggleRoleExcluded,
-            onClear = actions.onClearExcludedRoles,
-        )
+            SectionTitle(stringResource(Res.string.map_filter_roles_title))
+            RoleFilterChips(
+                excluded = filterState.excludedRoles,
+                onToggle = actions.onToggleRoleExcluded,
+                onClear = actions.onClearExcludedRoles,
+            )
 
-        HorizontalDivider()
+            HorizontalDivider()
 
-        SectionTitle(stringResource(Res.string.map_filter_nodes_title))
-        NodeFilterToggles(filterState = filterState, actions = actions)
+            SectionTitle(stringResource(Res.string.map_filter_nodes_title))
+            NodeFilterToggles(filterState = filterState, actions = actions)
 
-        HorizontalDivider()
+            HorizontalDivider()
 
-        SectionTitle(stringResource(Res.string.map_filter_max_hops_title))
-        SectionSummary(stringResource(Res.string.map_filter_max_hops_summary))
-        LimitChips(
-            options = HOP_LIMITS,
-            selected = filterState.maxHops,
-            noLimitValue = MAP_FILTER_NO_HOP_LIMIT,
-            label = { it.toString() },
-            onSelect = actions.onSelectMaxHops,
-        )
+            SectionTitle(stringResource(Res.string.map_filter_max_hops_title))
+            SectionSummary(stringResource(Res.string.map_filter_max_hops_summary))
+            LimitChips(
+                options = HOP_LIMITS,
+                selected = filterState.maxHops,
+                noLimitValue = MAP_FILTER_NO_HOP_LIMIT,
+                label = { it.toString() },
+                onSelect = actions.onSelectMaxHops,
+            )
 
-        SectionTitle(stringResource(Res.string.map_filter_max_distance_title))
-        SectionSummary(stringResource(Res.string.map_filter_max_distance_summary))
-        LimitChips(
-            options = DISTANCE_LIMITS_KM.map { it * METERS_PER_KM },
-            selected = filterState.maxDistanceMeters,
-            noLimitValue = 0,
-            label = { stringResource(Res.string.map_filter_distance_km, it / METERS_PER_KM) },
-            onSelect = actions.onSelectMaxDistance,
-        )
-    }
-    FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
+            SectionTitle(stringResource(Res.string.map_filter_max_distance_title))
+            SectionSummary(stringResource(Res.string.map_filter_max_distance_summary))
+            LimitChips(
+                options = DISTANCE_LIMITS_KM.map { it * METERS_PER_KM },
+                selected = filterState.maxDistanceMeters,
+                noLimitValue = 0,
+                label = { stringResource(Res.string.map_filter_distance_km, it / METERS_PER_KM) },
+                onSelect = actions.onSelectMaxDistance,
+            )
+        }
+        FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

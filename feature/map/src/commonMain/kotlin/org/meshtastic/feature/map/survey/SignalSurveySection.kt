@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,6 +73,7 @@ import org.meshtastic.core.resources.signal_survey_radio_no_fix
 import org.meshtastic.core.resources.signal_survey_readings
 import org.meshtastic.core.resources.signal_survey_record
 import org.meshtastic.core.resources.signal_survey_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.Switch

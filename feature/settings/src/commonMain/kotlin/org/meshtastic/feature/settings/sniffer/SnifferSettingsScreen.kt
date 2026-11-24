@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -75,6 +74,7 @@ import org.meshtastic.core.resources.sniffer_warning_cancel
 import org.meshtastic.core.resources.sniffer_warning_compatibility
 import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset

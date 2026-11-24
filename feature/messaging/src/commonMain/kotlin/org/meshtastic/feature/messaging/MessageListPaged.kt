@@ -167,6 +167,7 @@ private fun MutableState<Set<Long>>.toggle(uuid: Long) {
         }
 }
 
+@Suppress("LongMethod")
 @Composable
 internal fun MessageListPaged(
     state: MessageListPagedState,

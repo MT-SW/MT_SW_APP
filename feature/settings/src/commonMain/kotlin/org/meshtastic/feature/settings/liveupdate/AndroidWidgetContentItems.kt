@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -62,6 +61,7 @@ import org.meshtastic.core.resources.widget_others_pick_title
 import org.meshtastic.core.resources.widget_others_picked_summary
 import org.meshtastic.core.resources.widget_others_search
 import org.meshtastic.core.resources.widget_others_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.MeshtasticDialog

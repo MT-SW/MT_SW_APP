@@ -34,7 +34,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -102,6 +101,7 @@ import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.time
 import org.meshtastic.core.resources.waypoint_edit
 import org.meshtastic.core.resources.waypoint_new
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.OutlinedButton

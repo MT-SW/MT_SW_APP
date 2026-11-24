@@ -16,9 +16,6 @@
  */
 package org.meshtastic.feature.settings.component
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -48,30 +45,26 @@ class AppVersionRowsTest {
     }
 
     @Test
-    fun `five taps on the version row reveal Chirpy Hop below it`() = runComposeUiTest {
-        var unlocked by mutableStateOf(false)
+    fun `Chirpy Hop is visible to everyone without any taps`() = runComposeUiTest {
         var played = false
         setContent {
             AppTheme {
                 AppVersionRows(
-                    hiddenFeaturesUnlocked = unlocked,
+                    hiddenFeaturesUnlocked = false,
                     appVersionName = "2.8.0",
-                    onUnlockHiddenFeatures = { unlocked = true },
+                    onUnlockHiddenFeatures = {},
                     onPlayChirpyHop = { played = true },
                 )
             }
         }
-        onNodeWithText("Chirpy Hop").assertDoesNotExist()
-
-        repeat(5) { onNodeWithText("2.8.0").performClick() }
 
         onNodeWithText("Chirpy Hop").performClick()
         assertTrue(played)
     }
 
     @Test
-    fun `four taps leave Chirpy Hop hidden`() = runComposeUiTest {
-        var unlocked by mutableStateOf(false)
+    fun `five taps on the version row still unlock the hidden features`() = runComposeUiTest {
+        var unlocked = false
         setContent {
             AppTheme {
                 AppVersionRows(
@@ -83,8 +76,8 @@ class AppVersionRowsTest {
             }
         }
 
-        repeat(4) { onNodeWithText("2.8.0").performClick() }
+        repeat(5) { onNodeWithText("2.8.0").performClick() }
 
-        onNodeWithText("Chirpy Hop").assertDoesNotExist()
+        assertTrue(unlocked)
     }
 }

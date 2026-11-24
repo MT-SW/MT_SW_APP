@@ -49,7 +49,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
@@ -101,6 +100,7 @@ import org.meshtastic.core.resources.emoji_load_error
 import org.meshtastic.core.resources.emoji_no_results
 import org.meshtastic.core.resources.emoji_recently_used
 import org.meshtastic.core.resources.search_emoji
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon

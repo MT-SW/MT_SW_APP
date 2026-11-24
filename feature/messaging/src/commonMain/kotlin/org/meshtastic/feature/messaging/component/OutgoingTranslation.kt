@@ -25,10 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -61,6 +59,8 @@ import org.meshtastic.core.resources.translator_outgoing_original
 import org.meshtastic.core.resources.translator_outgoing_send
 import org.meshtastic.core.resources.translator_outgoing_title
 import org.meshtastic.core.resources.translator_to
+import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Language

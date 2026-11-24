@@ -39,6 +39,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
@@ -46,10 +47,9 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
@@ -146,7 +146,8 @@ fun MeshtasticDialog(
                 modifier =
                 Modifier.widthIn(min = 280.dp, max = 560.dp)
                     .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp))
-                    // MT_SW: every dialog has the gradient sheen and a thin rim (at least 1 dp) like the other elements.
+                    // MT_SW: every dialog has the gradient sheen and a thin rim (at least 1 dp) like the other
+                    // elements.
                     .popupRim(RoundedCornerShape(28.dp)),
                 shape = RoundedCornerShape(28.dp),
                 color = AlertDialogDefaults.containerColor.copy(alpha = dialogFade),

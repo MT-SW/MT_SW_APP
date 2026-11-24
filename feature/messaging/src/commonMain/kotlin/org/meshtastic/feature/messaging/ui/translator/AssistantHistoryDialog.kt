@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +41,7 @@ import org.meshtastic.core.resources.assistant_delete
 import org.meshtastic.core.resources.assistant_history
 import org.meshtastic.core.resources.assistant_history_empty
 import org.meshtastic.core.resources.assistant_new
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

@@ -16,11 +16,9 @@
  */
 package org.meshtastic.feature.map.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -28,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -40,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -62,6 +62,7 @@ import org.meshtastic.core.resources.url_must_contain_placeholders
 import org.meshtastic.core.resources.url_template
 import org.meshtastic.core.resources.url_template_hint
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Edit
@@ -97,86 +98,86 @@ fun CustomTileProviderManager(
     }
 
     val barList = rememberLazyListState()
-    Box {
-    LazyColumn(state = barList, modifier = modifier, contentPadding = PaddingValues(bottom = 16.dp)) {
-        item {
-            Text(
-                text = stringResource(Res.string.manage_custom_tile_sources),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(16.dp),
-            )
-            HorizontalDivider()
-        }
-
-        if (providers.isEmpty()) {
+    Box(modifier = modifier) {
+        LazyColumn(state = barList, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp)) {
             item {
                 Text(
-                    text = stringResource(Res.string.no_custom_tile_sources_found),
+                    text = stringResource(Res.string.manage_custom_tile_sources),
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        } else {
-            items(providers, key = { it.id }) { config ->
-                ListItem(
-                    headlineContent = { Text(config.name) },
-                    supportingContent = {
-                        Text(
-                            if (config.isLocal) {
-                                stringResource(Res.string.local_mbtiles_file)
-                            } else {
-                                config.urlTemplate
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    },
-                    trailingContent = {
-                        Row {
-                            if (!config.isLocal) {
-                                IconButton(
-                                    onClick = {
-                                        editingConfig = config
-                                        showEditDialog = true
-                                    },
-                                ) {
-                                    Icon(
-                                        MeshtasticIcons.Edit,
-                                        contentDescription = stringResource(Res.string.edit_custom_tile_source),
-                                    )
-                                }
-                            }
-                            IconButton(onClick = { onDelete(config.id) }) {
-                                Icon(
-                                    MeshtasticIcons.Delete,
-                                    contentDescription = stringResource(Res.string.delete_custom_tile_source),
-                                )
-                            }
-                        }
-                    },
                 )
                 HorizontalDivider()
             }
-        }
 
-        item {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = {
-                        editingConfig = null
-                        showEditDialog = true
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(Res.string.add_custom_tile_source))
+            if (providers.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.no_custom_tile_sources_found),
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
-                onAddLocalMbTiles?.let { onAddLocal ->
-                    Button(onClick = onAddLocal, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(Res.string.add_local_mbtiles_file))
+            } else {
+                items(providers, key = { it.id }) { config ->
+                    ListItem(
+                        headlineContent = { Text(config.name) },
+                        supportingContent = {
+                            Text(
+                                if (config.isLocal) {
+                                    stringResource(Res.string.local_mbtiles_file)
+                                } else {
+                                    config.urlTemplate
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        },
+                        trailingContent = {
+                            Row {
+                                if (!config.isLocal) {
+                                    IconButton(
+                                        onClick = {
+                                            editingConfig = config
+                                            showEditDialog = true
+                                        },
+                                    ) {
+                                        Icon(
+                                            MeshtasticIcons.Edit,
+                                            contentDescription = stringResource(Res.string.edit_custom_tile_source),
+                                        )
+                                    }
+                                }
+                                IconButton(onClick = { onDelete(config.id) }) {
+                                    Icon(
+                                        MeshtasticIcons.Delete,
+                                        contentDescription = stringResource(Res.string.delete_custom_tile_source),
+                                    )
+                                }
+                            }
+                        },
+                    )
+                    HorizontalDivider()
+                }
+            }
+
+            item {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = {
+                            editingConfig = null
+                            showEditDialog = true
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(Res.string.add_custom_tile_source))
+                    }
+                    onAddLocalMbTiles?.let { onAddLocal ->
+                        Button(onClick = onAddLocal, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(Res.string.add_local_mbtiles_file))
+                        }
                     }
                 }
             }
         }
-    }
         FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }

@@ -16,10 +16,8 @@
  */
 package org.meshtastic.feature.settings.liveupdate
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,11 +25,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -77,6 +75,8 @@ import org.meshtastic.core.resources.widget_adaptive_tracking_shown
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.icon
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -276,16 +276,19 @@ fun LiveUpdateChooserSheet(
                 } else {
                     val barList = rememberLazyListState()
                     Box(modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)) {
-                    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp).selectableGroup()) {
-                        items(shown, key = { it.num }) { node ->
-                            NodeChoiceRow(
-                                node = node,
-                                selected = node.num == selectedNum,
-                                onSelect = { selectedNum = node.num },
-                            )
+                        LazyColumn(
+                            state = barList,
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp).selectableGroup(),
+                        ) {
+                            items(shown, key = { it.num }) { node ->
+                                NodeChoiceRow(
+                                    node = node,
+                                    selected = node.num == selectedNum,
+                                    onSelect = { selectedNum = node.num },
+                                )
+                            }
                         }
-                    }
-                    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
+                        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
                     }
                 }
             }

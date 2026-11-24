@@ -19,7 +19,6 @@ package org.meshtastic.feature.settings.lockdown
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.lockdown_lock_reason
 import org.meshtastic.core.resources.lockdown_passphrase
 import org.meshtastic.core.resources.lockdown_set_passphrase
 import org.meshtastic.core.resources.lockdown_submit
+import org.meshtastic.core.ui.component.AlertDialog
 
 /**
  * Non-dismissable lockdown authentication dialog.

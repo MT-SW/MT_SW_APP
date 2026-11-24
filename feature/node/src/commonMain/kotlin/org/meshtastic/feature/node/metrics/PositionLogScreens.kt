@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
@@ -82,6 +81,7 @@ import org.meshtastic.core.resources.track_legend_show
 import org.meshtastic.core.resources.track_legend_snr
 import org.meshtastic.core.resources.track_legend_title
 import org.meshtastic.core.resources.track_snr_colors
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.LocalFloatingBarInset

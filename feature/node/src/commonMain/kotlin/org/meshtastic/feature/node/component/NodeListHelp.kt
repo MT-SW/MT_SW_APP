@@ -18,7 +18,6 @@
 
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
@@ -75,7 +73,9 @@ import org.meshtastic.core.resources.schema_device_role_tracker_description
 import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
 import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MaterialBatteryInfo
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.RSSI_BAD_THRESHOLD
 import org.meshtastic.core.ui.component.RSSI_FAIR_THRESHOLD
@@ -103,131 +103,129 @@ fun NodeListHelp(onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         val barScroll = rememberScrollState()
         Box {
-        Column(
-            modifier =
-            Modifier.fillMaxWidth()
-                .verticalScroll(barScroll)
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = stringResource(Res.string.node_list_help_title),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.semantics { heading() },
-            )
+            Column(
+                modifier =
+                Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.node_list_help_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.semantics { heading() },
+                )
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.security),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
+                Text(
+                    text = stringResource(Res.string.security),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
 
-            SecurityLegendItems()
+                SecurityLegendItems()
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.connections),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
+                Text(
+                    text = stringResource(Res.string.connections),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
 
-            ConnectionStatusLegendItems()
+                ConnectionStatusLegendItems()
 
-            ConnectionActivityLegendItems()
+                ConnectionActivityLegendItems()
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.node_list_help_node_details),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
+                Text(
+                    text = stringResource(Res.string.node_list_help_node_details),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
 
-            val bands = LocalModemPreset.current.snrBands()
-            val snrGood = formatThreshold(bands.good)
-            val snrFair = formatThreshold(bands.fair)
-            val snrBad = formatThreshold(bands.bad)
-            SignalQualityEntry(
-                Quality.GOOD,
-                stringResource(Res.string.node_layout_help_signal_good, snrGood, RSSI_GOOD_THRESHOLD.toString()),
-            )
-            SignalQualityEntry(
-                Quality.FAIR,
-                stringResource(
-                    Res.string.node_layout_help_signal_fair,
-                    snrFair,
-                    snrGood,
-                    RSSI_FAIR_THRESHOLD.toString(),
-                    RSSI_GOOD_THRESHOLD.toString(),
-                ),
-            )
-            SignalQualityEntry(
-                Quality.BAD,
-                stringResource(
-                    Res.string.node_layout_help_signal_bad,
-                    snrBad,
-                    snrFair,
-                    RSSI_BAD_THRESHOLD.toString(),
-                    RSSI_FAIR_THRESHOLD.toString(),
-                ),
-            )
-            SignalQualityEntry(
-                Quality.NONE,
-                stringResource(Res.string.node_layout_help_signal_none, snrBad, RSSI_BAD_THRESHOLD.toString()),
-            )
+                val bands = LocalModemPreset.current.snrBands()
+                val snrGood = formatThreshold(bands.good)
+                val snrFair = formatThreshold(bands.fair)
+                val snrBad = formatThreshold(bands.bad)
+                SignalQualityEntry(
+                    Quality.GOOD,
+                    stringResource(Res.string.node_layout_help_signal_good, snrGood, RSSI_GOOD_THRESHOLD.toString()),
+                )
+                SignalQualityEntry(
+                    Quality.FAIR,
+                    stringResource(
+                        Res.string.node_layout_help_signal_fair,
+                        snrFair,
+                        snrGood,
+                        RSSI_FAIR_THRESHOLD.toString(),
+                        RSSI_GOOD_THRESHOLD.toString(),
+                    ),
+                )
+                SignalQualityEntry(
+                    Quality.BAD,
+                    stringResource(
+                        Res.string.node_layout_help_signal_bad,
+                        snrBad,
+                        snrFair,
+                        RSSI_BAD_THRESHOLD.toString(),
+                        RSSI_FAIR_THRESHOLD.toString(),
+                    ),
+                )
+                SignalQualityEntry(
+                    Quality.NONE,
+                    stringResource(Res.string.node_layout_help_signal_none, snrBad, RSSI_BAD_THRESHOLD.toString()),
+                )
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.node_layout_signal_quality_indicator),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-            Text(
-                text = stringResource(Res.string.node_layout_help_signal_indicator),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+                Text(
+                    text = stringResource(Res.string.node_layout_signal_quality_indicator),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
+                Text(
+                    text = stringResource(Res.string.node_layout_help_signal_indicator),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.node_list_help_battery_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-            BatteryEntry(
-                level = BATTERY_SAMPLE_FULL,
-                description = stringResource(Res.string.node_list_help_battery_full),
-            )
-            BatteryEntry(
-                level = BATTERY_SAMPLE_MEDIUM,
-                description = stringResource(Res.string.node_list_help_battery_medium),
-            )
-            BatteryEntry(
-                level = BATTERY_SAMPLE_LOW,
-                description = stringResource(Res.string.node_list_help_battery_low),
-            )
-            BatteryEntry(
-                level = BATTERY_SAMPLE_EXTERNAL,
-                description = stringResource(Res.string.node_list_help_battery_external),
-            )
-            BatteryEntry(level = null, description = stringResource(Res.string.node_list_help_battery_unknown))
+                Text(
+                    text = stringResource(Res.string.node_list_help_battery_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
+                BatteryEntry(
+                    level = BATTERY_SAMPLE_FULL,
+                    description = stringResource(Res.string.node_list_help_battery_full),
+                )
+                BatteryEntry(
+                    level = BATTERY_SAMPLE_MEDIUM,
+                    description = stringResource(Res.string.node_list_help_battery_medium),
+                )
+                BatteryEntry(
+                    level = BATTERY_SAMPLE_LOW,
+                    description = stringResource(Res.string.node_list_help_battery_low),
+                )
+                BatteryEntry(
+                    level = BATTERY_SAMPLE_EXTERNAL,
+                    description = stringResource(Res.string.node_list_help_battery_external),
+                )
+                BatteryEntry(level = null, description = stringResource(Res.string.node_list_help_battery_unknown))
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Text(
-                text = stringResource(Res.string.node_list_help_roles_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
+                Text(
+                    text = stringResource(Res.string.node_list_help_roles_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
 
-            roleHelpEntries.forEach { (role, descRes) -> RoleEntry(role, stringResource(descRes)) }
-        }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+                roleHelpEntries.forEach { (role, descRes) -> RoleEntry(role, stringResource(descRes)) }
+            }
+            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

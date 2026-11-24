@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +57,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.coverage_export_all
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LocalFloatingBarInset

@@ -16,9 +16,8 @@
  */
 package org.meshtastic.feature.connections.ui.components
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +28,6 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -52,6 +50,8 @@ import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.ip_port
 import org.meshtastic.core.resources.websocket_port_in_url
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.feature.connections.TCP_DEVICE_PREFIX
 import org.meshtastic.feature.connections.WEBSOCKET_DEVICE_PREFIX
 
@@ -94,50 +94,50 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
     // Scrolls so a short window (landscape, large font) can still reach the actions.
     val barScroll = rememberScrollState()
     Box {
-    Column(
-        modifier = Modifier.verticalScroll(barScroll).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        OutlinedTextField(
-            state = addressState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.address)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        OutlinedTextField(
-            state = portState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            placeholder = { Text(defaultPort) },
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.ip_port)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-            enabled = !webSocket,
-            supportingText = portHint,
-            isError = portOutOfRange,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+        Column(
+            modifier = Modifier.verticalScroll(barScroll).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TextButton(onClick = onCancel) { Text(stringResource(Res.string.cancel)) }
+            OutlinedTextField(
+                state = addressState,
+                labelPosition = TextFieldLabelPosition.Above(),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                label = { Text(stringResource(Res.string.address)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-            Button(
-                onClick = {
-                    manualAddress(addressState.text.toString(), portState.text.toString())?.let { fullAddress ->
-                        onClickAdd(fullAddress.drop(1), fullAddress)
-                    }
-                },
+            OutlinedTextField(
+                state = portState,
+                labelPosition = TextFieldLabelPosition.Above(),
+                placeholder = { Text(defaultPort) },
+                lineLimits = TextFieldLineLimits.SingleLine,
+                label = { Text(stringResource(Res.string.ip_port)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                enabled = !webSocket,
+                supportingText = portHint,
+                isError = portOutOfRange,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
             ) {
-                Text(stringResource(Res.string.add_network_device))
+                TextButton(onClick = onCancel) { Text(stringResource(Res.string.cancel)) }
+
+                Button(
+                    onClick = {
+                        manualAddress(addressState.text.toString(), portState.text.toString())?.let { fullAddress ->
+                            onClickAdd(fullAddress.drop(1), fullAddress)
+                        }
+                    },
+                ) {
+                    Text(stringResource(Res.string.add_network_device))
+                }
             }
         }
-    }
-    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

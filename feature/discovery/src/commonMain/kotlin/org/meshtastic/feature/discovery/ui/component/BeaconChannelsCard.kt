@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +35,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mesh_beacon_channels_title
 import org.meshtastic.core.resources.mesh_beacon_preset_indicator
 import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons

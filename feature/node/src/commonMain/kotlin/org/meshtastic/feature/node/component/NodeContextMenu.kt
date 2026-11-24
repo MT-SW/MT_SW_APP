@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.DropdownMenu
-import org.meshtastic.core.ui.component.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +53,8 @@ import org.meshtastic.core.resources.trace_route
 import org.meshtastic.core.resources.traceroute_available_in
 import org.meshtastic.core.resources.unmute
 import org.meshtastic.core.resources.update_status
+import org.meshtastic.core.ui.component.DropdownMenu
+import org.meshtastic.core.ui.component.DropdownMenuGroup
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Compass
 import org.meshtastic.core.ui.icon.DeleteNode

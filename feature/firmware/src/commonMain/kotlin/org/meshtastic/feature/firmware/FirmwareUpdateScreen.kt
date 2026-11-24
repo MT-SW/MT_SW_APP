@@ -39,7 +39,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import org.meshtastic.core.ui.component.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -174,6 +173,7 @@ import org.meshtastic.core.resources.skip
 import org.meshtastic.core.resources.unknown
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.OutlinedButton

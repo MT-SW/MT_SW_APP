@@ -16,10 +16,8 @@
  */
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
@@ -41,6 +40,7 @@ import org.meshtastic.core.resources.download
 import org.meshtastic.core.resources.firmware_version
 import org.meshtastic.core.resources.view_release
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
@@ -52,33 +52,36 @@ fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modi
     val openUrl = rememberOpenUrl()
 
     val barScroll = rememberScrollState()
-    Box {
-    Column(
-        modifier = modifier.verticalScroll(barScroll).padding(16.dp).fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(text = firmwareRelease.title, style = MaterialTheme.typography.titleLarge)
-        Text(
-            text = stringResource(Res.string.firmware_version, firmwareRelease.id),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Markdown(modifier = Modifier.padding(8.dp), content = firmwareRelease.releaseNotes)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { openUrl(firmwareRelease.pageUrl) }, modifier = Modifier.weight(1f)) {
-                Icon(
-                    imageVector = MeshtasticIcons.LinkIcon,
-                    contentDescription = stringResource(Res.string.view_release),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(Res.string.view_release))
-            }
-            Button(onClick = { openUrl(firmwareRelease.zipUrl) }, modifier = Modifier.weight(1f)) {
-                Icon(imageVector = MeshtasticIcons.Download, contentDescription = stringResource(Res.string.download))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(Res.string.download))
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier.verticalScroll(barScroll).padding(16.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(text = firmwareRelease.title, style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = stringResource(Res.string.firmware_version, firmwareRelease.id),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Markdown(modifier = Modifier.padding(8.dp), content = firmwareRelease.releaseNotes)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { openUrl(firmwareRelease.pageUrl) }, modifier = Modifier.weight(1f)) {
+                    Icon(
+                        imageVector = MeshtasticIcons.LinkIcon,
+                        contentDescription = stringResource(Res.string.view_release),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = stringResource(Res.string.view_release))
+                }
+                Button(onClick = { openUrl(firmwareRelease.zipUrl) }, modifier = Modifier.weight(1f)) {
+                    Icon(
+                        imageVector = MeshtasticIcons.Download,
+                        contentDescription = stringResource(Res.string.download),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = stringResource(Res.string.download))
+                }
             }
         }
-    }
-    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }

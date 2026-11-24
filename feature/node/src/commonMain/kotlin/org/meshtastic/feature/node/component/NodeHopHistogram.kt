@@ -16,9 +16,8 @@
  */
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -30,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
@@ -59,7 +57,9 @@ import org.meshtastic.core.resources.hop_histogram_empty
 import org.meshtastic.core.resources.hop_histogram_title
 import org.meshtastic.core.resources.one_hour
 import org.meshtastic.core.resources.twenty_four_hours
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
 import kotlin.time.Duration.Companion.hours
 
@@ -108,38 +108,37 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
 
     val barScroll = rememberScrollState()
     Box {
-    Column(
-        modifier =
-        Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.hop_histogram_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.semantics { heading() },
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.hop_histogram_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.semantics { heading() },
+            )
 
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HopWindow.entries.forEach { option ->
-                FilterChip(
-                    selected = option == window,
-                    onClick = { onSelectWindow(option) },
-                    label = { Text(stringResource(option.label)) },
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                HopWindow.entries.forEach { option ->
+                    FilterChip(
+                        selected = option == window,
+                        onClick = { onSelectWindow(option) },
+                        label = { Text(stringResource(option.label)) },
+                    )
+                }
+            }
+
+            if (buckets.isEmpty()) {
+                Text(
+                    text = stringResource(Res.string.hop_histogram_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            } else {
+                buckets.forEachIndexed { hop, count -> HopBar(hop = hop, count = count, maxCount = maxCount) }
             }
         }
-
-        if (buckets.isEmpty()) {
-            Text(
-                text = stringResource(Res.string.hop_histogram_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            buckets.forEachIndexed { hop, count -> HopBar(hop = hop, count = count, maxCount = maxCount) }
-        }
-    }
-    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

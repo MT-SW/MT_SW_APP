@@ -31,8 +31,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -43,20 +41,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.surfaceColorAtElevation
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import org.meshtastic.core.ui.component.ModalBottomSheet
-import org.meshtastic.core.ui.component.elementLook
-import org.meshtastic.core.ui.component.onRightClick
-import org.meshtastic.core.ui.component.popupRim
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -131,8 +126,10 @@ import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.ui.component.AutoLinkText
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.HighlightedText
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.NODE_TINT_EMPHASIZED
 import org.meshtastic.core.ui.component.NODE_TINT_MUTED
 import org.meshtastic.core.ui.component.NODE_TINT_NORMAL
@@ -144,6 +141,8 @@ import org.meshtastic.core.ui.component.TransportIcon
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.nodeBorderStroke
 import org.meshtastic.core.ui.component.nodeTintedContainer
+import org.meshtastic.core.ui.component.onRightClick
+import org.meshtastic.core.ui.component.popupRim
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.styledControl
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
@@ -283,84 +282,85 @@ fun MessageItem(
                 ActiveSheet.Actions -> {
                     val actionsScroll = rememberScrollState()
                     Box {
-                    Column(modifier = Modifier.verticalScroll(actionsScroll)) {
-MessageActionsContent(
-                        quickEmojis = if (canReact) quickEmojis else emptyList(),
-                        canReply = canReply,
-                        onReply = {
-                            activeSheet = null
-                            onReply()
-                        },
-                        onReact = { emoji ->
-                            activeSheet = null
-                            sendReaction(emoji)
-                        },
-                        onMoreReactions = { activeSheet = ActiveSheet.Emoji },
-                        onCopy = {
-                            activeSheet = null
-                            coroutineScope.launch {
-                                clipboardManager.setClipEntry(createClipEntry(bodyText, "message"))
-                            }
-                        },
-                        onSelect = {
-                            activeSheet = null
-                            onSelect()
-                        },
-                        onDelete = {
-                            activeSheet = null
-                            onDelete()
-                        },
-                        statusString = statusString,
-                        status =
-                        if (isLocal) {
-                            message.status
-                        } else {
-                            null
-                        },
-                        // Mesh time (rx_time), matching the bubble header. receivedTime is when this phone
-                        // pulled the packet off the node, which is misleading after an offline backlog sync.
-                        timestamp = timestamp,
-                        // A sent message's relay is the ack's, shown in its status dialog instead.
-                        relay =
-                        if (message.fromLocal) {
-                            null
-                        } else {
-                            resolveRelay(
-                                receivedRelayNode(message.relayNode, message.hopsAway, message.viaMqtt),
-                            )
-                        },
-                        xeddsaSigned = message.xeddsaSigned,
-                        ackProofStatus = message.ackProofStatus,
-                        onStatus = onStatusClick,
-                        translationRowState = translationRowStateFor(message, translationAvailable),
-                        onTranslate = {
-                            activeSheet = null
-                            onTranslate()
-                        },
-                        onToggleTranslation = {
-                            activeSheet = null
-                            onToggleTranslation()
-                        },
-                        senderMuted = senderMuted,
-                        onReadAloud = {
-                            activeSheet = null
-                            speaker.speak(bodyText)
-                        },
-                        onMuteSender =
-                        onMuteSender?.let { mute ->
-                            {
-                                if (senderMuted) {
+                        Column(modifier = Modifier.verticalScroll(actionsScroll)) {
+                            MessageActionsContent(
+                                quickEmojis = if (canReact) quickEmojis else emptyList(),
+                                canReply = canReply,
+                                onReply = {
                                     activeSheet = null
-                                    mute(0L)
+                                    onReply()
+                                },
+                                onReact = { emoji ->
+                                    activeSheet = null
+                                    sendReaction(emoji)
+                                },
+                                onMoreReactions = { activeSheet = ActiveSheet.Emoji },
+                                onCopy = {
+                                    activeSheet = null
+                                    coroutineScope.launch {
+                                        clipboardManager.setClipEntry(createClipEntry(bodyText, "message"))
+                                    }
+                                },
+                                onSelect = {
+                                    activeSheet = null
+                                    onSelect()
+                                },
+                                onDelete = {
+                                    activeSheet = null
+                                    onDelete()
+                                },
+                                statusString = statusString,
+                                status =
+                                if (isLocal) {
+                                    message.status
                                 } else {
-                                    activeSheet = ActiveSheet.MuteSender
-                                }
-                            }
-                        },
-                    )
-}
-FastScrollSidebar(actionsScroll, Modifier.align(Alignment.CenterEnd))
-}
+                                    null
+                                },
+                                // Mesh time (rx_time), matching the bubble header. receivedTime is when this phone
+                                // pulled the packet off the node, which is misleading after an offline backlog
+                                // sync.
+                                timestamp = timestamp,
+                                // A sent message's relay is the ack's, shown in its status dialog instead.
+                                relay =
+                                if (message.fromLocal) {
+                                    null
+                                } else {
+                                    resolveRelay(
+                                        receivedRelayNode(message.relayNode, message.hopsAway, message.viaMqtt),
+                                    )
+                                },
+                                xeddsaSigned = message.xeddsaSigned,
+                                ackProofStatus = message.ackProofStatus,
+                                onStatus = onStatusClick,
+                                translationRowState = translationRowStateFor(message, translationAvailable),
+                                onTranslate = {
+                                    activeSheet = null
+                                    onTranslate()
+                                },
+                                onToggleTranslation = {
+                                    activeSheet = null
+                                    onToggleTranslation()
+                                },
+                                senderMuted = senderMuted,
+                                onReadAloud = {
+                                    activeSheet = null
+                                    speaker.speak(bodyText)
+                                },
+                                onMuteSender =
+                                onMuteSender?.let { mute ->
+                                    {
+                                        if (senderMuted) {
+                                            activeSheet = null
+                                            mute(0L)
+                                        } else {
+                                            activeSheet = ActiveSheet.MuteSender
+                                        }
+                                    }
+                                },
+                            )
+                        }
+                        FastScrollSidebar(actionsScroll, Modifier.align(Alignment.CenterEnd))
+                    }
                 }
 
                 ActiveSheet.MuteSender -> Unit

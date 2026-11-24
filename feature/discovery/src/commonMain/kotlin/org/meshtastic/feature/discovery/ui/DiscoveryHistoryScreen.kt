@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +63,7 @@ import org.meshtastic.core.resources.discovery_history
 import org.meshtastic.core.resources.discovery_scan_complete
 import org.meshtastic.core.resources.discovery_scan_incomplete
 import org.meshtastic.core.resources.discovery_unique_nodes_count
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FloatingBarUnderlap

@@ -23,6 +23,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.Reaction
 import org.meshtastic.proto.User
 import kotlin.test.Test
@@ -72,18 +73,21 @@ class ReactionDialogTest {
     }
 
     @Test
-    fun ourReactionStatusNamesTheRelay() = runComposeUiTest {
+    fun ourReactionStatusShowsTheRelayAsAPlate() = runComposeUiTest {
+        val relayNode =
+            Node(num = 0x5A, user = User.Builder().also { it.id = "!0000005a" }.also { it.short_name = "RDG" }.build())
         setContent {
             ReactionDialog(
                 reactions = listOf(reaction("!me", "Me", MessageStatus.DELIVERED)),
                 myId = "!me",
                 resolveRelay = resolveRelay,
+                resolveRelayNode = { relay -> if (relay == 0x5A) relayNode else null },
             )
         }
 
         onNodeWithContentDescription("Message delivery status").performClick()
         waitForIdle()
 
-        onNodeWithText("Relayed by Ridge (0x5A)").assertIsDisplayed()
+        onNodeWithText("RDG").assertIsDisplayed()
     }
 }

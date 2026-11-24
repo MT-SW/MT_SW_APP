@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import org.meshtastic.core.resources.ai_memory_open
 import org.meshtastic.core.resources.ai_memory_save
 import org.meshtastic.core.resources.ai_memory_summary
 import org.meshtastic.core.resources.ai_memory_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /** The switch of the assistant's memory and the dialog with the user's instructions and the assistant's notes. */

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.neighbor_info_received
 import org.meshtastic.core.resources.neighbor_info_requested
 import org.meshtastic.core.resources.routing_error_no_response
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons

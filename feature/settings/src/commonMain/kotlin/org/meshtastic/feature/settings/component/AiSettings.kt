@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SecondaryScrollableTabRow
@@ -117,6 +116,7 @@ import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.RadioButton

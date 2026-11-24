@@ -16,7 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -97,7 +98,8 @@ fun FastScrollSidebar(
         modifier =
         modifier
             .fillMaxHeight()
-            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners of
+            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners
+            // of
             // a window.
             .padding(vertical = END_PADDING_DP.dp)
             .width(20.dp)
@@ -232,7 +234,8 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
         modifier =
         modifier
             .fillMaxHeight()
-            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners of
+            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners
+            // of
             // a window.
             .padding(vertical = END_PADDING_DP.dp)
             .width(20.dp)
@@ -290,6 +293,7 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
  * text colour, not the surface: inside our windows the surface is made transparent, which would always read as dark.
  */
 @Composable
+@ReadOnlyComposable
 private fun scrollbarColor(): Color {
     val text = MaterialTheme.colorScheme.onSurface
     return if (text.luminance() > LIGHT_TEXT_LUMINANCE) Color.White else text

@@ -37,7 +37,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -192,6 +191,7 @@ import org.meshtastic.core.resources.wifi_drop_reason_label
 import org.meshtastic.core.resources.wifi_drops_label
 import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem

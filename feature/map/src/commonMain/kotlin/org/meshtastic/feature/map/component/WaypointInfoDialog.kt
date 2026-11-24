@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,6 +44,7 @@ import org.meshtastic.core.resources.geofence_alerts_opt_in
 import org.meshtastic.core.resources.geofence_alerts_opt_in_desc
 import org.meshtastic.core.resources.geofence_radius
 import org.meshtastic.core.resources.geofence_set_area
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.proto.Waypoint

@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,6 +62,7 @@ import org.meshtastic.core.resources.coverage_refresh
 import org.meshtastic.core.resources.coverage_summary
 import org.meshtastic.core.resources.coverage_summary_filtered
 import org.meshtastic.core.resources.coverage_title
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.OutlinedButton

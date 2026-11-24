@@ -32,7 +32,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +59,7 @@ import org.meshtastic.core.resources.signal_survey_readings
 import org.meshtastic.core.resources.signal_survey_senders
 import org.meshtastic.core.resources.signal_survey_unplaced
 import org.meshtastic.core.resources.snr
+import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 

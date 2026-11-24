@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.settings.debugging
 
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.sniffer_export_format_json
 import org.meshtastic.core.resources.sniffer_export_format_title
 import org.meshtastic.core.resources.sniffer_export_format_txt
+import org.meshtastic.core.ui.component.AlertDialog
 
 /** Asks in which form the logs are saved: as text or as JSON. */
 @Composable

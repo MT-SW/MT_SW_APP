@@ -48,7 +48,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -177,6 +176,7 @@ import org.meshtastic.core.resources.terrain_horizon_texture_off
 import org.meshtastic.core.resources.terrain_horizon_texture_on
 import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.terrain_horizon_update
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
 import org.meshtastic.core.ui.component.IndeterminateProgressLine

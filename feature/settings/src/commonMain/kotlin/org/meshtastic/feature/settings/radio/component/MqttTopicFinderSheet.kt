@@ -16,10 +16,8 @@
  */
 package org.meshtastic.feature.settings.radio.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,9 +25,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -64,7 +62,9 @@ import org.meshtastic.core.resources.mqtt_topic_finder_nothing_yet
 import org.meshtastic.core.resources.mqtt_topic_finder_only_above
 import org.meshtastic.core.resources.mqtt_topic_finder_sample_again
 import org.meshtastic.core.resources.mqtt_topic_finder_subscribing
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.proto.ModuleConfig
 
@@ -124,23 +124,27 @@ internal fun MqttTopicFinderContent(
 ) {
     val barList = rememberLazyListState()
     Box(modifier = Modifier.fillMaxWidth()) {
-    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        item {
-            Text(
-                text = stringResource(Res.string.mqtt_topic_finder),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+        LazyColumn(
+            state = barList,
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            item {
+                Text(
+                    text = stringResource(Res.string.mqtt_topic_finder),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            }
+            item { StatusBlock(state = state, host = host, onRestart = onRestart) }
+            val plan = state.plan
+            if (state.regionName != null && plan != null) {
+                suggestionRows(plan, state, current, onPick)
+                activeRows(plan, state, current, onPick)
+            }
+            item { CustomTopic(onPick) }
         }
-        item { StatusBlock(state = state, host = host, onRestart = onRestart) }
-        val plan = state.plan
-        if (state.regionName != null && plan != null) {
-            suggestionRows(plan, state, current, onPick)
-            activeRows(plan, state, current, onPick)
-        }
-        item { CustomTopic(onPick) }
-    }
-    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }
 

@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
-import org.meshtastic.core.ui.component.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -88,6 +87,7 @@ import org.meshtastic.core.resources.discovery_start_scan_reason_not_connected
 import org.meshtastic.core.resources.discovery_stop_scan
 import org.meshtastic.core.resources.mesh_beacon_invitations_title
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.OutlinedButton

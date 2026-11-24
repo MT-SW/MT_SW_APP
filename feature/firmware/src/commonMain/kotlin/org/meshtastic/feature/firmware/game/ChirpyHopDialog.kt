@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import org.meshtastic.core.ui.component.ElevatedCard
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,6 +51,7 @@ import org.meshtastic.core.resources.chirpy_hop_play
 import org.meshtastic.core.resources.chirpy_hop_update_complete
 import org.meshtastic.core.resources.chirpy_hop_update_interrupted
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine

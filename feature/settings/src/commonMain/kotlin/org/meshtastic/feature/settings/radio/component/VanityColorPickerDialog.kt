@@ -185,7 +185,10 @@ private fun ThemeChipSamples(rgb: Int) {
             style = MaterialTheme.typography.titleSmall,
         )
         // One row per chip style, one column per kind of theme.
-        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             samples.forEach { (name, _) ->
                 Text(
                     text = name,

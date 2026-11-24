@@ -46,7 +46,6 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -137,6 +136,7 @@ import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.InlineStyle
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner

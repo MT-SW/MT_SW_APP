@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,13 +27,13 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +41,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.manage_map_layers
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Layers
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.component.MapButton
@@ -128,39 +128,53 @@ private fun MapLayersSheet(
     // height, so they are never pushed off the bottom of a full-screen sheet.
     val barScroll = rememberScrollState()
     Box {
-    Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll)) {
-        // A column, not a box: the slot can bring several parts (imported layers, signal survey) and a box would draw
-        // them on top of each other.
-        Column(modifier = Modifier.fillMaxWidth()) { extra() }
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll)) {
+            // A column, not a box: the slot can bring several parts (imported layers, signal survey) and a box would
+            // draw
+            // them on top of each other.
+            Column(modifier = Modifier.fillMaxWidth()) { extra() }
 
-        HorizontalDivider()
-
-        Text(
-            text = stringResource(Res.string.manage_map_layers),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        )
-
-        RasterOverlayToggles(
-            available = MapTileCatalogue.overlays,
-            enabledIds = overlays.mapTo(mutableSetOf()) { it.id },
-            onToggle = { id -> MapOverlays.byId(id)?.let { onOverlaysChange(overlays.toggling(it)) } },
-            opacity = opacity,
-            onOpacityChange = onOpacityChange,
-        )
-
-        HorizontalDivider()
-
-        PropagationSection(target = offlineTarget, opacity = opacity, onOpacityChange = onOpacityChange)
-
-        HorizontalDivider()
-
-        CoverageSection(opacity = opacity, onOpacityChange = onOpacityChange)
-
-        if (offlineMapsSupported) {
             HorizontalDivider()
 
-            OfflineMapsSection(
+            Text(
+                text = stringResource(Res.string.manage_map_layers),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            RasterOverlayToggles(
+                available = MapTileCatalogue.overlays,
+                enabledIds = overlays.mapTo(mutableSetOf()) { it.id },
+                onToggle = { id -> MapOverlays.byId(id)?.let { onOverlaysChange(overlays.toggling(it)) } },
+                opacity = opacity,
+                onOpacityChange = onOpacityChange,
+            )
+
+            HorizontalDivider()
+
+            PropagationSection(target = offlineTarget, opacity = opacity, onOpacityChange = onOpacityChange)
+
+            HorizontalDivider()
+
+            CoverageSection(opacity = opacity, onOpacityChange = onOpacityChange)
+
+            if (offlineMapsSupported) {
+                HorizontalDivider()
+
+                OfflineMapsSection(
+                    target = offlineTarget,
+                    onShowRegion = { bounds ->
+                        onDismiss()
+                        offlineTarget.showRegion(bounds)
+                    },
+                )
+            }
+
+            HorizontalDivider()
+
+            // Not offlineMapsSupported-gated — see OfflineTerrainSection's own doc comment for why terrain downloads
+            // work on both Android and Desktop even though the base map's own offline packs don't.
+            OfflineTerrainSection(
                 target = offlineTarget,
                 onShowRegion = { bounds ->
                     onDismiss()
@@ -168,20 +182,7 @@ private fun MapLayersSheet(
                 },
             )
         }
-
-        HorizontalDivider()
-
-        // Not offlineMapsSupported-gated — see OfflineTerrainSection's own doc comment for why terrain downloads
-        // work on both Android and Desktop even though the base map's own offline packs don't.
-        OfflineTerrainSection(
-            target = offlineTarget,
-            onShowRegion = { bounds ->
-                onDismiss()
-                offlineTarget.showRegion(bounds)
-            },
-        )
-    }
-    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

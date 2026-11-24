@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -76,6 +75,7 @@ import org.meshtastic.core.resources.node_layout_preview
 import org.meshtastic.core.resources.node_layout_relative_last_heard
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_layout_signal_direct_only
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
 import org.meshtastic.core.ui.component.LocalNodeExtraStats

@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -87,6 +86,7 @@ import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.elementLook

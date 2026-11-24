@@ -18,7 +18,6 @@ package org.meshtastic.feature.map.maplibre.component
 
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.manage_custom_tile_sources
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.feature.map.component.CustomTileProviderManager
 import org.meshtastic.feature.map.tiles.CustomTileProviderRepository
 

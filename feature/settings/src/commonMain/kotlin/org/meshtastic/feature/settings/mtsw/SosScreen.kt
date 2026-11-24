@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -189,6 +188,7 @@ import org.meshtastic.core.resources.sos_targets_note
 import org.meshtastic.core.resources.sos_title
 import org.meshtastic.core.resources.sos_widget_taps_note
 import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.FilterChip

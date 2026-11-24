@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.docs.ui
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -26,6 +24,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -48,7 +47,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SuggestionChip
@@ -80,7 +78,9 @@ import org.meshtastic.core.resources.chirpy_thinking
 import org.meshtastic.core.resources.img_chirpy
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.elementLook
@@ -147,22 +147,24 @@ private fun ChirpyChatSheet(
             // Message list
             val listState = rememberLazyListState()
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
-                item { Text(
-                                text = stringResource(CoreRes.string.chirpy_assistant_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 12.dp),
-                            ) }
-                items(state.messages, key = { it.id }) { message ->
-                    ChirpyMessageBubble(message = message, onNavigateToPage = onNavigateToPage)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+                LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
+                    item {
+                        Text(
+                            text = stringResource(CoreRes.string.chirpy_assistant_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 12.dp),
+                        )
+                    }
+                    items(state.messages, key = { it.id }) { message ->
+                        ChirpyMessageBubble(message = message, onNavigateToPage = onNavigateToPage)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-                if (state.isLoading) {
-                    item { ThinkingBubble() }
+                    if (state.isLoading) {
+                        item { ThinkingBubble() }
+                    }
                 }
-            }
-            FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
+                FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
             }
 
             // Input bar — matches messaging MessageInput style

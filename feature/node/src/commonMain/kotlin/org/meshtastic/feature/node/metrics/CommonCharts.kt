@@ -35,7 +35,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -66,6 +65,7 @@ import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.metric_channel_label
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.snr
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info

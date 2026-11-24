@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
@@ -102,6 +101,7 @@ import org.meshtastic.core.resources.lora_value_none
 import org.meshtastic.core.resources.lora_value_not_used
 import org.meshtastic.core.resources.replace
 import org.meshtastic.core.resources.slot_auto
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.ChannelSelection
 import org.meshtastic.core.ui.icon.CloudDownload
 import org.meshtastic.core.ui.icon.CloudUpload

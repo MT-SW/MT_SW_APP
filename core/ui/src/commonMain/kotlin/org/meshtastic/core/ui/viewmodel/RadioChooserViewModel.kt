@@ -409,9 +409,9 @@ class RadioChooserViewModel(
 }
 
 /**
- * The plate of the device at [address], always taken from the database of that device: the live node of the device
- * in use only when it really is that device's node (right after a switch it can still be the previous device's
- * node), otherwise the plate read from its own database, otherwise the last one seen.
+ * The plate of the device at [address], always taken from the database of that device: the live node of the device in
+ * use only when it really is that device's node (right after a switch it can still be the previous device's node),
+ * otherwise the plate read from its own database, otherwise the last one seen.
  */
 private fun plateOf(
     address: String,

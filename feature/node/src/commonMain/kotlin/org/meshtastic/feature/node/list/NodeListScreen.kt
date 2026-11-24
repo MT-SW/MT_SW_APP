@@ -40,7 +40,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -104,6 +103,7 @@ import org.meshtastic.core.resources.nodes_unheard_banner_one
 import org.meshtastic.core.resources.nodes_unheard_keep
 import org.meshtastic.core.resources.nodes_unheard_remove
 import org.meshtastic.core.resources.set_up_connection
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.EmptyState
