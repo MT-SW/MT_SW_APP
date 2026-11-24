@@ -77,7 +77,12 @@ fun ModalBottomSheet(
                 shape = windowShape,
                 color = Color.Transparent,
             ) {
-                Column { content() }
+                // Rows such as ListItem paint the theme's surface colour by default, which would hide the window's
+                // gradient behind a flat fill. Inside the window that colour is transparent, so the whole window has
+                // one background with one gradient.
+                MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
+                    Column { content() }
+                }
             }
         }
 }
