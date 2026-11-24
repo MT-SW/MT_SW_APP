@@ -19,6 +19,9 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuGroupShapes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
@@ -59,4 +62,19 @@ fun DropdownMenu(
     ) {
         content()
     }
+}
+
+/**
+ * MT_SW: replaces the Material menu block `DropdownMenuGroup`. The Material block draws its own rounded box inside the
+ * menu window, which left a visible gap between it and our menu surface. Here the block adds nothing of its own: the
+ * items sit directly on the menu surface (with our rim and shadow), with a small space between the blocks.
+ */
+@Composable
+@Suppress("UNUSED_PARAMETER")
+fun DropdownMenuGroup(
+    shapes: MenuGroupShapes,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = modifier.padding(vertical = 2.dp)) { content() }
 }

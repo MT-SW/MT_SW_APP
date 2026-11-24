@@ -17,7 +17,7 @@
 package org.meshtastic.feature.node.component
 
 import org.meshtastic.core.ui.component.DropdownMenu
-import androidx.compose.material3.DropdownMenuGroup
+import org.meshtastic.core.ui.component.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
