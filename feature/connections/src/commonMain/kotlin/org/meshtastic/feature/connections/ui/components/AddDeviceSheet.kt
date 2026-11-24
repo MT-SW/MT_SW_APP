@@ -64,7 +64,7 @@ internal fun AddDeviceDialog(
     onHideDialog: () -> Unit,
     onClickAdd: (address: String, fullAddress: String) -> Unit,
 ) {
-    ModalBottomSheet(onDismissRequest = onHideDialog, sheetState = sheetState) {
+    ModalBottomSheet(onDismissRequest = onHideDialog, sheetState = sheetState, windowOnWide = false) {
         AddDeviceForm(onCancel = onHideDialog, onClickAdd = onClickAdd)
     }
 }
