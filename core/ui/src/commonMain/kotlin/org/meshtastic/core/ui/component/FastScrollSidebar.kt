@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
@@ -95,6 +96,9 @@ fun FastScrollSidebar(
         modifier =
         modifier
             .fillMaxHeight()
+            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners of
+            // a window.
+            .padding(vertical = END_PADDING_DP.dp)
             .width(20.dp)
             .pointerInput(listState, itemCount, reverseLayout) {
                 awaitEachGesture {
@@ -142,6 +146,7 @@ fun FastScrollSidebar(
 }
 
 private const val MIN_THUMB_DP = 24
+private const val END_PADDING_DP = 16
 
 /**
  * Remembers the pixel height of every row of a lazy list that has been on screen. A lazy list only measures what it
@@ -226,6 +231,9 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
         modifier =
         modifier
             .fillMaxHeight()
+            // Kept off the very top and bottom, so the bar is whole and never disappears under the rounded corners of
+            // a window.
+            .padding(vertical = END_PADDING_DP.dp)
             .width(20.dp)
             .pointerInput(scrollState) {
                 awaitEachGesture {
