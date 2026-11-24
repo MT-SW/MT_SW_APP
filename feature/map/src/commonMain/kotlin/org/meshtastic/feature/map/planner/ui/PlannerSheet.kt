@@ -218,18 +218,14 @@ private fun PlannerSheetContent(
     bridge: PlannerMapBridge,
     onDismiss: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-        PlannerHeader(onClose = onDismiss)
-        HorizontalDivider()
-        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-            val barScroll = rememberScrollState()
-            Box {
+    // The title row scrolls together with the content, so the window keeps one smooth background.
+    val barScroll = rememberScrollState()
+    Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
+        Column(modifier = Modifier.widthIn(max = CONTENT_MAX_WIDTH).fillMaxWidth().verticalScroll(barScroll)) {
+            PlannerHeader(onClose = onDismiss)
+            HorizontalDivider()
             Column(
-                modifier =
-                Modifier.widthIn(max = CONTENT_MAX_WIDTH)
-                    .fillMaxWidth()
-                    .verticalScroll(barScroll)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 SideSelector(state = state, vm = vm)
@@ -243,9 +239,8 @@ private fun PlannerSheetContent(
                 ExportSection(state = state, vm = vm, bridge = bridge, onShownOnMap = onDismiss)
                 CreditsFooter()
             }
-            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
-            }
         }
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 
