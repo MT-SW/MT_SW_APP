@@ -46,9 +46,9 @@ import org.meshtastic.core.resources.connected_sleeping
 import org.meshtastic.core.resources.connecting
 import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.ui.icon.Bluetooth
-import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.DeviceSleep
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.MeshRadio
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
 import org.meshtastic.core.ui.icon.Reconnecting
@@ -105,12 +105,12 @@ fun getIconPair(connectionState: ConnectionState, deviceType: DeviceType? = null
     when (connectionState) {
         ConnectionState.Disconnected -> MeshtasticIcons.NoDevice to null
 
-        ConnectionState.DeviceSleep -> MeshtasticIcons.Device to MeshtasticIcons.DeviceSleep
+        ConnectionState.DeviceSleep -> MeshtasticIcons.MeshRadio to MeshtasticIcons.DeviceSleep
 
-        ConnectionState.Connecting -> MeshtasticIcons.Device to MeshtasticIcons.Reconnecting
+        ConnectionState.Connecting -> MeshtasticIcons.MeshRadio to MeshtasticIcons.Reconnecting
 
         else ->
-            MeshtasticIcons.Device to
+            MeshtasticIcons.MeshRadio to
                 when (deviceType) {
                     DeviceType.BLE -> MeshtasticIcons.Bluetooth
                     DeviceType.TCP -> MeshtasticIcons.Wifi
