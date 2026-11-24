@@ -76,6 +76,8 @@ class AppVersionRowsTest {
             }
         }
 
+        // The tap counter resets after a second, so the clock must not run on between the quick taps.
+        mainClock.autoAdvance = false
         repeat(5) { onNodeWithText("2.8.0").performClick() }
 
         assertTrue(unlocked)
