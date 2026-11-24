@@ -213,6 +213,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
 * Ikona połączenia (wszystkie wersje): ikona podłączonego radia to teraz ręczne radio z anteną i falą (zamiast wyglądu routera). Idzie za stylem ikon z ustawień wyglądu, więc domyślnie pasuje do pozostałych ikon, a styl „Standardowy” pokazuje ją w pełnej, oryginalnej formie. Kolory i miganie zostają jak były.
+* Wybór urządzeń (wszystkie wersje): kafelek każdego urządzenia zawsze pochodzi z bazy tego urządzenia. Po przełączeniu wyświetlanego urządzenia drugie nie pokazuje już zwykłej nazwy zamiast kafelka: kafelek jest odczytywany od razu po pokazaniu urządzenia i po jego połączeniu, węzeł innego urządzenia nigdy nie jest brany za jego własny, a do tego czasu zostaje ostatni znany kafelek.
 * Wykres promieniowania anteny (kalkulator anten i planer, wszystkie wersje): wnętrze obrysu ma szklany gradient, mocniejszy w kierunku głównym, z jasnym połyskiem u góry i cienką jasną linią przy obrysie.
 * Panorama terenu (wszystkie wersje): teren ma szklany gradient z jasnym obrysem wzdłuż grzbietu; tekstura skał i lasu jest domyślnie wyłączona i włączasz ją w „Opcjach” ustawieniem „Tekstura skał i lasu”.
 * Panorama terenu (wszystkie wersje): budynki też są szklane: każda ściana ma gradient od jaśniejszej góry do ciemniejszej podstawy, cienki jasny obrys i delikatny połysk na dachu. Plakietka węzła na liście wiadomości bezpośrednich to ta sama szklana plakietka co wszędzie.
@@ -1171,6 +1172,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Device chooser (all versions): the plate of every device now always comes from the database of that device. After switching the displayed device, the other one no longer shows a plain name instead of its plate: the plate is read as soon as the device is shown and when it connects, a node of another device is never taken for it, and the last known plate is kept meanwhile.
 * Connection icon (all versions): the icon of the connected radio is now a handheld radio with an antenna and a wave (instead of the router look). It follows the icon style from the Look settings, so by default it matches the other icons, and the Standard style shows it in the original filled form. Colours and blinking stay as before.
 * Antenna radiation plot (antenna calculator and planner, all versions): the inside of the outline has a glass gradient, stronger towards the main direction, with a pale sheen at the top and a thin light line along the outline.
 * Terrain panorama (all versions): the terrain has a glass gradient with a light outline along the ridge; the rock and forest texture is off by default and is turned on in the "Options" with the "Rock and forest texture" setting.

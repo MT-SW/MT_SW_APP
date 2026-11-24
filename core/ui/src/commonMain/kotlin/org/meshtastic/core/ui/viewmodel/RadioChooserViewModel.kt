@@ -32,7 +32,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.DeviceBadge
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
@@ -146,6 +148,7 @@ class RadioChooserViewModel(
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices = slots.map { slot ->
                 val active = slot.id == activeId && isValidDeviceAddress(address)
+                val plate = plateOf(slot.address, active, ours, badges)
                 RadioChoice(
                     id = slot.id,
                     name = slot.name,
@@ -164,9 +167,8 @@ class RadioChooserViewModel(
                     },
                     active = active,
                     off = slot.id in off,
-                    shortName =
-                    if (active && ours != null) ours.user.short_name else badges[slot.address]?.shortName,
-                    nodeNum = if (active && ours != null) ours.num else badges[slot.address]?.nodeNum,
+                    shortName = plate?.shortName,
+                    nodeNum = plate?.nodeNum,
                     unread = if (active) 0 else unread[slot.address] ?: 0,
                     progress = if (active) null else steps[slot.address],
                     transportStatus = if (active) null else statuses[slot.address],
@@ -183,6 +185,33 @@ class RadioChooserViewModel(
         }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RadioChooserState())
+
+    // The last plate seen for each device, so that a device keeps its plate while the one of its own database is read.
+    private val knownPlates = mutableMapOf<String, DeviceBadge>()
+
+    /**
+     * The plate of the device at [address], always taken from the database of that device: the live node of the device
+     * in use only when it really is that device's node (right after a switch it can still be the previous device's
+     * node), otherwise the plate read from its own database, otherwise the last one seen.
+     */
+    private fun plateOf(address: String, active: Boolean, ours: Node?, badges: Map<String, DeviceBadge>): DeviceBadge? {
+        val badge = badges[address]
+        val live =
+            ours?.takeIf { node ->
+                active &&
+                    node.user.short_name.isNotBlank() &&
+                    (badge == null || badge.nodeNum == node.num) &&
+                    badges.none { (other, b) -> other != address && b.nodeNum == node.num }
+            }
+        val found =
+            when {
+                live != null -> DeviceBadge(live.num, live.user.short_name)
+                badge != null && badge.shortName.isNotBlank() -> badge
+                else -> knownPlates[address] ?: badge
+            }
+        if (found != null && found.shortName.isNotBlank()) knownPlates[address] = found
+        return found
+    }
 
     private val switchingState = MutableStateFlow(false)
 
@@ -216,6 +245,20 @@ class RadioChooserViewModel(
 
     init {
         watchSwitching()
+        // The plate of the device in use is read from its own database as soon as it is shown and again when it is
+        // connected (its own node is stored then), not only on the slow round of the background collector.
+        viewModelScope.launch {
+            combine(radioPrefs.devAddr, serviceRepository.connectionState) { address, connection ->
+                address to connection
+            }
+                .distinctUntilChanged()
+                .collect { (address, _) ->
+                    if (isValidDeviceAddress(address)) {
+                        delay(BADGE_READ_DELAY_MS)
+                        background.readBadge(address)
+                    }
+                }
+        }
         // Every radio the app connects to is remembered; the one in use is the selected one. A radio that is already
         // saved only gets its name refreshed; when all places are taken, the selected radio's place is reused.
         // Devices saved earlier with the same name (the old switch wrote the name of the device shown before): a
@@ -384,6 +427,7 @@ class RadioChooserViewModel(
         const val NETWORK_PREFIX = "t"
         const val STOP_TIMEOUT_MS = 5_000L
         const val SWITCH_MIN_MS = 700L
+        const val BADGE_READ_DELAY_MS = 800L
         const val SWITCH_MAX_MS = 20_000L
     }
 }
