@@ -84,7 +84,7 @@ internal fun AppVersionButton(
     }
 }
 
-/** The version row, followed by Chirpy Hop once the version row's taps have unlocked hidden features. */
+/** The version row, followed by Chirpy Hop, which is visible to everyone. */
 @Composable
 internal fun AppVersionRows(
     hiddenFeaturesUnlocked: Boolean,
@@ -97,7 +97,7 @@ internal fun AppVersionRows(
         appVersionName = appVersionName,
         onUnlockHiddenFeatures = onUnlockHiddenFeatures,
     )
-    if (hiddenFeaturesUnlocked && settingsPlatform.firmware) {
+    if (settingsPlatform.firmware) {
         ListItem(
             text = stringResource(Res.string.chirpy_hop),
             leadingIcon = MeshtasticIcons.PlayArrow,
