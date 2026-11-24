@@ -338,10 +338,9 @@ class MessageItemTest {
     }
 
     @Test
-    fun messageStatusDialog_namesTheRelay() = runComposeUiTest {
-        val message =
-            localMessage(node = NodePreviewParameterProvider().mickeyMouse, status = MessageStatus.RECEIVED)
-                .copy(fromLocal = false)
+    fun messageStatusDialog_showsTheRelayAsAPlate() = runComposeUiTest {
+        val relay = NodePreviewParameterProvider().mickeyMouse
+        val message = localMessage(node = relay, status = MessageStatus.RECEIVED).copy(fromLocal = false)
 
         setContent {
             MessageStatusDialog(
@@ -349,29 +348,12 @@ class MessageItemTest {
                 resendOption = false,
                 onResend = {},
                 onDismiss = {},
-                relayNodeLabel = "Ridge (0x5A)",
+                relayNodes = listOf(relay),
             )
         }
 
-        onNodeWithText("Relayed by Ridge (0x5A)").assertIsDisplayed()
-    }
-
-    @Test
-    fun messageStatusDialog_labelsTheAckRelayOfASentDirectMessage() = runComposeUiTest {
-        val message = localMessage(node = NodePreviewParameterProvider().mickeyMouse, status = MessageStatus.RECEIVED)
-
-        setContent {
-            MessageStatusDialog(
-                message = message,
-                resendOption = false,
-                onResend = {},
-                onDismiss = {},
-                isDirectMessage = true,
-                relayNodeLabel = "Ridge (0x5A)",
-            )
-        }
-
-        onNodeWithText("Ack relayed by Ridge (0x5A)").assertIsDisplayed()
+        onNodeWithText(relay.user.short_name).assertIsDisplayed()
+        onNodeWithText("elayed by", substring = true).assertDoesNotExist()
     }
 
     @Test

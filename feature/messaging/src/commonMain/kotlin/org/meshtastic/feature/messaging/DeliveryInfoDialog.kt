@@ -16,7 +16,9 @@
  */
 package org.meshtastic.feature.messaging
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -29,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.relays
 import org.meshtastic.core.resources.resend
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.NodeChip
 
 @Composable
 fun DeliveryInfo(
@@ -42,8 +46,8 @@ fun DeliveryInfo(
     text: StringResource? = null,
     detail: StringResource? = null,
     relays: Int = 0,
-    relayNodeNames: List<String> = emptyList(),
-    relay: String? = null,
+    /** MT_SW: the nodes that relayed the message, shown as plates with their short names and colours. */
+    relayNodes: List<Node> = emptyList(),
     onConfirm: (() -> Unit) = {},
     onDismiss: () -> Unit = {},
 ) = MeshtasticDialog(
@@ -69,30 +73,24 @@ fun DeliveryInfo(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            if (relays != 0) {
-                Text(
-                    text = pluralStringResource(Res.plurals.relays, relays, relays),
-                    modifier = Modifier.padding(top = 8.dp),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                if (relayNodeNames.isNotEmpty()) {
+            if (relays != 0 || relayNodes.isNotEmpty()) {
+                if (relays != 0) {
                     Text(
-                        text = relayNodeNames.joinToString(", "),
-                        modifier = Modifier.padding(top = 2.dp),
+                        text = pluralStringResource(Res.plurals.relays, relays, relays),
+                        modifier = Modifier.padding(top = 8.dp),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
-            }
-            relay?.let {
-                Text(
-                    text = it,
-                    modifier = Modifier.padding(top = 8.dp),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                if (relayNodes.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        relayNodes.forEach { node -> NodeChip(node = node) }
+                    }
+                }
             }
         }
     },

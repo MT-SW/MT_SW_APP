@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
 import org.meshtastic.core.model.getMessageStatusDetailRes
@@ -64,7 +65,6 @@ import org.meshtastic.core.model.isAckProofForged
 import org.meshtastic.core.model.isMessageStatusRetryable
 import org.meshtastic.core.model.util.getShortDateTime
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.ack_relayed_by
 import org.meshtastic.core.resources.react
 import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.security_signed_verified
@@ -214,6 +214,8 @@ internal fun ReactionDialog(
     reactorNames: Map<String, String> = emptyMap(),
     /** Names the node behind a relay byte. */
     resolveRelay: (Int?) -> String? = { null },
+    /** The known node behind a relay byte (shown as a plate in the delivery window). */
+    resolveRelayNode: (Int?) -> Node? = { null },
     /** False for an archived conversation: a failed reaction cannot be retried there. */
     canReact: Boolean = true,
     onResend: (Reaction) -> Unit = {},
@@ -252,10 +254,7 @@ internal fun ReactionDialog(
             },
             onDismiss = { showStatusDialog = null },
             relays = reaction.relays,
-            relay =
-            resolveRelay(reaction.relayNode)?.let {
-                stringResource(if (isDirectMessage) Res.string.ack_relayed_by else Res.string.relayed_by, it)
-            },
+            relayNodes = listOfNotNull(resolveRelayNode(reaction.relayNode)),
         )
     }
 

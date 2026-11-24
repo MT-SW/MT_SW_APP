@@ -136,6 +136,9 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
                 ->
                     cardShadow(options.glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
 
+                // MT_SW: pop-up windows cast a shadow like the cards do.
+                UiOptions.GROUP_DIALOGS -> cardShadow(options.glassShadowDp(), shape, isDarkSurface())
+
                 else -> this
             }
 

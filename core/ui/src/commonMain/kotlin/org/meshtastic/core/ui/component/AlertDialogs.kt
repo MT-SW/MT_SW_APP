@@ -46,6 +46,9 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -143,13 +146,8 @@ fun MeshtasticDialog(
                 modifier =
                 Modifier.widthIn(min = 280.dp, max = 560.dp)
                     .elementLook(UiOptions.GROUP_DIALOGS, RoundedCornerShape(28.dp))
-                    .then(
-                        if (dialogFade < 1f) {
-                            Modifier.glassEdge(RoundedCornerShape(28.dp), rememberUiOptions().rimDp())
-                        } else {
-                            Modifier
-                        },
-                    ),
+                    // MT_SW: every dialog has the gradient sheen and a thin rim (at least 1 dp) like the other elements.
+                    .glassEdge(RoundedCornerShape(28.dp), maxOf(rememberUiOptions().rimDp(), 1f)),
                 shape = RoundedCornerShape(28.dp),
                 color = AlertDialogDefaults.containerColor.copy(alpha = dialogFade),
                 tonalElevation = AlertDialogDefaults.TonalElevation,
@@ -282,3 +280,51 @@ fun MeshtasticTextDialog(
 
 private const val DIALOG_PERCENT = 100f
 private const val DIALOG_MIN_ALPHA = 0.85f
+
+/**
+ * MT_SW: the same as the Material pop-up window `AlertDialog` (same parameters), but in the look of our app: the shadow
+ * and the thin rim with the sheen of the "dialogs" group, and its see-through level. Use this instead of the Material
+ * one so that every window looks the same.
+ */
+@Composable
+fun AlertDialog(
+    onDismissRequest: () -> Unit,
+    confirmButton: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    dismissButton: @Composable (() -> Unit)? = null,
+    icon: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
+    text: @Composable (() -> Unit)? = null,
+    shape: Shape = AlertDialogDefaults.shape,
+    containerColor: Color = AlertDialogDefaults.containerColor,
+    iconContentColor: Color = AlertDialogDefaults.iconContentColor,
+    titleContentColor: Color = AlertDialogDefaults.titleContentColor,
+    textContentColor: Color = AlertDialogDefaults.textContentColor,
+    tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
+    properties: DialogProperties = DialogProperties(),
+) {
+    val options = rememberUiOptions()
+    val dialogLook = options.element(UiOptions.GROUP_DIALOGS)
+    val fade =
+        if (dialogLook.look == ElementLook.TRANSPARENT || dialogLook.look == ElementLook.GLASS) {
+            (1f - dialogLook.strength / DIALOG_PERCENT * (1f - DIALOG_MIN_ALPHA)).coerceIn(DIALOG_MIN_ALPHA, 1f)
+        } else {
+            1f
+        }
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = confirmButton,
+        modifier = modifier.elementLook(UiOptions.GROUP_DIALOGS, shape).glassEdge(shape, maxOf(options.rimDp(), 1f)),
+        dismissButton = dismissButton,
+        icon = icon,
+        title = title,
+        text = text,
+        shape = shape,
+        containerColor = containerColor.copy(alpha = containerColor.alpha * fade),
+        iconContentColor = iconContentColor,
+        titleContentColor = titleContentColor,
+        textContentColor = textContentColor,
+        tonalElevation = tonalElevation,
+        properties = properties,
+    )
+}

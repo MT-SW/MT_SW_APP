@@ -19,7 +19,7 @@ package org.meshtastic.feature.messaging.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.AlertDialog
+import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text

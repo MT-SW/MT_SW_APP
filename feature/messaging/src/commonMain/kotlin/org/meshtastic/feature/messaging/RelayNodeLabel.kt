@@ -34,6 +34,12 @@ internal fun relayNodeLabel(relayNode: Int?, nodes: List<Node>, ourNodeNum: Int?
     return if (name != null) "$name ($hex)" else hex
 }
 
+/** The known node behind the relay byte [relayNode], or null when none was recorded or no known node ends in it. */
+internal fun relayNodeOf(relayNode: Int?, nodes: List<Node>, ourNodeNum: Int?): Node? {
+    val relay = relayNode?.and(RELAY_BYTE_MASK)?.takeIf { it != 0 } ?: return null
+    return Node.getRelayNode(relay, nodes, ourNodeNum)
+}
+
 /**
  * The relay byte of a received packet, or null when it names no relay: every node stamps its own byte on transmit, so a
  * packet heard direct carries the sender's, and one from MQTT carries a node on the far side of the bridge.

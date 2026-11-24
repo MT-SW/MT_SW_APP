@@ -99,17 +99,15 @@ private fun resolveRelayNodeName(message: Message, nodeMap: Map<Int, Node>, ourN
 
 /**
  * Same suffix-matching logic as [resolveRelayNodeName], applied to every id in [Message.relayNodes] instead of the
- * single legacy [Message.relayNode]. Returns short names for every relay we could resolve; ids we couldn't match
- * (unknown node) are silently dropped from the list.
+ * single legacy [Message.relayNode]. Returns every relay we could resolve; ids we couldn't match (unknown node) are
+ * silently dropped from the list.
  */
-private fun resolveRelayNodeNames(message: Message, nodeMap: Map<Int, Node>, ourNode: Node?): List<String> =
+private fun resolveRelayNodes(message: Message, nodeMap: Map<Int, Node>, ourNode: Node?): List<Node> =
     message.relayNodes.mapNotNull { relayId ->
         val suffix = relayId and RELAY_NODE_SUFFIX_MASK
         nodeMap.values
             .filter { it.num != ourNode?.num && it.lastHeard != 0 && (it.num and RELAY_NODE_SUFFIX_MASK) == suffix }
             .minByOrNull { it.hopsAway }
-            ?.user
-            ?.short_name
     }
 
 /**
@@ -189,14 +187,20 @@ internal fun MessageListPaged(
     showStatusDialog?.let { clicked ->
         // Read the live row so an ack landing while the dialog is open updates its status and relay.
         val message = state.messages.itemSnapshotList.items.firstOrNull { it.uuid == clicked.uuid } ?: clicked
-        val relayNodeNames =
-            remember(nodeMap, message.relayNodes) { resolveRelayNodeNames(message, nodeMap, state.ourNode) }
+        // One list for the window: the node that relayed it and the relays heard, each node once.
+        val relayNodes =
+            remember(nodeMap, message.relayNodes, message.relayNode) {
+                (
+                    listOfNotNull(relayNodeOf(message.relayNode, state.nodes, state.ourNode?.num)) +
+                        resolveRelayNodes(message, nodeMap, state.ourNode)
+                    )
+                    .distinctBy { it.num }
+            }
         MessageStatusDialog(
             message = message,
             isDirectMessage = isDirectMessageConversation,
-            relayNodeLabel = relayNodeLabel(message.relayNode, state.nodes, state.ourNode?.num),
             resendOption = message.isStatusRetryable(isDirectMessageConversation) && state.canSend,
-            relayNodeNames = relayNodeNames,
+            relayNodes = relayNodes,
             onResend = {
                 handlers.onResendMessage(message)
                 showStatusDialog = null
@@ -215,6 +219,7 @@ internal fun MessageListPaged(
             myId = state.ourNode?.user?.id,
             reactorNames = reactorNames,
             resolveRelay = { relay -> relayNodeLabel(relay, state.nodes, state.ourNode?.num) },
+            resolveRelayNode = { relay -> relayNodeOf(relay, state.nodes, state.ourNode?.num) },
             canReact = state.canReact,
             onDismiss = { showReactionDialog = null },
             onResend = { reaction ->
