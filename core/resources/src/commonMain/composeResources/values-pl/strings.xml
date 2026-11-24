@@ -4663,4 +4663,7 @@
     <string name="view_style_standard">Standardowy (jednolite kolory z cienkim obrysem)</string>
     <string name="view_style_flat">Płaski (jednolite kolory, bez obrysu)</string>
     <string name="view_style_summary">Wygląd panoramy terenu (grzbiety i budynki), wykresu anteny i przycisków wyboru.</string>
+    <string name="vanity_chip_preview">Podgląd plakietki w motywach</string>
+    <string name="vanity_chip_preview_hint">Tak wybrany kolor wygląda na plakietce węzła w motywie standardowym i w dwóch nasyconych.</string>
+    <string name="vanity_theme_standard">Standardowy</string>
 </resources>

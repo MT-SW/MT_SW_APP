@@ -4361,6 +4361,9 @@ user_info
 user_string
 userinfo
 uv_lux
+vanity_chip_preview
+vanity_chip_preview_hint
+vanity_theme_standard
 via_api
 via_mqtt
 via_udp

@@ -4451,6 +4451,9 @@
     <string name="user_string">User String</string>
     <string name="userinfo">User Info</string>
     <string name="uv_lux">UV Lux</string>
+    <string name="vanity_chip_preview">Chip preview in the themes</string>
+    <string name="vanity_chip_preview_hint">How the chosen colour looks on a node chip in the standard theme and in the two saturated ones.</string>
+    <string name="vanity_theme_standard">Standard</string>
     <string name="via_api">via API</string>
     <string name="via_mqtt">via MQTT</string>
     <string name="via_udp">via UDP</string>

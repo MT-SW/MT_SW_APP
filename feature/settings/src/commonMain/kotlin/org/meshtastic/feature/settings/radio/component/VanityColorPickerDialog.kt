@@ -53,18 +53,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.ByteString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.theme_very_vivid
+import org.meshtastic.core.resources.theme_vivid
+import org.meshtastic.core.resources.vanity_chip_preview
+import org.meshtastic.core.resources.vanity_chip_preview_hint
+import org.meshtastic.core.resources.vanity_theme_standard
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Slider
+import org.meshtastic.core.ui.component.nodeChipLook
+import org.meshtastic.core.ui.component.nodeChipTextColor
+import org.meshtastic.core.ui.component.rememberNodeChipStyle
+import org.meshtastic.core.ui.theme.SATURATION_VERY_VIVID
+import org.meshtastic.core.ui.theme.SATURATION_VIVID
+import org.meshtastic.core.ui.theme.saturated
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -138,6 +154,64 @@ private sealed interface VanityGrindStatus {
     data object TimedOut : VanityGrindStatus
 
     data object FirmwareTooOld : VanityGrindStatus
+}
+
+/**
+ * MT_SW: how the chosen colour looks as a node chip (the plate with a short name) in the three kinds of theme: the
+ * standard one and the two saturated ones, whose stronger colours also strengthen the colour of a node chip.
+ */
+@Composable
+private fun ThemeChipSamples(rgb: Int) {
+    val base = Color(0xFF000000.toInt() or rgb)
+    val style = rememberNodeChipStyle()
+    val samples =
+        listOf(
+            stringResource(Res.string.vanity_theme_standard) to base,
+            stringResource(Res.string.theme_vivid) to base.saturated(SATURATION_VIVID / 100.0),
+            stringResource(Res.string.theme_very_vivid) to base.saturated(SATURATION_VERY_VIVID / 100.0),
+        )
+    Text(
+        text = stringResource(Res.string.vanity_chip_preview),
+        modifier = Modifier.padding(top = 16.dp),
+        style = MaterialTheme.typography.titleSmall,
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        samples.forEach { (name, color) ->
+            val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier =
+                    Modifier.width(64.dp)
+                        .then(nodeChipLook(color, textColor, MaterialTheme.shapes.small))
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(horizontal = 8.dp, vertical = 5.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "SW01",
+                        color = nodeChipTextColor(style, textColor),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                    )
+                }
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+            }
+        }
+    }
+    Text(
+        text = stringResource(Res.string.vanity_chip_preview_hint),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(top = 4.dp),
+    )
 }
 
 @Composable
@@ -232,6 +306,8 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                         )
                     }
                 }
+
+                ThemeChipSamples(selectedColor)
 
                 val editable = status !is VanityGrindStatus.Grinding
                 val hsv = rgbToHsv(selectedColor)
@@ -355,6 +431,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             ColorPreview(label = "Wybrany", color = Color(0xFF000000.toInt() or selectedColor))
                             ColorPreview(label = "Wynik", color = Color(current.result.nodeColor))
                         }
+                        ThemeChipSamples(current.result.nodeColor and 0xFFFFFF)
                         Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
                             TextButton(onClick = { status = VanityGrindStatus.Idle }, modifier = Modifier.weight(1f)) {
                                 Text(text = "Szukaj ponownie")
