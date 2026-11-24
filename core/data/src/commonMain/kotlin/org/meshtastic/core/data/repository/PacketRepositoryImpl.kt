@@ -21,8 +21,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -68,16 +70,22 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
         .retryOnDbPoolFailure("PacketRepository.getContacts")
         .map { map -> map.mapValues { it.value.data } }
 
-    override fun getContactsPaged(): Flow<PagingData<Pair<String, DataPacket>>> = Pager(
-        config =
-        PagingConfig(
-            pageSize = CONTACTS_PAGE_SIZE,
-            enablePlaceholders = false,
-            initialLoadSize = CONTACTS_PAGE_SIZE,
-        ),
-        pagingSourceFactory = { dbManager.currentDb.value.packetDao().getContactKeysPaged() },
-    )
-        .flow
+    // MT_SW: the list is built again when the active database changes (a device was switched). A list that kept its
+    // query to the old database never saw the new messages, until the person left the conversation and came back.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getContactsPaged(): Flow<PagingData<Pair<String, DataPacket>>> = dbManager.currentDb
+        .flatMapLatest { db ->
+            Pager(
+                config =
+                PagingConfig(
+                    pageSize = CONTACTS_PAGE_SIZE,
+                    enablePlaceholders = false,
+                    initialLoadSize = CONTACTS_PAGE_SIZE,
+                ),
+                pagingSourceFactory = { db.packetDao().getContactKeysPaged() },
+            )
+                .flow
+        }
         .map { pagingData -> pagingData.map { it.contact_key to it.data } }
 
     override suspend fun getMessageCount(contact: String): Int = dbManager.withReadDb {
@@ -249,20 +257,25 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
     ): Flow<PagingData<Message>> =
         pagedMessages(contactKey, getNode) { dao -> dao.getMessagesFromPaged(contactKey, includeFiltered) }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun pagedMessages(
         contactKey: String,
         getNode: suspend (String?) -> Node,
         pagingSource: (PacketDao) -> PagingSource<Int, PacketEntity>,
-    ): Flow<PagingData<Message>> = Pager(
-        config =
-        PagingConfig(
-            pageSize = MESSAGES_PAGE_SIZE,
-            enablePlaceholders = false,
-            initialLoadSize = MESSAGES_PAGE_SIZE,
-        ),
-        pagingSourceFactory = { pagingSource(dbManager.currentDb.value.packetDao()) },
-    )
-        .flow
+    ): Flow<PagingData<Message>> = dbManager.currentDb
+        .flatMapLatest { db ->
+            // MT_SW: built again for every active database, see getContactsPaged.
+            Pager(
+                config =
+                PagingConfig(
+                    pageSize = MESSAGES_PAGE_SIZE,
+                    enablePlaceholders = false,
+                    initialLoadSize = MESSAGES_PAGE_SIZE,
+                ),
+                pagingSourceFactory = { pagingSource(db.packetDao()) },
+            )
+                .flow
+        }
         .map { pagingData ->
             val cachedGetNode = memoize(getNode)
             val replyCache = mutableMapOf<Int, PacketEntity?>()
