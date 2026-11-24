@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.settings.radio.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -119,7 +122,9 @@ internal fun MqttTopicFinderContent(
     onPick: (String) -> Unit,
     onRestart: () -> Unit,
 ) {
-    LazyColumn(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    val barList = rememberLazyListState()
+    Box(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         item {
             Text(
                 text = stringResource(Res.string.mqtt_topic_finder),
@@ -134,6 +139,8 @@ internal fun MqttTopicFinderContent(
             activeRows(plan, state, current, onPick)
         }
         item { CustomTopic(onPick) }
+    }
+    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }
 

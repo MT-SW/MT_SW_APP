@@ -19,6 +19,7 @@
 
 package org.meshtastic.feature.map.planner.ui
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -221,11 +222,13 @@ private fun PlannerSheetContent(
         PlannerHeader(onClose = onDismiss)
         HorizontalDivider()
         Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+            val barScroll = rememberScrollState()
+            Box {
             Column(
                 modifier =
                 Modifier.widthIn(max = CONTENT_MAX_WIDTH)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(barScroll)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -239,6 +242,8 @@ private fun PlannerSheetContent(
                 CoverageSection(state = state, vm = vm, bridge = bridge, onShownOnMap = onDismiss)
                 ExportSection(state = state, vm = vm, bridge = bridge, onShownOnMap = onDismiss)
                 CreditsFooter()
+            }
+            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
             }
         }
     }

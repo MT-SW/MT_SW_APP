@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -100,10 +101,12 @@ fun NodeListHelp(onDismiss: () -> Unit) {
             enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
         )
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+        val barScroll = rememberScrollState()
+        Box {
         Column(
             modifier =
             Modifier.fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(barScroll)
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -223,6 +226,8 @@ fun NodeListHelp(onDismiss: () -> Unit) {
             )
 
             roleHelpEntries.forEach { (role, descRes) -> RoleEntry(role, stringResource(descRes)) }
+        }
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

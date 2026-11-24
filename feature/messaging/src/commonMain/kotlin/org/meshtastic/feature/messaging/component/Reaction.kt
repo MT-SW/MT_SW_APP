@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.messaging.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -286,7 +289,9 @@ internal fun ReactionDialog(
 
     HorizontalDivider(Modifier.padding(vertical = 8.dp))
 
-    LazyColumn(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    val barList = rememberLazyListState()
+    Box(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         items(filteredReactions, key = { reaction -> "${reaction.user.id}:${reaction.emoji}" }) { reaction ->
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Row(
@@ -394,5 +399,7 @@ internal fun ReactionDialog(
                 }
             }
         }
+    }
+    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }

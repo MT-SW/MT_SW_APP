@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -85,9 +86,13 @@ fun EventInfoSheet(edition: EventFirmwareEdition, onDismiss: () -> Unit) {
     val palette = edition.brandPalette()
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+        val barScroll = rememberScrollState()
+        Box {
+        Column(Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 24.dp)) {
             EventHeader(edition, accent, palette)
             EventDetails(edition = edition, palette = palette, onOpenUri = uriHandler::openUri)
+        }
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

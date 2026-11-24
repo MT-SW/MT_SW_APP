@@ -19,6 +19,9 @@
 
 package org.meshtastic.feature.settings.sniffer
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -164,7 +167,9 @@ internal fun SnifferGearSheet(
     onLoadLogClick: () -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom = 16.dp)) {
+        val barScroll = rememberScrollState()
+        Box {
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 16.dp)) {
             SnifferSourceSelector(
                 activeSource = activeSource,
                 onSelectSource = onSelectSource,
@@ -207,6 +212,8 @@ internal fun SnifferGearSheet(
                 leadingIcon = MeshtasticIcons.FolderOpen,
                 onClick = onLoadLogClick,
             )
+        }
+        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

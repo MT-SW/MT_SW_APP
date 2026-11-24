@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.settings.liveupdate
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -271,7 +274,9 @@ fun LiveUpdateChooserSheet(
                         modifier = Modifier.padding(vertical = 16.dp),
                     )
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp).selectableGroup()) {
+                    val barList = rememberLazyListState()
+                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)) {
+                    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp).selectableGroup()) {
                         items(shown, key = { it.num }) { node ->
                             NodeChoiceRow(
                                 node = node,
@@ -279,6 +284,8 @@ fun LiveUpdateChooserSheet(
                                 onSelect = { selectedNum = node.num },
                             )
                         }
+                    }
+                    FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
                     }
                 }
             }

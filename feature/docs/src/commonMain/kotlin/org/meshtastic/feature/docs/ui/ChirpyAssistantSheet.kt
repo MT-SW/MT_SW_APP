@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.docs.ui
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -150,7 +152,8 @@ private fun ChirpyChatSheet(
 
             // Message list
             val listState = rememberLazyListState()
-            LazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
                 items(state.messages, key = { it.id }) { message ->
                     ChirpyMessageBubble(message = message, onNavigateToPage = onNavigateToPage)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -159,6 +162,8 @@ private fun ChirpyChatSheet(
                 if (state.isLoading) {
                     item { ThinkingBubble() }
                 }
+            }
+            FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
             }
 
             // Input bar — matches messaging MessageInput style

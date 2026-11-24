@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.connections.ui.components
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -90,8 +92,10 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
         }
 
     // Scrolls so a short window (landscape, large font) can still reach the actions.
+    val barScroll = rememberScrollState()
+    Box {
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier = Modifier.verticalScroll(barScroll).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         OutlinedTextField(
@@ -132,6 +136,8 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
                 Text(stringResource(Res.string.add_network_device))
             }
         }
+    }
+    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -104,9 +106,11 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
     val buckets = remember(nodes, cutoffSecs) { hopHistogram(nodes, cutoffSecs) }
     val maxCount = buckets.maxOrNull() ?: 0
 
+    val barScroll = rememberScrollState()
+    Box {
     Column(
         modifier =
-        Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp),
+        Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
@@ -134,6 +138,8 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
         } else {
             buckets.forEachIndexed { hop, count -> HopBar(hop = hop, count = count, maxCount = maxCount) }
         }
+    }
+    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

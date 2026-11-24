@@ -31,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuGroupShapes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpOffset
@@ -66,14 +67,15 @@ fun DropdownMenu(
                 .popupRim(shape)
                 .clip(shape),
         ) {
+            val scroll = rememberScrollState()
             Column(
                 modifier =
-                Modifier.width(IntrinsicSize.Max)
-                    .verticalScroll(rememberScrollState())
-                    .padding(vertical = MENU_PADDING_DP.dp),
+                Modifier.width(IntrinsicSize.Max).verticalScroll(scroll).padding(vertical = MENU_PADDING_DP.dp),
             ) {
                 content()
             }
+            // A long menu can be dragged by its bar on the computer, like every other scrolling list.
+            FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

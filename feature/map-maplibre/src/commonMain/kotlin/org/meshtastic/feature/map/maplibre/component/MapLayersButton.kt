@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -123,7 +126,9 @@ private fun MapLayersSheet(
 ) {
     // The whole sheet scrolls, and the imported layers (with their add buttons) come first with their own bounded
     // height, so they are never pushed off the bottom of a full-screen sheet.
-    Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+    val barScroll = rememberScrollState()
+    Box {
+    Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll)) {
         // A column, not a box: the slot can bring several parts (imported layers, signal survey) and a box would draw
         // them on top of each other.
         Column(modifier = Modifier.fillMaxWidth()) { extra() }
@@ -175,6 +180,8 @@ private fun MapLayersSheet(
                 offlineTarget.showRegion(bounds)
             },
         )
+    }
+    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 
