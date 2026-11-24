@@ -258,7 +258,12 @@ private fun TopBarActions(
     DeviceBarSlot {
         AnimatedVisibility(visible = chipVisible, enter = fadeIn(), exit = fadeOut()) {
             chipNode?.let { node ->
-                NodeChip(modifier = Modifier.padding(start = 16.dp), node = node, onClick = onClickChip)
+                NodeChip(
+                    modifier = Modifier.padding(start = 16.dp),
+                    node = node,
+                    onClick = onClickChip,
+                    blinkWithActivity = true,
+                )
             }
         }
         // The radio chooser sits right next to the plate of our node (after the SOS button when there is no plate).

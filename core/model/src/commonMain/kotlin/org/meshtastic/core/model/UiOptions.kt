@@ -181,6 +181,12 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         const val RADIO_ALERT_SPEED = "radios.alert.speed"
         val RADIO_ALERT_PERIOD_MS = intArrayOf(2400, 1600, 1000)
 
+        /** 1 = the shadow of the plate of our node blinks blue and green together with the connection icon (0 = off). */
+        const val NODE_CHIP_BLINK = "nodeChip.blink"
+
+        /** With [NODE_CHIP_BLINK] on: 1 = received packets blink the shadow in the colour of the theme (0 = green). */
+        const val NODE_CHIP_BLINK_THEME = "nodeChip.blinkTheme"
+
         /** Whether the radio chooser shows the number of connected radios (1 = yes). */
         const val RADIO_COUNT = "radios.count"
 
@@ -318,6 +324,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_ALERT_COLOR, 0)
             put(RADIO_ALERT_SPEED, 1)
             put(RADIO_COUNT, 1)
+            put(NODE_CHIP_BLINK, 0)
+            put(NODE_CHIP_BLINK_THEME, 0)
             put(RADIO_BACKGROUND, 1)
             put(CHART_STYLE, CHART_STYLE_RIBBON)
             put(CHART_STYLE_HEALTH, CHART_STYLE_RIBBON)

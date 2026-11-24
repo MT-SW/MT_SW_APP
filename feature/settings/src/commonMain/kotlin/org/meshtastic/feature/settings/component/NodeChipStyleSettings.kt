@@ -40,6 +40,13 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_chip_blink
+import org.meshtastic.core.resources.node_chip_blink_off
+import org.meshtastic.core.resources.node_chip_blink_on
+import org.meshtastic.core.resources.node_chip_blink_receive
+import org.meshtastic.core.resources.node_chip_blink_receive_green
+import org.meshtastic.core.resources.node_chip_blink_receive_theme
+import org.meshtastic.core.resources.node_chip_blink_summary
 import org.meshtastic.core.resources.node_chip_style
 import org.meshtastic.core.resources.node_chip_style_flat
 import org.meshtastic.core.resources.node_chip_style_glass_3d
@@ -108,6 +115,29 @@ fun NodeChipStyleSettings(options: UiOptions, onChange: (String, Int) -> Unit) {
             selectedItem = options[UiOptions.VIEW_STYLE],
             onItemSelected = { onChange(UiOptions.VIEW_STYLE, it) },
             summary = stringResource(Res.string.view_style_summary),
+        )
+        DropDownPreference(
+            title = stringResource(Res.string.node_chip_blink),
+            enabled = true,
+            items =
+            listOf(
+                0 to stringResource(Res.string.node_chip_blink_off),
+                1 to stringResource(Res.string.node_chip_blink_on),
+            ),
+            selectedItem = options[UiOptions.NODE_CHIP_BLINK],
+            onItemSelected = { onChange(UiOptions.NODE_CHIP_BLINK, it) },
+            summary = stringResource(Res.string.node_chip_blink_summary),
+        )
+        DropDownPreference(
+            title = stringResource(Res.string.node_chip_blink_receive),
+            enabled = options[UiOptions.NODE_CHIP_BLINK] == 1,
+            items =
+            listOf(
+                0 to stringResource(Res.string.node_chip_blink_receive_green),
+                1 to stringResource(Res.string.node_chip_blink_receive_theme),
+            ),
+            selectedItem = options[UiOptions.NODE_CHIP_BLINK_THEME],
+            onItemSelected = { onChange(UiOptions.NODE_CHIP_BLINK_THEME, it) },
         )
     }
 }

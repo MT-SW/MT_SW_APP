@@ -98,6 +98,8 @@ import org.meshtastic.core.resources.nav_bar_rim
 import org.meshtastic.core.resources.nav_bar_select
 import org.meshtastic.core.resources.nav_bar_show
 import org.meshtastic.core.resources.node_active_alert
+import org.meshtastic.core.resources.node_chip_blink
+import org.meshtastic.core.resources.node_chip_blink_receive
 import org.meshtastic.core.resources.node_chip_style
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_neighbors
@@ -350,6 +352,8 @@ object SettingsSearchCatalog {
             Res.string.radio_count to SettingsRoute.ConnectionCenter,
             Res.string.radio_chooser_settings to SettingsRoute.ConnectionCenter,
             Res.string.node_chip_style to SettingsRoute.ElementLook,
+            Res.string.node_chip_blink to SettingsRoute.ElementLook,
+            Res.string.node_chip_blink_receive to SettingsRoute.ElementLook,
             Res.string.view_style to SettingsRoute.ElementLook,
             Res.string.chart_style to SettingsRoute.ElementLook,
             Res.string.chart_style_health to SettingsRoute.ElementLook,
