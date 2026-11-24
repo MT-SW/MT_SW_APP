@@ -60,8 +60,9 @@ fun DropdownMenu(
         Box(
             modifier =
             modifier
-                .elementLook(UiOptions.GROUP_DIALOGS, shape)
+                // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under it.
                 .background(MaterialTheme.colorScheme.surface, shape)
+                .elementLook(UiOptions.GROUP_DIALOGS, shape)
                 .popupRim(shape)
                 .clip(shape),
         ) {

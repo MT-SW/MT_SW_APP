@@ -37,13 +37,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private const val MIN_THUMB_HEIGHT_FRACTION = 0.05f
-private const val TRACK_ALPHA = 0.18f
 
 /**
  * A small draggable thumb along the trailing edge of [listState]'s list for fast-scrolling through a long list -- built
@@ -80,7 +80,7 @@ fun FastScrollSidebar(
     reverseLayout: Boolean = false,
 ) {
     if (!isDesktopPlatform) return
-    val thumbColor = MaterialTheme.colorScheme.outline
+    val thumbColor = scrollbarColor()
     val coroutineScope = rememberCoroutineScope()
     val sizeCache = remember(listState) { LazyItemSizeCache() }
     // Everything that changes while scrolling is read inside the draw / pointer lambdas below (never in composition),
@@ -217,7 +217,7 @@ private fun lazyScrollMetrics(
 @Composable
 fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
     if (!isDesktopPlatform) return
-    val thumbColor = MaterialTheme.colorScheme.outline
+    val thumbColor = scrollbarColor()
     val coroutineScope = rememberCoroutineScope()
     val canScroll by remember(scrollState) { derivedStateOf { scrollState.maxValue > 0 } }
     if (!canScroll) return
@@ -276,26 +276,41 @@ fun FastScrollSidebar(scrollState: ScrollState, modifier: Modifier = Modifier) {
     )
 }
 
-/** A faint full-height groove so the user can see where the bar is and where a click will land. */
+/** White on a dark surface, the text colour on a light one: the solid thumb has to stand out from the track. */
+@Composable
+private fun scrollbarColor(): Color = if (isDarkSurface()) Color.White else MaterialTheme.colorScheme.onSurface
+
+private const val TRACK_WIDTH_DP = 8
+private const val TRACK_EDGE_DP = 1.5f
+private const val THUMB_WIDTH_DP = 4
+private const val TRACK_EDGE_ALPHA = 0.55f
+
+/**
+ * MT_SW: the groove is an outline only: two long lines joined into one capsule with rounded ends. The thumb is the
+ * solid bar inside it.
+ */
 private fun DrawScope.drawTrack(color: Color) {
-    val trackWidth = 4.dp.toPx()
+    val trackWidth = TRACK_WIDTH_DP.dp.toPx()
+    val edge = TRACK_EDGE_DP.dp.toPx()
+    val inset = edge / 2f
     drawRoundRect(
-        color = color.copy(alpha = TRACK_ALPHA),
-        topLeft = Offset((size.width - trackWidth) / 2f, 0f),
-        size = Size(trackWidth, size.height),
-        cornerRadius = CornerRadius(2.dp.toPx()),
+        color = color.copy(alpha = TRACK_EDGE_ALPHA),
+        topLeft = Offset((size.width - trackWidth) / 2f + inset, inset),
+        size = Size(trackWidth - edge, size.height - edge),
+        cornerRadius = CornerRadius((trackWidth - edge) / 2f),
+        style = Stroke(width = edge),
     )
 }
 
 private fun DrawScope.drawThumb(color: Color, scrollFraction: Float, thumbFraction: Float) {
     val minThumbPx = MIN_THUMB_DP.dp.toPx()
     val thumbHeight = (size.height * thumbFraction).coerceAtLeast(minThumbPx).coerceAtMost(size.height)
-    val thumbWidth = 4.dp.toPx()
+    val thumbWidth = THUMB_WIDTH_DP.dp.toPx()
     val top = (size.height - thumbHeight) * scrollFraction
     drawRoundRect(
         color = color,
         topLeft = Offset((size.width - thumbWidth) / 2f, top),
         size = Size(thumbWidth, thumbHeight),
-        cornerRadius = CornerRadius(2.dp.toPx()),
+        cornerRadius = CornerRadius(thumbWidth / 2f),
     )
 }

@@ -499,10 +499,11 @@ MessageActionsContent(
         Surface(
             modifier =
             Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp), barShape)
                 .elementLook(UiOptions.GROUP_DIALOGS, barShape)
                 .popupRim(barShape),
             shape = barShape,
-            tonalElevation = 3.dp,
+            color = Color.Transparent,
             shadowElevation = 0.dp,
         ) {
             QuickEmojiRow(

@@ -117,7 +117,10 @@ internal fun NodeLinkLayers(links: List<MapLink>, nodes: List<Node>) {
     )
 }
 
-/** A link drawn as an outline only: two thin edges in the colour of the link round a narrow empty gap. */
+/**
+ * A link drawn as an outline only: one capsule in the colour of the link with rounded ends, with a pale, see-through
+ * core, so the two edges are joined at the ends instead of running on as two separate lines.
+ */
 @Composable
 private fun HollowLinkLayer(id: String, source: GeoJsonSource, opacity: Float) {
     LineLayer(
@@ -126,9 +129,17 @@ private fun HollowLinkLayer(id: String, source: GeoJsonSource, opacity: Float) {
         cap = const(LineCap.Round),
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.Gray)),
-        width = const(HOLLOW_EDGE_DP.dp),
-        gapWidth = const(HOLLOW_GAP_DP.dp),
+        width = const((HOLLOW_EDGE_DP * 2 + HOLLOW_GAP_DP).dp),
         opacity = const(opacity),
+    )
+    LineLayer(
+        id = "$id-core",
+        source = source,
+        cap = const(LineCap.Round),
+        join = const(LineJoin.Round),
+        color = const(Color.White),
+        width = const(HOLLOW_GAP_DP.dp),
+        opacity = const(HOLLOW_CORE_OPACITY),
     )
 }
 
@@ -171,6 +182,7 @@ private const val HOLLOW_EDGE_DP = 1.5f
 
 /** The empty space between the two edges of such a link. */
 private const val HOLLOW_GAP_DP = 0.75f
+private const val HOLLOW_CORE_OPACITY = 0.7f
 
 /** Together the two edges add this much to the width of a line (one dp on each side). */
 private const val OUTLINE_EXTRA_DP = 2
