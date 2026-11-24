@@ -16,6 +16,10 @@
  */
 package org.meshtastic.feature.map.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -92,7 +96,9 @@ fun CustomTileProviderManager(
         )
     }
 
-    LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 16.dp)) {
+    val barList = rememberLazyListState()
+    Box {
+    LazyColumn(state = barList, modifier = modifier, contentPadding = PaddingValues(bottom = 16.dp)) {
         item {
             Text(
                 text = stringResource(Res.string.manage_custom_tile_sources),
@@ -170,6 +176,8 @@ fun CustomTileProviderManager(
                 }
             }
         }
+    }
+        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }
 

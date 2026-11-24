@@ -261,6 +261,12 @@ internal fun ReactionDialog(
         )
     }
 
+
+    val barList = rememberLazyListState()
+    Box(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        // The emoji filter row scrolls with the list, so the window keeps one smooth background.
+        item {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         items(groupedEmojis.entries.toList(), key = { it.key }) { entry ->
             val emoji = entry.key
@@ -288,10 +294,7 @@ internal fun ReactionDialog(
     }
 
     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-
-    val barList = rememberLazyListState()
-    Box(modifier = Modifier.fillMaxWidth()) {
-    LazyColumn(state = barList, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        }
         items(filteredReactions, key = { reaction -> "${reaction.user.id}:${reaction.emoji}" }) { reaction ->
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Row(

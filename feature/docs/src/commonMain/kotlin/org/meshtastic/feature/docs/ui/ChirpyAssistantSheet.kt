@@ -144,16 +144,15 @@ private fun ChirpyChatSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize().imePadding().padding(16.dp)) {
-            Text(
-                text = stringResource(CoreRes.string.chirpy_assistant_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 12.dp),
-            )
-
             // Message list
             val listState = rememberLazyListState()
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
+                item { Text(
+                                text = stringResource(CoreRes.string.chirpy_assistant_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(bottom = 12.dp),
+                            ) }
                 items(state.messages, key = { it.id }) { message ->
                     ChirpyMessageBubble(message = message, onNavigateToPage = onNavigateToPage)
                     Spacer(modifier = Modifier.height(8.dp))

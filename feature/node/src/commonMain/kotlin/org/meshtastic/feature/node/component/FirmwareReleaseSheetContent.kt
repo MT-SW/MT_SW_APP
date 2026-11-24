@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,8 +51,10 @@ import org.meshtastic.core.ui.util.rememberOpenUrl
 fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modifier = Modifier) {
     val openUrl = rememberOpenUrl()
 
+    val barScroll = rememberScrollState()
+    Box {
     Column(
-        modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp).fillMaxWidth(),
+        modifier = modifier.verticalScroll(barScroll).padding(16.dp).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(text = firmwareRelease.title, style = MaterialTheme.typography.titleLarge)
@@ -73,5 +78,7 @@ fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modi
                 Text(text = stringResource(Res.string.download))
             }
         }
+    }
+    FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
