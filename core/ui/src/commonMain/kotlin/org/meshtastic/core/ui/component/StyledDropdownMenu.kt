@@ -16,27 +16,19 @@
  */
 package org.meshtastic.core.ui.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.model.UiOptions
 
 private const val MENU_CORNER_DP = 20
-private const val MENU_MARGIN_DP = 14
-private const val MENU_BACKING_ALPHA = 0.97f
-private const val MENU_PADDING_DP = 8
+private const val MENU_SHADOW_DP = 8
 
 /**
  * MT_SW: the same as the Material pop-up menu `DropdownMenu` (the parameters the app uses), but in the look of our app:
@@ -52,30 +44,20 @@ fun DropdownMenu(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(MENU_CORNER_DP.dp)
-    val backing = MaterialTheme.colorScheme.surface.copy(alpha = MENU_BACKING_ALPHA * popupFade())
+    // Opaque, so the text of the screen under the menu never shows through it.
+    val backing = MaterialTheme.colorScheme.surface
+    // The window itself is the rounded, filled surface (no transparent margin around a smaller bubble), so there is
+    // never a see-through strip above or below the content.
     androidx.compose.material3.DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
+        modifier = modifier,
         offset = offset,
-        shape = RoundedCornerShape(0.dp),
-        containerColor = Color.Transparent,
+        shape = shape,
+        containerColor = backing,
         tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
+        shadowElevation = MENU_SHADOW_DP.dp,
     ) {
-        // The margin gives the shadow room, so the menu window does not cut the edges of the menu.
-        Box(modifier = Modifier.padding(MENU_MARGIN_DP.dp)) {
-            Column(
-                modifier =
-                modifier
-                    .elementLook(UiOptions.GROUP_DIALOGS, shape)
-                    .background(backing, shape)
-                    .popupRim(shape)
-                    .clip(shape)
-                    .padding(vertical = MENU_PADDING_DP.dp)
-                    .width(IntrinsicSize.Max),
-            ) {
-                content()
-            }
-        }
+        Column(modifier = Modifier.popupRim(shape).width(IntrinsicSize.Max)) { content() }
     }
 }
