@@ -31,6 +31,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -277,7 +279,8 @@ fun MessageItem(
         ModalBottomSheet(onDismissRequest = { activeSheet = null }, sheetState = sheetState) {
             when (activeSheet) {
                 ActiveSheet.Actions -> {
-                    MessageActionsContent(
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+MessageActionsContent(
                         quickEmojis = if (canReact) quickEmojis else emptyList(),
                         canReply = canReply,
                         onReply = {
@@ -351,6 +354,7 @@ fun MessageItem(
                             }
                         },
                     )
+}
                 }
 
                 ActiveSheet.MuteSender -> Unit
