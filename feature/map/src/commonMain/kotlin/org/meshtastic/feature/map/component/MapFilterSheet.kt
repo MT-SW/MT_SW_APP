@@ -30,6 +30,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -103,7 +106,9 @@ fun MapFilterSheet(
 /** The sheet's body, separate from the sheet itself so it can be tested without a window manager to host a modal. */
 @Composable
 internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState, actions: MapFilterActions) {
-    Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+    val scroll = rememberScrollState()
+    Box {
+    Column(modifier = Modifier.fillMaxWidth().verticalScroll(scroll)) {
         Text(
             text = stringResource(Res.string.map_filter_title),
             style = MaterialTheme.typography.headlineSmall,
@@ -173,6 +178,8 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
             label = { stringResource(Res.string.map_filter_distance_km, it / METERS_PER_KM) },
             onSelect = actions.onSelectMaxDistance,
         )
+    }
+    FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 
