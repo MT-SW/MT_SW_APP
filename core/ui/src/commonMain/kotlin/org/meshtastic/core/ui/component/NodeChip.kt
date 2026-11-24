@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -121,7 +122,7 @@ private const val BLINK_DEFAULT_RADIUS_DP = 8f
  * is drawn in the draw phase from the activity flow, so a packet never recomposes the bar.
  */
 @Composable
-private fun Modifier.activityBlink(shape: Shape): Modifier {
+internal fun Modifier.activityBlink(shape: Shape): Modifier {
     val options = rememberUiOptions()
     val flow = LocalMeshActivity.current
     if (flow == null || options[UiOptions.NODE_CHIP_BLINK] != 1) return this
@@ -138,26 +139,31 @@ private fun Modifier.activityBlink(shape: Shape): Modifier {
             alpha.animateTo(0f, tween(durationMillis = BLINK_MILLIS, easing = LinearEasing))
         }
     }
-    return drawBehind {
-        val a = alpha.value
-        if (a <= 0f) return@drawBehind
-        val corner =
-            (shape.createOutline(size, layoutDirection, this) as? Outline.Rounded)?.roundRect?.topLeftCornerRadius?.x
-                ?: BLINK_DEFAULT_RADIUS_DP.dp.toPx()
-        val reach = BLINK_REACH_DP.dp.toPx()
-        for (i in BLINK_LAYERS downTo 1) {
-            val grow = reach * i / BLINK_LAYERS
-            val inner = 1f - (i - 1f) / BLINK_LAYERS
-            val outer = 1f - i.toFloat() / BLINK_LAYERS
-            drawRoundRect(
-                color = glow.copy(alpha = BLINK_ALPHA * a * (inner * inner - outer * outer)),
-                topLeft = Offset(-grow, -grow),
-                size = Size(size.width + 2 * grow, size.height + 2 * grow),
-                cornerRadius = CornerRadius(corner + grow),
-            )
-        }
+    return drawBehind { drawBlinkGlow(shape, glow, alpha.value) }
+}
+
+/** MT_SW: the layered soft glow around a rounded shape used by every blinking shadow (top-bar chip and node list). */
+internal fun DrawScope.drawBlinkGlow(shape: Shape, glow: Color, a: Float) {
+    if (a <= 0f) return
+    val corner =
+        (shape.createOutline(size, layoutDirection, this) as? Outline.Rounded)?.roundRect?.topLeftCornerRadius?.x
+            ?: BLINK_DEFAULT_RADIUS_DP.dp.toPx()
+    val reach = BLINK_REACH_DP.dp.toPx()
+    for (i in BLINK_LAYERS downTo 1) {
+        val grow = reach * i / BLINK_LAYERS
+        val inner = 1f - (i - 1f) / BLINK_LAYERS
+        val outer = 1f - i.toFloat() / BLINK_LAYERS
+        drawRoundRect(
+            color = glow.copy(alpha = BLINK_ALPHA * a * (inner * inner - outer * outer)),
+            topLeft = Offset(-grow, -grow),
+            size = Size(size.width + 2 * grow, size.height + 2 * grow),
+            cornerRadius = CornerRadius(corner + grow),
+        )
     }
 }
+
+/** MT_SW: blink length shared with the node list. */
+internal const val NODE_BLINK_MILLIS = BLINK_MILLIS
 
 @Suppress("MagicNumber")
 @Preview

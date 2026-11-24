@@ -4660,10 +4660,10 @@
     <string name="wifi_provision_pick_device">Wybierz urządzenie do skonfigurowania. Hasło Wi-Fi zostanie wysłane do wybranego urządzenia.</string>
     <string name="wifi_provision_rescan">Wyszukaj ponownie</string>
     <string name="wifi_provision_signal_dbm">Siła sygnału %1$d dBm</string>
-    <string name="node_chip_blink">Mruganie cienia plakietki mojego węzła</string>
+    <string name="node_chip_blink">Mruganie cienia węzłów</string>
     <string name="node_chip_blink_off">Wyłączone</string>
     <string name="node_chip_blink_on">Jak ikona połączenia (niebieski przy wysyłaniu, zielony przy odbiorze)</string>
-    <string name="node_chip_blink_summary">Cień pod plakietką węzła, z którym jesteś połączony (górny pasek), mruga razem z ikoną połączenia.</string>
+    <string name="node_chip_blink_summary">Cień pod plakietką i kartą Twojego węzła (górny pasek i lista węzłów) mruga razem z ikoną połączenia, a cień kart innych węzłów mruga w kolorze motywu, gdy coś od nich odbierzesz. Domyślnie wyłączone.</string>
     <string name="node_chip_blink_receive">Kolor mrugnięcia przy odbiorze</string>
     <string name="node_chip_blink_receive_green">Zielony (jak ikona)</string>
     <string name="node_chip_blink_receive_theme">Kolor motywu</string>

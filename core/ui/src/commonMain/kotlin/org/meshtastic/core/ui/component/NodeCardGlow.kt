@@ -19,6 +19,8 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,47 +28,31 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-
-private const val GLOW_MAX_ELEVATION_DP = 8
+import androidx.compose.ui.draw.drawBehind
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.theme.rememberUiOptions
 
 /**
- * A modifier that applies a glow animation to a node card when a packet is received.
- *
- * The glow blooms quickly using [MaterialTheme.motionScheme.fastSpatialSpec] and decays slowly using
- * [MaterialTheme.motionScheme.slowSpatialSpec], creating an M3 Expressive motion effect.
- *
- * @param lastHeard The node's lastHeard timestamp. Changes trigger the glow animation.
- * @param nodeColor The color used for the glow shadow (typically the node's assigned color).
+ * MT_SW: the blinking shadow of a node-list card. Off by default (the card shadow stays still); with the option
+ * "blinking shadow" on, the card of our own node blinks together with the connection icon (blue when sending, green
+ * or the theme colour when receiving), and the cards of other nodes blink in the colour of the theme when a packet
+ * from them arrives ([lastHeard] changes).
  */
 @Composable
-fun Modifier.nodeCardGlow(lastHeard: Int, nodeColor: Color): Modifier {
-    val glowAlpha = remember { Animatable(0f) }
-    val bloomSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
-    val decaySpec = MaterialTheme.motionScheme.slowSpatialSpec<Float>()
+fun Modifier.nodeCardGlow(lastHeard: Int, isThisNode: Boolean): Modifier {
+    val options = rememberUiOptions()
+    if (options[UiOptions.NODE_CHIP_BLINK] != 1) return this
     val cardShape = CardDefaults.shape
-
-    // Track previous value to distinguish initial composition from actual changes
-    val previousLastHeard = remember { mutableIntStateOf(lastHeard) }
+    if (isThisNode) return this.activityBlink(cardShape)
+    val color = MaterialTheme.colorScheme.primary
+    val alpha = remember { Animatable(0f) }
+    val previous = remember { mutableIntStateOf(lastHeard) }
     LaunchedEffect(lastHeard) {
-        if (lastHeard > 0 && lastHeard != previousLastHeard.intValue) {
-            glowAlpha.animateTo(targetValue = 1f, animationSpec = bloomSpec)
-            glowAlpha.animateTo(targetValue = 0f, animationSpec = decaySpec)
+        if (lastHeard > 0 && lastHeard != previous.intValue) {
+            alpha.snapTo(1f)
+            alpha.animateTo(0f, tween(durationMillis = NODE_BLINK_MILLIS, easing = LinearEasing))
         }
-        previousLastHeard.intValue = lastHeard
+        previous.intValue = lastHeard
     }
-
-    val alpha = glowAlpha.value
-    return if (alpha > 0f) {
-        this.shadow(
-            elevation = GLOW_MAX_ELEVATION_DP.dp * alpha,
-            shape = cardShape,
-            ambientColor = nodeColor.copy(alpha = alpha),
-            spotColor = nodeColor.copy(alpha = alpha),
-        )
-    } else {
-        this
-    }
+    return this.drawBehind { drawBlinkGlow(cardShape, color, alpha.value) }
 }

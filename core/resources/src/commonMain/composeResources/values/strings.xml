@@ -2888,13 +2888,13 @@
     <string name="node_active_notifications_description">A node you chose reports that someone is at it (or that it is away). Off by default.</string>
     <string name="node_away_alert">Also when it becomes away</string>
     <string name="node_away_alert_notification">%1$s is away</string>
-    <string name="node_chip_blink">Blinking shadow of my node chip</string>
+    <string name="node_chip_blink">Blinking shadow of nodes</string>
     <string name="node_chip_blink_off">Off</string>
     <string name="node_chip_blink_on">Like the connection icon (blue when sending, green when receiving)</string>
     <string name="node_chip_blink_receive">Colour of the blink when receiving</string>
     <string name="node_chip_blink_receive_green">Green (as the icon)</string>
     <string name="node_chip_blink_receive_theme">Colour of the theme</string>
-    <string name="node_chip_blink_summary">The shadow under the chip of the node you are connected to (top bar) blinks together with the connection icon.</string>
+    <string name="node_chip_blink_summary">The shadow under the chip and card of your node (top bar and node list) blinks together with the connection icon, and the shadow of other nodes' cards blinks in the theme colour when you receive something from them. Off by default.</string>
     <string name="node_chip_style">Node chip style</string>
     <string name="node_chip_style_flat">Flat (as before)</string>
     <string name="node_chip_style_glass_3d">3D glass (gradient, outline and shadow)</string>

@@ -176,7 +176,7 @@ fun NodeItemCompact(
 
     Card(
         modifier =
-        modifier.nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor).fillMaxWidth().semantics(
+        modifier.nodeCardGlow(lastHeard = thatNode.lastHeard, isThisNode = isThisNode).fillMaxWidth().semantics(
             mergeDescendants = true,
         ) {
             contentDescription = nodeDescription

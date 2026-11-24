@@ -213,7 +213,7 @@ fun NodeItem(
     Card(
         modifier =
         modifier
-            .nodeCardGlow(lastHeard = thatNode.lastHeard, nodeColor = nodeColor)
+            .nodeCardGlow(lastHeard = thatNode.lastHeard, isThisNode = isThisNode)
             .fillMaxWidth()
             .pressSpring()
             .semantics(mergeDescendants = true) {
