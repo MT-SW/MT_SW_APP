@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.component
 
-import androidx.compose.ui.test.assertExists
-import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.setValue
