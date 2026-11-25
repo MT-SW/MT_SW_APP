@@ -20,6 +20,8 @@ package org.meshtastic.ios
 
 import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,6 +43,7 @@ import org.meshtastic.core.common.util.Crc32
 import org.meshtastic.core.database.iosDataDir
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
+import platform.Foundation.create
 import platform.Foundation.NSLock
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
@@ -218,6 +221,17 @@ internal object IosLogControl : AppLogControl {
         val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
         picker.delegate = delegate
         top.presentViewController(picker, animated = true, completion = null)
+    }
+
+    /** The folder dialog of the common screens hands the bookmark back as `bookmark:` and its bytes in hex. */
+    @OptIn(ExperimentalForeignApi::class)
+    override fun onFolderPicked(uri: String) {
+        val hex = uri.removePrefix("bookmark:")
+        if (hex.length < 2 || hex.length % 2 != 0) return
+        val bytes = ByteArray(hex.length / 2) { hex.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+        val data = bytes.usePinned { NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong()) }
+        val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
+        remember(url)
     }
 
     override fun clearChosenFolder() {

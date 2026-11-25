@@ -4678,4 +4678,7 @@
     <string name="vanity_chip_preview">Podgląd plakietki w motywach</string>
     <string name="vanity_chip_preview_hint">Tak wybrany kolor wygląda na plakietce węzła w motywie standardowym i w dwóch nasyconych.</string>
     <string name="vanity_theme_standard">Standardowy</string>
+    <string name="log_folder_required_title">Wybierz folder na logi</string>
+    <string name="log_folder_required_body">Aplikacja zapisuje swoje logi w wybranym przez Ciebie folderze: log z ostatnich 24 godzin, który jest zawsze zbierany, oraz pełny log po jego włączeniu. Wybierz folder, w którym mają się zapisywać, żeby można było dołączyć je do zgłoszenia błędu. Folder możesz później zmienić w ustawieniach. Z aplikacji można korzystać po wybraniu folderu.</string>
+    <string name="log_folder_required_button">Wybierz folder</string>
 </resources>

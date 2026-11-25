@@ -51,6 +51,8 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.service.stats.MeshStatsFeed
+import org.meshtastic.core.ui.component.LogFolderScreen
+import org.meshtastic.core.ui.component.logFolderMissing
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.EventTheme
@@ -266,6 +268,9 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
                 // Still reading the stored consent: show nothing rather than flash the notice.
             } else if (dataNoticeAcceptedAt == 0L) {
                 DataNoticeScreen(onAccept = { uiViewModel.onDataNoticeAccepted() })
+            } else if (logFolderMissing(AppLogControls.current)) {
+                // The folder for the logs must be chosen first (every system).
+                AppLogControls.current?.let { LogFolderScreen(it) }
             } else if (introCompleted) {
                 ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
             } else {

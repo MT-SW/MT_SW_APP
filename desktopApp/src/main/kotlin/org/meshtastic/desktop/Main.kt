@@ -107,6 +107,9 @@ import org.meshtastic.core.resources.desktop_tray_quit
 import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
+import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.ui.component.LogFolderScreen
+import org.meshtastic.core.ui.component.logFolderMissing
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.navigation.startDestination
@@ -693,6 +696,9 @@ private fun ApplicationScope.MeshtasticWindow(
                             // Still reading the stored consent: show nothing rather than flash the notice.
                         } else if (dataNoticeAcceptedAt == 0L) {
                             DataNoticeScreen(onAccept = { uiViewModel.onDataNoticeAccepted() })
+                        } else if (logFolderMissing(AppLogControls.current)) {
+                            // The folder for the logs must be chosen first (every system).
+                            AppLogControls.current?.let { LogFolderScreen(it) }
                         } else if (introCompleted) {
                             DesktopMainScreen(uiViewModel, multiBackstack)
                             AppUpdateDialog()

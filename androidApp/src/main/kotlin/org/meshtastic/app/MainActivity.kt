@@ -84,6 +84,9 @@ import org.meshtastic.core.resources.map_layer_too_large
 import org.meshtastic.core.service.MeshService
 import org.meshtastic.core.service.ServiceStartTrigger
 import org.meshtastic.core.service.startService
+import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.ui.component.LogFolderScreen
+import org.meshtastic.core.ui.component.logFolderMissing
 import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.component.NarrowBandWarningDialog
 import org.meshtastic.core.ui.component.RegionWarningDialog
@@ -214,6 +217,9 @@ class MainActivity : AppCompatActivity() {
                         // Still reading the stored consent: show nothing rather than flash the notice.
                     } else if (!launchOptions.skipOnboarding && dataNoticeAcceptedAt == 0L) {
                         DataNoticeScreen(onAccept = { model.onDataNoticeAccepted() })
+                    } else if (!launchOptions.skipOnboarding && logFolderMissing(AppLogControls.current)) {
+                        // The folder for the logs must be chosen first (every system).
+                        AppLogControls.current?.let { LogFolderScreen(it) }
                     } else if (appIntroCompleted || launchOptions.skipOnboarding) {
                         AppSpatialShell { MainScreen() }
 

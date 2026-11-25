@@ -80,6 +80,19 @@ interface AppLogControl {
     /** Opens the folder picker. */
     fun chooseFolder() {}
 
+    /**
+     * True where the person has to choose a folder for the logs before the app can be used (every system): the app
+     * shows the choice at start until a folder is chosen.
+     */
+    val folderRequired: Boolean
+        get() = canChooseFolder
+
+    /**
+     * The folder picked in the system's folder dialog (as text: a content address on a phone, a path on a computer, a
+     * bookmark on iPhone). The platform remembers it and writes the log zips there.
+     */
+    fun onFolderPicked(uri: String) {}
+
     /** Forgets the chosen folder. */
     fun clearChosenFolder() {}
 

@@ -34,7 +34,9 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.net.Uri
 import android.os.Looper
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
@@ -46,6 +48,7 @@ import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -253,6 +256,47 @@ internal object AndroidLogging {
         override val folderHint: String
             get() = "Pobrane/$FOLDER"
 
+        // The folder the person chose for the logs (a tree address of the system's folder dialog), kept in a small file.
+        private val folderFile = File(dir, "log_folder.txt")
+        private val folderName = MutableStateFlow<String?>(null)
+
+        init {
+            folderName.value = readFolder()?.let { nameOf(it) }
+        }
+
+        override val canChooseFolder: Boolean = true
+
+        override val chosenFolderName: StateFlow<String?>
+            get() = folderName
+
+        private fun readFolder(): Uri? = runCatching { Uri.parse(folderFile.readText().trim()) }.getOrNull()?.takeIf {
+            it.toString().isNotBlank()
+        }
+
+        private fun nameOf(tree: Uri): String? = runCatching {
+            val doc = DocumentsContract.buildDocumentUriUsingTree(tree, DocumentsContract.getTreeDocumentId(tree))
+            app.contentResolver
+                .query(doc, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+        }
+            .getOrNull() ?: tree.lastPathSegment
+
+        override fun onFolderPicked(uri: String) {
+            val tree = runCatching { Uri.parse(uri) }.getOrNull() ?: return
+            runCatching { folderFile.writeText(uri) }
+            folderName.value = nameOf(tree)
+            Logger.i(tag = TAG) { "The log folder was chosen (${folderName.value})" }
+            // Fresh zips go to the new folder at once.
+            for (marker in listOf(FINGERPRINT_24H, FINGERPRINT_FULL)) runCatching { File(dir, marker).delete() }
+            CoroutineScope(Dispatchers.IO).launch { autoExport() }
+        }
+
+        override fun clearChosenFolder() {
+            runCatching { folderFile.delete() }
+            folderName.value = null
+            Logger.i(tag = TAG) { "The log folder was cleared" }
+        }
+
         override fun openFolder(): Boolean = false
 
         override val recent: StateFlow<Boolean>
@@ -371,7 +415,10 @@ internal object AndroidLogging {
         private suspend fun export(name: String, overwrite: Boolean, since: Long): String? =
             withContext(Dispatchers.IO) {
                 runCatching {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val tree = readFolder()
+                    if (tree != null) {
+                        exportToTree(tree, name, since)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         exportToDownloads(name, overwrite, since)
                     } else {
                         exportLegacy(name, since)
@@ -380,6 +427,41 @@ internal object AndroidLogging {
                     .onFailure { Logger.w(it, tag = TAG) { "Log export failed" } }
                     .getOrNull()
             }
+
+        /** Writes the zip into the folder the person chose (replacing the file of the same name). */
+        private fun exportToTree(tree: Uri, name: String, since: Long): String? {
+            val resolver = app.contentResolver
+            val treeId = DocumentsContract.getTreeDocumentId(tree)
+            val parent = DocumentsContract.buildDocumentUriUsingTree(tree, treeId)
+            val children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, treeId)
+            var existing: Uri? = null
+            resolver
+                .query(
+                    children,
+                    arrayOf(
+                        DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                        DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    ),
+                    null,
+                    null,
+                    null,
+                )
+                ?.use { c ->
+                    while (c.moveToNext()) {
+                        if (c.getString(1) == name) {
+                            existing = DocumentsContract.buildDocumentUriUsingTree(tree, c.getString(0))
+                            break
+                        }
+                    }
+                }
+            val target = existing ?: DocumentsContract.createDocument(resolver, parent, "application/zip", name)
+            if (target == null) {
+                Logger.w(tag = TAG) { "The log file could not be created in the chosen folder" }
+                return null
+            }
+            resolver.openOutputStream(target, "wt")?.use { MtSwLogging.writeReportZip(it, since) } ?: return null
+            return folderName.value ?: tree.toString()
+        }
 
         private fun exportToDownloads(name: String, overwrite: Boolean, since: Long): String? {
             val resolver = app.contentResolver

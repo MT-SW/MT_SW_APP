@@ -102,6 +102,34 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
 
     override val canOpenFolder: Boolean = true
 
+    // The folder the person chose for the logs: its path in a small file next to the logs.
+    private val folderFile = File(dir, "log_folder.txt")
+    private val folderName = kotlinx.coroutines.flow.MutableStateFlow<String?>(chosen()?.name)
+
+    private fun chosen(): File? =
+        runCatching { File(folderFile.readText().trim()) }.getOrNull()?.takeIf { it.path.isNotBlank() && it.isDirectory }
+
+    override val canChooseFolder: Boolean = true
+
+    override val chosenFolderName: StateFlow<String?>
+        get() = folderName
+
+    override fun onFolderPicked(uri: String) {
+        val folder = runCatching { File(java.net.URI(uri)) }.getOrNull() ?: return
+        if (!folder.isDirectory) return
+        runCatching { folderFile.writeText(folder.absolutePath) }
+        folderName.value = folder.name
+        Logger.i { "The log folder was chosen (${folder.name})" }
+        for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) runCatching { File(dir, marker).delete() }
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch { autoExport() }
+    }
+
+    override fun clearChosenFolder() {
+        runCatching { folderFile.delete() }
+        folderName.value = null
+        Logger.i { "The log folder was cleared" }
+    }
+
     override val recent: StateFlow<Boolean>
         get() = MtSwLogging.recent
 
@@ -125,7 +153,7 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                 "${files.size}:${files.maxOfOrNull { it.lastModified() } ?: 0L}:${files.sumOf { it.length() }}"
             val marker = File(dir, markerName)
             if (runCatching { marker.readText() }.getOrNull() == fingerprint) return
-            File(dir, name).outputStream().use { MtSwLogging.writeReportZip(it, since) }
+            File(chosen() ?: dir, name).outputStream().use { MtSwLogging.writeReportZip(it, since) }
             marker.writeText(fingerprint)
         }
             .onFailure { Logger.w(it) { "Saving the log zip failed" } }

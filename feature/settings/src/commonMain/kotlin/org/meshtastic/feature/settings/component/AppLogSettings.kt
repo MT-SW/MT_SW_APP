@@ -47,6 +47,7 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
 
 /**
  * The fork's log switch: off by default; once on, the app writes everything it does to log files on its own (on a phone
@@ -89,8 +90,11 @@ fun AppLogSettings() {
     }
     if (control.canChooseFolder) {
         val chosen by control.chosenFolderName.collectAsStateWithLifecycle()
+        val pickFolder = rememberOpenDocumentTreeLauncher { uri ->
+            if (uri != null) control.onFolderPicked(uri.toString())
+        }
         ListItem(text = stringResource(Res.string.app_log_choose_folder), leadingIcon = MeshtasticIcons.List) {
-            control.chooseFolder()
+            pickFolder()
         }
         Text(
             text =

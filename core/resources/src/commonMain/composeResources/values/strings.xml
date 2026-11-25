@@ -4672,5 +4672,8 @@
     <string name="zh_TW" translatable="false">繁體中文</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
+    <string name="log_folder_required_title">Choose a folder for the logs</string>
+    <string name="log_folder_required_body">The app saves its logs in a folder you choose: the log of the last 24 hours, which is always collected, and the full log when you switch it on. Choose the folder where they should be saved, so that you can attach them to a bug report. You can change the folder later in the settings. The app can be used after the folder is chosen.</string>
+    <string name="log_folder_required_button">Choose folder</string>
 </resources>
 
