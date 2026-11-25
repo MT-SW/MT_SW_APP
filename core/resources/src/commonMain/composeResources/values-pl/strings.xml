@@ -589,7 +589,7 @@
     <string name="device">Urządzenie</string>
     <string name="device_configuration">Konfiguracja urządzenia</string>
     <string name="device_db_cache_limit">Ile baz danych urządzeń przechowywać</string>
-    <string name="device_db_cache_limit_summary">Baza danych ilu urządzeń jest przechowywana w tej aplikacji naraz (osobna dla każdego urządzenia, bez względu na to, czy łączysz się przez Bluetooth, Wi-Fi czy USB). Gdy przybędzie kolejna, usuwana jest baza urządzenia używanego najdawniej.</string>
+    <string name="device_db_cache_limit_summary">Baza danych ilu urządzeń jest przechowywana w tej aplikacji naraz (osobna dla każdego urządzenia, bez względu na to, czy łączysz się przez Bluetooth, Wi-Fi czy USB). Minimum to 3, bo naraz można połączyć do 3 urządzeń. Bazy zapisanych urządzeń nigdy nie są usuwane. Gdy przybędzie kolejna, usuwana jest baza innego urządzenia używanego najdawniej.</string>
     <string name="device_gps">Ustawienia GPS</string>
     <string name="device_links">Linki urządzenia</string>
     <string name="device_links_affiliate_disclosure">Linki do produktów mogą być linkami afiliacyjnymi — zakupy mogą przynosić Meshtastic prowizję.</string>
