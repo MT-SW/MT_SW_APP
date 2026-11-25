@@ -19,6 +19,7 @@
 package org.meshtastic.ios
 
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -225,7 +226,7 @@ internal object IosLogControl : AppLogControl {
     }
 
     /** The folder dialog of the common screens hands the bookmark back as `bookmark:` and its bytes in hex. */
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     override fun onFolderPicked(uri: String) {
         val hex = uri.removePrefix("bookmark:")
         if (hex.length < 2 || hex.length % 2 != 0) return
