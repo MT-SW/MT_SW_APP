@@ -68,14 +68,13 @@ internal object IosFileLog : LogWriter() {
     private const val MAX_SCREEN_FILES = 60
     private const val SCREEN_MIN_GAP_MS = 30_000L
     private const val FULL_WINDOW_MS = 7L * 24 * 60 * 60 * 1000
-    private const val RECENT_MAX_BYTES = 40L * 1024 * 1024
+    private const val RECENT_MAX_BYTES = 100L * 1024 * 1024
     private const val MAX_CRASH_FILES = 20
     private const val PART_NUMBER_WIDTH = 3
     private const val MILLIS = 1000.0
     private const val MILLIS_PER_SECOND = 1000L
     private const val BYTES_IN_MB = 1_048_576UL
     private const val CONF_NAME = "logging.conf"
-    private const val RECENT_OFF = "recent=off"
 
     private val dir: Path by lazy { (iosDataDir() + "/logs").toPath() }
     private val crashDir: Path by lazy { dir / "crash" }
@@ -108,9 +107,12 @@ internal object IosFileLog : LogWriter() {
     val recent: StateFlow<Boolean>
         get() = recentFlow
 
-    /** What is really written: the chosen level, or the basic level while only the log of the last day is on. */
+    /**
+     * What is really written: the chosen level, or the detailed level while only the log of the last day is on (it is
+     * always on and cannot be switched off). Never message texts, names, positions or keys.
+     */
     private fun effectiveLevel(): AppLogLevel =
-        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
+        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.DETAILED else it }
 
     fun nowMillis(): Long = (NSDate().timeIntervalSince1970 * MILLIS).toLong()
 
@@ -143,7 +145,8 @@ internal object IosFileLog : LogWriter() {
             startedAt = nowMillis()
             val conf = runCatching { FileSystem.SYSTEM.read(dir / CONF_NAME) { readUtf8() }.lines() }.getOrNull()
             levelFlow.value = AppLogLevel.fromKey(conf?.firstOrNull())
-            recentFlow.value = conf?.getOrNull(1)?.trim() != RECENT_OFF
+            // Always on: an old "recent=off" in the file is ignored.
+            recentFlow.value = true
             pruneRecent()
         }
         applySeverity()
@@ -166,13 +169,10 @@ internal object IosFileLog : LogWriter() {
         if (before != level) Logger.i(tag = "Log") { "Log level: ${before.key} -> ${level.key}" }
     }
 
+    /** The automatic log of the last day cannot be switched off any more; kept so that older callers still build. */
+    @Suppress("UNUSED_PARAMETER")
     fun setRecent(on: Boolean) {
-        if (recentFlow.value == on) return
-        recentFlow.value = on
-        saveConf()
-        if (effectiveLevel() == AppLogLevel.OFF) closeCurrent()
-        applySeverity()
-        Logger.i(tag = "Log") { "Automatic log of the last day: ${if (on) "on" else "off"}" }
+        Logger.i(tag = "Log") { "The automatic log of the last day is always on (request to change it ignored)" }
     }
 
     /**
@@ -185,14 +185,14 @@ internal object IosFileLog : LogWriter() {
 
     private fun applySeverity() {
         val base = baseSeverity
-        val chosen = levelFlow.value.severity
+        val chosen = effectiveLevel().severity
         Logger.setMinSeverity(if (chosen != null && chosen < base) chosen else base)
     }
 
     private fun saveConf() {
         runCatching {
             FileSystem.SYSTEM.write(dir / CONF_NAME) {
-                writeUtf8(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF))
+                writeUtf8(levelFlow.value.key + "\nrecent=on")
             }
         }
     }

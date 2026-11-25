@@ -530,8 +530,8 @@
     <string name="app_log_open_failed">Could not open the log folder.</string>
     <string name="app_log_open_folder">Open log folder</string>
     <string name="app_log_recent">Logs of the last 24 hours</string>
-    <string name="app_log_recent_summary">On by default. The app keeps a basic log of the last day on this device by itself, so that in case of an error it can be attached to a report at once ("Report a bug or idea"). Logs are never sent anywhere by themselves; only you send them. Older than a day are deleted.</string>
-    <string name="app_log_summary">Off by default. When on, the app saves everything it does to files on its own, as it goes (from start to close), in parts of about 400 KB, to help find problems. The choice is kept after a restart. Message texts, keys and positions are not saved.</string>
+    <string name="app_log_recent_summary">Always on and cannot be switched off. The app keeps a detailed log of the last 24 hours on this device. It is not a package collected once a day: it is a rolling window that keeps clearing itself, so only the last day is ever kept. This is because errors are often reported without a log, or the logs are switched on only after the error, and then the error cannot be found and fixed. The log holds how the app works (events, states, errors), never message texts, names, positions or keys. It stays on this device and is sent only if you send it yourself ("Report a bug or idea").</string>
+    <string name="app_log_summary">Off by default. When on, the app saves everything it does to files on its own, as it goes (from start to close), in parts of about 400 KB, to help find problems. Old entries are cleaned up after at most 7 days of recorded time, so the logs do not take much memory (a pause in recording is not counted). The choice is kept after a restart. Message texts, keys and positions are not saved.</string>
     <string name="app_log_title">Logs</string>
     <string name="app_notifications">App Notifications</string>
     <string name="app_settings">App</string>

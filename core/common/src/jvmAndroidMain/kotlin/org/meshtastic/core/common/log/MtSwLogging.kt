@@ -61,7 +61,7 @@ object MtSwLogging {
      * trimmed.
      */
     const val RECENT_WINDOW_MS: Long = 24L * 60 * 60 * 1000
-    private const val RECENT_MAX_BYTES: Long = 40L * 1024 * 1024
+    private const val RECENT_MAX_BYTES: Long = 100L * 1024 * 1024
     private const val PRUNE_EVERY_MS = 5L * 60 * 1000
 
     /** How much recorded time a log the person switched on by hand keeps (a pause in recording is not counted). */
@@ -77,18 +77,21 @@ object MtSwLogging {
         get() = levelFlow
 
     /**
-     * The automatic log of the last 24 hours (on by default). While the switch for full logging is off, the app still
-     * keeps the basic log of the last day, so a person who meets a problem can send it at once. It stays on the device.
+     * The automatic log of the last 24 hours. It is always on and cannot be switched off (a report without a log cannot
+     * be diagnosed): the app keeps a detailed rolling log of the last day on the device, whether or not full logging
+     * is on. It stays on the device unless the person sends it.
      */
     private val recentFlow = MutableStateFlow(true)
     val recent: StateFlow<Boolean>
         get() = recentFlow
 
     /**
-     * What is really written: the chosen level, or the basic level while only the automatic log of the last day is on.
+     * What is really written: the chosen level, or the detailed level while only the automatic log of the last day is
+     * on (it is always on). Detailed means events, states, decisions and the reasons of failures, never message texts,
+     * names, positions or keys.
      */
     private fun effectiveLevel(): AppLogLevel =
-        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
+        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.DETAILED else it }
 
     @Volatile private var currentName: String? = null
 
@@ -137,7 +140,8 @@ object MtSwLogging {
         runCatching { logDir.mkdirs() }
         val conf = runCatching { File(logDir, CONF_NAME).readLines() }.getOrDefault(emptyList())
         levelFlow.value = AppLogLevel.fromKey(conf.firstOrNull())
-        recentFlow.value = conf.getOrNull(1)?.trim() != RECENT_OFF
+        // The automatic log of the last day is always on; an old "recent=off" in the file is ignored.
+        recentFlow.value = true
         installCrashRecorder()
         startBackgroundThread()
         installShutdownHook()
@@ -160,21 +164,17 @@ object MtSwLogging {
         if (before != level) Logger.i(tag = TAG) { "Log level: ${before.key} -> ${level.key}" }
     }
 
-    /** Switches the automatic log of the last 24 hours on or off (the full logging switch is separate). */
+    /** The automatic log of the last 24 hours cannot be switched off any more; kept so that older callers still build. */
+    @Suppress("UNUSED_PARAMETER")
     fun setRecent(on: Boolean) {
-        if (recentFlow.value == on) return
-        recentFlow.value = on
-        saveConf()
-        if (effectiveLevel() == AppLogLevel.OFF) synchronized(lock) { closeCurrent() }
-        onLevelChanged(effectiveLevel())
-        Logger.i(tag = TAG) { "Automatic log of the last day: ${if (on) "on" else "off"}" }
+        Logger.i(tag = TAG) { "The automatic log of the last day is always on (request to change it ignored)" }
     }
 
     private fun saveConf() {
         val folder = dir ?: return
         runCatching {
             File(folder, CONF_NAME)
-                .writeText(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF))
+                .writeText(levelFlow.value.key + "\nrecent=on")
         }
     }
 
@@ -539,7 +539,6 @@ object MtSwLogging {
     @Volatile private var shutdownHookInstalled = false
 
     private const val TAG = "MtSwLog"
-    private const val RECENT_OFF = "recent=off"
 
     /** Column of the level letter in a line: `MM-dd HH:mm:ss.SSS ` is 19 characters long. */
     private const val LEVEL_COLUMN = 19

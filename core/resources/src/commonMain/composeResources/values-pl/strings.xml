@@ -3302,7 +3302,7 @@
     <string name="display_name_hint">Widoczna tylko na tym urządzeniu. Udostępnianie i eksport używają prawdziwej nazwy węzła.</string>
     <string name="display_name">Nazwa własna</string>
     <string name="app_log_recent">Logi z ostatnich 24 godzin</string>
-    <string name="app_log_recent_summary">Domyślnie włączone. Aplikacja sama trzyma na tym urządzeniu podstawowy log z ostatniej doby, żeby w razie błędu można go było od razu dołączyć do zgłoszenia („Zgłoś błąd lub pomysł”). Logi nigdzie same się nie wysyłają; wysyłasz je tylko Ty. Starsze niż doba są usuwane.</string>
+    <string name="app_log_recent_summary">Zawsze włączone i nie da się tego wyłączyć. Aplikacja trzyma na tym urządzeniu szczegółowy log z ostatnich 24 godzin. To nie jest paczka zbierana raz na dobę, tylko okno ruchome, które samo się czyści, więc zawsze zostaje tylko ostatnia doba. Powód: błędy bywają zgłaszane bez logów albo logi włącza się dopiero po fakcie i wtedy nie da się ich znaleźć ani naprawić. W logu jest to, jak działa aplikacja (zdarzenia, stany, błędy), nigdy treść wiadomości, nazwy, pozycje ani klucze. Log zostaje na tym urządzeniu i jest wysyłany tylko wtedy, gdy wyślesz go sam („Zgłoś błąd lub pomysł”).</string>
     <string name="report_send_to">Dokąd wysłać zgłoszenie?</string>
     <string name="report_note_hint">Co się stało? (opcjonalnie)</string>
     <string name="report_with_logs">Dołącz logi z ostatnich 24 godzin</string>
@@ -3325,7 +3325,7 @@
     <string name="autostart_summary">Uruchamia aplikację po zalogowaniu do komputera, dzięki czemu dane z radia są dalej zbierane. Domyślnie wyłączone. Działa w zainstalowanej aplikacji.</string>
     <string name="background_section_title">Praca w tle</string>
     <string name="app_log_level">Zbieranie logów</string>
-    <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja sama, na bieżąco zapisuje do plików wszystko, co robi (od startu do zamknięcia), w częściach po ok. 400 KB, żeby łatwiej znajdować problemy. Wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>
+    <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja sama, na bieżąco zapisuje do plików wszystko, co robi (od startu do zamknięcia), w częściach po ok. 400 KB, żeby łatwiej znajdować problemy. Stare wpisy są czyszczone po najwyżej 7 dniach zapisanego czasu, żeby logi nie zajmowały dużo pamięci (przerwa w zapisie się nie liczy). Wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>
     <string name="app_log_open_folder">Otwórz folder z logami</string>
     <string name="app_log_folder">Logi zapisują się same w: %1$s</string>
     <string name="app_log_open_failed">Nie udało się otworzyć folderu z logami.</string>

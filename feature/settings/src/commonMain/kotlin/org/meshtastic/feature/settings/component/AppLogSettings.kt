@@ -57,18 +57,19 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 fun AppLogSettings() {
     val control = AppLogControls.current ?: return
     val level by control.level.collectAsStateWithLifecycle()
-    val recent by control.recent.collectAsStateWithLifecycle()
     var failed by remember { mutableStateOf(false) }
 
-    // The basic log of the last 24 hours, kept by the app on its own (on by default), so a problem can be reported with
-    // it.
+    // The log of the last 24 hours is always on and cannot be switched off: only a notice about it is shown.
     if (control.canMakeReport) {
-        SwitchPreference(
-            title = stringResource(Res.string.app_log_recent),
-            summary = stringResource(Res.string.app_log_recent_summary),
-            checked = recent,
-            enabled = true,
-            onCheckedChange = { control.setRecent(it) },
+        Text(
+            text = stringResource(Res.string.app_log_recent),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+        )
+        Text(
+            text = stringResource(Res.string.app_log_recent_summary),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
     }
 
