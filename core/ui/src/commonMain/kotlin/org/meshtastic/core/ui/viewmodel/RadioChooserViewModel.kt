@@ -30,11 +30,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.common.util.isValidDeviceAddress
+import org.meshtastic.core.common.util.normalizeAddress
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
@@ -104,6 +107,7 @@ class RadioChooserViewModel(
     private val background: RadioBackgroundMonitor,
     private val uiPrefs: UiPrefs,
     nodeRepository: NodeRepository,
+    databaseManager: DatabaseManager,
 ) : ViewModel() {
 
     // True after a change the user asked for (disconnect, another radio, removal): the disconnection that follows is
@@ -116,9 +120,19 @@ class RadioChooserViewModel(
     // The slot that the next device picked from the list is saved in (null: a free one). Used once.
     private var targetSlot: Int? = null
 
+    // The node of each device as the connection card finds it: the node number recorded for the address, looked up in
+    // the node list in use. The plate takes it first, so the top bar, the list and the menus show the same name.
+    private val knownNodes =
+        combine(databaseManager.localNodeNums, nodeRepository.nodeDBbyNum) { nums, nodes -> nums to nodes }
+
     private val plates =
-        combine(background.badges, background.unreadByAddress, nodeRepository.ourNodeInfo) { badges, unread, ours ->
-            Triple(badges, unread, ours)
+        combine(background.badges, background.unreadByAddress, nodeRepository.ourNodeInfo, knownNodes) {
+                badges,
+                unread,
+                ours,
+                known,
+            ->
+            Plates(badges, unread, ours, known.first, known.second)
         }
 
     val state: StateFlow<RadioChooserState> =
@@ -144,11 +158,11 @@ class RadioChooserViewModel(
                 (droppedByItself, plate, options),
             ->
             val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
-            val (badges, unread, ours) = plate
+            val (badges, unread, ours, recorded, nodeDb) = plate
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices = slots.map { slot ->
                 val active = slot.id == activeId && isValidDeviceAddress(address)
-                val plate = plateOf(slot.address, active, ours, badges, knownPlates)
+                val plate = plateOf(slot.address, active, ours, badges, knownPlates, recorded, nodeDb)
                 RadioChoice(
                     id = slot.id,
                     name = slot.name,
@@ -413,26 +427,44 @@ class RadioChooserViewModel(
  * use only when it really is that device's node (right after a switch it can still be the previous device's node),
  * otherwise the plate read from its own database, otherwise the last one seen.
  */
+private data class Plates(
+    val badges: Map<String, DeviceBadge>,
+    val unread: Map<String, Int>,
+    val ours: Node?,
+    val recorded: Map<String, Int>,
+    val nodes: Map<Int, Node>,
+)
+
+@Suppress("LongParameterList")
 private fun plateOf(
     address: String,
     active: Boolean,
     ours: Node?,
     badges: Map<String, DeviceBadge>,
     knownPlates: MutableMap<String, DeviceBadge>,
+    recorded: Map<String, Int>,
+    nodes: Map<Int, Node>,
 ): DeviceBadge? {
-    val badge = badges[address]
+    val key = normalizeAddress(address)
+    val badge = badges.badgeFor(address)
     val live = ours?.takeIf { node ->
         active &&
             node.user.short_name.isNotBlank() &&
             (badge == null || badge.nodeNum == node.num) &&
-            badges.none { (other, b) -> other != address && b.nodeNum == node.num }
+            badges.none { (other, b) -> other != key && b.nodeNum == node.num }
     }
+    // The same source as the connection card: the recorded node number of the device, found in the node list in use.
+    val fromList =
+        recorded[key]?.let(nodes::get)?.takeIf { it.user.short_name.isNotBlank() }?.let {
+            DeviceBadge(it.num, it.user.short_name)
+        }
     val found =
         when {
             live != null -> DeviceBadge(live.num, live.user.short_name)
+            fromList != null -> fromList
             badge != null && badge.shortName.isNotBlank() -> badge
-            else -> knownPlates[address] ?: badge
+            else -> knownPlates[key] ?: badge
         }
-    if (found != null && found.shortName.isNotBlank()) knownPlates[address] = found
+    if (found != null && found.shortName.isNotBlank()) knownPlates[key] = found
     return found
 }

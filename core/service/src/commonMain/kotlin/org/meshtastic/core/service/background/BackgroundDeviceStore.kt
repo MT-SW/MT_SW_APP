@@ -115,8 +115,12 @@ internal class BackgroundDeviceStore(
                 when {
                     existing == null -> dao.installConfig(mine.toEntity(metadata, 0L), entityNodes)
 
-                    // Another node number than the one kept: the app reconciles that itself when the device is shown.
-                    existing.myNodeNum != mine.my_node_num -> Unit
+                    // Another node number than the one kept (renumbered or re-keyed device): the same identity migration
+                    // the app does when the device is shown, so the own node and its short name follow the new number.
+                    existing.myNodeNum != mine.my_node_num -> {
+                        Logger.i { "Background device: the own node number changed, migrating the identity" }
+                        dao.installConfig(mine.toEntity(metadata, existing.currentPacketId), entityNodes)
+                    }
 
                     else -> {
                         dao.setMyNodeInfo(mine.toEntity(metadata, existing.currentPacketId))

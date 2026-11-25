@@ -24,6 +24,10 @@ import kotlinx.coroutines.flow.StateFlow
  */
 data class DeviceBadge(val nodeNum: Int, val shortName: String)
 
+/** The plate of the device at [address]: the map is keyed by the normalized address, so any spelling finds it. */
+fun Map<String, DeviceBadge>.badgeFor(address: String?): DeviceBadge? =
+    if (address.isNullOrBlank()) null else this[org.meshtastic.core.common.util.normalizeAddress(address)]
+
 /**
  * Starts the background collection (MT_SW) from the saved radios that are not in use: while the mesh service runs, each
  * of them is connected quietly and the packets it hears are kept in its own database.

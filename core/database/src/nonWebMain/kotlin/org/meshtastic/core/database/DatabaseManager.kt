@@ -288,10 +288,23 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
     override val cacheLimit: StateFlow<Int> =
         datastore.data
-            .map { it[cacheLimitKey] ?: DatabaseConstants.DEFAULT_CACHE_LIMIT }
+            .map {
+                // A value saved before the minimum was raised is lifted to the minimum.
+                (it[cacheLimitKey] ?: DatabaseConstants.DEFAULT_CACHE_LIMIT).coerceIn(
+                    DatabaseConstants.MIN_CACHE_LIMIT,
+                    DatabaseConstants.MAX_CACHE_LIMIT,
+                )
+            }
             .stateIn(managerScope, SharingStarted.Eagerly, DatabaseConstants.DEFAULT_CACHE_LIMIT)
 
     override fun getCurrentCacheLimit(): Int = cacheLimit.value
+
+    /** Addresses of the saved devices; their databases are protected from the cache limit (MT_SW). */
+    private val protectedAddresses = MutableStateFlow<Set<String>>(emptySet())
+
+    fun setProtectedAddresses(addresses: Set<String>) {
+        protectedAddresses.value = addresses
+    }
 
     private val statsSyncKey = booleanPreferencesKey("db_stats_sync_enabled")
 
@@ -344,12 +357,20 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         withContext(dispatchers.io) {
             mutex.withLock {
                 checkOpen()
-                if (!hasDatabaseFor(address) && !(createIfMissing && isRealDeviceAddress(address))) {
+                if (!isRealDeviceAddress(address)) {
                     null
                 } else {
+                    // The name is resolved first, so a device whose data lives in an aliased database (the same device
+                    // reached over another transport) is found too, not only one stored under its own address.
                     val dbName = resolveDbName(address, canReclaimRecoveredSource = false)
-                    // The active database is written by the app itself: a second writer would duplicate packets.
-                    if (dbName == currentDbName && !includeActive) null else block(getOrOpenDatabase(dbName))
+                    if (!dbFileExists(dbName) && !createIfMissing) {
+                        null
+                    } else if (dbName == currentDbName && !includeActive) {
+                        // The active database is written by the app itself: a second writer would duplicate packets.
+                        null
+                    } else {
+                        block(getOrOpenDatabase(dbName))
+                    }
                 }
             }
         }
@@ -2128,7 +2149,10 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
             // that publishes currentDbName so the active database at execution time can never become an LRU victim.
             val activeDbName = currentDbName
             val limit = getCurrentCacheLimit()
-            val pendingRouteNames = pendingRouteDbNames(datastore.data.first())
+            val pendingRouteNames =
+                pendingRouteDbNames(datastore.data.first()) +
+                    // MT_SW: the databases of the saved devices are never evicted.
+                    protectedAddresses.value.map { resolveDbName(it, canReclaimRecoveredSource = false) }
             // Only enforce the limit over device-specific DBs.
             val deviceDbs = deviceDbNamesLocked()
 

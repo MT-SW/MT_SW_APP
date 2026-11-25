@@ -32,7 +32,9 @@ object DatabaseConstants {
     // it falls out of the cache. 5 gives more headroom while still bounding on-disk growth; MAX_CACHE_LIMIT
     // remains the escape hatch for users who need more (github.com/meshtastic/Meshtastic-Android/issues/6186).
     const val DEFAULT_CACHE_LIMIT: Int = 5
-    const val MIN_CACHE_LIMIT: Int = 1
+    // MT_SW: up to 3 devices are kept connected in the background, each with its own database, so fewer than 3
+    // remembered databases would silently delete the history of a device that is still in use.
+    const val MIN_CACHE_LIMIT: Int = 3
     const val MAX_CACHE_LIMIT: Int = 10
 
     const val LEGACY_DB_CLEANED_KEY: String = "legacy_db_cleaned"

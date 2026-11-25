@@ -58,6 +58,7 @@ import org.meshtastic.core.resources.network
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.serial
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.ui.component.LocalAppBarExtras
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.ProgressSpinner
@@ -211,7 +212,7 @@ private fun DeviceHeadline(device: DeviceListEntry) {
     LaunchedEffect(device.fullAddress, device.node == null) {
         if (device.node == null) radios.onReadBadge(device.fullAddress)
     }
-    val badge = radios.state.badges[device.fullAddress]?.takeIf { it.shortName.isNotBlank() }
+    val badge = radios.state.badges.badgeFor(device.fullAddress)?.takeIf { it.shortName.isNotBlank() }
     val node =
         device.node
             ?: badge?.let {

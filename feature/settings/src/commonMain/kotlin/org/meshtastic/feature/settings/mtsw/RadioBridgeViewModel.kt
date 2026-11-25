@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgeMonitor
@@ -63,11 +64,11 @@ class RadioBridgeViewModel(
             savedSlots = slots
             slots.map { slot ->
                 // Only the short name of the device's node is shown.
-                val name = badges[slot.address]?.shortName?.takeIf { it.isNotBlank() }
+                val name = badges.badgeFor(slot.address)?.shortName?.takeIf { it.isNotBlank() }
                 RadioBridgeDevice(
                     slotId = slot.id,
                     name = name.takeIf { slot.address in connected },
-                    nodeNum = badges[slot.address]?.nodeNum?.takeIf { slot.address in connected },
+                    nodeNum = badges.badgeFor(slot.address)?.nodeNum?.takeIf { slot.address in connected },
                     config = configs[slot.id] ?: RadioBridgeConfig(),
                 )
             }

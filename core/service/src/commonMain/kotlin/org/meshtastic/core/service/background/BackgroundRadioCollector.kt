@@ -36,12 +36,14 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.toByteString
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.isValidDeviceAddress
+import org.meshtastic.core.common.util.normalizeAddress
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageFilter
 import org.meshtastic.core.repository.RadioBackgroundMonitor
@@ -101,6 +103,12 @@ class BackgroundRadioCollector(
         // The plates are read from the database of each saved device; the device in use is left as it was (the app
         // writes to that database itself and draws its own plate).
         scope.launch {
+            // The databases of the saved devices are never removed by the cache limit.
+            slotsPrefs.slots.collect { slots ->
+                databaseManager.setProtectedAddresses(slots.map { it.address }.filter(::isValidDeviceAddress).toSet())
+            }
+        }
+        scope.launch {
             slotsPrefs.slots.collectLatest { slots ->
                 while (true) {
                     slots.forEach { slot -> readBadge(slot.address) }
@@ -133,21 +141,54 @@ class BackgroundRadioCollector(
     private val workers = mutableMapOf<String, Job>()
 
     override suspend fun readBadge(address: String) {
+        val key = normalizeAddress(address)
         val badge =
             try {
                 databaseManager.withDeviceDb(address, includeActive = true) { db ->
-                    val mine = db.nodeInfoDao().getMyNodeEntity() ?: return@withDeviceDb null
+                    val mine = db.nodeInfoDao().getMyNodeEntity()
+                    if (mine == null) {
+                        Logger.d { "Plate ${anonymize(key)}: the database has no own node yet" }
+                        return@withDeviceDb null
+                    }
                     val node = db.nodeInfoDao().getNodeEntitiesByNums(listOf(mine.myNodeNum)).firstOrNull()
-                    DeviceBadge(mine.myNodeNum, node?.user?.short_name.orEmpty())
+                    val name = node?.user?.short_name.orEmpty()
+                    if (name.isBlank()) {
+                        Logger.d { "Plate ${anonymize(key)}: the own node is there but has no short name yet" }
+                    }
+                    DeviceBadge(mine.myNodeNum, name)
                 }
+                    ?: run {
+                        Logger.d { "Plate ${anonymize(key)}: no database found for this device" }
+                        null
+                    }
             } catch (e: CancellationException) {
                 throw e
             } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                Logger.d { "Background device: the plate could not be read: ${e.message}" }
+                Logger.d { "Plate ${anonymize(key)}: could not be read: ${e.message}" }
                 null
             }
-        if (badge != null) badgeMap.update { it + (address to badge) }
+        if (badge != null) publishBadge(key, badge)
     }
+
+    /**
+     * Keeps [badges] up to date. A plate with a name is never replaced by one without a name (the own node is stored
+     * before its short name arrives); the same device with a new node number gets the new plate.
+     */
+    private fun publishBadge(key: String, badge: DeviceBadge) {
+        badgeMap.update { current ->
+            val old = current[key]
+            when {
+                badge.shortName.isNotBlank() -> current + (key to badge)
+                old != null && old.shortName.isNotBlank() -> current
+                else -> current + (key to badge)
+            }
+        }
+    }
+
+    /** The plate of a device is also known the moment its start handshake ends (not only on the slow round). */
+    internal fun badgeOf(address: String): DeviceBadge? = badgeMap.value.badgeFor(address)
+
+    private fun anonymize(key: String): String = key.takeLast(ADDRESS_TAIL).let { "…$it" }
 
     private suspend fun keepCollecting(address: String) {
         // A short pause first: a radio that has just been in use may still be closing its connection.
@@ -230,7 +271,7 @@ class BackgroundRadioCollector(
                 databaseManager = databaseManager,
                 notifier = notifier,
                 // Only the short name of the device's own node, nothing else.
-                deviceName = { badgeMap.value[address]?.shortName.orEmpty() },
+                deviceName = { badgeMap.value.badgeFor(address)?.shortName.orEmpty() },
                 onMessage = { unread.update { it + (address to ((it[address] ?: 0) + 1)) } },
                 senderMutes = { senderMutePrefs.mutes.value },
                 isFiltered = messageFilter::shouldFilter,
@@ -272,6 +313,7 @@ class BackgroundRadioCollector(
 
     private companion object {
         const val BADGE_MS = 60_000L
+        const val ADDRESS_TAIL = 4
         const val START_DELAY_MS = 2_000L
         const val RETRY_MS = 10_000L
         const val HEARTBEAT_MS = 30 * 1_000L
