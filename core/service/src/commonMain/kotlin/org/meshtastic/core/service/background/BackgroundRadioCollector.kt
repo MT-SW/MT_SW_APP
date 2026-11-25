@@ -43,7 +43,6 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
-import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageFilter
 import org.meshtastic.core.repository.RadioBackgroundMonitor
@@ -52,6 +51,7 @@ import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.proto.Heartbeat
 import org.meshtastic.proto.ToRadio
 

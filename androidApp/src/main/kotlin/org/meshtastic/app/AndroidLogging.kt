@@ -30,11 +30,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.net.Uri
 import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -97,7 +97,7 @@ internal object AndroidLogging {
             Logger.setMinSeverity(MtSwLogging.minSeverityFor(baseSeverity, level))
         }
         MtSwLogging.screenProvider = { screenInfo() }
-        val control = AndroidLogControl(app, dir)
+        val control = AndroidLogControl(app, dir, scope)
         AppLogControls.current = control
         Logger.i(tag = TAG) { "App start: ${header()}; log level ${MtSwLogging.level.value.key}" }
         registerCallbacks(app, control, scope)
@@ -247,7 +247,12 @@ internal object AndroidLogging {
         }
     }
 
-    private class AndroidLogControl(private val app: Application, private val dir: File) : AppLogControl {
+    @Suppress("TooManyFunctions")
+    private class AndroidLogControl(
+        private val app: Application,
+        private val dir: File,
+        private val scope: CoroutineScope,
+    ) : AppLogControl {
         override val level: StateFlow<AppLogLevel>
             get() = MtSwLogging.level
 
@@ -256,7 +261,8 @@ internal object AndroidLogging {
         override val folderHint: String
             get() = "Pobrane/$FOLDER"
 
-        // The folder the person chose for the logs (a tree address of the system's folder dialog), kept in a small file.
+        // The folder the person chose for the logs (a tree address of the system's folder dialog), kept in a small
+        // file.
         private val folderFile = File(dir, "log_folder.txt")
         private val folderName = MutableStateFlow<String?>(null)
 
@@ -269,9 +275,13 @@ internal object AndroidLogging {
         override val chosenFolderName: StateFlow<String?>
             get() = folderName
 
-        private fun readFolder(): Uri? = runCatching { Uri.parse(folderFile.readText().trim()) }.getOrNull()?.takeIf {
-            it.toString().isNotBlank()
+        private fun readFolder(): Uri? = runCatching {
+            Uri.parse(folderFile.readText().trim())
         }
+            .getOrNull()
+            ?.takeIf {
+                it.toString().isNotBlank()
+            }
 
         private fun nameOf(tree: Uri): String? = runCatching {
             val doc = DocumentsContract.buildDocumentUriUsingTree(tree, DocumentsContract.getTreeDocumentId(tree))
@@ -288,7 +298,7 @@ internal object AndroidLogging {
             Logger.i(tag = TAG) { "The log folder was chosen (${folderName.value})" }
             // Fresh zips go to the new folder at once.
             for (marker in listOf(FINGERPRINT_24H, FINGERPRINT_FULL)) runCatching { File(dir, marker).delete() }
-            CoroutineScope(Dispatchers.IO).launch { autoExport() }
+            scope.launch(Dispatchers.IO) { autoExport() }
         }
 
         override fun clearChosenFolder() {
@@ -325,7 +335,8 @@ internal object AndroidLogging {
                         java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(Date(now)) +
                         ".zip"
                 val file = File(folder, name)
-                // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash records.
+                // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the
+                // crash records.
                 val since = 0L
                 val engineLogs =
                     File(app.filesDir, "engine-logs")

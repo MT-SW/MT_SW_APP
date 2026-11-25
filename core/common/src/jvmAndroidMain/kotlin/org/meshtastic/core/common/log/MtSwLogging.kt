@@ -78,8 +78,8 @@ object MtSwLogging {
 
     /**
      * The automatic log of the last 24 hours. It is always on and cannot be switched off (a report without a log cannot
-     * be diagnosed): the app keeps a detailed rolling log of the last day on the device, whether or not full logging
-     * is on. It stays on the device unless the person sends it.
+     * be diagnosed): the app keeps a detailed rolling log of the last day on the device, whether or not full logging is
+     * on. It stays on the device unless the person sends it.
      */
     private val recentFlow = MutableStateFlow(true)
     val recent: StateFlow<Boolean>
@@ -164,7 +164,9 @@ object MtSwLogging {
         if (before != level) Logger.i(tag = TAG) { "Log level: ${before.key} -> ${level.key}" }
     }
 
-    /** The automatic log of the last 24 hours cannot be switched off any more; kept so that older callers still build. */
+    /**
+     * The automatic log of the last 24 hours cannot be switched off any more; kept so that older callers still build.
+     */
     @Suppress("UNUSED_PARAMETER")
     fun setRecent(on: Boolean) {
         Logger.i(tag = TAG) { "The automatic log of the last day is always on (request to change it ignored)" }
@@ -173,8 +175,7 @@ object MtSwLogging {
     private fun saveConf() {
         val folder = dir ?: return
         runCatching {
-            File(folder, CONF_NAME)
-                .writeText(levelFlow.value.key + "\nrecent=on")
+            File(folder, CONF_NAME).writeText(levelFlow.value.key + "\nrecent=on")
         }
     }
 

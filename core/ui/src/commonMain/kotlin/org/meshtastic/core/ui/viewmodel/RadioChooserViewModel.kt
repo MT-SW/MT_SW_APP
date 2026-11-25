@@ -37,7 +37,6 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
-import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioController
@@ -45,6 +44,7 @@ import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.repository.badgeFor
 
 /** What a saved radio is doing in the chooser of the top bar. */
 enum class RadioStatus {
@@ -98,6 +98,7 @@ data class RadioChooserState(
  * saved radios stay connected in the background while that is allowed, so choosing another radio does not disconnect
  * the first one. Their databases stay separate.
  */
+@Suppress("LongParameterList")
 @KoinViewModel
 class RadioChooserViewModel(
     private val slotsPrefs: RadioSlotsPrefs,
@@ -158,7 +159,11 @@ class RadioChooserViewModel(
                 (droppedByItself, plate, options),
             ->
             val backgroundOn = UiOptions(options)[UiOptions.RADIO_BACKGROUND] == 1
-            val (badges, unread, ours, recorded, nodeDb) = plate
+            val badges = plate.badges
+            val unread = plate.unread
+            val ours = plate.ours
+            val recorded = plate.recorded
+            val nodeDb = plate.nodes
             val activeId = slots.firstOrNull { it.address == address }?.id ?: selectedId
             val choices = slots.map { slot ->
                 val active = slot.id == activeId && isValidDeviceAddress(address)
@@ -455,9 +460,12 @@ private fun plateOf(
     }
     // The same source as the connection card: the recorded node number of the device, found in the node list in use.
     val fromList =
-        recorded[key]?.let(nodes::get)?.takeIf { it.user.short_name.isNotBlank() }?.let {
-            DeviceBadge(it.num, it.user.short_name)
-        }
+        recorded[key]
+            ?.let(nodes::get)
+            ?.takeIf { it.user.short_name.isNotBlank() }
+            ?.let {
+                DeviceBadge(it.num, it.user.short_name)
+            }
     val found =
         when {
             live != null -> DeviceBadge(live.num, live.user.short_name)

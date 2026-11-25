@@ -43,13 +43,13 @@ import org.meshtastic.core.common.util.Crc32
 import org.meshtastic.core.database.iosDataDir
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
-import platform.Foundation.create
 import platform.Foundation.NSLock
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
+import platform.Foundation.create
 import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.lowPowerModeEnabled
 import platform.Foundation.thermalState
@@ -83,6 +83,7 @@ import platform.darwin.NSObject
 internal object IosLogControl : AppLogControl {
     private const val REPORT_DIR = "reports"
     private const val KB = 1024
+    private const val HEX_RADIX = 16
     private const val VIEW_SIZE = 1.0
     private const val NAME_24H = "mt_sw_logi_24h.zip"
     private const val NAME_FULL = "mt_sw_logi_pelne.zip"
@@ -228,7 +229,7 @@ internal object IosLogControl : AppLogControl {
     override fun onFolderPicked(uri: String) {
         val hex = uri.removePrefix("bookmark:")
         if (hex.length < 2 || hex.length % 2 != 0) return
-        val bytes = ByteArray(hex.length / 2) { hex.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+        val bytes = ByteArray(hex.length / 2) { hex.substring(it * 2, it * 2 + 2).toInt(HEX_RADIX).toByte() }
         val data = bytes.usePinned { NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong()) }
         val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
         remember(url)
@@ -375,8 +376,9 @@ internal object IosLogControl : AppLogControl {
                 .forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
             val name = "mt_sw_zgloszenie_" + IosFileLog.stamp().replace(Regex("[^0-9]"), "") + ".zip"
             val file = folder / name
-            val bytes = // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash records.
-            zip(reportEntries(note, true, extras, allTime = true))
+            val bytes = // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and
+                // the crash records.
+                zip(reportEntries(note, true, extras, allTime = true))
             FileSystem.SYSTEM.write(file) { write(bytes) }
             ReportFile(file.toString(), name, IosFileLog.size(file) / KB)
         }

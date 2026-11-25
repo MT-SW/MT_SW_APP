@@ -39,8 +39,8 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
     @AfterTest fun tearDown() = tearDownFixture()
 
     /**
-     * The cache limit cannot go below [DatabaseConstants.MIN_CACHE_LIMIT], so the eviction tests fill the cache with two
-     * more databases and let [oldestName] (listed first, the least recently used) be the only one over the limit.
+     * The cache limit cannot go below [DatabaseConstants.MIN_CACHE_LIMIT], so the eviction tests fill the cache with
+     * two more databases and let [oldestName] (listed first, the least recently used) be the only one over the limit.
      */
     private suspend fun fillCacheToMinimum(oldestName: String, activeName: String, activeAddress: String) {
         manager.switchActiveDatabase("addrFillC")

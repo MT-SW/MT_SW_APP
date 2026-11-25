@@ -49,6 +49,7 @@ import org.jetbrains.compose.resources.rememberResourceEnvironment
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.action_select_device
 import org.meshtastic.core.resources.add
@@ -58,7 +59,6 @@ import org.meshtastic.core.resources.network
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.serial
-import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.ui.component.LocalAppBarExtras
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.ProgressSpinner

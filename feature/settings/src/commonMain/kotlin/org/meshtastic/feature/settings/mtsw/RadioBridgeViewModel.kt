@@ -23,13 +23,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
-import org.meshtastic.core.repository.badgeFor
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioBridgeConfig
 import org.meshtastic.core.repository.RadioBridgeMonitor
 import org.meshtastic.core.repository.RadioBridgePrefs
 import org.meshtastic.core.repository.RadioSlot
 import org.meshtastic.core.repository.RadioSlotsPrefs
+import org.meshtastic.core.repository.badgeFor
 
 /** The bridge settings of the radio chosen in the top bar. [slotId] is null while no radio is saved. */
 data class RadioBridgeState(

@@ -86,6 +86,7 @@ import org.meshtastic.appshell.MeshServiceLifecycle
 import org.meshtastic.core.common.BuildConfigProvider
 import org.meshtastic.core.common.background.AutostartControls
 import org.meshtastic.core.common.background.SingleInstanceControls
+import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.RoomPoolTimeoutLog
 import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
@@ -107,10 +108,9 @@ import org.meshtastic.core.resources.desktop_tray_quit
 import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
-import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.component.LogFolderScreen
 import org.meshtastic.core.ui.component.logFolderMissing
-import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.navigation.startDestination
 import org.meshtastic.core.ui.theme.AppTheme

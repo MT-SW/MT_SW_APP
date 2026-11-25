@@ -66,6 +66,7 @@ import org.meshtastic.app.node.metrics.getTracerouteMapOverlayInsets
 import org.meshtastic.app.ui.MainScreen
 import org.meshtastic.app.xr.AppSpatialShell
 import org.meshtastic.core.barcode.rememberBarcodeScanner
+import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.state.LaunchOptions
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.di.CoroutineDispatchers
@@ -84,12 +85,11 @@ import org.meshtastic.core.resources.map_layer_too_large
 import org.meshtastic.core.service.MeshService
 import org.meshtastic.core.service.ServiceStartTrigger
 import org.meshtastic.core.service.startService
-import org.meshtastic.core.common.log.AppLogControls
-import org.meshtastic.core.ui.component.LogFolderScreen
-import org.meshtastic.core.ui.component.logFolderMissing
 import org.meshtastic.core.ui.component.DataNoticeScreen
+import org.meshtastic.core.ui.component.LogFolderScreen
 import org.meshtastic.core.ui.component.NarrowBandWarningDialog
 import org.meshtastic.core.ui.component.RegionWarningDialog
+import org.meshtastic.core.ui.component.logFolderMissing
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.EventFontResolver
 import org.meshtastic.core.ui.theme.EventTheme

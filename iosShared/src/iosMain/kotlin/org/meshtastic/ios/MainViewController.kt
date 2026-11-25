@@ -51,9 +51,9 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.service.stats.MeshStatsFeed
+import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.component.LogFolderScreen
 import org.meshtastic.core.ui.component.logFolderMissing
-import org.meshtastic.core.ui.component.DataNoticeScreen
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.EventTheme
 import org.meshtastic.core.ui.theme.EventThemeToggle

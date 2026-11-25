@@ -62,11 +62,12 @@ internal fun installDesktopLogging(isDebug: Boolean) {
         Logger.setMinSeverity(MtSwLogging.minSeverityFor(Severity.Info, level))
     }
     MtSwLogging.screenProvider = { windowExtras(withPicture = true) }
-    val control = DesktopLogControl(logDir)
+    val exportScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    val control = DesktopLogControl(logDir, exportScope)
     AppLogControls.current = control
     // Like the Downloads folder of a phone: two zips kept fresh in the logs folder, the log of the last 24 hours and,
     // apart from it, the full log (only while it is on).
-    CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+    exportScope.launch {
         while (true) {
             control.autoExport()
             delay(AUTO_EXPORT_EVERY_MS)
@@ -91,7 +92,7 @@ private const val NAME_24H = "mt_sw_logi_24h.zip"
 private const val NAME_FULL = "mt_sw_logi_pelne.zip"
 
 /** The desktop side of the log switch: same files as on a phone, kept in the logs folder of the data folder. */
-private class DesktopLogControl(private val dir: File) : AppLogControl {
+private class DesktopLogControl(private val dir: File, private val scope: CoroutineScope) : AppLogControl {
     override val level: StateFlow<AppLogLevel>
         get() = MtSwLogging.level
 
@@ -106,8 +107,11 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
     private val folderFile = File(dir, "log_folder.txt")
     private val folderName = kotlinx.coroutines.flow.MutableStateFlow<String?>(chosen()?.name)
 
-    private fun chosen(): File? =
-        runCatching { File(folderFile.readText().trim()) }.getOrNull()?.takeIf { it.path.isNotBlank() && it.isDirectory }
+    private fun chosen(): File? = runCatching {
+        File(folderFile.readText().trim())
+    }
+        .getOrNull()
+        ?.takeIf { it.path.isNotBlank() && it.isDirectory }
 
     override val canChooseFolder: Boolean = true
 
@@ -121,7 +125,7 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
         folderName.value = folder.name
         Logger.i { "The log folder was chosen (${folder.name})" }
         for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) runCatching { File(dir, marker).delete() }
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch { autoExport() }
+        scope.launch { autoExport() }
     }
 
     override fun clearChosenFolder() {
@@ -172,7 +176,8 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                     java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date(now)) +
                     ".zip"
             val file = File(folder, name)
-            // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash records.
+            // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash
+            // records.
             val since = 0L
             val engineLogs =
                 File(dir.parentFile, "engine-logs")
