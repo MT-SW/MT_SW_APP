@@ -100,7 +100,7 @@ data class AutoCleanNodesPolicy(val enabled: Boolean, val inactivityDays: Int, v
 }
 
 /** Version of the terms-of-use text. Raise it whenever the text changes so everybody is asked to accept it again. */
-const val DATA_NOTICE_VERSION = 1
+const val DATA_NOTICE_VERSION = 2
 
 /** Reactive interface for general UI preferences. */
 @Suppress("TooManyFunctions")
