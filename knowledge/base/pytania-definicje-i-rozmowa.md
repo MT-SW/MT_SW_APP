@@ -218,3 +218,8 @@ Słowa: zdalne ulubione, zdalne ignorowane, zdalny kontakt, zdalna lista węzł�
 Nad przyciskami powiększania i pomniejszania na mapie jest przycisk „Widok 3D”, który pochyla mapę, a dotknięty jeszcze raz prostuje ją („Widok płaski”). Mapę pochylisz też dwoma palcami przesuwanymi razem w górę lub w dół; na komputerze przeciągając z prawym przyciskiem myszy.
 Słowa: widok 3D, pochylenie mapy, przechylić mapę, tryb 3D, mapa 3D, jak pochylić mapę
 Źródło: Dokumentacja MT_SW_APP (opracowanie własne, 2026-11)
+
+### Czy sterowanie GPIO w aplikacji wymaga kanału „gpio”?
+W MT_SW_FIRMWARE v3 nie: sterowanie idzie przez zdalnego admina (klucze administratora), więc wystarczy włączony moduł „Zdalny sprzęt” na węźle docelowym i Twój klucz na liście kluczy administratora tego węzła. Na starszym oprogramowaniu potrzebny jest kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach.
+Słowa: GPIO, kanał gpio, zdalny sprzęt, Remote Hardware, klucz administratora, zdalny admin, MT_SW_FIRMWARE v3
+Źródło: Dokumentacja MT_SW_APP (opracowanie własne, 2026-11)
