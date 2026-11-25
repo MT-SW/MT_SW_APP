@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -50,6 +51,7 @@ import org.meshtastic.core.ui.component.NodeChip
  * MT_SW: a window with our own node list, from which the nodes to manage on the remote device are ticked (many at
  * once, with a search). Everything ticked stays selected after the window is closed.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RemoteNodePickerSheet(
     nodes: List<Node>,
