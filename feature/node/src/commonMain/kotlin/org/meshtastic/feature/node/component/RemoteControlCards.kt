@@ -21,6 +21,7 @@ package org.meshtastic.feature.node.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -32,10 +33,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,9 +46,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,10 +70,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add_contact
+import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.gpio_action_off
 import org.meshtastic.core.resources.gpio_action_on
 import org.meshtastic.core.resources.gpio_mask_display
@@ -85,6 +94,7 @@ import org.meshtastic.core.resources.quick_commands_hint
 import org.meshtastic.core.resources.quick_commands_need_keys
 import org.meshtastic.core.resources.quick_commands_title
 import org.meshtastic.core.resources.remote_add_to_list
+import org.meshtastic.core.resources.remote_clear_selection
 import org.meshtastic.core.resources.remote_contact_hint
 import org.meshtastic.core.resources.remote_contact_title
 import org.meshtastic.core.resources.remote_id_invalid
@@ -92,10 +102,17 @@ import org.meshtastic.core.resources.remote_list_favorites
 import org.meshtastic.core.resources.remote_list_ignored
 import org.meshtastic.core.resources.remote_manage_hint
 import org.meshtastic.core.resources.remote_manage_title
+import org.meshtastic.core.resources.remote_pick_from_list
 import org.meshtastic.core.resources.remote_remove_from_list
+import org.meshtastic.core.resources.remote_remove_node
+import org.meshtastic.core.resources.remote_remove_node_text
+import org.meshtastic.core.resources.remote_remove_node_title
+import org.meshtastic.core.resources.remote_selected_count
+import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.icon.CheckCircle
@@ -449,14 +466,21 @@ internal fun RemoteNodeManagementPanel(
     // The app's usual hex node ID ("!a1b2c3d4", with or without the "!").
     val targetNodeNum = NodeAddress.idToNum(idText)
     val idInvalid = idText.isNotBlank() && targetNodeNum == null
+    // MT_SW: nodes ticked from our own node list; they are managed together with the typed ID.
+    val nodeDb by koinInject<NodeRepository>().nodeDBbyNum.collectAsState()
+    val selected = remember { mutableStateListOf<Int>() }
+    var pickerOpen by remember { mutableStateOf(false) }
+    var confirmRemove by remember { mutableStateOf(false) }
+    val targets = (selected.toList() + listOfNotNull(targetNodeNum)).distinct()
     var listType by remember { mutableStateOf(RemoteListType.FAVORITE) }
     val listColor = if (listType == RemoteListType.FAVORITE) gold else purple
 
     fun send(add: Boolean) {
-        val id = targetNodeNum ?: return
-        when (listType) {
-            RemoteListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, add))
-            RemoteListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, add))
+        targets.forEach { id ->
+            when (listType) {
+                RemoteListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, add))
+                RemoteListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, add))
+            }
         }
     }
 
@@ -485,6 +509,36 @@ internal fun RemoteNodeManagementPanel(
             enabled = !isEnsuringSession,
             modifier = Modifier.fillMaxWidth(),
         )
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isEnsuringSession,
+            onClick = { pickerOpen = true },
+        ) {
+            Text(stringResource(Res.string.remote_pick_from_list))
+        }
+        if (selected.isNotEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(Res.string.remote_selected_count, selected.size),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState()),
+                ) {
+                    selected.toList().forEach { num ->
+                        nodeDb[num]?.let { node -> NodeChip(node = node, onClick = { selected.remove(num) }) }
+                    }
+                }
+                OutlinedButton(onClick = { selected.clear() }) {
+                    Text(stringResource(Res.string.remote_clear_selection))
+                }
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             ChoiceTile(
                 icon =
@@ -509,7 +563,7 @@ internal fun RemoteNodeManagementPanel(
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             Button(
                 modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targetNodeNum != null,
+                enabled = !isEnsuringSession && targets.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(containerColor = listColor, contentColor = Color.Black),
                 onClick = { send(add = true) },
             ) {
@@ -517,11 +571,18 @@ internal fun RemoteNodeManagementPanel(
             }
             OutlinedButton(
                 modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targetNodeNum != null,
+                enabled = !isEnsuringSession && targets.isNotEmpty(),
                 onClick = { send(add = false) },
             ) {
                 Text(stringResource(Res.string.remote_remove_from_list))
             }
+        }
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isEnsuringSession && targets.isNotEmpty(),
+            onClick = { confirmRemove = true },
+        ) {
+            Text(stringResource(Res.string.remote_remove_node))
         }
 
         SectionDivider()
@@ -550,22 +611,62 @@ internal fun RemoteNodeManagementPanel(
             modifier = Modifier.fillMaxWidth(),
         )
         Button(
-            enabled = !isEnsuringSession && targetNodeNum != null && longNameState.text.isNotBlank(),
+            enabled =
+            !isEnsuringSession &&
+                (selected.isNotEmpty() || (targetNodeNum != null && longNameState.text.isNotBlank())),
             onClick = {
-                val id = targetNodeNum ?: return@Button
-                onAction(
-                    NodeDetailAction.AddRemoteContact(
-                        destNum,
-                        id,
-                        longNameState.text.toString(),
-                        shortNameState.text.toString(),
-                    ),
-                )
+                // Ticked nodes are saved with the names from our own list; a typed ID with the names typed here.
+                selected.toList().forEach { num ->
+                    nodeDb[num]?.let { node ->
+                        val contact =
+                            NodeDetailAction.AddRemoteContact(destNum, num, node.user.long_name, node.user.short_name)
+                        onAction(contact)
+                    }
+                }
+                if (targetNodeNum != null && longNameState.text.isNotBlank()) {
+                    onAction(
+                        NodeDetailAction.AddRemoteContact(
+                            destNum,
+                            targetNodeNum,
+                            longNameState.text.toString(),
+                            shortNameState.text.toString(),
+                        ),
+                    )
+                }
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(MeshtasticIcons.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
             Text(stringResource(Res.string.add_contact), modifier = Modifier.padding(start = 8.dp))
         }
+    }
+
+    if (pickerOpen) {
+        RemoteNodePickerSheet(
+            nodes = nodeDb.values.filter { it.num != destNum },
+            selected = selected.toSet(),
+            onToggle = { num -> if (!selected.remove(num)) selected.add(num) },
+            onDismiss = { pickerOpen = false },
+        )
+    }
+    if (confirmRemove) {
+        AlertDialog(
+            onDismissRequest = { confirmRemove = false },
+            title = { Text(stringResource(Res.string.remote_remove_node_title)) },
+            text = { Text(stringResource(Res.string.remote_remove_node_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmRemove = false
+                        targets.forEach { id -> onAction(NodeDetailAction.RemoveRemoteNode(destNum, id)) }
+                    },
+                ) {
+                    Text(stringResource(Res.string.remove))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRemove = false }) { Text(stringResource(Res.string.cancel)) }
+            },
+        )
     }
 }

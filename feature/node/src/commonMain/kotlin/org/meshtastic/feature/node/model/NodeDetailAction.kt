@@ -55,6 +55,12 @@ sealed interface NodeDetailAction {
     data class AddRemoteContact(val destNum: Int, val targetNodeNum: Int, val longName: String, val shortName: String) :
         NodeDetailAction
 
+    /**
+     * Removes [targetNodeNum] from the node database of the remote radio [destNum] over an active admin session — not
+     * from the locally-connected radio and not from our own node list.
+     */
+    data class RemoveRemoteNode(val destNum: Int, val targetNodeNum: Int) : NodeDetailAction
+
     /** Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue], via the Remote Hardware module. */
     data class WriteGpio(val destNum: Int, val gpioMask: Long, val gpioValue: Long) : NodeDetailAction
 

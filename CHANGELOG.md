@@ -24,6 +24,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Nowe funkcje
 
+* **Zdalne zarządzanie listami: wybór z własnej listy węzłów (wszystkie wersje).** W szczegółach węzła, w zdalnej administracji, można wybrać z własnej listy węzłów (z wyszukiwaniem i wielokrotnym zaznaczaniem) węzły, które mają zostać dodane lub usunięte z ulubionych i ignorowanych zdalnego urządzenia, albo dodane jako kontakt (z nazwami z naszej listy). Doszło też zdalne usuwanie węzła z listy węzłów zdalnego urządzenia (z potwierdzeniem). Podgląd, kto już jest na zdalnych listach, wymaga zmiany w MT_SW_FIRMWARE i na razie go nie ma.
 * **Mostek: czas trzymania kopii konfiguracji i „Odśwież teraz” (wszystkie wersje).** Mostek trzyma kopię konfiguracji cały czas i nie pyta radia ani nie rozłącza aplikacji; czas ważności kopii wybierzesz w „Centrum połączeń”, a przycisk odnawia ją od razu.
 * **Plakietka z liczbą nieprzeczytanych na ikonie aplikacji (iPhone/iPad i komputer).** Liczba nieprzeczytanych wiadomości pokazuje się na ikonie aplikacji (ekran główny iPhone’a, Dock lub pasek zadań komputera, jeśli system to obsługuje); na Androidzie plakietkę rysuje sam launcher z powiadomień.
 * **Jaskrawość kolorów (wszystkie wersje).** W „Wygląd” → „Ustawienia zaawansowane” ogólna jaskrawość kolorów motywu (pięć poziomów) i osobna jaskrawość przycisków („Jak ogólna” albo własny poziom). Głównych motywów nie zmienia.
@@ -55,7 +56,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
-* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół, więc łatwo je zamknąć także na telefonie.
+* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół z dowolnego miejsca okna (przy przewijanej liście dopiero gdy lista jest na samej górze, więc zwykłe przewijanie nie zamyka okna); planer zachowuje swój oryginalny krzyżyk, bez drugiego.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
 * Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
 * Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
@@ -220,7 +221,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
-* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół, więc łatwo je zamknąć także na telefonie.
+* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół z dowolnego miejsca okna (przy przewijanej liście dopiero gdy lista jest na samej górze, więc zwykłe przewijanie nie zamyka okna); planer zachowuje swój oryginalny krzyżyk, bez drugiego.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
 * Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
 * Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
@@ -1013,6 +1014,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### New features
 
+* **Remote list management: pick from your own node list (all versions).** In the node details, in remote administration, you can pick from your own node list (with a search and multiple selection) the nodes to add to or remove from the favorites and ignored lists of the remote device, or to add as a contact (with the names from our list). A remote removal of a node from the remote device's node list was added too (with a confirmation). Viewing who is already on the remote lists needs a change in MT_SW_FIRMWARE and is not available yet.
 * **Bridge: how long the copy of the configuration is kept and "Renew the copy now" (all versions).** The bridge keeps the copy of the configuration all the time and neither asks the radio nor disconnects the app; the time the copy stays valid is chosen in "Connection center", and the button renews it at once.
 * **Unread badge on the app icon (iPhone/iPad and computer).** The number of unread messages is shown on the icon of the app (the iPhone home screen, the dock or taskbar of the computer where the system supports it); on Android the launcher draws the badge from the notifications itself.
 * **Colour brightness (all versions).** In "Look" → "Advanced settings" a general brightness of the theme colours (five levels) and a separate brightness of the buttons ("As the general setting" or an own level). It does not change the main themes.
@@ -1044,7 +1046,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
-* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down, so it is easy to close on a phone too.
+* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down from anywhere on the window (with a scrolling list only when the list is at the very top, so normal scrolling never closes the window); the planner keeps its own original cross, without a second one.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
 * Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
 * Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.
@@ -1201,7 +1203,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
-* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down, so it is easy to close on a phone too.
+* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down from anywhere on the window (with a scrolling list only when the list is at the very top, so normal scrolling never closes the window); the planner keeps its own original cross, without a second one.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
 * Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
 * Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.

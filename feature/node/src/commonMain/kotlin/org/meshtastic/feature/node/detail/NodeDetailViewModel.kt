@@ -266,6 +266,17 @@ class NodeDetailViewModel(
     }
 
     /**
+     * Removes [targetNodeNum] from the node database of the remote radio [destNum] over the admin session already
+     * established for this screen — not from the locally-connected radio and not from our own node list.
+     */
+    fun removeRemoteNode(destNum: Int, targetNodeNum: Int) {
+        viewModelScope.launch {
+            val delivered = radioController.removeRemoteNode(targetNodeNum, destNum)
+            showRemoteCommandResult(delivered)
+        }
+    }
+
+    /**
      * Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue] via the Remote Hardware module and shows whether the
      * target confirmed delivery.
      */

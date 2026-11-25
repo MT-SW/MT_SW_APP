@@ -460,6 +460,8 @@ class FakeRadioController :
 
     override suspend fun removeByNodenum(packetId: Int, nodeNum: Int) {}
 
+    override suspend fun removeRemoteNode(nodeNum: Int, destNum: Int): Boolean = true
+
     override suspend fun requestPosition(destNum: Int, currentPosition: Position, requestId: Int) {}
 
     override suspend fun requestUserInfo(destNum: Int, requestId: Int) {}

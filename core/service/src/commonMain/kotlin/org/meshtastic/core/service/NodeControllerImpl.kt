@@ -110,6 +110,11 @@ internal class NodeControllerImpl(
         nodeManager.updateNode(node.num) { it.copy(isMuted = !node.isMuted) }
     }
 
+    override suspend fun removeRemoteNode(nodeNum: Int, destNum: Int): Boolean =
+        commandSender.sendAdminAndAwaitDelivery(destNum) {
+            AdminMessage.Builder().also { wb -> wb.remove_by_nodenum = nodeNum }.build()
+        }
+
     override suspend fun removeByNodenum(packetId: Int, nodeNum: Int) {
         nodeManager.removeByNodenum(nodeNum)
         val myNum = nodeManager.myNodeNum.value ?: return

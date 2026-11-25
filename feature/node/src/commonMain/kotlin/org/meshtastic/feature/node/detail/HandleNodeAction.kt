@@ -54,6 +54,8 @@ internal fun handleNodeAction(
         is NodeDetailAction.AddRemoteContact ->
             viewModel.addRemoteContact(action.destNum, action.targetNodeNum, action.longName, action.shortName)
 
+        is NodeDetailAction.RemoveRemoteNode -> viewModel.removeRemoteNode(action.destNum, action.targetNodeNum)
+
         is NodeDetailAction.WriteGpio -> viewModel.writeGpio(action.destNum, action.gpioMask, action.gpioValue)
 
         is NodeDetailAction.ReadGpio -> viewModel.readGpio(action.destNum, action.gpioMask)

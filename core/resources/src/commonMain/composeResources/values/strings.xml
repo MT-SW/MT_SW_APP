@@ -3561,7 +3561,7 @@
     <string name="remote_admin">Remote Administration</string>
     <string name="remote_admin_unreachable">Could not reach node — try again or move closer.</string>
     <string name="remote_command_no_response">No response from node</string>
-    <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, using the ID typed above.</string>
+    <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, for the selected nodes or the typed ID.</string>
     <string name="remote_contact_title">Add a contact remotely</string>
     <string name="remote_hardware">Remote Hardware</string>
     <string name="remote_hardware_config">Remote Hardware Config</string>
@@ -3569,9 +3569,16 @@
     <string name="remote_id_invalid">This does not look like a node ID (for example !a1b2c3d4)</string>
     <string name="remote_list_favorites">Favorites</string>
     <string name="remote_list_ignored">Ignored</string>
-    <string name="remote_manage_hint">Type the ID of the node you want to manage on the remote device, for example !a1b2c3d4. It does not have to be on your own node list.</string>
+    <string name="remote_manage_hint">Pick nodes from your own list or type the ID of a node you want to manage on the remote device, for example !a1b2c3d4. A typed node does not have to be on your own list.</string>
     <string name="remote_manage_title">Lists and contacts on the remote device</string>
     <string name="remote_remove_from_list">Remove from list</string>
+    <string name="remote_pick_from_list">Pick from node list</string>
+    <string name="remote_pick_search">Search nodes</string>
+    <string name="remote_selected_count">Selected: %1$d</string>
+    <string name="remote_clear_selection">Clear selection</string>
+    <string name="remote_remove_node">Remove from node list of the device</string>
+    <string name="remote_remove_node_title">Remove from the remote device?</string>
+    <string name="remote_remove_node_text">The selected nodes will be removed only from the node list of the remote device. Your own list stays the same. The device adds a node again when it hears it.</string>
     <string name="remote_shell">Remote Shell</string>
     <string name="remote_shell_command_hint">Command</string>
     <string name="remote_shell_error_notice">Error from the node: %1$s</string>

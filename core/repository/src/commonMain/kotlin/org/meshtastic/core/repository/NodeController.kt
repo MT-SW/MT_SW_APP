@@ -56,4 +56,12 @@ interface NodeController {
 
     /** Removes a node from the mesh by its node number. */
     suspend fun removeByNodenum(packetId: Int, nodeNum: Int)
+
+    /**
+     * Removes [nodeNum] from the node database of the remote radio [destNum] over an active admin session — not from
+     * the locally-connected radio and not from our own node list.
+     *
+     * @return `true` only if the remote radio's mesh routing ACK confirmed delivery (same semantics as [setFavorite]).
+     */
+    suspend fun removeRemoteNode(nodeNum: Int, destNum: Int): Boolean
 }
