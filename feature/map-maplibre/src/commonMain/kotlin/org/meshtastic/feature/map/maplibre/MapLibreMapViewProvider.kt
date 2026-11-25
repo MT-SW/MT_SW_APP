@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -476,11 +477,15 @@ private fun BoxScope.MapToolbar(
     val filterViewModel: SharedMapViewModel = koinViewModel()
     val filterState by filterViewModel.mapFilterStateFlow.collectAsStateWithLifecycle()
 
+    // Only the bearing is read here, through derivedStateOf: reading the whole camera position made this screen
+    // recompose on every frame of a pan, although only a turn changes the compass.
+    val bearing by remember(mapState) { derivedStateOf { mapState.cameraPosition.bearing.toFloat() } }
+
     MapControlsOverlay(
         modifier = Modifier.align(Alignment.TopCenter).padding(top = TOOLBAR_INSET.dp),
         onToggleFilterMenu = { filterMenuExpanded = !filterMenuExpanded },
         filtersActive = filterState.isNarrowing,
-        bearing = mapState.cameraPosition.bearing.toFloat(),
+        bearing = bearing,
         followPhoneBearing = location.followingBearing,
         // Matches the Google flavor: while following, the compass toggles heading-lock; otherwise it straightens
         // the map back to north. Assembled here because it needs both the controls and the map state, and the

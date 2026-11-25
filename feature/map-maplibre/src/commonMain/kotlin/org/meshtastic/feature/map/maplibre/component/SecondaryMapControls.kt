@@ -17,6 +17,7 @@
 package org.meshtastic.feature.map.maplibre.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,12 +49,13 @@ internal fun SecondaryMapControls(
 ) {
     var filterMenuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val bearing by remember(mapState) { derivedStateOf { mapState.cameraPosition.bearing.toFloat() } }
 
     MapControlsOverlay(
         modifier = modifier,
         onToggleFilterMenu = filterMenu?.let { { filterMenuExpanded = !filterMenuExpanded } },
         filterDropdownContent = { filterMenu?.invoke(filterMenuExpanded) { filterMenuExpanded = false } },
-        bearing = mapState.cameraPosition.bearing.toFloat(),
+        bearing = bearing,
         onCompassClick = {
             scope.launch { mapState.animateCamera(CameraUpdate(bearing = 0.0), CameraAnimation.Ease.Standard) }
         },

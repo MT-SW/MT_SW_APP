@@ -19,6 +19,9 @@ package org.meshtastic.feature.map.maplibre.component
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +76,8 @@ internal fun BoxScope.MapZoom(
 ) {
     val scope = rememberCoroutineScope()
     val zoomRange = basemap.zoomRange()
-    val tilted = mapState.cameraPosition.pitch > TILTED_ABOVE_DEGREES
+    // derivedStateOf: the buttons change only when the map goes between flat and tilted, not on every frame.
+    val tilted by remember(mapState) { derivedStateOf { mapState.cameraPosition.pitch > TILTED_ABOVE_DEGREES } }
 
     MapZoomControls(
         compact = centered,
