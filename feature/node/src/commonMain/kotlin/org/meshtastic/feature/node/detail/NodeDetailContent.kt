@@ -179,6 +179,8 @@ fun NodeDetailList(
                         onFirmwareSelect = onFirmwareSelect,
                         sessionStatus = uiState.sessionStatus,
                         isEnsuringSession = uiState.isEnsuringSession,
+                        gpioPins = uiState.gpioPins,
+                        gpioAdminSupported = uiState.gpioAdminSupported,
                     )
                 }
             }

@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.repository
 
+import kotlinx.coroutines.flow.Flow
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
@@ -25,6 +26,7 @@ import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.PresenceConfig
 import org.meshtastic.core.model.Position as ModelPosition
 import org.meshtastic.proto.Position as ProtoPosition
+import org.meshtastic.proto.RemoteHardwarePin
 
 /** Interface for sending commands and packets to the mesh network. */
 @Suppress("TooManyFunctions")
@@ -216,6 +218,20 @@ interface CommandSender {
      * @return the reported gpio_value bitmask, or `null` on timeout/no response.
      */
     suspend fun readGpio(destNum: Int, gpioMask: Long): Long?
+
+    /**
+     * Asks [destNum], over the remote admin, for the list of pins its Remote Hardware module may control (only that one
+     * settings section is requested).
+     *
+     * @return the pins, or `null` on timeout/no response.
+     */
+    suspend fun requestGpioPins(destNum: Int): List<RemoteHardwarePin>?
+
+    /** Whether [destNum] is known to run MT_SW_FIRMWARE v3 or newer (GPIO goes through the remote admin there). */
+    fun gpioAdminSupportedFlow(destNum: Int): Flow<Boolean>
+
+    /** Finds out the firmware version of [destNum] if it is not known yet (asked at most once a week). */
+    suspend fun checkGpioVersion(destNum: Int)
 
     /**
      * Sends a lockdown passphrase to authenticate with a locked device.

@@ -87,6 +87,7 @@ import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.NodeDetailAction
 import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.HardwareModel
+import org.meshtastic.proto.RemoteHardwarePin
 
 @Composable
 fun AdministrationSection(
@@ -97,6 +98,8 @@ fun AdministrationSection(
     sessionStatus: SessionStatus,
     isEnsuringSession: Boolean,
     modifier: Modifier = Modifier,
+    gpioPins: List<RemoteHardwarePin>? = null,
+    gpioAdminSupported: Boolean = false,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
         SectionCard(
@@ -172,7 +175,7 @@ fun AdministrationSection(
             }
         }
 
-        GpioSection(node = node, onAction = onAction)
+        GpioSection(node = node, onAction = onAction, pins = gpioPins, adminSupported = gpioAdminSupported)
 
         val firmwareVersion = node.metadata?.firmware_version
         val firmwareEdition = metricsState.firmwareEdition
@@ -225,7 +228,12 @@ private fun RemoteAdminListItem(
 
 /** The GPIO card: its title row has an info icon that opens a short setup guide. */
 @Composable
-private fun GpioSection(node: Node, onAction: (NodeDetailAction) -> Unit) {
+private fun GpioSection(
+    node: Node,
+    onAction: (NodeDetailAction) -> Unit,
+    pins: List<RemoteHardwarePin>?,
+    adminSupported: Boolean,
+) {
     var showHelp by remember { mutableStateOf(false) }
     if (showHelp) {
         MeshtasticDialog(
@@ -248,7 +256,7 @@ private fun GpioSection(node: Node, onAction: (NodeDetailAction) -> Unit) {
         },
     ) {
         Column {
-            GpioPanel(node = node, onAction = onAction)
+            GpioPanel(node = node, onAction = onAction, pins = pins, adminSupported = adminSupported)
             SectionDivider()
             QuickCommandsPanel(node = node, onAction = onAction)
         }

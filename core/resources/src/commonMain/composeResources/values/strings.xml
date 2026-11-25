@@ -1951,6 +1951,10 @@
     <string name="gpio_pin_invalid">Enter a pin number from 0 to 62</string>
     <string name="gpio_pin_title">Pin control</string>
     <string name="gpio_pin_to_monitor">GPIO pin to monitor</string>
+    <string name="gpio_pins_get">Get the list of pins</string>
+    <string name="gpio_pins_need_v3">The list of pins is available only in MT_SW_FIRMWARE v3 (it is fetched through the remote admin).</string>
+    <string name="gpio_pins_none">The list of pins on this node is empty.</string>
+    <string name="gpio_pins_pick">Choose a pin from the list:</string>
     <string name="gpio_read">Read</string>
     <string name="gpio_read_result">GPIO read: %1$s</string>
     <string name="gps_en_gpio">GPS EN GPIO</string>

@@ -197,6 +197,16 @@ class FakeCommandSender :
         return null
     }
 
+    override suspend fun requestGpioPins(destNum: Int): List<org.meshtastic.proto.RemoteHardwarePin>? {
+        failCommandIfConfigured()
+        return null
+    }
+
+    override fun gpioAdminSupportedFlow(destNum: Int): kotlinx.coroutines.flow.Flow<Boolean> =
+        kotlinx.coroutines.flow.flowOf(false)
+
+    override suspend fun checkGpioVersion(destNum: Int) = Unit
+
     override suspend fun sendAdminAwaitResultForConnection(
         destNum: Int,
         expectedConnectionVersion: Long,

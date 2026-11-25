@@ -18,6 +18,7 @@ package org.meshtastic.core.repository
 
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.QueueStatus
+import org.meshtastic.proto.RemoteHardwarePin
 import org.meshtastic.proto.ToRadio
 
 /** Interface for handling the transmission of packets to the radio and managing the packet queue. */
@@ -101,6 +102,17 @@ interface PacketHandler {
      * processed.
      */
     suspend fun completeGpioReply(fromNum: Int, gpioValue: Long)
+
+    /**
+     * Suspends until the Remote Hardware module settings of [fromNum] (its list of available pins) arrive over the remote
+     * admin, or times out. Keyed by the sender only, one pending wait per node.
+     *
+     * @return the available pins, or `null` on timeout/no response.
+     */
+    suspend fun awaitGpioPins(fromNum: Int): List<RemoteHardwarePin>?
+
+    /** Completes a pending [awaitGpioPins] wait for [fromNum] with [pins]. */
+    suspend fun completeGpioPins(fromNum: Int, pins: List<RemoteHardwarePin>)
 
     /**
      * [sendToRadioAndAwaitResult] admitted only while [expectedConnectionVersion] still owns the connected lifecycle

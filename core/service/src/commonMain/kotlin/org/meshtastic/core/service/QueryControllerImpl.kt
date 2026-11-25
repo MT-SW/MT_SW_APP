@@ -88,6 +88,12 @@ internal class QueryControllerImpl(
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? = commandSender.readGpio(destNum, gpioMask)
 
+    override suspend fun requestGpioPins(destNum: Int) = commandSender.requestGpioPins(destNum)
+
+    override fun gpioAdminSupportedFlow(destNum: Int) = commandSender.gpioAdminSupportedFlow(destNum)
+
+    override suspend fun checkGpioVersion(destNum: Int) = commandSender.checkGpioVersion(destNum)
+
     override suspend fun requestTelemetry(requestId: Int, destNum: Int, typeValue: Int) {
         commandSender.requestTelemetry(requestId, destNum, typeValue)
     }

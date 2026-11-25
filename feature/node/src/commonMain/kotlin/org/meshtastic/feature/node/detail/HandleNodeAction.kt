@@ -60,6 +60,10 @@ internal fun handleNodeAction(
 
         is NodeDetailAction.ReadGpio -> viewModel.readGpio(action.destNum, action.gpioMask)
 
+        is NodeDetailAction.RequestGpioPins -> viewModel.requestGpioPins(action.destNum)
+
+        is NodeDetailAction.CheckGpioVersion -> viewModel.checkGpioVersion(action.destNum)
+
         is NodeDetailAction.SendQuickMessage -> viewModel.sendQuickMessage(action.node, action.text)
 
         is NodeDetailAction.RequestOnDemand ->

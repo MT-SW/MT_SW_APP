@@ -2762,6 +2762,10 @@
     <string name="network_health_info_neighbors">Sąsiedzi (ile węzłów słyszy dany węzeł). Dobrze: 3 lub więcej. Średnio: 2. Źle: 1. Bardzo źle: 0, węzeł jest odizolowany.</string>
     <string name="network_health_info_none">W tej zakładce nie ma kolorów, bo jej wartości nie mają jednej granicy między dobrym a złym.</string>
     <string name="gpio_pin_title">Sterowanie pinem</string>
+    <string name="gpio_pins_get">Pobierz listę pinów</string>
+    <string name="gpio_pins_need_v3">Lista pinów jest dostępna tylko w MT_SW_FIRMWARE v3 (pobierana przez zdalnego admina).</string>
+    <string name="gpio_pins_none">Lista pinów na tym węźle jest pusta.</string>
+    <string name="gpio_pins_pick">Wybierz pin z listy:</string>
     <string name="gpio_pin_hint">Wpisz numer pinu, a potem go włącz, wyłącz albo odczytaj jego stan.</string>
     <string name="gpio_pin_invalid">Podaj numer pinu od 0 do 62</string>
     <string name="gpio_action_on">Włącz (1)</string>

@@ -71,6 +71,7 @@ import org.meshtastic.core.resources.delivery_confirmed
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.gpio_off
 import org.meshtastic.core.resources.gpio_on
+import org.meshtastic.core.resources.gpio_pins_none
 import org.meshtastic.core.resources.gpio_read_result
 import org.meshtastic.core.resources.quick_command_sent
 import org.meshtastic.core.resources.remote_admin_unreachable
@@ -86,6 +87,7 @@ import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.OnDemandType
+import org.meshtastic.proto.RemoteHardwarePin
 import org.meshtastic.proto.Routing
 
 private const val QUEUE_REJECTION_LOG_MESSAGE = "Node-detail request rejected by outbound packet queue"
@@ -124,6 +126,10 @@ data class NodeDetailUiState(
      * conversation instead of the thread the message action was kept visible for.
      */
     val existingContactKey: String? = null,
+    /** The pins the node's Remote Hardware module may control, once the GPIO card has asked for them. */
+    val gpioPins: List<RemoteHardwarePin>? = null,
+    /** True when the node is known to run MT_SW_FIRMWARE v3 or newer (the GPIO list of pins can be asked for). */
+    val gpioAdminSupported: Boolean = false,
 ) {
     /** True when a direct-message thread with this node already exists, keyed either legacy or PKI. */
     val hasConversation: Boolean
@@ -207,23 +213,33 @@ class NodeDetailViewModel(
                     flowOf(NodeDetailUiState())
                 } else {
                     combine(
-                        getNodeDetailsUseCase.summary(nodeId),
-                        sessionStatusFlow,
-                        isEnsuringSession,
-                        narrowBandWarningFlow,
-                        // The contact list is a heavy read; the screen must not wait for it before showing anything.
-                        existingContactKeyFlow(nodeId).onStart { emit(null) },
-                    ) { base, sessionStatus, ensuring, showNarrowBandWarning, existingContactKey ->
-                        base.copy(
-                            sessionStatus = sessionStatus,
-                            isEnsuringSession = ensuring,
-                            showNarrowBandWarning = showNarrowBandWarning,
-                            existingContactKey = existingContactKey,
-                        )
+                        combine(
+                            getNodeDetailsUseCase.summary(nodeId),
+                            sessionStatusFlow,
+                            isEnsuringSession,
+                            narrowBandWarningFlow,
+                            // The contact list is a heavy read; the screen must not wait for it before showing
+                            // anything.
+                            existingContactKeyFlow(nodeId).onStart { emit(null) },
+                        ) { base, sessionStatus, ensuring, showNarrowBandWarning, existingContactKey ->
+                            base.copy(
+                                sessionStatus = sessionStatus,
+                                isEnsuringSession = ensuring,
+                                showNarrowBandWarning = showNarrowBandWarning,
+                                existingContactKey = existingContactKey,
+                            )
+                        },
+                        gpioPinsByNode.map { it[nodeId] },
+                        queryController.gpioAdminSupportedFlow(nodeId).onStart { emit(false) },
+                    ) { state, pins, gpioSupported ->
+                        state.copy(gpioPins = pins, gpioAdminSupported = gpioSupported)
                     }
                 }
             }
             .stateInWhileSubscribed(initialValue = NodeDetailUiState())
+
+    /** The pins each node told us its Remote Hardware module may control (asked for from the GPIO card). */
+    private val gpioPinsByNode = MutableStateFlow<Map<Int, List<RemoteHardwarePin>>>(emptyMap())
 
     fun start(nodeId: Int) {
         if (manualNodeId.value != nodeId) {
@@ -283,6 +299,26 @@ class NodeDetailViewModel(
     fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) = safeLaunch(tag = "writeGpio") {
         try {
             showRemoteCommandResult(queryController.writeGpio(destNum, gpioMask, gpioValue))
+        } catch (e: PacketQueueRejectedException) {
+            showNodeRequestFailure(e, QUEUE_REJECTION_LOG_MESSAGE, snackbarManager, resolveUiText)
+        } catch (e: LocalNodeUnavailableException) {
+            showNodeRequestFailure(e, LOCAL_NODE_UNAVAILABLE_LOG_MESSAGE, snackbarManager, resolveUiText)
+        }
+    }
+
+    /** Finds out the firmware version of [destNum] for the GPIO card; it is asked for at most once a week. */
+    fun checkGpioVersion(destNum: Int) = safeLaunch(tag = "checkGpioVersion") { queryController.checkGpioVersion(destNum) }
+
+    /** Asks [destNum] over the remote admin for the pins its Remote Hardware module may control and keeps the answer. */
+    fun requestGpioPins(destNum: Int) = safeLaunch(tag = "requestGpioPins") {
+        try {
+            val pins = queryController.requestGpioPins(destNum)
+            if (pins == null) {
+                snackbarManager.showSnackbar(getStringSuspend(Res.string.remote_command_no_response))
+            } else {
+                gpioPinsByNode.value = gpioPinsByNode.value + (destNum to pins)
+                if (pins.isEmpty()) snackbarManager.showSnackbar(getStringSuspend(Res.string.gpio_pins_none))
+            }
         } catch (e: PacketQueueRejectedException) {
             showNodeRequestFailure(e, QUEUE_REJECTION_LOG_MESSAGE, snackbarManager, resolveUiText)
         } catch (e: LocalNodeUnavailableException) {

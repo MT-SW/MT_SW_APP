@@ -81,6 +81,8 @@ import org.meshtastic.core.resources.error_duty_cycle
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.waypoint_received
+import org.meshtastic.proto.AdminMessage
+import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.MeshBeacon
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Paxcount
@@ -207,6 +209,11 @@ class MeshDataHandlerImpl(
 
             PortNum.ADMIN_APP -> {
                 adminPacketHandler.handleAdminMessage(packet, myNodeNum, session)
+                handleRemoteGpioPins(packet, myNodeNum, session)
+            }
+
+            PortNum.REMOTE_HARDWARE_APP -> {
+                handleRemoteHardware(packet, session)
             }
 
             PortNum.REMOTE_SHELL_APP -> {
@@ -273,6 +280,26 @@ class MeshDataHandlerImpl(
                 serviceNotifications.showMeshBeaconNotification(offer)
             }
         }
+    }
+
+    /** The answer to a Remote Hardware READ_GPIOS wakes up the read that waits for it. */
+    private fun handleRemoteHardware(packet: MeshPacket, session: RadioSessionContext) {
+        val payload = packet.decoded?.payload ?: return
+        val hw = HardwareMessage.ADAPTER.decodeOrNull(payload, Logger) ?: return
+        if (hw.type != HardwareMessage.Type.READ_GPIOS_REPLY) return
+        Logger.i { "GPIO: odpowiedź z węzła ${packet.from.toUInt()}, stan pinów ${hw.gpio_value}" }
+        radioInterfaceService.launchSessionWork(scope, session) { packetHandler.completeGpioReply(packet.from, hw.gpio_value) }
+    }
+
+    /** The Remote Hardware settings of another node (asked for by the GPIO card) hand over the list of its pins. */
+    private fun handleRemoteGpioPins(packet: MeshPacket, myNodeNum: Int, session: RadioSessionContext) {
+        if (packet.from == myNodeNum) return
+        val payload = packet.decoded?.payload ?: return
+        val pins =
+            AdminMessage.ADAPTER.decodeOrNull(payload, Logger)?.get_module_config_response?.remote_hardware?.available_pins
+                ?: return
+        Logger.i { "GPIO: lista pinów z węzła ${packet.from.toUInt()}, pinów ${pins.size}" }
+        radioInterfaceService.launchSessionWork(scope, session) { packetHandler.completeGpioPins(packet.from, pins) }
     }
 
     private fun handlePaxCounter(packet: MeshPacket, session: RadioSessionContext) {

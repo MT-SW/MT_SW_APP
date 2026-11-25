@@ -1900,6 +1900,10 @@ gpio_pin_hint
 gpio_pin_invalid
 gpio_pin_title
 gpio_pin_to_monitor
+gpio_pins_get
+gpio_pins_need_v3
+gpio_pins_none
+gpio_pins_pick
 gpio_read
 gpio_read_result
 gps_en_gpio

@@ -30,7 +30,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -38,6 +40,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -49,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -84,6 +88,9 @@ import org.meshtastic.core.resources.gpio_pin
 import org.meshtastic.core.resources.gpio_pin_hint
 import org.meshtastic.core.resources.gpio_pin_invalid
 import org.meshtastic.core.resources.gpio_pin_title
+import org.meshtastic.core.resources.gpio_pins_get
+import org.meshtastic.core.resources.gpio_pins_need_v3
+import org.meshtastic.core.resources.gpio_pins_pick
 import org.meshtastic.core.resources.gpio_read
 import org.meshtastic.core.resources.long_name
 import org.meshtastic.core.resources.node_id
@@ -135,6 +142,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.feature.node.health.HealthLevel
 import org.meshtastic.feature.node.health.color
 import org.meshtastic.feature.node.model.NodeDetailAction
+import org.meshtastic.proto.RemoteHardwarePin
 
 private const val MAX_GPIO_PIN = 62
 private const val TINT_ALPHA = 0.14f
@@ -259,7 +267,12 @@ private fun ActionTile(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun GpioPanel(node: Node, onAction: (NodeDetailAction) -> Unit) {
+internal fun GpioPanel(
+    node: Node,
+    onAction: (NodeDetailAction) -> Unit,
+    pins: List<RemoteHardwarePin>? = null,
+    adminSupported: Boolean = false,
+) {
     val gold = MaterialTheme.colorScheme.StatusOnline
     val red = HealthLevel.MEDIUM.color()
     val pinState = rememberTextFieldState("")
@@ -267,6 +280,9 @@ internal fun GpioPanel(node: Node, onAction: (NodeDetailAction) -> Unit) {
     val pinNumber = pinText.toIntOrNull()
     val gpioMask = pinNumber?.takeIf { it in 0..MAX_GPIO_PIN }?.let { 1L shl it }
     val pinInvalid = pinText.isNotBlank() && gpioMask == null
+
+    // The firmware version is asked for when the card shows (at most once a week); the list of pins needs v3.
+    LaunchedEffect(node.num) { onAction(NodeDetailAction.CheckGpioVersion(node.num)) }
 
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         PanelHeader(
@@ -315,6 +331,64 @@ internal fun GpioPanel(node: Node, onAction: (NodeDetailAction) -> Unit) {
                 onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(node.num, it)) } },
                 modifier = Modifier.weight(1f),
             )
+        }
+        // A wide fourth button a little lower: it asks the node, over the remote admin, which pins it may control.
+        Spacer(Modifier.height(4.dp))
+        TileCard(
+            onClick = { onAction(NodeDetailAction.RequestGpioPins(node.num)) },
+            enabled = adminSupported,
+            modifier = Modifier.fillMaxWidth(),
+            container = MaterialTheme.colorScheme.surfaceContainerHighest,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Icon(
+                    imageVector = MeshtasticIcons.Refresh,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+                Text(
+                    text = stringResource(Res.string.gpio_pins_get),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+        if (!adminSupported) {
+            Text(
+                text = stringResource(Res.string.gpio_pins_need_v3),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (!pins.isNullOrEmpty()) {
+            Text(
+                text = stringResource(Res.string.gpio_pins_pick),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                pins.forEach { pin ->
+                    TileCard(
+                        onClick = { pinState.setTextAndPlaceCursorAtEnd(pin.gpio_pin.toString()) },
+                        enabled = true,
+                        modifier = Modifier.weight(1f),
+                        container = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ) {
+                        Text(
+                            text =
+                            if (pin.name.isBlank()) "${pin.gpio_pin}" else "${pin.name} · ${pin.gpio_pin}",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 12.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }

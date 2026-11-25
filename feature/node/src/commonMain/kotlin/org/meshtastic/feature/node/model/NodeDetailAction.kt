@@ -69,6 +69,12 @@ sealed interface NodeDetailAction {
     /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
     data class ReadGpio(val destNum: Int, val gpioMask: Long) : NodeDetailAction
 
+    /** Asks [destNum] over the remote admin for the list of pins its Remote Hardware module may control. */
+    data class RequestGpioPins(val destNum: Int) : NodeDetailAction
+
+    /** Finds out the firmware version of [destNum] for the GPIO card (asked at most once a week). */
+    data class CheckGpioVersion(val destNum: Int) : NodeDetailAction
+
     /**
      * Sends a preset quick command (e.g. "/ping") as a private message to [node] — independent of the normal messaging
      * entry point, so it works even for nodes whose role makes them otherwise unmessageable. The caller is expected to

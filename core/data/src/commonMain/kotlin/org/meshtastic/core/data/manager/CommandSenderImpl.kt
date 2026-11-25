@@ -20,6 +20,9 @@ package org.meshtastic.core.data.manager
 
 import co.touchlab.kermit.Logger
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -81,6 +84,7 @@ import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.PowerMetrics
 import org.meshtastic.proto.PresenceConfig
+import org.meshtastic.proto.RemoteHardwarePin
 import org.meshtastic.proto.Telemetry
 import org.meshtastic.proto.ToRadio
 import kotlin.math.absoluteValue
@@ -511,22 +515,23 @@ class CommandSenderImpl(
     private suspend fun knownFwPlusVersion(destNum: Int): Pair<Int, Long>? =
         meshLogRepository
             .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
-            .map { logs ->
-                logs
-                    .mapNotNull { log ->
-                        log.fromRadio.packet
-                            ?.decoded
-                            ?.payload
-                            ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
-                            ?.response
-                            ?.takeIf { it.response_type == OnDemandType.RESPONSE_FW_PLUS_VERSION }
-                            ?.fw_plus_version
-                            ?.version_number
-                            ?.let { version -> version to log.received_date }
-                    }
-                    .maxByOrNull { it.second }
-            }
+            .map(::latestFwPlusVersion)
             .first()
+
+    /** The newest firmware version number (and when it was received) found in the on-demand [logs]. */
+    private fun latestFwPlusVersion(logs: List<MeshLog>): Pair<Int, Long>? = logs
+        .mapNotNull { log ->
+            log.fromRadio.packet
+                ?.decoded
+                ?.payload
+                ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                ?.response
+                ?.takeIf { it.response_type == OnDemandType.RESPONSE_FW_PLUS_VERSION }
+                ?.fw_plus_version
+                ?.version_number
+                ?.let { version -> version to log.received_date }
+        }
+        .maxByOrNull { it.second }
 
     /**
      * Which channel the Remote Hardware (GPIO) command goes out on. A node that told us it runs MT_SW_FIRMWARE v3 or
@@ -560,6 +565,27 @@ class CommandSenderImpl(
                 (if (admin) "przez zdalnego admina (bez kanału gpio)" else "kanałem gpio") + ", kanał $channel"
         }
         return channel
+    }
+
+    override suspend fun requestGpioPins(destNum: Int): List<RemoteHardwarePin>? = coroutineScope {
+        val answer = async { packetHandler.awaitGpioPins(destNum) }
+        Logger.i { "GPIO: pytam węzeł ${destNum.toUInt()} o listę pinów przez zdalnego admina" }
+        sendAdmin(destNum, generatePacketId(), wantResponse = true) {
+            AdminMessage.Builder()
+                .also { wb -> wb.get_module_config_request = AdminMessage.ModuleConfigType.REMOTEHARDWARE_CONFIG }
+                .build()
+        }
+        answer.await().also { Logger.i { "GPIO: lista pinów z węzła ${destNum.toUInt()}: ${it?.size ?: "brak odpowiedzi"}" } }
+    }
+
+    override fun gpioAdminSupportedFlow(destNum: Int): Flow<Boolean> =
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map { logs ->
+            (latestFwPlusVersion(logs)?.first ?: 0) >= MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN
+        }
+
+    override suspend fun checkGpioVersion(destNum: Int) {
+        if (destNum == nodeManager.myNodeNum.value) return
+        gpioChannelFor(destNum)
     }
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? {

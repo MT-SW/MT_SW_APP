@@ -23,6 +23,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 #### Wersja v5 (2.8.5)
 
 ##### Nowe funkcje
+* Karta GPIO (wszystkie wersje): szeroki przycisk „Pobierz listę pinów” pyta zdalnego admina o listę pinów węzła (tylko ta jedna sekcja ustawień) i pokazuje piny do wybrania; aktywny tylko, gdy węzeł jest wykryty jako MT_SW_FIRMWARE v3, w przeciwnym razie wyszarzony.
 
 * **Przycisk widoku 3D na mapie (wszystkie wersje).** Nad przyciskami powiększania i pomniejszania jest przycisk, który pochyla mapę do widoku 3D, a ponowne dotknięcie prostuje ją z powrotem; pochylać można też gestem dwóch palców (na komputerze przeciąganiem z prawym przyciskiem myszy). Mapa zapisuje w logu kąt pochylenia, żeby dało się sprawdzić, czy gest dociera do mapy.
 * **Zdalne zarządzanie listami: wybór z własnej listy węzłów (wszystkie wersje).** W szczegółach węzła, w zdalnej administracji, można wybrać z własnej listy węzłów (z wyszukiwaniem i wielokrotnym zaznaczaniem) węzły, które mają zostać dodane lub usunięte z ulubionych i ignorowanych zdalnego urządzenia, albo dodane jako kontakt (z nazwami z naszej listy). Doszło też zdalne usuwanie węzła z listy węzłów zdalnego urządzenia (z potwierdzeniem). Podgląd, kto już jest na zdalnych listach, wymaga zmiany w MT_SW_FIRMWARE i na razie go nie ma.
@@ -114,6 +115,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Pełny log (włączany ręcznie) zapisuje rozmiar okna i ekranu oraz zrzut okna, gdy interfejs się wysypie (nieobsłużony wyjątek), najwyżej raz na 30 s, do 60 plików; zrzuty znikają razem z najstarszymi częściami logu (siedem dni zapisanego czasu) i trafiają do paczki z logiem w folderze „zrzuty”. Automatyczny log z 24 godzin ich nie zapisuje (Android, komputer, iPhone/iPad).
 
 ##### Naprawione błędy
+* Odczyt pinu GPIO (wszystkie wersje): „Odczytaj” zawsze kończył się brakiem odpowiedzi, bo aplikacja nie obsługiwała odpowiedzi modułu Remote Hardware; teraz odpowiedź jest przyjmowana.
 
 * Wybór urządzeń (wszystkie wersje): kafelek urządzenia pokazuje zawsze prawdziwą krótką nazwę (bez zastępowania końcówką numeru), pojawia się od razu po połączeniu i bierze dane z tego samego źródła co karta „Połącz”; poprawione dla węzła, który zmienił numer, i dla adresów zapisanych w innej postaci. Powody, dla których kafelka nie dało się narysować, trafiają do logu.
 * Sąsiedzi węzła (wszystkie wersje): lista raportów sąsiadów nie wysypuje już aplikacji przy powtórzonych wpisach (zdublowany klucz listy).
@@ -1018,6 +1020,7 @@ The main things of every version, split by kind of change (the "What's new in th
 #### Version v5 (2.8.5)
 
 ##### New features
+* GPIO card (all versions): a wide "Get the list of pins" button asks the remote admin for the node's pin list (only that one settings section) and shows the pins to choose from; active only when the node is detected as MT_SW_FIRMWARE v3, greyed out otherwise.
 
 * **A 3D view button on the map (all versions).** Above the zoom in and zoom out buttons there is a button that tilts the map into a 3D view; touching it again levels the map. The map can also be tilted with a two-finger gesture (on the computer, by dragging with the right mouse button). The map writes its tilt angle to the log, so it can be checked whether the gesture reaches the map.
 * **Remote list management: pick from your own node list (all versions).** In the node details, in remote administration, you can pick from your own node list (with a search and multiple selection) the nodes to add to or remove from the favorites and ignored lists of the remote device, or to add as a contact (with the names from our list). A remote removal of a node from the remote device's node list was added too (with a confirmation). Viewing who is already on the remote lists needs a change in MT_SW_FIRMWARE and is not available yet.
@@ -1108,6 +1111,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * The full log (switched on by hand) saves the size of the window and screen and a picture of the window when the interface crashes (an unhandled exception), at most once in 30 s, up to 60 files; the pictures go together with the oldest log parts (seven recorded days) and are put into the log package in a "zrzuty" folder. The automatic 24-hour log does not save them (Android, desktop, iPhone/iPad).
 
 ##### Fixed bugs
+* GPIO pin read (all versions): "Read" always ended with no response, because the app did not handle the Remote Hardware module's answer; the answer is now accepted.
 
 * Device chooser (all versions): the plate of a device always shows the real short name (never the end of the node number), appears at once after connecting and takes its data from the same source as the "Connect" card; fixed for a node that changed its number and for addresses stored in another form. The reasons why a plate could not be drawn go to the log.
 * Node neighbours (all versions): the list of neighbour reports no longer crashes the app on repeated entries (a duplicate list key).

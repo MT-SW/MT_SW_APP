@@ -223,3 +223,8 @@ Słowa: widok 3D, pochylenie mapy, przechylić mapę, tryb 3D, mapa 3D, jak poch
 W MT_SW_FIRMWARE v3 nie: sterowanie idzie przez zdalnego admina (klucze administratora), więc wystarczy włączony moduł „Zdalny sprzęt” na węźle docelowym i Twój klucz na liście kluczy administratora tego węzła. Na starszym oprogramowaniu potrzebny jest kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach. W oryginalnym oprogramowaniu i starszych wersjach moduł zwraca stany pinów kanałem głównym, a nie kanałem „gpio” (znany, niepoprawiony błąd porzuconego modułu).
 Słowa: GPIO, kanał gpio, zdalny sprzęt, Remote Hardware, klucz administratora, zdalny admin, MT_SW_FIRMWARE v3
 Źródło: Dokumentacja MT_SW_APP (opracowanie własne, 2026-11)
+
+### Do czego służy przycisk „Pobierz listę pinów” przy GPIO?
+Pyta zdalnego admina węzła o listę pinów, które jego moduł Remote Hardware może sterować, i pokazuje je do wybrania zamiast wpisywania numeru z pamięci. Działa tylko z MT_SW_FIRMWARE v3; przy innym oprogramowaniu przycisk jest wyszarzony.
+Słowa: lista pinów, GPIO, Remote Hardware, zdalny admin, MT_SW_FIRMWARE v3, dostępne piny
+Źródło: Dokumentacja MT_SW_APP (opracowanie własne, 2026-11)

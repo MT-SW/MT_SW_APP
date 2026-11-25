@@ -288,6 +288,13 @@ class FakeRadioController :
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? = null
 
+    override suspend fun requestGpioPins(destNum: Int): List<org.meshtastic.proto.RemoteHardwarePin>? = null
+
+    override fun gpioAdminSupportedFlow(destNum: Int): kotlinx.coroutines.flow.Flow<Boolean> =
+        kotlinx.coroutines.flow.flowOf(false)
+
+    override suspend fun checkGpioVersion(destNum: Int) = Unit
+
     override suspend fun toggleMuted(nodeNum: Int) {}
 
     override suspend fun sendReaction(emoji: String, replyId: Int, contactKey: String) {}

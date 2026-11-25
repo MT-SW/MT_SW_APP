@@ -60,6 +60,7 @@ import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.QueueStatus
+import org.meshtastic.proto.RemoteHardwarePin
 import org.meshtastic.proto.Routing
 import org.meshtastic.proto.ToRadio
 import kotlin.time.Duration
@@ -214,6 +215,7 @@ class PacketHandlerImpl(
     // Independent, out-of-band response correlation maps — unrelated to the queue-admission system above.
     private val routingAckResponse = mutableMapOf<Int, CompletableDeferred<Boolean>>()
     private val gpioReplyResponse = mutableMapOf<Int, CompletableDeferred<Long?>>()
+    private val gpioPinsResponse = mutableMapOf<Int, CompletableDeferred<List<RemoteHardwarePin>?>>()
 
     private val timeoutMutex = Mutex()
     private val sendAckTimeoutJobs = mutableMapOf<PersistedStatusTarget, Job>()
@@ -459,6 +461,27 @@ class PacketHandlerImpl(
         responseMutex.withLock { gpioReplyResponse[fromNum]?.let { if (!it.isCompleted) it.complete(gpioValue) } }
     }
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    override suspend fun awaitGpioPins(fromNum: Int): List<RemoteHardwarePin>? {
+        val deferred = CompletableDeferred<List<RemoteHardwarePin>?>()
+        responseMutex.withLock { gpioPinsResponse[fromNum] = deferred }
+        return try {
+            withTimeout(GPIO_REPLY_TIMEOUT) { deferred.await() }
+        } catch (e: TimeoutCancellationException) {
+            null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        } finally {
+            responseMutex.withLock { gpioPinsResponse.remove(fromNum) }
+        }
+    }
+
+    override suspend fun completeGpioPins(fromNum: Int, pins: List<RemoteHardwarePin>) {
+        responseMutex.withLock { gpioPinsResponse[fromNum]?.let { if (!it.isCompleted) it.complete(pins) } }
+    }
+
     override fun stopPacketQueue() {
         // Run async so callers (non-suspend) don't block, but all mutations are
         // serialized under the same mutexes used by the queue processor and senders.
@@ -478,6 +501,8 @@ class PacketHandlerImpl(
                     routingAckResponse.clear()
                     gpioReplyResponse.values.forEach { if (!it.isCompleted) it.complete(null) }
                     gpioReplyResponse.clear()
+                    gpioPinsResponse.values.forEach { if (!it.isCompleted) it.complete(null) }
+                    gpioPinsResponse.clear()
                 }
                 changeStatusesNow(failedPacketIds, MessageStatus.ERROR, PERSISTED_STATUS_SHUTDOWN_WAIT)
             }
