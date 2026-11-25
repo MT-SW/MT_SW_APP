@@ -380,8 +380,7 @@ internal fun GpioPanel(
                         container = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ) {
                         Text(
-                            text =
-                            if (pin.name.isBlank()) "${pin.gpio_pin}" else "${pin.name} · ${pin.gpio_pin}",
+                            text = if (pin.name.isBlank()) "${pin.gpio_pin}" else "${pin.name} · ${pin.gpio_pin}",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 12.dp),

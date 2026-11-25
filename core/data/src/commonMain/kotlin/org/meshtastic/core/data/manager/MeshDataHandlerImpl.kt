@@ -288,7 +288,9 @@ class MeshDataHandlerImpl(
         val hw = HardwareMessage.ADAPTER.decodeOrNull(payload, Logger) ?: return
         if (hw.type != HardwareMessage.Type.READ_GPIOS_REPLY) return
         Logger.i { "GPIO: odpowiedź z węzła ${packet.from.toUInt()}, stan pinów ${hw.gpio_value}" }
-        radioInterfaceService.launchSessionWork(scope, session) { packetHandler.completeGpioReply(packet.from, hw.gpio_value) }
+        radioInterfaceService.launchSessionWork(scope, session) {
+            packetHandler.completeGpioReply(packet.from, hw.gpio_value)
+        }
     }
 
     /** The Remote Hardware settings of another node (asked for by the GPIO card) hand over the list of its pins. */
@@ -296,8 +298,10 @@ class MeshDataHandlerImpl(
         if (packet.from == myNodeNum) return
         val payload = packet.decoded?.payload ?: return
         val pins =
-            AdminMessage.ADAPTER.decodeOrNull(payload, Logger)?.get_module_config_response?.remote_hardware?.available_pins
-                ?: return
+            AdminMessage.ADAPTER.decodeOrNull(payload, Logger)
+                ?.get_module_config_response
+                ?.remote_hardware
+                ?.available_pins ?: return
         Logger.i { "GPIO: lista pinów z węzła ${packet.from.toUInt()}, pinów ${pins.size}" }
         radioInterfaceService.launchSessionWork(scope, session) { packetHandler.completeGpioPins(packet.from, pins) }
     }

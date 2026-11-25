@@ -197,18 +197,18 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
             }
         }
         .pointerInput(threshold) {
-        awaitEachGesture {
-            awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
-            var dragged = 0f
-            while (true) {
-                val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull() ?: break
-                if (!change.pressed || change.isConsumed) break
-                dragged += change.positionChange().y
-                if (dragged > threshold) {
-                    close.value()
-                    break
+            awaitEachGesture {
+                awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                var dragged = 0f
+                while (true) {
+                    val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull() ?: break
+                    if (!change.pressed || change.isConsumed) break
+                    dragged += change.positionChange().y
+                    if (dragged > threshold) {
+                        close.value()
+                        break
+                    }
                 }
             }
         }
-    }
 }

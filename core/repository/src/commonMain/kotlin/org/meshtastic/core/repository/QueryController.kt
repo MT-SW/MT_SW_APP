@@ -73,7 +73,9 @@ interface QueryController {
      */
     suspend fun readGpio(destNum: Int, gpioMask: Long): Long?
 
-    /** Asks [destNum] over the remote admin for the pins its Remote Hardware module may control; `null` on no answer. */
+    /**
+     * Asks [destNum] over the remote admin for the pins its Remote Hardware module may control; `null` on no answer.
+     */
     suspend fun requestGpioPins(destNum: Int): List<org.meshtastic.proto.RemoteHardwarePin>?
 
     /** Whether [destNum] is known to run MT_SW_FIRMWARE v3 or newer. */

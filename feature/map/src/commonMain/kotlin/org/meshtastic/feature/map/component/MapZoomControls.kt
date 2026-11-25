@@ -73,8 +73,7 @@ fun MapZoomControls(
         if (onToggleTilt != null) {
             MapButton(
                 icon = MeshtasticIcons.View3d,
-                contentDescription =
-                stringResource(if (tilted) Res.string.map_view_flat else Res.string.map_view_3d),
+                contentDescription = stringResource(if (tilted) Res.string.map_view_flat else Res.string.map_view_3d),
                 onClick = onToggleTilt,
                 modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(buttonDp.dp),
             )

@@ -26,8 +26,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withTimeoutOrNull
 import okio.ByteString
@@ -513,10 +513,7 @@ class CommandSenderImpl(
 
     /** The newest firmware version number (and when it was received) the node has told us, from the log. */
     private suspend fun knownFwPlusVersion(destNum: Int): Pair<Int, Long>? =
-        meshLogRepository
-            .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
-            .map(::latestFwPlusVersion)
-            .first()
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map(::latestFwPlusVersion).first()
 
     /** The newest firmware version number (and when it was received) found in the on-demand [logs]. */
     private fun latestFwPlusVersion(logs: List<MeshLog>): Pair<Int, Long>? = logs
@@ -543,7 +540,8 @@ class CommandSenderImpl(
         val known = knownFwPlusVersion(destNum)
         var version = known?.first
         val lastCheck = maxOf(known?.second ?: 0L, gpioVersionAskedAt[destNum] ?: 0L)
-        if ((version == null || version < MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN) &&
+        if (
+            (version == null || version < MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN) &&
             nowMillis - lastCheck > GPIO_VERSION_RECHECK_MS
         ) {
             gpioVersionAskedAt[destNum] = nowMillis
@@ -562,7 +560,8 @@ class CommandSenderImpl(
         val channel = if (admin) getAdminChannelIndex(destNum, null) else GPIO_CHANNEL_INDEX
         Logger.i {
             "GPIO: węzeł ${destNum.toUInt()}, wersja firmware $version, " +
-                (if (admin) "przez zdalnego admina (bez kanału gpio)" else "kanałem gpio") + ", kanał $channel"
+                (if (admin) "przez zdalnego admina (bez kanału gpio)" else "kanałem gpio") +
+                ", kanał $channel"
         }
         return channel
     }
@@ -575,7 +574,9 @@ class CommandSenderImpl(
                 .also { wb -> wb.get_module_config_request = AdminMessage.ModuleConfigType.REMOTEHARDWARE_CONFIG }
                 .build()
         }
-        answer.await().also { Logger.i { "GPIO: lista pinów z węzła ${destNum.toUInt()}: ${it?.size ?: "brak odpowiedzi"}" } }
+        answer.await().also {
+            Logger.i { "GPIO: lista pinów z węzła ${destNum.toUInt()}: ${it?.size ?: "brak odpowiedzi"}" }
+        }
     }
 
     override fun gpioAdminSupportedFlow(destNum: Int): Flow<Boolean> =

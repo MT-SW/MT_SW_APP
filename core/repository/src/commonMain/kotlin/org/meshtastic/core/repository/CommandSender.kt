@@ -24,9 +24,9 @@ import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.PresenceConfig
+import org.meshtastic.proto.RemoteHardwarePin
 import org.meshtastic.core.model.Position as ModelPosition
 import org.meshtastic.proto.Position as ProtoPosition
-import org.meshtastic.proto.RemoteHardwarePin
 
 /** Interface for sending commands and packets to the mesh network. */
 @Suppress("TooManyFunctions")

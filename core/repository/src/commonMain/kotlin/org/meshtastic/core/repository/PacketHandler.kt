@@ -104,8 +104,8 @@ interface PacketHandler {
     suspend fun completeGpioReply(fromNum: Int, gpioValue: Long)
 
     /**
-     * Suspends until the Remote Hardware module settings of [fromNum] (its list of available pins) arrive over the remote
-     * admin, or times out. Keyed by the sender only, one pending wait per node.
+     * Suspends until the Remote Hardware module settings of [fromNum] (its list of available pins) arrive over the
+     * remote admin, or times out. Keyed by the sender only, one pending wait per node.
      *
      * @return the available pins, or `null` on timeout/no response.
      */

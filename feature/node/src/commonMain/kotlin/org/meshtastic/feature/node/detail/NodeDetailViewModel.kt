@@ -307,9 +307,12 @@ class NodeDetailViewModel(
     }
 
     /** Finds out the firmware version of [destNum] for the GPIO card; it is asked for at most once a week. */
-    fun checkGpioVersion(destNum: Int) = safeLaunch(tag = "checkGpioVersion") { queryController.checkGpioVersion(destNum) }
+    fun checkGpioVersion(destNum: Int) =
+        safeLaunch(tag = "checkGpioVersion") { queryController.checkGpioVersion(destNum) }
 
-    /** Asks [destNum] over the remote admin for the pins its Remote Hardware module may control and keeps the answer. */
+    /**
+     * Asks [destNum] over the remote admin for the pins its Remote Hardware module may control and keeps the answer.
+     */
     fun requestGpioPins(destNum: Int) = safeLaunch(tag = "requestGpioPins") {
         try {
             val pins = queryController.requestGpioPins(destNum)

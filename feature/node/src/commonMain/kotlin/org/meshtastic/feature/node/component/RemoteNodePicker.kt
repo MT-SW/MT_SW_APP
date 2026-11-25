@@ -48,8 +48,8 @@ import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.NodeChip
 
 /**
- * MT_SW: a window with our own node list, from which the nodes to manage on the remote device are ticked (many at
- * once, with a search). Everything ticked stays selected after the window is closed.
+ * MT_SW: a window with our own node list, from which the nodes to manage on the remote device are ticked (many at once,
+ * with a search). Everything ticked stays selected after the window is closed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
