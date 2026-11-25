@@ -55,6 +55,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół, więc łatwo je zamknąć także na telefonie.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
 * Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
 * Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
@@ -219,6 +220,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół, więc łatwo je zamknąć także na telefonie.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
 * Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
 * Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
@@ -1042,6 +1044,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down, so it is easy to close on a phone too.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
 * Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
 * Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.
@@ -1198,6 +1201,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down, so it is easy to close on a phone too.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
 * Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
 * Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.
