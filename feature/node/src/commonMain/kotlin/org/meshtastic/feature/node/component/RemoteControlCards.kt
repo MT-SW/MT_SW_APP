@@ -334,16 +334,11 @@ internal fun GpioPanel(
         }
         // A wide fourth button a little lower: it asks the node, over the remote admin, which pins it may control.
         Spacer(Modifier.height(4.dp))
-        // The same look as the three tiles above: a tint of the accent colour, a thin border in it and, when active,
-        // the card's own shadow (greyed out and flat while the node is not known to run MT_SW_FIRMWARE v3).
-        val pinsAccent = MaterialTheme.colorScheme.primary
-        val pinsBase = MaterialTheme.colorScheme.surfaceContainerHighest
         TileCard(
             onClick = { onAction(NodeDetailAction.RequestGpioPins(node.num)) },
             enabled = adminSupported,
             modifier = Modifier.fillMaxWidth(),
-            container = pinsAccent.copy(alpha = TINT_ALPHA).compositeOver(pinsBase),
-            border = BorderStroke(1.dp, pinsAccent.copy(alpha = 0.5f).dimmed(adminSupported)),
+            container = MaterialTheme.colorScheme.surfaceContainerHighest,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
@@ -353,7 +348,7 @@ internal fun GpioPanel(
                 Icon(
                     imageVector = MeshtasticIcons.Refresh,
                     contentDescription = null,
-                    tint = pinsAccent,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp),
                 )
                 Text(
@@ -382,8 +377,7 @@ internal fun GpioPanel(
                         onClick = { pinState.setTextAndPlaceCursorAtEnd(pin.gpio_pin.toString()) },
                         enabled = true,
                         modifier = Modifier.weight(1f),
-                        container = pinsAccent.copy(alpha = TINT_ALPHA).compositeOver(pinsBase),
-                        border = BorderStroke(1.dp, pinsAccent.copy(alpha = 0.5f)),
+                        container = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ) {
                         Text(
                             text = if (pin.name.isBlank()) "${pin.gpio_pin}" else "${pin.name} · ${pin.gpio_pin}",
