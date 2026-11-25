@@ -285,9 +285,10 @@ class MeshDataHandlerImpl(
     /** The answer to a Remote Hardware READ_GPIOS wakes up the read that waits for it. */
     private fun handleRemoteHardware(packet: MeshPacket, session: RadioSessionContext) {
         val hw =
-            packet.decoded?.payload?.let { HardwareMessage.ADAPTER.decodeOrNull(it, Logger) }
-                ?.takeIf { it.type == HardwareMessage.Type.READ_GPIOS_REPLY }
-                ?: return
+            packet.decoded
+                ?.payload
+                ?.let { HardwareMessage.ADAPTER.decodeOrNull(it, Logger) }
+                ?.takeIf { it.type == HardwareMessage.Type.READ_GPIOS_REPLY } ?: return
         Logger.i { "GPIO: odpowiedź z węzła ${packet.from.toUInt()}, stan pinów ${hw.gpio_value}" }
         radioInterfaceService.launchSessionWork(scope, session) {
             packetHandler.completeGpioReply(packet.from, hw.gpio_value)
