@@ -62,7 +62,6 @@ import org.meshtastic.core.resources.report_note_hint
 import org.meshtastic.core.resources.report_send
 import org.meshtastic.core.resources.report_send_to
 import org.meshtastic.core.resources.report_sending
-import org.meshtastic.core.resources.report_with_logs
 import org.meshtastic.core.resources.report_with_logs_hint
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -102,7 +101,6 @@ fun ReportIssuesDialog(
     val control = AppLogControls.current
     var target by rememberSaveable { mutableStateOf(ReportTarget.WHATSAPP) }
     var note by rememberSaveable { mutableStateOf(startNote) }
-    var withLogs by rememberSaveable { mutableStateOf(true) }
     var busy by rememberSaveable { mutableStateOf(false) }
     var result by rememberSaveable { mutableStateOf<String?>(null) }
     var failed by rememberSaveable { mutableStateOf(false) }
@@ -119,7 +117,7 @@ fun ReportIssuesDialog(
                 failed = false
                 result = null
                 scope.launch {
-                    val report = control?.takeIf { it.canMakeReport }?.buildReport(note, withLogs, extras)
+                    val report = control?.takeIf { it.canMakeReport }?.buildReport(note, true, extras)
                     if (control == null || report == null) {
                         failed = true
                         // Without a package the group still opens, so the report can be written there by hand.
@@ -194,24 +192,12 @@ fun ReportIssuesDialog(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 if (control?.canMakeReport == true) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                stringResource(Res.string.report_with_logs),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = stringResource(Res.string.report_with_logs_hint),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(checked = withLogs, onCheckedChange = { withLogs = it })
-                    }
+                    Text(
+                        text = stringResource(Res.string.report_with_logs_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
                 }
                 if (busy) {
                     Spacer(Modifier.height(8.dp))

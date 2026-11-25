@@ -3305,8 +3305,7 @@
     <string name="app_log_recent_summary">Zawsze włączone i nie da się tego wyłączyć. Aplikacja trzyma na tym urządzeniu szczegółowy log z ostatnich 24 godzin. To nie jest paczka zbierana raz na dobę, tylko okno ruchome, które samo się czyści, więc zawsze zostaje tylko ostatnia doba. Powód: błędy bywają zgłaszane bez logów albo logi włącza się dopiero po fakcie i wtedy nie da się ich znaleźć ani naprawić. W logu jest to, jak działa aplikacja (zdarzenia, stany, błędy), nigdy treść wiadomości, nazwy, pozycje ani klucze. Log zostaje na tym urządzeniu i jest wysyłany tylko wtedy, gdy wyślesz go sam („Zgłoś błąd lub pomysł”).</string>
     <string name="report_send_to">Dokąd wysłać zgłoszenie?</string>
     <string name="report_note_hint">Co się stało? (opcjonalnie)</string>
-    <string name="report_with_logs">Dołącz logi z ostatnich 24 godzin</string>
-    <string name="report_with_logs_hint">Logi zostają na Twoim urządzeniu i trafiają tam, gdzie je wyślesz dotknięciem „Wyślij”. Są potrzebne, żebyśmy mogli sprawdzić, co poszło nie tak.</string>
+    <string name="report_with_logs_hint">Do zgłoszenia zawsze dołączane są wszystkie logi: z ostatnich 24 godzin, pełny log (do 7 dni) i zapisy awarii. Zostają na Twoim urządzeniu i trafiają tam, gdzie je wyślesz dotknięciem „Wyślij”. Są potrzebne, żebyśmy mogli sprawdzić, co poszło nie tak.</string>
     <string name="report_send">Wyślij</string>
     <string name="report_sending">Przygotowuję paczkę ze zgłoszeniem…</string>
     <string name="report_done_phone">Paczka (%1$s KB) jest gotowa i otwarta w wybranej aplikacji: wybierz tam czat grupy i wyślij plik. Kopia leży w: %2$s.</string>

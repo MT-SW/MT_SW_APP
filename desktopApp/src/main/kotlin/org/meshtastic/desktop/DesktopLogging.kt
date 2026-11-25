@@ -172,7 +172,8 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                     java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date(now)) +
                     ".zip"
             val file = File(folder, name)
-            val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
+            // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash records.
+            val since = 0L
             val engineLogs =
                 File(dir.parentFile, "engine-logs")
                     .listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }
@@ -181,8 +182,8 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                 MtSwLogging.writeReportZip(
                     out,
                     since,
-                    extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + windowExtras(withLogs) + extras,
-                    extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
+                    extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + windowExtras(true) + extras,
+                    extraFiles = engineLogs.map { "silnik/${it.name}" to it },
                 )
             }
             // A copy where the person looks first (Downloads, else Desktop, else the home folder), not six folders

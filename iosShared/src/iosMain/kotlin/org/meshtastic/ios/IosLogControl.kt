@@ -375,7 +375,8 @@ internal object IosLogControl : AppLogControl {
                 .forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
             val name = "mt_sw_zgloszenie_" + IosFileLog.stamp().replace(Regex("[^0-9]"), "") + ".zip"
             val file = folder / name
-            val bytes = zip(reportEntries(note, withLogs, extras))
+            val bytes = // A report always carries all the logs: the last 24 hours, the full log (up to 7 days) and the crash records.
+            zip(reportEntries(note, true, extras, allTime = true))
             FileSystem.SYSTEM.write(file) { write(bytes) }
             ReportFile(file.toString(), name, IosFileLog.size(file) / KB)
         }

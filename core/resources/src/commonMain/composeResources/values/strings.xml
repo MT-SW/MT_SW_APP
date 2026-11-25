@@ -3644,8 +3644,7 @@
     <string name="report_send">Send</string>
     <string name="report_send_to">Where to send the report?</string>
     <string name="report_sending">Preparing the report package…</string>
-    <string name="report_with_logs">Attach the logs of the last 24 hours</string>
-    <string name="report_with_logs_hint">The logs stay on your device and go only where you send them by tapping "Send". We need them to check what went wrong.</string>
+    <string name="report_with_logs_hint">All the logs are always attached to a report: the last 24 hours, the full log (up to 7 days) and the crash records. They stay on your device and go only where you send them by tapping "Send". We need them to check what went wrong.</string>
     <!-- REQUEST -->
     <string name="request">Request</string>
     <string name="request_air_quality_metrics">Air-Quality Metrics</string>
