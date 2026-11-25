@@ -284,9 +284,10 @@ class MeshDataHandlerImpl(
 
     /** The answer to a Remote Hardware READ_GPIOS wakes up the read that waits for it. */
     private fun handleRemoteHardware(packet: MeshPacket, session: RadioSessionContext) {
-        val payload = packet.decoded?.payload ?: return
-        val hw = HardwareMessage.ADAPTER.decodeOrNull(payload, Logger) ?: return
-        if (hw.type != HardwareMessage.Type.READ_GPIOS_REPLY) return
+        val hw =
+            packet.decoded?.payload?.let { HardwareMessage.ADAPTER.decodeOrNull(it, Logger) }
+                ?.takeIf { it.type == HardwareMessage.Type.READ_GPIOS_REPLY }
+                ?: return
         Logger.i { "GPIO: odpowiedź z węzła ${packet.from.toUInt()}, stan pinów ${hw.gpio_value}" }
         radioInterfaceService.launchSessionWork(scope, session) {
             packetHandler.completeGpioReply(packet.from, hw.gpio_value)
@@ -295,10 +296,11 @@ class MeshDataHandlerImpl(
 
     /** The Remote Hardware settings of another node (asked for by the GPIO card) hand over the list of its pins. */
     private fun handleRemoteGpioPins(packet: MeshPacket, myNodeNum: Int, session: RadioSessionContext) {
-        if (packet.from == myNodeNum) return
-        val payload = packet.decoded?.payload ?: return
         val pins =
-            AdminMessage.ADAPTER.decodeOrNull(payload, Logger)
+            packet.decoded
+                ?.payload
+                ?.takeIf { packet.from != myNodeNum }
+                ?.let { AdminMessage.ADAPTER.decodeOrNull(it, Logger) }
                 ?.get_module_config_response
                 ?.remote_hardware
                 ?.available_pins ?: return

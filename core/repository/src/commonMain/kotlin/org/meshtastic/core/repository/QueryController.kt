@@ -29,6 +29,7 @@ import org.meshtastic.proto.PresenceConfig
  *
  * @see RadioController which extends this interface for backward compatibility
  */
+@Suppress("TooManyFunctions")
 interface QueryController {
 
     /** Requests device metadata from a remote node. A [requestId] of 0 lets the sender assign one. */

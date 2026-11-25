@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
@@ -127,7 +128,12 @@ fun ModalBottomSheet(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            IconButton(onClick = onDismissRequest) {
+                            IconButton(
+                                onClick = {
+                                    Logger.i { "Okno: zamknięte krzyżykiem" }
+                                    onDismissRequest()
+                                },
+                            ) {
                                 Icon(
                                     imageVector = MeshtasticIcons.Close,
                                     contentDescription = stringResource(Res.string.close),
@@ -161,6 +167,7 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                     dragged += available.y
                     if (dragged > threshold) {
                         dragged = Float.NEGATIVE_INFINITY
+                        Logger.i { "Okno: zamknięte przesunięciem listy w dół (lista na górze)" }
                         close.value()
                     }
                 } else {
@@ -182,15 +189,17 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                 var wheel = 0f
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Final)
-                    if (event.type != PointerEventType.Scroll) continue
-                    val change = event.changes.firstOrNull() ?: continue
-                    if (change.isConsumed || change.scrollDelta.y >= 0f) {
-                        wheel = 0f
-                    } else {
-                        wheel -= change.scrollDelta.y
-                        if (wheel >= WHEEL_CLOSE_TICKS) {
+                    val change = event.changes.firstOrNull()
+                    if (event.type == PointerEventType.Scroll && change != null) {
+                        if (change.isConsumed || change.scrollDelta.y >= 0f) {
                             wheel = 0f
-                            close.value()
+                        } else {
+                            wheel -= change.scrollDelta.y
+                            if (wheel >= WHEEL_CLOSE_TICKS) {
+                                wheel = 0f
+                                Logger.i { "Okno: zamknięte kółkiem myszy" }
+                                close.value()
+                            }
                         }
                     }
                 }
@@ -200,13 +209,18 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
             awaitEachGesture {
                 awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
                 var dragged = 0f
-                while (true) {
-                    val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull() ?: break
-                    if (!change.pressed || change.isConsumed) break
-                    dragged += change.positionChange().y
-                    if (dragged > threshold) {
-                        close.value()
-                        break
+                var following = true
+                while (following) {
+                    val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull()
+                    if (change == null || !change.pressed || change.isConsumed) {
+                        following = false
+                    } else {
+                        dragged += change.positionChange().y
+                        if (dragged > threshold) {
+                            Logger.i { "Okno: zamknięte przeciągnięciem w dół" }
+                            close.value()
+                            following = false
+                        }
                     }
                 }
             }

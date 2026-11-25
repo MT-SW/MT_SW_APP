@@ -31,6 +31,7 @@ import org.meshtastic.proto.PresenceConfig
  *
  * Focused collaborator of [RadioControllerImpl]. Mirrors the SDK's `TelemetryApi`/`RoutingApi` surface.
  */
+@Suppress("TooManyFunctions")
 internal class QueryControllerImpl(
     private val commandSender: CommandSender,
     private val nodeManager: NodeManager,

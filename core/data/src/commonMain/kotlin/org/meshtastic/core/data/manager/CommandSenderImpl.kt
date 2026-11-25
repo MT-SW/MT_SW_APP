@@ -552,7 +552,7 @@ class CommandSenderImpl(
                     meshLogRepository
                         .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
                         .map { knownFwPlusVersion(destNum) }
-                        .first { known == null || (it != null && it.second > known.second) }
+                        .first { it != null && (known == null || it.second > known.second) }
                 }
             version = fresh?.first ?: version
         }

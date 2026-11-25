@@ -58,6 +58,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,6 +73,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -282,7 +284,8 @@ internal fun GpioPanel(
     val pinInvalid = pinText.isNotBlank() && gpioMask == null
 
     // The firmware version is asked for when the card shows (at most once a week); the list of pins needs v3.
-    LaunchedEffect(node.num) { onAction(NodeDetailAction.CheckGpioVersion(node.num)) }
+    val latestOnAction by rememberUpdatedState(onAction)
+    LaunchedEffect(node.num) { latestOnAction(NodeDetailAction.CheckGpioVersion(node.num)) }
 
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         PanelHeader(
@@ -724,7 +727,12 @@ internal fun RemoteNodeManagementPanel(
         RemoteNodePickerSheet(
             nodes = nodeDb.values.filter { it.num != destNum },
             selected = selected.toSet(),
-            onToggle = { num -> if (!selected.remove(num)) selected.add(num) },
+            onToggle = { num ->
+                val added = !selected.remove(num)
+                if (added) selected.add(num)
+                val state = if (added) "zaznaczony" else "odznaczony"
+                Logger.i { "Zdalne listy: wybór węzła ${num.toUInt()} $state, razem ${selected.size}" }
+            },
             onDismiss = { pickerOpen = false },
         )
     }

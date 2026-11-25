@@ -21,6 +21,7 @@ package org.meshtastic.feature.node.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -288,6 +289,10 @@ class NodeDetailViewModel(
     fun removeRemoteNode(destNum: Int, targetNodeNum: Int) {
         viewModelScope.launch {
             val delivered = radioController.removeRemoteNode(targetNodeNum, destNum)
+            Logger.i {
+                "Zdalne listy: usunięcie węzła ${targetNodeNum.toUInt()} z listy urządzenia ${destNum.toUInt()}, " +
+                    "potwierdzone: $delivered"
+            }
             showRemoteCommandResult(delivered)
         }
     }

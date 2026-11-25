@@ -34,6 +34,7 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.Dispatchers
@@ -180,12 +181,15 @@ class NodeDetailCompassLifecycleTest {
                 ),
             )
         every { observeSessionStatus(any()) } returns flowOf(SessionStatus.NoSession)
+        val queryController: QueryController = mock()
+        every { queryController.gpioAdminSupportedFlow(any()) } returns flowOf(false)
+        everySuspend { queryController.checkGpioVersion(any()) } returns Unit
 
         return NodeDetailViewModel(
             savedStateHandle = SavedStateHandle(),
             nodeManagementActions = mock<NodeManagementActions>(),
             nodeRequestActions = mock<NodeRequestActions>(),
-            queryController = mock<QueryController>(),
+            queryController = queryController,
             radioController = FakeRadioController(),
             getNodeDetailsUseCase = getNodeDetailsUseCase,
             packetRepository = packetRepository,
