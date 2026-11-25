@@ -221,6 +221,24 @@ class UIViewModel(
     private val optionsSync =
         uiPrefs.uiOptions.map { UiOptions(it) }.onEach { AppUiOptions.state.value = it }.launchIn(viewModelScope)
 
+    // The settings in effect are written to the log at start and at every change, so a report shows the state the app
+    // was in. Only the values of the look and feature switches are written, never anything of the person.
+    @Suppress("unused")
+    private val settingsLog =
+        combine(
+            combine(uiPrefs.theme, uiPrefs.uiScale, uiPrefs.fontFamily, uiPrefs.fontSizePercent) { a, b, c, d ->
+                "theme=$a scale=$b font=$c fontSize=$d"
+            },
+            combine(uiPrefs.floatingNavBar, uiPrefs.translatorEnabled, uiPrefs.assistantEnabled) { a, b, c ->
+                "floatingNavBar=$a translator=$b assistant=$c"
+            },
+        ) { a, b ->
+            "$a $b"
+        }
+            .distinctUntilChanged()
+            .onEach { Logger.i(tag = "Settings") { "Settings in effect: $it" } }
+            .launchIn(viewModelScope)
+
     /** Whether the bottom navigation is the floating rounded bar (the default) or the classic bar. */
     val floatingNavBar: StateFlow<Boolean> = uiPrefs.floatingNavBar
 
