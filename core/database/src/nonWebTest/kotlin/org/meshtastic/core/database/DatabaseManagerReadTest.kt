@@ -38,6 +38,20 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
 
     @AfterTest fun tearDown() = tearDownFixture()
 
+    /**
+     * The cache limit cannot go below [DatabaseConstants.MIN_CACHE_LIMIT], so the eviction tests fill the cache with two
+     * more databases and let [oldestName] (listed first, the least recently used) be the only one over the limit.
+     */
+    private suspend fun fillCacheToMinimum(oldestName: String, activeName: String, activeAddress: String) {
+        manager.switchActiveDatabase("addrFillC")
+        manager.switchActiveDatabase("addrFillD")
+        manager.switchActiveDatabase(activeAddress)
+        manager.existingDbNamesForTest =
+            listOf(oldestName, buildDbName("addrFillC"), buildDbName("addrFillD"), activeName)
+        armableDs.edit { it[intPreferencesKey(DatabaseConstants.CACHE_LIMIT_KEY)] = DatabaseConstants.MIN_CACHE_LIMIT }
+        manager.cacheLimit.first { it == DatabaseConstants.MIN_CACHE_LIMIT }
+    }
+
     @Test
     fun boundedReadUsesCapturedPublishedPoolWithoutWriterAdmissionOrReplay() = runTest(testDispatcher) {
         manager.switchActiveDatabase("addrA")
@@ -127,9 +141,7 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
         started.await()
         assertEquals(1, manager.debugReaderCount(captured))
         manager.switchActiveDatabase("addrB")
-        manager.existingDbNamesForTest = listOf(firstName, secondName)
-        armableDs.edit { it[intPreferencesKey(DatabaseConstants.CACHE_LIMIT_KEY)] = 1 }
-        manager.cacheLimit.first { it == 1 }
+        fillCacheToMinimum(firstName, secondName, "addrB")
         manager.debugEnforceCacheLimit()
 
         assertFalse(captured in manager.closedDatabases, "eviction must defer while the captured pool has a reader")
@@ -205,9 +217,7 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
 
         started.await()
         manager.switchActiveDatabase("addrB")
-        manager.existingDbNamesForTest = listOf(firstName, secondName)
-        armableDs.edit { it[intPreferencesKey(DatabaseConstants.CACHE_LIMIT_KEY)] = 1 }
-        manager.cacheLimit.first { it == 1 }
+        fillCacheToMinimum(firstName, secondName, "addrB")
         manager.debugEnforceCacheLimit()
 
         assertEquals(1, manager.debugReaderCount(captured))
@@ -254,9 +264,7 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
         assertEquals(2, manager.debugReaderCount(captured))
 
         manager.switchActiveDatabase("addrB")
-        manager.existingDbNamesForTest = listOf(firstName, secondName)
-        armableDs.edit { it[intPreferencesKey(DatabaseConstants.CACHE_LIMIT_KEY)] = 1 }
-        manager.cacheLimit.first { it == 1 }
+        fillCacheToMinimum(firstName, secondName, "addrB")
         manager.debugEnforceCacheLimit()
 
         releaseFirst.complete(Unit)
@@ -282,9 +290,7 @@ class DatabaseManagerReadTest : DatabaseManagerTestFixture() {
         manager.switchActiveDatabase("addrA")
         val victim = manager.currentDb.value
         manager.switchActiveDatabase("addrB")
-        manager.existingDbNamesForTest = listOf(victimName, activeName)
-        armableDs.edit { it[intPreferencesKey(DatabaseConstants.CACHE_LIMIT_KEY)] = 1 }
-        manager.cacheLimit.first { it == 1 }
+        fillCacheToMinimum(victimName, activeName, "addrB")
 
         val victimSelected = CompletableDeferred<Unit>()
         val releaseEviction = CompletableDeferred<Unit>()
