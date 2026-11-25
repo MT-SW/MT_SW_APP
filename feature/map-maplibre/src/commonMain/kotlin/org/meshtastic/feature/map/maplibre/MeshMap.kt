@@ -71,6 +71,7 @@ import org.maplibre.compose.map.CameraConstraints
 import org.maplibre.compose.map.LocalMapState
 import org.maplibre.compose.map.MapEvent
 import org.maplibre.compose.map.MapState
+import org.maplibre.compose.map.MapUiOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.material3.LocationIndicatorDefaults
@@ -395,6 +396,7 @@ fun MeshMap(
                     shown = with(mapDensity) { DpSize(it.width.toDp(), it.height.toDp()) }
                 },
                 state = mapState,
+                uiOptions = MeshMapUiOptions,
                 // Honour what the source can actually serve, as the OSMdroid map did.
                 cameraConstraints =
                 CameraConstraints {
@@ -752,6 +754,15 @@ private fun MapFrameStats(mapState: MapState) {
 }
 
 private const val PITCH_LOG_STEP_DEGREES = 5
+
+/**
+ * MT_SW: two fingers moved together up or down tilt the map. The library starts the tilt only after 16 dp of such a
+ * move, and a turn of 3 degrees or a change of 7 dp in the gap between the fingers, which two fingers on a phone make
+ * easily, start a rotation or a zoom first and then the tilt can no longer begin. A shorter start lets the tilt win.
+ */
+private val MeshMapUiOptions = MapUiOptions { bindings { transform { pitch { startSlop = PITCH_START_DP.dp } } } }
+
+private const val PITCH_START_DP = 6
 private const val FRAME_WINDOW = 60
 private const val SLOW_FRAME_MS = 32
 private const val FRAME_IDLE_GAP_MS = 250

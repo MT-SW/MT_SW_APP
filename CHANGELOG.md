@@ -57,6 +57,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Mapa (wszystkie wersje): pochylanie dwoma palcami zaczyna się po krótszym ruchu (6 dp zamiast 16 dp), żeby lekki obrót albo zmiana odstępu palców nie przejmowały gestu wcześniej i pochylenie łatwiej wychodziło, zwłaszcza na iPhonie.
 * Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół z dowolnego miejsca okna (przy przewijanej liście dopiero gdy lista jest na samej górze, więc zwykłe przewijanie nie zamyka okna); planer zachowuje swój oryginalny krzyżyk, bez drugiego.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
 * Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
@@ -1048,6 +1049,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* Map (all versions): the two-finger tilt starts after a shorter move (6 dp instead of 16 dp), so that a slight turn or change in the gap between the fingers does not take over the gesture first and the tilt comes out more easily, especially on the iPhone.
 * Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down from anywhere on the window (with a scrolling list only when the list is at the very top, so normal scrolling never closes the window); the planner keeps its own original cross, without a second one.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
 * Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
