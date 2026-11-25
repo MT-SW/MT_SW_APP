@@ -456,12 +456,24 @@ fun MessageItem(
     // time-windowed upstream, so the header time is always close to every message in the run.
     if (showUserName) {
         if (message.fromLocal) {
-            Text(
-                text = timestamp,
-                modifier = Modifier.align(Alignment.End).padding(end = 12.dp, bottom = 2.dp),
-                style = metadataStyle,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            // Our own messages get the same header as received ones: our short-name plate and our name, mirrored to
+            // the right side.
+            Row(
+                modifier = Modifier.align(Alignment.End).padding(start = 12.dp, end = 12.dp, bottom = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(text = timestamp, style = metadataStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = ourNode.effectiveLongName,
+                    modifier = Modifier.weight(1f, fill = false),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                NodeChip(node = ourNode, onClick = onClickChip, modifier = Modifier.heightIn(min = 28.dp))
+            }
         } else {
             Row(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 2.dp),
