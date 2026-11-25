@@ -55,6 +55,11 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
+* Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
+* Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
+* Logi (wszystkie wersje): dziennik zawiera teraz zmiany ekranów (same nazwy typów ekranów) i ustawienia w użyciu przy starcie i przy każdej zmianie (same wartości przełączników), bez danych osobowych.
+* Urządzenia zapamiętane (wszystkie wersje): najmniejsza liczba zapamiętanych baz urządzeń to 3.
 * **Badanie sygnału na iPhonie/iPadzie i komputerze.** Przełącznik „Nagrywaj” z historią sesji, mapą cieplną i eksportem CSV jest teraz w arkuszu warstw mapy także na iPhonie/iPadzie (z lokalizacją telefonu albo GPS radia) i na komputerze (z pozycją z GPS połączonego radia; gdy radio jej jeszcze nie podało, wiersz pod przełącznikiem o tym mówi).
 * Wybór koloru węzła (wszystkie wersje): pod kolorami jest podgląd plakietki z krótką nazwą w trzech wyglądach plakietek (Standardowy, Szkło 3D, Płaski), każdy w trzech rodzajach motywu: standardowym, nasyconym i bardzo nasyconym (dziewięć podglądów). Podgląd zmienia się przy wyborze koloru, a po znalezieniu klucza pokazuje też kolor wyniku.
 * Wygląd (wszystkie wersje): nowa opcja „Mruganie cienia plakietki mojego węzła” (domyślnie wyłączona). Cień pod plakietką węzła, z którym jesteś połączony, mruga razem z ikoną połączenia: na niebiesko przy wysyłaniu i na zielono przy odbiorze.
@@ -103,6 +108,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Naprawione błędy
 
+* Wybór urządzeń (wszystkie wersje): kafelek urządzenia pokazuje zawsze prawdziwą krótką nazwę (bez zastępowania końcówką numeru), pojawia się od razu po połączeniu i bierze dane z tego samego źródła co karta „Połącz”; poprawione dla węzła, który zmienił numer, i dla adresów zapisanych w innej postaci. Powody, dla których kafelka nie dało się narysować, trafiają do logu.
+* Sąsiedzi węzła (wszystkie wersje): lista raportów sąsiadów nie wysypuje już aplikacji przy powtórzonych wpisach (zdublowany klucz listy).
 * Wiadomości w otwartym kanale nie pojawiały się na bieżąco (widać je było dopiero po przejściu do innego kanału i powrocie albo po ponownym uruchomieniu): listy wiadomości i rozmów trzymały zapytanie do starej bazy po przełączeniu urządzenia lub odtworzeniu bazy. Teraz są budowane od nowa przy każdej zmianie aktywnej bazy (wszystkie wersje).
 * Plakietka Twojego węzła na górnym pasku i jej cień nie migają już przy nadawaniu i odbiorze pakietów (pasek dostawał nową wartość węzła przy każdym pakiecie i rysował plakietkę od nowa; teraz zmienia się tylko, gdy zmieni się to, co widać: numer, krótka nazwa, nazwa lub oznaczenie „ignorowany”).
 * Cofanie w szczegółach węzła na komputerze: strzałka na karcie szczegółów zamyka od razu wszystkie otwarte obok statystyki i pokazuje listę (dopiero kolejne cofnięcie zamyka szczegóły), zamiast przechodzić przez każdą statystykę po kolei. Strzałka w samej statystyce cofa o jedną.
@@ -212,6 +219,13 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
+* Logi (wszystkie wersje): przy pierwszym uruchomieniu i dopóki nie wybierzesz folderu na logi, aplikacja pokazuje ekran wyboru folderu (po zgodzie na dane). Zipy z logami zapisują się w wybranym folderze; folder zmienisz w ustawieniach.
+* Zgłaszanie błędu (wszystkie wersje): do każdego zgłoszenia zawsze dołączane są wszystkie logi (z 24 godzin, pełny do siedmiu dni i zapisy awarii), bez przełącznika.
+* Logi (wszystkie wersje): dziennik zawiera teraz zmiany ekranów (same nazwy typów ekranów) i ustawienia w użyciu przy starcie i przy każdej zmianie (same wartości przełączników), bez danych osobowych.
+* Urządzenia zapamiętane (wszystkie wersje): najmniejsza liczba zapamiętanych baz urządzeń to 3.
+* Wybór urządzeń (wszystkie wersje): kafelek urządzenia pokazuje zawsze prawdziwą krótką nazwę (bez zastępowania końcówką numeru), pojawia się od razu po połączeniu i bierze dane z tego samego źródła co karta „Połącz”; poprawione dla węzła, który zmienił numer, i dla adresów zapisanych w innej postaci. Powody, dla których kafelka nie dało się narysować, trafiają do logu.
+* Sąsiedzi węzła (wszystkie wersje): lista raportów sąsiadów nie wysypuje już aplikacji przy powtórzonych wpisach (zdublowany klucz listy).
 * Ikona połączenia (wszystkie wersje): ikona podłączonego radia to teraz ręczne radio z anteną i falą (zamiast wyglądu routera). Idzie za stylem ikon z ustawień wyglądu, więc domyślnie pasuje do pozostałych ikon, a styl „Standardowy” pokazuje ją w pełnej, oryginalnej formie. Kolory i miganie zostają jak były.
 * Wybór urządzeń (wszystkie wersje): kafelek każdego urządzenia zawsze pochodzi z bazy tego urządzenia. Po przełączeniu wyświetlanego urządzenia drugie nie pokazuje już zwykłej nazwy zamiast kafelka: kafelek jest odczytywany od razu po pokazaniu urządzenia i po jego połączeniu, węzeł innego urządzenia nigdy nie jest brany za jego własny, a do tego czasu zostaje ostatni znany kafelek.
 * Nasz wygląd w menu, arkuszach i kartach (wszystkie wersje): menu wyskakujące (filtry i sortowanie listy węzłów, menu węzła po prawym przycisku lub przytrzymaniu, menu wyboru i inne), arkusze dolne i karty, które wcześniej miały zwykły wygląd, dostały nasz styl: zaokrąglenie, cień (jasna poświata w ciemnym motywie), cienką obwódkę i połysk. Menu i arkusze idą za wyglądem grupy „okna”, a karty za wyglądem swojej grupy kart w „Wygląd” (matowy, głębia, przezroczysty, szkło), więc każdy może je dostosować. Lista wyboru urządzeń ma teraz widoczny cień także w ciemnym motywie.
@@ -1028,6 +1042,11 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
+* Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
+* Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.
+* Logs (all versions): the log now holds the screen changes (type names of screens only) and the settings in effect at start and at every change (values of switches only), without personal data.
+* Remembered devices (all versions): the smallest number of remembered device databases is 3.
 * **Signal survey on iPhone/iPad and desktop.** The "Record" switch with the session history, the heatmap and the CSV export is now in the map layers sheet on iPhone/iPad too (with the phone's location or the radio's GPS) and on desktop (with the GPS position of the connected radio; while the radio has not reported one yet, the line under the switch says so).
 * Node colour picker (all versions): below the colours there is a preview of the chip with a short name in the three chip styles (Standard, 3D glass, Flat), each in three kinds of theme: standard, saturated and very saturated (nine previews). It follows the chosen colour and, once a key is found, also shows the colour of the result.
 * Look (all versions): a new option "Blinking shadow of my node chip" (off by default). The shadow under the chip of the node you are connected to blinks together with the connection icon: blue when sending and green when receiving.
@@ -1075,6 +1094,8 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 
+* Device chooser (all versions): the plate of a device always shows the real short name (never the end of the node number), appears at once after connecting and takes its data from the same source as the "Connect" card; fixed for a node that changed its number and for addresses stored in another form. The reasons why a plate could not be drawn go to the log.
+* Node neighbours (all versions): the list of neighbour reports no longer crashes the app on repeated entries (a duplicate list key).
 * Messages in an open channel did not appear live (they showed only after going to another channel and back, or after restarting): the lists of messages and conversations kept their query to the old database after a device was switched or the database was recreated. They are now built again with every change of the active database (all versions).
 * The plate of your node on the top bar and its shadow no longer flicker while packets are sent and received (the bar was given a new value of the node with every packet and drew the plate again; now it changes only when what is shown changes: the number, short name, long name or the "ignored" mark).
 * Going back in node details on the desktop: the arrow on the details card closes all the statistics opened beside it at once and shows the list (only the next press closes the details), instead of going through each statistic in turn. The arrow in a statistic itself goes back by one.
@@ -1177,6 +1198,13 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
+* Logs (all versions): on first start and until a folder for the logs is chosen, the app shows a folder choice screen (after the data consent). The log zips are saved in the chosen folder; the folder can be changed in the settings.
+* Bug report (all versions): every report always carries all the logs (the last 24 hours, the full log up to seven days and the crash records), with no switch.
+* Logs (all versions): the log now holds the screen changes (type names of screens only) and the settings in effect at start and at every change (values of switches only), without personal data.
+* Remembered devices (all versions): the smallest number of remembered device databases is 3.
+* Device chooser (all versions): the plate of a device always shows the real short name (never the end of the node number), appears at once after connecting and takes its data from the same source as the "Connect" card; fixed for a node that changed its number and for addresses stored in another form. The reasons why a plate could not be drawn go to the log.
+* Node neighbours (all versions): the list of neighbour reports no longer crashes the app on repeated entries (a duplicate list key).
 * Device chooser (all versions): the plate of every device now always comes from the database of that device. After switching the displayed device, the other one no longer shows a plain name instead of its plate: the plate is read as soon as the device is shown and when it connects, a node of another device is never taken for it, and the last known plate is kept meanwhile.
 * Our look in menus, sheets and cards (all versions): the pop-up menus (node list filter and sort, the node menu on right click or long press, the device chooser and others), bottom sheets and cards that used to have the plain look now have our style: rounded corners, a shadow (a light glow on a dark theme), a thin rim and a sheen. Menus and sheets follow the look of the "windows" group, and cards the look of their group of cards in "Look" (plain, depth, see-through, glass), so everyone can adjust them. The device chooser list now has a visible shadow on a dark theme too.
 * Message delivery status window (all versions): the nodes that relayed the message are shown as plates with their short name and colour (below the relay count, wrapping to the width), instead of the full name and the byte number. The duplicated relay information (the count and "Relayed by...") is merged into one. This also applies to the reaction status window.
