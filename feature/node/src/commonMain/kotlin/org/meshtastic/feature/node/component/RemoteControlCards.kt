@@ -267,6 +267,7 @@ private fun ActionTile(
  * https://meshtastic.org/docs/configuration/module/remote-hardware/#masks); the tiles send WRITE_GPIOS (on / off) or
  * READ_GPIOS to [node]. The module has to be enabled on the node and a shared "gpio" channel must exist on both ends.
  */
+@Suppress("UnnecessaryLaunchedEffect")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun GpioPanel(
