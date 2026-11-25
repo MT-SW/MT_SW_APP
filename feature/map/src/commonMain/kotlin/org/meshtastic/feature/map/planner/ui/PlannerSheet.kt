@@ -204,7 +204,7 @@ fun PlannerSheet(visible: Boolean, nodeNum: Int?, bridge: PlannerMapBridge, onDi
                 initialValue = SheetValue.Hidden,
                 enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
             )
-        ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+        ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, closeCross = false) {
             PlannerSheetContent(state = state, nodes = nodes, vm = vm, bridge = bridge, onDismiss = onDismiss)
         }
     }
