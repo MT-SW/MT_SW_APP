@@ -21,9 +21,12 @@ package org.meshtastic.core.data.manager
 import co.touchlab.kermit.Logger
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withTimeoutOrNull
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.koin.core.annotation.Single
@@ -486,11 +489,10 @@ class CommandSenderImpl(
             buildMeshPacket(
                 to = destNum,
                 wantAck = true,
-                // Remote Hardware commands must go out on the dedicated "gpio" channel, not the node's default
-                // channel — per https://meshtastic.org/docs/configuration/module/remote-hardware/#setup, the app and
-                // the target radio share a channel created specifically for this. Simplification: assume it's always
-                // channel 1 (the one right after the primary channel 0), matching the documented setup flow.
-                channel = GPIO_CHANNEL_INDEX,
+                // Older firmware: Remote Hardware commands go out on the dedicated "gpio" channel (assumed to be
+                // channel 1, per the documented setup). MT_SW_FIRMWARE v3 and newer: no channel, the command goes
+                // out like a remote admin message (see gpioChannelFor).
+                channel = gpioChannelFor(destNum),
                 decoded =
                 Data.Builder()
                     .also { wb ->
@@ -500,6 +502,64 @@ class CommandSenderImpl(
                     .build(),
             ),
         )
+    }
+
+    /** When the firmware version of a node was last asked for because of GPIO control (ms), per node. */
+    private val gpioVersionAskedAt = mutableMapOf<Int, Long>()
+
+    /** The newest firmware version number (and when it was received) the node has told us, from the log. */
+    private suspend fun knownFwPlusVersion(destNum: Int): Pair<Int, Long>? =
+        meshLogRepository
+            .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
+            .map { logs ->
+                logs
+                    .mapNotNull { log ->
+                        log.fromRadio.packet
+                            ?.decoded
+                            ?.payload
+                            ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                            ?.response
+                            ?.takeIf { it.response_type == OnDemandType.RESPONSE_FW_PLUS_VERSION }
+                            ?.fw_plus_version
+                            ?.version_number
+                            ?.let { version -> version to log.received_date }
+                    }
+                    .maxByOrNull { it.second }
+            }
+            .first()
+
+    /**
+     * Which channel the Remote Hardware (GPIO) command goes out on. A node that told us it runs MT_SW_FIRMWARE v3 or
+     * newer is controlled without the "gpio" channel, through the remote admin (the admin keys), so the same encrypted
+     * way as other remote admin messages is used. For any other node the "gpio" channel is used. A node that has not
+     * told its version (or runs an older one) is asked again at most once a week, not on every command.
+     */
+    private suspend fun gpioChannelFor(destNum: Int): Int {
+        val known = knownFwPlusVersion(destNum)
+        var version = known?.first
+        val lastCheck = maxOf(known?.second ?: 0L, gpioVersionAskedAt[destNum] ?: 0L)
+        if ((version == null || version < MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN) &&
+            nowMillis - lastCheck > GPIO_VERSION_RECHECK_MS
+        ) {
+            gpioVersionAskedAt[destNum] = nowMillis
+            Logger.i { "GPIO: pytam węzeł ${destNum.toUInt()} o wersję firmware (znana: $version)" }
+            runCatching { requestOnDemand(destNum, OnDemandType.REQUEST_FW_PLUS_VERSION) }
+            val fresh =
+                withTimeoutOrNull(GPIO_VERSION_WAIT_MS) {
+                    meshLogRepository
+                        .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
+                        .map { knownFwPlusVersion(destNum) }
+                        .first { known == null || (it != null && it.second > known.second) }
+                }
+            version = fresh?.first ?: version
+        }
+        val admin = version != null && version >= MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN
+        val channel = if (admin) getAdminChannelIndex(destNum, null) else GPIO_CHANNEL_INDEX
+        Logger.i {
+            "GPIO: węzeł ${destNum.toUInt()}, wersja firmware $version, " +
+                (if (admin) "przez zdalnego admina (bez kanału gpio)" else "kanałem gpio") + ", kanał $channel"
+        }
+        return channel
     }
 
     override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? {
@@ -514,7 +574,7 @@ class CommandSenderImpl(
             buildMeshPacket(
                 to = destNum,
                 wantAck = true,
-                channel = GPIO_CHANNEL_INDEX,
+                channel = gpioChannelFor(destNum),
                 decoded =
                 Data.Builder()
                     .also { wb ->
@@ -864,5 +924,14 @@ class CommandSenderImpl(
          * Index of the dedicated "gpio" channel, per Remote Hardware setup convention — always right after channel 0.
          */
         private const val GPIO_CHANNEL_INDEX = 1
+
+        /** The firmware version number (MT_SW_FIRMWARE v3) from which GPIO control goes through the remote admin. */
+        private const val MIN_FW_PLUS_VERSION_FOR_GPIO_ADMIN = 3
+
+        /** A node with an unknown or older firmware version is asked for it again at most once a week. */
+        private const val GPIO_VERSION_RECHECK_MS = 7L * 24 * 60 * 60 * 1000
+
+        /** How long a GPIO command waits for the answer about the firmware version. */
+        private const val GPIO_VERSION_WAIT_MS = 10_000L
     }
 }

@@ -57,6 +57,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Sterowanie GPIO (wszystkie wersje): aplikacja sama wykrywa MT_SW_FIRMWARE v3 (wersję węzła sprawdza raz na tydzień) i dla v3 nie wysyła już kanałem „gpio”, tylko jak zdalną komendę administratora; dla pozostałych węzłów nic się nie zmienia.
 * Sterowanie GPIO (wszystkie wersje): okno informacji i dokumentacja opisują, że w MT_SW_FIRMWARE v3 sterowanie nie wymaga kanału „gpio”, bo idzie przez zdalnego admina (klucze administratora); na starszym oprogramowaniu kanał nadal jest potrzebny, a w oryginale i starszych wersjach moduł zwraca stany pinów kanałem głównym (ostrzeżenie w oknie informacji i dokumentacji).
 * Mapa (wszystkie wersje): pochylanie dwoma palcami zaczyna się po krótszym ruchu (6 dp zamiast 16 dp), żeby lekki obrót albo zmiana odstępu palców nie przejmowały gestu wcześniej i pochylenie łatwiej wychodziło, zwłaszcza na iPhonie.
 * Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół z dowolnego miejsca okna (przy przewijanej liście dopiero gdy lista jest na samej górze, więc zwykłe przewijanie nie zamyka okna); planer zachowuje swój oryginalny krzyżyk, bez drugiego.
@@ -1050,6 +1051,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* GPIO control (all versions): the app detects MT_SW_FIRMWARE v3 by itself (it checks the node's version once a week) and for v3 no longer sends on the gpio channel but like a remote admin command; other nodes are unchanged.
 * GPIO control (all versions): the info window and the documentation describe that in MT_SW_FIRMWARE v3 the control does not need the gpio channel, because it goes through the remote admin (the administrator keys); older firmware still needs the channel, and in the original and older versions the module returns the pin states on the main channel (warning in the info window and the documentation).
 * Map (all versions): the two-finger tilt starts after a shorter move (6 dp instead of 16 dp), so that a slight turn or change in the gap between the fingers does not take over the gesture first and the tilt comes out more easily, especially on the iPhone.
 * Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down from anywhere on the window (with a scrolling list only when the list is at the very top, so normal scrolling never closes the window); the planner keeps its own original cross, without a second one.
