@@ -143,7 +143,7 @@ fun NeighborInfoLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit,
         },
         listPart = { listModifier, _, lazyListState, onCardClick ->
             LazyColumn(modifier = listModifier.fillMaxSize(), state = lazyListState) {
-                items(entries, key = { it.log.uuid }) { entry ->
+                items(entries, key = { it.listKey }) { entry ->
                     val report = entry.report
                     val time = DateFormatter.formatDateTime((report ?: entry.log).received_date)
                     val text =

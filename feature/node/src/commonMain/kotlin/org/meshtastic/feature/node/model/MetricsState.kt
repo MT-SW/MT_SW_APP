@@ -116,7 +116,7 @@ data class MetricsState(
  * connected radio's periodic report to the app - newest first.
  */
 fun MetricsState.neighborInfoEntries(): List<NeighborInfoEntry> {
-    val requested = neighborInfoRequests.map { request ->
+    val requested = neighborInfoRequests.distinctBy { it.uuid }.map { request ->
         val id = request.fromRadio.packet?.id
         NeighborInfoEntry.Requested(
             log = request,
@@ -125,13 +125,22 @@ fun MetricsState.neighborInfoEntries(): List<NeighborInfoEntry> {
     }
     // Only the report each request took is excluded, so a second copy answering the same request still shows.
     val pairedReplies = requested.mapNotNull { it.reply?.uuid }.toSet()
-    val received = neighborInfoResults.filter { it.uuid !in pairedReplies }.map { NeighborInfoEntry.Received(it) }
+    val received =
+        neighborInfoResults.distinctBy { it.uuid }.filter { it.uuid !in pairedReplies }.map {
+            NeighborInfoEntry.Received(it)
+        }
     return (requested + received).sortedByDescending { it.timeSeconds }
 }
 
 /** One row of the neighbor-info log. */
 sealed interface NeighborInfoEntry {
     val log: MeshLog
+
+    /**
+     * Unique key of a list row: the kind plus the log id. A list item key must never repeat (a repeated key crashes the
+     * list), and a request and a received report may come from the same log.
+     */
+    val listKey: String
 
     /** The packet carrying the neighbor list, or null for a request nothing answered. */
     val report: MeshLog?
@@ -145,12 +154,18 @@ sealed interface NeighborInfoEntry {
 
     /** A request we sent, with the reply if one came back. */
     data class Requested(override val log: MeshLog, val reply: MeshLog?) : NeighborInfoEntry {
+        override val listKey: String
+            get() = "req-${log.uuid}"
+
         override val report: MeshLog?
             get() = reply
     }
 
     /** Neighbor info that arrived without our asking. */
     data class Received(override val log: MeshLog) : NeighborInfoEntry {
+        override val listKey: String
+            get() = "rec-${log.uuid}"
+
         override val report: MeshLog
             get() = log
     }

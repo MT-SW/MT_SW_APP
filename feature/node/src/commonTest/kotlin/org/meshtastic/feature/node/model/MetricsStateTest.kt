@@ -74,6 +74,22 @@ class MetricsStateTest {
     }
 
     @Test
+    fun theSameLogTwiceNeverGivesTheSameListKeyTwice() {
+        val request = neighborLog(uuid = "request", packetId = 10, receivedDate = 1_000)
+        val broadcast = neighborLog(uuid = "broadcast", packetId = 12, receivedDate = 3_000)
+        val state =
+            MetricsState(
+                neighborInfoRequests = listOf(request, request),
+                neighborInfoResults = listOf(broadcast, broadcast, request),
+            )
+
+        val keys = state.neighborInfoEntries().map { it.listKey }
+
+        assertEquals(keys.size, keys.toSet().size, "a repeated list key would crash the list")
+        assertEquals(3, keys.size)
+    }
+
+    @Test
     fun neighborInfoLogsExistWithOnlyUnaskedNeighborInfo() {
         val state = MetricsState(neighborInfoResults = listOf(neighborLog(uuid = "b", packetId = 1, receivedDate = 1)))
 
