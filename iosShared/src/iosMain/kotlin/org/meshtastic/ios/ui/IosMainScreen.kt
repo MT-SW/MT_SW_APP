@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import org.meshtastic.core.navigation.MultiBackstack
+import org.meshtastic.core.ui.component.LogScreenChanges
 import org.meshtastic.core.ui.component.MeshtasticAppShell
 import org.meshtastic.core.ui.component.MeshtasticNavDisplay
 import org.meshtastic.core.ui.component.MeshtasticNavigationSuite
@@ -57,6 +58,7 @@ private val BAR_BOTTOM_GAP = 10.dp
 fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modifier: Modifier = Modifier) {
     val backStack = multiBackstack.activeBackStack
     val settingsRadioConfigViewModelProvider = rememberSettingsRadioConfigViewModelProvider(backStack)
+    LogScreenChanges(multiBackstack)
 
     // The background is painted over the whole screen, including the notch area; only the content stays inside it.
     Surface(modifier = modifier.fillMaxSize()) {

@@ -28,6 +28,7 @@ import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.repository.PlatformAnalytics
+import org.meshtastic.core.ui.component.LogScreenChanges
 import org.meshtastic.core.ui.component.MeshtasticAppShell
 import org.meshtastic.core.ui.component.MeshtasticNavDisplay
 import org.meshtastic.core.ui.component.MeshtasticNavigationSuite
@@ -67,6 +68,7 @@ fun MeshtasticMainScreen(
     val settingsRadioConfigViewModelProvider = rememberSettingsRadioConfigViewModelProvider(backStack)
 
     LockdownPrompt(uiViewModel)
+    LogScreenChanges(multiBackstack)
 
     MeshtasticAppShell(multiBackstack = multiBackstack, uiViewModel = uiViewModel, hostModifier = hostModifier) {
         MeshtasticNavigationSuite(
