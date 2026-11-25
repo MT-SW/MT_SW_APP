@@ -203,7 +203,7 @@ class MapLibreMapViewProvider(
                 },
             )
 
-            MapZoom(mapState = mapState, basemap = basemaps.current)
+            MapZoom(mapState = mapState, basemap = basemaps.current, tiltSwitch = true)
 
             OfflineIndicator(viewModel)
 

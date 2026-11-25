@@ -23,7 +23,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
+import org.maplibre.compose.camera.CameraAnimation
+import org.maplibre.compose.camera.CameraUpdate
 import org.maplibre.compose.map.MapState
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.feature.map.component.MapZoomControls
@@ -44,6 +47,12 @@ private const val ZOOM_INSET = 8
  */
 internal const val ZOOM_BOTTOM_INSET = 88
 
+/** The pitch the 2D/3D button tilts the map to (the original iPhone app uses the same). */
+private const val TILT_3D_DEGREES = 55.0
+
+/** Above this pitch the map counts as tilted, so the button offers the way back to flat. */
+private const val TILTED_ABOVE_DEGREES = 1.0
+
 /**
  * Zoom controls in the lower trailing corner of a map, where Google Maps draws its own.
  *
@@ -56,14 +65,31 @@ internal const val ZOOM_BOTTOM_INSET = 88
  * the credit outright and the small maps behind the button.
  */
 @Composable
-internal fun BoxScope.MapZoom(mapState: MapState, basemap: Basemap, centered: Boolean = false) {
+internal fun BoxScope.MapZoom(
+    mapState: MapState,
+    basemap: Basemap,
+    centered: Boolean = false,
+    tiltSwitch: Boolean = false,
+) {
     val scope = rememberCoroutineScope()
     val zoomRange = basemap.zoomRange()
+    val tilted = mapState.cameraPosition.pitch > TILTED_ABOVE_DEGREES
 
     MapZoomControls(
         compact = centered,
         onZoomIn = { scope.launch { mapState.zoomBy(ZOOM_STEP, zoomRange) } },
         onZoomOut = { scope.launch { mapState.zoomBy(-ZOOM_STEP, zoomRange) } },
+        onToggleTilt =
+        if (tiltSwitch) {
+            {
+                val target = if (tilted) 0.0 else TILT_3D_DEGREES
+                Logger.i { "Mapa: przycisk widoku 3D, pochylenie ${mapState.cameraPosition.pitch} -> $target" }
+                scope.launch { mapState.animateCamera(CameraUpdate(pitch = target), CameraAnimation.Ease.Standard) }
+            }
+        } else {
+            null
+        },
+        tilted = tilted,
         modifier =
         if (centered) {
             // A map too short for the lifted corner (the thumbnail in the node details): a smaller pair in the

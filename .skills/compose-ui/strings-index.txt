@@ -2223,6 +2223,9 @@ lockdown_show_passphrase
 lockdown_submit
 locked
 ### LOG ###
+log_folder_required_body
+log_folder_required_button
+log_folder_required_title
 log_retention_days
 log_retention_days_quantity
 log_retention_days_summary
@@ -2364,6 +2367,8 @@ map_type_hybrid
 map_type_normal
 map_type_satellite
 map_type_terrain
+map_view_3d
+map_view_flat
 map_zoom_levels
 mark_as_read
 mark_unread_selected
@@ -3482,6 +3487,7 @@ remote
 remote_add_to_list
 remote_admin
 remote_admin_unreachable
+remote_clear_selection
 remote_command_no_response
 remote_contact_hint
 remote_contact_title
@@ -3493,7 +3499,13 @@ remote_list_favorites
 remote_list_ignored
 remote_manage_hint
 remote_manage_title
+remote_pick_from_list
+remote_pick_search
 remote_remove_from_list
+remote_remove_node
+remote_remove_node_text
+remote_remove_node_title
+remote_selected_count
 remote_shell
 remote_shell_command_hint
 remote_shell_error_notice
@@ -3563,7 +3575,6 @@ report_note_hint
 report_send
 report_send_to
 report_sending
-report_with_logs
 report_with_logs_hint
 ### REQUEST ###
 request

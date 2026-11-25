@@ -32,6 +32,7 @@ import org.meshtastic.core.resources.ic_place
 import org.meshtastic.core.resources.ic_route
 import org.meshtastic.core.resources.ic_trip_origin
 import org.meshtastic.core.resources.ic_tune
+import org.meshtastic.core.resources.ic_view_3d
 
 // Map control icons
 val MeshtasticIcons.Layers: ImageVector
@@ -60,3 +61,6 @@ val MeshtasticIcons.LocationOn: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_location_on)
 val MeshtasticIcons.Route: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_route)
+
+val MeshtasticIcons.View3d: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_view_3d)

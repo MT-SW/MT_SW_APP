@@ -32,6 +32,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ElementLook
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.map_view_3d
+import org.meshtastic.core.resources.map_view_flat
 import org.meshtastic.core.resources.zoom_in
 import org.meshtastic.core.resources.zoom_out
 import org.meshtastic.core.ui.component.MAP_GLASS_MIN_ALPHA
@@ -39,6 +41,7 @@ import org.meshtastic.core.ui.component.StyledSurface
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
+import org.meshtastic.core.ui.icon.View3d
 import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.theme.rememberUiOptions
 
@@ -59,11 +62,23 @@ fun MapZoomControls(
     onZoomOut: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
+    onToggleTilt: (() -> Unit)? = null,
+    tilted: Boolean = false,
 ) {
     val style = rememberUiOptions().element(UiOptions.GROUP_MAP)
     // The small thumbnail map is short: a smaller pair leaves its credit strip free.
     val buttonDp = if (compact) COMPACT_ZOOM_BUTTON_DP else ZOOM_BUTTON_DP
     val buttons: @Composable () -> Unit = {
+        // MT_SW: the 2D/3D switch above the zoom pair; only the maps that can be tilted pass it.
+        if (onToggleTilt != null) {
+            MapButton(
+                icon = MeshtasticIcons.View3d,
+                contentDescription =
+                stringResource(if (tilted) Res.string.map_view_flat else Res.string.map_view_3d),
+                onClick = onToggleTilt,
+                modifier = if (style.look == ElementLook.FLAT) Modifier else Modifier.size(buttonDp.dp),
+            )
+        }
         MapButton(
             icon = MeshtasticIcons.Add,
             contentDescription = stringResource(Res.string.zoom_in),

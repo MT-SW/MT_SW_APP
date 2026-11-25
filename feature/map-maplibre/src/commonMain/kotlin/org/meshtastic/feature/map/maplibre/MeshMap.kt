@@ -710,6 +710,18 @@ private const val PROPAGATION_END_CLEARANCE_DP = 88
 /** Diagnostics for the logs: how smooth the map is while it moves (only a window with slow frames is written). */
 @Composable
 private fun MapFrameStats(mapState: MapState) {
+    // The tilt of the map, written each time it moves by a step, so the log shows whether a two-finger tilt (or the
+    // 2D/3D button) reached the map at all.
+    LaunchedEffect(mapState) {
+        var last = -1
+        snapshotFlow { (mapState.cameraPosition.pitch / PITCH_LOG_STEP_DEGREES).toInt() }
+            .collect { step ->
+                if (step != last) {
+                    last = step
+                    Logger.i { "Mapa: pochylenie ok. ${step * PITCH_LOG_STEP_DEGREES}°" }
+                }
+            }
+    }
     LaunchedEffect(mapState) {
         var mark = TimeSource.Monotonic.markNow()
         var frames = 0
@@ -724,7 +736,12 @@ private fun MapFrameStats(mapState: MapState) {
                     if (gap > SLOW_FRAME_MS) slow++
                     longest = maxOf(longest, gap)
                     if (frames >= FRAME_WINDOW) {
-                        if (slow > 0) Logger.i { "Mapa: klatek $frames, wolnych $slow, najdłuższa przerwa $longest ms" }
+                        if (slow > 0) {
+                            Logger.i {
+                                "Mapa: klatek $frames, wolnych $slow, najdłuższa przerwa $longest ms, " +
+                                    "pochylenie ${mapState.cameraPosition.pitch.toInt()}°"
+                            }
+                        }
                         frames = 0
                         slow = 0
                         longest = 0L
@@ -734,6 +751,7 @@ private fun MapFrameStats(mapState: MapState) {
     }
 }
 
+private const val PITCH_LOG_STEP_DEGREES = 5
 private const val FRAME_WINDOW = 60
 private const val SLOW_FRAME_MS = 32
 private const val FRAME_IDLE_GAP_MS = 250

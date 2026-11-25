@@ -2274,6 +2274,9 @@
     <string name="lockdown_submit">Submit</string>
     <string name="locked">Locked</string>
     <!-- LOG -->
+    <string name="log_folder_required_body">The app saves its logs in a folder you choose: the log of the last 24 hours, which is always collected, and the full log when you switch it on. Choose the folder where they should be saved, so that you can attach them to a bug report. You can change the folder later in the settings. The app can be used after the folder is chosen.</string>
+    <string name="log_folder_required_button">Choose folder</string>
+    <string name="log_folder_required_title">Choose a folder for the logs</string>
     <string name="log_retention_days">How long to keep received packets</string>
     <plurals name="log_retention_days_quantity">
         <item quantity="one">%1$d day</item>
@@ -2421,6 +2424,8 @@
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
+    <string name="map_view_3d">3D view</string>
+    <string name="map_view_flat">Flat view</string>
     <string name="map_zoom_levels" translatable="false">(z%1$d–%2$d)</string>
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_unread_selected">Mark unread</string>
@@ -3560,6 +3565,7 @@
     <string name="remote_add_to_list">Add to list</string>
     <string name="remote_admin">Remote Administration</string>
     <string name="remote_admin_unreachable">Could not reach node — try again or move closer.</string>
+    <string name="remote_clear_selection">Clear selection</string>
     <string name="remote_command_no_response">No response from node</string>
     <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, for the selected nodes or the typed ID.</string>
     <string name="remote_contact_title">Add a contact remotely</string>
@@ -3571,14 +3577,13 @@
     <string name="remote_list_ignored">Ignored</string>
     <string name="remote_manage_hint">Pick nodes from your own list or type the ID of a node you want to manage on the remote device, for example !a1b2c3d4. A typed node does not have to be on your own list.</string>
     <string name="remote_manage_title">Lists and contacts on the remote device</string>
-    <string name="remote_remove_from_list">Remove from list</string>
     <string name="remote_pick_from_list">Pick from node list</string>
     <string name="remote_pick_search">Search nodes</string>
-    <string name="remote_selected_count">Selected: %1$d</string>
-    <string name="remote_clear_selection">Clear selection</string>
+    <string name="remote_remove_from_list">Remove from list</string>
     <string name="remote_remove_node">Remove from node list of the device</string>
-    <string name="remote_remove_node_title">Remove from the remote device?</string>
     <string name="remote_remove_node_text">The selected nodes will be removed only from the node list of the remote device. Your own list stays the same. The device adds a node again when it hears it.</string>
+    <string name="remote_remove_node_title">Remove from the remote device?</string>
+    <string name="remote_selected_count">Selected: %1$d</string>
     <string name="remote_shell">Remote Shell</string>
     <string name="remote_shell_command_hint">Command</string>
     <string name="remote_shell_error_notice">Error from the node: %1$s</string>
@@ -4678,8 +4683,5 @@
     <string name="zh_TW" translatable="false">繁體中文</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
-    <string name="log_folder_required_title">Choose a folder for the logs</string>
-    <string name="log_folder_required_body">The app saves its logs in a folder you choose: the log of the last 24 hours, which is always collected, and the full log when you switch it on. Choose the folder where they should be saved, so that you can attach them to a bug report. You can change the folder later in the settings. The app can be used after the folder is chosen.</string>
-    <string name="log_folder_required_button">Choose folder</string>
 </resources>
 

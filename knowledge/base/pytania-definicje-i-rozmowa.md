@@ -213,3 +213,8 @@ Słowa: zgoda, warunki korzystania, regulamin, dane publiczne, odmowa zgody, wyc
 W szczegółach węzła, w zdalnej administracji (po nawiązaniu sesji), jest panel „Listy i kontakty na zdalnym urządzeniu”. Węzły wybierasz z własnej listy (przycisk „Wybierz z listy węzłów”, z wyszukiwaniem, wiele naraz) albo wpisujesz ID, na przykład !a1b2c3d4. Potem możesz dodać je do ulubionych lub ignorowanych zdalnego urządzenia, usunąć z tych list, zapisać jako kontakt (z nazwami z naszej listy) albo usunąć z listy węzłów zdalnego urządzenia. Aplikacja czeka na potwierdzenie z sieci. Podglądu, kto już jest na zdalnych listach, na razie nie ma, bo wymaga zmiany w MT_SW_FIRMWARE.
 Słowa: zdalne ulubione, zdalne ignorowane, zdalny kontakt, zdalna lista węzłów, usuń węzeł zdalnie, wybór z listy węzłów, zdalna administracja
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW (sprawdzono 2026-11)
+
+### Jak pochylić mapę do widoku 3D?
+Nad przyciskami powiększania i pomniejszania na mapie jest przycisk „Widok 3D”, który pochyla mapę, a dotknięty jeszcze raz prostuje ją („Widok płaski”). Mapę pochylisz też dwoma palcami przesuwanymi razem w górę lub w dół; na komputerze przeciągając z prawym przyciskiem myszy.
+Słowa: widok 3D, pochylenie mapy, przechylić mapę, tryb 3D, mapa 3D, jak pochylić mapę
+Źródło: Dokumentacja MT_SW_APP (opracowanie własne, 2026-11)
