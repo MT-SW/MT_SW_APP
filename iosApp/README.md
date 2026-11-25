@@ -10,6 +10,8 @@ Skorupa aplikacji iOS. Cały ekran rysuje wspólny kod Kotlin (moduł `iosShared
 
 Projekt ma tylko konfigurację Release (nie ma wersji Debug), więc aplikacja jest zawsze szybka; po zmianie `project.yml` uruchom `xcodegen` jeszcze raz.
 
+Podpis z darmowego konta Apple trwa 7 dni. Żeby go odświeżyć, uruchom `./iosApp/odswiez-podpis.sh` (usuwa stare profile i uruchamia `xcodegen`), potem uruchom aplikację w Xcode na iPhonie.
+
 Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone.
 
 ## Stan
@@ -28,6 +30,8 @@ The iOS app shell. The whole screen is drawn by shared Kotlin code (module `iosS
 3. Open `MTSWApp.xcodeproj`, pick a simulator or an iPhone, choose your Apple ID (Team) under Signing & Capabilities and run.
 
 The project has only the Release configuration (there is no Debug version), so the app is always fast; after changing `project.yml` run `xcodegen` again.
+
+A signature from a free Apple account lasts 7 days. To refresh it, run `./iosApp/odswiez-podpis.sh` (removes the old profiles and runs `xcodegen`), then run the app from Xcode on the iPhone.
 
 With a free Apple ID the app works for 7 days and must then be installed again. Bluetooth does not work in the simulator; a real iPhone is needed for it.
 
