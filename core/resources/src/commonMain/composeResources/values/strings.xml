@@ -3742,6 +3742,13 @@
     <string name="role_tak">TAK</string>
     <string name="role_tak_tracker">TAK Tracker</string>
     <string name="role_tracker">Tracker</string>
+    <!-- ROUTE -->
+    <string name="route_playback_pause">Pause</string>
+    <string name="route_playback_play">Play</string>
+    <string name="route_playback_reading">Heard: %1$s · %2$d dBm%3$s</string>
+    <string name="route_playback_relay">Through a relay</string>
+    <string name="route_playback_start">Replay this route</string>
+    <string name="route_playback_stop">Close</string>
     <string name="router_role_confirmation_text">I have read the &lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;Device Role Documentation&lt;/a&gt; and the blog post about &lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;Choosing The Right Device Role&lt;/a&gt;.</string>
     <!-- ROUTING -->
     <string name="routing_error_admin_bad_session_key">Admin session expired</string>

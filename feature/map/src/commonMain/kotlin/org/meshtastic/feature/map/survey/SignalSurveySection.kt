@@ -54,7 +54,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.repository.SignalSurveyBlocker
+import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.route_playback_start
+import org.meshtastic.core.ui.icon.PlayArrow
+import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.grant_permission
@@ -98,6 +102,7 @@ private const val CSV_MIME_TYPE = "text/csv"
 @Composable
 fun SignalSurveySection(modifier: Modifier = Modifier, viewModel: SignalSurveyViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val playback: RoutePlayback = koinInject()
     var exportSessionId by rememberSaveable { mutableStateOf<Long?>(null) }
     var exportStartedAt by rememberSaveable { mutableStateOf<Long?>(null) }
     val export =
@@ -138,6 +143,7 @@ fun SignalSurveySection(modifier: Modifier = Modifier, viewModel: SignalSurveyVi
                 export(SURVEY_FILE_NAME, CSV_MIME_TYPE)
             },
             onDelete = viewModel::delete,
+            onPlay = playback::play,
             onHeatmapChange = viewModel::setHeatmap,
         ),
         modifier = modifier,
@@ -150,6 +156,7 @@ internal class SignalSurveyActions(
     val onFixBlocker: (SignalSurveyBlocker) -> Unit = {},
     val onVisibleChange: (sessionId: Long, visible: Boolean) -> Unit = { _, _ -> },
     val onExport: (sessionId: Long) -> Unit = {},
+    val onPlay: (sessionId: Long) -> Unit = {},
     val onDelete: (sessionId: Long) -> Unit = {},
     val onHeatmapChange: (Boolean) -> Unit = {},
 )
@@ -209,6 +216,7 @@ internal fun SignalSurveyContent(
                     item = item,
                     onVisibleChange = { actions.onVisibleChange(item.session.id, it) },
                     onExport = { actions.onExport(item.session.id) },
+                    onPlay = { actions.onPlay(item.session.id) },
                     onDelete = { deleteSessionId = item.session.id },
                 )
             }
@@ -230,6 +238,7 @@ private fun SessionRow(
     item: SurveySessionUi,
     onVisibleChange: (Boolean) -> Unit,
     onExport: () -> Unit,
+    onPlay: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val count = item.session.readingCount
@@ -243,6 +252,12 @@ private fun SessionRow(
                         imageVector = if (item.visible) MeshtasticIcons.Visibility else MeshtasticIcons.VisibilityOff,
                         contentDescription =
                         stringResource(if (item.visible) Res.string.hide_layer else Res.string.show_layer),
+                    )
+                }
+                IconButton(onClick = onPlay, enabled = count > 1 && !item.recording) {
+                    Icon(
+                        imageVector = MeshtasticIcons.PlayArrow,
+                        contentDescription = stringResource(Res.string.route_playback_start),
                     )
                 }
                 IconButton(onClick = onExport, enabled = count > 0) {

@@ -3661,6 +3661,13 @@ role_sensor
 role_tak
 role_tak_tracker
 role_tracker
+### ROUTE ###
+route_playback_pause
+route_playback_play
+route_playback_reading
+route_playback_relay
+route_playback_start
+route_playback_stop
 router_role_confirmation_text
 ### ROUTING ###
 routing_error_admin_bad_session_key

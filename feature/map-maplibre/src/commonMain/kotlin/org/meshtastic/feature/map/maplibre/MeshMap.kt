@@ -100,6 +100,7 @@ import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
+import org.meshtastic.feature.map.maplibre.component.RoutePlaybackControls
 import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.meshtastic.feature.map.maplibre.component.ZOOM_BOTTOM_INSET
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
@@ -121,6 +122,7 @@ import org.meshtastic.feature.map.maplibre.layers.SignalSurveyHeatmapLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLinkLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
+import org.meshtastic.feature.map.maplibre.layers.RoutePlaybackLayer
 import org.meshtastic.feature.map.maplibre.layers.TrackLineLayer
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
 import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
@@ -261,6 +263,7 @@ fun rememberMeshMapState(
             )
             CustomLayers(customLayers, layerOpacity)
             TrackLineLayer()
+            RoutePlaybackLayer()
             CoverageLayer(coverage, layerOpacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY)
             SignalSurveyLayer(surveyCells, surveyColors, onSurveyCellClick)
             SignalSurveyHeatmapLayer(surveyHeatPoints, surveyColors)
@@ -381,6 +384,7 @@ fun MeshMap(
         }
     }
     MapFrameStats(mapState)
+    RoutePlaybackCamera(mapState)
     PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
     val credits = extraCredits.distinct()
@@ -441,6 +445,15 @@ fun MeshMap(
                 overlay = { WithFloatingBarInset { include(ornaments) } },
             )
         }
+        RoutePlaybackControls(
+            Modifier.align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .padding(
+                    start = 8.dp,
+                    end = PROPAGATION_END_CLEARANCE_DP.dp,
+                    bottom = ZOOM_BOTTOM_INSET.dp + LocalFloatingBarInset.current + ROUTE_PLAYBACK_LIFT_DP.dp,
+                ),
+        )
         // As wide as the room left of the zoom buttons, with a small gap to them, and low so it covers little map.
         PropagationOverlay(
             Modifier.align(Alignment.BottomStart)
@@ -769,3 +782,37 @@ private const val PITCH_START_DP = 6
 private const val FRAME_WINDOW = 60
 private const val SLOW_FRAME_MS = 32
 private const val FRAME_IDLE_GAP_MS = 250
+
+private const val ROUTE_PLAYBACK_LIFT_DP = 40
+private const val PLAYBACK_ZOOM = 17.0
+private const val PLAYBACK_PITCH = 60.0
+
+/**
+ * MT_SW: while the virtual walk plays, the camera follows the dot in a tilted (3D) view. Once the walk is over the
+ * camera is left where it is.
+ */
+@Composable
+private fun RoutePlaybackCamera(mapState: MapState) {
+    val playback: org.meshtastic.feature.map.playback.RoutePlayback = org.koin.compose.koinInject()
+    LaunchedEffect(mapState, playback) {
+        var started = false
+        snapshotFlow { playback.state.value.current }
+            .collect { step ->
+                if (step == null) {
+                    started = false
+                } else {
+                    val centre = Position(longitude = step.longitude, latitude = step.latitude)
+                    if (!started) {
+                        started = true
+                        Logger.i { "Spacer: kamera podąża za punktem, pochylenie ${PLAYBACK_PITCH.toInt()}°" }
+                        mapState.animateCamera(
+                            CameraUpdate(center = centre, zoom = PLAYBACK_ZOOM, pitch = PLAYBACK_PITCH),
+                            CameraAnimation.Ease.Standard,
+                        )
+                    } else {
+                        mapState.animateCamera(CameraUpdate(center = centre), CameraAnimation.Ease.Standard)
+                    }
+                }
+            }
+    }
+}

@@ -4730,4 +4730,10 @@
     <string name="device_compare_uptime">Działa od: %1$s</string>
     <string name="device_compare_nodes">Węzły aktywne: %1$d z %2$d</string>
     <string name="device_compare_unread">Nowe wiadomości: %1$d</string>
+    <string name="route_playback_start">Odtwórz tę trasę</string>
+    <string name="route_playback_play">Odtwarzaj</string>
+    <string name="route_playback_pause">Pauza</string>
+    <string name="route_playback_stop">Zamknij</string>
+    <string name="route_playback_reading">Słyszany: %1$s · %2$d dBm%3$s</string>
+    <string name="route_playback_relay">Przez przekaźnik</string>
 </resources>
