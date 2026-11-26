@@ -488,6 +488,7 @@
     <string name="app_data_summary_fixed">The app's data is in: %1$s. The folder is set by the MT_SW_DATA_DIR variable and cannot be changed here.</string>
     <string name="app_data_summary_phone">The message database and settings stay in the app's own memory (Android requires this). The AI models are in: %1$s. Free space: %2$s.</string>
     <string name="app_data_title">App data folder</string>
+    <string name="app_data_where">Messages, settings, logs, maps and AI models are in: %1$s</string>
     <string name="app_database_backup_disconnect_confirmation">The radio will be disconnected first. Reconnect from the Connections screen when you are done.</string>
     <string name="app_database_backup_failed">Could not write the backup.</string>
     <string name="app_database_backup_no_device">Connect to a radio first. There is no app data to back up or restore yet.</string>
@@ -1898,6 +1899,7 @@
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
     <string name="floating_nav_bar">Floating navigation bar at the bottom</string>
+    <string name="folder_usage">Takes: %1$s. Free space on the disk: %2$s.</string>
     <string name="folders_title">Folders for data and pictures</string>
     <!-- FONT -->
     <string name="font_default">As designed</string>

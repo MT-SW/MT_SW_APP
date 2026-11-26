@@ -73,3 +73,18 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
         Logger.w { "Album zdjęć: zapis w folderze nie udał się: ${e.message}" }
         false
     }
+
+actual fun defaultPhotoFolder(): String? = fallbackFolder.path
+
+actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? =
+    try {
+        val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
+        val used = if (dir.isDirectory) dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } else 0L
+        val free = (if (dir.exists()) dir else dir.parentFile ?: dir).usableSpace
+        PhotoFolderUsage(usedMb = used / BYTES_IN_MB, freeMb = free / BYTES_IN_MB)
+    } catch (e: Exception) {
+        Logger.w { "Album zdjęć: zajęte miejsce nie zostało policzone: ${e.message}" }
+        null
+    }
+
+private const val BYTES_IN_MB = 1024L * 1024L

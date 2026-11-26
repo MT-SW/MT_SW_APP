@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.folder_usage
 import org.meshtastic.core.resources.photo_folder_auto
 import org.meshtastic.core.resources.photo_folder_change
 import org.meshtastic.core.resources.photo_folder_current
@@ -49,7 +50,9 @@ import org.meshtastic.core.ui.icon.PhotoSave
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.changeAppPhotoFolder
 import org.meshtastic.core.ui.util.currentPhotoFolder
+import org.meshtastic.core.ui.util.defaultPhotoFolder
 import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.core.ui.util.photoFolderUsage
 
 /**
  * MT_SW: where the pictures taken with the camera in the app (messages and hikes) are kept. On a phone or tablet the
@@ -60,7 +63,7 @@ import org.meshtastic.core.ui.util.isDesktopPlatform
 fun PhotoFolderSettings() {
     var folder by remember { mutableStateOf(currentPhotoFolder()) }
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -78,10 +81,21 @@ fun PhotoFolderSettings() {
             )
         }
         if (isDesktopPlatform) {
+            val shown = folder ?: defaultPhotoFolder().orEmpty()
+            val muted = MaterialTheme.colorScheme.onSurfaceVariant
             Text(
-                text = stringResource(Res.string.photo_folder_current, folder ?: "~/Pictures/MT_SW"),
+                text = stringResource(Res.string.photo_folder_current, shown),
                 style = MaterialTheme.typography.bodySmall,
+                color = muted,
             )
+            val usage = remember(shown) { photoFolderUsage(shown) }
+            usage?.let {
+                Text(
+                    text = stringResource(Res.string.folder_usage, formatMb(it.usedMb), formatMb(it.freeMb)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = muted,
+                )
+            }
             OutlinedButton(
                 onClick = {
                     Logger.i { "Folder zdjęć: ustawienia — zmiana folderu" }
@@ -91,7 +105,11 @@ fun PhotoFolderSettings() {
                 Text(stringResource(Res.string.photo_folder_change))
             }
         } else {
-            Text(text = stringResource(Res.string.photo_folder_auto), style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = stringResource(Res.string.photo_folder_auto),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

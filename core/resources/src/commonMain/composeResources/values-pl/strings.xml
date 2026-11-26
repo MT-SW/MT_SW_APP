@@ -4848,4 +4848,6 @@
     <string name="app_data_info_title">Dane aplikacji</string>
     <string name="app_data_info_1">W tym folderze aplikacja trzyma wszystkie swoje dane: wiadomości i listę węzłów, modele AI, pobrane dane map, wędrówki i logi. Aktualny folder jest napisany pod nazwą.</string>
     <string name="app_data_info_2">Zmiana folderu przenosi dane w nowe miejsce, więc może chwilę potrwać. Zdjęcia z aparatu mają osobny folder, poniżej.</string>
+    <string name="app_data_where">Wiadomości, ustawienia, logi, mapy i modele AI są w: %1$s</string>
+    <string name="folder_usage">Zajmuje: %1$s. Wolne miejsce na dysku: %2$s.</string>
 </resources>

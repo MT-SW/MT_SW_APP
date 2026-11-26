@@ -41,3 +41,12 @@ expect fun changeAppPhotoFolder(): String?
 /** Saves a picture taken with the camera in the app to the app's album (on the computer: the chosen folder). */
 fun saveAppPhoto(bytes: ByteArray): Boolean =
     saveToHikeAlbum(bytes, "mtsw_${org.meshtastic.core.common.util.nowMillis}.jpg", appPhotoFolder())
+
+/** How much room the pictures take in the folder and how much free space the disk has, both in megabytes. */
+data class PhotoFolderUsage(val usedMb: Long, val freeMb: Long)
+
+/** The folder pictures go to when none is chosen yet (the computer); null elsewhere. */
+expect fun defaultPhotoFolder(): String?
+
+/** The room taken by the pictures in [folder] and the free space of its disk; null where the system keeps the album. */
+expect fun photoFolderUsage(folder: String?): PhotoFolderUsage?

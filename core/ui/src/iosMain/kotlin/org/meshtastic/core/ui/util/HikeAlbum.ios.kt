@@ -87,3 +87,7 @@ actual fun appPhotoFolder(): String? = null
 actual fun currentPhotoFolder(): String? = null
 
 actual fun changeAppPhotoFolder(): String? = null
+
+actual fun defaultPhotoFolder(): String? = null
+
+actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? = null

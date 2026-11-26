@@ -25,6 +25,9 @@ import androidx.compose.foundation.layout.Row
 import org.meshtastic.core.resources.app_data_info_2
 import org.meshtastic.core.resources.app_data_info_1
 import org.meshtastic.core.resources.app_data_info_title
+import org.meshtastic.core.resources.photo_folder_change
+import org.meshtastic.core.resources.folder_usage
+import org.meshtastic.core.resources.app_data_where
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.icon.Storage
@@ -33,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -76,7 +80,6 @@ import org.meshtastic.core.resources.ai_storage_summary
 import org.meshtastic.core.resources.app_data_phone_single
 import org.meshtastic.core.resources.app_data_previous_failed
 import org.meshtastic.core.resources.app_data_scheduled
-import org.meshtastic.core.resources.app_data_summary
 import org.meshtastic.core.resources.app_data_summary_fixed
 import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
@@ -139,17 +142,17 @@ internal fun AiStorageRow() {
     val computer = i.choices.isEmpty()
     // Always clickable (a phone without an SD card explains in the dialog why there is only one place to choose).
     val canClick = i.canChange && move !is AiStorageMove.Moving
+    val change = {
+        if (computer) {
+            scope.launch { store.pickStorageFolder()?.let { store.moveStorage(it) } }
+        } else {
+            chooser = true
+        }
+    }
     Column(
         modifier =
-        Modifier.fillMaxWidth()
-            .clickable(enabled = canClick) {
-                if (computer) {
-                    scope.launch { store.pickStorageFolder()?.let { store.moveStorage(it) } }
-                } else {
-                    chooser = true
-                }
-            }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        Modifier.fillMaxWidth().clickable(enabled = canClick, onClick = change).padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(imageVector = MeshtasticIcons.Storage, contentDescription = null)
@@ -165,27 +168,27 @@ internal fun AiStorageRow() {
                 tint = MaterialTheme.colorScheme.StatusYellow,
             )
         }
-        val summary =
-            when {
-                computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
+        val small = MaterialTheme.typography.bodySmall
+        val muted = MaterialTheme.colorScheme.onSurfaceVariant
+        if (computer && i.canChange && i.movableMb != null) {
+            // Two short lines, the same size as the pictures' folder below: where it is, then how much it takes.
+            Text(text = stringResource(Res.string.app_data_where, i.folder), style = small, color = muted)
+            Text(
+                text = stringResource(Res.string.folder_usage, formatMb(i.movableMb ?: 0L), formatMb(i.freeMb)),
+                style = small,
+                color = muted,
+            )
+        } else {
+            val summary =
+                when {
+                    computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
 
-                computer && i.movableMb != null ->
-                    stringResource(
-                        Res.string.app_data_summary,
-                        i.folder,
-                        formatMb(i.movableMb ?: 0L),
-                        formatMb(i.freeMb),
-                    )
+                    computer -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
 
-                computer -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
-
-                else -> stringResource(Res.string.app_data_summary_phone, i.folder, formatMb(i.freeMb))
-            }
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+                    else -> stringResource(Res.string.app_data_summary_phone, i.folder, formatMb(i.freeMb))
+                }
+            Text(text = summary, style = small, color = muted)
+        }
         when (val m = move) {
             is AiStorageMove.Moving -> {
                 Text(stringResource(Res.string.ai_storage_moving), style = MaterialTheme.typography.bodySmall)
@@ -200,6 +203,9 @@ internal fun AiStorageRow() {
                 )
 
             else -> Unit
+        }
+        if (computer && i.canChange) {
+            OutlinedButton(enabled = canClick, onClick = change) { Text(stringResource(Res.string.photo_folder_change)) }
         }
         val next = i.nextFolder
         if (next != null) {

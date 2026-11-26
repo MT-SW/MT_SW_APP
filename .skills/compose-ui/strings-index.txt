@@ -467,6 +467,7 @@ app_data_summary
 app_data_summary_fixed
 app_data_summary_phone
 app_data_title
+app_data_where
 app_database_backup_disconnect_confirmation
 app_database_backup_failed
 app_database_backup_no_device
@@ -1847,6 +1848,7 @@ firmware_update_wipe_usb_detail
 firmware_version
 fixed_position
 floating_nav_bar
+folder_usage
 folders_title
 ### FONT ###
 font_default
