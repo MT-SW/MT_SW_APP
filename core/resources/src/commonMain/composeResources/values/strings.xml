@@ -1387,6 +1387,17 @@
     <string name="detection_sensor_config">Detection Sensor Config</string>
     <!-- DEVICE -->
     <string name="device">Device</string>
+    <string name="device_compare_battery">Battery: %1$s</string>
+    <string name="device_compare_connected">Connected</string>
+    <string name="device_compare_empty">No saved devices.</string>
+    <string name="device_compare_no_data">No data from this device yet.</string>
+    <string name="device_compare_nodes">Nodes online: %1$d of %2$d</string>
+    <string name="device_compare_not_connected">Not connected</string>
+    <string name="device_compare_refresh">Refresh</string>
+    <string name="device_compare_title">Compare devices</string>
+    <string name="device_compare_unread">New messages: %1$d</string>
+    <string name="device_compare_uptime">Running for: %1$s</string>
+    <string name="device_compare_utilization">Channel use: %1$s, transmit time: %2$s</string>
     <string name="device_configuration">Device configuration</string>
     <string name="device_db_cache_limit">How many device databases to keep</string>
     <string name="device_db_cache_limit_summary">How many device databases this app keeps at once (a separate one for each device, whether you connect over Bluetooth, Wi-Fi or USB). The minimum is 3, because up to 3 devices can be connected at once; the databases of your saved devices are never deleted. When another one is added, the database of the least recently used other device is deleted.</string>

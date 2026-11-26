@@ -43,6 +43,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.DeviceSnapshot
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageFilter
 import org.meshtastic.core.repository.RadioBackgroundMonitor
@@ -139,6 +140,36 @@ class BackgroundRadioCollector(
     }
 
     private val workers = mutableMapOf<String, Job>()
+
+    override suspend fun readSnapshot(address: String): DeviceSnapshot? {
+        val key = normalizeAddress(address)
+        return try {
+            databaseManager.withDeviceDb(address, includeActive = true) { db ->
+                val dao = db.nodeInfoDao()
+                val mine = dao.getMyNodeEntity() ?: return@withDeviceDb null
+                val nodes = dao.getAllNodesSnapshot()
+                val own = nodes.firstOrNull { it.num == mine.myNodeNum }
+                val metrics = own?.deviceMetrics
+                DeviceSnapshot(
+                    nodeNum = mine.myNodeNum,
+                    shortName = own?.user?.short_name.orEmpty(),
+                    batteryLevel = metrics?.battery_level,
+                    voltage = metrics?.voltage,
+                    channelUtilization = metrics?.channel_utilization,
+                    airUtilTx = metrics?.air_util_tx,
+                    uptimeSeconds = metrics?.uptime_seconds,
+                    nodeCount = nodes.size,
+                    onlineCount = nodes.count { it.isOnline },
+                )
+            }
+                .also { Logger.d { "Porównanie urządzeń: ${anonymize(key)} odczytane = ${it != null}" } }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            Logger.d { "Porównanie urządzeń: ${anonymize(key)} nie dało się odczytać: ${e.message}" }
+            null
+        }
+    }
 
     override suspend fun readBadge(address: String) {
         val key = normalizeAddress(address)

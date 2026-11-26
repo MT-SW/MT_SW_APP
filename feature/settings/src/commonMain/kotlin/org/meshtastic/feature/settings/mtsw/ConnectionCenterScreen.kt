@@ -40,6 +40,7 @@ import org.meshtastic.core.resources.connection_center_intro
 import org.meshtastic.core.resources.connection_center_title
 import org.meshtastic.core.resources.console_summary
 import org.meshtastic.core.resources.console_title
+import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
@@ -90,6 +91,7 @@ fun ConnectionCenterScreen(settingsViewModel: SettingsViewModel, onBack: () -> U
                 RadioChooserSettings(options = options, onChange = settingsViewModel::setUiOption)
             }
             ExpressiveSection(title = stringResource(Res.string.radio_bridge_title)) { RadioBridgeSettings() }
+            ExpressiveSection(title = stringResource(Res.string.device_compare_title)) { DeviceCompareEntry() }
             ExpressiveSection(title = stringResource(Res.string.console_title)) {
                 ListItem(
                     text = stringResource(Res.string.console_title),

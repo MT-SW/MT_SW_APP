@@ -1339,6 +1339,17 @@ detection_sensor
 detection_sensor_config
 ### DEVICE ###
 device
+device_compare_battery
+device_compare_connected
+device_compare_empty
+device_compare_no_data
+device_compare_nodes
+device_compare_not_connected
+device_compare_refresh
+device_compare_title
+device_compare_unread
+device_compare_uptime
+device_compare_utilization
 device_configuration
 device_db_cache_limit
 device_db_cache_limit_summary

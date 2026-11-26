@@ -24,6 +24,22 @@ import kotlinx.coroutines.flow.StateFlow
  */
 data class DeviceBadge(val nodeNum: Int, val shortName: String)
 
+/**
+ * What a saved device last reported about itself and its mesh (MT_SW), read from the device's own database. A value is
+ * null while the device never reported it.
+ */
+data class DeviceSnapshot(
+    val nodeNum: Int,
+    val shortName: String,
+    val batteryLevel: Int?,
+    val voltage: Float?,
+    val channelUtilization: Float?,
+    val airUtilTx: Float?,
+    val uptimeSeconds: Int?,
+    val nodeCount: Int,
+    val onlineCount: Int,
+)
+
 /** The plate of the device at [address]: the map is keyed by the normalized address, so any spelling finds it. */
 fun Map<String, DeviceBadge>.badgeFor(address: String?): DeviceBadge? =
     if (address.isNullOrBlank()) null else this[org.meshtastic.core.common.util.normalizeAddress(address)]
@@ -56,6 +72,9 @@ interface RadioBackgroundMonitor {
 
     /** Reads the plate of the device at [address] from its own database (when it has one) and keeps it in [badges]. */
     suspend fun readBadge(address: String) {}
+
+    /** Reads the last reported state of the device at [address] from its own database; null without a database. */
+    suspend fun readSnapshot(address: String): DeviceSnapshot? = null
 
     fun start(scope: CoroutineScope)
 }

@@ -4719,4 +4719,15 @@
     <string name="log_folder_required_title">Wybierz folder na logi</string>
     <string name="log_folder_required_body">Aplikacja zapisuje swoje logi w wybranym przez Ciebie folderze: log z ostatnich 24 godzin, który jest zawsze zbierany, oraz pełny log po jego włączeniu. Wybierz folder, w którym mają się zapisywać, żeby można było dołączyć je do zgłoszenia błędu. Folder możesz później zmienić w ustawieniach. Z aplikacji można korzystać po wybraniu folderu.</string>
     <string name="log_folder_required_button">Wybierz folder</string>
+    <string name="device_compare_title">Porównanie urządzeń</string>
+    <string name="device_compare_empty">Brak zapisanych urządzeń.</string>
+    <string name="device_compare_refresh">Odśwież</string>
+    <string name="device_compare_connected">Połączone</string>
+    <string name="device_compare_not_connected">Niepołączone</string>
+    <string name="device_compare_no_data">Brak jeszcze danych z tego urządzenia.</string>
+    <string name="device_compare_battery">Bateria: %1$s</string>
+    <string name="device_compare_utilization">Zajęcie kanału: %1$s, czas nadawania: %2$s</string>
+    <string name="device_compare_uptime">Działa od: %1$s</string>
+    <string name="device_compare_nodes">Węzły aktywne: %1$d z %2$d</string>
+    <string name="device_compare_unread">Nowe wiadomości: %1$d</string>
 </resources>
