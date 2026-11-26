@@ -30,6 +30,7 @@ import okio.Path
 import okio.Path.Companion.toPath
 import okio.buffer
 import org.meshtastic.core.common.log.AppLogLevel
+import org.meshtastic.core.common.log.LogInsights
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.database.iosDataDir
 import platform.Foundation.NSDate
@@ -151,7 +152,7 @@ internal object IosFileLog : LogWriter() {
         }
         applySeverity()
         // The console keeps what it always saw, whatever the file log asks for.
-        Logger.setLogWriters(MinSeverityLogWriter(platformLogWriter(), baseSeverity), this)
+        Logger.setLogWriters(MinSeverityLogWriter(platformLogWriter(), baseSeverity), this, LogInsights.writer)
         @OptIn(ExperimentalNativeApi::class)
         setUnhandledExceptionHook { error ->
             runCatching { Logger.e(error, tag = "Log") { "Uncaught exception in thread ${threadName()}" } }

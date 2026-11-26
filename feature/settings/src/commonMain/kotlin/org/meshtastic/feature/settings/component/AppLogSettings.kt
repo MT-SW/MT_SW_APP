@@ -74,6 +74,8 @@ fun AppLogSettings() {
         )
     }
 
+    LogInsightsEntries()
+
     SwitchPreference(
         title = stringResource(Res.string.app_log_level),
         summary = stringResource(Res.string.app_log_summary),

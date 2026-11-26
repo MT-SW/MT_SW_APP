@@ -2097,6 +2097,9 @@ licensed_mode_enable_warning
 licensed_mode_enable_warning_signed
 lightning_distance
 lightning_strikes_1h
+link_quality_item
+link_quality_none
+link_quality_title
 ### LIVE ###
 live_update
 live_update_ble
@@ -2230,6 +2233,13 @@ locked
 log_folder_required_body
 log_folder_required_button
 log_folder_required_title
+log_insights_ago
+log_insights_clear
+log_insights_counts
+log_insights_map
+log_insights_none
+log_insights_since
+log_insights_title
 log_retention_days
 log_retention_days_quantity
 log_retention_days_summary

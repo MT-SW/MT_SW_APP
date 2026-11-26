@@ -55,6 +55,7 @@ import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
+import org.meshtastic.core.common.log.LogInsights
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.core.common.log.ReportFile
@@ -92,7 +93,11 @@ internal object AndroidLogging {
     fun install(app: Application, scope: CoroutineScope) {
         val dir = File(app.filesDir, "logs")
         Logger.setMinSeverity(baseSeverity)
-        Logger.setLogWriters(MinSeverityLogWriter(platformLogWriter(), baseSeverity), MtSwLogging.writer)
+        Logger.setLogWriters(
+            MinSeverityLogWriter(platformLogWriter(), baseSeverity),
+            MtSwLogging.writer,
+            LogInsights.writer,
+        )
         MtSwLogging.init(dir, headerText = { header() }, sample = { sampleExtras(app) }) { level ->
             Logger.setMinSeverity(MtSwLogging.minSeverityFor(baseSeverity, level))
         }

@@ -33,6 +33,7 @@ import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.InMemoryLogBuffer
+import org.meshtastic.core.common.log.LogInsights
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.core.common.log.ReportFile
@@ -56,6 +57,7 @@ internal fun installDesktopLogging(isDebug: Boolean) {
             MinSeverityLogWriter(platformLogWriter(), Severity.Info),
             MinSeverityLogWriter(InMemoryLogBuffer, Severity.Info),
             MtSwLogging.writer,
+            LogInsights.writer,
         ),
     )
     MtSwLogging.init(logDir, headerText = ::desktopHeader) { level ->

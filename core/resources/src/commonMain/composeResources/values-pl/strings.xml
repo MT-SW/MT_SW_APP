@@ -2785,6 +2785,16 @@
     <string name="remote_add_to_list">Dodaj do listy</string>
     <string name="remote_remove_from_list">Usuń z listy</string>
     <string name="remote_pick_from_list">Wybierz z listy węzłów</string>
+    <string name="log_insights_title">Podsumowanie logów</string>
+    <string name="log_insights_since">Liczone od %1$d min temu (od uruchomienia aplikacji)</string>
+    <string name="log_insights_counts">Błędy: %1$d, ostrzeżenia: %2$d</string>
+    <string name="log_insights_map">Mapa: %1$d wolnych klatek w %2$d pomiarach, najdłuższa przerwa %3$d ms</string>
+    <string name="log_insights_none">Nic złego nie zostało zapisane.</string>
+    <string name="log_insights_ago">ostatnio %1$d min temu</string>
+    <string name="log_insights_clear">Zacznij liczyć od nowa</string>
+    <string name="link_quality_title">Jakość łącza urządzeń</string>
+    <string name="link_quality_item">Przekroczenia czasu: %1$d · zamknięte po kolejnych: %2$d · błędy: %3$d</string>
+    <string name="link_quality_none">Brak zapisanych problemów z łączem.</string>
     <string name="remote_lists_open">Zdalne listy</string>
     <string name="remote_lists_open_description">Ulubione, ignorowane i kontakty na tym urządzeniu</string>
     <string name="remote_pick_search">Szukaj węzła</string>
