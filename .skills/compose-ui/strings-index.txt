@@ -4369,6 +4369,8 @@ trips_album_change
 trips_album_folder
 trips_album_note
 trips_caption
+trips_chart_height
+trips_chart_speed
 trips_chosen
 trips_empty
 trips_import_button

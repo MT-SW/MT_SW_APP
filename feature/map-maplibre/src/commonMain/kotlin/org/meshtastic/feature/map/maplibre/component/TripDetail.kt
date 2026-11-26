@@ -191,6 +191,7 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 text = stringResource(Res.string.trips_stats_counts, trip.points.size, trip.photoCount),
                 style = MaterialTheme.typography.bodySmall,
             )
+            TripCharts(trip)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 pickAll?.let { pick ->
                     TextButton(onClick = pick) {

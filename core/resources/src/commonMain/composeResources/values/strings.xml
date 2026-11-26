@@ -4465,6 +4465,8 @@
     <string name="trips_album_folder">Photo folder: %1$s</string>
     <string name="trips_album_note">Pictures taken here are also kept in a separate album "MT_SW" (on the computer: in a folder), so deleting a hike never deletes them.</string>
     <string name="trips_caption">Caption</string>
+    <string name="trips_chart_height">Height</string>
+    <string name="trips_chart_speed">Speed</string>
     <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
     <string name="trips_import_button">Replay the hike</string>

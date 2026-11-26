@@ -4782,4 +4782,6 @@
     <string name="trips_album_note">Zdjęcia zrobione tutaj są też zapisywane w osobnym albumie „MT_SW” (na komputerze: w folderze), więc usunięcie wędrówki ich nie kasuje.</string>
     <string name="trips_album_folder">Folder zdjęć: %1$s</string>
     <string name="trips_album_change">Zmień folder</string>
+    <string name="trips_chart_height">Wysokość</string>
+    <string name="trips_chart_speed">Prędkość</string>
 </resources>
