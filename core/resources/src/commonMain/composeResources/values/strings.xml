@@ -4455,10 +4455,26 @@
     <string name="transport_udp">UDP</string>
     <string name="transport_usb">USB</string>
     <string name="triple_click_adhoc_ping">Triple Click Ad Hoc Ping</string>
+    <!-- TRIPS -->
+    <string name="trips_add_gallery">Add pictures from the gallery</string>
+    <string name="trips_add_stop">Add a point</string>
+    <string name="trips_caption">Caption</string>
+    <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
     <string name="trips_item">%1$d m · pictures: %2$d</string>
+    <string name="trips_move_to">Move to another point</string>
+    <string name="trips_no_time">The picture has no time</string>
     <string name="trips_photo">Take a picture on the route (%1$d)</string>
+    <string name="trips_photo_taken">Picture taken: %1$s</string>
+    <string name="trips_rename">Hike name</string>
+    <string name="trips_send_this">Send this picture</string>
+    <string name="trips_stop">Point %1$d</string>
+    <string name="trips_stop_place">Place on the route</string>
+    <string name="trips_stop_time">Time on the route: %1$s</string>
+    <string name="trips_stop_title">Point name</string>
     <string name="trips_title">Hikes</string>
+    <string name="trips_unplaced">Without a match</string>
+    <string name="trips_unplaced_note">%1$d pictures did not say where they were taken. They are at the start of the route: move them by hand.</string>
     <string name="turbidity">Turbidity</string>
     <string name="twenty_four_hours">24H</string>
     <string name="two_days">48 Hours</string>

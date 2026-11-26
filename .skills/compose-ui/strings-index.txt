@@ -4359,10 +4359,26 @@ transport_tcp
 transport_udp
 transport_usb
 triple_click_adhoc_ping
+### TRIPS ###
+trips_add_gallery
+trips_add_stop
+trips_caption
+trips_chosen
 trips_empty
 trips_item
+trips_move_to
+trips_no_time
 trips_photo
+trips_photo_taken
+trips_rename
+trips_send_this
+trips_stop
+trips_stop_place
+trips_stop_time
+trips_stop_title
 trips_title
+trips_unplaced
+trips_unplaced_note
 turbidity
 twenty_four_hours
 two_days

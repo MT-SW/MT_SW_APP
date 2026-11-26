@@ -4740,4 +4740,19 @@
     <string name="trips_empty">Brak zapisanych wędrówek. Włącz nagrywanie trasy i rób zdjęcia po drodze.</string>
     <string name="trips_item">%1$d m · zdjęć: %2$d</string>
     <string name="trips_photo">Zrób zdjęcie na trasie (%1$d)</string>
+    <string name="trips_add_gallery">Dodaj zdjęcia z galerii</string>
+    <string name="trips_stop">Punkt %1$d</string>
+    <string name="trips_stop_time">Godzina na trasie: %1$s</string>
+    <string name="trips_stop_title">Nazwa punktu</string>
+    <string name="trips_stop_place">Miejsce na trasie</string>
+    <string name="trips_add_stop">Dodaj punkt</string>
+    <string name="trips_caption">Podpis</string>
+    <string name="trips_send_this">Wyślij to zdjęcie</string>
+    <string name="trips_chosen">Wybrane do wysłania</string>
+    <string name="trips_move_to">Przenieś do innego punktu</string>
+    <string name="trips_unplaced">Bez dopasowania</string>
+    <string name="trips_rename">Nazwa wędrówki</string>
+    <string name="trips_unplaced_note">Zdjęć bez informacji o miejscu: %1$d. Są na początku trasy, przesuń je ręcznie.</string>
+    <string name="trips_photo_taken">Zdjęcie zrobione: %1$s</string>
+    <string name="trips_no_time">Zdjęcie nie ma godziny</string>
 </resources>

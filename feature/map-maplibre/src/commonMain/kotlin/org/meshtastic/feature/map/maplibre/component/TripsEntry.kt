@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,6 +87,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     val trips by store.trips.collectAsStateWithLifecycle()
     val visible by store.visibleIds.collectAsStateWithLifecycle()
     var deleteId by remember { mutableStateOf<String?>(null) }
+    var openId by remember { mutableStateOf<String?>(null) }
     StyledBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
             Text(
@@ -104,6 +106,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
             }
             trips.forEach { trip ->
                 ListItem(
+                    modifier = Modifier.clickable { openId = trip.id },
                     headlineContent = { Text(trip.name) },
                     supportingContent = {
                         Text(stringResource(Res.string.trips_item, trip.distanceMeters.toInt(), trip.photoCount))
@@ -131,6 +134,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
             }
         }
     }
+    openId?.let { id -> TripDetailWindow(tripId = id, onDismiss = { openId = null }) }
     deleteId?.let { id ->
         AlertDialog(
             onDismissRequest = { deleteId = null },
