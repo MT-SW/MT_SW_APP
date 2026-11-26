@@ -131,7 +131,7 @@ class SignalSurveyViewModel(
         selectedSpot.value = id?.let { cellId -> cells.value.firstOrNull { it.id == cellId } }?.spot()
     }
 
-    /** Brings the readings of a CSV file (the survey's own, or a hike's exported signal) in as a session of their own. */
+    /** Brings in the readings of a CSV file (the survey's own, or a hike's exported signal) as a session. */
     fun importCsv(text: String) {
         viewModelScope.launch {
             val samples = parseSurveyCsv(text).take(MAX_IMPORTED_READINGS)
