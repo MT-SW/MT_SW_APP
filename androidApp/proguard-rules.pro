@@ -86,6 +86,9 @@
 -dontwarn com.android.extensions.xr.**
 -dontwarn android.extensions.xr.**
 
+# Guava (a dependency of the AI engine / health libraries) refers to an annotation that only exists for iOS
+-dontwarn com.google.j2objc.annotations.**
+
 # ---- AppSearch / AppFunctions generated document factories ------------------
 # AppSearch's DocumentClassFactoryRegistry loads the generated
 # `$$__AppSearch__*` factory classes by name and instantiates them via their
