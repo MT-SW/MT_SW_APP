@@ -24,8 +24,10 @@ import org.meshtastic.core.common.util.safeCatching
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MessageStatus
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.model.util.toSharedContact
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.DataPair
 import org.meshtastic.core.repository.MeshDataHandler
@@ -177,8 +179,18 @@ internal class MessagingControllerImpl(
             nodeManager.handleReceivedUser(nodeNum, user, manuallyVerified = false)
             true
         } else {
+            // MT_SW: a contact without a valid public key would overwrite the key the remote device already holds and
+            // break its direct messages with that node, so a remote contact is built from our node database and sent
+            // only when it carries a trusted key.
+            val remoteContact = nodeManager.nodeDBbyNodeNum[nodeNum]?.toSharedContact()
+            val key = remoteContact?.user?.public_key
+            val keyValid = key != null && key.size == Node.PUBLIC_KEY_SIZE && key != Node.ERROR_BYTE_STRING
+            if (remoteContact == null || !keyValid) {
+                Logger.w { "Zdalny kontakt: nie wysłano, brak zaufanego klucza węzła ${nodeNum.toUInt()}" }
+                return false
+            }
             commandSender.sendAdminAndAwaitDelivery(target) {
-                AdminMessage.Builder().also { wb -> wb.add_contact = contact }.build()
+                AdminMessage.Builder().also { wb -> wb.add_contact = remoteContact }.build()
             }
         }
     }

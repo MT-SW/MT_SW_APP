@@ -3533,6 +3533,8 @@ remote_hardware
 remote_hardware_config
 remote_hardware_enabled
 remote_id_invalid
+remote_ignore_confirm_text
+remote_ignore_confirm_title
 remote_list_favorites
 remote_list_ignored
 remote_lists_open

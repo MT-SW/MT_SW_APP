@@ -3611,6 +3611,8 @@
     <string name="remote_hardware_config">Remote Hardware Config</string>
     <string name="remote_hardware_enabled">Remote Hardware enabled</string>
     <string name="remote_id_invalid">This does not look like a node ID (for example !a1b2c3d4)</string>
+    <string name="remote_ignore_confirm_text">The remote device will drop packets from the selected nodes and delete what it stored from them. Removing the block later does not bring that back.</string>
+    <string name="remote_ignore_confirm_title">Ignore on the remote device?</string>
     <string name="remote_list_favorites">Favorites</string>
     <string name="remote_list_ignored">Ignored</string>
     <string name="remote_lists_open">Remote lists</string>

@@ -4813,4 +4813,6 @@
     <string name="trips_rangetest">Wysyłaj wiadomości testu zasięgu podczas nagrywania</string>
     <string name="trips_signal_stats">Zasięg: %1$d odczytów z %2$d węzłów · najsilniejszy %3$d dBm, najsłabszy %4$d dBm</string>
     <string name="trips_chart_signal">Najlepszy sygnał</string>
+    <string name="remote_ignore_confirm_title">Ignorować na zdalnym urządzeniu?</string>
+    <string name="remote_ignore_confirm_text">Zdalne urządzenie odrzuci pakiety z wybranych węzłów i usunie to, co od nich zapisało. Zdjęcie ignorowania później tego nie przywróci.</string>
 </resources>

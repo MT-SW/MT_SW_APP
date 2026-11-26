@@ -107,6 +107,8 @@ import org.meshtastic.core.resources.remote_clear_selection
 import org.meshtastic.core.resources.remote_contact_hint
 import org.meshtastic.core.resources.remote_contact_title
 import org.meshtastic.core.resources.remote_id_invalid
+import org.meshtastic.core.resources.remote_ignore_confirm_text
+import org.meshtastic.core.resources.remote_ignore_confirm_title
 import org.meshtastic.core.resources.remote_list_favorites
 import org.meshtastic.core.resources.remote_list_ignored
 import org.meshtastic.core.resources.remote_manage_hint
@@ -554,6 +556,7 @@ internal fun RemoteNodeManagementPanel(
     val selected = remember { mutableStateListOf<Int>() }
     var pickerOpen by remember { mutableStateOf(false) }
     var confirmRemove by remember { mutableStateOf(false) }
+    var confirmIgnore by remember { mutableStateOf(false) }
     val targets = (selected.toList() + listOfNotNull(targetNodeNum)).distinct()
     var listType by remember { mutableStateOf(RemoteListType.FAVORITE) }
     val listColor = if (listType == RemoteListType.FAVORITE) gold else purple
@@ -648,7 +651,8 @@ internal fun RemoteNodeManagementPanel(
                 modifier = Modifier.weight(1f),
                 enabled = !isEnsuringSession && targets.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(containerColor = listColor, contentColor = Color.Black),
-                onClick = { send(add = true) },
+                // Ignoring makes the remote device delete what it stored from the node, so it asks first.
+                onClick = { if (listType == RemoteListType.IGNORE) confirmIgnore = true else send(add = true) },
             ) {
                 Text(stringResource(Res.string.remote_add_to_list))
             }
@@ -735,6 +739,26 @@ internal fun RemoteNodeManagementPanel(
                 Logger.i { "Zdalne listy: wybór węzła ${num.toUInt()} $state, razem ${selected.size}" }
             },
             onDismiss = { pickerOpen = false },
+        )
+    }
+    if (confirmIgnore) {
+        AlertDialog(
+            onDismissRequest = { confirmIgnore = false },
+            title = { Text(stringResource(Res.string.remote_ignore_confirm_title)) },
+            text = { Text(stringResource(Res.string.remote_ignore_confirm_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmIgnore = false
+                        send(add = true)
+                    },
+                ) {
+                    Text(stringResource(Res.string.remote_add_to_list))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmIgnore = false }) { Text(stringResource(Res.string.cancel)) }
+            },
         )
     }
     if (confirmRemove) {

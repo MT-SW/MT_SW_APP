@@ -20,6 +20,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.handledLaunch
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.toSharedContact
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeController
@@ -27,6 +29,7 @@ import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.proto.AdminMessage
+import org.meshtastic.proto.Config
 
 /**
  * [NodeController] implementation: favorite, ignore, mute, and remove nodes.
@@ -65,6 +68,26 @@ internal class NodeControllerImpl(
             // Remote radio: fire the admin command over the mesh via the established admin session and wait for its
             // routing ACK/NAK. We have no visibility into the remote radio's own node DB (and the target node may not
             // even be in ours), so this is unconditional — no local idempotency check, no local DB update.
+            if (favorite && nodeManager.nodeDBbyNodeNum[target]?.user?.role == Config.DeviceConfig.Role.CLIENT_BASE) {
+                // MT_SW: a Client Base does not favorite a node when it learns its contact, and a favorite for a node
+                // it does not know does nothing. So the contact (with its key) goes first and the favorite only
+                // after the device has confirmed it.
+                val contact = nodeManager.nodeDBbyNodeNum[nodeNum]?.toSharedContact()
+                val key = contact?.user?.public_key
+                val keyValid = key != null && key.size == Node.PUBLIC_KEY_SIZE && key != Node.ERROR_BYTE_STRING
+                if (contact == null || !keyValid) {
+                    Logger.w { "Zdalne ulubione: nie wysłano, brak zaufanego klucza węzła ${nodeNum.toUInt()}" }
+                    return false
+                }
+                val contactSent =
+                    commandSender.sendAdminAndAwaitDelivery(target) {
+                        AdminMessage.Builder().also { wb -> wb.add_contact = contact }.build()
+                    }
+                if (!contactSent) {
+                    Logger.w { "Zdalne ulubione: urządzenie ${target.toUInt()} nie potwierdziło kontaktu, pominięto" }
+                    return false
+                }
+            }
             commandSender.sendAdminAndAwaitDelivery(target) {
                 if (favorite) {
                     AdminMessage.Builder().also { wb -> wb.set_favorite_node = nodeNum }.build()
