@@ -33,8 +33,8 @@ data class TripPhoto(
 )
 
 /**
- * A place on the route where pictures were taken: a stack of [photos]. When the hike is shared only one picture of
- * the stop goes out: the one at [shareIndex] (the first by default).
+ * A place on the route where pictures were taken: a stack of [photos]. When the hike is shared only one picture of the
+ * stop goes out: the one at [shareIndex] (the first by default).
  */
 @Serializable
 data class TripStop(

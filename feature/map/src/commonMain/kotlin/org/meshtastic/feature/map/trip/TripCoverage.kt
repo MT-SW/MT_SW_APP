@@ -54,15 +54,16 @@ fun Trip.coverageGeoJson(): String? {
         val parts = mutableListOf<String>()
         if (points.size >= 2) {
             val line = points.joinToString(",") { "[${it.lon},${it.lat}]" }
-            parts += "{\"type\":\"Feature\",\"properties\":{\"kind\":\"route\"},\"geometry\":" +
+            parts +=
+                "{\"type\":\"Feature\",\"properties\":{\"kind\":\"route\"},\"geometry\":" +
                 "{\"type\":\"LineString\",\"coordinates\":[$line]}}"
         }
         signals.forEach {
             parts +=
                 "{\"type\":\"Feature\",\"properties\":{\"kind\":\"signal\",\"time\":${it.t / MS_PER_SECOND}," +
-                    "\"node\":\"${NodeAddress.numToDefaultId(it.node)}\",\"rssi\":${it.rssi},\"snr\":${it.snr}," +
-                    "\"direct\":${!it.relayed}},\"geometry\":{\"type\":\"Point\"," +
-                    "\"coordinates\":[${it.lon},${it.lat}]}}"
+                "\"node\":\"${NodeAddress.numToDefaultId(it.node)}\",\"rssi\":${it.rssi},\"snr\":${it.snr}," +
+                "\"direct\":${!it.relayed}},\"geometry\":{\"type\":\"Point\"," +
+                "\"coordinates\":[${it.lon},${it.lat}]}}"
         }
         append(parts.joinToString(","))
         append("]}")

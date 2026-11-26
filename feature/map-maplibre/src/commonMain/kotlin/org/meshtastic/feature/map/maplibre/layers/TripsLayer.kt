@@ -99,8 +99,8 @@ internal fun TripsLayer() {
 }
 
 /**
- * MT_SW: the saved hikes' stops that fall on a node's position track (the own node's position history): a drop with
- * the picture at each, taken from the hikes by time and nearness to the track.
+ * MT_SW: the saved hikes' stops that fall on a node's position track (the own node's position history): a drop with the
+ * picture at each, taken from the hikes by time and nearness to the track.
  */
 @Composable
 internal fun TripStopsOnTrack(track: List<Pair<Position, Int>>) {

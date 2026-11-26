@@ -30,13 +30,15 @@ class ModuleBoundaryTest {
     /**
      * The MapLibre renderer draws feature:map's shared map model and map-terrain's elevation tiles. The link planner in
      * feature:map reads the same elevation tiles for its terrain profile. The XR viewer stands feature:node's device
-     * model and banana in the room and builds the terrain table from map-terrain's spatial model.
+     * model and banana in the room and builds the terrain table from map-terrain's spatial model. MT_SW: the device
+     * history in feature:settings keeps its files beside the map layers, so it reads feature:map's storage location.
      */
     private val allowedFeatureImports =
         mapOf(
             "map-maplibre" to setOf("map", "map-terrain"),
             "map" to setOf("map-terrain"),
             "xr" to setOf("node", "map-terrain"),
+            "settings" to setOf("map"),
         )
 
     private val sourceFiles = Konsist.scopeFromProject().files.filterNot { it.isNestedAgentWorktree() }

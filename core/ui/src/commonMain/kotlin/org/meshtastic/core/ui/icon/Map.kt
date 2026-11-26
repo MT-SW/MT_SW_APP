@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_calendar_month
+import org.meshtastic.core.resources.ic_hiking
 import org.meshtastic.core.resources.ic_layers
 import org.meshtastic.core.resources.ic_lens
 import org.meshtastic.core.resources.ic_location_disabled
@@ -29,7 +30,6 @@ import org.meshtastic.core.resources.ic_my_location
 import org.meshtastic.core.resources.ic_navigation
 import org.meshtastic.core.resources.ic_pin_drop
 import org.meshtastic.core.resources.ic_place
-import org.meshtastic.core.resources.ic_hiking
 import org.meshtastic.core.resources.ic_route
 import org.meshtastic.core.resources.ic_trip_origin
 import org.meshtastic.core.resources.ic_tune

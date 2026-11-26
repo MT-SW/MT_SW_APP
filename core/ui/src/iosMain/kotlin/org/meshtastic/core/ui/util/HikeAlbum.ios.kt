@@ -23,8 +23,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSMutableArray
 import platform.Foundation.NSData
+import platform.Foundation.NSMutableArray
 import platform.Foundation.NSUserDefaults
 import platform.Foundation.create
 import platform.Photos.PHAssetChangeRequest
@@ -50,11 +50,9 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
     }
     val defaults = NSUserDefaults.standardUserDefaults
     val known = defaults.stringForKey(ALBUM_ID_KEY)
-    val album =
-        known?.let {
-            PHAssetCollection.fetchAssetCollectionsWithLocalIdentifiers(listOf(it), null).firstObject
-                as? PHAssetCollection
-        }
+    val album = known?.let {
+        PHAssetCollection.fetchAssetCollectionsWithLocalIdentifiers(listOf(it), null).firstObject as? PHAssetCollection
+    }
     PHPhotoLibrary.sharedPhotoLibrary()
         .performChanges(
             {

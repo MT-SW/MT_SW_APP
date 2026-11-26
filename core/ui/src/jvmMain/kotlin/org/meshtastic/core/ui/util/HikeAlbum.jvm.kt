@@ -30,13 +30,12 @@ private val folderFile: File
 private val fallbackFolder: File
     get() = File(File(System.getProperty("user.home"), "Pictures"), HIKE_ALBUM_NAME)
 
-actual fun currentPhotoFolder(): String? =
-    try {
-        if (folderFile.exists()) folderFile.readText().trim().ifBlank { null } else null
-    } catch (e: Exception) {
-        Logger.w { "Album zdjęć: folder nie został odczytany: ${e.message}" }
-        null
-    }
+actual fun currentPhotoFolder(): String? = try {
+    if (folderFile.exists()) folderFile.readText().trim().ifBlank { null } else null
+} catch (e: Exception) {
+    Logger.w { "Album zdjęć: folder nie został odczytany: ${e.message}" }
+    null
+}
 
 actual fun changeAppPhotoFolder(): String? {
     val chooser =
@@ -62,29 +61,27 @@ actual fun changeAppPhotoFolder(): String? {
 /** The first picture asks for the folder; a closed window means the default one beside the pictures of the user. */
 actual fun appPhotoFolder(): String? = currentPhotoFolder() ?: changeAppPhotoFolder() ?: fallbackFolder.path
 
-actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean =
-    try {
-        val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
-        dir.mkdirs()
-        File(dir, fileName).writeBytes(bytes)
-        Logger.i { "Album zdjęć: zapisano ${bytes.size} bajtów w folderze" }
-        true
-    } catch (e: Exception) {
-        Logger.w { "Album zdjęć: zapis w folderze nie udał się: ${e.message}" }
-        false
-    }
+actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean = try {
+    val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
+    dir.mkdirs()
+    File(dir, fileName).writeBytes(bytes)
+    Logger.i { "Album zdjęć: zapisano ${bytes.size} bajtów w folderze" }
+    true
+} catch (e: Exception) {
+    Logger.w { "Album zdjęć: zapis w folderze nie udał się: ${e.message}" }
+    false
+}
 
 actual fun defaultPhotoFolder(): String? = fallbackFolder.path
 
-actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? =
-    try {
-        val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
-        val used = if (dir.isDirectory) dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } else 0L
-        val free = (if (dir.exists()) dir else dir.parentFile ?: dir).usableSpace
-        PhotoFolderUsage(usedMb = used / BYTES_IN_MB, freeMb = free / BYTES_IN_MB)
-    } catch (e: Exception) {
-        Logger.w { "Album zdjęć: zajęte miejsce nie zostało policzone: ${e.message}" }
-        null
-    }
+actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? = try {
+    val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
+    val used = if (dir.isDirectory) dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } else 0L
+    val free = (if (dir.exists()) dir else dir.parentFile ?: dir).usableSpace
+    PhotoFolderUsage(usedMb = used / BYTES_IN_MB, freeMb = free / BYTES_IN_MB)
+} catch (e: Exception) {
+    Logger.w { "Album zdjęć: zajęte miejsce nie zostało policzone: ${e.message}" }
+    null
+}
 
 private const val BYTES_IN_MB = 1024L * 1024L

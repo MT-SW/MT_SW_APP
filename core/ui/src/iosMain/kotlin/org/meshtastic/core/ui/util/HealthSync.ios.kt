@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalForeignApi::class)
-@file:Suppress("TooGenericExceptionCaught")
+@file:Suppress("MagicNumber", "TooGenericExceptionCaught")
 
 package org.meshtastic.core.ui.util
 
@@ -30,12 +30,12 @@ import platform.Foundation.NSDate
 import platform.Foundation.dateWithTimeIntervalSince1970
 import platform.HealthKit.HKHealthStore
 import platform.HealthKit.HKQuantity
+import platform.HealthKit.HKQuantitySample
 import platform.HealthKit.HKQuantityType
 import platform.HealthKit.HKQuantityTypeIdentifierActiveEnergyBurned
 import platform.HealthKit.HKQuantityTypeIdentifierDistanceWalkingRunning
 import platform.HealthKit.HKQuantityTypeIdentifierHeartRate
 import platform.HealthKit.HKQuantityTypeIdentifierStepCount
-import platform.HealthKit.HKQuantitySample
 import platform.HealthKit.HKQuery
 import platform.HealthKit.HKQueryOptionNone
 import platform.HealthKit.HKSeriesType
@@ -80,13 +80,12 @@ private fun quantity(id: String?): HKQuantityType? = HKQuantityType.quantityType
 private class IosHealthSync : HealthSync {
     private val store = HKHealthStore()
 
-    private suspend fun authorize(share: Set<Any>, read: Set<Any>): Boolean =
-        suspendCancellableCoroutine { c ->
-            store.requestAuthorizationToShareTypes(share, readTypes = read) { ok, error ->
-                if (!ok) Logger.w { "Zdrowie: pytanie o zgody nie udało się: ${error?.localizedDescription}" }
-                c.resume(ok)
-            }
+    private suspend fun authorize(share: Set<Any>, read: Set<Any>): Boolean = suspendCancellableCoroutine { c ->
+        store.requestAuthorizationToShareTypes(share, readTypes = read) { ok, error ->
+            if (!ok) Logger.w { "Zdrowie: pytanie o zgody nie udało się: ${error?.localizedDescription}" }
+            c.resume(ok)
         }
+    }
 
     /** One number from the store over the time range; null when there is none or no right to read it. */
     private suspend fun number(
@@ -95,74 +94,80 @@ private class IosHealthSync : HealthSync {
         to: Long,
         options: ULong,
         read: (platform.HealthKit.HKStatistics) -> Double?,
-    ): Double? =
-        suspendCancellableCoroutine { c ->
-            val predicate =
-                HKQuery.predicateForSamplesWithStartDate(date(from), endDate = date(to), options = HKQueryOptionNone)
-            val query =
-                HKStatisticsQuery(
-                    quantityType = type,
-                    quantitySamplePredicate = predicate,
-                    options = options,
-                    completionHandler = { _, stats, error ->
-                        if (error != null) Logger.i { "Zdrowie: zapytanie bez wyniku: ${error.localizedDescription}" }
-                        c.resume(stats?.let(read))
-                    },
-                )
-            store.executeQuery(query)
-        }
+    ): Double? = suspendCancellableCoroutine { c ->
+        val predicate =
+            HKQuery.predicateForSamplesWithStartDate(date(from), endDate = date(to), options = HKQueryOptionNone)
+        val query =
+            HKStatisticsQuery(
+                quantityType = type,
+                quantitySamplePredicate = predicate,
+                options = options,
+                completionHandler = { _, stats, error ->
+                    if (error != null) Logger.i { "Zdrowie: zapytanie bez wyniku: ${error.localizedDescription}" }
+                    c.resume(stats?.let(read))
+                },
+            )
+        store.executeQuery(query)
+    }
 
-    override suspend fun read(fromMillis: Long, toMillis: Long): HealthData? =
-        try {
-            val steps = quantity(HKQuantityTypeIdentifierStepCount)
-            val distance = quantity(HKQuantityTypeIdentifierDistanceWalkingRunning)
-            val heart = quantity(HKQuantityTypeIdentifierHeartRate)
-            val energy = quantity(HKQuantityTypeIdentifierActiveEnergyBurned)
-            val types = listOfNotNull(steps, distance, heart, energy).toSet<Any>()
-            if (!authorize(emptySet(), types)) {
-                null
-            } else {
-                val bpm = HKUnit.countUnit().unitDividedByUnit(HKUnit.minuteUnit())
-                val data =
-                    HealthData(
-                        steps =
-                        steps?.let {
+    override suspend fun read(fromMillis: Long, toMillis: Long): HealthData? = try {
+        val steps = quantity(HKQuantityTypeIdentifierStepCount)
+        val distance = quantity(HKQuantityTypeIdentifierDistanceWalkingRunning)
+        val heart = quantity(HKQuantityTypeIdentifierHeartRate)
+        val energy = quantity(HKQuantityTypeIdentifierActiveEnergyBurned)
+        val types = listOfNotNull(steps, distance, heart, energy).toSet<Any>()
+        if (!authorize(emptySet(), types)) {
+            null
+        } else {
+            val bpm = HKUnit.countUnit().unitDividedByUnit(HKUnit.minuteUnit())
+            val data =
+                HealthData(
+                    steps =
+                    steps
+                        ?.let {
                             number(it, fromMillis, toMillis, HKStatisticsOptionCumulativeSum) { s ->
                                 s.sumQuantity()?.doubleValueForUnit(HKUnit.countUnit())
                             }
-                        }?.toLong(),
-                        distanceMeters =
-                        distance?.let {
-                            number(it, fromMillis, toMillis, HKStatisticsOptionCumulativeSum) { s ->
-                                s.sumQuantity()?.doubleValueForUnit(HKUnit.meterUnit())
-                            }
-                        },
-                        avgHeartRate =
-                        heart?.let {
+                        }
+                        ?.toLong(),
+                    distanceMeters =
+                    distance?.let {
+                        number(it, fromMillis, toMillis, HKStatisticsOptionCumulativeSum) { s ->
+                            s.sumQuantity()?.doubleValueForUnit(HKUnit.meterUnit())
+                        }
+                    },
+                    avgHeartRate =
+                    heart
+                        ?.let {
                             number(it, fromMillis, toMillis, HKStatisticsOptionDiscreteAverage) { s ->
                                 s.averageQuantity()?.doubleValueForUnit(bpm)
                             }
-                        }?.roundToInt(),
-                        maxHeartRate =
-                        heart?.let {
+                        }
+                        ?.roundToInt(),
+                    maxHeartRate =
+                    heart
+                        ?.let {
                             number(it, fromMillis, toMillis, HKStatisticsOptionDiscreteMax) { s ->
                                 s.maximumQuantity()?.doubleValueForUnit(bpm)
                             }
-                        }?.roundToInt(),
-                        calories =
-                        energy?.let {
+                        }
+                        ?.roundToInt(),
+                    calories =
+                    energy
+                        ?.let {
                             number(it, fromMillis, toMillis, HKStatisticsOptionCumulativeSum) { s ->
                                 s.sumQuantity()?.doubleValueForUnit(HKUnit.kilocalorieUnit())
                             }
-                        }?.roundToInt(),
-                    )
-                Logger.i { "Zdrowie: odczyt zakończony, dane ${if (data.isEmpty) "puste" else "są"}" }
-                data
-            }
-        } catch (e: Exception) {
-            Logger.w { "Zdrowie: odczyt nie udał się: ${e.message}" }
-            null
+                        }
+                        ?.roundToInt(),
+                )
+            Logger.i { "Zdrowie: odczyt zakończony, dane ${if (data.isEmpty) "puste" else "są"}" }
+            data
         }
+    } catch (e: Exception) {
+        Logger.w { "Zdrowie: odczyt nie udał się: ${e.message}" }
+        null
+    }
 
     private suspend fun step(label: String, run: ((Boolean, platform.Foundation.NSError?) -> Unit) -> Unit): Boolean =
         suspendCancellableCoroutine { c ->
@@ -178,78 +183,76 @@ private class IosHealthSync : HealthSync {
         toMillis: Long,
         distanceMeters: Double,
         route: List<HealthRoutePoint>,
-    ): Boolean =
-        try {
-            val distanceType = quantity(HKQuantityTypeIdentifierDistanceWalkingRunning)
-            val share =
-                listOfNotNull(HKWorkoutType.workoutType(), HKSeriesType.workoutRouteType(), distanceType).toSet<Any>()
-            if (!authorize(share, emptySet())) {
+    ): Boolean = try {
+        val distanceType = quantity(HKQuantityTypeIdentifierDistanceWalkingRunning)
+        val share =
+            listOfNotNull(HKWorkoutType.workoutType(), HKSeriesType.workoutRouteType(), distanceType).toSet<Any>()
+        if (!authorize(share, emptySet())) {
+            false
+        } else {
+            val config = HKWorkoutConfiguration().apply { activityType = HKWorkoutActivityTypeHiking }
+            val builder = HKWorkoutBuilder(healthStore = store, configuration = config, device = null)
+            val start = date(fromMillis)
+            val end = date(toMillis.coerceAtLeast(fromMillis + 1000))
+            var ok =
+                step("rozpoczęcie treningu") { done ->
+                    builder.beginCollectionWithStartDate(start, completion = done)
+                }
+            if (ok && distanceType != null && distanceMeters > 0) {
+                val sample =
+                    HKQuantitySample.quantitySampleWithType(
+                        distanceType,
+                        quantity = HKQuantity.quantityWithUnit(HKUnit.meterUnit(), doubleValue = distanceMeters),
+                        startDate = start,
+                        endDate = end,
+                    )
+                ok = step("dodanie dystansu") { done -> builder.addSamples(listOf(sample), completion = done) }
+            }
+            if (ok) {
+                ok =
+                    step("zakończenie treningu") { done ->
+                        builder.endCollectionWithEndDate(end, completion = done)
+                    }
+            }
+            val workout: HKWorkout? =
+                if (!ok) {
+                    null
+                } else {
+                    suspendCancellableCoroutine { c ->
+                        builder.finishWorkoutWithCompletion { w, error ->
+                            if (w == null) {
+                                Logger.w { "Zdrowie: zapis treningu nie udał się: ${error?.localizedDescription}" }
+                            }
+                            c.resume(w)
+                        }
+                    }
+                }
+            if (workout == null) {
                 false
             } else {
-                val config = HKWorkoutConfiguration().apply { activityType = HKWorkoutActivityTypeHiking }
-                val builder = HKWorkoutBuilder(healthStore = store, configuration = config, device = null)
-                val start = date(fromMillis)
-                val end = date(toMillis.coerceAtLeast(fromMillis + 1000))
-                var ok =
-                    step("rozpoczęcie treningu") { done ->
-                        builder.beginCollectionWithStartDate(start, completion = done)
-                    }
-                if (ok && distanceType != null && distanceMeters > 0) {
-                    val sample =
-                        HKQuantitySample.quantitySampleWithType(
-                            distanceType,
-                            quantity = HKQuantity.quantityWithUnit(HKUnit.meterUnit(), doubleValue = distanceMeters),
-                            startDate = start,
-                            endDate = end,
-                        )
-                    ok = step("dodanie dystansu") { done -> builder.addSamples(listOf(sample), completion = done) }
-                }
-                if (ok) {
-                    ok =
-                        step("zakończenie treningu") { done ->
-                            builder.endCollectionWithEndDate(end, completion = done)
-                        }
-                }
-                val workout: HKWorkout? =
-                    if (!ok) {
-                        null
-                    } else {
-                        suspendCancellableCoroutine { c ->
-                            builder.finishWorkoutWithCompletion { w, error ->
-                                if (w == null) {
-                                    Logger.w { "Zdrowie: zapis treningu nie udał się: ${error?.localizedDescription}" }
-                                }
-                                c.resume(w)
-                            }
-                        }
-                    }
-                if (workout == null) {
-                    false
-                } else {
-                    saveRoute(workout, route.filter { it.t in fromMillis..toMillis })
-                    Logger.i { "Zdrowie: trening zapisany" }
-                    true
-                }
+                saveRoute(workout, route.filter { it.t in fromMillis..toMillis })
+                Logger.i { "Zdrowie: trening zapisany" }
+                true
             }
-        } catch (e: Exception) {
-            Logger.w { "Zdrowie: zapis nie udał się: ${e.message}" }
-            false
         }
+    } catch (e: Exception) {
+        Logger.w { "Zdrowie: zapis nie udał się: ${e.message}" }
+        false
+    }
 
     /** The route is a bonus: when it fails the workout stays saved without it. */
     private suspend fun saveRoute(workout: HKWorkout, points: List<HealthRoutePoint>) {
         if (points.isEmpty()) return
         val routeBuilder = HKWorkoutRouteBuilder(healthStore = store, device = null)
-        val locations =
-            points.map {
-                CLLocation(
-                    coordinate = CLLocationCoordinate2DMake(it.lat, it.lon),
-                    altitude = it.ele ?: 0.0,
-                    horizontalAccuracy = ACCURACY_METERS,
-                    verticalAccuracy = if (it.ele != null) ACCURACY_METERS else -1.0,
-                    timestamp = date(it.t),
-                )
-            }
+        val locations = points.map {
+            CLLocation(
+                coordinate = CLLocationCoordinate2DMake(it.lat, it.lon),
+                altitude = it.ele ?: 0.0,
+                horizontalAccuracy = ACCURACY_METERS,
+                verticalAccuracy = if (it.ele != null) ACCURACY_METERS else -1.0,
+                timestamp = date(it.t),
+            )
+        }
         var ok = true
         locations.chunked(ROUTE_CHUNK).forEach { chunk ->
             if (ok) ok = step("dodanie trasy") { done -> routeBuilder.insertRouteData(chunk, completion = done) }

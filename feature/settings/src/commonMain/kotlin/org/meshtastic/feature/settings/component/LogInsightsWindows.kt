@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ModifierMissing", "LongMethod")
+@file:Suppress("LongMethod", "ModifierMissing", "MultipleEmitters")
 
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -50,9 +48,9 @@ import org.meshtastic.core.resources.log_insights_map
 import org.meshtastic.core.resources.log_insights_none
 import org.meshtastic.core.resources.log_insights_since
 import org.meshtastic.core.resources.log_insights_title
-import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons

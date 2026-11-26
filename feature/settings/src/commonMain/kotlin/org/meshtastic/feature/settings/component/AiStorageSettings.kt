@@ -22,19 +22,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import org.meshtastic.core.resources.app_data_info_2
-import org.meshtastic.core.resources.app_data_info_1
-import org.meshtastic.core.resources.app_data_info_title
-import org.meshtastic.core.resources.photo_folder_change
-import org.meshtastic.core.resources.folder_usage
-import org.meshtastic.core.resources.app_data_where
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
-import org.meshtastic.core.ui.component.InfoButton
-import org.meshtastic.core.ui.icon.Storage
-import org.meshtastic.core.ui.icon.MeshtasticIcons
-import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -77,16 +67,26 @@ import org.meshtastic.core.resources.ai_storage_none_body
 import org.meshtastic.core.resources.ai_storage_pick
 import org.meshtastic.core.resources.ai_storage_restart_first
 import org.meshtastic.core.resources.ai_storage_summary
+import org.meshtastic.core.resources.app_data_info_1
+import org.meshtastic.core.resources.app_data_info_2
+import org.meshtastic.core.resources.app_data_info_title
 import org.meshtastic.core.resources.app_data_phone_single
 import org.meshtastic.core.resources.app_data_previous_failed
 import org.meshtastic.core.resources.app_data_scheduled
 import org.meshtastic.core.resources.app_data_summary_fixed
 import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
+import org.meshtastic.core.resources.app_data_where
+import org.meshtastic.core.resources.folder_usage
+import org.meshtastic.core.resources.photo_folder_change
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.RadioButton
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Storage
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
 /** On a computer, a model download that would leave less than this much free space (50 GB) asks first. */
 private const val LOW_SPACE_MB = 50L * 1024L
@@ -151,7 +151,9 @@ internal fun AiStorageRow() {
     }
     Column(
         modifier =
-        Modifier.fillMaxWidth().clickable(enabled = canClick, onClick = change).padding(horizontal = 16.dp, vertical = 12.dp),
+        Modifier.fillMaxWidth()
+            .clickable(enabled = canClick, onClick = change)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -182,9 +184,7 @@ internal fun AiStorageRow() {
             val summary =
                 when {
                     computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
-
                     computer -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
-
                     else -> stringResource(Res.string.app_data_summary_phone, i.folder, formatMb(i.freeMb))
                 }
             Text(text = summary, style = small, color = muted)
@@ -205,7 +205,9 @@ internal fun AiStorageRow() {
             else -> Unit
         }
         if (computer && i.canChange) {
-            OutlinedButton(enabled = canClick, onClick = change) { Text(stringResource(Res.string.photo_folder_change)) }
+            OutlinedButton(enabled = canClick, onClick = change) {
+                Text(stringResource(Res.string.photo_folder_change))
+            }
         }
         val next = i.nextFolder
         if (next != null) {

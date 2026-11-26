@@ -68,11 +68,11 @@ import org.meshtastic.feature.map.component.OfflineStatusBanner
 import org.meshtastic.feature.map.component.mapFilterActions
 import org.meshtastic.feature.map.layers.LayerOpacityStore
 import org.meshtastic.feature.map.layers.MapLayersManager
-import org.meshtastic.feature.map.maplibre.component.HikesMapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.BoxAuthoringBar
 import org.meshtastic.feature.map.maplibre.component.CustomTileSourcesMenuItem
+import org.meshtastic.feature.map.maplibre.component.HikesMapButton
 import org.meshtastic.feature.map.maplibre.component.MapLayersButton
 import org.meshtastic.feature.map.maplibre.component.MapZoom
 import org.meshtastic.feature.map.maplibre.component.OfflineMapTarget

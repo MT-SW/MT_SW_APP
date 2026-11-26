@@ -47,6 +47,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.ObserveRemoteAdminSessionStatusUseCase
@@ -65,6 +68,7 @@ import org.meshtastic.core.resources.getString
 import org.meshtastic.core.resources.open_compass
 import org.meshtastic.core.testing.FakeRadioConfigRepository
 import org.meshtastic.core.testing.FakeRadioController
+import org.meshtastic.core.ui.util.HikeImporter
 import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.feature.node.compass.CompassViewModel
@@ -86,11 +90,26 @@ class NodeDetailCompassLifecycleTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        // MT_SW: the position section looks up the hike importer from Koin.
+        startKoin {
+            modules(
+                module {
+                    single<HikeImporter> {
+                        object : HikeImporter {
+                            override suspend fun import(url: String, senderNum: Int, onStep: (Int, Int) -> Unit) = ""
+
+                            override val receivedFrom = MutableStateFlow<Map<Int, String>>(emptyMap())
+                        }
+                    }
+                },
+            )
+        }
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        stopKoin()
     }
 
     @Test

@@ -55,7 +55,6 @@ import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
 import org.meshtastic.core.resources.connection_center_summary
 import org.meshtastic.core.resources.connection_center_title
-import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.console_summary
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.control_style_thin
@@ -64,6 +63,7 @@ import org.meshtastic.core.resources.data_logs_title
 import org.meshtastic.core.resources.db_sync_auto
 import org.meshtastic.core.resources.db_sync_title
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
@@ -99,6 +99,7 @@ import org.meshtastic.core.resources.nav_bar_new_icons
 import org.meshtastic.core.resources.nav_bar_rim
 import org.meshtastic.core.resources.nav_bar_select
 import org.meshtastic.core.resources.nav_bar_show
+import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.node_active_alert
 import org.meshtastic.core.resources.node_chip_blink
 import org.meshtastic.core.resources.node_chip_style
@@ -107,6 +108,7 @@ import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_silence_alert
 import org.meshtastic.core.resources.notification_test_title
+import org.meshtastic.core.resources.photo_folder_title
 import org.meshtastic.core.resources.presence_ask_now_favorites
 import org.meshtastic.core.resources.presence_ask_title
 import org.meshtastic.core.resources.presence_device_switch
@@ -132,7 +134,6 @@ import org.meshtastic.core.resources.radio_bridge_refresh_now
 import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.resources.radio_count
-import org.meshtastic.core.resources.photo_folder_title
 import org.meshtastic.core.resources.report_issues_title
 import org.meshtastic.core.resources.restore_app_settings
 import org.meshtastic.core.resources.restore_look
@@ -157,13 +158,12 @@ import org.meshtastic.core.resources.track_compare
 import org.meshtastic.core.resources.track_export_kml
 import org.meshtastic.core.resources.track_snr_colors
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.trips_title
 import org.meshtastic.core.resources.view_style
 import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.wifi_devices
-import org.meshtastic.core.resources.network_report_setting
-import org.meshtastic.core.resources.trips_title
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute

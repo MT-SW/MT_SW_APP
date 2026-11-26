@@ -18,16 +18,6 @@
 
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
-import org.meshtastic.core.resources.remote_lists_info_5
-import org.meshtastic.core.resources.remote_lists_info_4
-import org.meshtastic.core.resources.remote_lists_info_3
-import org.meshtastic.core.resources.remote_lists_info_2
-import org.meshtastic.core.resources.remote_lists_info_1
-import org.meshtastic.core.resources.remote_lists_info_title
-import org.meshtastic.core.resources.remote_lists_open
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
-import org.meshtastic.core.ui.component.InfoButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,6 +113,13 @@ import org.meshtastic.core.resources.remote_ignore_confirm_text
 import org.meshtastic.core.resources.remote_ignore_confirm_title
 import org.meshtastic.core.resources.remote_list_favorites
 import org.meshtastic.core.resources.remote_list_ignored
+import org.meshtastic.core.resources.remote_lists_info_1
+import org.meshtastic.core.resources.remote_lists_info_2
+import org.meshtastic.core.resources.remote_lists_info_3
+import org.meshtastic.core.resources.remote_lists_info_4
+import org.meshtastic.core.resources.remote_lists_info_5
+import org.meshtastic.core.resources.remote_lists_info_title
+import org.meshtastic.core.resources.remote_lists_open
 import org.meshtastic.core.resources.remote_manage_hint
 import org.meshtastic.core.resources.remote_manage_title
 import org.meshtastic.core.resources.remote_pick_from_list
@@ -135,8 +132,10 @@ import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.DoDisturb
@@ -145,7 +144,6 @@ import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.RemoteContacts
 import org.meshtastic.core.ui.icon.NearMe
 import org.meshtastic.core.ui.icon.NotFavorite
 import org.meshtastic.core.ui.icon.Output
@@ -153,10 +151,12 @@ import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PersonRemove
 import org.meshtastic.core.ui.icon.PowerSettingsNew
 import org.meshtastic.core.ui.icon.Refresh
+import org.meshtastic.core.ui.icon.RemoteContacts
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.feature.node.health.HealthLevel
 import org.meshtastic.feature.node.health.color
 import org.meshtastic.feature.node.model.NodeDetailAction
@@ -726,8 +726,7 @@ internal fun RemoteNodeManagementPanel(
             modifier = Modifier.fillMaxWidth(),
         )
         Button(
-            enabled =
-            !isEnsuringSession && (selected.isNotEmpty() || targetNodeNum != null),
+            enabled = !isEnsuringSession && (selected.isNotEmpty() || targetNodeNum != null),
             onClick = {
                 // Ticked nodes are saved with the names from our own list; a typed ID with the names typed here.
                 selected.toList().forEach { num ->

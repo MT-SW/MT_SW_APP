@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.ui.util
 
-
 actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean = false
 
 actual fun appPhotoFolder(): String? = null

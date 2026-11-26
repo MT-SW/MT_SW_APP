@@ -32,18 +32,18 @@ import org.meshtastic.core.database.MeshtasticDatabase.Companion.configureCommon
 import java.io.File
 
 /**
- * Resolves the desktop data directory for persistent storage (DataStore files, Room database). Defaults to
- * `~/MT_SW/`; a person can choose another folder in the settings (see [AppDataRoot]), and the
- * `MT_SW_DATA_DIR` environment variable always wins.
+ * Resolves the desktop data directory for persistent storage (DataStore files, Room database). Defaults to `~/MT_SW/`;
+ * a person can choose another folder in the settings (see [AppDataRoot]), and the `MT_SW_DATA_DIR` environment variable
+ * always wins.
  *
  * Shared between `core:database` and `desktop` module to ensure all persistent data is co-located.
  */
 fun desktopDataDir(): String = resolvedDataDir
 
 /**
- * The default `~/MT_SW/` is restricted to the current user the first time it is resolved, including when it
- * already exists. An explicit `MT_SW_DATA_DIR` is left as the user set it; the app restricts its own
- * subdirectories and files inside it.
+ * The default `~/MT_SW/` is restricted to the current user the first time it is resolved, including when it already
+ * exists. An explicit `MT_SW_DATA_DIR` is left as the user set it; the app restricts its own subdirectories and files
+ * inside it.
  */
 private val resolvedDataDir: String by lazy {
     // MT_SW: the person may have chosen another folder (see AppDataRoot); the default one is restricted as upstream.

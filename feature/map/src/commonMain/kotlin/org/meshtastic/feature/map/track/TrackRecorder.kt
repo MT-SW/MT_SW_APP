@@ -14,43 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "ReturnCount", "TooManyFunctions")
+
 package org.meshtastic.feature.map.track
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.di.ApplicationCoroutineScope
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.repository.HeardSignal
+import org.meshtastic.core.repository.HeardSignals
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.QuietMode
-import org.meshtastic.core.ui.util.HealthData
-import org.meshtastic.feature.map.trip.Trip
-import org.meshtastic.feature.map.trip.TripStop
-import org.meshtastic.feature.map.trip.TripPoint
-import org.meshtastic.feature.map.trip.TripStore
-import org.meshtastic.core.common.state.HiddenFeaturesUnlock
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.repository.HeardSignal
-import org.meshtastic.core.repository.HeardSignals
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.core.ui.util.HealthData
+import org.meshtastic.feature.map.trip.Trip
+import org.meshtastic.feature.map.trip.TripPoint
 import org.meshtastic.feature.map.trip.TripSignal
-import kotlinx.coroutines.flow.first
+import org.meshtastic.feature.map.trip.TripStop
+import org.meshtastic.feature.map.trip.TripStore
+import org.meshtastic.proto.ModuleConfig
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
@@ -63,8 +63,8 @@ import kotlin.time.Instant
  * MT_SW: records the person's own route. Where the points come from is chosen ([UiOptions.HIKE_POSITION_SOURCE]): the
  * phone's position, the position of the connected radio (the device), both at once, or the best one available (the
  * phone, and the device while the phone has no position, which is also what a computer gets). A point is added only
- * when it is [MIN_STEP_METERS] away from the last one, so standing still does not fill the track. The finished route
- * is saved as a GPX file, the same format as the exported node tracks. It is kept while the app runs.
+ * when it is [MIN_STEP_METERS] away from the last one, so standing still does not fill the track. The finished route is
+ * saved as a GPX file, the same format as the exported node tracks. It is kept while the app runs.
  */
 @Single
 class TrackRecorder(
@@ -72,7 +72,7 @@ class TrackRecorder(
     private val nodeRepository: NodeRepository,
     private val fileService: FileService,
     private val tripStore: TripStore,
-    private val dispatchers: CoroutineDispatchers,
+    private val scope: ApplicationCoroutineScope,
     private val uiPrefs: UiPrefs,
     private val radioConfigRepository: RadioConfigRepository,
     private val radioController: RadioController,
@@ -90,7 +90,6 @@ class TrackRecorder(
         val signals: List<TripSignal> = emptyList(),
     )
 
-    private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
     private val mutableLiveHealth = MutableStateFlow<HealthData?>(null)
 
     /** What the health app has recorded since the start of the hike being recorded (null when nothing yet). */
@@ -115,40 +114,37 @@ class TrackRecorder(
             State(recording = true, startedMillis = nowMillis, tripId = kotlin.uuid.Uuid.random().toString())
         Logger.i { "Trasa: nagrywanie rozpoczęte" }
         lastSignal.clear()
-        signalJob =
-            scope.launch { HeardSignals.signals.collect { heard -> onHeard(heard) } }
+        signalJob = scope.launch { HeardSignals.signals.collect { heard -> onHeard(heard) } }
         scope.launch { startRangeTest() }
         lastPhoneFixMillis = 0L
         lastUsedSource = null
         Logger.i { "Trasa: źródło pozycji ${positionSource()}" }
-        phoneJob =
-            scope.launch {
-                locationRepository
-                    .getLocations()
-                    .catch { Logger.w { "Trasa: pozycja telefonu niedostępna: ${it::class.simpleName}" } }
-                    .collect { fix ->
-                        lastPhoneFixMillis = nowMillis
-                        val height = fix.mslAltitudeMeters ?: fix.altitudeMeters
-                        if (positionSource() != UiOptions.HIKE_POSITION_DEVICE) {
-                            used("telefon")
-                            add(Point(fix.latitude, fix.longitude, height, fix.timeMillis))
-                        }
+        phoneJob = scope.launch {
+            locationRepository
+                .getLocations()
+                .catch { Logger.w { "Trasa: pozycja telefonu niedostępna: ${it::class.simpleName}" } }
+                .collect { fix ->
+                    lastPhoneFixMillis = nowMillis
+                    val height = fix.mslAltitudeMeters ?: fix.altitudeMeters
+                    if (positionSource() != UiOptions.HIKE_POSITION_DEVICE) {
+                        used("telefon")
+                        add(Point(fix.latitude, fix.longitude, height, fix.timeMillis))
                     }
-            }
-        radioJob =
-            scope.launch {
-                nodeRepository.ourNodeInfo
-                    .map { node -> node?.validPosition?.let { Point(node.latitude, node.longitude, null, nowMillis) } }
-                    .distinctUntilChanged { old, new ->
-                        old?.latitude == new?.latitude && old?.longitude == new?.longitude
+                }
+        }
+        radioJob = scope.launch {
+            nodeRepository.ourNodeInfo
+                .map { node -> node?.validPosition?.let { Point(node.latitude, node.longitude, null, nowMillis) } }
+                .distinctUntilChanged { old, new ->
+                    old?.latitude == new?.latitude && old?.longitude == new?.longitude
+                }
+                .collect { point ->
+                    if (point != null && deviceAllowed()) {
+                        used("urządzenie")
+                        add(point)
                     }
-                    .collect { point ->
-                        if (point != null && deviceAllowed()) {
-                            used("urządzenie")
-                            add(point)
-                        }
-                    }
-            }
+                }
+        }
     }
 
     private var lastPhoneFixMillis = 0L
@@ -159,7 +155,11 @@ class TrackRecorder(
     /** Whether a position of the device counts now (best available: only while the phone has no position). */
     private fun deviceAllowed(): Boolean = when (positionSource()) {
         UiOptions.HIKE_POSITION_PHONE -> false
-        UiOptions.HIKE_POSITION_DEVICE, UiOptions.HIKE_POSITION_BOTH -> true
+
+        UiOptions.HIKE_POSITION_DEVICE,
+        UiOptions.HIKE_POSITION_BOTH,
+        -> true
+
         else -> lastPhoneFixMillis == 0L || nowMillis - lastPhoneFixMillis > PHONE_SILENT_MILLIS
     }
 
@@ -178,8 +178,8 @@ class TrackRecorder(
 
     /**
      * Saves the signal of a node heard on the route, at most once in the chosen time for each node. A packet passed on
-     * by another node counts for the node that passed it on (the signal is that node's), found by the last byte of
-     * its number when only one known node ends like that.
+     * by another node counts for the node that passed it on (the signal is that node's), found by the last byte of its
+     * number when only one known node ends like that.
      */
     private fun rangeTestConfig(config: ModuleConfig.RangeTestConfig): ModuleConfig =
         ModuleConfig.Builder().also { it.range_test = config }.build()
@@ -206,7 +206,15 @@ class TrackRecorder(
             it.copy(
                 signals =
                 it.signals +
-                    TripSignal(heard.timeMillis, at.latitude, at.longitude, node, heard.rssi, heard.snr, !heard.direct),
+                    TripSignal(
+                        heard.timeMillis,
+                        at.latitude,
+                        at.longitude,
+                        node,
+                        heard.rssi,
+                        heard.snr,
+                        !heard.direct,
+                    ),
             )
         }
         Logger.d { "Trasa: zapisany sygnał węzła, razem ${mutableState.value.signals.size}" }
@@ -269,12 +277,11 @@ class TrackRecorder(
         quietJob = null
         QuietMode.set(mode)
         if (mode == QuietMode.Mode.Silent) {
-            quietJob =
-                scope.launch {
-                    nodeRepository.nodeDBbyNum.collect { nodes ->
-                        QuietMode.setFavorites(nodes.values.filter { it.isFavorite }.map { it.num }.toSet())
-                    }
+            quietJob = scope.launch {
+                nodeRepository.nodeDBbyNum.collect { nodes ->
+                    QuietMode.setFavorites(nodes.values.filter { it.isFavorite }.map { it.num }.toSet())
                 }
+            }
         }
     }
 
@@ -325,9 +332,7 @@ class TrackRecorder(
         tripStore.archive(bytes)
         mutableState.update { old ->
             val last = old.stops.lastOrNull()
-            val near =
-                last != null &&
-                    distanceMeters(Point(last.lat, last.lon, null, last.t), at) < STOP_JOIN_METERS
+            val near = last != null && distanceMeters(Point(last.lat, last.lon, null, last.t), at) < STOP_JOIN_METERS
             val stops =
                 if (near && last != null) {
                     old.stops.dropLast(1) + last.copy(photos = last.photos + photo)

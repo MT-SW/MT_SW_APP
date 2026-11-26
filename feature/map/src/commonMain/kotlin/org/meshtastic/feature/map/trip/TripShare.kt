@@ -67,8 +67,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         val points = trip.points.subList(first, last + 1)
         val start = points.first().t
         val end = points.last().t
-        val stops =
-            trip.stops.filter { it.photos.isNotEmpty() && it.t in start..end }.sortedBy { it.t }.take(MAX_STOPS)
+        val stops = trip.stops.filter { it.photos.isNotEmpty() && it.t in start..end }.sortedBy { it.t }.take(MAX_STOPS)
         val total = stops.size + 1
         Logger.i { "Wędrówki: udostępnianie, punktów trasy ${points.size}, miejsc ${stops.size}" }
         val shared = mutableListOf<SharedStop>()
@@ -99,7 +98,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
                 "hike.json",
             )
         onStep(total, total)
-        Logger.i { "Wędrówki: udostępniona, plików ${total}" }
+        Logger.i { "Wędrówki: udostępniona, plików $total" }
         return link
     }
 

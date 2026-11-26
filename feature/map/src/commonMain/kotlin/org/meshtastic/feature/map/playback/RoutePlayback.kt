@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ReturnCount")
+
 package org.meshtastic.feature.map.playback
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
-import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.common.di.ApplicationCoroutineScope
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.SignalSurveyRepository
 import org.meshtastic.feature.map.trip.TripStore
@@ -41,7 +41,7 @@ class RoutePlayback(
     private val repository: SignalSurveyRepository,
     private val nodeRepository: NodeRepository,
     private val tripStore: TripStore,
-    dispatchers: CoroutineDispatchers,
+    private val scope: ApplicationCoroutineScope,
 ) {
     /** One reading of the replayed route. [name] is the short name of the node that was heard, when it is known. */
     data class Step(
@@ -74,7 +74,6 @@ class RoutePlayback(
             get() = steps.getOrNull(index)
     }
 
-    private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
     private val mutableState = MutableStateFlow(State())
     val state: StateFlow<State>
         get() = mutableState
@@ -84,64 +83,62 @@ class RoutePlayback(
     /** Loads the survey [sessionId] and starts replaying it from its first reading. */
     fun play(sessionId: Long) {
         job?.cancel()
-        job =
-            scope.launch {
-                val names = nodeRepository.nodeDBbyNum.value
-                val steps =
-                    repository
-                        .samplesOnce(sessionId)
-                        .sortedBy { it.timeMillis }
-                        .map { s ->
-                            val name = names[s.fromNum]?.user?.short_name?.takeIf { it.isNotBlank() }
-                            Step(
-                                s.latitude,
-                                s.longitude,
-                                s.timeMillis,
-                                name ?: "!${s.fromNum.toUInt().toString(HEX_RADIX)}",
-                                s.rssi,
-                                s.snr,
-                                s.direct,
-                            )
-                        }
-                Logger.i { "Spacer: sesja $sessionId wczytana, odczytów ${steps.size}" }
-                if (steps.size < 2) {
-                    Logger.i { "Spacer: za mało odczytów, żeby odtworzyć trasę" }
-                    return@launch
-                }
-                val speed = mutableState.value.speed
-                mutableState.value = State(active = true, steps = steps, playing = true, speed = speed)
-                run()
+        job = scope.launch {
+            val names = nodeRepository.nodeDBbyNum.value
+            val steps =
+                repository
+                    .samplesOnce(sessionId)
+                    .sortedBy { it.timeMillis }
+                    .map { s ->
+                        val name = names[s.fromNum]?.user?.short_name?.takeIf { it.isNotBlank() }
+                        Step(
+                            s.latitude,
+                            s.longitude,
+                            s.timeMillis,
+                            name ?: "!${s.fromNum.toUInt().toString(HEX_RADIX)}",
+                            s.rssi,
+                            s.snr,
+                            s.direct,
+                        )
+                    }
+            Logger.i { "Spacer: sesja $sessionId wczytana, odczytów ${steps.size}" }
+            if (steps.size < 2) {
+                Logger.i { "Spacer: za mało odczytów, żeby odtworzyć trasę" }
+                return@launch
             }
+            val speed = mutableState.value.speed
+            mutableState.value = State(active = true, steps = steps, playing = true, speed = speed)
+            run()
+        }
     }
 
     /** Replays the hike [tripId]: the dot walks the route and stops at each place to show its pictures as slides. */
     fun playTrip(tripId: String) {
         job?.cancel()
-        job =
-            scope.launch {
-                val trip = tripStore.find(tripId) ?: return@launch
-                if (trip.points.size < 2) {
-                    Logger.i { "Spacer: wędrówka ma za mało punktów" }
-                    return@launch
-                }
-                val slidesAt = HashMap<Int, MutableList<Slide>>()
-                val titleAt = HashMap<Int, String>()
-                trip.stops
-                    .filter { it.photos.isNotEmpty() }
-                    .forEach { stop ->
-                        val at = trip.points.indices.minBy { abs(trip.points[it].t - stop.t) }
-                        slidesAt.getOrPut(at) { mutableListOf() }.addAll(stop.photos.map { Slide(it.file, it.caption) })
-                        if (stop.title.isNotBlank()) titleAt[at] = stop.title
-                    }
-                val steps =
-                    trip.points.mapIndexed { i, p ->
-                        Step(p.lat, p.lon, p.t, titleAt[i] ?: trip.name, 0, null, true, slidesAt[i].orEmpty())
-                    }
-                Logger.i { "Spacer: wędrówka wczytana, punktów ${steps.size}, miejsc ze zdjęciami ${slidesAt.size}" }
-                val speed = mutableState.value.speed
-                mutableState.value = State(active = true, steps = steps, playing = true, speed = speed, tripId = tripId)
-                run()
+        job = scope.launch {
+            val trip = tripStore.find(tripId) ?: return@launch
+            if (trip.points.size < 2) {
+                Logger.i { "Spacer: wędrówka ma za mało punktów" }
+                return@launch
             }
+            val slidesAt = HashMap<Int, MutableList<Slide>>()
+            val titleAt = HashMap<Int, String>()
+            trip.stops
+                .filter { it.photos.isNotEmpty() }
+                .forEach { stop ->
+                    val at = trip.points.indices.minBy { abs(trip.points[it].t - stop.t) }
+                    slidesAt.getOrPut(at) { mutableListOf() }.addAll(stop.photos.map { Slide(it.file, it.caption) })
+                    if (stop.title.isNotBlank()) titleAt[at] = stop.title
+                }
+            val steps =
+                trip.points.mapIndexed { i, p ->
+                    Step(p.lat, p.lon, p.t, titleAt[i] ?: trip.name, 0, null, true, slidesAt[i].orEmpty())
+                }
+            Logger.i { "Spacer: wędrówka wczytana, punktów ${steps.size}, miejsc ze zdjęciami ${slidesAt.size}" }
+            val speed = mutableState.value.speed
+            mutableState.value = State(active = true, steps = steps, playing = true, speed = speed, tripId = tripId)
+            run()
+        }
     }
 
     private suspend fun run() {

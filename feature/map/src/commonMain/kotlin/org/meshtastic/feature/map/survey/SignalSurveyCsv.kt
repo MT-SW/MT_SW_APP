@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ComplexCondition", "MagicNumber")
+
 package org.meshtastic.feature.map.survey
 
 import org.meshtastic.core.model.SignalSample
@@ -47,10 +49,11 @@ internal fun List<SignalSample>.toSurveyCsv(): String = buildString {
 private const val CSV_COLUMNS = 8
 
 /**
- * The readings in [text], which is the file [toSurveyCsv] writes (a hike's exported signal has the same columns).
- * A row that does not fit is skipped, so a file edited by hand or cut short still brings in what is readable.
+ * The readings in [text], which is the file [toSurveyCsv] writes (a hike's exported signal has the same columns). A row
+ * that does not fit is skipped, so a file edited by hand or cut short still brings in what is readable.
  */
-internal fun parseSurveyCsv(text: String): List<SignalSample> = text.lineSequence()
+internal fun parseSurveyCsv(text: String): List<SignalSample> = text
+    .lineSequence()
     .map { it.trim() }
     .filter { it.isNotEmpty() && !it.startsWith("time_ms") }
     .mapNotNull { line ->

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalForeignApi::class)
-@file:Suppress("TooGenericExceptionCaught")
+@file:Suppress("ReturnCount", "TooGenericExceptionCaught")
 
 package org.meshtastic.core.ui.util
 

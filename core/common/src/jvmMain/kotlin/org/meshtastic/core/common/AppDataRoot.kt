@@ -25,8 +25,9 @@ import java.nio.file.StandardCopyOption
 
 /**
  * The one folder that holds everything the desktop app keeps for itself: the message database, the settings, the logs,
- * the map files, the AI models and engine programs. By default it is `~/MT_SW`, named like the app (or the folder named by the
- * `MT_SW_DATA_DIR` variable, which always wins). A person can choose another place (another disk) in the settings.
+ * the map files, the AI models and engine programs. By default it is `~/MT_SW`, named like the app (or the folder named
+ * by the `MT_SW_DATA_DIR` variable, which always wins). A person can choose another place (another disk) in the
+ * settings.
  *
  * The choice is a small pointer file that always stays in [defaultDir], so it is found again at every start. Moving is
  * done in two steps because the database and the settings are open while the app runs and must not be copied then:
@@ -61,7 +62,10 @@ object AppDataRoot {
     private val SETTINGS_FILES =
         setOf(POINTER, PENDING, OLD_FOLDERS, ERROR, ASKED, SEVERAL, INSTANCE_LOCK, INSTANCE_PORT)
 
-    /** The folder named by the `MT_SW_DATA_DIR` variable (the variable of the earlier versions still works); null = none. */
+    /**
+     * The folder named by the `MT_SW_DATA_DIR` variable (the variable of the earlier versions still works); null =
+     * none.
+     */
     val envDir: String? =
         listOf("MT_SW_DATA_DIR", "MESHTASTIC_DATA_DIR").firstNotNullOfOrNull { name ->
             System.getenv(name)?.takeIf { it.isNotBlank() }
@@ -70,8 +74,7 @@ object AppDataRoot {
     private val overridden: Boolean = envDir != null
 
     /** Where the pointer file lives and the folder used when nothing else was chosen. */
-    val defaultDir: File =
-        envDir?.let(::File) ?: homeDefault()
+    val defaultDir: File = envDir?.let(::File) ?: homeDefault()
 
     /**
      * The folder named like the app. Data kept by an earlier version in the old hidden folder is moved there once (a

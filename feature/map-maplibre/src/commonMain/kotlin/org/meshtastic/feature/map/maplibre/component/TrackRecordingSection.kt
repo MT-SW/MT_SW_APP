@@ -14,70 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber")
+
 package org.meshtastic.feature.map.maplibre.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.rememberLazyListState
-import org.meshtastic.core.resources.trips_position_title
-import org.meshtastic.core.resources.trips_position_auto
-import org.meshtastic.core.resources.trips_position_phone
-import org.meshtastic.core.resources.trips_position_device
-import org.meshtastic.core.resources.trips_position_both
-import org.meshtastic.core.resources.trips_position_hint
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.ui.component.AlertDialog
-import org.meshtastic.core.ui.component.Checkbox
-import org.meshtastic.core.resources.sos_nodes_done
-import org.meshtastic.core.resources.sos_nodes_empty
-import org.meshtastic.core.resources.sos_nodes_search
-import org.meshtastic.core.resources.trips_quiet_exceptions
-import org.meshtastic.core.resources.trips_quiet_nodes
-import org.meshtastic.core.resources.trips_quiet_pick_title
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import org.meshtastic.core.resources.trips_rangetest
-import org.meshtastic.core.resources.trips_signal_live
-import org.meshtastic.core.resources.trips_signal_hint
-import org.meshtastic.core.resources.trips_signal_title
-import org.meshtastic.core.common.state.HiddenFeaturesUnlock
-import org.meshtastic.core.resources.trips_health_live
-import org.meshtastic.core.resources.trips_health_auto_hint
-import org.meshtastic.core.resources.trips_health_auto
-import org.meshtastic.core.ui.util.rememberHealthSync
-import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.model.UiOptions
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.QuietMode
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.sos_nodes_done
+import org.meshtastic.core.resources.sos_nodes_empty
+import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.track_rec_clear
 import org.meshtastic.core.resources.track_rec_hint
 import org.meshtastic.core.resources.track_rec_save
@@ -85,15 +68,33 @@ import org.meshtastic.core.resources.track_rec_start
 import org.meshtastic.core.resources.track_rec_status
 import org.meshtastic.core.resources.track_rec_stop
 import org.meshtastic.core.resources.track_rec_title
+import org.meshtastic.core.resources.trips_health_auto
+import org.meshtastic.core.resources.trips_health_auto_hint
+import org.meshtastic.core.resources.trips_health_live
 import org.meshtastic.core.resources.trips_photo
+import org.meshtastic.core.resources.trips_position_auto
+import org.meshtastic.core.resources.trips_position_both
+import org.meshtastic.core.resources.trips_position_device
+import org.meshtastic.core.resources.trips_position_hint
+import org.meshtastic.core.resources.trips_position_phone
+import org.meshtastic.core.resources.trips_position_title
+import org.meshtastic.core.resources.trips_quiet_exceptions
 import org.meshtastic.core.resources.trips_quiet_hint
+import org.meshtastic.core.resources.trips_quiet_nodes
+import org.meshtastic.core.resources.trips_quiet_pick_title
 import org.meshtastic.core.resources.trips_quiet_priority
 import org.meshtastic.core.resources.trips_quiet_title
-import org.koin.compose.koinInject
-import org.meshtastic.core.repository.QuietMode
+import org.meshtastic.core.resources.trips_rangetest
+import org.meshtastic.core.resources.trips_signal_hint
+import org.meshtastic.core.resources.trips_signal_live
+import org.meshtastic.core.resources.trips_signal_title
+import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.rememberCameraLauncher
+import org.meshtastic.core.ui.util.rememberHealthSync
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.map.track.TrackRecorder
 
@@ -341,18 +342,18 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                 }
                 val listState = rememberLazyListState()
                 Box(modifier = Modifier.padding(top = 8.dp)) {
-                LazyColumn(state = listState) {
-                    items(shown, key = { it.num }) { node ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
-                        ) {
-                            Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
-                            Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
+                    LazyColumn(state = listState) {
+                        items(shown, key = { it.num }) { node ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
+                            ) {
+                                Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
+                                Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
-                }
-                FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
+                    FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
                 }
             }
         },

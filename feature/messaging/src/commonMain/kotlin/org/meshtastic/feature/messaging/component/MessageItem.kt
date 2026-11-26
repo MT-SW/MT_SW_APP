@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "MutableStateAutoboxing", "TooGenericExceptionCaught")
+@file:Suppress("ComplexCondition", "MagicNumber", "MutableStateAutoboxing", "TooGenericExceptionCaught", "TooManyFunctions")
 
 package org.meshtastic.feature.messaging.component
 
@@ -114,9 +114,6 @@ import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
 import org.meshtastic.core.resources.image_preview_failed
 import org.meshtastic.core.resources.image_preview_loading
-import org.meshtastic.core.resources.trips_import_button
-import org.meshtastic.core.resources.trips_import_done
-import org.meshtastic.core.resources.trips_import_progress
 import org.meshtastic.core.resources.message_translated_label
 import org.meshtastic.core.resources.mute_1_hour
 import org.meshtastic.core.resources.mute_1_month
@@ -130,6 +127,9 @@ import org.meshtastic.core.resources.mute_sender_marker
 import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
+import org.meshtastic.core.resources.trips_import_button
+import org.meshtastic.core.resources.trips_import_done
+import org.meshtastic.core.resources.trips_import_progress
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.HighlightedText
@@ -1120,7 +1120,9 @@ private fun HikeLinkButton(url: String, senderNum: Int) {
                 ) {
                     Text(stringResource(Res.string.trips_import_button))
                 }
+
             DONE -> Text(stringResource(Res.string.trips_import_done), style = MaterialTheme.typography.bodySmall)
+
             else -> {
                 ProgressSpinner(size = 14.dp)
                 Text(

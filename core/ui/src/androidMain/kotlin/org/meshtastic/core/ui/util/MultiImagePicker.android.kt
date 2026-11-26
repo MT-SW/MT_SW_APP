@@ -32,22 +32,22 @@ actual fun rememberMultiImagePicker(onPicked: (List<PickedImage>) -> Unit): (() 
     val context = LocalContext.current
     val current = rememberUpdatedState(onPicked)
     val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(MAX_PICKED_IMAGES)) {
-            uris: List<Uri> ->
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia(MAX_PICKED_IMAGES),
+        ) { uris: List<Uri> ->
             if (uris.isEmpty()) {
                 Logger.i { "Galeria: nic nie wybrano" }
                 return@rememberLauncherForActivityResult
             }
-            val images =
-                uris.mapNotNull { uri ->
-                    try {
-                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                        bytes?.let { PickedImage(it, context.contentResolver.getType(uri) ?: "image/jpeg") }
-                    } catch (e: Exception) {
-                        Logger.w { "Galeria: nie udało się odczytać zdjęcia: ${e.message}" }
-                        null
-                    }
+            val images = uris.mapNotNull { uri ->
+                try {
+                    val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    bytes?.let { PickedImage(it, context.contentResolver.getType(uri) ?: "image/jpeg") }
+                } catch (e: Exception) {
+                    Logger.w { "Galeria: nie udało się odczytać zdjęcia: ${e.message}" }
+                    null
                 }
+            }
             Logger.i { "Galeria: wybrano ${uris.size}, odczytano ${images.size}" }
             current.value(images)
         }

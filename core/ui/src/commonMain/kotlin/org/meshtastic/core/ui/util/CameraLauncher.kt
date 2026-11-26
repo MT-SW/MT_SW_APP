@@ -25,5 +25,4 @@ import androidx.compose.runtime.Composable
  * picture from the gallery. Returns null where the platform has no camera to take a picture with (desktop), so the
  * button is not shown there.
  */
-@Composable
-expect fun rememberCameraLauncher(onPhotoTaken: (bytes: ByteArray, mimeType: String) -> Unit): (() -> Unit)?
+@Composable expect fun rememberCameraLauncher(onPhotoTaken: (bytes: ByteArray, mimeType: String) -> Unit): (() -> Unit)?

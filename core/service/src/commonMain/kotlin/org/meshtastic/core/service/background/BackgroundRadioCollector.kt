@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("SwallowedException")
+
 package org.meshtastic.core.service.background
 
 import co.touchlab.kermit.Logger
@@ -130,9 +132,7 @@ class BackgroundRadioCollector(
                             readSnapshot(slot.address)?.let { historyRecorder.store(slot.address, it, nowMillis) }
                         } catch (e: CancellationException) {
                             throw e
-                        } catch (
-                            @Suppress("TooGenericExceptionCaught") e: Exception,
-                        ) {
+                        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                             Logger.w { "Historia urządzeń: odczyt w tle nie udał się: \${e.message}" }
                         }
                     }
@@ -167,24 +167,25 @@ class BackgroundRadioCollector(
     override suspend fun readSnapshot(address: String): DeviceSnapshot? {
         val key = normalizeAddress(address)
         return try {
-            databaseManager.withDeviceDb(address, includeActive = true) { db ->
-                val dao = db.nodeInfoDao()
-                val mine = dao.getMyNodeEntity() ?: return@withDeviceDb null
-                val nodes = dao.getAllNodesSnapshot()
-                val own = nodes.firstOrNull { it.num == mine.myNodeNum }
-                val metrics = own?.deviceMetrics
-                DeviceSnapshot(
-                    nodeNum = mine.myNodeNum,
-                    shortName = own?.user?.short_name.orEmpty(),
-                    batteryLevel = metrics?.battery_level,
-                    voltage = metrics?.voltage,
-                    channelUtilization = metrics?.channel_utilization,
-                    airUtilTx = metrics?.air_util_tx,
-                    uptimeSeconds = metrics?.uptime_seconds,
-                    nodeCount = nodes.size,
-                    onlineCount = nodes.count { it.isOnline },
-                )
-            }
+            databaseManager
+                .withDeviceDb(address, includeActive = true) { db ->
+                    val dao = db.nodeInfoDao()
+                    val mine = dao.getMyNodeEntity() ?: return@withDeviceDb null
+                    val nodes = dao.getAllNodesSnapshot()
+                    val own = nodes.firstOrNull { it.num == mine.myNodeNum }
+                    val metrics = own?.deviceMetrics
+                    DeviceSnapshot(
+                        nodeNum = mine.myNodeNum,
+                        shortName = own?.user?.short_name.orEmpty(),
+                        batteryLevel = metrics?.battery_level,
+                        voltage = metrics?.voltage,
+                        channelUtilization = metrics?.channel_utilization,
+                        airUtilTx = metrics?.air_util_tx,
+                        uptimeSeconds = metrics?.uptime_seconds,
+                        nodeCount = nodes.size,
+                        onlineCount = nodes.count { it.isOnline },
+                    )
+                }
                 .also { Logger.d { "Porównanie urządzeń: ${anonymize(key)} odczytane = ${it != null}" } }
         } catch (e: CancellationException) {
             throw e

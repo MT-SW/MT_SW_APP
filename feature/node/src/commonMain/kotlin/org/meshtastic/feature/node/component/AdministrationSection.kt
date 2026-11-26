@@ -21,9 +21,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
@@ -66,19 +67,17 @@ import org.meshtastic.core.resources.latest_stable_firmware
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.refresh_metadata
 import org.meshtastic.core.resources.remote_admin
+import org.meshtastic.core.resources.remote_lists_open
+import org.meshtastic.core.resources.remote_lists_open_description
 import org.meshtastic.core.resources.remote_shell_open
 import org.meshtastic.core.resources.remote_shell_open_description
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
-import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.icon.Favorite
-import org.meshtastic.core.ui.component.ModalBottomSheet
-import org.meshtastic.core.resources.remote_lists_open_description
-import org.meshtastic.core.resources.remote_lists_open
-import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.icon.ForkLeft
 import org.meshtastic.core.ui.icon.Icecream
 import org.meshtastic.core.ui.icon.Icon
@@ -173,7 +172,8 @@ fun AdministrationSection(
                     onClick = { onAction(NodeDetailAction.Navigate(NodeDetailRoute.OnDemandLog(node.num))) },
                 )
 
-                // Next to the on-demand diagnostics, and there for good once the device was confirmed as the user's own.
+                // Next to the on-demand diagnostics, and there for good once the device was confirmed as the user's
+                // own.
                 if (!metricsState.isLocal && remoteAdminKnown) {
                     SectionDivider()
                     RemoteListsEntry(node = node, isEnsuringSession = isEnsuringSession, onAction = onAction)
@@ -193,8 +193,8 @@ fun AdministrationSection(
 
 /**
  * MT_SW: the "Remote lists" entry. A tap opens a window (the same kind as the map's) with everything that changes the
- * favorites, the ignored list and the contacts of the remote device; the admin session is brought up at that moment,
- * so the window is ready to send.
+ * favorites, the ignored list and the contacts of the remote device; the admin session is brought up at that moment, so
+ * the window is ready to send.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -217,7 +217,11 @@ private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (
             },
         ) {
             ScrollWithBar {
-                RemoteNodeManagementPanel(destNum = node.num, isEnsuringSession = isEnsuringSession, onAction = onAction)
+                RemoteNodeManagementPanel(
+                    destNum = node.num,
+                    isEnsuringSession = isEnsuringSession,
+                    onAction = onAction,
+                )
             }
         }
     }

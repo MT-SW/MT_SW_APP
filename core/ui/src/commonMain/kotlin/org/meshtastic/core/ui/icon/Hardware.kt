@@ -48,10 +48,11 @@ val MeshtasticIcons.Wrench: ImageVector
 val MeshtasticIcons.ViewInAr: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_view_in_ar)
 
-/** Material Symbols "photo_camera": capture the AR view. */
 /** MT_SW: a camera with a "save" arrow, for the folder the pictures taken in the app are saved to. */
 val MeshtasticIcons.PhotoSave: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_photo_save)
+
+/** Material Symbols "photo_camera": capture the AR view. */
 val MeshtasticIcons.PhotoCamera: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_photo_camera)
 

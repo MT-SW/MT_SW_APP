@@ -16,16 +16,15 @@
  */
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.component.FastScrollSidebar
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Checkbox
@@ -47,6 +46,7 @@ import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.remote_pick_from_list
 import org.meshtastic.core.resources.remote_pick_search
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.NodeChip
 
@@ -90,33 +90,33 @@ internal fun RemoteNodePickerSheet(
         )
         val listState = rememberLazyListState()
         Box(modifier = Modifier.weight(1f, fill = false)) {
-        LazyColumn(state = listState) {
-            items(shown, key = { it.num }) { node ->
-                Row(
-                    modifier =
-                    Modifier.fillMaxWidth()
-                        .clickable { onToggle(node.num) }
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Checkbox(checked = node.num in selected, onCheckedChange = null)
-                    NodeChip(node = node)
-                    Text(
-                        text = node.effectiveLongName,
-                        modifier = Modifier.weight(1f),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = NodeAddress.numToDefaultId(node.num),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+            LazyColumn(state = listState) {
+                items(shown, key = { it.num }) { node ->
+                    Row(
+                        modifier =
+                        Modifier.fillMaxWidth()
+                            .clickable { onToggle(node.num) }
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Checkbox(checked = node.num in selected, onCheckedChange = null)
+                        NodeChip(node = node)
+                        Text(
+                            text = node.effectiveLongName,
+                            modifier = Modifier.weight(1f),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = NodeAddress.numToDefaultId(node.num),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
-        }
             FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
         }
     }

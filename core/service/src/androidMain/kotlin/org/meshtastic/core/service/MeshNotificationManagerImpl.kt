@@ -79,13 +79,13 @@ import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
-import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
 import org.meshtastic.core.repository.SosAlarmStyle
@@ -937,7 +937,8 @@ class MeshNotificationManagerImpl(
 
     override suspend fun showNodeSilenceNotification(node: Node, title: String) {
         ensureChannels()
-        quietNotify(TAG_NODE_SILENCE,
+        quietNotify(
+            TAG_NODE_SILENCE,
             node.num,
             createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeSilence),
         )
@@ -947,7 +948,8 @@ class MeshNotificationManagerImpl(
 
     override suspend fun showNodeActiveNotification(node: Node, title: String) {
         ensureChannels()
-        quietNotify(TAG_NODE_ACTIVE,
+        quietNotify(
+            TAG_NODE_ACTIVE,
             node.num,
             createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeActive),
         )

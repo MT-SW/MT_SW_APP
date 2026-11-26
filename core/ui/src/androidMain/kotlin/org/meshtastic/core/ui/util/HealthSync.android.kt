@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooGenericExceptionCaught")
+@file:Suppress("MagicNumber", "ReturnCount", "TooGenericExceptionCaught")
 
 package org.meshtastic.core.ui.util
 
@@ -84,8 +84,7 @@ actual fun rememberHealthSync(): HealthSync? {
     }
 }
 
-private class AndroidHealthSync(context: Context, private val ask: suspend (Set<String>) -> Set<String>) :
-    HealthSync {
+private class AndroidHealthSync(context: Context, private val ask: suspend (Set<String>) -> Set<String>) : HealthSync {
     private val client = HealthConnectClient.getOrCreate(context)
 
     private suspend fun ensure(wanted: Set<String>): Set<String> {
@@ -96,55 +95,56 @@ private class AndroidHealthSync(context: Context, private val ask: suspend (Set<
         return ask(missing) + have
     }
 
-    override suspend fun read(fromMillis: Long, toMillis: Long): HealthData? =
-        try {
-            val granted = ensure(READ_PERMISSIONS)
-            val metrics =
-                buildSet {
-                    if (HealthPermission.getReadPermission(StepsRecord::class) in granted) add(StepsRecord.COUNT_TOTAL)
-                    if (HealthPermission.getReadPermission(DistanceRecord::class) in granted) {
-                        add(DistanceRecord.DISTANCE_TOTAL)
-                    }
-                    if (HealthPermission.getReadPermission(HeartRateRecord::class) in granted) {
-                        add(HeartRateRecord.BPM_AVG)
-                        add(HeartRateRecord.BPM_MAX)
-                    }
-                    if (HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class) in granted) {
-                        add(ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL)
-                    }
-                    if (HealthPermission.getReadPermission(ElevationGainedRecord::class) in granted) {
-                        add(ElevationGainedRecord.ELEVATION_GAINED_TOTAL)
-                    }
-                }
-            if (metrics.isEmpty()) {
-                Logger.w { "Zdrowie: brak zgody na odczyt, nic nie pobrano" }
-                null
-            } else {
-                val result =
-                    client.aggregate(
-                        AggregateRequest(
-                            metrics = metrics,
-                            timeRangeFilter =
-                            TimeRangeFilter.between(Instant.ofEpochMilli(fromMillis), Instant.ofEpochMilli(toMillis)),
-                        ),
-                    )
-                val data =
-                    HealthData(
-                        steps = result[StepsRecord.COUNT_TOTAL],
-                        distanceMeters = result[DistanceRecord.DISTANCE_TOTAL]?.inMeters,
-                        avgHeartRate = result[HeartRateRecord.BPM_AVG]?.toInt(),
-                        maxHeartRate = result[HeartRateRecord.BPM_MAX]?.toInt(),
-                        calories =
-                        result[ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL]?.inKilocalories?.roundToInt(),
-                        ascentMeters = result[ElevationGainedRecord.ELEVATION_GAINED_TOTAL]?.inMeters?.roundToInt(),
-                    )
-                Logger.i { "Zdrowie: odczyt zakończony, dane ${if (data.isEmpty) "puste" else "są"}" }
-                data
+    override suspend fun read(fromMillis: Long, toMillis: Long): HealthData? = try {
+        val granted = ensure(READ_PERMISSIONS)
+        val metrics = buildSet {
+            if (HealthPermission.getReadPermission(StepsRecord::class) in granted) add(StepsRecord.COUNT_TOTAL)
+            if (HealthPermission.getReadPermission(DistanceRecord::class) in granted) {
+                add(DistanceRecord.DISTANCE_TOTAL)
             }
-        } catch (e: Exception) {
-            Logger.w { "Zdrowie: odczyt nie udał się: ${e.message}" }
-            null
+            if (HealthPermission.getReadPermission(HeartRateRecord::class) in granted) {
+                add(HeartRateRecord.BPM_AVG)
+                add(HeartRateRecord.BPM_MAX)
+            }
+            if (HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class) in granted) {
+                add(ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL)
+            }
+            if (HealthPermission.getReadPermission(ElevationGainedRecord::class) in granted) {
+                add(ElevationGainedRecord.ELEVATION_GAINED_TOTAL)
+            }
         }
+        if (metrics.isEmpty()) {
+            Logger.w { "Zdrowie: brak zgody na odczyt, nic nie pobrano" }
+            null
+        } else {
+            val result =
+                client.aggregate(
+                    AggregateRequest(
+                        metrics = metrics,
+                        timeRangeFilter =
+                        TimeRangeFilter.between(
+                            Instant.ofEpochMilli(fromMillis),
+                            Instant.ofEpochMilli(toMillis),
+                        ),
+                    ),
+                )
+            val data =
+                HealthData(
+                    steps = result[StepsRecord.COUNT_TOTAL],
+                    distanceMeters = result[DistanceRecord.DISTANCE_TOTAL]?.inMeters,
+                    avgHeartRate = result[HeartRateRecord.BPM_AVG]?.toInt(),
+                    maxHeartRate = result[HeartRateRecord.BPM_MAX]?.toInt(),
+                    calories =
+                    result[ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL]?.inKilocalories?.roundToInt(),
+                    ascentMeters = result[ElevationGainedRecord.ELEVATION_GAINED_TOTAL]?.inMeters?.roundToInt(),
+                )
+            Logger.i { "Zdrowie: odczyt zakończony, dane ${if (data.isEmpty) "puste" else "są"}" }
+            data
+        }
+    } catch (e: Exception) {
+        Logger.w { "Zdrowie: odczyt nie udał się: ${e.message}" }
+        null
+    }
 
     override suspend fun export(
         title: String,
@@ -189,21 +189,22 @@ private class AndroidHealthSync(context: Context, private val ask: suspend (Set<
                     title = title,
                     exerciseRoute = if (withRoute && locations.isNotEmpty()) ExerciseRoute(locations) else null,
                 )
-            val records = buildList<androidx.health.connect.client.records.Record> {
-                add(session)
-                if (distanceMeters > 0) {
-                    add(
-                        DistanceRecord(
-                            startTime = start,
-                            startZoneOffset = ZoneOffset.UTC,
-                            endTime = end,
-                            endZoneOffset = ZoneOffset.UTC,
-                            distance = Length.meters(distanceMeters),
-                            metadata = Metadata.manualEntry(),
-                        ),
-                    )
+            val records =
+                buildList<androidx.health.connect.client.records.Record> {
+                    add(session)
+                    if (distanceMeters > 0) {
+                        add(
+                            DistanceRecord(
+                                startTime = start,
+                                startZoneOffset = ZoneOffset.UTC,
+                                endTime = end,
+                                endZoneOffset = ZoneOffset.UTC,
+                                distance = Length.meters(distanceMeters),
+                                metadata = Metadata.manualEntry(),
+                            ),
+                        )
+                    }
                 }
-            }
             client.insertRecords(records)
         }
         return try {

@@ -16,15 +16,8 @@
  */
 package org.meshtastic.feature.map.survey
 
-import androidx.compose.foundation.clickable
-import androidx.compose.runtime.rememberCoroutineScope
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.launch
-import org.meshtastic.core.repository.FileService
-import org.meshtastic.core.resources.signal_survey_import
-import org.meshtastic.core.resources.signal_survey_import_hint
-import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,27 +51,30 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.SignalSurveyBlocker
-import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.route_playback_start
-import org.meshtastic.core.ui.icon.PlayArrow
-import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.grant_permission
 import org.meshtastic.core.resources.hide_layer
 import org.meshtastic.core.resources.not_connected
 import org.meshtastic.core.resources.open_settings
+import org.meshtastic.core.resources.route_playback_start
 import org.meshtastic.core.resources.show_layer
 import org.meshtastic.core.resources.signal_survey_delete_confirm
 import org.meshtastic.core.resources.signal_survey_description
 import org.meshtastic.core.resources.signal_survey_export
 import org.meshtastic.core.resources.signal_survey_heatmap
+import org.meshtastic.core.resources.signal_survey_import
+import org.meshtastic.core.resources.signal_survey_import_hint
 import org.meshtastic.core.resources.signal_survey_location_off
 import org.meshtastic.core.resources.signal_survey_location_permission
 import org.meshtastic.core.resources.signal_survey_no_fix
@@ -92,12 +89,15 @@ import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FileDownload
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.util.PermissionStatus
 import org.meshtastic.core.ui.util.rememberFileExporter
 import org.meshtastic.core.ui.util.rememberLocationPermissionState
+import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberOpenLocationSettings
+import org.meshtastic.feature.map.playback.RoutePlayback
 
 internal const val SIGNAL_SURVEY_SWITCH_TAG = "signal_survey_switch"
 internal const val SIGNAL_SURVEY_CONFIRM_DELETE_TAG = "signal_survey_confirm_delete"
@@ -123,16 +123,15 @@ fun SignalSurveySection(modifier: Modifier = Modifier, viewModel: SignalSurveyVi
         )
     val fileService: FileService = koinInject()
     val importScope = rememberCoroutineScope()
-    val openFile =
-        rememberOpenFileLauncher { uri ->
-            if (uri != null) {
-                importScope.launch {
-                    var text = ""
-                    val read = fileService.read(uri) { text = it.readUtf8() }
-                    if (read) viewModel.importCsv(text) else Logger.w { "Zasięg: nie udało się odczytać pliku" }
-                }
+    val openFile = rememberOpenFileLauncher { uri ->
+        if (uri != null) {
+            importScope.launch {
+                var text = ""
+                val read = fileService.read(uri) { text = it.readUtf8() }
+                if (read) viewModel.importCsv(text) else Logger.w { "Zasięg: nie udało się odczytać pliku" }
             }
         }
+    }
     val permission = rememberLocationPermissionState()
     val openLocationSettings = rememberOpenLocationSettings()
     val askForLocation = {

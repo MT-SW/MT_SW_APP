@@ -34,8 +34,8 @@ import javax.crypto.SecretKey
 /**
  * File-backed encrypted store for the local TAK server's TLS material on JVM/Desktop.
  *
- * The material is one AES-256-GCM `.enc` file under `$MT_SW_DATA_DIR/tak_certs/` (default:
- * `~/MT_SW/tak_certs/`); see [DesktopKeystoreCipher] for the key handling.
+ * The material is one AES-256-GCM `.enc` file under `$MT_SW_DATA_DIR/tak_certs/` (default: `~/MT_SW/tak_certs/`); see
+ * [DesktopKeystoreCipher] for the key handling.
  */
 @Single(binds = [TakCertificateStore::class])
 @Suppress("TooGenericExceptionCaught")

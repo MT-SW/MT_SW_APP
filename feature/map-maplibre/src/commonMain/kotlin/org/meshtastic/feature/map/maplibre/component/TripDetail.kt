@@ -14,16 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ModifierMissing", "LongMethod", "TooManyFunctions", "TooGenericExceptionCaught")
+@file:Suppress("LongMethod", "ModifierMissing", "MultipleEmitters", "TooGenericExceptionCaught", "TooManyFunctions")
 
 package org.meshtastic.feature.map.maplibre.component
 
-import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
-import org.meshtastic.core.resources.trips_coverage_csv
-import org.meshtastic.core.resources.trips_coverage_geojson
-import org.meshtastic.core.ui.util.rememberFileExporter
-import org.meshtastic.feature.map.trip.coverageCsv
-import org.meshtastic.feature.map.trip.coverageGeoJson
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,10 +32,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -62,10 +57,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,6 +73,8 @@ import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.delete
@@ -85,6 +82,18 @@ import org.meshtastic.core.resources.trips_add_gallery
 import org.meshtastic.core.resources.trips_add_stop
 import org.meshtastic.core.resources.trips_caption
 import org.meshtastic.core.resources.trips_chosen
+import org.meshtastic.core.resources.trips_coverage_csv
+import org.meshtastic.core.resources.trips_coverage_geojson
+import org.meshtastic.core.resources.trips_health_ascent
+import org.meshtastic.core.resources.trips_health_calories
+import org.meshtastic.core.resources.trips_health_distance
+import org.meshtastic.core.resources.trips_health_export
+import org.meshtastic.core.resources.trips_health_heart
+import org.meshtastic.core.resources.trips_health_import
+import org.meshtastic.core.resources.trips_health_none
+import org.meshtastic.core.resources.trips_health_sent
+import org.meshtastic.core.resources.trips_health_steps
+import org.meshtastic.core.resources.trips_health_title
 import org.meshtastic.core.resources.trips_move_to
 import org.meshtastic.core.resources.trips_no_time
 import org.meshtastic.core.resources.trips_photo_taken
@@ -104,52 +113,44 @@ import org.meshtastic.core.resources.trips_signal_stats
 import org.meshtastic.core.resources.trips_stats
 import org.meshtastic.core.resources.trips_stats_ascent
 import org.meshtastic.core.resources.trips_stats_counts
+import org.meshtastic.core.resources.trips_stats_descent
+import org.meshtastic.core.resources.trips_stats_heights
+import org.meshtastic.core.resources.trips_stats_max_speed
+import org.meshtastic.core.resources.trips_stats_moving
 import org.meshtastic.core.resources.trips_stop
 import org.meshtastic.core.resources.trips_stop_place
 import org.meshtastic.core.resources.trips_stop_time
 import org.meshtastic.core.resources.trips_stop_title
 import org.meshtastic.core.resources.trips_unplaced
 import org.meshtastic.core.resources.trips_unplaced_note
-import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.ChatDraftRequest
+import org.meshtastic.core.ui.util.HealthRoutePoint
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeLinks
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.readExif
 import org.meshtastic.core.ui.util.rememberCameraLauncher
+import org.meshtastic.core.ui.util.rememberFileExporter
+import org.meshtastic.core.ui.util.rememberHealthSync
 import org.meshtastic.core.ui.util.rememberMultiImagePicker
 import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.feature.map.trip.Trip
-import org.meshtastic.feature.map.trip.TripShare
-import org.meshtastic.core.resources.trips_health_export
-import org.meshtastic.core.resources.trips_health_import
-import org.meshtastic.core.resources.trips_health_sent
-import org.meshtastic.core.resources.trips_health_none
-import org.meshtastic.core.resources.trips_health_ascent
-import org.meshtastic.core.resources.trips_health_calories
-import org.meshtastic.core.resources.trips_health_heart
-import org.meshtastic.core.resources.trips_health_distance
-import org.meshtastic.core.resources.trips_health_steps
-import org.meshtastic.core.resources.trips_health_title
-import org.meshtastic.core.resources.trips_stats_moving
-import org.meshtastic.core.resources.trips_stats_max_speed
-import org.meshtastic.core.resources.trips_stats_heights
-import org.meshtastic.core.resources.trips_stats_descent
-import org.meshtastic.feature.map.trip.formatDuration
 import org.meshtastic.feature.map.trip.TripHealth
-import org.meshtastic.core.common.util.NumberFormatter
-import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.ui.util.HealthRoutePoint
-import org.meshtastic.core.ui.util.rememberHealthSync
+import org.meshtastic.feature.map.trip.TripShare
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripStore
-import org.meshtastic.feature.map.trip.stats
 import org.meshtastic.feature.map.trip.TripViewRequest
+import org.meshtastic.feature.map.trip.coverageCsv
+import org.meshtastic.feature.map.trip.coverageGeoJson
+import org.meshtastic.feature.map.trip.formatDuration
+import org.meshtastic.feature.map.trip.stats
 import kotlin.math.abs
 
 /** Shows the details of a hike while a stop is asked for from the map (a tap on a drop). */
@@ -174,8 +175,8 @@ internal fun TripViewHost() {
 }
 
 /**
- * MT_SW: the details of one hike: its points with stacks of pictures. Pictures come from the camera or the gallery,
- * to a chosen point or placed by themselves by their time and position, and every placement can be changed by hand.
+ * MT_SW: the details of one hike: its points with stacks of pictures. Pictures come from the camera or the gallery, to
+ * a chosen point or placed by themselves by their time and position, and every placement can be changed by hand.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -185,18 +186,17 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
     val trip = trips.firstOrNull { it.id == tripId }
     val scope = rememberCoroutineScope()
     val unplacedTitle = stringResource(Res.string.trips_unplaced)
-    var unplaced by remember { mutableStateOf(0) }
+    var unplaced by remember { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<Pair<String, String>?>(null) }
-    val pickAll =
-        rememberMultiImagePicker { picked ->
-            scope.launch {
-                val missing =
-                    withContext(Dispatchers.Default) {
-                        store.addPhotosAuto(tripId, picked.map { it.bytes to readExif(it.bytes) }, unplacedTitle)
-                    }
-                unplaced = missing
-            }
+    val pickAll = rememberMultiImagePicker { picked ->
+        scope.launch {
+            val missing =
+                withContext(Dispatchers.Default) {
+                    store.addPhotosAuto(tripId, picked.map { it.bytes to readExif(it.bytes) }, unplacedTitle)
+                }
+            unplaced = missing
         }
+    }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         if (trip == null) {
             Text(text = "", modifier = Modifier.padding(16.dp))
@@ -292,15 +292,17 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 )
             }
             HorizontalDivider()
-            trip.stops.sortedBy { it.t }.forEachIndexed { index, stop ->
-                StopCard(
-                    trip = trip,
-                    stop = stop,
-                    number = index + 1,
-                    focused = stop.id == focusStopId,
-                    onOpenPhoto = { file -> editing = stop.id to file },
-                )
-            }
+            trip.stops
+                .sortedBy { it.t }
+                .forEachIndexed { index, stop ->
+                    StopCard(
+                        trip = trip,
+                        stop = stop,
+                        number = index + 1,
+                        focused = stop.id == focusStopId,
+                        onOpenPhoto = { file -> editing = stop.id to file },
+                    )
+                }
             HorizontalDivider()
             ShareSection(trip = trip, onClose = onDismiss)
         }
@@ -331,24 +333,26 @@ private fun NameField(trip: Trip, store: TripStore) {
 private fun StopCard(trip: Trip, stop: TripStop, number: Int, focused: Boolean, onOpenPhoto: (String) -> Unit) {
     val store: TripStore = koinInject()
     val scope = rememberCoroutineScope()
-    val camera =
-        rememberCameraLauncher { bytes, _ ->
-            store.archive(bytes)
-            store.addPhotos(trip.id, stop.id, listOf(bytes to nowTaken()))
-        }
-    val gallery =
-        rememberMultiImagePicker { picked ->
-            scope.launch {
-                withContext(Dispatchers.Default) {
-                    store.addPhotos(trip.id, stop.id, picked.map { it.bytes to (readExif(it.bytes).takenMillis ?: 0L) })
-                }
+    val camera = rememberCameraLauncher { bytes, _ ->
+        store.archive(bytes)
+        store.addPhotos(trip.id, stop.id, listOf(bytes to nowTaken()))
+    }
+    val gallery = rememberMultiImagePicker { picked ->
+        scope.launch {
+            withContext(Dispatchers.Default) {
+                store.addPhotos(trip.id, stop.id, picked.map { it.bytes to (readExif(it.bytes).takenMillis ?: 0L) })
             }
         }
+    }
     Card(
         colors =
         CardDefaults.cardColors(
             containerColor =
-            if (focused) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+            if (focused) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
         ),
     ) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -424,12 +428,13 @@ private fun PhotoDialog(trip: Trip, stopId: String, file: String, onDismiss: () 
         onDismiss()
         return
     }
-    val big by produceState<ImageBitmap?>(null, trip.id, file) {
-        value =
-            withContext(Dispatchers.Default) {
-                store.photoBytes(trip.id, file)?.let { runCatching { it.decodeToImageBitmap() }.getOrNull() }
-            }
-    }
+    val big by
+        produceState<ImageBitmap?>(null, trip.id, file) {
+            value =
+                withContext(Dispatchers.Default) {
+                    store.photoBytes(trip.id, file)?.let { runCatching { it.decodeToImageBitmap() }.getOrNull() }
+                }
+        }
     var caption by remember(file) { mutableStateOf(photo.caption) }
     var moving by remember { mutableStateOf(false) }
     AlertDialog(
@@ -450,7 +455,10 @@ private fun PhotoDialog(trip: Trip, stopId: String, file: String, onDismiss: () 
                 Text(
                     text =
                     if (photo.takenMillis > 0L) {
-                        stringResource(Res.string.trips_photo_taken, DateFormatter.formatDateTime(photo.takenMillis))
+                        stringResource(
+                            Res.string.trips_photo_taken,
+                            DateFormatter.formatDateTime(photo.takenMillis),
+                        )
                     } else {
                         stringResource(Res.string.trips_no_time)
                     },
@@ -473,21 +481,23 @@ private fun PhotoDialog(trip: Trip, stopId: String, file: String, onDismiss: () 
                 if (trip.stops.size > 1) {
                     TextButton(onClick = { moving = !moving }) { Text(stringResource(Res.string.trips_move_to)) }
                     if (moving) {
-                        trip.stops.sortedBy { it.t }.forEachIndexed { i, other ->
-                            if (other.id != stopId) {
-                                TextButton(
-                                    onClick = {
-                                        store.movePhoto(trip.id, stopId, file, other.id)
-                                        onDismiss()
-                                    },
-                                ) {
-                                    Text(
-                                        stringResource(Res.string.trips_stop, i + 1) +
-                                            if (other.title.isNotBlank()) " – ${other.title}" else "",
-                                    )
+                        trip.stops
+                            .sortedBy { it.t }
+                            .forEachIndexed { i, other ->
+                                if (other.id != stopId) {
+                                    TextButton(
+                                        onClick = {
+                                            store.movePhoto(trip.id, stopId, file, other.id)
+                                            onDismiss()
+                                        },
+                                    ) {
+                                        Text(
+                                            stringResource(Res.string.trips_stop, i + 1) +
+                                                if (other.title.isNotBlank()) " – ${other.title}" else "",
+                                        )
+                                    }
                                 }
                             }
-                        }
                     }
                 }
             }
@@ -520,14 +530,15 @@ private fun PhotoDialog(trip: Trip, stopId: String, file: String, onDismiss: () 
 @Composable
 internal fun TripThumb(tripId: String, file: String, size: Dp, chosen: Boolean, onClick: () -> Unit) {
     val store: TripStore = koinInject()
-    val bitmap by produceState<ImageBitmap?>(null, tripId, file) {
-        value =
-            withContext(Dispatchers.Default) {
-                store.photoBytes(tripId, file, small = true)?.let {
-                    runCatching { it.decodeToImageBitmap() }.getOrNull()
+    val bitmap by
+        produceState<ImageBitmap?>(null, tripId, file) {
+            value =
+                withContext(Dispatchers.Default) {
+                    store.photoBytes(tripId, file, small = true)?.let {
+                        runCatching { it.decodeToImageBitmap() }.getOrNull()
+                    }
                 }
-            }
-    }
+        }
     val shape = RoundedCornerShape(THUMB_CORNER_DP.dp)
     val frame = if (chosen) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape) else Modifier
     Box(modifier = Modifier.size(size).clip(shape).then(frame).clickable(onClick = onClick)) {
@@ -549,12 +560,13 @@ private const val THUMB_CORNER_DP = 8
 @Composable
 internal fun TripSlideImage(tripId: String, file: String, modifier: Modifier = Modifier) {
     val store: TripStore = koinInject()
-    val bitmap by produceState<ImageBitmap?>(null, tripId, file) {
-        value =
-            withContext(Dispatchers.Default) {
-                store.photoBytes(tripId, file)?.let { runCatching { it.decodeToImageBitmap() }.getOrNull() }
-            }
-    }
+    val bitmap by
+        produceState<ImageBitmap?>(null, tripId, file) {
+            value =
+                withContext(Dispatchers.Default) {
+                    store.photoBytes(tripId, file)?.let { runCatching { it.decodeToImageBitmap() }.getOrNull() }
+                }
+        }
     bitmap?.let {
         Image(
             bitmap = it,
@@ -627,9 +639,7 @@ private fun ShareSection(trip: Trip, onClose: () -> Unit) {
     link?.let { url ->
         Text(text = url, style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(
-                onClick = { scope.launch { clipboard.setClipEntry(createClipEntry(url, "hike")) } },
-            ) {
+            TextButton(onClick = { scope.launch { clipboard.setClipEntry(createClipEntry(url, "hike")) } }) {
                 Text(stringResource(Res.string.trips_share_copy))
             }
             TextButton(
@@ -647,8 +657,8 @@ private fun ShareSection(trip: Trip, onClose: () -> Unit) {
 }
 
 /**
- * MT_SW: the link to the health app of the phone: reads the steps, distance, heart rate and energy of the time of
- * the hike, and sends the hike there as a workout with its route. Not shown where the phone has no health store.
+ * MT_SW: the link to the health app of the phone: reads the steps, distance, heart rate and energy of the time of the
+ * hike, and sends the hike there as a workout with its route. Not shown where the phone has no health store.
  */
 @Composable
 private fun HealthSection(trip: Trip, store: TripStore) {
@@ -742,6 +752,7 @@ private fun HealthSection(trip: Trip, store: TripStore) {
         }
     }
 }
+
 private const val METERS_PER_KM = 1000.0
 
 private const val COVERAGE_FILE_ID_LENGTH = 8

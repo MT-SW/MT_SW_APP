@@ -43,9 +43,9 @@ import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.model.util.toOneLineString
 import org.meshtastic.core.model.util.toPIIString
 import org.meshtastic.core.repository.FromRadioPacketHandler
-import org.meshtastic.core.repository.MeshDataHandler
 import org.meshtastic.core.repository.HeardSignal
 import org.meshtastic.core.repository.HeardSignals
+import org.meshtastic.core.repository.MeshDataHandler
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.NodeManager

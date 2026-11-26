@@ -64,8 +64,8 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.repository.RadioConfigRepository
-import org.meshtastic.core.repository.RemoteAdminKnownPrefs
 import org.meshtastic.core.repository.RadioController
+import org.meshtastic.core.repository.RemoteAdminKnownPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.connect_radio_for_remote_admin

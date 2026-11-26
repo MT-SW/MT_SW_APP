@@ -35,8 +35,8 @@ interface HiddenFeaturesStore {
 
 /**
  * Process-scoped easter-egg unlock (tapping the app version row in Settings five times). A normal unlock re-locks on
- * the next launch, like the web flasher's konami code. Gates the firmware-excluded module configuration screens and
- * the nightly firmware preview channel.
+ * the next launch, like the web flasher's konami code. Gates the firmware-excluded module configuration screens and the
+ * nightly firmware preview channel.
  */
 @Single
 class HiddenFeaturesUnlock(private val store: HiddenFeaturesStore? = null, scope: ServiceScope? = null) {

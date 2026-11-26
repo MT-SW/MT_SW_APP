@@ -28,8 +28,8 @@ import javax.crypto.SecretKey
 
 /**
  * File-backed encrypted key-backup store for JVM/Desktop, mirroring [LockdownPassphraseStoreImpl]. Each node's key
- * backup is an AES-256-GCM `.enc` file under `$MT_SW_DATA_DIR/security_keys/`; see [DesktopKeystoreCipher] for the
- * key handling.
+ * backup is an AES-256-GCM `.enc` file under `$MT_SW_DATA_DIR/security_keys/`; see [DesktopKeystoreCipher] for the key
+ * handling.
  */
 @Single(binds = [SecurityKeyBackupStore::class])
 @Suppress("TooGenericExceptionCaught")

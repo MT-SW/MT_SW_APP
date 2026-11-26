@@ -26,8 +26,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.trips_title
-import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Hiking
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.TripsWindowRequest
 import org.meshtastic.feature.map.component.MapButton
 import org.meshtastic.feature.map.track.TrackRecorder

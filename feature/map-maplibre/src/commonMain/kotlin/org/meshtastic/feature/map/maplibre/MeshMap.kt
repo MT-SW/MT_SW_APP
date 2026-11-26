@@ -121,11 +121,11 @@ import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_DEFAULT_OPACITY
 import org.meshtastic.feature.map.maplibre.layers.PROPAGATION_LAYER_ID
 import org.meshtastic.feature.map.maplibre.layers.PropagationLayer
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
+import org.meshtastic.feature.map.maplibre.layers.RoutePlaybackLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyHeatmapLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLinkLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
-import org.meshtastic.feature.map.maplibre.layers.RoutePlaybackLayer
 import org.meshtastic.feature.map.maplibre.layers.TrackLineLayer
 import org.meshtastic.feature.map.maplibre.layers.TripsLayer
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
@@ -722,9 +722,9 @@ private fun BoxCornerMarker(corner: Position?) {
 /**
  * How far past the screen edge a node still counts as "in view" for chip drawing, as a fraction of the visible span.
  *
- * One screen in each direction: new chips are drawn in one burst each time the camera leaves the held box, and a
- * wider box makes those bursts rarer (the logs showed short stalls of a pan at that rhythm), while the image ceiling
- * still keeps a dense mesh from blowing the budget on nodes well off screen.
+ * One screen in each direction: new chips are drawn in one burst each time the camera leaves the held box, and a wider
+ * box makes those bursts rarer (the logs showed short stalls of a pan at that rhythm), while the image ceiling still
+ * keeps a dense mesh from blowing the budget on nodes well off screen.
  */
 private const val CHIP_VIEW_PADDING = 1.0
 

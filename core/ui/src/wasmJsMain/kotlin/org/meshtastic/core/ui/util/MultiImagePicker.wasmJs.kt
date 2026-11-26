@@ -20,5 +20,4 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 
-@Composable
-actual fun rememberMultiImagePicker(onPicked: (List<PickedImage>) -> Unit): (() -> Unit)? = null
+@Composable actual fun rememberMultiImagePicker(onPicked: (List<PickedImage>) -> Unit): (() -> Unit)? = null

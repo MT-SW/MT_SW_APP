@@ -16,7 +16,10 @@
  */
 package org.meshtastic.core.ui.util
 
-/** The name of the separate album, the same as the app (on the computer: the folder) where the pictures taken for hikes are kept. */
+/**
+ * The name of the separate album, the same as the app (on the computer: the folder) where the pictures taken for hikes
+ * are kept.
+ */
 const val HIKE_ALBUM_NAME = "MT_SW"
 
 /**

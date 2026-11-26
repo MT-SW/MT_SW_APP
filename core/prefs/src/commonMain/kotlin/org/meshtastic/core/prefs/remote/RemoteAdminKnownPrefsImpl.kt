@@ -17,23 +17,20 @@
 package org.meshtastic.core.prefs.remote
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
-import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.common.di.ApplicationCoroutineScope
 import org.meshtastic.core.prefs.di.MeshDataStore
 import org.meshtastic.core.prefs.store.stringSetPrefsKey
 import org.meshtastic.core.repository.RemoteAdminKnownPrefs
 
 @Single
-class RemoteAdminKnownPrefsImpl(private val dataStore: MeshDataStore, dispatchers: CoroutineDispatchers) :
+class RemoteAdminKnownPrefsImpl(private val dataStore: MeshDataStore, private val scope: ApplicationCoroutineScope) :
     RemoteAdminKnownPrefs {
-    private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
     override val known: StateFlow<Set<Int>> =
         dataStore.data

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress("ReturnCount", "TooGenericExceptionCaught", "TooManyFunctions")
 
 package org.meshtastic.feature.map.trip
 
@@ -98,10 +98,7 @@ class TripStore {
             }
         mutableTrips.value = loaded.sortedByDescending { it.startedMillis }
         mutableReceivedFrom.value =
-            mutableTrips.value
-                .filter { it.sharedBy != 0 }
-                .distinctBy { it.sharedBy }
-                .associate { it.sharedBy to it.id }
+            mutableTrips.value.filter { it.sharedBy != 0 }.distinctBy { it.sharedBy }.associate { it.sharedBy to it.id }
         Logger.i { "Wędrówki: zapisanych ${loaded.size}" }
     }
 
@@ -129,31 +126,29 @@ class TripStore {
     /**
      * Writes a picture into the folder of hike [tripId] (shrunk, with a small copy) and returns it; null on failure.
      */
-    fun writePhoto(tripId: String, bytes: ByteArray, takenMillis: Long): TripPhoto? =
-        try {
-            val dir = root / tripId
-            fs.createDirectories(dir)
-            val name = "p${newId().take(ID_CHARS)}.jpg"
-            val main = scaleJpeg(bytes, MAIN_SIDE, MAIN_QUALITY) ?: bytes
-            fs.write(dir / name) { write(main) }
-            scaleJpeg(bytes, THUMB_SIDE, THUMB_QUALITY)?.let { small -> fs.write(dir / "th_$name") { write(small) } }
-            Logger.i { "Wędrówki: zdjęcie zapisane, ${main.size} bajtów" }
-            TripPhoto(file = name, takenMillis = takenMillis)
-        } catch (e: Exception) {
-            Logger.w { "Wędrówki: zdjęcia nie udało się zapisać: ${e.message}" }
-            null
-        }
+    fun writePhoto(tripId: String, bytes: ByteArray, takenMillis: Long): TripPhoto? = try {
+        val dir = root / tripId
+        fs.createDirectories(dir)
+        val name = "p${newId().take(ID_CHARS)}.jpg"
+        val main = scaleJpeg(bytes, MAIN_SIDE, MAIN_QUALITY) ?: bytes
+        fs.write(dir / name) { write(main) }
+        scaleJpeg(bytes, THUMB_SIDE, THUMB_QUALITY)?.let { small -> fs.write(dir / "th_$name") { write(small) } }
+        Logger.i { "Wędrówki: zdjęcie zapisane, ${main.size} bajtów" }
+        TripPhoto(file = name, takenMillis = takenMillis)
+    } catch (e: Exception) {
+        Logger.w { "Wędrówki: zdjęcia nie udało się zapisać: ${e.message}" }
+        null
+    }
 
     /** The picture, or its small copy when [small] (which falls back to the picture when there is none). */
-    fun photoBytes(tripId: String, file: String, small: Boolean = false): ByteArray? =
-        try {
-            val thumb = root / tripId / "th_$file"
-            val path = if (small && fs.exists(thumb)) thumb else root / tripId / file
-            fs.read(path) { readByteArray() }
-        } catch (e: Exception) {
-            Logger.w { "Wędrówki: zdjęcia nie udało się odczytać: ${e.message}" }
-            null
-        }
+    fun photoBytes(tripId: String, file: String, small: Boolean = false): ByteArray? = try {
+        val thumb = root / tripId / "th_$file"
+        val path = if (small && fs.exists(thumb)) thumb else root / tripId / file
+        fs.read(path) { readByteArray() }
+    } catch (e: Exception) {
+        Logger.w { "Wędrówki: zdjęcia nie udało się odczytać: ${e.message}" }
+        null
+    }
 
     private fun persist(trip: Trip) {
         try {
@@ -225,9 +220,8 @@ class TripStore {
     }
 
     /**
-     * Puts each picture on the stop it belongs to, by its time or position ([exif]); a picture that fits nowhere
-     * goes to a stop at the start of the route. Returns how many could not be placed by what they say about
-     * themselves.
+     * Puts each picture on the stop it belongs to, by its time or position ([exif]); a picture that fits nowhere goes
+     * to a stop at the start of the route. Returns how many could not be placed by what they say about themselves.
      */
     fun addPhotosAuto(tripId: String, pictures: List<Pair<ByteArray, ExifInfo>>, unplacedTitle: String): Int {
         var trip = find(tripId) ?: return 0
@@ -238,8 +232,7 @@ class TripStore {
             val p = trip.points[index ?: 0]
             val taken = exif.takenMillis ?: 0L
             val photo = writePhoto(tripId, bytes, taken) ?: return@forEach
-            val near =
-                trip.stops.firstOrNull { (index != null || it.title == unplacedTitle) && closeTo(it, p) }
+            val near = trip.stops.firstOrNull { (index != null || it.title == unplacedTitle) && closeTo(it, p) }
             trip =
                 if (near != null) {
                     val joined = trip.stops.map { if (it.id == near.id) it.copy(photos = it.photos + photo) else it }
@@ -307,10 +300,9 @@ class TripStore {
     fun setShareIndex(tripId: String, stopId: String, index: Int) =
         mutateStop(tripId, stopId) { it.copy(shareIndex = index.coerceIn(0, (it.photos.size - 1).coerceAtLeast(0))) }
 
-    fun setCaption(tripId: String, stopId: String, file: String, caption: String) =
-        mutateStop(tripId, stopId) { s ->
-            s.copy(photos = s.photos.map { if (it.file == file) it.copy(caption = caption) else it })
-        }
+    fun setCaption(tripId: String, stopId: String, file: String, caption: String) = mutateStop(tripId, stopId) { s ->
+        s.copy(photos = s.photos.map { if (it.file == file) it.copy(caption = caption) else it })
+    }
 
     fun removePhoto(tripId: String, stopId: String, file: String) {
         runCatching {
@@ -337,10 +329,9 @@ class TripStore {
     }
 
     /** Sets the link a picture was uploaded to. */
-    fun setPhotoUrl(tripId: String, stopId: String, file: String, url: String) =
-        mutateStop(tripId, stopId) { s ->
-            s.copy(photos = s.photos.map { if (it.file == file) it.copy(url = url) else it })
-        }
+    fun setPhotoUrl(tripId: String, stopId: String, file: String, url: String) = mutateStop(tripId, stopId) { s ->
+        s.copy(photos = s.photos.map { if (it.file == file) it.copy(url = url) else it })
+    }
 
     private fun meters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double =
         Companion.meters(lat1, lon1, lat2, lon2)

@@ -29,6 +29,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.SnackbarManager
 import kotlin.test.AfterTest
@@ -43,7 +44,12 @@ class AboutScreenTest {
     @BeforeTest
     fun startKoinForToasts() {
         // On desktop the toast helper looks up the snackbar manager from Koin.
-        startKoin { modules(module { single { SnackbarManager() } }) }
+        startKoin { modules(
+                module {
+                    single { SnackbarManager() }
+                    single { HiddenFeaturesUnlock() }
+                },
+            ) }
     }
 
     @AfterTest

@@ -27,34 +27,34 @@ import javax.imageio.IIOImage
 import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
 
-actual fun scaleJpeg(bytes: ByteArray, maxSide: Int, quality: Int): ByteArray? =
-    try {
-        val source = ImageIO.read(ByteArrayInputStream(bytes))
-        if (source == null) {
-            null
-        } else {
-            val factor = minOf(1.0, maxSide.toDouble() / maxOf(source.width, source.height))
-            val w = (source.width * factor).toInt().coerceAtLeast(1)
-            val h = (source.height * factor).toInt().coerceAtLeast(1)
-            val out = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
-            val g = out.createGraphics()
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
-            g.drawImage(source, 0, 0, w, h, null)
-            g.dispose()
-            val writer = ImageIO.getImageWritersByFormatName("jpeg").next()
-            val params = writer.defaultWriteParam.apply {
+actual fun scaleJpeg(bytes: ByteArray, maxSide: Int, quality: Int): ByteArray? = try {
+    val source = ImageIO.read(ByteArrayInputStream(bytes))
+    if (source == null) {
+        null
+    } else {
+        val factor = minOf(1.0, maxSide.toDouble() / maxOf(source.width, source.height))
+        val w = (source.width * factor).toInt().coerceAtLeast(1)
+        val h = (source.height * factor).toInt().coerceAtLeast(1)
+        val out = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+        val g = out.createGraphics()
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        g.drawImage(source, 0, 0, w, h, null)
+        g.dispose()
+        val writer = ImageIO.getImageWritersByFormatName("jpeg").next()
+        val params =
+            writer.defaultWriteParam.apply {
                 compressionMode = ImageWriteParam.MODE_EXPLICIT
                 compressionQuality = quality / PERCENT
             }
-            val buffer = ByteArrayOutputStream()
-            writer.output = ImageIO.createImageOutputStream(buffer)
-            writer.write(null, IIOImage(out, null, null), params)
-            writer.dispose()
-            buffer.toByteArray()
-        }
-    } catch (e: Exception) {
-        Logger.w { "Zdjęcie: zmniejszenie nie udało się: ${e.message}" }
-        null
+        val buffer = ByteArrayOutputStream()
+        writer.output = ImageIO.createImageOutputStream(buffer)
+        writer.write(null, IIOImage(out, null, null), params)
+        writer.dispose()
+        buffer.toByteArray()
     }
+} catch (e: Exception) {
+    Logger.w { "Zdjęcie: zmniejszenie nie udało się: ${e.message}" }
+    null
+}
 
 private const val PERCENT = 100f

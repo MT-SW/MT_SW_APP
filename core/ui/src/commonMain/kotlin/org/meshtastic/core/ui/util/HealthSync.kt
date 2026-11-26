@@ -29,8 +29,12 @@ data class HealthData(
 ) {
     val isEmpty: Boolean
         get() =
-            steps == null && distanceMeters == null && avgHeartRate == null && maxHeartRate == null &&
-                calories == null && ascentMeters == null
+            steps == null &&
+                distanceMeters == null &&
+                avgHeartRate == null &&
+                maxHeartRate == null &&
+                calories == null &&
+                ascentMeters == null
 }
 
 /** One point of a route handed to the health app. */
@@ -38,9 +42,9 @@ data class HealthRoutePoint(val lat: Double, val lon: Double, val ele: Double?, 
 
 /**
  * MT_SW: the link to the health app of the phone through the system's own store (Health Connect on Android, Health on
- * iPhone): it reads what the phone and its watch recorded and writes a hike there as a workout with its route. The
- * apps that feed that store (Huawei Zdrowie, Zdrowie Google, Samsung Health and others) are reached this way; none
- * of their own kits is used. Errors go only to the log.
+ * iPhone): it reads what the phone and its watch recorded and writes a hike there as a workout with its route. The apps
+ * that feed that store (Huawei Zdrowie, Zdrowie Google, Samsung Health and others) are reached this way; none of their
+ * own kits is used. Errors go only to the log.
  */
 interface HealthSync {
     /** Reads the data recorded between [fromMillis] and [toMillis], asking for the permission when it is missing. */

@@ -75,11 +75,10 @@ object QuietMode {
     }
 
     /** Whether a notice keyed by [id] (a node number or the hash of a conversation) is held back now. */
-    fun blocksId(id: Int): Boolean =
-        when (mode.value) {
-            Mode.Off -> false
-            Mode.Silent -> id !in exemptIds
-        }
+    fun blocksId(id: Int): Boolean = when (mode.value) {
+        Mode.Off -> false
+        Mode.Silent -> id !in exemptIds
+    }
 
     fun blocks(notification: Notification): Boolean {
         if (mode.value == Mode.Off || notification.alarm || notification.category == Notification.Category.Alert) {

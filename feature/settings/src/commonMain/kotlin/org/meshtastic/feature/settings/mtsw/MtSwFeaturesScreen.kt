@@ -70,6 +70,7 @@ import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.element_look_short
 import org.meshtastic.core.resources.element_look_title
 import org.meshtastic.core.resources.floating_nav_bar
+import org.meshtastic.core.resources.folders_title
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_summary
@@ -87,11 +88,9 @@ import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
-import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.mt_sw_group_help
 import org.meshtastic.core.resources.mt_sw_group_look
 import org.meshtastic.core.resources.mt_sw_group_safety
-import org.meshtastic.core.resources.folders_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
 import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title
@@ -129,6 +128,7 @@ import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.mt_sw_planner_open_summary
 import org.meshtastic.core.resources.mt_sw_terrain_open_summary
+import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
@@ -163,15 +163,15 @@ import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.AutoAwesome
+import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.DisplaySettings
 import org.meshtastic.core.ui.icon.FilterList
+import org.meshtastic.core.ui.icon.FilterListOff
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
-import org.meshtastic.core.ui.icon.FilterListOff
-import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon

@@ -18,7 +18,6 @@
 
 package org.meshtastic.feature.node.component
 
-import org.meshtastic.core.ui.icon.Hiking
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,8 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.isDesktopPlatform
 import org.meshtastic.core.model.Node
@@ -53,23 +55,21 @@ import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.resources.node_show_on_map
 import org.meshtastic.core.resources.open_compass
 import org.meshtastic.core.resources.planner_title
+import org.meshtastic.core.resources.trips_title
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Compass
 import org.meshtastic.core.ui.icon.Distance
+import org.meshtastic.core.ui.icon.Hiking
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.util.TripsWindowRequest
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.koinInject
-import org.meshtastic.core.resources.trips_title
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeImporter
-import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
+import org.meshtastic.core.ui.util.TripsWindowRequest
 import org.meshtastic.core.ui.util.rememberMeshHudSupported
 import org.meshtastic.feature.node.model.NodeDetailAction
 

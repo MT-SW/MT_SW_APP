@@ -43,8 +43,8 @@ private const val RECENT_MS = 30 * 60_000L
 /**
  * MT_SW: while a hike is recorded the steps, distance, heart rate and energy are taken from the health app by
  * themselves (when the option is on, which it is by default): the permission is asked for when the recording starts,
- * the numbers are refreshed while it runs and saved with the hike when it ends. A hike that ended while this was not
- * on screen is filled in the next time the map is shown. Errors only go to the log.
+ * the numbers are refreshed while it runs and saved with the hike when it ends. A hike that ended while this was not on
+ * screen is filled in the next time the map is shown. Errors only go to the log.
  */
 @Composable
 internal fun HikeHealthAuto() {

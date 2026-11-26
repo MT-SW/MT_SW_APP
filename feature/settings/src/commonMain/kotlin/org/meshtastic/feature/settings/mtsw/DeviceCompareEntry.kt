@@ -13,13 +13,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */@file:Suppress("ModifierMissing", "LongMethod")
+ */
+@file:Suppress("LongMethod", "MagicNumber", "ModifierMissing", "ReturnCount")
 
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +41,9 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.device_compare_battery
 import org.meshtastic.core.resources.device_compare_connected
 import org.meshtastic.core.resources.device_compare_empty
+import org.meshtastic.core.resources.device_compare_no_data
 import org.meshtastic.core.resources.device_compare_nodes
 import org.meshtastic.core.resources.device_compare_not_connected
-import org.meshtastic.core.resources.device_compare_no_data
 import org.meshtastic.core.resources.device_compare_refresh
 import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.device_compare_unread
@@ -52,9 +52,9 @@ import org.meshtastic.core.resources.device_compare_utilization
 import org.meshtastic.core.resources.device_history_battery
 import org.meshtastic.core.resources.device_history_load
 import org.meshtastic.core.resources.device_history_title
-import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
@@ -126,14 +126,16 @@ private fun DeviceCompareCard(row: DeviceCompareRow) {
 
 private fun Float?.percentText(): String = this?.let { "${(it * PERCENT_ROUND).toInt() / PERCENT_ROUND}%" } ?: "—"
 
-private fun uptimeText(seconds: Int?): String =
-    when {
-        seconds == null -> "—"
-        seconds >= SECONDS_IN_DAY -> "${seconds / SECONDS_IN_DAY} d ${seconds % SECONDS_IN_DAY / SECONDS_IN_HOUR} h"
-        seconds >= SECONDS_IN_HOUR ->
-            "${seconds / SECONDS_IN_HOUR} h ${seconds % SECONDS_IN_HOUR / SECONDS_IN_MINUTE} min"
-        else -> "${seconds / SECONDS_IN_MINUTE} min"
-    }
+private fun uptimeText(seconds: Int?): String = when {
+    seconds == null -> "—"
+
+    seconds >= SECONDS_IN_DAY -> "${seconds / SECONDS_IN_DAY} d ${seconds % SECONDS_IN_DAY / SECONDS_IN_HOUR} h"
+
+    seconds >= SECONDS_IN_HOUR ->
+        "${seconds / SECONDS_IN_HOUR} h ${seconds % SECONDS_IN_HOUR / SECONDS_IN_MINUTE} min"
+
+    else -> "${seconds / SECONDS_IN_MINUTE} min"
+}
 
 /** What changed over the last day: the battery and the load of the channel, against the oldest reading of that day. */
 @Composable

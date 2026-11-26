@@ -26,6 +26,8 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_version
 import org.meshtastic.core.resources.chirpy_hop
@@ -37,8 +39,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.feature.settings.settingsPlatform
-import org.koin.compose.koinInject
-import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import kotlin.time.Duration.Companion.seconds
 
 private const val UNLOCK_CLICK_COUNT = 5 // Number of clicks required to unlock excluded modules.

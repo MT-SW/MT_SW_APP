@@ -54,14 +54,13 @@ class DeviceHistoryStore : DeviceHistoryRecorder {
     private fun file(address: String): Path =
         root / (address.filter { it.isLetterOrDigit() }.ifEmpty { "device" } + ".json")
 
-    fun history(address: String): List<DeviceHistoryEntry> =
-        try {
-            val f = file(address)
-            if (fs.exists(f)) json.decodeFromString(serializer, fs.read(f) { readUtf8() }) else emptyList()
-        } catch (e: Exception) {
-            Logger.w { "Historia urządzeń: odczyt nie udał się: ${e.message}" }
-            emptyList()
-        }
+    fun history(address: String): List<DeviceHistoryEntry> = try {
+        val f = file(address)
+        if (fs.exists(f)) json.decodeFromString(serializer, fs.read(f) { readUtf8() }) else emptyList()
+    } catch (e: Exception) {
+        Logger.w { "Historia urządzeń: odczyt nie udał się: ${e.message}" }
+        emptyList()
+    }
 
     override fun store(address: String, snapshot: DeviceSnapshot, nowMillis: Long) {
         record(address, snapshot, nowMillis)

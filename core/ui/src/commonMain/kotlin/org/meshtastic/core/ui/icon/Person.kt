@@ -20,8 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_account_circle
-import org.meshtastic.core.resources.ic_group
 import org.meshtastic.core.resources.ic_contacts_remote
+import org.meshtastic.core.resources.ic_group
 import org.meshtastic.core.resources.ic_groups
 import org.meshtastic.core.resources.ic_person
 import org.meshtastic.core.resources.ic_person_add
@@ -43,11 +43,13 @@ val MeshtasticIcons.PersonSearch: ImageVector
 
 val MeshtasticIcons.PersonAdd: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_person_add)
+
 /** MT_SW: a person with a minus, for removing a contact. */
 val MeshtasticIcons.PersonRemove: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_person_remove)
 val MeshtasticIcons.Person: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_person)
+
 /** MT_SW: the address book with the person and the signal, for the remote lists and contacts of a device. */
 val MeshtasticIcons.RemoteContacts: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_contacts_remote)

@@ -57,24 +57,23 @@ class DeviceCompareViewModel(
             val connected = background.connectedAddresses.value
             val unread = background.unreadByAddress.value
             Logger.i { "Porównanie urządzeń: odczyt ${slots.size} urządzeń" }
-            _rows.value =
-                slots.map { slot ->
-                    val snapshot = background.readSnapshot(slot.address)
-                    val history =
-                        if (snapshot != null) {
-                            historyStore.record(slot.address, snapshot, nowMillis)
-                        } else {
-                            historyStore.history(slot.address)
-                        }
-                    DeviceCompareRow(
-                        slotId = slot.id,
-                        title = snapshot?.shortName?.takeIf { it.isNotBlank() } ?: slot.name ?: slot.address,
-                        connected = slot.address in connected,
-                        unread = unread[slot.address] ?: 0,
-                        snapshot = snapshot,
-                        history = history,
-                    )
-                }
+            _rows.value = slots.map { slot ->
+                val snapshot = background.readSnapshot(slot.address)
+                val history =
+                    if (snapshot != null) {
+                        historyStore.record(slot.address, snapshot, nowMillis)
+                    } else {
+                        historyStore.history(slot.address)
+                    }
+                DeviceCompareRow(
+                    slotId = slot.id,
+                    title = snapshot?.shortName?.takeIf { it.isNotBlank() } ?: slot.name ?: slot.address,
+                    connected = slot.address in connected,
+                    unread = unread[slot.address] ?: 0,
+                    snapshot = snapshot,
+                    history = history,
+                )
+            }
         }
     }
 }
