@@ -86,7 +86,7 @@
 -dontwarn com.android.extensions.xr.**
 -dontwarn android.extensions.xr.**
 
-# Guava (a dependency of the AI engine / health libraries) refers to an annotation that only exists for iOS
+# Guava refers to an annotation (j2objc) that is not needed on Android
 -dontwarn com.google.j2objc.annotations.**
 
 # ---- AppSearch / AppFunctions generated document factories ------------------
