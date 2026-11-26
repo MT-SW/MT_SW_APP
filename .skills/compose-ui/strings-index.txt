@@ -4409,6 +4409,12 @@ trips_move_to
 trips_no_time
 trips_photo
 trips_photo_taken
+trips_position_auto
+trips_position_both
+trips_position_device
+trips_position_hint
+trips_position_phone
+trips_position_title
 trips_quiet_exceptions
 trips_quiet_hint
 trips_quiet_nodes

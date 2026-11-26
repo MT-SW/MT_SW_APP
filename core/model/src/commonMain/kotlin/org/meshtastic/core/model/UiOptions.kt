@@ -203,6 +203,17 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
         /** How often (seconds) the range test message is sent during a hike. */
         const val HIKE_RANGE_TEST_EVERY = "hike.rangetest.every"
 
+        /**
+         * Where a hike takes its position from: 0 = the best one available (the phone, the device when the phone has
+         * had no position for a while; the default), 1 = only the phone, 2 = only the device (the connected radio),
+         * 3 = both at once.
+         */
+        const val HIKE_POSITION_SOURCE = "hike.position.source"
+        const val HIKE_POSITION_AUTO = 0
+        const val HIKE_POSITION_PHONE = 1
+        const val HIKE_POSITION_DEVICE = 2
+        const val HIKE_POSITION_BOTH = 3
+
         /** 1 = while a hike is recorded the steps, heart rate and more are taken from the health app by themselves. */
         const val HIKE_HEALTH_AUTO = "hike.health.auto"
 

@@ -4505,6 +4505,12 @@
     <string name="trips_no_time">The picture has no time</string>
     <string name="trips_photo">Take a picture on the route (%1$d)</string>
     <string name="trips_photo_taken">Picture taken: %1$s</string>
+    <string name="trips_position_auto">Best available</string>
+    <string name="trips_position_both">Both</string>
+    <string name="trips_position_device">Device</string>
+    <string name="trips_position_hint">Best available: the phone, and the device while the phone has no position for 30 s. Both: points from the two sources are mixed, so the route can zigzag where their positions differ.</string>
+    <string name="trips_position_phone">Phone</string>
+    <string name="trips_position_title">Position source</string>
     <string name="trips_quiet_exceptions">Exceptions (their notifications still arrive):</string>
     <string name="trips_quiet_hint">While it is on, no device sends notifications, except the exceptions above. Alarms and alerts always get through. The mode ends with the recording.</string>
     <string name="trips_quiet_nodes">Chosen devices: %1$d</string>

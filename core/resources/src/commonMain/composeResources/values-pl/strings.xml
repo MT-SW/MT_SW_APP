@@ -4822,4 +4822,10 @@
     <string name="signal_survey_import_hint">Plik zapisany z badania zasięgu albo z wędrówki. Zostaje dodany jako osobna sesja.</string>
     <string name="trips_coverage_csv">Eksportuj zasięg (CSV)</string>
     <string name="trips_coverage_geojson">Eksportuj zasięg (GeoJSON)</string>
+    <string name="trips_position_title">Źródło pozycji</string>
+    <string name="trips_position_auto">Najlepsze dostępne</string>
+    <string name="trips_position_phone">Telefon</string>
+    <string name="trips_position_device">Urządzenie</string>
+    <string name="trips_position_both">Oba naraz</string>
+    <string name="trips_position_hint">Najlepsze dostępne: telefon, a urządzenie wtedy, gdy telefon przez 30 s nie ma pozycji. Oba naraz: punkty z obu źródeł się mieszają, więc trasa może „zygzakować” tam, gdzie ich pozycje się różnią.</string>
 </resources>

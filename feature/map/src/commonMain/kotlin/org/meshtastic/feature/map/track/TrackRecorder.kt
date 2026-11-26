@@ -60,10 +60,11 @@ import kotlin.math.sqrt
 import kotlin.time.Instant
 
 /**
- * MT_SW: records the person's own route. The points come from the phone's position and, where there is none (the
- * computer), from the position of the connected radio; a point is added only when it is [MIN_STEP_METERS] away from the
- * last one, so standing still does not fill the track. The finished route is saved as a GPX file, the same format as
- * the exported node tracks. It is kept while the app runs.
+ * MT_SW: records the person's own route. Where the points come from is chosen ([UiOptions.HIKE_POSITION_SOURCE]): the
+ * phone's position, the position of the connected radio (the device), both at once, or the best one available (the
+ * phone, and the device while the phone has no position, which is also what a computer gets). A point is added only
+ * when it is [MIN_STEP_METERS] away from the last one, so standing still does not fill the track. The finished route
+ * is saved as a GPX file, the same format as the exported node tracks. It is kept while the app runs.
  */
 @Single
 class TrackRecorder(
@@ -117,14 +118,21 @@ class TrackRecorder(
         signalJob =
             scope.launch { HeardSignals.signals.collect { heard -> onHeard(heard) } }
         scope.launch { startRangeTest() }
+        lastPhoneFixMillis = 0L
+        lastUsedSource = null
+        Logger.i { "Trasa: źródło pozycji ${positionSource()}" }
         phoneJob =
             scope.launch {
                 locationRepository
                     .getLocations()
                     .catch { Logger.w { "Trasa: pozycja telefonu niedostępna: ${it::class.simpleName}" } }
                     .collect { fix ->
+                        lastPhoneFixMillis = nowMillis
                         val height = fix.mslAltitudeMeters ?: fix.altitudeMeters
-                        add(Point(fix.latitude, fix.longitude, height, fix.timeMillis))
+                        if (positionSource() != UiOptions.HIKE_POSITION_DEVICE) {
+                            used("telefon")
+                            add(Point(fix.latitude, fix.longitude, height, fix.timeMillis))
+                        }
                     }
             }
         radioJob =
@@ -134,8 +142,33 @@ class TrackRecorder(
                     .distinctUntilChanged { old, new ->
                         old?.latitude == new?.latitude && old?.longitude == new?.longitude
                     }
-                    .collect { point -> if (point != null) add(point) }
+                    .collect { point ->
+                        if (point != null && deviceAllowed()) {
+                            used("urządzenie")
+                            add(point)
+                        }
+                    }
             }
+    }
+
+    private var lastPhoneFixMillis = 0L
+    private var lastUsedSource: String? = null
+
+    private fun positionSource(): Int = UiOptions(uiPrefs.uiOptions.value)[UiOptions.HIKE_POSITION_SOURCE]
+
+    /** Whether a position of the device counts now (best available: only while the phone has no position). */
+    private fun deviceAllowed(): Boolean = when (positionSource()) {
+        UiOptions.HIKE_POSITION_PHONE -> false
+        UiOptions.HIKE_POSITION_DEVICE, UiOptions.HIKE_POSITION_BOTH -> true
+        else -> lastPhoneFixMillis == 0L || nowMillis - lastPhoneFixMillis > PHONE_SILENT_MILLIS
+    }
+
+    /** Logs when the points start to come from another source (why a part of the route may look different). */
+    private fun used(source: String) {
+        if (lastUsedSource != source) {
+            Logger.i { "Trasa: punkty z źródła: $source" }
+            lastUsedSource = source
+        }
     }
 
     private var quietJob: Job? = null
@@ -336,6 +369,7 @@ class TrackRecorder(
 
     companion object {
         const val MIN_STEP_METERS = 5.0
+        private const val PHONE_SILENT_MILLIS = 30_000L
         private const val MAX_SIGNALS = 20_000
         private const val BYTE_MASK = 0xFF
         private const val MS_PER_SECOND = 1000L

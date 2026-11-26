@@ -16,6 +16,12 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.resources.trips_position_title
+import org.meshtastic.core.resources.trips_position_auto
+import org.meshtastic.core.resources.trips_position_phone
+import org.meshtastic.core.resources.trips_position_device
+import org.meshtastic.core.resources.trips_position_both
+import org.meshtastic.core.resources.trips_position_hint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -140,6 +146,24 @@ internal fun TrackRecordingSection() {
         }
         val prefs: UiPrefs = koinInject()
         val options by prefs.uiOptions.collectAsStateWithLifecycle()
+        val positionSource = UiOptions(options)[UiOptions.HIKE_POSITION_SOURCE]
+        Text(text = stringResource(Res.string.trips_position_title), style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            listOf(
+                UiOptions.HIKE_POSITION_AUTO to Res.string.trips_position_auto,
+                UiOptions.HIKE_POSITION_PHONE to Res.string.trips_position_phone,
+                UiOptions.HIKE_POSITION_DEVICE to Res.string.trips_position_device,
+                UiOptions.HIKE_POSITION_BOTH to Res.string.trips_position_both,
+            )
+                .forEach { (value, label) ->
+                    FilterChip(
+                        selected = positionSource == value,
+                        onClick = { prefs.setUiOption(UiOptions.HIKE_POSITION_SOURCE, value) },
+                        label = { Text(stringResource(label)) },
+                    )
+                }
+        }
+        Text(text = stringResource(Res.string.trips_position_hint), style = MaterialTheme.typography.bodySmall)
         val healthAuto = UiOptions(options)[UiOptions.HIKE_HEALTH_AUTO] == 1
         if (rememberHealthSync() != null) {
             Row(
