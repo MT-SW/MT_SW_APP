@@ -39,6 +39,7 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Length
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import java.time.Instant
 import java.time.ZoneOffset
@@ -141,6 +142,8 @@ private class AndroidHealthSync(context: Context, private val ask: suspend (Set<
             Logger.i { "Zdrowie: odczyt zakończony, dane ${if (data.isEmpty) "puste" else "są"}" }
             data
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Logger.w { "Zdrowie: odczyt nie udał się: ${e.message}" }
         null
@@ -156,6 +159,8 @@ private class AndroidHealthSync(context: Context, private val ask: suspend (Set<
         val granted =
             try {
                 ensure(WRITE_PERMISSIONS)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.w { "Zdrowie: pytanie o zgody na zapis nie udało się: ${e.message}" }
                 return false
@@ -211,12 +216,16 @@ private class AndroidHealthSync(context: Context, private val ask: suspend (Set<
             insert(withRoute = HealthPermission.PERMISSION_WRITE_EXERCISE_ROUTE in granted)
             Logger.i { "Zdrowie: trening zapisany, punktów trasy ${locations.size}" }
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.w { "Zdrowie: zapis z trasą nie udał się (${e.message}), próbuję bez trasy" }
             try {
                 insert(withRoute = false)
                 Logger.i { "Zdrowie: trening zapisany bez trasy" }
                 true
+            } catch (e: CancellationException) {
+                throw e
             } catch (e2: Exception) {
                 Logger.w { "Zdrowie: zapis treningu nie udał się: ${e2.message}" }
                 false

@@ -47,7 +47,7 @@ class HikeTransportImpl : HikeTransport {
                 if (i < ImageHost.entries.lastIndex) delay(RETRY_DELAY_MS)
             }
         }
-        throw failure ?: IllegalStateException("Upload failed")
+        throw failure ?: error("Upload failed")
     }
 
     override suspend fun download(url: String, maxBytes: Long): ByteArray = downloadBytes(url, maxBytes)

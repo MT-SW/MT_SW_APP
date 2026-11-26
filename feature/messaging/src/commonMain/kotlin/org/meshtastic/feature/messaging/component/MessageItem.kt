@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ComplexCondition", "MagicNumber", "MutableStateAutoboxing", "TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress(
+    "ComplexCondition",
+    "MagicNumber",
+    "MutableStateAutoboxing",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+)
 
 package org.meshtastic.feature.messaging.component
 

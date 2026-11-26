@@ -43,11 +43,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.floor
-import kotlin.math.log2
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
@@ -98,6 +93,11 @@ import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.offlineStyleJson
 import org.meshtastic.feature.map.maplibre.tileCount
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.log2
+import kotlin.math.roundToInt
 
 /** What the map must tell the offline sheet: which style to pack, and which region is on screen. */
 internal class OfflineMapTarget(
@@ -190,11 +190,11 @@ internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (Boundin
                 }
             },
             enabled =
-                canDownloadOfflinePack(
-                    managerState is OfflineStorageState.Ready,
-                    target.styleUrl ?: target.rasterBasemap?.id,
-                    estimate,
-                ) && estimate <= MAX_PACK_TILES,
+            canDownloadOfflinePack(
+                managerState is OfflineStorageState.Ready,
+                target.styleUrl ?: target.rasterBasemap?.id,
+                estimate,
+            ) && estimate <= MAX_PACK_TILES,
             modifier = Modifier.padding(vertical = 8.dp),
         ) {
             Text(text = stringResource(Res.string.map_start_download))
@@ -263,11 +263,11 @@ private fun DownloadEstimateLines(estimate: Long, range: IntRange) {
         Text(text = stringResource(Res.string.map_select_download_region), style = MaterialTheme.typography.bodyMedium)
         Text(
             text =
-                stringResource(Res.string.map_tile_download_estimate) +
-                    " " +
-                    stringResource(Res.string.map_cache_tiles, estimate.toInt()) +
-                    "  " +
-                    stringResource(Res.string.map_zoom_levels, range.first, range.last),
+            stringResource(Res.string.map_tile_download_estimate) +
+                " " +
+                stringResource(Res.string.map_cache_tiles, estimate.toInt()) +
+                "  " +
+                stringResource(Res.string.map_zoom_levels, range.first, range.last),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -291,8 +291,8 @@ private fun OfflinePackRow(
     ) {
         Column(
             modifier =
-                Modifier.fillMaxWidth(PACK_ROW_TEXT_FRACTION)
-                    .then(if (bounds != null) Modifier.clickable { onShow(bounds) } else Modifier)
+            Modifier.fillMaxWidth(PACK_ROW_TEXT_FRACTION)
+                .then(if (bounds != null) Modifier.clickable { onShow(bounds) } else Modifier),
         ) {
             Text(text = pack.label(), style = MaterialTheme.typography.bodyLarge)
             if (progress is DownloadProgress.Healthy && progress.status != DownloadStatus.Complete) {
@@ -348,18 +348,18 @@ private suspend fun OfflineStorage.downloadArea(
     val range = area.range
 
     return safeCatching {
-            val styleUrl =
-                target.styleUrl ?: target.rasterBasemap?.let { writeOfflineStyle(it) } ?: return@safeCatching null
-            create(
-                OfflinePackDefinition.TilePyramid(
-                    styleUrl = styleUrl,
-                    bounds = bounds,
-                    pixelRatio = pixelRatio,
-                    minZoom = range.first.toDouble(),
-                    maxZoom = range.last.toDouble(),
-                )
-            )
-        }
+        val styleUrl =
+            target.styleUrl ?: target.rasterBasemap?.let { writeOfflineStyle(it) } ?: return@safeCatching null
+        create(
+            OfflinePackDefinition.TilePyramid(
+                styleUrl = styleUrl,
+                bounds = bounds,
+                pixelRatio = pixelRatio,
+                minZoom = range.first.toDouble(),
+                maxZoom = range.last.toDouble(),
+            ),
+        )
+    }
         .onFailure { error -> Logger.w(error) { "Could not create an offline pack" } }
         .map { it != null }
         .getOrDefault(false)
@@ -371,16 +371,15 @@ private suspend fun OfflineStorage.downloadArea(
  * Kept in the persistent layers directory rather than a cache: a pack remembers this URL, and a cache the system may
  * empty would leave a paused pack that cannot be resumed.
  */
-private suspend fun writeOfflineStyle(basemap: Basemap.Raster): String =
-    withContext(ioDispatcher) {
-        val fs = mapLayerFileSystem()
-        val dir = mapLayersDirectory() / "offline-styles"
-        fs.createDirectories(dir)
-        val file = dir / "${basemap.id}.json"
-        fs.write(file) { writeUtf8(basemap.offlineStyleJson()) }
-        val path = file.toString().replace('\\', '/')
-        if (path.startsWith("/")) "file://$path" else "file:///$path"
-    }
+private suspend fun writeOfflineStyle(basemap: Basemap.Raster): String = withContext(ioDispatcher) {
+    val fs = mapLayerFileSystem()
+    val dir = mapLayersDirectory() / "offline-styles"
+    fs.createDirectories(dir)
+    val file = dir / "${basemap.id}.json"
+    fs.write(file) { writeUtf8(basemap.offlineStyleJson()) }
+    val path = file.toString().replace('\\', '/')
+    if (path.startsWith("/")) "file://$path" else "file:///$path"
+}
 
 private fun OfflinePack.label(): String {
     val definition = definition
@@ -391,17 +390,16 @@ private fun OfflinePack.label(): String {
     return "$centre  z$minZoom–$maxZoom"
 }
 
-private fun DownloadProgress.fraction(): Float =
-    when (this) {
-        is DownloadProgress.Healthy ->
-            if (requiredResourceCount > 0L) {
-                (completedResourceCount.toFloat() / requiredResourceCount.toFloat()).coerceIn(0f, 1f)
-            } else {
-                0f
-            }
+private fun DownloadProgress.fraction(): Float = when (this) {
+    is DownloadProgress.Healthy ->
+        if (requiredResourceCount > 0L) {
+            (completedResourceCount.toFloat() / requiredResourceCount.toFloat()).coerceIn(0f, 1f)
+        } else {
+            0f
+        }
 
-        else -> 0f
-    }
+    else -> 0f
+}
 
 /**
  * One line describing a pack's state, assembled from resources rather than written in English.
@@ -410,28 +408,27 @@ private fun DownloadProgress.fraction(): Float =
  * and byte size render as the cache figures above render them.
  */
 @Composable
-private fun DownloadProgress.summary(): String =
-    when (this) {
-        is DownloadProgress.Healthy ->
-            listOfNotNull(
-                    when (status) {
-                        DownloadStatus.Paused -> Res.string.map_download_status_paused
-                        DownloadStatus.Downloading -> Res.string.map_download_status_downloading
-                        DownloadStatus.Complete -> Res.string.map_download_status_complete
-                        else -> null
-                    }?.let { stringResource(it) },
-                    stringResource(Res.string.map_cache_tiles, completedTileCount.toInt()),
-                    formatByteSize(completedResourceBytes),
-                )
-                .joinToString(SUMMARY_SEPARATOR)
+private fun DownloadProgress.summary(): String = when (this) {
+    is DownloadProgress.Healthy ->
+        listOfNotNull(
+            when (status) {
+                DownloadStatus.Paused -> Res.string.map_download_status_paused
+                DownloadStatus.Downloading -> Res.string.map_download_status_downloading
+                DownloadStatus.Complete -> Res.string.map_download_status_complete
+                else -> null
+            }?.let { stringResource(it) },
+            stringResource(Res.string.map_cache_tiles, completedTileCount.toInt()),
+            formatByteSize(completedResourceBytes),
+        )
+            .joinToString(SUMMARY_SEPARATOR)
 
-        // Upstream's message, which is not ours to localise, and more useful than a generic failure line.
-        is DownloadProgress.Error -> message
+    // Upstream's message, which is not ours to localise, and more useful than a generic failure line.
+    is DownloadProgress.Error -> message
 
-        is DownloadProgress.TileLimitExceeded -> stringResource(Res.string.map_tile_limit_reached, limit.toInt())
+    is DownloadProgress.TileLimitExceeded -> stringResource(Res.string.map_tile_limit_reached, limit.toInt())
 
-        else -> EM_DASH
-    }
+    else -> EM_DASH
+}
 
 private fun Double.round(): String {
     // Rounded, not truncated, so a negative coordinate labels the same way as its positive twin.
@@ -472,15 +469,15 @@ private fun OfflineMapTarget.areaFor(radiusKm: Int, detail: Int): OfflineArea? {
     val box =
         BoundingBox(
             southwest =
-                Position(
-                    longitude = (longitude - dLon).coerceAtLeast(-MAX_LONGITUDE),
-                    latitude = (latitude - dLat).coerceAtLeast(-MAX_LATITUDE),
-                ),
+            Position(
+                longitude = (longitude - dLon).coerceAtLeast(-MAX_LONGITUDE),
+                latitude = (latitude - dLat).coerceAtLeast(-MAX_LATITUDE),
+            ),
             northeast =
-                Position(
-                    longitude = (longitude + dLon).coerceAtMost(MAX_LONGITUDE),
-                    latitude = (latitude + dLat).coerceAtMost(MAX_LATITUDE),
-                ),
+            Position(
+                longitude = (longitude + dLon).coerceAtMost(MAX_LONGITUDE),
+                latitude = (latitude + dLat).coerceAtMost(MAX_LATITUDE),
+            ),
         )
     val worldKm = EQUATOR_KM * cos(latitude * PI / HALF_TURN_DEGREES).coerceAtLeast(MIN_COS_LATITUDE)
     val fitting = floor(log2(TILES_ACROSS * worldKm / (2.0 * radiusKm))).toInt()
@@ -511,7 +508,7 @@ private fun OfflineAreaChoice(radiusKm: Int, onRadius: (Int) -> Unit, detail: In
                                 stringResource(Res.string.offline_area_visible)
                             } else {
                                 stringResource(Res.string.offline_area_radius_km, km)
-                            }
+                            },
                         )
                     },
                 )

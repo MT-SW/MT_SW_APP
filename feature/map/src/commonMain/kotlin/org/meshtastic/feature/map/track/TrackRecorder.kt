@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "ReturnCount", "TooManyFunctions")
+@file:Suppress("LongParameterList", "MagicNumber", "ReturnCount", "TooManyFunctions")
 
 package org.meshtastic.feature.map.track
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -249,6 +250,8 @@ class TrackRecorder(
                     .build()
             radioController.editLocalSettings { setModuleConfig(rangeTestConfig(on)) }
             Logger.i { "Trasa: test zasięgu włączony na czas wędrówki, co $seconds s" }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.w { "Trasa: nie udało się włączyć testu zasięgu: ${e.message}" }
             savedRangeTest = null
@@ -262,6 +265,8 @@ class TrackRecorder(
         try {
             radioController.editLocalSettings { setModuleConfig(rangeTestConfig(old)) }
             Logger.i { "Trasa: test zasięgu przywrócony do poprzednich ustawień" }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.w { "Trasa: nie udało się przywrócić testu zasięgu: ${e.message}" }
         }

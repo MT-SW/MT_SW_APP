@@ -29,12 +29,11 @@ data class ExifInfo(val takenMillis: Long?, val latitude: Double?, val longitude
  * MT_SW: reads the time and the GPS position out of a JPEG's EXIF block. Written here in plain Kotlin so it works the
  * same on every platform and needs no library. A picture without EXIF, or a damaged one, gives an empty result.
  */
-fun readExif(bytes: ByteArray): ExifInfo =
-    try {
-        ExifParser(bytes).parse()
-    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-        ExifInfo(null, null, null)
-    }
+fun readExif(bytes: ByteArray): ExifInfo = try {
+    ExifParser(bytes).parse()
+} catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+    ExifInfo(null, null, null)
+}
 
 private const val TAG_EXIF_IFD = 0x8769
 private const val TAG_GPS_IFD = 0x8825
@@ -52,12 +51,11 @@ private class ExifParser(private val b: ByteArray) {
 
     private fun u16(o: Int) = if (little) u8(o) or (u8(o + 1) shl 8) else (u8(o) shl 8) or u8(o + 1)
 
-    private fun u32(o: Int): Long =
-        if (little) {
-            u16(o).toLong() or (u16(o + 2).toLong() shl 16)
-        } else {
-            (u16(o).toLong() shl 16) or u16(o + 2).toLong()
-        }
+    private fun u32(o: Int): Long = if (little) {
+        u16(o).toLong() or (u16(o + 2).toLong() shl 16)
+    } else {
+        (u16(o).toLong() shl 16) or u16(o + 2).toLong()
+    }
 
     private class Entry(val tag: Int, val type: Int, val count: Int, val valueOffset: Int)
 

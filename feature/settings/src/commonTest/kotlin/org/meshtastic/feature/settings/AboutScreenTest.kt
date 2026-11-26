@@ -44,12 +44,14 @@ class AboutScreenTest {
     @BeforeTest
     fun startKoinForToasts() {
         // On desktop the toast helper looks up the snackbar manager from Koin.
-        startKoin { modules(
+        startKoin {
+            modules(
                 module {
                     single { SnackbarManager() }
                     single { HiddenFeaturesUnlock() }
                 },
-            ) }
+            )
+        }
     }
 
     @AfterTest

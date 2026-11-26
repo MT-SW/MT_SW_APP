@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("LongMethod", "ModifierMissing", "MultipleEmitters", "TooGenericExceptionCaught", "TooManyFunctions")
+@file:Suppress(
+    "InjectDispatcher",
+    "LongMethod",
+    "ModifierMissing",
+    "MultipleEmitters",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "UnnecessaryLaunchedEffect",
+)
 
 package org.meshtastic.feature.map.maplibre.component
 
