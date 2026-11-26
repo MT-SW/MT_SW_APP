@@ -142,6 +142,7 @@ androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", versi
 androidx-camera-compose = { module = "androidx.camera:camera-compose", version.ref = "camerax" }
 androidx-camera-effects = { module = "androidx.camera:camera-effects", version.ref = "camerax" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.19.1" }
+androidx-health-connect = { module = "androidx.health.connect:connect-client", version = "1.1.0" }
 androidx-core-location-altitude = { module = "androidx.core:core-location-altitude", version = "1.0.1" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.2.0" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version = "1.1.0" }

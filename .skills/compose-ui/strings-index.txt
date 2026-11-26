@@ -4376,6 +4376,16 @@ trips_chart_pace
 trips_chart_speed
 trips_chosen
 trips_empty
+trips_health_ascent
+trips_health_calories
+trips_health_distance
+trips_health_export
+trips_health_heart
+trips_health_import
+trips_health_none
+trips_health_sent
+trips_health_steps
+trips_health_title
 trips_import_button
 trips_import_done
 trips_import_progress
@@ -4404,6 +4414,10 @@ trips_share_warning
 trips_stats
 trips_stats_ascent
 trips_stats_counts
+trips_stats_descent
+trips_stats_heights
+trips_stats_max_speed
+trips_stats_moving
 trips_stop
 trips_stop_place
 trips_stop_time

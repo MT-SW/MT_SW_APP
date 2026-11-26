@@ -23,6 +23,12 @@ data class TripStats(
     val distanceMeters: Double,
     val durationMillis: Long,
     val ascentMeters: Int?,
+    val descentMeters: Int? = null,
+    val lowestMeters: Int? = null,
+    val highestMeters: Int? = null,
+    val maxKmh: Double? = null,
+    /** The time the route was really moving (not standing), as the share of the whole time. */
+    val movingMillis: Long? = null,
 ) {
     /** The average speed over the whole time, in km/h. */
     val averageKmh: Double
@@ -56,14 +62,38 @@ private const val MS_PER_SECOND = 1000L
 private const val SECONDS_PER_HOUR = 3600L
 private const val SECONDS_PER_MINUTE = 60L
 
+private const val MOVING_MIN_MPS = 0.3
+private const val MAX_PLAUSIBLE_MPS = 50.0
+private const val MPS_TO_KMH = 3.6
+
 /** The numbers of a saved hike. */
 fun Trip.stats(): TripStats {
     val heights = points.mapNotNull { it.ele }
-    val ascent =
-        if (heights.size < 2) {
-            null
-        } else {
-            heights.zipWithNext { a, b -> (b - a).coerceAtLeast(0.0) }.sum().toInt()
+    val steps = heights.zipWithNext { a, b -> b - a }
+    val ascent = if (heights.size < 2) null else steps.filter { it > 0 }.sum().toInt()
+    val descent = if (heights.size < 2) null else -steps.filter { it < 0 }.sum().toInt()
+    var maxMps = 0.0
+    var moving = 0L
+    points.zipWithNext { a, b ->
+        val dt = (b.t - a.t) / MS_PER_SECOND_D
+        if (dt > 0) {
+            val v = TripStore.meters(a.lat, a.lon, b.lat, b.lon) / dt
+            if (v in MOVING_MIN_MPS..MAX_PLAUSIBLE_MPS) {
+                moving += b.t - a.t
+                if (v > maxMps) maxMps = v
+            }
         }
-    return TripStats(distanceMeters, (endedMillis - startedMillis).coerceAtLeast(0L), ascent)
+    }
+    return TripStats(
+        distanceMeters = distanceMeters,
+        durationMillis = (endedMillis - startedMillis).coerceAtLeast(0L),
+        ascentMeters = ascent,
+        descentMeters = descent,
+        lowestMeters = heights.minOrNull()?.toInt(),
+        highestMeters = heights.maxOrNull()?.toInt(),
+        maxKmh = if (maxMps > 0) maxMps * MPS_TO_KMH else null,
+        movingMillis = if (moving > 0) moving else null,
+    )
 }
+
+private const val MS_PER_SECOND_D = 1000.0

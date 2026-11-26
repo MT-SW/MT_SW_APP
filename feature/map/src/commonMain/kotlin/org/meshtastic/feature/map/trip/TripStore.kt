@@ -211,6 +211,11 @@ class TripStore {
         Logger.i { "Wędrówki: ${if (visible) "pokazana" else "ukryta"} na mapie" }
     }
 
+    fun setHealth(tripId: String, health: TripHealth) {
+        mutate(tripId) { it.copy(health = health) }
+        Logger.i { "Wędrówki: zapisano dane z aplikacji zdrowia" }
+    }
+
     fun rename(tripId: String, name: String) = mutate(tripId) { it.copy(name = name) }
 
     /** A new stop at the route point [pointIndex]; returns its id. */

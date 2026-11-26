@@ -59,6 +59,19 @@ data class LegacyPhoto(
     val url: String = "",
 )
 
+/** What the health app of the phone had recorded for the time of the hike (read on request, kept with the hike). */
+@Serializable
+data class TripHealth(
+    val steps: Long? = null,
+    val distanceMeters: Double? = null,
+    val avgHeartRate: Int? = null,
+    val maxHeartRate: Int? = null,
+    val calories: Int? = null,
+    val ascentMeters: Int? = null,
+    /** When it was read (epoch milliseconds). */
+    val readMillis: Long = 0L,
+)
+
 /** MT_SW: a saved hike: the route and the stops with their pictures. */
 @Serializable
 data class Trip(
@@ -70,6 +83,7 @@ data class Trip(
     val points: List<TripPoint>,
     val stops: List<TripStop> = emptyList(),
     val photos: List<LegacyPhoto> = emptyList(),
+    val health: TripHealth? = null,
 ) {
     val photoCount: Int
         get() = stops.sumOf { it.photos.size }

@@ -139,6 +139,16 @@
         android:name="android.hardware.usb.host"
         android:required="false" />
 
+    <!-- MT_SW: reading steps, distance, heart rate and energy from the phone's health store (Health Connect) and writing a hike there as a workout. -->
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+    <uses-permission android:name="android.permission.health.READ_ELEVATION_GAINED" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE_ROUTE" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" />
+
     <!-- Declare geo: intent visibility for Android 11+ (needed for resolveActivity with map apps) -->
     <queries>
         <intent>
@@ -153,6 +163,7 @@
             <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
         </intent>
         <!-- The apps of the groups where reports are taken: the report zip is handed to the chosen one. -->
+        <package android:name="com.google.android.apps.healthdata" />
         <package android:name="com.discord" />
         <package android:name="com.whatsapp" />
         <package android:name="org.thoughtcrime.securesms" />
@@ -303,6 +314,26 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:exported="false" />
+
+        <!-- Health Connect asks the app to explain how it uses the health data (Android 13 and older, then 14 and newer). -->
+        <activity-alias
+            android:name="org.meshtastic.app.HealthRationale"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name="org.meshtastic.app.HealthPermissionUsage"
+            android:targetActivity="org.meshtastic.app.MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
 
         <activity
             android:name="org.meshtastic.app.MainActivity"

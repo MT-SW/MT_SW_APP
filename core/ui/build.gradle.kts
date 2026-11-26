@@ -75,7 +75,11 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.runtime.compose)
         }
 
-        androidMain.dependencies { implementation(libs.androidx.activity.compose) }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            // MT_SW: the link to the health store of the phone (Apache-2.0).
+            implementation(libs.androidx.health.connect)
+        }
 
         meshtasticWeb.wasmJsMain {
             dependencies {

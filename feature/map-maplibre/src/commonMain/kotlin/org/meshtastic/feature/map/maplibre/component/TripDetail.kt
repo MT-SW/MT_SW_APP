@@ -118,6 +118,26 @@ import org.meshtastic.core.ui.util.rememberMultiImagePicker
 import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripShare
+import org.meshtastic.core.resources.trips_health_export
+import org.meshtastic.core.resources.trips_health_import
+import org.meshtastic.core.resources.trips_health_sent
+import org.meshtastic.core.resources.trips_health_none
+import org.meshtastic.core.resources.trips_health_ascent
+import org.meshtastic.core.resources.trips_health_calories
+import org.meshtastic.core.resources.trips_health_heart
+import org.meshtastic.core.resources.trips_health_distance
+import org.meshtastic.core.resources.trips_health_steps
+import org.meshtastic.core.resources.trips_health_title
+import org.meshtastic.core.resources.trips_stats_moving
+import org.meshtastic.core.resources.trips_stats_max_speed
+import org.meshtastic.core.resources.trips_stats_heights
+import org.meshtastic.core.resources.trips_stats_descent
+import org.meshtastic.feature.map.trip.formatDuration
+import org.meshtastic.feature.map.trip.TripHealth
+import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.ui.util.HealthRoutePoint
+import org.meshtastic.core.ui.util.rememberHealthSync
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripStore
 import org.meshtastic.feature.map.trip.stats
@@ -187,6 +207,28 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             stats.ascentMeters?.let {
                 Text(stringResource(Res.string.trips_stats_ascent, it), style = MaterialTheme.typography.bodySmall)
             }
+            stats.descentMeters?.let {
+                Text(stringResource(Res.string.trips_stats_descent, it), style = MaterialTheme.typography.bodySmall)
+            }
+            if (stats.lowestMeters != null && stats.highestMeters != null) {
+                Text(
+                    stringResource(Res.string.trips_stats_heights, stats.lowestMeters, stats.highestMeters),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            stats.maxKmh?.let {
+                Text(
+                    stringResource(Res.string.trips_stats_max_speed, NumberFormatter.format(it, 1)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            stats.movingMillis?.let {
+                Text(
+                    stringResource(Res.string.trips_stats_moving, formatDuration(it)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            HealthSection(trip = trip, store = store)
             Text(
                 text = stringResource(Res.string.trips_stats_counts, trip.points.size, trip.photoCount),
                 style = MaterialTheme.typography.bodySmall,
@@ -568,3 +610,99 @@ private fun ShareSection(trip: Trip, onClose: () -> Unit) {
         Text(stringResource(Res.string.trips_share_chat_hint), style = MaterialTheme.typography.bodySmall)
     }
 }
+
+/**
+ * MT_SW: the link to the health app of the phone: reads the steps, distance, heart rate and energy of the time of
+ * the hike, and sends the hike there as a workout with its route. Not shown where the phone has no health store.
+ */
+@Composable
+private fun HealthSection(trip: Trip, store: TripStore) {
+    val health = rememberHealthSync() ?: return
+    val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
+    var noData by remember { mutableStateOf(false) }
+    var sent by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        HorizontalDivider()
+        Text(stringResource(Res.string.trips_health_title), style = MaterialTheme.typography.titleSmall)
+        trip.health?.let { h ->
+            h.steps?.let {
+                Text(stringResource(Res.string.trips_health_steps, it), style = MaterialTheme.typography.bodySmall)
+            }
+            h.distanceMeters?.let {
+                Text(
+                    stringResource(Res.string.trips_health_distance, NumberFormatter.format(it / METERS_PER_KM, 2)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            if (h.avgHeartRate != null && h.maxHeartRate != null) {
+                Text(
+                    stringResource(Res.string.trips_health_heart, h.avgHeartRate, h.maxHeartRate),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            h.calories?.let {
+                Text(stringResource(Res.string.trips_health_calories, it), style = MaterialTheme.typography.bodySmall)
+            }
+            h.ascentMeters?.let {
+                Text(stringResource(Res.string.trips_health_ascent, it), style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        if (noData) Text(stringResource(Res.string.trips_health_none), style = MaterialTheme.typography.bodySmall)
+        if (sent) Text(stringResource(Res.string.trips_health_sent), style = MaterialTheme.typography.bodySmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(
+                enabled = !busy,
+                onClick = {
+                    busy = true
+                    noData = false
+                    scope.launch {
+                        Logger.i { "Wędrówki: pobieranie danych z aplikacji zdrowia" }
+                        val data = health.read(trip.startedMillis, trip.endedMillis)
+                        if (data == null || data.isEmpty) {
+                            noData = true
+                        } else {
+                            store.setHealth(
+                                trip.id,
+                                TripHealth(
+                                    steps = data.steps,
+                                    distanceMeters = data.distanceMeters,
+                                    avgHeartRate = data.avgHeartRate,
+                                    maxHeartRate = data.maxHeartRate,
+                                    calories = data.calories,
+                                    ascentMeters = data.ascentMeters,
+                                    readMillis = nowMillis,
+                                ),
+                            )
+                        }
+                        busy = false
+                    }
+                },
+            ) {
+                Text(stringResource(Res.string.trips_health_import))
+            }
+            TextButton(
+                enabled = !busy && trip.points.isNotEmpty(),
+                onClick = {
+                    busy = true
+                    sent = false
+                    scope.launch {
+                        Logger.i { "Wędrówki: wysyłanie wędrówki do aplikacji zdrowia" }
+                        sent =
+                            health.export(
+                                title = trip.name,
+                                fromMillis = trip.startedMillis,
+                                toMillis = trip.endedMillis,
+                                distanceMeters = trip.distanceMeters,
+                                route = trip.points.map { HealthRoutePoint(it.lat, it.lon, it.ele, it.t) },
+                            )
+                        busy = false
+                    }
+                },
+            ) {
+                Text(stringResource(Res.string.trips_health_export))
+            }
+        }
+    }
+}
+private const val METERS_PER_KM = 1000.0
