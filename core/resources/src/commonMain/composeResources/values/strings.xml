@@ -4476,7 +4476,6 @@
     <string name="trips_chart_speed">Speed</string>
     <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
-    <string name="trips_from_node">Received hikes</string>
     <string name="trips_health_ascent">Ascent (health app): %1$d m</string>
     <string name="trips_health_auto">Take steps and heart rate from the health app by itself</string>
     <string name="trips_health_auto_hint">Asks for permission when the recording starts, refreshes the numbers while it runs and saves them with the hike when it ends.</string>
@@ -4494,7 +4493,6 @@
     <string name="trips_import_done">The hike is saved. The map replays it when you open it.</string>
     <string name="trips_import_progress">Receiving the hike: %1$d of %2$d</string>
     <string name="trips_item">%1$d m · pictures: %2$d</string>
-    <string name="trips_mine">My hikes</string>
     <string name="trips_move_to">Move to another point</string>
     <string name="trips_no_time">The picture has no time</string>
     <string name="trips_photo">Take a picture on the route (%1$d)</string>
