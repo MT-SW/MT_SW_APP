@@ -25,6 +25,7 @@ import org.meshtastic.core.resources.remote_lists_info_3
 import org.meshtastic.core.resources.remote_lists_info_2
 import org.meshtastic.core.resources.remote_lists_info_1
 import org.meshtastic.core.resources.remote_lists_info_title
+import org.meshtastic.core.resources.remote_lists_open
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.component.InfoButton
 import androidx.compose.foundation.BorderStroke
@@ -586,19 +587,17 @@ internal fun RemoteNodeManagementPanel(
         modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        // The info button sits left of the window's close cross, in the same row.
+        // The window's title, the yellow info button and (overlaid by the window) the close cross share one line.
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = (SHEET_CROSS_INSET_DP - 16).dp),
+            modifier = Modifier.fillMaxWidth().padding(end = (SHEET_CROSS_INSET_DP - 16).dp),
         ) {
-            Box(modifier = Modifier.weight(1f)) {
-                PanelHeader(
-                    icon = MeshtasticIcons.RemoteContacts,
-                    title = stringResource(Res.string.remote_manage_title),
-                    hint = stringResource(Res.string.remote_manage_hint),
-                    accent = gold,
-                )
-            }
+            Text(
+                text = stringResource(Res.string.remote_lists_open),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+            )
             InfoButton(
                 Res.string.remote_lists_info_title,
                 Res.string.remote_lists_info_1,
@@ -609,6 +608,12 @@ internal fun RemoteNodeManagementPanel(
                 tint = MaterialTheme.colorScheme.StatusYellow,
             )
         }
+        PanelHeader(
+            icon = MeshtasticIcons.RemoteContacts,
+            title = stringResource(Res.string.remote_manage_title),
+            hint = stringResource(Res.string.remote_manage_hint),
+            accent = gold,
+        )
         OutlinedTextField(
             state = targetIdState,
             labelPosition = TextFieldLabelPosition.Above(),
