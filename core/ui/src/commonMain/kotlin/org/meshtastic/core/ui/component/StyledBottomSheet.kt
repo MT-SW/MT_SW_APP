@@ -158,17 +158,25 @@ fun ModalBottomSheet(
 private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
     val threshold = with(LocalDensity.current) { SWIPE_CLOSE_DP.dp.toPx() }
     val close = rememberUpdatedState(onClose)
+    val gesture = remember { SwipeGesture() }
     val connection = remember {
         object : NestedScrollConnection {
             private var dragged = 0f
 
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // A list received a downward drag. On iPhone its rubber-band effect then swallows the rest of the
+                // drag, so the pointer watcher below must keep counting even though the list consumed the move.
+                if (source == NestedScrollSource.UserInput && available.y > 0f) gesture.scrollSeen = true
+                return Offset.Zero
+            }
+
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                if (consumed.y != 0f) gesture.contentMoved = true
                 if (source == NestedScrollSource.UserInput && available.y > 0f && consumed.y == 0f) {
                     dragged += available.y
                     if (dragged > threshold) {
                         dragged = Float.NEGATIVE_INFINITY
-                        Logger.i { "Okno: zamknięte przesunięciem listy w dół (lista na górze)" }
-                        close.value()
+                        gesture.closeOnce("Okno: zamknięte przesunięciem listy w dół (lista na górze)", close.value)
                     }
                 } else {
                     dragged = 0f
@@ -208,21 +216,45 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
         .pointerInput(threshold) {
             awaitEachGesture {
                 awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                gesture.reset()
                 var dragged = 0f
                 var following = true
                 while (following) {
                     val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull()
-                    if (change == null || !change.pressed || change.isConsumed) {
+                    // A move taken by something that is not a list (a slider, a reorder handle) is not ours; a move
+                    // taken by a list that is already at its top (iPhone rubber band) still counts.
+                    val takenByOther = change != null && change.isConsumed && !gesture.scrollSeen
+                    if (change == null || !change.pressed || takenByOther) {
                         following = false
                     } else {
                         dragged += change.positionChange().y
-                        if (dragged > threshold) {
-                            Logger.i { "Okno: zamknięte przeciągnięciem w dół" }
-                            close.value()
+                        if (dragged > threshold && !gesture.contentMoved) {
+                            gesture.closeOnce("Okno: zamknięte przeciągnięciem w dół", close.value)
                             following = false
                         }
                     }
                 }
             }
         }
+}
+
+/** State of one drag on the window, shared by the list watcher and the pointer watcher. */
+private class SwipeGesture {
+    var scrollSeen = false
+    var contentMoved = false
+    private var closed = false
+
+    fun reset() {
+        scrollSeen = false
+        contentMoved = false
+        closed = false
+    }
+
+    fun closeOnce(reason: String, close: () -> Unit) {
+        if (!closed) {
+            closed = true
+            Logger.i { reason }
+            close()
+        }
+    }
 }
