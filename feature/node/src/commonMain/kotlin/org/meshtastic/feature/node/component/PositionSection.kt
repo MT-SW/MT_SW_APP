@@ -65,6 +65,7 @@ import org.meshtastic.core.ui.util.TripsWindowRequest
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.trips_from_node
+import org.meshtastic.core.resources.trips_mine
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeImporter
 import org.meshtastic.core.resources.trips_title
@@ -157,7 +158,7 @@ internal fun PositionInlineContent(
             Icon(MeshtasticIcons.PhotoCamera, null, Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
             Text(
-                text = stringResource(Res.string.trips_title),
+                text = stringResource(Res.string.trips_mine),
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

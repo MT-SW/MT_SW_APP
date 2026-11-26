@@ -4398,6 +4398,7 @@ trips_import_button
 trips_import_done
 trips_import_progress
 trips_item
+trips_mine
 trips_move_to
 trips_no_time
 trips_photo
