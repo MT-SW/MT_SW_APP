@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.util
 
+import kotlinx.datetime.offsetAt
 import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.common.util.toInstant
 
@@ -109,7 +110,7 @@ private class ExifParser(private val b: ByteArray) {
         return ExifInfo(null, null, null)
     }
 
-    private fun ascii6(at: Int) = String(CharArray(4) { b[at + it].toInt().toChar() })
+    private fun ascii6(at: Int) = CharArray(4) { b[at + it].toInt().toChar() }.concatToString()
 
     private fun readTiff(): ExifInfo {
         val ifd0 = entries(u32(tiff + 4).toInt())

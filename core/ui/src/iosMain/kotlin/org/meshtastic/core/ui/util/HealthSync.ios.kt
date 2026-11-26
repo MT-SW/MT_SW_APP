@@ -54,6 +54,7 @@ import platform.HealthKit.countUnit
 import platform.HealthKit.kilocalorieUnit
 import platform.HealthKit.meterUnit
 import platform.HealthKit.minuteUnit
+import platform.HealthKit.predicateForSamplesWithStartDate
 import platform.HealthKit.unitDividedByUnit
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt

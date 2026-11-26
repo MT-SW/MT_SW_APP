@@ -14,14 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalForeignApi::class)
 @file:Suppress("TooGenericExceptionCaught")
 
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import platform.Foundation.NSArray
 import platform.Foundation.NSData
 import platform.Foundation.NSUserDefaults
 import platform.Foundation.create
@@ -60,13 +63,13 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
                 val placeholder = asset.placeholderForCreatedAsset
                 if (album != null) {
                     PHAssetCollectionChangeRequest.changeRequestForAssetCollection(album)
-                        ?.addAssets(listOf(placeholder))
+                        ?.addAssets(NSArray.arrayWithObject(placeholder))
                 } else {
                     val create =
                         PHAssetCollectionChangeRequest.creationRequestForAssetCollectionWithTitle(HIKE_ALBUM_NAME)
                     val newId = create.placeholderForCreatedAssetCollection.localIdentifier
                     defaults.setObject(newId, ALBUM_ID_KEY)
-                    create.addAssets(listOf(placeholder))
+                    create.addAssets(NSArray.arrayWithObject(placeholder))
                 }
             },
             completionHandler = { ok, error ->
