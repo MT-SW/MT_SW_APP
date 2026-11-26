@@ -54,7 +54,7 @@ import org.meshtastic.core.resources.show_layer
 import org.meshtastic.core.resources.trips_empty
 import org.meshtastic.core.resources.trips_item
 import org.meshtastic.core.resources.trips_title
-import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
@@ -93,7 +93,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     val visible by store.visibleIds.collectAsStateWithLifecycle()
     var deleteId by remember { mutableStateOf<String?>(null) }
     var openId by remember { mutableStateOf<String?>(null) }
-    StyledBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
             Text(
                 text = stringResource(Res.string.trips_title),

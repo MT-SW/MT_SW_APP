@@ -72,7 +72,7 @@ import org.meshtastic.core.resources.session_refresh_required
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.icon.Favorite
-import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.resources.remote_lists_open_description
 import org.meshtastic.core.resources.remote_lists_open
 import androidx.compose.foundation.verticalScroll
@@ -208,7 +208,7 @@ private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (
         },
     )
     if (open) {
-        StyledBottomSheet(
+        ModalBottomSheet(
             onDismissRequest = {
                 Logger.i { "Zdalne listy: okno zamknięte" }
                 open = false

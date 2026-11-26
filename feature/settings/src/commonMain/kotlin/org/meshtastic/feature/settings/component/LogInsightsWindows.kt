@@ -52,7 +52,7 @@ import org.meshtastic.core.resources.log_insights_none
 import org.meshtastic.core.resources.log_insights_since
 import org.meshtastic.core.resources.log_insights_title
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -85,7 +85,7 @@ private const val MAX_SHOWN_GROUPS = 30
 private fun LogSummaryWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()
     val now = nowMillis
-    StyledBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -142,7 +142,7 @@ private fun LogSummaryWindow(onDismiss: () -> Unit) {
 private fun LinkQualityWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()
     val now = nowMillis
-    StyledBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),

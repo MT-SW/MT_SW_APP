@@ -54,7 +54,7 @@ import org.meshtastic.core.resources.device_history_battery
 import org.meshtastic.core.resources.device_history_load
 import org.meshtastic.core.resources.device_history_title
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
@@ -74,7 +74,7 @@ fun DeviceCompareEntry(viewModel: DeviceCompareViewModel = koinViewModel()) {
     if (open) {
         val rows by viewModel.rows.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) { viewModel.refresh() }
-        StyledBottomSheet(onDismissRequest = { open = false }) {
+        ModalBottomSheet(onDismissRequest = { open = false }) {
             Column(
                 modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -109,7 +109,7 @@ import org.meshtastic.core.resources.trips_stop_time
 import org.meshtastic.core.resources.trips_stop_title
 import org.meshtastic.core.resources.trips_unplaced
 import org.meshtastic.core.resources.trips_unplaced_note
-import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -194,10 +194,10 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 unplaced = missing
             }
         }
-    StyledBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         if (trip == null) {
             Text(text = "", modifier = Modifier.padding(16.dp))
-            return@StyledBottomSheet
+            return@ModalBottomSheet
         }
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
