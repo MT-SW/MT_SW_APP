@@ -60,6 +60,8 @@ import org.meshtastic.feature.map.trip.TripViewRequest
 
 private const val KEY_STOP = "sid"
 private const val MAX_DROPS = 60
+private const val MILLIS_PER_SECOND = 1000
+private const val NEAR_DEGREES = 0.002
 
 /** MT_SW: the saved hikes switched on in the Hikes window: their routes, and a drop with the picture at each stop. */
 @Composable
@@ -93,11 +95,42 @@ internal fun TripsLayer() {
 
     val stops =
         shown.flatMap { trip -> trip.stops.filter { it.photos.isNotEmpty() }.map { trip.id to it } }.take(MAX_DROPS)
+    TripDrops(layerId = "trips-drops", stops = stops)
+}
+
+/**
+ * MT_SW: the saved hikes' stops that fall on a node's position track (the own node's position history): a drop with
+ * the picture at each, taken from the hikes by time and nearness to the track.
+ */
+@Composable
+internal fun TripStopsOnTrack(track: List<Pair<Position, Int>>) {
+    val store: TripStore = koinInject()
+    val trips by store.trips.collectAsStateWithLifecycle()
+    if (track.isEmpty() || trips.isEmpty()) return
+    val from = track.minOf { it.second }
+    val to = track.maxOf { it.second }
+    val stops =
+        trips
+            .flatMap { trip -> trip.stops.filter { it.photos.isNotEmpty() }.map { trip.id to it } }
+            .filter { (_, stop) ->
+                val seconds = stop.t / MILLIS_PER_SECOND
+                (from == 0 || seconds in from..to) &&
+                    track.any { (p, _) ->
+                        kotlin.math.abs(p.latitude - stop.lat) < NEAR_DEGREES &&
+                            kotlin.math.abs(p.longitude - stop.lon) < NEAR_DEGREES
+                    }
+            }
+            .take(MAX_DROPS)
+    TripDrops(layerId = "trip-track-drops", stops = stops)
+}
+
+@Composable
+private fun TripDrops(layerId: String, stops: List<Pair<String, org.meshtastic.feature.map.trip.TripStop>>) {
     if (stops.isEmpty()) return
     val painters = rememberDrops(stops)
     if (painters.isEmpty()) return
     val points =
-        rememberFeatureSource(stops.map { it.second.id to it.second.lat to it.second.lon }) {
+        rememberFeatureSource(layerId, stops.map { it.second.id to it.second.lat to it.second.lon }) {
             FeatureCollection(
                 stops.map { (_, stop) ->
                     Feature<Point, JsonObject?>(
@@ -109,7 +142,7 @@ internal fun TripsLayer() {
         }
     val owner = stops.associate { it.second.id to it.first }
     SymbolLayer(
-        id = "trips-drops",
+        id = layerId,
         source = points,
         iconImage =
         switch(

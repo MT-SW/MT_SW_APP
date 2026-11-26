@@ -69,6 +69,7 @@ import org.meshtastic.feature.map.maplibre.geojson.lenientInt
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.geojson.toNodeChip
 import org.meshtastic.feature.map.maplibre.layers.NodeChipLayer
+import org.meshtastic.feature.map.maplibre.layers.TripStopsOnTrack
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.MapColors
 import org.meshtastic.feature.map.trackFadeAlpha
@@ -154,6 +155,8 @@ fun MapLibreNodeTrackMap(
         rememberSecondaryMapState(basemaps) {
             // A LineString needs two coordinates; a filter tight enough to leave one point would otherwise throw.
             if (points.size > 1) TrackLineLayer(points = points, color = trackColor, snrByTime = snrByTime)
+            // MT_SW: the pictures of the hikes that went along this track.
+            TripStopsOnTrack(allPoints)
             if (comparePoints.size > 1) CompareTrackLayer(points = comparePoints, color = compareColor)
             if (points.isNotEmpty()) {
                 TrackPointLayer(
