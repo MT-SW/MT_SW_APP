@@ -21,9 +21,12 @@ package org.meshtastic.feature.map.maplibre.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -51,6 +54,7 @@ import org.maplibre.compose.offline.OfflineStorage
 import org.maplibre.compose.offline.OfflineStorageState
 import org.maplibre.compose.offline.offlineStorage
 import org.maplibre.spatialk.geojson.BoundingBox
+import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.safeCatching
@@ -68,7 +72,14 @@ import org.meshtastic.core.resources.map_start_download
 import org.meshtastic.core.resources.map_tile_download_estimate
 import org.meshtastic.core.resources.map_tile_limit_reached
 import org.meshtastic.core.resources.map_zoom_levels
+import org.meshtastic.core.resources.offline_area_hint
+import org.meshtastic.core.resources.offline_area_radius_km
+import org.meshtastic.core.resources.offline_area_title
+import org.meshtastic.core.resources.offline_area_visible
+import org.meshtastic.core.resources.offline_detail_title
+import org.meshtastic.core.resources.offline_estimate_size
 import org.meshtastic.core.resources.offline_maps_empty
+import org.meshtastic.core.resources.offline_size_warning
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
@@ -81,6 +92,10 @@ import org.meshtastic.feature.map.layers.mapLayersDirectory
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.offlineStyleJson
 import org.meshtastic.feature.map.maplibre.tileCount
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.log2
 import kotlin.math.roundToInt
 
 /** What the map must tell the offline sheet: which style to pack, and which region is on screen. */
@@ -112,27 +127,72 @@ internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (Boundin
     // A pack definition now carries the pixel ratio it was downloaded at, so the tiles match this display.
     val pixelRatio = LocalDensity.current.density
 
-    val range = target.zoomRange()
-    val estimate = target.bounds()?.tileCount(range.first, range.last) ?: 0L
+    // MT_SW: besides the area on screen, the person can pick a radius around the centre of the map (up to 1000 km) and
+    // how many zoom levels deeper to go; the estimate below follows the choice.
+    var radiusKm by remember { mutableStateOf(0) }
+    var detail by remember { mutableStateOf(DEFAULT_DETAIL) }
+    val area = target.areaFor(radiusKm, detail)
+    val range = area?.range ?: target.zoomRange()
+    val estimate = area?.bounds?.tileCount(range.first, range.last) ?: 0L
     val usage = rememberCacheUsage(packs)
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(text = stringResource(Res.string.map_cache_manager), style = MaterialTheme.typography.titleMedium)
 
         CacheUsageLine(storedBytes = usage.bytes, storedTiles = usage.tiles)
+        OfflineAreaChoice(
+            radiusKm = radiusKm,
+            onRadius = {
+                radiusKm = it
+                Logger.i { "Mapa offline: wybrany zasięg ${if (it == 0) "widoczny obszar" else "$it km"}" }
+            },
+            detail = detail,
+            onDetail = {
+                detail = it
+                Logger.i { "Mapa offline: szczegółowość +$it" }
+            },
+        )
         DownloadEstimateLines(estimate = estimate, range = range)
+        if (estimate > 0L) {
+            val bytes = estimate * ESTIMATED_TILE_BYTES
+            Text(
+                text = stringResource(Res.string.offline_estimate_size, formatByteSize(bytes)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (bytes > BIG_DOWNLOAD_BYTES) {
+                Text(
+                    text = stringResource(Res.string.offline_size_warning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+            if (estimate > MAX_PACK_TILES) {
+                Text(
+                    text = stringResource(Res.string.map_tile_limit_reached, MAX_PACK_TILES.toInt()),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
 
         Button(
             onClick = {
                 createFailed = false
-                scope.launch { createFailed = !manager.downloadVisibleArea(target, pixelRatio) }
+                scope.launch {
+                    Logger.i {
+                        "Mapa offline: pobieranie, zasięg ${if (radiusKm == 0) "widoczny obszar" else "$radiusKm km"}, " +
+                            "poziomy ${range.first}–${range.last}, kafelków $estimate"
+                    }
+                    createFailed = area == null || !manager.downloadArea(target, area, pixelRatio)
+                }
             },
             enabled =
             canDownloadOfflinePack(
                 managerState is OfflineStorageState.Ready,
                 target.styleUrl ?: target.rasterBasemap?.id,
                 estimate,
-            ),
+            ) && estimate <= MAX_PACK_TILES,
             modifier = Modifier.padding(vertical = 8.dp),
         ) {
             Text(text = stringResource(Res.string.map_start_download))
@@ -277,11 +337,13 @@ private fun OfflinePackRow(
  * Creates the pack only. A created pack is paused, and stays that way until the user presses play on its row —
  * [OfflineStorage.resume] is deliberately not called here, so a download never starts itself.
  */
-private suspend fun OfflineStorage.downloadVisibleArea(target: OfflineMapTarget, pixelRatio: Float): Boolean {
-    val bounds = target.bounds()
-    if (bounds == null) return false
-
-    val range = target.zoomRange()
+private suspend fun OfflineStorage.downloadArea(
+    target: OfflineMapTarget,
+    area: OfflineArea,
+    pixelRatio: Float,
+): Boolean {
+    val bounds = area.bounds
+    val range = area.range
 
     return safeCatching {
         val styleUrl =
@@ -386,6 +448,98 @@ private const val COORD_SCALE = 100.0
  * Deliberately the only place this is worked out. Computing it twice is what produced an inverted range — an absolute
  * ceiling below the current zoom — which MapLibre rejects outright.
  */
+/** What a download covers: the box and the zoom levels. */
+private class OfflineArea(val bounds: BoundingBox, val range: IntRange)
+
+/**
+ * The area for the person's choice: the visible area ([radiusKm] 0) or a box of [radiusKm] around the centre of what is
+ * on screen, from the zoom at which the box is about [TILES_ACROSS] tiles wide to [detail] levels deeper. A wider box
+ * therefore starts at a lower zoom, which keeps the number of tiles about the same.
+ */
+private fun OfflineMapTarget.areaFor(radiusKm: Int, detail: Int): OfflineArea? {
+    val visible = bounds() ?: return null
+    if (radiusKm <= 0) return OfflineArea(visible, zoomRange())
+    val latitude = (visible.south + visible.north) / 2
+    val longitude = (visible.west + visible.east) / 2
+    val dLat = radiusKm / KM_PER_DEGREE
+    val dLon = radiusKm / (KM_PER_DEGREE * cos(latitude * PI / HALF_TURN_DEGREES).coerceAtLeast(MIN_COS_LATITUDE))
+    val box =
+        BoundingBox(
+            southwest =
+            Position(
+                longitude = (longitude - dLon).coerceAtLeast(-MAX_LONGITUDE),
+                latitude = (latitude - dLat).coerceAtLeast(-MAX_LATITUDE),
+            ),
+            northeast =
+            Position(
+                longitude = (longitude + dLon).coerceAtMost(MAX_LONGITUDE),
+                latitude = (latitude + dLat).coerceAtMost(MAX_LATITUDE),
+            ),
+        )
+    val worldKm = EQUATOR_KM * cos(latitude * PI / HALF_TURN_DEGREES).coerceAtLeast(MIN_COS_LATITUDE)
+    val fitting = floor(log2(TILES_ACROSS * worldKm / (2.0 * radiusKm))).toInt()
+    val first = fitting.coerceIn(MIN_PACK_ZOOM, MAX_PACK_ZOOM)
+    val last = (first + detail).coerceAtMost(MAX_PACK_ZOOM)
+    return OfflineArea(box, first..last)
+}
+
+/** The choice of area (radius around the centre of the map) and of detail (zoom levels deeper), as chips. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun OfflineAreaChoice(radiusKm: Int, onRadius: (Int) -> Unit, detail: Int, onDetail: (Int) -> Unit) {
+    Column(modifier = Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(text = stringResource(Res.string.offline_area_title), style = MaterialTheme.typography.titleSmall)
+        Text(
+            text = stringResource(Res.string.offline_area_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OFFLINE_RADII_KM.forEach { km ->
+                FilterChip(
+                    selected = radiusKm == km,
+                    onClick = { onRadius(km) },
+                    label = {
+                        Text(
+                            if (km == 0) {
+                                stringResource(Res.string.offline_area_visible)
+                            } else {
+                                stringResource(Res.string.offline_area_radius_km, km)
+                            },
+                        )
+                    },
+                )
+            }
+        }
+        if (radiusKm > 0) {
+            Text(text = stringResource(Res.string.offline_detail_title), style = MaterialTheme.typography.titleSmall)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OFFLINE_DETAILS.forEach { level ->
+                    FilterChip(selected = detail == level, onClick = { onDetail(level) }, label = { Text("+$level") })
+                }
+            }
+        }
+    }
+}
+
+private val OFFLINE_RADII_KM = listOf(0, 5, 20, 50, 100, 200, 500, 1000)
+private val OFFLINE_DETAILS = listOf(1, 2, 3, 4)
+private const val DEFAULT_DETAIL = 2
+private const val TILES_ACROSS = 6.0
+private const val EQUATOR_KM = 40075.0
+private const val KM_PER_DEGREE = 111.32
+private const val HALF_TURN_DEGREES = 180.0
+private const val MIN_COS_LATITUDE = 0.05
+private const val MAX_LATITUDE = 85.0
+private const val MAX_LONGITUDE = 180.0
+
+/** About what one raster tile weighs, for the size estimate. */
+private const val ESTIMATED_TILE_BYTES = 25_000L
+private const val BIG_DOWNLOAD_BYTES = 500_000_000L
+
+/** The most tiles one pack may hold; the map engine stops a pack that asks for more. */
+private const val MAX_PACK_TILES = 6000L
+
 private fun OfflineMapTarget.zoomRange(): IntRange {
     val current = zoom().toInt().coerceIn(MIN_PACK_ZOOM, MAX_PACK_ZOOM)
     val max = (current + PACK_EXTRA_ZOOM_LEVELS).coerceAtMost(MAX_PACK_ZOOM)

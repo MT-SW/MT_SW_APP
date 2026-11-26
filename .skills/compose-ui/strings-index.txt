@@ -3009,8 +3009,15 @@ notifications_turn_on_summary
 notifications_updates
 now
 ### OFFLINE ###
+offline_area_hint
+offline_area_radius_km
+offline_area_title
+offline_area_visible
+offline_detail_title
+offline_estimate_size
 offline_maps
 offline_maps_empty
+offline_size_warning
 offline_terrain_cache_detail
 offline_terrain_empty
 offline_terrain_manager

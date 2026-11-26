@@ -2802,6 +2802,13 @@
     <string name="track_rec_stop">Stop</string>
     <string name="track_rec_save">Zapisz jako GPX</string>
     <string name="track_rec_clear">Usuń trasę</string>
+    <string name="offline_area_title">Obszar do pobrania</string>
+    <string name="offline_area_hint">Wokół środka mapy</string>
+    <string name="offline_area_visible">Widoczny obszar</string>
+    <string name="offline_area_radius_km">%1$d km</string>
+    <string name="offline_detail_title">Szczegółowość (dodatkowe poziomy przybliżenia)</string>
+    <string name="offline_estimate_size">Szacowany rozmiar: ok. %1$s</string>
+    <string name="offline_size_warning">To dużo miejsca na dysku</string>
     <string name="remote_lists_open">Zdalne listy</string>
     <string name="remote_lists_open_description">Ulubione, ignorowane i kontakty na tym urządzeniu</string>
     <string name="remote_pick_search">Szukaj węzła</string>
