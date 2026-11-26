@@ -1402,6 +1402,9 @@
     <string name="device_db_cache_limit">How many device databases to keep</string>
     <string name="device_db_cache_limit_summary">How many device databases this app keeps at once (a separate one for each device, whether you connect over Bluetooth, Wi-Fi or USB). The minimum is 3, because up to 3 devices can be connected at once; the databases of your saved devices are never deleted. When another one is added, the database of the least recently used other device is deleted.</string>
     <string name="device_gps">Device GPS</string>
+    <string name="device_history_battery">battery %1$s</string>
+    <string name="device_history_load">channel load %1$s (was %2$s)</string>
+    <string name="device_history_title">In the last %1$d h:</string>
     <string name="device_links">Device Links</string>
     <string name="device_links_affiliate_disclosure">Product links may be affiliate links — purchases may earn Meshtastic a commission.</string>
     <string name="device_links_i_want_one">I want one</string>

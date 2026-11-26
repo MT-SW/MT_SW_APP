@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.DeviceSnapshot
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.RadioSlotsPrefs
@@ -35,6 +36,8 @@ data class DeviceCompareRow(
     val connected: Boolean,
     val unread: Int,
     val snapshot: DeviceSnapshot?,
+    /** The readings kept so far, oldest first. */
+    val history: List<DeviceHistoryEntry> = emptyList(),
 )
 
 /** Reads the last reported state of every saved device, to show them side by side. */
@@ -42,6 +45,7 @@ data class DeviceCompareRow(
 class DeviceCompareViewModel(
     private val slotsPrefs: RadioSlotsPrefs,
     private val background: RadioBackgroundMonitor,
+    private val historyStore: DeviceHistoryStore,
 ) : ViewModel() {
     private val _rows = MutableStateFlow<List<DeviceCompareRow>>(emptyList())
     val rows: StateFlow<List<DeviceCompareRow>> = _rows.asStateFlow()
@@ -56,12 +60,19 @@ class DeviceCompareViewModel(
             _rows.value =
                 slots.map { slot ->
                     val snapshot = background.readSnapshot(slot.address)
+                    val history =
+                        if (snapshot != null) {
+                            historyStore.record(slot.address, snapshot, nowMillis)
+                        } else {
+                            historyStore.history(slot.address)
+                        }
                     DeviceCompareRow(
                         slotId = slot.id,
                         title = snapshot?.shortName?.takeIf { it.isNotBlank() } ?: slot.name ?: slot.address,
                         connected = slot.address in connected,
                         unread = unread[slot.address] ?: 0,
                         snapshot = snapshot,
+                        history = history,
                     )
                 }
         }

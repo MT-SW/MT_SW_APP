@@ -4776,4 +4776,7 @@
     <string name="trips_stats">Dystans %1$s · czas %2$s · średnio %3$s</string>
     <string name="trips_stats_ascent">Podejścia: %1$d m</string>
     <string name="trips_stats_counts">Punkty: %1$d · zdjęcia: %2$d</string>
+    <string name="device_history_title">W ciągu ostatnich %1$d godz.:</string>
+    <string name="device_history_battery">bateria %1$s</string>
+    <string name="device_history_load">obciążenie kanału %1$s (było %2$s)</string>
 </resources>

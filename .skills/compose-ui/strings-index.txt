@@ -1354,6 +1354,9 @@ device_configuration
 device_db_cache_limit
 device_db_cache_limit_summary
 device_gps
+device_history_battery
+device_history_load
+device_history_title
 device_links
 device_links_affiliate_disclosure
 device_links_i_want_one

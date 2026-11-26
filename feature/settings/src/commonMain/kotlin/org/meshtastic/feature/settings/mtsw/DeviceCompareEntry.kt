@@ -50,6 +50,9 @@ import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.device_compare_unread
 import org.meshtastic.core.resources.device_compare_uptime
 import org.meshtastic.core.resources.device_compare_utilization
+import org.meshtastic.core.resources.device_history_battery
+import org.meshtastic.core.resources.device_history_load
+import org.meshtastic.core.resources.device_history_title
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.StyledBottomSheet
 import org.meshtastic.core.ui.icon.MeshHub
@@ -118,6 +121,8 @@ private fun DeviceCompareCard(row: DeviceCompareRow) {
         Text(stringResource(Res.string.device_compare_uptime, uptimeText(snap.uptimeSeconds)))
         Text(stringResource(Res.string.device_compare_nodes, snap.onlineCount, snap.nodeCount))
         if (row.unread > 0) Text(stringResource(Res.string.device_compare_unread, row.unread))
+        val trend = trendText(row.history)
+        if (trend != null) Text(trend, style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -131,3 +136,32 @@ private fun uptimeText(seconds: Int?): String =
             "${seconds / SECONDS_IN_HOUR} h ${seconds % SECONDS_IN_HOUR / SECONDS_IN_MINUTE} min"
         else -> "${seconds / SECONDS_IN_MINUTE} min"
     }
+
+/** What changed over the last day: the battery and the load of the channel, against the oldest reading of that day. */
+@Composable
+private fun trendText(history: List<DeviceHistoryEntry>): String? {
+    val last = history.lastOrNull() ?: return null
+    val base = history.firstOrNull { last.timeMillis - it.timeMillis <= DAY_MS } ?: return null
+    if (base === last) return null
+    val battery =
+        if (last.batteryLevel != null && base.batteryLevel != null && last.batteryLevel <= MAX_PERCENT) {
+            val delta = last.batteryLevel - base.batteryLevel
+            stringResource(Res.string.device_history_battery, (if (delta > 0) "+" else "") + "$delta%")
+        } else {
+            null
+        }
+    val hours = (last.timeMillis - base.timeMillis) / HOUR_MS
+    val load =
+        last.channelUtilization?.let { now ->
+            base.channelUtilization?.let { was ->
+                stringResource(Res.string.device_history_load, now.percentText(), was.percentText())
+            }
+        }
+    val parts = listOfNotNull(battery, load)
+    if (parts.isEmpty()) return null
+    return stringResource(Res.string.device_history_title, hours.toInt()) + " " + parts.joinToString(", ")
+}
+
+private const val DAY_MS = 86_400_000L
+private const val HOUR_MS = 3_600_000L
+private const val MAX_PERCENT = 100

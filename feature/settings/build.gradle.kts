@@ -37,6 +37,8 @@ kotlin {
             implementation(projects.core.resources)
             implementation(projects.core.ui)
             implementation(projects.core.di)
+            implementation(projects.feature.map)
+            implementation(libs.okio)
 
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
