@@ -3420,7 +3420,7 @@
     <string name="app_data_summary_phone">Baza wiadomości i ustawienia zostają w pamięci aplikacji (tak wymaga Android). Modele AI są w: %1$s. Wolne miejsce: %2$s.</string>
     <string name="app_data_phone_single">Na tym telefonie nie ma innej pamięci (np. karty SD). Android pozwala aplikacji trzymać pliki tylko w jej własnej pamięci albo na karcie SD.</string>
     <string name="app_data_summary">Wiadomości, ustawienia, logi, mapy i modele AI są w: %1$s. Zajmują %2$s, wolne miejsce na dysku: %3$s.</string>
-    <string name="app_data_summary_fixed">Dane aplikacji są w: %1$s. Folder jest ustawiony zmienną MESHTASTIC_DATA_DIR i nie można go tu zmienić.</string>
+    <string name="app_data_summary_fixed">Dane aplikacji są w: %1$s. Folder jest ustawiony zmienną MT_SW_DATA_DIR i nie można go tu zmienić.</string>
     <string name="app_data_scheduled">Zapisano. Wszystkie dane zostaną przeniesione do: %1$s przy następnym uruchomieniu aplikacji. Zamknij ją i uruchom jeszcze raz; przenoszenie może chwilę potrwać.</string>
     <string name="app_data_previous_failed">Ostatnie przenoszenie danych nie udało się: %1$s. Dane zostały w starym folderze.</string>
     <string name="ai_storage_restart_first">Najpierw uruchom aplikację ponownie: dane są w trakcie przenoszenia do nowego folderu.</string>
@@ -3430,7 +3430,7 @@
     <string name="ai_storage_err_inside">Jeden folder nie może być w środku drugiego.</string>
     <string name="ai_storage_err_create">Nie można utworzyć folderu.</string>
     <string name="ai_storage_err_copy">Plik nie został skopiowany w całości.</string>
-    <string name="ai_storage_err_env">Folder jest ustawiony zmienną MESHTASTIC_DATA_DIR.</string>
+    <string name="ai_storage_err_env">Folder jest ustawiony zmienną MT_SW_DATA_DIR.</string>
     <string name="ai_storage_err_busy">Trwa pobieranie modelu; poczekaj, aż się skończy.</string>
     <string name="ai_storage_err_other">%1$s</string>
     <string name="ai_skip_npu_title">Pomijaj NPU</string>

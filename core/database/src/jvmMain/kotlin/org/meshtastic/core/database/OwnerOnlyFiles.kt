@@ -47,7 +47,7 @@ fun createOwnerOnlyDirectories(dir: File) {
 
 /**
  * Creates [dir] and any missing parents, each owner-only, and leaves [dir] untouched when it already exists. For a
- * directory the user chose, such as an explicit `MESHTASTIC_DATA_DIR`.
+ * directory the user chose, such as an explicit `MT_SW_DATA_DIR`.
  */
 fun createMissingOwnerOnlyDirectories(dir: File) {
     createOwnerOnlyDirectories(dir, posixSupported(), tightenExisting = false)

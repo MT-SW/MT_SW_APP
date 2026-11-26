@@ -25,8 +25,8 @@ import java.nio.file.StandardCopyOption
 
 /**
  * The one folder that holds everything the desktop app keeps for itself: the message database, the settings, the logs,
- * the map files, the AI models and engine programs. By default it is `~/.meshtastic` (or the folder named by the
- * `MESHTASTIC_DATA_DIR` variable, which always wins). A person can choose another place (another disk) in the settings.
+ * the map files, the AI models and engine programs. By default it is `~/MT_SW`, named like the app (or the folder named by the
+ * `MT_SW_DATA_DIR` variable, which always wins). A person can choose another place (another disk) in the settings.
  *
  * The choice is a small pointer file that always stays in [defaultDir], so it is found again at every start. Moving is
  * done in two steps because the database and the settings are open while the app runs and must not be copied then:
@@ -51,6 +51,9 @@ object AppDataRoot {
      */
     const val SUBFOLDER = "MT_SW"
 
+    /** The name the folder had in earlier versions; only used to find the data once. */
+    private const val LEGACY_FOLDER = ".meshtastic"
+
     private const val MB = 1024L * 1024L
     private const val SPARE_MB = 100L
 
@@ -58,12 +61,37 @@ object AppDataRoot {
     private val SETTINGS_FILES =
         setOf(POINTER, PENDING, OLD_FOLDERS, ERROR, ASKED, SEVERAL, INSTANCE_LOCK, INSTANCE_PORT)
 
-    private val overridden: Boolean = !System.getenv("MESHTASTIC_DATA_DIR").isNullOrBlank()
+    /** The folder named by the `MT_SW_DATA_DIR` variable (the variable of the earlier versions still works); null = none. */
+    val envDir: String? =
+        listOf("MT_SW_DATA_DIR", "MESHTASTIC_DATA_DIR").firstNotNullOfOrNull { name ->
+            System.getenv(name)?.takeIf { it.isNotBlank() }
+        }
+
+    private val overridden: Boolean = envDir != null
 
     /** Where the pointer file lives and the folder used when nothing else was chosen. */
     val defaultDir: File =
-        System.getenv("MESHTASTIC_DATA_DIR")?.takeIf { it.isNotBlank() }?.let(::File)
-            ?: File(System.getProperty("user.home"), ".meshtastic")
+        envDir?.let(::File) ?: homeDefault()
+
+    /**
+     * The folder named like the app. Data kept by an earlier version in the old hidden folder is moved there once (a
+     * plain rename, so nothing is copied or lost); when that fails the old folder simply stays in use.
+     */
+    private fun homeDefault(): File {
+        val home = System.getProperty("user.home")
+        val named = File(home, SUBFOLDER)
+        val old = File(home, LEGACY_FOLDER)
+        if (!named.exists() && old.isDirectory) {
+            try {
+                Files.move(old.toPath(), named.toPath())
+                Logger.i(tag = TAG) { "The data folder of the earlier version was renamed to ${named.path}" }
+            } catch (e: java.io.IOException) {
+                Logger.w(tag = TAG, throwable = e) { "Renaming the earlier data folder failed: ${e.message}" }
+                return old
+            }
+        }
+        return named
+    }
 
     @Volatile private var prepared = false
 
@@ -123,7 +151,7 @@ object AppDataRoot {
         }
     }
 
-    /** False when the folder comes from `MESHTASTIC_DATA_DIR`: then it cannot be changed in the settings. */
+    /** False when the folder comes from `MT_SW_DATA_DIR`: then it cannot be changed in the settings. */
     val canChange: Boolean
         get() = !overridden
 
@@ -142,7 +170,7 @@ object AppDataRoot {
      * request was saved, or a short reason when it cannot be done. Nothing is copied yet.
      */
     fun schedule(chosen: File): String? = runCatching {
-        if (overridden) return@runCatching "the folder is set by MESHTASTIC_DATA_DIR"
+        if (overridden) return@runCatching "the folder is set by MT_SW_DATA_DIR"
         val picked = chosen.absoluteFile.canonicalFile
         val target =
             if (picked == defaultDir.absoluteFile.canonicalFile || picked.name == SUBFOLDER) {

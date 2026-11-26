@@ -88,7 +88,7 @@ class AiStorageLocation(
     /** Megabytes that a move to another folder has to copy (computers: the whole data folder); null = not known. */
     fun movableMb(): Long? = scheduler?.usedMb()
 
-    /** False when the folder is fixed from outside (the MESHTASTIC_DATA_DIR variable). */
+    /** False when the folder is fixed from outside (the MT_SW_DATA_DIR variable). */
     val canChange: Boolean
         get() = scheduler?.canChange ?: true
 

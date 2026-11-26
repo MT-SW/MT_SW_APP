@@ -33,23 +33,23 @@ import java.io.File
 
 /**
  * Resolves the desktop data directory for persistent storage (DataStore files, Room database). Defaults to
- * `~/.meshtastic/`; a person can choose another folder in the settings (see [AppDataRoot]), and the
- * `MESHTASTIC_DATA_DIR` environment variable always wins.
+ * `~/MT_SW/`; a person can choose another folder in the settings (see [AppDataRoot]), and the
+ * `MT_SW_DATA_DIR` environment variable always wins.
  *
  * Shared between `core:database` and `desktop` module to ensure all persistent data is co-located.
  */
 fun desktopDataDir(): String = resolvedDataDir
 
 /**
- * The default `~/.meshtastic/` is restricted to the current user the first time it is resolved, including when it
- * already exists. An explicit `MESHTASTIC_DATA_DIR` is left as the user set it; the app restricts its own
+ * The default `~/MT_SW/` is restricted to the current user the first time it is resolved, including when it
+ * already exists. An explicit `MT_SW_DATA_DIR` is left as the user set it; the app restricts its own
  * subdirectories and files inside it.
  */
 private val resolvedDataDir: String by lazy {
     // MT_SW: the person may have chosen another folder (see AppDataRoot); the default one is restricted as upstream.
     val dir = AppDataRoot.dir
     if (dir == AppDataRoot.defaultDir) {
-        prepareDataDir(System.getenv("MESHTASTIC_DATA_DIR"), System.getProperty("user.home"))
+        prepareDataDir(AppDataRoot.envDir, System.getProperty("user.home"))
     } else {
         dir.path
     }
@@ -57,7 +57,7 @@ private val resolvedDataDir: String by lazy {
 
 internal fun prepareDataDir(override: String?, home: String): String {
     if (!override.isNullOrBlank()) return override
-    return "$home/.meshtastic".also { createOwnerOnlyDirectories(File(it)) }
+    return "$home/${AppDataRoot.SUBFOLDER}".also { createOwnerOnlyDirectories(File(it)) }
 }
 
 /** The database file for [dbName] in [dataDir], created owner-only. A data directory that exists is left as it is. */

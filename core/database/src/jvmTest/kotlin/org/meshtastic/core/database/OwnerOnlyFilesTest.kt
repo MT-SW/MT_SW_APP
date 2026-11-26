@@ -126,7 +126,7 @@ class OwnerOnlyFilesTest {
     fun `the default data root is tightened when it already exists`() {
         if (!posix) return
         val home = File(root, "home").apply { mkdir() }
-        val dataRoot = File(home, ".meshtastic").apply { mkdir() }
+        val dataRoot = File(home, "MT_SW").apply { mkdir() }
         setMode(dataRoot, "rwxr-xr-x")
 
         prepareDataDir(override = null, home = home.path)

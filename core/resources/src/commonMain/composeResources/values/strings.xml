@@ -273,7 +273,7 @@
     <string name="ai_storage_err_busy">A model is being downloaded; wait until it finishes.</string>
     <string name="ai_storage_err_copy">A file was not copied completely.</string>
     <string name="ai_storage_err_create">The folder cannot be created.</string>
-    <string name="ai_storage_err_env">The folder is set by the MESHTASTIC_DATA_DIR variable.</string>
+    <string name="ai_storage_err_env">The folder is set by the MT_SW_DATA_DIR variable.</string>
     <string name="ai_storage_err_inside">One folder cannot be inside the other.</string>
     <string name="ai_storage_err_other">%1$s</string>
     <string name="ai_storage_err_same">This folder is already in use.</string>
@@ -485,7 +485,7 @@
     <string name="app_data_previous_failed">The last move of the data failed: %1$s. The data stayed in the old folder.</string>
     <string name="app_data_scheduled">Saved. All the data will be moved to: %1$s the next time the app starts. Close it and start it again; moving can take a while.</string>
     <string name="app_data_summary">Messages, settings, logs, maps and AI models are in: %1$s. They take %2$s, free space on the disk: %3$s.</string>
-    <string name="app_data_summary_fixed">The app's data is in: %1$s. The folder is set by the MESHTASTIC_DATA_DIR variable and cannot be changed here.</string>
+    <string name="app_data_summary_fixed">The app's data is in: %1$s. The folder is set by the MT_SW_DATA_DIR variable and cannot be changed here.</string>
     <string name="app_data_summary_phone">The message database and settings stay in the app's own memory (Android requires this). The AI models are in: %1$s. Free space: %2$s.</string>
     <string name="app_data_title">App data folder</string>
     <string name="app_database_backup_disconnect_confirmation">The radio will be disconnected first. Reconnect from the Connections screen when you are done.</string>

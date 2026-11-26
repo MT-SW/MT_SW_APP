@@ -114,7 +114,7 @@ private fun reasonText(reason: String): String = when {
 
     reason.startsWith("a file was not copied") -> stringResource(Res.string.ai_storage_err_copy)
 
-    reason.contains("MESHTASTIC_DATA_DIR") -> stringResource(Res.string.ai_storage_err_env)
+    reason.contains("MT_SW_DATA_DIR") -> stringResource(Res.string.ai_storage_err_env)
 
     reason.startsWith("a model is being downloaded") -> stringResource(Res.string.ai_storage_err_busy)
 

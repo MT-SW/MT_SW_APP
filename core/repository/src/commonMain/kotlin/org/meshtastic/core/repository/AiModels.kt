@@ -877,7 +877,7 @@ data class AiStorageInfo(
     val choices: List<String> = emptyList(),
     /** After a move, the folder that will be used from the next start; null = none. */
     val nextFolder: String? = null,
-    /** False when the folder is fixed from outside (computers: the MESHTASTIC_DATA_DIR variable). */
+    /** False when the folder is fixed from outside (computers: the MT_SW_DATA_DIR variable). */
     val canChange: Boolean = true,
     /** Megabytes a move has to copy (computers: the whole data folder, not only the AI files); null = not known. */
     val movableMb: Long? = null,

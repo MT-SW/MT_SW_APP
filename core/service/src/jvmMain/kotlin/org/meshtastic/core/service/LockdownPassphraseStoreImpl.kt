@@ -29,8 +29,8 @@ import javax.crypto.SecretKey
 /**
  * File-backed encrypted passphrase store for JVM/Desktop.
  *
- * Each passphrase entry is an AES-256-GCM `.enc` file under `$MESHTASTIC_DATA_DIR/lockdown/` (default:
- * `~/.meshtastic/lockdown/`), keyed by a sanitized device address; see [DesktopKeystoreCipher] for the key handling.
+ * Each passphrase entry is an AES-256-GCM `.enc` file under `$MT_SW_DATA_DIR/lockdown/` (default:
+ * `~/MT_SW/lockdown/`), keyed by a sanitized device address; see [DesktopKeystoreCipher] for the key handling.
  */
 @Single(binds = [LockdownPassphraseStore::class])
 @Suppress("TooGenericExceptionCaught")
