@@ -4815,4 +4815,6 @@
     <string name="trips_chart_signal">Najlepszy sygnał</string>
     <string name="remote_ignore_confirm_title">Ignorować na zdalnym urządzeniu?</string>
     <string name="remote_ignore_confirm_text">Zdalne urządzenie odrzuci pakiety z wybranych węzłów i usunie to, co od nich zapisało. Zdjęcie ignorowania później tego nie przywróci.</string>
+    <string name="remote_favorite_confirm_title">Dodać do ulubionych na zdalnym urządzeniu?</string>
+    <string name="remote_favorite_confirm_text">Wybrane węzły zostaną dodane do ulubionych zdalnego urządzenia. Jeśli urządzenie jeszcze ich nie zna, najpierw zostanie wysłany ich kontakt.</string>
 </resources>

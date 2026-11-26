@@ -3529,6 +3529,8 @@ remote_clear_selection
 remote_command_no_response
 remote_contact_hint
 remote_contact_title
+remote_favorite_confirm_text
+remote_favorite_confirm_title
 remote_hardware
 remote_hardware_config
 remote_hardware_enabled

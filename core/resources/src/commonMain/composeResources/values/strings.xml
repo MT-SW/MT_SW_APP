@@ -3607,6 +3607,8 @@
     <string name="remote_command_no_response">No response from node</string>
     <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, for the selected nodes or the typed ID.</string>
     <string name="remote_contact_title">Add a contact remotely</string>
+    <string name="remote_favorite_confirm_text">The selected nodes will be added to the favorites of the remote device. If it does not know a node yet, its contact is sent first.</string>
+    <string name="remote_favorite_confirm_title">Add to favorites on the remote device?</string>
     <string name="remote_hardware">Remote Hardware</string>
     <string name="remote_hardware_config">Remote Hardware Config</string>
     <string name="remote_hardware_enabled">Remote Hardware enabled</string>

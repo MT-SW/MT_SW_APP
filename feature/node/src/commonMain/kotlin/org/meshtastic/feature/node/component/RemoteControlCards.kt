@@ -106,6 +106,8 @@ import org.meshtastic.core.resources.remote_add_to_list
 import org.meshtastic.core.resources.remote_clear_selection
 import org.meshtastic.core.resources.remote_contact_hint
 import org.meshtastic.core.resources.remote_contact_title
+import org.meshtastic.core.resources.remote_favorite_confirm_text
+import org.meshtastic.core.resources.remote_favorite_confirm_title
 import org.meshtastic.core.resources.remote_id_invalid
 import org.meshtastic.core.resources.remote_ignore_confirm_text
 import org.meshtastic.core.resources.remote_ignore_confirm_title
@@ -556,7 +558,7 @@ internal fun RemoteNodeManagementPanel(
     val selected = remember { mutableStateListOf<Int>() }
     var pickerOpen by remember { mutableStateOf(false) }
     var confirmRemove by remember { mutableStateOf(false) }
-    var confirmIgnore by remember { mutableStateOf(false) }
+    var confirmAdd by remember { mutableStateOf(false) }
     val targets = (selected.toList() + listOfNotNull(targetNodeNum)).distinct()
     var listType by remember { mutableStateOf(RemoteListType.FAVORITE) }
     val listColor = if (listType == RemoteListType.FAVORITE) gold else purple
@@ -651,8 +653,8 @@ internal fun RemoteNodeManagementPanel(
                 modifier = Modifier.weight(1f),
                 enabled = !isEnsuringSession && targets.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(containerColor = listColor, contentColor = Color.Black),
-                // Ignoring makes the remote device delete what it stored from the node, so it asks first.
-                onClick = { if (listType == RemoteListType.IGNORE) confirmIgnore = true else send(add = true) },
+                // Adding to either list changes the remote device, so it asks first (ignoring also deletes data).
+                onClick = { confirmAdd = true },
             ) {
                 Text(stringResource(Res.string.remote_add_to_list))
             }
@@ -741,15 +743,35 @@ internal fun RemoteNodeManagementPanel(
             onDismiss = { pickerOpen = false },
         )
     }
-    if (confirmIgnore) {
+    if (confirmAdd) {
         AlertDialog(
-            onDismissRequest = { confirmIgnore = false },
-            title = { Text(stringResource(Res.string.remote_ignore_confirm_title)) },
-            text = { Text(stringResource(Res.string.remote_ignore_confirm_text)) },
+            onDismissRequest = { confirmAdd = false },
+            title = {
+                Text(
+                    stringResource(
+                        if (listType == RemoteListType.IGNORE) {
+                            Res.string.remote_ignore_confirm_title
+                        } else {
+                            Res.string.remote_favorite_confirm_title
+                        },
+                    ),
+                )
+            },
+            text = {
+                Text(
+                    stringResource(
+                        if (listType == RemoteListType.IGNORE) {
+                            Res.string.remote_ignore_confirm_text
+                        } else {
+                            Res.string.remote_favorite_confirm_text
+                        },
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        confirmIgnore = false
+                        confirmAdd = false
                         send(add = true)
                     },
                 ) {
@@ -757,7 +779,7 @@ internal fun RemoteNodeManagementPanel(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { confirmIgnore = false }) { Text(stringResource(Res.string.cancel)) }
+                TextButton(onClick = { confirmAdd = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
     }

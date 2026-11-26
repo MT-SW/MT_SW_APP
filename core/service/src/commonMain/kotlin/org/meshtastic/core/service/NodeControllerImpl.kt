@@ -20,8 +20,6 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.handledLaunch
-import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.util.toSharedContact
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeController
@@ -70,15 +68,11 @@ internal class NodeControllerImpl(
             // even be in ours), so this is unconditional — no local idempotency check, no local DB update.
             if (favorite && nodeManager.nodeDBbyNodeNum[target]?.user?.role == Config.DeviceConfig.Role.CLIENT_BASE) {
                 // MT_SW: a Client Base does not favorite a node when it learns its contact, and a favorite for a node
-                // it does not know does nothing. So the contact (with its key) goes first and the favorite only
-                // after the device has confirmed it.
-                val contact = nodeManager.nodeDBbyNodeNum[nodeNum]?.toSharedContact()
-                val key = contact?.user?.public_key
-                val keyValid = key != null && key.size == Node.PUBLIC_KEY_SIZE && key != Node.ERROR_BYTE_STRING
-                if (contact == null || !keyValid) {
-                    Logger.w { "Zdalne ulubione: nie wysłano, brak zaufanego klucza węzła ${nodeNum.toUInt()}" }
-                    return false
-                }
+                // it does not know does nothing. So the contact goes first (with the key when we hold one) and the
+                // favorite only after the device has confirmed it.
+                val known = nodeManager.nodeDBbyNodeNum[nodeNum]
+                val longName = known?.user?.long_name.orEmpty()
+                val contact = buildRemoteContact(known, nodeNum, longName, known?.user?.short_name.orEmpty())
                 val contactSent =
                     commandSender.sendAdminAndAwaitDelivery(target) {
                         AdminMessage.Builder().also { wb -> wb.add_contact = contact }.build()
