@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.icon.Hiking
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,7 +61,6 @@ import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.TripsWindowRequest
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
@@ -153,7 +153,7 @@ internal fun PositionInlineContent(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
         ) {
-            Icon(MeshtasticIcons.PhotoCamera, null, Modifier.size(18.dp))
+            Icon(MeshtasticIcons.Hiking, null, Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(Res.string.trips_title),
@@ -179,7 +179,7 @@ internal fun PositionInlineContent(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
         ) {
-            Icon(MeshtasticIcons.PhotoCamera, null, Modifier.size(18.dp))
+            Icon(MeshtasticIcons.Hiking, null, Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(Res.string.trips_title),

@@ -29,6 +29,7 @@ import org.meshtastic.core.resources.ic_my_location
 import org.meshtastic.core.resources.ic_navigation
 import org.meshtastic.core.resources.ic_pin_drop
 import org.meshtastic.core.resources.ic_place
+import org.meshtastic.core.resources.ic_hiking
 import org.meshtastic.core.resources.ic_route
 import org.meshtastic.core.resources.ic_trip_origin
 import org.meshtastic.core.resources.ic_tune
@@ -59,6 +60,9 @@ val MeshtasticIcons.Map: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_map)
 val MeshtasticIcons.LocationOn: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_location_on)
+val MeshtasticIcons.Hiking: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_hiking)
+
 val MeshtasticIcons.Route: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_route)
 

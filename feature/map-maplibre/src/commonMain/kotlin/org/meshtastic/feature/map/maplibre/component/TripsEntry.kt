@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.ui.icon.Hiking
 import org.meshtastic.core.resources.trips_info_4
 import org.meshtastic.core.resources.trips_info_3
 import org.meshtastic.core.resources.trips_info_2
@@ -80,7 +81,7 @@ import org.meshtastic.feature.map.trip.stats
  */
 @Composable
 internal fun TripsEntry() {
-    StyledListItem(text = stringResource(Res.string.trips_title)) {
+    StyledListItem(text = stringResource(Res.string.trips_title), leadingIcon = MeshtasticIcons.Hiking) {
         Logger.i { "Wędrówki: okno otwarte z menu warstw" }
         TripsWindowRequest.requested.value = true
     }

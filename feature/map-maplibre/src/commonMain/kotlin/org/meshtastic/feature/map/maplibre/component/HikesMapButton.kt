@@ -27,7 +27,7 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.trips_title
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.Route
+import org.meshtastic.core.ui.icon.Hiking
 import org.meshtastic.core.ui.util.TripsWindowRequest
 import org.meshtastic.feature.map.component.MapButton
 import org.meshtastic.feature.map.track.TrackRecorder
@@ -42,7 +42,7 @@ internal fun HikesMapButton() {
     val state by recorder.state.collectAsStateWithLifecycle()
     BadgedBox(badge = { if (state.recording) Badge() }) {
         MapButton(
-            icon = MeshtasticIcons.Route,
+            icon = MeshtasticIcons.Hiking,
             contentDescription = stringResource(Res.string.trips_title),
             onClick = {
                 Logger.i { "Wędrówki: okno otwarte z przycisku na mapie" }
