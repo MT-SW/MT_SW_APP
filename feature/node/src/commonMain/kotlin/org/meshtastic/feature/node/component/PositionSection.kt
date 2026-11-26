@@ -68,7 +68,6 @@ import org.meshtastic.core.resources.trips_from_node
 import org.meshtastic.core.resources.trips_mine
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeImporter
-import org.meshtastic.core.resources.trips_title
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
