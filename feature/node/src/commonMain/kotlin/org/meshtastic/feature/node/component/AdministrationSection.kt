@@ -71,6 +71,13 @@ import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.component.StyledBottomSheet
+import org.meshtastic.core.resources.remote_lists_open_description
+import org.meshtastic.core.resources.remote_lists_open
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
 import org.meshtastic.core.ui.icon.Icecream
@@ -100,6 +107,7 @@ fun AdministrationSection(
     modifier: Modifier = Modifier,
     gpioPins: List<RemoteHardwarePin>? = null,
     gpioAdminSupported: Boolean = false,
+    remoteAdminKnown: Boolean = false,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
         SectionCard(
@@ -126,15 +134,6 @@ fun AdministrationSection(
                         isEnsuringSession = isEnsuringSession,
                         onAction = onAction,
                     )
-
-                    if (sessionStatus is SessionStatus.Active) {
-                        SectionDivider()
-                        RemoteNodeManagementPanel(
-                            destNum = node.num,
-                            isEnsuringSession = isEnsuringSession,
-                            onAction = onAction,
-                        )
-                    }
 
                     // The node gates the shell on the same admin_key list as remote admin, so the row
                     // establishes that session first, as the remote-admin row does. Only meshtasticd builds the
@@ -172,6 +171,12 @@ fun AdministrationSection(
                     leadingIcon = MeshtasticIcons.Memory,
                     onClick = { onAction(NodeDetailAction.Navigate(NodeDetailRoute.OnDemandLog(node.num))) },
                 )
+
+                // Next to the on-demand diagnostics, and there for good once the device was confirmed as the user's own.
+                if (!metricsState.isLocal && remoteAdminKnown) {
+                    SectionDivider()
+                    RemoteListsEntry(node = node, isEnsuringSession = isEnsuringSession, onAction = onAction)
+                }
             }
         }
 
@@ -181,6 +186,37 @@ fun AdministrationSection(
         val firmwareEdition = metricsState.firmwareEdition
         if (firmwareVersion != null || (firmwareEdition != null && metricsState.isLocal)) {
             FirmwareSection(metricsState, firmwareEdition, firmwareVersion, onFirmwareSelect)
+        }
+    }
+}
+
+/**
+ * MT_SW: the "Remote lists" entry. A tap opens a window (the same kind as the map's) with everything that changes the
+ * favorites, the ignored list and the contacts of the remote device; the admin session is brought up at that moment,
+ * so the window is ready to send.
+ */
+@Composable
+private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    ListItem(
+        text = stringResource(Res.string.remote_lists_open),
+        leadingIcon = MeshtasticIcons.Favorite,
+        supportingText = stringResource(Res.string.remote_lists_open_description),
+        onClick = {
+            open = true
+            onAction(NodeDetailAction.EnsureRemoteSession(node.num))
+        },
+    )
+    if (open) {
+        StyledBottomSheet(
+            onDismissRequest = {
+                Logger.i { "Zdalne listy: okno zamknięte" }
+                open = false
+            },
+        ) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                RemoteNodeManagementPanel(destNum = node.num, isEnsuringSession = isEnsuringSession, onAction = onAction)
+            }
         }
     }
 }

@@ -205,5 +205,6 @@ class HandleNodeActionTest {
             override suspend fun getCurrentLocation() = null
         },
         nakWatcher = testNakWatcher(),
+        remoteAdminKnown = testRemoteAdminKnownPrefs(),
     )
 }

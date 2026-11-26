@@ -3579,6 +3579,8 @@
     <string name="remote_id_invalid">This does not look like a node ID (for example !a1b2c3d4)</string>
     <string name="remote_list_favorites">Favorites</string>
     <string name="remote_list_ignored">Ignored</string>
+    <string name="remote_lists_open">Remote lists</string>
+    <string name="remote_lists_open_description">Favorites, ignored and contacts on this device</string>
     <string name="remote_manage_hint">Pick nodes from your own list or type the ID of a node you want to manage on the remote device, for example !a1b2c3d4. A typed node does not have to be on your own list.</string>
     <string name="remote_manage_title">Lists and contacts on the remote device</string>
     <string name="remote_pick_from_list">Pick from node list</string>

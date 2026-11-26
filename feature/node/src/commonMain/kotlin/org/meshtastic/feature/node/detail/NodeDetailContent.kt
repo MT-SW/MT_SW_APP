@@ -181,6 +181,7 @@ fun NodeDetailList(
                         isEnsuringSession = uiState.isEnsuringSession,
                         gpioPins = uiState.gpioPins,
                         gpioAdminSupported = uiState.gpioAdminSupported,
+                        remoteAdminKnown = uiState.remoteAdminKnown,
                     )
                 }
             }

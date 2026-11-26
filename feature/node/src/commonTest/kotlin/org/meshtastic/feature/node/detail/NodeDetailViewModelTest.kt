@@ -104,6 +104,7 @@ class NodeDetailViewModelTest {
             override suspend fun getCurrentLocation() = null
         },
         nakWatcher = testNakWatcher(),
+        remoteAdminKnown = testRemoteAdminKnownPrefs(),
         resolveUiText = resolveNodeDetailUiTextForTest,
     )
 

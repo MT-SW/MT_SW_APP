@@ -64,6 +64,7 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.RemoteAdminKnownPrefs
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
@@ -120,6 +121,8 @@ data class NodeDetailUiState(
     val relayNodeName: String? = null,
     val sessionStatus: SessionStatus = SessionStatus.NoSession,
     val isEnsuringSession: Boolean = false,
+    /** The device was once confirmed as the user's own through remote management (kept for good). */
+    val remoteAdminKnown: Boolean = false,
     val showNarrowBandWarning: Boolean = false,
     /**
      * Contact key of an existing direct-message thread with this node, or null. Held as the key rather than a flag: the
@@ -157,6 +160,7 @@ class NodeDetailViewModel(
     private val radioConfigRepository: RadioConfigRepository,
     private val locationService: LocationService,
     private val nakWatcher: RequestNakWatcher,
+    private val remoteAdminKnown: RemoteAdminKnownPrefs,
     private val resolveUiText: suspend (UiText) -> String = { it.resolve() },
 ) : ViewModel() {
 
@@ -232,8 +236,11 @@ class NodeDetailViewModel(
                         },
                         gpioPinsByNode.map { it[nodeId] },
                         queryController.gpioAdminSupportedFlow(nodeId).onStart { emit(false) },
-                    ) { state, pins, gpioSupported ->
-                        state.copy(gpioPins = pins, gpioAdminSupported = gpioSupported)
+                        remoteAdminKnown.known.map { nodeId in it },
+                    ) { state, pins, gpioSupported, known ->
+                        // An active session is itself the confirmation, so it counts at once.
+                        val confirmed = known || state.sessionStatus is SessionStatus.Active
+                        state.copy(gpioPins = pins, gpioAdminSupported = gpioSupported, remoteAdminKnown = confirmed)
                     }
                 }
             }
@@ -448,7 +455,16 @@ class NodeDetailViewModel(
     fun openRemoteShell(destNum: Int) =
         ensureSessionThenNavigate(destNum, "openRemoteShell") { NodeDetailRoute.RemoteShell(destNum) }
 
-    private fun ensureSessionThenNavigate(destNum: Int, tag: String, destination: () -> Route) {
+    /**
+     * Opens the "Remote lists" window: the admin session is brought up (or found already up) and nothing is navigated
+     * to, so the window can send its commands over it.
+     */
+    fun ensureRemoteSession(destNum: Int) {
+        Logger.i { "Zdalne listy: okno otwarte dla urządzenia ${destNum.toUInt()}, sprawdzam sesję" }
+        ensureSessionThenNavigate(destNum, "ensureRemoteSession") { null }
+    }
+
+    private fun ensureSessionThenNavigate(destNum: Int, tag: String, destination: () -> Route?) {
         // Atomic check-and-flip prevents a double-tap from queuing two passkey exchanges + two navigation events.
         if (!isEnsuringSession.compareAndSet(expect = false, update = true)) return
         safeLaunch(tag = tag) {
@@ -456,7 +472,11 @@ class NodeDetailViewModel(
                 when (val result = ensureRemoteAdminSession(destNum)) {
                     EnsureSessionResult.AlreadyActive,
                     EnsureSessionResult.Refreshed,
-                    -> _navigationEvents.trySend(destination())
+                    -> {
+                        // The device answered the passkey exchange, so it is the user's own: remember it for good.
+                        remoteAdminKnown.markKnown(destNum)
+                        destination()?.let { _navigationEvents.trySend(it) }
+                    }
 
                     EnsureSessionResult.Disconnected -> {
                         val text = Res.string.connect_radio_for_remote_admin

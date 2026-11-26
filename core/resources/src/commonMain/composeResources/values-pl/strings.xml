@@ -2785,6 +2785,8 @@
     <string name="remote_add_to_list">Dodaj do listy</string>
     <string name="remote_remove_from_list">Usuń z listy</string>
     <string name="remote_pick_from_list">Wybierz z listy węzłów</string>
+    <string name="remote_lists_open">Zdalne listy</string>
+    <string name="remote_lists_open_description">Ulubione, ignorowane i kontakty na tym urządzeniu</string>
     <string name="remote_pick_search">Szukaj węzła</string>
     <string name="remote_selected_count">Wybrano: %1$d</string>
     <string name="remote_clear_selection">Wyczyść wybór</string>

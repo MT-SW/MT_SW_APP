@@ -23,10 +23,13 @@ import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.di.asServiceScope
 import org.meshtastic.core.repository.RadioController
+import org.meshtastic.core.repository.RemoteAdminKnownPrefs
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.ui.util.SnackbarManager
@@ -45,6 +48,16 @@ internal fun testNakWatcher(
     val serviceRepository = mock<ServiceRepository>(MockMode.autofill)
     every { serviceRepository.meshPacketFlow } returns packets
     return RequestNakWatcher(radioController, serviceRepository, scope.asServiceScope(), snackbarManager, resolveUiText)
+}
+
+/** Remembers confirmed devices in memory only, which is all the screen tests need. */
+internal fun testRemoteAdminKnownPrefs(): RemoteAdminKnownPrefs = object : RemoteAdminKnownPrefs {
+    private val state = MutableStateFlow<Set<Int>>(emptySet())
+    override val known: StateFlow<Set<Int>> = state
+
+    override fun markKnown(nodeNum: Int) {
+        state.value = state.value + nodeNum
+    }
 }
 
 internal fun routingNakPacket(requestId: Int, from: Int, error: Routing.Error): MeshPacket {

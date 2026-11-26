@@ -3501,6 +3501,8 @@ remote_hardware_enabled
 remote_id_invalid
 remote_list_favorites
 remote_list_ignored
+remote_lists_open
+remote_lists_open_description
 remote_manage_hint
 remote_manage_title
 remote_pick_from_list
