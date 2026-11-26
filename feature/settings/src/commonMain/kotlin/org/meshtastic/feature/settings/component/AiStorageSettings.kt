@@ -142,7 +142,7 @@ internal fun AiStorageRow() {
     val computer = i.choices.isEmpty()
     // Always clickable (a phone without an SD card explains in the dialog why there is only one place to choose).
     val canClick = i.canChange && move !is AiStorageMove.Moving
-    val change = {
+    val change: () -> Unit = {
         if (computer) {
             scope.launch { store.pickStorageFolder()?.let { store.moveStorage(it) } }
         } else {
