@@ -594,8 +594,7 @@ internal fun RemoteNodeManagementPanel(
         ) {
             Text(
                 text = stringResource(Res.string.remote_lists_open),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.weight(1f),
             )
             InfoButton(

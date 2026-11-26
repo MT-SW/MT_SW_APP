@@ -112,7 +112,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(Res.string.trips_title),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f).padding(vertical = 12.dp),
                 )
                 InfoButton(
