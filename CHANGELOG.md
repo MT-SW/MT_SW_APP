@@ -23,6 +23,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 #### Wersja v5 (2.8.5)
 
 ##### Nowe funkcje
+* **Wędrówki (wszystkie wersje, etap 1).** Nowe menu „Wędrówki” w warstwach mapy i przycisk „Wędrówki” w szczegółach własnego węzła pod minimapką pozycji. W oknie: nagrywanie trasy, ikona aparatu robiąca zdjęcie przypisane do miejsca na trasie, lista zapisanych wypraw z pokazywaniem na mapie (ślad i kropki w miejscach zdjęć) i usuwaniem. Wyprawy są zapisywane na urządzeniu. Kolejne etapy: miniatury zdjęć w kroplach na mapie, odtwarzanie ze slajdami i udostępnianie linkiem.
 * **Wirtualny spacer po trasie (wszystkie wersje).** Przy zapisanej sesji „Pomiaru sygnału” (menu warstw mapy) jest przycisk odtwarzania: po mapie w widoku 3D porusza się punkt ze śladem, a panel pokazuje, który węzeł był tam słyszany i z jakim sygnałem; pauza, prędkość 1x–16x i suwak.
 * **Zrób zdjęcie w rozmowie (Android i iPhone/iPad).** Obok przycisku zdjęcia z galerii jest ikona aparatu; zdjęcie zrobione na miejscu idzie tą samą drogą co zdjęcie z galerii (ostrzeżenie, wysyłanie jako link). Na komputerze zostaje wybór pliku.
 * **Podsumowanie logów i jakość łącza (wszystkie wersje).** W ustawieniach logów dwa okna: podsumowanie tego, co poszło źle od uruchomienia aplikacji (ostrzeżenia i błędy zgrupowane według treści, płynność mapy) oraz jakość łącza każdego urządzenia (przekroczenia czasu, zamknięte łącza, błędy). Liczy tylko od uruchomienia aplikacji; przycisk czyści liczenie.
@@ -1028,6 +1029,7 @@ The main things of every version, split by kind of change (the "What's new in th
 #### Version v5 (2.8.5)
 
 ##### New features
+* **Hikes (all versions, stage 1).** A new "Hikes" menu in the map layers and a "Hikes" button in the own node's details under the position mini map. The window has route recording, a camera icon that takes a picture tied to the place on the route, and a list of saved hikes to show on the map (route and dots where pictures were taken) or delete. Hikes are kept on the device. Next stages: picture thumbnails in drops on the map, replay with slides, and sharing by link.
 * **Virtual route walk (all versions).** A saved "Signal survey" session (map layers menu) has a play button: a dot with a trail moves over the map in a 3D view, and a panel shows which node was heard there and how strongly; pause, speed 1x–16x and a slider.
 * **Take a picture in a conversation (Android and iPhone/iPad).** A camera icon next to the gallery picture button; a picture taken on the spot goes the same way as one from the gallery (warning, sent as a link). On desktop the file choice stays.
 * **Log summary and link quality (all versions).** Two windows in the log settings: a summary of what went wrong since the app started (warnings and errors grouped by what they say, map smoothness) and the link quality of each device (timeouts, closed links, errors). It counts only since the app started; a button clears the count.

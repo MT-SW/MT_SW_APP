@@ -271,6 +271,8 @@ On weaker devices big models can slow the app down or get it closed, so every mo
 
 **Virtual walk and camera.** A saved signal survey session (map layers menu) has a play button: a dot moves over the map in a 3D view while a panel shows the heard node and signal, with pause, speed and a slider. In a conversation a camera icon sits next to the gallery picture button (Android and iPhone/iPad); the picture goes the same way as one from the gallery.
 
+**Hikes.** The map layers menu and the own node's details (under the position mini map) have "Hikes": route recording, a camera icon that takes a picture tied to the place on the route, and a list of saved hikes to show on the map (route and dots where pictures were taken) or delete. Hikes are kept on the device. Works the same on Android, desktop and iPhone/iPad (camera: Android and iPhone/iPad).
+
 **Compare devices side by side.** In "MT_SW features" → "Connection center" → "Compare devices" a window opens with a card for each saved device: connected or not, battery and voltage, channel use and transmit time, uptime, active nodes and new messages. The data is the last reported, read from the device's own database; "Refresh" reads it again. Works the same on Android, desktop and iPhone/iPad.
 
 **Log summary, link quality, route recording, offline map range.** The log settings have "Log summary" and "Device link quality" windows (counted since the app started). The map layers menu records your own route with GPX export (only while the app runs). Downloading offline maps lets you choose a radius up to 1000 km and a detail level, with an estimated size and a warning.
