@@ -702,7 +702,8 @@ internal fun RemoteNodeManagementPanel(
         Button(
             enabled =
             !isEnsuringSession &&
-                (selected.isNotEmpty() || (targetNodeNum != null && longNameState.text.isNotBlank())),
+                (selected.isNotEmpty() ||
+                    (targetNodeNum != null && (longNameState.text.isNotBlank() || nodeDb.containsKey(targetNodeNum)))),
             onClick = {
                 // Ticked nodes are saved with the names from our own list; a typed ID with the names typed here.
                 selected.toList().forEach { num ->
@@ -712,13 +713,16 @@ internal fun RemoteNodeManagementPanel(
                         onAction(contact)
                     }
                 }
-                if (targetNodeNum != null && longNameState.text.isNotBlank()) {
+                // A typed ID that is in our database goes with the key and the names we hold; one that is not goes
+                // without a key, with the names typed here.
+                if (targetNodeNum != null && (longNameState.text.isNotBlank() || nodeDb.containsKey(targetNodeNum))) {
+                    val known = nodeDb[targetNodeNum]?.user
                     onAction(
                         NodeDetailAction.AddRemoteContact(
                             destNum,
                             targetNodeNum,
-                            longNameState.text.toString(),
-                            shortNameState.text.toString(),
+                            longNameState.text.toString().ifBlank { known?.long_name.orEmpty() },
+                            shortNameState.text.toString().ifBlank { known?.short_name.orEmpty() },
                         ),
                     )
                 }
