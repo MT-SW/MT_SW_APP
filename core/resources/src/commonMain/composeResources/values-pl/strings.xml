@@ -4779,4 +4779,7 @@
     <string name="device_history_title">W ciągu ostatnich %1$d godz.:</string>
     <string name="device_history_battery">bateria %1$s</string>
     <string name="device_history_load">obciążenie kanału %1$s (było %2$s)</string>
+    <string name="trips_album_note">Zdjęcia zrobione tutaj są też zapisywane w osobnym albumie „MT_SW” (na komputerze: w folderze), więc usunięcie wędrówki ich nie kasuje.</string>
+    <string name="trips_album_folder">Folder zdjęć: %1$s</string>
+    <string name="trips_album_change">Zmień folder</string>
 </resources>

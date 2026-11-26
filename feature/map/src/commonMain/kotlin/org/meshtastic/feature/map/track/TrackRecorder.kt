@@ -168,6 +168,7 @@ class TrackRecorder(
         }
         val now = nowMillis
         val photo = tripStore.writePhoto(s.tripId, bytes, now) ?: return false
+        tripStore.archive(bytes)
         mutableState.update { old ->
             val last = old.stops.lastOrNull()
             val near =

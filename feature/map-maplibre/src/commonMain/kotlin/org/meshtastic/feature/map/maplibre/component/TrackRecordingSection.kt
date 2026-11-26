@@ -44,15 +44,22 @@ import org.meshtastic.core.resources.track_rec_start
 import org.meshtastic.core.resources.track_rec_status
 import org.meshtastic.core.resources.track_rec_stop
 import org.meshtastic.core.resources.track_rec_title
+import org.meshtastic.core.resources.trips_album_change
+import org.meshtastic.core.resources.trips_album_folder
+import org.meshtastic.core.resources.trips_album_note
 import org.meshtastic.core.resources.trips_photo
 import org.meshtastic.core.resources.trips_quiet_hint
 import org.meshtastic.core.resources.trips_quiet_off
 import org.meshtastic.core.resources.trips_quiet_priority
 import org.meshtastic.core.resources.trips_quiet_silent
 import org.meshtastic.core.resources.trips_quiet_title
+import org.koin.compose.koinInject
 import org.meshtastic.core.repository.QuietMode
+import org.meshtastic.feature.map.trip.TripStore
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.util.defaultAlbumFolder
+import org.meshtastic.core.ui.util.rememberAlbumFolderPicker
 import org.meshtastic.core.ui.util.rememberCameraLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.map.track.TrackRecorder
@@ -89,6 +96,17 @@ internal fun TrackRecordingSection() {
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
+        }
+        val store: TripStore = koinInject()
+        val folder by store.albumFolder.collectAsStateWithLifecycle()
+        val pickFolder = rememberAlbumFolderPicker { store.setAlbumFolder(it) }
+        Text(text = stringResource(Res.string.trips_album_note), style = MaterialTheme.typography.bodySmall)
+        if (pickFolder != null) {
+            Text(
+                text = stringResource(Res.string.trips_album_folder, folder ?: defaultAlbumFolder().orEmpty()),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            OutlinedButton(onClick = pickFolder) { Text(stringResource(Res.string.trips_album_change)) }
         }
         val quiet by QuietMode.mode.collectAsStateWithLifecycle()
         Text(text = stringResource(Res.string.trips_quiet_title), style = MaterialTheme.typography.titleSmall)

@@ -4365,6 +4365,9 @@ triple_click_adhoc_ping
 ### TRIPS ###
 trips_add_gallery
 trips_add_stop
+trips_album_change
+trips_album_folder
+trips_album_note
 trips_caption
 trips_chosen
 trips_empty

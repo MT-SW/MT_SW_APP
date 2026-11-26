@@ -27,6 +27,7 @@ import okio.FileSystem
 import okio.Path
 import org.koin.core.annotation.Single
 import org.meshtastic.core.ui.util.ExifInfo
+import org.meshtastic.core.ui.util.saveToHikeAlbum
 import org.meshtastic.core.ui.util.scaleJpeg
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
@@ -56,8 +57,41 @@ class TripStore {
     /** The ids of the hikes drawn on the map. */
     val visibleIds = MutableStateFlow<Set<String>>(emptySet())
 
+    private val folderFile: Path = root / "album_folder.txt"
+
+    /** The folder the pictures are copied to on the computer (null: the default one, or the system album). */
+    val albumFolder = MutableStateFlow<String?>(null)
+
     init {
+        albumFolder.value =
+            try {
+                if (fs.exists(folderFile)) fs.read(folderFile) { readUtf8() }.trim().ifBlank { null } else null
+            } catch (e: Exception) {
+                Logger.w { "Wędrówki: folder zdjęć nie został odczytany: ${e.message}" }
+                null
+            }
         refresh()
+    }
+
+    fun setAlbumFolder(path: String) {
+        albumFolder.value = path
+        try {
+            fs.createDirectories(root)
+            fs.write(folderFile) { writeUtf8(path) }
+            Logger.i { "Wędrówki: zmieniono folder zdjęć" }
+        } catch (e: Exception) {
+            Logger.w { "Wędrówki: folder zdjęć nie został zapisany: ${e.message}" }
+        }
+    }
+
+    /**
+     * Keeps a whole copy of a picture taken for a hike in the separate album (the folder on the computer), so deleting
+     * a hike in the app never deletes the picture.
+     */
+    fun archive(bytes: ByteArray) {
+        val name = "mtsw_${org.meshtastic.core.common.util.nowMillis}.jpg"
+        val saved = saveToHikeAlbum(bytes, name, albumFolder.value)
+        Logger.i { "Wędrówki: kopia zdjęcia w albumie: ${if (saved) "zapisana" else "niezapisana"}" }
     }
 
     fun refresh() {

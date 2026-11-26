@@ -250,7 +250,11 @@ private fun NameField(trip: Trip, store: TripStore) {
 private fun StopCard(trip: Trip, stop: TripStop, number: Int, focused: Boolean, onOpenPhoto: (String) -> Unit) {
     val store: TripStore = koinInject()
     val scope = rememberCoroutineScope()
-    val camera = rememberCameraLauncher { bytes, _ -> store.addPhotos(trip.id, stop.id, listOf(bytes to nowTaken())) }
+    val camera =
+        rememberCameraLauncher { bytes, _ ->
+            store.archive(bytes)
+            store.addPhotos(trip.id, stop.id, listOf(bytes to nowTaken()))
+        }
     val gallery =
         rememberMultiImagePicker { picked ->
             scope.launch {
