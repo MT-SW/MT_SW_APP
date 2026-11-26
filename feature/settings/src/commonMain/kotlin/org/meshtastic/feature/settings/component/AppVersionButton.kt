@@ -74,13 +74,13 @@ internal fun AppVersionButton(
         clickCount = clickCount.inc().coerceIn(0, KEEP_CLICK_COUNT)
 
         when {
-            clickCount == UNLOCKED_CLICK_COUNT && hiddenFeaturesUnlocked -> {
-                scope.launch { showToast(Res.string.modules_already_unlocked) }
-            }
-
             clickCount == UNLOCK_CLICK_COUNT && !hiddenFeaturesUnlocked -> {
                 onUnlockHiddenFeatures()
                 scope.launch { showToast(Res.string.modules_unlocked) }
+            }
+
+            clickCount in UNLOCKED_CLICK_COUNT..<KEEP_CLICK_COUNT && hiddenFeaturesUnlocked -> {
+                scope.launch { showToast(Res.string.modules_already_unlocked) }
             }
 
             clickCount == KEEP_CLICK_COUNT -> {
