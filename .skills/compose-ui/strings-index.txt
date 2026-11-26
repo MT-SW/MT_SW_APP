@@ -4365,6 +4365,9 @@ trips_add_stop
 trips_caption
 trips_chosen
 trips_empty
+trips_import_button
+trips_import_done
+trips_import_progress
 trips_item
 trips_move_to
 trips_no_time
@@ -4372,6 +4375,16 @@ trips_photo
 trips_photo_taken
 trips_rename
 trips_send_this
+trips_share
+trips_share_chat
+trips_share_chat_hint
+trips_share_copy
+trips_share_from
+trips_share_go
+trips_share_progress
+trips_share_range
+trips_share_to
+trips_share_warning
 trips_stop
 trips_stop_place
 trips_stop_time

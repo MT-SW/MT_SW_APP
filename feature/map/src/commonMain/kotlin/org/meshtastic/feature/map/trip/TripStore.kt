@@ -310,26 +310,36 @@ class TripStore {
         Logger.i { "Wędrówki: punkt usunięty" }
     }
 
-    private fun meters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val dLat = (lat2 - lat1) * PI / DEG
-        val dLon = (lon2 - lon1) * PI / DEG
-        val h =
-            sin(dLat / 2) * sin(dLat / 2) +
-                cos(lat1 * PI / DEG) * cos(lat2 * PI / DEG) * sin(dLon / 2) * sin(dLon / 2)
-        return 2 * EARTH_RADIUS_M * asin(sqrt(h))
-    }
+    /** Sets the link a picture was uploaded to. */
+    fun setPhotoUrl(tripId: String, stopId: String, file: String, url: String) =
+        mutateStop(tripId, stopId) { s ->
+            s.copy(photos = s.photos.map { if (it.file == file) it.copy(url = url) else it })
+        }
 
-    private companion object {
-        const val TRIP_FILE = "trip.json"
-        const val MAIN_SIDE = 1600
-        const val MAIN_QUALITY = 85
-        const val THUMB_SIDE = 256
-        const val THUMB_QUALITY = 80
-        const val ID_CHARS = 8
-        const val STOP_JOIN_METERS = 40.0
-        const val GPS_MATCH_METERS = 150.0
-        const val TIME_SLACK_MS = 5 * 60_000L
-        const val DEG = 180.0
-        const val EARTH_RADIUS_M = 6_371_000.0
+    private fun meters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double =
+        Companion.meters(lat1, lon1, lat2, lon2)
+
+    companion object {
+        private const val TRIP_FILE = "trip.json"
+        private const val MAIN_SIDE = 1600
+        private const val MAIN_QUALITY = 85
+        private const val THUMB_SIDE = 256
+        private const val THUMB_QUALITY = 80
+        private const val ID_CHARS = 8
+        private const val STOP_JOIN_METERS = 40.0
+        private const val GPS_MATCH_METERS = 150.0
+        private const val TIME_SLACK_MS = 5 * 60_000L
+        private const val DEG = 180.0
+        private const val EARTH_RADIUS_M = 6_371_000.0
+
+        /** The distance between two places in metres. */
+        fun meters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+            val dLat = (lat2 - lat1) * PI / DEG
+            val dLon = (lon2 - lon1) * PI / DEG
+            val h =
+                sin(dLat / 2) * sin(dLat / 2) +
+                    cos(lat1 * PI / DEG) * cos(lat2 * PI / DEG) * sin(dLon / 2) * sin(dLon / 2)
+            return 2 * EARTH_RADIUS_M * asin(sqrt(h))
+        }
     }
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ModifierMissing", "LongMethod", "TooManyFunctions")
+@file:Suppress("ModifierMissing", "LongMethod", "TooManyFunctions", "TooGenericExceptionCaught")
 
 package org.meshtastic.feature.map.maplibre.component
 
@@ -45,6 +45,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -62,6 +64,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -81,6 +84,16 @@ import org.meshtastic.core.resources.trips_no_time
 import org.meshtastic.core.resources.trips_photo_taken
 import org.meshtastic.core.resources.trips_rename
 import org.meshtastic.core.resources.trips_send_this
+import org.meshtastic.core.resources.trips_share
+import org.meshtastic.core.resources.trips_share_chat
+import org.meshtastic.core.resources.trips_share_chat_hint
+import org.meshtastic.core.resources.trips_share_copy
+import org.meshtastic.core.resources.trips_share_from
+import org.meshtastic.core.resources.trips_share_go
+import org.meshtastic.core.resources.trips_share_progress
+import org.meshtastic.core.resources.trips_share_range
+import org.meshtastic.core.resources.trips_share_to
+import org.meshtastic.core.resources.trips_share_warning
 import org.meshtastic.core.resources.trips_stop
 import org.meshtastic.core.resources.trips_stop_place
 import org.meshtastic.core.resources.trips_stop_time
@@ -92,10 +105,16 @@ import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.util.ChatDraftRequest
+import org.meshtastic.core.ui.util.HikeImportRequest
+import org.meshtastic.core.ui.util.HikeLinks
+import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.readExif
 import org.meshtastic.core.ui.util.rememberCameraLauncher
 import org.meshtastic.core.ui.util.rememberMultiImagePicker
+import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.feature.map.trip.Trip
+import org.meshtastic.feature.map.trip.TripShare
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripStore
 import org.meshtastic.feature.map.trip.TripViewRequest
@@ -104,6 +123,18 @@ import kotlin.math.abs
 /** Shows the details of a hike while a stop is asked for from the map (a tap on a drop). */
 @Composable
 internal fun TripViewHost() {
+    val store: TripStore = koinInject()
+    val playback: RoutePlayback = koinInject()
+    val received by HikeImportRequest.pendingReplay.collectAsStateWithLifecycle()
+    // A hike received from a message is replayed as soon as the map is shown.
+    LaunchedEffect(received) {
+        received?.let { id ->
+            Logger.i { "Wędrówki: odtwarzanie odebranej wędrówki" }
+            store.setVisible(id, true)
+            playback.playTrip(id)
+            HikeImportRequest.pendingReplay.value = null
+        }
+    }
     val request by TripViewRequest.stop.collectAsStateWithLifecycle()
     request?.let { (tripId, stopId) ->
         TripDetailWindow(tripId = tripId, focusStopId = stopId, onDismiss = { TripViewRequest.stop.value = null })
@@ -174,6 +205,8 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                     onOpenPhoto = { file -> editing = stop.id to file },
                 )
             }
+            HorizontalDivider()
+            ShareSection(trip = trip, onClose = onDismiss)
         }
     }
     editing?.let { (stopId, file) ->
@@ -434,3 +467,82 @@ internal fun TripSlideImage(tripId: String, file: String, modifier: Modifier = M
 }
 
 private const val SLIDE_MAX_HEIGHT_DP = 220
+
+/** The sharing of a hike: the part of the route to send, the warning, and the link at the end. */
+@Composable
+private fun ShareSection(trip: Trip, onClose: () -> Unit) {
+    val share: TripShare = koinInject()
+    val scope = rememberCoroutineScope()
+    val clipboard = LocalClipboard.current
+    var cutStart by remember(trip.id) { mutableFloatStateOf(0f) }
+    var cutEnd by remember(trip.id) { mutableFloatStateOf(trip.points.lastIndex.coerceAtLeast(0).toFloat()) }
+    var progress by remember(trip.id) { mutableStateOf<Pair<Int, Int>?>(null) }
+    var link by remember(trip.id) { mutableStateOf<String?>(null) }
+    if (trip.points.size < 2) return
+    val last = trip.points.lastIndex.toFloat()
+    Text(stringResource(Res.string.trips_share), style = MaterialTheme.typography.titleSmall)
+    Text(
+        text = stringResource(Res.string.trips_share_warning),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.error,
+    )
+    val from = trip.points[cutStart.toInt().coerceIn(0, trip.points.lastIndex)].t
+    val to = trip.points[cutEnd.toInt().coerceIn(0, trip.points.lastIndex)].t
+    Text(
+        text =
+        stringResource(Res.string.trips_share_range, DateFormatter.formatTime(from), DateFormatter.formatTime(to)),
+        style = MaterialTheme.typography.bodySmall,
+    )
+    Text(stringResource(Res.string.trips_share_from), style = MaterialTheme.typography.bodySmall)
+    Slider(value = cutStart, onValueChange = { cutStart = it.coerceAtMost(cutEnd) }, valueRange = 0f..last)
+    Text(stringResource(Res.string.trips_share_to), style = MaterialTheme.typography.bodySmall)
+    Slider(value = cutEnd, onValueChange = { cutEnd = it.coerceAtLeast(cutStart) }, valueRange = 0f..last)
+    val running = progress
+    if (running != null) {
+        Text(
+            text = stringResource(Res.string.trips_share_progress, running.first, running.second),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    } else {
+        TextButton(
+            onClick = {
+                progress = 0 to 1
+                scope.launch {
+                    try {
+                        link =
+                            share.share(trip.id, cutStart.toInt(), cutEnd.toInt()) { done, all ->
+                                progress = done to all
+                            }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Logger.w { "Wędrówki: udostępnianie nie udało się: ${e.message}" }
+                    }
+                    progress = null
+                }
+            },
+        ) {
+            Text(stringResource(Res.string.trips_share_go))
+        }
+    }
+    link?.let { url ->
+        Text(text = url, style = MaterialTheme.typography.bodySmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(
+                onClick = { scope.launch { clipboard.setClipEntry(createClipEntry(url, "hike")) } },
+            ) {
+                Text(stringResource(Res.string.trips_share_copy))
+            }
+            TextButton(
+                onClick = {
+                    ChatDraftRequest.text.value = HikeLinks.message(url)
+                    Logger.i { "Wędrówki: link wstawiony do następnej rozmowy" }
+                    onClose()
+                },
+            ) {
+                Text(stringResource(Res.string.trips_share_chat))
+            }
+        }
+        Text(stringResource(Res.string.trips_share_chat_hint), style = MaterialTheme.typography.bodySmall)
+    }
+}

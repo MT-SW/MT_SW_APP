@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "MutableStateAutoboxing")
+@file:Suppress("MagicNumber", "MutableStateAutoboxing", "TooGenericExceptionCaught")
 
 package org.meshtastic.feature.messaging.component
 
@@ -50,6 +50,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -91,6 +92,7 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -112,6 +114,9 @@ import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
 import org.meshtastic.core.resources.image_preview_failed
 import org.meshtastic.core.resources.image_preview_loading
+import org.meshtastic.core.resources.trips_import_button
+import org.meshtastic.core.resources.trips_import_done
+import org.meshtastic.core.resources.trips_import_progress
 import org.meshtastic.core.resources.message_translated_label
 import org.meshtastic.core.resources.mute_1_hour
 import org.meshtastic.core.resources.mute_1_month
@@ -158,6 +163,9 @@ import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.util.HikeImportRequest
+import org.meshtastic.core.ui.util.HikeImporter
+import org.meshtastic.core.ui.util.HikeLinks
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes
@@ -676,7 +684,9 @@ fun MessageItem(
                     // again;
                     // any other link is a guess at an image and is quietly hidden when it is none.
                     val ownHost = linkUrl?.let(::isOwnImageHost) == true
-                    if (linkUrl != null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
+                    val hikeUrl = remember(message.text) { HikeLinks.hikeUrl(message.text) }
+                    if (hikeUrl != null) HikeLinkButton(hikeUrl)
+                    if (linkUrl != null && hikeUrl == null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
                         if (linkImageFailed) {
                             Text(
                                 text = stringResource(Res.string.image_preview_failed),
@@ -1065,3 +1075,57 @@ private fun Long.toUntilMillis(): Long = if (this == Long.MAX_VALUE) this else n
 
 private const val BUBBLE_PERCENT = 100f
 private const val BUBBLE_MIN_ALPHA = 0.12f
+
+/** MT_SW: under a message that carries a shared hike: reads it into the own hikes, where the map replays it. */
+@Composable
+private fun HikeLinkButton(url: String) {
+    val importer: HikeImporter = koinInject()
+    val scope = rememberCoroutineScope()
+    // -1: not started, 0..: files done, DONE: saved.
+    var done by remember(url) { mutableStateOf(NOT_STARTED) }
+    var total by remember(url) { mutableStateOf(0) }
+    Row(
+        modifier = Modifier.padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        when (done) {
+            NOT_STARTED ->
+                TextButton(
+                    onClick = {
+                        done = 0
+                        Logger.i { "Wędrówki: odbieranie z wiadomości" }
+                        scope.launch {
+                            try {
+                                val id =
+                                    importer.import(url) { d, t ->
+                                        done = d
+                                        total = t
+                                    }
+                                HikeImportRequest.pendingReplay.value = id
+                                done = DONE
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                Logger.w { "Wędrówki: odbieranie nie udało się: ${e.message}" }
+                                done = NOT_STARTED
+                            }
+                        }
+                    },
+                ) {
+                    Text(stringResource(Res.string.trips_import_button))
+                }
+            DONE -> Text(stringResource(Res.string.trips_import_done), style = MaterialTheme.typography.bodySmall)
+            else -> {
+                ProgressSpinner(size = 14.dp)
+                Text(
+                    text = stringResource(Res.string.trips_import_progress, done, total),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+    }
+}
+
+private const val NOT_STARTED = -1
+private const val DONE = -2

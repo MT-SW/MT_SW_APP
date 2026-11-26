@@ -4755,4 +4755,17 @@
     <string name="trips_unplaced_note">Zdjęć bez informacji o miejscu: %1$d. Są na początku trasy, przesuń je ręcznie.</string>
     <string name="trips_photo_taken">Zdjęcie zrobione: %1$s</string>
     <string name="trips_no_time">Zdjęcie nie ma godziny</string>
+    <string name="trips_share">Udostępnij wędrówkę</string>
+    <string name="trips_share_warning">Pliki trafią na publiczny serwer: każdy, kto ma link, zobaczy trasę i zdjęcia. Przez sieć mesh idzie tylko link.</string>
+    <string name="trips_share_from">Obetnij początek trasy</string>
+    <string name="trips_share_to">Obetnij koniec trasy</string>
+    <string name="trips_share_range">Udostępniana część trasy: %1$s – %2$s</string>
+    <string name="trips_share_go">Wyślij na serwer i pobierz link</string>
+    <string name="trips_share_progress">Wysyłanie plików: %1$d z %2$d</string>
+    <string name="trips_share_copy">Skopiuj link</string>
+    <string name="trips_share_chat">Wstaw do pola wiadomości</string>
+    <string name="trips_share_chat_hint">Link czeka w polu wiadomości następnej rozmowy, którą otworzysz.</string>
+    <string name="trips_import_button">Odtwórz wędrówkę</string>
+    <string name="trips_import_progress">Odbieranie wędrówki: %1$d z %2$d</string>
+    <string name="trips_import_done">Wędrówka zapisana. Mapa odtworzy ją po otwarciu.</string>
 </resources>

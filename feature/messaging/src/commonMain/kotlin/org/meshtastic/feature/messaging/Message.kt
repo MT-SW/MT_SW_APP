@@ -153,6 +153,7 @@ import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.rememberUiOptions
+import org.meshtastic.core.ui.util.ChatDraftRequest
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.isFromSoftKeyboard
 import org.meshtastic.feature.messaging.component.ActionModeTopBar
@@ -285,6 +286,14 @@ fun MessageScreen(
         val draft = storedDraft
         if (!draft.isNullOrEmpty() && messageInputState.text.isEmpty()) {
             messageInputState.setTextAndPlaceCursorAtEnd(draft)
+        }
+    }
+
+    // MT_SW: the link of a shared hike waits for the next conversation that opens.
+    LaunchedEffect(messageInputState) {
+        ChatDraftRequest.text.value?.let { text ->
+            messageInputState.setTextAndPlaceCursorAtEnd(text)
+            ChatDraftRequest.text.value = null
         }
     }
 

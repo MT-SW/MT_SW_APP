@@ -4461,6 +4461,9 @@
     <string name="trips_caption">Caption</string>
     <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
+    <string name="trips_import_button">Replay the hike</string>
+    <string name="trips_import_done">The hike is saved. The map replays it when you open it.</string>
+    <string name="trips_import_progress">Receiving the hike: %1$d of %2$d</string>
     <string name="trips_item">%1$d m · pictures: %2$d</string>
     <string name="trips_move_to">Move to another point</string>
     <string name="trips_no_time">The picture has no time</string>
@@ -4468,6 +4471,16 @@
     <string name="trips_photo_taken">Picture taken: %1$s</string>
     <string name="trips_rename">Hike name</string>
     <string name="trips_send_this">Send this picture</string>
+    <string name="trips_share">Share the hike</string>
+    <string name="trips_share_chat">Put it in the message field</string>
+    <string name="trips_share_chat_hint">The link waits in the message field of the next conversation you open.</string>
+    <string name="trips_share_copy">Copy the link</string>
+    <string name="trips_share_from">Cut the start of the route</string>
+    <string name="trips_share_go">Upload and get the link</string>
+    <string name="trips_share_progress">Sending files: %1$d of %2$d</string>
+    <string name="trips_share_range">Shared part of the route: %1$s – %2$s</string>
+    <string name="trips_share_to">Cut the end of the route</string>
+    <string name="trips_share_warning">The files go to a public server: anyone with the link can see the route and the pictures. Only a link is sent over the mesh.</string>
     <string name="trips_stop">Point %1$d</string>
     <string name="trips_stop_place">Place on the route</string>
     <string name="trips_stop_time">Time on the route: %1$s</string>
