@@ -147,6 +147,7 @@ import org.meshtastic.core.ui.component.smartScrollToIndex
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.theme.AppTheme
@@ -1035,6 +1036,11 @@ internal fun MessageInput(
         pendingImageMimeType = mimeType
     }
 
+    val launchCamera = rememberCameraLauncher { bytes, mimeType ->
+        pendingImageBytes = bytes
+        pendingImageMimeType = mimeType
+    }
+
     pendingImageBytes?.let { bytesToSend ->
         AlertDialog(
             onDismissRequest = { pendingImageBytes = null },
@@ -1156,8 +1162,15 @@ internal fun MessageInput(
             // If strict real-time byte trimming is required, it needs careful handling of
             // cursor position and multi-byte characters, likely outside simple inputTransformation.
             leadingIcon = {
-                IconButton(onClick = launchImagePicker, enabled = isEnabled) {
-                    Icon(imageVector = addIcon, contentDescription = "Wyślij zdjęcie")
+                Row {
+                    IconButton(onClick = launchImagePicker, enabled = isEnabled) {
+                        Icon(imageVector = addIcon, contentDescription = "Wyślij zdjęcie")
+                    }
+                    launchCamera?.let { camera ->
+                        IconButton(onClick = camera, enabled = isEnabled) {
+                            Icon(imageVector = MeshtasticIcons.PhotoCamera, contentDescription = "Zrób zdjęcie")
+                        }
+                    }
                 }
             },
             trailingIcon = {
