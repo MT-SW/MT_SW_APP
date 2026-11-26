@@ -95,6 +95,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sqrt
+import kotlin.time.TimeSource
 
 /**
  * Node markers drawn as chips — the rounded, node-coloured badge with the short name in it that
@@ -263,10 +264,23 @@ private fun rememberChipImages(chips: List<MapChipKey>): Map<String, ChipImage> 
     val chipStyle = rememberNodeChipStyle()
     val cache = remember(measurer, density, textStyle, glyphs, chipStyle) { HashMap<String, ChipImage>() }
     return remember(chips, cache) {
-        chips.associate { chip ->
-            val key = chip.featureValue()
-            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs, chipStyle) }
+        val before = cache.size
+        val started = TimeSource.Monotonic.markNow()
+        val result =
+            chips.associate { chip ->
+                val key = chip.featureValue()
+                key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs, chipStyle) }
+            }
+        // For the logs: a burst of new chips is drawn in one go on the main thread, which is what a short stall of the
+        // map during a pan can come from.
+        val added = cache.size - before
+        if (added > 0) {
+            Logger.i {
+                "Mapa: nowe kafelki węzłów $added, razem ${cache.size}, " +
+                    "rysowanie ${started.elapsedNow().inWholeMilliseconds} ms"
+            }
         }
+        result
     }
 }
 

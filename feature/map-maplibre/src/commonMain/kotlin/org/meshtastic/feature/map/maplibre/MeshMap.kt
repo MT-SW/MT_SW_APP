@@ -699,10 +699,11 @@ private fun BoxCornerMarker(corner: Position?) {
 /**
  * How far past the screen edge a node still counts as "in view" for chip drawing, as a fraction of the visible span.
  *
- * Half a screen in each direction: enough that a flick does not immediately invalidate the chip set, small enough that
- * a dense mesh does not blow the image budget on nodes well off screen.
+ * One screen in each direction: new chips are drawn in one burst each time the camera leaves the held box, and a
+ * wider box makes those bursts rarer (the logs showed short stalls of a pan at that rhythm), while the image ceiling
+ * still keeps a dense mesh from blowing the budget on nodes well off screen.
  */
-private const val CHIP_VIEW_PADDING = 0.5
+private const val CHIP_VIEW_PADDING = 1.0
 
 private const val PROPAGATION_CHECK_MS = 60_000L
 
