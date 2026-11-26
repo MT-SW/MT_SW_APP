@@ -101,6 +101,7 @@ import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.coverage.CoverageController
 import org.meshtastic.feature.map.maplibre.component.PropagationOverlay
 import org.meshtastic.feature.map.maplibre.component.RoutePlaybackControls
+import org.meshtastic.feature.map.maplibre.component.TripsHost
 import org.meshtastic.feature.map.maplibre.component.WithFloatingBarInset
 import org.meshtastic.feature.map.maplibre.component.ZOOM_BOTTOM_INSET
 import org.meshtastic.feature.map.maplibre.component.meshMapOrnaments
@@ -447,6 +448,7 @@ fun MeshMap(
                 overlay = { WithFloatingBarInset { include(ornaments) } },
             )
         }
+        TripsHost()
         RoutePlaybackControls(
             Modifier.align(Alignment.BottomStart)
                 .fillMaxWidth()

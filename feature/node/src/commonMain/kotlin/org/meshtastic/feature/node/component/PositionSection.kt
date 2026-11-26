@@ -60,6 +60,10 @@ import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.util.TripsWindowRequest
+import org.meshtastic.core.resources.trips_title
+import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.rememberMeshHudSupported
@@ -127,6 +131,28 @@ internal fun PositionInlineContent(
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(Res.string.node_show_on_map),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+    // MT_SW: the hikes (own route with pictures) belong to this device's own node only.
+    if (ourNode != null && ourNode.num == node.num) {
+        Spacer(Modifier.height(8.dp))
+        FilledTonalButton(
+            onClick = {
+                Logger.i { "Wędrówki: otwarcie z szczegółów własnego węzła" }
+                TripsWindowRequest.requested.value = true
+                onAction(NodeDetailAction.Navigate(MapRoute.Map()))
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+        ) {
+            Icon(MeshtasticIcons.PhotoCamera, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = stringResource(Res.string.trips_title),
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

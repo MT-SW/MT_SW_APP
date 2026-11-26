@@ -58,6 +58,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.component.ListItem as StyledListItem
+import org.meshtastic.core.ui.util.TripsWindowRequest
 import org.meshtastic.feature.map.trip.TripStore
 
 /**
@@ -66,12 +67,17 @@ import org.meshtastic.feature.map.trip.TripStore
  */
 @Composable
 internal fun TripsEntry() {
-    var open by remember { mutableStateOf(false) }
     StyledListItem(text = stringResource(Res.string.trips_title)) {
-        Logger.i { "Wędrówki: okno otwarte" }
-        open = true
+        Logger.i { "Wędrówki: okno otwarte z menu warstw" }
+        TripsWindowRequest.requested.value = true
     }
-    if (open) TripsWindow(onDismiss = { open = false })
+}
+
+/** Shows the Hikes window on the map while it is asked for (by the layers menu or by the own node's details). */
+@Composable
+internal fun TripsHost() {
+    val requested by TripsWindowRequest.requested.collectAsStateWithLifecycle()
+    if (requested) TripsWindow(onDismiss = { TripsWindowRequest.requested.value = false })
 }
 
 @Composable
