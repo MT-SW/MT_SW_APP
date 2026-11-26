@@ -4242,6 +4242,13 @@ track_legend_show
 track_legend_snr
 track_legend_title
 track_point
+track_rec_clear
+track_rec_hint
+track_rec_save
+track_rec_start
+track_rec_status
+track_rec_stop
+track_rec_title
 track_snr_colors
 ### TRAFFIC ###
 traffic_management

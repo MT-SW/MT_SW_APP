@@ -121,6 +121,7 @@ import org.meshtastic.feature.map.maplibre.layers.SignalSurveyHeatmapLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLayer
 import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLinkLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
+import org.meshtastic.feature.map.maplibre.layers.TrackLineLayer
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
 import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
 import org.meshtastic.feature.map.maplibre.style.Basemap
@@ -259,6 +260,7 @@ fun rememberMeshMapState(
                 displayUnits = displayUnits,
             )
             CustomLayers(customLayers, layerOpacity)
+            TrackLineLayer()
             CoverageLayer(coverage, layerOpacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY)
             SignalSurveyLayer(surveyCells, surveyColors, onSurveyCellClick)
             SignalSurveyHeatmapLayer(surveyHeatPoints, surveyColors)
