@@ -16,6 +16,25 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.resources.sos_nodes_done
+import org.meshtastic.core.resources.sos_nodes_empty
+import org.meshtastic.core.resources.sos_nodes_search
+import org.meshtastic.core.resources.trips_quiet_exceptions
+import org.meshtastic.core.resources.trips_quiet_nodes
+import org.meshtastic.core.resources.trips_quiet_pick_title
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,9 +81,7 @@ import org.meshtastic.core.resources.trips_album_folder
 import org.meshtastic.core.resources.trips_album_note
 import org.meshtastic.core.resources.trips_photo
 import org.meshtastic.core.resources.trips_quiet_hint
-import org.meshtastic.core.resources.trips_quiet_off
 import org.meshtastic.core.resources.trips_quiet_priority
-import org.meshtastic.core.resources.trips_quiet_silent
 import org.meshtastic.core.resources.trips_quiet_title
 import org.koin.compose.koinInject
 import org.meshtastic.core.repository.QuietMode
@@ -201,20 +218,52 @@ internal fun TrackRecordingSection() {
             }
         }
         val quiet by QuietMode.mode.collectAsStateWithLifecycle()
-        Text(text = stringResource(Res.string.trips_quiet_title), style = MaterialTheme.typography.titleSmall)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            listOf(
-                QuietMode.Mode.Off to Res.string.trips_quiet_off,
-                QuietMode.Mode.Silent to Res.string.trips_quiet_silent,
-                QuietMode.Mode.Priority to Res.string.trips_quiet_priority,
+        val exceptFavorites by QuietMode.exceptFavorites.collectAsStateWithLifecycle()
+        val exceptNodes by QuietMode.exceptNodes.collectAsStateWithLifecycle()
+        val nodeRepository: NodeRepository = koinInject()
+        val nodeDb by nodeRepository.nodeDBbyNum.collectAsStateWithLifecycle()
+        val myInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
+        var pickingQuietNodes by remember { mutableStateOf(false) }
+        if (pickingQuietNodes) {
+            QuietNodePicker(
+                nodes = nodeDb.values.filter { it.num != myInfo?.myNodeNum },
+                selected = exceptNodes,
+                onToggle = { num ->
+                    QuietMode.setExceptNodes(if (num in exceptNodes) exceptNodes - num else exceptNodes + num)
+                },
+                onDismiss = { pickingQuietNodes = false },
             )
-                .forEach { (mode, label) ->
-                    FilterChip(
-                        selected = quiet == mode,
-                        onClick = { recorder.setQuiet(mode) },
-                        label = { Text(stringResource(label)) },
-                    )
-                }
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(Res.string.trips_quiet_title),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f),
+            )
+            Switch(
+                checked = quiet == QuietMode.Mode.Silent,
+                onCheckedChange = { recorder.setQuiet(if (it) QuietMode.Mode.Silent else QuietMode.Mode.Off) },
+            )
+        }
+        Text(text = stringResource(Res.string.trips_quiet_exceptions), style = MaterialTheme.typography.bodyMedium)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(Res.string.trips_quiet_priority),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f),
+            )
+            Switch(checked = exceptFavorites, onCheckedChange = { QuietMode.setExceptFavorites(it) })
+        }
+        OutlinedButton(onClick = { pickingQuietNodes = true }) {
+            Text(stringResource(Res.string.trips_quiet_nodes, exceptNodes.size))
         }
         Text(text = stringResource(Res.string.trips_quiet_hint), style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -237,4 +286,62 @@ internal fun TrackRecordingSection() {
             }
         }
     }
+}
+
+/** The name of a node for the list of exceptions: its long name, else the short one, else its id. */
+private fun quietNodeName(node: Node): String {
+    val long = node.user.long_name
+    val short = node.user.short_name
+    return when {
+        long.isNotBlank() && short.isNotBlank() -> "$long ($short)"
+        long.isNotBlank() -> long
+        short.isNotBlank() -> short
+        else -> NodeAddress.numToDefaultId(node.num)
+    }
+}
+
+/** The window to pick, by hand, the nodes that are an exception to the quiet mode. Every known node is listed. */
+@Composable
+private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (Int) -> Unit, onDismiss: () -> Unit) {
+    var query by remember { mutableStateOf("") }
+    val shown =
+        remember(nodes, query) {
+            nodes
+                .filter { quietNodeName(it).contains(query.trim(), ignoreCase = true) }
+                .sortedBy { quietNodeName(it).lowercase() }
+        }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.trips_quiet_pick_title)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(Res.string.sos_nodes_search)) },
+                    singleLine = true,
+                )
+                if (shown.isEmpty()) {
+                    Text(
+                        text = stringResource(Res.string.sos_nodes_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
+                }
+                LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                    items(shown, key = { it.num }) { node ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
+                        ) {
+                            Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
+                            Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sos_nodes_done)) } },
+    )
 }

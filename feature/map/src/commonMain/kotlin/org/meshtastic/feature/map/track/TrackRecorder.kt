@@ -227,18 +227,19 @@ class TrackRecorder(
     }
 
     /**
-     * Sets the quiet mode: nothing disturbs, except alarms and alerts (and, in the priority mode, the favourite
-     * devices). It ends when the recording ends.
+     * Sets the quiet mode: nothing disturbs, except alarms and alerts and the exceptions (the favourite devices and the
+     * devices chosen by hand, see [QuietMode]). It ends when the recording ends; the exceptions are kept for the next
+     * time.
      */
     fun setQuiet(mode: QuietMode.Mode) {
         quietJob?.cancel()
         quietJob = null
         QuietMode.set(mode)
-        if (mode == QuietMode.Mode.Priority) {
+        if (mode == QuietMode.Mode.Silent) {
             quietJob =
                 scope.launch {
                     nodeRepository.nodeDBbyNum.collect { nodes ->
-                        QuietMode.setPriority(nodes.values.filter { it.isFavorite }.map { it.num }.toSet())
+                        QuietMode.setFavorites(nodes.values.filter { it.isFavorite }.map { it.num }.toSet())
                     }
                 }
         }

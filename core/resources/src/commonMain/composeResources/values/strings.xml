@@ -4501,10 +4501,11 @@
     <string name="trips_no_time">The picture has no time</string>
     <string name="trips_photo">Take a picture on the route (%1$d)</string>
     <string name="trips_photo_taken">Picture taken: %1$s</string>
-    <string name="trips_quiet_hint">Alarms and alerts always get through. The mode ends with the recording.</string>
-    <string name="trips_quiet_off">Off</string>
-    <string name="trips_quiet_priority">Favourite devices only</string>
-    <string name="trips_quiet_silent">Silence</string>
+    <string name="trips_quiet_exceptions">Exceptions (their notifications still arrive):</string>
+    <string name="trips_quiet_hint">While it is on, no device sends notifications, except the exceptions above. Alarms and alerts always get through. The mode ends with the recording.</string>
+    <string name="trips_quiet_nodes">Chosen devices: %1$d</string>
+    <string name="trips_quiet_pick_title">Devices that are an exception</string>
+    <string name="trips_quiet_priority">Favourite devices</string>
     <string name="trips_quiet_title">Quiet mode</string>
     <string name="trips_rangetest">Send range test messages while recording</string>
     <string name="trips_rename">Hike name</string>

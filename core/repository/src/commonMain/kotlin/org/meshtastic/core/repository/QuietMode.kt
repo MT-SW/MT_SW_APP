@@ -20,30 +20,53 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
- * MT_SW: the quiet mode (for a hike, for instance): notifications are held back so nothing disturbs. Alarms (the SOS)
- * and alerts always get through. In [Mode.Priority] the notices that come from the priority devices (the favourite
- * nodes) get through as well: their direct messages and the notices about the node itself.
+ * MT_SW: the quiet mode (for a hike, for instance): while it is on, notifications from all devices are held back so
+ * nothing disturbs. Alarms (the SOS) and alerts always get through. Exceptions can be made: the favourite nodes
+ * ([exceptFavorites]) and nodes chosen by hand ([exceptNodes]); their direct messages and the notices about the node
+ * itself get through.
  */
 object QuietMode {
     enum class Mode {
         Off,
         Silent,
-        Priority,
     }
 
     val mode = MutableStateFlow(Mode.Off)
 
-    private var priorityNums: Set<Int> = emptySet()
-    private var priorityIds: Set<Int> = emptySet()
-    private var priorityNames: Set<String> = emptySet()
+    /** Whether the favourite nodes are an exception. */
+    val exceptFavorites = MutableStateFlow(false)
 
-    /** The priority devices (node numbers). */
-    fun setPriority(nums: Set<Int>) {
-        priorityNums = nums
+    /** The nodes chosen by hand as an exception (node numbers). */
+    val exceptNodes = MutableStateFlow<Set<Int>>(emptySet())
+
+    private var favoriteNums: Set<Int> = emptySet()
+    private var exemptNums: Set<Int> = emptySet()
+    private var exemptNames: Set<String> = emptySet()
+    private var exemptIds: Set<Int> = emptySet()
+
+    /** The favourite nodes the app knows now (node numbers); they count only while [exceptFavorites] is on. */
+    fun setFavorites(nums: Set<Int>) {
+        favoriteNums = nums
+        refresh()
+    }
+
+    fun setExceptFavorites(on: Boolean) {
+        exceptFavorites.value = on
+        refresh()
+    }
+
+    fun setExceptNodes(nums: Set<Int>) {
+        exceptNodes.value = nums
+        refresh()
+    }
+
+    private fun refresh() {
+        val nums = exceptNodes.value + if (exceptFavorites.value) favoriteNums else emptySet()
+        exemptNums = nums
         val names = nums.map { "!" + it.toUInt().toString(HEX_RADIX).padStart(HEX_WIDTH, '0') }.toSet()
-        priorityNames = names
+        exemptNames = names
         // A direct message is filed under the channel number and the node id; the notice is keyed by its hash.
-        priorityIds = nums.toSet() + names.flatMap { name -> (0 until CHANNELS).map { "$it$name".hashCode() } }
+        exemptIds = nums + names.flatMap { name -> (0 until CHANNELS).map { "$it$name".hashCode() } }
     }
 
     fun set(newMode: Mode) {
@@ -55,19 +78,16 @@ object QuietMode {
     fun blocksId(id: Int): Boolean =
         when (mode.value) {
             Mode.Off -> false
-            Mode.Silent -> true
-            Mode.Priority -> id !in priorityIds
+            Mode.Silent -> id !in exemptIds
         }
 
     fun blocks(notification: Notification): Boolean {
         if (mode.value == Mode.Off || notification.alarm || notification.category == Notification.Category.Alert) {
             return false
         }
-        if (mode.value == Mode.Silent) return true
         val link = notification.deepLink.orEmpty()
-        val fromPriority =
-            notification.id?.let { it in priorityIds } == true || priorityNames.any { link.contains(it) }
-        return !fromPriority
+        val exempt = notification.id?.let { it in exemptIds } == true || exemptNames.any { link.contains(it) }
+        return !exempt
     }
 
     private const val HEX_RADIX = 16

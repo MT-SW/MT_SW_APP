@@ -4405,10 +4405,11 @@ trips_move_to
 trips_no_time
 trips_photo
 trips_photo_taken
+trips_quiet_exceptions
 trips_quiet_hint
-trips_quiet_off
+trips_quiet_nodes
+trips_quiet_pick_title
 trips_quiet_priority
-trips_quiet_silent
 trips_quiet_title
 trips_rangetest
 trips_rename
