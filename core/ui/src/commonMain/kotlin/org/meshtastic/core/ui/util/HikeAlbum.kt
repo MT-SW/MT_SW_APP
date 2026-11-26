@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.ui.util
 
-import androidx.compose.runtime.Composable
-
 /** The name of the separate album, the same as the app (on the computer: the folder) where the pictures taken for hikes are kept. */
 const val HIKE_ALBUM_NAME = "MT_SW"
 
@@ -28,8 +26,18 @@ const val HIKE_ALBUM_NAME = "MT_SW"
  */
 expect fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean
 
-/** Where the album folder is chosen by hand (the computer); null elsewhere, where the system keeps the album. */
-@Composable expect fun rememberAlbumFolderPicker(onPicked: (String) -> Unit): (() -> Unit)?
+/**
+ * The folder pictures taken in the app go to on the computer. It is chosen at the first picture (a window asks) and can
+ * be changed in the settings; null elsewhere, where the system keeps the album and creates it by itself.
+ */
+expect fun appPhotoFolder(): String?
 
-/** The folder pictures are saved to on the computer when none is chosen; null elsewhere. */
-expect fun defaultAlbumFolder(): String?
+/** The folder chosen so far, without asking; null when none is chosen yet or where the system keeps the album. */
+expect fun currentPhotoFolder(): String?
+
+/** Opens the folder choice (the computer) and remembers the answer; null when cancelled or not offered. */
+expect fun changeAppPhotoFolder(): String?
+
+/** Saves a picture taken with the camera in the app to the app's album (on the computer: the chosen folder). */
+fun saveAppPhoto(bytes: ByteArray): Boolean =
+    saveToHikeAlbum(bytes, "mtsw_${org.meshtastic.core.common.util.nowMillis}.jpg", appPhotoFolder())

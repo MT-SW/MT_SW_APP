@@ -132,6 +132,7 @@ import org.meshtastic.core.resources.radio_bridge_refresh_now
 import org.meshtastic.core.resources.radio_bridge_title
 import org.meshtastic.core.resources.radio_chooser_settings
 import org.meshtastic.core.resources.radio_count
+import org.meshtastic.core.resources.photo_folder_title
 import org.meshtastic.core.resources.report_issues_title
 import org.meshtastic.core.resources.restore_app_settings
 import org.meshtastic.core.resources.restore_look
@@ -399,6 +400,7 @@ object SettingsSearchCatalog {
             Res.string.app_log_recent to SettingsRoute.DataAndLogs,
             Res.string.app_log_choose_folder to SettingsRoute.DataAndLogs,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,
+            Res.string.photo_folder_title to SettingsRoute.DataAndLogs,
             Res.string.intro_mtsw_planner_title to SettingsRoute.MtSwFeatures,
             Res.string.terrain_horizon_title to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,

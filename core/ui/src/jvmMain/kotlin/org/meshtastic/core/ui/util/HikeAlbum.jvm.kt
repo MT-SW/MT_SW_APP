@@ -18,36 +18,58 @@
 
 package org.meshtastic.core.ui.util
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberUpdatedState
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.common.AppDataRoot
 import java.io.File
 import javax.swing.JFileChooser
 
-/** By default beside the logs and the other data of the app; the person can choose any other folder. */
-actual fun defaultAlbumFolder(): String? = File(AppDataRoot.dir.path, "Zdjęcia").path
+private val folderFile: File
+    get() = File(AppDataRoot.dir, "photo-folder.txt")
+
+/** Where pictures go when no folder is chosen (a window was closed without a choice). */
+private val fallbackFolder: File
+    get() = File(File(System.getProperty("user.home"), "Pictures"), HIKE_ALBUM_NAME)
+
+actual fun currentPhotoFolder(): String? =
+    try {
+        if (folderFile.exists()) folderFile.readText().trim().ifBlank { null } else null
+    } catch (e: Exception) {
+        Logger.w { "Album zdjęć: folder nie został odczytany: ${e.message}" }
+        null
+    }
+
+actual fun changeAppPhotoFolder(): String? {
+    val chooser =
+        JFileChooser(File(System.getProperty("user.home"), "Pictures").takeIf { it.isDirectory }).apply {
+            fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+            dialogTitle = HIKE_ALBUM_NAME
+        }
+    if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+        Logger.i { "Album zdjęć: wybór folderu anulowany" }
+        return null
+    }
+    val path = chooser.selectedFile.path
+    try {
+        folderFile.parentFile?.mkdirs()
+        folderFile.writeText(path)
+        Logger.i { "Album zdjęć: wybrano folder" }
+    } catch (e: Exception) {
+        Logger.w { "Album zdjęć: folder nie został zapisany: ${e.message}" }
+    }
+    return path
+}
+
+/** The first picture asks for the folder; a closed window means the default one beside the pictures of the user. */
+actual fun appPhotoFolder(): String? = currentPhotoFolder() ?: changeAppPhotoFolder() ?: fallbackFolder.path
 
 actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean =
     try {
-        val dir = File(folder?.takeIf { it.isNotBlank() } ?: defaultAlbumFolder().orEmpty())
+        val dir = File(folder?.takeIf { it.isNotBlank() } ?: fallbackFolder.path)
         dir.mkdirs()
         File(dir, fileName).writeBytes(bytes)
-        Logger.i { "Album wędrówek: zapisano ${bytes.size} bajtów w folderze" }
+        Logger.i { "Album zdjęć: zapisano ${bytes.size} bajtów w folderze" }
         true
     } catch (e: Exception) {
-        Logger.w { "Album wędrówek: zapis w folderze nie udał się: ${e.message}" }
+        Logger.w { "Album zdjęć: zapis w folderze nie udał się: ${e.message}" }
         false
     }
-
-@Composable
-actual fun rememberAlbumFolderPicker(onPicked: (String) -> Unit): (() -> Unit)? {
-    val current = rememberUpdatedState(onPicked)
-    return {
-        val chooser = JFileChooser().apply { fileSelectionMode = JFileChooser.DIRECTORIES_ONLY }
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            Logger.i { "Album wędrówek: wybrano folder" }
-            current.value(chooser.selectedFile.path)
-        }
-    }
-}

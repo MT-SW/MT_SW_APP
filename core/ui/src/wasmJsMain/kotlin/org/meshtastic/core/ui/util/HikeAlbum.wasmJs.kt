@@ -16,10 +16,11 @@
  */
 package org.meshtastic.core.ui.util
 
-import androidx.compose.runtime.Composable
 
 actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?): Boolean = false
 
-@Composable actual fun rememberAlbumFolderPicker(onPicked: (String) -> Unit): (() -> Unit)? = null
+actual fun appPhotoFolder(): String? = null
 
-actual fun defaultAlbumFolder(): String? = null
+actual fun currentPhotoFolder(): String? = null
+
+actual fun changeAppPhotoFolder(): String? = null

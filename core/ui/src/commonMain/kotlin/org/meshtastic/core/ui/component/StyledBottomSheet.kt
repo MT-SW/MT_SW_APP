@@ -20,6 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -75,6 +76,9 @@ private const val SWIPE_CLOSE_DP = 40
 /** How many mouse wheel ticks up, with nothing left to scroll, close the window. */
 private const val WHEEL_CLOSE_TICKS = 3f
 
+/** Width kept free at the right of a window's first row for the close cross (an icon button plus its margin). */
+const val SHEET_CROSS_INSET_DP = 52
+
 /**
  * MT_SW: the same as the Material bottom sheet `ModalBottomSheet` (the parameters the app uses), but in the look of our
  * app: the shadow (a light glow on a dark theme) and the thin rim along the rounded top edge, like the other elements.
@@ -118,30 +122,26 @@ fun ModalBottomSheet(
             // gradient behind a flat fill. Inside the window that colour is transparent, so the whole window has
             // one background with one gradient.
             MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
-                Column {
-                    // A close cross at the top, so the window can always be closed with one touch. Windows that
-                    // have their own original cross in their header pass closeCross = false.
+                Box {
+                    Column { content() }
+                    // A close cross in the top right corner, laid over the window (it takes no row of its own, so
+                    // there is no empty strip above the title). Headers with buttons of their own leave
+                    // SHEET_CROSS_INSET_DP free at the right. Windows that have their own original cross in their
+                    // header pass closeCross = false.
                     if (closeCross) {
-                        // The same cross as the planner's original one (a plain icon button at the right).
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically,
+                        IconButton(
+                            onClick = {
+                                Logger.i { "Okno: zamknięte krzyżykiem" }
+                                onDismissRequest()
+                            },
+                            modifier = Modifier.align(Alignment.TopEnd).padding(end = 4.dp),
                         ) {
-                            IconButton(
-                                onClick = {
-                                    Logger.i { "Okno: zamknięte krzyżykiem" }
-                                    onDismissRequest()
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = MeshtasticIcons.Close,
-                                    contentDescription = stringResource(Res.string.close),
-                                )
-                            }
+                            Icon(
+                                imageVector = MeshtasticIcons.Close,
+                                contentDescription = stringResource(Res.string.close),
+                            )
                         }
                     }
-                    content()
                 }
             }
         }

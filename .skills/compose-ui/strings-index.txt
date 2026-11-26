@@ -3197,6 +3197,15 @@ permissions_show
 phone_location
 phone_location_description
 phosphorus
+### PHOTO ###
+photo_folder_auto
+photo_folder_change
+photo_folder_choose_title
+photo_folder_current
+photo_folder_info_1
+photo_folder_info_2
+photo_folder_info_title
+photo_folder_title
 pin_selected
 ### PLANNER ###
 planner_buildings_on_map
@@ -4380,9 +4389,6 @@ triple_click_adhoc_ping
 ### TRIPS ###
 trips_add_gallery
 trips_add_stop
-trips_album_change
-trips_album_folder
-trips_album_note
 trips_caption
 trips_chart_climbed
 trips_chart_distance

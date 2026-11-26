@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.resources.trips_coverage_csv
 import org.meshtastic.core.resources.trips_coverage_geojson
 import org.meshtastic.core.ui.util.rememberFileExporter
@@ -205,7 +206,7 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             contentModifier = Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            NameField(trip, store)
+            Box(modifier = Modifier.padding(end = SHEET_CROSS_INSET_DP.dp)) { NameField(trip, store) }
             val stats = remember(trip) { trip.stats() }
             Text(
                 text =

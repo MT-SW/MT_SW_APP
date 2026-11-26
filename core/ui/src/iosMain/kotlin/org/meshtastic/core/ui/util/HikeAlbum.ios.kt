@@ -19,7 +19,6 @@
 
 package org.meshtastic.core.ui.util
 
-import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -83,6 +82,8 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
     return true
 }
 
-@Composable actual fun rememberAlbumFolderPicker(onPicked: (String) -> Unit): (() -> Unit)? = null
+actual fun appPhotoFolder(): String? = null
 
-actual fun defaultAlbumFolder(): String? = null
+actual fun currentPhotoFolder(): String? = null
+
+actual fun changeAppPhotoFolder(): String? = null

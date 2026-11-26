@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.resources.remote_lists_info_5
 import org.meshtastic.core.resources.remote_lists_info_4
 import org.meshtastic.core.resources.remote_lists_info_3
@@ -143,9 +144,9 @@ import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.RemoteContacts
 import org.meshtastic.core.ui.icon.NearMe
 import org.meshtastic.core.ui.icon.NotFavorite
-import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Output
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PowerSettingsNew
@@ -581,11 +582,18 @@ internal fun RemoteNodeManagementPanel(
         }
     }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Row(verticalAlignment = Alignment.Top) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        // The info button sits left of the window's close cross, in the same row.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = (SHEET_CROSS_INSET_DP - 16).dp),
+        ) {
             Box(modifier = Modifier.weight(1f)) {
                 PanelHeader(
-                    icon = MeshtasticIcons.Person,
+                    icon = MeshtasticIcons.RemoteContacts,
                     title = stringResource(Res.string.remote_manage_title),
                     hint = stringResource(Res.string.remote_manage_hint),
                     accent = gold,

@@ -149,6 +149,7 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.rememberCameraLauncher
+import org.meshtastic.core.ui.util.saveAppPhoto
 import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.theme.AppTheme
@@ -1047,6 +1048,7 @@ internal fun MessageInput(
     }
 
     val launchCamera = rememberCameraLauncher { bytes, mimeType ->
+        saveAppPhoto(bytes)
         pendingImageBytes = bytes
         pendingImageMimeType = mimeType
     }

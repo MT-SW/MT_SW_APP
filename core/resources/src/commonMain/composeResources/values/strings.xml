@@ -3260,6 +3260,15 @@
     <string name="phone_location">Phone Location</string>
     <string name="phone_location_description">MT_SW_APP uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
     <string name="phosphorus">Phosphorus</string>
+    <!-- PHOTO -->
+    <string name="photo_folder_auto">Pictures taken in the app go to the MT_SW album. The album is created by itself at the first picture.</string>
+    <string name="photo_folder_change">Change folder</string>
+    <string name="photo_folder_choose_title">Choose a folder for pictures from the app</string>
+    <string name="photo_folder_current">Pictures taken in the app go to: %1$s</string>
+    <string name="photo_folder_info_1">Every picture taken with the camera in the app (in messages and in hikes) gets a copy in a separate MT_SW album, so it does not mix with other pictures and is not lost when a message or a hike is deleted.</string>
+    <string name="photo_folder_info_2">On a phone or tablet the album is created by itself at the first picture. On a computer you choose the folder at the first picture and can change it here.</string>
+    <string name="photo_folder_info_title">Picture folder</string>
+    <string name="photo_folder_title">Folder for pictures from the app</string>
     <string name="pin_selected">Pin</string>
     <!-- PLANNER -->
     <string name="planner_buildings_on_map">Show buildings on the map (route: those blocking the line of sight in red; range: backdrop)</string>
@@ -4476,9 +4485,6 @@
     <!-- TRIPS -->
     <string name="trips_add_gallery">Add pictures from the gallery</string>
     <string name="trips_add_stop">Add a point</string>
-    <string name="trips_album_change">Change the folder</string>
-    <string name="trips_album_folder">Photo folder: %1$s</string>
-    <string name="trips_album_note">Pictures taken here are also kept in a separate album "MT_SW" (on the computer: in a folder), so deleting a hike never deletes them.</string>
     <string name="trips_caption">Caption</string>
     <string name="trips_chart_climbed">Ascent so far</string>
     <string name="trips_chart_distance">Distance so far</string>

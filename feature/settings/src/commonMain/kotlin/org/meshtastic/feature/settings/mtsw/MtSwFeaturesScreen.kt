@@ -92,6 +92,7 @@ import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.mt_sw_group_help
 import org.meshtastic.core.resources.mt_sw_group_look
 import org.meshtastic.core.resources.mt_sw_group_safety
+import org.meshtastic.core.resources.photo_folder_title
 import org.meshtastic.core.resources.mt_sw_map_filter_summary
 import org.meshtastic.core.resources.mt_sw_map_filter_title
 import org.meshtastic.core.resources.mt_sw_map_title
@@ -199,6 +200,7 @@ import org.meshtastic.feature.settings.component.FontSettingsItems
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
+import org.meshtastic.feature.settings.component.PhotoFolderSettings
 import org.meshtastic.feature.settings.component.PresenceManualAsk
 import org.meshtastic.feature.settings.component.PresenceSettings
 import org.meshtastic.feature.settings.component.ReportIssuesSection
@@ -761,6 +763,9 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                 // Where the app keeps all its data (not only the AI files): one folder on a computer.
                 AiStorageRow()
             }
+
+            // The folder of the pictures taken in the app: with the other folders, in one place.
+            ExpressiveSection(title = stringResource(Res.string.photo_folder_title)) { PhotoFolderSettings() }
 
             ExpressiveSection(title = stringResource(Res.string.archive_title)) {
                 ListItem(

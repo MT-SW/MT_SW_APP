@@ -18,6 +18,7 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.ui.icon.Hiking
 import org.meshtastic.core.resources.trips_info_4
 import org.meshtastic.core.resources.trips_info_3
@@ -106,13 +107,13 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         ScrollWithBar {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = SHEET_CROSS_INSET_DP.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(Res.string.trips_title),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f).padding(vertical = 16.dp),
+                    modifier = Modifier.weight(1f).padding(vertical = 12.dp),
                 )
                 InfoButton(
                     Res.string.trips_info_title,

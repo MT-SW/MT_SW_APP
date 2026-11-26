@@ -22,7 +22,6 @@ import android.content.ContentValues
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.common.ContextServices
 
@@ -56,6 +55,8 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
     }
 }
 
-@Composable actual fun rememberAlbumFolderPicker(onPicked: (String) -> Unit): (() -> Unit)? = null
+actual fun appPhotoFolder(): String? = null
 
-actual fun defaultAlbumFolder(): String? = null
+actual fun currentPhotoFolder(): String? = null
+
+actual fun changeAppPhotoFolder(): String? = null
