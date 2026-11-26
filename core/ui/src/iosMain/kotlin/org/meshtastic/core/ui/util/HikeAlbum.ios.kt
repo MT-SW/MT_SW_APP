@@ -24,10 +24,9 @@ import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSArray
+import platform.Foundation.NSMutableArray
 import platform.Foundation.NSData
 import platform.Foundation.NSUserDefaults
-import platform.Foundation.arrayWithObject
 import platform.Foundation.create
 import platform.Photos.PHAssetChangeRequest
 import platform.Photos.PHAssetCollection
@@ -64,13 +63,13 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
                 val placeholder = asset.placeholderForCreatedAsset
                 if (album != null) {
                     PHAssetCollectionChangeRequest.changeRequestForAssetCollection(album)
-                        ?.addAssets(NSArray.arrayWithObject(placeholder))
+                        ?.addAssets(NSMutableArray().apply { addObject(placeholder) })
                 } else {
                     val create =
                         PHAssetCollectionChangeRequest.creationRequestForAssetCollectionWithTitle(HIKE_ALBUM_NAME)
                     val newId = create.placeholderForCreatedAssetCollection.localIdentifier
                     defaults.setObject(newId, ALBUM_ID_KEY)
-                    create.addAssets(NSArray.arrayWithObject(placeholder))
+                    create.addAssets(NSMutableArray().apply { addObject(placeholder) })
                 }
             },
             completionHandler = { ok, error ->
