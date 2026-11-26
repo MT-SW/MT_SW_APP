@@ -94,6 +94,7 @@ import org.meshtastic.core.resources.trips_share_progress
 import org.meshtastic.core.resources.trips_share_range
 import org.meshtastic.core.resources.trips_share_to
 import org.meshtastic.core.resources.trips_share_warning
+import org.meshtastic.core.resources.trips_signal_stats
 import org.meshtastic.core.resources.trips_stats
 import org.meshtastic.core.resources.trips_stats_ascent
 import org.meshtastic.core.resources.trips_stats_counts
@@ -225,6 +226,18 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             stats.movingMillis?.let {
                 Text(
                     stringResource(Res.string.trips_stats_moving, formatDuration(it)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            if (trip.signals.isNotEmpty()) {
+                Text(
+                    stringResource(
+                        Res.string.trips_signal_stats,
+                        trip.signals.size,
+                        trip.signals.map { it.node }.distinct().size,
+                        trip.signals.maxOf { it.rssi },
+                        trip.signals.minOf { it.rssi },
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

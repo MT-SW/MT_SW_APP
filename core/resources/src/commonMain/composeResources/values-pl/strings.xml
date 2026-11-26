@@ -4808,4 +4808,10 @@
     <string name="trips_health_auto_hint">Pyta o zgodę przy starcie nagrywania, odświeża liczby w trakcie i zapisuje je przy wędrówce po jej zakończeniu.</string>
     <string name="trips_health_live">Kroki z aplikacji zdrowia: %1$d</string>
     <string name="trips_from_node">Wędrówki od tego węzła</string>
+    <string name="trips_signal_title">Zapis zasięgu</string>
+    <string name="trips_signal_hint">Podczas nagrywania zapisuje się sygnał węzłów, które słyszy Twoje radio (także pakiety przekazywane przez inne węzły), razem z miejscem, najwyżej raz w wybranym czasie dla każdego węzła. „—” wyłącza zapis.</string>
+    <string name="trips_signal_live">Zapisanych sygnałów: %1$d</string>
+    <string name="trips_rangetest">Wysyłaj wiadomości testu zasięgu podczas nagrywania</string>
+    <string name="trips_signal_stats">Zasięg: %1$d odczytów z %2$d węzłów · najsilniejszy %3$d dBm, najsłabszy %4$d dBm</string>
+    <string name="trips_chart_signal">Najlepszy sygnał</string>
 </resources>

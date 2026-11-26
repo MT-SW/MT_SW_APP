@@ -4376,6 +4376,7 @@ trips_chart_climbed
 trips_chart_distance
 trips_chart_height
 trips_chart_pace
+trips_chart_signal
 trips_chart_speed
 trips_chosen
 trips_empty
@@ -4406,6 +4407,7 @@ trips_quiet_off
 trips_quiet_priority
 trips_quiet_silent
 trips_quiet_title
+trips_rangetest
 trips_rename
 trips_send_this
 trips_share
@@ -4418,6 +4420,10 @@ trips_share_progress
 trips_share_range
 trips_share_to
 trips_share_warning
+trips_signal_hint
+trips_signal_live
+trips_signal_stats
+trips_signal_title
 trips_stats
 trips_stats_ascent
 trips_stats_counts

@@ -44,6 +44,8 @@ import org.meshtastic.core.model.util.toOneLineString
 import org.meshtastic.core.model.util.toPIIString
 import org.meshtastic.core.repository.FromRadioPacketHandler
 import org.meshtastic.core.repository.MeshDataHandler
+import org.meshtastic.core.repository.HeardSignal
+import org.meshtastic.core.repository.HeardSignals
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.NodeManager
@@ -304,6 +306,21 @@ class MeshMessageProcessorImpl(
         // count.
         if (packet.relay_node != 0 && packet.rx_rssi != null && packet.via_mqtt != true && packet.from != myNodeNum) {
             RelayActivityTracker.record(packet.relay_node, nowSeconds.toInt())
+        }
+        // MT_SW: the signal of every packet heard over the air, for the range recording of a hike.
+        packet.rx_rssi?.let { rssi ->
+            if (packet.via_mqtt != true && packet.from != myNodeNum) {
+                HeardSignals.emit(
+                    HeardSignal(
+                        from = packet.from,
+                        relayByte = packet.relay_node,
+                        direct = packet.hop_start != 0 && packet.hop_limit == packet.hop_start,
+                        rssi = rssi,
+                        snr = packet.rx_snr,
+                        timeMillis = nowMillis,
+                    ),
+                )
+            }
         }
 
         // A packet the firmware could not decrypt (no matching channel key) still arrives via the same

@@ -194,6 +194,15 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
          */
         const val RADIO_BACKGROUND = "radios.background"
 
+        /** How often (seconds) the signal of each heard node is saved along a hike; 0 = not saved. */
+        const val HIKE_SIGNAL_EVERY = "hike.signal.every"
+
+        /** 1 = while a hike is recorded the radio also sends range test messages (0 = off, the default). */
+        const val HIKE_RANGE_TEST = "hike.rangetest"
+
+        /** How often (seconds) the range test message is sent during a hike. */
+        const val HIKE_RANGE_TEST_EVERY = "hike.rangetest.every"
+
         /** 1 = while a hike is recorded the steps, heart rate and more are taken from the health app by themselves. */
         const val HIKE_HEALTH_AUTO = "hike.health.auto"
 
@@ -335,6 +344,8 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(NODE_CHIP_BLINK, 0)
             put(RADIO_BACKGROUND, 1)
             put(HIKE_HEALTH_AUTO, 1)
+            put(HIKE_SIGNAL_EVERY, 15)
+            put(HIKE_RANGE_TEST_EVERY, 120)
             put(CHART_STYLE, CHART_STYLE_RIBBON)
             put(CHART_STYLE_HEALTH, CHART_STYLE_RIBBON)
             put(CHART_STYLE_NODE, CHART_STYLE_RIBBON)

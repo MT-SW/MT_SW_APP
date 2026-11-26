@@ -4472,6 +4472,7 @@
     <string name="trips_chart_distance">Distance so far</string>
     <string name="trips_chart_height">Height</string>
     <string name="trips_chart_pace">Pace</string>
+    <string name="trips_chart_signal">Best signal</string>
     <string name="trips_chart_speed">Speed</string>
     <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
@@ -4502,6 +4503,7 @@
     <string name="trips_quiet_priority">Favourite devices only</string>
     <string name="trips_quiet_silent">Silence</string>
     <string name="trips_quiet_title">Quiet mode</string>
+    <string name="trips_rangetest">Send range test messages while recording</string>
     <string name="trips_rename">Hike name</string>
     <string name="trips_send_this">Send this picture</string>
     <string name="trips_share">Share the hike</string>
@@ -4514,6 +4516,10 @@
     <string name="trips_share_range">Shared part of the route: %1$s – %2$s</string>
     <string name="trips_share_to">Cut the end of the route</string>
     <string name="trips_share_warning">The files go to a public server: anyone with the link can see the route and the pictures. Only a link is sent over the mesh.</string>
+    <string name="trips_signal_hint">While recording, the signal of the nodes your radio hears (also packets passed on by other nodes) is saved with the place, at most once in the chosen time for each node. "—" turns it off.</string>
+    <string name="trips_signal_live">Signals saved: %1$d</string>
+    <string name="trips_signal_stats">Range: %1$d readings from %2$d nodes · strongest %3$d dBm, weakest %4$d dBm</string>
+    <string name="trips_signal_title">Range recording</string>
     <string name="trips_stats">Distance %1$s · time %2$s · average %3$s</string>
     <string name="trips_stats_ascent">Ascent: %1$d m</string>
     <string name="trips_stats_counts">Points: %1$d · pictures: %2$d</string>

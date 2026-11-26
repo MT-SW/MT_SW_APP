@@ -41,6 +41,16 @@ import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripPoint
 import org.meshtastic.feature.map.trip.TripStore
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.repository.HeardSignal
+import org.meshtastic.core.repository.HeardSignals
+import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.RadioController
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.feature.map.trip.TripSignal
+import kotlinx.coroutines.flow.first
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
@@ -62,6 +72,10 @@ class TrackRecorder(
     private val fileService: FileService,
     private val tripStore: TripStore,
     private val dispatchers: CoroutineDispatchers,
+    private val uiPrefs: UiPrefs,
+    private val radioConfigRepository: RadioConfigRepository,
+    private val radioController: RadioController,
+    private val hiddenFeatures: HiddenFeaturesUnlock,
 ) {
     data class Point(val latitude: Double, val longitude: Double, val altitudeMeters: Double?, val timeMillis: Long)
 
@@ -72,6 +86,7 @@ class TrackRecorder(
         val startedMillis: Long = 0L,
         val tripId: String = "",
         val stops: List<TripStop> = emptyList(),
+        val signals: List<TripSignal> = emptyList(),
     )
 
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
@@ -98,6 +113,10 @@ class TrackRecorder(
         mutableState.value =
             State(recording = true, startedMillis = nowMillis, tripId = kotlin.uuid.Uuid.random().toString())
         Logger.i { "Trasa: nagrywanie rozpoczęte" }
+        lastSignal.clear()
+        signalJob =
+            scope.launch { HeardSignals.signals.collect { heard -> onHeard(heard) } }
+        scope.launch { startRangeTest() }
         phoneJob =
             scope.launch {
                 locationRepository
@@ -120,6 +139,92 @@ class TrackRecorder(
     }
 
     private var quietJob: Job? = null
+    private var signalJob: Job? = null
+    private val lastSignal = mutableMapOf<Int, Long>()
+    private var savedRangeTest: ModuleConfig.RangeTestConfig? = null
+
+    /**
+     * Saves the signal of a node heard on the route, at most once in the chosen time for each node. A packet passed on
+     * by another node counts for the node that passed it on (the signal is that node's), found by the last byte of
+     * its number when only one known node ends like that.
+     */
+    private fun rangeTestConfig(config: ModuleConfig.RangeTestConfig): ModuleConfig =
+        ModuleConfig.Builder().also { it.range_test = config }.build()
+
+    private fun onHeard(heard: HeardSignal) {
+        val every = UiOptions(uiPrefs.uiOptions.value)[UiOptions.HIKE_SIGNAL_EVERY]
+        val s = mutableState.value
+        val at = s.points.lastOrNull()
+        if (every <= 0 || !s.recording || at == null || s.signals.size >= MAX_SIGNALS) return
+        val node: Int
+        if (heard.direct) {
+            node = heard.from
+        } else {
+            if (heard.relayByte == 0) return
+            val wanted = heard.relayByte and BYTE_MASK
+            val match = nodeRepository.nodeDBbyNum.value.keys.filter { (it and BYTE_MASK) == wanted }
+            if (match.size != 1) return
+            node = match.first()
+        }
+        val last = lastSignal[node] ?: 0L
+        if (heard.timeMillis - last < every * MS_PER_SECOND) return
+        lastSignal[node] = heard.timeMillis
+        mutableState.update {
+            it.copy(
+                signals =
+                it.signals +
+                    TripSignal(heard.timeMillis, at.latitude, at.longitude, node, heard.rssi, heard.snr, !heard.direct),
+            )
+        }
+        Logger.d { "Trasa: zapisany sygnał węzła, razem ${mutableState.value.signals.size}" }
+    }
+
+    /**
+     * Only with the hidden features open: the range test of the radio is switched on for the time of the hike and put
+     * back as it was when the hike ends. Never on a public primary channel.
+     */
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun startRangeTest() {
+        val options = UiOptions(uiPrefs.uiOptions.value)
+        if (!hiddenFeatures.unlocked.value || options[UiOptions.HIKE_RANGE_TEST] != 1) return
+        try {
+            val primary = radioConfigRepository.channelSetFlow.first().settings.firstOrNull()
+            val publicPrimary = (primary?.psk?.size ?: 0) < 2
+            if (publicPrimary) {
+                Logger.w { "Trasa: test zasięgu pominięty, główny kanał jest publiczny" }
+                return
+            }
+            val old =
+                radioConfigRepository.moduleConfigFlow.first().range_test
+                    ?: ModuleConfig.RangeTestConfig.Builder().build()
+            savedRangeTest = old
+            val seconds = options[UiOptions.HIKE_RANGE_TEST_EVERY]
+            val on =
+                old.newBuilder()
+                    .also {
+                        it.enabled = true
+                        it.sender = seconds
+                    }
+                    .build()
+            radioController.editLocalSettings { setModuleConfig(rangeTestConfig(on)) }
+            Logger.i { "Trasa: test zasięgu włączony na czas wędrówki, co $seconds s" }
+        } catch (e: Exception) {
+            Logger.w { "Trasa: nie udało się włączyć testu zasięgu: ${e.message}" }
+            savedRangeTest = null
+        }
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun stopRangeTest() {
+        val old = savedRangeTest ?: return
+        savedRangeTest = null
+        try {
+            radioController.editLocalSettings { setModuleConfig(rangeTestConfig(old)) }
+            Logger.i { "Trasa: test zasięgu przywrócony do poprzednich ustawień" }
+        } catch (e: Exception) {
+            Logger.w { "Trasa: nie udało się przywrócić testu zasięgu: ${e.message}" }
+        }
+    }
 
     /**
      * Sets the quiet mode: nothing disturbs, except alarms and alerts (and, in the priority mode, the favourite
@@ -144,6 +249,9 @@ class TrackRecorder(
         setQuiet(QuietMode.Mode.Off)
         phoneJob?.cancel()
         radioJob?.cancel()
+        signalJob?.cancel()
+        signalJob = null
+        scope.launch { stopRangeTest() }
         phoneJob = null
         radioJob = null
         val s = mutableState.value
@@ -160,6 +268,7 @@ class TrackRecorder(
                     distanceMeters = s.distanceMeters,
                     points = s.points.map { TripPoint(it.latitude, it.longitude, it.altitudeMeters, it.timeMillis) },
                     stops = s.stops,
+                    signals = s.signals,
                 ),
             )
         }
@@ -226,6 +335,9 @@ class TrackRecorder(
 
     companion object {
         const val MIN_STEP_METERS = 5.0
+        private const val MAX_SIGNALS = 20_000
+        private const val BYTE_MASK = 0xFF
+        private const val MS_PER_SECOND = 1000L
         private const val STOP_JOIN_METERS = 25.0
         private const val EARTH_RADIUS_M = 6_371_000.0
 

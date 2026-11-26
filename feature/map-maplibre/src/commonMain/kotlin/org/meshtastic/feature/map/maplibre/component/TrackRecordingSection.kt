@@ -28,6 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import org.meshtastic.core.resources.trips_rangetest
+import org.meshtastic.core.resources.trips_signal_live
+import org.meshtastic.core.resources.trips_signal_hint
+import org.meshtastic.core.resources.trips_signal_title
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.resources.trips_health_live
 import org.meshtastic.core.resources.trips_health_auto_hint
 import org.meshtastic.core.resources.trips_health_auto
@@ -143,6 +148,55 @@ internal fun TrackRecordingSection() {
                         text = stringResource(Res.string.trips_health_live, it),
                         style = MaterialTheme.typography.bodySmall,
                     )
+                }
+            }
+        }
+        val signalEvery = UiOptions(options)[UiOptions.HIKE_SIGNAL_EVERY]
+        Text(text = stringResource(Res.string.trips_signal_title), style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            listOf(0 to "—", 5 to "5 s", 15 to "15 s", 30 to "30 s", 60 to "1 min").forEach { (seconds, label) ->
+                FilterChip(
+                    selected = signalEvery == seconds,
+                    onClick = { prefs.setUiOption(UiOptions.HIKE_SIGNAL_EVERY, seconds) },
+                    label = { Text(label) },
+                )
+            }
+        }
+        Text(text = stringResource(Res.string.trips_signal_hint), style = MaterialTheme.typography.bodySmall)
+        if (state.recording && signalEvery > 0) {
+            Text(
+                text = stringResource(Res.string.trips_signal_live, state.signals.size),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        val hiddenOpen by koinInject<HiddenFeaturesUnlock>().unlocked.collectAsStateWithLifecycle()
+        if (hiddenOpen) {
+            val testOn = UiOptions(options)[UiOptions.HIKE_RANGE_TEST] == 1
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(Res.string.trips_rangetest),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = testOn,
+                    onCheckedChange = { prefs.setUiOption(UiOptions.HIKE_RANGE_TEST, if (it) 1 else 0) },
+                )
+            }
+            if (testOn) {
+                val testEvery = UiOptions(options)[UiOptions.HIKE_RANGE_TEST_EVERY]
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    listOf(60 to "1 min", 120 to "2 min", 300 to "5 min", 600 to "10 min").forEach { (seconds, label) ->
+                        FilterChip(
+                            selected = testEvery == seconds,
+                            onClick = { prefs.setUiOption(UiOptions.HIKE_RANGE_TEST_EVERY, seconds) },
+                            label = { Text(label) },
+                        )
+                    }
                 }
             }
         }

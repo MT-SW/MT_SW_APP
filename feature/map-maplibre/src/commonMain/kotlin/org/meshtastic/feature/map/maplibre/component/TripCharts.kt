@@ -38,6 +38,7 @@ import org.meshtastic.core.resources.trips_chart_climbed
 import org.meshtastic.core.resources.trips_chart_distance
 import org.meshtastic.core.resources.trips_chart_height
 import org.meshtastic.core.resources.trips_chart_pace
+import org.meshtastic.core.resources.trips_chart_signal
 import org.meshtastic.core.resources.trips_chart_speed
 import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripStore
@@ -48,6 +49,7 @@ private const val MS_PER_HOUR = 3_600_000.0
 private const val METERS_PER_KM = 1000.0
 private const val MIN_PACE_KMH = 0.5
 private const val MINUTES_PER_HOUR = 60.0
+private const val MS_PER_MINUTE = 60_000L
 
 /** MT_SW: two small charts of a hike along the route: the height (when it was recorded) and the speed. */
 @Composable
@@ -103,6 +105,16 @@ internal fun TripCharts(trip: Trip) {
     if (speeds.size >= 2) Chart(stringResource(Res.string.trips_chart_speed), speeds, "km/h")
     if (pace.size >= 2) Chart(stringResource(Res.string.trips_chart_pace), pace, "min/km")
     if (distance.size >= 2) Chart(stringResource(Res.string.trips_chart_distance), distance, "km")
+    // The best signal heard in each minute of the walk.
+    val signal =
+        remember(trip.id, trip.signals.size) {
+            trip.signals
+                .groupBy { it.t / MS_PER_MINUTE }
+                .toSortedMap()
+                .values
+                .map { list -> list.maxOf { it.rssi }.toDouble() }
+        }
+    if (signal.size >= 2) Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm")
 }
 
 /** At most [MAX_CHART_POINTS] values: the missing ones are skipped and a long route is thinned out. */

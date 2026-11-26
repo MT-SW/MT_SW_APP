@@ -59,6 +59,18 @@ data class LegacyPhoto(
     val url: String = "",
 )
 
+/** One signal heard on the route: where it was heard, from which node and how strong ([relayed]: it was passed on). */
+@Serializable
+data class TripSignal(
+    val t: Long,
+    val lat: Double,
+    val lon: Double,
+    val node: Int,
+    val rssi: Int,
+    val snr: Float,
+    val relayed: Boolean = false,
+)
+
 /** What the health app of the phone had recorded for the time of the hike (read on request, kept with the hike). */
 @Serializable
 data class TripHealth(
@@ -86,6 +98,8 @@ data class Trip(
     val health: TripHealth? = null,
     /** The node that sent this hike to us (0 for a hike recorded here). */
     val sharedBy: Int = 0,
+    /** The signals of the nodes heard along the route (range recording). */
+    val signals: List<TripSignal> = emptyList(),
 ) {
     val photoCount: Int
         get() = stops.sumOf { it.photos.size }
