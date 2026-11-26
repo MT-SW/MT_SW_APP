@@ -23,6 +23,12 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 #### Wersja v5 (2.8.5)
 
 ##### Nowe funkcje
+* **Podsumowanie logów i jakość łącza (wszystkie wersje).** W ustawieniach logów dwa okna: podsumowanie tego, co poszło źle od uruchomienia aplikacji (ostrzeżenia i błędy zgrupowane według treści, płynność mapy) oraz jakość łącza każdego urządzenia (przekroczenia czasu, zamknięte łącza, błędy). Liczy tylko od uruchomienia aplikacji; przycisk czyści liczenie.
+* **Nagrywanie własnej trasy i eksport GPX (wszystkie wersje).** W menu warstw mapy przycisk nagrywania trasy z własnej pozycji (na komputerze z pozycji radia), trasa rysuje się na mapie, a po zakończeniu można ją wyeksportować do pliku GPX. Nagrywa tylko, gdy aplikacja działa.
+* **Mapy offline: zasięg do 1000 km i szczegółowość (wszystkie wersje).** Przy pobieraniu mapy wybierasz promień od środka mapy (do 1000 km) i poziom szczegółowości; aplikacja pokazuje szacowany rozmiar i ostrzega przy bardzo dużym obszarze.
+* **Porównanie urządzeń obok siebie (wszystkie wersje).** W „Funkcje MT_SW” → „Centrum połączeń” → „Porównanie urządzeń” okno z kartą każdego zapisanego urządzenia: połączone lub nie, bateria i napięcie, zajęcie kanału i czas nadawania, czas działania, liczba aktywnych węzłów i nowe wiadomości. Dane z własnej bazy każdego urządzenia (ostatnio zgłoszone); przycisk „Odśwież” czyta je ponownie.
+* **Zdalne listy w osobnym oknie (wszystkie wersje).** Obok „Diagnostyki na żądanie” jest stała pozycja z oknem wszystkich opcji ulubionych, ignorowanych i kontaktów zdalnego urządzenia; pojawia się po raz pierwszy potwierdzenia, że urządzenie jest Twoje, i zostaje na stałe.
+* **Przeciąganie okien w dół na iPhonie.** Okno zamyka się przeciągnięciem w dół z dowolnego miejsca, gdy lista jest przewinięta na samą górę.
 * Karta GPIO (wszystkie wersje): szeroki przycisk „Pobierz listę pinów” pyta zdalnego admina o listę pinów węzła (tylko ta jedna sekcja ustawień) i pokazuje piny do wybrania; aktywny tylko, gdy węzeł jest wykryty jako MT_SW_FIRMWARE v3, w przeciwnym razie wyszarzony.
 
 * **Przycisk widoku 3D na mapie (wszystkie wersje).** Nad przyciskami powiększania i pomniejszania jest przycisk, który pochyla mapę do widoku 3D, a ponowne dotknięcie prostuje ją z powrotem; pochylać można też gestem dwóch palców (na komputerze przeciąganiem z prawym przyciskiem myszy). Mapa zapisuje w logu kąt pochylenia, żeby dało się sprawdzić, czy gest dociera do mapy.
@@ -1020,6 +1026,12 @@ The main things of every version, split by kind of change (the "What's new in th
 #### Version v5 (2.8.5)
 
 ##### New features
+* **Log summary and link quality (all versions).** Two windows in the log settings: a summary of what went wrong since the app started (warnings and errors grouped by what they say, map smoothness) and the link quality of each device (timeouts, closed links, errors). It counts only since the app started; a button clears the count.
+* **Recording your own route and GPX export (all versions).** A route recording button in the map layers menu records from your own position (on desktop from the radio's position), draws the route on the map and exports it to a GPX file when stopped. It records only while the app is running.
+* **Offline maps: range up to 1000 km and detail level (all versions).** When downloading a map you choose a radius around the map centre (up to 1000 km) and a detail level; the app shows an estimated size and warns for a very large area.
+* **Compare devices side by side (all versions).** In "MT_SW features" → "Connection center" → "Compare devices" a window with a card for each saved device: connected or not, battery and voltage, channel use and transmit time, uptime, active nodes and new messages. The data is the last reported, read from each device's own database; "Refresh" reads it again.
+* **Remote lists in their own window (all versions).** Next to "On-demand diagnostics" there is a permanent entry opening a window with all favorites, ignored and contacts options of the remote device; it appears once the device was confirmed as yours and stays.
+* **Dragging windows down on iPhone.** A window closes by dragging down from anywhere when its list is scrolled to the top.
 * GPIO card (all versions): a wide "Get the list of pins" button asks the remote admin for the node's pin list (only that one settings section) and shows the pins to choose from; active only when the node is detected as MT_SW_FIRMWARE v3, greyed out otherwise.
 
 * **A 3D view button on the map (all versions).** Above the zoom in and zoom out buttons there is a button that tilts the map into a 3D view; touching it again levels the map. The map can also be tilted with a two-finger gesture (on the computer, by dragging with the right mouse button). The map writes its tilt angle to the log, so it can be checked whether the gesture reaches the map.

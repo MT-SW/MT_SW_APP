@@ -55,6 +55,7 @@ import org.meshtastic.core.resources.chart_style_health
 import org.meshtastic.core.resources.chart_style_node
 import org.meshtastic.core.resources.connection_center_summary
 import org.meshtastic.core.resources.connection_center_title
+import org.meshtastic.core.resources.device_compare_title
 import org.meshtastic.core.resources.console_summary
 import org.meshtastic.core.resources.console_title
 import org.meshtastic.core.resources.control_style_thin
@@ -285,6 +286,7 @@ object SettingsSearchCatalog {
             Res.string.radio_bridge_title to SettingsRoute.ConnectionCenter,
             Res.string.connection_center_title to SettingsRoute.ConnectionCenter,
             Res.string.connection_center_summary to SettingsRoute.ConnectionCenter,
+            Res.string.device_compare_title to SettingsRoute.ConnectionCenter,
             Res.string.console_title to SettingsRoute.Console,
             Res.string.console_summary to SettingsRoute.Console,
             Res.string.radio_bridge_enabled to SettingsRoute.ConnectionCenter,
