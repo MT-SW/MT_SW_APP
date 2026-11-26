@@ -23,6 +23,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 #### Wersja v5 (2.8.5)
 
 ##### Nowe funkcje
+* **Wirtualny spacer po trasie (wszystkie wersje).** Przy zapisanej sesji „Pomiaru sygnału” (menu warstw mapy) jest przycisk odtwarzania: po mapie w widoku 3D porusza się punkt ze śladem, a panel pokazuje, który węzeł był tam słyszany i z jakim sygnałem; pauza, prędkość 1x–16x i suwak.
+* **Zrób zdjęcie w rozmowie (Android i iPhone/iPad).** Obok przycisku zdjęcia z galerii jest ikona aparatu; zdjęcie zrobione na miejscu idzie tą samą drogą co zdjęcie z galerii (ostrzeżenie, wysyłanie jako link). Na komputerze zostaje wybór pliku.
 * **Podsumowanie logów i jakość łącza (wszystkie wersje).** W ustawieniach logów dwa okna: podsumowanie tego, co poszło źle od uruchomienia aplikacji (ostrzeżenia i błędy zgrupowane według treści, płynność mapy) oraz jakość łącza każdego urządzenia (przekroczenia czasu, zamknięte łącza, błędy). Liczy tylko od uruchomienia aplikacji; przycisk czyści liczenie.
 * **Nagrywanie własnej trasy i eksport GPX (wszystkie wersje).** W menu warstw mapy przycisk nagrywania trasy z własnej pozycji (na komputerze z pozycji radia), trasa rysuje się na mapie, a po zakończeniu można ją wyeksportować do pliku GPX. Nagrywa tylko, gdy aplikacja działa.
 * **Mapy offline: zasięg do 1000 km i szczegółowość (wszystkie wersje).** Przy pobieraniu mapy wybierasz promień od środka mapy (do 1000 km) i poziom szczegółowości; aplikacja pokazuje szacowany rozmiar i ostrzega przy bardzo dużym obszarze.
@@ -1026,6 +1028,8 @@ The main things of every version, split by kind of change (the "What's new in th
 #### Version v5 (2.8.5)
 
 ##### New features
+* **Virtual route walk (all versions).** A saved "Signal survey" session (map layers menu) has a play button: a dot with a trail moves over the map in a 3D view, and a panel shows which node was heard there and how strongly; pause, speed 1x–16x and a slider.
+* **Take a picture in a conversation (Android and iPhone/iPad).** A camera icon next to the gallery picture button; a picture taken on the spot goes the same way as one from the gallery (warning, sent as a link). On desktop the file choice stays.
 * **Log summary and link quality (all versions).** Two windows in the log settings: a summary of what went wrong since the app started (warnings and errors grouped by what they say, map smoothness) and the link quality of each device (timeouts, closed links, errors). It counts only since the app started; a button clears the count.
 * **Recording your own route and GPX export (all versions).** A route recording button in the map layers menu records from your own position (on desktop from the radio's position), draws the route on the map and exports it to a GPX file when stopped. It records only while the app is running.
 * **Offline maps: range up to 1000 km and detail level (all versions).** When downloading a map you choose a radius around the map centre (up to 1000 km) and a detail level; the app shows an estimated size and warns for a very large area.
