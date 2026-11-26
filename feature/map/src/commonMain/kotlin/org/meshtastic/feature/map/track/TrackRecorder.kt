@@ -35,6 +35,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripPoint
@@ -107,8 +108,29 @@ class TrackRecorder(
             }
     }
 
+    private var quietJob: Job? = null
+
+    /**
+     * Sets the quiet mode: nothing disturbs, except alarms and alerts (and, in the priority mode, the favourite
+     * devices). It ends when the recording ends.
+     */
+    fun setQuiet(mode: QuietMode.Mode) {
+        quietJob?.cancel()
+        quietJob = null
+        QuietMode.set(mode)
+        if (mode == QuietMode.Mode.Priority) {
+            quietJob =
+                scope.launch {
+                    nodeRepository.nodeDBbyNum.collect { nodes ->
+                        QuietMode.setPriority(nodes.values.filter { it.isFavorite }.map { it.num }.toSet())
+                    }
+                }
+        }
+    }
+
     /** Stops recording; the route stays until it is saved or a new one starts. */
     fun stop() {
+        setQuiet(QuietMode.Mode.Off)
         phoneJob?.cancel()
         radioJob?.cancel()
         phoneJob = null

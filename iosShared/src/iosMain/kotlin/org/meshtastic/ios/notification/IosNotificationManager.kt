@@ -33,6 +33,7 @@ import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioBackgroundMonitor
 import org.meshtastic.core.repository.SosNotificationActions
@@ -212,6 +213,7 @@ class IosNotificationManager(
 
     @Suppress("ReturnCount")
     override suspend fun dispatch(notification: Notification): Boolean {
+        if (QuietMode.blocks(notification)) return false
         val categoryEnabled =
             when (notification.category) {
                 Notification.Category.Message -> prefs.messagesEnabled.value

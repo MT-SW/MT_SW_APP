@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.onEach
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.allows
 import org.w3c.notifications.NotificationOptions
 import org.w3c.notifications.Notification as BrowserNotification
@@ -57,7 +58,8 @@ class WebNotificationManager(private val prefs: NotificationPrefs, scope: Corout
         askWhenSwitchedOn(prefs.newWaypointsEnabled, scope)
     }
 
-    override suspend fun dispatch(notification: Notification): Boolean = prefs.allows(notification.category) &&
+    override suspend fun dispatch(notification: Notification): Boolean = !QuietMode.blocks(notification) &&
+        prefs.allows(notification.category) &&
         notificationsSupported() &&
         notificationPermission() == "granted" &&
         (showInWorker(notification) || showInPage(notification))

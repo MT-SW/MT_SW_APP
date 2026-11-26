@@ -94,6 +94,9 @@ import org.meshtastic.core.resources.trips_share_progress
 import org.meshtastic.core.resources.trips_share_range
 import org.meshtastic.core.resources.trips_share_to
 import org.meshtastic.core.resources.trips_share_warning
+import org.meshtastic.core.resources.trips_stats
+import org.meshtastic.core.resources.trips_stats_ascent
+import org.meshtastic.core.resources.trips_stats_counts
 import org.meshtastic.core.resources.trips_stop
 import org.meshtastic.core.resources.trips_stop_place
 import org.meshtastic.core.resources.trips_stop_time
@@ -117,6 +120,7 @@ import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripShare
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripStore
+import org.meshtastic.feature.map.trip.stats
 import org.meshtastic.feature.map.trip.TripViewRequest
 import kotlin.math.abs
 
@@ -174,6 +178,19 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             NameField(trip, store)
+            val stats = remember(trip) { trip.stats() }
+            Text(
+                text =
+                stringResource(Res.string.trips_stats, stats.distanceText, stats.durationText, stats.averageText),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            stats.ascentMeters?.let {
+                Text(stringResource(Res.string.trips_stats_ascent, it), style = MaterialTheme.typography.bodySmall)
+            }
+            Text(
+                text = stringResource(Res.string.trips_stats_counts, trip.points.size, trip.photoCount),
+                style = MaterialTheme.typography.bodySmall,
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 pickAll?.let { pick ->
                     TextButton(onClick = pick) {

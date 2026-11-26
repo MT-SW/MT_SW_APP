@@ -4469,6 +4469,11 @@
     <string name="trips_no_time">The picture has no time</string>
     <string name="trips_photo">Take a picture on the route (%1$d)</string>
     <string name="trips_photo_taken">Picture taken: %1$s</string>
+    <string name="trips_quiet_hint">Alarms and alerts always get through. The mode ends with the recording.</string>
+    <string name="trips_quiet_off">Off</string>
+    <string name="trips_quiet_priority">Favourite devices only</string>
+    <string name="trips_quiet_silent">Silence</string>
+    <string name="trips_quiet_title">Quiet mode</string>
     <string name="trips_rename">Hike name</string>
     <string name="trips_send_this">Send this picture</string>
     <string name="trips_share">Share the hike</string>
@@ -4481,6 +4486,9 @@
     <string name="trips_share_range">Shared part of the route: %1$s – %2$s</string>
     <string name="trips_share_to">Cut the end of the route</string>
     <string name="trips_share_warning">The files go to a public server: anyone with the link can see the route and the pictures. Only a link is sent over the mesh.</string>
+    <string name="trips_stats">Distance %1$s · time %2$s · average %3$s</string>
+    <string name="trips_stats_ascent">Ascent: %1$d m</string>
+    <string name="trips_stats_counts">Points: %1$d · pictures: %2$d</string>
     <string name="trips_stop">Point %1$d</string>
     <string name="trips_stop_place">Place on the route</string>
     <string name="trips_stop_time">Time on the route: %1$s</string>

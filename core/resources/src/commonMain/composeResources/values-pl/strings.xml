@@ -4768,4 +4768,12 @@
     <string name="trips_import_button">Odtwórz wędrówkę</string>
     <string name="trips_import_progress">Odbieranie wędrówki: %1$d z %2$d</string>
     <string name="trips_import_done">Wędrówka zapisana. Mapa odtworzy ją po otwarciu.</string>
+    <string name="trips_quiet_title">Tryb ciszy</string>
+    <string name="trips_quiet_off">Wyłączony</string>
+    <string name="trips_quiet_silent">Cisza</string>
+    <string name="trips_quiet_priority">Tylko ulubione urządzenia</string>
+    <string name="trips_quiet_hint">Alarmy i alerty zawsze docierają. Tryb kończy się razem z nagrywaniem.</string>
+    <string name="trips_stats">Dystans %1$s · czas %2$s · średnio %3$s</string>
+    <string name="trips_stats_ascent">Podejścia: %1$d m</string>
+    <string name="trips_stats_counts">Punkty: %1$d · zdjęcia: %2$d</string>
 </resources>

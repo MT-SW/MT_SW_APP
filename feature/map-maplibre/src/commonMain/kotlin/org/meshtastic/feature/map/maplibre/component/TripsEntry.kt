@@ -64,6 +64,7 @@ import org.meshtastic.core.ui.component.ListItem as StyledListItem
 import org.meshtastic.core.ui.util.TripsWindowRequest
 import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.feature.map.trip.TripStore
+import org.meshtastic.feature.map.trip.stats
 
 /**
  * MT_SW: the "Hikes" entry of the map layers menu. It opens a window with everything about hikes: recording the own
@@ -113,7 +114,11 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                     modifier = Modifier.clickable { openId = trip.id },
                     headlineContent = { Text(trip.name) },
                     supportingContent = {
-                        Text(stringResource(Res.string.trips_item, trip.distanceMeters.toInt(), trip.photoCount))
+                        val stats = trip.stats()
+                        Text(
+                            stringResource(Res.string.trips_item, trip.distanceMeters.toInt(), trip.photoCount) +
+                                " · " + stats.durationText,
+                        )
                     },
                     trailingContent = {
                         Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {

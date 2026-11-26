@@ -79,6 +79,7 @@ import org.meshtastic.core.navigation.NotificationDeepLinks
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
@@ -196,6 +197,16 @@ class MeshNotificationManagerImpl(
 
     private val notificationManager =
         checkNotNull(context.getSystemService<NotificationManager>()) { "NotificationManager not found" }
+
+    /** MT_SW: posts a notice unless the quiet mode holds it back; the SOS alarm and alerts always get through. */
+    private fun quietNotify(tag: String, id: Int, notification: android.app.Notification) {
+        val always = tag == TAG_SOS_ALARM || tag == TAG_ALERT
+        if (!always && QuietMode.blocksId(id)) {
+            Logger.d { "Tryb ciszy: powiadomienie $tag wstrzymane" }
+            return
+        }
+        notificationManager.notify(tag, id, notification)
+    }
 
     companion object {
         const val MAX_BATTERY_LEVEL = 100
@@ -668,7 +679,7 @@ class MeshNotificationManagerImpl(
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setAutoCancel(true)
         if (isSilent) builder.setSilent(true)
-        notificationManager.notify(TAG_REACTION, contactKey.hashCode(), builder.build())
+        quietNotify(TAG_REACTION, contactKey.hashCode(), builder.build())
     }
 
     @Suppress("LongParameterList")
@@ -694,7 +705,7 @@ class MeshNotificationManagerImpl(
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
-        notificationManager.notify(TAG_BACKGROUND_MESSAGE, id, builder.build())
+        quietNotify(TAG_BACKGROUND_MESSAGE, id, builder.build())
     }
 
     override suspend fun updateWaypointNotification(
@@ -706,7 +717,7 @@ class MeshNotificationManagerImpl(
     ) {
         ensureChannels()
         val notification = createWaypointNotification(name, message, waypointId, isSilent)
-        notificationManager.notify(TAG_WAYPOINT, contactKey.hashCode(), notification)
+        quietNotify(TAG_WAYPOINT, contactKey.hashCode(), notification)
     }
 
     private suspend fun showConversationNotification(
@@ -759,7 +770,7 @@ class MeshNotificationManagerImpl(
                 history = displayHistory,
                 isSilent = isSilent,
             )
-        notificationManager.notify(TAG_MESSAGE, contactKey.hashCode(), notification)
+        quietNotify(TAG_MESSAGE, contactKey.hashCode(), notification)
         showGroupSummary()
     }
 
@@ -821,12 +832,12 @@ class MeshNotificationManagerImpl(
                 .setAutoCancel(true)
                 .build()
 
-        notificationManager.notify(TAG_MESSAGE_SUMMARY, SUMMARY_ID, summaryNotification)
+        quietNotify(TAG_MESSAGE_SUMMARY, SUMMARY_ID, summaryNotification)
     }
 
     override suspend fun showAlertNotification(contactKey: String, name: String, alert: String) {
         ensureChannels()
-        notificationManager.notify(TAG_ALERT, contactKey.hashCode(), createAlertNotification(contactKey, name, alert))
+        quietNotify(TAG_ALERT, contactKey.hashCode(), createAlertNotification(contactKey, name, alert))
     }
 
     /**
@@ -870,7 +881,7 @@ class MeshNotificationManagerImpl(
         }
         val notification = builder.build()
         notification.flags = notification.flags or Notification.FLAG_INSISTENT
-        notificationManager.notify(TAG_SOS_ALARM, SOS_ALARM_ID, notification)
+        quietNotify(TAG_SOS_ALARM, SOS_ALARM_ID, notification)
     }
 
     /** A button of the SOS alarm that confirms it (and answers the sender) without opening the app. */
@@ -912,20 +923,19 @@ class MeshNotificationManagerImpl(
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
-        notificationManager.notify(TAG_MESH_BEACON, offer.fromNodeNum, notification)
+        quietNotify(TAG_MESH_BEACON, offer.fromNodeNum, notification)
     }
 
     override suspend fun showNewNodeSeenNotification(node: Node, title: String) {
         ensureChannels()
-        notificationManager.notify(TAG_NEW_NODE, node.num, createNewNodeSeenNotification(title, node))
+        quietNotify(TAG_NEW_NODE, node.num, createNewNodeSeenNotification(title, node))
     }
 
     override fun cancelNewNodeNotification(nodeNum: Int) = notificationManager.cancel(TAG_NEW_NODE, nodeNum)
 
     override suspend fun showNodeSilenceNotification(node: Node, title: String) {
         ensureChannels()
-        notificationManager.notify(
-            TAG_NODE_SILENCE,
+        quietNotify(TAG_NODE_SILENCE,
             node.num,
             createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeSilence),
         )
@@ -935,8 +945,7 @@ class MeshNotificationManagerImpl(
 
     override suspend fun showNodeActiveNotification(node: Node, title: String) {
         ensureChannels()
-        notificationManager.notify(
-            TAG_NODE_ACTIVE,
+        quietNotify(TAG_NODE_ACTIVE,
             node.num,
             createNewNodeSeenNotification(title, node, NotificationChannelSpec.NodeActive),
         )
@@ -961,7 +970,7 @@ class MeshNotificationManagerImpl(
                 if (lowBatteryEpisodes[node.num] !== episode) return
                 val showing =
                     notificationManager.activeNotifications.any { it.tag == TAG_LOW_BATTERY && it.id == node.num }
-                if (firstReading || showing) notificationManager.notify(TAG_LOW_BATTERY, node.num, notification)
+                if (firstReading || showing) quietNotify(TAG_LOW_BATTERY, node.num, notification)
                 posted = true
             }
         } finally {
@@ -992,7 +1001,7 @@ class MeshNotificationManagerImpl(
                 // repeats (see notificationId), so only the first one should sound.
                 .setOnlyAlertOnce(clientNotification.isProtectedPositionAdvisory())
                 .build()
-        notificationManager.notify(TAG_CLIENT, clientNotification.notificationId(), notification)
+        quietNotify(TAG_CLIENT, clientNotification.notificationId(), notification)
     }
 
     override fun clearClientNotification(clientNotification: ClientNotification) =
@@ -1022,7 +1031,7 @@ class MeshNotificationManagerImpl(
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
-        notificationManager.notify(TAG_FIRMWARE_UPDATE, id, notification)
+        quietNotify(TAG_FIRMWARE_UPDATE, id, notification)
         return true
     }
 
@@ -1049,7 +1058,7 @@ class MeshNotificationManagerImpl(
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
-        notificationManager.notify(TAG_APP_UPDATE, APP_UPDATE_ID, notification)
+        quietNotify(TAG_APP_UPDATE, APP_UPDATE_ID, notification)
         return true
     }
 
@@ -1067,7 +1076,7 @@ class MeshNotificationManagerImpl(
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
-        notificationManager.notify(TAG_RECONNECT_BLOCKED, RECONNECT_BLOCKED_ID, notification)
+        quietNotify(TAG_RECONNECT_BLOCKED, RECONNECT_BLOCKED_ID, notification)
         return true
     }
 

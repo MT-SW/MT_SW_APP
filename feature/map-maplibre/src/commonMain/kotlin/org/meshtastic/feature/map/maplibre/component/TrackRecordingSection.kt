@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -44,6 +45,12 @@ import org.meshtastic.core.resources.track_rec_status
 import org.meshtastic.core.resources.track_rec_stop
 import org.meshtastic.core.resources.track_rec_title
 import org.meshtastic.core.resources.trips_photo
+import org.meshtastic.core.resources.trips_quiet_hint
+import org.meshtastic.core.resources.trips_quiet_off
+import org.meshtastic.core.resources.trips_quiet_priority
+import org.meshtastic.core.resources.trips_quiet_silent
+import org.meshtastic.core.resources.trips_quiet_title
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.rememberCameraLauncher
@@ -83,6 +90,23 @@ internal fun TrackRecordingSection() {
                 )
             }
         }
+        val quiet by QuietMode.mode.collectAsStateWithLifecycle()
+        Text(text = stringResource(Res.string.trips_quiet_title), style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            listOf(
+                QuietMode.Mode.Off to Res.string.trips_quiet_off,
+                QuietMode.Mode.Silent to Res.string.trips_quiet_silent,
+                QuietMode.Mode.Priority to Res.string.trips_quiet_priority,
+            )
+                .forEach { (mode, label) ->
+                    FilterChip(
+                        selected = quiet == mode,
+                        onClick = { recorder.setQuiet(mode) },
+                        label = { Text(stringResource(label)) },
+                    )
+                }
+        }
+        Text(text = stringResource(Res.string.trips_quiet_hint), style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             if (state.recording) {
                 Button(onClick = recorder::stop) { Text(stringResource(Res.string.track_rec_stop)) }

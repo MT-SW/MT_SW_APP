@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
 import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.NotificationPrefs
+import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.allows
 import org.meshtastic.desktop.notification.NativeNotificationSender
 import androidx.compose.ui.window.Notification as ComposeNotification
@@ -62,6 +63,7 @@ class DesktopNotificationManager(
 
     @Suppress("InjectDispatcher", "TooGenericExceptionCaught")
     override suspend fun dispatch(notification: Notification): Boolean {
+        if (QuietMode.blocks(notification)) return false
         val enabled = prefs.allows(notification.category)
 
         Logger.d { "DesktopNotificationManager dispatch: category=${notification.category}, enabled=$enabled" }

@@ -4373,6 +4373,11 @@ trips_move_to
 trips_no_time
 trips_photo
 trips_photo_taken
+trips_quiet_hint
+trips_quiet_off
+trips_quiet_priority
+trips_quiet_silent
+trips_quiet_title
 trips_rename
 trips_send_this
 trips_share
@@ -4385,6 +4390,9 @@ trips_share_progress
 trips_share_range
 trips_share_to
 trips_share_warning
+trips_stats
+trips_stats_ascent
+trips_stats_counts
 trips_stop
 trips_stop_place
 trips_stop_time
