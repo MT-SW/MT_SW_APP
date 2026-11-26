@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.data.repository
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
@@ -111,6 +112,16 @@ class SignalSurveyRepositoryImpl(
         local.samplesOnce(sessionId).map { it.asExternalModel() }
 
     override suspend fun delete(sessionId: Long) = local.deleteSession(sessionId)
+
+    override suspend fun import(samples: List<SignalSample>): Boolean {
+        if (samples.isEmpty()) return false
+        val sorted = samples.sortedBy { it.timeMillis }
+        val session =
+            SignalSurveySessionEntity(startedAt = sorted.first().timeMillis, endedAt = sorted.last().timeMillis)
+        val stored = safeCatching { local.importSession(session, sorted.map { it.asEntity(0) }) }.getOrDefault(false)
+        Logger.i { "Zasięg: import ${sorted.size} odczytów, zapisano: $stored" }
+        return stored
+    }
 
     private suspend fun record(started: Request) {
         // The preset is kept with the session because an SNR reading only means something against it.

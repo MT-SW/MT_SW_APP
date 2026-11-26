@@ -3835,6 +3835,8 @@ signal_survey_export
 signal_survey_heard_directly
 signal_survey_heatmap
 signal_survey_hud_recording
+signal_survey_import
+signal_survey_import_hint
 signal_survey_last_reading
 signal_survey_location_off
 signal_survey_location_permission
@@ -4383,6 +4385,8 @@ trips_chart_pace
 trips_chart_signal
 trips_chart_speed
 trips_chosen
+trips_coverage_csv
+trips_coverage_geojson
 trips_empty
 trips_health_ascent
 trips_health_auto

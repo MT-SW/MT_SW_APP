@@ -43,3 +43,35 @@ internal fun List<SignalSample>.toSurveyCsv(): String = buildString {
         )
     }
 }
+
+private const val CSV_COLUMNS = 8
+
+/**
+ * The readings in [text], which is the file [toSurveyCsv] writes (a hike's exported signal has the same columns).
+ * A row that does not fit is skipped, so a file edited by hand or cut short still brings in what is readable.
+ */
+internal fun parseSurveyCsv(text: String): List<SignalSample> = text.lineSequence()
+    .map { it.trim() }
+    .filter { it.isNotEmpty() && !it.startsWith("time_ms") }
+    .mapNotNull { line ->
+        val c = line.split(',')
+        if (c.size < CSV_COLUMNS) return@mapNotNull null
+        val node = c[4].trim().removePrefix("!").toUIntOrNull(HEX)?.toInt()
+        val time = c[0].trim().toLongOrNull()
+        val lat = c[1].trim().toDoubleOrNull()
+        val lon = c[2].trim().toDoubleOrNull()
+        val rssi = c[5].trim().toIntOrNull()
+        if (node == null || time == null || lat == null || lon == null || rssi == null) return@mapNotNull null
+        if (lat !in -90.0..90.0 || lon !in -180.0..180.0) return@mapNotNull null
+        SignalSample(
+            timeMillis = time,
+            latitude = lat,
+            longitude = lon,
+            accuracyM = c[3].trim().toFloatOrNull(),
+            fromNum = node,
+            rssi = rssi,
+            snr = c[6].trim().toFloatOrNull(),
+            direct = c[7].trim() != "false",
+        )
+    }
+    .toList()

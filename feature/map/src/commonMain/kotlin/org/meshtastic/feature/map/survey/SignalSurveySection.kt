@@ -16,6 +16,14 @@
  */
 package org.meshtastic.feature.map.survey
 
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.rememberCoroutineScope
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.resources.signal_survey_import
+import org.meshtastic.core.resources.signal_survey_import_hint
+import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -113,6 +121,18 @@ fun SignalSurveySection(modifier: Modifier = Modifier, viewModel: SignalSurveyVi
                 if (id != null && startedAt != null) viewModel.csv(id, startedAt) else null
             },
         )
+    val fileService: FileService = koinInject()
+    val importScope = rememberCoroutineScope()
+    val openFile =
+        rememberOpenFileLauncher { uri ->
+            if (uri != null) {
+                importScope.launch {
+                    var text = ""
+                    val read = fileService.read(uri) { text = it.readUtf8() }
+                    if (read) viewModel.importCsv(text) else Logger.w { "Zasięg: nie udało się odczytać pliku" }
+                }
+            }
+        }
     val permission = rememberLocationPermissionState()
     val openLocationSettings = rememberOpenLocationSettings()
     val askForLocation = {
@@ -142,6 +162,7 @@ fun SignalSurveySection(modifier: Modifier = Modifier, viewModel: SignalSurveyVi
                     state.sessions.firstOrNull { it.session.id == sessionId }?.session?.startedAtMillis
                 export(SURVEY_FILE_NAME, CSV_MIME_TYPE)
             },
+            onImport = { openFile("*/*") },
             onDelete = viewModel::delete,
             onPlay = playback::play,
             onHeatmapChange = viewModel::setHeatmap,
@@ -156,6 +177,7 @@ internal class SignalSurveyActions(
     val onFixBlocker: (SignalSurveyBlocker) -> Unit = {},
     val onVisibleChange: (sessionId: Long, visible: Boolean) -> Unit = { _, _ -> },
     val onExport: (sessionId: Long) -> Unit = {},
+    val onImport: () -> Unit = {},
     val onPlay: (sessionId: Long) -> Unit = {},
     val onDelete: (sessionId: Long) -> Unit = {},
     val onHeatmapChange: (Boolean) -> Unit = {},
@@ -200,6 +222,11 @@ internal fun SignalSurveyContent(
             trailingContent = {
                 Switch(modifier = Modifier.clearAndSetSemantics {}, checked = state.heatmap, onCheckedChange = null)
             },
+        )
+        ListItem(
+            modifier = Modifier.clickable(onClick = actions.onImport),
+            headlineContent = { Text(stringResource(Res.string.signal_survey_import)) },
+            supportingContent = { Text(stringResource(Res.string.signal_survey_import_hint)) },
         )
         fixLabel(blocker)?.let { label ->
             Button(

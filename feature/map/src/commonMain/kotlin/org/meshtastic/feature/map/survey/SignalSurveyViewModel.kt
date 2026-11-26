@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.survey
 
+import co.touchlab.kermit.Logger
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -130,6 +131,15 @@ class SignalSurveyViewModel(
         selectedSpot.value = id?.let { cellId -> cells.value.firstOrNull { it.id == cellId } }?.spot()
     }
 
+    /** Brings the readings of a CSV file (the survey's own, or a hike's exported signal) in as a session of their own. */
+    fun importCsv(text: String) {
+        viewModelScope.launch {
+            val samples = parseSurveyCsv(text).take(MAX_IMPORTED_READINGS)
+            Logger.i { "Zasięg: odczytanych z pliku ${samples.size}" }
+            repository.import(samples)
+        }
+    }
+
     fun delete(sessionId: Long) {
         visibility.sessionIds.update { it - sessionId }
         viewModelScope.launch { repository.delete(sessionId) }
@@ -148,3 +158,5 @@ class SignalSurveyViewModel(
         }
     }
 }
+
+private const val MAX_IMPORTED_READINGS = 200_000

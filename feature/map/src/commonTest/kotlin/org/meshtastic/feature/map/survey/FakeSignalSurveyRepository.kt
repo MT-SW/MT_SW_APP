@@ -51,6 +51,8 @@ internal class FakeSignalSurveyRepository : SignalSurveyRepository {
 
     override suspend fun samplesOnce(sessionId: Long) = readings.value[sessionId].orEmpty()
 
+    override suspend fun import(samples: List<SignalSample>): Boolean = samples.isNotEmpty()
+
     override suspend fun delete(sessionId: Long) {
         deleted += sessionId
         readings.update { it - sessionId }

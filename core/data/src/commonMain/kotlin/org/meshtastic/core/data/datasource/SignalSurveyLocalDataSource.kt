@@ -78,6 +78,17 @@ class SignalSurveyLocalDataSource(
             }
         } == true
 
+    /** Stores a finished session with its readings in one go; false when the database is shutting down. */
+    suspend fun importSession(session: SignalSurveySessionEntity, samples: List<SignalSampleEntity>): Boolean =
+        withContext(dispatchers.io) {
+            dbManager.withDb { db ->
+                val dao = db.signalSampleDao()
+                val id = dao.insertSession(session)
+                dao.insertAll(samples.map { it.copy(sessionId = id) })
+                true
+            }
+        } == true
+
     suspend fun deleteSession(sessionId: Long) {
         withContext(dispatchers.io) { dbManager.withDb { it.signalSampleDao().deleteSession(sessionId) } }
     }

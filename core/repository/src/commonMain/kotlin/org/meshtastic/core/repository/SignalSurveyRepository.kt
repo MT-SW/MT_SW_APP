@@ -59,4 +59,7 @@ interface SignalSurveyRepository {
     suspend fun samplesOnce(sessionId: Long): List<SignalSample>
 
     suspend fun delete(sessionId: Long)
+
+    /** Stores [samples] (from a file or a hike) as a finished session of their own; false when nothing was stored. */
+    suspend fun import(samples: List<SignalSample>): Boolean
 }

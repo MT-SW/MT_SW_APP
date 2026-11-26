@@ -4818,4 +4818,8 @@
     <string name="remote_ignore_confirm_text">Zdalne urządzenie odrzuci pakiety z wybranych węzłów i usunie to, co od nich zapisało. Zdjęcie ignorowania później tego nie przywróci.</string>
     <string name="remote_favorite_confirm_title">Dodać do ulubionych na zdalnym urządzeniu?</string>
     <string name="remote_favorite_confirm_text">Wybrane węzły zostaną dodane do ulubionych zdalnego urządzenia. Jeśli urządzenie jeszcze ich nie zna, najpierw zostanie wysłany ich kontakt.</string>
+    <string name="signal_survey_import">Importuj zasięg z pliku CSV</string>
+    <string name="signal_survey_import_hint">Plik zapisany z badania zasięgu albo z wędrówki. Zostaje dodany jako osobna sesja.</string>
+    <string name="trips_coverage_csv">Eksportuj zasięg (CSV)</string>
+    <string name="trips_coverage_geojson">Eksportuj zasięg (GeoJSON)</string>
 </resources>

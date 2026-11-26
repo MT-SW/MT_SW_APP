@@ -18,6 +18,11 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.resources.trips_coverage_csv
+import org.meshtastic.core.resources.trips_coverage_geojson
+import org.meshtastic.core.ui.util.rememberFileExporter
+import org.meshtastic.feature.map.trip.coverageCsv
+import org.meshtastic.feature.map.trip.coverageGeoJson
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -247,6 +252,19 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 style = MaterialTheme.typography.bodySmall,
             )
             TripCharts(trip)
+            if (trip.signals.isNotEmpty()) {
+                val exportCsv = rememberFileExporter(content = { trip.coverageCsv()?.encodeToByteArray() })
+                val exportGeoJson = rememberFileExporter(content = { trip.coverageGeoJson()?.encodeToByteArray() })
+                val fileName = "zasieg-" + trip.id.take(COVERAGE_FILE_ID_LENGTH)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { exportCsv("$fileName.csv", "text/csv") }) {
+                        Text(stringResource(Res.string.trips_coverage_csv))
+                    }
+                    TextButton(onClick = { exportGeoJson("$fileName.geojson", "application/geo+json") }) {
+                        Text(stringResource(Res.string.trips_coverage_geojson))
+                    }
+                }
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 pickAll?.let { pick ->
                     TextButton(onClick = pick) {
@@ -719,3 +737,5 @@ private fun HealthSection(trip: Trip, store: TripStore) {
     }
 }
 private const val METERS_PER_KM = 1000.0
+
+private const val COVERAGE_FILE_ID_LENGTH = 8

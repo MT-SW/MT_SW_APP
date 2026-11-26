@@ -3916,6 +3916,8 @@
     <string name="signal_survey_heard_directly">Heard directly here</string>
     <string name="signal_survey_heatmap">Show as heatmap</string>
     <string name="signal_survey_hud_recording">Recording survey · %1$s</string>
+    <string name="signal_survey_import">Import signal CSV</string>
+    <string name="signal_survey_import_hint">A file saved from a signal survey or from a hike. It is added as a session of its own.</string>
     <string name="signal_survey_last_reading">Last reading %1$s</string>
     <string name="signal_survey_location_off">Turn on location to log readings</string>
     <string name="signal_survey_location_permission">Allow location access to log readings</string>
@@ -4479,6 +4481,8 @@
     <string name="trips_chart_signal">Best signal</string>
     <string name="trips_chart_speed">Speed</string>
     <string name="trips_chosen">Chosen to send</string>
+    <string name="trips_coverage_csv">Export signal (CSV)</string>
+    <string name="trips_coverage_geojson">Export signal (GeoJSON)</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
     <string name="trips_health_ascent">Ascent (health app): %1$d m</string>
     <string name="trips_health_auto">Take steps and heart rate from the health app by itself</string>
