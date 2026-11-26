@@ -110,9 +110,9 @@ internal fun TripCharts(trip: Trip) {
         remember(trip.id, trip.signals.size) {
             trip.signals
                 .groupBy { it.t / MS_PER_MINUTE }
-                .toSortedMap()
-                .values
-                .map { list -> list.maxOf { it.rssi }.toDouble() }
+                .entries
+                .sortedBy { it.key }
+                .map { entry -> entry.value.maxOf { it.rssi }.toDouble() }
         }
     if (signal.size >= 2) Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm")
 }
