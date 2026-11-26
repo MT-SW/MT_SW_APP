@@ -17,6 +17,7 @@
 package org.meshtastic.core.ui.util
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * MT_SW: how a hike travels between devices. The files go to a public image host (the same ones the chat uses for
@@ -55,8 +56,14 @@ object HikeLinks {
 
 /** Reads a shared hike (by its link) into the hikes of this device; implemented by the map module. */
 interface HikeImporter {
-    /** Returns the id of the new hike. [onStep] gets the number of files done and of all files. Throws on failure. */
-    suspend fun import(url: String, onStep: (Int, Int) -> Unit): String
+    /**
+     * Returns the id of the new hike. [senderNum] is the node that sent the link (0 when not known), so the hike can be
+     * found again from that node's details. [onStep] gets the number of files done and of all files. Throws on failure.
+     */
+    suspend fun import(url: String, senderNum: Int = 0, onStep: (Int, Int) -> Unit): String
+
+    /** The newest hike received from each node: node number → hike id. Empty until a node has sent one. */
+    val receivedFrom: StateFlow<Map<Int, String>>
 }
 
 /** The hike just received from a message: the map replays it the next time it is shown. */

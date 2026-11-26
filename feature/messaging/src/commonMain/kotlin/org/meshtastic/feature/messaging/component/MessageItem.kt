@@ -685,7 +685,7 @@ fun MessageItem(
                     // any other link is a guess at an image and is quietly hidden when it is none.
                     val ownHost = linkUrl?.let(::isOwnImageHost) == true
                     val hikeUrl = remember(message.text) { HikeLinks.hikeUrl(message.text) }
-                    if (hikeUrl != null) HikeLinkButton(hikeUrl)
+                    if (hikeUrl != null) HikeLinkButton(hikeUrl, node.num)
                     if (linkUrl != null && hikeUrl == null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
                         if (linkImageFailed) {
                             Text(
@@ -1078,7 +1078,7 @@ private const val BUBBLE_MIN_ALPHA = 0.12f
 
 /** MT_SW: under a message that carries a shared hike: reads it into the own hikes, where the map replays it. */
 @Composable
-private fun HikeLinkButton(url: String) {
+private fun HikeLinkButton(url: String, senderNum: Int) {
     val importer: HikeImporter = koinInject()
     val scope = rememberCoroutineScope()
     // -1: not started, 0..: files done, DONE: saved.
@@ -1098,7 +1098,7 @@ private fun HikeLinkButton(url: String) {
                         scope.launch {
                             try {
                                 val id =
-                                    importer.import(url) { d, t ->
+                                    importer.import(url, senderNum) { d, t ->
                                         done = d
                                         total = t
                                     }

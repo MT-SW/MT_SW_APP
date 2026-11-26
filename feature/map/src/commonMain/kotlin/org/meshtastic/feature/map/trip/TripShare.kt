@@ -19,6 +19,7 @@
 package org.meshtastic.feature.map.trip
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
@@ -103,7 +104,10 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
     }
 
     /** Reads the hike behind [url] into the own hikes and returns its id. Throws when it cannot be read. */
-    override suspend fun import(url: String, onStep: (Int, Int) -> Unit): String {
+    override val receivedFrom: StateFlow<Map<Int, String>>
+        get() = store.receivedFrom
+
+    override suspend fun import(url: String, senderNum: Int, onStep: (Int, Int) -> Unit): String {
         check(HikeLinks.isAllowedHost(url)) { "Nieznany serwer" }
         val shared = json.decodeFromString<SharedTrip>(transport.download(url, MAX_FILE_BYTES).decodeToString())
         check(shared.points.size in 2..MAX_POINTS) { "Zła liczba punktów trasy" }
@@ -146,6 +150,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
                 distanceMeters = routeLength(points),
                 points = points,
                 stops = built,
+                sharedBy = senderNum,
             )
         store.save(trip)
         Logger.i { "Wędrówki: odebrana, punktów trasy ${points.size}, miejsc ${built.size}" }

@@ -4379,6 +4379,7 @@ trips_chart_pace
 trips_chart_speed
 trips_chosen
 trips_empty
+trips_from_node
 trips_health_ascent
 trips_health_auto
 trips_health_auto_hint

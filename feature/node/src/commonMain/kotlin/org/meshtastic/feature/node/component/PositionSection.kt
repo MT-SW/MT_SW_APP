@@ -62,6 +62,11 @@ import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.TripsWindowRequest
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.core.resources.trips_from_node
+import org.meshtastic.core.ui.util.HikeImportRequest
+import org.meshtastic.core.ui.util.HikeImporter
 import org.meshtastic.core.resources.trips_title
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
@@ -153,6 +158,32 @@ internal fun PositionInlineContent(
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(Res.string.trips_title),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+    // MT_SW: a hike that this node sent to us. The button is grey until the node has sent one.
+    if (ourNode == null || ourNode.num != node.num) {
+        val importer: HikeImporter = koinInject()
+        val received by importer.receivedFrom.collectAsStateWithLifecycle()
+        val hikeId = received[node.num]
+        Spacer(Modifier.height(8.dp))
+        FilledTonalButton(
+            onClick = {
+                Logger.i { "Wędrówki: otwarcie wędrówki odebranej od węzła" }
+                HikeImportRequest.pendingReplay.value = hikeId
+                onAction(NodeDetailAction.Navigate(MapRoute.Map()))
+            },
+            enabled = hikeId != null,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+        ) {
+            Icon(MeshtasticIcons.PhotoCamera, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = stringResource(Res.string.trips_from_node),
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

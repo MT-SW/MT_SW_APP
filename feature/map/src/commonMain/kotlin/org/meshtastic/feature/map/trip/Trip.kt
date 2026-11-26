@@ -84,6 +84,8 @@ data class Trip(
     val stops: List<TripStop> = emptyList(),
     val photos: List<LegacyPhoto> = emptyList(),
     val health: TripHealth? = null,
+    /** The node that sent this hike to us (0 for a hike recorded here). */
+    val sharedBy: Int = 0,
 ) {
     val photoCount: Int
         get() = stops.sumOf { it.photos.size }

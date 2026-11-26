@@ -54,6 +54,12 @@ class TripStore {
     val trips: StateFlow<List<Trip>>
         get() = mutableTrips
 
+    private val mutableReceivedFrom = MutableStateFlow<Map<Int, String>>(emptyMap())
+
+    /** The newest hike received from each node (node number → hike id). */
+    val receivedFrom: StateFlow<Map<Int, String>>
+        get() = mutableReceivedFrom
+
     /** The ids of the hikes drawn on the map. */
     val visibleIds = MutableStateFlow<Set<String>>(emptySet())
 
@@ -115,6 +121,11 @@ class TripStore {
                 emptyList()
             }
         mutableTrips.value = loaded.sortedByDescending { it.startedMillis }
+        mutableReceivedFrom.value =
+            mutableTrips.value
+                .filter { it.sharedBy != 0 }
+                .distinctBy { it.sharedBy }
+                .associate { it.sharedBy to it.id }
         Logger.i { "Wędrówki: zapisanych ${loaded.size}" }
     }
 
