@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -81,6 +82,7 @@ fun LogInsightsEntries() {
 private const val MILLIS_IN_MINUTE = 60_000L
 private const val MAX_SHOWN_GROUPS = 30
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LogSummaryWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()
@@ -138,6 +140,7 @@ private fun LogSummaryWindow(onDismiss: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LinkQualityWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()

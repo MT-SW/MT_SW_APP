@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -175,6 +176,7 @@ internal fun TripViewHost() {
  * MT_SW: the details of one hike: its points with stacks of pictures. Pictures come from the camera or the gallery,
  * to a chosen point or placed by themselves by their time and position, and every placement can be changed by hand.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDismiss: () -> Unit) {
     val store: TripStore = koinInject()
@@ -216,9 +218,11 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             stats.descentMeters?.let {
                 Text(stringResource(Res.string.trips_stats_descent, it), style = MaterialTheme.typography.bodySmall)
             }
-            if (stats.lowestMeters != null && stats.highestMeters != null) {
+            val lowest = stats.lowestMeters
+            val highest = stats.highestMeters
+            if (lowest != null && highest != null) {
                 Text(
-                    stringResource(Res.string.trips_stats_heights, stats.lowestMeters, stats.highestMeters),
+                    stringResource(Res.string.trips_stats_heights, lowest, highest),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -301,7 +305,9 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
         }
     }
     editing?.let { (stopId, file) ->
-        PhotoDialog(trip = trip, stopId = stopId, file = file, onDismiss = { editing = null })
+        if (trip != null) {
+            PhotoDialog(trip = trip, stopId = stopId, file = file, onDismiss = { editing = null })
+        }
     }
 }
 
@@ -666,9 +672,11 @@ private fun HealthSection(trip: Trip, store: TripStore) {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            if (h.avgHeartRate != null && h.maxHeartRate != null) {
+            val avgHeart = h.avgHeartRate
+            val maxHeart = h.maxHeartRate
+            if (avgHeart != null && maxHeart != null) {
                 Text(
-                    stringResource(Res.string.trips_health_heart, h.avgHeartRate, h.maxHeartRate),
+                    stringResource(Res.string.trips_health_heart, avgHeart, maxHeart),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

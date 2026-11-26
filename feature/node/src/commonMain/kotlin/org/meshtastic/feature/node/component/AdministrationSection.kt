@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.IconButton
@@ -195,6 +196,7 @@ fun AdministrationSection(
  * favorites, the ignored list and the contacts of the remote device; the admin session is brought up at that moment,
  * so the window is ready to send.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
     var open by remember { mutableStateOf(false) }

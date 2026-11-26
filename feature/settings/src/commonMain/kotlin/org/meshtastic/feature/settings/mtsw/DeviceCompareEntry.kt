@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -64,6 +65,7 @@ private const val SECONDS_IN_DAY = 86_400
 private const val PERCENT_ROUND = 10f
 
 /** MT_SW: an entry that opens a window comparing every saved device side by side (battery, load, uptime, mesh). */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceCompareEntry(viewModel: DeviceCompareViewModel = koinViewModel()) {
     var open by remember { mutableStateOf(false) }
