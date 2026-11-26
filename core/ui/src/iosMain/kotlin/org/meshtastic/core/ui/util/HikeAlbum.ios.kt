@@ -27,6 +27,7 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.NSArray
 import platform.Foundation.NSData
 import platform.Foundation.NSUserDefaults
+import platform.Foundation.arrayWithObject
 import platform.Foundation.create
 import platform.Photos.PHAssetChangeRequest
 import platform.Photos.PHAssetCollection
