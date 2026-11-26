@@ -2809,7 +2809,7 @@
     <string name="offline_detail_title">Szczegółowość (dodatkowe poziomy przybliżenia)</string>
     <string name="offline_estimate_size">Szacowany rozmiar: ok. %1$s</string>
     <string name="offline_size_warning">To dużo miejsca na dysku</string>
-    <string name="remote_lists_open">Zdalne listy</string>
+    <string name="remote_lists_open">Zdalne kontakty i listy</string>
     <string name="remote_lists_open_description">Ulubione, ignorowane i kontakty na tym urządzeniu</string>
     <string name="remote_pick_search">Szukaj węzła</string>
     <string name="remote_selected_count">Wybrano: %1$d</string>
@@ -4825,7 +4825,7 @@
     <string name="trips_position_device">Urządzenie</string>
     <string name="trips_position_both">Oba naraz</string>
     <string name="trips_position_hint">Najlepsze dostępne: telefon, a urządzenie wtedy, gdy telefon przez 30 s nie ma pozycji. Oba naraz: punkty z obu źródeł się mieszają, więc trasa może „zygzakować” tam, gdzie ich pozycje się różnią.</string>
-    <string name="remote_lists_info_title">Zdalne listy i kontakty</string>
+    <string name="remote_lists_info_title">Zdalne kontakty i listy</string>
     <string name="remote_lists_info_1">Tu zmieniasz listy urządzenia, z którym masz zdalne zarządzanie, a nie listy tego telefonu. Wybierz urządzenia z naszej listy albo wpisz numer ID (np. !a1b2c3d4). Możesz zaznaczyć wiele naraz.</string>
     <string name="remote_lists_info_2">Ulubione: urządzenie uzna wybrane węzły za ulubione. Ignorowane: urządzenie będzie pomijać wybrane węzły i wymaże ich dane, dlatego przed dodaniem pojawia się pytanie.</string>
     <string name="remote_lists_info_3">„Dodaj do listy” wpisuje wybrane węzły na wybraną listę, a „Usuń z listy” je z niej zdejmuje. „Usuń węzeł z urządzenia” kasuje je z bazy węzłów tego urządzenia.</string>

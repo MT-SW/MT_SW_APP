@@ -3637,8 +3637,8 @@
     <string name="remote_lists_info_3">"Add to list" puts the chosen nodes on the chosen list and "Remove from list" takes them off. "Remove node from device" deletes them from that device\'s node database.</string>
     <string name="remote_lists_info_4">Contact: adds the node to the device\'s contacts. The ID alone is enough, names are optional. A node from our database goes with its public key, one typed by hand goes without a key.</string>
     <string name="remote_lists_info_5">The app cannot read what is on the device\'s lists now, it only sends add and remove commands. The entry is visible once the device has been confirmed as yours through remote management.</string>
-    <string name="remote_lists_info_title">Remote lists and contacts</string>
-    <string name="remote_lists_open">Remote lists</string>
+    <string name="remote_lists_info_title">Remote contacts and lists</string>
+    <string name="remote_lists_open">Remote contacts and lists</string>
     <string name="remote_lists_open_description">Favorites, ignored and contacts on this device</string>
     <string name="remote_manage_hint">Pick nodes from your own list or type the ID of a node you want to manage on the remote device, for example !a1b2c3d4. A typed node does not have to be on your own list.</string>
     <string name="remote_manage_title">Lists and contacts on the remote device</string>
