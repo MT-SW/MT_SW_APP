@@ -75,6 +75,16 @@ Oryginalna aplikacja Meshtastic-Android nie ma wersji na iOS. Ten fork ma własn
 - **Wgrywanie firmware: własne pliki i nieznane urządzenia** — własny plik (np. OTA) można wgrać także na urządzenie spoza listy sprzętu, z wyraźnymi ostrzeżeniami o ryzyku; odzyskiwanie urządzenia zablokowanego w trybie DFU działa także po wgraniu własnego pliku.
 - **Płynne przewijanie i powiększanie mapy z dużą liczbą węzłów** — mapa przestała co chwilę przebudowywać dane i warstwy: z danych węzłów na mapie usunięto pola „ostatnio słyszany” i „online” (zmieniały się ciągle i wymuszały odświeżenie wszystkich węzłów, a lista węzłów i tak je pokazuje), węzły są ponownie przekazywane do mapy dopiero gdy zmieni się to, co faktycznie na niej widać (pozycja, nazwa, ikona), animacja pulsowania obejmuje tylko widoczne węzły i odświeża się w 15 krokach zamiast ciągle, obszar „widocznych węzłów” nie jest przeliczany przy każdym drobnym ruchu, a obrazki plakietek są zapamiętywane zamiast rysowane od nowa. Efekt potwierdzony na telefonie (Snapdragon 8 Gen 3): koniec zacinania przy doczytywaniu mapy.
 
+### Zdalne kontakty, ulubione i ignorowanie: nasze rozwiązanie i oryginał
+
+W szczegółach zdalnego węzła mamy własny panel zdalnych list (w tej postaci co najmniej od 14.10.2026, commit 987e7a4ef6). 25.11.2026 oryginał (Meshtastic-Android, commit 3147011b87, #8251) dodał własny ekran „Kontakty i ulubione” do tego samego celu. Po migracji zostaje nasz panel, a z oryginału przejęliśmy tylko to, co było w nim lepsze. Porównanie opiera się na kodzie i dokumentacji obu wersji; oryginału nie testowaliśmy na sprzęcie.
+
+- **Zostaje nasze:** wybór wielu węzłów naraz z własnej listy (z wyszukiwarką) oraz ręczne wpisanie ID węzła, którego nie mamy w bazie. W oryginale węzły wybiera się pojedynczo z listy własnego radia (albo wkleja link kontaktu), a kontakt węzła bez zaufanego klucza publicznego nie może zostać wysłany.
+- **Przejęte z oryginału:** (1) pytanie o potwierdzenie przed „Ignoruj” (dodaliśmy je też przed dodaniem do ulubionych), (2) w urządzeniu z rolą Client Base ulubione ustawiane jest dopiero po potwierdzeniu kontaktu, (3) poprawka eksportu kontaktu (np. do kodu QR), tak aby niósł poprawny klucz.
+- **Przejęte w zmienionej postaci:** oryginał nie wysyła kontaktu bez klucza publicznego, bo mógłby on nadpisać klucz zapisany w zdalnym urządzeniu. U nas węzeł z naszej bazy idzie z kluczem, a węzeł wpisany ręcznie po ID idzie bez klucza, żeby ręczne dodawanie nadal działało.
+- **Nieprzejęte:** osobny ekran w Ustawieniach zdalnego węzła i lista wyników pod każdym węzłem.
+- **Wspólne ograniczenie:** żadna z wersji nie odczyta, co zdalne urządzenie ma już na swoich listach, bo protokół nie ma takiego zapytania; potwierdzenie dotyczy dostarczenia polecenia.
+
 ## Mapa
 
 - **Mapy offline działają też dla OpenStreetMap** — w oknie warstw mapy pobieranie widocznego obszaru działa teraz także dla domyślnej mapy OpenStreetMap i pozostałych map rastrowych (wcześniej tylko dla stylów wektorowych). Uwaga: serwer OSM nie lubi masowego pobierania, więc pobieraj małe obszary.
@@ -355,6 +365,16 @@ The original Meshtastic-Android app has no iOS version. This fork has its own ap
 - **Windows-like scrollbar on desktop** — visible track, clicking the track scrolls to that spot, and the thumb keeps one size based on the amount of content and only moves.
 - **Firmware update: own files and unknown devices** — an own file (e.g. OTA) can also be flashed to a device missing from the hardware list, with clear risk warnings; recovering a device stuck in DFU mode also works after flashing an own file.
 - **Smooth panning and zooming with many nodes** — the map no longer keeps rebuilding its data and layers: the "last heard" and "online" fields were removed from the node data sent to the map (they changed constantly, forcing every node to refresh, and the node list shows them anyway); nodes are handed to the map again only when something actually visible changes (position, name, icon); the pulse animation covers visible nodes only and runs in 15 steps; the "visible nodes" area is not recalculated on every small movement; and chip images are cached instead of redrawn. Confirmed on a phone (Snapdragon 8 Gen 3): no more stutter while the map loads.
+
+### Remote contacts, favorites and ignoring: our solution and the original
+
+The node details of a remote node hold our own panel of remote lists (in this form since at least 14 October 2026, commit 987e7a4ef6). On 25 November 2026 the original (Meshtastic-Android, commit 3147011b87, #8251) added its own "Contacts and favorites" screen for the same purpose. After the migration our panel stays, and from the original we took only what was better there. The comparison rests on the code and documentation of both versions; the original was not tested on hardware.
+
+- **Ours stays:** picking many nodes at once from your own list (with a search) and typing in the ID of a node that is not in our database. In the original nodes are picked one at a time from the list of your own radio (or a contact link is pasted), and the contact of a node without a trusted public key cannot be sent.
+- **Taken from the original:** (1) the confirmation before "Ignore" (we also added it before adding to favorites), (2) on a device with the Client Base role the favorite is set only after the contact is confirmed, (3) a fix of the contact export (for example to a QR code) so that it carries a correct key.
+- **Taken in a changed form:** the original does not send a contact without a public key, because it could overwrite the key stored in the remote device. Ours sends a node from our database with its key, and a node typed in by its ID without a key, so that manual adding keeps working.
+- **Not taken:** the separate screen in the settings of the remote node and the result list under each node.
+- **Shared limitation:** neither version can read what the remote device already holds on its lists, because the protocol has no such request; the confirmation concerns delivery of the command.
 
 ## Map
 
