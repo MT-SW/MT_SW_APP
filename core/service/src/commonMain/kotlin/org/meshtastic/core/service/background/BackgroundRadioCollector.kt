@@ -37,12 +37,14 @@ import okio.ByteString.Companion.toByteString
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.isValidDeviceAddress
 import org.meshtastic.core.common.util.normalizeAddress
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.TransportStatus
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.repository.DeviceBadge
+import org.meshtastic.core.repository.DeviceHistoryRecorder
 import org.meshtastic.core.repository.DeviceSnapshot
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageFilter
@@ -77,6 +79,7 @@ class BackgroundRadioCollector(
     private val senderMutePrefs: SenderMutePrefs,
     private val messageFilter: MessageFilter,
     private val dispatchers: CoroutineDispatchers,
+    private val historyRecorder: DeviceHistoryRecorder,
 ) : RadioBackgroundMonitor {
     override val connectedAddresses: StateFlow<Set<String>> = pool.connectedAddresses
 
@@ -114,6 +117,26 @@ class BackgroundRadioCollector(
                 while (true) {
                     slots.forEach { slot -> readBadge(slot.address) }
                     delay(BADGE_MS)
+                }
+            }
+        }
+        // The history of the device comparison grows by itself, whether or not its window is ever opened.
+        scope.launch {
+            slotsPrefs.slots.collectLatest { slots ->
+                delay(HISTORY_FIRST_MS)
+                while (true) {
+                    slots.forEach { slot ->
+                        try {
+                            readSnapshot(slot.address)?.let { historyRecorder.store(slot.address, it, nowMillis) }
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (
+                            @Suppress("TooGenericExceptionCaught") e: Exception,
+                        ) {
+                            Logger.w { "Historia urządzeń: odczyt w tle nie udał się: \${e.message}" }
+                        }
+                    }
+                    delay(HISTORY_EVERY_MS)
                 }
             }
         }
@@ -344,6 +367,8 @@ class BackgroundRadioCollector(
 
     private companion object {
         const val BADGE_MS = 60_000L
+        const val HISTORY_FIRST_MS = 60_000L
+        const val HISTORY_EVERY_MS = 10 * 60_000L
         const val ADDRESS_TAIL = 4
         const val START_DELAY_MS = 2_000L
         const val RETRY_MS = 10_000L

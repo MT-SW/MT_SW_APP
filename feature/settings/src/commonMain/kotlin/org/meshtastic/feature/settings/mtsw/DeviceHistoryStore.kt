@@ -24,6 +24,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import okio.Path
 import org.koin.core.annotation.Single
+import org.meshtastic.core.repository.DeviceHistoryRecorder
 import org.meshtastic.core.repository.DeviceSnapshot
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.mapLayersDirectory
@@ -43,8 +44,8 @@ data class DeviceHistoryEntry(
  * MT_SW: the history of the device comparison. Each reading is kept (at most one every [MIN_GAP_MS] and [MAX_ENTRIES]
  * in all) in a small file for each device, on this device only.
  */
-@Single
-class DeviceHistoryStore {
+@Single(binds = [DeviceHistoryStore::class, DeviceHistoryRecorder::class])
+class DeviceHistoryStore : DeviceHistoryRecorder {
     private val fs = mapLayerFileSystem()
     private val root: Path = (mapLayersDirectory().parent ?: mapLayersDirectory()) / "device_history"
     private val json = Json { ignoreUnknownKeys = true }
@@ -61,6 +62,10 @@ class DeviceHistoryStore {
             Logger.w { "Historia urządzeń: odczyt nie udał się: ${e.message}" }
             emptyList()
         }
+
+    override fun store(address: String, snapshot: DeviceSnapshot, nowMillis: Long) {
+        record(address, snapshot, nowMillis)
+    }
 
     /** Adds the reading unless the last one is too recent; returns the history. */
     fun record(address: String, snapshot: DeviceSnapshot, nowMillis: Long): List<DeviceHistoryEntry> {
