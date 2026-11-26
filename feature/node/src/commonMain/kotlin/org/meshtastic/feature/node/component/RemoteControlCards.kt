@@ -150,6 +150,7 @@ import org.meshtastic.core.ui.icon.NearMe
 import org.meshtastic.core.ui.icon.NotFavorite
 import org.meshtastic.core.ui.icon.Output
 import org.meshtastic.core.ui.icon.PersonAdd
+import org.meshtastic.core.ui.icon.PersonRemove
 import org.meshtastic.core.ui.icon.PowerSettingsNew
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Send
@@ -762,7 +763,8 @@ internal fun RemoteNodeManagementPanel(
             enabled = !isEnsuringSession && targets.isNotEmpty(),
             onClick = { confirmRemove = true },
         ) {
-            Text(stringResource(Res.string.remote_remove_node))
+            Icon(MeshtasticIcons.PersonRemove, contentDescription = null, modifier = Modifier.size(18.dp))
+            Text(stringResource(Res.string.remote_remove_node), modifier = Modifier.padding(start = 8.dp))
         }
     }
 

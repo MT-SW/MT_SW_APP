@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.ic_person
 import org.meshtastic.core.resources.ic_person_add
 import org.meshtastic.core.resources.ic_person_off
 import org.meshtastic.core.resources.ic_person_question
+import org.meshtastic.core.resources.ic_person_remove
 import org.meshtastic.core.resources.ic_person_search
 
 val MeshtasticIcons.PersonOff: ImageVector
@@ -42,6 +43,9 @@ val MeshtasticIcons.PersonSearch: ImageVector
 
 val MeshtasticIcons.PersonAdd: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_person_add)
+/** MT_SW: a person with a minus, for removing a contact. */
+val MeshtasticIcons.PersonRemove: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_person_remove)
 val MeshtasticIcons.Person: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_person)
 /** MT_SW: the address book with the person and the signal, for the remote lists and contacts of a device. */
