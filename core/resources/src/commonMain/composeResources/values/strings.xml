@@ -3643,9 +3643,9 @@
     <string name="remote_pick_from_list">Pick from node list</string>
     <string name="remote_pick_search">Search nodes</string>
     <string name="remote_remove_from_list">Remove from list</string>
-    <string name="remote_remove_node">Remove from node list of the device</string>
+    <string name="remote_remove_node">Remove contact</string>
     <string name="remote_remove_node_text">The selected nodes will be removed only from the node list of the remote device. Your own list stays the same. The device adds a node again when it hears it.</string>
-    <string name="remote_remove_node_title">Remove from the remote device?</string>
+    <string name="remote_remove_node_title">Remove the contact from the remote device?</string>
     <string name="remote_selected_count">Selected: %1$d</string>
     <string name="remote_shell">Remote Shell</string>
     <string name="remote_shell_command_hint">Command</string>

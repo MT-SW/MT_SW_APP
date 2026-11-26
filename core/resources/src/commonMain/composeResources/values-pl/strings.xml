@@ -2814,8 +2814,8 @@
     <string name="remote_pick_search">Szukaj węzła</string>
     <string name="remote_selected_count">Wybrano: %1$d</string>
     <string name="remote_clear_selection">Wyczyść wybór</string>
-    <string name="remote_remove_node">Usuń z listy węzłów urządzenia</string>
-    <string name="remote_remove_node_title">Usunąć ze zdalnego urządzenia?</string>
+    <string name="remote_remove_node">Usuń kontakt</string>
+    <string name="remote_remove_node_title">Usunąć kontakt ze zdalnego urządzenia?</string>
     <string name="remote_remove_node_text">Wybrane węzły zostaną usunięte tylko z listy węzłów zdalnego urządzenia. Twoja własna lista się nie zmieni. Urządzenie doda węzeł z powrotem, gdy go usłyszy.</string>
     <string name="remote_contact_title">Dodaj kontakt zdalnie</string>
     <string name="remote_contact_hint">Zapisuje nazwę i ID w liście węzłów zdalnego urządzenia, dla wybranych węzłów albo wpisanego ID.</string>
