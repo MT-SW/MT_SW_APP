@@ -4784,4 +4784,7 @@
     <string name="trips_album_change">Zmień folder</string>
     <string name="trips_chart_height">Wysokość</string>
     <string name="trips_chart_speed">Prędkość</string>
+    <string name="trips_chart_climbed">Podejścia do tej pory</string>
+    <string name="trips_chart_pace">Tempo</string>
+    <string name="trips_chart_distance">Dystans do tej pory</string>
 </resources>

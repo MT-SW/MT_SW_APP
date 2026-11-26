@@ -34,7 +34,10 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.trips_chart_climbed
+import org.meshtastic.core.resources.trips_chart_distance
 import org.meshtastic.core.resources.trips_chart_height
+import org.meshtastic.core.resources.trips_chart_pace
 import org.meshtastic.core.resources.trips_chart_speed
 import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripStore
@@ -43,6 +46,8 @@ private const val MAX_CHART_POINTS = 200
 private const val CHART_HEIGHT_DP = 80
 private const val MS_PER_HOUR = 3_600_000.0
 private const val METERS_PER_KM = 1000.0
+private const val MIN_PACE_KMH = 0.5
+private const val MINUTES_PER_HOUR = 60.0
 
 /** MT_SW: two small charts of a hike along the route: the height (when it was recorded) and the speed. */
 @Composable
@@ -66,8 +71,38 @@ internal fun TripCharts(trip: Trip) {
                 },
             )
         }
+    // The distance walked so far, by time: a flat part is a rest.
+    val distance =
+        remember(trip.id, trip.points.size) {
+            var total = 0.0
+            sample(
+                trip.points.mapIndexed { i, p ->
+                    if (i > 0) {
+                        val q = trip.points[i - 1]
+                        total += TripStore.meters(q.lat, q.lon, p.lat, p.lon)
+                    }
+                    total / METERS_PER_KM
+                },
+            )
+        }
+    // The pace in minutes per kilometre, from the speed (a standing still is left out).
+    val pace = remember(speeds) { speeds.filter { it > MIN_PACE_KMH }.map { MINUTES_PER_HOUR / it } }
+    // The height gained so far.
+    val climbed =
+        remember(heights) {
+            var up = 0.0
+            heights.mapIndexed { i, h ->
+                if (i > 0) up += (h - heights[i - 1]).coerceAtLeast(0.0)
+                up
+            }
+        }
     if (heights.size >= 2) Chart(stringResource(Res.string.trips_chart_height), heights, "m")
+    if (climbed.size >= 2 && climbed.last() > 0.0) {
+        Chart(stringResource(Res.string.trips_chart_climbed), climbed, "m")
+    }
     if (speeds.size >= 2) Chart(stringResource(Res.string.trips_chart_speed), speeds, "km/h")
+    if (pace.size >= 2) Chart(stringResource(Res.string.trips_chart_pace), pace, "min/km")
+    if (distance.size >= 2) Chart(stringResource(Res.string.trips_chart_distance), distance, "km")
 }
 
 /** At most [MAX_CHART_POINTS] values: the missing ones are skipped and a long route is thinned out. */
