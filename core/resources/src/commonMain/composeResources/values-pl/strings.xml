@@ -2795,6 +2795,13 @@
     <string name="link_quality_title">Jakość łącza urządzeń</string>
     <string name="link_quality_item">Przekroczenia czasu: %1$d · zamknięte po kolejnych: %2$d · błędy: %3$d</string>
     <string name="link_quality_none">Brak zapisanych problemów z łączem.</string>
+    <string name="track_rec_title">Nagrywanie trasy</string>
+    <string name="track_rec_hint">Nagrywa Twoją trasę z pozycji telefonu (na komputerze z pozycji podłączonego urządzenia) i zapisuje ją jako plik GPX.</string>
+    <string name="track_rec_status">Punkty: %1$d, długość: %2$d m</string>
+    <string name="track_rec_start">Start</string>
+    <string name="track_rec_stop">Stop</string>
+    <string name="track_rec_save">Zapisz jako GPX</string>
+    <string name="track_rec_clear">Usuń trasę</string>
     <string name="remote_lists_open">Zdalne listy</string>
     <string name="remote_lists_open_description">Ulubione, ignorowane i kontakty na tym urządzeniu</string>
     <string name="remote_pick_search">Szukaj węzła</string>

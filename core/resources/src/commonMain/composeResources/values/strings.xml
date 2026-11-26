@@ -4338,6 +4338,13 @@
     <string name="track_legend_snr">SNR: colours the track by the signal strength each position was heard with — red weak, green strong. It shows where the network reaches well.</string>
     <string name="track_legend_title">What the icons at the top do</string>
     <string name="track_point">track point</string>
+    <string name="track_rec_clear">Delete route</string>
+    <string name="track_rec_hint">Records your own route from the phone\'s position (on a computer from the position of the connected device) and saves it as a GPX file.</string>
+    <string name="track_rec_save">Save as GPX</string>
+    <string name="track_rec_start">Start</string>
+    <string name="track_rec_status">Points: %1$d, length: %2$d m</string>
+    <string name="track_rec_stop">Stop</string>
+    <string name="track_rec_title">Route recording</string>
     <string name="track_snr_colors">Colour track by SNR</string>
     <!-- TRAFFIC -->
     <string name="traffic_management">Traffic Management</string>

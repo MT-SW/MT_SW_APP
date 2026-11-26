@@ -136,6 +136,10 @@ private fun MapLayersSheet(
 
             HorizontalDivider()
 
+            TrackRecordingSection()
+
+            HorizontalDivider()
+
             Text(
                 text = stringResource(Res.string.manage_map_layers),
                 style = MaterialTheme.typography.titleMedium,
