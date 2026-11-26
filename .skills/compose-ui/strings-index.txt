@@ -457,6 +457,9 @@ antenna_wavelength
 antenna_yagi_row
 any
 ### APP ###
+app_data_info_1
+app_data_info_2
+app_data_info_title
 app_data_phone_single
 app_data_previous_failed
 app_data_scheduled
@@ -1844,6 +1847,7 @@ firmware_update_wipe_usb_detail
 firmware_version
 fixed_position
 floating_nav_bar
+folders_title
 ### FONT ###
 font_default
 font_family

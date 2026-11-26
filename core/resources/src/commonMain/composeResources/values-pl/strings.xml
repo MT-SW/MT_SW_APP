@@ -4844,4 +4844,8 @@
     <string name="photo_folder_info_title">Folder zdjęć</string>
     <string name="photo_folder_info_1">Każde zdjęcie zrobione aparatem w aplikacji (w wiadomościach i w Wędrówkach) dostaje kopię w osobnym albumie MT_SW, żeby nie mieszało się z innymi zdjęciami i nie zginęło przy usunięciu wiadomości lub wędrówki.</string>
     <string name="photo_folder_info_2">Na telefonie i tablecie album tworzy się sam przy pierwszym zdjęciu. Na komputerze folder wybierasz przy pierwszym zdjęciu i możesz go tu zmienić.</string>
+    <string name="folders_title">Foldery na dane i zdjęcia</string>
+    <string name="app_data_info_title">Dane aplikacji</string>
+    <string name="app_data_info_1">W tym folderze aplikacja trzyma wszystkie swoje dane: wiadomości i listę węzłów, modele AI, pobrane dane map, wędrówki i logi. Aktualny folder jest napisany pod nazwą.</string>
+    <string name="app_data_info_2">Zmiana folderu przenosi dane w nowe miejsce, więc może chwilę potrwać. Zdjęcia z aparatu mają osobny folder, poniżej.</string>
 </resources>

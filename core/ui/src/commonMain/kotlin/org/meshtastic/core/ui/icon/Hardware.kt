@@ -31,6 +31,7 @@ import org.meshtastic.core.resources.ic_memory
 import org.meshtastic.core.resources.ic_mesh_radio
 import org.meshtastic.core.resources.ic_nfc
 import org.meshtastic.core.resources.ic_photo_camera
+import org.meshtastic.core.resources.ic_photo_save
 import org.meshtastic.core.resources.ic_settings_input_antenna
 import org.meshtastic.core.resources.ic_speaker_phone
 import org.meshtastic.core.resources.ic_terminal
@@ -48,6 +49,9 @@ val MeshtasticIcons.ViewInAr: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_view_in_ar)
 
 /** Material Symbols "photo_camera": capture the AR view. */
+/** MT_SW: a camera with a "save" arrow, for the folder the pictures taken in the app are saved to. */
+val MeshtasticIcons.PhotoSave: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_photo_save)
 val MeshtasticIcons.PhotoCamera: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_photo_camera)
 

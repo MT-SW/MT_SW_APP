@@ -478,6 +478,9 @@
     <string name="antenna_yagi_row">%1$s: %2$s, at %3$s from the reflector</string>
     <string name="any">Any</string>
     <!-- APP -->
+    <string name="app_data_info_1">The app keeps all its data in this folder: messages and the node list, AI models, downloaded map data, hikes and logs. The current folder is written under the name.</string>
+    <string name="app_data_info_2">Changing the folder moves the data to the new place, so it can take a moment. Pictures from the camera have their own folder, below.</string>
+    <string name="app_data_info_title">App data</string>
     <string name="app_data_phone_single">This phone has no other storage (for example an SD card). Android lets an app keep files only in its own memory or on an SD card.</string>
     <string name="app_data_previous_failed">The last move of the data failed: %1$s. The data stayed in the old folder.</string>
     <string name="app_data_scheduled">Saved. All the data will be moved to: %1$s the next time the app starts. Close it and start it again; moving can take a while.</string>
@@ -1895,6 +1898,7 @@
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_position">Fixed Position</string>
     <string name="floating_nav_bar">Floating navigation bar at the bottom</string>
+    <string name="folders_title">Folders for data and pictures</string>
     <!-- FONT -->
     <string name="font_default">As designed</string>
     <string name="font_family">Font</string>

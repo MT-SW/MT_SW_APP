@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -43,6 +44,8 @@ import org.meshtastic.core.resources.photo_folder_info_2
 import org.meshtastic.core.resources.photo_folder_info_title
 import org.meshtastic.core.resources.photo_folder_title
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PhotoSave
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.changeAppPhotoFolder
 import org.meshtastic.core.ui.util.currentPhotoFolder
@@ -61,10 +64,11 @@ fun PhotoFolderSettings() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Icon(imageVector = MeshtasticIcons.PhotoSave, contentDescription = null)
             Text(
                 text = stringResource(Res.string.photo_folder_title),
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f).padding(start = 12.dp),
             )
             InfoButton(
                 Res.string.photo_folder_info_title,

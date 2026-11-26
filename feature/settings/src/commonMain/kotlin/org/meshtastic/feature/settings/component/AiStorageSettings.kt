@@ -22,6 +22,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import org.meshtastic.core.resources.app_data_info_2
+import org.meshtastic.core.resources.app_data_info_1
+import org.meshtastic.core.resources.app_data_info_title
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.icon.Storage
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -143,10 +151,20 @@ internal fun AiStorageRow() {
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        Text(
-            text = stringResource(Res.string.app_data_title),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(imageVector = MeshtasticIcons.Storage, contentDescription = null)
+            Text(
+                text = stringResource(Res.string.app_data_title),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            InfoButton(
+                Res.string.app_data_info_title,
+                Res.string.app_data_info_1,
+                Res.string.app_data_info_2,
+                tint = MaterialTheme.colorScheme.StatusYellow,
+            )
+        }
         val summary =
             when {
                 computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
