@@ -78,7 +78,7 @@ internal fun TrackRecordingSection() {
             OutlinedButton(onClick = camera) {
                 Icon(imageVector = MeshtasticIcons.PhotoCamera, contentDescription = null)
                 Text(
-                    text = stringResource(Res.string.trips_photo, state.photos.size),
+                    text = stringResource(Res.string.trips_photo, state.stops.sumOf { it.photos.size }),
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }

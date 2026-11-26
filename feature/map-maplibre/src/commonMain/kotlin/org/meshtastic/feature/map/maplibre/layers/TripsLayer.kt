@@ -14,20 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.map.maplibre.layers
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.koin.compose.koinInject
+import org.maplibre.compose.expressions.dsl.asString
+import org.maplibre.compose.expressions.dsl.case
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.feature
+import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.expressions.dsl.switch
 import org.maplibre.compose.expressions.value.LineCap
 import org.maplibre.compose.expressions.value.LineJoin
-import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.expressions.value.SymbolAnchor
+import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.layers.LineLayer
+import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.LineString
@@ -35,8 +56,12 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.trip.TripStore
+import org.meshtastic.feature.map.trip.TripViewRequest
 
-/** MT_SW: the saved hikes switched on in the Hikes window: their routes, and a dot where a picture was taken. */
+private const val KEY_STOP = "sid"
+private const val MAX_DROPS = 60
+
+/** MT_SW: the saved hikes switched on in the Hikes window: their routes, and a drop with the picture at each stop. */
 @Composable
 internal fun TripsLayer() {
     val store: TripStore = koinInject()
@@ -65,31 +90,82 @@ internal fun TripsLayer() {
         width = const(TRIP_WIDTH_DP.dp),
         opacity = const(TRIP_OPACITY),
     )
-    val photos = shown.flatMap { it.photos }
-    if (photos.isNotEmpty()) {
-        val points =
-            rememberFeatureSource(photos.size, shown.map { it.id }) {
-                FeatureCollection(
-                    photos.map { photo ->
-                        Feature<Point, JsonObject?>(
-                            geometry = Point(Position(longitude = photo.lon, latitude = photo.lat)),
-                            properties = null,
-                        )
-                    },
-                )
+
+    val stops =
+        shown.flatMap { trip -> trip.stops.filter { it.photos.isNotEmpty() }.map { trip.id to it } }.take(MAX_DROPS)
+    if (stops.isEmpty()) return
+    val painters = rememberDrops(stops)
+    if (painters.isEmpty()) return
+    val points =
+        rememberFeatureSource(stops.map { it.second.id to it.second.lat to it.second.lon }) {
+            FeatureCollection(
+                stops.map { (_, stop) ->
+                    Feature<Point, JsonObject?>(
+                        geometry = Point(Position(longitude = stop.lon, latitude = stop.lat)),
+                        properties = buildJsonObject { put(KEY_STOP, stop.id) },
+                    )
+                },
+            )
+        }
+    val owner = stops.associate { it.second.id to it.first }
+    SymbolLayer(
+        id = "trips-drops",
+        source = points,
+        iconImage =
+        switch(
+            input = feature[KEY_STOP].asString(const("")),
+            *painters.map { (id, painter) -> case(id, image(painter, TRIP_DROP_SIZE)) }.toTypedArray(),
+            fallback = image(painters.values.first(), TRIP_DROP_SIZE),
+        ),
+        // The tip of the drop is the place.
+        iconAnchor = const(SymbolAnchor.Bottom),
+        iconAllowOverlap = const(true),
+        onClick = { features ->
+            val id = features.firstOrNull()?.properties?.get(KEY_STOP)?.jsonPrimitive?.content
+            val tripId = id?.let(owner::get)
+            if (id != null && tripId != null) {
+                TripViewRequest.stop.value = tripId to id
+                ClickResult.Consume
+            } else {
+                ClickResult.Pass
             }
-        CircleLayer(
-            id = "trips-photos",
-            source = points,
-            color = const(TRIP_COLOR),
-            radius = const(PHOTO_RADIUS_DP.dp),
-            strokeColor = const(Color.White),
-            strokeWidth = const(2.dp),
-        )
+        },
+    )
+}
+
+/** The painter of each drop. A picture arrives a moment after the drop does, and then the painter is replaced. */
+@Composable
+private fun rememberDrops(stops: List<Pair<String, org.meshtastic.feature.map.trip.TripStop>>): Map<String, Painter> {
+    val store: TripStore = koinInject()
+    val pictures = remember { mutableStateMapOf<String, ImageBitmap>() }
+    stops.forEach { (tripId, stop) ->
+        val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.first()
+        key(stop.id, photo.file) {
+            LaunchedEffect(Unit) {
+                val bitmap =
+                    withContext(Dispatchers.Default) {
+                        store.photoBytes(tripId, photo.file, small = true)?.let {
+                            runCatching { it.decodeToImageBitmap() }.getOrNull()
+                        }
+                    }
+                if (bitmap != null) pictures[stop.id] = bitmap
+            }
+        }
+    }
+    val cache = remember { mutableMapOf<String, Pair<ImageBitmap?, Painter>>() }
+    return stops.associate { (_, stop) ->
+        val picture = pictures[stop.id]
+        val old = cache[stop.id]
+        val painter =
+            if (old != null && old.first === picture) {
+                old.second
+            } else {
+                TripDropPainter(picture, TRIP_COLOR).also { cache[stop.id] = picture to it }
+            }
+        stop.id to painter
     }
 }
 
 private const val TRIP_WIDTH_DP = 4
 private const val TRIP_OPACITY = 0.9f
-private const val PHOTO_RADIUS_DP = 7
 private val TRIP_COLOR = Color(0xFF43A047)

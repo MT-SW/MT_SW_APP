@@ -106,7 +106,7 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                 ListItem(
                     headlineContent = { Text(trip.name) },
                     supportingContent = {
-                        Text(stringResource(Res.string.trips_item, trip.distanceMeters.toInt(), trip.photos.size))
+                        Text(stringResource(Res.string.trips_item, trip.distanceMeters.toInt(), trip.photoCount))
                     },
                     trailingContent = {
                         Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {

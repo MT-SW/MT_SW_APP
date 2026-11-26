@@ -36,7 +36,7 @@ import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.feature.map.trip.Trip
-import org.meshtastic.feature.map.trip.TripPhoto
+import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripPoint
 import org.meshtastic.feature.map.trip.TripStore
 import kotlin.math.PI
@@ -69,7 +69,7 @@ class TrackRecorder(
         val distanceMeters: Double = 0.0,
         val startedMillis: Long = 0L,
         val tripId: String = "",
-        val photos: List<TripPhoto> = emptyList(),
+        val stops: List<TripStop> = emptyList(),
     )
 
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
@@ -126,13 +126,16 @@ class TrackRecorder(
                     endedMillis = nowMillis,
                     distanceMeters = s.distanceMeters,
                     points = s.points.map { TripPoint(it.latitude, it.longitude, it.altitudeMeters, it.timeMillis) },
-                    photos = s.photos,
+                    stops = s.stops,
                 ),
             )
         }
     }
 
-    /** Saves a picture taken now at the last known place of the route. False when there is no place yet. */
+    /**
+     * Saves a picture taken now at the last known place of the route: it goes on the stack of the stop there (when the
+     * last stop is close) or starts a new stop. False when there is no place yet.
+     */
     fun addPhoto(bytes: ByteArray): Boolean {
         val s = mutableState.value
         val at = s.points.lastOrNull()
@@ -142,8 +145,21 @@ class TrackRecorder(
             return false
         }
         val now = nowMillis
-        val file = tripStore.writePhoto(s.tripId, bytes, now) ?: return false
-        mutableState.update { it.copy(photos = it.photos + TripPhoto(at.latitude, at.longitude, now, file)) }
+        val photo = tripStore.writePhoto(s.tripId, bytes, now) ?: return false
+        mutableState.update { old ->
+            val last = old.stops.lastOrNull()
+            val near =
+                last != null &&
+                    distanceMeters(Point(last.lat, last.lon, null, last.t), at) < STOP_JOIN_METERS
+            val stops =
+                if (near && last != null) {
+                    old.stops.dropLast(1) + last.copy(photos = last.photos + photo)
+                } else {
+                    old.stops + TripStop(tripStore.newId(), at.latitude, at.longitude, at.timeMillis, "", listOf(photo))
+                }
+            old.copy(stops = stops)
+        }
+        Logger.i { "Trasa: zdjęcie dodane, punktów ze zdjęciami ${mutableState.value.stops.size}" }
         return true
     }
 
@@ -176,6 +192,7 @@ class TrackRecorder(
 
     companion object {
         const val MIN_STEP_METERS = 5.0
+        private const val STOP_JOIN_METERS = 25.0
         private const val EARTH_RADIUS_M = 6_371_000.0
 
         /** The distance along the ground between two points (haversine). */

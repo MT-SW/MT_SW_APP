@@ -21,19 +21,45 @@ import kotlinx.serialization.Serializable
 /** One point of a hike's route. */
 @Serializable data class TripPoint(val lat: Double, val lon: Double, val ele: Double? = null, val t: Long)
 
-/** A picture taken during a hike, tied to the place where it was taken. [file] is the name inside the hike's folder. */
+/** A picture of a stop. [file] is the name inside the hike's folder; the small copy is kept as `th_` + [file]. */
 @Serializable
 data class TripPhoto(
-    val lat: Double,
-    val lon: Double,
-    val t: Long,
     val file: String,
+    /** When the picture was taken, when known (epoch milliseconds); 0 when not. */
+    val takenMillis: Long = 0L,
     val caption: String = "",
     /** The link the picture was sent to over the internet, once the hike is shared; empty before. */
     val url: String = "",
 )
 
-/** MT_SW: a saved hike: the route and the pictures taken along it. */
+/**
+ * A place on the route where pictures were taken: a stack of [photos]. When the hike is shared only one picture of
+ * the stop goes out: the one at [shareIndex] (the first by default).
+ */
+@Serializable
+data class TripStop(
+    val id: String,
+    val lat: Double,
+    val lon: Double,
+    /** The time at this place on the route (epoch milliseconds). */
+    val t: Long,
+    val title: String = "",
+    val photos: List<TripPhoto> = emptyList(),
+    val shareIndex: Int = 0,
+)
+
+/** The first form of a saved picture (one per place), read only to bring old hikes over to [TripStop]. */
+@Serializable
+data class LegacyPhoto(
+    val lat: Double,
+    val lon: Double,
+    val t: Long,
+    val file: String,
+    val caption: String = "",
+    val url: String = "",
+)
+
+/** MT_SW: a saved hike: the route and the stops with their pictures. */
 @Serializable
 data class Trip(
     val id: String,
@@ -42,5 +68,9 @@ data class Trip(
     val endedMillis: Long,
     val distanceMeters: Double,
     val points: List<TripPoint>,
-    val photos: List<TripPhoto> = emptyList(),
-)
+    val stops: List<TripStop> = emptyList(),
+    val photos: List<LegacyPhoto> = emptyList(),
+) {
+    val photoCount: Int
+        get() = stops.sumOf { it.photos.size }
+}
