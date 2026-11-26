@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -42,6 +43,10 @@ import org.meshtastic.core.resources.track_rec_start
 import org.meshtastic.core.resources.track_rec_status
 import org.meshtastic.core.resources.track_rec_stop
 import org.meshtastic.core.resources.track_rec_title
+import org.meshtastic.core.resources.trips_photo
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.util.rememberCameraLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.map.track.TrackRecorder
 
@@ -67,6 +72,16 @@ internal fun TrackRecordingSection() {
                 text = stringResource(Res.string.track_rec_status, state.points.size, state.distanceMeters.toInt()),
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+        val camera = rememberCameraLauncher { bytes, _ -> recorder.addPhoto(bytes) }
+        if (state.recording && camera != null) {
+            OutlinedButton(onClick = camera) {
+                Icon(imageVector = MeshtasticIcons.PhotoCamera, contentDescription = null)
+                Text(
+                    text = stringResource(Res.string.trips_photo, state.photos.size),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             if (state.recording) {

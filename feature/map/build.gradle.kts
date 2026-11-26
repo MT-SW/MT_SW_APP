@@ -46,6 +46,7 @@ kotlin {
             implementation(projects.feature.mapTerrain)
             // The imported-layer store: Okio for the files it keeps, Ktor for the network layers it fetches.
             implementation(libs.okio)
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
         }
 

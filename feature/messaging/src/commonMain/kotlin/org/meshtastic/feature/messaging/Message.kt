@@ -148,6 +148,7 @@ import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.util.rememberCameraLauncher
 import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.theme.AppTheme

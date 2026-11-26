@@ -16,7 +16,7 @@
  */
 @file:Suppress("ParameterNaming")
 
-package org.meshtastic.feature.messaging
+package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

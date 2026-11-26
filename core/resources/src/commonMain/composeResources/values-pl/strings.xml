@@ -4736,4 +4736,8 @@
     <string name="route_playback_stop">Zamknij</string>
     <string name="route_playback_reading">Słyszany: %1$s · %2$d dBm%3$s</string>
     <string name="route_playback_relay">Przez przekaźnik</string>
+    <string name="trips_title">Wędrówki</string>
+    <string name="trips_empty">Brak zapisanych wędrówek. Włącz nagrywanie trasy i rób zdjęcia po drodze.</string>
+    <string name="trips_item">%1$d m · zdjęć: %2$d</string>
+    <string name="trips_photo">Zrób zdjęcie na trasie (%1$d)</string>
 </resources>

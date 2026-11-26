@@ -35,6 +35,10 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.feature.map.trip.Trip
+import org.meshtastic.feature.map.trip.TripPhoto
+import org.meshtastic.feature.map.trip.TripPoint
+import org.meshtastic.feature.map.trip.TripStore
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
@@ -54,6 +58,7 @@ class TrackRecorder(
     private val locationRepository: LocationRepository,
     private val nodeRepository: NodeRepository,
     private val fileService: FileService,
+    private val tripStore: TripStore,
     private val dispatchers: CoroutineDispatchers,
 ) {
     data class Point(val latitude: Double, val longitude: Double, val altitudeMeters: Double?, val timeMillis: Long)
@@ -63,6 +68,8 @@ class TrackRecorder(
         val points: List<Point> = emptyList(),
         val distanceMeters: Double = 0.0,
         val startedMillis: Long = 0L,
+        val tripId: String = "",
+        val photos: List<TripPhoto> = emptyList(),
     )
 
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
@@ -76,7 +83,8 @@ class TrackRecorder(
     /** Starts a new route; a route already recorded is dropped. */
     fun start() {
         if (mutableState.value.recording) return
-        mutableState.value = State(recording = true, startedMillis = nowMillis)
+        mutableState.value =
+            State(recording = true, startedMillis = nowMillis, tripId = kotlin.uuid.Uuid.random().toString())
         Logger.i { "Trasa: nagrywanie rozpoczęte" }
         phoneJob =
             scope.launch {
@@ -108,6 +116,35 @@ class TrackRecorder(
         val s = mutableState.value
         mutableState.update { it.copy(recording = false) }
         Logger.i { "Trasa: nagrywanie zakończone, punktów ${s.points.size}, ${s.distanceMeters.toInt()} m" }
+        if (s.points.size >= 2) {
+            val name = org.meshtastic.core.common.util.DateFormatter.formatDateTimeShort(s.startedMillis)
+            tripStore.save(
+                Trip(
+                    id = s.tripId,
+                    name = name,
+                    startedMillis = s.startedMillis,
+                    endedMillis = nowMillis,
+                    distanceMeters = s.distanceMeters,
+                    points = s.points.map { TripPoint(it.latitude, it.longitude, it.altitudeMeters, it.timeMillis) },
+                    photos = s.photos,
+                ),
+            )
+        }
+    }
+
+    /** Saves a picture taken now at the last known place of the route. False when there is no place yet. */
+    fun addPhoto(bytes: ByteArray): Boolean {
+        val s = mutableState.value
+        val at = s.points.lastOrNull()
+        if (!s.recording || at == null) {
+            val reason = if (!s.recording) "nagrywanie nie trwa" else "brak jeszcze pozycji"
+            Logger.i { "Trasa: zdjęcie pominięte, $reason" }
+            return false
+        }
+        val now = nowMillis
+        val file = tripStore.writePhoto(s.tripId, bytes, now) ?: return false
+        mutableState.update { it.copy(photos = it.photos + TripPhoto(at.latitude, at.longitude, now, file)) }
+        return true
     }
 
     fun clear() {

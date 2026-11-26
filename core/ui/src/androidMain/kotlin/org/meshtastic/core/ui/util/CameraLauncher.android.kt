@@ -16,7 +16,7 @@
  */
 @file:Suppress("ParameterNaming", "TooGenericExceptionCaught")
 
-package org.meshtastic.feature.messaging
+package org.meshtastic.core.ui.util
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

@@ -16,14 +16,9 @@
  */
 @file:Suppress("ParameterNaming")
 
-package org.meshtastic.feature.messaging
+package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 
-/**
- * MT_SW: takes a picture with the camera and hands its bytes over, like [rememberImagePickerLauncher] does for a
- * picture from the gallery. Returns null where the platform has no camera to take a picture with (desktop), so the
- * button is not shown there.
- */
 @Composable
-expect fun rememberCameraLauncher(onPhotoTaken: (bytes: ByteArray, mimeType: String) -> Unit): (() -> Unit)?
+actual fun rememberCameraLauncher(onPhotoTaken: (bytes: ByteArray, mimeType: String) -> Unit): (() -> Unit)? = null

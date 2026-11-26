@@ -4455,6 +4455,10 @@
     <string name="transport_udp">UDP</string>
     <string name="transport_usb">USB</string>
     <string name="triple_click_adhoc_ping">Triple Click Ad Hoc Ping</string>
+    <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
+    <string name="trips_item">%1$d m · pictures: %2$d</string>
+    <string name="trips_photo">Take a picture on the route (%1$d)</string>
+    <string name="trips_title">Hikes</string>
     <string name="turbidity">Turbidity</string>
     <string name="twenty_four_hours">24H</string>
     <string name="two_days">48 Hours</string>

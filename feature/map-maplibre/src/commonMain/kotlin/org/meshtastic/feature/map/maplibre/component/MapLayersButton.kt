@@ -136,7 +136,7 @@ private fun MapLayersSheet(
 
             HorizontalDivider()
 
-            TrackRecordingSection()
+            TripsEntry()
 
             HorizontalDivider()
 

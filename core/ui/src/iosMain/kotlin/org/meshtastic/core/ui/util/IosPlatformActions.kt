@@ -166,7 +166,7 @@ private class FolderPickerDelegate(var onUri: (CommonUri?) -> Unit) :
 private fun hexByte(byte: Byte): String = (byte.toInt() and 0xFF).toString(16).padStart(2, '0')
 
 @OptIn(ExperimentalForeignApi::class)
-private fun NSData.toByteArray(): ByteArray {
+internal fun NSData.toByteArray(): ByteArray {
     val n = length.toInt()
     val out = ByteArray(n)
     if (n > 0) out.usePinned { memcpy(it.addressOf(0), bytes, length) }

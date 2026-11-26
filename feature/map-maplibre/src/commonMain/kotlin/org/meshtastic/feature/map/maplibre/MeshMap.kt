@@ -124,6 +124,7 @@ import org.meshtastic.feature.map.maplibre.layers.SignalSurveyLinkLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
 import org.meshtastic.feature.map.maplibre.layers.RoutePlaybackLayer
 import org.meshtastic.feature.map.maplibre.layers.TrackLineLayer
+import org.meshtastic.feature.map.maplibre.layers.TripsLayer
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
 import org.meshtastic.feature.map.maplibre.layers.nodeTapAt
 import org.meshtastic.feature.map.maplibre.style.Basemap
@@ -263,6 +264,7 @@ fun rememberMeshMapState(
             )
             CustomLayers(customLayers, layerOpacity)
             TrackLineLayer()
+            TripsLayer()
             RoutePlaybackLayer()
             CoverageLayer(coverage, layerOpacity[COVERAGE_LAYER_ID] ?: COVERAGE_DEFAULT_OPACITY)
             SignalSurveyLayer(surveyCells, surveyColors, onSurveyCellClick)
