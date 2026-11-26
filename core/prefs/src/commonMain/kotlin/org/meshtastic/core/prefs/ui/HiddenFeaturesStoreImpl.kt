@@ -28,6 +28,8 @@ class HiddenFeaturesStoreImpl(private val uiPrefs: UiPrefs) : HiddenFeaturesStor
 
     override fun keep() = uiPrefs.setUiOption(KEY, 1)
 
+    override fun forget() = uiPrefs.setUiOption(KEY, 0)
+
     private companion object {
         const val KEY = "app.mode.k"
     }

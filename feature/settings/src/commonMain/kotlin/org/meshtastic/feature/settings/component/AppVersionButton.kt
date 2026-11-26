@@ -43,6 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val UNLOCK_CLICK_COUNT = 5 // Number of clicks required to unlock excluded modules.
 private const val KEEP_CLICK_COUNT = 3 * UNLOCK_CLICK_COUNT // Number of clicks of the longer series.
+private const val LOCK_CLICK_COUNT = 4 * UNLOCK_CLICK_COUNT // Number of clicks of the longest series.
 private const val UNLOCKED_CLICK_COUNT = 3 // Number of clicks before we toast that modules are already unlocked.
 private const val UNLOCK_TIMEOUT_SECONDS = 1 // Timeout in seconds to reset the click counter.
 
@@ -59,7 +60,7 @@ internal fun AppVersionButton(
     var clickCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(clickCount) {
-        if (clickCount in 1..<KEEP_CLICK_COUNT) {
+        if (clickCount in 1..<LOCK_CLICK_COUNT) {
             delay(UNLOCK_TIMEOUT_SECONDS.seconds)
             clickCount = 0
         }
@@ -71,7 +72,7 @@ internal fun AppVersionButton(
         supportingText = appVersionName,
         trailingIcon = null,
     ) {
-        clickCount = clickCount.inc().coerceIn(0, KEEP_CLICK_COUNT)
+        clickCount = clickCount.inc().coerceIn(0, LOCK_CLICK_COUNT)
 
         when {
             clickCount == UNLOCK_CLICK_COUNT && !hiddenFeaturesUnlocked -> {
@@ -83,9 +84,11 @@ internal fun AppVersionButton(
                 scope.launch { showToast(Res.string.modules_already_unlocked) }
             }
 
-            clickCount == KEEP_CLICK_COUNT -> {
+            clickCount == KEEP_CLICK_COUNT -> hiddenFeatures.keep()
+
+            clickCount == LOCK_CLICK_COUNT -> {
                 clickCount = 0
-                hiddenFeatures.keep()
+                hiddenFeatures.lock()
             }
         }
     }

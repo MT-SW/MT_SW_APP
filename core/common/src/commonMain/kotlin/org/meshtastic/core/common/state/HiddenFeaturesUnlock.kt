@@ -29,6 +29,8 @@ interface HiddenFeaturesStore {
     val kept: Flow<Boolean>
 
     fun keep()
+
+    fun forget()
 }
 
 /**
@@ -49,6 +51,12 @@ class HiddenFeaturesUnlock(private val store: HiddenFeaturesStore? = null, scope
 
     fun unlock() {
         _unlocked.value = true
+    }
+
+    /** Locks again and clears the stored state. */
+    fun lock() {
+        _unlocked.value = false
+        store?.forget()
     }
 
     /** Unlocks and stores the state. */
