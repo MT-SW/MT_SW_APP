@@ -2,7 +2,7 @@
 title: Ustawienia — Moduły i administracja
 parent: Przewodnik użytkownika
 nav_order: 8
-last_updated: 2026-11-21
+last_updated: 2026-11-26
 description: Konfiguracja opcjonalnych modułów funkcji (MQTT, telemetria, wiadomości predefiniowane, TAK i inne) oraz administrowanie urządzeniem.
 aliases:
   - modules

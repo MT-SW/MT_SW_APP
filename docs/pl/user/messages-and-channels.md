@@ -142,7 +142,7 @@ Etykieta statusu pojawia się wyłącznie pod **Twoimi własnymi** wiadomościam
 
 Dotknij statusu pod dowolną wysłaną przez Ciebie wiadomością, aby otworzyć szczegóły jej doręczenia. Przy nieudanej wiadomości albo wiadomości bezpośredniej oznaczonej **Przekazane, niepotwierdzone przez odbiorcę** wybierz **Wyślij ponownie**, aby wysłać ją jeszcze raz. Wiadomość zostaje na swoim miejscu w rozmowie, a jej status zaczyna się od nowa. **Wyślij ponownie** nie jest dostępne przy **Niezgodność kanału/klucza** ani **Wiadomość jest za duża, by ją wysłać**, bo druga próba tego nie naprawi, ani w zarchiwizowanej rozmowie.
 
-To samo okno podaje węzeł przekazujący: przy wiadomości kanałowej węzeł, który ją przekazał, a przy wiadomości bezpośredniej węzeł, który przekazał potwierdzenie z powrotem, na przykład **Potwierdzenie przekazane przez Ridge (0x5A)**. Pakiet niesie tylko ostatni bajt identyfikatora przekaźnika, więc nazwa to najlepsze dopasowanie wśród znanych aplikacji węzłów i może być błędna. Wiersz się nie pojawia, gdy nie zapisano żadnego przekaźnika, gdy potwierdzenie wróciło prosto od odbiorcy albo gdy dotarło przez MQTT.
+To samo okno podaje węzeł przekazujący: przy wiadomości kanałowej węzeł, który ją przekazał, a przy wiadomości bezpośredniej węzeł, który przekazał potwierdzenie z powrotem, na przykład **Potwierdzenie przekazane przez Ridge (0x5A)**. Pakiet niesie tylko ostatni bajt identyfikatora przekaźnika, więc nazwa to najlepsze dopasowanie wśród znanych aplikacji węzłów i może być błędna. Wiersz się nie pojawia, gdy nie zapisano żadnego przekaźnika, gdy potwierdzenie wróciło prosto od odbiorcy albo gdy dotarło przez MQTT. Potwierdzenie, które przeszło przez most MQTT, a potem dotarło do Twojego węzła przez LoRa, podaje swój ostatni przekaźnik LoRa, jeśli Twój węzeł ma firmware 2.7.5 lub nowszy.
 
 ### Błędy dostarczania
 
@@ -268,7 +268,7 @@ Dotknij i przytrzymaj albo dotknij dwukrotnie wiadomość, aby otworzyć pasek s
 arkusza — tam są reakcje. Pod nim pojawia się **Podpisano · zweryfikowano** przy wiadomości, której
 podpis Twój węzeł sprawdził kluczem nadawcy, oraz **Dostarczenie potwierdzone**, **Dowód dostarczenia nieudany**
 albo **Dowód dostarczenia niesprawdzony**, gdy potwierdzenie Twojej wiadomości zawierało dowód dostarczenia.
-Dalej idą czas wiadomości i status dostarczenia, a przy odebranej wiadomości węzeł, który ją do Ciebie przekazał, na przykład **Przekazane przez Ridge (0x5A)**. Przy wiadomości usłyszanej bezpośrednio od nadawcy albo takiej, która przyszła przez MQTT, przekaźnika nie ma. Potem te działania:
+Dalej idą czas wiadomości i status dostarczenia, a przy odebranej wiadomości węzeł, który ją do Ciebie przekazał, na przykład **Przekazane przez Ridge (0x5A)**. Przy wiadomości usłyszanej bezpośrednio od nadawcy albo takiej, którą Twój węzeł dostał przez MQTT, przekaźnika nie ma. Wiadomość, która przeszła przez most MQTT, a potem dotarła do Twojego węzła przez LoRa, pokazuje swój ostatni przekaźnik LoRa, jeśli Twój węzeł ma firmware 2.7.5 lub nowszy. Potem te działania:
 
 - **Odpowiedz** — zacytuj wiadomość w swojej odpowiedzi
 - **Kopiuj** — skopiuj tekst wiadomości do schowka

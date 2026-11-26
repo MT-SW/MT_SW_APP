@@ -334,7 +334,12 @@ fun MessageItem(
                                     null
                                 } else {
                                     resolveRelay(
-                                        receivedRelayNode(message.relayNode, message.hopsAway, message.viaMqtt),
+                                        receivedRelayNode(
+                                            message.relayNode,
+                                            message.hopsAway,
+                                            message.viaMqtt,
+                                            message.transportMechanism,
+                                        ),
                                     )
                                 },
                                 xeddsaSigned = message.xeddsaSigned,

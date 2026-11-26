@@ -22,6 +22,7 @@ import org.meshtastic.core.model.DeviceLink
 import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.MeshPacket
@@ -116,6 +117,9 @@ data class MetricsState(
  * connected radio's periodic report to the app - newest first.
  */
 fun MetricsState.neighborInfoEntries(): List<NeighborInfoEntry> {
+    // Every log once; on our own node's page the results are every log our radio originated, so they hold our
+    // requests too, which are not reports.
+    val reports = neighborInfoResults.distinctBy { it.uuid }.filterNot { it.isOutgoingRequest() }
     val requested =
         neighborInfoRequests
             .distinctBy { it.uuid }
@@ -123,20 +127,17 @@ fun MetricsState.neighborInfoEntries(): List<NeighborInfoEntry> {
                 val id = request.fromRadio.packet?.id
                 NeighborInfoEntry.Requested(
                     log = request,
-                    reply = neighborInfoResults.find { it.fromRadio.packet?.decoded?.request_id == id },
+                    reply = reports.find { it.fromRadio.packet?.decoded?.request_id == id },
                 )
             }
     // Only the report each request took is excluded, so a second copy answering the same request still shows.
     val pairedReplies = requested.mapNotNull { it.reply?.uuid }.toSet()
-    val received =
-        neighborInfoResults
-            .distinctBy { it.uuid }
-            .filter { it.uuid !in pairedReplies }
-            .map {
-                NeighborInfoEntry.Received(it)
-            }
+    val received = reports.filter { it.uuid !in pairedReplies }.map { NeighborInfoEntry.Received(it) }
     return (requested + received).sortedByDescending { it.timeSeconds }
 }
+
+private fun MeshLog.isOutgoingRequest() =
+    fromNum == MeshLog.NODE_NUM_LOCAL && fromRadio.packet?.decoded?.want_response == true
 
 /** One row of the neighbor-info log. */
 sealed interface NeighborInfoEntry {
@@ -152,8 +153,8 @@ sealed interface NeighborInfoEntry {
     val report: MeshLog?
 
     /**
-     * When the neighbor list arrived, or when the request went out if it never did. Whole seconds: the chart library
-     * refuses times with more than four decimal places, which fractional seconds hit through rounding errors.
+     * When the neighbor list arrived, or when the request went out if it never did, in whole seconds: the chart rejects
+     * x-values finer than four decimal places.
      */
     val timeSeconds: Double
         get() = ((report ?: log).received_date / MS_PER_SEC).toDouble()
@@ -176,5 +177,3 @@ sealed interface NeighborInfoEntry {
             get() = log
     }
 }
-
-private const val MS_PER_SEC = 1000L
