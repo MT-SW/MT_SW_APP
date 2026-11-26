@@ -60,12 +60,23 @@ internal fun RoutePlaybackControls(modifier: Modifier = Modifier) {
             .background(MaterialTheme.colorScheme.surface.copy(alpha = PANEL_ALPHA))
             .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
-        val snr = now.snr?.let { " · SNR ${(it * 10).toInt() / 10f}" }.orEmpty()
-        Text(
-            text = stringResource(Res.string.route_playback_reading, now.name, now.rssi, snr),
-            style = MaterialTheme.typography.titleSmall,
-        )
-        if (!now.direct) {
+        val tripId = state.tripId
+        val slide = now.slides.getOrNull(state.slide)
+        if (tripId != null) {
+            // A hike: the title of the place, and its picture with the caption while the walk is there.
+            Text(text = now.name, style = MaterialTheme.typography.titleSmall)
+            if (slide != null) {
+                TripSlideImage(tripId = tripId, file = slide.file, modifier = Modifier.fillMaxWidth())
+                if (slide.caption.isNotBlank()) Text(text = slide.caption, style = MaterialTheme.typography.bodyMedium)
+            }
+        } else {
+            val snr = now.snr?.let { " · SNR ${(it * 10).toInt() / 10f}" }.orEmpty()
+            Text(
+                text = stringResource(Res.string.route_playback_reading, now.name, now.rssi, snr),
+                style = MaterialTheme.typography.titleSmall,
+            )
+        }
+        if (tripId == null && !now.direct) {
             Text(stringResource(Res.string.route_playback_relay), style = MaterialTheme.typography.bodySmall)
         }
         Slider(

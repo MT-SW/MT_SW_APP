@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -411,3 +412,25 @@ internal fun TripThumb(tripId: String, file: String, size: Dp, chosen: Boolean, 
 
 private const val THUMB_DP = 72
 private const val THUMB_CORNER_DP = 8
+
+/** A picture of a hike shown large (a slide of the replay). */
+@Composable
+internal fun TripSlideImage(tripId: String, file: String, modifier: Modifier = Modifier) {
+    val store: TripStore = koinInject()
+    val bitmap by produceState<ImageBitmap?>(null, tripId, file) {
+        value =
+            withContext(Dispatchers.Default) {
+                store.photoBytes(tripId, file)?.let { runCatching { it.decodeToImageBitmap() }.getOrNull() }
+            }
+    }
+    bitmap?.let {
+        Image(
+            bitmap = it,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = modifier.heightIn(max = SLIDE_MAX_HEIGHT_DP.dp),
+        )
+    }
+}
+
+private const val SLIDE_MAX_HEIGHT_DP = 220

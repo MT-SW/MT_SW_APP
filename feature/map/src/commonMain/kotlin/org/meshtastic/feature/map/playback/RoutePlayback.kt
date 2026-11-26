@@ -29,6 +29,8 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.SignalSurveyRepository
+import org.meshtastic.feature.map.trip.TripStore
+import kotlin.math.abs
 
 /**
  * MT_SW: the virtual walk. A recorded signal survey is replayed on the map: a dot moves along the route in the order
@@ -38,6 +40,7 @@ import org.meshtastic.core.repository.SignalSurveyRepository
 class RoutePlayback(
     private val repository: SignalSurveyRepository,
     private val nodeRepository: NodeRepository,
+    private val tripStore: TripStore,
     dispatchers: CoroutineDispatchers,
 ) {
     /** One reading of the replayed route. [name] is the short name of the node that was heard, when it is known. */
@@ -49,7 +52,12 @@ class RoutePlayback(
         val rssi: Int,
         val snr: Float?,
         val direct: Boolean,
+        /** The pictures of the place (a hike's stop) shown as slides when the walk gets here. */
+        val slides: List<Slide> = emptyList(),
     )
+
+    /** One slide of a hike's stop. */
+    data class Slide(val file: String, val caption: String)
 
     data class State(
         val active: Boolean = false,
@@ -57,6 +65,10 @@ class RoutePlayback(
         val index: Int = 0,
         val playing: Boolean = false,
         val speed: Int = 1,
+        /** The hike being replayed, or null when a signal survey is. */
+        val tripId: String? = null,
+        /** Which slide of the current place is shown. */
+        val slide: Int = 0,
     ) {
         val current: Step?
             get() = steps.getOrNull(index)
@@ -102,6 +114,36 @@ class RoutePlayback(
             }
     }
 
+    /** Replays the hike [tripId]: the dot walks the route and stops at each place to show its pictures as slides. */
+    fun playTrip(tripId: String) {
+        job?.cancel()
+        job =
+            scope.launch {
+                val trip = tripStore.find(tripId) ?: return@launch
+                if (trip.points.size < 2) {
+                    Logger.i { "Spacer: wędrówka ma za mało punktów" }
+                    return@launch
+                }
+                val slidesAt = HashMap<Int, MutableList<Slide>>()
+                val titleAt = HashMap<Int, String>()
+                trip.stops
+                    .filter { it.photos.isNotEmpty() }
+                    .forEach { stop ->
+                        val at = trip.points.indices.minBy { abs(trip.points[it].t - stop.t) }
+                        slidesAt.getOrPut(at) { mutableListOf() }.addAll(stop.photos.map { Slide(it.file, it.caption) })
+                        if (stop.title.isNotBlank()) titleAt[at] = stop.title
+                    }
+                val steps =
+                    trip.points.mapIndexed { i, p ->
+                        Step(p.lat, p.lon, p.t, titleAt[i] ?: trip.name, 0, null, true, slidesAt[i].orEmpty())
+                    }
+                Logger.i { "Spacer: wędrówka wczytana, punktów ${steps.size}, miejsc ze zdjęciami ${slidesAt.size}" }
+                val speed = mutableState.value.speed
+                mutableState.value = State(active = true, steps = steps, playing = true, speed = speed, tripId = tripId)
+                run()
+            }
+    }
+
     private suspend fun run() {
         while (true) {
             val s = mutableState.value
@@ -113,7 +155,17 @@ class RoutePlayback(
             }
             delay(STEP_MILLIS / s.speed)
             mutableState.update {
-                if (it.playing) it.copy(index = (it.index + 1).coerceAtMost(it.steps.lastIndex)) else it
+                if (it.playing) {
+                    it.copy(index = (it.index + 1).coerceAtMost(it.steps.lastIndex), slide = 0)
+                } else {
+                    it
+                }
+            }
+            val slides = mutableState.value.current?.slides.orEmpty()
+            for (i in slides.indices) {
+                mutableState.update { it.copy(slide = i) }
+                delay(SLIDE_MILLIS / mutableState.value.speed)
+                if (!mutableState.value.playing || !mutableState.value.active) return
             }
         }
     }
@@ -124,7 +176,11 @@ class RoutePlayback(
         if (!s.active) return
         val resume = !s.playing
         mutableState.update {
-            it.copy(playing = resume, index = if (resume && it.index >= it.steps.lastIndex) 0 else it.index)
+            it.copy(
+                playing = resume,
+                index = if (resume && it.index >= it.steps.lastIndex) 0 else it.index,
+                slide = 0,
+            )
         }
         Logger.i { "Spacer: ${if (resume) "wznowiony" else "wstrzymany"} na odczycie ${mutableState.value.index}" }
         if (resume) {
@@ -140,7 +196,7 @@ class RoutePlayback(
 
     /** Jumps to the reading [index] (the slider). */
     fun seek(index: Int) {
-        mutableState.update { it.copy(index = index.coerceIn(0, (it.steps.size - 1).coerceAtLeast(0))) }
+        mutableState.update { it.copy(index = index.coerceIn(0, (it.steps.size - 1).coerceAtLeast(0)), slide = 0) }
     }
 
     fun stop() {
@@ -152,6 +208,7 @@ class RoutePlayback(
     companion object {
         val SPEEDS = listOf(1, 2, 4, 8, 16)
         private const val STEP_MILLIS = 600L
+        private const val SLIDE_MILLIS = 2500L
         private const val HEX_RADIX = 16
     }
 }

@@ -49,6 +49,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.hide_layer
+import org.meshtastic.core.resources.route_playback_play
 import org.meshtastic.core.resources.show_layer
 import org.meshtastic.core.resources.trips_empty
 import org.meshtastic.core.resources.trips_item
@@ -56,10 +57,12 @@ import org.meshtastic.core.resources.trips_title
 import org.meshtastic.core.ui.component.StyledBottomSheet
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.component.ListItem as StyledListItem
 import org.meshtastic.core.ui.util.TripsWindowRequest
+import org.meshtastic.feature.map.playback.RoutePlayback
 import org.meshtastic.feature.map.trip.TripStore
 
 /**
@@ -84,6 +87,7 @@ internal fun TripsHost() {
 @Composable
 private fun TripsWindow(onDismiss: () -> Unit) {
     val store: TripStore = koinInject()
+    val playback: RoutePlayback = koinInject()
     val trips by store.trips.collectAsStateWithLifecycle()
     val visible by store.visibleIds.collectAsStateWithLifecycle()
     var deleteId by remember { mutableStateOf<String?>(null) }
@@ -120,6 +124,19 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                                     if (shown) MeshtasticIcons.Visibility else MeshtasticIcons.VisibilityOff,
                                     contentDescription =
                                     stringResource(if (shown) Res.string.hide_layer else Res.string.show_layer),
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    store.setVisible(trip.id, true)
+                                    playback.playTrip(trip.id)
+                                    onDismiss()
+                                },
+                                enabled = trip.points.size > 1,
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = MeshtasticIcons.PlayArrow,
+                                    contentDescription = stringResource(Res.string.route_playback_play),
                                 )
                             }
                             IconButton(onClick = { deleteId = trip.id }) {
