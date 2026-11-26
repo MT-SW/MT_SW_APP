@@ -4801,4 +4801,7 @@
     <string name="trips_health_sent">Wędrówka została wysłana do aplikacji zdrowia jako trening.</string>
     <string name="trips_health_import">Pobierz kroki i tętno</string>
     <string name="trips_health_export">Wyślij jako trening</string>
+    <string name="network_report_setting">Raport tygodniowy sieci</string>
+    <string name="network_report_title">Raport sieci z tygodnia</string>
+    <string name="network_report_message">W ciągu ostatnich 7 dni Twoje urządzenie słyszało %1$d węzłów; teraz aktywnych jest %2$d, a znanych w sumie %3$d.</string>
 </resources>

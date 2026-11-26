@@ -161,6 +161,7 @@ import org.meshtastic.core.resources.whats_new_title
 import org.meshtastic.core.resources.widget_others_title
 import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.resources.wifi_devices
+import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.trips_title
 import org.meshtastic.feature.settings.component.isSupportLinkAllowed
 import org.meshtastic.feature.settings.navigation.ConfigRoute
@@ -289,6 +290,7 @@ object SettingsSearchCatalog {
             Res.string.connection_center_summary to SettingsRoute.ConnectionCenter,
             Res.string.device_compare_title to SettingsRoute.ConnectionCenter,
             Res.string.trips_title to SettingsRoute.MtSwFeatures,
+            Res.string.network_report_setting to SettingsRoute.MtSwFeatures,
             Res.string.console_title to SettingsRoute.Console,
             Res.string.console_summary to SettingsRoute.Console,
             Res.string.radio_bridge_enabled to SettingsRoute.ConnectionCenter,

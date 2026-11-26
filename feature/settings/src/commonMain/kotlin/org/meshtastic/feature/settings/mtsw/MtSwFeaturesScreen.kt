@@ -88,6 +88,7 @@ import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_own
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
+import org.meshtastic.core.resources.network_report_setting
 import org.meshtastic.core.resources.mt_sw_group_help
 import org.meshtastic.core.resources.mt_sw_group_look
 import org.meshtastic.core.resources.mt_sw_group_safety
@@ -256,6 +257,17 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.History,
                     checked = skipBadTimes,
                     onClick = { settingsViewModel.setSkipBadTimeChartPoints(!skipBadTimes) },
+                )
+                SwitchListItem(
+                    text = stringResource(Res.string.network_report_setting),
+                    leadingIcon = MeshtasticIcons.History,
+                    checked = options[UiOptions.NETWORK_REPORT] == 1,
+                    onClick = {
+                        val on = options[UiOptions.NETWORK_REPORT] != 1
+                        onChange(UiOptions.NETWORK_REPORT, if (on) 1 else 0)
+                        // A new start of the counting: the first report comes a week after switching on.
+                        onChange(UiOptions.NETWORK_REPORT_LAST, 0)
+                    },
                 )
                 AppUpdateSettings()
             }

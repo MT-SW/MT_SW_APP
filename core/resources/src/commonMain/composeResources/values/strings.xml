@@ -2885,6 +2885,9 @@
     <string name="network_health_online">Online %1$d / %2$d</string>
     <string name="network_health_problems_only">Problems only</string>
     <string name="network_layer_url_hint" translatable="false">https://example.com/map.kml or .geojson</string>
+    <string name="network_report_message">In the last 7 days your device heard %1$d nodes; %2$d are active now, %3$d are known in all.</string>
+    <string name="network_report_setting">Weekly network report</string>
+    <string name="network_report_title">Network report for the week</string>
     <string name="network_scan_unavailable">A browser can't scan the network. Add a radio by its address.</string>
     <string name="new_messages_below">New messages below</string>
     <string name="new_node_seen">New Node Seen: %1$s</string>

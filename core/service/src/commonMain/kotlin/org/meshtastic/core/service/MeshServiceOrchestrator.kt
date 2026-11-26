@@ -39,6 +39,7 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MeshMessageProcessor
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageArchiveMonitor
+import org.meshtastic.core.repository.NetworkReportMonitor
 import org.meshtastic.core.repository.NodeActiveMonitor
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeSilenceMonitor
@@ -83,6 +84,7 @@ class MeshServiceOrchestrator(
     private val lastBleNodeRecorder: LastBleNodeRecorder,
     private val nodeSilenceMonitor: NodeSilenceMonitor,
     private val nodeActiveMonitor: NodeActiveMonitor,
+    private val networkReportMonitor: NetworkReportMonitor,
     private val messageArchiveMonitor: MessageArchiveMonitor,
     private val radioBridge: RadioBridgeMonitor,
     private val radioBackground: RadioBackgroundMonitor,
@@ -232,6 +234,8 @@ class MeshServiceOrchestrator(
         nodeSilenceMonitor.start(newScope)
         // MT_SW: the "active" alerts set per node in the node details.
         nodeActiveMonitor.start(newScope)
+        // MT_SW: the weekly report of the network (when switched on).
+        networkReportMonitor.start(newScope)
         // The automatic message archive in the chosen folder.
         messageArchiveMonitor.start(newScope)
         radioBridge.start(newScope)

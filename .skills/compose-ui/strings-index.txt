@@ -2825,6 +2825,9 @@ network_health_level_unknown
 network_health_online
 network_health_problems_only
 network_layer_url_hint
+network_report_message
+network_report_setting
+network_report_title
 network_scan_unavailable
 new_messages_below
 new_node_seen

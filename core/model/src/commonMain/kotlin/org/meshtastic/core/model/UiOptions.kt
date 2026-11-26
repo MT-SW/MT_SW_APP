@@ -194,6 +194,12 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
          */
         const val RADIO_BACKGROUND = "radios.background"
 
+        /** 1 = a short report of the network is posted once a week (0 = off, the default). */
+        const val NETWORK_REPORT = "report.weekly"
+
+        /** The day (days since 1970) the last weekly report was posted, or the day the report was switched on. */
+        const val NETWORK_REPORT_LAST = "report.weekly.last"
+
         /**
          * How the data charts (bars, heat map, half-round gauge) look: [CHART_STYLE_FLAT] (the old plain colours),
          * [CHART_STYLE_GLASS] (glossy 3D glass with a gradient), [CHART_STYLE_RIBBON] (default: glass, with a glass

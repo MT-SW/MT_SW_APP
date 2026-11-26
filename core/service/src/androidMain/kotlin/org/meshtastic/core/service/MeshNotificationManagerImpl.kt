@@ -251,6 +251,8 @@ class MeshNotificationManagerImpl(
         private const val TAG_FIRMWARE_UPDATE = "firmware_update"
         private const val TAG_APP_UPDATE = "app_update"
         private const val APP_UPDATE_ID = 2
+        private const val TAG_NETWORK_REPORT = "network_report"
+        private const val NETWORK_REPORT_ID = 3
         private const val TAG_RECONNECT_BLOCKED = "reconnect_blocked"
         private const val RECONNECT_BLOCKED_ID = 1
         private val CHANNEL_LABEL_TIMEOUT = 2.seconds
@@ -1059,6 +1061,24 @@ class MeshNotificationManagerImpl(
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
         quietNotify(TAG_APP_UPDATE, APP_UPDATE_ID, notification)
+        return true
+    }
+
+    override suspend fun showNetworkReportNotification(title: String, message: String): Boolean {
+        ensureChannels()
+        if (!canPost(NotificationChannelSpec.DeviceStatus)) return false
+        val notification =
+            commonBuilder(
+                NotificationChannelSpec.DeviceStatus,
+                createDeepLinkIntent(NotificationDeepLinks.CONNECTIONS, NETWORK_REPORT_ID),
+            )
+                .setCategory(Notification.CATEGORY_STATUS)
+                .setAutoCancel(true)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+                .build()
+        quietNotify(TAG_NETWORK_REPORT, NETWORK_REPORT_ID, notification)
         return true
     }
 

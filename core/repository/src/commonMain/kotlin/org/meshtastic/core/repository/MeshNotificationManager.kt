@@ -149,6 +149,9 @@ interface MeshNotificationManager {
      */
     suspend fun showAppUpdateNotification(tag: String, isTest: Boolean, url: String): Boolean = false
 
+    /** MT_SW: the weekly report of the network ([title] and [message] arrive resolved). True when it was accepted. */
+    suspend fun showNetworkReportNotification(title: String, message: String): Boolean = false
+
     /** Returns true only when the platform accepted the notification. [title] and [message] arrive resolved. */
     suspend fun showReconnectBlockedNotification(title: String, message: String): Boolean
 

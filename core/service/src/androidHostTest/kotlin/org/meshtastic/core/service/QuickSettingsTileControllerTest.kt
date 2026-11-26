@@ -86,6 +86,7 @@ class QuickSettingsTileControllerTest {
             lastBleNodeRecorder = {},
             nodeSilenceMonitor = mock(MockMode.autofill),
             nodeActiveMonitor = mock(MockMode.autofill),
+            networkReportMonitor = mock(MockMode.autofill),
             messageArchiveMonitor = {},
             radioBridge =
             object : RadioBridgeMonitor {

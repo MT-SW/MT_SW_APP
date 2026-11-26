@@ -44,6 +44,7 @@ import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Telemetry
 
 private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
+private const val NETWORK_REPORT_NOTIFICATION_ID = 0x4D5454
 
 /** The same link Android uses: a tap opens the conversation the notification came from. */
 private fun openMessageLink(contactKey: String, deviceAddress: String? = null) =
@@ -313,6 +314,16 @@ class DispatchingMeshNotificationManager(private val notificationManager: Notifi
                 ),
                 category = Notification.Category.Service,
                 id = APP_UPDATE_NOTIFICATION_ID,
+            ),
+        )
+
+    override suspend fun showNetworkReportNotification(title: String, message: String): Boolean =
+        notificationManager.dispatch(
+            Notification(
+                title = title,
+                message = message,
+                category = Notification.Category.Service,
+                id = NETWORK_REPORT_NOTIFICATION_ID,
             ),
         )
 
