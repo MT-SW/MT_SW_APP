@@ -698,13 +698,6 @@ internal fun RemoteNodeManagementPanel(
         ) {
             Text(stringResource(Res.string.remote_remove_from_list))
         }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isEnsuringSession && targets.isNotEmpty(),
-            onClick = { confirmRemove = true },
-        ) {
-            Text(stringResource(Res.string.remote_remove_node))
-        }
 
         SectionDivider()
 
@@ -761,6 +754,15 @@ internal fun RemoteNodeManagementPanel(
         ) {
             Icon(MeshtasticIcons.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
             Text(stringResource(Res.string.add_contact), modifier = Modifier.padding(start = 8.dp))
+        }
+
+        // Under "Add contact": removes the chosen contacts from the remote device.
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isEnsuringSession && targets.isNotEmpty(),
+            onClick = { confirmRemove = true },
+        ) {
+            Text(stringResource(Res.string.remote_remove_node))
         }
     }
 
