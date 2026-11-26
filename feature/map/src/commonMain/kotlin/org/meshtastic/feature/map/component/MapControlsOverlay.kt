@@ -99,6 +99,8 @@ fun MapControlsOverlay(
     filtersActive: Boolean = false,
     mapTypeContent: @Composable () -> Unit = {},
     layersContent: @Composable () -> Unit = {},
+    /** MT_SW: the Hikes button (flavor-specific), next to the planner. */
+    hikesContent: @Composable () -> Unit = {},
     /** Null hides the button; opens the native MT_SW Planner. */
     onPlannerClick: (() -> Unit)? = null,
     isLocationTrackingEnabled: Boolean = false,
@@ -155,6 +157,9 @@ fun MapControlsOverlay(
                     onClick = onClick,
                 )
             }
+
+            // MT_SW: hikes (optional)
+            hikesContent()
 
             // The mesh view (terrain panorama first, camera second), next to the planner (optional)
             LocalOpenMeshHud.current?.let { onClick ->

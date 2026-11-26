@@ -4828,4 +4828,15 @@
     <string name="trips_position_device">Urządzenie</string>
     <string name="trips_position_both">Oba naraz</string>
     <string name="trips_position_hint">Najlepsze dostępne: telefon, a urządzenie wtedy, gdy telefon przez 30 s nie ma pozycji. Oba naraz: punkty z obu źródeł się mieszają, więc trasa może „zygzakować” tam, gdzie ich pozycje się różnią.</string>
+    <string name="remote_lists_info_title">Zdalne listy i kontakty</string>
+    <string name="remote_lists_info_1">Tu zmieniasz listy urządzenia, z którym masz zdalne zarządzanie, a nie listy tego telefonu. Wybierz urządzenia z naszej listy albo wpisz numer ID (np. !a1b2c3d4). Możesz zaznaczyć wiele naraz.</string>
+    <string name="remote_lists_info_2">Ulubione: urządzenie uzna wybrane węzły za ulubione. Ignorowane: urządzenie będzie pomijać wybrane węzły i wymaże ich dane, dlatego przed dodaniem pojawia się pytanie.</string>
+    <string name="remote_lists_info_3">„Dodaj do listy” wpisuje wybrane węzły na wybraną listę, a „Usuń z listy” je z niej zdejmuje. „Usuń węzeł z urządzenia” kasuje je z bazy węzłów tego urządzenia.</string>
+    <string name="remote_lists_info_4">Kontakt: dodaje węzeł do kontaktów urządzenia. Wystarczy sam numer ID, nazwy są nieobowiązkowe. Węzeł z naszej bazy idzie razem z kluczem publicznym, a wpisany ręcznie bez klucza.</string>
+    <string name="remote_lists_info_5">Aplikacja nie odczyta, co jest teraz na listach urządzenia, tylko wysyła polecenia dodania i usunięcia. Wpis jest widoczny, gdy urządzenie zostało raz potwierdzone jako Twoje przez zdalne zarządzanie.</string>
+    <string name="trips_info_title">Wędrówki</string>
+    <string name="trips_info_1">Nagrywasz trasę, robisz zdjęcia (aparatem albo z galerii) i oglądasz zapisane wędrówki. Zdjęcia przypisują się do punktów trasy po czasie i pozycji, a ręcznie możesz zmienić czas, punkt i miejsce.</string>
+    <string name="trips_info_2">W szczegółach wędrówki są kilometry, czas, przewyższenia, wykresy i dane ze Zdrowia (jeśli telefon na to pozwala). Zasięg usłyszanych węzłów zapisuje się na trasie i można go wyeksportować (CSV, GeoJSON).</string>
+    <string name="trips_info_3">Tryb ciszy: w czasie wędrówki wszystkie urządzenia nie dają powiadomień. Wyjątkiem mogą być ulubione albo ręcznie wybrane węzły. Źródło pozycji: telefon, urządzenie albo oba naraz.</string>
+    <string name="trips_info_4">Zdjęcia trafiają do osobnego albumu MT_SW. Wędrówkę możesz udostępnić: do każdego punktu idzie jedno zdjęcie, żeby dane były małe.</string>
 </resources>

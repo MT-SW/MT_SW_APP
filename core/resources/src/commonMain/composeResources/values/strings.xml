@@ -3617,6 +3617,12 @@
     <string name="remote_ignore_confirm_title">Ignore on the remote device?</string>
     <string name="remote_list_favorites">Favorites</string>
     <string name="remote_list_ignored">Ignored</string>
+    <string name="remote_lists_info_1">Here you change the lists of the device you manage remotely, not the lists of this phone. Pick devices from our list or type a node ID (e.g. !a1b2c3d4). You can select many at once.</string>
+    <string name="remote_lists_info_2">Favorites: the device will treat the chosen nodes as favorites. Ignored: the device will skip the chosen nodes and erase their data, so a question comes before adding.</string>
+    <string name="remote_lists_info_3">"Add to list" puts the chosen nodes on the chosen list and "Remove from list" takes them off. "Remove node from device" deletes them from that device\'s node database.</string>
+    <string name="remote_lists_info_4">Contact: adds the node to the device\'s contacts. The ID alone is enough, names are optional. A node from our database goes with its public key, one typed by hand goes without a key.</string>
+    <string name="remote_lists_info_5">The app cannot read what is on the device\'s lists now, it only sends add and remove commands. The entry is visible once the device has been confirmed as yours through remote management.</string>
+    <string name="remote_lists_info_title">Remote lists and contacts</string>
     <string name="remote_lists_open">Remote lists</string>
     <string name="remote_lists_open_description">Favorites, ignored and contacts on this device</string>
     <string name="remote_manage_hint">Pick nodes from your own list or type the ID of a node you want to manage on the remote device, for example !a1b2c3d4. A typed node does not have to be on your own list.</string>
@@ -4500,6 +4506,11 @@
     <string name="trips_import_button">Replay the hike</string>
     <string name="trips_import_done">The hike is saved. The map replays it when you open it.</string>
     <string name="trips_import_progress">Receiving the hike: %1$d of %2$d</string>
+    <string name="trips_info_1">You record a route, take photos (with the camera or from the gallery) and view saved hikes. Photos are assigned to route points by time and position, and you can change the time, point and place by hand.</string>
+    <string name="trips_info_2">A hike shows kilometres, time, ascent, charts and health data (if the phone allows). The signal of heard nodes is saved on the route and can be exported (CSV, GeoJSON).</string>
+    <string name="trips_info_3">Quiet mode: during a hike all devices give no notifications. Favorites or hand-picked nodes can be exceptions. Position source: the phone, the device or both at once.</string>
+    <string name="trips_info_4">Photos go to a separate MT_SW album. You can share a hike: one photo per point goes out, to keep the data small.</string>
+    <string name="trips_info_title">Hikes</string>
     <string name="trips_item">%1$d m · pictures: %2$d</string>
     <string name="trips_move_to">Move to another point</string>
     <string name="trips_no_time">The picture has no time</string>

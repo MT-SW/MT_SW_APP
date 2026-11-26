@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.rememberLazyListState
 import org.meshtastic.core.resources.trips_position_title
 import org.meshtastic.core.resources.trips_position_auto
 import org.meshtastic.core.resources.trips_position_phone
@@ -353,7 +356,9 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                         modifier = Modifier.padding(top = 12.dp),
                     )
                 }
-                LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                val listState = rememberLazyListState()
+                Box(modifier = Modifier.padding(top = 8.dp)) {
+                LazyColumn(state = listState) {
                     items(shown, key = { it.num }) { node ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -363,6 +368,8 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                             Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
+                }
+                FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
                 }
             }
         },

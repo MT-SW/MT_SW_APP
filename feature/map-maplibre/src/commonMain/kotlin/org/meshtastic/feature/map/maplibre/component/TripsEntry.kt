@@ -18,14 +18,19 @@
 
 package org.meshtastic.feature.map.maplibre.component
 
+import org.meshtastic.core.resources.trips_info_4
+import org.meshtastic.core.resources.trips_info_3
+import org.meshtastic.core.resources.trips_info_2
+import org.meshtastic.core.resources.trips_info_1
+import org.meshtastic.core.resources.trips_info_title
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.component.InfoButton
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -35,6 +40,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +61,7 @@ import org.meshtastic.core.resources.show_layer
 import org.meshtastic.core.resources.trips_empty
 import org.meshtastic.core.resources.trips_item
 import org.meshtastic.core.resources.trips_title
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -96,12 +103,25 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     var deleteId by remember { mutableStateOf<String?>(null) }
     var openId by remember { mutableStateOf<String?>(null) }
     ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-            Text(
-                text = stringResource(Res.string.trips_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp),
-            )
+        ScrollWithBar {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(Res.string.trips_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f).padding(vertical = 16.dp),
+                )
+                InfoButton(
+                    Res.string.trips_info_title,
+                    Res.string.trips_info_1,
+                    Res.string.trips_info_2,
+                    Res.string.trips_info_3,
+                    Res.string.trips_info_4,
+                    tint = MaterialTheme.colorScheme.StatusYellow,
+                )
+            }
             TrackRecordingSection()
             HorizontalDivider()
             if (trips.isEmpty()) {

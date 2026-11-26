@@ -3539,6 +3539,12 @@ remote_ignore_confirm_text
 remote_ignore_confirm_title
 remote_list_favorites
 remote_list_ignored
+remote_lists_info_1
+remote_lists_info_2
+remote_lists_info_3
+remote_lists_info_4
+remote_lists_info_5
+remote_lists_info_title
 remote_lists_open
 remote_lists_open_description
 remote_manage_hint
@@ -4404,6 +4410,11 @@ trips_health_title
 trips_import_button
 trips_import_done
 trips_import_progress
+trips_info_1
+trips_info_2
+trips_info_3
+trips_info_4
+trips_info_title
 trips_item
 trips_move_to
 trips_no_time

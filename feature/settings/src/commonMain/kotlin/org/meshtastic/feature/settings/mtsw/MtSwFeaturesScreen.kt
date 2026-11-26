@@ -170,7 +170,8 @@ import org.meshtastic.core.ui.icon.DisplaySettings
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
-import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.FilterListOff
+import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.LinkIcon
@@ -254,13 +255,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 )
                 SwitchListItem(
                     text = stringResource(Res.string.skip_bad_time_chart_points),
-                    leadingIcon = MeshtasticIcons.History,
+                    leadingIcon = MeshtasticIcons.FilterListOff,
                     checked = skipBadTimes,
                     onClick = { settingsViewModel.setSkipBadTimeChartPoints(!skipBadTimes) },
                 )
                 SwitchListItem(
                     text = stringResource(Res.string.network_report_setting),
-                    leadingIcon = MeshtasticIcons.History,
+                    leadingIcon = MeshtasticIcons.BarChart,
                     checked = options[UiOptions.NETWORK_REPORT] == 1,
                     onClick = {
                         val on = options[UiOptions.NETWORK_REPORT] != 1

@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -54,6 +52,7 @@ import org.meshtastic.core.resources.device_compare_utilization
 import org.meshtastic.core.resources.device_history_battery
 import org.meshtastic.core.resources.device_history_load
 import org.meshtastic.core.resources.device_history_title
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.MeshHub
@@ -77,10 +76,7 @@ fun DeviceCompareEntry(viewModel: DeviceCompareViewModel = koinViewModel()) {
         val rows by viewModel.rows.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) { viewModel.refresh() }
         ModalBottomSheet(onDismissRequest = { open = false }) {
-            Column(
-                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+            ScrollWithBar(contentModifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(Res.string.device_compare_title), style = MaterialTheme.typography.titleMedium)
                 if (rows.isEmpty()) {
                     Text(stringResource(Res.string.device_compare_empty), style = MaterialTheme.typography.bodyMedium)

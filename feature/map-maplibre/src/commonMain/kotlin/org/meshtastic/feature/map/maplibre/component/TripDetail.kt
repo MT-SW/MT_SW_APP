@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -110,6 +109,7 @@ import org.meshtastic.core.resources.trips_stop_time
 import org.meshtastic.core.resources.trips_stop_title
 import org.meshtastic.core.resources.trips_unplaced
 import org.meshtastic.core.resources.trips_unplaced_note
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Delete
@@ -201,8 +201,8 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
             Text(text = "", modifier = Modifier.padding(16.dp))
             return@ModalBottomSheet
         }
-        Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+        ScrollWithBar(
+            contentModifier = Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             NameField(trip, store)
@@ -437,10 +437,7 @@ private fun PhotoDialog(trip: Trip, stopId: String, file: String, onDismiss: () 
             onDismiss()
         },
         text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+            ScrollWithBar(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 big?.let {
                     Image(
                         bitmap = it,

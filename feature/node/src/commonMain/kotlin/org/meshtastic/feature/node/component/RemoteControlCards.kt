@@ -18,6 +18,14 @@
 
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.resources.remote_lists_info_5
+import org.meshtastic.core.resources.remote_lists_info_4
+import org.meshtastic.core.resources.remote_lists_info_3
+import org.meshtastic.core.resources.remote_lists_info_2
+import org.meshtastic.core.resources.remote_lists_info_1
+import org.meshtastic.core.resources.remote_lists_info_title
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.component.InfoButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -137,6 +145,7 @@ import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NearMe
 import org.meshtastic.core.ui.icon.NotFavorite
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Output
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PowerSettingsNew
@@ -573,12 +582,25 @@ internal fun RemoteNodeManagementPanel(
     }
 
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        PanelHeader(
-            icon = MeshtasticIcons.Favorite,
-            title = stringResource(Res.string.remote_manage_title),
-            hint = stringResource(Res.string.remote_manage_hint),
-            accent = gold,
-        )
+        Row(verticalAlignment = Alignment.Top) {
+            Box(modifier = Modifier.weight(1f)) {
+                PanelHeader(
+                    icon = MeshtasticIcons.Person,
+                    title = stringResource(Res.string.remote_manage_title),
+                    hint = stringResource(Res.string.remote_manage_hint),
+                    accent = gold,
+                )
+            }
+            InfoButton(
+                Res.string.remote_lists_info_title,
+                Res.string.remote_lists_info_1,
+                Res.string.remote_lists_info_2,
+                Res.string.remote_lists_info_3,
+                Res.string.remote_lists_info_4,
+                Res.string.remote_lists_info_5,
+                tint = MaterialTheme.colorScheme.StatusYellow,
+            )
+        }
         OutlinedTextField(
             state = targetIdState,
             labelPosition = TextFieldLabelPosition.Above(),
@@ -648,23 +670,21 @@ internal fun RemoteNodeManagementPanel(
                 modifier = Modifier.weight(1f),
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targets.isNotEmpty(),
-                colors = ButtonDefaults.buttonColors(containerColor = listColor, contentColor = Color.Black),
-                // Adding to either list changes the remote device, so it asks first (ignoring also deletes data).
-                onClick = { confirmAdd = true },
-            ) {
-                Text(stringResource(Res.string.remote_add_to_list))
-            }
-            OutlinedButton(
-                modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targets.isNotEmpty(),
-                onClick = { send(add = false) },
-            ) {
-                Text(stringResource(Res.string.remote_remove_from_list))
-            }
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isEnsuringSession && targets.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(containerColor = listColor, contentColor = Color.Black),
+            // Adding to either list changes the remote device, so it asks first (ignoring also deletes data).
+            onClick = { confirmAdd = true },
+        ) {
+            Text(stringResource(Res.string.remote_add_to_list))
+        }
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isEnsuringSession && targets.isNotEmpty(),
+            onClick = { send(add = false) },
+        ) {
+            Text(stringResource(Res.string.remote_remove_from_list))
         }
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
@@ -701,9 +721,7 @@ internal fun RemoteNodeManagementPanel(
         )
         Button(
             enabled =
-            !isEnsuringSession &&
-                (selected.isNotEmpty() ||
-                    (targetNodeNum != null && (longNameState.text.isNotBlank() || nodeDb.containsKey(targetNodeNum)))),
+            !isEnsuringSession && (selected.isNotEmpty() || targetNodeNum != null),
             onClick = {
                 // Ticked nodes are saved with the names from our own list; a typed ID with the names typed here.
                 selected.toList().forEach { num ->
@@ -714,8 +732,8 @@ internal fun RemoteNodeManagementPanel(
                     }
                 }
                 // A typed ID that is in our database goes with the key and the names we hold; one that is not goes
-                // without a key, with the names typed here.
-                if (targetNodeNum != null && (longNameState.text.isNotBlank() || nodeDb.containsKey(targetNodeNum))) {
+                // without a key, with the names typed here (or with no name at all: the ID alone is enough).
+                if (targetNodeNum != null) {
                     val known = nodeDb[targetNodeNum]?.user
                     onAction(
                         NodeDetailAction.AddRemoteContact(

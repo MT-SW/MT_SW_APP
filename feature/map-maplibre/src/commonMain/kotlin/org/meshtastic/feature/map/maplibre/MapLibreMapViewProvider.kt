@@ -68,6 +68,7 @@ import org.meshtastic.feature.map.component.OfflineStatusBanner
 import org.meshtastic.feature.map.component.mapFilterActions
 import org.meshtastic.feature.map.layers.LayerOpacityStore
 import org.meshtastic.feature.map.layers.MapLayersManager
+import org.meshtastic.feature.map.maplibre.component.HikesMapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.BoxAuthoringBar
@@ -523,6 +524,7 @@ private fun BoxScope.MapToolbar(
                 extra = layersSheetExtra,
             )
         },
+        hikesContent = { if (onPlannerClick != null) HikesMapButton() },
         onPlannerClick = onPlannerClick,
         isLocationTrackingEnabled = location.following,
         onToggleLocationTracking = location.onToggleFollow,

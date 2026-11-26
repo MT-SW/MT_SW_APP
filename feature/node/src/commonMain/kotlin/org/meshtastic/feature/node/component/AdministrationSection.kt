@@ -70,14 +70,13 @@ import org.meshtastic.core.resources.remote_shell_open
 import org.meshtastic.core.resources.remote_shell_open_description
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.resources.remote_lists_open_description
 import org.meshtastic.core.resources.remote_lists_open
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
@@ -86,6 +85,7 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
@@ -202,7 +202,7 @@ private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (
     var open by remember { mutableStateOf(false) }
     ListItem(
         text = stringResource(Res.string.remote_lists_open),
-        leadingIcon = MeshtasticIcons.Favorite,
+        leadingIcon = MeshtasticIcons.Person,
         supportingText = stringResource(Res.string.remote_lists_open_description),
         onClick = {
             open = true
@@ -216,7 +216,7 @@ private fun RemoteListsEntry(node: Node, isEnsuringSession: Boolean, onAction: (
                 open = false
             },
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            ScrollWithBar {
                 RemoteNodeManagementPanel(destNum = node.num, isEnsuringSession = isEnsuringSession, onAction = onAction)
             }
         }

@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.node.component
 
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -85,7 +88,9 @@ internal fun RemoteNodePickerSheet(
             label = { Text(stringResource(Res.string.remote_pick_search)) },
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         )
-        LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+        val listState = rememberLazyListState()
+        Box(modifier = Modifier.weight(1f, fill = false)) {
+        LazyColumn(state = listState) {
             items(shown, key = { it.num }) { node ->
                 Row(
                     modifier =
@@ -111,6 +116,8 @@ internal fun RemoteNodePickerSheet(
                     )
                 }
             }
+        }
+            FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

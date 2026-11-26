@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -52,6 +50,7 @@ import org.meshtastic.core.resources.log_insights_map
 import org.meshtastic.core.resources.log_insights_none
 import org.meshtastic.core.resources.log_insights_since
 import org.meshtastic.core.resources.log_insights_title
+import org.meshtastic.core.ui.component.ScrollWithBar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.icon.List
@@ -88,10 +87,7 @@ private fun LogSummaryWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()
     val now = nowMillis
     ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+        ScrollWithBar(contentModifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(Res.string.log_insights_title), style = MaterialTheme.typography.titleMedium)
             Text(
                 text = stringResource(Res.string.log_insights_since, minutesAgo(now, summary.sinceMillis)),
@@ -146,10 +142,7 @@ private fun LinkQualityWindow(onDismiss: () -> Unit) {
     val summary by LogInsights.summary.collectAsStateWithLifecycle()
     val now = nowMillis
     ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+        ScrollWithBar(contentModifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(Res.string.link_quality_title), style = MaterialTheme.typography.titleMedium)
             Text(
                 text = stringResource(Res.string.log_insights_since, minutesAgo(now, summary.sinceMillis)),
