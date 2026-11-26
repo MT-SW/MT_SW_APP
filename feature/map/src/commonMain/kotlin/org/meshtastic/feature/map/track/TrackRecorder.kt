@@ -36,6 +36,7 @@ import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.QuietMode
+import org.meshtastic.core.ui.util.HealthData
 import org.meshtastic.feature.map.trip.Trip
 import org.meshtastic.feature.map.trip.TripStop
 import org.meshtastic.feature.map.trip.TripPoint
@@ -74,6 +75,16 @@ class TrackRecorder(
     )
 
     private val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
+    private val mutableLiveHealth = MutableStateFlow<HealthData?>(null)
+
+    /** What the health app has recorded since the start of the hike being recorded (null when nothing yet). */
+    val liveHealth: StateFlow<HealthData?>
+        get() = mutableLiveHealth
+
+    fun setLiveHealth(data: HealthData?) {
+        mutableLiveHealth.value = data
+    }
+
     private val mutableState = MutableStateFlow(State())
     val state: StateFlow<State>
         get() = mutableState

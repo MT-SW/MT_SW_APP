@@ -28,6 +28,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import org.meshtastic.core.resources.trips_health_live
+import org.meshtastic.core.resources.trips_health_auto_hint
+import org.meshtastic.core.resources.trips_health_auto
+import org.meshtastic.core.ui.util.rememberHealthSync
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.model.UiOptions
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -107,6 +115,36 @@ internal fun TrackRecordingSection() {
                 style = MaterialTheme.typography.bodySmall,
             )
             OutlinedButton(onClick = pickFolder) { Text(stringResource(Res.string.trips_album_change)) }
+        }
+        val prefs: UiPrefs = koinInject()
+        val options by prefs.uiOptions.collectAsStateWithLifecycle()
+        val healthAuto = UiOptions(options)[UiOptions.HIKE_HEALTH_AUTO] == 1
+        if (rememberHealthSync() != null) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(Res.string.trips_health_auto),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = healthAuto,
+                    onCheckedChange = { prefs.setUiOption(UiOptions.HIKE_HEALTH_AUTO, if (it) 1 else 0) },
+                )
+            }
+            Text(text = stringResource(Res.string.trips_health_auto_hint), style = MaterialTheme.typography.bodySmall)
+            val live by recorder.liveHealth.collectAsStateWithLifecycle()
+            live?.steps?.let {
+                if (state.recording) {
+                    Text(
+                        text = stringResource(Res.string.trips_health_live, it),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
         }
         val quiet by QuietMode.mode.collectAsStateWithLifecycle()
         Text(text = stringResource(Res.string.trips_quiet_title), style = MaterialTheme.typography.titleSmall)

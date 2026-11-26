@@ -4476,11 +4476,14 @@
     <string name="trips_chosen">Chosen to send</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
     <string name="trips_health_ascent">Ascent (health app): %1$d m</string>
+    <string name="trips_health_auto">Take steps and heart rate from the health app by itself</string>
+    <string name="trips_health_auto_hint">Asks for permission when the recording starts, refreshes the numbers while it runs and saves them with the hike when it ends.</string>
     <string name="trips_health_calories">Active energy: %1$d kcal</string>
     <string name="trips_health_distance">Distance (health app): %1$s km</string>
     <string name="trips_health_export">Send as a workout</string>
     <string name="trips_health_heart">Heart rate: average %1$d, highest %2$d bpm</string>
     <string name="trips_health_import">Get steps and heart rate</string>
+    <string name="trips_health_live">Steps from the health app: %1$d</string>
     <string name="trips_health_none">The health app has no data for the time of this hike.</string>
     <string name="trips_health_sent">The hike was sent to the health app as a workout.</string>
     <string name="trips_health_steps">Steps: %1$d</string>

@@ -4380,11 +4380,14 @@ trips_chart_speed
 trips_chosen
 trips_empty
 trips_health_ascent
+trips_health_auto
+trips_health_auto_hint
 trips_health_calories
 trips_health_distance
 trips_health_export
 trips_health_heart
 trips_health_import
+trips_health_live
 trips_health_none
 trips_health_sent
 trips_health_steps

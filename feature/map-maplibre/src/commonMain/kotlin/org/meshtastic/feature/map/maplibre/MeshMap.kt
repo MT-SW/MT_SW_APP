@@ -451,6 +451,7 @@ fun MeshMap(
         }
         TripsHost()
         TripViewHost()
+        HikeHealthAuto()
         RoutePlaybackControls(
             Modifier.align(Alignment.BottomStart)
                 .fillMaxWidth()

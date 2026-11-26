@@ -194,6 +194,9 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
          */
         const val RADIO_BACKGROUND = "radios.background"
 
+        /** 1 = while a hike is recorded the steps, heart rate and more are taken from the health app by themselves. */
+        const val HIKE_HEALTH_AUTO = "hike.health.auto"
+
         /** 1 = a short report of the network is posted once a week (0 = off, the default). */
         const val NETWORK_REPORT = "report.weekly"
 
@@ -331,6 +334,7 @@ class UiOptions(private val stored: Map<String, Int> = emptyMap()) {
             put(RADIO_COUNT, 1)
             put(NODE_CHIP_BLINK, 0)
             put(RADIO_BACKGROUND, 1)
+            put(HIKE_HEALTH_AUTO, 1)
             put(CHART_STYLE, CHART_STYLE_RIBBON)
             put(CHART_STYLE_HEALTH, CHART_STYLE_RIBBON)
             put(CHART_STYLE_NODE, CHART_STYLE_RIBBON)
