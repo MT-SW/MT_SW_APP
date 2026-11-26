@@ -16,22 +16,44 @@
  */
 package org.meshtastic.core.common.state
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.di.ServiceScope
+
+/** Storage of the state between launches. */
+interface HiddenFeaturesStore {
+    val kept: Flow<Boolean>
+
+    fun keep()
+}
 
 /**
- * Process-scoped easter-egg unlock (tapping the app version row in Settings five times). Deliberately not persisted —
- * like the web flasher's konami code, it re-locks on the next launch. Gates the firmware-excluded module configuration
- * screens and the nightly firmware preview channel.
+ * Process-scoped easter-egg unlock (tapping the app version row in Settings five times). A normal unlock re-locks on
+ * the next launch, like the web flasher's konami code. Gates the firmware-excluded module configuration screens and
+ * the nightly firmware preview channel.
  */
 @Single
-class HiddenFeaturesUnlock {
+class HiddenFeaturesUnlock(private val store: HiddenFeaturesStore? = null, scope: ServiceScope? = null) {
     private val _unlocked = MutableStateFlow(false)
     val unlocked: StateFlow<Boolean> = _unlocked.asStateFlow()
 
+    init {
+        if (store != null && scope != null) {
+            scope.launch { store.kept.collect { if (it) _unlocked.value = true } }
+        }
+    }
+
     fun unlock() {
         _unlocked.value = true
+    }
+
+    /** Unlocks and stores the state. */
+    fun keep() {
+        _unlocked.value = true
+        store?.keep()
     }
 }

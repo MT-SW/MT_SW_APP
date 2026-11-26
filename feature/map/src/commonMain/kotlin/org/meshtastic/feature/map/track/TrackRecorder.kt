@@ -180,8 +180,8 @@ class TrackRecorder(
     }
 
     /**
-     * Only with the hidden features open: the range test of the radio is switched on for the time of the hike and put
-     * back as it was when the hike ends. Never on a public primary channel.
+     * Only when the extra option is available and on: the range test of the radio is switched on for the time of the
+     * hike and put back as it was when the hike ends. Never on a public primary channel.
      */
     @Suppress("TooGenericExceptionCaught")
     private suspend fun startRangeTest() {

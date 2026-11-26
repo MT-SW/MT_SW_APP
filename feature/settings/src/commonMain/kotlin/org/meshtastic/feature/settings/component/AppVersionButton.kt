@@ -37,9 +37,12 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.feature.settings.settingsPlatform
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import kotlin.time.Duration.Companion.seconds
 
 private const val UNLOCK_CLICK_COUNT = 5 // Number of clicks required to unlock excluded modules.
+private const val KEEP_CLICK_COUNT = 3 * UNLOCK_CLICK_COUNT // Number of clicks of the longer series.
 private const val UNLOCKED_CLICK_COUNT = 3 // Number of clicks before we toast that modules are already unlocked.
 private const val UNLOCK_TIMEOUT_SECONDS = 1 // Timeout in seconds to reset the click counter.
 
@@ -52,10 +55,11 @@ internal fun AppVersionButton(
 ) {
     val scope = rememberCoroutineScope()
     val showToast = rememberShowToastResource()
+    val hiddenFeatures = koinInject<HiddenFeaturesUnlock>()
     var clickCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(clickCount) {
-        if (clickCount in 1..<UNLOCK_CLICK_COUNT) {
+        if (clickCount in 1..<KEEP_CLICK_COUNT) {
             delay(UNLOCK_TIMEOUT_SECONDS.seconds)
             clickCount = 0
         }
@@ -67,18 +71,21 @@ internal fun AppVersionButton(
         supportingText = appVersionName,
         trailingIcon = null,
     ) {
-        clickCount = clickCount.inc().coerceIn(0, UNLOCK_CLICK_COUNT)
+        clickCount = clickCount.inc().coerceIn(0, KEEP_CLICK_COUNT)
 
         when {
             clickCount == UNLOCKED_CLICK_COUNT && hiddenFeaturesUnlocked -> {
-                clickCount = 0
                 scope.launch { showToast(Res.string.modules_already_unlocked) }
             }
 
-            clickCount == UNLOCK_CLICK_COUNT -> {
-                clickCount = 0
+            clickCount == UNLOCK_CLICK_COUNT && !hiddenFeaturesUnlocked -> {
                 onUnlockHiddenFeatures()
                 scope.launch { showToast(Res.string.modules_unlocked) }
+            }
+
+            clickCount == KEEP_CLICK_COUNT -> {
+                clickCount = 0
+                hiddenFeatures.keep()
             }
         }
     }
