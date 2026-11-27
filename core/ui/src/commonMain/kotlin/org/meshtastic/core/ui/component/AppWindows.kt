@@ -16,14 +16,19 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TooltipScope
+import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import co.touchlab.kermit.Logger
 
@@ -75,4 +80,30 @@ fun Popup(
 /** Writes once, to the log, which scale a window got (for diagnosing a window that looks too big or too small). */
 internal fun logWindowScale(name: String, density: Density) {
     Logger.d { "Okno $name: skala ${density.density} / tekst ${density.fontScale}" }
+}
+
+/**
+ * The Material tooltip box with the in-app interface scale kept in the tooltip. The tooltip opens in its own window,
+ * which would otherwise fall back to the system scale.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TooltipBox(
+    positionProvider: PopupPositionProvider,
+    tooltip: @Composable TooltipScope.() -> Unit,
+    state: TooltipState,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val appDensity = LocalDensity.current
+    androidx.compose.material3.TooltipBox(
+        positionProvider = positionProvider,
+        tooltip = {
+            val scope = this
+            ProvideAppDensity(appDensity) { scope.tooltip() }
+        },
+        state = state,
+        modifier = modifier,
+        content = content,
+    )
 }

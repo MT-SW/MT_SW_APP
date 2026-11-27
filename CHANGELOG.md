@@ -134,6 +134,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Badanie sygnału (wszystkie wersje): karta dotkniętego kwadratu pokazuje jak dotąd najlepszy odczyt, a pod nim rozwijaną listę „Wszystkie odczyty w tym kwadracie”: węzeł, RSSI, SNR, godzina i czy odczyt był bezpośredni, czy przez przekaźnik (najlepszy z gwiazdką). Dzięki temu odczyty z jednego miejsca nie zlewają się w jeden punkt.
 * Wędrówki (wszystkie wersje): dotknięcie lub przesunięcie palca po jednym wykresie pokazuje ten sam moment na wszystkich wykresach trasy (wysokość, prędkość, dystans, sygnał).
 * Wędrówki (wszystkie wersje): na liście wędrówek przycisk „Wczytaj wędrówkę z pliku (JSON)” wczytuje wędrówkę zapisaną wcześniej do pliku (ten sam format co udostępnianie). Błędy odczytu trafiają tylko do logu.
+* Skalowanie interfejsu (wszystkie wersje): podpowiedzi (dymki przy ikonach) również trzymają ustawioną skalę aplikacji.
 * iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
 * Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
 * Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
@@ -259,6 +260,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 * Badanie sygnału (wszystkie wersje): karta dotkniętego kwadratu pokazuje jak dotąd najlepszy odczyt, a pod nim rozwijaną listę „Wszystkie odczyty w tym kwadracie”: węzeł, RSSI, SNR, godzina i czy odczyt był bezpośredni, czy przez przekaźnik (najlepszy z gwiazdką). Dzięki temu odczyty z jednego miejsca nie zlewają się w jeden punkt.
 * Wędrówki (wszystkie wersje): dotknięcie lub przesunięcie palca po jednym wykresie pokazuje ten sam moment na wszystkich wykresach trasy (wysokość, prędkość, dystans, sygnał).
 * Wędrówki (wszystkie wersje): na liście wędrówek przycisk „Wczytaj wędrówkę z pliku (JSON)” wczytuje wędrówkę zapisaną wcześniej do pliku (ten sam format co udostępnianie). Błędy odczytu trafiają tylko do logu.
+* Skalowanie interfejsu (wszystkie wersje): podpowiedzi (dymki przy ikonach) również trzymają ustawioną skalę aplikacji.
 * iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
 * Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
 * Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
@@ -1165,6 +1167,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Signal survey (all versions): the card of a tapped square shows the best reading as before, and below it an expandable list "All readings in this square": node, RSSI, SNR, time and whether the reading was direct or via a relay (the best one has a star). Readings from one place no longer merge into a single point.
 * Hikes (all versions): touching or dragging on one chart shows the same moment on all the route charts (height, speed, distance, signal).
 * Hikes (all versions): the hikes list has a "Load a hike from a file (JSON)" button that loads a hike saved earlier to a file (the same format as sharing). Read errors go to the log only.
+* Interface scale (all versions): tooltips (the bubbles next to icons) also keep the app's chosen scale.
 * iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
 * Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
 * GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
@@ -1283,6 +1286,7 @@ Every new change goes under the heading of the current version.
 * Signal survey (all versions): the card of a tapped square shows the best reading as before, and below it an expandable list "All readings in this square": node, RSSI, SNR, time and whether the reading was direct or via a relay (the best one has a star). Readings from one place no longer merge into a single point.
 * Hikes (all versions): touching or dragging on one chart shows the same moment on all the route charts (height, speed, distance, signal).
 * Hikes (all versions): the hikes list has a "Load a hike from a file (JSON)" button that loads a hike saved earlier to a file (the same format as sharing). Read errors go to the log only.
+* Interface scale (all versions): tooltips (the bubbles next to icons) also keep the app's chosen scale.
 * iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
 * Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
 * GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
