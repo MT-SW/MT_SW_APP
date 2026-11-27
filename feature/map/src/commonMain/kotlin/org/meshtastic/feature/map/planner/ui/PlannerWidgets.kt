@@ -60,6 +60,8 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Warning
+import androidx.compose.ui.platform.LocalDensity
+import org.meshtastic.core.ui.component.ProvideAppDensity
 
 /** A titled card; [info] adds the "i" button of that topic next to the title. */
 @Composable
@@ -276,16 +278,19 @@ internal fun <T> PlannerDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
+        val appDensity = LocalDensity.current
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { (value, text) ->
-                DropdownMenuItem(
-                    text = { Text(text) },
-                    onClick = {
-                        onSelect(value)
-                        expanded = false
-                    },
-                )
+            ProvideAppDensity(appDensity) {
+                options.forEach { (value, text) ->
+                    DropdownMenuItem(
+                        text = { Text(text) },
+                        onClick = {
+                            onSelect(value)
+                            expanded = false
+                        },
+                    )
             }
+                    }
         }
     }
 }

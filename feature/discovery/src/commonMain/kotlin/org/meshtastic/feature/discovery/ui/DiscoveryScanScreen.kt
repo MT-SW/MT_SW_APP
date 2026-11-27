@@ -108,6 +108,8 @@ import org.meshtastic.feature.discovery.ui.component.DwellProgressIndicator
 import org.meshtastic.feature.discovery.ui.component.MeshBeaconInvitationCard
 import org.meshtastic.feature.discovery.ui.component.PresetPickerCard
 import org.meshtastic.proto.ChannelSet
+import androidx.compose.ui.platform.LocalDensity
+import org.meshtastic.core.ui.component.ProvideAppDensity
 
 private val CONTENT_PADDING = 16.dp
 private val SECTION_SPACING = 16.dp
@@ -373,16 +375,19 @@ private fun DwellTimePicker(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 )
+                val appDensity = LocalDensity.current
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DWELL_OPTIONS.forEach { minutes ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.discovery_dwell_minutes, minutes)) },
-                            onClick = {
-                                onMinuteSelect(minutes)
-                                expanded = false
-                            },
-                        )
+                    ProvideAppDensity(appDensity) {
+                        DWELL_OPTIONS.forEach { minutes ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.discovery_dwell_minutes, minutes)) },
+                                onClick = {
+                                    onMinuteSelect(minutes)
+                                    expanded = false
+                                },
+                            )
                     }
+                                    }
                 }
             }
         }

@@ -52,6 +52,7 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.enums.enumEntries
 import kotlin.jvm.JvmName
+import androidx.compose.ui.platform.LocalDensity
 
 // Reified so the entries come from enumEntries, which every target has; reading them off an instance takes JVM
 // reflection, which Kotlin/Wasm and Kotlin/Native lack.
@@ -223,38 +224,41 @@ fun <T> DropDownPreference(
                     null
                 },
             )
+            val appDensity = LocalDensity.current
             ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                items.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        modifier = selectionOption.testTag?.let { Modifier.testTag(it) } ?: Modifier,
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (selectionOption.icon != null) {
-                                    Icon(
-                                        imageVector = selectionOption.icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                } else if (selectionOption.color != null) {
-                                    Icon(
-                                        painter = ColorPainter(selectionOption.color),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
-                                        tint = Color.Unspecified,
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
+                ProvideAppDensity(appDensity) {
+                    items.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            modifier = selectionOption.testTag?.let { Modifier.testTag(it) } ?: Modifier,
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (selectionOption.icon != null) {
+                                        Icon(
+                                            imageVector = selectionOption.icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                    } else if (selectionOption.color != null) {
+                                        Icon(
+                                            painter = ColorPainter(selectionOption.color),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = Color.Unspecified,
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                    }
+                                    Text(selectionOption.label)
                                 }
-                                Text(selectionOption.label)
-                            }
-                        },
-                        enabled = selectionOption.enabled,
-                        onClick = {
-                            onItemSelected(selectionOption.value)
-                            expanded = false
-                        },
-                    )
+                            },
+                            enabled = selectionOption.enabled,
+                            onClick = {
+                                onItemSelected(selectionOption.value)
+                                expanded = false
+                            },
+                        )
                 }
+                            }
             }
         }
     }

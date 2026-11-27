@@ -313,6 +313,8 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
         return
     }
     val shape = RoundedCornerShape(BUBBLE_CORNER_DP.dp)
+    // The menu opens in its own window, which would lose the in-app scale; its content gets it back.
+    val appDensity = androidx.compose.ui.platform.LocalDensity.current
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
@@ -323,17 +325,19 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
         shadowElevation = 0.dp,
     ) {
         // The margin gives the shadow room, so the menu window does not cut the edges of the bubble.
-        Box(modifier = Modifier.padding(BUBBLE_MARGIN_DP.dp)) {
-            val backing = MaterialTheme.colorScheme.surface.copy(alpha = BUBBLE_BACKING_ALPHA)
-            Box(
-                modifier =
-                Modifier.cardShadow(BUBBLE_SHADOW_DP.toFloat(), shape, isDarkSurface())
-                    .background(backing, shape)
-                    .decorated(decor, shape)
-                    .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),
-            ) {
-                content()
-            }
+        ProvideAppDensity(appDensity) {
+            Box(modifier = Modifier.padding(BUBBLE_MARGIN_DP.dp)) {
+                val backing = MaterialTheme.colorScheme.surface.copy(alpha = BUBBLE_BACKING_ALPHA)
+                Box(
+                    modifier =
+                    Modifier.cardShadow(BUBBLE_SHADOW_DP.toFloat(), shape, isDarkSurface())
+                        .background(backing, shape)
+                        .decorated(decor, shape)
+                        .padding(horizontal = BUBBLE_PADDING_DP.dp, vertical = BUBBLE_PADDING_DP.dp / 2),
+                ) {
+                    content()
+                }
+        }
         }
     }
 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.UiOptions
+import androidx.compose.ui.platform.LocalDensity
 
 private const val MENU_CORNER_DP = 20
 private const val MENU_PADDING_DP = 8
@@ -57,25 +58,29 @@ fun DropdownMenu(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(MENU_CORNER_DP.dp)
+    // The menu opens in its own window, which would lose the in-app scale; its content gets it back.
+    val appDensity = LocalDensity.current
     DropdownMenuPopup(expanded = expanded, onDismissRequest = onDismissRequest, offset = offset) {
-        Box(
-            modifier =
-            modifier
-                // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under it.
-                .background(MaterialTheme.colorScheme.surface, shape)
-                .elementLook(UiOptions.GROUP_DIALOGS, shape)
-                .popupRim(shape)
-                .clip(shape),
-        ) {
-            val scroll = rememberScrollState()
-            Column(
+        ProvideAppDensity(appDensity) {
+            Box(
                 modifier =
-                Modifier.width(IntrinsicSize.Max).verticalScroll(scroll).padding(vertical = MENU_PADDING_DP.dp),
+                modifier
+                    // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under it.
+                    .background(MaterialTheme.colorScheme.surface, shape)
+                    .elementLook(UiOptions.GROUP_DIALOGS, shape)
+                    .popupRim(shape)
+                    .clip(shape),
             ) {
-                content()
+                val scroll = rememberScrollState()
+                Column(
+                    modifier =
+                    Modifier.width(IntrinsicSize.Max).verticalScroll(scroll).padding(vertical = MENU_PADDING_DP.dp),
+                ) {
+                    content()
+                }
+                // A long menu can be dragged by its bar on the computer, like every other scrolling list.
+                FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
             }
-            // A long menu can be dragged by its bar on the computer, like every other scrolling list.
-            FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

@@ -18,6 +18,9 @@ package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -287,6 +291,7 @@ private const val DIALOG_MIN_ALPHA = 0.85f
  * and the thin rim with the sheen of the "dialogs" group, and its see-through level. Use this instead of the Material
  * one so that every window looks the same.
  */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
@@ -312,23 +317,69 @@ fun AlertDialog(
         } else {
             1f
         }
-    androidx.compose.material3.AlertDialog(
+    // The dialog opens in its own window, which would lose the in-app scale; its content gets it back.
+    val appDensity = LocalDensity.current
+    BasicAlertDialog(
         onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
         modifier = modifier.elementLook(UiOptions.GROUP_DIALOGS, shape).popupRim(shape),
-        dismissButton = dismissButton,
-        icon = icon,
-        title = title,
-        text = text,
-        shape = shape,
-        containerColor = containerColor.copy(alpha = containerColor.alpha * fade),
-        iconContentColor = iconContentColor,
-        titleContentColor = titleContentColor,
-        textContentColor = textContentColor,
-        tonalElevation = tonalElevation,
         properties = properties,
-    )
+    ) {
+        ProvideAppDensity(appDensity) {
+            Surface(
+                modifier = Modifier.widthIn(min = ALERT_MIN_WIDTH_DP.dp, max = ALERT_MAX_WIDTH_DP.dp),
+                shape = shape,
+                color = containerColor.copy(alpha = containerColor.alpha * fade),
+                tonalElevation = tonalElevation,
+            ) {
+                Column(modifier = Modifier.padding(ALERT_PADDING_DP.dp)) {
+                    val centered = icon != null
+                    if (icon != null) {
+                        CompositionLocalProvider(LocalContentColor provides iconContentColor) {
+                            Box(modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)) {
+                                icon()
+                            }
+                        }
+                    }
+                    if (title != null) {
+                        CompositionLocalProvider(LocalContentColor provides titleContentColor) {
+                            ProvideTextStyle(MaterialTheme.typography.headlineSmall) {
+                                Box(
+                                    modifier =
+                                    Modifier.align(if (centered) Alignment.CenterHorizontally else Alignment.Start)
+                                        .padding(bottom = 16.dp),
+                                ) {
+                                    title()
+                                }
+                            }
+                        }
+                    }
+                    if (text != null) {
+                        CompositionLocalProvider(LocalContentColor provides textContentColor) {
+                            ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                                Box(
+                                    modifier =
+                                    Modifier.weight(1f, fill = false).align(Alignment.Start).padding(bottom = 24.dp),
+                                ) {
+                                    text()
+                                }
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier.align(Alignment.End)) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            dismissButton?.invoke()
+                            confirmButton()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
+private const val ALERT_MIN_WIDTH_DP = 280
+private const val ALERT_MAX_WIDTH_DP = 560
+private const val ALERT_PADDING_DP = 24
 
 /**
  * MT_SW: how much of the fill of a pop-up window (dialog, menu, sheet) is left for the look chosen for the "dialogs"

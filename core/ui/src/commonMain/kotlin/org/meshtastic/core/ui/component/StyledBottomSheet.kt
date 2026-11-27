@@ -56,7 +56,6 @@ import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource

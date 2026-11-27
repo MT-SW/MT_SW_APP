@@ -41,6 +41,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.ui.theme.AppTheme
+import androidx.compose.ui.platform.LocalDensity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,20 +76,22 @@ fun BitwisePreference(
             enabled = enabled,
             supportingText = { if (summary != null) Text(text = summary) },
         )
+        val appDensity = LocalDensity.current
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = item.second, overflow = TextOverflow.Ellipsis)
-                        Checkbox(
-                            modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.End),
-                            checked = value and item.first != 0,
-                            onCheckedChange = { onItemSelected(value xor item.first) },
-                            enabled = enabled,
-                        )
-                    },
-                    onClick = { onItemSelected(value xor item.first) },
-                )
+            ProvideAppDensity(appDensity) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = item.second, overflow = TextOverflow.Ellipsis)
+                            Checkbox(
+                                modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.End),
+                                checked = value and item.first != 0,
+                                onCheckedChange = { onItemSelected(value xor item.first) },
+                                enabled = enabled,
+                            )
+                        },
+                        onClick = { onItemSelected(value xor item.first) },
+                    )
             }
             PreferenceFooter(
                 enabled = enabled,
@@ -97,6 +100,7 @@ fun BitwisePreference(
                 positiveText = stringResource(Res.string.close),
                 onPositiveClicked = { expanded = false },
             )
+                    }
         }
     }
 }

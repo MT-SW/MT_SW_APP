@@ -35,7 +35,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -44,7 +43,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -101,6 +99,13 @@ import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.time
 import org.meshtastic.core.resources.waypoint_edit
 import org.meshtastic.core.resources.waypoint_new
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.window.DialogProperties
+import org.meshtastic.core.model.UiOptions
+import org.meshtastic.core.ui.component.Dialog
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.popupRim
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FilterChip
@@ -566,9 +571,9 @@ private fun ExpiryDatePickerDialog(initial: LocalDateTime, onPick: (LocalDate) -
         rememberDatePickerState(
             initialSelectedDateMillis = initial.date.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds(),
         )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
+    PickerWindow(
+        onDismiss = onDismiss,
+        confirm = {
             TextButton(
                 onClick = {
                     state.selectedDateMillis?.let { millis ->
@@ -579,7 +584,6 @@ private fun ExpiryDatePickerDialog(initial: LocalDateTime, onPick: (LocalDate) -
                 Text(stringResource(Res.string.save))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
     ) {
         DatePicker(state = state)
     }
@@ -595,17 +599,59 @@ private fun ExpiryDatePickerDialog(initial: LocalDateTime, onPick: (LocalDate) -
 @Composable
 private fun ExpiryTimePickerDialog(initial: LocalDateTime, onPick: (Int, Int) -> Unit, onDismiss: () -> Unit) {
     val state = rememberTimePickerState(initialHour = initial.hour, initialMinute = initial.minute)
-    TimePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
+    PickerWindow(
+        onDismiss = onDismiss,
+        confirm = {
             TextButton(onClick = { onPick(state.hour, state.minute) }) { Text(stringResource(Res.string.save)) }
         },
         title = { Text(stringResource(Res.string.time)) },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
     ) {
         TimePicker(state = state)
     }
 }
+
+/**
+ * MT_SW: the window of the date and time pickers, in our look and with the in-app scale (the Material picker windows
+ * open in a window of their own that loses the scale). Same buttons as before: cancel and save.
+ */
+@Composable
+private fun PickerWindow(
+    onDismiss: () -> Unit,
+    confirm: @Composable () -> Unit,
+    title: (@Composable () -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    val shape = RoundedCornerShape(PICKER_CORNER_DP.dp)
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(
+            modifier =
+            Modifier.padding(PICKER_MARGIN_DP.dp).elementLook(UiOptions.GROUP_DIALOGS, shape).popupRim(shape),
+            shape = shape,
+            tonalElevation = PICKER_ELEVATION_DP.dp,
+        ) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()).padding(PICKER_PADDING_DP.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                title?.invoke()
+                content()
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    horizontalArrangement = Arrangement.spacedBy(PICKER_BUTTON_GAP_DP.dp),
+                ) {
+                    TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) }
+                    confirm()
+                }
+            }
+        }
+    }
+}
+
+private const val PICKER_CORNER_DP = 28
+private const val PICKER_MARGIN_DP = 16
+private const val PICKER_ELEVATION_DP = 6
+private const val PICKER_PADDING_DP = 16
+private const val PICKER_BUTTON_GAP_DP = 8
 
 /**
  * Whether this `expire` value names a real expiry.
