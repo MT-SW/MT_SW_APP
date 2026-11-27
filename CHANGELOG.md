@@ -68,6 +68,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **MT_SW_FIRMWARE v3.** Zapytanie o statystyki sieci LAN w Diagnostyce na żądanie i odczyt siły sygnału Bluetooth telefonu.
 
 ##### Ulepszenia
+* Zdalne listy (wszystkie wersje): okno pamięta ostatnio wybrane węzły osobno dla ulubionych, ignorowanych i dodawanych kontaktów; pod wyborem są chipy do dotknięcia, „Użyj wszystkich” i „Wyczyść tę listę” (każda pamięć czyszczona osobno).
 * Mapa (wszystkie wersje, najbardziej iPhone): przewijanie mapy jest płynniejsze, bo ekran mapy i przyciski nie przeliczają się już przy każdej klatce przesuwania, tylko gdy zmienia się obrót lub pochylenie.
 * Sterowanie GPIO (wszystkie wersje): aplikacja sama wykrywa MT_SW_FIRMWARE v3 (wersję węzła sprawdza raz na tydzień) i dla v3 nie wysyła już kanałem „gpio”, tylko jak zdalną komendę administratora; dla pozostałych węzłów nic się nie zmienia.
 * Sterowanie GPIO (wszystkie wersje): okno informacji i dokumentacja opisują, że w MT_SW_FIRMWARE v3 sterowanie nie wymaga kanału „gpio”, bo idzie przez zdalnego admina (klucze administratora); na starszym oprogramowaniu kanał nadal jest potrzebny, a w oryginale i starszych wersjach moduł zwraca stany pinów kanałem głównym (ostrzeżenie w oknie informacji i dokumentacji).
@@ -243,6 +244,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Zdalne listy (wszystkie wersje): okno pamięta ostatnio wybrane węzły osobno dla ulubionych, ignorowanych i dodawanych kontaktów; pod wyborem są chipy do dotknięcia, „Użyj wszystkich” i „Wyczyść tę listę” (każda pamięć czyszczona osobno).
 * Okna (wszystkie wersje): przeciągnięcie w dół zamyka teraz także okna z przewijaną listą (np. warstwy mapy, filtr mapy, planer); wcześniej ruch zabrany przez listę nie był liczony i zamykały się tylko okna bez przewijania.
 * Okna (wszystkie wersje): okno otwarte z wnętrza innego okna (wybór węzła do zdalnych list, wędrówka z listy Wędrówek) ma własne pełne tło, więc tekst okna pod spodem nie prześwituje, a kolory jasny/ciemny w oknach są liczone z tła motywu (nie z przezroczystej powierzchni okna).
 * iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
@@ -1086,6 +1088,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **MT_SW_FIRMWARE v3.** A query for LAN network statistics in On-demand diagnostics and reading of the phone's Bluetooth signal strength.
 
 ##### Improvements
+* Remote lists (all versions): the window remembers the nodes last picked separately for favorites, ignored nodes and added contacts; chips to tap, "Use all" and "Clear this list" appear under the picker (each memory is cleared on its own).
 * Map (all versions, mostly iPhone): panning the map is smoother, because the map screen and its buttons no longer recompute on every frame of a pan, only when the rotation or the tilt changes.
 * GPIO control (all versions): the app detects MT_SW_FIRMWARE v3 by itself (it checks the node's version once a week) and for v3 no longer sends on the gpio channel but like a remote admin command; other nodes are unchanged.
 * GPIO control (all versions): the info window and the documentation describe that in MT_SW_FIRMWARE v3 the control does not need the gpio channel, because it goes through the remote admin (the administrator keys); older firmware still needs the channel, and in the original and older versions the module returns the pin states on the main channel (warning in the info window and the documentation).
@@ -1253,6 +1256,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Remote lists (all versions): the window remembers the nodes last picked separately for favorites, ignored nodes and added contacts; chips to tap, "Use all" and "Clear this list" appear under the picker (each memory is cleared on its own).
 * Windows (all versions): dragging down now also closes windows with a scrolling list (e.g. map layers, map filter, planner); before, a move taken by the list was not counted and only windows without scrolling closed.
 * Windows (all versions): a window opened from inside another window (node picker for remote lists, a hike from the hikes list) has its own solid background, so the text of the window below no longer shows through, and light/dark colours inside windows are judged from the theme background (not from the window's transparent surface).
 * iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
