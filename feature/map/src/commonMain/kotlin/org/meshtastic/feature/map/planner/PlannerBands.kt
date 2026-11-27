@@ -103,5 +103,5 @@ object PlannerBands {
  */
 fun plannerRadioFromPreset(preset: ModemPreset?): PlannerRadio {
     val option = ChannelOption.from(preset) ?: ChannelOption.DEFAULT
-    return PlannerRadio(option.bandwidth.toDouble() * 1000.0, option.spreadingFactor)
+    return PlannerRadio(option.preciseBandwidthKHz, option.spreadingFactor)
 }

@@ -87,6 +87,9 @@ private fun LoRaConfig.bandwidth(regionInfo: RegionInfo?): Float {
 
 private const val DEFAULT_BANDWIDTH_MHZ = 0.25f
 
+/** The chip's true bandwidth for the Tiny presets (see [ChannelOption.preciseBandwidthKHz]). */
+private const val TINY_CHIP_BANDWIDTH_KHZ = 15.625
+
 /**
  * Effective RF channel bandwidth in kHz for this LoRa configuration, honoring [LoRaConfig.use_preset] vs a custom
  * [LoRaConfig.bandwidth] value and the region's wide-LoRa scaling factor.
@@ -536,6 +539,11 @@ enum class ChannelOption(
     val removedInFirmware: DeviceVersion? = null,
     /** Whether a wide-LoRa (2.4 GHz) region scales [bandwidth] by 3.25, as firmware does for the original presets. */
     val widensOnWideLora: Boolean = true,
+    /**
+     * The channel's true (chip) bandwidth in kHz, only where it differs from [bandwidth] * 1000 - firmware's own
+     * slot-timing math rounds Tiny's 15.625 kHz down to 15.6, but the chip still runs the channel at 15.625.
+     */
+    private val preciseBandwidthKHzOverride: Double? = null,
 ) {
     // Grouped by range and speed for better readability.
     // Preset parameters mirror firmware's modemPresetToParams (src/mesh/MeshRadio.h).
@@ -604,6 +612,7 @@ enum class ChannelOption(
         codingRate = 5,
         minFirmware = FIRMWARE_2_8,
         widensOnWideLora = false,
+        preciseBandwidthKHzOverride = TINY_CHIP_BANDWIDTH_KHZ,
     ),
     TINY_SLOW(
         ModemPreset.TINY_SLOW,
@@ -612,11 +621,20 @@ enum class ChannelOption(
         codingRate = 6,
         minFirmware = FIRMWARE_2_8,
         widensOnWideLora = false,
+        preciseBandwidthKHzOverride = TINY_CHIP_BANDWIDTH_KHZ,
     ),
     ;
 
     // Semtech demodulation floor: -7.5 dB at SF7, improving 2.5 dB per SF step.
     // Bandwidth changes sensitivity in dBm, not this SNR threshold.
+    /**
+     * The channel's true (chip) bandwidth in kHz. Link-budget and time-on-air math (the Planner, the assistant)
+     * should use this instead of [bandwidth] * 1000, which is firmware's own (sometimes rounded) slot-timing
+     * value.
+     */
+    val preciseBandwidthKHz: Double
+        get() = preciseBandwidthKHzOverride ?: (bandwidth.toDouble() * 1000.0)
+
     val snrLimit: Float
         get() = SNR_FLOOR_SF7_DB - SNR_FLOOR_PER_SF_DB * (spreadingFactor - MIN_SPREADING_FACTOR)
 
