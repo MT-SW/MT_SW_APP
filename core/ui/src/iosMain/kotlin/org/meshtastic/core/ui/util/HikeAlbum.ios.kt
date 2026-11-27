@@ -32,6 +32,7 @@ import platform.Foundation.NSMutableArray
 import platform.Foundation.NSNumber
 import platform.Foundation.NSUserDefaults
 import platform.Foundation.create
+import platform.Foundation.valueForKey
 import platform.Photos.PHAsset
 import platform.Photos.PHAssetChangeRequest
 import platform.Photos.PHAssetCollection
