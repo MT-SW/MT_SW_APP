@@ -44,6 +44,7 @@ fun ProvideAppDensity(density: Density, content: @Composable () -> Unit) {
 }
 
 /** The same as the Compose `Dialog`, but its content keeps the in-app scale. */
+@Suppress("UnnecessaryLaunchedEffect") // logged once per opening, not on every recomposition
 @Composable
 fun Dialog(
     onDismissRequest: () -> Unit,

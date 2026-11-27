@@ -101,6 +101,7 @@ private class Sample(val t: Long, val v: Double)
  * the end of the hike), so a place on one chart is the same moment on every other. A touch or a drag shows the value at
  * that moment.
  */
+@Suppress("LongMethod", "UnnecessaryLaunchedEffect") // the log line is written once per hike
 @Composable
 internal fun TripCharts(trip: Trip) {
     val start = trip.points.firstOrNull()?.t ?: return
@@ -233,6 +234,7 @@ private fun Modifier.glassChartCard(): Modifier {
         .border(1.dp, colors.outlineVariant.copy(alpha = CARD_RIM_ALPHA), shape)
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun Chart(
     title: String,

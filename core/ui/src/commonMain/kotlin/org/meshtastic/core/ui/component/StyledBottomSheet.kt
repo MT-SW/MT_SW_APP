@@ -82,6 +82,7 @@ private const val WHEEL_CLOSE_TICKS = 3f
  * made transparent, so a window opened from within another window (a node picker over a list window, a hike over the
  * hikes list) would otherwise take that transparent colour for its own background and show the window below through.
  */
+@Suppress("CompositionLocalAllowlist")
 internal val LocalWindowSurface = compositionLocalOf<Color?> { null }
 
 /** Width kept free at the right of a window's first row for the close cross (an icon button plus its margin). */
@@ -93,7 +94,7 @@ const val SHEET_CROSS_INSET_DP = 52
  * Use this instead of the Material one so that every sheet looks the same.
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("UNUSED_PARAMETER")
+@Suppress("UNUSED_PARAMETER", "UnnecessaryLaunchedEffect")
 @Composable
 fun ModalBottomSheet(
     onDismissRequest: () -> Unit,

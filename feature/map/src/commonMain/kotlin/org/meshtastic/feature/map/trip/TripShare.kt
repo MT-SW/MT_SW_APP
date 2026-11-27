@@ -106,7 +106,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
      * The whole hike as a file in the same form that is shared (route, places, the chosen picture link of each place
      * where it was uploaded), for saving on the device. Nothing is uploaded. Null when the hike is not found.
      */
-    suspend fun exportJson(tripId: String): String? {
+    fun exportJson(tripId: String): String? {
         val trip = store.find(tripId) ?: return null
         val stops =
             trip.stops
@@ -137,7 +137,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
      * ([ARCHIVE_ROUTE]) and the pictures next to it, so nothing needs the internet to be read back. Null when the hike
      * is not found.
      */
-    suspend fun exportArchive(tripId: String): ByteArray? {
+    fun exportArchive(tripId: String): ByteArray? {
         val trip = store.find(tripId) ?: return null
         val files = mutableListOf<Pair<String, ByteArray>>()
         val stops =

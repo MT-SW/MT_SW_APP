@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -132,7 +133,9 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                             tripShare.importFile(bytes.decodeToString())
                         }
                     Logger.i { "Wędrówki: wczytana z pliku, id $id" }
-                } catch (e: Exception) {
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                     Logger.w(e) { "Wędrówki: plik nie jest poprawną wędrówką: ${e.message}" }
                 }
             }
