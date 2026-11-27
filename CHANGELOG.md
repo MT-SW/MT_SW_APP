@@ -125,6 +125,11 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Pełny log (włączany ręcznie) zapisuje rozmiar okna i ekranu oraz zrzut okna, gdy interfejs się wysypie (nieobsłużony wyjątek), najwyżej raz na 30 s, do 60 plików; zrzuty znikają razem z najstarszymi częściami logu (siedem dni zapisanego czasu) i trafiają do paczki z logiem w folderze „zrzuty”. Automatyczny log z 24 godzin ich nie zapisuje (Android, komputer, iPhone/iPad).
 
 ##### Naprawione błędy
+* Okna (wszystkie wersje): przeciągnięcie w dół zamyka teraz także okna z przewijaną listą (np. warstwy mapy, filtr mapy, planer); wcześniej ruch zabrany przez listę nie był liczony i zamykały się tylko okna bez przewijania.
+* Okna (wszystkie wersje): okno otwarte z wnętrza innego okna (wybór węzła do zdalnych list, wędrówka z listy Wędrówek) ma własne pełne tło, więc tekst okna pod spodem nie prześwituje, a kolory jasny/ciemny w oknach są liczone z tła motywu (nie z przezroczystej powierzchni okna).
+* iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
+* Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
+* Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
 * Odczyt pinu GPIO (wszystkie wersje): „Odczytaj” zawsze kończył się brakiem odpowiedzi, bo aplikacja nie obsługiwała odpowiedzi modułu Remote Hardware; teraz odpowiedź jest przyjmowana.
 
 * Wybór urządzeń (wszystkie wersje): kafelek urządzenia pokazuje zawsze prawdziwą krótką nazwę (bez zastępowania końcówką numeru), pojawia się od razu po połączeniu i bierze dane z tego samego źródła co karta „Połącz”; poprawione dla węzła, który zmienił numer, i dla adresów zapisanych w innej postaci. Powody, dla których kafelka nie dało się narysować, trafiają do logu.
@@ -238,6 +243,11 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Okna (wszystkie wersje): przeciągnięcie w dół zamyka teraz także okna z przewijaną listą (np. warstwy mapy, filtr mapy, planer); wcześniej ruch zabrany przez listę nie był liczony i zamykały się tylko okna bez przewijania.
+* Okna (wszystkie wersje): okno otwarte z wnętrza innego okna (wybór węzła do zdalnych list, wędrówka z listy Wędrówek) ma własne pełne tło, więc tekst okna pod spodem nie prześwituje, a kolory jasny/ciemny w oknach są liczone z tła motywu (nie z przezroczystej powierzchni okna).
+* iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
+* Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
+* Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
 * Zdalne kontakty, ulubione i ignorowanie (wszystkie wersje): oryginał (Meshtastic-Android, commit 3147011b87, #8251, 25.11.2026) dodał własny ekran „Kontakty i ulubione” dla zdalnego węzła. Zostaje nasz panel zdalnych list w szczegółach węzła, który robi to samo i dodatkowo pozwala wybrać wiele węzłów naraz z własnej listy oraz wpisać ID ręcznie; ekranu z oryginału nie ma. Z oryginału przejęte są trzy rozwiązania: węzeł z naszej bazy idzie do zdalnego urządzenia razem z kluczem publicznym (węzeł wpisany ręcznie po ID idzie bez klucza), w urządzeniu z rolą Client Base ulubione ustawia się dopiero po potwierdzeniu kontaktu, a przed dodaniem do ulubionych i przed „Ignoruj” na zdalnym urządzeniu aplikacja pyta o potwierdzenie. Kontakt eksportowany (np. do kodu QR) zawsze niesie poprawny klucz (poprawka z oryginału).
 * Okienka zamiast wysuwanych list (wszystkie wersje): każde takie okienko (np. warstwy mapy, menu wiadomości) ma u góry krzyżyk zamykający i zamyka się też gestem przesunięcia w dół z dowolnego miejsca okna (przy przewijanej liście dopiero gdy lista jest na samej górze, więc zwykłe przewijanie nie zamyka okna); planer zachowuje swój oryginalny krzyżyk, bez drugiego.
 * Logi (wszystkie wersje): log z ostatnich 24 godzin jest zawsze włączony na poziomie szczegółowym i nie da się go wyłączyć (przełącznik zastąpiła informacja); pełny log zapisuje się dalej po włączeniu i czyści się po najwyżej siedmiu dniach zapisanego czasu. Zgoda na dane ma nowy punkt o logach i pojawia się ponownie, żeby każdy ją przyjął.
@@ -1132,6 +1142,11 @@ The main things of every version, split by kind of change (the "What's new in th
 * The full log (switched on by hand) saves the size of the window and screen and a picture of the window when the interface crashes (an unhandled exception), at most once in 30 s, up to 60 files; the pictures go together with the oldest log parts (seven recorded days) and are put into the log package in a "zrzuty" folder. The automatic 24-hour log does not save them (Android, desktop, iPhone/iPad).
 
 ##### Fixed bugs
+* Windows (all versions): dragging down now also closes windows with a scrolling list (e.g. map layers, map filter, planner); before, a move taken by the list was not counted and only windows without scrolling closed.
+* Windows (all versions): a window opened from inside another window (node picker for remote lists, a hike from the hikes list) has its own solid background, so the text of the window below no longer shows through, and light/dark colours inside windows are judged from the theme background (not from the window's transparent surface).
+* iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
+* Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
+* GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
 * GPIO pin read (all versions): "Read" always ended with no response, because the app did not handle the Remote Hardware module's answer; the answer is now accepted.
 
 * Device chooser (all versions): the plate of a device always shows the real short name (never the end of the node number), appears at once after connecting and takes its data from the same source as the "Connect" card; fixed for a node that changed its number and for addresses stored in another form. The reasons why a plate could not be drawn go to the log.
@@ -1238,6 +1253,11 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Windows (all versions): dragging down now also closes windows with a scrolling list (e.g. map layers, map filter, planner); before, a move taken by the list was not counted and only windows without scrolling closed.
+* Windows (all versions): a window opened from inside another window (node picker for remote lists, a hike from the hikes list) has its own solid background, so the text of the window below no longer shows through, and light/dark colours inside windows are judged from the theme background (not from the window's transparent surface).
+* iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
+* Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
+* GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
 * Remote contacts, favorites and ignoring (all versions): the original (Meshtastic-Android, commit 3147011b87, #8251, 25 November 2026) added its own "Contacts and favorites" screen for a remote node. Our panel of remote lists in the node details stays; it does the same and additionally lets you pick many nodes at once from your own list and type an ID by hand; the screen from the original is not included. Three solutions were taken from the original: a node from our database is sent to the remote device with its public key (a node typed in by its ID goes without a key), on a device with the Client Base role the favorite is set only after the contact is confirmed, and the app asks for confirmation before adding to favorites and before "Ignore" on a remote device. An exported contact (for example in a QR code) always carries a correct key (a fix from the original).
 * Pop-up windows instead of sliding lists (all versions): every such window (for example the map layers, the message menu) has a close cross at the top and also closes with a swipe down from anywhere on the window (with a scrolling list only when the list is at the very top, so normal scrolling never closes the window); the planner keeps its own original cross, without a second one.
 * Logs (all versions): the log of the last 24 hours is always on at the detailed level and cannot be switched off (a note replaced the switch); the full log is still written when switched on and is cleaned after at most seven days of recorded time. The data consent has a new point about logs and appears again so that everyone accepts it.
