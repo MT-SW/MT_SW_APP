@@ -191,6 +191,15 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                         gesture.closeOnce("Okno: zamknięte przesunięciem listy w dół (lista na górze)", close.value)
                     }
                 } else {
+                    // MT_SW: diagnostyka - niewykorzystany ruch w dół pojawił się (lista jest blisko góry), ale coś
+                    // go przerwało zanim doszedł do progu (np. lista "zjadła" go sama efektem gumowym na iPhonie).
+                    if (available.y > 0f && !gesture.closed) {
+                        Logger.d {
+                            "Okno: przesunięcie listy przerwane (zebrane ${dragged.toInt()}px z " +
+                                "${threshold.toInt()}px progu, zabrane przez listę=${consumed.y.toInt()}px, " +
+                                "zostało=${available.y.toInt()}px, źródło=$source)"
+                        }
+                    }
                     dragged = 0f
                 }
                 return Offset.Zero
