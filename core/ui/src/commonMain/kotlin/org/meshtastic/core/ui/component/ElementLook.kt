@@ -108,7 +108,7 @@ fun Modifier.elementLook(group: String, shape: Shape = RoundedCornerShape(12.dp)
     val options = rememberUiOptions()
     val style = options.element(group)
     return when (style.look) {
-        ElementLook.DEPTH -> depthLook(style.strength, shape, options.rimDp())
+        ElementLook.DEPTH -> depthLook(style.strength, shape, options.rimDp(), isDarkSurface())
 
         // MT_SW: glass casts a soft shadow of its own ("Shadow under glass"); on a dark theme a black shadow cannot
         // be seen, so there it is a soft light glow that lifts the element off the background.
@@ -354,9 +354,9 @@ private const val SHADOW_REACH = 0.8f
 const val SHADOW_ROOM_DP = 14
 
 /** The depth look of [elementLook], with its strength 0-100. */
-fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f): Modifier {
+fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f, dark: Boolean = false): Modifier {
     val s = strength.coerceIn(0, PERCENT.toInt()) / PERCENT
-    return this.shadow(elevation = (DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s).dp, shape = shape, clip = false)
+    return this.cardShadow(DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s, shape, dark)
         .drawWithContent {
             drawContent()
             val outline = shape.createOutline(size, layoutDirection, this)
@@ -479,7 +479,12 @@ fun StyledSurface(
             )
 
         style.look == ElementLook.DEPTH ->
-            Box(modifier = modifier.depthLook(style.strength, shape).clip(shape).background(baseColor)) { content() }
+            Box(
+                modifier =
+                modifier.depthLook(style.strength, shape, dark = dark).clip(shape).background(baseColor),
+            ) {
+                content()
+            }
 
         else ->
             Surface(
