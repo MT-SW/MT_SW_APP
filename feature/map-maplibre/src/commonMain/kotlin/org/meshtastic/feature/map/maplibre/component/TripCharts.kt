@@ -164,17 +164,35 @@ internal fun TripCharts(trip: Trip) {
                 "sygnał ${signal.size} punktów)"
         }
     }
+    // One touched moment for all the charts: a touch on one chart shows the same time on every other.
+    var selectedT by remember(trip.id) { mutableStateOf<Long?>(null) }
     val primary = MaterialTheme.colorScheme.primary
     val secondary = MaterialTheme.colorScheme.secondary
     val tertiary = MaterialTheme.colorScheme.tertiary
-    if (heights.size >= 2) Chart(stringResource(Res.string.trips_chart_height), heights, "m", 0, primary, start, end)
-    if (climbed.size >= 2 && climbed.last().v > 0.0) {
-        Chart(stringResource(Res.string.trips_chart_climbed), climbed, "m", 0, tertiary, start, end)
+    if (heights.size >= 2) {
+        Chart(stringResource(Res.string.trips_chart_height), heights, "m", 0, primary, start, end, selectedT) {
+            selectedT = it
+        }
     }
-    if (speeds.size >= 2) Chart(stringResource(Res.string.trips_chart_speed), speeds, "km/h", 1, secondary, start, end)
-    if (pace.size >= 2) Chart(stringResource(Res.string.trips_chart_pace), pace, "min/km", 1, primary, start, end)
+    if (climbed.size >= 2 && climbed.last().v > 0.0) {
+        Chart(stringResource(Res.string.trips_chart_climbed), climbed, "m", 0, tertiary, start, end, selectedT) {
+            selectedT = it
+        }
+    }
+    if (speeds.size >= 2) {
+        Chart(stringResource(Res.string.trips_chart_speed), speeds, "km/h", 1, secondary, start, end, selectedT) {
+            selectedT = it
+        }
+    }
+    if (pace.size >= 2) {
+        Chart(stringResource(Res.string.trips_chart_pace), pace, "min/km", 1, primary, start, end, selectedT) {
+            selectedT = it
+        }
+    }
     if (distance.size >= 2) {
-        Chart(stringResource(Res.string.trips_chart_distance), distance, "km", 2, tertiary, start, end)
+        Chart(stringResource(Res.string.trips_chart_distance), distance, "km", 2, tertiary, start, end, selectedT) {
+            selectedT = it
+        }
     }
     if (signal.size >= 2) {
         // Normally the signal shares the time axis of the route. When its times lie outside the route (the clock of
@@ -184,7 +202,9 @@ internal fun TripCharts(trip: Trip) {
         val from = if (outside) signal.first().t else start
         val to = if (outside) signal.last().t else end
         if (outside) Logger.w { "Wędrówki: czasy sygnału poza trasą, wykres sygnału ma własną oś czasu" }
-        Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm", 0, secondary, from, to)
+        Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm", 0, secondary, from, to, selectedT) {
+            selectedT = it
+        }
     }
 }
 
@@ -222,6 +242,8 @@ private fun Chart(
     colour: Color,
     startT: Long,
     endT: Long,
+    selectedT: Long?,
+    onSelect: (Long?) -> Unit,
 ) {
     val low = values.minOf { it.v }
     val high = values.maxOf { it.v }
@@ -233,7 +255,8 @@ private fun Chart(
     val measurer = rememberTextMeasurer()
     val axisStyle = TextStyle(color = colors.onSurfaceVariant, fontSize = AXIS_FONT_SP.sp)
     val markerStyle = TextStyle(color = colors.onSurface, fontSize = MARKER_FONT_SP.sp)
-    var selected by remember(values) { mutableStateOf<Int?>(null) }
+    // The same moment on every chart: the value nearest in time to the touched one.
+    val selected = selectedT?.let { t -> values.indices.minByOrNull { kotlin.math.abs(values[it].t - t) } }
     Column {
         Text(
             text = "$title: ${NumberFormatter.format(low, decimals)}–${NumberFormatter.format(high, decimals)} $unit",
@@ -245,15 +268,16 @@ private fun Chart(
                 .padding(vertical = 4.dp)
                 .height(CHART_HEIGHT_DP.dp)
                 .then(if (glassCard) Modifier.glassChartCard() else Modifier)
-                .pointerInput(values, startT, endT) {
+                .pointerInput(values, startT, endT, onSelect) {
                     detectTapGestures { offset ->
-                        selected = nearest(values, offset.x, size.width.toFloat(), startT, endT)
+                        nearest(values, offset.x, size.width.toFloat(), startT, endT)?.let { onSelect(values[it].t) }
                     }
                 }
-                .pointerInput(values, startT, endT) {
+                .pointerInput(values, startT, endT, onSelect) {
                     detectHorizontalDragGestures { change, _ ->
                         change.consume()
-                        selected = nearest(values, change.position.x, size.width.toFloat(), startT, endT)
+                        nearest(values, change.position.x, size.width.toFloat(), startT, endT)
+                            ?.let { onSelect(values[it].t) }
                     }
                 },
         ) {
