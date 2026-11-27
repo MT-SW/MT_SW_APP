@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -56,12 +57,11 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_error_number
 import org.meshtastic.core.resources.planner_error_range
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.ProvideAppDensity
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Warning
-import androidx.compose.ui.platform.LocalDensity
-import org.meshtastic.core.ui.component.ProvideAppDensity
 
 /** A titled card; [info] adds the "i" button of that topic next to the title. */
 @Composable
@@ -289,8 +289,8 @@ internal fun <T> PlannerDropdown(
                             expanded = false
                         },
                     )
+                }
             }
-                    }
         }
     }
 }

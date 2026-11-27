@@ -80,7 +80,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
-import org.meshtastic.core.ui.component.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
@@ -101,6 +100,7 @@ import org.meshtastic.core.resources.emoji_no_results
 import org.meshtastic.core.resources.emoji_recently_used
 import org.meshtastic.core.resources.search_emoji
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.Popup
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon

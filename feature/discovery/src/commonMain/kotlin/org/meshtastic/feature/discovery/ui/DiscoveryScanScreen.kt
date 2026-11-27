@@ -49,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -91,6 +92,7 @@ import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ProvideAppDensity
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -108,8 +110,6 @@ import org.meshtastic.feature.discovery.ui.component.DwellProgressIndicator
 import org.meshtastic.feature.discovery.ui.component.MeshBeaconInvitationCard
 import org.meshtastic.feature.discovery.ui.component.PresetPickerCard
 import org.meshtastic.proto.ChannelSet
-import androidx.compose.ui.platform.LocalDensity
-import org.meshtastic.core.ui.component.ProvideAppDensity
 
 private val CONTENT_PADDING = 16.dp
 private val SECTION_SPACING = 16.dp
@@ -386,8 +386,8 @@ private fun DwellTimePicker(
                                     expanded = false
                                 },
                             )
+                        }
                     }
-                                    }
                 }
             }
         }

@@ -109,17 +109,19 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
     suspend fun exportJson(tripId: String): String? {
         val trip = store.find(tripId) ?: return null
         val stops =
-            trip.stops.sortedBy { it.t }.map { stop ->
-                val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
-                SharedStop(
-                    lat = stop.lat,
-                    lon = stop.lon,
-                    t = stop.t / MILLIS,
-                    title = stop.title,
-                    photo = photo?.url.orEmpty(),
-                    caption = photo?.caption.orEmpty(),
-                )
-            }
+            trip.stops
+                .sortedBy { it.t }
+                .map { stop ->
+                    val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
+                    SharedStop(
+                        lat = stop.lat,
+                        lon = stop.lon,
+                        t = stop.t / MILLIS,
+                        title = stop.title,
+                        photo = photo?.url.orEmpty(),
+                        caption = photo?.caption.orEmpty(),
+                    )
+                }
         val file =
             SharedTrip(
                 name = trip.name,
@@ -139,19 +141,21 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         val trip = store.find(tripId) ?: return null
         val files = mutableListOf<Pair<String, ByteArray>>()
         val stops =
-            trip.stops.sortedBy { it.t }.map { stop ->
-                val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
-                val bytes = photo?.let { store.photoBytes(tripId, it.file) }
-                val name = bytes?.let { "$ARCHIVE_PHOTO_DIR/${files.size + 1}.jpg".also { n -> files += n to it } }
-                SharedStop(
-                    lat = stop.lat,
-                    lon = stop.lon,
-                    t = stop.t / MILLIS,
-                    title = stop.title,
-                    photo = name.orEmpty(),
-                    caption = photo?.caption.orEmpty(),
-                )
-            }
+            trip.stops
+                .sortedBy { it.t }
+                .map { stop ->
+                    val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
+                    val bytes = photo?.let { store.photoBytes(tripId, it.file) }
+                    val name = bytes?.let { "$ARCHIVE_PHOTO_DIR/${files.size + 1}.jpg".also { n -> files += n to it } }
+                    SharedStop(
+                        lat = stop.lat,
+                        lon = stop.lon,
+                        t = stop.t / MILLIS,
+                        title = stop.title,
+                        photo = name.orEmpty(),
+                        caption = photo?.caption.orEmpty(),
+                    )
+                }
         val route =
             SharedTrip(
                 name = trip.name,

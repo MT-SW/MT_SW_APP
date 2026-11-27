@@ -55,7 +55,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.meshtastic.core.ui.component.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
@@ -70,6 +69,7 @@ import org.meshtastic.core.resources.device_model_banana_for_scale
 import org.meshtastic.core.resources.device_model_load_failed
 import org.meshtastic.core.resources.device_model_view_in_space
 import org.meshtastic.core.resources.info
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon

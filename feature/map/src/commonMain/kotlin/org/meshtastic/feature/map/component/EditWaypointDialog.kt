@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -40,6 +41,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -60,6 +62,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -71,6 +74,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.systemTimeZone
+import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.model.geofence.GeofenceRadiusPresets
 import org.meshtastic.core.model.isLocked
 import org.meshtastic.core.model.util.PUSHPIN_CODE_POINT
@@ -99,18 +103,14 @@ import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.time
 import org.meshtastic.core.resources.waypoint_edit
 import org.meshtastic.core.resources.waypoint_new
-import androidx.compose.material3.Surface
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.window.DialogProperties
-import org.meshtastic.core.model.UiOptions
-import org.meshtastic.core.ui.component.Dialog
-import org.meshtastic.core.ui.component.elementLook
-import org.meshtastic.core.ui.component.popupRim
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.Switch
+import org.meshtastic.core.ui.component.elementLook
+import org.meshtastic.core.ui.component.popupRim
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.CalendarMonth
 import org.meshtastic.core.ui.icon.Lock

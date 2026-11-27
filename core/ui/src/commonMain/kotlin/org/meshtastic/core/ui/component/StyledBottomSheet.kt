@@ -132,29 +132,29 @@ fun ModalBottomSheet(
             // gradient behind a flat fill. Inside the window that colour is transparent, so the whole window has
             // one background with one gradient.
             CompositionLocalProvider(LocalWindowSurface provides windowSurface) {
-            MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
-                Box {
-                    Column { content() }
-                    // A close cross in the top right corner, laid over the window (it takes no row of its own, so
-                    // there is no empty strip above the title). Headers with buttons of their own leave
-                    // SHEET_CROSS_INSET_DP free at the right. Windows that have their own original cross in their
-                    // header pass closeCross = false.
-                    if (closeCross) {
-                        IconButton(
-                            onClick = {
-                                Logger.i { "Okno: zamknięte krzyżykiem" }
-                                onDismissRequest()
-                            },
-                            modifier = Modifier.align(Alignment.TopEnd).padding(end = 4.dp),
-                        ) {
-                            Icon(
-                                imageVector = MeshtasticIcons.Close,
-                                contentDescription = stringResource(Res.string.close),
-                            )
+                MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
+                    Box {
+                        Column { content() }
+                        // A close cross in the top right corner, laid over the window (it takes no row of its own, so
+                        // there is no empty strip above the title). Headers with buttons of their own leave
+                        // SHEET_CROSS_INSET_DP free at the right. Windows that have their own original cross in their
+                        // header pass closeCross = false.
+                        if (closeCross) {
+                            IconButton(
+                                onClick = {
+                                    Logger.i { "Okno: zamknięte krzyżykiem" }
+                                    onDismissRequest()
+                                },
+                                modifier = Modifier.align(Alignment.TopEnd).padding(end = 4.dp),
+                            ) {
+                                Icon(
+                                    imageVector = MeshtasticIcons.Close,
+                                    contentDescription = stringResource(Res.string.close),
+                                )
+                            }
                         }
                     }
                 }
-            }
             }
         }
     }

@@ -91,7 +91,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.ui.component.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
@@ -137,6 +136,7 @@ import org.meshtastic.core.resources.trips_import_button
 import org.meshtastic.core.resources.trips_import_done
 import org.meshtastic.core.resources.trips_import_progress
 import org.meshtastic.core.ui.component.AutoLinkText
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.HighlightedText
 import org.meshtastic.core.ui.component.MeshtasticDialog

@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.ui.component.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -51,6 +50,7 @@ import org.meshtastic.core.resources.chirpy_hop_play
 import org.meshtastic.core.resources.chirpy_hop_update_complete
 import org.meshtastic.core.resources.chirpy_hop_update_interrupted
 import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.ElevatedCard
 import org.meshtastic.core.ui.component.FilledTonalButton
 import org.meshtastic.core.ui.component.IndeterminateProgressLine

@@ -40,7 +40,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -133,6 +132,7 @@ import org.meshtastic.core.resources.trips_stop_time
 import org.meshtastic.core.resources.trips_stop_title
 import org.meshtastic.core.resources.trips_unplaced
 import org.meshtastic.core.resources.trips_unplaced_note
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.ui.component.ScrollWithBar

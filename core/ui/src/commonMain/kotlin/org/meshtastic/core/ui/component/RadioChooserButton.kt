@@ -337,7 +337,7 @@ private fun RadioChooserBubble(expanded: Boolean, onDismiss: () -> Unit, content
                 ) {
                     content()
                 }
-        }
+            }
         }
     }
 }

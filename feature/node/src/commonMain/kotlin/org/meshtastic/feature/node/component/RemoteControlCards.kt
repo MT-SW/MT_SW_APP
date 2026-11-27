@@ -41,7 +41,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -135,6 +134,7 @@ import org.meshtastic.core.resources.remote_remove_node_title
 import org.meshtastic.core.resources.remote_selected_count
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.short_name
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.InfoButton
@@ -870,12 +870,7 @@ internal fun RemoteNodeManagementPanel(
  * the selection with one touch, with "use all" and a button that clears this memory. Nothing is shown when empty.
  */
 @Composable
-private fun RememberedPicks(
-    nums: Set<Int>,
-    nodeDb: Map<Int, Node>,
-    onUse: (Int) -> Unit,
-    onClear: () -> Unit,
-) {
+private fun RememberedPicks(nums: Set<Int>, nodeDb: Map<Int, Node>, onUse: (Int) -> Unit, onClear: () -> Unit) {
     val known = nums.mapNotNull { nodeDb[it] }
     if (known.isEmpty()) return
     Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {

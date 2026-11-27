@@ -36,8 +36,6 @@ import platform.UIKit.UIButtonTypeSystem
 import platform.UIKit.UIColor
 import platform.UIKit.UIControlEventTouchUpInside
 import platform.UIKit.UIControlStateNormal
-import platform.UIKit.UIScreen
-import platform.UIKit.UIView
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
@@ -46,6 +44,8 @@ import platform.UIKit.UIImagePickerControllerDelegateProtocol
 import platform.UIKit.UIImagePickerControllerOriginalImage
 import platform.UIKit.UIImagePickerControllerSourceType
 import platform.UIKit.UINavigationControllerDelegateProtocol
+import platform.UIKit.UIScreen
+import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 private const val JPEG_QUALITY = 0.85

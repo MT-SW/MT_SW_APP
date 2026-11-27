@@ -338,9 +338,10 @@ class TrackRecorder(
         val photo = tripStore.writePhoto(s.tripId, bytes, now) ?: return false
         tripStore.archive(bytes)
         mutableState.update { old ->
-            val last = old.stops.lastOrNull()?.takeIf {
-                distanceMeters(Point(it.lat, it.lon, null, it.t), at) < STOP_JOIN_METERS
-            }
+            val last =
+                old.stops.lastOrNull()?.takeIf {
+                    distanceMeters(Point(it.lat, it.lon, null, it.t), at) < STOP_JOIN_METERS
+                }
             val stops =
                 if (last != null) {
                     old.stops.dropLast(1) + last.copy(photos = last.photos + photo)

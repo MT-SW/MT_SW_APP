@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.ui.component.Dialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -57,6 +56,7 @@ import org.meshtastic.core.resources.camera_permission
 import org.meshtastic.core.resources.camera_permission_rationale
 import org.meshtastic.core.resources.camera_unavailable
 import org.meshtastic.core.ui.component.BarcodeScannerFrame
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.util.BarcodeScanner
 import org.meshtastic.core.ui.util.PermissionStatus

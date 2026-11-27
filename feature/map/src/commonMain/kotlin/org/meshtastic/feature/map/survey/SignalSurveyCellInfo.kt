@@ -17,6 +17,7 @@
 package org.meshtastic.feature.map.survey
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,42 +39,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.dbm_value
 import org.meshtastic.core.resources.mesh_hud_snr
 import org.meshtastic.core.resources.rssi
+import org.meshtastic.core.resources.signal_survey_all_readings
 import org.meshtastic.core.resources.signal_survey_heard_directly
 import org.meshtastic.core.resources.signal_survey_last_reading
+import org.meshtastic.core.resources.signal_survey_reading_direct
+import org.meshtastic.core.resources.signal_survey_reading_relayed
 import org.meshtastic.core.resources.signal_survey_readings
 import org.meshtastic.core.resources.signal_survey_senders
 import org.meshtastic.core.resources.signal_survey_unplaced
 import org.meshtastic.core.resources.snr
-import androidx.compose.foundation.clickable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import co.touchlab.kermit.Logger
-import org.koin.compose.koinInject
-import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.resources.signal_survey_all_readings
-import org.meshtastic.core.resources.signal_survey_reading_direct
-import org.meshtastic.core.resources.signal_survey_reading_relayed
-import org.meshtastic.core.ui.icon.ExpandLess
-import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Close
+import org.meshtastic.core.ui.icon.ExpandLess
+import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 internal const val SIGNAL_SURVEY_CELL_INFO_TAG = "signal_survey_cell_info"
@@ -202,8 +202,7 @@ private fun ReadingsToggle(count: Int, open: Boolean, onToggle: () -> Unit) {
 private fun ReadingsList(readings: List<SurveyReading>, names: Map<Int, String>) {
     val scroll = rememberScrollState()
     Column(
-        modifier =
-        Modifier.padding(end = 16.dp).heightIn(max = READINGS_MAX_HEIGHT_DP.dp).verticalScroll(scroll),
+        modifier = Modifier.padding(end = 16.dp).heightIn(max = READINGS_MAX_HEIGHT_DP.dp).verticalScroll(scroll),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         readings.forEachIndexed { index, item ->

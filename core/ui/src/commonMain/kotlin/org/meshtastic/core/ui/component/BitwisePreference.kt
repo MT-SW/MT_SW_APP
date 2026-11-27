@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.ui.theme.AppTheme
-import androidx.compose.ui.platform.LocalDensity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,15 +92,15 @@ fun BitwisePreference(
                         },
                         onClick = { onItemSelected(value xor item.first) },
                     )
+                }
+                PreferenceFooter(
+                    enabled = enabled,
+                    negativeText = stringResource(Res.string.clear),
+                    onNegativeClicked = { onItemSelected(0) },
+                    positiveText = stringResource(Res.string.close),
+                    onPositiveClicked = { expanded = false },
+                )
             }
-            PreferenceFooter(
-                enabled = enabled,
-                negativeText = stringResource(Res.string.clear),
-                onNegativeClicked = { onItemSelected(0) },
-                positiveText = stringResource(Res.string.close),
-                onPositiveClicked = { expanded = false },
-            )
-                    }
         }
     }
 }

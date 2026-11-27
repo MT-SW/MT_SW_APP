@@ -99,31 +99,28 @@ actual fun defaultPhotoFolder(): String? = null
 private const val BYTES_PER_MB = 1024L * 1024L
 
 /** The room taken by the pictures in the album "MT_SW" and the free space of the phone's storage. */
-actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? {
-    return try {
-        var used = 0L
-        val known = NSUserDefaults.standardUserDefaults.stringForKey(ALBUM_ID_KEY)
-        val album =
-            known?.let {
-                PHAssetCollection.fetchAssetCollectionsWithLocalIdentifiers(listOf(it), null).firstObject
-                    as? PHAssetCollection
-            }
-        if (album != null) {
-            val assets = PHAsset.fetchAssetsInAssetCollection(album, null)
-            for (index in 0 until assets.count.toInt()) {
-                val asset = assets.objectAtIndex(index.toULong()) as? PHAsset ?: continue
-                PHAssetResource.assetResourcesForAsset(asset).forEach { resource ->
-                    val size = (resource as? PHAssetResource)?.valueForKey("fileSize") as? NSNumber
-                    used += size?.longLongValue ?: 0L
-                }
+actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? = try {
+    var used = 0L
+    val known = NSUserDefaults.standardUserDefaults.stringForKey(ALBUM_ID_KEY)
+    val album = known?.let {
+        PHAssetCollection.fetchAssetCollectionsWithLocalIdentifiers(listOf(it), null).firstObject
+            as? PHAssetCollection
+    }
+    if (album != null) {
+        val assets = PHAsset.fetchAssetsInAssetCollection(album, null)
+        for (index in 0 until assets.count.toInt()) {
+            val asset = assets.objectAtIndex(index.toULong()) as? PHAsset ?: continue
+            PHAssetResource.assetResourcesForAsset(asset).forEach { resource ->
+                val size = (resource as? PHAssetResource)?.valueForKey("fileSize") as? NSNumber
+                used += size?.longLongValue ?: 0L
             }
         }
-        val attributes = NSFileManager.defaultManager.attributesOfFileSystemForPath(NSHomeDirectory(), null)
-        val free = (attributes?.get(NSFileSystemFreeSize) as? NSNumber)?.longLongValue ?: 0L
-        Logger.i { "Album zdjęć: zajmuje ${used / BYTES_PER_MB} MB, wolne ${free / BYTES_PER_MB} MB" }
-        PhotoFolderUsage(used / BYTES_PER_MB, free / BYTES_PER_MB)
-    } catch (e: Exception) {
-        Logger.w { "Album zdjęć: nie udało się policzyć miejsca: ${e.message}" }
-        null
     }
+    val attributes = NSFileManager.defaultManager.attributesOfFileSystemForPath(NSHomeDirectory(), null)
+    val free = (attributes?.get(NSFileSystemFreeSize) as? NSNumber)?.longLongValue ?: 0L
+    Logger.i { "Album zdjęć: zajmuje ${used / BYTES_PER_MB} MB, wolne ${free / BYTES_PER_MB} MB" }
+    PhotoFolderUsage(used / BYTES_PER_MB, free / BYTES_PER_MB)
+} catch (e: Exception) {
+    Logger.w { "Album zdjęć: nie udało się policzyć miejsca: ${e.message}" }
+    null
 }

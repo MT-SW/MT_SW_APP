@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,6 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.enums.enumEntries
 import kotlin.jvm.JvmName
-import androidx.compose.ui.platform.LocalDensity
 
 // Reified so the entries come from enumEntries, which every target has; reading them off an instance takes JVM
 // reflection, which Kotlin/Wasm and Kotlin/Native lack.
@@ -257,8 +257,8 @@ fun <T> DropDownPreference(
                                 expanded = false
                             },
                         )
+                    }
                 }
-                            }
             }
         }
     }

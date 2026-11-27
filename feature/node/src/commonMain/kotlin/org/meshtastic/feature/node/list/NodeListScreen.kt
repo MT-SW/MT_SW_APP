@@ -66,7 +66,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.ui.component.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
@@ -106,6 +105,7 @@ import org.meshtastic.core.resources.set_up_connection
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap

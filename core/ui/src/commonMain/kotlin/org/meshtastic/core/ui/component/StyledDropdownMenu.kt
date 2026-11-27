@@ -34,10 +34,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.model.UiOptions
-import androidx.compose.ui.platform.LocalDensity
 
 private const val MENU_CORNER_DP = 20
 private const val MENU_PADDING_DP = 8
@@ -65,7 +65,8 @@ fun DropdownMenu(
             Box(
                 modifier =
                 modifier
-                    // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under it.
+                    // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under
+                    // it.
                     .background(MaterialTheme.colorScheme.surface, shape)
                     .elementLook(UiOptions.GROUP_DIALOGS, shape)
                     .popupRim(shape)

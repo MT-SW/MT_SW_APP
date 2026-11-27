@@ -35,8 +35,8 @@ import co.touchlab.kermit.Logger
 /**
  * MT_SW: every window the system opens on top of the app (dialog, pop-up, menu) is a window of its own, and its
  * composition starts again from the screen's own density, so the in-app scale (text and elements) would be lost there.
- * The windows below take the density of the place that opens them and give it back to their content, so the scale
- * set in "Wygląd" holds in every window, on every platform.
+ * The windows below take the density of the place that opens them and give it back to their content, so the scale set
+ * in "Wygląd" holds in every window, on every platform.
  */
 @Composable
 fun ProvideAppDensity(density: Density, content: @Composable () -> Unit) {

@@ -23,8 +23,8 @@ import org.meshtastic.core.model.util.crc32
 
 /**
  * A minimal ZIP archive for a hike with its pictures: files are stored without compression (the pictures are already
- * compressed JPEG files and the route file is small), so the same code works on every platform and the archive opens
- * in any ZIP program. Only archives written here are read back; an archive with compressed entries is refused.
+ * compressed JPEG files and the route file is small), so the same code works on every platform and the archive opens in
+ * any ZIP program. Only archives written here are read back; an archive with compressed entries is refused.
  */
 object TripArchive {
     private const val LOCAL_SIG = 0x04034b50

@@ -270,14 +270,17 @@ private fun Chart(
                 .then(if (glassCard) Modifier.glassChartCard() else Modifier)
                 .pointerInput(values, startT, endT, onSelect) {
                     detectTapGestures { offset ->
-                        nearest(values, offset.x, size.width.toFloat(), startT, endT)?.let { onSelect(values[it].t) }
+                        nearest(values, offset.x, size.width.toFloat(), startT, endT)?.let {
+                            onSelect(values[it].t)
+                        }
                     }
                 }
                 .pointerInput(values, startT, endT, onSelect) {
                     detectHorizontalDragGestures { change, _ ->
                         change.consume()
-                        nearest(values, change.position.x, size.width.toFloat(), startT, endT)
-                            ?.let { onSelect(values[it].t) }
+                        nearest(values, change.position.x, size.width.toFloat(), startT, endT)?.let {
+                            onSelect(values[it].t)
+                        }
                     }
                 },
         ) {
@@ -313,12 +316,13 @@ private fun Chart(
                 if (i == 0) line.moveTo(xOf(s.t), yOf(s.v)) else line.lineTo(xOf(s.t), yOf(s.v))
             }
             if (area) {
-                val fill = Path().apply {
-                    addPath(line)
-                    lineTo(xOf(values.last().t), bottom)
-                    lineTo(xOf(values.first().t), bottom)
-                    close()
-                }
+                val fill =
+                    Path().apply {
+                        addPath(line)
+                        lineTo(xOf(values.last().t), bottom)
+                        lineTo(xOf(values.first().t), bottom)
+                        close()
+                    }
                 drawPath(
                     fill,
                     Brush.verticalGradient(

@@ -107,10 +107,9 @@ internal fun List<SignalSample>.toSurveyCells(cellMeters: Double = SURVEY_CELL_M
                     .groupBy { it.fromNum }
                     .mapValues { (_, own) -> own.maxWith(ClearestFirst).let { SurveyReception(it.snr, it.rssi) } },
                 readings =
-                readings
-                    .sortedWith(ClearestFirst.reversed())
-                    .take(MAX_CELL_READINGS)
-                    .map { SurveyReading(it.fromNum, it.snr, it.rssi, it.timeMillis, it.direct) },
+                readings.sortedWith(ClearestFirst.reversed()).take(MAX_CELL_READINGS).map {
+                    SurveyReading(it.fromNum, it.snr, it.rssi, it.timeMillis, it.direct)
+                },
             )
         }
 }

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -36,21 +35,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
-import org.meshtastic.core.repository.FileService
-import org.meshtastic.core.resources.trips_import_json
-import org.meshtastic.core.ui.util.rememberOpenFileLauncher
-import org.meshtastic.feature.map.trip.TripArchive
-import org.meshtastic.feature.map.trip.TripShare
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.delete
@@ -58,6 +53,7 @@ import org.meshtastic.core.resources.hide_layer
 import org.meshtastic.core.resources.route_playback_play
 import org.meshtastic.core.resources.show_layer
 import org.meshtastic.core.resources.trips_empty
+import org.meshtastic.core.resources.trips_import_json
 import org.meshtastic.core.resources.trips_info_1
 import org.meshtastic.core.resources.trips_info_2
 import org.meshtastic.core.resources.trips_info_3
@@ -65,6 +61,7 @@ import org.meshtastic.core.resources.trips_info_4
 import org.meshtastic.core.resources.trips_info_title
 import org.meshtastic.core.resources.trips_item
 import org.meshtastic.core.resources.trips_title
+import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
@@ -77,7 +74,10 @@ import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.TripsWindowRequest
+import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.feature.map.playback.RoutePlayback
+import org.meshtastic.feature.map.trip.TripArchive
+import org.meshtastic.feature.map.trip.TripShare
 import org.meshtastic.feature.map.trip.TripStore
 import org.meshtastic.feature.map.trip.stats
 import org.meshtastic.core.ui.component.ListItem as StyledListItem
@@ -113,32 +113,31 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     val tripShare: TripShare = koinInject()
     val fileService: FileService = koinInject()
     val scope = rememberCoroutineScope()
-    val pickFile =
-        rememberOpenFileLauncher { uri ->
-            if (uri == null) {
-                Logger.d { "Wędrówki: wybór pliku do wczytania przerwany" }
-            } else {
-                scope.launch {
-                    var bytes = ByteArray(0)
-                    val read = fileService.read(uri) { bytes = it.readByteArray() }
-                    if (!read) {
-                        Logger.w { "Wędrówki: nie udało się odczytać wybranego pliku" }
-                        return@launch
-                    }
-                    try {
-                        val id =
-                            if (TripArchive.looksLikeZip(bytes)) {
-                                tripShare.importArchive(bytes)
-                            } else {
-                                tripShare.importFile(bytes.decodeToString())
-                            }
-                        Logger.i { "Wędrówki: wczytana z pliku, id $id" }
-                    } catch (e: Exception) {
-                        Logger.w(e) { "Wędrówki: plik nie jest poprawną wędrówką: ${e.message}" }
-                    }
+    val pickFile = rememberOpenFileLauncher { uri ->
+        if (uri == null) {
+            Logger.d { "Wędrówki: wybór pliku do wczytania przerwany" }
+        } else {
+            scope.launch {
+                var bytes = ByteArray(0)
+                val read = fileService.read(uri) { bytes = it.readByteArray() }
+                if (!read) {
+                    Logger.w { "Wędrówki: nie udało się odczytać wybranego pliku" }
+                    return@launch
+                }
+                try {
+                    val id =
+                        if (TripArchive.looksLikeZip(bytes)) {
+                            tripShare.importArchive(bytes)
+                        } else {
+                            tripShare.importFile(bytes.decodeToString())
+                        }
+                    Logger.i { "Wędrówki: wczytana z pliku, id $id" }
+                } catch (e: Exception) {
+                    Logger.w(e) { "Wędrówki: plik nie jest poprawną wędrówką: ${e.message}" }
                 }
             }
         }
+    }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         ScrollWithBar {
             Row(
