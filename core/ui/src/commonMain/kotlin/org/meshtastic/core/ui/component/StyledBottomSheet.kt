@@ -46,7 +46,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.dismiss
@@ -220,12 +220,13 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                 while (following) {
                     val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull()
                     // A move taken by something that is not a list (a slider, a reorder handle) is not ours; a move
-                    // taken by a list that is already at its top (iPhone rubber band) still counts.
+                    // taken by a list that is already at its top (iPhone rubber band) still counts. The move is read together with
+                    // what a list consumed (positionChange() reports zero for it, so a scrolling window never closed).
                     val takenByOther = change != null && change.isConsumed && !gesture.scrollSeen
                     if (change == null || !change.pressed || takenByOther) {
                         following = false
                     } else {
-                        dragged += change.positionChange().y
+                        dragged += change.positionChangeIgnoreConsumed().y
                         if (dragged > threshold && !gesture.contentMoved) {
                             gesture.closeOnce("Okno: zamknięte przeciągnięciem w dół", close.value)
                             following = false
