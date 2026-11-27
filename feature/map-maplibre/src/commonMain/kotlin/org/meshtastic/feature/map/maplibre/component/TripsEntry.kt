@@ -43,6 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.resources.trips_import_json
+import org.meshtastic.core.ui.util.rememberOpenFileLauncher
+import org.meshtastic.feature.map.trip.TripShare
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
@@ -103,6 +109,30 @@ private fun TripsWindow(onDismiss: () -> Unit) {
     val visible by store.visibleIds.collectAsStateWithLifecycle()
     var deleteId by remember { mutableStateOf<String?>(null) }
     var openId by remember { mutableStateOf<String?>(null) }
+    val tripShare: TripShare = koinInject()
+    val fileService: FileService = koinInject()
+    val scope = rememberCoroutineScope()
+    val pickFile =
+        rememberOpenFileLauncher { uri ->
+            if (uri == null) {
+                Logger.d { "Wędrówki: wybór pliku do wczytania przerwany" }
+            } else {
+                scope.launch {
+                    var text = ""
+                    val read = fileService.read(uri) { text = it.readUtf8() }
+                    if (!read) {
+                        Logger.w { "Wędrówki: nie udało się odczytać wybranego pliku" }
+                        return@launch
+                    }
+                    try {
+                        val id = tripShare.importFile(text)
+                        Logger.i { "Wędrówki: wczytana z pliku, id $id" }
+                    } catch (e: Exception) {
+                        Logger.w(e) { "Wędrówki: plik nie jest poprawną wędrówką: ${e.message}" }
+                    }
+                }
+            }
+        }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         ScrollWithBar {
             Row(
@@ -177,6 +207,15 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                         }
                     },
                 )
+            }
+            TextButton(
+                onClick = {
+                    Logger.d { "Wędrówki: wybór pliku wędrówki do wczytania" }
+                    pickFile("*/*")
+                },
+                modifier = Modifier.padding(horizontal = 8.dp),
+            ) {
+                Text(stringResource(Res.string.trips_import_json))
             }
         }
     }

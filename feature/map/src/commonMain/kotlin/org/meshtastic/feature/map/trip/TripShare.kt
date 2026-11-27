@@ -136,7 +136,21 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
 
     override suspend fun import(url: String, senderNum: Int, onStep: (Int, Int) -> Unit): String {
         check(HikeLinks.isAllowedHost(url)) { "Nieznany serwer" }
-        val shared = json.decodeFromString<SharedTrip>(transport.download(url, MAX_FILE_BYTES).decodeToString())
+        return build(
+            json.decodeFromString<SharedTrip>(transport.download(url, MAX_FILE_BYTES).decodeToString()),
+            senderNum,
+            onStep,
+        )
+    }
+
+    /** Reads a hike saved to a file on the device ([exportJson]) into the own hikes and returns its id. */
+    suspend fun importFile(text: String): String {
+        check(text.length <= MAX_FILE_BYTES) { "Plik jest za duży" }
+        Logger.i { "Wędrówki: wczytywanie z pliku, ${text.length} znaków" }
+        return build(json.decodeFromString<SharedTrip>(text), senderNum = 0) { _, _ -> }
+    }
+
+    private suspend fun build(shared: SharedTrip, senderNum: Int, onStep: (Int, Int) -> Unit): String {
         check(shared.points.size in 2..MAX_POINTS) { "Zła liczba punktów trasy" }
         check(shared.points.all { it.size == POINT_FIELDS && it[0] in LAT_RANGE && it[1] in LON_RANGE }) {
             "Zły punkt trasy"
