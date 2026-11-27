@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -131,7 +132,12 @@ fun ModalBottomSheet(
             // Rows such as ListItem paint the theme's surface colour by default, which would hide the window's
             // gradient behind a flat fill. Inside the window that colour is transparent, so the whole window has
             // one background with one gradient.
-            CompositionLocalProvider(LocalWindowSurface provides windowSurface) {
+            // MT_SW: bez tego na iPhonie efekt gumowy u góry listy sam zjada ruch (consumed != 0),
+            // więc przeciągnięcie w dół od góry listy nigdy nie dochodziło do progu zamknięcia okna.
+            CompositionLocalProvider(
+                LocalWindowSurface provides windowSurface,
+                LocalOverscrollFactory provides null,
+            ) {
                 MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
                     Box {
                         Column { content() }
