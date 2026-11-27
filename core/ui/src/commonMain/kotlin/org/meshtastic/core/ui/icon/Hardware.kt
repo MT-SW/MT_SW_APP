@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.ic_build
 import org.meshtastic.core.resources.ic_cached
 import org.meshtastic.core.resources.ic_center_focus_strong
 import org.meshtastic.core.resources.ic_display_settings
+import org.meshtastic.core.resources.ic_gpio_pins
 import org.meshtastic.core.resources.ic_memory
 import org.meshtastic.core.resources.ic_mesh_radio
 import org.meshtastic.core.resources.ic_nfc
@@ -47,6 +48,10 @@ val MeshtasticIcons.Wrench: ImageVector
 /** Material Symbols "view_in_ar": the entry to a device's 3D model. */
 val MeshtasticIcons.ViewInAr: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_view_in_ar)
+
+/** MT_SW: a row of pins under a header, for asking a device which GPIO pins it lets us control. */
+val MeshtasticIcons.GpioPins: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_gpio_pins)
 
 /** MT_SW: a camera with a "save" arrow, for the folder the pictures taken in the app are saved to. */
 val MeshtasticIcons.PhotoSave: ImageVector

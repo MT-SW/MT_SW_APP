@@ -141,6 +141,7 @@ import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.DoDisturb
 import org.meshtastic.core.ui.icon.ErrorOutline
 import org.meshtastic.core.ui.icon.Favorite
+import org.meshtastic.core.ui.icon.GpioPins
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -371,7 +372,7 @@ internal fun GpioPanel(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
-                    imageVector = MeshtasticIcons.Refresh,
+                    imageVector = MeshtasticIcons.GpioPins,
                     contentDescription = null,
                     tint = pinsAccent,
                     modifier = Modifier.size(24.dp),
