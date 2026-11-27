@@ -147,6 +147,7 @@ import org.meshtastic.core.ui.icon.DoDisturb
 import org.meshtastic.core.ui.icon.ErrorOutline
 import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.GpioPins
+import org.meshtastic.core.ui.icon.GpioRead
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -156,7 +157,6 @@ import org.meshtastic.core.ui.icon.Output
 import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.PersonRemove
 import org.meshtastic.core.ui.icon.PowerSettingsNew
-import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.RemoteContacts
 import org.meshtastic.core.ui.icon.Send
 import org.meshtastic.core.ui.icon.Tune
@@ -350,7 +350,7 @@ internal fun GpioPanel(
                 modifier = Modifier.weight(1f),
             )
             ActionTile(
-                icon = MeshtasticIcons.Refresh,
+                icon = MeshtasticIcons.GpioRead,
                 label = stringResource(Res.string.gpio_read),
                 color = MaterialTheme.colorScheme.primary,
                 enabled = gpioMask != null,

@@ -136,6 +136,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Wędrówki (wszystkie wersje): na liście wędrówek przycisk „Wczytaj wędrówkę z pliku (JSON)” wczytuje wędrówkę zapisaną wcześniej do pliku (ten sam format co udostępnianie). Błędy odczytu trafiają tylko do logu.
 * Skalowanie interfejsu (wszystkie wersje): podpowiedzi (dymki przy ikonach) również trzymają ustawioną skalę aplikacji.
 * Wędrówki (wszystkie wersje): jeden wspólny zegar całej wędrówki: punkty trasy z telefonu dostają ten sam czas (zegar telefonu) co odczyty sygnału i punkty z urządzenia, więc wykresy trasy i sygnału mają tę samą oś czasu.
+* Zdalne GPIO (wszystkie wersje): nowe ikony z lupą: przebieg 0/1 przy odczycie stanu pinu (zamiast zaokrąglonych strzałek) i układ z nóżkami przy wczytaniu listy pinów. Rysowane jako pełne kształty, więc w stylu „obrys” są pustym konturem.
 * iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
 * Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
 * Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
@@ -263,6 +264,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 * Wędrówki (wszystkie wersje): na liście wędrówek przycisk „Wczytaj wędrówkę z pliku (JSON)” wczytuje wędrówkę zapisaną wcześniej do pliku (ten sam format co udostępnianie). Błędy odczytu trafiają tylko do logu.
 * Skalowanie interfejsu (wszystkie wersje): podpowiedzi (dymki przy ikonach) również trzymają ustawioną skalę aplikacji.
 * Wędrówki (wszystkie wersje): jeden wspólny zegar całej wędrówki: punkty trasy z telefonu dostają ten sam czas (zegar telefonu) co odczyty sygnału i punkty z urządzenia, więc wykresy trasy i sygnału mają tę samą oś czasu.
+* Zdalne GPIO (wszystkie wersje): nowe ikony z lupą: przebieg 0/1 przy odczycie stanu pinu (zamiast zaokrąglonych strzałek) i układ z nóżkami przy wczytaniu listy pinów. Rysowane jako pełne kształty, więc w stylu „obrys” są pustym konturem.
 * iPhone: aparat do wiadomości ma własne przyciski (zrób zdjęcie, obróć, anuluj), więc można z niego wyjść w każdej chwili; zdjęcie trafia od razu do pytania o wysłanie.
 * Folder zdjęć (telefon i tablet): ustawienia pokazują album MT_SW, miejsce zajęte przez zdjęcia i wolne miejsce w pamięci, tak jak na komputerze.
 * Karta GPIO (wszystkie wersje): przycisk „Pobierz listę pinów” ma własną ikonę listwy pinów zamiast kółka odświeżania (to samo kółko ma przycisk odczytu).
@@ -1171,6 +1173,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * Hikes (all versions): the hikes list has a "Load a hike from a file (JSON)" button that loads a hike saved earlier to a file (the same format as sharing). Read errors go to the log only.
 * Interface scale (all versions): tooltips (the bubbles next to icons) also keep the app's chosen scale.
 * Hikes (all versions): one shared clock for the whole hike: route points from the phone get the same time (the phone's clock) as the signal readings and the device's points, so the route and signal charts share one time axis.
+* Remote GPIO (all versions): new icons with a magnifier: a 0/1 waveform for reading a pin's state (instead of the rounded arrows) and a chip with pins for loading the list of pins. Drawn as solid shapes, so the "outline" style shows them as a hollow contour.
 * iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
 * Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
 * GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
@@ -1291,6 +1294,7 @@ Every new change goes under the heading of the current version.
 * Hikes (all versions): the hikes list has a "Load a hike from a file (JSON)" button that loads a hike saved earlier to a file (the same format as sharing). Read errors go to the log only.
 * Interface scale (all versions): tooltips (the bubbles next to icons) also keep the app's chosen scale.
 * Hikes (all versions): one shared clock for the whole hike: route points from the phone get the same time (the phone's clock) as the signal readings and the device's points, so the route and signal charts share one time axis.
+* Remote GPIO (all versions): new icons with a magnifier: a 0/1 waveform for reading a pin's state (instead of the rounded arrows) and a chip with pins for loading the list of pins. Drawn as solid shapes, so the "outline" style shows them as a hollow contour.
 * iPhone: the camera for messages has its own buttons (shoot, flip, cancel), so it can be left at any moment; the photo goes straight to the question whether to send it.
 * Picture folder (phone and tablet): settings show the MT_SW album, the room taken by the pictures and the free storage, like on the computer.
 * GPIO card (all versions): the "Get the pin list" button has its own pin-header icon instead of the refresh circle (the read button has the same circle).
