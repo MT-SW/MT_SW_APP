@@ -254,6 +254,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
+* Komputer i iPhone/iPad: na liście Połącz od razu widać wcześniej połączone urządzenia Bluetooth, bez potrzeby skanowania — tak jak na Androidzie z parowaniem systemowym.
 * Zdalne listy (wszystkie wersje): okno pamięta ostatnio wybrane węzły osobno dla ulubionych, ignorowanych i dodawanych kontaktów; pod wyborem są chipy do dotknięcia, „Użyj wszystkich” i „Wyczyść tę listę” (każda pamięć czyszczona osobno).
 * Okna (wszystkie wersje): przeciągnięcie w dół zamyka teraz także okna z przewijaną listą (np. warstwy mapy, filtr mapy, planer); wcześniej ruch zabrany przez listę nie był liczony i zamykały się tylko okna bez przewijania.
 * Okna (wszystkie wersje): okno otwarte z wnętrza innego okna (wybór węzła do zdalnych list, wędrówka z listy Wędrówek) ma własne pełne tło, więc tekst okna pod spodem nie prześwituje, a kolory jasny/ciemny w oknach są liczone z tła motywu (nie z przezroczystej powierzchni okna).
@@ -1286,6 +1287,7 @@ Every new change goes under the heading of the current version.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 
+* Desktop and iPhone/iPad: previously connected Bluetooth devices now show on the Connect list right away, without scanning — the way Android already does with system pairing.
 * Remote lists (all versions): the window remembers the nodes last picked separately for favorites, ignored nodes and added contacts; chips to tap, "Use all" and "Clear this list" appear under the picker (each memory is cleared on its own).
 * Windows (all versions): dragging down now also closes windows with a scrolling list (e.g. map layers, map filter, planner); before, a move taken by the list was not counted and only windows without scrolling closed.
 * Windows (all versions): a window opened from inside another window (node picker for remote lists, a hike from the hikes list) has its own solid background, so the text of the window below no longer shows through, and light/dark colours inside windows are judged from the theme background (not from the window's transparent surface).
