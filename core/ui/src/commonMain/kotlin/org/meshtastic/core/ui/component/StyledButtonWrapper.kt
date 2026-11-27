@@ -187,7 +187,7 @@ private fun isDangerColor(color: Color, scheme: ColorScheme): Boolean = color ==
  * light background the colour is moved most of the way to that pink, so the button looks the same there.
  */
 private fun Color.softenedOnLight(scheme: ColorScheme): Color =
-    if (scheme.surface.luminance() > LIGHT_SURFACE_LUMINANCE) {
+    if (scheme.background.luminance() > LIGHT_SURFACE_LUMINANCE) {
         lerp(this, SOFT_DANGER_PINK, DANGER_LIGHT_SOFTEN)
     } else {
         this

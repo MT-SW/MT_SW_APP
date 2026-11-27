@@ -120,7 +120,7 @@ object SemanticColors {
  * active scheme's surface rather than the system, so a theme picked in the app is respected.
  */
 val ColorScheme.link: Color
-    get() = if (surface.luminance() < DARK_SURFACE_LUMINANCE) BluePalette.B300 else BluePalette.B800
+    get() = if (background.luminance() < DARK_SURFACE_LUMINANCE) BluePalette.B300 else BluePalette.B800
 
 /** Midpoint luminance separating a light surface from a dark one; both static schemes sit near the extremes. */
 private const val DARK_SURFACE_LUMINANCE = 0.5f
@@ -278,7 +278,7 @@ object StatusColors {
      * one status colour whose light and dark values differ, so it follows the active scheme's surface, not the system.
      */
     val ColorScheme.StatusSky: Color
-        get() = if (surface.luminance() < DARK_SURFACE_LUMINANCE) Color(0xFF7DD3FC) else Color(0xFF075985)
+        get() = if (background.luminance() < DARK_SURFACE_LUMINANCE) Color(0xFF7DD3FC) else Color(0xFF075985)
 }
 
 @Suppress("MagicNumber")

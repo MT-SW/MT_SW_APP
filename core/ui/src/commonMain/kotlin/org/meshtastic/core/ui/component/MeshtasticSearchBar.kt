@@ -234,7 +234,7 @@ private fun InlineSearchField(
     val contentColor = glassContentColor(UiOptions.GROUP_SEARCH, base)
     // MT_SW: one even pane of glass with a soft gradient from the light top to the plain bottom (so it looks raised),
     // on a solid base: the shadow under a see-through pane shows through it as a band, so the base is not see-through.
-    val sheenTop = if (scheme.surface.luminance() < DARK_LUMINANCE) SEARCH_SHEEN_DARK else SEARCH_SHEEN_LIGHT
+    val sheenTop = if (scheme.background.luminance() < DARK_LUMINANCE) SEARCH_SHEEN_DARK else SEARCH_SHEEN_LIGHT
     // As soon as something is typed the whole pane takes the gold of the theme, so it is visible that the list is
     // filtered. It is drawn over the whole pane, not only over the field, so there is no band.
     val tint by animateFloatAsState(targetValue = if (filtering) 1f else 0f)

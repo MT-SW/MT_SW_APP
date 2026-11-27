@@ -66,7 +66,7 @@ enum class PmAqiSeverity(
      * `isSystemInDarkTheme()`, so a user who forces light while the system is dark (or vice versa — `AppTheme` takes an
      * explicit `darkTheme`) still gets the tone that was contrast-checked against the surface they are looking at.
      */
-    @Composable fun color(): Color = colorFor(MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE)
+    @Composable fun color(): Color = colorFor(MaterialTheme.colorScheme.background.luminance() < DARK_SURFACE_LUMINANCE)
 
     companion object {
         /**

@@ -34,6 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -74,6 +77,13 @@ private const val SWIPE_CLOSE_DP = 40
 /** How many mouse wheel ticks up, with nothing left to scroll, close the window. */
 private const val WHEEL_CLOSE_TICKS = 3f
 
+/**
+ * MT_SW: the real (opaque) surface colour of the window we are inside of. Inside a window the theme's surface colour is
+ * made transparent, so a window opened from within another window (a node picker over a list window, a hike over the
+ * hikes list) would otherwise take that transparent colour for its own background and show the window below through.
+ */
+internal val LocalWindowSurface = compositionLocalOf<Color?> { null }
+
 /** Width kept free at the right of a window's first row for the close cross (an icon button plus its margin). */
 const val SHEET_CROSS_INSET_DP = 52
 
@@ -98,6 +108,9 @@ fun ModalBottomSheet(
     // coming up from the bottom edge. The content scrolls by itself where it needs to; the window only limits
     // its height (an outer scroll would clash with the content's own one).
     val windowShape = RoundedCornerShape(SHEET_CORNER_DP.dp)
+    val windowSurface = LocalWindowSurface.current ?: MaterialTheme.colorScheme.surface
+    val overWindow = LocalWindowSurface.current != null
+    LaunchedEffect(Unit) { Logger.i { "Okno: otwarte, tło ${if (overWindow) "z okna pod spodem" else "z motywu"}" } }
     Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
             modifier =
@@ -106,7 +119,7 @@ fun ModalBottomSheet(
                 .widthIn(max = WINDOW_MAX_WIDTH_DP.dp)
                 .fillMaxWidth()
                 .heightIn(max = (containerSize.height / density * WINDOW_MAX_HEIGHT_PERCENT).dp)
-                .background(MaterialTheme.colorScheme.surface, windowShape)
+                .background(windowSurface, windowShape)
                 .elementLook(UiOptions.GROUP_DIALOGS, windowShape)
                 .popupRim(windowShape)
                 // A swipe down anywhere on the window closes it.
@@ -119,6 +132,7 @@ fun ModalBottomSheet(
             // Rows such as ListItem paint the theme's surface colour by default, which would hide the window's
             // gradient behind a flat fill. Inside the window that colour is transparent, so the whole window has
             // one background with one gradient.
+            CompositionLocalProvider(LocalWindowSurface provides windowSurface) {
             MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
                 Box {
                     Column { content() }
@@ -141,6 +155,7 @@ fun ModalBottomSheet(
                         }
                     }
                 }
+            }
             }
         }
     }

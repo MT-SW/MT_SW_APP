@@ -152,7 +152,9 @@ internal fun Modifier.searchShadow(shape: Shape): Modifier =
     cardShadow(rememberUiOptions().glassShadowDp() * BUBBLE_SHADOW_SHARE, shape, isDarkSurface())
 
 /** Whether the current theme is dark, judged by its surface colour. */
-@Composable internal fun isDarkSurface(): Boolean = MaterialTheme.colorScheme.surface.luminance() < READABLE_LUMINANCE
+@Composable
+internal fun isDarkSurface(): Boolean =
+    (LocalWindowSurface.current ?: MaterialTheme.colorScheme.surface).luminance() < READABLE_LUMINANCE
 
 /** How much stronger the sheen of glass is drawn: a dark theme needs more of it to show any depth. */
 @Composable internal fun glassSheenBoost(): Float = if (isDarkSurface()) DARK_SHEEN_BOOST else LIGHT_SHEEN_BOOST

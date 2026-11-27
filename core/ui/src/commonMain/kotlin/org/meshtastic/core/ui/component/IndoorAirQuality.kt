@@ -127,7 +127,7 @@ enum class Iaq(val color: Color, val tones: AqiSeverityColors.Tones, val label: 
 
     /** The text tone for the applied theme, resolved from the surface in use as `PmAqiSeverity.color` does. */
     @Composable
-    fun textColor(): Color = textColorFor(MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE)
+    fun textColor(): Color = textColorFor(MaterialTheme.colorScheme.background.luminance() < DARK_SURFACE_LUMINANCE)
 }
 
 fun getIaq(iaq: Int): Iaq? = when {

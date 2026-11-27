@@ -87,7 +87,7 @@ private const val LOOP_MILLIS = 1400
  */
 @Composable
 @ReadOnlyComposable
-internal fun thinTrackColor(): Color = if (MaterialTheme.colorScheme.surface.luminance() < DARK_THEME_LUMINANCE) {
+internal fun thinTrackColor(): Color = if (MaterialTheme.colorScheme.background.luminance() < DARK_THEME_LUMINANCE) {
     Color.White.copy(alpha = DARK_TRACK_ALPHA)
 } else {
     Color.Black.copy(alpha = LIGHT_TRACK_ALPHA)
@@ -100,7 +100,7 @@ internal fun thinTrackColor(): Color = if (MaterialTheme.colorScheme.surface.lum
 @Composable
 internal fun thinFillColor(progress: Float, color: Color = Color.Unspecified): Color {
     if (color != Color.Unspecified) return color
-    val dark = MaterialTheme.colorScheme.surface.luminance() < DARK_THEME_LUMINANCE
+    val dark = MaterialTheme.colorScheme.background.luminance() < DARK_THEME_LUMINANCE
     val start = if (dark) DARK_THEME_START else LIGHT_THEME_START
     return lerp(start, themeAccent(), progress.coerceIn(0f, 1f))
 }
