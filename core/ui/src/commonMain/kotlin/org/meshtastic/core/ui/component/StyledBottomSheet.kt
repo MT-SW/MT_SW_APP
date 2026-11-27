@@ -231,6 +231,7 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                 gesture.reset()
                 var dragged = 0f
                 var following = true
+                var endReason = "palec podniesiony"
                 while (following) {
                     val change = awaitPointerEvent(PointerEventPass.Final).changes.firstOrNull()
                     // A move taken by something that is not a list (a slider, a reorder handle) is not ours; a move
@@ -239,6 +240,11 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                     // closed).
                     val takenByOther = change != null && change.isConsumed && !gesture.scrollSeen
                     if (change == null || !change.pressed || takenByOther) {
+                        endReason = when {
+                            change == null -> "brak zdarzenia"
+                            takenByOther -> "ruch zabrany przez inny element"
+                            else -> "palec podniesiony"
+                        }
                         following = false
                     } else {
                         dragged += change.positionChangeIgnoreConsumed().y
@@ -248,15 +254,28 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                         }
                     }
                 }
+                // MT_SW: diagnostyka gestu, gdy ruch był wyraźny, ale okno się NIE zamknęło (np. zgłoszenie z
+                // iPhone'a, że przeciągnięcie w dół nie działa) - widać tu dokładnie, co przerwało śledzenie gestu.
+                if (!gesture.closed && dragged > threshold * GESTURE_LOG_SHARE) {
+                    Logger.d {
+                        "Okno: przeciągnięcie w dół nie zamknęło okna (powód: $endReason, przesunięcie " +
+                            "${dragged.toInt()}px z ${threshold.toInt()}px progu, treść poruszona=" +
+                            "${gesture.contentMoved}, ruch z listy=${gesture.scrollSeen})"
+                    }
+                }
             }
         }
 }
+
+/** Jak duża część progu zamknięcia musi być pokonana, żeby nieudana próba trafiła do logu (pomija drobne drgnięcia). */
+private const val GESTURE_LOG_SHARE = 0.3f
 
 /** State of one drag on the window, shared by the list watcher and the pointer watcher. */
 private class SwipeGesture {
     var scrollSeen = false
     var contentMoved = false
-    private var closed = false
+    var closed = false
+        private set
 
     fun reset() {
         scrollSeen = false
