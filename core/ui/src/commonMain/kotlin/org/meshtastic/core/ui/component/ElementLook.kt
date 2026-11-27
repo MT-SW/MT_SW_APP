@@ -356,31 +356,30 @@ const val SHADOW_ROOM_DP = 14
 /** The depth look of [elementLook], with its strength 0-100. */
 fun Modifier.depthLook(strength: Int, shape: Shape, rimDp: Float = 1f, dark: Boolean = false): Modifier {
     val s = strength.coerceIn(0, PERCENT.toInt()) / PERCENT
-    return this.cardShadow(DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s, shape, dark)
-        .drawWithContent {
-            drawContent()
-            val outline = shape.createOutline(size, layoutDirection, this)
-            drawOutline(
-                outline = outline,
-                brush =
-                Brush.verticalGradient(
-                    0f to Color.White.copy(alpha = LIGHT_TOP_ALPHA * s),
-                    0.5f to Color.Transparent,
-                    1f to Color.Black.copy(alpha = SHADE_BOTTOM_ALPHA * s),
+    return this.cardShadow(DEPTH_SHADOW_BASE_DP + DEPTH_SHADOW_RANGE_DP * s, shape, dark).drawWithContent {
+        drawContent()
+        val outline = shape.createOutline(size, layoutDirection, this)
+        drawOutline(
+            outline = outline,
+            brush =
+            Brush.verticalGradient(
+                0f to Color.White.copy(alpha = LIGHT_TOP_ALPHA * s),
+                0.5f to Color.Transparent,
+                1f to Color.Black.copy(alpha = SHADE_BOTTOM_ALPHA * s),
+            ),
+        )
+        drawOutline(
+            outline = outline,
+            brush =
+            Brush.verticalGradient(
+                listOf(
+                    Color.White.copy(alpha = RIM_TOP_ALPHA * s),
+                    Color.White.copy(alpha = RIM_BOTTOM_ALPHA * s),
                 ),
-            )
-            drawOutline(
-                outline = outline,
-                brush =
-                Brush.verticalGradient(
-                    listOf(
-                        Color.White.copy(alpha = RIM_TOP_ALPHA * s),
-                        Color.White.copy(alpha = RIM_BOTTOM_ALPHA * s),
-                    ),
-                ),
-                style = Stroke(width = rimDp.dp.toPx()),
-            )
-        }
+            ),
+            style = Stroke(width = rimDp.dp.toPx()),
+        )
+    }
 }
 
 /**
@@ -479,10 +478,7 @@ fun StyledSurface(
             )
 
         style.look == ElementLook.DEPTH ->
-            Box(
-                modifier =
-                modifier.depthLook(style.strength, shape, dark = dark).clip(shape).background(baseColor),
-            ) {
+            Box(modifier = modifier.depthLook(style.strength, shape, dark = dark).clip(shape).background(baseColor)) {
                 content()
             }
 

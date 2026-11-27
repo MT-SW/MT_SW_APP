@@ -255,11 +255,12 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                     // closed).
                     val takenByOther = change != null && change.isConsumed && !gesture.scrollSeen
                     if (change == null || !change.pressed || takenByOther) {
-                        endReason = when {
-                            change == null -> "brak zdarzenia"
-                            takenByOther -> "ruch zabrany przez inny element"
-                            else -> "palec podniesiony"
-                        }
+                        endReason =
+                            when {
+                                change == null -> "brak zdarzenia"
+                                takenByOther -> "ruch zabrany przez inny element"
+                                else -> "palec podniesiony"
+                            }
                         following = false
                     } else {
                         dragged += change.positionChangeIgnoreConsumed().y
