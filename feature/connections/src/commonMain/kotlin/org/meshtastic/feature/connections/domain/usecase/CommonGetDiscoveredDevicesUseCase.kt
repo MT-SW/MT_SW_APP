@@ -19,15 +19,21 @@ package org.meshtastic.feature.connections.domain.usecase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import org.meshtastic.core.ble.BluetoothRepository
+import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.common.util.safeCatchingAll
+import org.meshtastic.core.datastore.model.RecentAddress
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.network.repository.DiscoveredService
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.meshtastic
+import org.meshtastic.feature.connections.BLE_DEVICE_PREFIX
 import org.meshtastic.feature.connections.data.RecentAddressesSource
+import org.meshtastic.feature.connections.model.DeviceListEntry
 import org.meshtastic.feature.connections.model.DiscoveredDevices
 import org.meshtastic.feature.connections.model.GetDiscoveredDevicesUseCase
 
@@ -45,6 +51,9 @@ open class CommonGetDiscoveredDevicesUseCase(
     private val databaseManager: DatabaseManager,
     private val nodeManager: NodeManager,
     private val usbScanner: UsbScanner? = null,
+    // MT_SW: lets a previously connected BLE device (recent address) show on the Connect list right away, the way
+    // Android always shows its system-bonded devices — null only in tests/targets with no BLE transport at all.
+    private val bluetoothRepository: BluetoothRepository? = null,
 ) : GetDiscoveredDevicesUseCase {
 
     override fun invoke(
@@ -68,8 +77,10 @@ open class CommonGetDiscoveredDevicesUseCase(
 
             val discoveredTcpForUi = matchDiscoveredTcpNodes(processedTcp, db, resolved, databaseManager, nums)
             val recentTcpForUi = buildRecentTcpEntries(recentList, discoveredTcpAddresses, db, nums)
+            val recentBleForUi = buildRecentBleEntries(recentList, db, nums)
 
             DiscoveredDevices(
+                bleDevices = recentBleForUi,
                 discoveredTcpDevices = discoveredTcpForUi,
                 recentTcpDevices = recentTcpForUi,
                 usbDevices = usbList.withLocalNodes(db, nums),
@@ -77,4 +88,31 @@ open class CommonGetDiscoveredDevicesUseCase(
             )
         }
     }
+
+    /**
+     * A previously connected BLE device (saved to [RecentAddressesSource] on connect) shown right away, before any
+     * scan: the counterpart of Android's always-visible system-bonded list, for platforms (desktop, iPhone/iPad) that
+     * have no such system list, or where it cannot be enumerated ahead of a scan. Deduplicated against a live scan by
+     * the view model merging them, the same as Android's bonded entries.
+     */
+    private fun buildRecentBleEntries(
+        recentList: List<RecentAddress>,
+        nodeDb: Map<Int, Node>,
+        nums: LocalNodeNums,
+    ): List<DeviceListEntry> = recentList
+        .filter { it.address.startsWith(BLE_DEVICE_PREFIX) }
+        .map { recent ->
+            val address = recent.address.removePrefix(BLE_DEVICE_PREFIX)
+            DeviceListEntry.Ble(
+                device =
+                MeshtasticBleDevice(
+                    address = address,
+                    name = recent.name,
+                    isBonded = bluetoothRepository?.isBonded(address) ?: false,
+                ),
+            )
+        }
+        .distinctBy { it.fullAddress }
+        .withLocalNodes(nodeDb, nums)
+        .sortedBy { it.name }
 }

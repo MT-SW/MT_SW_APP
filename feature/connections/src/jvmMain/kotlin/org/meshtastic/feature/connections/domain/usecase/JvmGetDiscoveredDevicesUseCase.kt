@@ -17,6 +17,7 @@
 package org.meshtastic.feature.connections.domain.usecase
 
 import org.koin.core.annotation.Single
+import org.meshtastic.core.ble.BluetoothRepository
 import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.NodeRepository
@@ -41,10 +42,12 @@ class JvmGetDiscoveredDevicesUseCase(
     databaseManager: DatabaseManager,
     nodeManager: NodeManager,
     usbScanner: UsbScanner? = null,
+    bluetoothRepository: BluetoothRepository? = null,
 ) : CommonGetDiscoveredDevicesUseCase(
     recentAddressesDataSource,
     nodeRepository,
     databaseManager,
     nodeManager,
     usbScanner,
+    bluetoothRepository,
 )
