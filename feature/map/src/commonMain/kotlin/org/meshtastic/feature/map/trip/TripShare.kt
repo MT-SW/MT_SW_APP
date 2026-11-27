@@ -197,7 +197,7 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
     suspend fun importFile(text: String): String {
         check(text.length <= MAX_FILE_BYTES) { "Plik jest za duży" }
         Logger.i { "Wędrówki: wczytywanie z pliku, ${text.length} znaków" }
-        return build(json.decodeFromString<SharedTrip>(text), senderNum = 0) { _, _ -> }
+        return build(json.decodeFromString<SharedTrip>(text), senderNum = 0, onStep = { _, _ -> })
     }
 
     private suspend fun build(
