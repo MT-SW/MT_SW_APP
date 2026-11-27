@@ -3,22 +3,10 @@ name: Web Snapshot
 # Builds the web app from main and deploys it to app-snapshot.meshtastic.org, the web
 # counterpart of the rolling snapshot release main-check.yml publishes.
 
+# MT_SW: upstream runs this automatically on every push to main, deploying to the original
+# project's own app-snapshot.meshtastic.org — not ours to deploy to, and pointless without
+# their secrets. Manual-only here, matching every other workflow in this fork.
 on:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - 'fastlane/**'
-      - 'obtainium/**'
-      # Hosts and test modules the web app does not build from. Listed as exclusions so a new
-      # web module deploys without being added anywhere.
-      - 'androidApp/**'
-      - 'desktopApp/**'
-      - 'baselineprofile/**'
-      - 'screenshot-tests/**'
-      - 'docs-screenshots/**'
-      - 'store-screenshots/**'
   workflow_dispatch:
 
 permissions:

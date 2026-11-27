@@ -1382,6 +1382,8 @@
     <string name="mesh_beacon_interval">Interwał nadawania (sekundy)</string>
     <string name="mesh_beacon_interval_error">Minimum %1$d sekund</string>
     <string name="mesh_beacon_invitations_title">Zaproszenia do sieci mesh</string>
+    <string name="mesh_beacon_legacy_split">Starsza wiadomość tekstowa</string>
+    <string name="mesh_beacon_legacy_split_summary">Wysyłaj wiadomość beacona też jako zwykłą wiadomość tekstową, dla starszego firmware</string>
     <string name="mesh_beacon_listen">Nasłuchuj pakietów meshbeacon</string>
     <string name="mesh_beacon_listen_summary">Wychwytuj zaproszenia ogłaszane przez pobliskie sieci mesh</string>
     <string name="mesh_beacon_message_error">Maksymalnie %1$d bajtów</string>
@@ -1411,6 +1413,7 @@
     <string name="mesh_beacon_target_add">Dodaj cel</string>
     <string name="mesh_beacon_target_channel_index">Indeks kanału</string>
     <string name="mesh_beacon_target_default">Domyślny</string>
+    <string name="mesh_beacon_target_frequency_slot">Slot częstotliwości</string>
     <string name="mesh_beacon_target_remove">Usuń cel</string>
     <string name="mesh_beacon_targets">Cele nadawania</string>
     <string name="mesh_beacon_broadcast_requires_preset">Nadawanie beacona ogłasza preset modemu, do którego mogą dołączyć inni. To radio używa niestandardowych ustawień LoRa zamiast standardowego presetu, więc beacon mógłby zapraszać do ustawień, których inni nie usłyszą. Nadawanie można tu wyłączyć, ale nie włączyć, dopóki radio nie użyje standardowego presetu modemu.</string>

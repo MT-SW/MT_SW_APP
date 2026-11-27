@@ -27,7 +27,7 @@ package org.meshtastic.core.model
  */
 object MtswRelease {
     const val RELEASE = 5
-    const val TEST = 2
+    const val TEST = 0
 
     private val BASE_NUMBER = Regex("^\\d+\\.\\d+\\.\\d+")
 
