@@ -129,7 +129,8 @@ class TrackRecorder(
                     val height = fix.mslAltitudeMeters ?: fix.altitudeMeters
                     if (positionSource() != UiOptions.HIKE_POSITION_DEVICE) {
                         used("telefon")
-                        // One clock for the whole hike (the phone's), the same as for the signal readings and radio points.
+                        // One clock for the whole hike (the phone's), the same as for the signal readings and
+                        // radio points.
                         add(Point(fix.latitude, fix.longitude, height, nowMillis))
                     }
                 }
