@@ -93,6 +93,7 @@ import org.meshtastic.core.resources.trips_chosen
 import org.meshtastic.core.resources.trips_coverage_csv
 import org.meshtastic.core.resources.trips_coverage_geojson
 import org.meshtastic.core.resources.trips_export_json
+import org.meshtastic.core.resources.trips_export_zip
 import org.meshtastic.core.resources.trips_health_ascent
 import org.meshtastic.core.resources.trips_health_calories
 import org.meshtastic.core.resources.trips_health_distance
@@ -275,6 +276,15 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 },
             ) {
                 Text(stringResource(Res.string.trips_export_json))
+            }
+            val exportZip = rememberFileExporter(content = { tripShare.exportArchive(tripId) })
+            TextButton(
+                onClick = {
+                    Logger.i { "Wędrówki: zapis wędrówki ze zdjęciami do archiwum na urządzeniu" }
+                    exportZip("wedrowka-" + trip.id.take(COVERAGE_FILE_ID_LENGTH) + ".zip", "application/zip")
+                },
+            ) {
+                Text(stringResource(Res.string.trips_export_zip))
             }
             if (trip.signals.isNotEmpty()) {
                 val exportCsv = rememberFileExporter(content = { trip.coverageCsv()?.encodeToByteArray() })

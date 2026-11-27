@@ -4509,6 +4509,7 @@
     <string name="trips_coverage_geojson">Export signal (GeoJSON)</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
     <string name="trips_export_json">Save hike to a file (JSON)</string>
+    <string name="trips_export_zip">Save hike with photos to an archive (ZIP)</string>
     <string name="trips_health_ascent">Ascent (health app): %1$d m</string>
     <string name="trips_health_auto">Take steps and heart rate from the health app by itself</string>
     <string name="trips_health_auto_hint">Asks for permission when the recording starts, refreshes the numbers while it runs and saves them with the hike when it ends.</string>
@@ -4524,7 +4525,7 @@
     <string name="trips_health_title">Health app</string>
     <string name="trips_import_button">Replay the hike</string>
     <string name="trips_import_done">The hike is saved. The map replays it when you open it.</string>
-    <string name="trips_import_json">Load a hike from a file (JSON)</string>
+    <string name="trips_import_json">Load a hike from a file (JSON or ZIP)</string>
     <string name="trips_import_progress">Receiving the hike: %1$d of %2$d</string>
     <string name="trips_info_1">You record a route, take photos (with the camera or from the gallery) and view saved hikes. Photos are assigned to route points by time and position, and you can change the time, point and place by hand.</string>
     <string name="trips_info_2">A hike shows kilometres, time, ascent, charts and health data (if the phone allows). The signal of heard nodes is saved on the route and can be exported (CSV, GeoJSON).</string>

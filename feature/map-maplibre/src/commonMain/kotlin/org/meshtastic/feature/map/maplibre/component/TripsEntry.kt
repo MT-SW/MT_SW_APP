@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.resources.trips_import_json
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
+import org.meshtastic.feature.map.trip.TripArchive
 import org.meshtastic.feature.map.trip.TripShare
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
@@ -118,14 +119,19 @@ private fun TripsWindow(onDismiss: () -> Unit) {
                 Logger.d { "Wędrówki: wybór pliku do wczytania przerwany" }
             } else {
                 scope.launch {
-                    var text = ""
-                    val read = fileService.read(uri) { text = it.readUtf8() }
+                    var bytes = ByteArray(0)
+                    val read = fileService.read(uri) { bytes = it.readByteArray() }
                     if (!read) {
                         Logger.w { "Wędrówki: nie udało się odczytać wybranego pliku" }
                         return@launch
                     }
                     try {
-                        val id = tripShare.importFile(text)
+                        val id =
+                            if (TripArchive.looksLikeZip(bytes)) {
+                                tripShare.importArchive(bytes)
+                            } else {
+                                tripShare.importFile(bytes.decodeToString())
+                            }
                         Logger.i { "Wędrówki: wczytana z pliku, id $id" }
                     } catch (e: Exception) {
                         Logger.w(e) { "Wędrówki: plik nie jest poprawną wędrówką: ${e.message}" }

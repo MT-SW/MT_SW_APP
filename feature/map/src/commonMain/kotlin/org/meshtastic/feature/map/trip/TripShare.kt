@@ -130,6 +130,56 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         return json.encodeToString(SharedTrip.serializer(), file)
     }
 
+    /**
+     * The whole hike with its chosen pictures in one ZIP archive for saving on the device: the route file
+     * ([ARCHIVE_ROUTE]) and the pictures next to it, so nothing needs the internet to be read back. Null when the hike
+     * is not found.
+     */
+    suspend fun exportArchive(tripId: String): ByteArray? {
+        val trip = store.find(tripId) ?: return null
+        val files = mutableListOf<Pair<String, ByteArray>>()
+        val stops =
+            trip.stops.sortedBy { it.t }.map { stop ->
+                val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
+                val bytes = photo?.let { store.photoBytes(tripId, it.file) }
+                val name = bytes?.let { "$ARCHIVE_PHOTO_DIR/${files.size + 1}.jpg".also { n -> files += n to it } }
+                SharedStop(
+                    lat = stop.lat,
+                    lon = stop.lon,
+                    t = stop.t / MILLIS,
+                    title = stop.title,
+                    photo = name.orEmpty(),
+                    caption = photo?.caption.orEmpty(),
+                )
+            }
+        val route =
+            SharedTrip(
+                name = trip.name,
+                points = trip.points.map { listOf(it.lat, it.lon, (it.t / MILLIS).toDouble()) },
+                stops = stops,
+            )
+        files.add(0, ARCHIVE_ROUTE to json.encodeToString(SharedTrip.serializer(), route).encodeToByteArray())
+        Logger.i { "Wędrówki: zapis do archiwum, punktów trasy ${trip.points.size}, zdjęć ${files.size - 1}" }
+        return TripArchive.write(files)
+    }
+
+    /** Reads a hike saved by [exportArchive] into the own hikes and returns its id. Throws when it cannot be read. */
+    suspend fun importArchive(bytes: ByteArray): String {
+        check(bytes.size <= MAX_ARCHIVE_BYTES) { "Archiwum jest za duże" }
+        Logger.i { "Wędrówki: wczytywanie z archiwum, ${bytes.size} B" }
+        val entries = checkNotNull(TripArchive.read(bytes, MAX_PHOTO_BYTES.toInt())) { "To nie jest archiwum wędrówki" }
+        val route = checkNotNull(entries[ARCHIVE_ROUTE]) { "W archiwum brak pliku trasy" }
+        check(route.size <= MAX_FILE_BYTES) { "Plik trasy jest za duży" }
+        return build(
+            json.decodeFromString<SharedTrip>(route.decodeToString()),
+            senderNum = 0,
+            onStep = { _, _ -> },
+            allowed = { it.startsWith("$ARCHIVE_PHOTO_DIR/") && entries.containsKey(it) },
+            fetch = { name -> checkNotNull(entries[name]) { "Brak zdjęcia" } },
+            keepUrl = false,
+        )
+    }
+
     /** Reads the hike behind [url] into the own hikes and returns its id. Throws when it cannot be read. */
     override val receivedFrom: StateFlow<Map<Int, String>>
         get() = store.receivedFrom
@@ -150,14 +200,21 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         return build(json.decodeFromString<SharedTrip>(text), senderNum = 0) { _, _ -> }
     }
 
-    private suspend fun build(shared: SharedTrip, senderNum: Int, onStep: (Int, Int) -> Unit): String {
+    private suspend fun build(
+        shared: SharedTrip,
+        senderNum: Int,
+        onStep: (Int, Int) -> Unit,
+        allowed: (String) -> Boolean = { HikeLinks.isAllowedHost(it) },
+        fetch: suspend (String) -> ByteArray = { transport.download(it, MAX_PHOTO_BYTES) },
+        keepUrl: Boolean = true,
+    ): String {
         check(shared.points.size in 2..MAX_POINTS) { "Zła liczba punktów trasy" }
         check(shared.points.all { it.size == POINT_FIELDS && it[0] in LAT_RANGE && it[1] in LON_RANGE }) {
             "Zły punkt trasy"
         }
         val id = store.newId()
         val points = shared.points.map { TripPoint(it[0], it[1], null, it[2].toLong() * MILLIS) }
-        val stops = shared.stops.filter { HikeLinks.isAllowedHost(it.photo) }.take(MAX_STOPS)
+        val stops = shared.stops.filter { allowed(it.photo) }.take(MAX_STOPS)
         val total = stops.size
         val built = mutableListOf<TripStop>()
         stops.forEachIndexed { i, s ->
@@ -165,8 +222,8 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
             val photo =
                 try {
                     store
-                        .writePhoto(id, transport.download(s.photo, MAX_PHOTO_BYTES), s.t * MILLIS)
-                        ?.copy(caption = s.caption.take(MAX_TEXT), url = s.photo)
+                        .writePhoto(id, fetch(s.photo), s.t * MILLIS)
+                        ?.copy(caption = s.caption.take(MAX_TEXT), url = if (keepUrl) s.photo else "")
                 } catch (e: Exception) {
                     Logger.w { "Wędrówki: zdjęcia z udostępnionej wędrówki nie udało się pobrać: ${e.message}" }
                     null
@@ -207,6 +264,9 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         const val MAX_POINTS = 20_000
         const val POINT_FIELDS = 3
         const val MAX_FILE_BYTES = 4L * 1024 * 1024
+        const val MAX_ARCHIVE_BYTES = 120 * 1024 * 1024
+        const val ARCHIVE_ROUTE = "wedrowka.json"
+        const val ARCHIVE_PHOTO_DIR = "zdjecia"
         const val MAX_PHOTO_BYTES = 8L * 1024 * 1024
         const val MAX_TEXT = 200
         val LAT_RANGE = -90.0..90.0
