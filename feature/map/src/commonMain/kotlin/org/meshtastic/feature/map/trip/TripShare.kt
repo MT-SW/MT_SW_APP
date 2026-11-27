@@ -102,6 +102,34 @@ class TripShare(private val store: TripStore, private val transport: HikeTranspo
         return link
     }
 
+    /**
+     * The whole hike as a file in the same form that is shared (route, places, the chosen picture link of each place
+     * where it was uploaded), for saving on the device. Nothing is uploaded. Null when the hike is not found.
+     */
+    suspend fun exportJson(tripId: String): String? {
+        val trip = store.find(tripId) ?: return null
+        val stops =
+            trip.stops.sortedBy { it.t }.map { stop ->
+                val photo = stop.photos.getOrNull(stop.shareIndex) ?: stop.photos.firstOrNull()
+                SharedStop(
+                    lat = stop.lat,
+                    lon = stop.lon,
+                    t = stop.t / MILLIS,
+                    title = stop.title,
+                    photo = photo?.url.orEmpty(),
+                    caption = photo?.caption.orEmpty(),
+                )
+            }
+        val file =
+            SharedTrip(
+                name = trip.name,
+                points = trip.points.map { listOf(it.lat, it.lon, (it.t / MILLIS).toDouble()) },
+                stops = stops,
+            )
+        Logger.i { "Wędrówki: zapis do pliku, punktów trasy ${trip.points.size}, miejsc ${stops.size}" }
+        return json.encodeToString(SharedTrip.serializer(), file)
+    }
+
     /** Reads the hike behind [url] into the own hikes and returns its id. Throws when it cannot be read. */
     override val receivedFrom: StateFlow<Map<Int, String>>
         get() = store.receivedFrom

@@ -40,7 +40,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import org.meshtastic.core.ui.component.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -92,6 +92,7 @@ import org.meshtastic.core.resources.trips_caption
 import org.meshtastic.core.resources.trips_chosen
 import org.meshtastic.core.resources.trips_coverage_csv
 import org.meshtastic.core.resources.trips_coverage_geojson
+import org.meshtastic.core.resources.trips_export_json
 import org.meshtastic.core.resources.trips_health_ascent
 import org.meshtastic.core.resources.trips_health_calories
 import org.meshtastic.core.resources.trips_health_distance
@@ -265,6 +266,16 @@ internal fun TripDetailWindow(tripId: String, focusStopId: String? = null, onDis
                 style = MaterialTheme.typography.bodySmall,
             )
             TripCharts(trip)
+            val tripShare: TripShare = koinInject()
+            val exportJson = rememberFileExporter(content = { tripShare.exportJson(tripId)?.encodeToByteArray() })
+            TextButton(
+                onClick = {
+                    Logger.i { "Wędrówki: zapis wędrówki do pliku na urządzeniu" }
+                    exportJson("wedrowka-" + trip.id.take(COVERAGE_FILE_ID_LENGTH) + ".json", "application/json")
+                },
+            ) {
+                Text(stringResource(Res.string.trips_export_json))
+            }
             if (trip.signals.isNotEmpty()) {
                 val exportCsv = rememberFileExporter(content = { trip.coverageCsv()?.encodeToByteArray() })
                 val exportGeoJson = rememberFileExporter(content = { trip.coverageGeoJson()?.encodeToByteArray() })

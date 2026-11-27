@@ -4505,6 +4505,7 @@
     <string name="trips_coverage_csv">Export signal (CSV)</string>
     <string name="trips_coverage_geojson">Export signal (GeoJSON)</string>
     <string name="trips_empty">No saved hikes yet. Start recording a route and take pictures along the way.</string>
+    <string name="trips_export_json">Save hike to a file (JSON)</string>
     <string name="trips_health_ascent">Ascent (health app): %1$d m</string>
     <string name="trips_health_auto">Take steps and heart rate from the health app by itself</string>
     <string name="trips_health_auto_hint">Asks for permission when the recording starts, refreshes the numbers while it runs and saves them with the hike when it ends.</string>

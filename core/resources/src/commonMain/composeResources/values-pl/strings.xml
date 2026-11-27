@@ -4819,6 +4819,7 @@
     <string name="signal_survey_import_hint">Plik zapisany z badania zasięgu albo z wędrówki. Zostaje dodany jako osobna sesja.</string>
     <string name="trips_coverage_csv">Eksportuj zasięg (CSV)</string>
     <string name="trips_coverage_geojson">Eksportuj zasięg (GeoJSON)</string>
+    <string name="trips_export_json">Zapisz wędrówkę do pliku (JSON)</string>
     <string name="trips_position_title">Źródło pozycji</string>
     <string name="trips_position_auto">Najlepsze dostępne</string>
     <string name="trips_position_phone">Telefon</string>

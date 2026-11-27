@@ -4409,6 +4409,7 @@ trips_chosen
 trips_coverage_csv
 trips_coverage_geojson
 trips_empty
+trips_export_json
 trips_health_ascent
 trips_health_auto
 trips_health_auto_hint
