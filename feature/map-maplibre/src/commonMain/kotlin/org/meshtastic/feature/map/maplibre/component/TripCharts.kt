@@ -176,7 +176,16 @@ internal fun TripCharts(trip: Trip) {
     if (distance.size >= 2) {
         Chart(stringResource(Res.string.trips_chart_distance), distance, "km", 2, tertiary, start, end)
     }
-    if (signal.size >= 2) Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm", 0, secondary, start, end)
+    if (signal.size >= 2) {
+        // Normally the signal shares the time axis of the route. When its times lie outside the route (the clock of
+        // the readings and the clock of the position disagree, e.g. on an emulator) the chart uses its own range, so
+        // the readings are not drawn off the card.
+        val outside = signal.last().t < start || signal.first().t > end
+        val from = if (outside) signal.first().t else start
+        val to = if (outside) signal.last().t else end
+        if (outside) Logger.w { "Wędrówki: czasy sygnału poza trasą, wykres sygnału ma własną oś czasu" }
+        Chart(stringResource(Res.string.trips_chart_signal), signal, "dBm", 0, secondary, from, to)
+    }
 }
 
 /** At most [MAX_CHART_POINTS] values: a long route is thinned out. */
