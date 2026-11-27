@@ -627,10 +627,10 @@ enum class ChannelOption(
 
     // Semtech demodulation floor: -7.5 dB at SF7, improving 2.5 dB per SF step.
     // Bandwidth changes sensitivity in dBm, not this SNR threshold.
+
     /**
-     * The channel's true (chip) bandwidth in kHz. Link-budget and time-on-air math (the Planner, the assistant)
-     * should use this instead of [bandwidth] * 1000, which is firmware's own (sometimes rounded) slot-timing
-     * value.
+     * The channel's true (chip) bandwidth in kHz. Link-budget and time-on-air math (the Planner, the assistant) should
+     * use this instead of [bandwidth] * 1000, which is firmware's own (sometimes rounded) slot-timing value.
      */
     val preciseBandwidthKHz: Double
         get() = preciseBandwidthKHzOverride ?: (bandwidth.toDouble() * 1000.0)
