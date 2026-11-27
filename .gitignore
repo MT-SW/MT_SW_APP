@@ -125,3 +125,4 @@ iosApp/Signing.local.xcconfig
 
 # Lokalne notatki robocze Claude
 NOTATKI_CLAUDE.md
+NOTATKI_CLAUDE_HISTORIA.md
