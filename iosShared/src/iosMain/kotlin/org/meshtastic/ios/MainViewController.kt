@@ -132,18 +132,9 @@ fun handleIosSosFromWidget() {
 // The name is called from Swift (iosApp), so it has to start with a capital letter.
 @Suppress("FunctionName", "ktlint:standard:function-naming")
 fun MainViewController() = ComposeUIViewController(
-    configure = {
-        // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out
-        // of sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
-        onFocusBehavior = OnFocusBehavior.DoNothing
-        // MT_SW: since Compose Multiplatform 1.6 every dialog/popup/menu on iOS opens in its own native layer,
-        // separate from the screen under it. That separate layer is what stops a drag from reaching our swipe-
-        // down-to-close code (it works on Android and desktop, where windows stay in the same layer as the
-        // screen) - a known Compose Multiplatform limitation, not something in our own gesture code. Turning this
-        // off puts windows back in the same layer as the rest of the screen, like before 1.6, so the drag reaches
-        // them there too.
-        platformLayers = false
-    },
+    // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out of
+    // sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
+    configure = { onFocusBehavior = OnFocusBehavior.DoNothing },
 ) {
     val uiViewModel = sharedUiViewModel
     MeshServiceLifecycle()
