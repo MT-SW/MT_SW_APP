@@ -21,6 +21,7 @@ package org.meshtastic.core.ui.util
 import android.content.ContentValues
 import android.os.Build
 import android.os.Environment
+import android.os.StatFs
 import android.provider.MediaStore
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.common.ContextServices
@@ -63,4 +64,27 @@ actual fun changeAppPhotoFolder(): String? = null
 
 actual fun defaultPhotoFolder(): String? = null
 
-actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? = null
+private const val BYTES_PER_MB = 1024L * 1024L
+
+/** The room taken by the pictures in the album "MT_SW" and the free space of the phone's storage. */
+actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+    return try {
+        var used = 0L
+        ContextServices.app.contentResolver
+            .query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                arrayOf(MediaStore.Images.Media.SIZE),
+                "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?",
+                arrayOf("${Environment.DIRECTORY_PICTURES}/$HIKE_ALBUM_NAME/%"),
+                null,
+            )
+            ?.use { cursor -> while (cursor.moveToNext()) used += cursor.getLong(0) }
+        val free = StatFs(Environment.getExternalStorageDirectory().path).availableBytes
+        Logger.i { "Album zdjęć: zajmuje ${used / BYTES_PER_MB} MB, wolne ${free / BYTES_PER_MB} MB" }
+        PhotoFolderUsage(used / BYTES_PER_MB, free / BYTES_PER_MB)
+    } catch (e: Exception) {
+        Logger.w { "Album zdjęć: nie udało się policzyć miejsca: ${e.message}" }
+        null
+    }
+}

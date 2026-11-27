@@ -50,6 +50,7 @@ import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoSave
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.util.HIKE_ALBUM_NAME
 import org.meshtastic.core.ui.util.changeAppPhotoFolder
 import org.meshtastic.core.ui.util.currentPhotoFolder
 import org.meshtastic.core.ui.util.defaultPhotoFolder
@@ -107,11 +108,26 @@ fun PhotoFolderSettings() {
                 Text(stringResource(Res.string.photo_folder_change))
             }
         } else {
+            val muted = MaterialTheme.colorScheme.onSurfaceVariant
             Text(
                 text = stringResource(Res.string.photo_folder_auto),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = muted,
             )
+            // The same lines as on the computer: where the pictures are and how much room they take.
+            Text(
+                text = stringResource(Res.string.photo_folder_current, HIKE_ALBUM_NAME),
+                style = MaterialTheme.typography.bodySmall,
+                color = muted,
+            )
+            val usage = remember { photoFolderUsage(HIKE_ALBUM_NAME) }
+            usage?.let {
+                Text(
+                    text = stringResource(Res.string.folder_usage, formatMb(it.usedMb), formatMb(it.freeMb)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = muted,
+                )
+            }
         }
     }
 }
