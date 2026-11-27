@@ -41,15 +41,12 @@ import platform.UIKit.UIView
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
+import platform.UIKit.UIImagePickerControllerCameraDevice
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
 import platform.UIKit.UIImagePickerControllerOriginalImage
 import platform.UIKit.UIImagePickerControllerSourceType
 import platform.UIKit.UINavigationControllerDelegateProtocol
 import platform.darwin.NSObject
-
-// UIImagePickerController.CameraDevice values (the Kotlin binding does not expose the names).
-private const val CAMERA_DEVICE_REAR = 0L
-private const val CAMERA_DEVICE_FRONT = 1L
 
 private const val JPEG_QUALITY = 0.85
 
@@ -93,10 +90,14 @@ private class CameraControls(private val picker: UIImagePickerController, privat
 
     @ObjCAction
     fun flip() {
-        val toFront = picker.cameraDevice == CAMERA_DEVICE_REAR
+        val toFront = picker.cameraDevice == UIImagePickerControllerCameraDevice.UIImagePickerControllerCameraDeviceRear
         Logger.i { "Aparat: przełączenie kamery na ${if (toFront) "przednią" else "tylną"}" }
         picker.cameraDevice =
-            if (toFront) CAMERA_DEVICE_FRONT else CAMERA_DEVICE_REAR
+            if (toFront) {
+                UIImagePickerControllerCameraDevice.UIImagePickerControllerCameraDeviceFront
+            } else {
+                UIImagePickerControllerCameraDevice.UIImagePickerControllerCameraDeviceRear
+            }
     }
 
     @ObjCAction
