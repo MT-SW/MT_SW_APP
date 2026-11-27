@@ -59,6 +59,19 @@ import org.meshtastic.core.resources.signal_survey_readings
 import org.meshtastic.core.resources.signal_survey_senders
 import org.meshtastic.core.resources.signal_survey_unplaced
 import org.meshtastic.core.resources.snr
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
+import org.koin.compose.koinInject
+import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.resources.signal_survey_all_readings
+import org.meshtastic.core.resources.signal_survey_reading_direct
+import org.meshtastic.core.resources.signal_survey_reading_relayed
+import org.meshtastic.core.ui.icon.ExpandLess
+import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -76,7 +89,12 @@ private const val LINKS_MAX_HEIGHT_DP = 120
 fun SignalSurveyCellInfo(modifier: Modifier = Modifier, viewModel: SignalSurveyViewModel = koinViewModel()) {
     val selected by viewModel.selectedCell.collectAsStateWithLifecycle()
     val links by viewModel.selectedLinks.collectAsStateWithLifecycle()
-    selected?.let { SignalSurveyCellCard(it, links, onDismiss = { viewModel.selectCell(null) }, modifier = modifier) }
+    val nodes by koinInject<NodeRepository>().nodeDBbyNum.collectAsStateWithLifecycle()
+    val names =
+        remember(nodes) { nodes.mapValues { (_, node) -> node.user.short_name.ifBlank { node.user.long_name } } }
+    selected?.let {
+        SignalSurveyCellCard(it, links, onDismiss = { viewModel.selectCell(null) }, modifier = modifier, names = names)
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -86,8 +104,10 @@ internal fun SignalSurveyCellCard(
     links: SurveyLinks,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    names: Map<Int, String> = emptyMap(),
 ) {
     val reading = cell.cell
+    var showReadings by remember(cell.id) { mutableStateOf(false) }
     Card(
         modifier =
         modifier
@@ -122,6 +142,13 @@ internal fun SignalSurveyCellCard(
                     DateFormatter.formatDateTimeShort(reading.lastHeardMillis),
                 ),
             )
+            if (reading.readings.size > 1) {
+                ReadingsToggle(count = reading.readings.size, open = showReadings) {
+                    showReadings = !showReadings
+                    Logger.d { "Badanie sygnału: lista odczytów kwadratu, rozwinięta: $showReadings" }
+                }
+                if (showReadings) ReadingsList(reading.readings, names)
+            }
             if (links.links.isNotEmpty()) {
                 Text(
                     stringResource(Res.string.signal_survey_heard_directly),
@@ -150,3 +177,50 @@ internal fun SignalSurveyCellCard(
         }
     }
 }
+
+/** The row that opens and closes the list of every reading in the square (the square itself shows the clearest). */
+@Composable
+private fun ReadingsToggle(count: Int, open: Boolean, onToggle: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 8.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(Res.string.signal_survey_all_readings, count),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = if (open) MeshtasticIcons.ExpandLess else MeshtasticIcons.ExpandMore,
+            contentDescription = null,
+        )
+    }
+}
+
+/** Every reading in the square, the clearest first: who was heard, RSSI, SNR, the time and how it arrived. */
+@Composable
+private fun ReadingsList(readings: List<SurveyReading>, names: Map<Int, String>) {
+    val scroll = rememberScrollState()
+    Column(
+        modifier =
+        Modifier.padding(end = 16.dp).heightIn(max = READINGS_MAX_HEIGHT_DP.dp).verticalScroll(scroll),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        readings.forEachIndexed { index, item ->
+            val name = names[item.fromNum] ?: NodeAddress.numToDefaultId(item.fromNum)
+            val snrLabel = stringResource(Res.string.snr)
+            val snr = item.snr?.let { " · $snrLabel ${NumberFormatter.format(it, 1)}" }.orEmpty()
+            val howRes =
+                if (item.direct) Res.string.signal_survey_reading_direct else Res.string.signal_survey_reading_relayed
+            val how = stringResource(howRes)
+            Text(
+                text =
+                "${if (index == 0) "★ " else ""}$name · ${item.rssi} dBm$snr · " +
+                    "${DateFormatter.formatTime(item.timeMillis)} · $how",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+private const val READINGS_MAX_HEIGHT_DP = 160

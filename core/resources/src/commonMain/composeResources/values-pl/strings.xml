@@ -4227,6 +4227,9 @@
     <string name="signal_survey_heatmap">Pokaż jako mapę cieplną</string>
     <string name="signal_survey_hud_recording">Badanie sygnału trwa · %1$s</string>
     <string name="signal_survey_last_reading">Ostatni odczyt %1$s</string>
+    <string name="signal_survey_all_readings">Wszystkie odczyty w tym kwadracie (%1$d)</string>
+    <string name="signal_survey_reading_direct">bezpośrednio</string>
+    <string name="signal_survey_reading_relayed">przez przekaźnik</string>
     <string name="signal_survey_location_off">Włącz lokalizację, aby zapisywać odczyty</string>
     <string name="signal_survey_location_permission">Zezwól na dostęp do lokalizacji, aby zapisywać odczyty</string>
     <string name="signal_survey_no_fix">Czekam na ustalenie lokalizacji</string>

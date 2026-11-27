@@ -60,7 +60,14 @@ data class SurveyCell(
     val lastHeardMillis: Long,
     /** The clearest direct reception from each node heard without a relay here, by node number. */
     val direct: Map<Int, SurveyReception> = emptyMap(),
+    /** Every reading in the cell (at most [MAX_CELL_READINGS]), the clearest first, for the list in the cell's card. */
+    val readings: List<SurveyReading> = emptyList(),
 )
+
+/** One reading inside a square: who was heard, how strongly, when, and whether without a relay. */
+data class SurveyReading(val fromNum: Int, val snr: Float?, val rssi: Int, val timeMillis: Long, val direct: Boolean)
+
+internal const val MAX_CELL_READINGS = 100
 
 /** One reception's signal, the pair a quality rating is made from. */
 data class SurveyReception(val snr: Float?, val rssi: Int)
@@ -99,6 +106,11 @@ internal fun List<SignalSample>.toSurveyCells(cellMeters: Double = SURVEY_CELL_M
                     .filter { it.direct }
                     .groupBy { it.fromNum }
                     .mapValues { (_, own) -> own.maxWith(ClearestFirst).let { SurveyReception(it.snr, it.rssi) } },
+                readings =
+                readings
+                    .sortedWith(ClearestFirst.reversed())
+                    .take(MAX_CELL_READINGS)
+                    .map { SurveyReading(it.fromNum, it.snr, it.rssi, it.timeMillis, it.direct) },
             )
         }
 }
