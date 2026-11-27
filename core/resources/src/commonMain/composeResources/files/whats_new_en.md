@@ -52,6 +52,8 @@
 - Ranges from a route recognise positions heard directly also when the radio gives no kind of transport.
 - The neighbours window had two buttons that did the same; now there is one "Close".
 - The download of buildings goes on after leaving the screen instead of being cut off silently.
+- The "depth" look (windows, menus, cards): the shadow was drawn by the system's own mechanism and was barely visible; it now draws the same way as the other looks (by hand), so it is clearly visible on every platform.
+- Dragging a window down on the iPhone did not close it when the finger started the move on a scrollable list at the top (the list's own rubber-band effect "ate" the move); it now closes from anywhere in the window, the list included.
 ## orig | Changes against the original
 - Merged changes of the original (version 2.8.5 and later): among others the radio setup wizard, QR/NFC connection codes, an nRF52 bootloader update over Bluetooth and newer libraries.
 - The "Local statistics" and "Node tracker" widgets were removed: one MT_SW widget is left.

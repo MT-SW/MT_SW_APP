@@ -187,6 +187,8 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * Lista rozmów i kanałów: niewybrane są prawie białe i pełne (nic nie prześwieca z tyłu), wybrane mają żółtawy odcień; ciemnoszary kolor usunięty.
 * Poprawki po pełnych testach: testy ponownego uruchamiania połączenia nie czekają już 3 s przerwy (przerwa jest do ustawienia w teście), uwagi detekt, formatowanie.
 * Poprawki po kolejnych pełnych testach: brakujący import przy zapisie zrzutu okna na iPhonie/iPadzie, uwagi detekt przy anulowaniu uruchamiania połączenia i plakietce na ikonie (komputer).
+* Wygląd „z głębią” (okna, menu, karty): cień rysował się mechanizmem systemu i był ledwo widoczny; teraz rysuje się tak samo jak reszta wyglądów (ręcznie), więc jest wyraźny na każdej platformie.
+* Przeciąganie okien w dół na iPhonie nie zamykało okna, gdy palec zaczynał ruch na przewijanej liście u góry (efekt gumowy listy „zjadał” ruch); teraz zamyka się z każdego miejsca okna, też z listy.
 
 ##### Zmiany względem oryginału
 
@@ -1220,6 +1222,8 @@ The main things of every version, split by kind of change (the "What's new in th
 * Conversation and channel list: unchosen ones are nearly white and solid (nothing shows through from behind), chosen ones have a yellowish tint; the dark grey is gone.
 * Fixes after the full tests: the connection-restart tests no longer wait for the 3 s pause (the pause can be set in a test), detekt notes, formatting.
 * Fixes after the next full tests: a missing import when saving the window picture on iPhone/iPad, detekt notes for cancelling a connection start and for the badge on the app icon (desktop).
+* The "depth" look (windows, menus, cards): the shadow was drawn by the system's own mechanism and was barely visible; it now draws the same way as the other looks (by hand), so it is clearly visible on every platform.
+* Dragging a window down on the iPhone did not close it when the finger started the move on a scrollable list at the top (the list's own rubber-band effect "ate" the move); it now closes from anywhere in the window, the list included.
 
 ##### Changes against the original
 

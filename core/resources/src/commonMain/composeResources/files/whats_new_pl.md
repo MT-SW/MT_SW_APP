@@ -52,6 +52,8 @@
 - Zasięgi z trasy rozpoznają pozycje usłyszane bezpośrednio także wtedy, gdy radio nie podaje rodzaju transportu.
 - Okno sąsiadów miało dwa przyciski robiące to samo; teraz jest jeden „Zamknij”.
 - Pobieranie budynków trwa dalej po wyjściu z ekranu, zamiast przerywać się po cichu.
+- Wygląd „z głębią” (okna, menu, karty): cień rysował się mechanizmem systemu i był ledwo widoczny; teraz rysuje się tak samo jak reszta wyglądów (ręcznie), więc jest wyraźny na każdej platformie.
+- Przeciąganie okien w dół na iPhonie nie zamykało okna, gdy palec zaczynał ruch na przewijanej liście u góry (efekt gumowy listy „zjadał” ruch); teraz zamyka się z każdego miejsca okna, też z listy.
 ## orig | Zmiany względem oryginału
 - Scalone zmiany oryginału (wersja 2.8.5 i późniejsze): m.in. kreator konfiguracji radia, kody połączenia QR/NFC, aktualizacja bootloadera nRF52 przez Bluetooth i nowsze biblioteki.
 - Usunięte widżety „Statystyki lokalne” i „Śledzenie węzła”: został jeden widżet MT_SW.
