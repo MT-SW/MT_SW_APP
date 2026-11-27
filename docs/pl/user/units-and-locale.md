@@ -28,7 +28,7 @@ Jednostki zależą od **regionu** urządzenia, a nie od języka wyświetlania. Z
 
 ## Ekran węzła jest osobny
 
-**Ustawienia → Konfiguracja urządzenia → Wyświetlacz → Wyświetlane jednostki** konfiguruje ekran na węźle, a nie aplikację. Ustawienia **Zegar 12-godzinny** i **Zawsze wskazuj północ** także dotyczą tylko wyświetlacza węzła, wszystkie trzy. Temperatura na tym ekranie ma własne ustawienie, **Wyświetlaj w Fahrenheitach**, w module Telemetria węzła. Zobacz [opis modułu telemetrii](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) na meshtastic.org.
+**Ustawienia → Konfiguracja urządzenia → Wyświetlacz → Wyświetlane jednostki** konfiguruje ekran na węźle, a nie aplikację. Ustawienie **Zegar 12-godzinny** także dotyczy tylko wyświetlacza węzła, oba. Temperatura na tym ekranie ma własne ustawienie, **Wyświetlaj w Fahrenheitach**, w module Telemetria węzła. Zobacz [opis modułu telemetrii](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) na meshtastic.org.
 
 Jeśli lista węzłów pokazuje mile, a ekran węzła kilometry, to właśnie dlatego: oba ustawia się w różnych miejscach. Zmiana ustawienia węzła nigdy nie zmienia tego, co wyświetla aplikacja. Opcje po stronie urządzenia opisuje przewodnik [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) na meshtastic.org.
 

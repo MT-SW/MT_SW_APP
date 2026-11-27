@@ -150,7 +150,7 @@ W **Ustawienia → Konfiguracja urządzenia → Wyświetlacz**. Te ustawienia do
 | Ustawienie | Opis | Domyślnie |
 |---------|-------------|---------|
 | Format 12-godzinny | Pokazuje zegar węzła w formacie 12-godzinnym zamiast 24-godzinnego | Wyłączone |
-| Zawsze wskazuj północ | Blokuje różę kompasu północą do góry zamiast obracać ją razem z Twoim kierunkiem. Niezależne od **Orientacji kompasu** — żadne z nich nie zastępuje drugiego | Wyłączone |
+| Zawsze wskazuj północ | Pokazywane tylko dla węzła z firmware starszym niż 2.7.1 albo dopóki ustawienie jest włączone. Firmware 2.7.1 i nowsze je ignoruje: styl kompasu wybiera się na węźle, w jego menu **Kompas** | Wyłączone |
 | Pogrubiony nagłówek | Rysuje tekst nagłówka ekranu pogrubioną czcionką | Wyłączone |
 | Interwał "karuzeli" | Jak często węzeł sam przechodzi do następnego ekranu: **Nieustawiony** (nigdy) albo od 15 sekund do 15 minut | Nieustawiony |
 | Orientacja kompasu | Przesunięcie obrotu różyny kompasu: **0°**, **90°**, **180°** lub **270°**, każde także w wariancie **Odwrócone** | 0° |
