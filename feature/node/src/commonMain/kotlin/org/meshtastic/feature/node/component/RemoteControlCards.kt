@@ -80,6 +80,8 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.RemoteLastPicks
+import org.meshtastic.core.repository.RemotePickKind
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add_contact
 import org.meshtastic.core.resources.cancel
@@ -111,6 +113,9 @@ import org.meshtastic.core.resources.remote_favorite_confirm_title
 import org.meshtastic.core.resources.remote_id_invalid
 import org.meshtastic.core.resources.remote_ignore_confirm_text
 import org.meshtastic.core.resources.remote_ignore_confirm_title
+import org.meshtastic.core.resources.remote_last_clear
+import org.meshtastic.core.resources.remote_last_picks
+import org.meshtastic.core.resources.remote_last_use_all
 import org.meshtastic.core.resources.remote_list_favorites
 import org.meshtastic.core.resources.remote_list_ignored
 import org.meshtastic.core.resources.remote_lists_info_1
@@ -574,9 +579,13 @@ internal fun RemoteNodeManagementPanel(
     var confirmAdd by remember { mutableStateOf(false) }
     val targets = (selected.toList() + listOfNotNull(targetNodeNum)).distinct()
     var listType by remember { mutableStateOf(RemoteListType.FAVORITE) }
+    val lastPicks = koinInject<RemoteLastPicks>()
+    val remembered by lastPicks.picks.collectAsState()
+    val listKind = if (listType == RemoteListType.FAVORITE) RemotePickKind.FAVORITE else RemotePickKind.IGNORE
     val listColor = if (listType == RemoteListType.FAVORITE) gold else purple
 
     fun send(add: Boolean) {
+        lastPicks.remember(listKind, targets)
         targets.forEach { id ->
             when (listType) {
                 RemoteListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, add))
@@ -663,6 +672,12 @@ internal fun RemoteNodeManagementPanel(
                 }
             }
         }
+        RememberedPicks(
+            nums = remembered[listKind].orEmpty(),
+            nodeDb = nodeDb,
+            onUse = { num -> if (num !in selected) selected.add(num) },
+            onClear = { lastPicks.clear(listKind) },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             ChoiceTile(
                 icon =
@@ -710,6 +725,12 @@ internal fun RemoteNodeManagementPanel(
             hint = stringResource(Res.string.remote_contact_hint),
             accent = MaterialTheme.colorScheme.primary,
         )
+        RememberedPicks(
+            nums = remembered[RemotePickKind.CONTACT].orEmpty(),
+            nodeDb = nodeDb,
+            onUse = { num -> if (num !in selected) selected.add(num) },
+            onClear = { lastPicks.clear(RemotePickKind.CONTACT) },
+        )
         OutlinedTextField(
             state = longNameState,
             labelPosition = TextFieldLabelPosition.Above(),
@@ -730,6 +751,7 @@ internal fun RemoteNodeManagementPanel(
             enabled = !isEnsuringSession && (selected.isNotEmpty() || targetNodeNum != null),
             onClick = {
                 // Ticked nodes are saved with the names from our own list; a typed ID with the names typed here.
+                lastPicks.remember(RemotePickKind.CONTACT, selected.toList() + listOfNotNull(targetNodeNum))
                 selected.toList().forEach { num ->
                     nodeDb[num]?.let { node ->
                         val contact =
@@ -840,5 +862,46 @@ internal fun RemoteNodeManagementPanel(
                 TextButton(onClick = { confirmRemove = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
+    }
+}
+
+/**
+ * MT_SW: the nodes last picked for this purpose (favorites, ignored or contacts), as chips that put a node back into
+ * the selection with one touch, with "use all" and a button that clears this memory. Nothing is shown when empty.
+ */
+@Composable
+private fun RememberedPicks(
+    nums: Set<Int>,
+    nodeDb: Map<Int, Node>,
+    onUse: (Int) -> Unit,
+    onClear: () -> Unit,
+) {
+    val known = nums.mapNotNull { nodeDb[it] }
+    if (known.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(Res.string.remote_last_picks),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        ) {
+            known.forEach { node -> NodeChip(node = node, onClick = { onUse(node.num) }) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = {
+                    Logger.i { "Zdalne listy: użyto wszystkich zapamiętanych węzłów (${known.size})" }
+                    known.forEach { onUse(it.num) }
+                },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(stringResource(Res.string.remote_last_use_all))
+            }
+            OutlinedButton(onClick = onClear, modifier = Modifier.weight(1f)) {
+                Text(stringResource(Res.string.remote_last_clear))
+            }
+        }
     }
 }

@@ -3630,6 +3630,9 @@
     <string name="remote_id_invalid">This does not look like a node ID (for example !a1b2c3d4)</string>
     <string name="remote_ignore_confirm_text">The remote device will drop packets from the selected nodes and delete what it stored from them. Removing the block later does not bring that back.</string>
     <string name="remote_ignore_confirm_title">Ignore on the remote device?</string>
+    <string name="remote_last_clear">Clear this list</string>
+    <string name="remote_last_picks">Last picked for this</string>
+    <string name="remote_last_use_all">Use all</string>
     <string name="remote_list_favorites">Favorites</string>
     <string name="remote_list_ignored">Ignored</string>
     <string name="remote_lists_info_1">Here you change the lists of the device you manage remotely, not the lists of this phone. Pick devices from our list or type a node ID (e.g. !a1b2c3d4). You can select many at once.</string>

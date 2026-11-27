@@ -4850,4 +4850,7 @@
     <string name="app_data_info_2">Zmiana folderu przenosi dane w nowe miejsce, więc może chwilę potrwać. Zdjęcia z aparatu mają osobny folder, poniżej.</string>
     <string name="app_data_where">Wiadomości, ustawienia, logi, mapy i modele AI są w: %1$s</string>
     <string name="folder_usage">Zajmuje: %1$s. Wolne miejsce na dysku: %2$s.</string>
+    <string name="remote_last_picks">Ostatnio wybrane do tego</string>
+    <string name="remote_last_use_all">Użyj wszystkich</string>
+    <string name="remote_last_clear">Wyczyść tę listę</string>
 </resources>
