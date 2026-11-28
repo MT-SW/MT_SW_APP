@@ -33,7 +33,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.app_log_folder
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_open_failed
 import org.meshtastic.core.resources.app_log_open_folder
@@ -79,13 +78,6 @@ fun AppLogSettings() {
         enabled = true,
         onCheckedChange = { on -> control.setLevel(if (on) AppLogLevel.FULL else AppLogLevel.OFF) },
     )
-    control.folderHint?.let { hint ->
-        Text(
-            text = stringResource(Res.string.app_log_folder, hint),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-    }
     if (control.canOpenFolder) {
         ListItem(text = stringResource(Res.string.app_log_open_folder), leadingIcon = MeshtasticIcons.List) {
             failed = !control.openFolder()

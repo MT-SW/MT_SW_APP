@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -762,7 +763,9 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
             // All the folders in one place: the app's data, the pictures taken in the app and the logs.
             ExpressiveSection(title = stringResource(Res.string.folders_title)) {
                 AiStorageRow()
+                HorizontalDivider()
                 PhotoFolderSettings()
+                HorizontalDivider()
                 LogFolderSettings()
             }
 

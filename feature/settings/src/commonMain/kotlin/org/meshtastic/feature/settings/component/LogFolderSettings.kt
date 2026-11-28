@@ -45,8 +45,8 @@ import org.meshtastic.core.resources.log_folder_app_info
 import org.meshtastic.core.resources.log_folder_title
 import org.meshtastic.core.resources.photo_folder_change
 import org.meshtastic.core.ui.component.InfoButton
-import org.meshtastic.core.ui.icon.FolderOpen
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
 
@@ -64,7 +64,7 @@ fun LogFolderSettings() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Icon(imageVector = MeshtasticIcons.FolderOpen, contentDescription = null)
+            Icon(imageVector = MeshtasticIcons.Notes, contentDescription = null)
             Text(
                 text = stringResource(Res.string.log_folder_title),
                 style = MaterialTheme.typography.bodyLarge,
