@@ -129,7 +129,8 @@ fun ModalBottomSheet(
     val windowSurface = LocalWindowSurface.current ?: MaterialTheme.colorScheme.surface
     val overWindow = LocalWindowSurface.current != null
     LaunchedEffect(Unit) { Logger.i { "Okno: otwarte, tło ${if (overWindow) "z okna pod spodem" else "z motywu"}" } }
-    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = standardWidth)) {
+    val dialogProperties = DialogProperties(usePlatformDefaultWidth = standardWidth)
+    Dialog(onDismissRequest = onDismissRequest, properties = dialogProperties) {
         Surface(
             modifier =
             modifier
