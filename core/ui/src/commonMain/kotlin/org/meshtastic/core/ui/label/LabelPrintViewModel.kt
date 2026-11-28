@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.label
 
+import co.touchlab.kermit.Logger
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -135,8 +136,11 @@ class LabelPrintViewModel(printerFactory: NiimbotPrinterFactory, private val pre
         if (_state.value.status != LabelPrinterStatus.READY) return
         _state.update { it.copy(status = LabelPrinterStatus.PRINTING, error = null) }
         work = viewModelScope.launch {
+            Logger.i { "Etykiety: start wydruku" }
             val result = safeCatching { printer.print(bitmap) }
             ensureActive()
+            val failed = result.exceptionOrNull()?.let { it::class.simpleName }
+            Logger.i { "Etykiety: koniec wydruku, błąd: ${failed ?: "brak"}" }
             if (result.exceptionOrNull() is NiimbotException.LinkLost) {
                 // Its notifications or writes failed while Bluetooth may still hold the link, so no drop is reported.
                 onPrinterDropped(release = true)
@@ -164,8 +168,10 @@ class LabelPrintViewModel(printerFactory: NiimbotPrinterFactory, private val pre
             // A canceled connect disconnects as it unwinds, which must not land on this connection.
             previous?.join()
             closing?.join()
+            Logger.i { "Etykiety: łączenie z drukarką" }
             val result = safeCatching { printer.connect(device) }
             ensureActive()
+            Logger.i { "Etykiety: łączenie, wynik ${result.exceptionOrNull()?.let { it::class.simpleName } ?: "ok"}" }
             result
                 .onSuccess { _ ->
                     prefs.setPrinterAddress(device.address)
@@ -184,6 +190,7 @@ class LabelPrintViewModel(printerFactory: NiimbotPrinterFactory, private val pre
      */
     private fun onPrinterDropped(release: Boolean = false) {
         val wasPrinting = _state.value.status == LabelPrinterStatus.PRINTING
+        Logger.w { "Etykiety: drukarka rozłączona, w trakcie wydruku: $wasPrinting" }
         work?.cancel()
         if (wasPrinting) _state.update { it.copy(error = LabelPrintError.NoResponse) }
         _state.update { it.copy(status = LabelPrinterStatus.IDLE, printerName = null) }
@@ -204,6 +211,7 @@ class LabelPrintViewModel(printerFactory: NiimbotPrinterFactory, private val pre
 
     private fun startSearch() {
         search?.cancel()
+        Logger.i { "Etykiety: szukanie drukarki" }
         _state.update { it.copy(status = LabelPrinterStatus.SEARCHING, printerName = null, found = emptyList()) }
         search = viewModelScope.launch {
             val scan = safeCatching {

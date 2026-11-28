@@ -20,6 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +32,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -87,6 +87,7 @@ import org.meshtastic.core.resources.label_print_error_scan_busy
 import org.meshtastic.core.resources.label_print_error_unsupported
 import org.meshtastic.core.resources.label_print_error_wrong_roll
 import org.meshtastic.core.resources.label_print_include_pin
+import org.meshtastic.core.resources.label_print_info
 import org.meshtastic.core.resources.label_print_length
 import org.meshtastic.core.resources.label_print_length_mm
 import org.meshtastic.core.resources.label_print_name_tag_title
@@ -107,6 +108,10 @@ import org.meshtastic.core.resources.label_print_search_again
 import org.meshtastic.core.resources.label_print_searching
 import org.meshtastic.core.resources.label_print_stock_hint
 import org.meshtastic.core.resources.open_settings
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Print
 import org.meshtastic.core.ui.util.PermissionStatus
@@ -145,40 +150,52 @@ fun LabelPrintSheet(
     }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            modifier =
-            Modifier.fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = stringResource(spec.titleRes),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-            LabelPreview(shown, rendered)
-            if (spec is LabelSpec.Connect && spec.linkWithoutPin != null) {
-                PinOption(included = includePin, onChange = { includePin = it })
-            }
-            LabelLengthPicker(lengthMm, viewModel::setLabelLengthMm)
-            SectionTitle(Res.string.label_print_printer)
-            PrinterAccess(permission, bluetoothOff) {
-                PrinterSection(state, onConnect = viewModel::connect, onSearch = viewModel::start)
-            }
-            state.error?.let { Text(text = it.message(), color = MaterialTheme.colorScheme.error) }
-            Button(
-                onClick = { rendered?.let { viewModel.print(it.bitmap) } },
-                enabled = state.status == LabelPrinterStatus.READY && rendered != null,
-                modifier = Modifier.fillMaxWidth(),
+        val scroll = rememberScrollState()
+        Box {
+            Column(
+                modifier =
+                Modifier.fillMaxWidth()
+                    .verticalScroll(scroll)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Icon(imageVector = MeshtasticIcons.Print, contentDescription = null)
-                Text(text = stringResource(state.printLabel), modifier = Modifier.padding(start = 8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(end = SHEET_CROSS_INSET_DP.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(spec.titleRes),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(1f).semantics { heading() },
+                    )
+                    InfoButton(spec.titleRes, Res.string.label_print_info, tint = Color(INFO_YELLOW))
+                }
+                LabelPreview(shown, rendered)
+                if (spec is LabelSpec.Connect && spec.linkWithoutPin != null) {
+                    PinOption(included = includePin, onChange = { includePin = it })
+                }
+                LabelLengthPicker(lengthMm, viewModel::setLabelLengthMm)
+                SectionTitle(Res.string.label_print_printer)
+                PrinterAccess(permission, bluetoothOff) {
+                    PrinterSection(state, onConnect = viewModel::connect, onSearch = viewModel::start)
+                }
+                state.error?.let { Text(text = it.message(), color = MaterialTheme.colorScheme.error) }
+                Button(
+                    onClick = { rendered?.let { viewModel.print(it.bitmap) } },
+                    enabled = state.status == LabelPrinterStatus.READY && rendered != null,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(imageVector = MeshtasticIcons.Print, contentDescription = null)
+                    Text(text = stringResource(state.printLabel), modifier = Modifier.padding(start = 8.dp))
+                }
             }
+            FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }
+
+private const val INFO_YELLOW = 0xFFF5C839
 
 private val LabelSpec.titleRes: StringResource
     get() =
