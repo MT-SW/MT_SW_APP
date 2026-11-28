@@ -31,6 +31,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 ##### Ulepszenia
 
 * **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
+* **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 
 ##### Zmiany względem oryginału
 
@@ -180,6 +181,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 * **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
 * **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
 * **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
+* **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 * Zaktualizowano do oryginału w wersji 2.8.6.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
@@ -1002,6 +1004,7 @@ The main things of every version, split by kind of change (the "What's new in th
 ##### Improvements
 
 * **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
+* **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 
 ##### Changes against the original
 
@@ -1151,6 +1154,7 @@ Every new change goes under the heading of the current version.
 * **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
 * **Red open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
 * **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
+* **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 * Updated to the original app, version 2.8.6.
 
 ### v5 (2.8.5) — test versions from 5 November 2026

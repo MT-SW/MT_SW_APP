@@ -5,6 +5,7 @@
 - **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
 ## better | Ulepszenia
 - **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
+- **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 ## orig | Zmiany względem oryginału
 - Zaktualizowano do oryginału w wersji 2.8.6.
 
