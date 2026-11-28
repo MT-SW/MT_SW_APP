@@ -65,7 +65,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private const val SHEET_CORNER_DP = 28
 private const val WINDOW_MAX_WIDTH_DP = 560
@@ -75,8 +74,7 @@ private const val WINDOW_MAX_HEIGHT_PERCENT = 0.85f
 /** How far (in dp) a downward swipe has to go to close the window. */
 private const val SWIPE_CLOSE_DP = 40
 
-/** How many mouse wheel ticks up, with nothing left to scroll, close the window. */
-private const val WHEEL_CLOSE_TICKS = 3f
+/** How far up the wheel must pull, after the rest at the top, to close the window. */
 private const val WHEEL_AGAIN_TICKS = 1f
 private const val WHEEL_PAUSE_MS = 500L
 
@@ -199,8 +197,8 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                 if (consumed.y != 0f) gesture.contentMoved = true
-                // On a computer the wheel and the trackpad are judged below (a pause and a new scroll are needed).
-                val fromTouch = !isDesktopPlatform && source == NestedScrollSource.UserInput
+                // The wheel and the trackpad are judged below (a rest and a new scroll are needed), on every system.
+                val fromTouch = !gesture.wheeling && source == NestedScrollSource.UserInput
                 if (fromTouch && available.y > 0f && consumed.y == 0f) {
                     dragged += available.y
                     if (dragged > threshold) {
@@ -230,9 +228,20 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
     }
     return nestedScroll(connection)
         .pointerInput(Unit) {
+            // Seen before the content scrolls: tells a wheel or trackpad apart from a finger.
+            awaitPointerEventScope {
+                while (true) {
+                    when (awaitPointerEvent(PointerEventPass.Initial).type) {
+                        PointerEventType.Scroll -> gesture.wheeling = true
+                        PointerEventType.Press -> gesture.wheeling = false
+                    }
+                }
+            }
+        }
+        .pointerInput(Unit) {
             // The mouse wheel and the trackpad (computer): see [WheelClose].
             awaitPointerEventScope {
-                val wheel = WheelClose(needsPause = isDesktopPlatform)
+                val wheel = WheelClose()
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Final)
                     val change = event.changes.firstOrNull()
@@ -290,11 +299,11 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
 }
 
 /**
- * Closing by scrolling with a wheel or trackpad. On a computer ([needsPause]) scrolling from the bottom only reaches the
- * top, however fast. The window closes when, after a rest of [WHEEL_PAUSE_MS], it is pulled up again with the content
- * already at its top. Elsewhere (a mouse on a tablet) a few ticks up close the window, as before.
+ * Closing by scrolling with a wheel or trackpad, on every system. Scrolling from the bottom only reaches the top, however
+ * fast. The window closes when, after a rest of [WHEEL_PAUSE_MS], it is pulled up again with the content already at its
+ * top.
  */
-private class WheelClose(private val needsPause: Boolean) {
+private class WheelClose {
     private var lastEvent: Long? = null
     private var afterPause = false
     private var ticks = 0f
@@ -306,10 +315,10 @@ private class WheelClose(private val needsPause: Boolean) {
         if (usedByContent) {
             reset()
         } else {
-            if (rested || !needsPause) afterPause = true
+            if (rested) afterPause = true
             // Weak pulls after the rest add up.
             if (afterPause) ticks += up
-            close = ticks >= if (needsPause) WHEEL_AGAIN_TICKS else WHEEL_CLOSE_TICKS
+            close = ticks >= WHEEL_AGAIN_TICKS
         }
         if (close) reset()
         return close
@@ -326,6 +335,7 @@ private const val GESTURE_LOG_SHARE = 0.3f
 
 /** State of one drag on the window, shared by the list watcher and the pointer watcher. */
 private class SwipeGesture {
+    var wheeling = false
     var scrollSeen = false
     var contentMoved = false
     var closed = false
