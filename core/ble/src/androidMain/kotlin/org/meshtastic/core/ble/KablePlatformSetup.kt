@@ -24,12 +24,10 @@ import com.juul.kable.PooledThreadingStrategy
 import com.juul.kable.ScannerBuilder
 import com.juul.kable.toIdentifier
 
-// The scan callback never blocks; pre-conflating means a dense BLE environment cannot back
-// advertisements up behind a slow collector. (Kable 0.44.3's `ScannerBuilder` predates
-// `bufferCapacity`, added in 0.45.0 -- `preConflate = true` is the 0.44.3 equivalent of
-// `bufferCapacity = 1`.)
+// The scan callback never blocks; a capacity of 1 conflates, so a dense BLE environment cannot back
+// advertisements up behind a slow collector.
 internal actual fun ScannerBuilder.platformScanConfig() {
-    preConflate = true
+    bufferCapacity = 1
 }
 
 /** Android's scanner filters on address in hardware, so Kable's `Filter.Address` works natively here. */
@@ -51,7 +49,11 @@ internal actual val bleAddressIsHardware: Boolean = true
  */
 private val sharedThreadingStrategy = PooledThreadingStrategy()
 
-internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean) {
+internal actual fun PeripheralBuilder.platformConfig(
+    device: BleDevice,
+    requestMtu: Boolean,
+    autoConnect: () -> Boolean,
+) {
     // Bonded devices without a fresh advertisement must use autoConnect = true. Otherwise,
     // Android's direct connect algorithm often fails with GATT 133 or times out, especially
     // if the device uses random resolvable addresses. Scanned devices (advertisement != null)
@@ -65,7 +67,13 @@ internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConn
     // the LE 2M PHY in any first-party firmware, so changing these would be a regression risk
     // with no upside. If a future hardware revision exposes 2M PHY, override `phy = Phy.Le2M`
     // here after confirming the firmware advertises it.
+
+    // Android defaults to 23 bytes, Meshtastic packets can be 512. Kable requests the MTU after connect, before
+    // service discovery, and a refused request fails the whole connect -- so the caller can leave it out once.
+    mtu = if (requestMtu) REQUESTED_MTU else null
 }
+
+private const val REQUESTED_MTU = 512
 
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =
     com.juul.kable.Peripheral(address.toIdentifier(), builderAction)
@@ -73,15 +81,13 @@ internal actual fun createPeripheral(address: String, builderAction: PeripheralB
 /** ATT protocol header size (opcode + handle) subtracted from MTU to get the usable payload. */
 private const val ATT_HEADER_SIZE = 3
 
-internal actual fun Peripheral.negotiatedMaxWriteLength(): Int? {
+// Reads the live MTU rather than [atConnect], since Android can renegotiate it after connect.
+internal actual fun Peripheral.negotiatedMaxWriteLength(atConnect: Int?): Int? {
     val mtu = (this as? AndroidPeripheral)?.mtu?.value ?: return null
-    return (mtu - ATT_HEADER_SIZE).takeIf { it > 0 }
+    return (mtu - ATT_HEADER_SIZE).coerceAtMost(MAX_ATTRIBUTE_LENGTH).takeIf { it > 0 }
 }
 
-internal actual suspend fun Peripheral.negotiateMtu(mtu: Int): Int? {
-    val androidPeripheral = this as? AndroidPeripheral ?: return null
-    return androidPeripheral.requestMtu(mtu)
-}
+internal actual fun Peripheral.mtuRequestUnanswered(): Boolean = this is AndroidPeripheral && mtu.value == null
 
 internal actual fun Peripheral.requestHighConnectionPriority(): Boolean {
     val androidPeripheral = this as? AndroidPeripheral ?: return false

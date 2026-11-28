@@ -3,6 +3,8 @@
 - **Labels on a Niimbot D110 printer (Android, desktop, iPhone/iPad).** “Print label” (QR code) when sharing a contact or channels and on the connected device card. Android only in the original. Not yet tried with a printer on desktop and iPhone.
 - **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
 - **Red open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
+## better | Improvements
+- **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 ## orig | Changes against the original
 - Updated to the original app, version 2.8.6.
 

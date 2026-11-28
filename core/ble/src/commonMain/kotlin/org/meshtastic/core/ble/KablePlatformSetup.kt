@@ -33,7 +33,7 @@ import com.juul.kable.PeripheralBuilder
 internal expect val supportsNativeServiceScanFilter: Boolean
 
 /** Platform-specific configuration for the Peripheral builder based on device type. */
-internal expect fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean)
+internal expect fun PeripheralBuilder.platformConfig(device: BleDevice, requestMtu: Boolean, autoConnect: () -> Boolean)
 
 /** Platform-specific instantiation of a Peripheral by address. */
 internal expect fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral
@@ -46,9 +46,13 @@ internal expect suspend fun Peripheral.connectedRssi(): Int?
 
 /**
  * Returns the negotiated maximum write payload length in bytes (i.e. ATT MTU minus the 3-byte ATT header), or `null` if
- * MTU has not yet been negotiated on this platform.
+ * MTU has not yet been negotiated on this platform. [atConnect] is Kable's `maximumWriteValueLengthForType`, read once
+ * after the last connect, for platforms that only report it through that suspend call.
  */
-internal expect fun Peripheral.negotiatedMaxWriteLength(): Int?
+internal expect fun Peripheral.negotiatedMaxWriteLength(atConnect: Int?): Int?
+
+/** True where the app asks for an MTU and the peripheral never got one (Android only). */
+internal expect fun Peripheral.mtuRequestUnanswered(): Boolean
 
 /**
  * Requests the highest-throughput BLE connection priority (smallest connection interval) supported by the platform.
@@ -67,9 +71,7 @@ internal expect fun Peripheral.requestBalancedConnectionPriority(): Boolean
 /**
  * Clears the platform's cached GATT service table for the connected [Peripheral].
  *
- * Kable keeps Android's `BluetoothGatt` on an internal connection object owned by the peripheral. This extension
- * searches the peripheral and its active connection for that field, then invokes the hidden `refresh()` API to clear
- * the per-device service cache.
+ * On Android this is Kable's `AndroidPeripheral.refreshGattCache`, which invokes the hidden `BluetoothGatt.refresh()`.
  *
  * Necessary when a device reboots into a different GATT profile (e.g., ESP32 OTA loader) using the same BLE MAC.
  *
@@ -77,12 +79,6 @@ internal expect fun Peripheral.requestBalancedConnectionPriority(): Boolean
  * `false`.
  */
 internal expect fun Peripheral.refreshGattCache(): Boolean
-
-/**
- * Requests the given ATT MTU on the connected [Peripheral] and returns the negotiated value, or `null` if negotiation
- * failed, hasn't run, or the platform has no equivalent API (JVM/iOS).
- */
-internal expect suspend fun Peripheral.negotiateMtu(mtu: Int): Int?
 
 /**
  * The observation failure Kable suppressed on this peripheral through a handler the connection did not install, or

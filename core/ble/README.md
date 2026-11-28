@@ -15,7 +15,7 @@ The connection contract, implemented over Kable's `Peripheral` by `KableBleConne
     - **Connection & Await:** `connect` and `connectAndAwait` connect and wait for a terminal `BleConnectionState`.
     - **Unified Profile Helper:** `profile` runs service discovery and characteristic setup for one service in a single block, with a timeout (30 s by default).
     - **Observability:** Exposes `connectionState` and `deviceFlow` as `StateFlow`s for reactive UI and service updates.
-    - **Platform Setup:** The `expect`/`actual` functions in `KablePlatformSetup.kt` (`platformConfig`, `negotiatedMaxWriteLength`, connection priority, GATT cache refresh) carry the platform differences: on Android, `autoConnect` for bonded devices without a fresh advertisement and a 512-byte MTU request; on Desktop, direct connections; on the web, the peripheral the page was granted, kept open across reconnects because only the picker can make another.
+    - **Platform Setup:** The `expect`/`actual` functions in `KablePlatformSetup.kt` (`platformConfig`, `negotiatedMaxWriteLength`, connection priority, GATT cache refresh) carry the platform differences: on Android, `autoConnect` for bonded devices without a fresh advertisement and a 512-byte MTU request (left out for one attempt if a connect failed on it); on Desktop, direct connections; on the web, the peripheral the page was granted, kept open across reconnects because only the picker can make another.
 
 ### 2. `BluetoothRepository`
 A singleton repository for the global state of Bluetooth on the device, implemented by `AndroidBluetoothRepository`, `KableBluetoothRepository` on Desktop and `WebBluetoothRepository` on the web, where there are no bonds.

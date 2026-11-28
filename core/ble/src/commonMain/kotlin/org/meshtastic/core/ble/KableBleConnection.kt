@@ -49,6 +49,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid
 
+/** No attribute value exceeds 512 bytes, while Android 14+ and BlueZ negotiate an MTU of 517 (a 514-byte payload). */
+internal const val MAX_ATTRIBUTE_LENGTH = 512
+
 /** [BleService] implementation backed by a Kable [Peripheral] for a specific GATT service. */
 class KableBleService(private val peripheral: Peripheral, private val serviceUuid: Uuid) : BleService {
     override fun hasCharacteristic(characteristic: BleCharacteristic): Boolean = peripheral.services.value?.any { svc ->
@@ -106,6 +109,16 @@ internal inline fun <T> asException(block: () -> T): T = try {
     throw if (t is Exception || t is Error) t else IllegalStateException(t.message, t)
 }
 
+@Suppress("TooGenericExceptionCaught")
+private suspend fun Peripheral.queryMaxWriteLength(): Int? = try {
+    asException { maximumWriteValueLengthForType(WriteType.WithoutResponse) }
+} catch (e: CancellationException) {
+    throw e
+} catch (e: Exception) {
+    Logger.w(e) { "maximumWriteValueLengthForType failed; callers use their own fallback" }
+    null
+}
+
 /** Builds the Kable peripheral for a connect: from the scan's advertisement when there is one, else by address. */
 internal typealias PeripheralFactory = (MeshtasticBleDevice, PeripheralBuilder.() -> Unit) -> Peripheral
 
@@ -146,6 +159,13 @@ internal constructor(
 
     @Volatile private var observationFailure: Throwable? = null
 
+    @Volatile private var writeLengthAtConnect: Int? = null
+
+    /** Set when a connect died on the MTU request; the next one is then built without it, once. */
+    @Volatile private var skipMtuOnce = false
+
+    @Volatile private var reachedServices = false
+
     override val lastFailureCause: Throwable?
         get() = connectFailure ?: observationFailure ?: peripheral?.preinstalledObservationFailure()
 
@@ -170,11 +190,17 @@ internal constructor(
         var autoConnect = meshtasticDevice.advertisement == null
         connectFailure = null
         observationFailure = null
+        val requestMtu = !skipMtuOnce
+        skipMtuOnce = false
+        reachedServices = false
+        if (!requestMtu) {
+            Logger.w { "[${device.address.anonymize()}] Connecting without an MTU request after it failed last time" }
+        }
 
         /** Applies logging, observation exception handling, and platform config shared by both peripheral types. */
         fun PeripheralBuilder.commonConfig() {
             meshtasticConfig(loggingConfig, device.address.anonymize()) { observationFailure = it }
-            platformConfig(device) { autoConnect }
+            platformConfig(device, requestMtu) { autoConnect }
         }
 
         val p =
@@ -194,6 +220,7 @@ internal constructor(
         withContext(NonCancellable) {
             cleanUpPeripheral()
             peripheral = p
+            writeLengthAtConnect = null
             if (tracksActiveConnection) ActiveBleConnection.active = ActiveConnection(p, device.address)
         }
 
@@ -204,6 +231,8 @@ internal constructor(
         stateJob =
             p.state
                 .onEach { kableState ->
+                    if (kableState is State.Connecting.Services) reachedServices = true
+                    if (kableState is State.Disconnected) writeLengthAtConnect = null
                     val mappedState = kableState.toBleConnectionState(hasStartedConnecting) ?: return@onEach
                     if (kableState is State.Connecting || kableState is State.Connected) {
                         hasStartedConnecting = true
@@ -218,46 +247,57 @@ internal constructor(
         // Bounded to at most two attempts: direct connect, then autoConnect fallback when a fresh
         // advertisement was available. Advertisement-less devices start on the autoConnect path.
         // The outer reconnect loop (BleRadioTransport) owns the macro retry budget — see class kdoc.
-        repeat(2) {
-            if (p.state.value is State.Connected) return
-            autoConnect =
-                try {
-                    connectionScope?.let { oldScope ->
-                        Logger.d {
-                            "[${device.address.anonymize()}] Cancelling previous connectionScope before reconnect"
+        try {
+            repeat(2) {
+                if (p.state.value is State.Connected) return@repeat
+                autoConnect =
+                    try {
+                        connectionScope?.let { oldScope ->
+                            Logger.d {
+                                "[${device.address.anonymize()}] Cancelling previous connectionScope before reconnect"
+                            }
+                            oldScope.coroutineContext.job.cancel()
                         }
-                        oldScope.coroutineContext.job.cancel()
-                    }
-                    connectionScope = asException { p.connect() }
-                    false
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (@Suppress("TooGenericExceptionCaught", "SwallowedException") e: Exception) {
-                    connectFailure = e
-                    if (autoConnect) {
-                        // Already on the autoConnect path and still failing: surface a clear Disconnected
-                        // and let the outer reconnect loop (BleRadioTransport) own the macro retry budget.
-                        Logger.w {
-                            "[${device.address.anonymize()}] autoConnect also failed; deferring to outer reconnect loop"
-                        }
-                        _connectionState.emit(BleConnectionState.Disconnected(DisconnectReason.ConnectionFailed))
+                        connectionScope = asException { p.connect() }
+                        false
+                    } catch (e: CancellationException) {
                         throw e
+                    } catch (@Suppress("TooGenericExceptionCaught", "SwallowedException") e: Exception) {
+                        connectFailure = e
+                        if (autoConnect) {
+                            // Already on the autoConnect path and still failing: surface a clear Disconnected
+                            // and let the outer reconnect loop (BleRadioTransport) own the macro retry budget.
+                            Logger.w {
+                                "[${device.address.anonymize()}] autoConnect also failed; " +
+                                    "deferring to outer reconnect loop"
+                            }
+                            _connectionState.emit(BleConnectionState.Disconnected(DisconnectReason.ConnectionFailed))
+                            throw e
+                        }
+                        Logger.d {
+                            "[${device.address.anonymize()}] Direct connect failed, falling back to autoConnect"
+                        }
+                        delay(AUTOCONNECT_FALLBACK_DELAY)
+                        true
                     }
-                    Logger.d { "[${device.address.anonymize()}] Direct connect failed, falling back to autoConnect" }
-                    delay(AUTOCONNECT_FALLBACK_DELAY)
-                    true
-                }
+            }
+            // Bounded loop may exit without reaching Connected if both connect() calls
+            // returned without throwing but state hasn't settled. The original while loop
+            // would have kept iterating; the bounded loop defers to the outer reconnect policy.
+            // Guard against false-positive Connected by verifying state here.
+            if (p.state.value !is State.Connected) {
+                _connectionState.emit(BleConnectionState.Disconnected(DisconnectReason.ConnectionFailed))
+                throw NotConnectedException(
+                    "Failed to establish connection after bounded attempts (state=${p.state.value})",
+                )
+            }
+        } finally {
+            if (requestMtu && reachedServices && p.state.value !is State.Connected && p.mtuRequestUnanswered()) {
+                skipMtuOnce = true
+                Logger.w { "[${device.address.anonymize()}] Connect failed before an MTU was negotiated" }
+            }
         }
-        // Bounded loop may exit without reaching Connected if both connect() calls
-        // returned without throwing but state hasn't settled. The original while loop
-        // would have kept iterating; the bounded loop defers to the outer reconnect policy.
-        // Guard against false-positive Connected by verifying state here.
-        if (p.state.value !is State.Connected) {
-            _connectionState.emit(BleConnectionState.Disconnected(DisconnectReason.ConnectionFailed))
-            throw NotConnectedException(
-                "Failed to establish connection after bounded attempts (state=${p.state.value})",
-            )
-        }
+        writeLengthAtConnect = p.queryMaxWriteLength()?.coerceAtMost(MAX_ATTRIBUTE_LENGTH)
     }
 
     @Suppress("TooGenericExceptionCaught", "SwallowedException")
@@ -293,6 +333,7 @@ internal constructor(
         val owned = peripheral
         safeClosePeripheral("disconnect")
         peripheral = null
+        writeLengthAtConnect = null
         connectionScope = null
 
         if (owned != null && ActiveBleConnection.active?.peripheral === owned) {
@@ -358,15 +399,14 @@ internal constructor(
             }
     }
 
-    override fun maximumWriteValueLength(writeType: BleWriteType): Int? = peripheral?.negotiatedMaxWriteLength()
+    override fun maximumWriteValueLength(writeType: BleWriteType): Int? =
+        peripheral?.negotiatedMaxWriteLength(writeLengthAtConnect)
 
     override fun requestHighConnectionPriority(): Boolean = peripheral?.requestHighConnectionPriority() == true
 
     override fun requestBalancedConnectionPriority(): Boolean = peripheral?.requestBalancedConnectionPriority() == true
 
     override fun invalidateServiceCache(): Boolean = peripheral?.refreshGattCache() == true
-
-    override suspend fun negotiateMtu(mtu: Int): Int? = peripheral?.negotiateMtu(mtu)
 
     /** Ensures the previous peripheral's GATT resources are fully released. */
     private suspend fun cleanUpPeripheral() {

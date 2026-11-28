@@ -31,10 +31,10 @@ internal actual val supportsNativeServiceScanFilter: Boolean = true
 internal actual val bleAddressIsHardware: Boolean = false
 
 internal actual fun ScannerBuilder.platformScanConfig() {
-    // No-op: preConflate is Android-only.
+    // No-op: the scan buffer setting is Android-only.
 }
 
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =
     com.juul.kable.Peripheral(address.toIdentifier(), builderAction)
 
-internal actual fun Peripheral.negotiatedMaxWriteLength(): Int? = null
+internal actual fun Peripheral.negotiatedMaxWriteLength(atConnect: Int?): Int? = null

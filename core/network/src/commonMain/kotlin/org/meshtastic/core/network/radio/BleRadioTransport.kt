@@ -83,19 +83,6 @@ private val CONNECTION_TIMEOUT = 15.seconds
 // How long one connection request may stay pending where the system finishes it by itself (iPhone, iPad).
 private val PENDING_CONNECT_TIMEOUT = 30.minutes
 
-/** ATT MTU requested on every connect. Android defaults to 23 bytes; Meshtastic packets can be 512. */
-private const val MTU_SIZE = 512
-
-/**
- * Attempts for the initial MTU negotiation, including the first try. On some OEM stacks (observed on a Xiaomi/MIUI
- * device) Android briefly re-verifies the encrypted link for an already-bonded device right around this point in the
- * connect sequence — a short (~15-30 ms observed), OS-driven bond-state blip this app doesn't trigger. A request that
- * lands mid-blip fails outright with no automatic retry; a second attempt after [MTU_RETRY_DELAY_MS] lands safely after
- * it.
- */
-private const val MTU_NEGOTIATION_ATTEMPTS = 2
-private const val MTU_RETRY_DELAY_MS = 300L
-
 /**
  * Delay after writing a heartbeat before re-polling FROMRADIO.
  *
@@ -462,25 +449,15 @@ class BleRadioTransport(
             )
         }
 
-        // Unconditionally refresh the platform's cached GATT service table before negotiating MTU, on every
+        // Unconditionally refresh the platform's cached GATT service table on every
         // connect — mirroring the pre-KMP app's long-proven behavior (it called BluetoothGatt.refresh() on every
         // connect, before any other GATT operation) instead of only refreshing reactively after a suspected
         // problem. Cheap: a single reflective call, no disconnect involved. Android-only/no-op elsewhere.
         bleConnection.invalidateServiceCache()
-        try {
-            val negotiatedMtu =
-                retryBleOperation(
-                    count = MTU_NEGOTIATION_ATTEMPTS,
-                    delayMs = MTU_RETRY_DELAY_MS,
-                    tag = address.anonymize(),
-                ) {
-                    bleConnection.negotiateMtu(MTU_SIZE)
-                }
-            Logger.i { "[${address.anonymize()}] Negotiated MTU: $negotiatedMtu" }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.w(e) { "[${address.anonymize()}] Failed to negotiate MTU after $MTU_NEGOTIATION_ATTEMPTS attempts" }
+        // The MTU was requested during the connect itself; log what came out of it.
+        Logger.i {
+            "[${address.anonymize()}] Max write after connect: " +
+                "${bleConnection.maximumWriteValueLength(BleWriteType.WITHOUT_RESPONSE)}"
         }
 
         // GATT cache invalidation has three triggers, all repaired the same way — refresh the platform's cached

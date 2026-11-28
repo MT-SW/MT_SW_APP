@@ -20,7 +20,11 @@ import com.juul.kable.Peripheral
 import com.juul.kable.PeripheralBuilder
 
 // Desktop, iOS and the web have no autoConnect, connection-priority or GATT-cache API to drive.
-internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean) = Unit
+internal actual fun PeripheralBuilder.platformConfig(
+    device: BleDevice,
+    requestMtu: Boolean,
+    autoConnect: () -> Boolean,
+) = Unit
 
 internal actual fun Peripheral.requestHighConnectionPriority(): Boolean = false
 
@@ -28,5 +32,5 @@ internal actual fun Peripheral.requestBalancedConnectionPriority(): Boolean = fa
 
 internal actual fun Peripheral.refreshGattCache(): Boolean = false
 
-// Desktop and iOS give Kable no MTU negotiation control.
-internal actual suspend fun Peripheral.negotiateMtu(mtu: Int): Int? = null
+// Desktop, iOS and the web negotiate the MTU by themselves.
+internal actual fun Peripheral.mtuRequestUnanswered(): Boolean = false

@@ -3,6 +3,8 @@
 - **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
 - **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
 - **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+## better | Ulepszenia
+- **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 ## orig | Zmiany względem oryginału
 - Zaktualizowano do oryginału w wersji 2.8.6.
 

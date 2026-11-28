@@ -54,6 +54,7 @@ private class ConnectedPeripheral : Peripheral {
         state.value = State.Disconnected()
     }
 
+    override suspend fun maximumWriteValueLengthForType(writeType: WriteType): Int = 244
 
     override suspend fun rssi(): Int = 0
 

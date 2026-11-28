@@ -28,6 +28,10 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
 * **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
 
+##### Ulepszenia
+
+* **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
+
 ##### Zmiany względem oryginału
 
 * Zaktualizowano do oryginału w wersji 2.8.6.
@@ -175,6 +179,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 * **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
 * **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
 * **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+* **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 * Zaktualizowano do oryginału w wersji 2.8.6.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
@@ -994,6 +999,10 @@ The main things of every version, split by kind of change (the "What's new in th
 * **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
 * **Red open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
 
+##### Improvements
+
+* **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
+
 ##### Changes against the original
 
 * Updated to the original app, version 2.8.6.
@@ -1141,6 +1150,7 @@ Every new change goes under the heading of the current version.
 * **Labels on a Niimbot D110 printer (Android, desktop, iPhone/iPad).** “Print label” (QR code) when sharing a contact or channels and on the connected device card. Android only in the original. Not yet tried with a printer on desktop and iPhone.
 * **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
 * **Red open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
+* **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 * Updated to the original app, version 2.8.6.
 
 ### v5 (2.8.5) — test versions from 5 November 2026

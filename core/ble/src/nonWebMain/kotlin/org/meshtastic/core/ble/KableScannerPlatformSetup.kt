@@ -18,7 +18,7 @@ package org.meshtastic.core.ble
 
 import com.juul.kable.ScannerBuilder
 
-/** Platform-specific configuration for the Scanner builder (e.g. Android's `preConflate`). */
+/** Platform-specific configuration for the Scanner builder (e.g. Android's `bufferCapacity`). */
 internal expect fun ScannerBuilder.platformScanConfig()
 
 /**
