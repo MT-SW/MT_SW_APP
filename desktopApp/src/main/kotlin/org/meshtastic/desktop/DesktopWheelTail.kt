@@ -24,7 +24,7 @@ import java.awt.Toolkit
 import java.awt.event.MouseWheelEvent
 
 /** A scroll that stayed silent this long has ended; what comes next is a new one. */
-private const val TAIL_END_MS = 150L
+private const val TAIL_END_MS = 250L
 
 /**
  * MT_SW: after a window is closed by scrolling, drops the rest of that scroll before it reaches the app, so it does not
@@ -37,14 +37,15 @@ internal class DesktopWheelTail : EventQueue() {
 
     override fun dispatchEvent(event: AWTEvent) {
         if (swallowing && event is MouseWheelEvent) {
-            // A scroll the other way is a new one, even without a break.
-            if (event.`when` - lastTime < TAIL_END_MS && event.preciseWheelRotation <= 0.0) {
+            // Only silence ends it: a trackpad mixes sideways and opposite jitter into the same scroll.
+            val gap = event.`when` - lastTime
+            if (gap < TAIL_END_MS) {
                 lastTime = event.`when`
                 dropped++
                 return
             }
             swallowing = false
-            Logger.i { "Okno: po zamknięciu pominięto $dropped ruchów przewijania" }
+            Logger.i { "Okno: po zamknięciu pominięto $dropped ruchów przewijania (cisza ${gap}ms)" }
         }
         super.dispatchEvent(event)
     }
@@ -53,6 +54,7 @@ internal class DesktopWheelTail : EventQueue() {
         swallowing = true
         dropped = 0
         lastTime = System.currentTimeMillis()
+        Logger.i { "Okno: pomijam resztę przewijania po zamknięciu" }
     }
 
     companion object {
