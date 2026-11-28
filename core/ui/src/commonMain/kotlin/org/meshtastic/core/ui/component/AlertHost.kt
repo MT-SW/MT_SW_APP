@@ -47,6 +47,7 @@ fun AlertHost(alertManager: AlertManager) {
             onDismiss = state.onDismiss,
             choices = state.choices,
             dismissable = state.dismissable,
+            compact = state.compact,
         )
     }
 }

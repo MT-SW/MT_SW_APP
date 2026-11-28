@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +42,12 @@ fun InfoWindow(
     onDismiss: () -> Unit,
     /** False for content that scrolls by itself (a list): two scrolls inside each other do not work. */
     scrolls: Boolean = true,
+    /** The size of a standard dialog (a neighbour list, a traceroute) instead of nearly the whole screen width. */
+    compact: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
+        standardWidth = compact,
         onDismissRequest = {
             Logger.i { "Okno informacji: zamknięte" }
             onDismiss()
@@ -52,7 +56,7 @@ fun InfoWindow(
         val scroll = rememberScrollState()
         Column(
             modifier =
-            Modifier.fillMaxWidth()
+            (if (compact) Modifier.widthIn(min = STANDARD_MIN_WIDTH_DP.dp) else Modifier.fillMaxWidth())
                 .then(if (scrolls) Modifier.verticalScrollWithBar(scroll, sideMargin = SIDE_DP.dp) else Modifier)
                 .padding(horizontal = SIDE_DP.dp)
                 .padding(bottom = SIDE_DP.dp),
@@ -69,3 +73,6 @@ fun InfoWindow(
 }
 
 private const val SIDE_DP = 24
+
+/** The smallest width of a standard dialog. */
+private const val STANDARD_MIN_WIDTH_DP = 280

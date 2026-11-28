@@ -8,6 +8,7 @@
 - **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 - **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 ## fix | Naprawione błędy
+- **Okna sąsiadów i trasy mają znów zwykły rozmiar (wszystkie wersje).** Zamykają się krzyżykiem i przeciągnięciem w dół. „Pokaż na mapie” ma odstęp od treści. Okno sąsiadów informuje, ilu z nich nie ma na mapie, bo nie znamy ich pozycji.
 - **iPhone/iPad: pytanie o wysłanie po zrobieniu zdjęcia.** Zdjęcie jest przekazywane do rozmowy dopiero po zamknięciu aparatu.
 - **iPhone/iPad: aplikacja nie zamyka się po zrobieniu zdjęcia i przy wejściu w „Dane i logi”.** Brakowało zgody na odczyt albumu ze zdjęciami. Przy pierwszym użyciu system zapyta o dostęp do Zdjęć.
 - **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć. Pasek ma własne miejsce obok treści, więc nie zasłania tekstu ani przełączników. Okna „i” (też asystenta i tłumacza) wyglądają jak pozostałe okna: krzyżyk u góry zamiast przycisku na dole, zamykanie przeciągnięciem w dół.

@@ -8,6 +8,7 @@
 - **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 - **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 ## fix | Fixed bugs
+- **The neighbour and traceroute windows have the standard size again (all versions).** The cross or a swipe down closes them. "Show on map" has room above it. The neighbour window says how many neighbours are missing from the map because their position is unknown.
 - **iPhone/iPad: the question about sending after taking a picture.** The picture is handed to the conversation only after the camera has closed.
 - **iPhone/iPad: the app no longer closes after taking a picture or when opening “Data and logs”.** The permission to read the photo album was missing. The system asks for access to Photos at first use.
 - **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.

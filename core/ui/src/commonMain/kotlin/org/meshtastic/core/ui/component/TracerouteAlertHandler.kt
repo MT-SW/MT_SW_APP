@@ -89,6 +89,7 @@ fun TracerouteAlertHandler(
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(text = stringResource(unavailableRes), color = MaterialTheme.colorScheme.error)
                         } else {
+                            Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = {
                                     uiViewModel.dismissAlert()
@@ -102,10 +103,13 @@ fun TracerouteAlertHandler(
                             ) {
                                 Text(stringResource(Res.string.view_on_map))
                             }
+                            // Room for the button's glow, which the scroll would otherwise cut off.
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 },
                 onConfirm = null,
+                compact = true,
                 onDismiss = {
                     uiViewModel.clearTracerouteResponse()
                     dismissedTracerouteRequestId = null

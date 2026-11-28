@@ -49,6 +49,7 @@ open class AlertManager {
         val dismissTextRes: StringResource? = null,
         val choices: Map<String, () -> Unit> = emptyMap(),
         val dismissable: Boolean = true,
+        val compact: Boolean = false,
     )
 
     private val _currentAlert = MutableStateFlow<AlertData?>(null)
@@ -70,6 +71,7 @@ open class AlertManager {
         dismissTextRes: StringResource? = null,
         choices: Map<String, () -> Unit> = emptyMap(),
         dismissable: Boolean = true,
+        compact: Boolean = false,
     ) {
         _currentAlert.value =
             AlertData(
@@ -100,6 +102,7 @@ open class AlertManager {
                 dismissTextRes = dismissTextRes,
                 choices = choices,
                 dismissable = dismissable,
+                compact = compact,
             )
     }
 

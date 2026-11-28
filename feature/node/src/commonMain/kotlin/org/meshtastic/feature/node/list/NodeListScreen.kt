@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -248,6 +249,8 @@ fun NodeListScreen(
                     ?.let { "${it.user.long_name} (${it.user.short_name})" }
                     ?: "!" + nodeNum.toUInt().toString(HEX_RADIX)
             },
+            nodeLookup = remember(unfilteredNodes) { unfilteredNodes.associateBy { it.num } },
+            centerNum = num,
             onDismiss = { neighborsOpenFor = null },
             onShowOnMap = {
                 neighborsOpenFor = null
@@ -714,6 +717,8 @@ private const val HEX_RADIX = 16
 private fun NeighborReportDialog(
     report: NeighborReport?,
     nameOf: (Int) -> String,
+    nodeLookup: Map<Int, Node>,
+    centerNum: Int,
     onDismiss: () -> Unit,
     onShowOnMap: () -> Unit,
 ) {
@@ -724,7 +729,13 @@ private fun NeighborReportDialog(
     val statusRed = Quality.NONE.color.invoke()
     val modemPreset = LocalModemPreset.current
     val message = report?.packet?.getNeighborInfoResponse(nameOf, header = header)
-    InfoWindow(title = header, onDismiss = onDismiss) {
+    val neighbors = report?.neighbors.orEmpty()
+    val missing = neighbors.count { nodeLookup[it.nodeNum]?.validPosition == null }
+    val centerKnown = nodeLookup[centerNum]?.validPosition != null
+    LaunchedEffect(Unit) {
+        Logger.i { "Okno sąsiadów: otwarte, raport=${message != null}, bez pozycji $missing z ${neighbors.size}" }
+    }
+    InfoWindow(title = header, onDismiss = onDismiss, compact = true) {
         if (message == null) {
             Text(stringResource(Res.string.neighbors_dialog_empty))
         } else {
@@ -744,6 +755,20 @@ private fun NeighborReportDialog(
             }
         }
         if (message != null) {
+            // Shown only when something cannot be drawn on the map.
+            val note =
+                when {
+                    !centerKnown -> stringResource(Res.string.neighbors_map_center_unknown)
+                    missing > 0 -> stringResource(Res.string.neighbors_map_missing, missing, neighbors.size)
+                    else -> null
+                }
+            if (note != null) {
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Button(onClick = onShowOnMap) { Text(stringResource(Res.string.neighbors_show_on_map)) }
         }
     }

@@ -368,6 +368,7 @@ open class MetricsViewModel(
                 Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                     SelectionContainer { Text(text = annotatedMessage) }
                     if (onShowOnMap != null) {
+                        Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
                                 alertManager.dismissAlert()
@@ -376,10 +377,12 @@ open class MetricsViewModel(
                         ) {
                             Text(stringResource(Res.string.neighbors_show_on_map))
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             },
             onConfirm = null,
+            compact = onShowOnMap != null,
         )
     }
 
@@ -415,6 +418,7 @@ open class MetricsViewModel(
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(text = stringResource(errorRes), color = MaterialTheme.colorScheme.error)
                         } else {
+                            Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = {
                                     alertManager.dismissAlert()
@@ -423,10 +427,12 @@ open class MetricsViewModel(
                             ) {
                                 Text(stringResource(Res.string.view_on_map))
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 },
                 onConfirm = null,
+                compact = true,
             )
         }
     }

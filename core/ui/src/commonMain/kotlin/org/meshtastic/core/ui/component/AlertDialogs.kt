@@ -112,6 +112,7 @@ fun MeshtasticDialog(
     onDismiss: (() -> Unit)? = null,
     choices: Map<String, () -> Unit> = emptyMap(),
     dismissable: Boolean = true,
+    compact: Boolean = false,
 ) {
     val titleText = title ?: titleRes?.let { stringResource(it) } ?: ""
     val messageText = message ?: messageRes?.let { stringResource(it) }
@@ -135,7 +136,7 @@ fun MeshtasticDialog(
 
     // MT_SW: a window with nothing to decide (only closing) is our window with a cross at the top, like the others.
     if (onConfirm == null && onDismiss != null && choices.isEmpty() && dismissable) {
-        InfoWindow(title = titleText, onDismiss = onDismiss, scrolls = text == null) {
+        InfoWindow(title = titleText, onDismiss = onDismiss, scrolls = text == null, compact = compact) {
             if (icon != null) {
                 Icon(
                     imageVector = icon,

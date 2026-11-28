@@ -116,6 +116,8 @@ fun ModalBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState? = null,
     closeCross: Boolean = true,
+    /** The size of a standard dialog, as wide as its content, instead of nearly the whole screen. */
+    standardWidth: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val containerSize = LocalWindowInfo.current.containerSize
@@ -127,13 +129,13 @@ fun ModalBottomSheet(
     val windowSurface = LocalWindowSurface.current ?: MaterialTheme.colorScheme.surface
     val overWindow = LocalWindowSurface.current != null
     LaunchedEffect(Unit) { Logger.i { "Okno: otwarte, tło ${if (overWindow) "z okna pod spodem" else "z motywu"}" } }
-    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = standardWidth)) {
         Surface(
             modifier =
             modifier
-                .padding(WINDOW_MARGIN_DP.dp)
+                .then(if (standardWidth) Modifier else Modifier.padding(WINDOW_MARGIN_DP.dp))
                 .widthIn(max = WINDOW_MAX_WIDTH_DP.dp)
-                .fillMaxWidth()
+                .then(if (standardWidth) Modifier else Modifier.fillMaxWidth())
                 .heightIn(max = (containerSize.height / density * WINDOW_MAX_HEIGHT_PERCENT).dp)
                 .background(windowSurface, windowShape)
                 .elementLook(UiOptions.GROUP_DIALOGS, windowShape)

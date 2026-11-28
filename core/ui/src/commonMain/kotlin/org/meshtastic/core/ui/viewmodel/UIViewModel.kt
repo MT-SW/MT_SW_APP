@@ -365,6 +365,7 @@ class UIViewModel(
         dismissText: String? = null,
         dismissTextRes: StringResource? = null,
         choices: Map<String, () -> Unit> = emptyMap(),
+        compact: Boolean = false,
     ) {
         alertManager.showAlert(
             title = title,
@@ -380,6 +381,7 @@ class UIViewModel(
             dismissText = dismissText,
             dismissTextRes = dismissTextRes,
             choices = choices,
+            compact = compact,
         )
     }
 
