@@ -354,7 +354,7 @@ internal object IosLogControl : AppLogControl {
                 FileSystem.SYSTEM.write(folder.toPath() / name) { write(bytes) }
                 FileSystem.SYSTEM.write(marker) { writeUtf8(fingerprint) }
             } finally {
-                if (opened) url?.stopAccessingSecurityScopedResource()
+                if (opened) url.stopAccessingSecurityScopedResource()
             }
         }
             .onFailure { Logger.w(it, tag = "Log") { "Saving the logs to the chosen folder failed" } }
