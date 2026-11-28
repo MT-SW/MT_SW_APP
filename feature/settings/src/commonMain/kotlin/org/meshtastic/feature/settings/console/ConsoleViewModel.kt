@@ -43,6 +43,7 @@ import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioSlotsPrefs
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.usecase.SendMessageOutcome
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 import org.meshtastic.proto.Channel
 import org.meshtastic.proto.ChannelSettings
@@ -99,8 +100,15 @@ class ConsoleViewModel(
 
     override fun ownNode(): Node? = nodeRepository.ourNodeInfo.value
 
-    override suspend fun send(text: String, channel: Int, destination: Node?): Boolean = onDevice {
-        sendMessageUseCase(text, "$channel${destination?.user?.id ?: NodeAddress.ID_BROADCAST}")
+    override suspend fun send(text: String, channel: Int, destination: Node?): Boolean {
+        var queued = false
+        val connected = onDevice {
+            val key = "$channel${destination?.user?.id ?: NodeAddress.ID_BROADCAST}"
+            val outcome = sendMessageUseCase(text, key)
+            queued = outcome is SendMessageOutcome.Queued
+            if (!queued) Logger.w { "Konsola: wiadomość nie została wysłana (${outcome::class.simpleName})" }
+        }
+        return connected && queued
     }
 
     override suspend fun reboot() = onDevice { radioController.reboot(it, packetId()) }
