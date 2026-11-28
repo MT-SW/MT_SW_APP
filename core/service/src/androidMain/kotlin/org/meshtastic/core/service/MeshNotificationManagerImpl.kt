@@ -155,6 +155,8 @@ import org.meshtastic.core.resources.sos_alarm_confirm
 import org.meshtastic.core.resources.sos_alarm_notification_title
 import org.meshtastic.core.resources.sos_reply_button_calling_help
 import org.meshtastic.core.resources.sos_reply_button_coming
+import org.meshtastic.core.resources.transparent_mode_banner_title
+import org.meshtastic.core.resources.transparent_mode_send_blocked
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.you
 import org.meshtastic.core.service.stats.MeshStatsLines
@@ -909,6 +911,12 @@ class MeshNotificationManagerImpl(
     }
 
     override fun cancelSosAlarmNotification() = notificationManager.cancel(TAG_SOS_ALARM, SOS_ALARM_ID)
+
+    override suspend fun showTransparentModeSendBlocked(contactKey: String) = showAlertNotification(
+        contactKey,
+        getStringSuspend(Res.string.transparent_mode_banner_title),
+        getStringSuspend(Res.string.transparent_mode_send_blocked),
+    )
 
     override suspend fun showMeshBeaconNotification(offer: MeshBeaconOffer) {
         ensureChannels()

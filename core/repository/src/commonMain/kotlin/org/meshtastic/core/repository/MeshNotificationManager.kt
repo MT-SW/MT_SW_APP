@@ -99,6 +99,9 @@ interface MeshNotificationManager {
     /** Removes the SOS alarm notification, when the person confirmed the alarm. */
     fun cancelSosAlarmNotification() = Unit
 
+    /** Tells the user a reply to [contactKey] was not sent because the connected node is in transparent mode. */
+    suspend fun showTransparentModeSendBlocked(contactKey: String) {}
+
     suspend fun showMeshBeaconNotification(offer: MeshBeaconOffer)
 
     /** [title] arrives resolved: the caller revalidates [node]'s identity right before posting, with no suspension. */

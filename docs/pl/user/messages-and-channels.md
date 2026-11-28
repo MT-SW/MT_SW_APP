@@ -2,7 +2,7 @@
 title: Wiadomości i kanały
 parent: Przewodnik użytkownika
 nav_order: 3
-last_updated: 2026-11-23
+last_updated: 2026-11-28
 description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
@@ -87,7 +87,8 @@ Wiadomości bezpośrednie (DM) trafiają do jednego, konkretnego węzła. Gdy ob
 
 Jeśli Twój węzeł nie ma licencji, musi już mieć klucz publiczny drugiego węzła, zanim będzie mogło wysłać wiadomość bezpośrednią. Klucze podróżują wewnątrz informacji o węźle, które węzły okresowo rozgłaszają, więc zwykle klucz pojawia się sam, gdy tylko usłyszysz dany węzeł. Dopóki to nie nastąpi, węzeł mający własną parę kluczy — czyli domyślnie — odmawia wysłania zamiast przechodzić na szyfrowanie kanału, a przy wiadomości widać **Klucz odbiorcy niedostępny**.
 
-Rozmowa z kluczem publicznym ma na górnym pasku ikonę szyfrowania. Zielona zamknięta kłódka oznacza, że wiadomość bezpośrednia jest chroniona szyfrowaniem kluczem publicznym; czerwona ikona przekreślonego klucza oznacza, że klucz publiczny węzła zmienił się i nie zgadza się już z tym, który zapamiętał Twój węzeł. Dotknij ikony, aby zobaczyć szczegóły. Ta ikona opisuje szyfrowanie rozmowy, więc przy każdej wersji firmware zostają kłódki, a nie odznaki podpisu i weryfikacji z listy węzłów.
+Rozmowa z kluczem publicznym ma na górnym pasku ikonę szyfrowania. Zielona zamknięta kłódka oznacza, że wiadomość bezpośrednia jest chroniona szyfrowaniem kluczem publicznym; czerwona ikona przekreślonego klucza oznacza, że klucz publiczny węzła zmienił się i nie zgadza się już z tym, który zapamiętał Twój węzeł. Dotknij ikony, aby zobaczyć szczegóły. Ta ikona opisuje szyfrowanie rozmowy, więc przy każdej wersji firmware zostają kłódki, a nie odznaki podpisu i weryfikacji z listy węzłów. Odpowiedź, która przyjdzie zaszyfrowana kluczem kanału zamiast kluczem publicznym, zostaje w tej samej rozmowie i ma obok szczegółów sygnału żółtą otwartą kłódkę; może ją przeczytać każdy, kto ma klucz tego kanału. Przytrzymaj wiadomość, aby zobaczyć szczegóły.
+
 
 ### Wysyłanie wiadomości bezpośredniej
 

@@ -84,6 +84,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
@@ -134,6 +135,7 @@ import org.meshtastic.core.resources.image_upload_retry
 import org.meshtastic.core.resources.image_upload_sending
 import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
+import org.meshtastic.core.resources.transparent_mode_send_blocked
 import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
 import org.meshtastic.core.ui.component.AlertDialog
@@ -150,6 +152,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Mic
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Send
+import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.ChatDraftRequest
@@ -170,6 +173,9 @@ import org.meshtastic.feature.messaging.component.QuickChatRow
 import org.meshtastic.feature.messaging.component.ReplySnippet
 import org.meshtastic.feature.messaging.component.ScrollToBottomFab
 import org.meshtastic.feature.messaging.component.TranslationModelDownloadDialog
+
+internal const val RETIRED_CHANNEL_NOTICE_TAG = "retired_channel_notice"
+internal const val TRANSPARENT_MODE_SEND_NOTICE_TAG = "transparent_mode_send_notice"
 
 private const val ROUNDED_CORNER_PERCENT = 100
 private const val MAX_LINES = 3
@@ -249,6 +255,7 @@ fun MessageScreen(
     }
     val ourNode by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
     val connectionState by viewModel.connectionState.collectAsStateWithLifecycle()
+    val sendBlockedByTransparentMode by viewModel.sendBlockedByTransparentMode.collectAsStateWithLifecycle()
     val channels by viewModel.channels.collectAsStateWithLifecycle()
     val quickChatActions by viewModel.quickChatActions.collectAsStateWithLifecycle(initialValue = emptyList())
     val pagedMessages = viewModel.getMessagesFromPaged(contactKey).collectAsLazyPagingItems()
@@ -607,11 +614,10 @@ fun MessageScreen(
             }
         },
         bottomBar = {
-            // A retired channel is read-only: there is no slot left to send on, so the composer and the quick-chat
-            // row are replaced outright rather than merely disabled.
-            if (isRetiredChannel) {
-                RetiredChannelNotice()
-            } else {
+            ComposerOrNotice(
+                isRetiredChannel = isRetiredChannel,
+                sendBlockedByTransparentMode = sendBlockedByTransparentMode,
+            ) {
                 Column {
                     AnimatedVisibility(visible = showQuickChat) {
                         QuickChatRow(
@@ -677,8 +683,8 @@ fun MessageScreen(
                     searchQuery = if (isSearchActive) searchQuery else "",
                     translationAvailable = translationAvailable,
                     showFullMessageTimestamps = showFullMessageTimestamps,
-                    canReact = !isRetiredChannel,
-                    canSend = !isRetiredChannel,
+                    canReact = !isRetiredChannel && !sendBlockedByTransparentMode,
+                    canSend = !isRetiredChannel && !sendBlockedByTransparentMode,
                     senderMutes = senderMutes,
                 ),
                 handlers =
@@ -932,19 +938,54 @@ private fun mentionOutputTransformation(candidatesById: () -> Map<String, Mentio
  */
 @Composable
 internal fun RetiredChannelNotice(modifier: Modifier = Modifier) {
+    ComposerNotice(
+        icon = MeshtasticIcons.History,
+        text = stringResource(Res.string.archived_channel_read_only),
+        modifier = modifier.testTag(RETIRED_CHANNEL_NOTICE_TAG),
+    )
+}
+
+/**
+ * The composer, or the notice that replaces it outright where nothing can be sent. A retired channel wins over
+ * transparent mode: it stays read-only once the mode is off.
+ */
+@Composable
+internal fun ComposerOrNotice(
+    isRetiredChannel: Boolean,
+    sendBlockedByTransparentMode: Boolean,
+    composer: @Composable () -> Unit,
+) {
+    when {
+        isRetiredChannel -> RetiredChannelNotice()
+        sendBlockedByTransparentMode -> TransparentModeSendNotice()
+        else -> composer()
+    }
+}
+
+/**
+ * Replaces the composer while the connected node is in transparent mode: the node drops whatever the app sends, so the
+ * affordance is removed and the reason takes its place.
+ */
+@Composable
+internal fun TransparentModeSendNotice(modifier: Modifier = Modifier) {
+    ComposerNotice(
+        icon = MeshtasticIcons.Warning,
+        text = stringResource(Res.string.transparent_mode_send_blocked),
+        modifier = modifier.testTag(TRANSPARENT_MODE_SEND_NOTICE_TAG),
+    )
+}
+
+@Composable
+private fun ComposerNotice(icon: ImageVector, text: String, modifier: Modifier = Modifier) {
     Surface(modifier = modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(
-                imageVector = MeshtasticIcons.History,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
-                text = stringResource(Res.string.archived_channel_read_only),
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

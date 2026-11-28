@@ -114,6 +114,7 @@ fun CurrentlyConnectedInfo(
     modifier: Modifier = Modifier,
     bleDevice: DeviceListEntry.Ble? = null,
     onClickLora: () -> Unit = {},
+    onPrintLabel: (() -> Unit)? = null,
 ) {
     // Null until the first successful read: 0 dBm is the strongest value on this scale, not "unknown".
     var rssi by remember(bleDevice?.device?.address) { mutableStateOf<Int?>(null) }
@@ -175,6 +176,8 @@ fun CurrentlyConnectedInfo(
         }
 
         text.loraSummary?.let { LoraRow(summary = it, onClick = onClickLora) }
+
+        onPrintLabel?.let { ConnectLabelButton(onClick = it) }
 
         DisconnectButton(onClick = onClickDisconnect, label = text.disconnectLabel)
     }

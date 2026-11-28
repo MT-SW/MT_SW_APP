@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.Channel
@@ -106,6 +107,7 @@ import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.util.formatFrequencyMhz
+import org.meshtastic.core.ui.viewmodel.TransparentModeViewModel
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.search.SettingsSearchCatalog
@@ -189,7 +191,11 @@ internal fun regionLabels(): Map<RegionCode, String> =
     RegionCode.entries.mapNotNull { region -> region.schemaLabelRes()?.let { region to stringResource(it) } }.toMap()
 
 @Composable
-fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
+fun LoRaConfigScreen(
+    viewModel: RadioConfigViewModel,
+    onBack: () -> Unit,
+    transparentModeViewModel: TransparentModeViewModel = koinViewModel(),
+) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
     val loraConfig = state.radioConfig.lora ?: Config.LoRaConfig.Builder().build()
     val primarySettings = state.channelList.getOrNull(0)
@@ -239,8 +245,13 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         showConnectPrompt = state.connectPromptVisible,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
-            val config = Config.Builder().also { wb -> wb.lora = it.withCodingRateOverrideFor(capabilities) }.build()
-            viewModel.setConfig(config)
+            saveLora(
+                viewModel = viewModel,
+                transparentMode = transparentModeViewModel.asLoraSaveTransparentMode(),
+                isLocal = state.isLocal,
+                reported = loraConfig,
+                saved = it.withCodingRateOverrideFor(capabilities),
+            )
         },
     ) {
         fieldItem(cards[0]) {
@@ -557,6 +568,7 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                         containerColor = CardDefaults.cardColors().containerColor,
                     )
                 }
+                TransparentModeRow(isLocal = state.isLocal, connected = state.connected, formState = formState)
             }
         }
     }

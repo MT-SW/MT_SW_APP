@@ -2,7 +2,7 @@
 title: Messages & Channels
 parent: User Guide
 nav_order: 3
-last_updated: 2026-11-23
+last_updated: 2026-11-27
 description: Send and receive messages, manage channels, configure encryption, search conversations, and use quick chat, reactions, and message actions.
 aliases:
   - channels
@@ -57,6 +57,8 @@ On the **Channels** screen, tap **Share Channels** to show a QR code and a link 
 - **Replace** overwrites every channel on their node with yours and applies your LoRa settings.
 - **Add** keeps their channels and LoRa settings and appends yours.
 
+On an Android phone with Bluetooth, **Print label** in that dialog prints the code as a channel label on a Niimbot D110 label printer, the same way a [contact prints as a name tag](nodes#printing-a-name-tag). The label names the first channel, its region and preset, and says whether scanning it adds channels or replaces them. A set of channels whose QR code would be too dense to scan from a 12 mm label is not printed; share fewer channels to print one.
+
 To take in someone else's channels, use the import button on the same screen: **Scan Shared Channels QR Code**, **Input Shared Channels URL**, or, on a phone with NFC, **Scan Shared Channels NFC**. The **Import channels** dialog lists the incoming channels. A code made with **Replace** opens with **Replace** selected, a code made with **Add** offers only **Add**, and the **Replace** and **Add** control only picks the mode: nothing changes on your node until you tap **Replace channels** or **Add channels**. A channel that forwards messages to or from MQTT, or shares your location, says so on its row.
 
 - **Replace** removes the channels on your node, then lists every LoRa setting that will change. Changes to sending and receiving, such as turning transmit off, come first in their own group.
@@ -87,7 +89,7 @@ Direct messages (DMs) go to one specific node. When both nodes hold each other's
 
 Unless your node is licensed, it must already hold the other node's public key before it can send a DM. Keys travel inside node info, which nodes broadcast periodically, so the key usually arrives on its own once you have heard from that node. Until it does, a node that has its own key pair — the default — refuses the send rather than falling back to channel encryption, and the message shows **Recipient key unavailable**.
 
-A public-key conversation carries an encryption icon in its top bar. A green closed lock means the direct message is protected by public-key encryption; a red crossed-out key means the node's public key changed and no longer matches the one your node stored. Tap the icon for the details. This icon describes the conversation's encryption, so it keeps the locks at every firmware version rather than showing the signed or verified badges from the node list.
+A public-key conversation carries an encryption icon in its top bar. A green closed lock means the direct message is protected by public-key encryption; a red crossed-out key means the node's public key changed and no longer matches the one your node stored. Tap the icon for the details. This icon describes the conversation's encryption, so it keeps the locks at every firmware version rather than showing the signed or verified badges from the node list. A reply that arrives encrypted with a channel key instead of public-key encryption stays in the same conversation and carries a yellow open lock beside its signal details; anyone with that channel key can read it. Long-press the message for the details.
 
 ### Sending a Direct Message
 

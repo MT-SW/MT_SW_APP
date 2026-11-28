@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontStyle
@@ -65,6 +66,10 @@ import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.theme.link
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.annotatedStringFromHtml
+
+/** The confirm and dismiss buttons of a [MeshtasticDialog], for tests that cannot match their resolved labels. */
+const val DIALOG_CONFIRM_BUTTON_TAG = "dialog_confirm_button"
+const val DIALOG_DISMISS_BUTTON_TAG = "dialog_dismiss_button"
 
 /**
  * A comprehensive and flexible dialog component for the Meshtastic application.
@@ -206,7 +211,7 @@ fun MeshtasticDialog(
                             if (onDismiss != null) {
                                 TextButton(
                                     onClick = onDismiss,
-                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp).testTag(DIALOG_DISMISS_BUTTON_TAG),
                                     colors =
                                     ButtonDefaults.textButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -218,7 +223,7 @@ fun MeshtasticDialog(
                             if (onConfirm != null) {
                                 TextButton(
                                     onClick = onConfirm,
-                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp).testTag(DIALOG_CONFIRM_BUTTON_TAG),
                                     colors =
                                     ButtonDefaults.textButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurface,

@@ -131,6 +131,7 @@ import org.meshtastic.core.resources.mute_sender_info
 import org.meshtastic.core.resources.mute_sender_marker
 import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
+import org.meshtastic.core.resources.security_channel_key_message
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.resources.trips_import_button
 import org.meshtastic.core.resources.trips_import_done
@@ -161,6 +162,7 @@ import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FormatQuote
 import org.meshtastic.core.ui.icon.HopCount
 import org.meshtastic.core.ui.icon.Icon
+import org.meshtastic.core.ui.icon.LockOpen
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Reply
 import org.meshtastic.core.ui.icon.Save
@@ -168,6 +170,7 @@ import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeImporter
@@ -349,6 +352,7 @@ fun MessageItem(
                                     )
                                 },
                                 xeddsaSigned = message.xeddsaSigned,
+                                channelKeyEncrypted = message.channelKeyEncrypted,
                                 ackProofStatus = message.ackProofStatus,
                                 onStatus = onStatusClick,
                                 translationRowState = translationRowStateFor(message, translationAvailable),
@@ -765,6 +769,16 @@ fun MessageItem(
                                         contentDescription = stringResource(Res.string.security_signed_verified),
                                         modifier = Modifier.size(14.dp),
                                         tint = MaterialTheme.colorScheme.StatusOnline,
+                                    )
+                                }
+                                // The conversation's lock claims public-key encryption; this reply did not have it.
+                                if (message.channelKeyEncrypted) {
+                                    Icon(
+                                        imageVector = MeshtasticIcons.LockOpen,
+                                        contentDescription =
+                                        stringResource(Res.string.security_channel_key_message),
+                                        modifier = Modifier.size(14.dp),
+                                        tint = MaterialTheme.colorScheme.StatusYellow,
                                     )
                                 }
                                 TransportIcon(

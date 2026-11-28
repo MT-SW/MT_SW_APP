@@ -34,6 +34,7 @@ import org.meshtastic.core.resources.ic_mesh_radio
 import org.meshtastic.core.resources.ic_nfc
 import org.meshtastic.core.resources.ic_photo_camera
 import org.meshtastic.core.resources.ic_photo_save
+import org.meshtastic.core.resources.ic_print
 import org.meshtastic.core.resources.ic_settings_input_antenna
 import org.meshtastic.core.resources.ic_speaker_phone
 import org.meshtastic.core.resources.ic_terminal
@@ -84,6 +85,10 @@ val MeshtasticIcons.Reconnecting: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_cached)
 val MeshtasticIcons.Nfc: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_nfc)
+
+/** Material Symbols "print": print a label. */
+val MeshtasticIcons.Print: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_print)
 val MeshtasticIcons.Bluetooth: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_bluetooth)
 val MeshtasticIcons.Wifi: ImageVector
