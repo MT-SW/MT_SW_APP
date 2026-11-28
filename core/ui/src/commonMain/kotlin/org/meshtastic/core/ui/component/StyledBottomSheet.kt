@@ -65,6 +65,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private const val SHEET_CORNER_DP = 28
 private const val WINDOW_MAX_WIDTH_DP = 560
@@ -76,6 +77,8 @@ private const val SWIPE_CLOSE_DP = 40
 
 /** How many mouse wheel ticks up, with nothing left to scroll, close the window. */
 private const val WHEEL_CLOSE_TICKS = 3f
+private const val WHEEL_PAUSE_MS = 350L
+private const val WHEEL_READY_MS = 2500L
 
 /**
  * MT_SW: the real (opaque) surface colour of the window we are inside of. Inside a window the theme's surface colour is
@@ -196,7 +199,9 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                 if (consumed.y != 0f) gesture.contentMoved = true
-                if (source == NestedScrollSource.UserInput && available.y > 0f && consumed.y == 0f) {
+                // On a computer the wheel and the trackpad are judged below (a pause and a new scroll are needed).
+                val fromTouch = !isDesktopPlatform && source == NestedScrollSource.UserInput
+                if (fromTouch && available.y > 0f && consumed.y == 0f) {
                     dragged += available.y
                     if (dragged > threshold) {
                         dragged = Float.NEGATIVE_INFINITY
@@ -225,22 +230,17 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
     }
     return nestedScroll(connection)
         .pointerInput(Unit) {
-            // The mouse wheel (computer): ticks up that nobody scrolled with, i.e. the content is already at its top.
+            // The mouse wheel and the trackpad (computer): see [WheelClose].
             awaitPointerEventScope {
-                var wheel = 0f
+                val wheel = WheelClose()
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Final)
                     val change = event.changes.firstOrNull()
                     if (event.type == PointerEventType.Scroll && change != null) {
-                        if (change.isConsumed || change.scrollDelta.y >= 0f) {
-                            wheel = 0f
-                        } else {
-                            wheel -= change.scrollDelta.y
-                            if (wheel >= WHEEL_CLOSE_TICKS) {
-                                wheel = 0f
-                                Logger.i { "Okno: zamknięte kółkiem myszy" }
-                                close.value()
-                            }
+                        val used = change.isConsumed || change.scrollDelta.y >= 0f
+                        if (wheel.closes(change.uptimeMillis, -change.scrollDelta.y, used)) {
+                            Logger.i { "Okno: zamknięte ponownym przewinięciem do góry po przerwie" }
+                            close.value()
                         }
                     }
                 }
@@ -287,6 +287,46 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                 }
             }
         }
+}
+
+/**
+ * Closing by scrolling on a computer, made hard to do by accident. One run of the wheel or trackpad (events closer
+ * together than [WHEEL_PAUSE_MS]) never closes the window, however fast. The first run that pushes up with the content
+ * already at its top only gets ready; a new run, started after a pause and soon enough, closes it.
+ */
+private class WheelClose {
+    private var lastEvent = 0L
+    private var readySince: Long? = null
+    private var secondRun = false
+    private var ticks = 0f
+
+    fun closes(time: Long, up: Float, usedByContent: Boolean): Boolean {
+        val newRun = time - lastEvent > WHEEL_PAUSE_MS
+        lastEvent = time
+        if (newRun) {
+            secondRun = readySince?.let { time - it <= WHEEL_READY_MS } == true
+            readySince = null
+            ticks = 0f
+        }
+        var close = false
+        when {
+            usedByContent -> {
+                readySince = null
+                secondRun = false
+                ticks = 0f
+            }
+            !secondRun -> readySince = time
+            else -> {
+                ticks += up
+                close = ticks >= WHEEL_CLOSE_TICKS
+                if (close) {
+                    secondRun = false
+                    ticks = 0f
+                }
+            }
+        }
+        return close
+    }
 }
 
 /** Jak duża część progu zamknięcia musi być pokonana, żeby nieudana próba trafiła do logu (pomija drobne drgnięcia). */
