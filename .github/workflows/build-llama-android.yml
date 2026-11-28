@@ -16,7 +16,7 @@ on:
         required: true
       whisper_ref:
         description: "whisper.cpp version (must match WHISPER_REF in ModelServerInstaller)"
-        default: "v1.9.5"
+        default: "v1.9.6"
         required: true
 
 permissions:
@@ -123,7 +123,7 @@ jobs:
         kind: [cpu, i8mm, opencl, openclgen, vulkan]
     steps:
       - name: Get whisper.cpp
-        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
+        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.6' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
 
       - name: Tools
         run: |
@@ -188,7 +188,7 @@ jobs:
           mkdir pack
           cp "$BIN" pack/
           cp whisper.cpp/LICENSE pack/
-          NAME="whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64"
+          NAME="whisper-${{ inputs.whisper_ref || 'v1.9.6' }}-android-arm64"
           if [ "${{ matrix.kind }}" != "cpu" ]; then NAME="$NAME-${{ matrix.kind }}"; fi
           tar -czf "$NAME.tar.gz" -C pack .
           ls -l *.tar.gz
@@ -206,7 +206,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Get whisper.cpp
-        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
+        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.6' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
 
       - name: Keep the model caches on the processor (the NPU cannot copy into its own memory)
         run: |
@@ -253,7 +253,7 @@ jobs:
           ls pack/lib | grep -q "libggml-hexagon.so"
           ls pack/lib | grep -q "libggml-htp-v"
           cp whisper.cpp/LICENSE pack/
-          tar -czf "whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64-snapdragon.tar.gz" -C pack .
+          tar -czf "whisper-${{ inputs.whisper_ref || 'v1.9.6' }}-android-arm64-snapdragon.tar.gz" -C pack .
           ls -l *.tar.gz
 
       - name: Publish on the release page

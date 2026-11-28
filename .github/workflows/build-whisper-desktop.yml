@@ -17,14 +17,14 @@ on:
         required: true
       whisper_ref:
         description: "whisper.cpp version (must match WHISPER_REF in ModelServerInstaller)"
-        default: "v1.9.5"
+        default: "v1.9.6"
         required: true
 
 permissions:
   contents: write
 
 env:
-  REF: ${{ inputs.whisper_ref || 'v1.9.5' }}
+  REF: ${{ inputs.whisper_ref || 'v1.9.6' }}
   RELEASE: engines-${{ inputs.llama_tag || 'b11960' }}
 
 jobs:

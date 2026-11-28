@@ -690,10 +690,10 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         const val LLAMA_TAG = "b11960"
 
         /** The whisper.cpp source version of the Android build (our own, see the workflow). */
-        const val WHISPER_REF = "v1.9.5"
+        const val WHISPER_REF = "v1.9.6"
 
         /** The whisper.cpp build the app is tested with. */
-        const val WHISPER_TAG = "b5454"
+        const val WHISPER_TAG = "b5907"
 
         private const val LINKER = "/system/bin/linker64"
         private const val LLAMA_ANDROID_MB = 78

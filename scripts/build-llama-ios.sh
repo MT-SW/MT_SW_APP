@@ -5,12 +5,13 @@
 # dictation) and whisper.cpp (Whisper dictation), sharing one ggml: native/ios/llama.xcframework
 set -euo pipefail
 LLAMA_TAG="b11960"
+WHISPER_REF="v1.9.6"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$ROOT/build/llama-ios"
 rm -rf "$WORK"
 mkdir -p "$WORK" "$ROOT/native/ios"
 git clone --depth 1 --branch "$LLAMA_TAG" https://github.com/ggml-org/llama.cpp "$WORK/llama.cpp"
-git clone --depth 1 https://github.com/ggml-org/whisper.cpp "$WORK/whisper.cpp"
+git clone --depth 1 --branch "$WHISPER_REF" https://github.com/ggml-org/whisper.cpp "$WORK/whisper.cpp"
 cd "$WORK/llama.cpp"
 # whisper.cpp builds on the ggml of llama.cpp (one copy of ggml in the app).
 cat >> CMakeLists.txt <<CMAKE
