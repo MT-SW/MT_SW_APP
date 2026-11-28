@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuGroupShapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
@@ -60,24 +61,27 @@ fun DropdownMenu(
     val appDensity = LocalDensity.current
     DropdownMenuPopup(expanded = expanded, onDismissRequest = onDismissRequest, offset = offset) {
         ProvideAppDensity(appDensity) {
-            Box(
-                modifier =
-                modifier
-                    // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under
-                    // it.
-                    .background(MaterialTheme.colorScheme.surface, shape)
-                    .elementLook(UiOptions.GROUP_DIALOGS, shape)
-                    .popupRim(shape)
-                    .clip(shape),
-            ) {
-                val scroll = rememberScrollState()
-                Column(
+            // A menu opened from a dialog must not inherit the dialog's place for the scroll bar.
+            CompositionLocalProvider(LocalScrollbarOutset provides 0.dp) {
+                Box(
                     modifier =
-                    Modifier.width(IntrinsicSize.Max)
-                        .verticalScrollWithBar(scroll)
-                        .padding(vertical = MENU_PADDING_DP.dp),
+                    modifier
+                        // The fill goes first so the look's own gradient and sheen are drawn over it, not hidden under
+                        // it.
+                        .background(MaterialTheme.colorScheme.surface, shape)
+                        .elementLook(UiOptions.GROUP_DIALOGS, shape)
+                        .popupRim(shape)
+                        .clip(shape),
                 ) {
-                    content()
+                    val scroll = rememberScrollState()
+                    Column(
+                        modifier =
+                        Modifier.width(IntrinsicSize.Max)
+                            .verticalScrollWithBar(scroll)
+                            .padding(vertical = MENU_PADDING_DP.dp),
+                    ) {
+                        content()
+                    }
                 }
             }
         }

@@ -207,8 +207,8 @@ fun RadioSetupScreen(
                 modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
                     .verticalScrollWithBar(rememberScrollState())
+                    .padding(16.dp)
                     .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {

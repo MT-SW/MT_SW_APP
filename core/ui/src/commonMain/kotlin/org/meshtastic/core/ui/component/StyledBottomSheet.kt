@@ -86,7 +86,10 @@ private const val WHEEL_CLOSE_TICKS = 3f
 internal val LocalWindowSurface = compositionLocalOf<Color?> { null }
 
 /** Width kept free at the right of a window's first row for the close cross (an icon button plus its margin). */
-const val SHEET_CROSS_INSET_DP = 52
+const val SHEET_CROSS_INSET_DP = 60
+
+/** How far the close cross stays from the right edge of the window. */
+private const val CROSS_END_DP = 12
 
 /**
  * MT_SW: the same as the Material bottom sheet `ModalBottomSheet` (the parameters the app uses), but in the look of our
@@ -138,6 +141,8 @@ fun ModalBottomSheet(
             CompositionLocalProvider(
                 LocalWindowSurface provides windowSurface,
                 LocalOverscrollFactory provides null,
+                // A window opened from a dialog must not inherit the dialog's place for the scroll bar.
+                LocalScrollbarOutset provides 0.dp,
             ) {
                 MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent)) {
                     Box {
@@ -152,7 +157,7 @@ fun ModalBottomSheet(
                                     Logger.i { "Okno: zamknięte krzyżykiem" }
                                     onDismissRequest()
                                 },
-                                modifier = Modifier.align(Alignment.TopEnd).padding(end = 4.dp),
+                                modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = CROSS_END_DP.dp),
                             ) {
                                 Icon(
                                     imageVector = MeshtasticIcons.Close,

@@ -104,8 +104,8 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .padding(16.dp)
                 .verticalScrollWithBar(rememberScrollState())
+                .padding(16.dp)
                 .floatingBarEndPadding(),
         ) {
             AutoCleanNodesSection(

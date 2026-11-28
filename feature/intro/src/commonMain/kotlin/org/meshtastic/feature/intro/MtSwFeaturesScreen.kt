@@ -191,8 +191,8 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
                 modifier =
                 Modifier.widthIn(max = maxContentWidth)
                     .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScrollWithBar(rememberScrollState()),
+                    .verticalScrollWithBar(rememberScrollState())
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(

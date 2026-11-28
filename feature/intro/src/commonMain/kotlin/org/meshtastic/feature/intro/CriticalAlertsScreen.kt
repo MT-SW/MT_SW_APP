@@ -64,7 +64,7 @@ internal fun CriticalAlertsScreen(onSkip: () -> Unit, onConfigure: () -> Unit) {
     ) { innerPadding ->
         Column(
             modifier =
-            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScrollWithBar(rememberScrollState()),
+            Modifier.fillMaxSize().padding(innerPadding).verticalScrollWithBar(rememberScrollState()).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(

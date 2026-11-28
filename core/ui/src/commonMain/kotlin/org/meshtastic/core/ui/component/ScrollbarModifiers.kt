@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
@@ -76,8 +78,8 @@ fun ScrollbarLazyColumn(
 private fun Modifier.desktopScrollbar(state: ScrollState): Modifier =
     if (isDesktopPlatform) {
         // `maxValue` is MAX_VALUE until the first layout, which is not "something to scroll".
-        scrollStateBar(state, MaterialTheme.colorScheme.onSurface)
-            .barGutter(state) { state.maxValue in 1 until Int.MAX_VALUE }
+        val color = MaterialTheme.colorScheme.onSurface
+        barPlace(state, { state.maxValue in 1 until Int.MAX_VALUE }) { scrollStateBar(state, color) }
     } else {
         this
     }
@@ -87,8 +89,10 @@ private fun Modifier.desktopScrollbar(state: ScrollState): Modifier =
 fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = false): Modifier =
     if (isDesktopPlatform) {
         val sizes = remember(state) { LazyItemSizeCache() }
-        lazyListBar(state, MaterialTheme.colorScheme.onSurface, reverseLayout, sizes)
-            .barGutter(state) { state.canScrollForward || state.canScrollBackward }
+        val color = MaterialTheme.colorScheme.onSurface
+        barPlace(state, { state.canScrollForward || state.canScrollBackward }) {
+            lazyListBar(state, color, reverseLayout, sizes)
+        }
     } else {
         this
     }
@@ -97,11 +101,46 @@ fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = fal
 @Composable
 fun Modifier.desktopScrollbar(state: LazyGridState): Modifier =
     if (isDesktopPlatform) {
-        lazyGridBar(state, MaterialTheme.colorScheme.onSurface)
-            .barGutter(state) { state.canScrollForward || state.canScrollBackward }
+        val color = MaterialTheme.colorScheme.onSurface
+        barPlace(state, { state.canScrollForward || state.canScrollBackward }) { lazyGridBar(state, color) }
     } else {
         this
     }
+
+/**
+ * MT_SW: how far past the right edge of the content the bar may sit. A window with its own side margin sets this, so
+ * the bar goes into that margin, close to the edge of the window and clear of the content.
+ */
+internal val LocalScrollbarOutset = compositionLocalOf { 0.dp }
+
+/**
+ * Puts the [bar] where it does not cover the content. In a window with a side margin ([LocalScrollbarOutset]) it goes
+ * into the margin and the content keeps its width; elsewhere the content makes room for it.
+ */
+@Composable
+private fun Modifier.barPlace(key: Any, canScroll: () -> Boolean, bar: Modifier.() -> Modifier): Modifier {
+    val outset = LocalScrollbarOutset.current
+    return if (outset > 0.dp) {
+        reachOut(outset).bar().pullBack(outset)
+    } else {
+        // Kept a little off the edge, so the bar does not stick to the rim of a window or menu.
+        reachOut(-BAR_EDGE_DP.dp).bar().pullBack(-BAR_EDGE_DP.dp).barGutter(key, canScroll)
+    }
+}
+
+/** Makes what follows wider by [by] to the right, without changing the size the parent sees. */
+private fun Modifier.reachOut(by: Dp): Modifier = layout { measurable, constraints ->
+    val extra = by.roundToPx()
+    val placeable = measurable.measure(constraints.offset(horizontal = extra))
+    layout(placeable.width - extra, placeable.height) { placeable.place(0, 0) }
+}
+
+/** Gives the content back the width it had before [reachOut]. */
+private fun Modifier.pullBack(by: Dp): Modifier = layout { measurable, constraints ->
+    val extra = by.roundToPx()
+    val placeable = measurable.measure(constraints.offset(horizontal = -extra))
+    layout(placeable.width + extra, placeable.height) { placeable.place(0, 0) }
+}
 
 /**
  * MT_SW: room of its own for the scroll bar, so it never covers text or switches. Once there is something to scroll,
@@ -127,4 +166,6 @@ private fun Modifier.barGutter(key: Any, canScroll: () -> Boolean): Modifier {
     }
 }
 
-private const val SCROLLBAR_GUTTER_DP = 14
+private const val BAR_EDGE_DP = 4
+
+private const val SCROLLBAR_GUTTER_DP = 22

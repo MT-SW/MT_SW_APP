@@ -137,7 +137,6 @@ fun MeshtasticDialog(
     // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
     val appDensity = LocalDensity.current
     val scrollState = rememberScrollState()
-    val bodyScroll = if (choices.isNotEmpty()) Modifier.verticalScrollWithBar(scrollState) else Modifier
 
     BasicAlertDialog(onDismissRequest = { if (dismissable) onDismiss?.invoke() }, modifier = modifier) {
         CompositionLocalProvider(LocalDensity provides appDensity) {
@@ -175,7 +174,12 @@ fun MeshtasticDialog(
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.headlineSmallEmphasized,
                     )
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                    CompositionLocalProvider(
+                        LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                        LocalScrollbarOutset provides DIALOG_BAR_OUTSET_DP.dp,
+                    ) {
+                        val bodyScroll =
+                            if (choices.isNotEmpty()) Modifier.verticalScrollWithBar(scrollState) else Modifier
                         Column(modifier = Modifier.weight(1f, fill = false).then(bodyScroll)) {
                             if (text != null) {
                                 text()
@@ -287,6 +291,9 @@ fun MeshtasticTextDialog(
     )
 }
 
+/** Both windows have a 24 dp side margin; the scroll bar uses most of it. */
+private const val DIALOG_BAR_OUTSET_DP = 20
+
 private const val DIALOG_PERCENT = 100f
 private const val DIALOG_MIN_ALPHA = 0.85f
 
@@ -358,7 +365,10 @@ fun AlertDialog(
                         }
                     }
                     if (text != null) {
-                        CompositionLocalProvider(LocalContentColor provides textContentColor) {
+                        CompositionLocalProvider(
+                            LocalContentColor provides textContentColor,
+                            LocalScrollbarOutset provides DIALOG_BAR_OUTSET_DP.dp,
+                        ) {
                             ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
                                 Box(
                                     modifier =
