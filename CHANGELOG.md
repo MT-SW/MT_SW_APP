@@ -36,6 +36,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 ##### Poprawione błędy
 
 * **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć. Pasek ma własne miejsce obok treści, więc nie zasłania tekstu ani przełączników. Okna „i” (też asystenta i tłumacza) wyglądają jak pozostałe okna: krzyżyk u góry zamiast przycisku na dole, zamykanie przeciągnięciem w dół.
+* **Okna informacyjne i listy wyboru wyglądają jednakowo.** Także w wiadomościach, węzłach, mapie i ustawieniach: krzyżyk u góry i zamykanie przeciągnięciem w dół, bez przycisków „OK”, „Zamknij” i „Anuluj”. Potrzebny przycisk (np. „Wyślij ponownie”, „Pokaż na mapie”) jest pod treścią i przewija się razem z nią. Pytania z wyborem (np. usuwanie) mają przyciski jak dotąd.
 * **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku. Po polsku jest też porównanie NPU i karty graficznej.
 
 ##### Zmiany względem oryginału
@@ -189,6 +190,7 @@ Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
 * **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 * **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku. Po polsku jest też porównanie NPU i karty graficznej.
 * **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć. Pasek ma własne miejsce obok treści, więc nie zasłania tekstu ani przełączników. Okna „i” (też asystenta i tłumacza) wyglądają jak pozostałe okna: krzyżyk u góry zamiast przycisku na dole, zamykanie przeciągnięciem w dół.
+* **Okna informacyjne i listy wyboru wyglądają jednakowo.** Także w wiadomościach, węzłach, mapie i ustawieniach: krzyżyk u góry i zamykanie przeciągnięciem w dół, bez przycisków „OK”, „Zamknij” i „Anuluj”. Potrzebny przycisk (np. „Wyślij ponownie”, „Pokaż na mapie”) jest pod treścią i przewija się razem z nią. Pytania z wyborem (np. usuwanie) mają przyciski jak dotąd.
 * Zaktualizowano do oryginału w wersji 2.8.6.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
@@ -1016,6 +1018,7 @@ The main things of every version, split by kind of change (the "What's new in th
 ##### Fixed bugs
 
 * **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.
+* **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
 * **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too.
 
 ##### Changes against the original
@@ -1169,6 +1172,7 @@ Every new change goes under the heading of the current version.
 * **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 * **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too.
 * **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.
+* **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
 * Updated to the original app, version 2.8.6.
 
 ### v5 (2.8.5) — test versions from 5 November 2026

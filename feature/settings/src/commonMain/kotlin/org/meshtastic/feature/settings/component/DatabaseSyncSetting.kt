@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.component
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +27,6 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.db_sync_auto
 import org.meshtastic.core.resources.db_sync_auto_summary
 import org.meshtastic.core.resources.db_sync_done
@@ -39,10 +36,10 @@ import org.meshtastic.core.resources.db_sync_now
 import org.meshtastic.core.resources.db_sync_summary
 import org.meshtastic.core.resources.db_sync_title
 import org.meshtastic.core.resources.db_sync_working
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
-import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 
@@ -65,33 +62,30 @@ fun DatabaseSyncSettingItems(
     val done = stringResource(Res.string.db_sync_done)
     val failed = stringResource(Res.string.db_sync_failed)
     if (open) {
-        MeshtasticDialog(
-            title = stringResource(Res.string.db_sync_title),
-            onDismiss = { open = false },
-            text = {
-                Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
-                    Text(stringResource(Res.string.db_sync_info))
-                    result?.let { Text("\n$it") }
-                    if (busy) Text("\n" + stringResource(Res.string.db_sync_working))
-                }
-            },
-            confirmText = stringResource(Res.string.db_sync_now),
-            onConfirm = {
-                if (!busy) {
-                    busy = true
-                    scope.launch {
-                        result =
-                            try {
-                                done.replace("%1\$d", syncNow().toString())
-                            } catch (@Suppress("TooGenericExceptionCaught", "SwallowedException") e: Exception) {
-                                failed
-                            }
-                        busy = false
+        InfoWindow(title = stringResource(Res.string.db_sync_title), onDismiss = { open = false }) {
+            Text(stringResource(Res.string.db_sync_info))
+            result?.let { Text(it) }
+            if (busy) Text(stringResource(Res.string.db_sync_working))
+            Button(
+                enabled = !busy,
+                onClick = {
+                    if (!busy) {
+                        busy = true
+                        scope.launch {
+                            result =
+                                try {
+                                    done.replace("%1\$d", syncNow().toString())
+                                } catch (@Suppress("TooGenericExceptionCaught", "SwallowedException") e: Exception) {
+                                    failed
+                                }
+                            busy = false
+                        }
                     }
-                }
-            },
-            dismissText = stringResource(Res.string.close),
-        )
+                },
+            ) {
+                Text(stringResource(Res.string.db_sync_now))
+            }
+        }
     }
     SwitchListItem(
         modifier = modifier,

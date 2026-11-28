@@ -36,17 +36,24 @@ import co.touchlab.kermit.Logger
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InfoWindow(title: String, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun InfoWindow(
+    title: String,
+    onDismiss: () -> Unit,
+    /** False for content that scrolls by itself (a list): two scrolls inside each other do not work. */
+    scrolls: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     ModalBottomSheet(
         onDismissRequest = {
             Logger.i { "Okno informacji: zamknięte" }
             onDismiss()
         },
     ) {
+        val scroll = rememberScrollState()
         Column(
             modifier =
             Modifier.fillMaxWidth()
-                .verticalScrollWithBar(rememberScrollState(), sideMargin = SIDE_DP.dp)
+                .then(if (scrolls) Modifier.verticalScrollWithBar(scroll, sideMargin = SIDE_DP.dp) else Modifier)
                 .padding(horizontal = SIDE_DP.dp)
                 .padding(bottom = SIDE_DP.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),

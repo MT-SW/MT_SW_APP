@@ -78,10 +78,12 @@ import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_data_where
 import org.meshtastic.core.resources.folder_usage
+import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.photo_folder_change
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -310,11 +312,9 @@ fun StorageFolderFirstRunDialog() {
         )
     }
     scheduledTo?.let { target ->
-        AlertDialog(
-            onDismissRequest = { scheduledTo = null },
-            text = { Text(stringResource(Res.string.app_data_scheduled, target)) },
-            confirmButton = { TextButton(onClick = { scheduledTo = null }) { Text("OK") } },
-        )
+        InfoWindow(title = stringResource(Res.string.info), onDismiss = { scheduledTo = null }) {
+            Text(stringResource(Res.string.app_data_scheduled, target))
+        }
     }
 }
 
@@ -334,12 +334,9 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
     asking?.let { (id, after) ->
         val need = free - after
         if (after < 0) {
-            AlertDialog(
-                onDismissRequest = { asking = null },
-                title = { Text(stringResource(Res.string.ai_storage_low_title)) },
-                text = { Text(stringResource(Res.string.ai_storage_none_body, formatMb(need), formatMb(free))) },
-                confirmButton = { TextButton(onClick = { asking = null }) { Text("OK") } },
-            )
+            InfoWindow(title = stringResource(Res.string.ai_storage_low_title), onDismiss = { asking = null }) {
+                Text(stringResource(Res.string.ai_storage_none_body, formatMb(need), formatMb(free)))
+            }
         } else {
             AlertDialog(
                 onDismissRequest = { asking = null },
@@ -362,11 +359,9 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
         }
     }
     if (restartFirst) {
-        AlertDialog(
-            onDismissRequest = { restartFirst = false },
-            text = { Text(stringResource(Res.string.ai_storage_restart_first)) },
-            confirmButton = { TextButton(onClick = { restartFirst = false }) { Text("OK") } },
-        )
+        InfoWindow(title = stringResource(Res.string.info), onDismiss = { restartFirst = false }) {
+            Text(stringResource(Res.string.ai_storage_restart_first))
+        }
     }
 
     return { id ->

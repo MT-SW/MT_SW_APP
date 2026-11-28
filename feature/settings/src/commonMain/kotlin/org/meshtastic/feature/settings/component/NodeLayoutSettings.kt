@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -35,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -74,8 +72,8 @@ import org.meshtastic.core.resources.node_layout_preview
 import org.meshtastic.core.resources.node_layout_relative_last_heard
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_layout_signal_direct_only
-import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
 import org.meshtastic.core.ui.component.LocalNodeExtraStats
 import org.meshtastic.core.ui.component.LocalNodeExtraTick
@@ -86,7 +84,6 @@ import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.nodeExtraLegend
-import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -493,26 +490,21 @@ private fun NodeExtraSettings(
         }
     }
     if (showLegend) {
-        AlertDialog(
-            onDismissRequest = { showLegend = false },
-            confirmButton = { TextButton(onClick = { showLegend = false }) { Text("OK") } },
-            title = { Text("Znaczenie ikon") },
-            text = {
-                Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
-                    nodeExtraLegend.forEach { (icon, meaning) ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (icon != null) {
-                                Icon(
-                                    imageVector = icon.invoke(),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp).padding(end = 6.dp),
-                                )
-                            }
-                            Text(meaning, style = MaterialTheme.typography.bodyMedium)
+        InfoWindow(title = "Znaczenie ikon", onDismiss = { showLegend = false }) {
+            Column {
+                nodeExtraLegend.forEach { (icon, meaning) ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (icon != null) {
+                            Icon(
+                                imageVector = icon.invoke(),
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp).padding(end = 6.dp),
+                            )
                         }
+                        Text(meaning, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-            },
-        )
+            }
+        }
     }
 }

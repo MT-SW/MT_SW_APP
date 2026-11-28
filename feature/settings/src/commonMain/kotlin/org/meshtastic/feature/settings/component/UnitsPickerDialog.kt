@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +44,7 @@ import org.meshtastic.core.resources.units_metric
 import org.meshtastic.core.resources.units_scope_summary
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.RadioButton
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 
 /** The [UnitsOverride] choices with their labels; System default follows the OS locale. */
 enum class UnitsOption(val label: StringResource, val override: UnitsOverride) {
@@ -70,7 +72,7 @@ fun UnitsPickerDialog(
         title = stringResource(Res.string.choose_units),
         onDismiss = onDismiss,
         text = {
-            Column {
+            Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                 Text(
                     text = stringResource(Res.string.units_scope_summary),
                     style = MaterialTheme.typography.bodyMedium,

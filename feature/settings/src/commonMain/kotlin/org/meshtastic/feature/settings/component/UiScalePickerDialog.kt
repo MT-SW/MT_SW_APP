@@ -19,13 +19,16 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.resources.ui_scale_follow_system
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.theme.UI_SCALE_OPTIONS
 
 /** Label of one scale choice: "Follow the phone" for 0, otherwise the percent. */
@@ -40,7 +43,7 @@ fun UiScalePickerDialog(current: Int, onClickScale: (Int) -> Unit, onDismiss: ()
         title = stringResource(Res.string.ui_scale),
         onDismiss = onDismiss,
         text = {
-            Column {
+            Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                 UI_SCALE_OPTIONS.forEach { percent ->
                     ListItem(
                         text = uiScaleLabel(percent) + if (percent == current) "  ✓" else "",

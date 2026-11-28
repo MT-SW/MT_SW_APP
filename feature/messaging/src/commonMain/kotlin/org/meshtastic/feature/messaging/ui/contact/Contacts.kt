@@ -270,8 +270,6 @@ fun ContactsScreen(
         MeshtasticDialog(
             titleRes = Res.string.chat_info_title,
             messageRes = Res.string.chat_info_body,
-            confirmTextRes = Res.string.okay,
-            onConfirm = { showChatInfo = false },
             onDismiss = { showChatInfo = false },
         )
     }

@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
@@ -89,20 +88,24 @@ fun TracerouteAlertHandler(
                         if (unavailableRes != null) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(text = stringResource(unavailableRes), color = MaterialTheme.colorScheme.error)
+                        } else {
+                            Button(
+                                onClick = {
+                                    uiViewModel.dismissAlert()
+                                    dismissedTracerouteRequestId = response.requestId
+                                    currentOnNavigateToMap(
+                                        response.destinationNodeNum,
+                                        response.requestId,
+                                        response.logUuid,
+                                    )
+                                },
+                            ) {
+                                Text(stringResource(Res.string.view_on_map))
+                            }
                         }
                     }
                 },
-                confirmTextRes = if (unavailableRes == null) Res.string.view_on_map else null,
-                onConfirm =
-                if (unavailableRes != null) {
-                    null
-                } else {
-                    {
-                        dismissedTracerouteRequestId = response.requestId
-                        currentOnNavigateToMap(response.destinationNodeNum, response.requestId, response.logUuid)
-                    }
-                },
-                dismissTextRes = Res.string.okay,
+                onConfirm = null,
                 onDismiss = {
                     uiViewModel.clearTracerouteResponse()
                     dismissedTracerouteRequestId = null

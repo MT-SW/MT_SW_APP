@@ -64,7 +64,6 @@ import org.meshtastic.core.resources.error
 import org.meshtastic.core.resources.no_public_key
 import org.meshtastic.core.resources.no_public_key_text
 import org.meshtastic.core.resources.security
-import org.meshtastic.core.resources.security_icon_help_dismiss
 import org.meshtastic.core.resources.security_icon_help_show_all
 import org.meshtastic.core.resources.security_icon_help_show_less
 import org.meshtastic.core.resources.security_legend_any_version
@@ -266,39 +265,26 @@ private val LEGEND_ORDER =
 @Composable
 fun NodeSecurityDialog(indicator: NodeSecurityIndicator, key: ByteString?, onDismiss: () -> Unit = {}) {
     var showAll by rememberSaveable { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(if (showAll) Res.string.security else indicator.title)) },
-        text = {
-            if (showAll) {
-                SecurityLegend()
-            } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(indicator.helpText), textAlign = TextAlign.Center)
-                    Spacer(Modifier.height(16.dp))
-                    PublicKeyBlock(indicator, key)
-                }
+    InfoWindow(title = stringResource(if (showAll) Res.string.security else indicator.title), onDismiss = onDismiss) {
+        if (showAll) {
+            SecurityLegendItems()
+        } else {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(indicator.helpText), textAlign = TextAlign.Center)
+                Spacer(Modifier.height(16.dp))
+                PublicKeyBlock(indicator, key)
             }
-        },
-        confirmButton = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = { showAll = !showAll }) {
-                    Text(
-                        if (showAll) {
-                            stringResource(Res.string.security_icon_help_show_less)
-                        } else {
-                            stringResource(Res.string.security_icon_help_show_all)
-                        },
-                    )
-                }
-                TextButton(onClick = onDismiss) { Text(stringResource(Res.string.security_icon_help_dismiss)) }
-            }
-        },
-    )
+        }
+        TextButton(onClick = { showAll = !showAll }) {
+            Text(
+                if (showAll) {
+                    stringResource(Res.string.security_icon_help_show_less)
+                } else {
+                    stringResource(Res.string.security_icon_help_show_all)
+                },
+            )
+        }
+    }
 }
 
 /** The node's public key, shown only where it is the subject: a key on file, or one that stopped matching. */

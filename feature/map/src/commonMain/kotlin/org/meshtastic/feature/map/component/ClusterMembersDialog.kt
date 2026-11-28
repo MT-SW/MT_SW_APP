@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,9 +37,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.nodes_at_this_location
-import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 
@@ -54,25 +52,25 @@ fun ClusterMembersDialog(
     members: List<ClusterMemberEntry>,
     onMemberClick: (Int) -> Unit,
     onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     if (members.isEmpty()) return
 
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        modifier = modifier,
-        title = { Text(text = stringResource(Res.string.nodes_at_this_location)) },
-        text = {
-            ScrollbarLazyColumn(contentPadding = PaddingValues(vertical = 0.dp)) {
-                // Deduped by node number: it is the key and must be unique, and a node can reach the map from two
-                // sources, or arrive as a `num = 0` placeholder.
-                items(items = members.distinctBy { it.nodeNum }, key = { it.nodeNum }) { member ->
-                    ClusterMemberRow(member = member, onClick = { onMemberClick(member.nodeNum) })
-                }
+    InfoWindow(
+        title = stringResource(Res.string.nodes_at_this_location),
+        onDismiss = onDismissRequest,
+        scrolls = false,
+    ) {
+        ScrollbarLazyColumn(
+            modifier = Modifier.heightIn(max = 420.dp),
+            contentPadding = PaddingValues(vertical = 0.dp),
+        ) {
+            // Deduped by node number: it is the key and must be unique, and a node can reach the map from two
+            // sources, or arrive as a `num = 0` placeholder.
+            items(items = members.distinctBy { it.nodeNum }, key = { it.nodeNum }) { member ->
+                ClusterMemberRow(member = member, onClick = { onMemberClick(member.nodeNum) })
             }
-        },
-        confirmButton = { TextButton(onClick = onDismissRequest) { Text(stringResource(Res.string.close)) } },
-    )
+        }
+    }
 }
 
 @Composable

@@ -24,10 +24,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +35,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +56,6 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.QuietMode
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.sos_nodes_done
 import org.meshtastic.core.resources.sos_nodes_empty
 import org.meshtastic.core.resources.sos_nodes_search
 import org.meshtastic.core.resources.track_rec_clear
@@ -87,8 +85,9 @@ import org.meshtastic.core.resources.trips_rangetest
 import org.meshtastic.core.resources.trips_signal_hint
 import org.meshtastic.core.resources.trips_signal_live
 import org.meshtastic.core.resources.trips_signal_title
-import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Checkbox
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
@@ -320,41 +319,36 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                 .filter { quietNodeName(it).contains(query.trim(), ignoreCase = true) }
                 .sortedBy { quietNodeName(it).lowercase() }
         }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.trips_quiet_pick_title)) },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(Res.string.sos_nodes_search)) },
-                    singleLine = true,
+    InfoWindow(title = stringResource(Res.string.trips_quiet_pick_title), onDismiss = onDismiss, scrolls = false) {
+        Column {
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(Res.string.sos_nodes_search)) },
+                singleLine = true,
+            )
+            if (shown.isEmpty()) {
+                Text(
+                    text = stringResource(Res.string.sos_nodes_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 12.dp),
                 )
-                if (shown.isEmpty()) {
-                    Text(
-                        text = stringResource(Res.string.sos_nodes_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 12.dp),
-                    )
-                }
-                val listState = rememberLazyListState()
-                Box(modifier = Modifier.padding(top = 8.dp)) {
-                    ScrollbarLazyColumn(state = listState) {
-                        items(shown, key = { it.num }) { node ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
-                            ) {
-                                Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
-                                Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
-                            }
+            }
+            val listState = rememberLazyListState()
+            Box(modifier = Modifier.padding(top = 8.dp)) {
+                ScrollbarLazyColumn(modifier = Modifier.heightIn(max = 360.dp), state = listState) {
+                    items(shown, key = { it.num }) { node ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
+                        ) {
+                            Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
+                            Text(text = quietNodeName(node), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sos_nodes_done)) } },
-    )
+        }
+    }
 }

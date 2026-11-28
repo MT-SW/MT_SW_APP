@@ -78,7 +78,6 @@ import org.meshtastic.core.resources.debug_tab_app_logs
 import org.meshtastic.core.resources.debug_tab_device_logs
 import org.meshtastic.core.resources.debug_tab_mirror
 import org.meshtastic.core.resources.debug_tab_packets
-import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
@@ -209,8 +208,6 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
             MeshtasticDialog(
                 titleRes = Res.string.debug_info_title,
                 messageRes = Res.string.debug_info_body,
-                confirmTextRes = Res.string.okay,
-                onConfirm = { showInfo = false },
                 onDismiss = { showInfo = false },
             )
         }

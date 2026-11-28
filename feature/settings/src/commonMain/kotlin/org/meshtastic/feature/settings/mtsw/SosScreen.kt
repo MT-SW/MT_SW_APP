@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -129,7 +130,6 @@ import org.meshtastic.core.resources.sos_message_for
 import org.meshtastic.core.resources.sos_message_label
 import org.meshtastic.core.resources.sos_no_targets
 import org.meshtastic.core.resources.sos_nodes_add
-import org.meshtastic.core.resources.sos_nodes_done
 import org.meshtastic.core.resources.sos_nodes_empty
 import org.meshtastic.core.resources.sos_nodes_missing
 import org.meshtastic.core.resources.sos_nodes_missing_remove
@@ -192,6 +192,7 @@ import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ScrollbarLazyColumn
@@ -1006,40 +1007,35 @@ private fun SosNodePicker(nodes: List<Node>, selected: List<Int>, onToggle: (Int
                 .filter { node -> sosNodeName(node, node.num).contains(query.trim(), ignoreCase = true) }
                 .sortedBy { sosNodeName(it, it.num).lowercase() }
         }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.sos_nodes_pick_title)) },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(Res.string.sos_nodes_search)) },
-                    singleLine = true,
+    InfoWindow(title = stringResource(Res.string.sos_nodes_pick_title), onDismiss = onDismiss, scrolls = false) {
+        Column {
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(Res.string.sos_nodes_search)) },
+                singleLine = true,
+            )
+            if (shown.isEmpty()) {
+                Text(
+                    text = stringResource(Res.string.sos_nodes_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 12.dp),
                 )
-                if (shown.isEmpty()) {
-                    Text(
-                        text = stringResource(Res.string.sos_nodes_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 12.dp),
-                    )
-                }
-                ScrollbarLazyColumn(modifier = Modifier.padding(top = 8.dp)) {
-                    items(shown, key = { it.num }) { node ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
-                        ) {
-                            Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
-                            Text(text = sosNodeName(node, node.num), style = MaterialTheme.typography.bodyMedium)
-                        }
+            }
+            ScrollbarLazyColumn(modifier = Modifier.padding(top = 8.dp).heightIn(max = 360.dp)) {
+                items(shown, key = { it.num }) { node ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().clickable { onToggle(node.num) },
+                    ) {
+                        Checkbox(checked = node.num in selected, onCheckedChange = { onToggle(node.num) })
+                        Text(text = sosNodeName(node, node.num), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sos_nodes_done)) } },
-    )
+        }
+    }
 }
 
 /** What the last run did: progress while sending, then the result. Nothing before the first run. */

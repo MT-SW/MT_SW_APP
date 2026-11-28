@@ -133,6 +133,27 @@ fun MeshtasticDialog(
         )
     }
 
+    // MT_SW: a window with nothing to decide (only closing) is our window with a cross at the top, like the others.
+    if (onConfirm == null && onDismiss != null && choices.isEmpty() && dismissable) {
+        InfoWindow(title = titleText, onDismiss = onDismiss, scrolls = text == null) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+            }
+            if (text != null) {
+                text()
+            } else if (htmlAnnotated != null) {
+                Text(text = htmlAnnotated)
+            } else if (messageText != null) {
+                Text(text = messageText, color = messageColor)
+            }
+        }
+        return
+    }
+
     // A dialog opens in its own window whose composition resets LocalDensity to the system value, which would
     // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
     val appDensity = LocalDensity.current

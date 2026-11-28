@@ -22,12 +22,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.HorizontalDivider
@@ -62,7 +59,6 @@ import org.meshtastic.core.resources.ic_lock_open
 import org.meshtastic.core.resources.ic_warning
 import org.meshtastic.core.resources.security_icon_badge_warning_description
 import org.meshtastic.core.resources.security_icon_description
-import org.meshtastic.core.resources.security_icon_help_dismiss
 import org.meshtastic.core.resources.security_icon_help_green_lock
 import org.meshtastic.core.resources.security_icon_help_red_open_lock
 import org.meshtastic.core.resources.security_icon_help_show_all
@@ -398,49 +394,28 @@ fun SecurityIcon(
 private fun SecurityHelpDialog(securityState: SecurityState, onDismiss: () -> Unit) {
     var showAll by rememberSaveable { mutableStateOf(false) }
 
-    AlertDialog(
-        modifier =
+    InfoWindow(
+        title =
+        stringResource(
+            if (showAll) Res.string.security_icon_help_title_all else Res.string.security_icon_help_title,
+        ),
+        onDismiss = onDismiss,
+    ) {
         if (showAll) {
-            Modifier.fillMaxSize()
+            AllSecurityStates()
         } else {
-            Modifier
-        },
-        onDismissRequest = onDismiss,
-        title = {
+            ContextualSecurityState(securityState)
+        }
+        TextButton(onClick = { showAll = !showAll }) {
             Text(
                 if (showAll) {
-                    stringResource(Res.string.security_icon_help_title_all)
+                    stringResource(Res.string.security_icon_help_show_less)
                 } else {
-                    stringResource(Res.string.security_icon_help_title)
+                    stringResource(Res.string.security_icon_help_show_all)
                 },
             )
-        },
-        text = {
-            if (showAll) {
-                AllSecurityStates()
-            } else {
-                ContextualSecurityState(securityState)
-            }
-        },
-        confirmButton = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = { showAll = !showAll }) {
-                    Text(
-                        if (showAll) {
-                            stringResource(Res.string.security_icon_help_show_less)
-                        } else {
-                            stringResource(Res.string.security_icon_help_show_all)
-                        },
-                    )
-                }
-                TextButton(onClick = onDismiss) { Text(stringResource(Res.string.security_icon_help_dismiss)) }
-            }
-        },
-    )
+        }
+    }
 }
 
 /**
@@ -470,10 +445,7 @@ private fun ContextualSecurityState(securityState: SecurityState) {
  */
 @Composable
 private fun AllSecurityStates() {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         SecurityState.entries.forEach { state ->
             // Uses enum entries
             Row(verticalAlignment = Alignment.CenterVertically) {

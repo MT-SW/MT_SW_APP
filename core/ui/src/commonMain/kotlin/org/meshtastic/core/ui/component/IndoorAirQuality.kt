@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -280,7 +281,7 @@ fun IndoorAirQuality(iaq: Int?, displayMode: IaqDisplayMode = IaqDisplayMode.Pil
                     onDismiss = { isLegendOpen = false },
                     dismissText = stringResource(Res.string.close),
                     title = stringResource(Res.string.indoor_air_quality_iaq),
-                    text = { IAQScale() },
+                    text = { IAQScale(Modifier.verticalScrollWithBar(rememberScrollState())) },
                 )
             }
         }

@@ -111,6 +111,7 @@ import org.meshtastic.core.resources.dictation_enabled_summary
 import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_summary
 import org.meshtastic.core.resources.dictation_external_mic_title
+import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
@@ -118,6 +119,7 @@ import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.ReportIssuesDialog
@@ -170,11 +172,9 @@ internal fun AiSettings() {
     // A download on a computer asks first when the disk would be left almost full (and waits while a move is pending).
     val startDownload = rememberDownloadGuard { id -> appScope.launch { store.download(id) } }
     if (freedMb > 0 && freedNoticeShown) {
-        AlertDialog(
-            onDismissRequest = { freedNoticeShown = false },
-            text = { Text(stringResource(Res.string.ai_legacy_freed, freedMb)) },
-            confirmButton = { TextButton(onClick = { freedNoticeShown = false }) { Text("OK") } },
-        )
+        InfoWindow(title = stringResource(Res.string.info), onDismiss = { freedNoticeShown = false }) {
+            Text(stringResource(Res.string.ai_legacy_freed, freedMb))
+        }
     }
 
     // Everything here is still being developed: people are asked to try the models and tell us how each one works.

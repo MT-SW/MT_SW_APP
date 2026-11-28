@@ -88,7 +88,6 @@ import org.meshtastic.core.resources.network_health_info_intro
 import org.meshtastic.core.resources.network_health_info_title
 import org.meshtastic.core.resources.network_health_online
 import org.meshtastic.core.resources.network_health_problems_only
-import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -713,8 +712,6 @@ internal fun NetworkHealthInfoDialog(
                 }
             }
         },
-        confirmTextRes = Res.string.okay,
-        onConfirm = onDismiss,
         onDismiss = onDismiss,
     )
 }

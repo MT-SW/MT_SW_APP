@@ -39,7 +39,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,7 +57,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_antenna_height
 import org.meshtastic.core.resources.planner_antenna_height_title
 import org.meshtastic.core.resources.planner_clear_point
-import org.meshtastic.core.resources.planner_close
 import org.meshtastic.core.resources.planner_coordinates_hint
 import org.meshtastic.core.resources.planner_coordinates_title
 import org.meshtastic.core.resources.planner_error_latitude
@@ -93,8 +91,8 @@ import org.meshtastic.core.resources.planner_source_station_used
 import org.meshtastic.core.resources.planner_source_tap_map
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_unit_m_asl
-import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
@@ -365,37 +363,32 @@ private fun NodePickerDialog(
                         .thenBy { it.displayName.lowercase() },
                 )
         }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.planner_node_picker_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    label = { Text(stringResource(Res.string.planner_node_search)) },
-                    leadingIcon = { Icon(MeshtasticIcons.Search, contentDescription = null) },
+    InfoWindow(title = stringResource(Res.string.planner_node_picker_title), onDismiss = onDismiss, scrolls = false) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                label = { Text(stringResource(Res.string.planner_node_search)) },
+                leadingIcon = { Icon(MeshtasticIcons.Search, contentDescription = null) },
+            )
+            if (filtered.isEmpty()) {
+                Text(
+                    text = stringResource(Res.string.planner_node_none),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (filtered.isEmpty()) {
-                    Text(
-                        text = stringResource(Res.string.planner_node_none),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else {
-                    ScrollbarLazyColumn(modifier = Modifier.heightIn(max = NODE_LIST_MAX_HEIGHT)) {
-                        items(filtered, key = { it.num }) { node ->
-                            NodeRow(node = node, selected = node.num == selectedNum, onClick = { onPick(node.num) })
-                            HorizontalDivider()
-                        }
+            } else {
+                ScrollbarLazyColumn(modifier = Modifier.heightIn(max = NODE_LIST_MAX_HEIGHT)) {
+                    items(filtered, key = { it.num }) { node ->
+                        NodeRow(node = node, selected = node.num == selectedNum, onClick = { onPick(node.num) })
+                        HorizontalDivider()
                     }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.planner_close)) } },
-    )
+        }
+    }
 }
 
 @Composable

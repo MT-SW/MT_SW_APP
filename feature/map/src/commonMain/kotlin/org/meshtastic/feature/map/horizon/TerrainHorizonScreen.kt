@@ -178,6 +178,7 @@ import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.GlassChoiceChip
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
@@ -197,6 +198,7 @@ import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import org.meshtastic.feature.map.planner.Geodesy
+import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -206,7 +208,6 @@ import kotlin.math.roundToInt
 import kotlin.math.tan
 import kotlin.time.Clock
 import kotlin.time.TimeSource
-import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
 
 private val Visible = Color(0xFF66BB6A)
 private val Hidden = Color(0xFFEF5350)
@@ -352,18 +353,9 @@ fun TerrainHorizonScreen(
         )
     }
     if (showInfo) {
-        AlertDialog(
-            onDismissRequest = { showInfo = false },
-            title = { Text(stringResource(Res.string.terrain_horizon_info_title)) },
-            text = {
-                Text(
-                    stringResource(Res.string.terrain_horizon_info_body),
-                    fontSize = 13.sp,
-                    modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
-                )
-            },
-            confirmButton = { TextButton(onClick = { showInfo = false }) { Text(stringResource(Res.string.close)) } },
-        )
+        InfoWindow(title = stringResource(Res.string.terrain_horizon_info_title), onDismiss = { showInfo = false }) {
+            Text(stringResource(Res.string.terrain_horizon_info_body), fontSize = 13.sp)
+        }
     }
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         Row(verticalAlignment = Alignment.CenterVertically) {

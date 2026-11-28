@@ -33,10 +33,10 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.relays
 import org.meshtastic.core.resources.resend
-import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.Button
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.NodeChip
 
 @Composable
@@ -50,48 +50,46 @@ fun DeliveryInfo(
     relayNodes: List<Node> = emptyList(),
     onConfirm: (() -> Unit) = {},
     onDismiss: () -> Unit = {},
-) = MeshtasticDialog(
-    title = stringResource(title),
-    onDismiss = onDismiss,
-    dismissText = stringResource(Res.string.close),
-    confirmText = if (resendOption) stringResource(Res.string.resend) else null,
-    onConfirm = if (resendOption) onConfirm else null,
-    text = {
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            text?.let {
+) = InfoWindow(title = stringResource(title), onDismiss = onDismiss) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        text?.let {
+            Text(
+                text = stringResource(it),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        detail?.let {
+            Text(
+                text = stringResource(it),
+                modifier = Modifier.padding(top = 8.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        if (relays != 0 || relayNodes.isNotEmpty()) {
+            if (relays != 0) {
                 Text(
-                    text = stringResource(it),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            detail?.let {
-                Text(
-                    text = stringResource(it),
+                    text = pluralStringResource(Res.plurals.relays, relays, relays),
                     modifier = Modifier.padding(top = 8.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            if (relays != 0 || relayNodes.isNotEmpty()) {
-                if (relays != 0) {
-                    Text(
-                        text = pluralStringResource(Res.plurals.relays, relays, relays),
-                        modifier = Modifier.padding(top = 8.dp),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                if (relayNodes.isNotEmpty()) {
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        relayNodes.forEach { node -> NodeChip(node = node) }
-                    }
+            if (relayNodes.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    relayNodes.forEach { node -> NodeChip(node = node) }
                 }
             }
         }
-    },
-)
+        if (resendOption) {
+            Button(onClick = onConfirm, modifier = Modifier.padding(top = 16.dp)) {
+                Text(stringResource(Res.string.resend))
+            }
+        }
+    }
+}

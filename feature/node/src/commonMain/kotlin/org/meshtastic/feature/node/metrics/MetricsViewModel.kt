@@ -75,11 +75,10 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.TracerouteResponseProvider
 import org.meshtastic.core.repository.TracerouteSnapshotRepository
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.neighbors_show_on_map
-import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
+import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.TrackCompare
@@ -97,8 +96,8 @@ import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.RouteDiscovery
 import org.meshtastic.proto.Telemetry
-import kotlin.time.Instant
 import org.meshtastic.proto.Paxcount as ProtoPaxcount
+import kotlin.time.Instant
 
 /**
  * ViewModel responsible for managing and graphing metrics (telemetry, signal strength, paxcount) for a specific node.
@@ -359,8 +358,8 @@ open class MetricsViewModel(
     fun nodesByNum(): Map<Int, org.meshtastic.core.model.Node> = nodeRepository.nodeDBbyNum.value
 
     /**
-     * Shows a log entry in a window. With [onShowOnMap] the window has "Show on map" and "Close" (as the neighbour
-     * window on the node list); without it, a single "Close".
+     * Shows a log entry in our window (cross at the top, swipe down). With [onShowOnMap] a "Show on map" button sits
+     * under the text.
      */
     fun showLogDetail(titleRes: StringResource, annotatedMessage: AnnotatedString, onShowOnMap: (() -> Unit)? = null) {
         alertManager.showAlert(
@@ -368,11 +367,19 @@ open class MetricsViewModel(
             composableMessage = {
                 Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                     SelectionContainer { Text(text = annotatedMessage) }
+                    if (onShowOnMap != null) {
+                        Button(
+                            onClick = {
+                                alertManager.dismissAlert()
+                                onShowOnMap()
+                            },
+                        ) {
+                            Text(stringResource(Res.string.neighbors_show_on_map))
+                        }
+                    }
                 }
             },
-            confirmTextRes = if (onShowOnMap != null) Res.string.neighbors_show_on_map else null,
-            onConfirm = onShowOnMap,
-            dismissTextRes = Res.string.close,
+            onConfirm = null,
         )
     }
 
@@ -407,12 +414,19 @@ open class MetricsViewModel(
                         if (errorRes != null) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(text = stringResource(errorRes), color = MaterialTheme.colorScheme.error)
+                        } else {
+                            Button(
+                                onClick = {
+                                    alertManager.dismissAlert()
+                                    onViewOnMap(requestId, responseLogUuid)
+                                },
+                            ) {
+                                Text(stringResource(Res.string.view_on_map))
+                            }
                         }
                     }
                 },
-                confirmTextRes = if (errorRes == null) Res.string.view_on_map else null,
-                onConfirm = if (errorRes == null) ({ onViewOnMap(requestId, responseLogUuid) }) else null,
-                dismissTextRes = Res.string.okay,
+                onConfirm = null,
             )
         }
     }

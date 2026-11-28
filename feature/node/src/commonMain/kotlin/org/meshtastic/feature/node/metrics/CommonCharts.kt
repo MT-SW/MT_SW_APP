@@ -31,12 +31,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
@@ -59,17 +55,12 @@ import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.metric_channel_label
 import org.meshtastic.core.resources.rssi
 import org.meshtastic.core.resources.snr
-import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.FilterChip
-import org.meshtastic.core.ui.component.verticalScrollWithBar
-import org.meshtastic.core.ui.icon.Icon
-import org.meshtastic.core.ui.icon.Info
-import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.time.Duration.Companion.days
 
@@ -207,53 +198,33 @@ fun LegendInfoDialog(
     onDismiss: () -> Unit,
     extraContent: (@Composable () -> Unit)? = null,
 ) {
-    AlertDialog(
-        icon = { Icon(imageVector = MeshtasticIcons.Info, contentDescription = null) },
-        title = {
-            Text(
-                text = stringResource(Res.string.info),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        },
-        text = {
-            // Scrollable: with the extra LNA field the content can exceed a small screen or a shown keyboard.
-            Column(
-                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                for (item in infoData) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            MetricIndicator(item.color)
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(item.titleRes),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = item.color,
-                            )
-                        }
+    InfoWindow(title = stringResource(Res.string.info), onDismiss = onDismiss) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            for (item in infoData) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        MetricIndicator(item.color)
+                        Spacer(Modifier.width(8.dp))
                         Text(
-                            text = stringResource(item.definitionRes),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(start = 16.dp),
+                            text = stringResource(item.titleRes),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = item.color,
                         )
                     }
+                    Text(
+                        text = stringResource(item.definitionRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
                 }
-                extraContent?.invoke()
             }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(Res.string.close), fontWeight = FontWeight.Bold)
-            }
-        },
-        shape = RoundedCornerShape(28.dp),
-    )
+            extraContent?.invoke()
+        }
+    }
 }
 
 /** Draws a small colored line segment or circle to identify a chart series. */

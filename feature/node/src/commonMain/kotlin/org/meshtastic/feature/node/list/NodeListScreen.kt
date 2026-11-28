@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
@@ -101,12 +100,12 @@ import org.meshtastic.core.resources.nodes_unheard_banner_one
 import org.meshtastic.core.resources.nodes_unheard_keep
 import org.meshtastic.core.resources.nodes_unheard_remove
 import org.meshtastic.core.resources.set_up_connection
-import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LocalNeighborsClick
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
@@ -126,9 +125,9 @@ import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.smartScrollToTop
-import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.component.withShadowInset
 import org.meshtastic.core.ui.icon.BarChart
+import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -725,44 +724,29 @@ private fun NeighborReportDialog(
     val statusRed = Quality.NONE.color.invoke()
     val modemPreset = LocalModemPreset.current
     val message = report?.packet?.getNeighborInfoResponse(nameOf, header = header)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(header) },
-        text = {
-            if (message == null) {
-                Text(stringResource(Res.string.neighbors_dialog_empty))
-            } else {
-                Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
-                    SelectionContainer {
-                        Text(
-                            annotateNeighborInfo(
-                                message,
-                                statusGreen = statusGreen,
-                                statusYellow = statusYellow,
-                                statusOrange = statusOrange,
-                                statusRed = statusRed,
-                                modemPreset = modemPreset,
-                            ),
-                        )
-                    }
+    InfoWindow(title = header, onDismiss = onDismiss) {
+        if (message == null) {
+            Text(stringResource(Res.string.neighbors_dialog_empty))
+        } else {
+            Column {
+                SelectionContainer {
+                    Text(
+                        annotateNeighborInfo(
+                            message,
+                            statusGreen = statusGreen,
+                            statusYellow = statusYellow,
+                            statusOrange = statusOrange,
+                            statusRed = statusRed,
+                            modemPreset = modemPreset,
+                        ),
+                    )
                 }
             }
-        },
-        // The two buttons used to do the same thing (close). Now one closes and the other opens the map.
-        dismissButton =
-        if (message == null) {
-            null
-        } else {
-            { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } }
-        },
-        confirmButton = {
-            if (message == null) {
-                TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
-            } else {
-                TextButton(onClick = onShowOnMap) { Text(stringResource(Res.string.neighbors_show_on_map)) }
-            }
-        },
-    )
+        }
+        if (message != null) {
+            Button(onClick = onShowOnMap) { Text(stringResource(Res.string.neighbors_show_on_map)) }
+        }
+    }
 }
 
 /**
@@ -795,7 +779,9 @@ internal fun NeighborMapDialog(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f),
                     )
-                    TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
+                    IconButton(onClick = onDismiss) {
+                        Icon(MeshtasticIcons.Close, contentDescription = stringResource(Res.string.close))
+                    }
                 }
                 Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     if (centerKnown && located > 0) {
