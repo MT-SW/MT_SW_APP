@@ -41,7 +41,7 @@ jobs:
 
   mac:
     needs: release
-    runs-on: macos-14
+    runs-on: macos-26
     steps:
       - name: Get whisper.cpp
         run: git clone --depth 1 --branch "$REF" https://github.com/ggml-org/whisper.cpp whisper.cpp
