@@ -76,10 +76,10 @@ private const val SWIPE_CLOSE_DP = 40
 
 /** How far up the wheel must pull, after the rest at the top, to close the window. */
 private const val WHEEL_AGAIN_TICKS = 0.3f
-private const val WHEEL_PAUSE_MS = 500L
+private const val WHEEL_PAUSE_MS = 150L
 
 /** Events further apart than this belong to separate pushes of the wheel or trackpad. */
-private const val WHEEL_GAP_MS = 150L
+private const val WHEEL_GAP_MS = 80L
 
 /**
  * MT_SW: the real (opaque) surface colour of the window we are inside of. Inside a window the theme's surface colour is
