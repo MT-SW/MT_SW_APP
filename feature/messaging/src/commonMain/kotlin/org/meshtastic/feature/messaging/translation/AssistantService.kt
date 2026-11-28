@@ -58,13 +58,13 @@ interface AssistantService {
 
     /** The short question the compatibility test asks (in the language of the app). */
     val compatQuestion: String
+        get() = "Co to jest zasięg LoRa?"
 
     /** Whether the app itself is in Polish: reports that no question asked for are written in that language. */
     val polishApp: Boolean
 
     /** A chip description (as [backendNow] gives it) in the language of the app. */
     fun placeInAppLanguage(backend: String): String
-        get() = "Co to jest zasięg LoRa?"
 
     /**
      * What the last answer was made with, "model|route", saved with the answer for diagnosis. Empty where not known.
