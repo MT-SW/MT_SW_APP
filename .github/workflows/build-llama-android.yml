@@ -12,7 +12,7 @@ on:
     inputs:
       llama_tag:
         description: "llama.cpp tag (must match LLAMA_TAG in ModelServerInstaller)"
-        default: "b11960"
+        default: "b12774"
         required: true
       whisper_ref:
         description: "whisper.cpp version (must match WHISPER_REF in ModelServerInstaller)"
@@ -30,9 +30,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="engines-${{ inputs.llama_tag || 'b11960' }}"
+          TAG="engines-${{ inputs.llama_tag || 'b12774' }}"
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "AI engines ${{ inputs.llama_tag || 'b11960' }}" \
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "AI engines ${{ inputs.llama_tag || 'b12774' }}" \
               --notes "Programs the app downloads for its AI models. Do not delete." --prerelease
 
   build:
@@ -44,7 +44,7 @@ jobs:
         kind: [opencl, vulkan]
     steps:
       - name: Get llama.cpp
-        run: git clone --depth 1 --branch "${{ inputs.llama_tag || 'b11960' }}" https://github.com/ggml-org/llama.cpp llama.cpp
+        run: git clone --depth 1 --branch "${{ inputs.llama_tag || 'b12774' }}" https://github.com/ggml-org/llama.cpp llama.cpp
 
       - name: Tools
         run: |
@@ -104,14 +104,14 @@ jobs:
           mkdir pack
           cp build/bin/llama-server pack/
           cp llama.cpp/LICENSE pack/
-          tar -czf "llama-${{ inputs.llama_tag || 'b11960' }}-android-arm64-${{ matrix.kind }}.tar.gz" -C pack .
+          tar -czf "llama-${{ inputs.llama_tag || 'b12774' }}-android-arm64-${{ matrix.kind }}.tar.gz" -C pack .
           ls -l *.tar.gz
 
       - name: Publish on the release page
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber llama-*-android-arm64-${{ matrix.kind }}.tar.gz
+          gh release upload "engines-${{ inputs.llama_tag || 'b12774' }}" --repo "$GITHUB_REPOSITORY" --clobber llama-*-android-arm64-${{ matrix.kind }}.tar.gz
 
   whisper:
     needs: release
@@ -197,7 +197,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64*.tar.gz
+          gh release upload "engines-${{ inputs.llama_tag || 'b12774' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64*.tar.gz
 
   # The Hexagon NPU of Snapdragon phones. Built in Qualcomm's own toolchain image (it holds the Hexagon SDK), with
   # shared libraries: the NPU programs (libggml-htp-v73/v75/v79/v81.so) are loaded by the NPU backend at run time.
@@ -260,4 +260,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64-snapdragon.tar.gz
+          gh release upload "engines-${{ inputs.llama_tag || 'b12774' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64-snapdragon.tar.gz

@@ -4,7 +4,7 @@
 # Builds the AI engines for iPhone and simulator in one framework: llama.cpp (assistant, translator, Gemma
 # dictation) and whisper.cpp (Whisper dictation), sharing one ggml: native/ios/llama.xcframework
 set -euo pipefail
-LLAMA_TAG="b11960"
+LLAMA_TAG="b12774"
 WHISPER_REF="v1.9.6"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$ROOT/build/llama-ios"
