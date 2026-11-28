@@ -121,8 +121,8 @@ fun Modifier.desktopScrollbar(state: LazyGridState): Modifier =
 internal val LocalScrollbarOutset = compositionLocalOf { 0.dp }
 
 /**
- * Puts the [bar] where it does not cover the content. In a window with a side margin ([LocalScrollbarOutset]) it goes
- * into the margin and the content keeps its width; elsewhere the content makes room for it.
+ * Puts the [bar] where it does not cover the content. Side margins that are already there (of the window,
+ * [LocalScrollbarOutset], or of the content, [sideMargin]) count; only what is missing is added.
  */
 @Composable
 private fun Modifier.barPlace(
@@ -131,16 +131,11 @@ private fun Modifier.barPlace(
     canScroll: () -> Boolean,
     bar: Modifier.() -> Modifier,
 ): Modifier {
-    val outset = LocalScrollbarOutset.current
-    return if (outset > 0.dp) {
-        reachOut(outset).bar().pullBack(outset)
-    } else if (sideMargin >= MIN_SIDE_MARGIN_DP.dp) {
-        // The content already keeps this much free at the side: the bar goes there, adding room would look lopsided.
-        reachOut(-MARGIN_BAR_EDGE_DP.dp).bar().pullBack(-MARGIN_BAR_EDGE_DP.dp)
-    } else {
-        // Kept a little off the edge, so the bar does not stick to the rim of a window or menu.
-        reachOut(-BAR_EDGE_DP.dp).bar().pullBack(-BAR_EDGE_DP.dp).barGutter(key, canScroll)
-    }
+    val windowMargin = LocalScrollbarOutset.current
+    // The same everywhere: the bar stands BAR_EDGE_DP from the edge of the window and the content keeps BAR_ROOM_DP.
+    val shift = windowMargin - BAR_EDGE_DP.dp
+    val gutter = (BAR_ROOM_DP.dp - windowMargin - sideMargin).coerceAtLeast(0.dp)
+    return reachOut(shift).bar().pullBack(shift).barGutter(key, gutter, canScroll)
 }
 
 /** Makes what follows wider by [by] to the right, without changing the size the parent sees. */
@@ -164,13 +159,13 @@ private fun Modifier.pullBack(by: Dp): Modifier = layout { measurable, constrain
  * content whose height follows its width (a picture) cannot make the layout jump back and forth.
  */
 @Composable
-private fun Modifier.barGutter(key: Any, canScroll: () -> Boolean): Modifier {
+private fun Modifier.barGutter(key: Any, width: Dp, canScroll: () -> Boolean): Modifier {
     var needed by remember(key) { mutableStateOf(false) }
     val scrollable by remember(key) { derivedStateOf(canScroll) }
     LaunchedEffect(key, scrollable) { if (scrollable) needed = true }
-    return if (needed) {
+    return if (needed && width > 0.dp) {
         layout { measurable, constraints ->
-            val gutter = SCROLLBAR_GUTTER_DP.dp.roundToPx()
+            val gutter = width.roundToPx()
             val placeable = measurable.measure(constraints.offset(horizontal = -gutter))
             layout(constraints.constrainWidth(placeable.width + gutter), placeable.height) {
                 placeable.placeRelative(0, 0)
@@ -181,10 +176,8 @@ private fun Modifier.barGutter(key: Any, canScroll: () -> Boolean): Modifier {
     }
 }
 
-private const val BAR_EDGE_DP = 4
+/** From the edge of the window to the strip of the bar (the visible groove is 3 dp further in: 10 dp). */
+private const val BAR_EDGE_DP = 7
 
-private const val MIN_SIDE_MARGIN_DP = 16
-
-private const val MARGIN_BAR_EDGE_DP = 2
-
-private const val SCROLLBAR_GUTTER_DP = 22
+/** From the edge of the window to the content, which leaves 8 dp between the groove and the content. */
+private const val BAR_ROOM_DP = 26

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
@@ -63,11 +62,10 @@ import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.resources.translator_sessions_empty
 import org.meshtastic.core.resources.translator_sessions_new
 import org.meshtastic.core.resources.translator_sessions_title
-import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.Switch
-import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
@@ -101,80 +99,70 @@ fun AiHomeScreen(
     }
     CompatTestDialogs(compat = compat, viewModel = assistantViewModel)
     if (showInfo) {
-        AlertDialog(
-            onDismissRequest = { showInfo = false },
-            title = {
-                Text(
-                    stringResource(
-                        if (showAssistant) Res.string.assistant_info_title else Res.string.translator_info_title,
-                    ),
-                )
-            },
-            text = {
-                Column(
-                    modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+        InfoWindow(
+            title =
+            stringResource(
+                if (showAssistant) Res.string.assistant_info_title else Res.string.translator_info_title,
+            ),
+            onDismiss = { showInfo = false },
+        ) {
+            Text(
+                stringResource(
+                    if (showAssistant) Res.string.assistant_info_body else Res.string.translator_info_body,
+                ),
+            )
+            val autoScroll by uiPrefs.assistantAutoScroll.collectAsStateWithLifecycle()
+            if (showAssistant) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Text(
-                        stringResource(
-                            if (showAssistant) Res.string.assistant_info_body else Res.string.translator_info_body,
-                        ),
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            stringResource(Res.string.assistant_autoscroll),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            stringResource(Res.string.assistant_autoscroll_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
+                }
+                val headerCollapse by uiPrefs.assistantHeaderCollapse.collectAsStateWithLifecycle()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            stringResource(Res.string.assistant_header_collapse),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            stringResource(Res.string.assistant_header_collapse_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = headerCollapse,
+                        onCheckedChange = { uiPrefs.setAssistantHeaderCollapse(it) },
                     )
-                    val autoScroll by uiPrefs.assistantAutoScroll.collectAsStateWithLifecycle()
-                    if (showAssistant) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(Res.string.assistant_autoscroll),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
-                                Text(
-                                    stringResource(Res.string.assistant_autoscroll_hint),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
-                        }
-                        val headerCollapse by uiPrefs.assistantHeaderCollapse.collectAsStateWithLifecycle()
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(Res.string.assistant_header_collapse),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
-                                Text(
-                                    stringResource(Res.string.assistant_header_collapse_hint),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Switch(
-                                checked = headerCollapse,
-                                onCheckedChange = { uiPrefs.setAssistantHeaderCollapse(it) },
-                            )
-                        }
-                        if (modelReady) {
-                            TextButton(
-                                onClick = {
-                                    showInfo = false
-                                    assistantViewModel.requestCompat()
-                                },
-                            ) {
-                                Text(stringResource(Res.string.compat_run_again))
-                            }
-                        }
+                }
+                if (modelReady) {
+                    TextButton(
+                        onClick = {
+                            showInfo = false
+                            assistantViewModel.requestCompat()
+                        },
+                    ) {
+                        Text(stringResource(Res.string.compat_run_again))
                     }
                 }
-            },
-            confirmButton = { TextButton(onClick = { showInfo = false }) { Text("OK") } },
-        )
+            }
+        }
     }
     val savedChats by assistantViewModel.saved.collectAsStateWithLifecycle()
     val savedSessions by translatorViewModel.saved.collectAsStateWithLifecycle()

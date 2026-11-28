@@ -18,10 +18,7 @@
 
 package org.meshtastic.feature.map.planner.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.planner_close
 import org.meshtastic.core.resources.planner_credits_line_cables
 import org.meshtastic.core.resources.planner_credits_line_itm
 import org.meshtastic.core.resources.planner_credits_line_mapterhorn
@@ -94,8 +90,7 @@ import org.meshtastic.core.resources.planner_info_tx_power_title
 import org.meshtastic.core.resources.planner_info_weather_body
 import org.meshtastic.core.resources.planner_info_weather_title
 import org.meshtastic.core.resources.planner_open_tropo_reference
-import org.meshtastic.core.ui.component.AlertDialog
-import org.meshtastic.core.ui.component.verticalScrollWithBar
+import org.meshtastic.core.ui.component.InfoWindow
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -200,24 +195,14 @@ fun PlannerInfoButton(topic: PlannerInfoTopic, modifier: Modifier = Modifier) {
 @Composable
 fun PlannerInfoDialog(topic: PlannerInfoTopic, onDismiss: () -> Unit) {
     val uriHandler = LocalUriHandler.current
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(topic.titleRes())) },
-        text = {
-            Column(
-                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(text = stringResource(topic.bodyRes()), style = MaterialTheme.typography.bodyMedium)
-                if (topic == PlannerInfoTopic.WEATHER) {
-                    TextButton(onClick = { uriHandler.openUri(TROPO_URL) }) {
-                        Text(stringResource(Res.string.planner_open_tropo_reference))
-                    }
-                }
+    InfoWindow(title = stringResource(topic.titleRes()), onDismiss = onDismiss) {
+        Text(text = stringResource(topic.bodyRes()), style = MaterialTheme.typography.bodyMedium)
+        if (topic == PlannerInfoTopic.WEATHER) {
+            TextButton(onClick = { uriHandler.openUri(TROPO_URL) }) {
+                Text(stringResource(Res.string.planner_open_tropo_reference))
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.planner_close)) } },
-    )
+        }
+    }
 }
 
 /** Attribution lines of the exported reports (the on-screen text is the CREDITS info topic). */

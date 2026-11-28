@@ -159,7 +159,7 @@ fun FastScrollSidebar(
 }
 
 private const val MIN_THUMB_DP = 24
-private const val END_PADDING_DP = 16
+private const val END_PADDING_DP = 24
 
 /**
  * Remembers the pixel height of every row of a lazy list that has been on screen. A lazy list only measures what it

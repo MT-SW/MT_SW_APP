@@ -291,8 +291,8 @@ fun MeshtasticTextDialog(
     )
 }
 
-/** Both windows have a 24 dp side margin; the scroll bar uses most of it. */
-private const val DIALOG_BAR_OUTSET_DP = 20
+/** Both windows have a 24 dp side margin, which the scroll bar uses. */
+private const val DIALOG_BAR_OUTSET_DP = 24
 
 private const val DIALOG_PERCENT = 100f
 private const val DIALOG_MIN_ALPHA = 0.85f
