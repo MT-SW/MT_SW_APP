@@ -32,6 +32,7 @@ import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_icon_title
 import org.meshtastic.core.resources.app_log_choose_folder
+import org.meshtastic.core.resources.log_folder_app_button
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.app_settings
@@ -399,6 +400,7 @@ object SettingsSearchCatalog {
             Res.string.app_log_level to SettingsRoute.DataAndLogs,
             Res.string.app_log_recent to SettingsRoute.DataAndLogs,
             Res.string.app_log_choose_folder to SettingsRoute.DataAndLogs,
+            Res.string.log_folder_app_button to SettingsRoute.DataAndLogs,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,
             Res.string.photo_folder_title to SettingsRoute.DataAndLogs,
             Res.string.intro_mtsw_planner_title to SettingsRoute.MtSwFeatures,

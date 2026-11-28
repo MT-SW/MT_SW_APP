@@ -39,6 +39,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **Okna informacyjne i listy wyboru wyglądają jednakowo.** Także w wiadomościach, węzłach, mapie i ustawieniach: krzyżyk u góry i zamykanie przeciągnięciem w dół, bez przycisków „OK”, „Zamknij” i „Anuluj”. Potrzebny przycisk (np. „Wyślij ponownie”, „Pokaż na mapie”) jest pod treścią i przewija się razem z nią. Pytania z wyborem (np. usuwanie) mają przyciski jak dotąd.
 * **Dobra nazwa przy łączeniu.** Urządzenie łączone w tle mogło dostać nazwę innego (np. Bluetooth pokazywał adres sieciowy). Teraz każde zachowuje swoją.
 * **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku. Po polsku jest też porównanie NPU i karty graficznej. Na iPhonie/iPadzie test dyktowania pokazuje, gdzie ono działa (wcześniej „?”).
+* **Wybór folderu na logi nie blokuje aplikacji (wszystkie wersje).** Przy starcie i w „Dane i logi” jest „Zapisuj w folderze aplikacji”. Na iPhonie/iPadzie wybrany folder jest zapamiętywany prościej, a nieudany wybór trafia do logu. Folder na logi jest teraz w sekcji „Foldery”, obok folderu zdjęć.
 
 ##### Zmiany względem oryginału
 
@@ -1023,6 +1024,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
 * **Correct name while connecting.** A device connected in the background could get another one's name (e.g. Bluetooth showing a network address). Each now keeps its own.
 * **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too. On iPhone/iPad the dictation test now says where dictation runs (it showed “?”).
+* **The log folder choice no longer blocks the app (all versions).** “Save in the app folder” is offered at start and in “Data and logs”. On iPhone/iPad a picked folder is kept in a simpler way and a failed choice is logged. The log folder now sits in the “Folders” section, next to the photo folder.
 
 ##### Changes against the original
 

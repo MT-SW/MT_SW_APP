@@ -11,6 +11,7 @@
 - **Okna informacyjne i listy wyboru wyglądają jednakowo.** Także w wiadomościach, węzłach, mapie i ustawieniach: krzyżyk u góry i zamykanie przeciągnięciem w dół, bez przycisków „OK”, „Zamknij” i „Anuluj”. Potrzebny przycisk (np. „Wyślij ponownie”, „Pokaż na mapie”) jest pod treścią i przewija się razem z nią. Pytania z wyborem (np. usuwanie) mają przyciski jak dotąd.
 - **Dobra nazwa przy łączeniu.** Urządzenie łączone w tle mogło dostać nazwę innego (np. Bluetooth pokazywał adres sieciowy). Teraz każde zachowuje swoją.
 - **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku. Po polsku jest też porównanie NPU i karty graficznej. Na iPhonie/iPadzie test dyktowania pokazuje, gdzie ono działa (wcześniej „?”).
+- **Można pominąć wybór folderu na logi (wszystkie wersje).** Przycisk „Zapisuj w folderze aplikacji” przy starcie i w „Dane i logi”. Na iPadzie, gdzie okno wyboru nie przepuszczało dalej, da się teraz wejść do aplikacji. Folder na logi jest w sekcji „Foldery”, obok folderu zdjęć.
 ## orig | Zmiany względem oryginału
 - Zaktualizowano do oryginału w wersji 2.8.6.
 

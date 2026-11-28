@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.log_folder_app_button
+import org.meshtastic.core.resources.log_folder_app_info
 import org.meshtastic.core.resources.log_folder_required_body
 import org.meshtastic.core.resources.log_folder_required_button
 import org.meshtastic.core.resources.log_folder_required_title
@@ -76,6 +78,11 @@ fun LogFolderScreen(control: AppLogControl, modifier: Modifier = Modifier) {
                 Button(onClick = pick, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(Res.string.log_folder_required_button))
                 }
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = control::useAppFolder, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(Res.string.log_folder_app_button))
+                }
+                InfoButton(Res.string.log_folder_app_button, Res.string.log_folder_app_info)
             }
         }
     }

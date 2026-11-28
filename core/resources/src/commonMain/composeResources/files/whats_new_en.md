@@ -11,6 +11,7 @@
 - **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
 - **Correct name while connecting.** A device connected in the background could get another one's name (e.g. Bluetooth showing a network address). Each now keeps its own.
 - **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too. On iPhone/iPad the dictation test now says where dictation runs (it showed “?”).
+- **The log folder choice can be skipped (all versions).** The “Save in the app folder” button at start and in “Data and logs”. On an iPad where the folder window did not let through, the app can now be entered. The log folder is in the “Folders” section, next to the photo folder.
 ## orig | Changes against the original
 - Updated to the original app, version 2.8.6.
 

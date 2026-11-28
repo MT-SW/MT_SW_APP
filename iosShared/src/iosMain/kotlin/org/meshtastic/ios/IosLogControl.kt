@@ -91,6 +91,8 @@ internal object IosLogControl : AppLogControl {
     private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
     private const val BOOKMARK_FILE = "folder.bookmark"
     private const val NAME_FILE = "folder.name"
+    private const val APP_FOLDER = "MT_SW"
+    private const val APP_FOLDER_FILE = "folder.app"
     private const val LIFECYCLE = "AppLifecycle"
     private const val SAMPLE_EVERY_MS = 30_000L
     private const val PERCENT = 100
@@ -111,6 +113,9 @@ internal object IosLogControl : AppLogControl {
 
     private val namePath: Path
         get() = (iosDataDir() + "/logs/" + NAME_FILE).toPath()
+
+    private val appFolderPath: Path
+        get() = (iosDataDir() + "/logs/" + APP_FOLDER_FILE).toPath()
 
     override val level: StateFlow<AppLogLevel>
         get() = IosFileLog.level
@@ -225,28 +230,55 @@ internal object IosLogControl : AppLogControl {
         top.presentViewController(picker, animated = true, completion = null)
     }
 
-    /** The folder dialog of the common screens hands the bookmark back as `bookmark:` and its bytes in hex. */
+    /**
+     * The folder dialog of the common screens hands the bookmark back as `bookmark:` and its bytes in hex. Those bytes
+     * are kept as they are: making a second bookmark from the resolved one can fail on some systems.
+     */
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     override fun onFolderPicked(uri: String) {
         val hex = uri.removePrefix("bookmark:")
-        if (hex.length < 2 || hex.length % 2 != 0) return
+        if (hex.length < 2 || hex.length % 2 != 0) {
+            Logger.w(tag = "Log") { "Log folder: the picker gave no bookmark (${hex.length} characters)" }
+            return
+        }
         val bytes = ByteArray(hex.length / 2) { hex.substring(it * 2, it * 2 + 2).toInt(HEX_RADIX).toByte() }
         val data = bytes.usePinned { NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong()) }
-        val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
-        remember(url)
+        val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null)
+        if (url == null) Logger.w(tag = "Log") { "Log folder: the bookmark could not be resolved" }
+        keep(data, url?.lastPathComponent ?: "?")
+    }
+
+    override fun useAppFolder() {
+        runCatching {
+            FileSystem.SYSTEM.createDirectories((iosDataDir() + "/logs").toPath())
+            FileSystem.SYSTEM.delete(bookmarkPath.toPath())
+            FileSystem.SYSTEM.delete(namePath)
+            FileSystem.SYSTEM.write(appFolderPath) { writeUtf8(APP_FOLDER) }
+        }
+            .onFailure { Logger.w(it, tag = "Log") { "Log folder: the app folder choice could not be kept" } }
+        // The choice counts for this run even when it could not be written: the person must get into the app.
+        folderName.value = APP_FOLDER
+        Logger.i(tag = "Log") { "Log folder: the app's own folder was chosen" }
+        forgetExports()
+        scope.launch { exportNow() }
     }
 
     override fun clearChosenFolder() {
         runCatching {
             FileSystem.SYSTEM.delete(bookmarkPath.toPath())
             FileSystem.SYSTEM.delete(namePath)
+            FileSystem.SYSTEM.delete(appFolderPath)
         }
         folderName.value = null
+        Logger.i(tag = "Log") { "Log folder: the choice was cleared" }
     }
 
     /** Keeps the picked folder for later runs (a bookmark keeps the access) and writes the first zip into it. */
     private fun remember(url: NSURL?) {
-        if (url == null) return
+        if (url == null) {
+            Logger.i(tag = "Log") { "Log folder: the picker was closed without a folder" }
+            return
+        }
         val opened = url.startAccessingSecurityScopedResource()
         try {
             val data =
@@ -256,17 +288,37 @@ internal object IosLogControl : AppLogControl {
                     relativeToURL = null,
                     error = null,
                 )
-            if (data == null || !data.writeToFile(bookmarkPath, atomically = true)) return
-            val name = url.lastPathComponent ?: "?"
-            FileSystem.SYSTEM.write(namePath) { writeUtf8(name) }
-            folderName.value = name
+            if (data == null) {
+                Logger.w(tag = "Log") { "Log folder: no bookmark for the picked folder (access opened: $opened)" }
+                return
+            }
+            keep(data, url.lastPathComponent ?: "?")
         } finally {
             if (opened) url.stopAccessingSecurityScopedResource()
         }
+    }
+
+    private fun keep(data: NSData, name: String) {
+        runCatching { FileSystem.SYSTEM.createDirectories((iosDataDir() + "/logs").toPath()) }
+        if (!data.writeToFile(bookmarkPath, atomically = true)) {
+            Logger.w(tag = "Log") { "Log folder: the bookmark could not be written" }
+            return
+        }
+        runCatching {
+            FileSystem.SYSTEM.delete(appFolderPath)
+            FileSystem.SYSTEM.write(namePath) { writeUtf8(name) }
+        }
+            .onFailure { Logger.w(it, tag = "Log") { "Log folder: the folder name could not be written" } }
+        folderName.value = name
+        Logger.i(tag = "Log") { "Log folder: a folder was chosen" }
+        forgetExports()
+        scope.launch { exportNow() }
+    }
+
+    private fun forgetExports() {
         for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) {
             runCatching { FileSystem.SYSTEM.delete((iosDataDir() + "/logs/" + marker).toPath()) }
         }
-        exportNow()
     }
 
     /**
@@ -297,16 +349,22 @@ internal object IosLogControl : AppLogControl {
                     "${files.sumOf { IosFileLog.size(it) }}"
             val marker = (iosDataDir() + "/logs/" + markerName).toPath()
             if (runCatching { FileSystem.SYSTEM.read(marker) { readUtf8() } }.getOrNull() == fingerprint) return
-            val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return
-            val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
-            val opened = url.startAccessingSecurityScopedResource()
+            val own = FileSystem.SYSTEM.exists(appFolderPath)
+            val url =
+                if (own) {
+                    null
+                } else {
+                    val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return
+                    NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
+                }
+            val opened = url?.startAccessingSecurityScopedResource() == true
             try {
-                val folder = url.path ?: return
+                val folder = if (url == null) iosDataDir() + "/logs" else url.path ?: return
                 val bytes = zip(reportEntries("", true, emptyList(), allTime))
                 FileSystem.SYSTEM.write(folder.toPath() / name) { write(bytes) }
                 FileSystem.SYSTEM.write(marker) { writeUtf8(fingerprint) }
             } finally {
-                if (opened) url.stopAccessingSecurityScopedResource()
+                if (opened) url?.stopAccessingSecurityScopedResource()
             }
         }
             .onFailure { Logger.w(it, tag = "Log") { "Saving the logs to the chosen folder failed" } }

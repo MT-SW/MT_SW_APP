@@ -478,6 +478,7 @@
     <string name="antenna_yagi_row">%1$s: %2$s, at %3$s from the reflector</string>
     <string name="any">Any</string>
     <!-- APP -->
+    <string name="app_data_fixed_here">The data is kept in the app\'s own storage; this place cannot be changed.</string>
     <string name="app_data_info_1">The app keeps all its data in this folder: messages and the node list, AI models, downloaded map data, hikes and logs. The current folder is written under the name.</string>
     <string name="app_data_info_2">Changing the folder moves the data to the new place, so it can take a moment. Pictures from the camera have their own folder, below.</string>
     <string name="app_data_info_title">App data</string>
@@ -2349,9 +2350,12 @@
     <string name="lockdown_submit">Submit</string>
     <string name="locked">Locked</string>
     <!-- LOG -->
-    <string name="log_folder_required_body">The app saves its logs in a folder you choose: the log of the last 24 hours, which is always collected, and the full log when you switch it on. Choose the folder where they should be saved, so that you can attach them to a bug report. You can change the folder later in the settings. The app can be used after the folder is chosen.</string>
+    <string name="log_folder_app_button">Save in the app folder</string>
+    <string name="log_folder_app_info">The logs stay in the app\'s own folder. Use this when the folder window does not let you through. To send them, use the bug report button. You can choose another folder later in the settings.</string>
+    <string name="log_folder_required_body">The app saves its logs in a folder you choose: the log of the last 24 hours, which is always collected, and the full log when you switch it on. Choose the folder where they should be saved, so that you can attach them to a bug report. You can change the folder later in the settings. If the folder cannot be chosen, save the logs in the app folder.</string>
     <string name="log_folder_required_button">Choose folder</string>
     <string name="log_folder_required_title">Choose a folder for the logs</string>
+    <string name="log_folder_title">Log folder</string>
     <string name="log_insights_ago">last %1$d min ago</string>
     <string name="log_insights_clear">Start counting again</string>
     <string name="log_insights_counts">Errors: %1$d, warnings: %2$d</string>

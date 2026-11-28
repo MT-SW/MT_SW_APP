@@ -78,6 +78,7 @@ internal object AndroidLogging {
     private const val NAME_24H = "mt_sw_logi_24h.zip"
     private const val NAME_FULL = "mt_sw_logi_pelne.zip"
     private const val FOLDER = "MT_SW_logi"
+    private const val APP_FOLDER = "MT_SW"
     private const val EXIT_REASONS_SHOWN = 6
     private const val FINGERPRINT_24H = "last_export_24h.txt"
     private const val FINGERPRINT_FULL = "last_export_full.txt"
@@ -264,15 +265,16 @@ internal object AndroidLogging {
         override fun setLevel(level: AppLogLevel) = MtSwLogging.setLevel(level)
 
         override val folderHint: String
-            get() = "Pobrane/$FOLDER"
+            get() = if (appFolderFile.exists()) APP_FOLDER else "Pobrane/$FOLDER"
 
         // The folder the person chose for the logs (a tree address of the system's folder dialog), kept in a small
         // file.
         private val folderFile = File(dir, "log_folder.txt")
+        private val appFolderFile = File(dir, "log_folder_app.txt")
         private val folderName = MutableStateFlow<String?>(null)
 
         init {
-            folderName.value = readFolder()?.let { nameOf(it) }
+            folderName.value = if (appFolderFile.exists()) APP_FOLDER else readFolder()?.let { nameOf(it) }
         }
 
         override val canChooseFolder: Boolean = true
@@ -299,6 +301,8 @@ internal object AndroidLogging {
         override fun onFolderPicked(uri: String) {
             val tree = runCatching { Uri.parse(uri) }.getOrNull() ?: return
             runCatching { folderFile.writeText(uri) }
+                .onFailure { Logger.w(it, tag = TAG) { "The log folder choice could not be kept" } }
+            runCatching { appFolderFile.delete() }
             folderName.value = nameOf(tree)
             Logger.i(tag = TAG) { "The log folder was chosen (${folderName.value})" }
             // Fresh zips go to the new folder at once.
@@ -306,8 +310,22 @@ internal object AndroidLogging {
             scope.launch(Dispatchers.IO) { autoExport() }
         }
 
+        override fun useAppFolder() {
+            runCatching {
+                dir.mkdirs()
+                folderFile.delete()
+                appFolderFile.writeText(APP_FOLDER)
+            }
+                .onFailure { Logger.w(it, tag = TAG) { "The app folder choice could not be kept" } }
+            folderName.value = APP_FOLDER
+            Logger.i(tag = TAG) { "The app's own folder was chosen for the logs" }
+            for (marker in listOf(FINGERPRINT_24H, FINGERPRINT_FULL)) runCatching { File(dir, marker).delete() }
+            scope.launch(Dispatchers.IO) { autoExport() }
+        }
+
         override fun clearChosenFolder() {
             runCatching { folderFile.delete() }
+            runCatching { appFolderFile.delete() }
             folderName.value = null
             Logger.i(tag = TAG) { "The log folder was cleared" }
         }
@@ -433,7 +451,11 @@ internal object AndroidLogging {
             withContext(Dispatchers.IO) {
                 runCatching {
                     val tree = readFolder()
-                    if (tree != null) {
+                    if (appFolderFile.exists()) {
+                        val file = File(app.getExternalFilesDir(null) ?: dir, name)
+                        file.outputStream().use { MtSwLogging.writeReportZip(it, since) }
+                        APP_FOLDER
+                    } else if (tree != null) {
                         exportToTree(tree, name, since)
                     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         exportToDownloads(name, overwrite, since)

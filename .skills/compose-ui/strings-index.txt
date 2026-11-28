@@ -457,6 +457,7 @@ antenna_wavelength
 antenna_yagi_row
 any
 ### APP ###
+app_data_fixed_here
 app_data_info_1
 app_data_info_2
 app_data_info_title
@@ -2295,9 +2296,12 @@ lockdown_show_passphrase
 lockdown_submit
 locked
 ### LOG ###
+log_folder_app_button
+log_folder_app_info
 log_folder_required_body
 log_folder_required_button
 log_folder_required_title
+log_folder_title
 log_insights_ago
 log_insights_clear
 log_insights_counts

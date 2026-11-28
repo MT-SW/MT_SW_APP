@@ -4723,7 +4723,10 @@
     <string name="vanity_chip_preview_hint">Tak wybrany kolor wygląda na plakietce węzła w motywie standardowym i w dwóch nasyconych.</string>
     <string name="vanity_theme_standard">Standardowy</string>
     <string name="log_folder_required_title">Wybierz folder na logi</string>
-    <string name="log_folder_required_body">Aplikacja zapisuje swoje logi w wybranym przez Ciebie folderze: log z ostatnich 24 godzin, który jest zawsze zbierany, oraz pełny log po jego włączeniu. Wybierz folder, w którym mają się zapisywać, żeby można było dołączyć je do zgłoszenia błędu. Folder możesz później zmienić w ustawieniach. Z aplikacji można korzystać po wybraniu folderu.</string>
+    <string name="log_folder_app_button">Zapisuj w folderze aplikacji</string>
+    <string name="log_folder_app_info">Logi zostają we własnym folderze aplikacji. Użyj tego, gdy okno wyboru folderu nie chce przepuścić dalej. Żeby je wysłać, użyj przycisku zgłoszenia błędu. Inny folder możesz wybrać później w ustawieniach.</string>
+    <string name="log_folder_title">Folder na logi</string>
+    <string name="log_folder_required_body">Aplikacja zapisuje swoje logi w wybranym przez Ciebie folderze: log z ostatnich 24 godzin, który jest zawsze zbierany, oraz pełny log po jego włączeniu. Wybierz folder, w którym mają się zapisywać, żeby można było dołączyć je do zgłoszenia błędu. Folder możesz później zmienić w ustawieniach. Jeśli folderu nie da się wybrać, zapisuj logi w folderze aplikacji.</string>
     <string name="log_folder_required_button">Wybierz folder</string>
     <string name="device_compare_title">Porównanie urządzeń</string>
     <string name="device_compare_empty">Brak zapisanych urządzeń.</string>
@@ -4855,6 +4858,7 @@
     <string name="photo_folder_info_2">Na telefonie i tablecie album tworzy się sam przy pierwszym zdjęciu. Na komputerze folder wybierasz przy pierwszym zdjęciu i możesz go tu zmienić.</string>
     <string name="folders_title">Foldery na dane i zdjęcia</string>
     <string name="app_data_info_title">Dane aplikacji</string>
+    <string name="app_data_fixed_here">Dane są w pamięci aplikacji; tego miejsca nie można zmienić.</string>
     <string name="app_data_info_1">W tym folderze aplikacja trzyma wszystkie swoje dane: wiadomości i listę węzłów, modele AI, pobrane dane map, wędrówki i logi. Aktualny folder jest napisany pod nazwą.</string>
     <string name="app_data_info_2">Zmiana folderu przenosi dane w nowe miejsce, więc może chwilę potrwać. Zdjęcia z aparatu mają osobny folder, poniżej.</string>
     <string name="app_data_where">Wiadomości, ustawienia, logi, mapy i modele AI są w: %1$s</string>

@@ -90,6 +90,7 @@ private fun desktopHeader(): String {
 
 private const val MB = 1024 * 1024
 private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
+private const val APP_FOLDER = "MT_SW"
 private const val NAME_24H = "mt_sw_logi_24h.zip"
 private const val NAME_FULL = "mt_sw_logi_pelne.zip"
 
@@ -107,7 +108,9 @@ private class DesktopLogControl(private val dir: File, private val scope: Corout
 
     // The folder the person chose for the logs: its path in a small file next to the logs.
     private val folderFile = File(dir, "log_folder.txt")
-    private val folderName = kotlinx.coroutines.flow.MutableStateFlow<String?>(chosen()?.name)
+    private val appFolderFile = File(dir, "log_folder_app.txt")
+    private val folderName =
+        kotlinx.coroutines.flow.MutableStateFlow(if (appFolderFile.exists()) APP_FOLDER else chosen()?.name)
 
     private fun chosen(): File? = runCatching {
         File(folderFile.readText().trim())
@@ -124,14 +127,30 @@ private class DesktopLogControl(private val dir: File, private val scope: Corout
         val folder = runCatching { File(java.net.URI(uri)) }.getOrNull() ?: return
         if (!folder.isDirectory) return
         runCatching { folderFile.writeText(folder.absolutePath) }
+            .onFailure { Logger.w(it) { "The log folder choice could not be kept" } }
+        runCatching { appFolderFile.delete() }
         folderName.value = folder.name
         Logger.i { "The log folder was chosen (${folder.name})" }
         for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) runCatching { File(dir, marker).delete() }
         scope.launch { autoExport() }
     }
 
+    override fun useAppFolder() {
+        runCatching {
+            dir.mkdirs()
+            folderFile.delete()
+            appFolderFile.writeText(APP_FOLDER)
+        }
+            .onFailure { Logger.w(it) { "The app folder choice could not be kept" } }
+        folderName.value = APP_FOLDER
+        Logger.i { "The app's own folder was chosen for the logs" }
+        for (marker in listOf("last_export_24h.txt", "last_export_full.txt")) runCatching { File(dir, marker).delete() }
+        scope.launch { autoExport() }
+    }
+
     override fun clearChosenFolder() {
         runCatching { folderFile.delete() }
+        runCatching { appFolderFile.delete() }
         folderName.value = null
         Logger.i { "The log folder was cleared" }
     }

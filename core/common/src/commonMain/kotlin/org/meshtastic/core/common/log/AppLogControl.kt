@@ -93,6 +93,9 @@ interface AppLogControl {
      */
     fun onFolderPicked(uri: String) {}
 
+    /** Keeps the logs in the app's own folder: the way on when the system's folder dialog hands no folder back. */
+    fun useAppFolder() {}
+
     /** Forgets the chosen folder. */
     fun clearChosenFolder() {}
 
