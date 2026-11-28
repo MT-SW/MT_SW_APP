@@ -169,8 +169,8 @@ import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.MessageItemColors
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.theme.rememberUiOptions
 import org.meshtastic.core.ui.util.HikeImportRequest
 import org.meshtastic.core.ui.util.HikeImporter
@@ -778,7 +778,7 @@ fun MessageItem(
                                         contentDescription =
                                         stringResource(Res.string.security_channel_key_message),
                                         modifier = Modifier.size(14.dp),
-                                        tint = MaterialTheme.colorScheme.StatusYellow,
+                                        tint = MaterialTheme.colorScheme.StatusDisconnected,
                                     )
                                 }
                                 TransportIcon(

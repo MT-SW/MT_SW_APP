@@ -2,7 +2,7 @@
 ## new | Nowe funkcje
 - **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
 - **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
-- **Żółta otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+- **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
 ## orig | Zmiany względem oryginału
 - Zaktualizowano do oryginału w wersji 2.8.6.
 

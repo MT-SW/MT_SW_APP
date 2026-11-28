@@ -90,7 +90,7 @@ import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.Translate
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.icon.VolumeUp
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.proto.MeshPacket
 
 @Suppress("LongMethod")
@@ -153,7 +153,7 @@ fun MessageActionsContent(
                     Icon(
                         MeshtasticIcons.LockOpen,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.StatusYellow,
+                        tint = MaterialTheme.colorScheme.StatusDisconnected,
                     )
                 },
             )

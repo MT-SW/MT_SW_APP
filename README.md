@@ -227,7 +227,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 
 - Druk etykiet z kodem QR na Niimbot D110: Android, komputer, iPhone/iPad (w oryginale tylko Android).
 - Ostrzeżenie o trybie przezroczystym i wstrzymanie wysyłania.
-- Żółta otwarta kłódka przy odpowiedzi zaszyfrowanej kluczem kanału.
+- Czerwona otwarta kłódka przy odpowiedzi zaszyfrowanej kluczem kanału.
 
 ## Łączność Bluetooth
 
@@ -311,7 +311,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 
 - QR code labels on a Niimbot D110: Android, desktop, iPhone/iPad (Android only in the original).
 - Transparent mode warning, with sending held.
-- Yellow open lock on a reply encrypted with a channel key.
+- Red open lock on a reply encrypted with a channel key.
 
 ## iPhone and iPad
 

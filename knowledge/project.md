@@ -12,4 +12,4 @@ EN: Settings of the mesh network in the Świętokrzyskie region: the official Na
 
 - Etykiety z kodem QR na drukarce Niimbot D110 (Bluetooth): przycisk „Drukuj etykietę” przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia. Android, komputer, iPhone/iPad. Źródło: kod aplikacji.
 - Tryb przezroczysty (urządzenie jako surowy modem LoRa dla innego programu): aplikacja ostrzega, nie wysyła wiadomości i pozwala wyłączyć tryb. Źródło: kod aplikacji.
-- Żółta otwarta kłódka przy wiadomości prywatnej: przyszła zaszyfrowana kluczem kanału, nie kluczem publicznym. Źródło: kod aplikacji.
+- Czerwona otwarta kłódka przy wiadomości prywatnej: przyszła zaszyfrowana kluczem kanału, nie kluczem publicznym. Źródło: kod aplikacji.
