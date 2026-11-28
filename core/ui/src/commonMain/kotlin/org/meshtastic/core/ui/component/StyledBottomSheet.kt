@@ -78,6 +78,9 @@ private const val SWIPE_CLOSE_DP = 40
 private const val WHEEL_AGAIN_TICKS = 0.3f
 private const val WHEEL_PAUSE_MS = 500L
 
+/** Events further apart than this belong to separate pushes of the wheel or trackpad. */
+private const val WHEEL_GAP_MS = 150L
+
 /**
  * MT_SW: the real (opaque) surface colour of the window we are inside of. Inside a window the theme's surface colour is
  * made transparent, so a window opened from within another window (a node picker over a list window, a hike over the
@@ -300,38 +303,38 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
 
 /**
  * Closing by scrolling with a wheel or trackpad, on every system. Scrolling from the bottom only reaches the top, however
- * fast. The window closes when, after a rest of [WHEEL_PAUSE_MS], it is pulled up again with the content already at its
- * top.
+ * fast. The window closes when a new push up starts (the events stopped for [WHEEL_GAP_MS]) at least [WHEEL_PAUSE_MS]
+ * after the content last moved. A trackpad keeps sending a fading tail after the fingers are lifted, so the rest is
+ * counted from the last move of the content and not from the last event.
  */
 private class WheelClose {
     private var lastEvent: Long? = null
-    private var afterPause = false
+    private var restFrom: Long? = null
+    private var armed = false
     private var ticks = 0f
 
     fun closes(time: Long, up: Float, usedByContent: Boolean): Boolean {
         val gap = lastEvent?.let { time - it }
         lastEvent = time
-        val rested = gap != null && gap >= WHEEL_PAUSE_MS
         var close = false
         if (usedByContent) {
-            if (rested) Logger.d { "Okno: kółko po przerwie przewija jeszcze treść" }
-            reset()
+            restFrom = time
+            armed = false
         } else {
-            if (rested) afterPause = true
-            if (afterPause) {
+            val still = time - (restFrom ?: time.also { restFrom = it })
+            if (gap != null && gap >= WHEEL_GAP_MS) {
+                armed = still >= WHEEL_PAUSE_MS
+                ticks = 0f
+                Logger.i { "Okno: nowe przewinięcie na krańcu (przerwa ${gap}ms, treść stoi ${still}ms, ruch $up)" }
+            }
+            if (armed) {
                 // Weak pulls add up; a small move back only takes away from them.
                 ticks = (ticks + up).coerceAtLeast(0f)
                 close = ticks >= WHEEL_AGAIN_TICKS
             }
-            if (rested) Logger.d { "Okno: kółko po przerwie ${gap}ms, ruch $up, zebrane $ticks" }
         }
-        if (close) reset()
+        if (close) armed = false
         return close
-    }
-
-    private fun reset() {
-        afterPause = false
-        ticks = 0f
     }
 }
 
