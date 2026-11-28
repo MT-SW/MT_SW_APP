@@ -6,6 +6,8 @@
 ## better | Improvements
 - **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 - **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
+## fix | Fixed bugs
+- **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there.
 ## orig | Changes against the original
 - Updated to the original app, version 2.8.6.
 
