@@ -96,9 +96,6 @@ interface AppLogControl {
     /** Keeps the logs in the app's own folder: the way on when the system's folder dialog hands no folder back. */
     fun useAppFolder() {}
 
-    /** Forgets the chosen folder. */
-    fun clearChosenFolder() {}
-
     /**
      * True where [shareReport] hands the file itself to the chosen app (a phone); on a computer the person attaches it.
      */

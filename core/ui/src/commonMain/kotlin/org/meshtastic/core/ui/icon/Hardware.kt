@@ -29,6 +29,7 @@ import org.meshtastic.core.resources.ic_center_focus_strong
 import org.meshtastic.core.resources.ic_display_settings
 import org.meshtastic.core.resources.ic_gpio_pins
 import org.meshtastic.core.resources.ic_gpio_read
+import org.meshtastic.core.resources.ic_log_save
 import org.meshtastic.core.resources.ic_memory
 import org.meshtastic.core.resources.ic_mesh_radio
 import org.meshtastic.core.resources.ic_nfc
@@ -60,6 +61,9 @@ val MeshtasticIcons.GpioRead: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_gpio_read)
 
 /** MT_SW: a camera with a "save" arrow, for the folder the pictures taken in the app are saved to. */
+val MeshtasticIcons.LogSave: ImageVector
+    @Composable get() = styledVectorResource(Res.drawable.ic_log_save)
+
 val MeshtasticIcons.PhotoSave: ImageVector
     @Composable get() = styledVectorResource(Res.drawable.ic_photo_save)
 

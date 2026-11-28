@@ -148,13 +148,6 @@ private class DesktopLogControl(private val dir: File, private val scope: Corout
         scope.launch { autoExport() }
     }
 
-    override fun clearChosenFolder() {
-        runCatching { folderFile.delete() }
-        runCatching { appFolderFile.delete() }
-        folderName.value = null
-        Logger.i { "The log folder was cleared" }
-    }
-
     override val recent: StateFlow<Boolean>
         get() = MtSwLogging.recent
 

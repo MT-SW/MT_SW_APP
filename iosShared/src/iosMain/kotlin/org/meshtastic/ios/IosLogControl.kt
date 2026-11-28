@@ -263,16 +263,6 @@ internal object IosLogControl : AppLogControl {
         scope.launch { exportNow() }
     }
 
-    override fun clearChosenFolder() {
-        runCatching {
-            FileSystem.SYSTEM.delete(bookmarkPath.toPath())
-            FileSystem.SYSTEM.delete(namePath)
-            FileSystem.SYSTEM.delete(appFolderPath)
-        }
-        folderName.value = null
-        Logger.i(tag = "Log") { "Log folder: the choice was cleared" }
-    }
-
     /** Keeps the picked folder for later runs (a bookmark keeps the access) and writes the first zip into it. */
     private fun remember(url: NSURL?) {
         if (url == null) {

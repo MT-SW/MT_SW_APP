@@ -323,13 +323,6 @@ internal object AndroidLogging {
             scope.launch(Dispatchers.IO) { autoExport() }
         }
 
-        override fun clearChosenFolder() {
-            runCatching { folderFile.delete() }
-            runCatching { appFolderFile.delete() }
-            folderName.value = null
-            Logger.i(tag = TAG) { "The log folder was cleared" }
-        }
-
         override fun openFolder(): Boolean = false
 
         override val recent: StateFlow<Boolean>

@@ -51,7 +51,7 @@ import org.meshtastic.core.resources.log_insights_title
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ScrollWithBar
-import org.meshtastic.core.ui.icon.List
+import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
@@ -64,7 +64,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 fun LogInsightsEntries() {
     var showSummary by remember { mutableStateOf(false) }
     var showLinks by remember { mutableStateOf(false) }
-    ListItem(text = stringResource(Res.string.log_insights_title), leadingIcon = MeshtasticIcons.List) {
+    ListItem(text = stringResource(Res.string.log_insights_title), leadingIcon = MeshtasticIcons.BarChart) {
         Logger.i { "Podsumowanie logów: okno otwarte" }
         showSummary = true
     }

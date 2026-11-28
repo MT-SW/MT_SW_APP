@@ -38,15 +38,14 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_log_folder
-import org.meshtastic.core.resources.app_log_folder_clear
 import org.meshtastic.core.resources.app_log_folder_none
 import org.meshtastic.core.resources.log_folder_app_button
 import org.meshtastic.core.resources.log_folder_app_info
 import org.meshtastic.core.resources.log_folder_title
 import org.meshtastic.core.resources.photo_folder_change
 import org.meshtastic.core.ui.component.InfoButton
+import org.meshtastic.core.ui.icon.LogSave
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
 
@@ -64,7 +63,7 @@ fun LogFolderSettings() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Icon(imageVector = MeshtasticIcons.Notes, contentDescription = null)
+            Icon(imageVector = MeshtasticIcons.LogSave, contentDescription = null)
             Text(
                 text = stringResource(Res.string.log_folder_title),
                 style = MaterialTheme.typography.bodyLarge,
@@ -92,10 +91,5 @@ fun LogFolderSettings() {
             Text(stringResource(Res.string.photo_folder_change))
         }
         OutlinedButton(onClick = control::useAppFolder) { Text(stringResource(Res.string.log_folder_app_button)) }
-        if (chosen != null) {
-            OutlinedButton(onClick = control::clearChosenFolder) {
-                Text(stringResource(Res.string.app_log_folder_clear))
-            }
-        }
     }
 }

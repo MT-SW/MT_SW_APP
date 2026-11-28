@@ -19,6 +19,7 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,8 +41,10 @@ import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.app_log_recent_summary
 import org.meshtastic.core.resources.app_log_summary
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.SwitchPreference
-import org.meshtastic.core.ui.icon.List
+import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.icon.BugReport
+import org.meshtastic.core.ui.icon.FolderOpen
+import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /**
@@ -57,29 +60,26 @@ fun AppLogSettings() {
 
     // The log of the last 24 hours is always on and cannot be switched off: only a notice about it is shown.
     if (control.canMakeReport) {
-        Text(
+        ListItem(
             text = stringResource(Res.string.app_log_recent),
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
-        )
-        Text(
-            text = stringResource(Res.string.app_log_recent_summary),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            supportingText = stringResource(Res.string.app_log_recent_summary),
+            leadingIcon = MeshtasticIcons.History,
+            trailingIcon = null,
         )
     }
 
-    LogInsightsEntries()
-
-    SwitchPreference(
-        title = stringResource(Res.string.app_log_level),
-        summary = stringResource(Res.string.app_log_summary),
+    SwitchListItem(
         checked = level != AppLogLevel.OFF,
-        enabled = true,
-        onCheckedChange = { on -> control.setLevel(if (on) AppLogLevel.FULL else AppLogLevel.OFF) },
+        text = stringResource(Res.string.app_log_level),
+        supportingText = stringResource(Res.string.app_log_summary),
+        leadingIcon = MeshtasticIcons.BugReport,
+        onClick = { control.setLevel(if (level == AppLogLevel.OFF) AppLogLevel.FULL else AppLogLevel.OFF) },
     )
+
+    HorizontalDivider()
+    LogInsightsEntries()
     if (control.canOpenFolder) {
-        ListItem(text = stringResource(Res.string.app_log_open_folder), leadingIcon = MeshtasticIcons.List) {
+        ListItem(text = stringResource(Res.string.app_log_open_folder), leadingIcon = MeshtasticIcons.FolderOpen) {
             failed = !control.openFolder()
         }
     }

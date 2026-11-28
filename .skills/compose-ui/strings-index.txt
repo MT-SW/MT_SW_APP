@@ -508,7 +508,6 @@ app_icon_tinted
 app_icon_title
 app_log_choose_folder
 app_log_folder
-app_log_folder_clear
 app_log_folder_none
 app_log_level
 app_log_open_failed
