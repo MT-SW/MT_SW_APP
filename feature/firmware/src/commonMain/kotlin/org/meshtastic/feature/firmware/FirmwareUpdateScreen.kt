@@ -415,7 +415,7 @@ private fun FirmwareUpdateScaffold(
             modifier =
             Modifier.padding(padding)
                 .fillMaxSize()
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(horizontal = 24.dp)
                 .floatingBarEndPadding()
                 .animateContentSize(),

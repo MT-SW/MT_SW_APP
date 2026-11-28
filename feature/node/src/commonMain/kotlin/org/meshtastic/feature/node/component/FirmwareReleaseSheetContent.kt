@@ -52,7 +52,7 @@ fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modi
     val barScroll = rememberScrollState()
     Box(modifier = modifier) {
         Column(
-            modifier = Modifier.verticalScrollWithBar(barScroll).padding(16.dp).fillMaxWidth(),
+            modifier = Modifier.verticalScrollWithBar(barScroll, sideMargin = 16.dp).padding(16.dp).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(text = firmwareRelease.title, style = MaterialTheme.typography.titleLarge)

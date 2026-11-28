@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
@@ -48,7 +49,8 @@ import org.meshtastic.core.ui.util.isDesktopPlatform
  * any window without wrapping the content in a `Box`. On phones and tablets it is a plain `verticalScroll`.
  */
 @Composable
-fun Modifier.verticalScrollWithBar(state: ScrollState): Modifier = desktopScrollbar(state).verticalScroll(state)
+fun Modifier.verticalScrollWithBar(state: ScrollState, sideMargin: Dp = 0.dp): Modifier =
+    desktopScrollbar(state, sideMargin).verticalScroll(state)
 
 /** MT_SW: a `LazyColumn` with our scroll bar on the computer. Same parameters as `LazyColumn`. */
 @Composable
@@ -63,7 +65,8 @@ fun ScrollbarLazyColumn(
     content: LazyListScope.() -> Unit,
 ) {
     LazyColumn(
-        modifier = modifier.desktopScrollbar(state, reverseLayout),
+        modifier =
+        modifier.desktopScrollbar(state, reverseLayout, contentPadding.calculateRightPadding(LayoutDirection.Ltr)),
         state = state,
         contentPadding = contentPadding,
         reverseLayout = reverseLayout,
@@ -75,22 +78,26 @@ fun ScrollbarLazyColumn(
 }
 
 @Composable
-private fun Modifier.desktopScrollbar(state: ScrollState): Modifier =
+private fun Modifier.desktopScrollbar(state: ScrollState, sideMargin: Dp): Modifier =
     if (isDesktopPlatform) {
         // `maxValue` is MAX_VALUE until the first layout, which is not "something to scroll".
         val color = MaterialTheme.colorScheme.onSurface
-        barPlace(state, { state.maxValue in 1 until Int.MAX_VALUE }) { scrollStateBar(state, color) }
+        barPlace(state, sideMargin, { state.maxValue in 1 until Int.MAX_VALUE }) { scrollStateBar(state, color) }
     } else {
         this
     }
 
 /** MT_SW: our scroll bar for a lazy list or grid built by hand. Does nothing outside the computer. */
 @Composable
-fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = false): Modifier =
+fun Modifier.desktopScrollbar(
+    state: LazyListState,
+    reverseLayout: Boolean = false,
+    sideMargin: Dp = 0.dp,
+): Modifier =
     if (isDesktopPlatform) {
         val sizes = remember(state) { LazyItemSizeCache() }
         val color = MaterialTheme.colorScheme.onSurface
-        barPlace(state, { state.canScrollForward || state.canScrollBackward }) {
+        barPlace(state, sideMargin, { state.canScrollForward || state.canScrollBackward }) {
             lazyListBar(state, color, reverseLayout, sizes)
         }
     } else {
@@ -102,7 +109,7 @@ fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = fal
 fun Modifier.desktopScrollbar(state: LazyGridState): Modifier =
     if (isDesktopPlatform) {
         val color = MaterialTheme.colorScheme.onSurface
-        barPlace(state, { state.canScrollForward || state.canScrollBackward }) { lazyGridBar(state, color) }
+        barPlace(state, 0.dp, { state.canScrollForward || state.canScrollBackward }) { lazyGridBar(state, color) }
     } else {
         this
     }
@@ -118,10 +125,18 @@ internal val LocalScrollbarOutset = compositionLocalOf { 0.dp }
  * into the margin and the content keeps its width; elsewhere the content makes room for it.
  */
 @Composable
-private fun Modifier.barPlace(key: Any, canScroll: () -> Boolean, bar: Modifier.() -> Modifier): Modifier {
+private fun Modifier.barPlace(
+    key: Any,
+    sideMargin: Dp,
+    canScroll: () -> Boolean,
+    bar: Modifier.() -> Modifier,
+): Modifier {
     val outset = LocalScrollbarOutset.current
     return if (outset > 0.dp) {
         reachOut(outset).bar().pullBack(outset)
+    } else if (sideMargin >= MIN_SIDE_MARGIN_DP.dp) {
+        // The content already keeps this much free at the side: the bar goes there, adding room would look lopsided.
+        reachOut(-MARGIN_BAR_EDGE_DP.dp).bar().pullBack(-MARGIN_BAR_EDGE_DP.dp)
     } else {
         // Kept a little off the edge, so the bar does not stick to the rim of a window or menu.
         reachOut(-BAR_EDGE_DP.dp).bar().pullBack(-BAR_EDGE_DP.dp).barGutter(key, canScroll)
@@ -167,5 +182,9 @@ private fun Modifier.barGutter(key: Any, canScroll: () -> Boolean): Modifier {
 }
 
 private const val BAR_EDGE_DP = 4
+
+private const val MIN_SIDE_MARGIN_DP = 16
+
+private const val MARGIN_BAR_EDGE_DP = 2
 
 private const val SCROLLBAR_GUTTER_DP = 22

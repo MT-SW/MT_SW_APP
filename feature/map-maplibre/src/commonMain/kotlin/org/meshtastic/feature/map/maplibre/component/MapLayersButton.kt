@@ -126,7 +126,7 @@ private fun MapLayersSheet(
     // height, so they are never pushed off the bottom of a full-screen sheet.
     val barScroll = rememberScrollState()
     Box {
-        Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(barScroll)) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(barScroll, sideMargin = 16.dp)) {
             // A column, not a box: the slot can bring several parts (imported layers, signal survey) and a box would
             // draw
             // them on top of each other.

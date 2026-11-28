@@ -154,7 +154,7 @@ fun LabelPrintSheet(
             Column(
                 modifier =
                 Modifier.fillMaxWidth()
-                    .verticalScrollWithBar(scroll)
+                    .verticalScrollWithBar(scroll, sideMargin = 16.dp)
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),

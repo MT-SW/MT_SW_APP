@@ -158,7 +158,7 @@ internal fun SignalSurveyCellCard(
                 // A square heard by many nodes would otherwise push names past the map's edge.
                 val scroll = rememberScrollState()
                 val bounded =
-                    Modifier.padding(end = 16.dp).heightIn(max = LINKS_MAX_HEIGHT_DP.dp).verticalScrollWithBar(scroll)
+                    Modifier.heightIn(max = LINKS_MAX_HEIGHT_DP.dp).verticalScrollWithBar(scroll)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = bounded) {
                     links.links.forEach { link ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -204,7 +204,6 @@ private fun ReadingsList(readings: List<SurveyReading>, names: Map<Int, String>)
     Column(
         modifier =
             Modifier
-                .padding(end = 16.dp)
                 .heightIn(max = READINGS_MAX_HEIGHT_DP.dp)
                 .verticalScrollWithBar(scroll),
         verticalArrangement = Arrangement.spacedBy(2.dp),

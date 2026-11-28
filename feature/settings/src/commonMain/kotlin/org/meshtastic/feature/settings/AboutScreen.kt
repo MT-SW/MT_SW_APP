@@ -161,7 +161,7 @@ fun AboutScreen(
             Column(
                 modifier =
                 Modifier.fillMaxSize()
-                    .verticalScrollWithBar(scrollState)
+                    .verticalScrollWithBar(scrollState, sideMargin = 16.dp)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
                     .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),

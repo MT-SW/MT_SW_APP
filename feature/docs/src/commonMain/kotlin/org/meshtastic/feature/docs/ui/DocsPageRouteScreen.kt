@@ -263,7 +263,7 @@ fun DocsPageRouteScreen(
                             ),
                             modifier =
                             Modifier.fillMaxSize()
-                                .verticalScrollWithBar(rememberScrollState())
+                                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                                 .padding(16.dp)
                                 .floatingBarEndPadding(),
                         )

@@ -95,7 +95,7 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
                 modifier =
                 Modifier.widthIn(max = maxContentWidth)
                     .fillMaxSize()
-                    .verticalScrollWithBar(rememberScrollState())
+                    .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

@@ -815,7 +815,7 @@ internal fun ConnectedContent(
         modifier =
         Modifier
             .fillMaxSize()
-            .verticalScrollWithBar(rememberScrollState())
+            .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
             .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -978,7 +978,7 @@ private fun ProvisionSuccessContent(ipAddress: String?, onDone: () -> Unit) {
         modifier =
         Modifier
             .fillMaxSize()
-            .verticalScrollWithBar(rememberScrollState())
+            .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
             .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -1158,7 +1158,7 @@ private fun CenteredStatusContent(content: @Composable () -> Unit) {
         modifier =
         Modifier
             .fillMaxSize()
-            .verticalScrollWithBar(rememberScrollState())
+            .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
             .padding(horizontal = 24.dp, vertical = 32.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,

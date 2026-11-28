@@ -453,7 +453,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),

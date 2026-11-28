@@ -263,7 +263,11 @@ fun DesktopSettingsScreen(
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Column(
                 modifier =
-                Modifier.verticalScrollWithBar(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
+                Modifier
+                    .verticalScrollWithBar(scrollState, sideMargin = 16.dp)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val searchViewModel = koinViewModel<SettingsSearchViewModel>()

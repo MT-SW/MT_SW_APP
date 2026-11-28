@@ -303,7 +303,7 @@ fun SnifferSettingsScreen(
                         PaddingValues(
                             start = 16.dp,
                             top = 16.dp,
-                            end = 28.dp,
+                            end = 16.dp,
                             bottom = 16.dp + LocalFloatingBarInset.current,
                         ),
                         verticalArrangement = Arrangement.spacedBy(8.dp),

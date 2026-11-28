@@ -94,7 +94,7 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
     val barScroll = rememberScrollState()
     Box {
         Column(
-            modifier = Modifier.verticalScrollWithBar(barScroll).padding(16.dp),
+            modifier = Modifier.verticalScrollWithBar(barScroll, sideMargin = 16.dp).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             OutlinedTextField(

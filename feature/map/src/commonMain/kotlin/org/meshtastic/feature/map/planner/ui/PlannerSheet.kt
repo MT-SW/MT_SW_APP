@@ -220,7 +220,10 @@ private fun PlannerSheetContent(
     // The title row scrolls together with the content, so the window keeps one smooth background.
     val barScroll = rememberScrollState()
     Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
-        Column(modifier = Modifier.widthIn(max = CONTENT_MAX_WIDTH).fillMaxWidth().verticalScrollWithBar(barScroll)) {
+        Column(modifier = Modifier
+            .widthIn(max = CONTENT_MAX_WIDTH)
+            .fillMaxWidth()
+            .verticalScrollWithBar(barScroll, sideMargin = 16.dp)) {
             PlannerHeader(onClose = onDismiss)
             HorizontalDivider()
             Column(

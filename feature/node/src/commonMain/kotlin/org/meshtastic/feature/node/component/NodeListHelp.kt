@@ -104,7 +104,10 @@ fun NodeListHelp(onDismiss: () -> Unit) {
         Box {
             Column(
                 modifier =
-                Modifier.fillMaxWidth().verticalScrollWithBar(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .verticalScrollWithBar(barScroll, sideMargin = 16.dp)
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(

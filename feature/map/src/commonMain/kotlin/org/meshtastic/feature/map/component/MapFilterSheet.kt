@@ -106,7 +106,7 @@ fun MapFilterSheet(
 internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState, actions: MapFilterActions) {
     val scroll = rememberScrollState()
     Box {
-        Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(scroll)) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(scroll, sideMargin = 16.dp)) {
             Text(
                 text = stringResource(Res.string.map_filter_title),
                 style = MaterialTheme.typography.headlineSmall,

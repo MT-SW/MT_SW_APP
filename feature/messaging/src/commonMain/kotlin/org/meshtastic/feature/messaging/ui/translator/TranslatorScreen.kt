@@ -114,7 +114,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
         }
 
     Column(
-        modifier = modifier.verticalScrollWithBar(rememberScrollState()).padding(16.dp),
+        modifier = modifier.verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (!enabled) {

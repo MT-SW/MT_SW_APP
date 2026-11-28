@@ -144,7 +144,12 @@ fun DisplayMirrorContent(modifier: Modifier = Modifier, viewModel: DisplayMirror
     DisposableEffect(Unit) { onDispose { viewModel.stopMirroring() } }
 
     Column(
-        modifier = modifier.fillMaxSize().imePadding().verticalScrollWithBar(rememberScrollState()).padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .imePadding()
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

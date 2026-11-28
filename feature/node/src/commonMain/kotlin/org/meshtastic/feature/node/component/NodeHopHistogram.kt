@@ -110,7 +110,7 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
         Column(
             modifier =
             Modifier.fillMaxWidth()
-                .verticalScrollWithBar(barScroll)
+                .verticalScrollWithBar(barScroll, sideMargin = 16.dp)
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

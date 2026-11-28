@@ -242,7 +242,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -500,7 +500,7 @@ fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -545,7 +545,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -660,7 +660,7 @@ fun ElementLookScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -745,7 +745,7 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScrollWithBar(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState(), sideMargin = 16.dp)
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
