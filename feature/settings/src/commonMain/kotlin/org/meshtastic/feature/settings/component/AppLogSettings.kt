@@ -33,10 +33,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.app_log_choose_folder
 import org.meshtastic.core.resources.app_log_folder
-import org.meshtastic.core.resources.app_log_folder_clear
-import org.meshtastic.core.resources.app_log_folder_none
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_open_failed
 import org.meshtastic.core.resources.app_log_open_folder
@@ -47,7 +44,6 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.util.rememberOpenDocumentTreeLauncher
 
 /**
  * The fork's log switch: off by default; once on, the app writes everything it does to log files on its own (on a phone
@@ -89,27 +85,6 @@ fun AppLogSettings() {
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
-    }
-    if (control.canChooseFolder) {
-        val chosen by control.chosenFolderName.collectAsStateWithLifecycle()
-        val pickFolder = rememberOpenDocumentTreeLauncher { uri ->
-            if (uri != null) control.onFolderPicked(uri.toString())
-        }
-        ListItem(text = stringResource(Res.string.app_log_choose_folder), leadingIcon = MeshtasticIcons.List) {
-            pickFolder()
-        }
-        Text(
-            text =
-            chosen?.let { stringResource(Res.string.app_log_folder, it) }
-                ?: stringResource(Res.string.app_log_folder_none),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-        if (chosen != null) {
-            ListItem(text = stringResource(Res.string.app_log_folder_clear), leadingIcon = MeshtasticIcons.List) {
-                control.clearChosenFolder()
-            }
-        }
     }
     if (control.canOpenFolder) {
         ListItem(text = stringResource(Res.string.app_log_open_folder), leadingIcon = MeshtasticIcons.List) {

@@ -196,6 +196,7 @@ import org.meshtastic.feature.settings.component.ElementAdvancedSettings
 import org.meshtastic.feature.settings.component.ElementBasicSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FontSettingsItems
+import org.meshtastic.feature.settings.component.LogFolderSettings
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.NavBarBehaviourSettings
 import org.meshtastic.feature.settings.component.NotificationTestSection
@@ -758,10 +759,11 @@ fun DataAndLogsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, 
                 )
             }
 
-            // All the folders in one place: the app's data and the pictures taken in the app.
+            // All the folders in one place: the app's data, the pictures taken in the app and the logs.
             ExpressiveSection(title = stringResource(Res.string.folders_title)) {
                 AiStorageRow()
                 PhotoFolderSettings()
+                LogFolderSettings()
             }
 
             ExpressiveSection(title = stringResource(Res.string.archive_title)) {

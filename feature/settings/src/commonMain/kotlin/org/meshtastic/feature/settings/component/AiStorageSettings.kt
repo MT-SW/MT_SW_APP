@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.ai_storage_none_body
 import org.meshtastic.core.resources.ai_storage_pick
 import org.meshtastic.core.resources.ai_storage_restart_first
 import org.meshtastic.core.resources.ai_storage_summary
+import org.meshtastic.core.resources.app_data_fixed_here
 import org.meshtastic.core.resources.app_data_info_1
 import org.meshtastic.core.resources.app_data_info_2
 import org.meshtastic.core.resources.app_data_info_title
@@ -140,7 +141,13 @@ internal fun AiStorageRow() {
     val info by store.storage.collectAsStateWithLifecycle()
     val move by store.storageMove.collectAsStateWithLifecycle()
     var chooser by remember { mutableStateOf(false) }
-    val i = info ?: return
+    val i =
+        info
+            ?: run {
+                // iPhone and iPad: the place cannot be changed, but it is listed with the other folders.
+                FixedAppDataRow()
+                return
+            }
     val computer = i.choices.isEmpty()
     // Always clickable (a phone without an SD card explains in the dialog why there is only one place to choose).
     val canClick = i.canChange && move !is AiStorageMove.Moving
@@ -373,5 +380,32 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
             val computer = current != null && current.choices.isEmpty()
             if (computer && after != null && after < LOW_SPACE_MB) asking = id to after else startDownload(id)
         }
+    }
+}
+
+@Composable
+private fun FixedAppDataRow() {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(imageVector = MeshtasticIcons.Storage, contentDescription = null)
+            Text(
+                text = stringResource(Res.string.app_data_title),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            InfoButton(
+                Res.string.app_data_info_title,
+                Res.string.app_data_fixed_here,
+                tint = MaterialTheme.colorScheme.StatusYellow,
+            )
+        }
+        Text(
+            text = stringResource(Res.string.app_data_fixed_here),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
