@@ -114,7 +114,7 @@ jmdns = "3.6.5"
 dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.10.0"
-wire = "6.4.7"
+wire = "7.2.2"
 # MT_SW: background blur ("glass") of the floating bars (Apache 2.0, github.com/chrisbanes/haze)
 haze = "2.1.0"
 meshtastic-protobufs = "2.8.3"
