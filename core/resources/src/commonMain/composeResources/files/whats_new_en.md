@@ -4,6 +4,7 @@
 - **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
 - **Red open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
 ## better | Improvements
+- **iPhone/iPad: the system camera in conversations and on hikes.** Instead of our three buttons the phone's full camera opens (zoom, flash, camera switch and more).
 - **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 - **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 ## fix | Fixed bugs

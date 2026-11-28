@@ -30,6 +30,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Ulepszenia
 
+* **iPhone/iPad: systemowy aparat w rozmowach i na wędrówkach.** Zamiast naszych trzech przycisków otwiera się pełny aparat telefonu (m.in. zoom, lampa błyskowa, zmiana kamery).
 * **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 * **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 
@@ -1018,6 +1019,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Improvements
 
+* **iPhone/iPad: the system camera in conversations and on hikes.** Instead of our three buttons the phone's full camera opens (zoom, flash, camera switch and more).
 * **Bluetooth: newer Kable library 0.46.0 (all versions).** When connecting on Android fails while setting the packet size, the next attempt skips that request. Desktop reads the packet size from the device. Still to be checked on devices.
 * **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 

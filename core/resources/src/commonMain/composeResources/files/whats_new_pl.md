@@ -4,6 +4,7 @@
 - **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
 - **Czerwona otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
 ## better | Ulepszenia
+- **iPhone/iPad: systemowy aparat w rozmowach i na wędrówkach.** Zamiast naszych trzech przycisków otwiera się pełny aparat telefonu (m.in. zoom, lampa błyskowa, zmiana kamery).
 - **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 - **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 ## fix | Naprawione błędy
