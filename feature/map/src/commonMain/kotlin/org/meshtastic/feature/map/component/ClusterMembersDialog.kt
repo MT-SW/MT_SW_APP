@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.nodes_at_this_location
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 
 /**
  * Lists the nodes sharing one spot, when zooming in further will not separate them.
@@ -63,7 +63,7 @@ fun ClusterMembersDialog(
         modifier = modifier,
         title = { Text(text = stringResource(Res.string.nodes_at_this_location)) },
         text = {
-            LazyColumn(contentPadding = PaddingValues(vertical = 0.dp)) {
+            ScrollbarLazyColumn(contentPadding = PaddingValues(vertical = 0.dp)) {
                 // Deduped by node number: it is the key and must be unique, and a node can reach the map from two
                 // sources, or arrive as a `num = 0` placeholder.
                 items(items = members.distinctBy { it.nodeNum }, key = { it.nodeNum }) { member ->

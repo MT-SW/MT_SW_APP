@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -49,7 +47,9 @@ import org.meshtastic.core.resources.font_weight_designed
 import org.meshtastic.core.resources.ui_scale_follow_system
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.Slider
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.FONT_SIZE_OPTIONS
@@ -89,7 +89,7 @@ private fun FontFamilyDialog(current: String, onPick: (String) -> Unit, onDismis
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                LazyColumn(Modifier.height(LIST_HEIGHT_DP.dp)) {
+                ScrollbarLazyColumn(Modifier.height(LIST_HEIGHT_DP.dp)) {
                     if (query.isBlank()) {
                         item {
                             ListItem(text = defaultName + if (current.isEmpty()) "  ✓" else "", trailingIcon = null) {
@@ -127,7 +127,7 @@ private fun FontWeightDialog(current: Int, onChange: (Int) -> Unit, onDismiss: (
         title = stringResource(Res.string.font_weight),
         onDismiss = onDismiss,
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                 Text(fontWeightLabel(value), style = MaterialTheme.typography.titleMedium)
                 Slider(
                     value = value.toFloat(),
@@ -153,7 +153,7 @@ private fun FontSizeDialog(current: Int, onPick: (Int) -> Unit, onDismiss: () ->
         title = stringResource(Res.string.font_size),
         onDismiss = onDismiss,
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                 FONT_SIZE_OPTIONS.forEach { percent ->
                     ListItem(
                         text = fontSizeLabel(percent) + if (percent == current) "  ✓" else "",

@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -91,6 +90,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Group
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -219,7 +219,7 @@ fun TracerouteLogScreen(
             )
         },
         listPart = { listModifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(
+            ScrollbarLazyColumn(
                 modifier = listModifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),

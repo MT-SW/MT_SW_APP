@@ -102,6 +102,7 @@ import org.meshtastic.core.resources.search_emoji
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.Popup
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.desktopScrollbar
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -445,6 +446,7 @@ private fun EmojiGrid(
     val cellSize = emojiCellSize()
     LazyVerticalGrid(
         state = gridState,
+        modifier = Modifier.desktopScrollbar(gridState),
         columns = GridCells.Adaptive(minSize = cellSize),
         contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),

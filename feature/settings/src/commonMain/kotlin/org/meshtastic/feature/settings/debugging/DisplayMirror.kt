@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,6 +80,7 @@ import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.Switch
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.input.RemoteKey
@@ -144,7 +144,7 @@ fun DisplayMirrorContent(modifier: Modifier = Modifier, viewModel: DisplayMirror
     DisposableEffect(Unit) { onDispose { viewModel.stopMirroring() } }
 
     Column(
-        modifier = modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier = modifier.fillMaxSize().imePadding().verticalScrollWithBar(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

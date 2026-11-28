@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -184,6 +183,7 @@ import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CheckCircle
@@ -415,7 +415,7 @@ private fun FirmwareUpdateScaffold(
             modifier =
             Modifier.padding(padding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState())
                 .padding(horizontal = 24.dp)
                 .floatingBarEndPadding()
                 .animateContentSize(),

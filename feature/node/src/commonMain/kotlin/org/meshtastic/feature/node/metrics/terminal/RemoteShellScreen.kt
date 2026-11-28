@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -104,6 +103,7 @@ import org.meshtastic.core.resources.remote_shell_subtitle_round_trip
 import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Icon
@@ -306,7 +306,7 @@ private fun TerminalPane(screen: TerminalScreenState, fontSizeSp: Int, showCurso
 
     val textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSizeSp.sp, color = palette.foreground)
     SelectionContainer {
-        LazyColumn(
+        ScrollbarLazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize().padding(TERMINAL_PADDING).clickable(onClick = onTap),
         ) {

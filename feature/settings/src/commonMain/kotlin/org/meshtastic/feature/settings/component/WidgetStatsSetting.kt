@@ -19,7 +19,6 @@ package org.meshtastic.feature.settings.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +34,7 @@ import org.meshtastic.core.resources.widget_stats_summary
 import org.meshtastic.core.resources.widget_stats_title
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
@@ -52,7 +52,7 @@ fun WidgetStatsSettingItem(modifier: Modifier = Modifier) {
                 title = stringResource(Res.string.widget_stats_title),
                 onDismiss = { open = false },
                 text = {
-                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                         Text(stringResource(Res.string.widget_stats_info))
                     }
                 },

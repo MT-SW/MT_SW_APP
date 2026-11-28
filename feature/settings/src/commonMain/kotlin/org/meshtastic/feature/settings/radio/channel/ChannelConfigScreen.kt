@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,6 +64,7 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.dragContainer
 import org.meshtastic.core.ui.component.dragDropItemsIndexed
@@ -270,7 +270,7 @@ private fun ChannelConfigScreen(
 
                 val locationChannel = determineLocationSharingChannel(capabilities, settingsListInput.toList())
 
-                LazyColumn(
+                ScrollbarLazyColumn(
                     modifier =
                     Modifier.dragContainer(dragDropState = dragDropState, haptics = LocalHapticFeedback.current),
                     state = listState,

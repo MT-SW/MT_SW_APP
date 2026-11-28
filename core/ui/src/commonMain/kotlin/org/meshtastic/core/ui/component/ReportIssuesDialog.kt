@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -148,7 +147,7 @@ fun ReportIssuesDialog(
         dismissText = stringResource(Res.string.close),
         onDismiss = onDismiss,
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                 Text(
                     text = stringResource(Res.string.report_issues_intro),
                     style = MaterialTheme.typography.bodyMedium,

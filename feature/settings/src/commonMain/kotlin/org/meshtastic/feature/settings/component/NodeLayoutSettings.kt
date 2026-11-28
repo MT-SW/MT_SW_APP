@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -87,6 +86,7 @@ import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.nodeExtraLegend
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -498,7 +498,7 @@ private fun NodeExtraSettings(
             confirmButton = { TextButton(onClick = { showLegend = false }) { Text("OK") } },
             title = { Text("Znaczenie ikon") },
             text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                     nodeExtraLegend.forEach { (icon, meaning) ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (icon != null) {

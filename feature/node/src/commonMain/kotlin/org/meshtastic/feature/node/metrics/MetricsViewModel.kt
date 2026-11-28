@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -81,6 +80,7 @@ import org.meshtastic.core.resources.neighbors_show_on_map
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.TrackCompare
 import org.meshtastic.core.ui.util.toMessageRes
@@ -366,7 +366,7 @@ open class MetricsViewModel(
         alertManager.showAlert(
             titleRes = titleRes,
             composableMessage = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                     SelectionContainer { Text(text = annotatedMessage) }
                 }
             },
@@ -402,7 +402,7 @@ open class MetricsViewModel(
             alertManager.showAlert(
                 titleRes = Res.string.traceroute,
                 composableMessage = {
-                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                         SelectionContainer { Text(text = annotatedMessage) }
                         if (errorRes != null) {
                             Spacer(modifier = Modifier.height(12.dp))

@@ -34,7 +34,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -111,6 +110,7 @@ import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.popupRim
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.CalendarMonth
 import org.meshtastic.core.ui.icon.Lock
@@ -181,7 +181,7 @@ fun EditWaypointDialog(
                 )
             },
             text = {
-                Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(rememberScrollState())) {
                     OutlinedTextField(
                         value = waypointInput.name,
                         onValueChange = {
@@ -630,7 +630,7 @@ private fun PickerWindow(
             tonalElevation = PICKER_ELEVATION_DP.dp,
         ) {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).padding(PICKER_PADDING_DP.dp),
+                modifier = Modifier.verticalScrollWithBar(rememberScrollState()).padding(PICKER_PADDING_DP.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 title?.invoke()

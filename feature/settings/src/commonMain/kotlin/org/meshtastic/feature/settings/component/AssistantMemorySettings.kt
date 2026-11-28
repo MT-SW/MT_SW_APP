@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -54,6 +53,7 @@ import org.meshtastic.core.resources.ai_memory_summary
 import org.meshtastic.core.resources.ai_memory_title
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 
 /** The switch of the assistant's memory and the dialog with the user's instructions and the assistant's notes. */
 @Composable
@@ -87,7 +87,7 @@ private fun MemoryDialog(memory: AssistantMemory, onClose: () -> Unit) {
         title = { Text(stringResource(Res.string.ai_memory_title)) },
         text = {
             Column(
-                modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
+                modifier = Modifier.heightIn(max = 420.dp).verticalScrollWithBar(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 OutlinedTextField(

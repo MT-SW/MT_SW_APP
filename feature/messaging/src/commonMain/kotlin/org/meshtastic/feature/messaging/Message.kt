@@ -45,7 +45,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -146,6 +145,7 @@ import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.holdBuzz
 import org.meshtastic.core.ui.component.smartScrollToIndex
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -1102,7 +1102,7 @@ internal fun MessageInput(
                 // Our own window with a long text: it scrolls, so nothing is cut off on a small screen.
                 Text(
                     stringResource(Res.string.image_send_message),
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                 )
             },
             confirmButton = {

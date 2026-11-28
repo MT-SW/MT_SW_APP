@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.compat_tips_title
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ReportIssuesDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.CompatStep
@@ -87,7 +87,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                 text = {
                     Text(
                         text = stringResource(Res.string.compat_offer_body),
-                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                     )
                 },
                 confirmButton = {
@@ -118,7 +118,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                             compat.offer.name,
                             compat.offer.sizeMb,
                         ),
-                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                     )
                 },
                 confirmButton = {

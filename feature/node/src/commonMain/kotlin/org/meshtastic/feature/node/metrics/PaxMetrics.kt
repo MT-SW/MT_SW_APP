@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -68,6 +67,7 @@ import org.meshtastic.core.resources.pax_wifi_marker
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Purple
 import org.meshtastic.feature.node.domain.usecase.NodeLogSource
@@ -230,7 +230,7 @@ fun PaxMetricsScreen(metricsViewModel: MetricsViewModel, onNavigateUp: () -> Uni
                     textAlign = TextAlign.Center,
                 )
             } else {
-                LazyColumn(
+                ScrollbarLazyColumn(
                     modifier = modifier.fillMaxSize(),
                     state = lazyListState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = LocalFloatingBarInset.current),

@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -138,7 +137,7 @@ fun MeshtasticDialog(
     // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
     val appDensity = LocalDensity.current
     val scrollState = rememberScrollState()
-    val bodyScroll = if (choices.isNotEmpty()) Modifier.verticalScroll(scrollState) else Modifier
+    val bodyScroll = if (choices.isNotEmpty()) Modifier.verticalScrollWithBar(scrollState) else Modifier
 
     BasicAlertDialog(onDismissRequest = { if (dismissable) onDismiss?.invoke() }, modifier = modifier) {
         CompositionLocalProvider(LocalDensity provides appDensity) {

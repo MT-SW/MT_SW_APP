@@ -18,7 +18,6 @@ package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +42,7 @@ import org.meshtastic.core.resources.db_sync_working
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 
@@ -69,7 +69,7 @@ fun DatabaseSyncSettingItems(
             title = stringResource(Res.string.db_sync_title),
             onDismiss = { open = false },
             text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
+                Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                     Text(stringResource(Res.string.db_sync_info))
                     result?.let { Text("\n$it") }
                     if (busy) Text("\n" + stringResource(Res.string.db_sync_working))

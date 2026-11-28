@@ -42,7 +42,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -142,6 +141,7 @@ import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.styledIndicator
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.CellTower
@@ -1089,7 +1089,7 @@ fun ConnectionsScreen(
                         Column(
                             // The pane is wider by the room for shadows (taken from the margin and the gap), and the
                             // content is inset by the same amount, so the buttons keep their width and place.
-                            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = room),
+                            modifier = Modifier.verticalScrollWithBar(rememberScrollState()).padding(horizontal = room),
                             verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
                         ) {
                             header(this)

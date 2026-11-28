@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
@@ -81,6 +80,7 @@ import org.meshtastic.core.ui.component.Co2Severity
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.PmAqiSeverity
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.GraphColors.Blue
 import org.meshtastic.core.ui.theme.GraphColors.Cyan
@@ -272,7 +272,7 @@ fun AirQualityMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Uni
             )
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(
+            ScrollbarLazyColumn(
                 modifier = modifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),

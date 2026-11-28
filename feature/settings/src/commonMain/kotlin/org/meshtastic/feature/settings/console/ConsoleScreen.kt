@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +67,7 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.floatingBarEndPadding
@@ -141,7 +141,7 @@ fun ConsoleScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(text = stringResource(Res.string.console_intro), style = MaterialTheme.typography.bodySmall)
-            LazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth()) {
+            ScrollbarLazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth()) {
                 items(lines) { line ->
                     Text(text = line, style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Monospace)
                 }

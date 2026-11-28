@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -79,6 +78,7 @@ import org.meshtastic.core.resources.save
 import org.meshtastic.core.resources.voltage
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
@@ -242,7 +242,7 @@ fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
             )
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(
+            ScrollbarLazyColumn(
                 modifier = modifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),

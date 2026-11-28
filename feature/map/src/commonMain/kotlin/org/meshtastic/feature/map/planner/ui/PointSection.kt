@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AssistChip
@@ -96,6 +95,7 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.resources.planner_unit_m_asl
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.FilterChip
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Map
@@ -385,7 +385,7 @@ private fun NodePickerDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
-                    LazyColumn(modifier = Modifier.heightIn(max = NODE_LIST_MAX_HEIGHT)) {
+                    ScrollbarLazyColumn(modifier = Modifier.heightIn(max = NODE_LIST_MAX_HEIGHT)) {
                         items(filtered, key = { it.num }) { node ->
                             NodeRow(node = node, selected = node.num == selectedNum, onClick = { onPick(node.num) })
                             HorizontalDivider()

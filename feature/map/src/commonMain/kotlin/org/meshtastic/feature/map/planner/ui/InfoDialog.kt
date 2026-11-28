@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -96,6 +95,7 @@ import org.meshtastic.core.resources.planner_info_weather_body
 import org.meshtastic.core.resources.planner_info_weather_title
 import org.meshtastic.core.resources.planner_open_tropo_reference
 import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -205,7 +205,7 @@ fun PlannerInfoDialog(topic: PlannerInfoTopic, onDismiss: () -> Unit) {
         title = { Text(stringResource(topic.titleRes())) },
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(text = stringResource(topic.bodyRes()), style = MaterialTheme.typography.bodyMedium)

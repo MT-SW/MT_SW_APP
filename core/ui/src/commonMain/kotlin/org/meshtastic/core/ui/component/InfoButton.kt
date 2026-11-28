@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -69,7 +68,7 @@ fun InfoButton(
             title = { Text(stringResource(title)) },
             text = {
                 Column(
-                    modifier = Modifier.heightIn(max = MAX_HEIGHT.dp).verticalScroll(rememberScrollState()),
+                    modifier = Modifier.heightIn(max = MAX_HEIGHT.dp).verticalScrollWithBar(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     for (body in bodies) {

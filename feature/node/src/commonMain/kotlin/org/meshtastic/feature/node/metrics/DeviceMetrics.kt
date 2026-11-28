@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -81,6 +80,7 @@ import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.voltage
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MaterialBatteryInfo
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.GraphColors.Cyan
 import org.meshtastic.core.ui.theme.GraphColors.Gold
@@ -205,7 +205,7 @@ fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
             )
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
-            LazyColumn(
+            ScrollbarLazyColumn(
                 modifier = modifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
@@ -626,7 +626,7 @@ private fun DeviceMetricsScreenPreview() {
                 )
 
                 /* Device Metric Cards */
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                ScrollbarLazyColumn(modifier = Modifier.fillMaxSize()) {
                     itemsIndexed(
                         telemetries,
                         key = { index, telemetry -> "${telemetry.time}_$index" },

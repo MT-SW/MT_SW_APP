@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -120,7 +119,7 @@ fun DataNoticeScreen(onAccept: () -> Unit, modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(Res.string.data_notice_body),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f).verticalScroll(scroll),
+                    modifier = Modifier.weight(1f).verticalScrollWithBar(scroll),
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
@@ -180,7 +179,7 @@ fun DataWipeDialog(secondaryLabel: StringResource, onSecondary: () -> Unit) {
         text = {
             Text(
                 text = stringResource(Res.string.data_wipe_body),
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
             )
         },
         confirmButton = {
@@ -212,7 +211,7 @@ fun DataNoticeReadDialog(onClose: () -> Unit) {
             Text(
                 text = stringResource(Res.string.data_notice_body),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
             )
         },
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(Res.string.data_notice_close)) } },

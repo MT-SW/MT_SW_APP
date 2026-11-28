@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -51,6 +50,7 @@ import org.meshtastic.core.resources.track_and_share_locations
 import org.meshtastic.core.ui.component.OnboardingBottomBar
 import org.meshtastic.core.ui.component.OnboardingFeature
 import org.meshtastic.core.ui.component.OnboardingFeatureRow
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -96,7 +96,7 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Un
                 Modifier.widthIn(max = maxContentWidth)
                     .fillMaxSize()
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScrollWithBar(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(

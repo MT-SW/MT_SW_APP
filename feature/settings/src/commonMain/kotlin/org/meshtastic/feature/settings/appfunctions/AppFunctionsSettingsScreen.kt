@@ -19,7 +19,6 @@ package org.meshtastic.feature.settings.appfunctions
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -53,6 +52,7 @@ import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SettingsRemote
 import org.meshtastic.core.ui.theme.AppTheme
@@ -91,7 +91,9 @@ fun AppFunctionsSettingsScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).floatingBarEndPadding()) {
+        Column(
+            modifier = Modifier.padding(padding).verticalScrollWithBar(rememberScrollState()).floatingBarEndPadding(),
+        ) {
             MasterToggleSection(
                 masterEnabled = masterEnabled,
                 onToggle = { viewModel.toggle(AppFunctionsSetting.MASTER) },

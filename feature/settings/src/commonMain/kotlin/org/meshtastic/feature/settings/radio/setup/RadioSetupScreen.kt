@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +61,7 @@ import org.meshtastic.core.ui.component.OnboardingBottomBar
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.qr.ScannedQrCodeDialog
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.settings.navigation.ModuleRoute
@@ -205,7 +205,11 @@ fun RadioSetupScreen(
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
                 modifier =
-                Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).floatingBarEndPadding(),
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScrollWithBar(rememberScrollState())
+                    .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // The flow has a known length, so the page shows where it is in it.

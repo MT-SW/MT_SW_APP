@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -59,6 +58,7 @@ import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.feature.docs.data.KbEntry
 import org.meshtastic.feature.docs.data.KbTier
 import org.meshtastic.feature.docs.data.KnowledgeBaseLoader
@@ -95,7 +95,7 @@ fun KnowledgeBaseScreen(onBack: () -> Unit) {
             )
         },
     ) { padding ->
-        LazyColumn(
+        ScrollbarLazyColumn(
             modifier = Modifier.padding(padding).fillMaxSize(),
             contentPadding =
             androidx.compose.foundation.layout.PaddingValues(

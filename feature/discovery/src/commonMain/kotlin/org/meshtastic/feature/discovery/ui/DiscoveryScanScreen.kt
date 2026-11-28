@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -93,6 +92,7 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ProvideAppDensity
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.ArrowBack
@@ -207,7 +207,7 @@ fun DiscoveryScanScreen(
             }
         },
     ) { padding ->
-        LazyColumn(
+        ScrollbarLazyColumn(
             contentPadding =
             androidx.compose.foundation.layout.PaddingValues(
                 top = padding.calculateTopPadding(),

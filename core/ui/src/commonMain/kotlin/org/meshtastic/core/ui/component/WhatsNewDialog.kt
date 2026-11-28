@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -227,7 +226,7 @@ fun WhatsNewDialog(initialRequest: WhatsNewRequest, onDismiss: () -> Unit) {
                             label = { Text(stringResource(Res.string.whats_new_all)) },
                         )
                     }
-                    LazyColumn(
+                    ScrollbarLazyColumn(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {

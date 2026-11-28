@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +41,7 @@ import org.meshtastic.core.resources.assistant_history
 import org.meshtastic.core.resources.assistant_history_empty
 import org.meshtastic.core.resources.assistant_new
 import org.meshtastic.core.ui.component.AlertDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -66,7 +66,7 @@ fun AssistantHistoryDialog(
             if (chats.isEmpty()) {
                 Text(stringResource(empty), style = MaterialTheme.typography.bodyMedium)
             } else {
-                LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+                ScrollbarLazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
                     items(chats, key = { it.id }) { chat ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

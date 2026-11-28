@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -79,6 +78,7 @@ import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -536,7 +536,7 @@ private fun LanguagePickerDialog(onSelectLanguage: (String) -> Unit, onDismiss: 
         onDismiss = onDismiss,
         text = {
             val options = languageOptions()
-            LazyColumn {
+            ScrollbarLazyColumn {
                 items(options) { (tag, displayName) ->
                     ListItem(text = displayName, trailingIcon = null) {
                         onSelectLanguage(tag)

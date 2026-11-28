@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +57,7 @@ import org.meshtastic.core.resources.theme_vivid_dark
 import org.meshtastic.core.resources.theme_vivid_light
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Check
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.MODE_DARK
@@ -119,7 +119,7 @@ fun ThemePickerDialog(currentMode: Int, onClickTheme: (Int) -> Unit, onDismiss: 
         title = stringResource(Res.string.choose_theme),
         onDismiss = onDismiss,
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                 ThemeGroup.entries.forEach { group ->
                     Text(
                         text = stringResource(group.title),

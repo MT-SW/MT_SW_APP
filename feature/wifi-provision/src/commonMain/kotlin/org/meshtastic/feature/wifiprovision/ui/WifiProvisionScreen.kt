@@ -43,13 +43,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -169,9 +167,11 @@ import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.MaterialBluetoothSignalInfo
 import org.meshtastic.core.ui.component.OutlinedButton
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarAction
 import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.core.ui.component.Switch
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.BluetoothSearching
@@ -562,7 +562,7 @@ internal fun DeviceListContent(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
             modifier = Modifier.weight(1f, fill = false),
         ) {
-            LazyColumn {
+            ScrollbarLazyColumn {
                 items(devices, key = { it.address }) { device ->
                     DeviceRow(device = device, showAddress = showAddress, onClick = { onSelect(device.address) })
                 }
@@ -813,7 +813,10 @@ internal fun ConnectedContent(
 
     Column(
         modifier =
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScrollWithBar(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
@@ -860,7 +863,7 @@ internal fun ConnectedContent(
                     shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
                 ) {
-                    LazyColumn(modifier = Modifier.heightIn(max = NETWORK_LIST_MAX_HEIGHT_DP.dp)) {
+                    ScrollbarLazyColumn(modifier = Modifier.heightIn(max = NETWORK_LIST_MAX_HEIGHT_DP.dp)) {
                         items(networks, key = { it.ssid }) { network ->
                             NetworkRow(
                                 network = network,
@@ -973,7 +976,10 @@ private fun ProvisionSuccessContent(ipAddress: String?, onDone: () -> Unit) {
 
     Column(
         modifier =
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScrollWithBar(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(
@@ -1150,7 +1156,10 @@ internal fun MpwrdDisclaimerBanner() {
 private fun CenteredStatusContent(content: @Composable () -> Unit) {
     Column(
         modifier =
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 32.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScrollWithBar(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 32.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

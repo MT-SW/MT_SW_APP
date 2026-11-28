@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -73,6 +72,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.theme.GraphColors
 import org.meshtastic.feature.node.domain.usecase.NodeLogSource
 import org.meshtastic.proto.Telemetry
@@ -127,7 +127,7 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
             // fw+ sends local_stats (heap) and local_stats_extended (CPU/flash/PSRAM) as separate packets in the
             // same telemetry cycle, sharing the same second-resolution `time` — group them into one card.
             val groupedData = remember(filteredData) { filteredData.groupBy { it.time }.values.toList() }
-            LazyColumn(
+            ScrollbarLazyColumn(
                 modifier = listModifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),

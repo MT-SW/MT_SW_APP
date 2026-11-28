@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -47,6 +46,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.settings_search_no_results
 import org.meshtastic.core.resources.settings_search_placeholder
 import org.meshtastic.core.ui.component.MeshtasticSearchBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.util.TabRepress
 
 /** Tag for the collapsed settings search field, so a test can target it rather than the expanded overlay's copy. */
@@ -144,7 +144,7 @@ internal fun SettingsSearchResults(
     } else {
         // Keyed on the resource name, not the text: two entries can share a title and a destination (six controls are
         // called "Enabled"), and a duplicate key crashes the list.
-        LazyColumn(modifier = modifier.fillMaxSize()) {
+        ScrollbarLazyColumn(modifier = modifier.fillMaxSize()) {
             items(results, key = { it.id }) { entry ->
                 SettingsSearchResult(entry = entry, onClick = { onSelect(entry) })
                 HorizontalDivider()

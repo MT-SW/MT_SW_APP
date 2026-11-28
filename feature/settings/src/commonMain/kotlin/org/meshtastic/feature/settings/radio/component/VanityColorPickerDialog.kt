@@ -34,7 +34,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -81,6 +80,7 @@ import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.Slider
 import org.meshtastic.core.ui.component.nodeChipLook
 import org.meshtastic.core.ui.component.nodeChipTextColor
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.theme.SATURATION_VERY_VIVID
 import org.meshtastic.core.ui.theme.SATURATION_VIVID
 import org.meshtastic.core.ui.theme.saturated
@@ -302,7 +302,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
             onDismiss()
         },
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),

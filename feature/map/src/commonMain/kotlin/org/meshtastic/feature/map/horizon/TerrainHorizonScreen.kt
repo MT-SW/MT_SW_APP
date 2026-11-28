@@ -43,11 +43,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -183,11 +181,13 @@ import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.nodeChipFillColors
 import org.meshtastic.core.ui.component.nodeChipTextColor
 import org.meshtastic.core.ui.component.rememberNodeChipStyle
 import org.meshtastic.core.ui.component.rememberViewStyle
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
@@ -359,7 +359,7 @@ fun TerrainHorizonScreen(
                 Text(
                     stringResource(Res.string.terrain_horizon_info_body),
                     fontSize = 13.sp,
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                 )
             },
             confirmButton = { TextButton(onClick = { showInfo = false }) { Text(stringResource(Res.string.close)) } },
@@ -459,7 +459,7 @@ fun TerrainHorizonScreen(
             }
         }
         if (moreOptions) {
-            Column(Modifier.heightIn(max = OPTIONS_MAX_HEIGHT_DP.dp).verticalScroll(rememberScrollState())) {
+            Column(Modifier.heightIn(max = OPTIONS_MAX_HEIGHT_DP.dp).verticalScrollWithBar(rememberScrollState())) {
                 ChipRow(stringResource(Res.string.terrain_horizon_target_antenna)) {
                     HORIZON_ANTENNAS_M.forEach { m ->
                         BrandChip(
@@ -691,7 +691,7 @@ private fun ObserverDialog(nodes: List<HorizonNodeChoice>, onPick: (HorizonObser
                 }
                 when (step) {
                     1 ->
-                        LazyColumn(Modifier.heightIn(max = LIST_HEIGHT_DP.dp)) {
+                        ScrollbarLazyColumn(Modifier.heightIn(max = LIST_HEIGHT_DP.dp)) {
                             items(nodes, key = { it.num }) { node ->
                                 Choice(node.name) { onPick(HorizonObserver.OtherNode(node.num)) }
                             }

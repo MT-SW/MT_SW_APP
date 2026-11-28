@@ -21,7 +21,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +43,7 @@ import org.meshtastic.core.resources.neighbor_info_requested
 import org.meshtastic.core.resources.routing_error_no_response
 import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
@@ -142,7 +142,7 @@ fun NeighborInfoLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit,
             )
         },
         listPart = { listModifier, _, lazyListState, onCardClick ->
-            LazyColumn(modifier = listModifier.fillMaxSize(), state = lazyListState) {
+            ScrollbarLazyColumn(modifier = listModifier.fillMaxSize(), state = lazyListState) {
                 items(entries, key = { it.listKey }) { entry ->
                     val report = entry.report
                     val time = DateFormatter.formatDateTime((report ?: entry.log).received_date)

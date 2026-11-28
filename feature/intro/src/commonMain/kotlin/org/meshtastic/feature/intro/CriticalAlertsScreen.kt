@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -41,6 +40,7 @@ import org.meshtastic.core.resources.critical_alerts
 import org.meshtastic.core.resources.critical_alerts_dnd_request_text
 import org.meshtastic.core.resources.skip
 import org.meshtastic.core.ui.component.OnboardingBottomBar
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.theme.AppTheme
 
 /**
@@ -64,7 +64,7 @@ internal fun CriticalAlertsScreen(onSkip: () -> Unit, onConfigure: () -> Unit) {
     ) { innerPadding ->
         Column(
             modifier =
-            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
+            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScrollWithBar(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(

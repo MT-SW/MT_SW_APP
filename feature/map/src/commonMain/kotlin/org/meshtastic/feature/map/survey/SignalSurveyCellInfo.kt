@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +70,7 @@ import org.meshtastic.core.resources.signal_survey_senders
 import org.meshtastic.core.resources.signal_survey_unplaced
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
@@ -158,7 +158,7 @@ internal fun SignalSurveyCellCard(
                 // A square heard by many nodes would otherwise push names past the map's edge.
                 val scroll = rememberScrollState()
                 val bounded =
-                    Modifier.padding(end = 16.dp).heightIn(max = LINKS_MAX_HEIGHT_DP.dp).verticalScroll(scroll)
+                    Modifier.padding(end = 16.dp).heightIn(max = LINKS_MAX_HEIGHT_DP.dp).verticalScrollWithBar(scroll)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = bounded) {
                     links.links.forEach { link ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -202,7 +202,11 @@ private fun ReadingsToggle(count: Int, open: Boolean, onToggle: () -> Unit) {
 private fun ReadingsList(readings: List<SurveyReading>, names: Map<Int, String>) {
     val scroll = rememberScrollState()
     Column(
-        modifier = Modifier.padding(end = 16.dp).heightIn(max = READINGS_MAX_HEIGHT_DP.dp).verticalScroll(scroll),
+        modifier =
+            Modifier
+                .padding(end = 16.dp)
+                .heightIn(max = READINGS_MAX_HEIGHT_DP.dp)
+                .verticalScrollWithBar(scroll),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         readings.forEachIndexed { index, item ->

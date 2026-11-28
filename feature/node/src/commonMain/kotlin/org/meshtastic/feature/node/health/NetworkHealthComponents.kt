@@ -48,7 +48,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.IconButton
@@ -98,6 +97,7 @@ import org.meshtastic.core.ui.component.SegmentedProgressRing
 import org.meshtastic.core.ui.component.Switch
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.rememberThinRings
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
 import org.meshtastic.core.ui.icon.DataUsage
@@ -683,7 +683,7 @@ internal fun NetworkHealthInfoDialog(
         title = stringResource(Res.string.network_health_info_title),
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(

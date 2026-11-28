@@ -27,10 +27,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -196,9 +194,11 @@ import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosChip
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.util.rememberFileExporter
 import org.meshtastic.feature.settings.component.ExpressiveSection
 
@@ -296,7 +296,7 @@ fun SosScreen(onBack: () -> Unit) {
         Column(
             modifier =
             Modifier.padding(paddingValues)
-                .verticalScroll(rememberScrollState())
+                .verticalScrollWithBar(rememberScrollState())
                 .padding(16.dp)
                 .floatingBarEndPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -1025,7 +1025,7 @@ private fun SosNodePicker(nodes: List<Node>, selected: List<Int>, onToggle: (Int
                         modifier = Modifier.padding(top = 12.dp),
                     )
                 }
-                LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                ScrollbarLazyColumn(modifier = Modifier.padding(top = 8.dp)) {
                     items(shown, key = { it.num }) { node ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -1136,7 +1136,7 @@ private fun SosAcksDialog(acks: List<SosAckEntry>, onExport: () -> Unit, onDismi
             if (acks.isEmpty()) {
                 Text(text = stringResource(Res.string.sos_acks_empty), style = MaterialTheme.typography.bodyMedium)
             } else {
-                LazyColumn {
+                ScrollbarLazyColumn {
                     items(acks) { entry ->
                         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
                             Text(text = entry.name, style = MaterialTheme.typography.titleSmall)

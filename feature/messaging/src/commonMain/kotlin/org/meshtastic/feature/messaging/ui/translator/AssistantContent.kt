@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -128,6 +127,7 @@ import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.DropdownMenu
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.inputFieldColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
@@ -318,7 +318,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             }
         }
 
-        LazyColumn(
+        ScrollbarLazyColumn(
             state = listState,
             modifier = Modifier.nestedScroll(swipeToFold).weight(1f).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),

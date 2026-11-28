@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
@@ -74,6 +73,7 @@ import org.meshtastic.core.resources.usb
 import org.meshtastic.core.resources.usb_blocked_hint
 import org.meshtastic.core.resources.usb_blocked_title
 import org.meshtastic.core.ui.component.Card
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.withShadowInset
 import org.meshtastic.core.ui.icon.Add
@@ -147,7 +147,7 @@ fun DeviceList(
         )
     }
 
-    LazyColumn(
+    ScrollbarLazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding.withShadowInset(rememberShadowInset()),
         verticalArrangement = Arrangement.spacedBy(16.dp),

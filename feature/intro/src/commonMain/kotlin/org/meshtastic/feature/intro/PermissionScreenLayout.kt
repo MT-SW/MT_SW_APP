@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,6 +40,7 @@ import org.meshtastic.core.ui.component.OnboardingFeature
 import org.meshtastic.core.ui.component.OnboardingFeatureRow
 import org.meshtastic.core.ui.component.OnboardingNotice
 import org.meshtastic.core.ui.component.OnboardingPageHeader
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -111,7 +111,7 @@ internal fun PermissionScreenLayout(
     ) { innerPadding ->
         Column(
             modifier =
-            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
+            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScrollWithBar(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OnboardingPageHeader(headline = stringResource(headlineRes), body = stringResource(descriptionRes))

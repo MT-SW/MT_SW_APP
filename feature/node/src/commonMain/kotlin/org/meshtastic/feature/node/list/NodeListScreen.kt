@@ -39,7 +39,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -127,6 +126,7 @@ import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.smartScrollToTop
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.component.withShadowInset
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Icon
@@ -738,7 +738,7 @@ private fun NeighborReportDialog(
             if (message == null) {
                 Text(stringResource(Res.string.neighbors_dialog_empty))
             } else {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier.verticalScrollWithBar(rememberScrollState())) {
                     SelectionContainer {
                         Text(
                             annotateNeighborInfo(

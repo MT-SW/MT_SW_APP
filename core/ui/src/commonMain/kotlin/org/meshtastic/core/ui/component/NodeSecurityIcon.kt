@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -339,7 +338,7 @@ private fun PublicKeyContent(key: ByteString) = Column(horizontalAlignment = Ali
 fun SecurityLegend() {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier.verticalScrollWithBar(rememberScrollState()),
     ) {
         SecurityLegendItems()
     }

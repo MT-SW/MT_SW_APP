@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,6 +48,7 @@ import org.meshtastic.core.resources.app_icon_title
 import org.meshtastic.core.ui.component.Checkbox
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.AppIconStyle
@@ -80,7 +80,7 @@ fun AppIconSettingsItem(current: String, onPick: (String) -> Unit, modifier: Mod
             title = stringResource(Res.string.app_icon_title),
             onDismiss = { open = false },
             text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
+                Column(Modifier.verticalScrollWithBar(rememberScrollState())) {
                     val flat = AppIconStyle.isFlat(current)
                     // One tick for every style below: the same icon without the 3D shading.
                     Row(

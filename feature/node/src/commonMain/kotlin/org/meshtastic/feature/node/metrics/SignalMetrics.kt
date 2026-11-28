@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.ButtonDefaults
@@ -102,6 +101,7 @@ import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LoraSignalIndicator
 import org.meshtastic.core.ui.component.OutlinedButton
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.determineRssiQuality
 import org.meshtastic.core.ui.component.determineSignalQuality
@@ -313,7 +313,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                     )
                 }
             } else {
-                LazyColumn(
+                ScrollbarLazyColumn(
                     modifier = contentModifier.fillMaxSize(),
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),

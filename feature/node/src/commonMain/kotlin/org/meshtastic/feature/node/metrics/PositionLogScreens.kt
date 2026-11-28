@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.IconButton
@@ -86,6 +85,7 @@ import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FileDownload
@@ -224,7 +224,7 @@ fun PositionLogScreen(
                 )
             },
             listPart = { modifier, selectedX, lazyListState, onCardClick ->
-                LazyColumn(
+                ScrollbarLazyColumn(
                     modifier = modifier.fillMaxSize(),
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
@@ -335,7 +335,7 @@ private fun TrackCompareDialog(
                 if (candidates.isEmpty()) {
                     Text(stringResource(Res.string.track_compare_empty))
                 } else {
-                    LazyColumn(modifier = Modifier.heightIn(max = COMPARE_LIST_MAX_HEIGHT.dp)) {
+                    ScrollbarLazyColumn(modifier = Modifier.heightIn(max = COMPARE_LIST_MAX_HEIGHT.dp)) {
                         items(candidates, key = { it.num }) { node ->
                             ListItem(
                                 headlineContent = { Text(node.effectiveLongName) },
