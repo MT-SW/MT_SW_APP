@@ -137,8 +137,8 @@ import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.PermissionRecoveryCard
 import org.meshtastic.core.ui.component.RecoveryCard
 import org.meshtastic.core.ui.component.SosBarScreen
-import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.TransparentModeBanner
+import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.isAdaptiveTwoPaneSplit
 import org.meshtastic.core.ui.component.rememberShadowInset
 import org.meshtastic.core.ui.component.styledIndicator
