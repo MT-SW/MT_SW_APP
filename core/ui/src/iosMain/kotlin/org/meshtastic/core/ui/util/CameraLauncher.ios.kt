@@ -41,15 +41,20 @@ private class CameraDelegate(var onPhoto: (ByteArray, String) -> Unit) :
     UIImagePickerControllerDelegateProtocol,
     UINavigationControllerDelegateProtocol {
     override fun imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo: Map<Any?, *>) {
-        picker.dismissViewControllerAnimated(true, completion = null)
         val image = didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
         val data = image?.let { UIImageJPEGRepresentation(it, JPEG_QUALITY) }
         if (data == null) {
             Logger.w { "Aparat: brak zdjęcia w odpowiedzi aparatu" }
+            picker.dismissViewControllerAnimated(true, completion = null)
             return
         }
         Logger.i { "Aparat: zdjęcie zrobione, ${data.length} bajtów" }
-        onPhoto(data.toByteArray(), "image/jpeg")
+        val bytes = data.toByteArray()
+        // The photo is handed on only once the camera is gone: what the app shows next must not appear under it.
+        picker.dismissViewControllerAnimated(true) {
+            Logger.i { "Aparat: ekran aparatu zamknięty, zdjęcie przekazane dalej" }
+            onPhoto(bytes, "image/jpeg")
+        }
     }
 
     override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {

@@ -36,6 +36,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 
 ##### Poprawione błędy
 
+* **iPhone/iPad: pytanie o wysłanie po zrobieniu zdjęcia.** Zdjęcie jest przekazywane do rozmowy dopiero po zamknięciu aparatu.
 * **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć. Pasek ma własne miejsce obok treści, więc nie zasłania tekstu ani przełączników. Okna „i” (też asystenta i tłumacza) wyglądają jak pozostałe okna: krzyżyk u góry zamiast przycisku na dole, zamykanie przeciągnięciem w dół.
 * **Okna informacyjne i listy wyboru wyglądają jednakowo.** Także w wiadomościach, węzłach, mapie i ustawieniach: krzyżyk u góry i zamykanie przeciągnięciem w dół, bez przycisków „OK”, „Zamknij” i „Anuluj”. Potrzebny przycisk (np. „Wyślij ponownie”, „Pokaż na mapie”) jest pod treścią i przewija się razem z nią. Pytania z wyborem (np. usuwanie) mają przyciski jak dotąd.
 * **Dobra nazwa przy łączeniu.** Urządzenie łączone w tle mogło dostać nazwę innego (np. Bluetooth pokazywał adres sieciowy). Teraz każde zachowuje swoją.
@@ -1025,6 +1026,7 @@ The main things of every version, split by kind of change (the "What's new in th
 
 ##### Fixed bugs
 
+* **iPhone/iPad: the question about sending after taking a picture.** The picture is handed to the conversation only after the camera has closed.
 * **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.
 * **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
 * **Correct name while connecting.** A device connected in the background could get another one's name (e.g. Bluetooth showing a network address). Each now keeps its own.

@@ -54,6 +54,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
@@ -99,6 +100,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import co.touchlab.kermit.Logger
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
@@ -1094,7 +1096,10 @@ internal fun MessageInput(
         pendingImageMimeType = mimeType
     }
 
+    DisposableEffect(Unit) { onDispose { Logger.i { "Zdjęcie: pole wiadomości zamknięte" } } }
+
     pendingImageBytes?.let { bytesToSend ->
+        LaunchedEffect(bytesToSend) { Logger.i { "Zdjęcie: pytanie o wysłanie na ekranie" } }
         AlertDialog(
             onDismissRequest = { pendingImageBytes = null },
             title = { Text(stringResource(Res.string.image_send_title)) },
