@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -40,12 +38,11 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.UiOptions
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.loading
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalCardGroup
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.ProgressSpinner
-import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.feature.node.component.ActiveAlertSection
 import org.meshtastic.feature.node.component.AdministrationSection
 import org.meshtastic.feature.node.component.AvailabilityHistorySection
@@ -121,8 +118,8 @@ fun NodeDetailList(
     // The details run under the floating bar (it shows through), so the list ends with the height of the bar.
     FloatingBarUnderlap()
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+        ScrollbarLazyColumn(
+            modifier = Modifier.fillMaxSize(),
             state = listState,
             contentPadding =
             PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + LocalFloatingBarInset.current),
@@ -186,13 +183,5 @@ fun NodeDetailList(
                 }
             }
         }
-        FastScrollSidebar(
-            listState = listState,
-            itemCount =
-            4 +
-                (if (uiState.metricsState.deviceLinks.isNotEmpty()) 1 else 0) +
-                (if (!uiState.metricsState.isManaged) 1 else 0),
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-        )
     }
 }

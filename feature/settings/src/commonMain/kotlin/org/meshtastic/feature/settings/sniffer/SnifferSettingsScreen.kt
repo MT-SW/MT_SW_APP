@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -75,10 +74,10 @@ import org.meshtastic.core.resources.sniffer_warning_compatibility
 import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
 import org.meshtastic.core.ui.component.AlertDialog
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.StyledSnackbar
 import org.meshtastic.feature.settings.export.rememberLogExportSaver
@@ -297,7 +296,7 @@ fun SnifferSettingsScreen(
                 }
             } else {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    LazyColumn(
+                    ScrollbarLazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding =
@@ -337,11 +336,6 @@ fun SnifferSettingsScreen(
                             }
                         }
                     }
-                    FastScrollSidebar(
-                        listState = listState,
-                        itemCount = display.itemCount,
-                        modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                    )
                 }
             }
         }

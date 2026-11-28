@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
@@ -57,11 +56,11 @@ import org.meshtastic.core.resources.hop_histogram_empty
 import org.meshtastic.core.resources.hop_histogram_title
 import org.meshtastic.core.resources.one_hour
 import org.meshtastic.core.resources.twenty_four_hours
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
 import kotlin.time.Duration.Companion.hours
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 
 /**
  * Counts nodes at each hop distance, as a list indexed by hop (element 0 = direct nodes). The list is contiguous from
@@ -109,7 +108,10 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
     val barScroll = rememberScrollState()
     Box {
         Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
+            modifier =
+            Modifier.fillMaxWidth()
+                .verticalScrollWithBar(barScroll)
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -138,7 +140,6 @@ internal fun HopHistogramContent(nodes: List<Node>, window: HopWindow, onSelectW
                 buckets.forEachIndexed { hop, count -> HopBar(hop = hop, count = count, maxCount = maxCount) }
             }
         }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

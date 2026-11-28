@@ -7,7 +7,7 @@
 - **Bluetooth: nowsza biblioteka Kable 0.46.0 (wszystkie wersje).** Gdy łączenie na Androidzie nie uda się na ustalaniu rozmiaru pakietu, następna próba idzie bez tej prośby. Komputer odczytuje rozmiar pakietu z urządzenia. Do sprawdzenia na urządzeniach.
 - **Nowsze silniki AI (wszystkie wersje).** Asystent, tłumacz i dyktowanie używają llama.cpp b12774 i whisper.cpp 1.9.6. Aplikacja pobierze silnik od nowa. Zaktualizowano też Wire (OnDemand i Sniffer) do 7.2.2.
 ## fix | Naprawione błędy
-- **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć.
+- **Paski przewijania na komputerze we wszystkich oknach.** Brakowało ich m.in. w oknach informacji „i” (także asystenta), w części ustawień, list i wykresów. Pasek pojawia się tylko wtedy, gdy jest co przewinąć. Pasek ma własne miejsce obok treści, więc nie zasłania tekstu ani przełączników.
 - **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku.
 ## orig | Zmiany względem oryginału
 - Zaktualizowano do oryginału w wersji 2.8.6.

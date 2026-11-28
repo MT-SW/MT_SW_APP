@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -82,12 +81,12 @@ import org.meshtastic.core.resources.debug_tab_packets
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
@@ -96,7 +95,6 @@ import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.AnnotationColor
-import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.debugging.DebugViewModel.UiMeshLog
 
@@ -252,8 +250,8 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 return@Column
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                ScrollbarLazyColumn(
+                    modifier = Modifier.fillMaxSize(),
                     state = listState,
                     contentPadding =
                     androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
@@ -291,11 +289,6 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                         )
                     }
                 }
-                FastScrollSidebar(
-                    listState = listState,
-                    itemCount = filteredLogs.size,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                )
             }
         }
     }

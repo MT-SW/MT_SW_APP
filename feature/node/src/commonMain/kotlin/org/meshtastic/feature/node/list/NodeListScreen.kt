@@ -106,7 +106,6 @@ import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
 import org.meshtastic.core.ui.component.Dialog
 import org.meshtastic.core.ui.component.EmptyState
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.LocalNeighborsClick
@@ -121,6 +120,7 @@ import org.meshtastic.core.ui.component.NodeItem
 import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.ScrollToTopEvent
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
@@ -142,7 +142,6 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNeighborMapProvider
 import org.meshtastic.core.ui.util.annotateNeighborInfo
-import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.feature.node.component.DisplayNameDialog
 import org.meshtastic.feature.node.component.LocalNodeContextMenu
@@ -418,9 +417,9 @@ fun NodeListScreen(
             Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
                 // The list runs under the floating bar (shows through its glass) and ends above it.
                 FloatingBarUnderlap()
-                LazyColumn(
+                ScrollbarLazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding =
                     PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
                 ) {
@@ -597,11 +596,6 @@ fun NodeListScreen(
                     }
                     item { Spacer(modifier = Modifier.height(88.dp)) }
                 }
-                FastScrollSidebar(
-                    listState = listState,
-                    itemCount = nodes.size,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                )
             }
         }
     }

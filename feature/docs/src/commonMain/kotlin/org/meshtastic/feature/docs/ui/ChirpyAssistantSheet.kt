@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -78,11 +77,11 @@ import org.meshtastic.core.resources.chirpy_thinking
 import org.meshtastic.core.resources.img_chirpy
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
 import org.meshtastic.core.ui.component.ProgressSpinner
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.elementLook
 import org.meshtastic.core.ui.component.inputFieldColors
 import org.meshtastic.core.ui.icon.Icon
@@ -147,7 +146,7 @@ private fun ChirpyChatSheet(
             // Message list
             val listState = rememberLazyListState()
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
+                ScrollbarLazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
                     item {
                         Text(
                             text = stringResource(CoreRes.string.chirpy_assistant_title),
@@ -164,7 +163,6 @@ private fun ChirpyChatSheet(
                         item { ThinkingBubble() }
                     }
                 }
-                FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
             }
 
             // Input bar — matches messaging MessageInput style

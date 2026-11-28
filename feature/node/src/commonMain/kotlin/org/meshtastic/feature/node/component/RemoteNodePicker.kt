@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -46,9 +45,9 @@ import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.remote_pick_from_list
 import org.meshtastic.core.resources.remote_pick_search
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.NodeChip
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 
 /**
  * MT_SW: a window with our own node list, from which the nodes to manage on the remote device are ticked (many at once,
@@ -90,7 +89,7 @@ internal fun RemoteNodePickerSheet(
         )
         val listState = rememberLazyListState()
         Box(modifier = Modifier.weight(1f, fill = false)) {
-            LazyColumn(state = listState) {
+            ScrollbarLazyColumn(state = listState) {
                 items(shown, key = { it.num }) { node ->
                     Row(
                         modifier =
@@ -117,7 +116,6 @@ internal fun RemoteNodePickerSheet(
                     }
                 }
             }
-            FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

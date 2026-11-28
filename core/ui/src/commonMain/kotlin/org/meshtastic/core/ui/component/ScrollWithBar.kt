@@ -22,9 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 /**
@@ -41,10 +39,9 @@ fun ScrollWithBar(
     val scroll = rememberScrollState()
     Box(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(scroll).then(contentModifier),
+            modifier = Modifier.fillMaxWidth().verticalScrollWithBar(scroll).then(contentModifier),
             verticalArrangement = verticalArrangement,
             content = content,
         )
-        FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
     }
 }

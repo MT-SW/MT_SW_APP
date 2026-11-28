@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +45,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -60,19 +58,18 @@ import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.navigation.TopLevelDestination
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticSearchBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.TabRepress
-import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private const val FOLD_MILLIS = 250
 private const val FOLD_DRAG_SLOP_PX = 1f
@@ -263,8 +260,8 @@ fun NetworkHealthScreen(
             )
 
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                ScrollbarLazyColumn(
+                    modifier = Modifier.fillMaxSize(),
                     state = listState,
                     // The rows keep the same 16 dp sides as the summary card and the search field above them.
                     contentPadding = PaddingValues(bottom = LocalFloatingBarInset.current),
@@ -284,10 +281,6 @@ fun NetworkHealthScreen(
                         )
                     }
                 }
-                FastScrollSidebar(
-                    listState = listState,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                )
                 if (!uiState.isLoaded) FullScreenLoading()
             }
         }

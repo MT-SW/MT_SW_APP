@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -81,12 +80,12 @@ import org.meshtastic.core.resources.what_is_meshtastic
 import org.meshtastic.core.resources.what_is_meshtastic_description
 import org.meshtastic.core.ui.component.DataNoticeReadDialog
 import org.meshtastic.core.ui.component.DataWipeDialog
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Code
 import org.meshtastic.core.ui.icon.Delete
@@ -162,7 +161,7 @@ fun AboutScreen(
             Column(
                 modifier =
                 Modifier.fillMaxSize()
-                    .verticalScroll(scrollState)
+                    .verticalScrollWithBar(scrollState)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
                     .floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -186,10 +185,6 @@ fun AboutScreen(
                 FeatureCreditsSection()
                 CopyrightFooter()
             }
-            FastScrollSidebar(
-                scrollState = scrollState,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            )
         }
     }
 }

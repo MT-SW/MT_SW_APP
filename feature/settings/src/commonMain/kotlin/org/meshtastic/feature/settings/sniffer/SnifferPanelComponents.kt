@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -37,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -77,12 +75,12 @@ import org.meshtastic.core.resources.sniffer_source_mqtt_unavailable_summary
 import org.meshtastic.core.resources.sniffer_source_off
 import org.meshtastic.core.resources.sniffer_source_title
 import org.meshtastic.core.ui.component.BasicListItem
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressSpinner
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.SegmentedButton
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FolderOpen
 import org.meshtastic.core.ui.icon.Icon
@@ -169,7 +167,7 @@ internal fun SnifferGearSheet(
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         val barScroll = rememberScrollState()
         Box {
-            Column(modifier = Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 16.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(barScroll).padding(bottom = 16.dp)) {
                 SnifferSourceSelector(
                     activeSource = activeSource,
                     onSelectSource = onSelectSource,
@@ -213,7 +211,6 @@ internal fun SnifferGearSheet(
                     onClick = onLoadLogClick,
                 )
             }
-            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

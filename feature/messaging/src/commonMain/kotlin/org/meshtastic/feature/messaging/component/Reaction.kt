@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -70,9 +69,9 @@ import org.meshtastic.core.resources.react
 import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.resources.you
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.Rssi
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.TransportIcon
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
@@ -263,7 +262,7 @@ internal fun ReactionDialog(
 
     val barList = rememberLazyListState()
     Box(modifier = Modifier.fillMaxWidth()) {
-        LazyColumn(
+        ScrollbarLazyColumn(
             state = barList,
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -419,6 +418,5 @@ internal fun ReactionDialog(
                 }
             }
         }
-        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }

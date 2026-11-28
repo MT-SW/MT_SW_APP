@@ -26,14 +26,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -66,10 +64,10 @@ import org.meshtastic.core.resources.show_node_links_summary
 import org.meshtastic.core.resources.show_precision_circle
 import org.meshtastic.core.resources.show_waypoints
 import org.meshtastic.core.ui.component.Checkbox
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.label
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.Icon
@@ -108,7 +106,7 @@ fun MapFilterSheet(
 internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState, actions: MapFilterActions) {
     val scroll = rememberScrollState()
     Box {
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(scroll)) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScrollWithBar(scroll)) {
             Text(
                 text = stringResource(Res.string.map_filter_title),
                 style = MaterialTheme.typography.headlineSmall,
@@ -179,7 +177,6 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
                 onSelect = actions.onSelectMaxDistance,
             )
         }
-        FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

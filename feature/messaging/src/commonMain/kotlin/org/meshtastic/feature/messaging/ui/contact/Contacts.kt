@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -133,7 +132,6 @@ import org.meshtastic.core.resources.undo
 import org.meshtastic.core.resources.unmute
 import org.meshtastic.core.resources.unmute_selected
 import org.meshtastic.core.resources.unpin_selected
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
@@ -142,6 +140,7 @@ import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.RadioButton
 import org.meshtastic.core.ui.component.ScrollToTopEvent
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.component.floatingBarEndPadding
 import org.meshtastic.core.ui.component.rememberShadowInset
@@ -161,7 +160,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SelectAll
 import org.meshtastic.core.ui.icon.VolumeMute
 import org.meshtastic.core.ui.icon.VolumeUp
-import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.proto.ChannelSet
@@ -645,9 +643,9 @@ private fun ContactListView(
         Box(modifier = modifier.fillMaxSize()) {
             // The list runs under the floating bar (shows through its glass) and ends above it.
             FloatingBarUnderlap()
-            LazyColumn(
+            ScrollbarLazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding =
                 PaddingValues(bottom = LocalFloatingBarInset.current).withShadowInset(rememberShadowInset()),
             ) {
@@ -685,11 +683,6 @@ private fun ContactListView(
                     haptic = haptic,
                 )
             }
-            FastScrollSidebar(
-                listState = listState,
-                itemCount = contacts.size,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            )
         }
     }
 }

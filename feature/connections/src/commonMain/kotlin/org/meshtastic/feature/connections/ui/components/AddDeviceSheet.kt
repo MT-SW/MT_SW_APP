@@ -26,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
@@ -50,8 +49,8 @@ import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.ip_port
 import org.meshtastic.core.resources.websocket_port_in_url
 import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.feature.connections.TCP_DEVICE_PREFIX
 import org.meshtastic.feature.connections.WEBSOCKET_DEVICE_PREFIX
 
@@ -95,7 +94,7 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
     val barScroll = rememberScrollState()
     Box {
         Column(
-            modifier = Modifier.verticalScroll(barScroll).padding(16.dp),
+            modifier = Modifier.verticalScrollWithBar(barScroll).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             OutlinedTextField(
@@ -137,7 +136,6 @@ internal fun AddDeviceForm(onCancel: () -> Unit, onClickAdd: (address: String, f
                 }
             }
         }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

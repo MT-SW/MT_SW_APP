@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
@@ -90,7 +89,7 @@ import org.meshtastic.core.resources.trips_signal_live
 import org.meshtastic.core.resources.trips_signal_title
 import org.meshtastic.core.ui.component.AlertDialog
 import org.meshtastic.core.ui.component.Checkbox
-import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.util.rememberCameraLauncher
@@ -342,7 +341,7 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                 }
                 val listState = rememberLazyListState()
                 Box(modifier = Modifier.padding(top = 8.dp)) {
-                    LazyColumn(state = listState) {
+                    ScrollbarLazyColumn(state = listState) {
                         items(shown, key = { it.num }) { node ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -353,7 +352,6 @@ private fun QuietNodePicker(nodes: List<Node>, selected: Set<Int>, onToggle: (In
                             }
                         }
                     }
-                    FastScrollSidebar(listState, Modifier.align(Alignment.CenterEnd))
                 }
             }
         },

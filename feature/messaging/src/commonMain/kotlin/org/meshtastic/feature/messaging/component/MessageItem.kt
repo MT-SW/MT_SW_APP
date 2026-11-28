@@ -49,7 +49,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -138,7 +137,6 @@ import org.meshtastic.core.resources.trips_import_done
 import org.meshtastic.core.resources.trips_import_progress
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.Dialog
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.HighlightedText
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ModalBottomSheet
@@ -157,6 +155,7 @@ import org.meshtastic.core.ui.component.onRightClick
 import org.meshtastic.core.ui.component.popupRim
 import org.meshtastic.core.ui.component.pressSpring
 import org.meshtastic.core.ui.component.styledControl
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FormatQuote
@@ -299,7 +298,7 @@ fun MessageItem(
                 ActiveSheet.Actions -> {
                     val actionsScroll = rememberScrollState()
                     Box {
-                        Column(modifier = Modifier.verticalScroll(actionsScroll)) {
+                        Column(modifier = Modifier.verticalScrollWithBar(actionsScroll)) {
                             MessageActionsContent(
                                 quickEmojis = if (canReact) quickEmojis else emptyList(),
                                 canReply = canReply,
@@ -382,7 +381,6 @@ fun MessageItem(
                                 },
                             )
                         }
-                        FastScrollSidebar(actionsScroll, Modifier.align(Alignment.CenterEnd))
                     }
                 }
 

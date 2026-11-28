@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -58,14 +57,13 @@ import org.meshtastic.core.resources.debug_logcat_empty
 import org.meshtastic.core.resources.debug_logcat_refresh
 import org.meshtastic.core.resources.debug_logs_export
 import org.meshtastic.core.resources.debug_logs_export_warning
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FilterChip
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.icon.FileDownload
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
-import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /** Logcat priority levels the user can toggle. Fatal/assert lines carry an unknown code and are always shown. */
 enum class LogLevel(val code: Char) {
@@ -193,9 +191,9 @@ fun LogcatContent(modifier: Modifier = Modifier) {
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
                 SelectionContainer {
-                    LazyColumn(
+                    ScrollbarLazyColumn(
                         state = listState,
-                        modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         items(lines) { line ->
                             Text(
@@ -209,11 +207,6 @@ fun LogcatContent(modifier: Modifier = Modifier) {
                         }
                     }
                 }
-                FastScrollSidebar(
-                    listState = listState,
-                    itemCount = lines.size,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                )
             }
         }
     }

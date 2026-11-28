@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
@@ -65,8 +64,8 @@ import org.meshtastic.core.resources.planner_disclaimer
 import org.meshtastic.core.resources.planner_pick_banner
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.planner_title_by
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -221,7 +220,7 @@ private fun PlannerSheetContent(
     // The title row scrolls together with the content, so the window keeps one smooth background.
     val barScroll = rememberScrollState()
     Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
-        Column(modifier = Modifier.widthIn(max = CONTENT_MAX_WIDTH).fillMaxWidth().verticalScroll(barScroll)) {
+        Column(modifier = Modifier.widthIn(max = CONTENT_MAX_WIDTH).fillMaxWidth().verticalScrollWithBar(barScroll)) {
             PlannerHeader(onClose = onDismiss)
             HorizontalDivider()
             Column(
@@ -240,7 +239,6 @@ private fun PlannerSheetContent(
                 CreditsFooter()
             }
         }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }
 

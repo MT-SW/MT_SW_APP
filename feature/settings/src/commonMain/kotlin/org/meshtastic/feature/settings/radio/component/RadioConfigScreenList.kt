@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +46,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.key.Key
@@ -72,13 +70,12 @@ import org.meshtastic.core.resources.connect_radio_to_change_settings
 import org.meshtastic.core.resources.discard_changes
 import org.meshtastic.core.resources.save_and_restart
 import org.meshtastic.core.resources.save_changes
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.PreferenceFooter
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
-import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.settings.radio.RadioConfigState
 import org.meshtastic.feature.settings.radio.RebootBehavior
 import org.meshtastic.feature.settings.radio.ResponseState
@@ -188,10 +185,9 @@ fun <T : Message<T, *>> RadioConfigScreenList(
                 DisposableEffect(fieldFocus) { onDispose { fieldFocus?.clear(seenRequest.value) } }
 
                 CompositionLocalProvider(LocalFieldHighlight provides highlight) {
-                    LazyColumn(
+                    ScrollbarLazyColumn(
                         modifier =
                         Modifier.fillMaxSize()
-                            .padding(end = if (isDesktopPlatform) 20.dp else 0.dp)
                             .onGloballyPositioned { highlight.listCoordinates = it },
                         state = listState,
                         contentPadding =
@@ -246,10 +242,6 @@ fun <T : Message<T, *>> RadioConfigScreenList(
                         }
                     }
                 }
-                FastScrollSidebar(
-                    listState = listState,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                )
             }
         }
 

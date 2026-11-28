@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -88,11 +87,10 @@ fun EventInfoSheet(edition: EventFirmwareEdition, onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         val barScroll = rememberScrollState()
         Box {
-            Column(Modifier.fillMaxWidth().verticalScroll(barScroll).padding(bottom = 24.dp)) {
+            Column(Modifier.fillMaxWidth().verticalScrollWithBar(barScroll).padding(bottom = 24.dp)) {
                 EventHeader(edition, accent, palette)
                 EventDetails(edition = edition, palette = palette, onOpenUri = uriHandler::openUri)
             }
-            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

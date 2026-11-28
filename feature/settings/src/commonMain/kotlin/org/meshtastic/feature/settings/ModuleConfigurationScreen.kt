@@ -22,12 +22,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,10 +34,10 @@ import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.module_settings
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.navigation.ModuleRoute
@@ -81,7 +79,8 @@ fun ModuleConfigurationScreen(
         val scrollState = rememberScrollState()
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Column(
-                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
+                modifier =
+                Modifier.verticalScrollWithBar(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 ExpressiveSection(title = stringResource(Res.string.module_settings)) {
@@ -96,10 +95,6 @@ fun ModuleConfigurationScreen(
                     }
                 }
             }
-            FastScrollSidebar(
-                scrollState = scrollState,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            )
         }
     }
 }

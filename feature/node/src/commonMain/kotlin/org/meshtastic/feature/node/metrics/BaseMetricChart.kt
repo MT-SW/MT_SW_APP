@@ -43,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -78,7 +77,6 @@ import org.meshtastic.core.resources.expand_chart
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.logs
 import org.meshtastic.core.resources.save
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
@@ -92,7 +90,6 @@ import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Save
-import org.meshtastic.core.ui.util.isDesktopPlatform
 
 private val CARD_PADDING = 6.dp
 private val CARD_CORNER = 16.dp
@@ -404,7 +401,7 @@ fun <T> BaseMetricScreen(
                 listPart = { modifier ->
                     Box(modifier = modifier) {
                         listPart(
-                            Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                            Modifier.fillMaxSize(),
                             selectedX,
                             lazyListState,
                         ) { x ->
@@ -413,11 +410,6 @@ fun <T> BaseMetricScreen(
                                 vicoScrollState.animateScroll(Scroll.Absolute.x(x, CommonCharts.SCROLL_BIAS))
                             }
                         }
-                        FastScrollSidebar(
-                            listState = lazyListState,
-                            itemCount = data.size,
-                            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-                        )
                     }
                 },
             )

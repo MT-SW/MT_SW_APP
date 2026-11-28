@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
@@ -75,9 +74,9 @@ import org.meshtastic.core.resources.widget_adaptive_tracking_shown
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.Button
 import org.meshtastic.core.ui.component.Card
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.RadioButton
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.icon
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Favorite
@@ -276,7 +275,7 @@ fun LiveUpdateChooserSheet(
                 } else {
                     val barList = rememberLazyListState()
                     Box(modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)) {
-                        LazyColumn(
+                        ScrollbarLazyColumn(
                             state = barList,
                             modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp).selectableGroup(),
                         ) {
@@ -288,7 +287,6 @@ fun LiveUpdateChooserSheet(
                                 )
                             }
                         }
-                        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
                     }
                 }
             }

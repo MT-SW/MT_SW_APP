@@ -68,9 +68,8 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
 import org.meshtastic.core.model.hasDisplayName
 import org.meshtastic.core.repository.isSenderMuted
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ProgressSpinner
-import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
@@ -316,8 +315,8 @@ private fun MessageListPagedContent(
             detectTapGestures { openReactionBarFor = null }
         },
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+        ScrollbarLazyColumn(
+            modifier = Modifier.fillMaxSize(),
             state = listState,
             reverseLayout = true,
             contentPadding = PaddingValues(bottom = 24.dp),
@@ -455,12 +454,6 @@ private fun MessageListPagedContent(
                 }
             }
         }
-        FastScrollSidebar(
-            listState = listState,
-            itemCount = state.messages.itemCount,
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            reverseLayout = true,
-        )
     }
 }
 

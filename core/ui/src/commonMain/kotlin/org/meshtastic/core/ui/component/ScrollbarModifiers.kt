@@ -27,10 +27,18 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.offset
 import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /**
@@ -66,7 +74,13 @@ fun ScrollbarLazyColumn(
 
 @Composable
 private fun Modifier.desktopScrollbar(state: ScrollState): Modifier =
-    if (isDesktopPlatform) scrollStateBar(state, MaterialTheme.colorScheme.onSurface) else this
+    if (isDesktopPlatform) {
+        // `maxValue` is MAX_VALUE until the first layout, which is not "something to scroll".
+        scrollStateBar(state, MaterialTheme.colorScheme.onSurface)
+            .barGutter(state) { state.maxValue in 1 until Int.MAX_VALUE }
+    } else {
+        this
+    }
 
 /** MT_SW: our scroll bar for a lazy list or grid built by hand. Does nothing outside the computer. */
 @Composable
@@ -74,6 +88,7 @@ fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = fal
     if (isDesktopPlatform) {
         val sizes = remember(state) { LazyItemSizeCache() }
         lazyListBar(state, MaterialTheme.colorScheme.onSurface, reverseLayout, sizes)
+            .barGutter(state) { state.canScrollForward || state.canScrollBackward }
     } else {
         this
     }
@@ -81,4 +96,35 @@ fun Modifier.desktopScrollbar(state: LazyListState, reverseLayout: Boolean = fal
 /** MT_SW: our scroll bar for a lazy grid. Does nothing outside the computer. */
 @Composable
 fun Modifier.desktopScrollbar(state: LazyGridState): Modifier =
-    if (isDesktopPlatform) lazyGridBar(state, MaterialTheme.colorScheme.onSurface) else this
+    if (isDesktopPlatform) {
+        lazyGridBar(state, MaterialTheme.colorScheme.onSurface)
+            .barGutter(state) { state.canScrollForward || state.canScrollBackward }
+    } else {
+        this
+    }
+
+/**
+ * MT_SW: room of its own for the scroll bar, so it never covers text or switches. Once there is something to scroll,
+ * the content is measured narrower and the same width is added back: a window that wraps its content gets wider, and
+ * one already as wide as it may be gets narrower content. The room is kept for as long as the window lives, so
+ * content whose height follows its width (a picture) cannot make the layout jump back and forth.
+ */
+@Composable
+private fun Modifier.barGutter(key: Any, canScroll: () -> Boolean): Modifier {
+    var needed by remember(key) { mutableStateOf(false) }
+    val scrollable by remember(key) { derivedStateOf(canScroll) }
+    LaunchedEffect(key, scrollable) { if (scrollable) needed = true }
+    return if (needed) {
+        layout { measurable, constraints ->
+            val gutter = SCROLLBAR_GUTTER_DP.dp.roundToPx()
+            val placeable = measurable.measure(constraints.offset(horizontal = -gutter))
+            layout(constraints.constrainWidth(placeable.width + gutter), placeable.height) {
+                placeable.placeRelative(0, 0)
+            }
+        }
+    } else {
+        this
+    }
+}
+
+private const val SCROLLBAR_GUTTER_DP = 14

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -62,10 +61,10 @@ import org.meshtastic.core.resources.mqtt_topic_finder_nothing_yet
 import org.meshtastic.core.resources.mqtt_topic_finder_only_above
 import org.meshtastic.core.resources.mqtt_topic_finder_sample_again
 import org.meshtastic.core.resources.mqtt_topic_finder_subscribing
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.IndeterminateProgressLine
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.ProgressLine
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.proto.ModuleConfig
 
 private const val MAX_ACTIVE_ROWS = 30
@@ -124,7 +123,7 @@ internal fun MqttTopicFinderContent(
 ) {
     val barList = rememberLazyListState()
     Box(modifier = Modifier.fillMaxWidth()) {
-        LazyColumn(
+        ScrollbarLazyColumn(
             state = barList,
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -144,7 +143,6 @@ internal fun MqttTopicFinderContent(
             }
             item { CustomTopic(onPick) }
         }
-        FastScrollSidebar(barList, Modifier.align(Alignment.CenterEnd))
     }
 }
 

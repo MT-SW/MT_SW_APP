@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -73,7 +72,6 @@ import org.meshtastic.core.resources.schema_device_role_tracker_description
 import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
 import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MaterialBatteryInfo
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.Quality
@@ -83,6 +81,7 @@ import org.meshtastic.core.ui.component.RSSI_GOOD_THRESHOLD
 import org.meshtastic.core.ui.component.SecurityLegendItems
 import org.meshtastic.core.ui.component.formatThreshold
 import org.meshtastic.core.ui.component.snrBands
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.label
@@ -105,7 +104,7 @@ fun NodeListHelp(onDismiss: () -> Unit) {
         Box {
             Column(
                 modifier =
-                Modifier.fillMaxWidth().verticalScroll(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
+                Modifier.fillMaxWidth().verticalScrollWithBar(barScroll).padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
@@ -225,7 +224,6 @@ fun NodeListHelp(onDismiss: () -> Unit) {
 
                 roleHelpEntries.forEach { (role, descRes) -> RoleEntry(role, stringResource(descRes)) }
             }
-            FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

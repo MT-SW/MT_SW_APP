@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -108,10 +107,10 @@ import org.meshtastic.core.resources.label_print_search_again
 import org.meshtastic.core.resources.label_print_searching
 import org.meshtastic.core.resources.label_print_stock_hint
 import org.meshtastic.core.resources.open_settings
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.InfoButton
 import org.meshtastic.core.ui.component.ModalBottomSheet
 import org.meshtastic.core.ui.component.SHEET_CROSS_INSET_DP
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Print
 import org.meshtastic.core.ui.util.PermissionStatus
@@ -155,7 +154,7 @@ fun LabelPrintSheet(
             Column(
                 modifier =
                 Modifier.fillMaxWidth()
-                    .verticalScroll(scroll)
+                    .verticalScrollWithBar(scroll)
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -190,7 +189,6 @@ fun LabelPrintSheet(
                     Text(text = stringResource(state.printLabel), modifier = Modifier.padding(start = 8.dp))
                 }
             }
-            FastScrollSidebar(scroll, Modifier.align(Alignment.CenterEnd))
         }
     }
 }

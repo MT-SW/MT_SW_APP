@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
@@ -37,15 +35,14 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.device_links_affiliate_disclosure
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.LocalFloatingBarInset
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SosBarScreen
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /** Directory of every imported msh.to short code. Tapping a row opens `msh.to/{shortCode}` in the browser. */
 @Composable
@@ -76,8 +73,8 @@ fun DeviceLinkDirectoryScreen(
     ) { paddingValues ->
         val listState = rememberLazyListState()
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+            ScrollbarLazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 state = listState,
                 contentPadding =
                 androidx.compose.foundation.layout.PaddingValues(bottom = LocalFloatingBarInset.current),
@@ -102,7 +99,6 @@ fun DeviceLinkDirectoryScreen(
                     )
                 }
             }
-            FastScrollSidebar(listState = listState, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp))
         }
     }
 }

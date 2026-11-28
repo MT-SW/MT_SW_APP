@@ -25,11 +25,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
@@ -40,7 +38,7 @@ import org.meshtastic.core.resources.download
 import org.meshtastic.core.resources.firmware_version
 import org.meshtastic.core.resources.view_release
 import org.meshtastic.core.ui.component.Button
-import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.Icon
 import org.meshtastic.core.ui.icon.LinkIcon
@@ -54,7 +52,7 @@ fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modi
     val barScroll = rememberScrollState()
     Box(modifier = modifier) {
         Column(
-            modifier = Modifier.verticalScroll(barScroll).padding(16.dp).fillMaxWidth(),
+            modifier = Modifier.verticalScrollWithBar(barScroll).padding(16.dp).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(text = firmwareRelease.title, style = MaterialTheme.typography.titleLarge)
@@ -82,6 +80,5 @@ fun FirmwareReleaseSheetContent(firmwareRelease: FirmwareRelease, modifier: Modi
                 }
             }
         }
-        FastScrollSidebar(barScroll, Modifier.align(Alignment.CenterEnd))
     }
 }

@@ -25,14 +25,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,13 +72,13 @@ import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.resources.zh_CN
 import org.meshtastic.core.resources.zh_TW
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.FloatingBarUnderlap
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.ScrollbarLazyColumn
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.component.floatingBarEndPadding
+import org.meshtastic.core.ui.component.verticalScrollWithBar
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.Distance
@@ -264,7 +262,8 @@ fun DesktopSettingsScreen(
         FloatingBarUnderlap()
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Column(
-                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
+                modifier =
+                Modifier.verticalScrollWithBar(scrollState).fillMaxSize().padding(16.dp).floatingBarEndPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val searchViewModel = koinViewModel<SettingsSearchViewModel>()
@@ -471,10 +470,6 @@ fun DesktopSettingsScreen(
                     }
                 }
             }
-            FastScrollSidebar(
-                scrollState = scrollState,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            )
         }
     }
 }
