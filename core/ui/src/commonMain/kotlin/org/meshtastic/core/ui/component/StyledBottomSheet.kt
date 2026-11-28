@@ -75,7 +75,7 @@ private const val WINDOW_MAX_HEIGHT_PERCENT = 0.85f
 private const val SWIPE_CLOSE_DP = 40
 
 /** How far up the wheel must pull, after the rest at the top, to close the window. */
-private const val WHEEL_AGAIN_TICKS = 1f
+private const val WHEEL_AGAIN_TICKS = 0.3f
 private const val WHEEL_PAUSE_MS = 500L
 
 /**
@@ -245,9 +245,9 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Final)
                     val change = event.changes.firstOrNull()
-                    if (event.type == PointerEventType.Scroll && change != null) {
-                        val used = change.isConsumed || change.scrollDelta.y >= 0f
-                        if (wheel.closes(change.uptimeMillis, -change.scrollDelta.y, used)) {
+                    // Empty and sideways events (a trackpad sends them) say nothing and must not break the rest.
+                    if (event.type == PointerEventType.Scroll && change != null && change.scrollDelta.y != 0f) {
+                        if (wheel.closes(change.uptimeMillis, -change.scrollDelta.y, change.isConsumed)) {
                             Logger.i { "Okno: zamknięte przewinięciem do góry" }
                             close.value()
                         }
@@ -309,16 +309,21 @@ private class WheelClose {
     private var ticks = 0f
 
     fun closes(time: Long, up: Float, usedByContent: Boolean): Boolean {
-        val rested = lastEvent?.let { time - it >= WHEEL_PAUSE_MS } == true
+        val gap = lastEvent?.let { time - it }
         lastEvent = time
+        val rested = gap != null && gap >= WHEEL_PAUSE_MS
         var close = false
         if (usedByContent) {
+            if (rested) Logger.d { "Okno: kółko po przerwie przewija jeszcze treść" }
             reset()
         } else {
             if (rested) afterPause = true
-            // Weak pulls after the rest add up.
-            if (afterPause) ticks += up
-            close = ticks >= WHEEL_AGAIN_TICKS
+            if (afterPause) {
+                // Weak pulls add up; a small move back only takes away from them.
+                ticks = (ticks + up).coerceAtLeast(0f)
+                close = ticks >= WHEEL_AGAIN_TICKS
+            }
+            if (rested) Logger.d { "Okno: kółko po przerwie ${gap}ms, ruch $up, zebrane $ticks" }
         }
         if (close) reset()
         return close
