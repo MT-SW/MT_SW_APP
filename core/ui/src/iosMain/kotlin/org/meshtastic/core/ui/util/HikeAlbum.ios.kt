@@ -56,6 +56,7 @@ actual fun saveToHikeAlbum(bytes: ByteArray, fileName: String, folder: String?):
         Logger.w { "Album wędrówek: obrazu nie da się odczytać" }
         return false
     }
+    Logger.i { "Album wędrówek: zapis zdjęcia, odczyt albumu" }
     val defaults = NSUserDefaults.standardUserDefaults
     val known = defaults.stringForKey(ALBUM_ID_KEY)
     val album = known?.let {
@@ -100,6 +101,7 @@ private const val BYTES_PER_MB = 1024L * 1024L
 
 /** The room taken by the pictures in the album "MT_SW" and the free space of the phone's storage. */
 actual fun photoFolderUsage(folder: String?): PhotoFolderUsage? = try {
+    Logger.i { "Album zdjęć: odczyt albumu" }
     var used = 0L
     val known = NSUserDefaults.standardUserDefaults.stringForKey(ALBUM_ID_KEY)
     val album = known?.let {

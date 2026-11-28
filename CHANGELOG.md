@@ -40,6 +40,7 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 * **Dobra nazwa przy łączeniu.** Urządzenie łączone w tle mogło dostać nazwę innego (np. Bluetooth pokazywał adres sieciowy). Teraz każde zachowuje swoją.
 * **Mysz i płytka dotykowa: okna nie zamykają się przypadkiem przy przewijaniu.** Szybkie przewinięcie kółkiem lub płytką dotykową zatrzymuje się na górze. Okno zamyka dopiero drugie przewinięcie do góry po krótkiej przerwie. Na komputerze reszta tego ruchu nie przybliża już mapy pod oknem.
 * **Test asystenta i /sprzet po polsku (wszystkie wersje).** W polskiej aplikacji pytanie testowe i raport o sprzęcie były po angielsku. Teraz mają język aplikacji, a miejsce działania dyktowania jest opisane po polsku. Po polsku jest też porównanie NPU i karty graficznej. Na iPhonie/iPadzie test dyktowania pokazuje, gdzie ono działa (wcześniej „?”).
+* **iPhone/iPad: aplikacja nie zamyka się po zrobieniu zdjęcia i przy wejściu w „Dane i logi”.** Brakowało zgody na odczyt albumu ze zdjęciami. Przy pierwszym użyciu system zapyta o dostęp do Zdjęć.
 * **Wybór folderu na logi nie blokuje aplikacji (wszystkie wersje).** Przy starcie i w „Dane i logi” jest „Zapisuj w folderze aplikacji”. Na iPhonie/iPadzie wybrany folder jest zapamiętywany prościej, a nieudany wybór trafia do logu. Folder na logi jest teraz w sekcji „Foldery”, obok folderu zdjęć i ma własną ikonę. Usunięto „Nie zapisuj logów w folderze”. Pozycje w części o logach mają równy układ i osobne ikony.
 
 ##### Zmiany względem oryginału
@@ -1027,6 +1028,7 @@ The main things of every version, split by kind of change (the "What's new in th
 * **Correct name while connecting.** A device connected in the background could get another one's name (e.g. Bluetooth showing a network address). Each now keeps its own.
 * **Mouse and trackpad: windows no longer close by accident while scrolling.** A fast wheel or trackpad scroll stops at the top. Only a second scroll up after a short pause closes the window. On the computer the rest of that scroll no longer zooms the map under the window.
 * **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too. On iPhone/iPad the dictation test now says where dictation runs (it showed “?”).
+* **iPhone/iPad: the app no longer closes after taking a picture or when opening “Data and logs”.** The permission to read the photo album was missing. The system asks for access to Photos at first use.
 * **The log folder choice no longer blocks the app (all versions).** “Save in the app folder” is offered at start and in “Data and logs”. On iPhone/iPad a picked folder is kept in a simpler way and a failed choice is logged. The log folder now sits in the “Folders” section, next to the photo folder, with its own icon. “Stop saving logs to the folder” was removed. The rows of the log section line up and each has its own icon.
 
 ##### Changes against the original
