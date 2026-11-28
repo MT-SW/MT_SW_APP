@@ -77,8 +77,9 @@ private const val SWIPE_CLOSE_DP = 40
 
 /** How many mouse wheel ticks up, with nothing left to scroll, close the window. */
 private const val WHEEL_CLOSE_TICKS = 3f
-private const val WHEEL_PAUSE_MS = 350L
-private const val WHEEL_READY_MS = 2500L
+private const val WHEEL_AGAIN_TICKS = 1f
+private const val WHEEL_PAUSE_MS = 250L
+private const val WHEEL_READY_MS = 4000L
 
 /**
  * MT_SW: the real (opaque) surface colour of the window we are inside of. Inside a window the theme's surface colour is
@@ -232,14 +233,14 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
         .pointerInput(Unit) {
             // The mouse wheel and the trackpad (computer): see [WheelClose].
             awaitPointerEventScope {
-                val wheel = WheelClose()
+                val wheel = WheelClose(needsPause = isDesktopPlatform)
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Final)
                     val change = event.changes.firstOrNull()
                     if (event.type == PointerEventType.Scroll && change != null) {
                         val used = change.isConsumed || change.scrollDelta.y >= 0f
                         if (wheel.closes(change.uptimeMillis, -change.scrollDelta.y, used)) {
-                            Logger.i { "Okno: zamknięte ponownym przewinięciem do góry po przerwie" }
+                            Logger.i { "Okno: zamknięte przewinięciem do góry" }
                             close.value()
                         }
                     }
@@ -290,42 +291,47 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
 }
 
 /**
- * Closing by scrolling on a computer, made hard to do by accident. One run of the wheel or trackpad (events closer
- * together than [WHEEL_PAUSE_MS]) never closes the window, however fast. The first run that pushes up with the content
- * already at its top only gets ready; a new run, started after a pause and soon enough, closes it.
+ * Closing by scrolling with a wheel or trackpad. On a computer ([needsPause]) it is hard to do by accident: one run of
+ * events (closer together than [WHEEL_PAUSE_MS]) never closes the window, however fast. A push up with the content
+ * already at its top only gets ready; scrolling up again after a pause, soon enough, closes it. Elsewhere (a mouse on a
+ * tablet) a few ticks up close the window, as before.
  */
-private class WheelClose {
+private class WheelClose(private val needsPause: Boolean) {
     private var lastEvent = 0L
     private var readySince: Long? = null
-    private var secondRun = false
+    private var afterPause = false
     private var ticks = 0f
 
     fun closes(time: Long, up: Float, usedByContent: Boolean): Boolean {
-        val newRun = time - lastEvent > WHEEL_PAUSE_MS
+        val sinceLast = time - lastEvent
         lastEvent = time
-        if (newRun) {
-            secondRun = readySince?.let { time - it <= WHEEL_READY_MS } == true
-            readySince = null
-            ticks = 0f
-        }
         var close = false
-        when {
-            usedByContent -> {
-                readySince = null
-                secondRun = false
-                ticks = 0f
+        if (usedByContent) {
+            reset()
+        } else if (!needsPause) {
+            ticks += up
+            close = ticks >= WHEEL_CLOSE_TICKS
+        } else {
+            val ready = readySince?.let { time - it <= WHEEL_READY_MS } == true
+            if (!ready) {
+                reset()
+                Logger.d { "Okno: góra treści, ponowne przewinięcie po przerwie zamknie okno" }
+            } else if (sinceLast > WHEEL_PAUSE_MS) {
+                afterPause = true
             }
-            !secondRun -> readySince = time
-            else -> {
-                ticks += up
-                close = ticks >= WHEEL_CLOSE_TICKS
-                if (close) {
-                    secondRun = false
-                    ticks = 0f
-                }
-            }
+            readySince = time
+            // Weak pushes after the pause add up, also over several short ones.
+            if (afterPause) ticks += up
+            close = ticks >= WHEEL_AGAIN_TICKS
         }
+        if (close) reset()
         return close
+    }
+
+    private fun reset() {
+        readySince = null
+        afterPause = false
+        ticks = 0f
     }
 }
 
