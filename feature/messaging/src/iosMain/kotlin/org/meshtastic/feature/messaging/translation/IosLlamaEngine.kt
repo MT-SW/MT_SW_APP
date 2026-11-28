@@ -24,6 +24,7 @@ import cnames.structs.llama_vocab
 import cnames.structs.mtmd_bitmap
 import cnames.structs.mtmd_context
 import cnames.structs.whisper_context
+import co.touchlab.kermit.Logger
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.CPointer
@@ -145,6 +146,17 @@ class IosLlamaEngine(
 
     override val activeBackend: String
         get() = backend
+
+    /** Where dictation ran last; kept after the model is released, because the report is read afterwards. */
+    private var speechPlace = ""
+
+    override val speechBackend: String
+        get() = speechPlace
+
+    private fun noteSpeechPlace(modelId: String, onGraphicsCard: Boolean) {
+        speechPlace = if (onGraphicsCard) "graphics card (metal)" else "processor"
+        Logger.i(tag = "IosLlamaEngine") { "Dictation with $modelId runs on: $speechPlace" }
+    }
 
     /** The context the loaded model really got: smaller than [CONTEXT_TOKENS] when the phone is short of memory. */
     private var activeContext = CONTEXT_TOKENS
@@ -371,6 +383,7 @@ class IosLlamaEngine(
             reportLoaded("whisper", modelId)
         }
         val w = whisperContext!!
+        noteSpeechPlace(modelId, !isSimulator())
         return memScoped {
             val language = IosDictationLanguage.hint
             val languageCode = language.cstr.ptr
@@ -422,6 +435,7 @@ class IosLlamaEngine(
                         }
                     }
             if (!mtmd_support_audio(mtmd)) error("This model cannot hear")
+            noteSpeechPlace(modelId, !isSimulator())
             val pcm = wavSamples(wav)
             val samples =
                 FloatArray(pcm.size / 2) { i ->
