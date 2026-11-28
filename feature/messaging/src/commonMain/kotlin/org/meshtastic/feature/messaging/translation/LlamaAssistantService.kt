@@ -192,7 +192,9 @@ class LlamaAssistantService(
             if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
                 val info = AiModels.byId(modelId)
-                val pl = data.polish
+                // A command has no language of its own, so the report is in the language of the app.
+                val pl = appLanguage() == "pl"
+                Logger.i(tag = TAG) { "Hardware report in app language ${appLanguage()}" }
                 fun t(polish: String, english: String) = if (pl) polish else english
                 val report =
                     t("Model", "Model") +
@@ -431,10 +433,13 @@ class LlamaAssistantService(
     // A longer general question with no ready-made answer in the knowledge base, so the model has to compose its own.
     override val compatQuestion: String
         get() =
-            if (data.polish) {
+            // The app's language: before the first question nothing else says which language the person uses.
+            if (appLanguage() == "pl") {
+                Logger.i(tag = TAG) { "Test question in app language ${appLanguage()}" }
                 "Wyjaśnij prostymi słowami, dlaczego niebo w ciągu dnia jest niebieskie, a podczas zachodu słońca " +
                     "robi się czerwone i pomarańczowe. Odpowiedz w trzech lub czterech zdaniach."
             } else {
+                Logger.i(tag = TAG) { "Test question in English, app language ${appLanguage()}" }
                 "Explain in simple words why the sky is blue during the day and turns red and orange at sunset. " +
                     "Answer in three or four sentences."
             }
@@ -471,7 +476,7 @@ class LlamaAssistantService(
                 t("Model", "Model") +
                 ": ${model.name} (${model.sizeMb} MB)\n" +
                 t("Gdzie działa", "Where it runs") +
-                ": ${engine.speechBackend.ifBlank { "?" }}\n" +
+                ": ${speechPlace(engine.speechBackend, pl).ifBlank { "?" }}\n" +
                 t("Czas pierwszego uruchomienia", "Time of the first run") +
                 ": $took ms\n" +
                 t("Odpowiedź na ciszę", "Answer to silence") +
@@ -514,6 +519,17 @@ class LlamaAssistantService(
         bytes(data, 4)
         repeat(data) { out.add(0) }
         return out.toByteArray()
+    }
+
+    /** Where dictation runs: the engine names it in English, the report says it in Polish. */
+    private fun speechPlace(name: String, polish: Boolean): String = if (!polish) {
+        name
+    } else {
+        name
+            .replace("graphics card", "karta graficzna")
+            .replace("safe mode", "tryb bezpieczny")
+            .replace("processor", "procesor")
+            .replace("(metal)", "(Metal)")
     }
 
     /** The chip line is stored in English; in Polish its layer count is written in Polish ("36 z 36 warstw na NPU"). */
