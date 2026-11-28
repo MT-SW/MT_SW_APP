@@ -9,6 +9,7 @@
 ## fix | Fixed bugs
 - **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.
 - **Information windows and pick lists look the same.** In messages, nodes, map and settings too: a cross at the top and swipe down to close, without "OK", "Close" and "Cancel" buttons. A needed button (e.g. "Resend", "Show on map") sits under the content and scrolls with it. Questions with a choice (e.g. deleting) keep their buttons.
+- **Correct name while connecting.** A device connected in the background could get another one's name (e.g. Bluetooth showing a network address). Each now keeps its own.
 - **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too.
 ## orig | Changes against the original
 - Updated to the original app, version 2.8.6.

@@ -764,12 +764,21 @@ open class ScannerViewModel(
         }
     }
 
+    // Names of the devices picked from the lists, by address: a device connected in the background gets its own name.
+    private val pickedNames = mutableMapOf<String, String>()
+
     /** True when [address] was saved (or switched on) and is left to the background connections of the app. */
     private suspend fun connectInBackground(address: String): Boolean {
         val prefs = slotsPrefs
         val id =
             if (prefs != null && canConnectInBackground(address)) {
-                prefs.slots.value.firstOrNull { it.address == address }?.id ?: prefs.put(address, null)
+                val known = prefs.slots.value.firstOrNull { it.address == address }
+                val name = pickedNames[address]
+                when {
+                    known == null -> prefs.put(address, name)
+                    known.name.isNullOrBlank() && name != null -> prefs.put(address, name, known.id)
+                    else -> known.id
+                }
             } else {
                 null
             }
@@ -847,7 +856,10 @@ open class ScannerViewModel(
         // handshake; cancelling here keeps the lifecycle ordered: scan → stop → connect.
         stopAllScans()
         recordSelectedTransport(entry.fullAddress)
-        radioPrefs.setDevName(entry.name)
+        pickedNames[entry.fullAddress] = entry.name
+        // The stored name belongs to the device that is shown. A device taken up in the background must not change it,
+        // or the name would later stick to another device.
+        if (slotsPrefs == null || !canConnectInBackground(entry.fullAddress)) radioPrefs.setDevName(entry.name)
         addRecentAddress(entry.fullAddress, entry.name)
         return when (entry) {
             is DeviceListEntry.Ble -> {

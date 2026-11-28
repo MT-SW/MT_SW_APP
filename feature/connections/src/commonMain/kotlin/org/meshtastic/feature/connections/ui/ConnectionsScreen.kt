@@ -713,7 +713,7 @@ fun ConnectionsScreen(
                             ) {
                                 ConnectingDeviceContent(
                                     selectedDevice = radio.address,
-                                    persistedDeviceName = radio.name?.takeIf { it.isNotBlank() },
+                                    persistedDeviceName = radio.name?.takeIf { it.isNotBlank() } ?: radio.shortName,
                                     bleDevices = bleDevices,
                                     discoveredTcpDevices = discoveredTcpDevices,
                                     recentTcpDevices = recentTcpDevices,

@@ -18,6 +18,7 @@ package org.meshtastic.core.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -258,7 +259,14 @@ class RadioChooserViewModel(
         // saved only gets its name refreshed; when all places are taken, the selected radio's place is reused.
         // Devices saved earlier with the same name (the old switch wrote the name of the device shown before): a
         // network device gets its address back as the name, any other duplicate loses the wrong name.
+        // A Bluetooth or USB device saved with the network address of another one as its name loses it.
         viewModelScope.launch {
+            val all = slotsPrefs.slots.first()
+            all.filter { !it.address.startsWith(NETWORK_PREFIX) && it.name?.matches(IP_NAME) == true }
+                .forEach {
+                    Logger.i { "Urządzenia: miejsce ${it.id} miało nazwę innego urządzenia sieciowego, usunięta" }
+                    slotsPrefs.put(it.address, null, it.id)
+                }
             val slots = slotsPrefs.slots.first()
             val seen = mutableSetOf<String>()
             for (slot in slots) {
@@ -356,7 +364,11 @@ class RadioChooserViewModel(
         viewModelScope.launch {
             slotsPrefs.setOff(slot.id, false)
             slotsPrefs.select(slot.id)
-            if (slot.address != radioPrefs.devAddr.value) expectChange()
+            if (slot.address != radioPrefs.devAddr.value) {
+                expectChange()
+                // The name is written before the address, so the device being shown starts with its own name.
+                radioPrefs.setDevName(slot.name)
+            }
             radioController.setDeviceAddress(slot.address)
         }
     }
@@ -420,6 +432,7 @@ class RadioChooserViewModel(
     private companion object {
         const val NO_DEVICE = "n"
         const val NETWORK_PREFIX = "t"
+        val IP_NAME = Regex("""\d{1,3}(\.\d{1,3}){3}(:\d+)?""")
         const val STOP_TIMEOUT_MS = 5_000L
         const val SWITCH_MIN_MS = 700L
         const val BADGE_READ_DELAY_MS = 800L
