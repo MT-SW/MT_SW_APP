@@ -218,7 +218,7 @@ jobs:
 
       - name: Build whisper-server with the Hexagon backend
         run: |
-          docker run --rm --platform linux/amd64 -v "$PWD":/workspace -w /workspace ghcr.io/snapdragon-toolchain/arm64-android:v0.7 bash -c '
+          docker run --rm --platform linux/amd64 -v "$PWD":/workspace -w /workspace ghcr.io/snapdragon-toolchain/arm64-android:v0.8 bash -c '
             set -e
             # Not a login shell: that would reset the image'"'"'s PATH and environment (Ninja, NDK, Hexagon SDK).
             env | grep -i -E "ndk|hexagon|android|^PATH" || true
