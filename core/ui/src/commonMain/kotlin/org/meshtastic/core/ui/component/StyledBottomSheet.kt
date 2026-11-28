@@ -89,6 +89,14 @@ private const val WHEEL_GAP_MS = 25L
 @Suppress("CompositionLocalAllowlist")
 internal val LocalWindowSurface = compositionLocalOf<Color?> { null }
 
+/**
+ * MT_SW: told when a window was closed by the wheel or trackpad. The rest of that scroll still arrives and would act on
+ * what was under the window (the map zooms), so a platform can set this to swallow it.
+ */
+object WheelCloseTail {
+    var onWindowClosed: () -> Unit = {}
+}
+
 /** Width kept free at the right of a window's first row for the close cross (an icon button plus its margin). */
 const val SHEET_CROSS_INSET_DP = 60
 
@@ -252,6 +260,7 @@ private fun Modifier.windowSwipeDownToClose(onClose: () -> Unit): Modifier {
                     if (event.type == PointerEventType.Scroll && change != null && change.scrollDelta.y != 0f) {
                         if (wheel.closes(change.uptimeMillis, -change.scrollDelta.y, change.isConsumed)) {
                             Logger.i { "Okno: zamknięte przewinięciem do góry" }
+                            WheelCloseTail.onWindowClosed()
                             close.value()
                         }
                     }

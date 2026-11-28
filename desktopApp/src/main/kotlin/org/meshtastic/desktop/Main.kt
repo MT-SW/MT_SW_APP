@@ -213,6 +213,7 @@ fun main(args: Array<String>) {
     // Resolving the data directory restricts the default location before any store writes into it.
     desktopDataDir()
     installQuitHandler()
+    DesktopWheelTail.install()
     AutostartControls.current = DesktopAutostart.create()
     SosAlarmSounds.current = DesktopSosAlarmSound()
     // No wallpaper colours on a computer: the saturated theme is the default look.
