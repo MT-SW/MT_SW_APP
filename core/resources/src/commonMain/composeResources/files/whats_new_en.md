@@ -8,7 +8,7 @@
 - **Newer AI engines (all versions).** The assistant, translator and dictation use llama.cpp b12774 and whisper.cpp 1.9.6. The app downloads the engine again. Wire (OnDemand and Sniffer) updated to 7.2.2.
 ## fix | Fixed bugs
 - **Scroll bars in every window on desktop.** They were missing, among others, in the “i” information windows (the assistant's too) and in some settings, lists and charts. The bar appears only when there is something to scroll. It has room of its own beside the content, so it does not cover text or switches. The “i” windows (assistant and translator too) look like the other windows: a cross at the top instead of a button at the bottom, closing by a swipe down.
-- **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there.
+- **Assistant test and /sprzet in the app's language (all versions).** In the Polish app the test question and the hardware report came out in English. Both now use the app's language, and the place where dictation runs is written in Polish there. The NPU and graphics card comparison follows the app's language too.
 ## orig | Changes against the original
 - Updated to the original app, version 2.8.6.
 

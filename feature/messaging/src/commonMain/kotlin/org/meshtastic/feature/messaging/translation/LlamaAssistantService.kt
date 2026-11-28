@@ -431,6 +431,11 @@ class LlamaAssistantService(
         get() = engine.activeBackend
 
     // A longer general question with no ready-made answer in the knowledge base, so the model has to compose its own.
+    override val polishApp: Boolean
+        get() = appLanguage() == "pl"
+
+    override fun placeInAppLanguage(backend: String): String = localBackend(backend, polishApp)
+
     override val compatQuestion: String
         get() =
             // The app's language: before the first question nothing else says which language the person uses.

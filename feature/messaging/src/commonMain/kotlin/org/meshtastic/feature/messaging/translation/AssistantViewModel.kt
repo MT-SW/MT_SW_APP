@@ -234,19 +234,30 @@ class AssistantViewModel(
         return CompatRun(chat, backend, failed, seconds)
     }
 
-    /** Both runs side by side. The time of the question includes starting the model. */
+    /** Both runs side by side, in the language of the app. The time of the question includes starting the model. */
     private fun comparison(npu: CompatRun, gpu: CompatRun): String = buildString {
-        append("NPU: ").append(npu.backend.ifBlank { "?" }).append('\n')
-        append("Question time (with the model start): ").append(roundTenth(npu.seconds)).append(" s\n\n")
-        append("Graphics card (NPU skipped): ").append(gpu.backend.ifBlank { "?" }).append('\n')
-        append("Question time (with the model start): ").append(roundTenth(gpu.seconds)).append(" s\n")
-        append("Errors: ").append(if (gpu.failed) "yes" else "none").append("\n\n")
+        val pl = service.polishApp
+        Logger.i(tag = "AssistantViewModel") { "NPU and graphics card comparison written, Polish: $pl" }
+        fun t(polish: String, english: String) = if (pl) polish else english
+        fun place(run: CompatRun) = service.placeInAppLanguage(run.backend).ifBlank { "?" }
+        val time = t("Czas pytania (razem z uruchomieniem modelu)", "Question time (with the model start)")
+        append("NPU: ").append(place(npu)).append('\n')
+        append(time).append(": ").append(roundTenth(npu.seconds)).append(" s\n\n")
+        append(t("Karta graficzna (NPU pominięte)", "Graphics card (NPU skipped)"))
+        append(": ").append(place(gpu)).append('\n')
+        append(time).append(": ").append(roundTenth(gpu.seconds)).append(" s\n")
+        append(t("Błędy", "Errors")).append(": ")
+        append(if (gpu.failed) t("tak", "yes") else t("brak", "none")).append("\n\n")
         append(
             when {
-                gpu.failed -> "The graphics card run had errors; the NPU result is the reliable one."
-                gpu.seconds < npu.seconds -> "The graphics card was faster."
-                gpu.seconds > npu.seconds -> "The NPU was faster."
-                else -> "Both were equally fast."
+                gpu.failed ->
+                    t(
+                        "Próba na karcie graficznej miała błędy; wiarygodny jest wynik z NPU.",
+                        "The graphics card run had errors; the NPU result is the reliable one.",
+                    )
+                gpu.seconds < npu.seconds -> t("Karta graficzna była szybsza.", "The graphics card was faster.")
+                gpu.seconds > npu.seconds -> t("NPU było szybsze.", "The NPU was faster.")
+                else -> t("Oba były tak samo szybkie.", "Both were equally fast.")
             },
         )
     }
