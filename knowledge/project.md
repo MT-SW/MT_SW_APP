@@ -7,3 +7,9 @@ EN: MT_SW is a regional LoRa mesh project for the Świętokrzyskie region (site:
 PL: Ustawienia sieci mesh w województwie świętokrzyskim: oficjalny preset Narrow Fast, region EU_N_868, częstotliwość 869,44165 MHz. MT_SW nie ma własnego presetu ani regionu – to oficjalne ustawienia Meshtastic. Firmware MT_SW domyślnie startuje z presetem Narrow Fast, ale region trzeba wybrać.
 
 EN: Settings of the mesh network in the Świętokrzyskie region: the official Narrow Fast preset, region EU_N_868, frequency 869.44165 MHz. MT_SW has no preset or region of its own – these are official Meshtastic settings. MT_SW firmware starts with the Narrow Fast preset by default, but the region still has to be chosen.
+
+## Nowości v6 (2.8.6)
+
+- Etykiety z kodem QR na drukarce Niimbot D110 (Bluetooth): przycisk „Drukuj etykietę” przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia. Android, komputer, iPhone/iPad. Źródło: kod aplikacji.
+- Tryb przezroczysty (urządzenie jako surowy modem LoRa dla innego programu): aplikacja ostrzega, nie wysyła wiadomości i pozwala wyłączyć tryb. Źródło: kod aplikacji.
+- Żółta otwarta kłódka przy wiadomości prywatnej: przyszła zaszyfrowana kluczem kanału, nie kluczem publicznym. Źródło: kod aplikacji.

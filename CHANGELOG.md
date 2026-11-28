@@ -20,6 +20,18 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokazuje okno „Nowości w aplikacji”).
 
+#### Wersja v6 (2.8.6)
+
+##### Nowe funkcje
+
+* **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
+* **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
+* **Żółta otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+
+##### Zmiany względem oryginału
+
+* Zaktualizowano do oryginału w wersji 2.8.6.
+
 #### Wersja v5 (2.8.5)
 
 ##### Nowe funkcje
@@ -157,6 +169,13 @@ Najważniejsze rzeczy każdej wersji, podzielone na rodzaje zmian (to samo pokaz
 ## Pełny dziennik zmian według wersji
 
 Każda nowa zmiana trafia pod nagłówek bieżącej wersji.
+
+### v6 (2.8.6) — wersje testowe od 28 listopada 2026
+
+* **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
+* **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
+* **Żółta otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+* Zaktualizowano do oryginału w wersji 2.8.6.
 
 ### v5 (2.8.5) — wersje testowe od 5 listopada 2026
 
@@ -967,6 +986,18 @@ The entries below describe only what this fork adds on top of the original, from
 
 The main things of every version, split by kind of change (the "What's new in the app" window shows the same).
 
+#### Version v6 (2.8.6)
+
+##### New features
+
+* **Labels on a Niimbot D110 printer (Android, desktop, iPhone/iPad).** “Print label” (QR code) when sharing a contact or channels and on the connected device card. Android only in the original. Not yet tried with a printer on desktop and iPhone.
+* **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
+* **Yellow open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
+
+##### Changes against the original
+
+* Updated to the original app, version 2.8.6.
+
 #### Version v5 (2.8.5)
 
 ##### New features
@@ -1104,6 +1135,13 @@ The main things of every version, split by kind of change (the "What's new in th
 ## Full change log by version
 
 Every new change goes under the heading of the current version.
+
+### v6 (2.8.6) — test versions from 28 November 2026
+
+* **Labels on a Niimbot D110 printer (Android, desktop, iPhone/iPad).** “Print label” (QR code) when sharing a contact or channels and on the connected device card. Android only in the original. Not yet tried with a printer on desktop and iPhone.
+* **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
+* **Yellow open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
+* Updated to the original app, version 2.8.6.
 
 ### v5 (2.8.5) — test versions from 5 November 2026
 

@@ -223,6 +223,12 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - Rozpoznawanie niestandardowej edycji firmware używanej w sieci Świętokrzyskiej — appka pokazuje czytelną nazwę zamiast surowej wartości technicznej.
 - Wygenerowany plik tłumaczeń PL uzupełniający ok. 1000 wcześniej brakujących stringów (appka była przetłumaczona na polski w ok. 43%).
 
+## Etykiety, tryb przezroczysty, kłódka klucza kanału (v6)
+
+- Druk etykiet z kodem QR na Niimbot D110: Android, komputer, iPhone/iPad (w oryginale tylko Android).
+- Ostrzeżenie o trybie przezroczystym i wstrzymanie wysyłania.
+- Żółta otwarta kłódka przy odpowiedzi zaszyfrowanej kluczem kanału.
+
 ## Łączność Bluetooth
 
 - **Naprawiona zawodność ponownego łączenia z już sparowanym urządzeniem** — na części telefonów (potwierdzone na Xiaomi/MIUI) appka potrafiła nie połączyć się ponownie z węzłem po tym, jak ten na chwilę zniknął z zasięgu lub się wyłączył, mimo że urządzenie pozostawało sparowane; jedynym działającym obejściem było ręczne odparowanie i sparowanie od nowa. Naprawione poprzez: odświeżanie cache usług GATT przy każdym połączeniu (a nie tylko reaktywnie, po wykryciu problemu), samodzielną negocjację MTU z automatycznym ponowieniem próby zamiast pojedynczej próby wystrzelonej natychmiast po odkryciu usług, oraz dodatkowe mechanizmy wykrywania i odzyskiwania połączenia działające również wtedy, gdy ręczne przerwanie i ponowienie łączenia zerowałoby licznik nieudanych prób.
@@ -300,6 +306,12 @@ ________________________________________________________________________________
 A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) app, developed for the **Świętokrzyskie** mesh radio network (mt-sw.pl). Builds on the upstream KMP/Compose Multiplatform architecture (`fdroid`/`google` flavors, desktop module) and adds a set of local features, fixes, and customizations not found in the upstream version.
 
 Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
+
+## Labels, transparent mode, channel key lock (v6)
+
+- QR code labels on a Niimbot D110: Android, desktop, iPhone/iPad (Android only in the original).
+- Transparent mode warning, with sending held.
+- Yellow open lock on a reply encrypted with a channel key.
 
 ## iPhone and iPad
 

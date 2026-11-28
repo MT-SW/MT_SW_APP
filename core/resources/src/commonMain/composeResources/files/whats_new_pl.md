@@ -1,3 +1,11 @@
+# 6 | Wersja v6 (2.8.6)
+## new | Nowe funkcje
+- **Etykiety na drukarce Niimbot D110 (Android, komputer, iPhone/iPad).** Przy udostępnianiu kontaktu i kanałów oraz na karcie połączonego urządzenia jest „Drukuj etykietę” (kod QR). W oryginale tylko na Androidzie. Na komputerze i iPhonie nie sprawdzone jeszcze z drukarką.
+- **Ostrzeżenie o trybie przezroczystym.** Gdy urządzenie tylko przekazuje surowe sygnały do innego programu, aplikacja ostrzega, wstrzymuje wysyłanie i pozwala wyłączyć ten tryb.
+- **Żółta otwarta kłódka w rozmowie.** Odpowiedź zaszyfrowana kluczem kanału zostaje w tej samej rozmowie prywatnej i jest oznaczona.
+## orig | Zmiany względem oryginału
+- Zaktualizowano do oryginału w wersji 2.8.6.
+
 # 5 | Wersja v5 (2.8.5)
 ## new | Nowe funkcje
 - **Raport tygodniowy sieci (wszystkie wersje, opcja, domyślnie wyłączona).** Przełącznik w „Funkcje MT_SW”: raz na 7 dni (pierwszy tydzień po włączeniu) przychodzi powiadomienie, ile węzłów słyszało Twoje urządzenie w ostatnich 7 dniach, ile jest teraz aktywnych i ile znanych w sumie. Powiadomienie wychodzi tylko przy połączonym radiu z gotową listą węzłów.

@@ -1,3 +1,11 @@
+# 6 | Version v6 (2.8.6)
+## new | New features
+- **Labels on a Niimbot D110 printer (Android, desktop, iPhone/iPad).** “Print label” (QR code) when sharing a contact or channels and on the connected device card. Android only in the original. Not yet tried with a printer on desktop and iPhone.
+- **Transparent mode warning.** When the device only passes raw frames to another program, the app warns, holds sending and can turn the mode off.
+- **Yellow open lock in a conversation.** A reply encrypted with a channel key stays in the same direct chat and is marked.
+## orig | Changes against the original
+- Updated to the original app, version 2.8.6.
+
 # 5 | Version v5 (2.8.5)
 ## new | New features
 - **Weekly network report (all versions, optional, off by default).** A switch in "MT_SW features": once every 7 days (the first one a week after switching on) a notification tells how many nodes your device heard in the last 7 days, how many are active now and how many are known in all. It is posted only with the radio connected and its node list ready.
